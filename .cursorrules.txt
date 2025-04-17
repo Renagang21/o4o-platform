@@ -1,0 +1,6 @@
+
+Use authentication, session, and validation logic from the common-core repository.
+Do not duplicate shared utility functions. Import them from common-core.
+Document new features in the docs repository under the ecommerce/ section.
+Follow RESTful API conventions for all backend routes.
+Keep UI components modular and reusable where possible.
