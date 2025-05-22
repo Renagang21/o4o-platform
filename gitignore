@@ -1,0 +1,23 @@
+# node
+node_modules/
+dist/
+build/
+.next/
+.cache/
+.env
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Runtime
+.pnpm/

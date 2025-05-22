@@ -1,0 +1,15 @@
+{
+  "folders": [
+    { "path": "." },
+    { "path": "services/ecommerce/admin" },
+    { "path": "docs" }
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true
+    }
+  }
+}

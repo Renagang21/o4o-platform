@@ -1,0 +1,4 @@
+* text=auto
+
+# 마크다운 파일은 LF로 고정
+*.md text eol=lf 
