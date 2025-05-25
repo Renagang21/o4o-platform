@@ -1,35 +1,39 @@
-# Node modules
+# node
 node_modules/
-
-# 환경 변수 파일
+dist/
+build/
+.next/
+.cache/
 .env
-.env.*
+.env.*.local
 
-# 로그 파일
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# 운영체제별 불필요 파일
+# OS
 .DS_Store
 Thumbs.db
 
-# 빌드 결과물
-dist/
-build/
-out/
-
-# IDE/에디터 설정
+# IDE
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 
-# 테스트 커버리지
-coverage/
+# Logs
+logs/
+*.log
 
-# 기타
-*.local
+# Runtime
+.pnpm/
+
+# Large files - binary, archive
+*.exe
+*.zip
+*.tar
+*.gz
+*.7z
+*.mp4
+*.avi
+*.mov
+*.iso
+
+# Office documents (optional)
+*.doc*
+*.xls*
+*.ppt*
