@@ -1,54 +1,75 @@
-# React + TypeScript + Vite
+# Yaksa Main Site
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+야크사 메인 사이트는 야크사들의 커뮤니티 플랫폼입니다.
 
-Currently, two official plugins are available:
+## 🚀 시작하기
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 필수 요구사항
 
-## Expanding the ESLint configuration
+- Node.js 18.x 이상
+- pnpm 8.x 이상
+- Git
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 설치
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+# 저장소 클론
+git clone https://github.com/your-org/o4o-platform.git
+cd o4o-platform/services/yaksa-main-site
+
+# 의존성 설치
+pnpm install
+
+# 환경 변수 설정
+cp .env.example .env
+# .env 파일을 열어 필요한 값들을 설정하세요
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 개발 서버 실행
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+pnpm dev
 ```
+
+### 빌드
+
+```bash
+pnpm build
+```
+
+## 🔧 환경 변수
+
+`.env.example` 파일을 참고하여 필요한 환경 변수를 설정하세요:
+
+- `VITE_API_BASE_URL`: API 서버 주소
+- `VITE_SITE_NAME`: 사이트 이름
+- 기타 필요한 환경 변수들...
+
+## 📦 배포
+
+### 수동 배포
+
+```bash
+# 빌드
+pnpm build
+
+# 배포 스크립트 실행
+../scripts/deploy-yaksa.sh
+```
+
+### 자동 배포
+
+GitHub Actions를 통해 main 브랜치에 push되면 자동으로 배포됩니다.
+
+## 🛠 기술 스택
+
+- React 18
+- TypeScript
+- Vite
+- TailwindCSS
+- React Router
+- React Query
+
+## �� 라이선스
+
+MIT License
