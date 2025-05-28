@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+
+
 
 const getBannerContent = (role: string | undefined) => {
   switch (role) {
@@ -31,7 +33,7 @@ const getBannerContent = (role: string | undefined) => {
 };
 
 const OnboardingBanner: React.FC = () => {
-  const  user  = useAuth();
+  const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
