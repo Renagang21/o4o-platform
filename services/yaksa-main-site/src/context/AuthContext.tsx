@@ -1,51 +1,37 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type UserRole = 'b2c' | 'yaksa' | 'admin';
-
+// 'User' 인터페이스를 export 합니다.
 export interface User {
-  id: string;
+  id: string; // id 속성이 여기에 포함되어 있어야 합니다.
   name: string;
   email: string;
-  role: UserRole;
+  role: 'admin' | 'yaksa' | 'user';
 }
 
 interface AuthContextType {
   user: User | null;
-  isAuthenticated: boolean;
   setUser: (user: User | null) => void;
-  logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// AuthContext를 export 합니다.
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-  };
-
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, setUser, logout }}>
+    <AuthContext.Provider value={{ user, setUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthContext; 
+// useAuth는 user만 반환하도록
+export const useAuth = (): User | null => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context.user;
+};
+

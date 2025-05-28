@@ -1,14 +1,15 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
-import useAuth from '../hooks/useAuth';
+import { useAuth, AuthContext } from '../context/AuthContext'; // useAuth 훅과 AuthContext를 모두 import
 
 const AppHeader: React.FC = () => {
-  const { user, logout } = useAuth();
+  const user = useAuth(); // useAuth()는 이제 User | null을 직접 반환합니다.
+  const { setUser } = React.useContext(AuthContext)!; // AuthContext에서 setUser 함수를 가져옵니다.
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    setUser(null); // setUser를 사용하여 로그아웃 처리 (user를 null로 설정)
     navigate('/');
   };
 
@@ -49,4 +50,4 @@ const AppHeader: React.FC = () => {
   );
 };
 
-export default AppHeader; 
+export default AppHeader;
