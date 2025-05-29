@@ -11,6 +11,7 @@ import ProductForm from './pages/ProductForm';
 import ProductList from './pages/ProductList';
 import YaksaApprovalList from './pages/admin/YaksaApprovalList';
 import YaksaApprovalDetail from './pages/admin/YaksaApprovalDetail';
+import HomeEditorPage from './pages/HomeEditor';
 import RoleProtectedRoute from './components/RoleProtectedRoute';
 import YaksaProtectedRoute from './components/YaksaProtectedRoute';
 import { ToastProvider } from './context/ToastContext';
@@ -64,6 +65,14 @@ const App: React.FC = () => {
                   element={
                     <RoleProtectedRoute allowedRoles={['admin']}>
                       <YaksaApprovalDetail />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/home-editor"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin']}>
+                      <HomeEditorPage />
                     </RoleProtectedRoute>
                   }
                 />
