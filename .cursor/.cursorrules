@@ -1,0 +1,16 @@
+{
+  "folders": [
+    "services/yaksa-main-site"
+  ],
+  "ignore": [
+    "node_modules",
+    "dist",
+    ".git",
+    ".vscode",
+    ".cursor",
+    "*.log",
+    "*.local",
+    ".env"
+  ],
+  "defaultLanguage": "typescript"
+} 
