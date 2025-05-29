@@ -1,0 +1,132 @@
+다음은 요청하신 내용을 그대로 마크다운 `.md` 형식으로 정리한 정식 문서입니다.
+
+---
+
+````markdown
+# yaksa.site 배포 구성 정리 문서
+
+작성일: 2025-05-25  
+작성자: yaksa.site 운영자
+
+---
+
+## ✅ 시스템 개요
+
+| 항목           | 내용 |
+|----------------|------|
+| 서버           | AWS Lightsail, Ubuntu 20.04 |
+| 도메인         | `yaksa.site` |
+| 인증서         | Let's Encrypt (certbot으로 발급 완료) |
+| 서비스 포트    | 443 (HTTPS) |
+| 애플리케이션   | React + Vite (`serve` 사용) |
+| 프로세스 매니저 | PM2 |
+| 프론트엔드 빌드 | `vite build` 결과물을 `dist/` 폴더에 저장 |
+| Nginx 역할     | HTTPS 리버스 프록시 (localhost:3000으로 포워딩) |
+
+---
+
+## ✅ 프로젝트 디렉토리 구조
+
+```bash
+/home/ubuntu/o4o-platform/services/yaksa-main-site/
+├── dist/                 # React 정적 빌드 결과
+├── serve-start.sh        # npx serve 실행용 스크립트
+├── package.json
+├── vite.config.ts
+├── tailwind.config.js
+└── ...
+````
+
+---
+
+## ✅ PM2 실행 구성
+
+```bash
+pm2 start ./serve-start.sh --name yaksa-site
+pm2 save
+pm2 startup systemd
+```
+
+`serve-start.sh` 내용:
+
+```bash
+#!/bin/bash
+npx serve -s dist -l 3000
+```
+
+> PM2 + ESM 조합으로 인해 `ERR_REQUIRE_ESM` 오류가 다수 발생함.
+
+---
+
+## ✅ Nginx 설정 (/etc/nginx/sites-available/yaksa.site)
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name yaksa.site www.yaksa.site;
+
+    ssl_certificate /etc/letsencrypt/live/yaksa.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yaksa.site/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+적용 명령:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/yaksa.site /etc/nginx/sites-enabled/yaksa.site
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+---
+
+## ❗ 현재 문제 요약
+
+* `curl -I http://localhost:3000` → **정상 (200 OK)**
+* `curl -I https://yaksa.site` → **500 Internal Server Error**
+* Nginx 설정은 정상이나, 내부 앱(`serve`)이 요청 처리 실패
+* PM2 로그에서 `ERR_REQUIRE_ESM` 오류 지속 발생
+* 빌드는 완료되어 `dist/index.html` 존재
+* `serve`를 직접 실행하거나 systemd로 대체 필요 가능성 있음
+
+---
+
+## 🔍 작업 이력 요약
+
+* Nginx `yaksa.site` 설정 proxy\_pass로 구성 완료
+* `/etc/nginx/sites-enabled/default` 중복 설정 제거
+* PM2 실행/삭제/재등록/스크립트 실행 방식 모두 시도
+* 인증서 위치 확인 및 nginx SSL 구성 테스트 완료
+* nginx -T 결과 기준 설정 적용 정상 확인됨
+
+---
+
+## 📌 다음 요청을 위한 참고 제안
+
+| 제안 방안         | 설명                                                     |
+| ------------- | ------------------------------------------------------ |
+| PM2 미사용       | `serve -s dist -l 3000`을 systemd 또는 background 실행으로 대체 |
+| 정적 파일 서빙      | Nginx에서 직접 `dist/`를 `root`로 서빙 (`try_files` 포함)        |
+| React 앱 빌드 점검 | index.html 및 경로 오류 가능성 확인 필요                           |
+| Vite 설정 점검    | base 경로 및 asset 경로 확인 권장                               |
+
+---
+
+```
+
+---
+
+필요하시면 이 문서를 `.md` 파일로 저장해 GitHub에 넣거나, 다른 개발자에게 그대로 전달하시면 됩니다.  
+다른 포맷이나 추가 정보가 필요하면 말씀만 주세요.
+```

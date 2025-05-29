@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "name": "Code Style",
+      "pattern": "**/*.{js,ts,jsx,tsx}",
+      "actions": [
+        {
+          "type": "format",
+          "config": {
+            "indentSize": 2,
+            "useTabs": false,
+            "singleQuote": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Import Sorting",
+      "pattern": "**/*.{js,ts,jsx,tsx}",
+      "actions": [
+        {
+          "type": "sort-imports",
+          "config": {
+            "newLinesBetweenGroups": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auto-fix Linting",
+      "pattern": "**/*.{js,ts,jsx,tsx}",
+      "actions": [
+        {
+          "type": "lint",
+          "config": {
+            "autoFix": true
+          }
+        }
+      ]
+    }
+  ]
+} 
