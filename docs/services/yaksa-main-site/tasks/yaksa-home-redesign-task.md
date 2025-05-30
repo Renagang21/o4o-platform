@@ -4,7 +4,7 @@
 2025-05-28
 
 ## 📁 저장 위치
-`services/yaksa-main-site/tasks/`
+`o4o-platform/services/yaksa-main-site/src/page/Home.tsx
 
 ## 🎯 작업 목적
 yaksa.site 초기화면(`Home.tsx`)을 미려한 전자상거래 플랫폼 스타일로 리디자인합니다. 현재는 단순한 3개 버튼 UI로 되어 있으나, 브랜드 첫 인상으로써 전문성과 신뢰감을 주는 디자인이 필요합니다.
