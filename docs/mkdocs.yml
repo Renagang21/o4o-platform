@@ -1,0 +1,74 @@
+site_name: MCP Documentation
+site_description: Micro Common Platform Documentation
+site_author: MCP Team
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.tabs.link
+    - content.code.annotate
+
+nav:
+  - Overview: 'index.md'
+  - Architecture:
+    - Overview: 'architecture/overview.md'
+    - System Design: 'architecture/system-design.md'
+  - Services:
+    - Pharmacy Automation: 'services/pharmacy-automation/README.md'
+    - O4O Platform: 'services/o4o-platform/README.md'
+    - AI Services: 'services/ai-services/README.md'
+    - WordPress: 'services/wordpress/README.md'
+  - Core:
+    - Authentication: 'core/auth/README.md'
+    - Payment: 'core/payment/README.md'
+    - Design System: 'core/design-system/README.md'
+  - Guides:
+    - Setup: 'guides/setup/README.md'
+    - Deployment: 'guides/deployment/README.md'
+    - Contribution: 'guides/contribution/README.md'
+  - API:
+    - REST APIs: 'api/rest-apis/README.md'
+    - GraphQL: 'api/graphql/README.md'
+  - Processes:
+    - Development: 'processes/development/README.md'
+    - Testing: 'processes/testing/README.md'
+    - Deployment: 'processes/deployment/README.md'
+  - Standards:
+    - Coding Style: 'standards/coding-style/README.md'
+    - Git Workflow: 'standards/git-workflow/README.md'
+    - Review Process: 'standards/review-process/README.md'
+  - Security:
+    - Policies: 'security/policies/README.md'
+    - Best Practices: 'security/best-practices/README.md'
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde 
