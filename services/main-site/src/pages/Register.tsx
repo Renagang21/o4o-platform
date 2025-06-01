@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuthContext } from '../context/AuthContext';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState<'b2c' | 'yaksa'>('b2c');
+  const { register } = useAuthContext();
+  const [role, setRole] = useState<'user' | 'contributor'>('user');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [license, setLicense] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password) {
       setError('모든 필드를 입력하세요.');
@@ -19,10 +25,26 @@ const Register: React.FC = () => {
       setError('비밀번호는 8자 이상이어야 합니다.');
       return;
     }
+    if (role === 'contributor' && (!license || !phone)) {
+      setError('약사 면허번호와 전화번호를 입력하세요.');
+      return;
+    }
     setError('');
-    // TODO: 실제 회원가입 로직 연결
-    // 회원가입 성공 시 로그인 페이지로 이동
-    navigate('/login');
+    setLoading(true);
+    const result = await register({
+      name,
+      email,
+      password,
+      roles: [role],
+      // 실제로는 license, phone도 서버에 전달해야 함
+    });
+    setLoading(false);
+    if (result.success) {
+      setSuccess('회원가입이 완료되었습니다! 메인페이지로 이동합니다.');
+      setTimeout(() => navigate('/'), 1500);
+    } else {
+      setError(result.message || '회원가입에 실패했습니다.');
+    }
   };
 
   return (
@@ -37,9 +59,9 @@ const Register: React.FC = () => {
                 <input
                   type="radio"
                   name="role"
-                  value="b2c"
-                  checked={role === 'b2c'}
-                  onChange={() => setRole('b2c')}
+                  value="user"
+                  checked={role === 'user'}
+                  onChange={() => setRole('user')}
                   className="accent-blue-600"
                 />
                 소비자
@@ -48,9 +70,9 @@ const Register: React.FC = () => {
                 <input
                   type="radio"
                   name="role"
-                  value="yaksa"
-                  checked={role === 'yaksa'}
-                  onChange={() => setRole('yaksa')}
+                  value="contributor"
+                  checked={role === 'contributor'}
+                  onChange={() => setRole('contributor')}
                   className="accent-blue-600"
                 />
                 약사
@@ -87,12 +109,38 @@ const Register: React.FC = () => {
               required
             />
           </div>
+          {role === 'contributor' && (
+            <>
+              <div>
+                <label className="block text-gray-700 dark:text-gray-200 mb-1">면허번호</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 dark:bg-gray-700 dark:text-white"
+                  value={license}
+                  onChange={e => setLicense(e.target.value)}
+                  required={role === 'contributor'}
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 dark:text-gray-200 mb-1">전화번호</label>
+                <input
+                  type="tel"
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-400 dark:bg-gray-700 dark:text-white"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  required={role === 'contributor'}
+                />
+              </div>
+            </>
+          )}
           {error && <div className="text-red-500 text-sm">{error}</div>}
+          {success && <div className="text-green-600 text-sm">{success}</div>}
           <button
             type="submit"
             className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            회원가입
+            {loading ? '회원가입 중...' : '회원가입'}
           </button>
         </form>
         <div className="my-4 flex items-center justify-between">

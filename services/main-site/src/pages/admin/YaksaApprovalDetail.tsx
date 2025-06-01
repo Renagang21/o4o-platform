@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useToast from '../../hooks/useToast';
+import { useApproval } from './ApprovalContext';
 
 interface ApprovalUser {
   id: string;
@@ -30,25 +31,27 @@ const YaksaApprovalDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [user, setUser] = useState<ApprovalUser | null>(null);
-  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const { getUserById, approveUser, rejectUser } = useApproval();
   const [rejectionReason, setRejectionReason] = useState('');
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // TODO: API 호출로 대체
-    setUser(mockUser);
-  }, [id]);
+  const user = id ? getUserById(id) : null;
 
   const handleApprove = () => {
     if (!user) return;
-    setUser({ ...user, status: 'approved' });
+    setLoading(true);
+    approveUser(user.id);
+    setLoading(false);
     showToast({ type: 'success', message: '약사 회원이 승인되었습니다.' });
     navigate('/admin/approvals');
   };
 
   const handleReject = () => {
     if (!user || !rejectionReason.trim()) return;
-    setUser({ ...user, status: 'rejected', rejectionReason });
+    setLoading(true);
+    rejectUser(user.id, rejectionReason);
+    setLoading(false);
     showToast({ type: 'error', message: '약사 회원이 거절되었습니다.' });
     setIsRejectModalOpen(false);
     navigate('/admin/approvals');
@@ -58,7 +61,7 @@ const YaksaApprovalDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-gray-500 dark:text-gray-400">로딩 중...</p>
+          <p className="text-gray-500 dark:text-gray-400">존재하지 않는 회원입니다.</p>
         </div>
       </div>
     );
@@ -113,12 +116,14 @@ const YaksaApprovalDetail: React.FC = () => {
                 <button
                   onClick={() => setIsRejectModalOpen(true)}
                   className="px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20"
+                  disabled={loading}
                 >
                   거절
                 </button>
                 <button
                   onClick={handleApprove}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                  disabled={loading}
                 >
                   승인
                 </button>
@@ -157,7 +162,7 @@ const YaksaApprovalDetail: React.FC = () => {
               </button>
               <button
                 onClick={handleReject}
-                disabled={!rejectionReason.trim()}
+                disabled={!rejectionReason.trim() || loading}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-red-500 dark:hover:bg-red-600"
               >
                 거절하기
