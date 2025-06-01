@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuthContext } from '../context/AuthContext';
 
 // 예시: user context에서 role을 가져온다고 가정
 // 실제로는 AuthContext 등에서 가져와야 함
@@ -15,10 +15,10 @@ interface RoleProtectedRouteProps {
 }
 
 const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ allowedRoles, children }) => {
-  const  user  = useAuth();
+  const { user } = useAuthContext();
   const location = useLocation();
 
-  if (!user || !allowedRoles.includes(user.role)) {
+  if (!user || !allowedRoles.some(role => user.roles.includes(role))) {
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 

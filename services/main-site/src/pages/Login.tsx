@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuthContext } from '../context/AuthContext';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 실제 로그인 로직 연결
     if (!email || !password) {
       setError('이메일과 비밀번호를 입력하세요.');
       return;
     }
     setError('');
-    // 로그인 성공 시 홈으로 이동
-    navigate('/');
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+    if (result.success) {
+      navigate('/');
+    } else {
+      setError(result.message || '로그인에 실패했습니다.');
+    }
   };
 
   return (
@@ -48,8 +56,9 @@ const Login: React.FC = () => {
           <button
             type="submit"
             className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            로그인
+            {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
         <div className="my-4 flex items-center justify-between">
