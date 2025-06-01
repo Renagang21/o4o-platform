@@ -6,13 +6,13 @@ interface User {
   email: string;
   name: string;
   status: string;
-  role: 'superadmin' | 'manager' | 'editor' | 'viewer';
+  roles: string[];
 }
 
 const mockUsers: User[] = [
-  { id: '1', email: 'user1@email.com', name: '홍길동', status: '정상', role: 'viewer' },
-  { id: '2', email: 'user2@email.com', name: '김철수', status: '정상', role: 'manager' },
-  { id: '3', email: 'admin@email.com', name: '관리자', status: '정상', role: 'superadmin' },
+  { id: '1', email: 'user1@email.com', name: '홍길동', status: '정상', roles: ['viewer'] },
+  { id: '2', email: 'user2@email.com', name: '김철수', status: '정상', roles: ['manager'] },
+  { id: '3', email: 'admin@email.com', name: '관리자', status: '정상', roles: ['superadmin'] },
 ];
 
 const roleOptions = [
@@ -41,12 +41,12 @@ const AdminUsers: React.FC = () => {
     setUsers(users.filter((u) => u.id !== id));
     if (user) logAdminAction('회원 삭제', user.email, `${user.name} 삭제`);
   };
-  const handleRoleChange = (id: string, role: User['role']) => {
+  const handleRoleChange = (id: string, role: User['roles'][number]) => {
     const user = users.find(u => u.id === id);
-    if (user && user.role !== role) {
-      logAdminAction('권한 변경', user.email, `권한 변경: ${user.role}→${role}`);
+    if (user && !user.roles.includes(role)) {
+      logAdminAction('권한 변경', user.email, `권한 변경: ${user.roles[0]}→${role}`);
     }
-    setUsers(users.map((u) => (u.id === id ? { ...u, role } : u)));
+    setUsers(users.map((u) => (u.id === id ? { ...u, roles: [role] } : u)));
   };
 
   return (
@@ -70,11 +70,11 @@ const AdminUsers: React.FC = () => {
                 <td className="px-4 py-2 border-b">{user.name}</td>
                 <td className="px-4 py-2 border-b">{user.status}</td>
                 <td className="px-4 py-2 border-b">
-                  {admin?.role === 'superadmin' ? (
+                  {admin?.roles.includes('superadmin') ? (
                     <select
                       className="border rounded px-2 py-1"
-                      value={user.role}
-                      onChange={e => handleRoleChange(user.id, e.target.value as User['role'])}
+                      value={user.roles[0]}
+                      onChange={e => handleRoleChange(user.id, e.target.value as User['roles'][number])}
                       disabled={user.id === admin.id}
                     >
                       {roleOptions.map(opt => (
@@ -82,7 +82,7 @@ const AdminUsers: React.FC = () => {
                       ))}
                     </select>
                   ) : (
-                    <span className="font-bold text-blue-700">{user.role}</span>
+                    <span className="font-bold text-blue-700">{user.roles[0]}</span>
                   )}
                 </td>
                 <td className="px-4 py-2 border-b flex gap-2">

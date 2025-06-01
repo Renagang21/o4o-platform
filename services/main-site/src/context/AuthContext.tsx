@@ -12,6 +12,7 @@ export type UserRole = 'user' | 'member' | 'contributor' | 'seller' | 'vendor' |
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   register: (data: Omit<User, 'id'> & { password: string }) => Promise<{ success: boolean; message?: string }>;
@@ -73,16 +74,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuthContext = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

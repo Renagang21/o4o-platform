@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { useAuth } from '../context/AuthContext';
+import { useAuth, UserRole } from '../context/AuthContext';
 
 
 const Profile: React.FC = () => {
 
-  const user = useAuth();
+  const { user } = useAuth();
 
 
   if (!user) {
@@ -93,11 +93,11 @@ const Profile: React.FC = () => {
 
                   <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
 
-                    {user.role === 'admin'
+                    {user && user.roles.includes('admin' as UserRole)
 
                       ? '관리자'
 
-                      : user.role === 'yaksa'
+                      : user && user.roles.includes('yaksa' as UserRole)
 
                       ? '약사'
 
@@ -116,7 +116,7 @@ const Profile: React.FC = () => {
         </div>
 
 
-        {user.role === 'yaksa' && (
+        {user && user.roles.includes('yaksa' as UserRole) && (
 
           <div className="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg">
 
@@ -151,7 +151,7 @@ const Profile: React.FC = () => {
         )}
 
 
-        {user.role === 'admin' && (
+        {user && user.roles.includes('admin' as UserRole) && (
 
           <div className="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg">
 

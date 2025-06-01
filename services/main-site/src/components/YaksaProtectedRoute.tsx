@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthContext } from '../context/AuthContext';
+import { useAuth, UserRole } from '../context/AuthContext';
 
 // 예시: user context에서 role을 가져온다고 가정
 // 실제로는 AuthContext 등에서 가져와야 함
@@ -14,10 +14,10 @@ interface YaksaProtectedRouteProps {
 }
 
 const YaksaProtectedRoute: React.FC<YaksaProtectedRouteProps> = ({ children }) => {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const location = useLocation();
 
-  if (!user || (user.role !== 'yaksa' && user.role !== 'admin')) {
+  if (!user || (!user.roles.includes('yaksa' as UserRole) && !user.roles.includes('admin' as UserRole))) {
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 

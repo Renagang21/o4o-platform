@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from '../context/AuthContext';
+import { User, UserRole } from '../context/AuthContext';
 import { UserCircle, Mail, Shield, Calendar, LogOut, KeyRound } from 'lucide-react';
 
 interface ProfileCardProps {
@@ -30,11 +30,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, onLogout, onPasswordCha
       <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
         <Shield size={18} />
         <span className="font-medium">역할:</span>
-        <span>{roleLabel[user.role]}</span>
-        {user.role === 'yaksa' && (
+        <span>{roleLabel[user.roles[0]]}</span>
+        {user.roles.includes('yaksa' as UserRole) && (
           <span className="ml-2 px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs">약사 인증 대기/승인</span>
         )}
-        {user.role === 'admin' && (
+        {user.roles.includes('admin' as UserRole) && (
           <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-800 text-xs">관리자</span>
         )}
       </div>

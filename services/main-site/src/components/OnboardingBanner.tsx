@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, UserRole } from '../context/AuthContext';
 
 const getBannerContent = (role: string | undefined) => {
   switch (role) {
@@ -31,22 +31,22 @@ const getBannerContent = (role: string | undefined) => {
 };
 
 const OnboardingBanner: React.FC = () => {
-  const  user  = useAuth();
+  const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    const key = `onboarding_banner_${user.role}`;
+    const key = `onboarding_banner_${user.roles[0] as UserRole}`;
     const dismissed = localStorage.getItem(key);
     setIsVisible(!dismissed);
   }, [user]);
 
   if (!user) return null;
-  const content = getBannerContent(user.role);
+  const content = getBannerContent(user.roles[0] as UserRole);
   if (!content || !isVisible) return null;
 
   const handleDismiss = () => {
-    localStorage.setItem(`onboarding_banner_${user.role}`, '1');
+    localStorage.setItem(`onboarding_banner_${user.roles[0] as UserRole}`, '1');
     setIsVisible(false);
   };
 
