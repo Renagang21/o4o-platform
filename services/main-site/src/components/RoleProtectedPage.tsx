@@ -1,7 +1,6 @@
 import React from 'react';
-import { useAuthContext } from '../context/AuthContext';
+import { useAuth, UserRole } from '../context/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
-import { UserRole } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { logAccess } from '../utils/logAccess';
 
@@ -16,7 +15,7 @@ export default function RoleProtectedPage({
   message?: string;
   show403?: boolean;
 }) {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const location = useLocation();
 
   // 전체 공개: allowedRoles가 없거나 빈 배열

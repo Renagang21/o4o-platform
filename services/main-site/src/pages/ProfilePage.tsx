@@ -5,8 +5,7 @@ import ProfileCard from '../components/ProfileCard'; // ✨ 이 import 문을 �
 import PasswordChangeModal from '../components/PasswordChangeModal';
 
 const ProfilePage: React.FC = () => {
-  const user = useAuth(); // useAuth()는 이제 User | null을 직접 반환합니다.
-  const { setUser } = React.useContext(AuthContext)!; // AuthContext에서 setUser 함수를 가져옵니다.
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
 

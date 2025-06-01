@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuthContext();
+  const { register } = useAuth();
   const [role, setRole] = useState<'user' | 'contributor'>('user');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
