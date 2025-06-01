@@ -17,15 +17,6 @@ import YaksaProtectedRoute from './components/YaksaProtectedRoute';
 import { ToastProvider } from './context/ToastContext';
 import Toast from './components/Toast';
 import OnboardingBanner from './components/OnboardingBanner';
-import { ApprovalProvider } from './pages/admin/ApprovalContext';
-import UserRoleManager from './pages/admin/UserRoleManager';
-import { UserRoleManagerProvider } from './pages/admin/UserRoleManagerContext';
-import SocialLoginConfigPage from './pages/admin/SocialLoginConfigPage';
-import { SocialLoginConfigProvider } from './pages/admin/SocialLoginConfigContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Forbidden from './pages/Forbidden';
-import AdminStats from './pages/admin/AdminStats';
 
 // Placeholder components for demonstration
 const ProductNew = () => <div className="p-8 text-center">[약사 전용] 상품 등록 페이지 (ProductNew)</div>;
@@ -38,7 +29,6 @@ const App: React.FC = () => {
           <Router>
             <OnboardingBanner />
             <Toast />
-            <ToastContainer position="top-center" />
             <Routes>
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />
@@ -66,9 +56,7 @@ const App: React.FC = () => {
                   path="/admin/approvals"
                   element={
                     <RoleProtectedRoute allowedRoles={['admin']}>
-                      <ApprovalProvider>
-                        <YaksaApprovalList />
-                      </ApprovalProvider>
+                      <YaksaApprovalList />
                     </RoleProtectedRoute>
                   }
                 />
@@ -76,9 +64,7 @@ const App: React.FC = () => {
                   path="/admin/approvals/:id"
                   element={
                     <RoleProtectedRoute allowedRoles={['admin']}>
-                      <ApprovalProvider>
-                        <YaksaApprovalDetail />
-                      </ApprovalProvider>
+                      <YaksaApprovalDetail />
                     </RoleProtectedRoute>
                   }
                 />
@@ -92,35 +78,6 @@ const App: React.FC = () => {
                   }
                 />
                 */}
-                <Route
-                  path="/admin/user-role-manager"
-                  element={
-                    <RoleProtectedRoute allowedRoles={['administrator']}>
-                      <UserRoleManagerProvider>
-                        <UserRoleManager />
-                      </UserRoleManagerProvider>
-                    </RoleProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/social-login-config"
-                  element={
-                    <RoleProtectedRoute allowedRoles={['administrator']}>
-                      <SocialLoginConfigProvider>
-                        <SocialLoginConfigPage />
-                      </SocialLoginConfigProvider>
-                    </RoleProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/stats"
-                  element={
-                    <RoleProtectedRoute allowedRoles={['administrator', 'operator']}>
-                      <AdminStats />
-                    </RoleProtectedRoute>
-                  }
-                />
-                <Route path="/403" element={<Forbidden />} />
               </Route>
             </Routes>
           </Router>
