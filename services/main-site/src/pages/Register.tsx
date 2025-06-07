@@ -68,7 +68,18 @@ const Register: React.FC = () => {
     setError('');
 
     try {
-      await authAPI.register(formData);
+      // 간소화된 회원가입을 위해 기본 비즈니스 정보 추가
+      const registerData = {
+        ...formData,
+        businessInfo: {
+          businessName: formData.name, // 임시로 이름을 사업체명으로 사용
+          businessType: 'individual', // 개인 회원으로 기본 설정
+          address: '', // 빈 주소
+          phone: '' // 빈 전화번호
+        }
+      };
+      
+      await authAPI.register(registerData);
       setSuccess(true);
       toast.success('회원가입이 완료되었습니다! 관리자 승인을 기다려주세요.');
       
