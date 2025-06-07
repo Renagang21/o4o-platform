@@ -165,6 +165,21 @@ const Login: React.FC = () => {
 
         {/* 링크들 */}
         <div className="mt-8 text-center space-y-4">
+          <div className="flex justify-center gap-4 text-sm">
+            <Link
+              to="/forgot-password"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              비밀번호 확인
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link
+              to="/check-account"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              계정 확인
+            </Link>
+          </div>
           <p className="text-gray-600">
             계정이 없으신가요?{' '}
             <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
