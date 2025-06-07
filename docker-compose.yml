@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # AI 서비스
+  ai-services:
+    build:
+      context: ./ai-services
+      dockerfile: Dockerfile.python
+    volumes:
+      - ./ai-services:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - PYTHON_ENV=development
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+
+  # RPA 서비스
+  rpa-services:
+    build:
+      context: ./rpa-services
+      target: builder
+    volumes:
+      - ./rpa-services:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+
+  # O4O 플랫폼
+  o4o-platform:
+    build:
+      context: ./o4o-platform
+      target: builder
+    volumes:
+      - ./o4o-platform:/app
+      - /app/node_modules
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      - postgres
+      - redis
+
+  # PostgreSQL
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=ai_services,rpa_services,o4o_platform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    ports:
+      - "5432:5432"
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Adminer (데이터베이스 관리 도구)
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data: 
