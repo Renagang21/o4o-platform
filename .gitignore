@@ -1,43 +1,52 @@
-# node
+# Dependencies
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production builds
 dist/
 build/
-.next/
-.cache/
+
+# Environment variables
 .env
-.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
+# IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # Logs
-logs/
+logs
 *.log
 
-# Runtime
-.pnpm/
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Large files - binary, archive
-*.exe
-*.zip
-*.tar
-*.gz
-*.7z
-*.mp4
-*.avi
-*.mov
-*.iso
+# Coverage directory used by tools like istanbul
+coverage/
 
-# Office documents (optional)
-*.doc*
-*.xls*
-*.ppt*
+# MongoDB data
+data/
 
-# CUESOR IDE 설정
-.cursor/
-
+# Temporary folders
+tmp/
+temp/
