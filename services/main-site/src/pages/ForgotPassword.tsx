@@ -22,18 +22,24 @@ const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      // TODO: 실제 API 연동
-      // await authAPI.forgotPassword(email);
-      
-      // 임시로 성공 처리 (2초 후)
-      setTimeout(() => {
-        setSuccess(true);
-        setLoading(false);
-      }, 2000);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '비밀번호 재설정 요청에 실패했습니다.');
+      }
+
+      setSuccess(true);
+      setLoading(false);
     } catch (error: any) {
       console.error('Password reset error:', error);
-      setError('비밀번호 재설정 요청에 실패했습니다. 다시 시도해주세요.');
+      setError(error.message || '비밀번호 재설정 요청에 실패했습니다. 다시 시도해주세요.');
       setLoading(false);
     }
   };
