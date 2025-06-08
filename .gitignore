@@ -1,28 +1,16 @@
 # Dependencies
 node_modules/
-*/node_modules/
-**/node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Build outputs
-dist/
-build/
-*.tgz
-
-# Environment files
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # OS generated files
 .DS_Store
@@ -33,44 +21,29 @@ lerna-debug.log*
 ehthumbs.db
 Thumbs.db
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.env
-.venv
-ENV/
-env.bak/
-venv.bak/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Coverage reports
-coverage/
-*.lcov
-.nyc_output
 
 # Temporary files
 *.tmp
 *.temp
 
-# docs-hub submodule (temporary)
-docs-hub/
+# Sensitive configuration files with tokens
+claude_config_*.json
+final_claude_config.json
+updated_claude_config.json
 
-# Deployment
-.vercel
-.netlify
+# Build outputs
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# SSH and security
+*.pem
+*.ppk
+*.p12
+test_ssh.bat
