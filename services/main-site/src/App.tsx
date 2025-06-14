@@ -12,6 +12,14 @@ import CheckAccount from './pages/CheckAccount';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
+// Dropshipping Pages
+import {
+  DropshippingDashboard,
+  ProductManagement,
+  PartnerManagement,
+  CustomerManagement
+} from './pages/dropshipping';
+
 // Components
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -67,6 +75,71 @@ const App: React.FC = () => {
               <ProtectedRoute requireAdmin>
                 <Navbar />
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dropshipping Module Routes */}
+          <Route
+            path="/dropshipping"
+            element={
+              <ProtectedRoute>
+                <DropshippingDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dropshipping/dashboard"
+            element={
+              <ProtectedRoute>
+                <DropshippingDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dropshipping/products"
+            element={
+              <ProtectedRoute>
+                <ProductManagement />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dropshipping/partners"
+            element={
+              <ProtectedRoute>
+                <PartnerManagement />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dropshipping/customers"
+            element={
+              <ProtectedRoute>
+                <CustomerManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Additional Dropshipping Routes */}
+          <Route
+            path="/dropshipping/commission"
+            element={
+              <ProtectedRoute>
+                <PartnerManagement />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dropshipping/analytics"
+            element={
+              <ProtectedRoute>
+                <DropshippingDashboard />
               </ProtectedRoute>
             }
           />
