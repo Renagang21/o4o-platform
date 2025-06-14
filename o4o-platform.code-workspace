@@ -1,0 +1,382 @@
+{
+  "folders": [
+    {
+      "name": "🚀 O4O Platform Root",
+      "path": "."
+    },
+    {
+      "name": "🔧 API Server",
+      "path": "./services/api-server"
+    },
+    {
+      "name": "🌐 Web App",
+      "path": "./services/main-site"
+    },
+    {
+      "name": "🧪 Tests",
+      "path": "./tests"
+    },
+    {
+      "name": "🛠️ Scripts",
+      "path": "./scripts"
+    },
+    {
+      "name": "📋 Cursor Rules",
+      "path": "./.cursor"
+    }
+  ],
+  "settings": {
+    // 🎨 에디터 설정
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.organizeImports": true
+    },
+    "editor.rulers": [80, 120],
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    
+    // 🗃️ 파일 설정
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    
+    // 🔍 검색 설정
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/.next": true,
+      "**/coverage": true,
+      "**/playwright-report": true,
+      "**/test-results": true
+    },
+    
+    // 📁 파일 탐색기 설정
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.js.map",
+      "*.tsx": "${capture}.js, ${capture}.d.ts, ${capture}.js.map",
+      "package.json": "package-lock.json, npm-shrinkwrap.json, yarn.lock, pnpm-lock.yaml",
+      ".env.example": ".env, .env.local, .env.*.local",
+      "docker-compose.yml": "docker-compose.*.yml, Dockerfile*",
+      "README.md": "CHANGELOG.md, CONTRIBUTING.md, LICENSE*"
+    },
+    
+    // 🔷 TypeScript 설정
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    
+    // 📋 ESLint 설정
+    "eslint.workingDirectories": [
+      "./services/api-server",
+      "./services/main-site"
+    ],
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    
+    // 💅 Prettier 설정
+    "prettier.configPath": "./prettier.config.js",
+    "prettier.requireConfig": true,
+    
+    // 🧪 Jest 설정
+    "jest.jestCommandLine": "npm test",
+    "jest.autoRun": "off",
+    "jest.showCoverageOnLoad": false,
+    
+    // 🎭 Playwright 설정
+    "playwright.showTrace": true,
+    "playwright.reuseBrowser": true,
+    
+    // 🐳 Docker 설정
+    "docker.defaultRegistryPath": "ghcr.io/o4o-platform",
+    
+    // 🌊 Git 설정
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "git.branchProtection": ["main", "develop"],
+    
+    // 📦 NPM 설정
+    "npm.packageManager": "npm",
+    "npm.enableRunFromFolder": true,
+    
+    // 🔧 터미널 설정
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.defaultProfile.linux": "bash",
+    
+    // 🎯 언어별 설정
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.suggest.insertMode": "replace"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.wordWrap": "on",
+      "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+      }
+    },
+    "[yaml]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[sql]": {
+      "editor.defaultFormatter": "ms-mssql.mssql"
+    },
+    
+    // 🤖 Cursor 1.0 특화 설정
+    "cursor.copilotPlusPlus.enabled": true,
+    "cursor.copilotPlusPlus.chunkedStreaming": true,
+    "cursor.backgroundAgent.enabled": true,
+    "cursor.chat.longContext.enabled": true,
+    "cursor.rules.enabled": true,
+    "cursor.mcp.enabled": true,
+    
+    // 🏷️ 파일 아이콘 설정
+    "workbench.iconTheme": "material-icon-theme",
+    "material-icon-theme.folders.associations": {
+      "cursor": "config",
+      "rules": "rules",
+      "mcp": "connection",
+      "scripts": "tools",
+      "api-server": "server",
+      "main-site": "web"
+    },
+    
+    // 🎨 테마 설정
+    "workbench.colorTheme": "GitHub Dark",
+    "workbench.preferredDarkColorTheme": "GitHub Dark",
+    "workbench.preferredLightColorTheme": "GitHub Light",
+    
+    // 📝 에디터 미니맵
+    "editor.minimap.enabled": true,
+    "editor.minimap.showSlider": "always",
+    "editor.minimap.size": "proportional",
+    
+    // 🔔 알림 설정
+    "workbench.statusBar.visible": true,
+    "workbench.activityBar.visible": true,
+    "problems.showCurrentInStatus": true,
+    
+    // 🚀 성능 설정
+    "files.watcherExclude": {
+      "**/node_modules/**": true,
+      "**/dist/**": true,
+      "**/build/**": true,
+      "**/.next/**": true,
+      "**/coverage/**": true
+    },
+    "typescript.disableAutomaticTypeAcquisition": false,
+    "typescript.suggest.completeJSDocs": true,
+    
+    // 🔍 IntelliSense 설정
+    "editor.suggestSelection": "first",
+    "editor.suggest.localityBonus": true,
+    "editor.suggest.showWords": false,
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    
+    // 📊 확장 프로그램 설정
+    "extensions.ignoreRecommendations": false,
+    "extensions.showRecommendationsOnlyOnDemand": false,
+    
+    // 🎯 프로젝트별 설정
+    "emmet.includeLanguages": {
+      "typescript": "html",
+      "typescriptreact": "html"
+    },
+    "emmet.triggerExpansionOnTab": true,
+    "html.autoClosingTags": true,
+    "javascript.autoClosingTags": true,
+    "typescript.autoClosingTags": true
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Start Development",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "dev:smart"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🧪 Run All Tests",
+        "type": "shell",
+        "command": "npm",
+        "args": ["test"],
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        }
+      },
+      {
+        "label": "🔨 Build All",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "build:all"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        }
+      },
+      {
+        "label": "📋 Lint Fix",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "lint:fix"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        }
+      },
+      {
+        "label": "🏥 Cursor Health Check",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "cursor:health-check"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        }
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "🔧 Debug API Server",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/services/api-server/src/index.ts",
+        "outFiles": ["${workspaceFolder}/services/api-server/dist/**/*.js"],
+        "runtimeArgs": ["-r", "ts-node/register"],
+        "env": {
+          "NODE_ENV": "development"
+        },
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      },
+      {
+        "name": "🌐 Debug Web App",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/services/main-site",
+        "runtimeExecutable": "npm",
+        "runtimeArgs": ["run", "dev"],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      },
+      {
+        "name": "🧪 Debug Tests",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+        "args": ["--runInBand", "--detectOpenHandles"],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "env": {
+          "NODE_ENV": "test"
+        }
+      }
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      // 🔷 TypeScript & JavaScript
+      "ms-vscode.vscode-typescript-next",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      
+      // ⚛️ React
+      "ms-vscode.vscode-react-native",
+      "bradlc.vscode-tailwindcss",
+      
+      // 🧪 테스트
+      "orta.vscode-jest",
+      "ms-playwright.playwright",
+      
+      // 🐳 DevOps
+      "ms-azuretools.vscode-docker",
+      "ms-kubernetes-tools.vscode-kubernetes-tools",
+      "redhat.vscode-yaml",
+      
+      // 🗃️ 데이터베이스
+      "ms-mssql.mssql",
+      "ckolkman.vscode-postgres",
+      
+      // 🎯 유틸리티
+      "ms-vscode.vscode-json",
+      "yzhang.markdown-all-in-one",
+      "shd101wyy.markdown-preview-enhanced",
+      "ms-vscode.vscode-restclient",
+      
+      // 🎨 UI
+      "pkief.material-icon-theme",
+      "github.github-vscode-theme",
+      
+      // 🔧 Git
+      "eamodio.gitlens",
+      "mhutchie.git-graph",
+      
+      // 🚀 생산성
+      "christian-kohler.path-intellisense",
+      "formulahendry.auto-rename-tag",
+      "streetsidesoftware.code-spell-checker",
+      
+      // 🤖 AI & Cursor
+      "github.copilot",
+      "github.copilot-chat"
+    ]
+  }
+}

@@ -1,80 +1,141 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { authApi } from '../api/auth/authApi';
+import { AuthState, LoginRequest, RegisterRequest, User } from '../api/auth/types';
 
-// 'User' 인터페이스를 export 합니다.
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  roles: UserRole[];
-}
+type AuthAction =
+  | { type: 'LOGIN_START' }
+  | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
+  | { type: 'LOGIN_FAILURE'; payload: { message: string; code: string } }
+  | { type: 'LOGOUT' }
+  | { type: 'REGISTER_START' }
+  | { type: 'REGISTER_SUCCESS'; payload: { user: User } }
+  | { type: 'REGISTER_FAILURE'; payload: { message: string; code: string } };
 
-export type UserRole = 'user' | 'member' | 'contributor' | 'seller' | 'vendor' | 'partner' | 'operator' | 'administrator';
+const initialState: AuthState = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isLoading: false,
+  error: null,
+};
 
-interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
-  logout: () => void;
-  register: (data: Omit<User, 'id'> & { password: string }) => Promise<{ success: boolean; message?: string }>;
-}
+const authReducer = (state: AuthState, action: AuthAction): AuthState => {
+  switch (action.type) {
+    case 'LOGIN_START':
+    case 'REGISTER_START':
+      return {
+        ...state,
+        isLoading: true,
+        error: null,
+      };
+    case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      };
+    case 'REGISTER_SUCCESS':
+      return {
+        ...state,
+        user: action.payload.user,
+        isLoading: false,
+        error: null,
+      };
+    case 'LOGIN_FAILURE':
+    case 'REGISTER_FAILURE':
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+      };
+    case 'LOGOUT':
+      return initialState;
+    default:
+      return state;
+  }
+};
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<{
+  state: AuthState;
+  login: (data: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
+  logout: () => Promise<void>;
+} | null>(null);
 
-// mock 사용자 데이터
-const mockUsers: (User & { password: string })[] = [
-  { id: '1', name: '최고관리자', email: 'admin@neture.co.kr', password: 'admin123', roles: ['administrator', 'operator'] },
-  { id: '2', name: '운영자', email: 'operator@neture.co.kr', password: 'operator123', roles: ['operator'] },
-  { id: '3', name: '판매자', email: 'seller@neture.co.kr', password: 'seller123', roles: ['seller'] },
-  { id: '4', name: '공급자', email: 'vendor@neture.co.kr', password: 'vendor123', roles: ['vendor'] },
-  { id: '5', name: '제휴사', email: 'partner@neture.co.kr', password: 'partner123', roles: ['partner'] },
-  { id: '6', name: '콘텐츠기여자', email: 'contributor@neture.co.kr', password: 'contrib123', roles: ['contributor'] },
-  { id: '7', name: '일반회원', email: 'member@neture.co.kr', password: 'member123', roles: ['member'] },
-  { id: '8', name: '방문자', email: 'user@neture.co.kr', password: 'user123', roles: ['user'] },
-];
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [state, dispatch] = useReducer(authReducer, initialState);
 
-const LOCAL_KEY = 'neture_auth_user';
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  // localStorage에서 유저 정보 불러오기
   useEffect(() => {
-    const stored = localStorage.getItem(LOCAL_KEY);
-    if (stored) {
-      setUser(JSON.parse(stored));
+    const token = authApi.getToken();
+    if (token) {
+      authApi.getCurrentUser()
+        .then(user => {
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: { user, token },
+          });
+        })
+        .catch(() => {
+          dispatch({ type: 'LOGOUT' });
+        });
     }
   }, []);
 
-  // 로그인 함수
-  const login = async (email: string, password: string) => {
-    const found = mockUsers.find(u => u.email === email && u.password === password);
-    if (found) {
-      const { password, ...userInfo } = found;
-      setUser(userInfo);
-      localStorage.setItem(LOCAL_KEY, JSON.stringify(userInfo));
-      return { success: true };
+  const login = async (data: LoginRequest) => {
+    try {
+      dispatch({ type: 'LOGIN_START' });
+      const response = await authApi.login(data);
+      authApi.setToken(response.token);
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: { user: response.user, token: response.token },
+      });
+    } catch (error: any) {
+      dispatch({
+        type: 'LOGIN_FAILURE',
+        payload: {
+          message: error.response?.data?.message || '로그인에 실패했습니다.',
+          code: error.response?.data?.code || 'UNKNOWN_ERROR',
+        },
+      });
+      throw error;
     }
-    return { success: false, message: '이메일 또는 비밀번호가 올바르지 않습니다.' };
   };
 
-  // 로그아웃 함수
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem(LOCAL_KEY);
+  const register = async (data: RegisterRequest) => {
+    try {
+      dispatch({ type: 'REGISTER_START' });
+      const response = await authApi.register(data);
+      dispatch({
+        type: 'REGISTER_SUCCESS',
+        payload: { user: response.user },
+      });
+    } catch (error: any) {
+      dispatch({
+        type: 'REGISTER_FAILURE',
+        payload: {
+          message: error.response?.data?.message || '회원가입에 실패했습니다.',
+          code: error.response?.data?.code || 'UNKNOWN_ERROR',
+        },
+      });
+      throw error;
+    }
   };
 
-  // 회원가입 함수 (mock)
-  const register = async (data: Omit<User, 'id'> & { password: string }) => {
-    if (mockUsers.find(u => u.email === data.email)) {
-      return { success: false, message: '이미 존재하는 이메일입니다.' };
+  const logout = async () => {
+    try {
+      await authApi.logout();
+      dispatch({ type: 'LOGOUT' });
+    } catch (error) {
+      console.error('Logout error:', error);
     }
-    const newUser: User = { id: String(Date.now()), name: data.name, email: data.email, roles: data.roles };
-    mockUsers.push({ ...newUser, password: data.password });
-    return { success: true };
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, register }}>
+    <AuthContext.Provider value={{ state, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

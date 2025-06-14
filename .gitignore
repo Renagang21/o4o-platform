@@ -1,28 +1,76 @@
-# Dependencies
+# ==============================================
+# 🚀 O4O Platform .gitignore
+# ==============================================
+
+# 📦 Dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
-# Production builds
+# 📁 Build outputs
 dist/
 build/
+out/
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
 
-# Environment variables
+# 🔧 Development
 .env
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# IDE files
-.vscode/
+# 📊 Coverage and testing
+coverage/
+.nyc_output
+.coverage/
+junit.xml
+test-results/
+playwright-report/
+playwright/.cache/
+
+# 🔷 TypeScript
+*.tsbuildinfo
+.tscache/
+
+# 📝 Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 🏃‍♂️ Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# 📚 Documentation
+.docusaurus/
+docs/.vuepress/dist
+
+# 🎨 IDE and editors
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
 .idea/
 *.swp
 *.swo
 *~
 
-# OS generated files
+# 🖥️ OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -30,23 +78,173 @@ build/
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Logs
-logs
-*.log
+# 🐳 Docker
+.dockerignore
+docker-compose.override.yml
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# 🗃️ Database
+*.sqlite
+*.sqlite3
+*.db
 
-# Coverage directory used by tools like istanbul
+# 📸 Media files
+uploads/
+temp/
+tmp/
+
+# 🔒 Security
+*.pem
+*.key
+*.crt
+*.p12
+.env.keys
+secrets/
+
+# 📦 Package managers
+.yarn/
+.pnp.*
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# 🧪 Testing
+.jest/
+.nyc_output/
 coverage/
 
-# MongoDB data
-data/
+# 📊 Monitoring and analytics
+.sentry/
 
-# Temporary folders
-tmp/
+# 🔄 Backup files
+*.backup
+*.bak
+*.tmp
+*~
+
+# 📋 Cursor specific
+.cursor/
+cursorrules.txt.backup
+
+# 🤖 AI and ML
+*.model
+*.pkl
+*.h5
+models/
+checkpoints/
+
+# 📈 Performance
+.cache/
+.parcel-cache/
+.webpack/
+
+# 🌐 Web specific
+public/uploads/
+static/uploads/
+
+# 📱 Mobile
+*.ipa
+*.apk
+*.aab
+
+# 🎯 Project specific
+# ==============================================
+
+# 📊 Analytics and tracking
+google-services.json
+GoogleService-Info.plist
+
+# 🔧 Configuration
+config/local.json
+config/production.json
+config/development.json
+
+# 🗂️ Temporary directories
 temp/
+tmp/
+temporary/
+
+# 📋 Local data
+data/
+dumps/
+backups/
+exports/
+
+# 🔌 MCP local storage
+.mcp-storage/
+mcp-data/
+
+# 🏥 Health check files
+.health
+health.json
+
+# 📝 Local documentation
+docs/local/
+.documents/
+
+# 🎨 Design files
+*.sketch
+*.fig
+*.xd
+*.psd
+
+# 📊 Metrics and profiling
+.clinic/
+*.cpuprofile
+*.heapprofile
+*.heapsnapshot
+
+# 🔄 Sync files
+.sync/
+.rsync_cache/
+
+# 📱 Mobile development
+android/
+ios/
+*.keystore
+*.jks
+
+# 🧰 Tools and utilities
+tools/temp/
+scripts/temp/
+utilities/temp/
+
+# 📋 Keep these files
+# ==============================================
+!.env.example
+!.gitkeep
+!.gitignore
+!.cursorrules
+!README.md
+!LICENSE
+!CHANGELOG.md
+!CONTRIBUTING.md
+
+# 📁 Force include empty directories with .gitkeep
+!**/.gitkeep
+
+# 🚫 Never ignore
+# ==============================================
+# Package manager files that should be tracked
+!yarn.lock.example
+!package-lock.json.example
+!pnpm-lock.yaml.example
+
+# Important configuration files
+!tsconfig.json
+!package.json
+!docker-compose.yml
+!docker-compose.*.yml
+!Dockerfile
+!.dockerignore
+
+# CI/CD files
+!.github/
+!.gitlab-ci.yml
+!.travis.yml
+!.circleci/
+
+# Documentation
+!docs/**/*.md
+!*.md

@@ -1,26 +1,97 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    // 🎯 기본 옵션
+    "target": "ES2022",
     "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleResolution": "node",
     "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    
+    // 📁 경로 설정
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@api/*": ["./services/api-server/src/*"],
+      "@web/*": ["./services/main-site/src/*"],
+      "@shared/*": ["./shared/*"],
+      "@tests/*": ["./tests/*"]
+    },
+    "rootDirs": ["./services", "./shared", "./tests"],
+    
+    // 📤 출력 설정
+    "outDir": "./dist",
+    "rootDir": "./",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    
+    // 🔷 타입 검사 옵션
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    
+    // 📦 모듈 설정
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    
+    // 🔧 고급 옵션
+    "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    
+    // ⚛️ JSX 설정 (React)
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    
+    // 🎯 추가 검사
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": false,
+    
+    // 📊 타입 정보
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "types": ["node", "jest", "@types/testing-library__jest-dom"]
   },
-  "references": [
-    {
-      "path": "./services/api-server"
-    }
+  "include": [
+    "services/**/*",
+    "shared/**/*",
+    "tests/**/*",
+    "scripts/**/*",
+    "*.config.ts",
+    "*.config.js"
   ],
-  "files": [],
-  "include": [],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts"
-  ]
+    "build",
+    ".next",
+    "coverage",
+    "playwright-report",
+    "test-results",
+    "**/*.min.js",
+    "**/node_modules",
+    "**/dist",
+    "**/build"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

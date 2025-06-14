@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    image: postgres:15-alpine
+    container_name: o4o-postgres-dev
+    environment:
+      POSTGRES_DB: o4o_platform_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 캐시
+  redis:
+    image: redis:7-alpine
+    container_name: o4o-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # API 서버 (개발 모드)
+  api-server:
+    build:
+      context: ./services/api-server
+      dockerfile: Dockerfile.dev
+    container_name: o4o-api-dev
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/o4o_platform_dev
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-secret-key
+      AI_SERVICE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Node.js 디버깅 포트
+    volumes:
+      - ./services/api-server/src:/app/src
+      - ./services/api-server/package*.json:/app/
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # 웹 앱 (개발 모드)
+  web-app:
+    build:
+      context: ./services/main-site
+      dockerfile: Dockerfile.dev
+    container_name: o4o-web-dev
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:3000/api
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./services/main-site/src:/app/src
+      - ./services/main-site/public:/app/public
+      - ./services/main-site/package*.json:/app/
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # 메일 서버 (개발용)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: o4o-mailhog-dev
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    restart: unless-stopped
+
+  # pgAdmin (선택사항)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: o4o-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@o4o-platform.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  default:
+    name: o4o-platform-dev
