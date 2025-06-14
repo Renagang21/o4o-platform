@@ -1,5 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
+import Card from '../common/Card';
+import Badge from '../common/Badge';
 
 const TrustSlider: React.FC = () => {
   const testimonials = [
@@ -44,9 +46,10 @@ const TrustSlider: React.FC = () => {
         {/* Testimonials */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {testimonials.map((testimonial, index) => (
-            <div
+            <Card
               key={index}
-              className="bg-white p-8 rounded-2xl shadow-lg"
+              variant="elevated"
+              className="p-8"
             >
               <div className="flex items-center mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
@@ -58,21 +61,25 @@ const TrustSlider: React.FC = () => {
                 <p className="font-semibold text-gray-900">{testimonial.name}</p>
                 <p className="text-gray-500">{testimonial.role}</p>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
 
         {/* Certifications */}
         <div className="flex justify-center items-center gap-12">
           {certifications.map((cert, index) => (
-            <div key={index} className="text-center">
+            <Card
+              key={index}
+              variant="filled"
+              className="text-center p-4"
+            >
               <img
                 src={cert.image}
                 alt={cert.name}
                 className="h-16 w-auto mb-4"
               />
               <p className="text-gray-600 font-medium">{cert.name}</p>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

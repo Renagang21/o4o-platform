@@ -1,5 +1,7 @@
 import React from 'react';
 import { UserPlus, ShoppingBag, TrendingUp } from 'lucide-react';
+import Card from '../common/Card';
+import Badge from '../common/Badge';
 
 const StepGuide: React.FC = () => {
   const steps = [
@@ -33,19 +35,24 @@ const StepGuide: React.FC = () => {
         </div>
         <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <div
+            <Card
               key={index}
-              className="relative p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              variant="elevated"
+              className="relative p-8 hover:shadow-xl transition-all duration-300"
             >
-              <div className="absolute -top-4 left-8 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+              <Badge
+                variant="primary"
+                size="sm"
+                className="absolute -top-4 left-8"
+              >
                 {index + 1}
-              </div>
+              </Badge>
               <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
                 <step.icon className="w-7 h-7 text-blue-600" />
               </div>
               <h3 className="text-2xl font-bold mb-4 text-gray-900">{step.title}</h3>
               <p className="text-gray-600">{step.description}</p>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

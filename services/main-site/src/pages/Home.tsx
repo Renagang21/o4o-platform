@@ -5,6 +5,9 @@ import StepGuide from '../components/home/StepGuide';
 import TrustSlider from '../components/home/TrustSlider';
 import BrandPreview from '../components/home/BrandPreview';
 import Footer from '../components/home/Footer';
+import Card from '../components/common/Card';
+import Badge from '../components/common/Badge';
+import Button from '../components/common/Button';
 
 const Home: React.FC = () => {
   const services = [
@@ -69,19 +72,20 @@ const Home: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {services.map((service) => (
-              <div key={service.id} className="relative group">
-                <div className={`bg-gradient-to-br ${service.color} rounded-2xl p-8 text-white transform transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl`}>
+              <Card
+                key={service.id}
+                variant="elevated"
+                className={`bg-gradient-to-br ${service.color} text-white transform transition-all duration-300 hover:scale-105`}
+              >
+                <div className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <div className="text-5xl">{service.icon}</div>
-                    {service.status === 'available' ? (
-                      <span className="bg-white bg-opacity-20 text-white text-xs font-medium px-2 py-1 rounded-full">
-                        이용 가능
-                      </span>
-                    ) : (
-                      <span className="bg-black bg-opacity-20 text-white text-xs font-medium px-2 py-1 rounded-full">
-                        출시 예정
-                      </span>
-                    )}
+                    <Badge
+                      variant={service.status === 'available' ? 'success' : 'secondary'}
+                      size="sm"
+                    >
+                      {service.status === 'available' ? '이용 가능' : '출시 예정'}
+                    </Badge>
                   </div>
 
                   <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
@@ -99,72 +103,83 @@ const Home: React.FC = () => {
                   </div>
 
                   {service.status === 'available' ? (
-                    <Link
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      as={Link}
                       to={service.href}
-                      className="inline-flex items-center px-6 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors"
+                      className="w-full"
                     >
-                      시작하기 
-                      <span className="ml-2">→</span>
-                    </Link>
+                      시작하기
+                    </Button>
                   ) : (
-                    <button 
+                    <Button
+                      variant="secondary"
+                      size="lg"
                       disabled
-                      className="inline-flex items-center px-6 py-3 bg-white bg-opacity-20 text-white font-medium rounded-lg cursor-not-allowed"
+                      className="w-full opacity-50"
                     >
                       곧 출시 예정
-                      <span className="ml-2">⏳</span>
-                    </button>
+                    </Button>
                   )}
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
 
           {/* 통합 플랫폼 소개 */}
-          <div className="mt-16 text-center">
-            <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-12">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                🔗 통합 플랫폼의 힘
-              </h3>
-              <p className="text-lg text-gray-600 mb-8">
-                모든 서비스가 하나로 연결되어 시너지 효과를 극대화합니다
-              </p>
+          <div className="mt-16">
+            <Card variant="elevated" className="p-8 lg:p-12">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  🔗 통합 플랫폼의 힘
+                </h3>
+                <p className="text-lg text-gray-600 mb-8">
+                  모든 서비스가 하나로 연결되어 시너지 효과를 극대화합니다
+                </p>
+              </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">🔄</span>
+                <Card variant="filled" className="p-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">🔄</span>
+                    </div>
+                    <h4 className="font-medium text-gray-900 mb-2">데이터 연동</h4>
+                    <p className="text-sm text-gray-600">
+                      펀딩 성공 제품이 자동으로 드랍쉬핑으로 전환되고, 
+                      포럼 인기 토픽이 사이니지 콘텐츠가 됩니다
+                    </p>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-2">데이터 연동</h4>
-                  <p className="text-sm text-gray-600">
-                    펀딩 성공 제품이 자동으로 드랍쉬핑으로 전환되고, 
-                    포럼 인기 토픽이 사이니지 콘텐츠가 됩니다
-                  </p>
-                </div>
+                </Card>
                 
-                <div className="text-center p-4">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">🤝</span>
+                <Card variant="filled" className="p-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">🤝</span>
+                    </div>
+                    <h4 className="font-medium text-gray-900 mb-2">파트너 생태계</h4>
+                    <p className="text-sm text-gray-600">
+                      모든 서비스에서 파트너들이 활동하며, 
+                      법적 준수 기반의 건전한 수수료 시스템을 제공합니다
+                    </p>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-2">파트너 생태계</h4>
-                  <p className="text-sm text-gray-600">
-                    모든 서비스에서 파트너들이 활동하며, 
-                    법적 준수 기반의 건전한 수수료 시스템을 제공합니다
-                  </p>
-                </div>
+                </Card>
                 
-                <div className="text-center p-4">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">📊</span>
+                <Card variant="filled" className="p-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">📊</span>
+                    </div>
+                    <h4 className="font-medium text-gray-900 mb-2">통합 분석</h4>
+                    <p className="text-sm text-gray-600">
+                      모든 서비스의 데이터가 통합되어 
+                      더 정확한 인사이트와 개인화 서비스를 제공합니다
+                    </p>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-2">통합 분석</h4>
-                  <p className="text-sm text-gray-600">
-                    모든 서비스의 데이터가 통합되어 
-                    더 정확한 인사이트와 개인화 서비스를 제공합니다
-                  </p>
-                </div>
+                </Card>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </section>

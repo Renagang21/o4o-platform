@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import Card from '../common/Card';
+import Button from '../common/Button';
 
 const BrandPreview: React.FC = () => {
   const products = [
@@ -35,9 +37,10 @@ const BrandPreview: React.FC = () => {
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {products.map((product, index) => (
-            <div
+            <Card
               key={index}
-              className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+              variant="elevated"
+              className="group overflow-hidden hover:shadow-xl transition-all duration-300"
             >
               <div className="aspect-w-1 aspect-h-1">
                 <img
@@ -52,18 +55,21 @@ const BrandPreview: React.FC = () => {
                 </h3>
                 <p className="text-gray-600">{product.brand}</p>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
 
         <div className="text-center">
-          <Link
+          <Button
+            as={Link}
             to="/customizer"
-            className="inline-flex items-center px-8 py-4 rounded-xl font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300"
+            variant="primary"
+            size="lg"
+            className="px-8"
+            rightIcon={<ArrowRight className="w-5 h-5" />}
           >
             커스터마이저 체험하기
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
+          </Button>
         </div>
       </div>
     </section>
