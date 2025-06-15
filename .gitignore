@@ -145,11 +145,6 @@ config/production.json
 config/development.json
 
 # ============= DOCS RULE =============
-# 기본적으로 docs 전체 무시
-/docs/
-# 단, .md 파일은 포함
-!docs/**/*.md
-!**/*.md
 
 # ============= FORCE INCLUDE =============
 !.env.example
