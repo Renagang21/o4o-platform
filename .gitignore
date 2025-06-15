@@ -1,17 +1,17 @@
-# ==============================================
-# 🚀 O4O Platform .gitignore
-# ==============================================
+# O4O Platform .gitignore (for local dev → GitHub sync)
 
-# 📦 Dependencies
+# ============= Dependencies =============
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-.pnpm-debug.log*
+.pnp/
+.pnp.js
+.yarn/
+.yarnrc.yml
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.tgz
 
-# 📁 Build outputs
+# ============= Build outputs =============
 dist/
 build/
 out/
@@ -21,28 +21,19 @@ out/
 .vercel/
 .netlify/
 
-# 🔧 Development
+# ============= Environment Files =============
 .env
+.env.*
 .env.local
 .env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.keys
+.health
+health.json
 
-# 📊 Coverage and testing
-coverage/
-.nyc_output
-.coverage/
-junit.xml
-test-results/
-playwright-report/
-playwright/.cache/
-
-# 🔷 TypeScript
-*.tsbuildinfo
-.tscache/
-
-# 📝 Logs
+# ============= Logs =============
 logs/
 *.log
 npm-debug.log*
@@ -51,167 +42,116 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# 🏃‍♂️ Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
+# ============= Test & Coverage =============
+coverage/
+.nyc_output
+.jest/
+*.test.js
+*.test.ts
+*.tsbuildinfo
+playwright-report/
+playwright/.cache/
 
-# 📚 Documentation
-.docusaurus/
-docs/.vuepress/dist
+# ============= TypeScript =============
+*.tsbuildinfo
+.tscache/
+next-env.d.ts
 
-# 🎨 IDE and editors
-.vscode/settings.json
-.vscode/launch.json
-.vscode/extensions.json
+# ============= IDE & Editor settings =============
+.vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# 🖥️ OS generated files
+# ============= OS Generated Files =============
 .DS_Store
-.DS_Store?
-._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
 Thumbs.db
 desktop.ini
 
-# 🐳 Docker
+# ============= Docker =============
 .dockerignore
 docker-compose.override.yml
 
-# 🗃️ Database
+# ============= Database / Media / Temp =============
 *.sqlite
 *.sqlite3
 *.db
-
-# 📸 Media files
 uploads/
 temp/
 tmp/
+data/
+dumps/
+backups/
+exports/
 
-# 🔒 Security
+# ============= Security & Certificates =============
 *.pem
 *.key
 *.crt
 *.p12
-.env.keys
 secrets/
 
-# 📦 Package managers
-.yarn/
-.pnp.*
-yarn.lock
-package-lock.json
-pnpm-lock.yaml
-
-# 🧪 Testing
-.jest/
-.nyc_output/
-coverage/
-
-# 📊 Monitoring and analytics
-.sentry/
-
-# 🔄 Backup files
-*.backup
-*.bak
-*.tmp
-*~
-
-# 📋 Cursor specific
-.cursor/
-cursorrules.txt.backup
-
-# 🤖 AI and ML
+# ============= AI & ML =============
 *.model
 *.pkl
 *.h5
 models/
 checkpoints/
 
-# 📈 Performance
+# ============= Performance cache =============
 .cache/
 .parcel-cache/
 .webpack/
 
-# 🌐 Web specific
+# ============= Web specific =============
 public/uploads/
 static/uploads/
 
-# 📱 Mobile
+# ============= Mobile =============
 *.ipa
 *.apk
 *.aab
-
-# 🎯 Project specific
-# ==============================================
-
-# 📊 Analytics and tracking
-google-services.json
-GoogleService-Info.plist
-
-# 🔧 Configuration
-config/local.json
-config/production.json
-config/development.json
-
-# 🗂️ Temporary directories
-temp/
-tmp/
-temporary/
-
-# 📋 Local data
-data/
-dumps/
-backups/
-exports/
-
-# 🔌 MCP local storage
-.mcp-storage/
-mcp-data/
-
-# 🏥 Health check files
-.health
-health.json
-
-# 📝 Local documentation
-/docs/
-.documents/
-
-# 🎨 Design files
-*.sketch
-*.fig
-*.xd
-*.psd
-
-# 📊 Metrics and profiling
-.clinic/
-*.cpuprofile
-*.heapprofile
-*.heapsnapshot
-
-# 🔄 Sync files
-.sync/
-.rsync_cache/
-
-# 📱 Mobile development
 android/
 ios/
 *.keystore
 *.jks
 
-# 🧰 Tools and utilities
-tools/temp/
-scripts/temp/
-utilities/temp/
+# ============= MCP local storage =============
+.cursor/
+.mcp-storage/
+mcp-data/
+cursorrules.txt.backup
 
-# 📋 Keep these files
-# ==============================================
+# ============= Design Files =============
+*.sketch
+*.fig
+*.xd
+*.psd
+
+# ============= Sync / Backup / Misc =============
+*.backup
+*.bak
+*.tmp
+.sync/
+.rsync_cache/
+
+# ============= Configs - Ignored =============
+config/local.json
+config/production.json
+config/development.json
+
+# ============= DOCS RULE =============
+# 기본적으로 docs 전체 무시
+/docs/
+# 단, .md 파일은 포함
+!docs/**/*.md
+!**/*.md
+
+# ============= FORCE INCLUDE =============
 !.env.example
 !.gitkeep
 !.gitignore
@@ -221,74 +161,17 @@ utilities/temp/
 !CHANGELOG.md
 !CONTRIBUTING.md
 
-# 📁 Force include empty directories with .gitkeep
+# Keep empty dirs
 !**/.gitkeep
 
-# 🚫 Never ignore
-# ==============================================
-# Package manager files that should be tracked
-!yarn.lock.example
-!package-lock.json.example
-!pnpm-lock.yaml.example
-
-# Important configuration files
-!tsconfig.json
+# ============= DO NOT IGNORE THESE =============
 !package.json
+!package-lock.json.example
+!tsconfig.json
 !docker-compose.yml
 !docker-compose.*.yml
 !Dockerfile
-!.dockerignore
-
-# CI/CD files
 !.github/
 !.gitlab-ci.yml
 !.travis.yml
 !.circleci/
-
-# Documentation
-!docs/**/*.md
-!*.md
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
-.env
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# IDE
-.idea
-.vscode
-*.swp
-*.swo
-
-# docs
-/docs/
