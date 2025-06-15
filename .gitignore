@@ -145,7 +145,6 @@ config/production.json
 config/development.json
 
 # ============= DOCS RULE =============
-
 # ============= FORCE INCLUDE =============
 !.env.example
 !.gitkeep
