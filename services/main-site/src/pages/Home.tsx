@@ -5,9 +5,12 @@ import StepGuide from '../components/home/StepGuide';
 import TrustSlider from '../components/home/TrustSlider';
 import BrandPreview from '../components/home/BrandPreview';
 import Footer from '../components/home/Footer';
+<<<<<<< HEAD
 // import Card from '../components/common/Card';
 // import Badge from '../components/common/Badge';
 // import Button from '../components/common/Button';
+=======
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
 
 const Home: React.FC = () => {
   const services = [
@@ -74,17 +77,29 @@ const Home: React.FC = () => {
             {services.map((service) => (
               <div
                 key={service.id}
+<<<<<<< HEAD
                 className={`bg-gradient-to-br ${service.color} text-white rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105`}
+=======
+                className={`bg-gradient-to-br ${service.color} text-white transform transition-all duration-300 hover:scale-105 rounded-xl shadow-xl`}
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
               >
                 <div className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <div className="text-5xl">{service.icon}</div>
                     <span
+<<<<<<< HEAD
                       className={
                         service.status === 'available'
                           ? 'bg-green-100 text-green-800 px-2 py-1 rounded text-sm'
                           : 'bg-gray-200 text-gray-800 px-2 py-1 rounded text-sm'
                       }
+=======
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        service.status === 'available' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
                     >
                       {service.status === 'available' ? '이용 가능' : '출시 예정'}
                     </span>
@@ -105,6 +120,7 @@ const Home: React.FC = () => {
                   </div>
 
                   {service.status === 'available' ? (
+<<<<<<< HEAD
                     <a
                       href={service.href}
                       className="w-full block text-center bg-white text-blue-700 font-bold py-3 rounded-lg text-lg hover:bg-blue-50 transition"
@@ -115,6 +131,18 @@ const Home: React.FC = () => {
                     <button
                       className="w-full bg-white text-gray-400 font-bold py-3 rounded-lg text-lg opacity-50 cursor-not-allowed"
                       disabled
+=======
+                    <Link
+                      to={service.href}
+                      className="block w-full bg-white text-gray-900 text-center py-3 px-6 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                    >
+                      시작하기
+                    </Link>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full bg-white bg-opacity-50 text-white text-center py-3 px-6 rounded-lg font-medium cursor-not-allowed"
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
                     >
                       곧 출시 예정
                     </button>
@@ -126,7 +154,11 @@ const Home: React.FC = () => {
 
           {/* 통합 플랫폼 소개 */}
           <div className="mt-16">
+<<<<<<< HEAD
             <div className="bg-white rounded-lg shadow-lg p-8 lg:p-12">
+=======
+            <div className="bg-white rounded-xl shadow-xl p-8 lg:p-12">
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   🔗 통합 플랫폼의 힘
@@ -136,7 +168,11 @@ const Home: React.FC = () => {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+<<<<<<< HEAD
                 <div className="bg-blue-50 rounded-lg p-4">
+=======
+                <div className="bg-gray-50 rounded-lg p-4">
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
                   <div className="text-center">
                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">🔄</span>
@@ -148,7 +184,12 @@ const Home: React.FC = () => {
                     </p>
                   </div>
                 </div>
+<<<<<<< HEAD
                 <div className="bg-purple-50 rounded-lg p-4">
+=======
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
                   <div className="text-center">
                     <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">🤝</span>
@@ -160,7 +201,12 @@ const Home: React.FC = () => {
                     </p>
                   </div>
                 </div>
+<<<<<<< HEAD
                 <div className="bg-green-50 rounded-lg p-4">
+=======
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+>>>>>>> 7f0f46222aa30511554262fbca123de619a8fb06
                   <div className="text-center">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">📊</span>
