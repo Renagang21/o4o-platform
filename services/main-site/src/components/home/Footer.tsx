@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
-import Button from '../common/Button';
 
 const footerLinks = {
   company: [
@@ -49,14 +48,12 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <Button
-                    as={Link}
+                  <a
                     href={link.href}
-                    variant="ghost"
                     className="text-gray-400 hover:text-white"
                   >
                     {link.name}
-                  </Button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -67,14 +64,12 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
-                  <Button
-                    as={Link}
+                  <a
                     href={link.href}
-                    variant="ghost"
                     className="text-gray-400 hover:text-white"
                   >
                     {link.name}
-                  </Button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -85,14 +80,12 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
-                  <Button
-                    as={Link}
+                  <a
                     href={link.href}
-                    variant="ghost"
                     className="text-gray-400 hover:text-white"
                   >
                     {link.name}
-                  </Button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -103,17 +96,15 @@ const Footer: React.FC = () => {
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex justify-center space-x-6">
             {socialLinks.map((link, index) => (
-              <Button
+              <a
                 key={index}
-                as="a"
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                variant="ghost"
                 className="text-gray-400 hover:text-white"
               >
                 {link.icon}
-              </Button>
+              </a>
             ))}
           </div>
         </div>

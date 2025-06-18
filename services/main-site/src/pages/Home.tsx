@@ -5,9 +5,9 @@ import StepGuide from '../components/home/StepGuide';
 import TrustSlider from '../components/home/TrustSlider';
 import BrandPreview from '../components/home/BrandPreview';
 import Footer from '../components/home/Footer';
-import Card from '../components/common/Card';
-import Badge from '../components/common/Badge';
-import Button from '../components/common/Button';
+// import Card from '../components/common/Card';
+// import Badge from '../components/common/Badge';
+// import Button from '../components/common/Button';
 
 const Home: React.FC = () => {
   const services = [
@@ -72,20 +72,22 @@ const Home: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {services.map((service) => (
-              <Card
+              <div
                 key={service.id}
-                variant="elevated"
-                className={`bg-gradient-to-br ${service.color} text-white transform transition-all duration-300 hover:scale-105`}
+                className={`bg-gradient-to-br ${service.color} text-white rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105`}
               >
                 <div className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <div className="text-5xl">{service.icon}</div>
-                    <Badge
-                      variant={service.status === 'available' ? 'success' : 'secondary'}
-                      size="sm"
+                    <span
+                      className={
+                        service.status === 'available'
+                          ? 'bg-green-100 text-green-800 px-2 py-1 rounded text-sm'
+                          : 'bg-gray-200 text-gray-800 px-2 py-1 rounded text-sm'
+                      }
                     >
                       {service.status === 'available' ? '이용 가능' : '출시 예정'}
-                    </Badge>
+                    </span>
                   </div>
 
                   <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
@@ -103,33 +105,28 @@ const Home: React.FC = () => {
                   </div>
 
                   {service.status === 'available' ? (
-                    <Button
-                      variant="secondary"
-                      size="lg"
-                      as={Link}
-                      to={service.href}
-                      className="w-full"
+                    <a
+                      href={service.href}
+                      className="w-full block text-center bg-white text-blue-700 font-bold py-3 rounded-lg text-lg hover:bg-blue-50 transition"
                     >
                       시작하기
-                    </Button>
+                    </a>
                   ) : (
-                    <Button
-                      variant="secondary"
-                      size="lg"
+                    <button
+                      className="w-full bg-white text-gray-400 font-bold py-3 rounded-lg text-lg opacity-50 cursor-not-allowed"
                       disabled
-                      className="w-full opacity-50"
                     >
                       곧 출시 예정
-                    </Button>
+                    </button>
                   )}
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
 
           {/* 통합 플랫폼 소개 */}
           <div className="mt-16">
-            <Card variant="elevated" className="p-8 lg:p-12">
+            <div className="bg-white rounded-lg shadow-lg p-8 lg:p-12">
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   🔗 통합 플랫폼의 힘
@@ -138,9 +135,8 @@ const Home: React.FC = () => {
                   모든 서비스가 하나로 연결되어 시너지 효과를 극대화합니다
                 </p>
               </div>
-              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card variant="filled" className="p-4">
+                <div className="bg-blue-50 rounded-lg p-4">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">🔄</span>
@@ -151,9 +147,8 @@ const Home: React.FC = () => {
                       포럼 인기 토픽이 사이니지 콘텐츠가 됩니다
                     </p>
                   </div>
-                </Card>
-                
-                <Card variant="filled" className="p-4">
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">🤝</span>
@@ -164,9 +159,8 @@ const Home: React.FC = () => {
                       법적 준수 기반의 건전한 수수료 시스템을 제공합니다
                     </p>
                   </div>
-                </Card>
-                
-                <Card variant="filled" className="p-4">
+                </div>
+                <div className="bg-green-50 rounded-lg p-4">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">📊</span>
@@ -177,9 +171,9 @@ const Home: React.FC = () => {
                       더 정확한 인사이트와 개인화 서비스를 제공합니다
                     </p>
                   </div>
-                </Card>
+                </div>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
       </section>

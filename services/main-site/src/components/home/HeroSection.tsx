@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../common/Button';
+// import Button from '../common/Button';
 
 const HeroSection: React.FC = () => {
   return (
@@ -17,24 +17,18 @@ const HeroSection: React.FC = () => {
               전문가와 함께하는 성공적인 비즈니스의 시작.
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <Button
-                as={Link}
-                to="/register"
-                variant="primary"
-                size="lg"
-                className="px-8"
+              <a
+                href="/register"
+                className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
               >
                 브랜드 만들기
-              </Button>
-              <Button
-                as={Link}
-                to="/products"
-                variant="secondary"
-                size="lg"
-                className="px-8"
+              </a>
+              <a
+                href="/products"
+                className="bg-gray-200 text-gray-800 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-300 transition"
               >
                 제품 살펴보기
-              </Button>
+              </a>
             </div>
           </div>
           <div className="hidden md:block">

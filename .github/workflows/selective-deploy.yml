@@ -1,0 +1,89 @@
+name: Selective Deployment to AWS Lightsail
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api-server-changed: ${{ steps.changes.outputs.api-server }}
+      web-server-changed: ${{ steps.changes.outputs.web-server }}
+      shared-changed: ${{ steps.changes.outputs.shared }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          api-server:
+            - 'services/api-server/**'
+          web-server:
+            - 'services/main-site/**'
+          shared:
+            - 'package.json'
+            - 'package-lock.json'
+            - 'docker-compose.production.yml'
+            - 'Dockerfile'
+            - '.env.example'
+            - 'scripts/**'
+
+  deploy-api-server:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.api-server-changed == 'true' || needs.detect-changes.outputs.shared-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to o4o-apiserver
+      run: |
+        echo "🚀 API 서버 배포 시작..."
+        
+        # SSH를 통한 서버 접속 및 배포
+        # 실제 배포시에는 여기에 SSH 키와 서버 정보를 설정해야 합니다
+        echo "SSH_HOST: ${{ secrets.API_SERVER_HOST }}"
+        echo "SSH_USER: ${{ secrets.SSH_USER }}"
+        
+        # 예시 배포 명령어 (실제 환경에 맞게 수정 필요)
+        # ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.API_SERVER_HOST }} "
+        #   cd /path/to/o4o-platform &&
+        #   git pull origin main &&
+        #   bash setup-apiserver-sync.sh &&
+        #   docker-compose -f docker-compose.production.yml up -d api-server
+        # "
+
+  deploy-web-server:
+    needs: detect-changes  
+    if: needs.detect-changes.outputs.web-server-changed == 'true' || needs.detect-changes.outputs.shared-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to o4o-webserver
+      run: |
+        echo "🚀 웹 서버 배포 시작..."
+        
+        # SSH를 통한 서버 접속 및 배포
+        echo "SSH_HOST: ${{ secrets.WEB_SERVER_HOST }}"
+        echo "SSH_USER: ${{ secrets.SSH_USER }}"
+        
+        # 예시 배포 명령어 (실제 환경에 맞게 수정 필요)
+        # ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.WEB_SERVER_HOST }} "
+        #   cd /path/to/o4o-platform &&
+        #   git pull origin main &&
+        #   bash setup-webserver-sync.sh &&
+        #   docker-compose -f docker-compose.production.yml up -d web-server
+        # "
+
+  notify-deployment:
+    needs: [deploy-api-server, deploy-web-server]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "📊 배포 완료 요약:"
+        echo "API 서버: ${{ needs.deploy-api-server.result }}"
+        echo "웹 서버: ${{ needs.deploy-web-server.result }}"

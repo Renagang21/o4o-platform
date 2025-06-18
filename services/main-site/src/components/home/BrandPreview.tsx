@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Card from '../common/Card';
-import Button from '../common/Button';
+// import Button from '../common/Button';
 
 const BrandPreview: React.FC = () => {
   const products = [
@@ -60,16 +60,13 @@ const BrandPreview: React.FC = () => {
         </div>
 
         <div className="text-center">
-          <Button
-            as={Link}
-            to="/customizer"
-            variant="primary"
-            size="lg"
-            className="px-8"
-            rightIcon={<ArrowRight className="w-5 h-5" />}
+          <a
+            href="/customizer"
+            className="inline-flex items-center bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
           >
             커스터마이저 체험하기
-          </Button>
+            <span className="ml-2"><ArrowRight className="w-5 h-5" /></span>
+          </a>
         </div>
       </div>
     </section>
