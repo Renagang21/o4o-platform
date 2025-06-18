@@ -1,7 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
-import Button from '../common/Button';
+import { Link } from 'react-router-dom';
 
 const footerLinks = {
   company: [
@@ -24,10 +22,10 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: <FaFacebook />, href: 'https://facebook.com' },
-  { icon: <FaTwitter />, href: 'https://twitter.com' },
-  { icon: <FaInstagram />, href: 'https://instagram.com' },
-  { icon: <FaLinkedin />, href: 'https://linkedin.com' }
+  { icon: '📘', href: 'https://facebook.com', name: 'Facebook' },
+  { icon: '🐦', href: 'https://twitter.com', name: 'Twitter' },
+  { icon: '📸', href: 'https://instagram.com', name: 'Instagram' },
+  { icon: '💼', href: 'https://linkedin.com', name: 'LinkedIn' }
 ];
 
 const Footer: React.FC = () => {
@@ -49,14 +47,12 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <Button
-                    as={Link}
-                    href={link.href}
-                    variant="ghost"
-                    className="text-gray-400 hover:text-white"
+                  <Link
+                    to={link.href}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
                     {link.name}
-                  </Button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -67,14 +63,12 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
-                  <Button
-                    as={Link}
-                    href={link.href}
-                    variant="ghost"
-                    className="text-gray-400 hover:text-white"
+                  <Link
+                    to={link.href}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
                     {link.name}
-                  </Button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -85,14 +79,12 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
-                  <Button
-                    as={Link}
-                    href={link.href}
-                    variant="ghost"
-                    className="text-gray-400 hover:text-white"
+                  <Link
+                    to={link.href}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
                     {link.name}
-                  </Button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -103,17 +95,16 @@ const Footer: React.FC = () => {
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex justify-center space-x-6">
             {socialLinks.map((link, index) => (
-              <Button
+              <a
                 key={index}
-                as="a"
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                variant="ghost"
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white transition-colors text-2xl"
+                title={link.name}
               >
                 {link.icon}
-              </Button>
+              </a>
             ))}
           </div>
         </div>
@@ -127,4 +118,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer; 
+export default Footer;
