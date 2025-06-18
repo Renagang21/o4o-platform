@@ -2,24 +2,26 @@
 
 ## 환경별 설정
 
-### 집(sohae) 환경
+### 집(sohae) 환경 - Windows
 ```bash
-# ~/.bashrc 또는 ~/.zshrc에 추가
-export NODE_ENV=development
-export PATH="/home/user/.nvm/versions/node/latest/bin:$PATH"
-export O4O_ENV=sohae
+# PowerShell에서 프로젝트 이동
+cd o4o-platform  # Cursor 열 때 기본 경로: C:\Users\sohae\OneDrive\Coding
 
-# 프로젝트별 alias
-alias o4o-dev="cd ~/projects/o4o-platform && npm run dev:all"
-alias o4o-pull="cd ~/projects/o4o-platform && git fetch && git pull"
-alias o4o-deploy="cd ~/projects/o4o-platform && ./scripts/deploy.sh"
+# 환경변수 (PowerShell Profile에 추가)
+$env:NODE_ENV = "development"
+$env:O4O_ENV = "sohae"
+
+# 프로젝트별 alias (PowerShell Profile)
+function o4o-dev { cd o4o-platform; npm run dev:all }
+function o4o-pull { cd o4o-platform; git fetch; git pull }
+function o4o-deploy { cd o4o-platform; .\scripts\deploy.ps1 }
 
 # Node.js 버전 확인
 node --version  # v18.x.x 이상 필요
 npm --version   # 9.x.x 이상 권장
 ```
 
-### 직장(home) 환경
+### 직장(home) 환경 - Linux/Mac
 ```bash
 # ~/.bashrc 또는 ~/.zshrc에 추가  
 export NODE_ENV=development
@@ -54,11 +56,11 @@ alias o4o-deploy="cd /workspace/o4o-platform && ./scripts/deploy.sh"
 4. 테스트: 업그레이드 후 `npm run dev:all`로 정상 작동 확인
 
 ## 필수 설치 프로그램
-```bash
-# Node.js (NVM 사용 권장)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 18
-nvm use 18
+
+### Windows (집 환경)
+```powershell
+# Node.js 설치 (공식 사이트에서 LTS 버전)
+# https://nodejs.org/
 
 # 전역 패키지
 npm install -g pm2@latest
@@ -69,7 +71,32 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 ```
 
+### Linux/Mac (직장 환경)
+```bash
+# Node.js (NVM 사용 권장)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 18
+nvm use 18
+
+# 전역 패키지
+npm install -g pm2@latest
+npm install -g typescript@latest
+```
+
 ## 환경별 PATH 문제 해결
+
+### Windows 환경
+```powershell
+# 현재 PATH 확인
+$env:PATH -split ';'
+Get-Command node
+Get-Command npm
+
+# 문제 발생 시 (PowerShell 재시작)
+# 또는 환경변수에서 Node.js 경로 직접 추가
+```
+
+### Linux/Mac 환경
 ```bash
 # 현재 PATH 확인
 echo $PATH
@@ -86,20 +113,37 @@ echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
 
 ## 서버별 배포 설정
 
-### API 서버 동기화
-```bash
+### API 서버 동기화 (Windows)
+```powershell
 # API 서버 전용 스크립트
-cd /path/to/api-server
+cd o4o-platform
 git pull origin main
 npm install
 npm run build:api
 pm2 restart api-server
 ```
 
-### 웹 서버 동기화  
-```bash
+### 웹 서버 동기화 (Windows)
+```powershell
 # 웹 서버 전용 스크립트
-cd /path/to/web-server
+cd o4o-platform
+git pull origin main
+npm install
+npm run build:web
+pm2 restart main-site
+```
+
+### Linux/Mac 환경 (직장)
+```bash
+# API 서버
+cd /workspace/o4o-platform
+git pull origin main
+npm install
+npm run build:api
+pm2 restart api-server
+
+# 웹 서버  
+cd /workspace/o4o-platform
 git pull origin main
 npm install
 npm run build:web
