@@ -1,13 +1,12 @@
 import { TiptapEditor } from '@/components/editor/TiptapEditor'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useParams } from 'react-router-dom'
 import { JSONContent } from '@tiptap/react'
 import toast from 'react-hot-toast'
 import { useVersionStore } from '@/lib/editor/versions'
 
 export default function EditorPage() {
-  const router = useRouter()
-  const { page } = router.query
+  const { page } = useParams<{ page: string }>()
   const [content, setContent] = useState<JSONContent | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -88,4 +87,4 @@ export default function EditorPage() {
       />
     </div>
   )
-} 
+}
