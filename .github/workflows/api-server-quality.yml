@@ -1,0 +1,45 @@
+# API 서버 품질 검사 워크플로우  
+name: API Server Quality Check
+
+on:
+  pull_request:
+    paths: 
+      - 'services/api-server/**'
+  push:
+    branches: [main]
+    paths:
+      - 'services/api-server/**'
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+      
+    - name: 🟢 Node.js 설정
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'services/api-server/package-lock.json'
+        
+    - name: 📦 의존성 설치
+      working-directory: services/api-server
+      run: npm ci
+      
+    - name: 🔍 TypeScript 타입 검사
+      working-directory: services/api-server
+      run: npm run type-check
+      
+    - name: 🧪 테스트 실행
+      working-directory: services/api-server
+      run: npm test
+      
+    - name: 🏗️ 빌드 테스트
+      working-directory: services/api-server
+      run: npm run build
+      
+    - name: ✅ 품질 검사 완료
+      run: echo "🎉 API 서버 품질 검사 통과!"

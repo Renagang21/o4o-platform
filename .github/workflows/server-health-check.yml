@@ -1,0 +1,53 @@
+# 서버 상태 확인 워크플로우
+name: Server Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # 6시간마다 실행
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🏥 서버 상태 확인
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.APISERVER_HOST }}
+        username: ${{ secrets.APISERVER_USER }}
+        key: ${{ secrets.APISERVER_SSH_KEY }}
+        timeout: 60s
+        script: |
+          echo "=== 🏥 서버 헬스체크 시작 ==="
+          echo "⏰ 체크 시간: $(date)"
+          echo "🖥️ 서버: $(hostname)"
+          
+          echo "=== 💾 시스템 리소스 ==="
+          echo "CPU 사용률:"
+          top -bn1 | grep "Cpu(s)" | head -1
+          echo "메모리 사용률:"
+          free -h
+          echo "디스크 사용률:"
+          df -h /
+          
+          echo "=== 🔧 Git 상태 ==="
+          cd /home/ubuntu/o4o-platform
+          echo "현재 브랜치: $(git branch --show-current)"
+          echo "최신 커밋: $(git log -1 --oneline)"
+          echo "Git 상태:"
+          git status --porcelain
+          
+          echo "=== 📦 서비스 상태 ==="
+          if command -v pm2 >/dev/null 2>&1; then
+            echo "PM2 프로세스 상태:"
+            pm2 status
+          else
+            echo "PM2가 설치되지 않음"
+          fi
+          
+          echo "=== 🌐 네트워크 상태 ==="
+          echo "포트 4000 상태:"
+          netstat -tlnp | grep :4000 || echo "포트 4000 사용 중이 아님"
+          
+          echo "=== ✅ 헬스체크 완료 ==="

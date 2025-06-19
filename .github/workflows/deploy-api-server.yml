@@ -1,0 +1,126 @@
+# o4o-apiserver 자동 배포 워크플로우
+name: Deploy API Server to o4o-apiserver
+
+on:
+  push:
+    branches: [main]
+    paths: 
+      - 'services/api-server/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.env.example'
+      - 'ecosystem.config.js'
+      - '.github/workflows/deploy-api-server.yml'
+  workflow_dispatch: # 수동 실행 가능
+    inputs:
+      reason:
+        description: '배포 이유'
+        required: false
+        default: '수동 배포'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: 📋 배포 시작 로그
+      run: |
+        echo "🚀 o4o-apiserver 배포 시작"
+        echo "📅 배포 시간: $(date)"
+        echo "👤 실행자: ${{ github.actor }}"
+        echo "📝 커밋: ${{ github.sha }}"
+        echo "🔗 브랜치: ${{ github.ref }}"
+        
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: 🔧 서버 배포 및 sparse-checkout 설정
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.APISERVER_HOST }}
+        username: ${{ secrets.APISERVER_USER }}
+        key: ${{ secrets.APISERVER_SSH_KEY }}
+        timeout: 300s
+        script: |
+          set -e  # 에러 발생 시 즉시 중단
+          
+          echo "=== 🏠 작업 디렉토리 이동 ==="
+          cd /home/ubuntu/o4o-platform || {
+            echo "❌ 프로젝트 디렉토리가 없습니다!"
+            exit 1
+          }
+          
+          echo "=== 📋 현재 상태 확인 ==="
+          echo "📍 현재 위치: $(pwd)"
+          echo "🖥️ 서버 호스트: $(hostname)"
+          echo "⏰ 서버 시간: $(date)"
+          
+          echo "=== 💾 현재 작업 백업 ==="
+          git stash push -m "auto-backup-$(date +%Y%m%d_%H%M%S)" || echo "백업할 변경사항 없음"
+          
+          echo "=== 🔧 sparse-checkout 설정 확인 및 적용 ==="
+          if ! git config core.sparseCheckout >/dev/null 2>&1; then
+            echo "⚙️ 최초 sparse-checkout 설정 중..."
+            git sparse-checkout init --cone
+            git sparse-checkout set services/api-server scripts
+            git sparse-checkout add package.json package-lock.json .env.example .gitignore README.md ecosystem.config.js
+            echo "✅ sparse-checkout 설정 완료"
+          else
+            echo "✅ sparse-checkout 이미 설정됨"
+            git sparse-checkout list
+          fi
+          
+          echo "=== 📥 최신 코드 동기화 ==="
+          git fetch origin --prune
+          echo "현재 브랜치: $(git branch --show-current)"
+          echo "동기화 전 커밋: $(git rev-parse HEAD)"
+          
+          git reset --hard origin/main
+          echo "동기화 후 커밋: $(git rev-parse HEAD)"
+          
+          echo "=== 📊 변경사항 확인 ==="
+          git status
+          echo "현재 services 폴더 구조:"
+          ls -la services/ || echo "services 폴더 없음"
+          
+          echo "=== 📦 의존성 설치 ==="
+          cd services/api-server
+          if [ -f package.json ]; then
+            echo "📦 npm install 실행 중..."
+            npm install --production
+            echo "✅ 의존성 설치 완료"
+          else
+            echo "⚠️ package.json이 없습니다"
+          fi
+          
+          echo "=== 🔄 서비스 재시작 ==="
+          # PM2가 설치되어 있는 경우
+          if command -v pm2 >/dev/null 2>&1; then
+            echo "🔄 PM2로 재시작..."
+            pm2 restart api-server || pm2 start npm --name "api-server" -- start
+            pm2 status
+          else
+            echo "⚠️ PM2가 설치되지 않음. 수동 재시작 필요"
+          fi
+          
+          echo "=== ✅ 배포 완료 ==="
+          echo "🎉 o4o-apiserver 배포가 성공적으로 완료되었습니다!"
+          echo "📊 최종 Git 상태:"
+          git log -1 --oneline
+          
+    - name: 🎉 배포 완료 알림
+      if: success()
+      run: |
+        echo "✅ 배포 성공!"
+        echo "🔗 서버: ${{ secrets.APISERVER_HOST }}"
+        echo "⏰ 완료 시간: $(date)"
+        
+    - name: ❌ 배포 실패 처리
+      if: failure()
+      run: |
+        echo "❌ 배포 실패!"
+        echo "🔍 로그를 확인하여 문제를 해결해주세요."
