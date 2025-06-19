@@ -5,6 +5,9 @@ import { JSONContent } from '@tiptap/react'
 import toast from 'react-hot-toast'
 import { useVersionStore } from '@/lib/editor/versions'
 
+// localStorage key for content storage
+const CONTENT_STORAGE_KEY = 'o4o-editor-content'
+
 export default function EditorPage() {
   const { page } = useParams<{ page: string }>()
   const [content, setContent] = useState<JSONContent | null>(null)
@@ -22,12 +25,29 @@ export default function EditorPage() {
     try {
       setIsLoading(true)
       setError(null)
-      const response = await fetch(`/api/editor/load?page=${page}`)
-      if (!response.ok) {
-        throw new Error('콘텐츠를 불러오는데 실패했습니다.')
+      
+      // Load from localStorage instead of API
+      const stored = localStorage.getItem(`${CONTENT_STORAGE_KEY}-${page}`)
+      if (stored) {
+        const data = JSON.parse(stored)
+        setContent(data)
+      } else {
+        // Default content if nothing stored
+        setContent({
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: `Welcome to ${page} editor. Start writing...`
+                }
+              ]
+            }
+          ]
+        })
       }
-      const data = await response.json()
-      setContent(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.')
       toast.error('콘텐츠를 불러오는데 실패했습니다.')
@@ -41,20 +61,9 @@ export default function EditorPage() {
 
     try {
       setIsLoading(true)
-      const response = await fetch('/api/editor/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          page,
-          content,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('저장에 실패했습니다.')
-      }
+      
+      // Save to localStorage instead of API
+      localStorage.setItem(`${CONTENT_STORAGE_KEY}-${page}`, JSON.stringify(content))
 
       // 저장 성공 시 자동으로 버전 추가
       addVersion(page as string, content)
