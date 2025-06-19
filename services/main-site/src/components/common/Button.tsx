@@ -1,6 +1,5 @@
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
-import Link from 'next/link';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'disabled' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -12,10 +11,10 @@ type ButtonBaseProps = {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
-  as?: React.ElementType | typeof Link | 'a';
+  as?: React.ElementType | 'a';
 };
 
-type ButtonProps<T extends React.ElementType | typeof Link | 'a' = 'button'> = ButtonBaseProps & {
+type ButtonProps<T extends React.ElementType | 'a' = 'button'> = ButtonBaseProps & {
   as?: T;
 } & Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonBaseProps>;
 
@@ -39,11 +38,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
     
     const variantStyles = {
-      primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
-      secondary: 'bg-primary-light text-primary hover:bg-secondary-dark focus:ring-primary',
-      success: 'bg-success text-white hover:bg-success-dark focus:ring-success',
-      danger: 'bg-danger text-white hover:bg-danger-dark focus:ring-danger',
-      disabled: 'bg-gray-100 text-text-disabled cursor-not-allowed',
+      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+      secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
+      success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
+      danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+      disabled: 'bg-gray-100 text-gray-400 cursor-not-allowed',
       ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500'
     };
 
@@ -102,4 +101,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-export default Button; 
+export default Button;
