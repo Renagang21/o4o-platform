@@ -1,0 +1,164 @@
+name: 🚨 Emergency Server Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_type:
+        description: '복구할 서버 선택'
+        required: true
+        default: 'webserver'
+        type: choice
+        options:
+          - webserver
+          - apiserver
+          - both
+      force_rebuild:
+        description: '강제 이미지 재빌드'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  emergency-recovery:
+    runs-on: ubuntu-latest
+    name: 🚑 Emergency Recovery - ${{ github.event.inputs.server_type }}
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.WEB_SERVER_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.API_SERVER_HOST }} >> ~/.ssh/known_hosts
+
+    - name: 🌐 Web Server Recovery
+      if: github.event.inputs.server_type == 'webserver' || github.event.inputs.server_type == 'both'
+      run: |
+        echo "🚑 Web Server 응급 복구 시작..."
+        
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.WEB_SERVER_HOST }} << 'EOF'
+          set -e
+          
+          echo "📂 프로젝트 디렉토리로 이동..."
+          cd /home/ubuntu/o4o-platform || { echo "❌ 프로젝트 디렉토리 없음"; exit 1; }
+          
+          echo "🔄 최신 코드 가져오기..."
+          git fetch origin
+          git reset --hard origin/main
+          
+          echo "🐳 현재 컨테이너 상태 확인..."
+          docker ps -a
+          
+          echo "🛑 기존 웹 서비스 중지..."
+          docker-compose -f docker-compose.production.yml stop web-app || true
+          docker-compose -f docker-compose.production.yml rm -f web-app || true
+          
+          if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+            echo "🔨 강제 이미지 재빌드..."
+            docker-compose -f docker-compose.production.yml build --no-cache web-app
+          fi
+          
+          echo "🚀 웹 서비스 재시작..."
+          docker-compose -f docker-compose.production.yml up -d web-app
+          
+          echo "⏱️ 서비스 안정화 대기 (30초)..."
+          sleep 30
+          
+          echo "🏥 헬스체크 수행..."
+          for i in {1..5}; do
+            if curl -f http://localhost/health; then
+              echo "✅ 헬스체크 성공 (시도 $i)"
+              break
+            else
+              echo "❌ 헬스체크 실패 (시도 $i/5)"
+              sleep 10
+            fi
+          done
+          
+          echo "📊 최종 상태 확인..."
+          docker ps -f name=o4o-web-prod
+          curl -I http://localhost/ || true
+          
+          echo "✅ Web Server 복구 완료!"
+        EOF
+
+    - name: 🔧 API Server Recovery  
+      if: github.event.inputs.server_type == 'apiserver' || github.event.inputs.server_type == 'both'
+      run: |
+        echo "🚑 API Server 응급 복구 시작..."
+        
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.API_SERVER_HOST }} << 'EOF'
+          set -e
+          
+          echo "📂 프로젝트 디렉토리로 이동..."
+          cd /home/ubuntu/o4o-platform || { echo "❌ 프로젝트 디렉토리 없음"; exit 1; }
+          
+          echo "🔄 최신 코드 가져오기..."
+          git fetch origin
+          git reset --hard origin/main
+          
+          echo "🐳 현재 컨테이너 상태 확인..."
+          docker ps -a
+          
+          echo "🛑 기존 API 서비스 중지..."
+          docker-compose -f docker-compose.production.yml stop api-server || true
+          docker-compose -f docker-compose.production.yml rm -f api-server || true
+          
+          if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+            echo "🔨 강제 이미지 재빌드..."
+            docker-compose -f docker-compose.production.yml build --no-cache api-server
+          fi
+          
+          echo "🚀 API 서비스 재시작..."
+          docker-compose -f docker-compose.production.yml up -d api-server
+          
+          echo "⏱️ 서비스 안정화 대기 (30초)..."
+          sleep 30
+          
+          echo "🏥 헬스체크 수행..."
+          for i in {1..5}; do
+            if curl -f http://localhost:3000/api/health; then
+              echo "✅ 헬스체크 성공 (시도 $i)"
+              break
+            else
+              echo "❌ 헬스체크 실패 (시도 $i/5)"
+              sleep 10
+            fi
+          done
+          
+          echo "📊 최종 상태 확인..."
+          docker ps -f name=o4o-api-prod
+          
+          echo "✅ API Server 복구 완료!"
+        EOF
+
+    - name: 📊 Recovery Status Report
+      run: |
+        echo "🎯 === 응급 복구 완료 보고서 ==="
+        echo "복구 대상: ${{ github.event.inputs.server_type }}"
+        echo "강제 재빌드: ${{ github.event.inputs.force_rebuild }}"
+        echo "실행 시간: $(date)"
+        echo "Git 커밋: ${{ github.sha }}"
+        echo ""
+        echo "✅ 복구 작업이 완료되었습니다."
+        echo "🔍 서비스 상태를 확인하려면 다음 URL을 확인하세요:"
+        echo "- 메인 사이트: https://neture.co.kr"
+        echo "- 헬스체크: https://neture.co.kr/health"
+        echo "- 진단 페이지: https://neture.co.kr/health.html"
+        
+    - name: 🚨 Notify on Failure
+      if: failure()
+      run: |
+        echo "❌ === 응급 복구 실패 ==="
+        echo "복구 작업 중 오류가 발생했습니다."
+        echo "수동 개입이 필요할 수 있습니다."
+        echo ""
+        echo "다음 단계를 시도해보세요:"
+        echo "1. 서버에 직접 SSH 접속"
+        echo "2. 로그 확인: docker logs o4o-web-prod"
+        echo "3. 수동 컨테이너 재시작"
+        echo "4. 필요시 서버 재부팅"
