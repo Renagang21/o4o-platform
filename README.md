@@ -436,3 +436,5 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 [Getting Started](#-빠른-시작) • [Documentation](./docs/) • [Issues](../../issues) • [Discussions](../../discussions)
 
 </div>
+<!-- Deploy trigger -->
+<!-- Emergency deployment trigger - 2025-06-20 neture.co.kr 404 fix -->
