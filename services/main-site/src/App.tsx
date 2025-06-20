@@ -11,6 +11,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import CheckAccount from './pages/CheckAccount';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import ContentManagement from './pages/admin/ContentManagement';
+import MediaLibrary from './pages/admin/MediaLibrary';
+import PageManager from './pages/admin/PageManager';
 
 // Dropshipping Pages
 import {
@@ -75,6 +78,36 @@ const App: React.FC = () => {
               <ProtectedRoute requireAdmin>
                 <Navbar />
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/content"
+            element={
+              <ProtectedRoute requireAdmin>
+                <Navbar />
+                <ContentManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/media"
+            element={
+              <ProtectedRoute requireAdmin>
+                <Navbar />
+                <MediaLibrary />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/pages"
+            element={
+              <ProtectedRoute requireAdmin>
+                <Navbar />
+                <PageManager />
               </ProtectedRoute>
             }
           />

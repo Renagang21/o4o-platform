@@ -25,34 +25,34 @@ export enum BusinessType {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.USER
   })
-  role: UserRole;
+  role!: UserRole;
 
   @Column({
     type: 'enum',
     enum: UserStatus,
     default: UserStatus.PENDING
   })
-  status: UserStatus;
+  status!: UserStatus;
 
   // Business Info (JSON column)
   @Column({ type: 'json', nullable: true })
-  businessInfo: {
+  businessInfo!: {
     businessName: string;
     businessType: BusinessType;
     businessNumber?: string;
@@ -61,19 +61,19 @@ export class User {
   };
 
   @Column({ nullable: true })
-  lastLoginAt: Date;
+  lastLoginAt!: Date;
 
   @Column({ nullable: true })
-  approvedAt: Date;
+  approvedAt!: Date;
 
   @Column({ nullable: true })
-  approvedBy: string;
+  approvedBy!: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @BeforeInsert()
   async hashPassword() {

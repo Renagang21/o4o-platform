@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   ShoppingBag, 
@@ -8,7 +9,10 @@ import {
   UserCheck,
   UserX,
   Settings,
-  Activity
+  Activity,
+  FileText,
+  Edit3,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface User {
@@ -27,6 +31,7 @@ interface Pagination {
 }
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<Pagination | null>(null);
@@ -143,8 +148,51 @@ const AdminDashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">관리자 대시보드</h1>
-          <p className="text-gray-600">시스템 전체를 관리하고 모니터링할 수 있습니다.</p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">관리자 대시보드</h1>
+              <p className="text-gray-600">시스템 전체를 관리하고 모니터링할 수 있습니다.</p>
+            </div>
+            
+            {/* 관리 메뉴 버튼들 */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate('/admin/pages')}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+              >
+                <Edit3 className="w-4 h-4" />
+                페이지 관리
+              </button>
+              <button
+                onClick={() => navigate('/admin/content')}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                컨텐츠 관리
+              </button>
+              <button
+                onClick={() => navigate('/admin/media')}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <ImageIcon className="w-4 h-4" />
+                미디어 라이브러리
+              </button>
+              <button
+                onClick={() => navigate('/admin/users')}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Users className="w-4 h-4" />
+                사용자 관리
+              </button>
+              <button
+                onClick={() => navigate('/admin/settings')}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                설정
+              </button>
+            </div>
+          </div>
         </motion.div>
 
         {/* Stats Cards */}
