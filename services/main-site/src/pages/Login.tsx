@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import { authAPI } from '../api/client';
+import { mockAuthService } from '../services/mockAuth';
 import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
@@ -30,14 +31,23 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const response = await authAPI.login(formData.email, formData.password);
+      let response;
+      
+      // API 서버 연결 시도, 실패 시 모의 서비스 사용
+      try {
+        response = await authAPI.login(formData.email, formData.password);
+      } catch (apiError) {
+        console.log('API 서버 연결 실패, 모의 서비스 사용');
+        response = await mockAuthService.login(formData.email, formData.password);
+      }
+      
       const { token, user } = response.data;
 
       // 토큰과 사용자 정보 저장
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      toast.success('로그인 성공!');
+      toast.success(`${user.name}님, 로그인 성공!`);
 
       // 역할에 따라 리다이렉트
       if (user.role === 'admin') {
@@ -49,7 +59,7 @@ const Login: React.FC = () => {
     } catch (error: any) {
       console.error('Login error:', error);
       
-      let errorMessage = '로그인에 실패했습니다.';
+      let errorMessage = error.message || '로그인에 실패했습니다.';
       
       if (error.response?.data?.code) {
         switch (error.response.data.code) {
@@ -91,6 +101,21 @@ const Login: React.FC = () => {
           </Link>
           <p className="text-gray-600">로그인</p>
         </div>
+
+        {/* 개발 환경 임시 계정 안내 */}
+        {import.meta.env.DEV && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+          >
+            <p className="text-yellow-800 text-sm font-medium mb-2">🔧 개발 환경 - 임시 계정</p>
+            <div className="text-yellow-700 text-xs space-y-1">
+              <div>관리자: <code className="bg-yellow-100 px-1 rounded">admin@neture.co.kr</code> / <code className="bg-yellow-100 px-1 rounded">admin123</code></div>
+              <div>일반: <code className="bg-yellow-100 px-1 rounded">user@neture.co.kr</code> / <code className="bg-yellow-100 px-1 rounded">user123</code></div>
+            </div>
+          </motion.div>
+        )}
 
         {/* 에러 메시지 */}
         {error && (

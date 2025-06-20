@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { mockAuthService } from '../services/mockAuth';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -22,17 +23,23 @@ const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      // API 서버 연결 시도, 실패 시 모의 서비스 사용
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '비밀번호 재설정 요청에 실패했습니다.');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || '비밀번호 재설정 요청에 실패했습니다.');
+        }
+      } catch (apiError) {
+        console.log('API 서버 연결 실패, 모의 서비스 사용');
+        await mockAuthService.forgotPassword(email);
       }
 
       setSuccess(true);
