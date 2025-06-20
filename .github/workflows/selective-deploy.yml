@@ -48,17 +48,33 @@ jobs:
         echo "🚀 API 서버 배포 시작..."
         
         # SSH를 통한 서버 접속 및 배포
-        # 실제 배포시에는 여기에 SSH 키와 서버 정보를 설정해야 합니다
         echo "SSH_HOST: ${{ secrets.API_SERVER_HOST }}"
         echo "SSH_USER: ${{ secrets.SSH_USER }}"
         
-        # 예시 배포 명령어 (실제 환경에 맞게 수정 필요)
-        # ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.API_SERVER_HOST }} "
-        #   cd /path/to/o4o-platform &&
-        #   git pull origin main &&
-        #   bash setup-apiserver-sync.sh &&
-        #   docker-compose -f docker-compose.production.yml up -d api-server
-        # "
+        # 실제 API 서버 배포 명령어
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.API_SERVER_HOST }} "
+          set -e
+          echo '🔄 API 서버 배포 프로세스 시작...'
+          cd /home/ubuntu/o4o-platform || { echo '❌ 프로젝트 디렉토리 없음'; exit 1; }
+          
+          echo '📥 최신 코드 가져오기...'
+          git fetch origin  
+          git reset --hard origin/main
+          
+          echo '🐳 API 서비스 재시작...'
+          docker-compose -f docker-compose.production.yml stop api-server || true
+          docker-compose -f docker-compose.production.yml rm -f api-server || true
+          docker-compose -f docker-compose.production.yml build api-server
+          docker-compose -f docker-compose.production.yml up -d api-server
+          
+          echo '⏱️ 서비스 안정화 대기...'
+          sleep 30
+          
+          echo '🏥 헬스체크 수행...'
+          curl -f http://localhost:3000/api/health || { echo '❌ API 헬스체크 실패'; exit 1; }
+          
+          echo '✅ API 서버 배포 완료!'
+        "
 
   deploy-web-server:
     needs: detect-changes  
@@ -73,13 +89,30 @@ jobs:
         echo "SSH_HOST: ${{ secrets.WEB_SERVER_HOST }}"
         echo "SSH_USER: ${{ secrets.SSH_USER }}"
         
-        # 예시 배포 명령어 (실제 환경에 맞게 수정 필요)
-        # ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.WEB_SERVER_HOST }} "
-        #   cd /path/to/o4o-platform &&
-        #   git pull origin main &&
-        #   bash setup-webserver-sync.sh &&
-        #   docker-compose -f docker-compose.production.yml up -d web-server
-        # "
+        # 실제 배포 명령어 실행
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.WEB_SERVER_HOST }} "
+          set -e
+          echo '🔄 서버 배포 프로세스 시작...'
+          cd /home/ubuntu/o4o-platform || { echo '❌ 프로젝트 디렉토리 없음'; exit 1; }
+          
+          echo '📥 최신 코드 가져오기...'
+          git fetch origin
+          git reset --hard origin/main
+          
+          echo '🐳 웹 서비스 재시작...'
+          docker-compose -f docker-compose.production.yml stop web-app || true
+          docker-compose -f docker-compose.production.yml rm -f web-app || true
+          docker-compose -f docker-compose.production.yml build web-app
+          docker-compose -f docker-compose.production.yml up -d web-app
+          
+          echo '⏱️ 서비스 안정화 대기...'
+          sleep 30
+          
+          echo '🏥 헬스체크 수행...'
+          curl -f http://localhost/health || { echo '❌ 헬스체크 실패'; exit 1; }
+          
+          echo '✅ 웹 서버 배포 완료!'
+        "
 
   notify-deployment:
     needs: [deploy-api-server, deploy-web-server]
