@@ -111,7 +111,7 @@ const Login: React.FC = () => {
           >
             <p className="text-yellow-800 text-sm font-medium mb-2">🔧 개발 환경 - 임시 계정</p>
             <div className="text-yellow-700 text-xs space-y-1">
-              <div>관리자: <code className="bg-yellow-100 px-1 rounded">admin@neture.co.kr</code> / <code className="bg-yellow-100 px-1 rounded">admin123</code></div>
+              <div>관리자: <code className="bg-yellow-100 px-1 rounded">sohae21@naver.com</code> / <code className="bg-yellow-100 px-1 rounded">admin123</code></div>
               <div>일반: <code className="bg-yellow-100 px-1 rounded">user@neture.co.kr</code> / <code className="bg-yellow-100 px-1 rounded">user123</code></div>
             </div>
           </motion.div>

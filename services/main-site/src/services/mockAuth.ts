@@ -12,8 +12,8 @@ interface User {
 const mockUsers: User[] = [
   {
     id: '1',
-    email: 'admin@neture.co.kr',
-    name: '관리자',
+    email: 'sohae21@naver.com',
+    name: '소해님 (관리자)',
     role: 'admin',
     status: 'active'
   },
@@ -35,7 +35,7 @@ const mockUsers: User[] = [
 
 // 모의 비밀번호 (실제로는 해시되어야 함)
 const mockPasswords: Record<string, string> = {
-  'admin@neture.co.kr': 'admin123',
+  'sohae21@naver.com': 'admin123',
   'user@neture.co.kr': 'user123',
   'test@example.com': 'test123'
 };
@@ -85,10 +85,14 @@ export const mockAuthService = {
       throw new Error('등록되지 않은 이메일입니다.');
     }
     
-    // 실제로는 이메일 발송
+    // 실제로는 이메일 발송 (개발 환경에서는 로그로 표시)
     console.log(`[모의 이메일 발송] ${email}로 비밀번호 재설정 링크 발송됨`);
     
-    // 실제 이메일 발송 로직을 시뮬레이션
+    // 실제 사용자 이메일인 경우 더 현실적인 메시지
+    if (email === 'sohae21@naver.com') {
+      console.log('📧 실제 이메일 주소로 발송 시뮬레이션 - 네이버 메일함을 확인하세요 (실제 발송 안됨)');
+    }
+    
     return {
       success: true,
       message: '비밀번호 재설정 링크가 발송되었습니다.'
@@ -142,7 +146,7 @@ export const mockAuthService = {
 // 개발 환경에서만 콘솔에 임시 계정 정보 출력
 if (import.meta.env.DEV) {
   console.log('🔐 임시 로그인 계정:');
-  console.log('관리자: admin@neture.co.kr / admin123');
+  console.log('관리자: sohae21@naver.com / admin123');
   console.log('일반사용자: user@neture.co.kr / user123');
   console.log('테스트: test@example.com / test123');
 }
