@@ -88,7 +88,7 @@ export default function EditorPage() {
   return (
     <div className="p-4">
       <TiptapEditor
-        content={content}
+        content={content || undefined}
         onChange={setContent}
         onSave={handleSave}
         isLoading={isLoading}

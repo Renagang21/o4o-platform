@@ -5,6 +5,8 @@ import ActivityHistoryTable from '../components/affiliate/ActivityHistoryTable';
 import NoticeBanner from '../components/affiliate/NoticeBanner';
 
 const AffiliateDashboard: React.FC = () => {
+  const [showNotice, setShowNotice] = React.useState(true);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -21,7 +23,7 @@ const AffiliateDashboard: React.FC = () => {
           {/* 왼쪽 컬럼 */}
           <div className="space-y-6">
             <ReferralLinkBox />
-            <NoticeBanner />
+            {showNotice && <NoticeBanner onClose={() => setShowNotice(false)} />}
           </div>
 
           {/* 오른쪽 컬럼 */}

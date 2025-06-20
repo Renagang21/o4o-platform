@@ -19,7 +19,13 @@ export const EditorTemplateManager = ({ editor }: EditorTemplateManagerProps) =>
       if (!name) return
 
       const content = editor.getJSON()
-      addTemplate(name, content)
+      addTemplate({
+        name,
+        description: `${name} 템플릿`,
+        content,
+        category: 'custom',
+        tags: []
+      })
       toast.success('템플릿이 저장되었습니다.')
     } catch (error) {
       console.error('템플릿 저장 오류:', error)

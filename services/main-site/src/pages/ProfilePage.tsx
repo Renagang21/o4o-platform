@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, AuthContext } from '../context/AuthContext';
-import ProfileCard from '../components/ProfileCard'; // ✨ 이 import 문을 깔끔하게 정리했습니다.
+import { useAuth } from '../contexts/AuthContext';
+import ProfileCard from '../components/ProfileCard';
 import PasswordChangeModal from '../components/PasswordChangeModal';
 
 const ProfilePage: React.FC = () => {
-  const { user, setUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
 
@@ -18,7 +18,7 @@ const ProfilePage: React.FC = () => {
   if (!user) return null;
 
   const handleLogout = () => {
-    setUser(null); // ✨ logout() 대신 setUser(null)로 변경하여 로그아웃 처리
+    logout(); // AuthContext의 logout 함수 사용
     navigate('/');
   };
 

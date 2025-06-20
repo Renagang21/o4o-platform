@@ -50,8 +50,8 @@ const CustomerManagement: React.FC = () => {
     }).format(amount);
   };
 
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('ko-KR').format(num);
+  const formatNumber = (num: number | undefined) => {
+    return new Intl.NumberFormat('ko-KR').format(num || 0);
   };
 
   return (

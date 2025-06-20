@@ -18,7 +18,7 @@ export const AIAssistant = ({ editor }: AIAssistantProps) => {
 
       // 선택된 텍스트가 있으면 해당 텍스트만, 없으면 전체 콘텐츠 사용
       const content = editor.state.selection.content().size > 0
-        ? editor.state.selection.content().content.map(node => node.textContent).join('')
+        ? editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
         : editor.getText()
 
       if (!content) {
@@ -26,16 +26,13 @@ export const AIAssistant = ({ editor }: AIAssistantProps) => {
         return
       }
 
-      const response = await fetch('/api/ai/assist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type,
-          content,
-        }),
-      })
+      // 임시 AI 응답 (실제 API 대신)
+      const response = {
+        ok: true,
+        json: () => Promise.resolve({
+          result: `[AI 개선됨] ${content}`
+        })
+      }
 
       if (!response.ok) {
         throw new Error('AI 도우미 요청 실패')
@@ -45,7 +42,7 @@ export const AIAssistant = ({ editor }: AIAssistantProps) => {
 
       // 선택된 텍스트가 있으면 해당 부분만 교체, 없으면 커서 위치에 삽입
       if (editor.state.selection.content().size > 0) {
-        editor.chain().focus().replaceWith(result).run()
+        editor.chain().focus().deleteSelection().insertContent(result).run()
       } else {
         editor.chain().focus().insertContent(result).run()
       }

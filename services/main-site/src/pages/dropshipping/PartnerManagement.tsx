@@ -407,7 +407,7 @@ const PartnerManagement: React.FC = () => {
       case 'commission_management':
         return (
           <CommissionManagementSystem
-            userRole={currentRole}
+            userRole={currentRole as "admin" | "supplier"}
             onApprove={handleCommissionApprove}
             onReject={handleCommissionReject}
           />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, UserRole } from '../context/AuthContext';
+import { User, UserRole } from '../contexts/AuthContext';
 import { UserCircle, Mail, Shield, Calendar, LogOut, KeyRound } from 'lucide-react';
 
 interface ProfileCardProps {
@@ -15,7 +15,7 @@ const roleLabel: Record<string, string> = {
 };
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ user, onLogout, onPasswordChange }) => {
-  const joinDate = user.id.length === 24 ? new Date(parseInt(user.id.substring(0, 8), 16) * 1000) : new Date();
+  const joinDate = user._id.length === 24 ? new Date(parseInt(user._id.substring(0, 8), 16) * 1000) : new Date();
   const formattedDate = joinDate.toISOString().slice(0, 10);
 
   return (
