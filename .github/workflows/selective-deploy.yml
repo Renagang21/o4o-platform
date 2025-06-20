@@ -26,6 +26,10 @@ jobs:
             - 'services/api-server/**'
           web-server:
             - 'services/main-site/**'
+            - 'services/crowdfunding/**'
+            - 'services/ecommerce/**'
+            - 'services/forum/**'
+            - 'services/signage/**'
           shared:
             - 'package.json'
             - 'package-lock.json'

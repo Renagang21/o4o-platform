@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '20.x'
           cache: 'npm'
 
       # common-core 업데이트 (repository_dispatch 이벤트 시)
@@ -43,7 +43,17 @@ jobs:
 
       # 의존성 설치
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          cd services/api-server && npm ci
+          cd ../main-site && npm ci
+          # ecommerce 서비스들
+          if [ -f "services/ecommerce/admin/package.json" ]; then
+            cd ../ecommerce/admin && npm ci
+          fi
+          if [ -f "services/ecommerce/web/package.json" ]; then
+            cd ../ecommerce/web && npm ci
+          fi
 
       # 테스트 실행
       - name: Run tests

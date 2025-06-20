@@ -30,6 +30,13 @@ jobs:
           npm ci
           cd services/api-server && npm ci
           cd ../main-site && npm ci
+          # ecommerce 서비스들
+          if [ -f "services/ecommerce/admin/package.json" ]; then
+            cd ../ecommerce/admin && npm ci
+          fi
+          if [ -f "services/ecommerce/web/package.json" ]; then
+            cd ../ecommerce/web && npm ci
+          fi
 
       - name: 📋 ESLint check
         run: npm run lint
@@ -63,6 +70,13 @@ jobs:
           npm ci
           cd services/api-server && npm ci
           cd ../main-site && npm ci
+          # ecommerce 서비스들
+          if [ -f "services/ecommerce/admin/package.json" ]; then
+            cd ../ecommerce/admin && npm ci
+          fi
+          if [ -f "services/ecommerce/web/package.json" ]; then
+            cd ../ecommerce/web && npm ci
+          fi
 
       - name: 🧪 Run unit tests
         run: npm run test:unit
@@ -153,6 +167,13 @@ jobs:
           npm ci
           cd services/api-server && npm ci
           cd ../main-site && npm ci
+          # ecommerce 서비스들
+          if [ -f "services/ecommerce/admin/package.json" ]; then
+            cd ../ecommerce/admin && npm ci
+          fi
+          if [ -f "services/ecommerce/web/package.json" ]; then
+            cd ../ecommerce/web && npm ci
+          fi
 
       - name: 🎭 Install Playwright
         run: npx playwright install --with-deps
