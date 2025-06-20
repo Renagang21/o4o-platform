@@ -1,82 +1,104 @@
-import { create } from 'zustand'
-import { JSONContent } from '@tiptap/react'
+import { create } from 'zustand';
+import { JSONContent } from '@tiptap/react';
 
 export interface Template {
-  id: string
-  name: string
-  content: JSONContent
-  createdAt: string
-  updatedAt: string
+  id: string;
+  name: string;
+  description: string;
+  content: JSONContent;
+  category: string;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface TemplateStore {
-  templates: Template[]
-  addTemplate: (name: string, content: JSONContent) => void
-  removeTemplate: (id: string) => void
-  updateTemplate: (id: string, name: string, content: JSONContent) => void
-  getTemplate: (id: string) => Template | undefined
-}
-
-// localStorage 키
-const STORAGE_KEY = 'editor_templates'
-const MAX_TEMPLATES = 10
-
-// localStorage에서 템플릿 불러오기
-const loadTemplates = (): Template[] => {
-  if (typeof window === 'undefined') return []
-  const stored = localStorage.getItem(STORAGE_KEY)
-  return stored ? JSON.parse(stored) : []
-}
-
-// localStorage에 템플릿 저장
-const saveTemplates = (templates: Template[]) => {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(templates))
+  templates: Template[];
+  selectedTemplate: Template | null;
+  isLoading: boolean;
+  error: string | null;
+  
+  // Actions
+  loadTemplates: () => Promise<void>;
+  saveTemplate: (template: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addTemplate: (template: Omit<Template, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>; // alias
+  updateTemplate: (id: string, updates: Partial<Template>) => Promise<void>;
+  deleteTemplate: (id: string) => Promise<void>;
+  removeTemplate: (id: string) => Promise<void>; // alias
+  selectTemplate: (template: Template | null) => void;
+  getTemplatesByCategory: (category: string) => Template[];
+  searchTemplates: (query: string) => Template[];
 }
 
 export const useTemplateStore = create<TemplateStore>((set, get) => ({
-  templates: loadTemplates(),
+  templates: [],
+  selectedTemplate: null,
+  isLoading: false,
+  error: null,
 
-  addTemplate: (name: string, content: JSONContent) => {
-    const templates = get().templates
-
-    // 최대 개수 제한 확인
-    if (templates.length >= MAX_TEMPLATES) {
-      throw new Error(`템플릿은 최대 ${MAX_TEMPLATES}개까지 저장할 수 있습니다.`)
+  loadTemplates: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      // Load templates from localStorage for now
+      const stored = localStorage.getItem('editor-templates');
+      const templates = stored ? JSON.parse(stored) : [];
+      set({ templates, isLoading: false });
+    } catch (error) {
+      set({ error: 'Failed to load templates', isLoading: false });
     }
+  },
 
-    const newTemplate: Template = {
+  saveTemplate: async (templateData) => {
+    const template: Template = {
+      ...templateData,
       id: Date.now().toString(),
-      name,
-      content,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-
-    const updatedTemplates = [...templates, newTemplate]
-    saveTemplates(updatedTemplates)
-    set({ templates: updatedTemplates })
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    const templates = [...get().templates, template];
+    localStorage.setItem('editor-templates', JSON.stringify(templates));
+    set({ templates });
   },
 
-  removeTemplate: (id: string) => {
-    const templates = get().templates
-    const updatedTemplates = templates.filter(t => t.id !== id)
-    saveTemplates(updatedTemplates)
-    set({ templates: updatedTemplates })
+  addTemplate: async (templateData) => {
+    // Alias for saveTemplate
+    return get().saveTemplate(templateData);
   },
 
-  updateTemplate: (id: string, name: string, content: JSONContent) => {
-    const templates = get().templates
-    const updatedTemplates = templates.map(t => 
-      t.id === id 
-        ? { ...t, name, content, updatedAt: new Date().toISOString() }
-        : t
-    )
-    saveTemplates(updatedTemplates)
-    set({ templates: updatedTemplates })
+  updateTemplate: async (id, updates) => {
+    const templates = get().templates.map(t => 
+      t.id === id ? { ...t, ...updates, updatedAt: new Date() } : t
+    );
+    localStorage.setItem('editor-templates', JSON.stringify(templates));
+    set({ templates });
   },
 
-  getTemplate: (id: string) => {
-    return get().templates.find(t => t.id === id)
+  deleteTemplate: async (id) => {
+    const templates = get().templates.filter(t => t.id !== id);
+    localStorage.setItem('editor-templates', JSON.stringify(templates));
+    set({ templates });
   },
-})) 
+
+  removeTemplate: async (id) => {
+    // Alias for deleteTemplate
+    return get().deleteTemplate(id);
+  },
+
+  selectTemplate: (template) => {
+    set({ selectedTemplate: template });
+  },
+
+  getTemplatesByCategory: (category) => {
+    return get().templates.filter(t => t.category === category);
+  },
+
+  searchTemplates: (query) => {
+    const templates = get().templates;
+    return templates.filter(t => 
+      t.name.toLowerCase().includes(query.toLowerCase()) ||
+      t.description.toLowerCase().includes(query.toLowerCase()) ||
+      t.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+    );
+  },
+}));

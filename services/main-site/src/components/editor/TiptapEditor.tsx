@@ -51,7 +51,7 @@ export const TiptapEditor = ({
 
   return (
     <div className="border rounded-lg overflow-hidden">
-      <EditorToolbar editor={editor} />
+      <EditorToolbar editor={editor} page={page} />
       <EditorContent editor={editor} className="p-4 min-h-[200px]" />
       <div className="border-t p-4 flex gap-2">
         <button

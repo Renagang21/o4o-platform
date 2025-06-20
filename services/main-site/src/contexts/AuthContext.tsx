@@ -3,11 +3,15 @@ import Cookies from 'js-cookie';
 import { authAPI } from '../services/api';
 import { toast } from 'react-toastify';
 
+// UserRole 타입 정의 및 export - 모든 가능한 역할 포함
+export type UserRole = 'user' | 'admin' | 'administrator' | 'manager' | 'partner' | 'operator' | 'member' | 'seller' | 'affiliate' | 'contributor' | 'vendor' | 'supplier';
+
 export interface User {
   _id: string;
   email: string;
   name: string;
-  role: 'user' | 'admin' | 'manager';
+  role: UserRole;
+  roles: UserRole[]; // 호환성을 위한 배열 형태
   status: 'pending' | 'approved' | 'rejected' | 'suspended';
   businessInfo?: {
     businessName: string;
@@ -151,6 +155,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
+// AuthContext export 추가  
+export { AuthContext };
+
 // 커스텀 훅
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -167,8 +174,10 @@ export const usePermissions = () => {
   return {
     isAdmin: user?.role === 'admin',
     isManager: user?.role === 'manager',
+    isPartner: user?.role === 'partner', 
+    isUser: user?.role === 'user',
     isManagerOrAdmin: user?.role === 'admin' || user?.role === 'manager',
-    hasRole: (roles: string[]) => user ? roles.includes(user.role) : false,
+    hasRole: (roles: UserRole[]) => user ? roles.includes(user.role) : false,
     canAccessAdmin: user?.role === 'admin' || user?.role === 'manager',
   };
 };

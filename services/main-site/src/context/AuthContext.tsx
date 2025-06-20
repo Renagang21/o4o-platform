@@ -2,6 +2,12 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { authApi } from '../api/auth/authApi';
 import { AuthState, LoginRequest, RegisterRequest, User } from '../api/auth/types';
 
+// UserRole 타입 정의 및 export - 모든 가능한 역할 포함
+export type UserRole = 'user' | 'admin' | 'administrator' | 'manager' | 'partner' | 'operator' | 'member' | 'seller' | 'affiliate' | 'contributor' | 'vendor' | 'supplier';
+
+// User 타입 re-export
+export type { User };
+
 type AuthAction =
   | { type: 'LOGIN_START' }
   | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
@@ -60,6 +66,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 
 const AuthContext = createContext<{
   state: AuthState;
+  user: User | null;  // 직접 접근을 위한 user 추가
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
@@ -135,7 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ state, login, register, logout }}>
+    <AuthContext.Provider value={{ state, user: state.user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -148,4 +155,7 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// AuthContext export 추가
+export { AuthContext };
 
