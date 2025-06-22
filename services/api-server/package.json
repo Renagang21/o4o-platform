@@ -16,7 +16,16 @@
     "test:integration": "jest --testPathPattern=integration",
     "test:coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
-    "create-admin": "npx ts-node ../scripts/create-admin.ts"
+    "create-admin": "npx ts-node ../../scripts/create-admin.ts",
+    "db:test": "node ../../scripts/test-database.js",
+    "db:setup": "docker-compose -f ../../docker-compose.dev.yml up -d postgres redis",
+    "db:stop": "docker-compose -f ../../docker-compose.dev.yml stop postgres redis",
+    "db:reset": "docker-compose -f ../../docker-compose.dev.yml down -v && docker-compose -f ../../docker-compose.dev.yml up -d postgres redis",
+    "db:logs": "docker logs o4o-postgres-dev",
+    "dev:full": "npm run db:setup && sleep 5 && npm run db:test && npm run dev",
+    "migration:generate": "npx typeorm-ts-node-commonjs migration:generate -d src/database/connection.ts",
+    "migration:run": "npx typeorm-ts-node-commonjs migration:run -d src/database/connection.ts",
+    "migration:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/database/connection.ts"
   },
   "dependencies": {
     "express": "^4.18.2",
