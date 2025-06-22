@@ -2,9 +2,11 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import bcrypt from 'bcryptjs';
 
 export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-  MANAGER = 'manager'
+  CUSTOMER = 'customer',      // B2C 고객
+  BUSINESS = 'business',      // B2B 고객  
+  AFFILIATE = 'affiliate',    // 제휴 파트너
+  ADMIN = 'admin',           // 관리자
+  MANAGER = 'manager'        // 매니저
 }
 
 export enum UserStatus {
@@ -39,7 +41,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.USER
+    default: UserRole.CUSTOMER
   })
   role!: UserRole;
 

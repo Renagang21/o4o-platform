@@ -1,19 +1,14 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
-import { getUserRepository, User, UserStatus } from '../models/User';
-import { AuthRequest } from '../middleware/auth';
+import bcrypt from 'bcryptjs';
+import jwt, { SignOptions } from 'jsonwebtoken';
+import { AppDataSource } from '../database/connection';
+import { User, UserRole, UserStatus } from '../entities/User';
 
-const generateToken = (userId: string) => {
-  return jwt.sign(
-    { userId },
-    process.env.JWT_SECRET || 'your-secret-key',
-    { expiresIn: '24h' }
-  );
-};
-
+// 회원가입
 export const register = async (req: Request, res: Response) => {
   try {
+    // 유효성 검증
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -22,55 +17,57 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    const {
-      email,
-      password,
-      name,
-      businessInfo
-    } = req.body;
+    const { email, password, name, businessInfo } = req.body;
 
-    const userRepository = getUserRepository();
+    const userRepository = AppDataSource.getRepository(User);
 
     // 이메일 중복 확인
     const existingUser = await userRepository.findOne({ where: { email } });
     if (existingUser) {
       return res.status(409).json({
-        error: 'Email already registered',
-        code: 'EMAIL_EXISTS'
+        error: 'Email already registered'
       });
     }
 
-    // 사용자 생성
+    // 새 사용자 생성
     const user = userRepository.create({
       email,
-      password,
+      password, // BeforeInsert에서 자동 해시
       name,
-      businessInfo,
-      status: UserStatus.PENDING
+      role: UserRole.CUSTOMER,
+      status: UserStatus.PENDING,
+      businessInfo: businessInfo || null
     });
 
     await userRepository.save(user);
 
-    // 비밀번호 제거 후 응답
-    const userResponse = { ...user };
-    delete userResponse.password;
+    // 응답에서 비밀번호 제외
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      status: user.status,
+      businessInfo: user.businessInfo,
+      createdAt: user.createdAt
+    };
 
     res.status(201).json({
       message: 'Registration successful. Please wait for admin approval.',
       user: userResponse
     });
-
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({
-      error: 'Internal server error',
-      code: 'REGISTRATION_FAILED'
+      error: 'Registration failed'
     });
   }
 };
 
+// 로그인
 export const login = async (req: Request, res: Response) => {
   try {
+    // 유효성 검증
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -79,141 +76,152 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    const { email, password } = req.body;
-    const userRepository = getUserRepository();
+    const { email, password: loginPassword } = req.body;
 
-    // 사용자 찾기
-    const user = await userRepository.findOne({ where: { email } });
+    const userRepository = AppDataSource.getRepository(User);
+
+    // 사용자 조회
+    const user = await userRepository.findOne({ 
+      where: { email },
+      select: ['id', 'email', 'password', 'name', 'role', 'status', 'businessInfo', 'lastLoginAt']
+    });
+
     if (!user) {
       return res.status(401).json({
-        error: 'Invalid credentials',
-        code: 'INVALID_CREDENTIALS'
+        error: 'Invalid credentials'
+      });
+    }
+
+    // 계정 승인 상태 확인
+    if (user.status !== UserStatus.APPROVED) {
+      return res.status(403).json({
+        error: 'Account not approved',
+        status: user.status
       });
     }
 
     // 비밀번호 확인
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await user.comparePassword(loginPassword);
     if (!isPasswordValid) {
       return res.status(401).json({
-        error: 'Invalid credentials',
-        code: 'INVALID_CREDENTIALS'
+        error: 'Invalid credentials'
       });
     }
 
-    // 계정 상태 확인
-    if (user.status === UserStatus.PENDING) {
-      return res.status(403).json({
-        error: 'Account pending approval',
-        code: 'ACCOUNT_PENDING'
-      });
-    }
-
-    if (user.status === UserStatus.REJECTED) {
-      return res.status(403).json({
-        error: 'Account rejected',
-        code: 'ACCOUNT_REJECTED'
-      });
-    }
-
-    if (user.status === UserStatus.SUSPENDED) {
-      return res.status(403).json({
-        error: 'Account suspended',
-        code: 'ACCOUNT_SUSPENDED'
-      });
-    }
+    // JWT 토큰 생성  
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      },
+      process.env.JWT_SECRET || 'your-secret-key'
+    );
 
     // 로그인 시간 업데이트
-    user.lastLoginAt = new Date();
-    await userRepository.save(user);
+    await userRepository.update(user.id, { lastLoginAt: new Date() });
 
-    // JWT 토큰 생성
-    const token = generateToken(user.id);
-
-    // 사용자 정보 (비밀번호 제외)
-    const userResponse = { ...user };
-    delete userResponse.password;
+    // 응답에서 비밀번호 제외
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      status: user.status,
+      businessInfo: user.businessInfo,
+      lastLoginAt: new Date()
+    };
 
     res.json({
       message: 'Login successful',
       token,
       user: userResponse
     });
-
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({
-      error: 'Internal server error',
-      code: 'LOGIN_FAILED'
+      error: 'Login failed'
     });
   }
 };
 
-export const getProfile = async (req: AuthRequest, res: Response) => {
+// 프로필 조회
+export const getProfile = async (req: any, res: Response) => {
   try {
-    if (!req.user) {
+    const user = req.user;
+
+    if (!user) {
       return res.status(401).json({
-        error: 'User not authenticated',
-        code: 'NOT_AUTHENTICATED'
+        error: 'User not authenticated'
       });
     }
 
-    const userRepository = getUserRepository();
-    const user = await userRepository.findOne({ 
-      where: { id: req.user.id },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
-    });
-    
-    res.json({ user });
+    // 비밀번호 제외한 사용자 정보 반환
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      status: user.status,
+      businessInfo: user.businessInfo,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      lastLoginAt: user.lastLoginAt
+    };
 
+    res.json({
+      user: userResponse
+    });
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(500).json({
-      error: 'Internal server error',
-      code: 'PROFILE_FETCH_FAILED'
+      error: 'Failed to get profile'
     });
   }
 };
 
-export const updateProfile = async (req: AuthRequest, res: Response) => {
+// 프로필 수정
+export const updateProfile = async (req: any, res: Response) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: errors.array()
-      });
-    }
-
-    if (!req.user) {
-      return res.status(401).json({
-        error: 'User not authenticated',
-        code: 'NOT_AUTHENTICATED'
-      });
-    }
-
+    const user = req.user;
     const { name, businessInfo } = req.body;
-    const userRepository = getUserRepository();
 
-    await userRepository.update(req.user.id, {
-      name,
-      businessInfo
-    });
+    if (!user) {
+      return res.status(401).json({
+        error: 'User not authenticated'
+      });
+    }
 
-    const user = await userRepository.findOne({ 
-      where: { id: req.user.id },
+    const userRepository = AppDataSource.getRepository(User);
+
+    // 업데이트할 데이터 준비
+    const updateData: any = {};
+    if (name) updateData.name = name;
+    if (businessInfo) updateData.businessInfo = businessInfo;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        error: 'No data to update'
+      });
+    }
+
+    // 프로필 업데이트
+    await userRepository.update(user.id, updateData);
+
+    // 업데이트된 사용자 정보 조회
+    const updatedUser = await userRepository.findOne({
+      where: { id: user.id },
       select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
     });
 
     res.json({
       message: 'Profile updated successfully',
-      user
+      user: updatedUser
     });
-
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({
-      error: 'Internal server error',
-      code: 'PROFILE_UPDATE_FAILED'
+      error: 'Failed to update profile'
     });
   }
 };
