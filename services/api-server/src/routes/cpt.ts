@@ -39,7 +39,7 @@ router.put('/:slug/posts/:postId', authenticateToken, CPTController.updatePost);
 router.delete('/:slug/posts/:postId', authenticateToken, CPTController.deletePost);
 
 // Publish post
-router.patch('/:slug/posts/:postId/publish', authenticateToken, CPTController.publishPost);
+// router.patch('/:slug/posts/:postId/publish', authenticateToken, CPTController.publishPost);
 
 // ============= Public Routes (for frontend display) =============
 
@@ -47,20 +47,20 @@ router.patch('/:slug/posts/:postId/publish', authenticateToken, CPTController.pu
 router.get('/public/:slug', CPTController.getPublicPosts);
 
 // Get single published post (public)
-router.get('/public/:slug/:postSlug', CPTController.getPublicPost);
+// router.get('/public/:slug/:postSlug', CPTController.getPublicPost);
 
 // ============= Utility Routes =============
 
 // Get CPT schema for form building
-router.get('/:slug/schema', authenticateToken, CPTController.getCPTSchema);
+// router.get('/:slug/schema', authenticateToken, CPTController.getCPTSchema);
 
 // Validate post data against schema
-router.post('/:slug/validate', authenticateToken, CPTController.validatePostData);
+// router.post('/:slug/validate', authenticateToken, CPTController.validatePostData);
 
 // Export posts as JSON
-router.get('/:slug/export', authenticateToken, requireAdmin, CPTController.exportPosts);
+// router.get('/:slug/export', authenticateToken, requireAdmin, CPTController.exportPosts);
 
 // Import posts from JSON
-router.post('/:slug/import', authenticateToken, requireAdmin, CPTController.importPosts);
+// router.post('/:slug/import', authenticateToken, requireAdmin, CPTController.importPosts);
 
 export default router;

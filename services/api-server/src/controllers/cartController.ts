@@ -3,13 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Product } from '../entities/Product';
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-}
+import { AuthRequest } from '../middleware/auth';
 
 export class CartController {
   private cartRepository = AppDataSource.getRepository(Cart);
@@ -17,7 +11,7 @@ export class CartController {
   private productRepository = AppDataSource.getRepository(Product);
 
   // 장바구니 조회
-  getCart = async (req: AuthenticatedRequest, res: Response) => {
+  getCart = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
 
@@ -67,7 +61,7 @@ export class CartController {
   };
 
   // 장바구니에 상품 추가
-  addToCart = async (req: AuthenticatedRequest, res: Response) => {
+  addToCart = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { productId, quantity = 1 } = req.body;
@@ -182,7 +176,7 @@ export class CartController {
   };
 
   // 장바구니 아이템 수량 수정
-  updateCartItem = async (req: AuthenticatedRequest, res: Response) => {
+  updateCartItem = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { itemId } = req.params;
@@ -253,7 +247,7 @@ export class CartController {
   };
 
   // 장바구니에서 아이템 제거
-  removeCartItem = async (req: AuthenticatedRequest, res: Response) => {
+  removeCartItem = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { itemId } = req.params;
@@ -304,7 +298,7 @@ export class CartController {
   };
 
   // 장바구니 비우기
-  clearCart = async (req: AuthenticatedRequest, res: Response) => {
+  clearCart = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
 

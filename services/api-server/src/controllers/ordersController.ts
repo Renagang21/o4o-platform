@@ -5,13 +5,7 @@ import { OrderItem } from '../entities/OrderItem';
 import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Product } from '../entities/Product';
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-}
+import { AuthRequest } from '../middleware/auth';
 
 export class OrdersController {
   private orderRepository = AppDataSource.getRepository(Order);
@@ -21,7 +15,7 @@ export class OrdersController {
   private productRepository = AppDataSource.getRepository(Product);
 
   // 주문 목록 조회
-  getOrders = async (req: AuthenticatedRequest, res: Response) => {
+  getOrders = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { page = 1, limit = 10, status } = req.query;
@@ -74,7 +68,7 @@ export class OrdersController {
   };
 
   // 주문 상세 조회
-  getOrder = async (req: AuthenticatedRequest, res: Response) => {
+  getOrder = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { id } = req.params;
@@ -115,7 +109,7 @@ export class OrdersController {
   };
 
   // 주문 생성 (장바구니에서)
-  createOrder = async (req: AuthenticatedRequest, res: Response) => {
+  createOrder = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { shippingAddress, billingAddress, notes } = req.body;
@@ -249,7 +243,7 @@ export class OrdersController {
   };
 
   // 주문 취소
-  cancelOrder = async (req: AuthenticatedRequest, res: Response) => {
+  cancelOrder = async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       const { id } = req.params;

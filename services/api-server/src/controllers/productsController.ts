@@ -3,21 +3,14 @@ import { AppDataSource } from '../database/connection';
 import { Product, ProductStatus } from '../entities/Product';
 import { Category } from '../entities/Category';
 import { Like, In } from 'typeorm';
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-    businessType?: string;
-  };
-}
+import { AuthRequest } from '../middleware/auth';
 
 export class ProductsController {
   private productRepository = AppDataSource.getRepository(Product);
   private categoryRepository = AppDataSource.getRepository(Category);
 
   // 상품 목록 조회 (필터링, 페이징, 정렬)
-  getProducts = async (req: AuthenticatedRequest, res: Response) => {
+  getProducts = async (req: AuthRequest, res: Response) => {
     try {
       const {
         page = 1,
@@ -109,7 +102,7 @@ export class ProductsController {
   };
 
   // 상품 상세 조회
-  getProduct = async (req: AuthenticatedRequest, res: Response) => {
+  getProduct = async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
       
@@ -154,7 +147,7 @@ export class ProductsController {
   };
 
   // 상품 생성 (관리자만)
-  createProduct = async (req: AuthenticatedRequest, res: Response) => {
+  createProduct = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
       if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
@@ -200,7 +193,7 @@ export class ProductsController {
   };
 
   // 상품 수정 (관리자만)
-  updateProduct = async (req: AuthenticatedRequest, res: Response) => {
+  updateProduct = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
       if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
@@ -253,7 +246,7 @@ export class ProductsController {
   };
 
   // 상품 삭제 (관리자만)
-  deleteProduct = async (req: AuthenticatedRequest, res: Response) => {
+  deleteProduct = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
       if (req.user?.role !== 'admin') {
@@ -291,7 +284,7 @@ export class ProductsController {
   };
 
   // 추천 상품 조회
-  getFeaturedProducts = async (req: AuthenticatedRequest, res: Response) => {
+  getFeaturedProducts = async (req: AuthRequest, res: Response) => {
     try {
       const { limit = 10 } = req.query;
 

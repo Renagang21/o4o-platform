@@ -2,13 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { CustomPostType, FieldGroup, FieldSchema } from '../entities/CustomPostType';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-}
+import { AuthRequest } from '../middleware/auth';
 
 export class CPTController {
   // ============= Custom Post Type Management =============
@@ -66,7 +60,7 @@ export class CPTController {
   }
 
   // Create new CPT
-  static async createCPT(req: AuthenticatedRequest, res: Response) {
+  static async createCPT(req: AuthRequest, res: Response) {
     try {
       const { 
         slug, 
@@ -263,7 +257,7 @@ export class CPTController {
   }
 
   // Create new post
-  static async createPost(req: AuthenticatedRequest, res: Response) {
+  static async createPost(req: AuthRequest, res: Response) {
     try {
       const { slug } = req.params;
       const { title, fields, content, status, meta } = req.body;
