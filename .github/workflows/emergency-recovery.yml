@@ -88,13 +88,13 @@ jobs:
     - name: 🔧 API Server Recovery  
       if: github.event.inputs.server_type == 'apiserver' || github.event.inputs.server_type == 'both'
       run: |
-        ssh-keyscan -H ${{ secrets.API_SERVER_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.APISERVER_HOST }} >> ~/.ssh/known_hosts
         echo "🚑 API Server 응급 복구 시작..."
         
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.API_SERVER_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.APISERVER_USER }}@${{ secrets.APISERVER_HOST }} << 'EOF'
           set -e
           
-          echo "📂 프로젝트 디렉토리로 이동..."
+          echo "�� 프로젝트 디렉토리로 이동..."
           cd /home/ubuntu/o4o-platform || { echo "❌ 프로젝트 디렉토리 없음"; exit 1; }
           
           echo "🔄 최신 코드 가져오기..."
