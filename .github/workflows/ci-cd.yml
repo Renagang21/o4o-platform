@@ -26,17 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
-          cd ../main-site && npm ci
-          # ecommerce 서비스들
-          if [ -f "services/ecommerce/admin/package.json" ]; then
-            cd ../ecommerce/admin && npm ci
-          fi
-          if [ -f "services/ecommerce/web/package.json" ]; then
-            cd ../ecommerce/web && npm ci
-          fi
+        run: npm ci
 
       - name: 📋 ESLint check
         run: npm run lint
@@ -66,17 +56,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
-          cd ../main-site && npm ci
-          # ecommerce 서비스들
-          if [ -f "services/ecommerce/admin/package.json" ]; then
-            cd ../ecommerce/admin && npm ci
-          fi
-          if [ -f "services/ecommerce/web/package.json" ]; then
-            cd ../ecommerce/web && npm ci
-          fi
+        run: npm ci
 
       - name: 🧪 Run unit tests
         run: npm run test:unit
@@ -128,9 +108,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
+        run: npm ci
 
       - name: 🗃️ Setup database
         run: |
@@ -163,17 +141,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
-          cd ../main-site && npm ci
-          # ecommerce 서비스들
-          if [ -f "services/ecommerce/admin/package.json" ]; then
-            cd ../ecommerce/admin && npm ci
-          fi
-          if [ -f "services/ecommerce/web/package.json" ]; then
-            cd ../ecommerce/web && npm ci
-          fi
+        run: npm ci
 
       - name: 🎭 Install Playwright
         run: npx playwright install --with-deps

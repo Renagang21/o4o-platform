@@ -43,6 +43,11 @@ jobs:
     if: needs.detect-changes.outputs.api-server-changed == 'true' || needs.detect-changes.outputs.shared-changed == 'true'
     runs-on: ubuntu-latest
     steps:
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
     - name: Deploy to o4o-apiserver
       run: |
         echo "🚀 API 서버 배포 시작..."
@@ -81,16 +86,21 @@ jobs:
     if: needs.detect-changes.outputs.web-server-changed == 'true' || needs.detect-changes.outputs.shared-changed == 'true'
     runs-on: ubuntu-latest
     steps:
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
     - name: Deploy to o4o-webserver
       run: |
         echo "🚀 웹 서버 배포 시작..."
         
         # SSH를 통한 서버 접속 및 배포
-        echo "SSH_HOST: ${{ secrets.APISERVER_HOST }}"
-        echo "SSH_USER: ${{ secrets.APISERVER_USER }}"
+        echo "SSH_HOST: ${{ secrets.API_SERVER_HOST }}"
+        echo "SSH_USER: ${{ secrets.SSH_USER }}"
         
         # 실제 배포 명령어 실행
-        ssh -o StrictHostKeyChecking=no ${{ secrets.APISERVER_USER }}@${{ secrets.APISERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.API_SERVER_HOST }} "
           set -e
           echo '🔄 서버 배포 프로세스 시작...'
           cd /home/ubuntu/o4o-platform || { echo '❌ 프로젝트 디렉토리 없음'; exit 1; }

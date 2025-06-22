@@ -57,7 +57,17 @@ jobs:
 
       # 테스트 실행
       - name: Run tests
-        run: npm test
+        run: |
+          if [ -f "services/api-server/package.json" ]; then
+            echo "--- Running api-server tests ---"
+            cd services/api-server && npm test
+            cd ../..
+          fi
+          if [ -f "services/main-site/package.json" ]; then
+            echo "--- Running main-site tests ---"
+            cd services/main-site && npm test
+            cd ../..
+          fi
 
       # Docker 빌드 및 푸시
       - name: Log in to the Container registry
@@ -103,11 +113,11 @@ jobs:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_PROD }}
 
       # Slack 알림
-      - name: Notify slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always() 
+      # - name: Notify slack
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     fields: repo,message,commit,author,action,eventName,ref,workflow
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #   if: always() 

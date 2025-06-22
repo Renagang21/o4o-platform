@@ -23,7 +23,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: 'services/api-server/package-lock.json'
+        cache-dependency-path: 'services/api-server/package.json'
         
     - name: 📦 의존성 설치
       working-directory: services/api-server

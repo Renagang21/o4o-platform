@@ -423,7 +423,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
       take: 5
     });
 
-    const totalUsers = Object.values(statusCounts).reduce((a: number, b: number) => a + b, 0);
+    const totalUsers = (Object.values(statusCounts) as number[]).reduce((a, b) => a + b, 0);
 
     res.json({
       userStats: statusCounts,

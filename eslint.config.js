@@ -12,7 +12,6 @@ export default [
       'dist/**',
       'build/**',
       'coverage/**',
-      'services/**', // 각 서비스는 자체 ESLint 설정 사용
       '*.config.js',
       '*.config.mjs',
       '.github/**',
