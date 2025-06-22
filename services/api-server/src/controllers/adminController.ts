@@ -3,25 +3,44 @@ import { validationResult } from 'express-validator';
 import { AppDataSource } from '../database/connection';
 import { User, UserStatus } from '../entities/User';
 import { AuthRequest } from '../middleware/auth';
+import { Like, SelectQueryBuilder } from 'typeorm';
 
 export const getPendingUsers = async (req: AuthRequest, res: Response) => {
   try {
     const { page = 1, limit = 10, businessType } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+    const offset = (Number(page) - 1) * Number(limit);
 
     const userRepository = AppDataSource.getRepository(User);
-    const queryBuilder = userRepository.createQueryBuilder('user')
-      .select(['user.id', 'user.email', 'user.name', 'user.role', 'user.status', 'user.businessInfo', 'user.createdAt', 'user.updatedAt'])
-      .where('user.status = :status', { status: 'pending' })
-      .orderBy('user.createdAt', 'DESC')
-      .skip(skip)
-      .take(Number(limit));
+    const queryBuilder = userRepository.createQueryBuilder('user');
 
+    // Base filter
+    queryBuilder.where('user.status = :status', { status: UserStatus.PENDING });
+
+    // Business type filter
     if (businessType && businessType !== 'all') {
-      queryBuilder.andWhere('user.businessInfo->>\'businessType\' = :businessType', { businessType });
+      queryBuilder.andWhere("user.businessInfo->>'businessType' = :businessType", {
+        businessType
+      });
     }
 
-    const [users, total] = await queryBuilder.getManyAndCount();
+    // Get users with pagination
+    const [users, total] = await queryBuilder
+      .select([
+        'user.id',
+        'user.email', 
+        'user.name',
+        'user.role',
+        'user.status',
+        'user.businessInfo',
+        'user.createdAt',
+        'user.updatedAt',
+        'user.approvedAt',
+        'user.approvedBy'
+      ])
+      .orderBy('user.createdAt', 'DESC')
+      .offset(offset)
+      .limit(Number(limit))
+      .getManyAndCount();
 
     res.json({
       users,
@@ -52,23 +71,24 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       search 
     } = req.query;
     
-    const skip = (Number(page) - 1) * Number(limit);
+    const offset = (Number(page) - 1) * Number(limit);
 
     const userRepository = AppDataSource.getRepository(User);
-    const queryBuilder = userRepository.createQueryBuilder('user')
-      .select(['user.id', 'user.email', 'user.name', 'user.role', 'user.status', 'user.businessInfo', 'user.createdAt', 'user.updatedAt'])
-      .orderBy('user.createdAt', 'DESC')
-      .skip(skip)
-      .take(Number(limit));
-    
+    const queryBuilder = userRepository.createQueryBuilder('user');
+
+    // Status filter
     if (status && status !== 'all') {
-      queryBuilder.andWhere('user.status = :status', { status });
+      queryBuilder.where('user.status = :status', { status });
     }
     
+    // Business type filter
     if (businessType && businessType !== 'all') {
-      queryBuilder.andWhere('user.businessInfo->>\'businessType\' = :businessType', { businessType });
+      queryBuilder.andWhere("user.businessInfo->>'businessType' = :businessType", {
+        businessType
+      });
     }
     
+    // Search filter (name, email, business name)
     if (search) {
       queryBuilder.andWhere(
         '(user.name ILIKE :search OR user.email ILIKE :search OR user.businessInfo->>\'businessName\' ILIKE :search)',
@@ -76,20 +96,37 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       );
     }
 
-    const [users, total] = await queryBuilder.getManyAndCount();
+    // Get users with pagination
+    const [users, total] = await queryBuilder
+      .select([
+        'user.id',
+        'user.email',
+        'user.name', 
+        'user.role',
+        'user.status',
+        'user.businessInfo',
+        'user.createdAt',
+        'user.updatedAt',
+        'user.approvedAt',
+        'user.approvedBy'
+      ])
+      .orderBy('user.createdAt', 'DESC')
+      .offset(offset)
+      .limit(Number(limit))
+      .getManyAndCount();
 
-    // 통계 정보
-    const statsResult = await userRepository
+    // Get status statistics
+    const statsQuery = userRepository
       .createQueryBuilder('user')
       .select('user.status', 'status')
       .addSelect('COUNT(*)', 'count')
-      .groupBy('user.status')
-      .getRawMany();
+      .groupBy('user.status');
 
-    const statusCounts = statsResult.reduce((acc: any, curr: any) => {
+    const statsResult = await statsQuery.getRawMany();
+    const statusCounts = statsResult.reduce((acc, curr) => {
       acc[curr.status] = parseInt(curr.count);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
     res.json({
       users,
@@ -125,7 +162,12 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     const { notes } = req.body;
 
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { id: userId } });
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -133,7 +175,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status !== 'pending') {
+    if (user.status !== UserStatus.PENDING) {
       return res.status(400).json({
         error: 'User is not in pending status',
         code: 'INVALID_STATUS',
@@ -141,16 +183,19 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    user.status = UserStatus.APPROVED;
-    user.approvedAt = new Date();
-    user.approvedBy = req.user!.id;
-    await userRepository.save(user);
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.APPROVED,
+      approvedAt: new Date(),
+      approvedBy: req.user!.id
+    });
 
     // TODO: 승인 이메일 발송
 
-    const updatedUser = await userRepository.findOne({ 
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'approvedAt', 'approvedBy']
     });
 
     res.json({
@@ -181,7 +226,12 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
     const { reason } = req.body;
 
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { id: userId } });
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'status']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -189,7 +239,7 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status !== 'pending') {
+    if (user.status !== UserStatus.PENDING) {
       return res.status(400).json({
         error: 'User is not in pending status',
         code: 'INVALID_STATUS',
@@ -197,12 +247,15 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    user.status = UserStatus.REJECTED;
-    await userRepository.save(user);
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.REJECTED
+    });
 
     // TODO: 거부 이메일 발송 (이유 포함)
 
-    const updatedUser = await userRepository.findOne({ 
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
       where: { id: userId },
       select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
@@ -228,7 +281,12 @@ export const suspendUser = async (req: AuthRequest, res: Response) => {
     const { reason } = req.body;
 
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { id: userId } });
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'status']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -236,19 +294,22 @@ export const suspendUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status === 'suspended') {
+    if (user.status === UserStatus.SUSPENDED) {
       return res.status(400).json({
         error: 'User is already suspended',
         code: 'ALREADY_SUSPENDED'
       });
     }
 
-    user.status = UserStatus.SUSPENDED;
-    await userRepository.save(user);
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.SUSPENDED
+    });
 
     // TODO: 정지 이메일 발송
 
-    const updatedUser = await userRepository.findOne({ 
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
       where: { id: userId },
       select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
@@ -273,7 +334,12 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params;
 
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { id: userId } });
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'status']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -281,7 +347,7 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status !== 'suspended') {
+    if (user.status !== UserStatus.SUSPENDED) {
       return res.status(400).json({
         error: 'User is not suspended',
         code: 'NOT_SUSPENDED',
@@ -289,12 +355,15 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    user.status = UserStatus.APPROVED;
-    await userRepository.save(user);
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.APPROVED
+    });
 
     // TODO: 재활성화 이메일 발송
 
-    const updatedUser = await userRepository.findOne({ 
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
       where: { id: userId },
       select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
@@ -316,48 +385,51 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
-    
-    // 사용자 상태별 통계
-    const userStats = await userRepository
+
+    // Get user status statistics
+    const userStatsQuery = userRepository
       .createQueryBuilder('user')
       .select('user.status', 'status')
       .addSelect('COUNT(*)', 'count')
-      .groupBy('user.status')
-      .getRawMany();
+      .groupBy('user.status');
 
-    // 승인된 사용자의 비즈니스 타입별 통계
-    const businessTypeStats = await userRepository
-      .createQueryBuilder('user')
-      .select('user.businessInfo->>\'businessType\'', 'businessType')
-      .addSelect('COUNT(*)', 'count')
-      .where('user.status = :status', { status: 'approved' })
-      .andWhere('user.businessInfo->>\'businessType\' IS NOT NULL')
-      .groupBy('user.businessInfo->>\'businessType\'')
-      .getRawMany();
-
-    // 최근 사용자 5명
-    const recentUsers = await userRepository
-      .createQueryBuilder('user')
-      .select(['user.id', 'user.email', 'user.name', 'user.role', 'user.status', 'user.businessInfo', 'user.createdAt', 'user.updatedAt', 'user.approvedBy'])
-      .orderBy('user.createdAt', 'DESC')
-      .limit(5)
-      .getMany();
-
-    const statusCounts = userStats.reduce((acc: any, curr: any) => {
+    const userStatsResult = await userStatsQuery.getRawMany();
+    const statusCounts = userStatsResult.reduce((acc, curr) => {
       acc[curr.status] = parseInt(curr.count);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
-    const businessTypeCounts = businessTypeStats.reduce((acc: any, curr: any) => {
-      acc[curr.businessType] = parseInt(curr.count);
+    // Get business type statistics for approved users
+    const businessTypeStatsQuery = userRepository
+      .createQueryBuilder('user')
+      .select("user.businessInfo->>'businessType'", 'businessType')
+      .addSelect('COUNT(*)', 'count')
+      .where('user.status = :status', { status: UserStatus.APPROVED })
+      .andWhere("user.businessInfo->>'businessType' IS NOT NULL")
+      .groupBy("user.businessInfo->>'businessType'");
+
+    const businessTypeStatsResult = await businessTypeStatsQuery.getRawMany();
+    const businessTypeCounts = businessTypeStatsResult.reduce((acc, curr) => {
+      if (curr.businessType) {
+        acc[curr.businessType] = parseInt(curr.count);
+      }
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
+
+    // Get recent users
+    const recentUsers = await userRepository.find({
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'approvedBy'],
+      order: { createdAt: 'DESC' },
+      take: 5
+    });
+
+    const totalUsers = Object.values(statusCounts).reduce((a: number, b: number) => a + b, 0);
 
     res.json({
       userStats: statusCounts,
       businessTypeStats: businessTypeCounts,
       recentUsers,
-      totalUsers: Object.values(statusCounts).reduce((a: any, b: any) => a + b, 0)
+      totalUsers
     });
 
   } catch (error) {
