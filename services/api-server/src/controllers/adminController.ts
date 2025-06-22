@@ -1,26 +1,46 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { getUserRepository, User } from '../models/User';
+import { AppDataSource } from '../database/connection';
+import { User, UserStatus } from '../entities/User';
 import { AuthRequest } from '../middleware/auth';
+import { Like, SelectQueryBuilder } from 'typeorm';
 
 export const getPendingUsers = async (req: AuthRequest, res: Response) => {
   try {
     const { page = 1, limit = 10, businessType } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+    const offset = (Number(page) - 1) * Number(limit);
 
-    const filter: any = { status: 'pending' };
+    const userRepository = AppDataSource.getRepository(User);
+    const queryBuilder = userRepository.createQueryBuilder('user');
+
+    // Base filter
+    queryBuilder.where('user.status = :status', { status: UserStatus.PENDING });
+
+    // Business type filter
     if (businessType && businessType !== 'all') {
-      filter['businessInfo.businessType'] = businessType;
+      queryBuilder.andWhere("user.businessInfo->>'businessType' = :businessType", {
+        businessType
+      });
     }
 
-    const users = await User.find(filter)
-      .select('-password')
-      .sort({ createdAt: -1 })
-      .skip(skip)
+    // Get users with pagination
+    const [users, total] = await queryBuilder
+      .select([
+        'user.id',
+        'user.email', 
+        'user.name',
+        'user.role',
+        'user.status',
+        'user.businessInfo',
+        'user.createdAt',
+        'user.updatedAt',
+        'user.approvedAt',
+        'user.approvedBy'
+      ])
+      .orderBy('user.createdAt', 'DESC')
+      .offset(offset)
       .limit(Number(limit))
-      .populate('approvedBy', 'name email');
-
-    const total = await User.countDocuments(filter);
+      .getManyAndCount();
 
     res.json({
       users,
@@ -51,49 +71,62 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       search 
     } = req.query;
     
-    const skip = (Number(page) - 1) * Number(limit);
+    const offset = (Number(page) - 1) * Number(limit);
 
-    const filter: any = {};
-    
+    const userRepository = AppDataSource.getRepository(User);
+    const queryBuilder = userRepository.createQueryBuilder('user');
+
+    // Status filter
     if (status && status !== 'all') {
-      filter.status = status;
+      queryBuilder.where('user.status = :status', { status });
     }
     
+    // Business type filter
     if (businessType && businessType !== 'all') {
-      filter['businessInfo.businessType'] = businessType;
+      queryBuilder.andWhere("user.businessInfo->>'businessType' = :businessType", {
+        businessType
+      });
     }
     
+    // Search filter (name, email, business name)
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { 'businessInfo.businessName': { $regex: search, $options: 'i' } }
-      ];
+      queryBuilder.andWhere(
+        '(user.name ILIKE :search OR user.email ILIKE :search OR user.businessInfo->>\'businessName\' ILIKE :search)',
+        { search: `%${search}%` }
+      );
     }
 
-    const users = await User.find(filter)
-      .select('-password')
-      .sort({ createdAt: -1 })
-      .skip(skip)
+    // Get users with pagination
+    const [users, total] = await queryBuilder
+      .select([
+        'user.id',
+        'user.email',
+        'user.name', 
+        'user.role',
+        'user.status',
+        'user.businessInfo',
+        'user.createdAt',
+        'user.updatedAt',
+        'user.approvedAt',
+        'user.approvedBy'
+      ])
+      .orderBy('user.createdAt', 'DESC')
+      .offset(offset)
       .limit(Number(limit))
-      .populate('approvedBy', 'name email');
+      .getManyAndCount();
 
-    const total = await User.countDocuments(filter);
+    // Get status statistics
+    const statsQuery = userRepository
+      .createQueryBuilder('user')
+      .select('user.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('user.status');
 
-    // 통계 정보
-    const stats = await User.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const statusCounts = stats.reduce((acc, curr) => {
-      acc[curr._id] = curr.count;
+    const statsResult = await statsQuery.getRawMany();
+    const statusCounts = statsResult.reduce((acc, curr) => {
+      acc[curr.status] = parseInt(curr.count);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
     res.json({
       users,
@@ -128,7 +161,13 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params;
     const { notes } = req.body;
 
-    const user = await User.findById(userId);
+    const userRepository = AppDataSource.getRepository(User);
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -136,7 +175,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status !== 'pending') {
+    if (user.status !== UserStatus.PENDING) {
       return res.status(400).json({
         error: 'User is not in pending status',
         code: 'INVALID_STATUS',
@@ -144,16 +183,20 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    user.status = 'approved';
-    user.approvedAt = new Date();
-    user.approvedBy = req.user!._id;
-    await user.save();
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.APPROVED,
+      approvedAt: new Date(),
+      approvedBy: req.user!.id
+    });
 
     // TODO: 승인 이메일 발송
 
-    const updatedUser = await User.findById(userId)
-      .select('-password')
-      .populate('approvedBy', 'name email');
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'approvedAt', 'approvedBy']
+    });
 
     res.json({
       message: 'User approved successfully',
@@ -182,7 +225,13 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params;
     const { reason } = req.body;
 
-    const user = await User.findById(userId);
+    const userRepository = AppDataSource.getRepository(User);
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'status']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -190,7 +239,7 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status !== 'pending') {
+    if (user.status !== UserStatus.PENDING) {
       return res.status(400).json({
         error: 'User is not in pending status',
         code: 'INVALID_STATUS',
@@ -198,12 +247,18 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    user.status = 'rejected';
-    await user.save();
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.REJECTED
+    });
 
     // TODO: 거부 이메일 발송 (이유 포함)
 
-    const updatedUser = await User.findById(userId).select('-password');
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+    });
 
     res.json({
       message: 'User rejected successfully',
@@ -225,7 +280,13 @@ export const suspendUser = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params;
     const { reason } = req.body;
 
-    const user = await User.findById(userId);
+    const userRepository = AppDataSource.getRepository(User);
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'status']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -233,19 +294,25 @@ export const suspendUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status === 'suspended') {
+    if (user.status === UserStatus.SUSPENDED) {
       return res.status(400).json({
         error: 'User is already suspended',
         code: 'ALREADY_SUSPENDED'
       });
     }
 
-    user.status = 'suspended';
-    await user.save();
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.SUSPENDED
+    });
 
     // TODO: 정지 이메일 발송
 
-    const updatedUser = await User.findById(userId).select('-password');
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+    });
 
     res.json({
       message: 'User suspended successfully',
@@ -266,7 +333,13 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req.params;
 
-    const user = await User.findById(userId);
+    const userRepository = AppDataSource.getRepository(User);
+    
+    const user = await userRepository.findOne({ 
+      where: { id: userId },
+      select: ['id', 'status']
+    });
+
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -274,7 +347,7 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (user.status !== 'suspended') {
+    if (user.status !== UserStatus.SUSPENDED) {
       return res.status(400).json({
         error: 'User is not suspended',
         code: 'NOT_SUSPENDED',
@@ -282,12 +355,18 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    user.status = 'approved';
-    await user.save();
+    // Update user status
+    await userRepository.update(userId, {
+      status: UserStatus.APPROVED
+    });
 
     // TODO: 재활성화 이메일 발송
 
-    const updatedUser = await User.findById(userId).select('-password');
+    // Get updated user
+    const updatedUser = await userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+    });
 
     res.json({
       message: 'User reactivated successfully',
@@ -305,46 +384,52 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
 
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
   try {
-    const userStats = await User.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    const userRepository = AppDataSource.getRepository(User);
 
-    const businessTypeStats = await User.aggregate([
-      { $match: { status: 'approved' } },
-      {
-        $group: {
-          _id: '$businessInfo.businessType',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    // Get user status statistics
+    const userStatsQuery = userRepository
+      .createQueryBuilder('user')
+      .select('user.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('user.status');
 
-    const recentUsers = await User.find()
-      .select('-password')
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .populate('approvedBy', 'name email');
-
-    const statusCounts = userStats.reduce((acc, curr) => {
-      acc[curr._id] = curr.count;
+    const userStatsResult = await userStatsQuery.getRawMany();
+    const statusCounts = userStatsResult.reduce((acc, curr) => {
+      acc[curr.status] = parseInt(curr.count);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
-    const businessTypeCounts = businessTypeStats.reduce((acc, curr) => {
-      acc[curr._id] = curr.count;
+    // Get business type statistics for approved users
+    const businessTypeStatsQuery = userRepository
+      .createQueryBuilder('user')
+      .select("user.businessInfo->>'businessType'", 'businessType')
+      .addSelect('COUNT(*)', 'count')
+      .where('user.status = :status', { status: UserStatus.APPROVED })
+      .andWhere("user.businessInfo->>'businessType' IS NOT NULL")
+      .groupBy("user.businessInfo->>'businessType'");
+
+    const businessTypeStatsResult = await businessTypeStatsQuery.getRawMany();
+    const businessTypeCounts = businessTypeStatsResult.reduce((acc, curr) => {
+      if (curr.businessType) {
+        acc[curr.businessType] = parseInt(curr.count);
+      }
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
+
+    // Get recent users
+    const recentUsers = await userRepository.find({
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'approvedBy'],
+      order: { createdAt: 'DESC' },
+      take: 5
+    });
+
+    const totalUsers = Object.values(statusCounts).reduce((a: number, b: number) => a + b, 0);
 
     res.json({
       userStats: statusCounts,
       businessTypeStats: businessTypeCounts,
       recentUsers,
-      totalUsers: Object.values(statusCounts).reduce((a: any, b: any) => a + b, 0)
+      totalUsers
     });
 
   } catch (error) {
