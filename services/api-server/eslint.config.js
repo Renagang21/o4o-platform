@@ -1,46 +1,59 @@
+// @ts-check
 import js from '@eslint/js';
-import tsEslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import prettier from 'eslint-plugin-prettier';
+import tseslint from 'typescript-eslint';
 
-export default [
+export default tseslint.config(
+  // ESLint recommended rules
   js.configs.recommended,
+  
+  // TypeScript ESLint recommended rules
+  ...tseslint.configs.recommended,
+  
+  // Global ignores
   {
-    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    ignores: [
+      'dist/**',
+      'build/**',
+      'node_modules/**',
+      'coverage/**',
+      '*.config.js',
+      '*.config.mjs',
+    ],
+  },
+  
+  // TypeScript files configuration
+  {
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
-      parser: tsParser,
+      parser: tseslint.parser,
       parserOptions: {
-        ecmaVersion: 2022,
-        sourceType: 'module',
         project: './tsconfig.json',
+        ecmaVersion: 'latest',
+        sourceType: 'module',
       },
     },
-    plugins: {
-      '@typescript-eslint': tsEslint,
-      prettier: prettier,
-    },
     rules: {
-      ...tsEslint.configs.recommended.rules,
-      'prettier/prettier': 'error',
+      // TypeScript specific rules
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
+      
+      // General rules
+      'no-console': 'warn',
+      'prefer-const': 'error',
+      'no-var': 'error',
     },
   },
+  
+  // JavaScript files configuration
   {
-    files: ['**/*.js'],
-    languageOptions: {
-      sourceType: 'commonjs',
+    files: ['**/*.{js,mjs,cjs}'],
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-console': 'warn',
+      'prefer-const': 'error',
+      'no-var': 'error',
     },
-  },
-  {
-    ignores: [
-      'dist/**',
-      'node_modules/**',
-      '*.config.js',
-      'coverage/**',
-    ],
-  },
-];
+  }
+);
