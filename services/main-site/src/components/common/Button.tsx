@@ -16,25 +16,25 @@ type ButtonBaseProps = {
 
 type ButtonProps<T extends React.ElementType | 'a' = 'button'> = ButtonBaseProps & {
   as?: T;
+  ref?: React.Ref<HTMLButtonElement>;
 } & Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonBaseProps>;
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      children,
-      variant = 'primary',
-      size = 'md',
-      isLoading = false,
-      leftIcon,
-      rightIcon,
-      fullWidth = false,
-      className,
-      disabled,
-      as: Component = 'button',
-      ...props
-    },
-    ref
-  ) => {
+const Button = <T extends React.ElementType | 'a' = 'button'>(
+  {
+    children,
+    variant = 'primary',
+    size = 'md',
+    isLoading = false,
+    leftIcon,
+    rightIcon,
+    fullWidth = false,
+    className,
+    disabled,
+    as: Component = 'button',
+    ref,
+    ...props
+  }: ButtonProps<T>
+) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
     
     const variantStyles = {
@@ -96,8 +96,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
       </Component>
     );
-  }
-);
+  };
 
 Button.displayName = 'Button';
 
