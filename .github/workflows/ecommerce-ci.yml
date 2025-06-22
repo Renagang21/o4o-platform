@@ -34,9 +34,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
+        run: npm ci
 
       - name: 🔷 TypeScript Entity Compile
         run: |
@@ -75,9 +73,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
+        run: npm ci
 
       - name: 🛍️ Products Controller Validation
         run: |
@@ -141,9 +137,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
+        run: npm ci
 
       - name: 🐘 Database Connection Test
         run: |
@@ -234,9 +228,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: |
-          npm ci
-          cd services/api-server && npm ci
+        run: npm ci
 
       - name: 🔒 Security Audit
         run: |
