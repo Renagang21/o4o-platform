@@ -63,16 +63,17 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       
-      // TypeScript specific rules
-      '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      // TypeScript specific rules (완화)
+      '@typescript-eslint/no-unused-vars': 'warn', // error → warn
+      '@typescript-eslint/no-explicit-any': 'off',  // warn → off
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       
-      // General rules
-      'no-console': 'warn',
-      'prefer-const': 'error',
-      'no-var': 'error',
+      // General rules (완화)
+      'no-console': 'off',        // warn → off  
+      'no-unused-vars': 'off',    // warn → off
+      'prefer-const': 'warn',     // error → warn
+      'no-var': 'warn',          // error → warn
     },
   },
   

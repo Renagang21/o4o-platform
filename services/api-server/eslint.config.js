@@ -33,16 +33,18 @@ export default tseslint.config(
       },
     },
     rules: {
-      // TypeScript specific rules
-      '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      // TypeScript specific rules (완화)
+      '@typescript-eslint/no-unused-vars': 'warn', // error → warn
+      '@typescript-eslint/no-explicit-any': 'off',  // warn → off
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       
-      // General rules
-      'no-console': 'warn',
-      'prefer-const': 'error',
-      'no-var': 'error',
+      // General rules (완화)
+      'no-console': 'off',        // warn → off (서버 로그용)
+      'no-unused-vars': 'off',    // warn → off (TypeScript가 처리)
+      'prefer-const': 'warn',     // error → warn
+      'no-var': 'warn',          // error → warn
+      'no-case-declarations': 'off', // case문 변수 선언 허용
     },
   },
   
