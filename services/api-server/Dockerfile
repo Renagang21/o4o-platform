@@ -1,25 +1,20 @@
 # O4O Platform API Server
 FROM node:20-alpine AS builder
 
-# 작업 디렉토리 설정
 WORKDIR /app
 
-# 루트 패키지 파일 복사 (Workspaces 때문에 필요)
+# 루트 및 api-server의 package.json 복사
 COPY ../../package*.json ./
+COPY package.json ./services/api-server/
 
-# api-server 패키지 파일 복사
-COPY package*.json ./services/api-server/
-WORKDIR /app/services/api-server
-
-# 의존성 설치 (루트에서 실행)
+# 의존성 설치 (프로젝트 루트에서 실행)
 RUN npm ci --workspace=o4o-platform-api-server && npm cache clean --force
 
-# 소스 코드 복사
-COPY src ./src
+# 빌드에 필요한 전체 소스 코드 복사
+COPY . .
 
 # TypeScript 빌드
-RUN npm run build
-WORKDIR /app
+RUN cd services/api-server && npm run build
 
 # 프로덕션 이미지
 FROM node:20-alpine AS production
@@ -28,21 +23,18 @@ FROM node:20-alpine AS production
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodeuser -u 1001
 
-# 작업 디렉토리 설정
 WORKDIR /app
 
 # 필요한 패키지 설치
 RUN apk add --no-cache dumb-init
 
-# 프로덕션 의존성만 설치
+# 프로덕션 의존성만 설치하기 위해 package.json 파일들 복사
 COPY ../../package*.json ./
-COPY package*.json ./services/api-server/
-WORKDIR /app/services/api-server
+COPY package.json ./services/api-server/
 RUN npm ci --only=production --workspace=o4o-platform-api-server && npm cache clean --force
-WORKDIR /app
 
 # 빌드된 애플리케이션 복사
-COPY --from=builder --chown=nodeuser:nodejs /app/services/api-server/dist ./dist
+COPY --from=builder /app/services/api-server/dist ./services/api-server/dist
 
 # 사용자 권한 설정
 USER nodeuser
@@ -55,4 +47,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # 애플리케이션 시작
-CMD ["dumb-init", "node", "dist/main.js"]
+CMD ["dumb-init", "node", "services/api-server/dist/main.js"]
