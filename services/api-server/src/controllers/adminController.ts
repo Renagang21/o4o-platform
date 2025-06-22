@@ -395,9 +395,9 @@ export const getDashboardStats = async (req: AuthRequest, res: Response) => {
 
     const userStatsResult = await userStatsQuery.getRawMany();
     const statusCounts = userStatsResult.reduce((acc, curr) => {
-      acc[curr.status] = parseInt(curr.count);
+      acc[curr.status] = parseInt(curr.count, 10);
       return acc;
-    }, {} as Record<string, number>);
+    }, {} as Record<UserStatus, number>);
 
     // Get business type statistics for approved users
     const businessTypeStatsQuery = userRepository
