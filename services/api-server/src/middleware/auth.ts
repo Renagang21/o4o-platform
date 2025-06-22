@@ -1,9 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { getUserRepository, User } from '../models/User';
+import { AppDataSource } from '../database/connection';
+import { User } from '../entities/User';
 
 export interface AuthRequest extends Request {
-  user?: User;
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    name?: string;        // 선택적 필드로 변경
+    status?: string;      // 선택적 필드로 변경
+    businessInfo?: any;
+    createdAt?: Date;
+    updatedAt?: Date;
+    lastLoginAt?: Date;
+    [key: string]: any;
+  };
 }
 
 export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -19,7 +31,7 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
-    const userRepository = getUserRepository();
+    const userRepository = AppDataSource.getRepository(User);
     
     const user = await userRepository.findOne({ 
       where: { id: decoded.userId },
@@ -41,7 +53,17 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
       });
     }
 
-    req.user = user;
+    req.user = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      status: user.status,
+      businessInfo: user.businessInfo,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      lastLoginAt: user.lastLoginAt
+    };
     next();
   } catch (error) {
     return res.status(401).json({ 
