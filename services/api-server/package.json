@@ -16,6 +16,10 @@
     "test:integration": "jest --testPathPattern=integration",
     "test:coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "prettier": "prettier --check src/**/*.{ts,tsx,js,jsx,json}",
+    "prettier:fix": "prettier --write src/**/*.{ts,tsx,js,jsx,json}",
     "create-admin": "npx ts-node ../../scripts/create-admin.ts",
     "db:test": "node ../../scripts/test-database.js",
     "db:setup": "docker-compose -f ../../docker-compose.dev.yml up -d postgres redis",
@@ -54,6 +58,12 @@
     "nodemon": "^3.1.7",
     "jest": "^29.5.0",
     "@types/jest": "^29.5.1",
-    "ts-jest": "^29.1.0"
+    "ts-jest": "^29.1.0",
+    "eslint": "^9.25.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "prettier": "^3.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1"
   }
 }
