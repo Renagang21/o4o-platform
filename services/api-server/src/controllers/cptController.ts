@@ -1,7 +1,14 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../database/connection';
 import { CustomPostType, FieldGroup, FieldSchema } from '../entities/CustomPostType';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    role: string;
+  };
+}
 
 export class CPTController {
   // ============= Custom Post Type Management =============
@@ -9,7 +16,7 @@ export class CPTController {
   // Get all CPTs
   static async getAllCPTs(req: Request, res: Response) {
     try {
-      const cptRepo = getRepository(CustomPostType);
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
       const cpts = await cptRepo.find({
         where: { active: true },
         order: { createdAt: 'DESC' }
@@ -32,7 +39,7 @@ export class CPTController {
   static async getCPTBySlug(req: Request, res: Response) {
     try {
       const { slug } = req.params;
-      const cptRepo = getRepository(CustomPostType);
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
       
       const cpt = await cptRepo.findOne({
         where: { slug, active: true }
@@ -59,7 +66,7 @@ export class CPTController {
   }
 
   // Create new CPT
-  static async createCPT(req: Request, res: Response) {
+  static async createCPT(req: AuthenticatedRequest, res: Response) {
     try {
       const { 
         slug, 
@@ -71,7 +78,7 @@ export class CPTController {
         settings 
       } = req.body;
 
-      const cptRepo = getRepository(CustomPostType);
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
 
       // Check if slug already exists
       const existingCPT = await cptRepo.findOne({ where: { slug } });
@@ -103,7 +110,7 @@ export class CPTController {
         supports: ['title'],
         ...settings
       };
-      cpt.createdBy = req.user?.id;
+      cpt.createdBy = req.user?.id || '';
 
       await cptRepo.save(cpt);
 
@@ -127,7 +134,7 @@ export class CPTController {
       const { slug } = req.params;
       const updates = req.body;
 
-      const cptRepo = getRepository(CustomPostType);
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
       const cpt = await cptRepo.findOne({ where: { slug } });
 
       if (!cpt) {
@@ -166,7 +173,7 @@ export class CPTController {
   static async deleteCPT(req: Request, res: Response) {
     try {
       const { slug } = req.params;
-      const cptRepo = getRepository(CustomPostType);
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
 
       const cpt = await cptRepo.findOne({ where: { slug } });
       if (!cpt) {
@@ -207,7 +214,7 @@ export class CPTController {
         sortOrder = 'DESC'
       } = req.query;
 
-      const postRepo = getRepository(CustomPost);
+      const postRepo = AppDataSource.getRepository(CustomPost);
       const queryBuilder = postRepo.createQueryBuilder('post')
         .leftJoinAndSelect('post.postType', 'postType')
         .where('post.postTypeSlug = :slug', { slug });
@@ -226,7 +233,7 @@ export class CPTController {
       }
 
       // Sorting
-      queryBuilder.orderBy(`post.${sortBy}`, sortOrder as 'ASC' | 'DESC');
+      queryBuilder.orderBy(`post.${sortBy as string}`, sortOrder as 'ASC' | 'DESC');
 
       // Pagination
       const skip = (Number(page) - 1) * Number(limit);
@@ -256,13 +263,13 @@ export class CPTController {
   }
 
   // Create new post
-  static async createPost(req: Request, res: Response) {
+  static async createPost(req: AuthenticatedRequest, res: Response) {
     try {
       const { slug } = req.params;
       const { title, fields, content, status, meta } = req.body;
 
-      const cptRepo = getRepository(CustomPostType);
-      const postRepo = getRepository(CustomPost);
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
+      const postRepo = AppDataSource.getRepository(CustomPost);
 
       // Verify CPT exists
       const cpt = await cptRepo.findOne({ where: { slug, active: true } });
@@ -291,7 +298,7 @@ export class CPTController {
       post.content = content;
       post.status = status || PostStatus.DRAFT;
       post.meta = meta;
-      post.authorId = req.user?.id;
+      post.authorId = req.user?.id || '';
 
       if (status === PostStatus.PUBLISHED) {
         post.publishedAt = new Date();
@@ -375,7 +382,7 @@ export class CPTController {
   static async getPostById(req: Request, res: Response) {
     try {
       const { slug, postId } = req.params;
-      const postRepo = getRepository(CustomPost);
+      const postRepo = AppDataSource.getRepository(CustomPost);
 
       const post = await postRepo.findOne({
         where: { id: postId, postTypeSlug: slug },
@@ -408,7 +415,7 @@ export class CPTController {
       const { slug, postId } = req.params;
       const updates = req.body;
 
-      const postRepo = getRepository(CustomPost);
+      const postRepo = AppDataSource.getRepository(CustomPost);
       const post = await postRepo.findOne({
         where: { id: postId, postTypeSlug: slug }
       });
@@ -441,7 +448,7 @@ export class CPTController {
   static async deletePost(req: Request, res: Response) {
     try {
       const { slug, postId } = req.params;
-      const postRepo = getRepository(CustomPost);
+      const postRepo = AppDataSource.getRepository(CustomPost);
 
       const result = await postRepo.delete({
         id: postId,
@@ -474,7 +481,7 @@ export class CPTController {
       const { slug } = req.params;
       const { limit = 10, page = 1 } = req.query;
 
-      const postRepo = getRepository(CustomPost);
+      const postRepo = AppDataSource.getRepository(CustomPost);
       const [posts, total] = await postRepo.findAndCount({
         where: { 
           postTypeSlug: slug, 
