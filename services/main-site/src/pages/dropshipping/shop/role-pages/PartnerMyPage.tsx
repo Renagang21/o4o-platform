@@ -6,16 +6,8 @@ import {
   ExternalLink, Copy, Download, Eye, MessageCircle
 } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-interface PartnerMyPageProps {
-  user: User;
-}
+// 공통 타입 import
+import { User, RolePageProps } from '../../../types/user';
 
 interface PartnerStats {
   totalEarnings: number;
@@ -51,7 +43,7 @@ interface ReferralLink {
   createdDate: string;
 }
 
-const PartnerMyPage: React.FC<PartnerMyPageProps> = ({ user }) => {
+const PartnerMyPage: React.FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [partnerStats, setPartnerStats] = useState<PartnerStats>({
     totalEarnings: 1850000,
