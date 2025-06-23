@@ -3,36 +3,15 @@ import Cookies from 'js-cookie';
 import { authAPI } from '../services/api';
 import { toast } from 'react-toastify';
 
-// UserRole 타입 정의 및 export - 모든 가능한 역할 포함
-export type UserRole = 'user' | 'admin' | 'administrator' | 'manager' | 'partner' | 'operator' | 'member' | 'seller' | 'affiliate' | 'contributor' | 'vendor' | 'supplier';
-
-export interface User {
-  _id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  roles: UserRole[]; // 호환성을 위한 배열 형태
-  status: 'pending' | 'approved' | 'rejected' | 'suspended';
-  businessInfo?: {
-    businessName: string;
-    businessType: string;
-    businessNumber?: string;
-    address: string;
-    phone: string;
-  };
-  createdAt: string;
-  lastLoginAt?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
-  checkAuthStatus: () => Promise<void>;
-}
+// 공통 타입 import
+import { 
+  User, 
+  UserRole, 
+  AuthContextType, 
+  UserPermissions,
+  LoginResponse,
+  AuthVerifyResponse 
+} from '../types/user';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -46,17 +25,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!user && user.status === 'approved';
 
+  // 사용자 데이터 정규화 함수 (id 속성 추가)
+  const normalizeUserData = (userData: any): User => {
+    return {
+      ...userData,
+      id: userData._id || userData.id, // MongoDB _id를 id로 매핑
+    };
+  };
+
   // 로그인
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await authAPI.login(email, password);
-      const { token, user: userData } = response.data;
+      const { token, user: userData }: LoginResponse = response.data;
+
+      // 사용자 데이터 정규화 (id 속성 추가)
+      const normalizedUser = normalizeUserData(userData);
 
       // 쿠키에 토큰 저장 (24시간)
       Cookies.set('authToken', token, { expires: 1 });
-      Cookies.set('user', JSON.stringify(userData), { expires: 1 });
+      Cookies.set('user', JSON.stringify(normalizedUser), { expires: 1 });
 
-      setUser(userData);
+      setUser(normalizedUser);
       toast.success('로그인되었습니다.');
       return true;
     } catch (error: any) {
@@ -95,6 +85,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
+      // id 속성 유지
+      updatedUser.id = updatedUser._id || updatedUser.id;
+      
       setUser(updatedUser);
       Cookies.set('user', JSON.stringify(updatedUser), { expires: 1 });
     }
@@ -119,8 +112,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // 토큰 유효성 검증
       const response = await authAPI.verifyToken();
-      if (response.data.valid) {
-        setUser(response.data.user);
+      const verifyData: AuthVerifyResponse = response.data;
+      
+      if (verifyData.valid) {
+        // 서버에서 받은 최신 사용자 정보 사용
+        const normalizedUser = normalizeUserData(verifyData.user);
+        setUser(normalizedUser);
       } else {
         // 토큰이 유효하지 않으면 로그아웃
         logout();
@@ -155,7 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// AuthContext export 추가  
+// AuthContext export
 export { AuthContext };
 
 // 커스텀 훅
@@ -168,7 +165,7 @@ export const useAuth = () => {
 };
 
 // 권한 확인 훅
-export const usePermissions = () => {
+export const usePermissions = (): UserPermissions => {
   const { user } = useAuth();
 
   return {
@@ -181,3 +178,6 @@ export const usePermissions = () => {
     canAccessAdmin: user?.role === 'admin' || user?.role === 'manager',
   };
 };
+
+// 타입 재export (호환성)
+export type { User, UserRole, AuthContextType, UserPermissions };
