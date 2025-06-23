@@ -6,16 +6,8 @@ import {
   Clock, FileText, Shield, Award, Eye, Plus
 } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-interface SupplierMyPageProps {
-  user: User;
-}
+// 공통 타입 import
+import { User, RolePageProps } from '../../../types/user';
 
 interface SupplierStats {
   totalProducts: number;
@@ -59,7 +51,7 @@ interface PartnerOrder {
   requestedDelivery: string;
 }
 
-const SupplierMyPage: React.FC<SupplierMyPageProps> = ({ user }) => {
+const SupplierMyPage: React.FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [supplierStats, setSupplierStats] = useState<SupplierStats>({
     totalProducts: 147,
