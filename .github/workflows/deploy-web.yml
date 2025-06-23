@@ -15,7 +15,7 @@ jobs:
       - name: Deploy to Web Server
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: 172.26.11.95
+          host: 13.125.144.8
           username: ubuntu
           key: ${{ secrets.WEB_SSH_PRIVATE_KEY }}
           script: |
