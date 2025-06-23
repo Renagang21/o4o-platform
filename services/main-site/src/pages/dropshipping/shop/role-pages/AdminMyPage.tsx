@@ -8,16 +8,8 @@ import {
   Activity, Lock, Download, Upload, RefreshCw, HelpCircle
 } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-interface AdminMyPageProps {
-  user: User;
-}
+// 공통 타입 import
+import { User, RolePageProps } from '../../../types/user';
 
 interface SystemStats {
   totalUsers: number;
@@ -52,7 +44,7 @@ interface PendingApproval {
   priority: 'high' | 'medium' | 'low';
 }
 
-const AdminMyPage: React.FC<AdminMyPageProps> = ({ user }) => {
+const AdminMyPage: React.FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [systemStats, setSystemStats] = useState<SystemStats>({
     totalUsers: 12547,
