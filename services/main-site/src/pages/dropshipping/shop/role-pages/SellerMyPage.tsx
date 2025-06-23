@@ -6,16 +6,8 @@ import {
   Calendar, Clock, AlertCircle, CheckCircle
 } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-interface SellerMyPageProps {
-  user: User;
-}
+// 공통 타입 import
+import { User, RolePageProps } from '../../../types/user';
 
 interface SellerStats {
   totalProducts: number;
@@ -53,7 +45,7 @@ interface Order {
   orderDate: string;
 }
 
-const SellerMyPage: React.FC<SellerMyPageProps> = ({ user }) => {
+const SellerMyPage: React.FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sellerStats, setSellerStats] = useState<SellerStats>({
     totalProducts: 24,
