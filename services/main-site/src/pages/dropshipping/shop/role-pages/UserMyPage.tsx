@@ -6,16 +6,8 @@ import {
   ShoppingCart, TrendingUp, Award, MessageCircle
 } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-interface UserMyPageProps {
-  user: User;
-}
+// 공통 타입 import
+import { User, RolePageProps } from '../../../types/user';
 
 interface Order {
   id: string;
@@ -38,7 +30,7 @@ interface WishlistItem {
   isRocket: boolean;
 }
 
-const UserMyPage: React.FC<UserMyPageProps> = ({ user }) => {
+const UserMyPage: React.FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
