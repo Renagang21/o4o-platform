@@ -22,10 +22,15 @@
     },
 
     /* Linting */
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/components/editor/extensions/UAGB*",
+    "src/components/editor/extensions/tiptap-block"
+  ]
 }

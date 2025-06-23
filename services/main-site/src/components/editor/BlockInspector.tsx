@@ -62,7 +62,7 @@ export const BlockInspector: React.FC<BlockInspectorProps> = ({
     if (level === 0) {
       editor.chain().focus().setParagraph().run();
     } else {
-      editor.chain().focus().setHeading({ level }).run();
+      editor.chain().focus().setHeading({ level: level as 1 | 2 | 3 | 4 | 5 | 6 }).run();
     }
   };
 

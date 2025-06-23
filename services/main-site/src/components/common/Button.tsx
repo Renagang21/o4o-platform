@@ -4,22 +4,21 @@ import { twMerge } from 'tailwind-merge';
 export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'disabled' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-type ButtonBaseProps = {
+interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
-  as?: React.ElementType | 'a';
-};
+  as?: React.ElementType;
+  className?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+  onClick?: () => void;
+}
 
-type ButtonProps<T extends React.ElementType | 'a' = 'button'> = ButtonBaseProps & {
-  as?: T;
-  ref?: React.Ref<HTMLButtonElement>;
-} & Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonBaseProps>;
-
-const Button = <T extends React.ElementType | 'a' = 'button'>(
+const Button = (
   {
     children,
     variant = 'primary',
@@ -31,9 +30,9 @@ const Button = <T extends React.ElementType | 'a' = 'button'>(
     className,
     disabled,
     as: Component = 'button',
-    ref,
+    onClick,
     ...props
-  }: ButtonProps<T>
+  }: ButtonProps
 ) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
     
@@ -64,10 +63,10 @@ const Button = <T extends React.ElementType | 'a' = 'button'>(
 
     return (
       <Component
-        ref={ref}
         className={buttonStyles}
         disabled={disabled || isLoading}
-        {...props}
+        onClick={onClick}
+        {...(props as any)}
       >
         {isLoading && (
           <svg

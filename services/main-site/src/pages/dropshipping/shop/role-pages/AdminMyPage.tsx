@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // 공통 타입 import
-import { User, RolePageProps } from '../../../types/user';
+import { User, RolePageProps } from '../../../../types/user';
 
 interface SystemStats {
   totalUsers: number;
