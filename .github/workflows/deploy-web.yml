@@ -1,0 +1,34 @@
+name: Deploy Web Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-web:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy to Web Server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 172.26.11.95
+          username: ubuntu
+          key: ${{ secrets.WEB_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/o4o-platform
+            git pull origin main
+            
+            # 의존성 설치
+            npm ci
+            
+            # 프로덕션 빌드
+            npm run build
+            
+            # PM2로 정적 파일 서빙 (기존 프로세스 중단 후 재시작)
+            pm2 delete web-app || true
+            pm2 serve dist 3000 --name "web-app" --spa
+            pm2 save
