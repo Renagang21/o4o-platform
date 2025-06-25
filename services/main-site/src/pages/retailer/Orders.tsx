@@ -328,7 +328,7 @@ export default function Orders() {
                       <button
                         onClick={() => {
                           // 배송 추적 페이지로 이동하거나 팝업
-                          toast.info('배송 추적 기능을 준비 중입니다.');
+                          toast.success('배송 추적 기능을 준비 중입니다.');
                         }}
                         className="text-green-600 hover:text-green-500 text-sm font-medium"
                       >
@@ -348,7 +348,7 @@ export default function Orders() {
                     {order.status === 'delivered' && (
                       <button
                         onClick={() => {
-                          toast.info('리뷰 작성 기능을 준비 중입니다.');
+                          toast.success('리뷰 작성 기능을 준비 중입니다.');
                         }}
                         className="text-purple-600 hover:text-purple-500 text-sm font-medium"
                       >

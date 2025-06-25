@@ -295,7 +295,7 @@ export default function CustomerOrderDetail() {
                           <div className="mt-2">
                             <button
                               onClick={() => {
-                                toast.info('리뷰 작성 기능을 준비 중입니다.');
+                                toast.success('리뷰 작성 기능을 준비 중입니다.');
                               }}
                               className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200"
                             >
@@ -343,7 +343,7 @@ export default function CustomerOrderDetail() {
                           <p className="text-blue-700">{currentOrder.trackingNumber}</p>
                           <button
                             onClick={() => {
-                              toast.info('배송 추적 기능을 준비 중입니다.');
+                              toast.success('배송 추적 기능을 준비 중입니다.');
                             }}
                             className="mt-1 text-xs text-blue-600 hover:text-blue-500 underline"
                           >
@@ -453,7 +453,7 @@ export default function CustomerOrderDetail() {
                   {currentOrder.trackingNumber && (
                     <button
                       onClick={() => {
-                        toast.info('배송 추적 기능을 준비 중입니다.');
+                        toast.success('배송 추적 기능을 준비 중입니다.');
                       }}
                       className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
                     >
@@ -474,7 +474,7 @@ export default function CustomerOrderDetail() {
                     <>
                       <button
                         onClick={() => {
-                          toast.info('리뷰 작성 기능을 준비 중입니다.');
+                          toast.success('리뷰 작성 기능을 준비 중입니다.');
                         }}
                         className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
                       >
@@ -483,7 +483,7 @@ export default function CustomerOrderDetail() {
                       
                       <button
                         onClick={() => {
-                          toast.info('재주문 기능을 준비 중입니다.');
+                          toast.success('재주문 기능을 준비 중입니다.');
                         }}
                         className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
                       >

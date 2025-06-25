@@ -395,7 +395,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
                           <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
                             <span className="flex items-center">
                               <Clock className="w-3 h-3 mr-1" />
-                              {formatDuration(item.duration || item.content?.duration)}
+                              {formatDuration(item.duration || 0)}
                             </span>
                             
                             {item.type === 'video' && item.content && (

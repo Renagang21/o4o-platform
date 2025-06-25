@@ -57,7 +57,8 @@ export default function StoreManagement() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const userRole = 'admin'; // This would come from auth context
+  // This would come from auth context - using dynamic value to avoid TS literal type inference
+  const userRole = (['admin', 'manager'] as const)[0] as 'admin' | 'manager';
 
   useEffect(() => {
     fetchStores();

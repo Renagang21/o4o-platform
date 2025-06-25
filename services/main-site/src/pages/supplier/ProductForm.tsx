@@ -46,15 +46,11 @@ export default function ProductForm() {
     },
   });
 
-  const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
-    control,
-    name: 'specifications' as any,
-  });
+  // Handle specifications as key-value pairs
+  const [specifications, setSpecifications] = useState<{[key: string]: string}>({});
 
-  const { fields: imageFields, append: appendImage, remove: removeImage } = useFieldArray({
-    control,
-    name: 'images',
-  });
+  // Handle images as array of strings
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const [specKey, setSpecKey] = useState('');
   const [specValue, setSpecValue] = useState('');
@@ -147,7 +143,7 @@ export default function ProductForm() {
     }
   };
 
-  const specifications = watch('specifications') || {};
+  const watchedSpecifications = watch('specifications') || {};
 
   return (
     <div className="min-h-screen bg-gray-100">

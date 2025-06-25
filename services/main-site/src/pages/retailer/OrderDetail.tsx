@@ -406,7 +406,7 @@ export default function OrderDetail() {
                   {currentOrder.trackingNumber && (
                     <button
                       onClick={() => {
-                        toast.info('배송 추적 기능을 준비 중입니다.');
+                        toast.success('배송 추적 기능을 준비 중입니다.');
                       }}
                       className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
                     >
@@ -426,7 +426,7 @@ export default function OrderDetail() {
                   {currentOrder.status === 'delivered' && (
                     <button
                       onClick={() => {
-                        toast.info('리뷰 작성 기능을 준비 중입니다.');
+                        toast.success('리뷰 작성 기능을 준비 중입니다.');
                       }}
                       className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700"
                     >

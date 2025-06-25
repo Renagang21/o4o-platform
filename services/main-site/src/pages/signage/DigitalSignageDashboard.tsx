@@ -27,7 +27,8 @@ export default function DigitalSignageDashboard() {
   const [selectedStoreId, setSelectedStoreId] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  const userRole = 'admin'; // This would come from auth context
+  // This would come from auth context - using dynamic value to avoid TS literal type inference
+  const userRole = (['admin', 'manager'] as const)[0] as 'admin' | 'manager';
 
   useEffect(() => {
     fetchDashboardStats();

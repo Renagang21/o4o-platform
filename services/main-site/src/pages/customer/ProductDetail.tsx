@@ -42,12 +42,7 @@ export default function ProductDetail() {
     if (!product || !user) return;
 
     try {
-      addToCart({
-        productId: product.id,
-        quantity,
-        buyerId: user.id,
-        buyerType: 'customer',
-      });
+      addToCart(product.id, quantity);
       toast.success('장바구니에 추가되었습니다.');
     } catch (error) {
       toast.error('장바구니 추가에 실패했습니다.');
@@ -280,7 +275,7 @@ export default function ProductDetail() {
                     {Object.entries(product.specifications).map(([key, value]) => (
                       <div key={key}>
                         <dt className="text-sm font-medium text-gray-900">{key}</dt>
-                        <dd className="mt-1 text-sm text-gray-700">{value}</dd>
+                        <dd className="mt-1 text-sm text-gray-700">{String(value)}</dd>
                       </div>
                     ))}
                   </dl>

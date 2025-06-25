@@ -372,7 +372,7 @@ export default function CustomerOrders() {
                     {order.trackingNumber && (
                       <button
                         onClick={() => {
-                          toast.info('배송 추적 기능을 준비 중입니다.');
+                          toast.success('배송 추적 기능을 준비 중입니다.');
                         }}
                         className="text-green-600 hover:text-green-500 text-sm font-medium"
                       >
@@ -392,7 +392,7 @@ export default function CustomerOrders() {
                     {order.status === 'delivered' && (
                       <button
                         onClick={() => {
-                          toast.info('리뷰 작성 기능을 준비 중입니다.');
+                          toast.success('리뷰 작성 기능을 준비 중입니다.');
                         }}
                         className="text-purple-600 hover:text-purple-500 text-sm font-medium"
                       >
@@ -404,7 +404,7 @@ export default function CustomerOrders() {
                       <button
                         onClick={() => {
                           // 재주문 기능 (장바구니에 동일 상품 추가)
-                          toast.info('재주문 기능을 준비 중입니다.');
+                          toast.success('재주문 기능을 준비 중입니다.');
                         }}
                         className="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
                       >

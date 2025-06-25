@@ -206,7 +206,7 @@ const TheDANGHomeEditor: React.FC<TheDANGHomeEditorProps> = ({
         />
       </div>
 
-      <style jsx>{`
+      <style>{`
         .editor-mode [data-tiptap-editable] {
           position: relative;
           border: 2px dashed #5787c5;

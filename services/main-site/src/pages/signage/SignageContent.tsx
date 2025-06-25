@@ -56,7 +56,10 @@ export default function SignageContent() {
       const queryParams = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
-        ...filters
+        ...(filters.status && { status: filters.status }),
+        ...(filters.type && { type: filters.type }),
+        ...(filters.search && { search: filters.search }),
+        ...(filters.isPublic !== undefined && { isPublic: filters.isPublic.toString() })
       });
 
       const response = await fetch(`/api/signage/contents?${queryParams}`, {
