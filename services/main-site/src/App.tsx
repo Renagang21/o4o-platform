@@ -18,6 +18,10 @@ import CustomerShop from './pages/customer/Shop';
 // Digital Signage Pages
 import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
+// TheDANG Style Home
+import TheDANGStyleHome from './pages/TheDANGStyleHome';
+import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
+
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 
@@ -41,7 +45,9 @@ const App: React.FC = () => {
         
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+          <Route path="/" element={<TheDANGStyleHome />} />
+          <Route path="/home" element={<TheDANGStyleHome />} />
+          <Route path="/editor/home" element={<TheDANGStyleEditorPage />} />
           <Route path="/auth/login" element={<Login />} />
           
           {/* Protected Routes - Admin */}

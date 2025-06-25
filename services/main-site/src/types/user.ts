@@ -17,7 +17,9 @@ export type UserRole =
   | 'affiliate' 
   | 'contributor' 
   | 'vendor' 
-  | 'supplier';
+  | 'supplier'
+  | 'retailer'
+  | 'customer';
 
 // 비즈니스 정보 인터페이스
 export interface BusinessInfo {
@@ -29,7 +31,7 @@ export interface BusinessInfo {
 }
 
 // 사용자 상태 타입
-export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
+export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'active' | 'inactive';
 
 // 메인 User 인터페이스
 export interface User {
@@ -37,12 +39,16 @@ export interface User {
   id: string;                     // 호환성을 위한 ID (= _id)
   email: string;
   name: string;
+  phone?: string;
   role: UserRole;                 // 강타입 UserRole
-  roles: UserRole[];              // 호환성을 위한 배열 형태
+  roles?: UserRole[];             // 호환성을 위한 배열 형태
+  userType?: 'admin' | 'supplier' | 'retailer' | 'customer'; // 호환성
   status: UserStatus;
   businessInfo?: BusinessInfo;
   createdAt: string;
+  updatedAt?: string;
   lastLoginAt?: string;
+  avatar?: string;
 }
 
 // AuthContext 관련 타입들
@@ -76,6 +82,64 @@ export interface LoginResponse {
 export interface AuthVerifyResponse {
   valid: boolean;
   user: User;
+}
+
+// 확장 사용자 타입 (하위 호환성)
+export interface Supplier extends User {
+  companyName: string;
+  businessNumber: string;
+  address: string;
+  contactPerson: string;
+  approvalStatus: 'pending' | 'approved' | 'rejected';
+  website?: string;
+  description?: string;
+}
+
+export interface Retailer extends User {
+  storeName: string;
+  storeAddress: string;
+  businessNumber: string;
+  grade: 'gold' | 'premium' | 'vip';
+  approvalStatus: 'pending' | 'approved' | 'rejected';
+  managerName: string;
+  storeType: string;
+}
+
+// 인증 응답 타입 (하위 호환성)
+export interface AuthResponse {
+  success: boolean;
+  data: {
+    user: User | Supplier | Retailer;
+    token: string;
+  };
+  message?: string;
+}
+
+// 요청 타입들
+export interface LoginRequest {
+  email: string;
+  password: string;
+  userType?: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+  userType: 'supplier' | 'retailer' | 'customer';
+  // 공급자 추가 정보
+  companyName?: string;
+  businessNumber?: string;
+  address?: string;
+  contactPerson?: string;
+  website?: string;
+  description?: string;
+  // 리테일러 추가 정보
+  storeName?: string;
+  storeAddress?: string;
+  managerName?: string;
+  storeType?: string;
 }
 
 // 사용자 업데이트 관련 타입
