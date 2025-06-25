@@ -11,9 +11,9 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,
+    host: '0.0.0.0',
     port: 3000,
-    allowedHosts: ['neture.co.kr', 'www.neture.co.kr'],
+    strictPort: false,
   },
 })
 

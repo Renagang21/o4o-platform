@@ -21,6 +21,9 @@ export type UserRole =
   | 'retailer'
   | 'customer';
 
+// PrivateRoute에서 사용하는 userType
+export type UserType = 'admin' | 'supplier' | 'retailer' | 'customer' | 'manager';
+
 // 비즈니스 정보 인터페이스
 export interface BusinessInfo {
   businessName: string;

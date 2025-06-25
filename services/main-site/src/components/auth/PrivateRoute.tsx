@@ -1,10 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
+import { UserType } from '../../types/user';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
-  allowedUserTypes?: Array<'admin' | 'supplier' | 'retailer' | 'customer'>;
+  allowedUserTypes?: UserType[];
 }
 
 export default function PrivateRoute({ children, allowedUserTypes }: PrivateRouteProps) {

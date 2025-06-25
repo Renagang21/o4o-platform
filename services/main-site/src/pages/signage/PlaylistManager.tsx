@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Play, Edit, Trash2, GripVertical, Clock, Video, Image } from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface PlaylistItem {
   id: string;
@@ -106,21 +105,19 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
     }
   };
 
-  const handleDragEnd = async (result: any) => {
-    if (!result.destination || !selectedPlaylist) return;
-
+  const handleMoveUp = async (itemId: string, currentIndex: number) => {
+    if (currentIndex === 0 || !selectedPlaylist) return;
+    
     const items = Array.from(playlistItems);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const [movedItem] = items.splice(currentIndex, 1);
+    items.splice(currentIndex - 1, 0, movedItem);
 
-    // Update local state immediately for better UX
     const updatedItems = items.map((item, index) => ({
       ...item,
       order: index + 1
     }));
     setPlaylistItems(updatedItems);
 
-    // Send update to server
     try {
       const itemOrders = updatedItems.map((item, index) => ({
         id: item.id,
@@ -142,6 +139,43 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reorder items');
       // Revert on error
+      fetchPlaylistItems(selectedPlaylist.id);
+    }
+  };
+
+  const handleMoveDown = async (itemId: string, currentIndex: number) => {
+    if (currentIndex === playlistItems.length - 1 || !selectedPlaylist) return;
+    
+    const items = Array.from(playlistItems);
+    const [movedItem] = items.splice(currentIndex, 1);
+    items.splice(currentIndex + 1, 0, movedItem);
+
+    const updatedItems = items.map((item, index) => ({
+      ...item,
+      order: index + 1
+    }));
+    setPlaylistItems(updatedItems);
+
+    try {
+      const itemOrders = updatedItems.map((item, index) => ({
+        id: item.id,
+        order: index + 1
+      }));
+
+      const response = await fetch(`/api/signage/playlists/${selectedPlaylist.id}/items/reorder`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ items: itemOrders })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reorder items');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reorder items');
       fetchPlaylistItems(selectedPlaylist.id);
     }
   };
@@ -307,95 +341,102 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
             {/* Playlist Items List */}
             <div className="p-4">
               {playlistItems.length > 0 ? (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="playlist-items">
-                    {(provided) => (
-                      <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                        {playlistItems.map((item, index) => (
-                          <Draggable key={item.id} draggableId={item.id} index={index}>
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`bg-gray-50 rounded-lg p-4 border ${
-                                  snapshot.isDragging ? 'shadow-lg' : ''
-                                }`}
-                              >
-                                <div className="flex items-center space-x-4">
-                                  {/* Drag Handle */}
-                                  <div {...provided.dragHandleProps} className="cursor-grab">
-                                    <GripVertical className="w-4 h-4 text-gray-400" />
-                                  </div>
+                <div className="space-y-2">
+                  {playlistItems.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="bg-gray-50 rounded-lg p-4 border"
+                    >
+                      <div className="flex items-center space-x-4">
+                        {/* Order Controls */}
+                        <div className="flex flex-col space-y-1">
+                          <button
+                            onClick={() => handleMoveUp(item.id, index)}
+                            disabled={index === 0}
+                            className={`p-1 rounded ${
+                              index === 0 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-gray-600 hover:bg-gray-200'
+                            }`}
+                          >
+                            ↑
+                          </button>
+                          <button
+                            onClick={() => handleMoveDown(item.id, index)}
+                            disabled={index === playlistItems.length - 1}
+                            className={`p-1 rounded ${
+                              index === playlistItems.length - 1 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-gray-600 hover:bg-gray-200'
+                            }`}
+                          >
+                            ↓
+                          </button>
+                        </div>
 
-                                  {/* Order Number */}
-                                  <div className="w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-medium">
-                                    {item.order}
-                                  </div>
+                        {/* Order Number */}
+                        <div className="w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-medium">
+                          {item.order}
+                        </div>
 
-                                  {/* Content */}
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center space-x-2">
-                                      {item.type === 'video' ? (
-                                        <Video className="w-4 h-4 text-blue-600" />
-                                      ) : (
-                                        <Image className="w-4 h-4 text-green-600" />
-                                      )}
-                                      <h4 className="font-medium text-gray-900 truncate">
-                                        {item.title || item.content?.title || 'Untitled'}
-                                      </h4>
-                                    </div>
-
-                                    <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
-                                      <span className="flex items-center">
-                                        <Clock className="w-3 h-3 mr-1" />
-                                        {formatDuration(item.duration || item.content?.duration)}
-                                      </span>
-                                      
-                                      {item.type === 'video' && item.content && (
-                                        <span className="capitalize">
-                                          {item.content.type}
-                                        </span>
-                                      )}
-
-                                      {item.customSettings?.volume && (
-                                        <span>Volume: {item.customSettings.volume}%</span>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {/* Thumbnail */}
-                                  {(item.content?.thumbnailUrl || item.imageUrl) && (
-                                    <div className="w-16 h-12 bg-gray-200 rounded overflow-hidden">
-                                      <img
-                                        src={item.content?.thumbnailUrl || item.imageUrl}
-                                        alt=""
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  )}
-
-                                  {/* Actions */}
-                                  <div className="flex space-x-1">
-                                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded">
-                                      <Edit className="w-3 h-3" />
-                                    </button>
-                                    <button
-                                      onClick={() => handleDeleteItem(item.id)}
-                                      className="p-1 text-red-600 hover:bg-red-100 rounded"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2">
+                            {item.type === 'video' ? (
+                              <Video className="w-4 h-4 text-blue-600" />
+                            ) : (
+                              <Image className="w-4 h-4 text-green-600" />
                             )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
+                            <h4 className="font-medium text-gray-900 truncate">
+                              {item.title || item.content?.title || 'Untitled'}
+                            </h4>
+                          </div>
+
+                          <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
+                            <span className="flex items-center">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {formatDuration(item.duration || item.content?.duration)}
+                            </span>
+                            
+                            {item.type === 'video' && item.content && (
+                              <span className="capitalize">
+                                {item.content.type}
+                              </span>
+                            )}
+
+                            {item.customSettings?.volume && (
+                              <span>Volume: {item.customSettings.volume}%</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Thumbnail */}
+                        {(item.content?.thumbnailUrl || item.imageUrl) && (
+                          <div className="w-16 h-12 bg-gray-200 rounded overflow-hidden">
+                            <img
+                              src={item.content?.thumbnailUrl || item.imageUrl}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex space-x-1">
+                          <button className="p-1 text-gray-600 hover:bg-gray-200 rounded">
+                            <Edit className="w-3 h-3" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="p-1 text-red-600 hover:bg-red-100 rounded"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <div className="text-center py-12">
                   <Play className="w-12 h-12 text-gray-400 mx-auto mb-4" />

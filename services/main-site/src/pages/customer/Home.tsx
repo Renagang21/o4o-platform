@@ -330,7 +330,7 @@ export default function CustomerHome() {
               </button>
             </div>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
