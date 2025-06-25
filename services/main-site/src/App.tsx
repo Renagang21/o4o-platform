@@ -1,181 +1,141 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './stores/authStore';
 
-// Pages
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import CheckAccount from './pages/CheckAccount';
-import Dashboard from './pages/Dashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import ContentManagement from './pages/admin/ContentManagement';
-import MediaLibrary from './pages/admin/MediaLibrary';
-import PageManager from './pages/admin/PageManager';
+// Auth Pages
+import Login from './pages/auth/Login';
 
-// Dropshipping Pages
-import {
-  DropshippingDashboard,
-  ProductManagement,
-  PartnerManagement,
-  CustomerManagement
-} from './pages/dropshipping';
+// User Type Dashboards
+import AdminDashboard from './pages/admin/Dashboard';
+import SupplierDashboard from './pages/supplier/Dashboard';
+import SupplierProductList from './pages/supplier/ProductList';
+import SupplierProductForm from './pages/supplier/ProductForm';
+import SupplierProductDetail from './pages/supplier/ProductDetail';
+import RetailerDashboard from './pages/retailer/Dashboard';
+import CustomerShop from './pages/customer/Shop';
+
+// Digital Signage Pages
+import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
 // Components
-import Navbar from './components/Navbar';
-import ProtectedRoute from './components/ProtectedRoute';
+import PrivateRoute from './components/auth/PrivateRoute';
 
 const App: React.FC = () => {
+  const { checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    // 앱 시작 시 인증 상태 확인
+    checkAuth();
+  }, []);
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <ToastContainer
+        <Toaster
           position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
+          toastOptions={{
+            duration: 3000,
+          }}
         />
         
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/check-account" element={<CheckAccount />} />
+          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+          <Route path="/auth/login" element={<Login />} />
           
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Navbar />
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requireAdmin>
-                <Navbar />
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          
+          {/* Protected Routes - Admin */}
           <Route
             path="/admin/dashboard"
             element={
-              <ProtectedRoute requireAdmin>
-                <Navbar />
+              <PrivateRoute allowedUserTypes={['admin']}>
                 <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/content"
-            element={
-              <ProtectedRoute requireAdmin>
-                <Navbar />
-                <ContentManagement />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/media"
-            element={
-              <ProtectedRoute requireAdmin>
-                <Navbar />
-                <MediaLibrary />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/pages"
-            element={
-              <ProtectedRoute requireAdmin>
-                <Navbar />
-                <PageManager />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Dropshipping Module Routes */}
-          <Route
-            path="/dropshipping"
-            element={
-              <ProtectedRoute>
-                <DropshippingDashboard />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           
+          {/* Protected Routes - Supplier */}
           <Route
-            path="/dropshipping/dashboard"
+            path="/supplier/dashboard"
             element={
-              <ProtectedRoute>
-                <DropshippingDashboard />
-              </ProtectedRoute>
+              <PrivateRoute allowedUserTypes={['supplier']}>
+                <SupplierDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/supplier/products"
+            element={
+              <PrivateRoute allowedUserTypes={['supplier']}>
+                <SupplierProductList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/supplier/products/new"
+            element={
+              <PrivateRoute allowedUserTypes={['supplier']}>
+                <SupplierProductForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/supplier/products/:id"
+            element={
+              <PrivateRoute allowedUserTypes={['supplier']}>
+                <SupplierProductDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/supplier/products/:id/edit"
+            element={
+              <PrivateRoute allowedUserTypes={['supplier']}>
+                <SupplierProductForm />
+              </PrivateRoute>
             }
           />
           
+          {/* Protected Routes - Retailer */}
           <Route
-            path="/dropshipping/products"
+            path="/retailer/dashboard"
             element={
-              <ProtectedRoute>
-                <ProductManagement />
-              </ProtectedRoute>
+              <PrivateRoute allowedUserTypes={['retailer']}>
+                <RetailerDashboard />
+              </PrivateRoute>
             }
           />
           
+          {/* Protected Routes - Customer */}
           <Route
-            path="/dropshipping/partners"
+            path="/shop"
             element={
-              <ProtectedRoute>
-                <PartnerManagement />
-              </ProtectedRoute>
-            }
-          />
-          
-          <Route
-            path="/dropshipping/customers"
-            element={
-              <ProtectedRoute>
-                <CustomerManagement />
-              </ProtectedRoute>
+              <PrivateRoute allowedUserTypes={['customer']}>
+                <CustomerShop />
+              </PrivateRoute>
             }
           />
 
-          {/* Additional Dropshipping Routes */}
+          {/* Digital Signage Routes */}
           <Route
-            path="/dropshipping/commission"
+            path="/signage"
             element={
-              <ProtectedRoute>
-                <PartnerManagement />
-              </ProtectedRoute>
+              <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                <DigitalSignageDashboard />
+              </PrivateRoute>
             }
           />
-          
           <Route
-            path="/dropshipping/analytics"
+            path="/signage/*"
             element={
-              <ProtectedRoute>
-                <DropshippingDashboard />
-              </ProtectedRoute>
+              <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                <DigitalSignageDashboard />
+              </PrivateRoute>
             }
           />
+
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/auth/login" replace />} />
         </Routes>
       </div>
     </Router>

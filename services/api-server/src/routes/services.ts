@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -7,7 +7,7 @@ const router = Router();
 router.use(authenticateToken);
 
 // AI 서비스 접근
-router.get('/ai', (req, res) => {
+router.get('/ai', (req: AuthRequest, res) => {
   res.json({
     message: 'AI Services Access',
     services: [
@@ -28,7 +28,7 @@ router.get('/ai', (req, res) => {
       }
     ],
     userAccess: {
-      userId: req.user?._id,
+      userId: req.user?.id,
       businessType: req.user?.businessInfo?.businessType,
       allowedServices: ['recommendations', 'analytics']
     }
@@ -36,7 +36,7 @@ router.get('/ai', (req, res) => {
 });
 
 // RPA 서비스 접근
-router.get('/rpa', (req, res) => {
+router.get('/rpa', (req: AuthRequest, res) => {
   res.json({
     message: 'RPA Services Access',
     services: [
@@ -57,7 +57,7 @@ router.get('/rpa', (req, res) => {
       }
     ],
     userAccess: {
-      userId: req.user?._id,
+      userId: req.user?.id,
       businessType: req.user?.businessInfo?.businessType,
       allowedServices: ['orders', 'inventory']
     }
@@ -65,7 +65,7 @@ router.get('/rpa', (req, res) => {
 });
 
 // 전자상거래 서비스 접근
-router.get('/ecommerce', (req, res) => {
+router.get('/ecommerce', (req: AuthRequest, res) => {
   res.json({
     message: 'E-commerce Services Access',
     services: [
@@ -86,16 +86,16 @@ router.get('/ecommerce', (req, res) => {
       }
     ],
     userAccess: {
-      userId: req.user?._id,
+      userId: req.user?.id,
       businessType: req.user?.businessInfo?.businessType,
-      storeUrl: `https://store.neture.co.kr/${req.user?._id}`,
+      storeUrl: `https://store.neture.co.kr/${req.user?.id}`,
       allowedServices: ['store', 'payments', 'orders']
     }
   });
 });
 
 // 크라우드펀딩 서비스 접근
-router.get('/crowdfunding', (req, res) => {
+router.get('/crowdfunding', (req: AuthRequest, res) => {
   res.json({
     message: 'Crowdfunding Services Access',
     services: [
@@ -116,7 +116,7 @@ router.get('/crowdfunding', (req, res) => {
       }
     ],
     userAccess: {
-      userId: req.user?._id,
+      userId: req.user?.id,
       businessType: req.user?.businessInfo?.businessType,
       allowedServices: ['projects', 'campaigns']
     }
@@ -124,7 +124,7 @@ router.get('/crowdfunding', (req, res) => {
 });
 
 // 포럼 서비스 접근
-router.get('/forum', (req, res) => {
+router.get('/forum', (req: AuthRequest, res) => {
   res.json({
     message: 'Forum Services Access',
     services: [
@@ -145,7 +145,7 @@ router.get('/forum', (req, res) => {
       }
     ],
     userAccess: {
-      userId: req.user?._id,
+      userId: req.user?.id,
       businessType: req.user?.businessInfo?.businessType,
       allowedServices: ['community', 'business', 'knowledge']
     }
@@ -153,7 +153,7 @@ router.get('/forum', (req, res) => {
 });
 
 // 사이니지 서비스 접근
-router.get('/signage', (req, res) => {
+router.get('/signage', (req: AuthRequest, res) => {
   res.json({
     message: 'Digital Signage Services Access',
     services: [
@@ -174,7 +174,7 @@ router.get('/signage', (req, res) => {
       }
     ],
     userAccess: {
-      userId: req.user?._id,
+      userId: req.user?.id,
       businessType: req.user?.businessInfo?.businessType,
       allowedServices: ['displays', 'content']
     }
@@ -182,7 +182,7 @@ router.get('/signage', (req, res) => {
 });
 
 // 서비스 상태 확인
-router.get('/status', (req, res) => {
+router.get('/status', (req: AuthRequest, res) => {
   res.json({
     timestamp: new Date().toISOString(),
     services: {
@@ -194,7 +194,7 @@ router.get('/status', (req, res) => {
       signage: { status: 'maintenance', version: '0.9.0' }
     },
     user: {
-      id: req.user?._id,
+      id: req.user?.id,
       name: req.user?.name,
       businessType: req.user?.businessInfo?.businessType,
       accessLevel: req.user?.role

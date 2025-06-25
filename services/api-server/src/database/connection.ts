@@ -12,6 +12,15 @@ import { OrderItem } from '../entities/OrderItem';
 import { CustomPost } from '../entities/CustomPost';
 import { CustomPostType } from '../entities/CustomPostType';
 
+// Import Digital Signage entities
+import { SignageContent } from '../entities/SignageContent';
+import { Store } from '../entities/Store';
+import { StorePlaylist } from '../entities/StorePlaylist';
+import { PlaylistItem } from '../entities/PlaylistItem';
+import { SignageSchedule } from '../entities/SignageSchedule';
+import { ScreenTemplate } from '../entities/ScreenTemplate';
+import { ContentUsageLog } from '../entities/ContentUsageLog';
+
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -30,7 +39,15 @@ export const AppDataSource = new DataSource({
     Order,
     OrderItem,
     CustomPost,
-    CustomPostType
+    CustomPostType,
+    // Digital Signage entities
+    SignageContent,
+    Store,
+    StorePlaylist,
+    PlaylistItem,
+    SignageSchedule,
+    ScreenTemplate,
+    ContentUsageLog
   ],
   
   // Migration settings

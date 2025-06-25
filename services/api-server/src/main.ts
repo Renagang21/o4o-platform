@@ -10,13 +10,17 @@ import { Server } from 'socket.io';
 // Database connection
 import { initializeDatabase } from './database/connection';
 
-// 라우트 imports
+// 라우트 imports 
 import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import servicesRoutes from './routes/services';
+import signageRoutes from './routes/signage';
 
 // 환경변수 로드
 dotenv.config();
+console.log('✅ Environment variables loaded');
+console.log('📍 Current directory:', process.cwd());
+console.log('🌐 PORT from env:', process.env.PORT);
 
 const app = express();
 const httpServer = createServer(app);
@@ -28,7 +32,8 @@ const io = new Server(httpServer, {
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
+console.log('🚀 Starting server on port:', port);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -71,6 +76,7 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', servicesRoutes);
+app.use('/api/signage', signageRoutes);
 
 // 헬스체크 엔드포인트
 app.get('/api/health', (req, res) => {
@@ -92,7 +98,8 @@ app.get('/', (req, res) => {
       health: '/api/health',
       auth: '/api/auth',
       admin: '/api/admin',
-      services: '/api/services'
+      services: '/api/services',
+      signage: '/api/signage'
     },
     frontend: process.env.FRONTEND_URL || 'http://localhost:5173'
   });
@@ -140,13 +147,16 @@ app.use('*', (req, res) => {
 
 // 서버 시작
 const startServer = async () => {
+  // 데이터베이스 초기화
   await initializeDatabase();
+  console.log('✅ Database connection established');
   
   httpServer.listen(port, () => {
     console.log(`🚀 Neture API Server running on port ${port}`);
     console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 API Base URL: http://localhost:${port}/api`);
     console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+    console.log('💾 Database: o4o_platform connected successfully');
   });
 };
 
