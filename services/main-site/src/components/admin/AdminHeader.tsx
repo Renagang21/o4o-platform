@@ -132,7 +132,7 @@ const AdminHeader: React.FC = () => {
               </div>
               <div className="text-left">
                 <div className="text-sm font-medium text-gray-900">
-                  {user?.firstName || '관리자'}
+                  {user?.name || '관리자'}
                 </div>
                 <div className="text-xs text-gray-500">
                   {user?.email || 'admin@example.com'}

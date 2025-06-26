@@ -2,10 +2,10 @@
 // 모든 UAGB (Spectra 스타일) 블록들을 통합 관리
 
 // 🎯 Core Common System
-export * from './tiptap-block';
+// export * from './tiptap-block'; // 일시적 비활성화
 
-// 🔥 UAGB 블록들 (완성된 13개 블록)
-
+// 🔥 UAGB 블록들 (완성된 13개 블록) - 일시적 비활성화
+/*
 // 1. Basic Content Blocks
 export { default as UAGBCallToActionBlock } from './UAGBCallToActionBlock';
 export { default as UAGBInfoBoxBlock } from './UAGBInfoBoxBlock';
@@ -27,8 +27,10 @@ export { default as UAGBImageBlock } from './UAGBImageBlock';
 export { default as UAGBContentManagerBlock } from './UAGBContentManagerBlock';
 export { default as UAGBSocialShareBlock } from './UAGBSocialShareBlock';
 export { default as UAGBUserDashboardBlock } from './UAGBUserDashboardBlock';
+*/
 
-// 🔧 블록 타입 정의들
+// 🔧 블록 타입 정의들 - 일시적 비활성화
+/*
 export type {
   // Basic Blocks
   UAGBCallToActionAttributes,
@@ -66,8 +68,10 @@ export type { UAGBImageAttributes } from './UAGBImageBlock';
 export type { UAGBContentManagerAttributes } from './UAGBContentManagerBlock';
 export type { UAGBSocialShareAttributes, SocialPlatform } from './UAGBSocialShareBlock';
 export type { UAGBUserDashboardAttributes, DashboardWidget, UserStats } from './UAGBUserDashboardBlock';
+*/
 
-// 🚀 블록 그룹 정의
+// 🚀 블록 그룹 정의 - 일시적 비활성화
+/*
 export const UAGBBlockGroups = {
   // 기본 콘텐츠 블록들
   basic: [
@@ -124,8 +128,10 @@ export const AllUAGBBlocks = [
   'UAGBSocialShareBlock',
   'UAGBUserDashboardBlock'
 ] as const;
+*/
 
-// 📋 블록 메타데이터
+// 📋 블록 메타데이터 - 일시적 비활성화
+/*
 export const UAGBBlockMetadata = {
   'uagb/call-to-action': {
     title: 'Call to Action',
@@ -289,3 +295,7 @@ export default {
   searchUAGBBlocks,
   getBlocksByCategory
 };
+*/
+
+// 일시적으로 빈 export를 제공
+export default {};

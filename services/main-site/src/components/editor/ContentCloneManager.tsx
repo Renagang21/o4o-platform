@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, FileText, Image as ImageIcon, Package, Globe, AlertCircle } from 'lucide-react';
+import { Copy, FileText, Image as ImageIcon, Package, Globe, AlertCircle, X } from 'lucide-react';
 
 interface Content {
   id: string;

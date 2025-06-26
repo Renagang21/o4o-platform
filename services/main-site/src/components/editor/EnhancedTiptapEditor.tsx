@@ -38,7 +38,7 @@ import {
   Redo,
   Quote,
   Code,
-  Separator,
+  Minus,
   Palette,
   Eye,
   Save,

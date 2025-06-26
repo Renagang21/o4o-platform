@@ -4,7 +4,7 @@ import { Save, Eye, Settings, Layout, Home, DollarSign, Info, Mail, ArrowLeft, P
 const PageManager = () => {
   const [currentPage, setCurrentPage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [pageContent, setPageContent] = useState({});
+  const [pageContent, setPageContent] = useState<any>({});
   const [previewMode, setPreviewMode] = useState('desktop');
 
   // 워드프레스 스타일 페이지 목록

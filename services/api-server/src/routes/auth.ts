@@ -1,4 +1,5 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
+import { AuthRequest } from '../middleware/auth';
 import { body } from 'express-validator';
 import {
   register,
@@ -90,7 +91,7 @@ router.get('/profile', authenticateToken, getProfile);
 router.put('/profile', authenticateToken, updateProfileValidation, updateProfile);
 
 // 토큰 검증 엔드포인트
-router.get('/verify', authenticateToken, (req, res) => {
+router.get('/verify', authenticateToken, (req: AuthRequest, res: Response) => {
   res.json({ 
     valid: true, 
     user: req.user 
