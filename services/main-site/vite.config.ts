@@ -12,15 +12,15 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 3000,
+    port: parseInt(process.env.VITE_DEV_SERVER_PORT || '3000'),
     strictPort: false,
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
   build: {
-    sourcemap: false,
-    minify: 'terser',
+    sourcemap: process.env.NODE_ENV === 'development',
+    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
     target: 'es2015',
     rollupOptions: {
       output: {

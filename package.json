@@ -44,7 +44,12 @@
     "setup:git-hooks": "node scripts/setup-git-hooks.js",
     "deploy:staging": "node scripts/deploy.js staging",
     "deploy:production": "node scripts/deploy.js production",
-    "monitor:start": "node scripts/monitoring-dashboard.js"
+    "monitor:start": "node scripts/monitoring-dashboard.js",
+    "env:dev": "echo 'Setting development environment...' && npm run env:dev:check",
+    "env:dev:check": "node -e \"console.log('Node.js version:', process.version); console.log('Environment checks:'); console.log('- Root .env NODE_ENV:', require('dotenv').config().parsed?.NODE_ENV || 'not set'); console.log('- API Server ready:', require('fs').existsSync('./services/api-server/.env')); console.log('- Main Site ready:', require('fs').existsSync('./services/main-site/.env'));\"",
+    "health:all": "echo 'Checking all services health...' && npm run health:api && npm run health:web",
+    "health:api": "cd services/api-server && npm run health 2>/dev/null || echo 'API health check not available'",
+    "health:web": "cd services/main-site && npm run health 2>/dev/null || echo 'Web health check not available'"
   },
   "devDependencies": {
     "@modelcontextprotocol/server-filesystem": "^2025.3.28",
