@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import { authAPI } from '../api/client';
 import { mockAuthService } from '../services/mockAuth';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();

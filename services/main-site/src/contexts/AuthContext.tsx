@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import Cookies from 'js-cookie';
 import { authAPI } from '../services/api';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 // 공통 타입 import
 import { 

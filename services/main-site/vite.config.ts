@@ -15,5 +15,25 @@ export default defineConfig({
     port: 3000,
     strictPort: false,
   },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+  },
+  build: {
+    sourcemap: false,
+    minify: 'terser',
+    target: 'es2015',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'utils': ['zustand', 'axios', 'react-hot-toast'],
+        },
+      },
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@vite/client', '@vite/env'],
+    force: true, // 강제 의존성 재생성
+  },
 })
 
