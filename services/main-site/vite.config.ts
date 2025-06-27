@@ -14,6 +14,11 @@ export default defineConfig({
     host: '0.0.0.0',
     port: parseInt(process.env.VITE_DEV_SERVER_PORT || '3000'),
     strictPort: false,
+    allowedHosts: [
+      'neture.co.kr',
+      'localhost',
+      '127.0.0.1'
+    ]
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
