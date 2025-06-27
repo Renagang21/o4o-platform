@@ -5,14 +5,61 @@ on:
     branches: [main]
 
 jobs:
-  deploy-web:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
-      - name: Deploy to Web Server
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_API_BASE_URL: https://neture.co.kr/api
+          VITE_SITE_URL: https://neture.co.kr
+          VITE_DOMAIN: neture.co.kr
+          VITE_APP_NAME: main-site
+          VITE_APP_TITLE: 매장 경쟁력 강화를 지원하는 플랫폼
+          VITE_APP_DESCRIPTION: 매장 경쟁력 강화를 지원하는 플랫폼
+          VITE_AUTH_TOKEN_KEY: neture_auth_token
+          VITE_AUTH_REFRESH_TOKEN_KEY: neture_refresh_token
+          VITE_DEV_MODE: false
+          VITE_LOG_LEVEL: error
+      
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 13.125.144.8
+          username: ubuntu
+          key: ${{ secrets.WEB_SSH_PRIVATE_KEY }}
+          script: |
+            # 백업 생성
+            if [ -d /home/ubuntu/o4o-platform/dist ]; then
+              rm -rf /home/ubuntu/o4o-platform/dist.backup
+              mv /home/ubuntu/o4o-platform/dist /home/ubuntu/o4o-platform/dist.backup
+            fi
+      
+      - name: Upload build files
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: 13.125.144.8
+          username: ubuntu
+          key: ${{ secrets.WEB_SSH_PRIVATE_KEY }}
+          source: "dist/*"
+          target: "/home/ubuntu/o4o-platform/"
+          strip_components: 0
+      
+      - name: Restart PM2 service
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: 13.125.144.8
@@ -20,15 +67,12 @@ jobs:
           key: ${{ secrets.WEB_SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/o4o-platform
-            git pull origin main
-            
-            # 의존성 설치
-            npm ci
-            
-            # 프로덕션 빌드
-            npm run build
             
             # PM2로 정적 파일 서빙 (기존 프로세스 중단 후 재시작)
             pm2 delete web-app || true
             pm2 serve dist 3000 --name "web-app" --spa
             pm2 save
+            
+            # 상태 확인
+            pm2 status
+            echo "Deployment completed at $(date)"
