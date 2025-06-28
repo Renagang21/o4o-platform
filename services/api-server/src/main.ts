@@ -11,7 +11,7 @@ import { Server } from 'socket.io';
 import { initializeDatabase } from './database/connection';
 
 // 라우트 imports 
-import authRoutes from './routes/auth';
+import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
 import servicesRoutes from './routes/services';
 import signageRoutes from './routes/signage';
@@ -45,15 +45,6 @@ const limiter = rateLimit({
   }
 });
 
-// 로그인 전용 Rate limiting
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15분
-  max: 5, // 최대 5회 로그인 시도
-  message: {
-    error: 'Too many login attempts',
-    code: 'LOGIN_RATE_LIMIT_EXCEEDED'
-  }
-});
 
 // 미들웨어 설정
 app.use(helmet({
@@ -70,10 +61,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rate limiting 적용
 app.use('/api/', limiter);
-app.use('/api/auth/login', authLimiter);
 
 // API 라우트
-app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
@@ -96,7 +86,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/api/health',
-      auth: '/api/auth',
+      users: '/api/users',
       admin: '/api/admin',
       services: '/api/services',
       signage: '/api/signage'

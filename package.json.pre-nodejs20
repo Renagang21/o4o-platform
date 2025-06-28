@@ -1,0 +1,78 @@
+{
+  "name": "o4o-platform",
+  "version": "1.0.0",
+  "description": "O4O Platform - Microservices Architecture",
+  "private": true,
+  "workspaces": [
+    "services/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0 <21.0.0",
+    "npm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "20.18.0",
+    "npm": "10.9.2"
+  },
+  "scripts": {
+    "dev:api": "cd services/api-server && npm run dev",
+    "dev:web": "cd services/main-site && npm run dev",
+    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:smart": "node scripts/smart-dev-start.js",
+    "build:api": "cd services/api-server && npm run build",
+    "build:web": "cd services/main-site && npm run build",
+    "build:all": "npm run build:api && npm run build:web",
+    "install:all": "npm install && cd services/api-server && npm install && cd ../main-site && npm install",
+    "clean": "rm -rf dist && rm -rf services/*/dist",
+    "create-admin": "cd services/api-server && npx ts-node ../../scripts/create-admin.ts",
+    "type-check": "cd services/api-server && npm run type-check",
+    "type-check:all": "cd services/api-server && npm run type-check && cd ../main-site && npm run type-check",
+    "test": "cd services/api-server && npm run test",
+    "test:unit": "cd services/api-server && npm run test:unit",
+    "test:integration": "cd services/api-server && npm run test:integration",
+    "test:e2e": "echo 'E2E tests temporarily disabled - playwright setup needed'",
+    "test:coverage": "cd services/api-server && npm run test:coverage",
+    "lint": "cd services/api-server && npm run lint",
+    "lint:all": "cd services/api-server && npm run lint && cd ../main-site && npm run lint",
+    "lint:fix": "cd services/api-server && npm run lint:fix && cd ../main-site && npm run lint:fix",
+    "cursor:migrate": "bash migrate-to-cursor-1.0.sh",
+    "cursor:sync-team": "node scripts/sync-team-settings.js",
+    "cursor:generate-component": "node scripts/generate-component.js",
+    "cursor:generate-api": "node scripts/generate-api.js",
+    "cursor:health-check": "node scripts/cursor-health-check.js",
+    "setup:mcp": "node scripts/setup-mcp.js",
+    "setup:git-hooks": "node scripts/setup-git-hooks.js",
+    "deploy:staging": "node scripts/deploy.js staging",
+    "deploy:production": "node scripts/deploy.js production",
+    "monitor:start": "node scripts/monitoring-dashboard.js",
+    "env:dev": "echo 'Setting development environment...' && npm run env:dev:check",
+    "env:dev:check": "node -e \"console.log('Node.js version:', process.version); console.log('Environment checks:'); console.log('- Root .env NODE_ENV:', require('dotenv').config().parsed?.NODE_ENV || 'not set'); console.log('- API Server ready:', require('fs').existsSync('./services/api-server/.env')); console.log('- Main Site ready:', require('fs').existsSync('./services/main-site/.env'));\"",
+    "health:all": "echo 'Checking all services health...' && npm run health:api && npm run health:web",
+    "health:api": "cd services/api-server && npm run health 2>/dev/null || echo 'API health check not available'",
+    "health:web": "cd services/main-site && npm run health 2>/dev/null || echo 'Web health check not available'"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/server-filesystem": "^2025.3.28",
+    "@modelcontextprotocol/server-github": "^2025.4.8",
+    "@modelcontextprotocol/server-memory": "^2025.4.25",
+    "@modelcontextprotocol/server-postgres": "^0.6.2",
+    "@playwright/test": "^1.40.0",
+    "concurrently": "^7.6.0",
+    "eslint": "^9.25.0",
+    "jest": "^29.6.0",
+    "lightningcss": "^1.30.1",
+    "prettier": "^3.0.0",
+    "supertest": "^6.3.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "o4o-platform",
+    "microservices",
+    "typescript",
+    "react",
+    "postgresql"
+  ],
+  "author": "O4O Platform Team",
+  "license": "MIT"
+}

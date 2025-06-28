@@ -67,8 +67,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 const AuthContext = createContext<{
   state: AuthState;
   user: User | null;  // 직접 접근을 위한 user 추가
-  login: (data: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
+  login: (user: User) => Promise<void>; // Common-Core에서 받은 사용자 데이터
   logout: () => Promise<void>;
 } | null>(null);
 
@@ -91,41 +90,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (data: LoginRequest) => {
+  const login = async (user: User) => {
     try {
       dispatch({ type: 'LOGIN_START' });
-      const response = await authApi.login(data);
-      authApi.setToken(response.token);
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: { user: response.user, token: response.token },
-      });
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: { user, token },
+        });
+      } else {
+        throw new Error('토큰이 없습니다');
+      }
     } catch (error: any) {
       dispatch({
         type: 'LOGIN_FAILURE',
         payload: {
-          message: error.response?.data?.message || '로그인에 실패했습니다.',
-          code: error.response?.data?.code || 'UNKNOWN_ERROR',
-        },
-      });
-      throw error;
-    }
-  };
-
-  const register = async (data: RegisterRequest) => {
-    try {
-      dispatch({ type: 'REGISTER_START' });
-      const response = await authApi.register(data);
-      dispatch({
-        type: 'REGISTER_SUCCESS',
-        payload: { user: response.user },
-      });
-    } catch (error: any) {
-      dispatch({
-        type: 'REGISTER_FAILURE',
-        payload: {
-          message: error.response?.data?.message || '회원가입에 실패했습니다.',
-          code: error.response?.data?.code || 'UNKNOWN_ERROR',
+          message: error.message || '로그인에 실패했습니다.',
+          code: 'LOGIN_ERROR',
         },
       });
       throw error;
@@ -134,15 +116,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await authApi.logout();
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        // Common-Core 인증 서버에 로그아웃 요청
+        const COMMON_CORE_AUTH_URL = import.meta.env.VITE_COMMON_CORE_AUTH_URL || 'http://localhost:5000';
+        await fetch(`${COMMON_CORE_AUTH_URL}/api/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+      
+      localStorage.removeItem('auth_token');
       dispatch({ type: 'LOGOUT' });
     } catch (error) {
       console.error('Logout error:', error);
+      // 에러가 나도 로컬 상태는 정리
+      localStorage.removeItem('auth_token');
+      dispatch({ type: 'LOGOUT' });
     }
   };
 
   return (
-    <AuthContext.Provider value={{ state, user: state.user, login, register, logout }}>
+    <AuthContext.Provider value={{ state, user: state.user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { TiptapEditor } from '@/components/editor/TiptapEditor'
+import { TiptapEditor } from '@shared/components/editor/TiptapEditor'
 import { useState } from 'react'
 import { JSONContent } from '@tiptap/react'
 

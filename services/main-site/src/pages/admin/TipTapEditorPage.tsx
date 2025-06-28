@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import TipTapPageEditor from '../../components/editor/TipTapPageEditor';
+import TipTapPageEditor from '@shared/components/editor/TipTapPageEditor';
 
 const TipTapEditorPage: React.FC = () => {
   const { pageId } = useParams<{ pageId: string }>();

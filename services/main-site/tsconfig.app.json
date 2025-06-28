@@ -18,7 +18,10 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shared/*": ["../../shared/*"],
+      "@shared/editor": ["../../shared/components/editor"],
+      "@shared/editor/*": ["../../shared/components/editor/*"]
     },
 
     /* Linting */
@@ -30,7 +33,6 @@
   },
   "include": ["src"],
   "exclude": [
-    "src/components/editor/extensions/UAGB*",
-    "src/components/editor/extensions/tiptap-block"
+    "src/components/editor"
   ]
 }

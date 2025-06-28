@@ -4,6 +4,7 @@ import { useAuthStore } from './stores/authStore';
 
 // Auth Pages
 import Login from './pages/auth/Login';
+import AuthCallback from './pages/auth/AuthCallback';
 
 // User Type Dashboards
 import AdminDashboard from './pages/admin/Dashboard';
@@ -43,6 +44,7 @@ const App: React.FC = () => {
           <Route path="/home" element={<TheDANGStyleHome />} />
           <Route path="/editor/home" element={<TheDANGStyleEditorPage />} />
           <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           
           {/* Protected Routes - Admin */}
           <Route
