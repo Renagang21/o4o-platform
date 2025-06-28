@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Import TheDANG theme styles */
+@import './styles/thedang-theme.css';

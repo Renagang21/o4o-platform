@@ -10,6 +10,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@shared': path.resolve(__dirname, '../../shared'),
       '@shared/editor': path.resolve(__dirname, '../../shared/components/editor'),
+      '@shared/editor/fullscreen': path.resolve(__dirname, '../../shared/components/editor/fullscreen'),
+      '@shared/admin': path.resolve(__dirname, '../../shared/components/admin'),
+      '@shared/theme': path.resolve(__dirname, '../../shared/components/theme'),
+      '@shared/ui': path.resolve(__dirname, '../../shared/components/ui'),
     },
   },
   server: {

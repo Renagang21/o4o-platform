@@ -1,0 +1,50 @@
+# 🔐 Common-Core Auth 환경설정 템플릿
+# 이 파일의 내용을 복사하여 서버의 .env 파일에 붙여넣으세요
+# 위치: /home/ubuntu/common-core/auth/backend/.env
+
+# 서버 설정
+NODE_ENV=production
+PORT=5000
+HOST=0.0.0.0
+
+# 데이터베이스 (PostgreSQL)
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=common_core_auth
+DATABASE_USER=postgres
+DATABASE_PASSWORD=[PostgreSQL 비밀번호 입력]
+
+# Redis (선택사항 - 없으면 주석처리)
+# REDIS_HOST=localhost
+# REDIS_PORT=6379
+# REDIS_PASSWORD=
+
+# JWT 보안 (아래 명령어로 생성 가능)
+# openssl rand -base64 32
+JWT_SECRET=[32자리 이상 랜덤 문자열]
+JWT_EXPIRY=24h
+SESSION_SECRET=[32자리 이상 랜덤 문자열]
+
+# OAuth 클라이언트 - 받으신 키값 입력 (필수!)
+# 이 값들이 없으면 소셜 로그인이 작동하지 않습니다!
+GOOGLE_CLIENT_ID=[여기에 Google OAuth 클라이언트 ID 입력]
+GOOGLE_CLIENT_SECRET=[여기에 Google OAuth 클라이언트 Secret 입력]
+NAVER_CLIENT_ID=[여기에 Naver 애플리케이션 Client ID 입력]
+NAVER_CLIENT_SECRET=[여기에 Naver 애플리케이션 Client Secret 입력]
+KAKAO_CLIENT_ID=[여기에 Kakao REST API 키 입력]
+KAKAO_CLIENT_SECRET=
+
+# 서비스 URL
+O4O_PLATFORM_URL=https://neture.co.kr
+AUTH_BASE_URL=https://auth.neture.co.kr
+
+# CORS 허용 도메인
+ALLOWED_ORIGINS=https://neture.co.kr,https://api.neture.co.kr
+
+# ====================================
+# 💡 JWT_SECRET 생성 방법:
+# openssl rand -base64 32
+# 
+# 또는 온라인 생성기:
+# https://generate-secret.vercel.app/32
+# ====================================

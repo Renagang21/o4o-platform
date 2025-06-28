@@ -22,6 +22,12 @@ import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 import TheDANGStyleHome from './pages/TheDANGStyleHome';
 import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
 
+// Fullscreen Editor Test
+import { FullScreenEditorSimpleTest } from './pages/FullScreenEditorSimpleTest';
+
+// Admin Dashboard Test
+import { AdminDashboardTest } from './pages/AdminDashboardTest';
+
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 
@@ -43,6 +49,8 @@ const App: React.FC = () => {
           <Route path="/" element={<TheDANGStyleHome />} />
           <Route path="/home" element={<TheDANGStyleHome />} />
           <Route path="/editor/home" element={<TheDANGStyleEditorPage />} />
+          <Route path="/editor-fullscreen" element={<FullScreenEditorSimpleTest />} />
+          <Route path="/admin-test/*" element={<AdminDashboardTest />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           

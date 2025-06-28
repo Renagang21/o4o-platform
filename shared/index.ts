@@ -1,6 +1,15 @@
 // Editor components export
 export * from './components/editor';
 
+// Admin components export
+export * from './components/admin';
+
+// Theme components export
+export * from './components/theme';
+
+// UI components export
+export * from './components/ui';
+
 // Shared utilities
 export * from './utils';
 export * from './hooks';

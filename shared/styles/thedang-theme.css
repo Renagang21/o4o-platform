@@ -1,0 +1,397 @@
+/* TheDANG.co.kr Style Theme */
+/* Replicates the exact visual style of thedang.co.kr */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+/* Root Variables - matching thedang.co.kr */
+:root {
+  --primary-color: #5787c5;
+  --primary-hover: #4a73a8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --background-primary: #ffffff;
+  --background-secondary: #ecf0f3;
+  --background-dark: #1c1b18;
+  --border-color: #e5e5e5;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-large: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Global Font Settings */
+.thedang-theme {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* Typography */
+.thedang-theme h1,
+.thedang-theme h2,
+.thedang-theme h3,
+.thedang-theme h4,
+.thedang-theme h5,
+.thedang-theme h6 {
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.thedang-theme .font-light {
+  font-weight: 300;
+}
+
+.thedang-theme .font-medium {
+  font-weight: 500;
+}
+
+.thedang-theme .font-bold {
+  font-weight: 700;
+}
+
+/* Header Styles */
+.thedang-header {
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.thedang-nav-link {
+  position: relative;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.2s ease;
+}
+
+.thedang-nav-link:hover {
+  color: var(--primary-color);
+}
+
+.thedang-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.thedang-nav-link:hover::after {
+  width: 100%;
+}
+
+/* Button Styles */
+.thedang-btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.thedang-btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+.thedang-btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.thedang-btn-secondary:hover {
+  background-color: var(--background-secondary);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Card Styles */
+.thedang-card {
+  background: var(--background-primary);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.thedang-card:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+/* Service Card Styles */
+.thedang-service-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.thedang-service-card:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.thedang-service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+}
+
+/* Hero Section */
+.thedang-hero {
+  padding: 5rem 0;
+  background: var(--background-primary);
+}
+
+.thedang-hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  line-height: 1.1;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.thedang-hero p {
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  line-height: 1.6;
+}
+
+/* Section Styles */
+.thedang-section {
+  padding: 4rem 0;
+}
+
+.thedang-section-alt {
+  background: var(--background-secondary);
+}
+
+.thedang-section h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.thedang-section p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+}
+
+/* Grid Layouts */
+.thedang-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.thedang-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.thedang-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.thedang-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Container */
+.thedang-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Footer */
+.thedang-footer {
+  background: var(--background-dark);
+  color: white;
+  padding: 3rem 0 2rem;
+}
+
+.thedang-footer h3,
+.thedang-footer h4 {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.thedang-footer a {
+  color: #999;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.thedang-footer a:hover {
+  color: white;
+}
+
+/* Status Badges */
+.thedang-status-available {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.thedang-status-coming-soon {
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Feature Icons */
+.thedang-feature-icon {
+  width: 4rem;
+  height: 4rem;
+  background: rgba(87, 135, 197, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.thedang-animate-in {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* TipTap Editor Compatibility */
+[data-tiptap-editable] {
+  position: relative;
+}
+
+[data-tiptap-editable]:hover::before {
+  content: '✏️ 편집 가능';
+  position: absolute;
+  top: -30px;
+  left: 0;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+[data-tiptap-section],
+[data-tiptap-component] {
+  outline: 2px dashed transparent;
+  transition: outline 0.2s ease;
+}
+
+[data-tiptap-section]:hover,
+[data-tiptap-component]:hover {
+  outline-color: var(--primary-color);
+  outline-offset: 2px;
+}
+
+[data-tiptap-field] {
+  outline: 1px dashed transparent;
+  transition: outline 0.2s ease;
+}
+
+[data-tiptap-field]:hover {
+  outline-color: var(--primary-color);
+  outline-offset: 1px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .thedang-hero {
+    padding: 3rem 0;
+  }
+  
+  .thedang-section {
+    padding: 3rem 0;
+  }
+  
+  .thedang-container {
+    padding: 0 1rem;
+  }
+  
+  .thedang-grid {
+    gap: 1.5rem;
+  }
+  
+  .thedang-btn-primary,
+  .thedang-btn-secondary {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .thedang-theme {
+    --text-primary: #ffffff;
+    --text-secondary: #d1d5db;
+    --background-primary: #111827;
+    --background-secondary: #1f2937;
+    --border-color: #374151;
+  }
+}
