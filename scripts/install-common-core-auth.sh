@@ -27,11 +27,24 @@ echo -e "\nStep 2: Checking for existing common-core repository..."
 if [ -d "/home/ubuntu/common-core" ]; then
     echo "common-core repository already exists at /home/ubuntu/common-core"
     cd /home/ubuntu/common-core
+    echo "Current branch: $(git branch --show-current)"
+    echo "Fetching latest changes..."
+    git fetch origin
     git pull origin main
+    echo "✅ Repository updated successfully"
 else
     echo "Cloning common-core repository..."
     cd /home/ubuntu
     git clone https://github.com/Renagang21/common-core.git
+    echo "✅ Repository cloned successfully"
+fi
+
+# Verify the auth backend exists
+if [ ! -d "/home/ubuntu/common-core/auth/backend" ]; then
+    echo "❌ Error: auth/backend directory not found in common-core repository"
+    echo "Repository structure:"
+    ls -la /home/ubuntu/common-core/
+    exit 1
 fi
 
 # Step 3: Navigate to auth backend directory
