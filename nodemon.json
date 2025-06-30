@@ -1,7 +1,7 @@
 {
-  "watch": ["src/server", "src/partner"],
+  "watch": ["src/server"],
   "ext": "ts,js,json",
-  "ignore": ["src/server/**/*.test.ts", "src/partner/**/*.test.ts"],
+  "ignore": ["src/server/**/*.test.ts"],
   "exec": "npx ts-node src/server/index.ts",
   "env": {
     "NODE_ENV": "development"

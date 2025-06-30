@@ -21,6 +21,12 @@ import { SignageSchedule } from '../entities/SignageSchedule';
 import { ScreenTemplate } from '../entities/ScreenTemplate';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
 
+// Import Content Management entities
+import { Page } from '../entities/Page';
+import { MediaFile, MediaFolder } from '../entities/MediaFile';
+import { Template } from '../entities/Template';
+import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
+
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -47,7 +53,15 @@ export const AppDataSource = new DataSource({
     PlaylistItem,
     SignageSchedule,
     ScreenTemplate,
-    ContentUsageLog
+    ContentUsageLog,
+    // Content Management entities
+    Page,
+    MediaFile,
+    MediaFolder,
+    Template,
+    FieldGroup,
+    CustomField,
+    CustomFieldValue
   ],
   
   // Migration settings

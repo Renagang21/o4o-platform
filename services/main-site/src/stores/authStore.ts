@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User, Supplier, Retailer, LoginRequest } from '../types/user';
-import { allMockUsers, TEST_PASSWORD } from '../mocks/users';
+
+// API Base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
 interface AuthState {
   user: User | Supplier | Retailer | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -15,7 +18,7 @@ interface AuthActions {
   logout: () => void;
   setUser: (user: User | Supplier | Retailer) => void;
   clearError: () => void;
-  checkAuth: () => void;
+  checkAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState & AuthActions>()(
@@ -23,58 +26,51 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     (set, get) => ({
       // State
       user: null,
+      token: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
 
       // Actions
-      login: async ({ email, password, userType }) => {
+      login: async ({ email, password }) => {
         set({ isLoading: true, error: null });
         
         try {
-          // Mock 로그인 로직 - 실제로는 API 호출
-          await new Promise(resolve => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
-          
-          // Mock 데이터에서 사용자 찾기
-          const user = allMockUsers.find(
-            u => u.email === email && u.userType === userType
-          );
-          
-          if (!user) {
-            throw new Error('사용자를 찾을 수 없습니다.');
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
           }
+
+          const data = await response.json();
+          const { token, user: apiUser } = data;
           
-          // 비밀번호 확인 (Mock에서는 모두 같은 비밀번호)
-          if (password !== TEST_PASSWORD) {
-            throw new Error('비밀번호가 올바르지 않습니다.');
-          }
-          
-          // 상태 확인
-          if (user.status === 'inactive') {
-            throw new Error('비활성화된 계정입니다.');
-          }
-          
-          if (user.status === 'pending') {
-            throw new Error('승인 대기 중인 계정입니다.');
-          }
-          
-          // 공급자/리테일러의 경우 승인 상태 확인
-          if ('approvalStatus' in user && user.approvalStatus !== 'approved') {
-            if (user.approvalStatus === 'pending') {
-              throw new Error('관리자 승인을 기다리고 있습니다.');
-            } else if (user.approvalStatus === 'rejected') {
-              throw new Error('승인이 거부된 계정입니다.');
-            }
-          }
-          
+          // Convert API user data to frontend user type
+          const user: User = {
+            id: apiUser.id,
+            email: apiUser.email,
+            name: apiUser.name || '',
+            userType: mapRoleToUserType(apiUser.role),
+            status: mapApiStatusToFrontendStatus(apiUser.status),
+            createdAt: new Date(apiUser.createdAt || Date.now()),
+            lastLoginAt: new Date(),
+          };
+
           set({
             user,
+            token,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
           
-          // 로그인 시간 업데이트 (실제로는 API에서 처리)
           console.log('로그인 성공:', user);
           
         } catch (error) {
@@ -83,19 +79,35 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             isAuthenticated: false,
             user: null,
+            token: null,
           });
         }
       },
 
       logout: () => {
+        const { token } = get();
+        
+        // API에 로그아웃 요청 (선택사항)
+        if (token) {
+          fetch(`${API_BASE_URL}/auth/logout`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }).catch(console.error);
+        }
+        
         set({
           user: null,
+          token: null,
           isAuthenticated: false,
           error: null,
         });
         
         // 로컬 스토리지에서 인증 정보 제거
         localStorage.removeItem('auth-storage');
+        localStorage.removeItem('auth_token');
         
         console.log('로그아웃 완료');
       },
@@ -108,11 +120,44 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set({ error: null });
       },
 
-      checkAuth: () => {
-        // 페이지 새로고침 시 인증 상태 확인
-        const state = get();
-        if (state.user && state.isAuthenticated) {
-          console.log('인증 상태 유지:', state.user);
+      checkAuth: async () => {
+        const { token } = get();
+        if (!token) {
+          set({ isAuthenticated: false, user: null });
+          return;
+        }
+        
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const apiUser = data.user;
+            
+            const user: User = {
+              id: apiUser.id,
+              email: apiUser.email,
+              name: apiUser.name || '',
+              userType: mapRoleToUserType(apiUser.role),
+              status: mapApiStatusToFrontendStatus(apiUser.status),
+              createdAt: new Date(apiUser.createdAt || Date.now()),
+              lastLoginAt: new Date(apiUser.lastLoginAt || Date.now()),
+            };
+            
+            set({ user, isAuthenticated: true });
+            console.log('인증 상태 유지:', user);
+          } else {
+            // Token invalid, logout
+            get().logout();
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          get().logout();
         }
       },
     }),
@@ -120,11 +165,42 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
     }
   )
 );
+
+// API 역할을 프론트엔드 사용자 타입으로 매핑
+const mapRoleToUserType = (role: string): 'admin' | 'supplier' | 'retailer' | 'customer' => {
+  switch (role) {
+    case 'admin':
+    case 'administrator':
+    case 'manager':
+      return 'admin';
+    case 'business':
+      return 'supplier'; // 비즈니스 사용자를 공급자로 매핑
+    case 'affiliate':
+      return 'retailer'; // 제휴사를 리테일러로 매핑
+    default:
+      return 'customer';
+  }
+};
+
+// API 상태를 프론트엔드 상태로 매핑
+const mapApiStatusToFrontendStatus = (status: string): 'active' | 'inactive' | 'pending' => {
+  switch (status) {
+    case 'approved':
+      return 'active';
+    case 'suspended':
+      return 'inactive';
+    case 'pending':
+      return 'pending';
+    default:
+      return 'pending';
+  }
+};
 
 // 사용자 타입별 권한 확인 헬퍼 함수
 export const isAdmin = (user: User | Supplier | Retailer | null): boolean => {

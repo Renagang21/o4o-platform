@@ -20,3 +20,4 @@ export * from './lib/editor/templates';
 export * from './lib/editor/versions';
 export * from './lib/ai/editor-assistant';
 export * from './lib/api/editor';
+export * from './lib/api/client';

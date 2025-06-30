@@ -10,6 +10,9 @@ interface AdminAuthState {
   checkAuth: () => Promise<void>;
 }
 
+// API Base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+
 export const useAdminAuthStore = create<AdminAuthState>()(
   persist(
     (set, get) => ({
@@ -17,18 +20,48 @@ export const useAdminAuthStore = create<AdminAuthState>()(
       token: null,
       isAdminAuthenticated: false,
       login: async (email, password) => {
-        // 데모: 이메일에 따라 역할 부여
-        let role: 'superadmin' | 'manager' | 'editor' | 'viewer' = 'viewer';
-        if (email.startsWith('admin@super')) role = 'superadmin';
-        else if (email.startsWith('admin@manager')) role = 'manager';
-        else if (email.startsWith('admin@editor')) role = 'editor';
-        else if (email.startsWith('admin@')) role = 'viewer';
-        else throw new Error('관리자 계정이 아닙니다.');
-        set({ token: 'admin-jwt-demo', isAdminAuthenticated: true, admin: { email, role } });
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
+          }
+
+          const data = await response.json();
+          const { token, user } = data;
+          
+          // Check if user has admin privileges
+          if (!['admin', 'administrator', 'manager', 'editor'].includes(user.role)) {
+            throw new Error('Insufficient privileges');
+          }
+
+          // Map role to admin roles
+          let adminRole: 'superadmin' | 'manager' | 'editor' | 'viewer' = 'viewer';
+          if (user.role === 'admin' || user.role === 'administrator') adminRole = 'superadmin';
+          else if (user.role === 'manager') adminRole = 'manager';
+          else if (user.role === 'editor') adminRole = 'editor';
+          
+          set({ 
+            token, 
+            isAdminAuthenticated: true, 
+            admin: { email: user.email, role: adminRole } 
+          });
+        } catch (error) {
+          console.error('Login failed:', error);
+          throw error;
+        }
       },
       logout: () => {
         set({ admin: null, token: null, isAdminAuthenticated: false });
         localStorage.removeItem('admin-auth');
+        localStorage.removeItem('auth_token');
       },
       checkAuth: async () => {
         const { token } = get();
@@ -36,8 +69,42 @@ export const useAdminAuthStore = create<AdminAuthState>()(
           set({ isAdminAuthenticated: false, admin: null });
           return;
         }
-        // 실제 운영에서는 토큰 검증 필요
-        set({ isAdminAuthenticated: true });
+        
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const user = data.user;
+            
+            // Check admin privileges
+            if (['admin', 'administrator', 'manager', 'editor'].includes(user.role)) {
+              let adminRole: 'superadmin' | 'manager' | 'editor' | 'viewer' = 'viewer';
+              if (user.role === 'admin' || user.role === 'administrator') adminRole = 'superadmin';
+              else if (user.role === 'manager') adminRole = 'manager';
+              else if (user.role === 'editor') adminRole = 'editor';
+              
+              set({ 
+                isAdminAuthenticated: true,
+                admin: { email: user.email, role: adminRole }
+              });
+            } else {
+              // Not an admin, logout
+              get().logout();
+            }
+          } else {
+            // Token invalid, logout
+            get().logout();
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          get().logout();
+        }
       },
     }),
     { name: 'admin-auth' }

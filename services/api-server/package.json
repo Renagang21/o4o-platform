@@ -32,6 +32,8 @@
     "migration:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/database/connection.ts"
   },
   "dependencies": {
+    "@types/multer": "^1.4.13",
+    "@types/uuid": "^10.0.0",
     "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -41,10 +43,13 @@
     "express-validator": "^6.15.0",
     "helmet": "^6.0.1",
     "jsonwebtoken": "^9.0.0",
+    "multer": "^2.0.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
+    "sharp": "^0.34.2",
     "socket.io": "^4.6.1",
     "typeorm": "^0.3.20",
+    "uuid": "^11.1.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {

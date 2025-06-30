@@ -8,8 +8,8 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     role: string;
-    name?: string;        // 선택적 필드로 변경
-    status?: string;      // 선택적 필드로 변경
+    name?: string;
+    status?: string;
     businessInfo?: any;
     createdAt?: Date;
     updatedAt?: Date;
@@ -30,7 +30,11 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not configured');
+    }
+    const decoded = jwt.verify(token, jwtSecret) as any;
     const userRepository = AppDataSource.getRepository(User);
     
     const user = await userRepository.findOne({ 
@@ -53,7 +57,7 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
       });
     }
 
-    req.user = {
+    (req as any).user = {
       id: user.id,
       email: user.email,
       name: user.name,

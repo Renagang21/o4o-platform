@@ -38,19 +38,19 @@ export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'ac
 
 // 메인 User 인터페이스
 export interface User {
-  _id: string;                    // MongoDB 원본 ID
-  id: string;                     // 호환성을 위한 ID (= _id)
+  _id?: string;                   // MongoDB 원본 ID (선택사항)
+  id: string;                     // UUID ID
   email: string;
   name: string;
   phone?: string;
-  role: UserRole;                 // 강타입 UserRole
+  role?: UserRole;                // 강타입 UserRole (선택사항)
   roles?: UserRole[];             // 호환성을 위한 배열 형태
-  userType?: 'admin' | 'supplier' | 'retailer' | 'customer'; // 호환성
+  userType: 'admin' | 'supplier' | 'retailer' | 'customer'; // 프론트엔드 타입 (필수)
   status: UserStatus;
   businessInfo?: BusinessInfo;
-  createdAt: string;
-  updatedAt?: string;
-  lastLoginAt?: string;
+  createdAt: Date | string;       // Date 객체 또는 문자열
+  updatedAt?: Date | string;
+  lastLoginAt?: Date | string;
   avatar?: string;
 }
 

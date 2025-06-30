@@ -9,7 +9,9 @@ export enum UserRole {
 }
 
 export enum UserStatus {
-  APPROVED = 'approved',     // 기본값: 소셜 로그인은 자동 승인
+  PENDING = 'pending',       // 승인 대기 중
+  APPROVED = 'approved',     // 승인됨
+  REJECTED = 'rejected',     // 거부됨
   SUSPENDED = 'suspended'    // 정지된 사용자
 }
 
@@ -26,12 +28,22 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Common-Core 인증 필드들
-  @Column({ type: 'varchar', length: 20 })
-  provider!: string; // 'google', 'naver', 'kakao'
+  // 기본 사용자 정보
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  email?: string; // 이메일 로그인용
 
-  @Column({ type: 'varchar', length: 100 })
-  provider_id!: string; // 소셜 제공자의 사용자 ID
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  password?: string; // 해싱된 패스워드
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  name?: string; // 사용자 이름
+
+  // Common-Core 인증 필드들 (소셜 로그인용)
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  provider?: string; // 'google', 'naver', 'kakao'
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  provider_id?: string; // 소셜 제공자의 사용자 ID
 
   // O4O Platform 비즈니스 필드들
   @Column({

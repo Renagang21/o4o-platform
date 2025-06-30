@@ -13,8 +13,8 @@ const execAsync = promisify(exec);
 class SmartDevStarter {
   constructor() {
     this.services = [
-      { name: 'api-server', port: 3000, path: 'services/api-server' },
-      { name: 'main-site', port: 5173, path: 'services/main-site' }
+      { name: 'api-server', port: 4000, path: 'services/api-server' },
+      { name: 'main-site', port: 3011, path: 'services/main-site' }
     ];
   }
 
@@ -154,8 +154,8 @@ class SmartDevStarter {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         // API 서버 체크
-        const apiResponse = await this.checkService('http://localhost:3000/api/health');
-        const webResponse = await this.checkService('http://localhost:5173');
+        const apiResponse = await this.checkService('http://localhost:4000/api/health');
+        const webResponse = await this.checkService('http://localhost:3011');
 
         if (apiResponse && webResponse) {
           console.log('   ✅ 모든 서비스가 정상적으로 시작되었습니다!');
@@ -185,8 +185,8 @@ class SmartDevStarter {
     console.log('\n🌐 브라우저 자동 오픈...');
 
     const urls = [
-      'http://localhost:5173',      // 웹 앱
-      'http://localhost:3000/api/docs'  // API 문서
+      'http://localhost:3011',      // 웹 앱
+      'http://localhost:4000/api/docs'  // API 문서
     ];
 
     for (const url of urls) {
@@ -214,10 +214,10 @@ class SmartDevStarter {
   async showStatus() {
     console.log('\n📋 개발 환경 상태:');
     console.log('=' .repeat(50));
-    console.log('🔧 API 서버:     http://localhost:3000');
-    console.log('📖 API 문서:     http://localhost:3000/api/docs');
-    console.log('🌐 웹 앱:        http://localhost:5173');
-    console.log('📊 관리자 패널:   http://localhost:3000/admin (예정)');
+    console.log('🔧 API 서버:     http://localhost:4000');
+    console.log('📖 API 문서:     http://localhost:4000/api/docs');
+    console.log('🌐 웹 앱:        http://localhost:3011');
+    console.log('📊 관리자 패널:   http://localhost:4000/admin (예정)');
     console.log('=' .repeat(50));
     console.log('\n💡 개발 팁:');
     console.log('   - Cursor Background Agent를 활성화하세요 (Cmd/Ctrl+E)');

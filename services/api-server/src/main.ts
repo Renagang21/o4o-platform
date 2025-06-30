@@ -11,10 +11,15 @@ import { Server } from 'socket.io';
 import { initializeDatabase } from './database/connection';
 
 // 라우트 imports 
+import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
+import ecommerceRoutes from './routes/ecommerce';
+import cptRoutes from './routes/cpt';
+import postCreationRoutes from './routes/post-creation';
 import servicesRoutes from './routes/services';
 import signageRoutes from './routes/signage';
+import contentRoutes from './routes/content';
 
 // 환경변수 로드
 dotenv.config();
@@ -26,7 +31,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:3011",
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -52,21 +57,30 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: process.env.FRONTEND_URL || "http://localhost:3011",
   credentials: true
 }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Static file serving for uploads
+const uploadsPath = process.env.UPLOAD_DIR || './uploads';
+app.use('/uploads', express.static(uploadsPath));
+
 // Rate limiting 적용
 app.use('/api/', limiter);
 
 // API 라우트
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ecommerce', ecommerceRoutes);
+app.use('/api/cpt', cptRoutes);
+app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
+app.use('/api', contentRoutes);
 
 // 헬스체크 엔드포인트
 app.get('/api/health', (req, res) => {
@@ -86,12 +100,22 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/api/health',
+      auth: '/api/auth',
       users: '/api/users',
       admin: '/api/admin',
+      ecommerce: '/api/ecommerce',
+      cpt: '/api/cpt',
+      postCreation: '/api/post-creation',
       services: '/api/services',
-      signage: '/api/signage'
+      signage: '/api/signage',
+      content: {
+        pages: '/api/admin/pages',
+        media: '/api/admin/media',
+        templates: '/api/admin/templates',
+        customFields: '/api/admin/custom-field-groups'
+      }
     },
-    frontend: process.env.FRONTEND_URL || 'http://localhost:5173'
+    frontend: process.env.FRONTEND_URL || 'http://localhost:3011'
   });
 });
 
@@ -145,7 +169,7 @@ const startServer = async () => {
     console.log(`🚀 Neture API Server running on port ${port}`);
     console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 API Base URL: http://localhost:${port}/api`);
-    console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+    console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3011'}`);
     console.log('💾 Database: o4o_platform connected successfully');
   });
 };
