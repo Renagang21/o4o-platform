@@ -151,4 +151,5 @@ const HealthcarePage: React.FC = () => {
   );
 };
 
+export { HealthcarePage };
 export default HealthcarePage;

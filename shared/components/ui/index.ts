@@ -2,10 +2,10 @@
 // This file provides clean imports for all UI components
 
 // Re-export Button and its types
-export { default as Button, Button, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
+export { default as Button, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
 
 // Re-export Card and its sub-components
-export { default as Card, Card, CardHeader, CardTitle, CardContent } from './Card';
+export { default as Card, CardHeader, CardTitle, CardContent } from './Card';
 
 // Re-export Badge
 export { default as Badge } from './Badge';

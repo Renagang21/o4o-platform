@@ -11,7 +11,7 @@ import {
   Edit,
   Eye,
   Trash2,
-  Toggle,
+  ToggleLeft,
   Settings
 } from 'lucide-react';
 import { SellerProduct } from '../types/seller';
@@ -663,7 +663,7 @@ const SellerProductManagementContent: React.FC<SellerProductManagementPageProps>
                             }`}
                             title={product.isActive ? '판매 비활성화' : '판매 활성화'}
                           >
-                            <Toggle className="w-4 h-4" />
+                            <ToggleLeft className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEdit(product)}
