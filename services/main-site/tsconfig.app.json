@@ -22,8 +22,12 @@
       "@shared/*": ["../../shared/*"],
       "@shared/editor": ["../../shared/components/editor"],
       "@shared/editor/*": ["../../shared/components/editor/*"],
+      "@shared/dropshipping": ["../../shared/components/dropshipping"],
       "@shared/dropshipping/*": ["../../shared/components/dropshipping/*"],
+      "@shared/healthcare": ["../../shared/components/healthcare"],
       "@shared/healthcare/*": ["../../shared/components/healthcare/*"],
+      "@shared/ui": ["../../shared/components/ui"],
+      "@shared/ui/*": ["../../shared/components/ui/*"],
       "@o4o/shared/ui": ["../../shared/components/ui"],
       "@o4o/shared/healthcare": ["../../shared/components/healthcare"]
     },
