@@ -19,6 +19,9 @@
     }
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.2",
+    "@tanstack/react-query": "^5.17.9",
+    "@tanstack/react-table": "^8.11.6",
     "@tiptap/core": "^2.22.3",
     "@tiptap/extension-color": "^2.22.3",
     "@tiptap/extension-highlight": "^2.22.3",
@@ -33,19 +36,17 @@
     "@tiptap/react": "^2.22.3",
     "@tiptap/starter-kit": "^2.22.3",
     "@tiptap/suggestion": "^2.22.3",
-    "@tanstack/react-table": "^8.11.6",
-    "@tanstack/react-query": "^5.17.9",
-    "react-hook-form": "^7.49.3",
-    "date-fns": "^3.0.6",
-    "@hookform/resolvers": "^3.3.2",
-    "zod": "^3.22.4",
-    "react-day-picker": "^8.10.0",
-    "tailwindcss": "^4.1.7",
-    "postcss": "^8.5.3",
-    "lightningcss": "^1.30.1",
-    "tailwind-merge": "^2.6.0",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.523.0"
+    "date-fns": "^3.0.6",
+    "dompurify": "^3.2.6",
+    "lightningcss": "^1.30.1",
+    "lucide-react": "^0.523.0",
+    "postcss": "^8.5.3",
+    "react-day-picker": "^8.10.0",
+    "react-hook-form": "^7.49.3",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss": "^4.1.7",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
     "react": "^19.1.0",
@@ -53,9 +54,10 @@
     "typescript": "~5.8.3"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^20.10.6",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.7",
-    "@types/node": "^20.10.6",
     "autoprefixer": "^10.4.21"
   }
 }

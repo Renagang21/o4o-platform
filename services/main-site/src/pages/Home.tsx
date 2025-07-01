@@ -52,7 +52,42 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection />
+      {/* 테스트 환경 배너 */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#ffebee',
+        border: '2px solid #f44336',
+        padding: '10px',
+        textAlign: 'center',
+        zIndex: 1000,
+        fontSize: '14px',
+        fontWeight: 'bold'
+      }}>
+        🧪 테스트 환경 | 
+        <span style={{ margin: '0 15px' }}>
+          <strong>고객:</strong> test@customer.com / pw123 
+        </span>
+        <span style={{ margin: '0 15px' }}>
+          <strong>비즈니스:</strong> test@business.com / pw123
+        </span>
+        <span style={{ margin: '0 15px' }}>
+          <strong>어필리에이트:</strong> test@affiliate.com / pw123
+        </span>
+        <span style={{ margin: '0 15px' }}>
+          <strong>관리자:</strong> test@admin.com / pw123
+        </span>
+        | 
+        <a href="/login" style={{ color: '#1976d2', textDecoration: 'underline', margin: '0 10px' }}>로그인</a>
+        <a href="/dropshipping" style={{ color: '#1976d2', textDecoration: 'underline', margin: '0 10px' }}>드롭시핑</a>
+        <a href="/admin" style={{ color: '#1976d2', textDecoration: 'underline', margin: '0 10px' }}>관리자</a>
+      </div>
+      
+      {/* 테스트 배너 때문에 본문 위치 조정 */}
+      <div style={{ marginTop: '60px' }}>
+        <HeroSection />
       <StepGuide />
       
       {/* Services Section */}
@@ -177,9 +212,10 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      <TrustSlider />
-      <BrandPreview />
-      <Footer />
+        <TrustSlider />
+        <BrandPreview />
+        <Footer />
+      </div>
     </div>
   );
 };

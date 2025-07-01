@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge';
 export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'disabled' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps {
+export interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
@@ -99,4 +99,5 @@ const Button = (
 
 Button.displayName = 'Button';
 
+export { Button, type ButtonProps, type ButtonVariant, type ButtonSize };
 export default Button;

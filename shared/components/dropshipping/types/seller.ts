@@ -45,6 +45,66 @@ export interface SellerDashboardData {
   }[];
 }
 
+// Sample data for seller products
+export const generateSellerProducts = (): SellerProduct[] => {
+  return [
+    {
+      id: 1,
+      name: '무선 블루투스 이어폰 프리미엄',
+      description: '고품질 사운드와 액티브 노이즈 캔슬링 기능을 제공하는 프리미엄 이어폰',
+      price: 89000,
+      originalPrice: 129000,
+      imageUrl: '/images/products/earphones-premium.jpg',
+      category: '전자제품',
+      stock: 45,
+      rating: 4.8,
+      reviewCount: 324,
+      tags: ['블루투스', '노이즈캔슬링', '프리미엄'],
+      sellerPrice: 89000,
+      isActive: true,
+      partnerCommissionRate: 15,
+      salesCount: 89,
+      dateAdded: '2024-01-15'
+    },
+    {
+      id: 2,
+      name: '스마트 워치 밴드 실리콘',
+      description: '편안한 착용감과 다양한 색상으로 제공되는 고급 실리콘 밴드',
+      price: 25000,
+      originalPrice: 35000,
+      imageUrl: '/images/products/watch-band-silicone.jpg',
+      category: '액세서리',
+      stock: 156,
+      rating: 4.6,
+      reviewCount: 198,
+      tags: ['스마트워치', '실리콘', '다양한색상'],
+      sellerPrice: 25000,
+      isActive: true,
+      partnerCommissionRate: 20,
+      salesCount: 67,
+      dateAdded: '2024-02-01'
+    },
+    {
+      id: 3,
+      name: 'USB-C 고속 충전 케이블 3m',
+      description: '고속 충전과 데이터 전송을 지원하는 내구성 있는 3미터 케이블',
+      price: 15000,
+      originalPrice: 22000,
+      imageUrl: '/images/products/usbc-cable-3m.jpg',
+      category: '전자제품',
+      stock: 234,
+      rating: 4.7,
+      reviewCount: 456,
+      tags: ['USB-C', '고속충전', '3미터'],
+      sellerPrice: 15000,
+      isActive: true,
+      partnerCommissionRate: 25,
+      salesCount: 124,
+      dateAdded: '2024-01-20'
+    }
+  ];
+};
+
 // Sample data for seller dashboard
 export const generateSellerDashboardData = (): SellerDashboardData => {
   return {

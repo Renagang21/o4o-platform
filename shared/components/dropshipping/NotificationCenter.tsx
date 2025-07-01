@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, X, Check, Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import Button from "../ui/Button";
+import Badge from "../ui/Badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from "../ui/Dropdown-menu";
+import { ScrollArea } from "../ui/Scroll-area";
 import { useNotifications } from './services/realtimeSync';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';

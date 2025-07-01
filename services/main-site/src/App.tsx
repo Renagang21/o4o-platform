@@ -31,6 +31,10 @@ import { AdminDashboardTest } from './pages/AdminDashboardTest';
 // Dropshipping
 import { DropshippingPage } from './pages/DropshippingPage';
 
+// Healthcare
+import { HealthcarePage } from './pages/healthcare';
+import HealthcareDemo from './components/healthcare/HealthcareDemo';
+
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 
@@ -55,6 +59,8 @@ const App: React.FC = () => {
           <Route path="/editor-fullscreen" element={<FullScreenEditorSimpleTest />} />
           <Route path="/admin-test/*" element={<AdminDashboardTest />} />
           <Route path="/dropshipping/*" element={<DropshippingPage />} />
+          <Route path="/healthcare" element={<HealthcarePage />} />
+          <Route path="/healthcare/demo" element={<HealthcareDemo />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           

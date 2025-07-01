@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import React from 'react';
 
 // 이벤트 타입 정의
 export enum SyncEventType {
@@ -36,8 +36,46 @@ export interface Notification {
   data?: any;
 }
 
+// 브라우저 호환 EventEmitter 구현
+class BrowserEventEmitter {
+  private events: Map<string, Set<Function>> = new Map();
+
+  on(event: string, listener: Function) {
+    if (!this.events.has(event)) {
+      this.events.set(event, new Set());
+    }
+    this.events.get(event)!.add(listener);
+  }
+
+  off(event: string, listener: Function) {
+    if (this.events.has(event)) {
+      this.events.get(event)!.delete(listener);
+    }
+  }
+
+  emit(event: string, ...args: any[]) {
+    if (this.events.has(event)) {
+      this.events.get(event)!.forEach(listener => {
+        try {
+          listener(...args);
+        } catch (error) {
+          console.error('Error in event listener:', error);
+        }
+      });
+    }
+  }
+
+  removeAllListeners(event?: string) {
+    if (event) {
+      this.events.delete(event);
+    } else {
+      this.events.clear();
+    }
+  }
+}
+
 // 실시간 동기화 클래스
-class RealtimeSyncService extends EventEmitter {
+class RealtimeSyncService extends BrowserEventEmitter {
   private notifications: Map<string, Notification[]> = new Map();
   private dataCache: Map<string, any> = new Map();
   
@@ -373,5 +411,3 @@ export const useRealtimeData = (dataKey: string, eventName?: string) => {
 
   return data;
 };
-
-import React from 'react';

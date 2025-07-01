@@ -70,13 +70,13 @@ export class User {
     phone: string;
   };
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastLoginAt?: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   approvedAt?: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   approvedBy?: string;
 
   @CreateDateColumn()

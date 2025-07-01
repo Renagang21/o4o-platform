@@ -226,8 +226,9 @@ export class ExtensionLoader {
     // 우선순위에 따라 정렬
     const sortedExtensions = allRequired
       .map(name => this.extensionRegistry.get(name))
-      .filter(Boolean) as ExtensionMapping[]
-      .sort((a, b) => a.priority - b.priority);
+      .filter(Boolean) as ExtensionMapping[];
+    
+    sortedExtensions.sort((a, b) => a.priority - b.priority);
 
     // 확장 로딩
     for (const extensionMapping of sortedExtensions) {

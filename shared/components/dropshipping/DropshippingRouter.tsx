@@ -2,34 +2,34 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { DropshippingLayout } from './DropshippingLayout';
 
-// Seller Pages
+// Import existing components
 import { SellerDashboard } from './SellerDashboard';
-import { SellerInventoryPage } from './SellerInventoryPage';
-import { SellerOrderManagementPage } from './SellerOrderManagementPage';
-import { SellerPricingRulesPage } from './SellerPricingRulesPage';
-import { SellerSuppliersPage } from './SellerSuppliersPage';
-import { SellerReportsPage } from './SellerReportsPage';
+import { PartnerDashboard } from './pages/PartnerDashboard';
 
-// Supplier Pages
-import { SupplierDashboard } from './SupplierDashboard';
-import { SupplierProductManagementPage } from './SupplierProductManagementPage';
-import { SupplierOrdersPage } from './SupplierOrdersPage';
-import { SupplierShippingPage } from './SupplierShippingPage';
-import { SupplierSettlementPage } from './SupplierSettlementPage';
-import { SupplierReportsPage } from './SupplierReportsPage';
+// Import placeholder components for missing ones
+import { 
+  SellerInventoryPage,
+  SellerOrderManagementPage,
+  SellerPricingRulesPage,
+  SellerSuppliersPage,
+  SellerReportsPage,
+  SupplierDashboard,
+  SupplierProductManagementPage,
+  SupplierOrdersPage,
+  SupplierShippingPage,
+  SupplierSettlementPage,
+  SupplierReportsPage,
+  AdminDashboard,
+  UserManagementPage,
+  SystemMonitoringPage,
+  PlatformReportsPage,
+  SettingsPage
+} from './missing-components';
 
-// Partner Pages
-import { PartnerDashboard } from './PartnerDashboard';
-import { PartnerMarketingPage } from './PartnerMarketingPage';
-import { PartnerCommissionPage } from './PartnerCommissionPage';
+// Partner Pages (try to import existing ones, fallback to placeholders)
+import { PartnerMarketingPage } from './pages/PartnerMarketingPage';
+import { PartnerCommissionPage } from './pages/PartnerCommissionPage';
 import { PartnerAnalyticsPage } from './PartnerAnalyticsPage';
-
-// Admin Pages
-import { AdminDashboard } from './AdminDashboard';
-import { UserManagementPage } from './admin/UserManagementPage';
-import { SystemMonitoringPage } from './admin/SystemMonitoringPage';
-import { PlatformReportsPage } from './admin/PlatformReportsPage';
-import { SettingsPage } from './admin/SettingsPage';
 
 interface DropshippingRouterProps {
   userRole: 'seller' | 'supplier' | 'partner' | 'admin';

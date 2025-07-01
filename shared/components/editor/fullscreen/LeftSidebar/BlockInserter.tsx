@@ -22,11 +22,9 @@ import {
 import { 
   ImportModal, 
   ImportBlock, 
-  ImportManager, 
-  ImportType, 
-  ImportStep,
-  ConversionResult
-} from '../../../import';
+  ImportManager
+} from '../../import';
+import type { ImportType, ImportStep, ConversionResult } from '../../import';
 
 interface BlockType {
   id: string;

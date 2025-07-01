@@ -51,7 +51,11 @@
     "env:dev:check": "node -e \"console.log('Node.js version:', process.version); console.log('Environment checks:'); console.log('- Root .env NODE_ENV:', require('dotenv').config().parsed?.NODE_ENV || 'not set'); console.log('- API Server ready:', require('fs').existsSync('./services/api-server/.env')); console.log('- Main Site ready:', require('fs').existsSync('./services/main-site/.env'));\"",
     "health:all": "echo 'Checking all services health...' && npm run health:api && npm run health:web",
     "health:api": "cd services/api-server && npm run health 2>/dev/null || echo 'API health check not available'",
-    "health:web": "cd services/main-site && npm run health 2>/dev/null || echo 'Web health check not available'"
+    "health:web": "cd services/main-site && npm run health 2>/dev/null || echo 'Web health check not available'",
+    "test:generate-data": "node scripts/run-test-data.js",
+    "test:setup": "npm run test:generate-data",
+    "test:create-users": "node scripts/simple-test-data.js",
+    "fix:imports": "node scripts/fix-import-errors.js"
   },
   "devDependencies": {
     "@modelcontextprotocol/server-filesystem": "^2025.3.28",

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from "../../lib/utils";
+import Button from "../ui/Button";
 import { NotificationCenter } from './NotificationCenter';
 import {
   LayoutDashboard,

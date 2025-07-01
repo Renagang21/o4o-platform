@@ -43,8 +43,38 @@ const TheDANGStyleHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#ecf0f3]">
+      {/* 테스트 환경 배너 */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#ffebee',
+        border: '2px solid #f44336',
+        padding: '10px',
+        textAlign: 'center',
+        zIndex: 1000,
+        fontSize: '14px',
+        fontWeight: 'bold'
+      }}>
+        🧪 테스트 환경 | 
+        <span style={{ margin: '0 15px' }}>
+          <strong>고객:</strong> test@customer.com / pw123 
+        </span>
+        <span style={{ margin: '0 15px' }}>
+          <strong>비즈니스:</strong> test@business.com / pw123
+        </span>
+        <span style={{ margin: '0 15px' }}>
+          <strong>제휴사:</strong> test@affiliate.com / pw123
+        </span>
+        <span style={{ margin: '0 15px' }}>
+          <strong>관리자:</strong> test@admin.com / pw123
+        </span>
+        | <Link to="/dropshipping" style={{ color: '#f44336', textDecoration: 'underline' }}>드롭쉬핑</Link>
+        | <Link to="/admin-test" style={{ color: '#f44336', textDecoration: 'underline' }}>관리자</Link>
+      </div>
       {/* Header Navigation - thedang.co.kr style */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm" style={{ marginTop: '50px' }}>
         <nav className="max-w-[1200px] mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">

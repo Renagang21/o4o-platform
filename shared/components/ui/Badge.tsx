@@ -6,6 +6,7 @@ export type BadgeVariant =
   | 'secondary'
   | 'success'
   | 'danger'
+  | 'destructive'
   | 'warning'
   | 'info'
   | 'vip'
@@ -15,7 +16,7 @@ export type BadgeVariant =
 
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
-interface BadgeProps {
+export interface BadgeProps {
   children: React.ReactNode;
   variant?: BadgeVariant;
   size?: BadgeSize;
@@ -33,16 +34,17 @@ const Badge: React.FC<BadgeProps> = ({
   const baseStyles = 'inline-flex items-center font-medium rounded-full';
   
   const variantStyles = {
-    primary: 'bg-primary text-white',
-    secondary: 'bg-primary-light text-primary',
-    success: 'bg-success text-white',
-    danger: 'bg-danger text-white',
-    warning: 'bg-warning text-white',
-    info: 'bg-info text-white',
-    vip: 'bg-gradient-to-r from-vip-gold to-vip-orange text-white',
-    premium: 'bg-gradient-to-r from-premium-silver to-premium-blue text-white',
-    member: 'bg-member-gray text-white',
-    b2b: 'bg-gradient-to-r from-b2b-dark to-b2b-blue text-white'
+    primary: 'bg-blue-600 text-white',
+    secondary: 'bg-gray-100 text-gray-800',
+    success: 'bg-green-600 text-white',
+    danger: 'bg-red-600 text-white',
+    destructive: 'bg-red-600 text-white',
+    warning: 'bg-yellow-600 text-white',
+    info: 'bg-blue-500 text-white',
+    vip: 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white',
+    premium: 'bg-gradient-to-r from-gray-400 to-blue-600 text-white',
+    member: 'bg-gray-600 text-white',
+    b2b: 'bg-gradient-to-r from-gray-800 to-blue-800 text-white'
   };
 
   const sizeStyles = {
@@ -68,4 +70,5 @@ const Badge: React.FC<BadgeProps> = ({
   );
 };
 
+export { Badge, type BadgeProps, type BadgeVariant, type BadgeSize };
 export default Badge; 
