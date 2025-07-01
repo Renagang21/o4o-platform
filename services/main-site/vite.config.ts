@@ -13,6 +13,7 @@ export default defineConfig({
       '@shared/editor/fullscreen': path.resolve(__dirname, '../../shared/components/editor/fullscreen'),
       '@shared/admin': path.resolve(__dirname, '../../shared/components/admin'),
       '@shared/theme': path.resolve(__dirname, '../../shared/components/theme'),
+      '@shared/components/admin': path.resolve(__dirname, '../../shared/components/admin'),
       '@shared/components/ui': path.resolve(__dirname, '../../shared/components/ui'),
       '@shared/components/dropshipping': path.resolve(__dirname, '../../shared/components/dropshipping'),
       '@shared/components/healthcare': path.resolve(__dirname, '../../shared/components/healthcare'),
