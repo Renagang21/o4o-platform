@@ -21,7 +21,11 @@
       "@/*": ["./src/*"],
       "@shared/*": ["../../shared/*"],
       "@shared/editor": ["../../shared/components/editor"],
-      "@shared/editor/*": ["../../shared/components/editor/*"]
+      "@shared/editor/*": ["../../shared/components/editor/*"],
+      "@shared/dropshipping/*": ["../../shared/components/dropshipping/*"],
+      "@shared/healthcare/*": ["../../shared/components/healthcare/*"],
+      "@o4o/shared/ui": ["../../shared/components/ui"],
+      "@o4o/shared/healthcare": ["../../shared/components/healthcare"]
     },
 
     /* Linting */

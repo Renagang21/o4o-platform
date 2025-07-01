@@ -37,6 +37,7 @@ import HealthcareDemo from './components/healthcare/HealthcareDemo';
 
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const App: React.FC = () => {
   const { checkAuth } = useAuthStore();
@@ -58,7 +59,21 @@ const App: React.FC = () => {
           <Route path="/editor/home" element={<TheDANGStyleEditorPage />} />
           <Route path="/editor-fullscreen" element={<FullScreenEditorSimpleTest />} />
           <Route path="/admin-test/*" element={<AdminDashboardTest />} />
-          <Route path="/dropshipping/*" element={<DropshippingPage />} />
+          <Route path="/dropshipping/*" element={
+            <ErrorBoundary fallback={
+              <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">드랍쉬핑 페이지 오류</h2>
+                  <p className="text-gray-600 mb-4">드랍쉬핑 페이지에 일시적인 문제가 있습니다.</p>
+                  <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    헬스케어 페이지로 이동
+                  </a>
+                </div>
+              </div>
+            }>
+              <DropshippingPage />
+            </ErrorBoundary>
+          } />
           <Route path="/healthcare" element={<HealthcarePage />} />
           <Route path="/healthcare/demo" element={<HealthcareDemo />} />
           <Route path="/auth/login" element={<Login />} />

@@ -14,6 +14,10 @@ export default defineConfig({
       '@shared/admin': path.resolve(__dirname, '../../shared/components/admin'),
       '@shared/theme': path.resolve(__dirname, '../../shared/components/theme'),
       '@shared/ui': path.resolve(__dirname, '../../shared/components/ui'),
+      '@shared/dropshipping': path.resolve(__dirname, '../../shared/components/dropshipping'),
+      '@shared/healthcare': path.resolve(__dirname, '../../shared/components/healthcare'),
+      '@o4o/shared/ui': path.resolve(__dirname, '../../shared/components/ui'),
+      '@o4o/shared/healthcare': path.resolve(__dirname, '../../shared/components/healthcare'),
     },
   },
   server: {

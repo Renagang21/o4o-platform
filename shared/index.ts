@@ -10,6 +10,12 @@ export * from './components/theme';
 // UI components export
 export * from './components/ui';
 
+// Healthcare components export
+export * from './components/healthcare';
+
+// Dropshipping components export
+export * from './components/dropshipping';
+
 // Shared utilities
 export * from './utils';
 export * from './hooks';
