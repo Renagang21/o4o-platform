@@ -288,4 +288,28 @@ NODE_ENV=development
 - Follow RESTful API conventions
 - Implement proper error handling with meaningful messages
 
+## 📚 프론트엔드 개발 지침서 참조
+
+**중요**: 모든 프론트엔드 작업 시 `/FRONTEND_GUIDELINES.md` 파일을 반드시 참조해주세요.
+
+### 핵심 원칙:
+1. **기존 코드베이스 절대 보호** - 모든 기존 기능 정상 작동 보장
+2. **에러 전파 방지** - Error Boundary 의무 적용, 모듈별 격리
+3. **점진적 통합** - 독립적 모듈 개발, 기존 구조 보호
+
+### 필수 구현 패턴:
+- **Error Boundary 패턴**: 모든 새 모듈 필수 적용
+- **Lazy Loading 패턴**: 대용량 모듈 지연 로딩
+- **조건부 Import 패턴**: 선택적 의존성으로 안전성 확보
+
+### 안전성 체크리스트:
+- [ ] Error Boundary 적용
+- [ ] Lazy loading 구현  
+- [ ] Fallback UI 제공
+- [ ] 기존 페이지 정상 작동 확인
+- [ ] TypeScript 타입 체크 통과
+- [ ] Build 성공 확인
+
+**이 지침서는 프론트엔드 작업의 모든 기준이 됩니다. 새로운 기능 개발 시 반드시 준수해주세요.**
+
 This platform emphasizes **simplicity over complexity** while maintaining enterprise-grade reliability and performance.
