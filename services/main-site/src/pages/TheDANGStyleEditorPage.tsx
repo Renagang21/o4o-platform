@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TheDANGHomeEditor from '../../../shared/components/editor/TheDANGHomeEditor';
+import TheDANGHomeEditor from '@shared/components/editor/TheDANGHomeEditor';
 
 const TheDANGStyleEditorPage: React.FC = () => {
   const [savedContent, setSavedContent] = useState<string>('');
