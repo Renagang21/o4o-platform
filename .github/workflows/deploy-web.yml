@@ -37,6 +37,14 @@ jobs:
             # Git pull latest changes
             git pull origin main
             
+            # Verify monorepo structure
+            echo "Verifying monorepo structure:"
+            ls -la
+            echo "Checking shared directory:"
+            ls -la shared/ || echo "WARNING: shared directory not found!"
+            echo "Checking shared/components:"
+            ls -la shared/components/ || echo "WARNING: shared/components not found!"
+            
             # Install dependencies
             npm ci
             cd services/main-site
