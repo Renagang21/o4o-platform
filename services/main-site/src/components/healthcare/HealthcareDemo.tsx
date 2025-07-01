@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { HealthcareMainPage } from '@shared/healthcare';
-import { Button, Card, CardContent } from '@shared/ui';
+import { HealthcareMainPage } from '@shared/components/healthcare';
+import { Button, Card, CardContent } from '@shared/components/ui';
 import { Play, Pause, RotateCcw, Monitor, Smartphone, Tablet } from 'lucide-react';
 
 const HealthcareDemo: React.FC = () => {

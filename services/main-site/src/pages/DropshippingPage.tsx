@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DropshippingRouter, realtimeSync } from '@shared/dropshipping';
+import { DropshippingRouter, realtimeSync } from '@shared/components/dropshipping';
 
 // 데모용 역할 선택 컴포넌트 (실제로는 로그인된 사용자의 역할을 사용)
 const RoleSelector: React.FC<{ onRoleSelect: (role: string) => void }> = ({ onRoleSelect }) => {
