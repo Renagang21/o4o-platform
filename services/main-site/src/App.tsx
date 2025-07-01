@@ -56,9 +56,51 @@ const App: React.FC = () => {
           {/* Public Routes */}
           <Route path="/" element={<TheDANGStyleHome />} />
           <Route path="/home" element={<TheDANGStyleHome />} />
-          <Route path="/editor/home" element={<TheDANGStyleEditorPage />} />
-          <Route path="/editor-fullscreen" element={<FullScreenEditorSimpleTest />} />
-          <Route path="/admin-test/*" element={<AdminDashboardTest />} />
+          <Route path="/editor/home" element={
+            <ErrorBoundary fallback={
+              <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">에디터 홈 페이지 오류</h2>
+                  <p className="text-gray-600 mb-4">에디터 홈 페이지에 일시적인 문제가 있습니다.</p>
+                  <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    헬스케어 페이지로 이동
+                  </a>
+                </div>
+              </div>
+            }>
+              <TheDANGStyleEditorPage />
+            </ErrorBoundary>
+          } />
+          <Route path="/editor-fullscreen" element={
+            <ErrorBoundary fallback={
+              <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">편집기 페이지 오류</h2>
+                  <p className="text-gray-600 mb-4">편집기 페이지에 일시적인 문제가 있습니다.</p>
+                  <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    헬스케어 페이지로 이동
+                  </a>
+                </div>
+              </div>
+            }>
+              <FullScreenEditorSimpleTest />
+            </ErrorBoundary>
+          } />
+          <Route path="/admin-test/*" element={
+            <ErrorBoundary fallback={
+              <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">관리자 테스트 페이지 오류</h2>
+                  <p className="text-gray-600 mb-4">관리자 테스트 페이지에 일시적인 문제가 있습니다.</p>
+                  <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    헬스케어 페이지로 이동
+                  </a>
+                </div>
+              </div>
+            }>
+              <AdminDashboardTest />
+            </ErrorBoundary>
+          } />
           <Route path="/dropshipping/*" element={
             <ErrorBoundary fallback={
               <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -155,17 +197,41 @@ const App: React.FC = () => {
           <Route
             path="/signage"
             element={
-              <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                <DigitalSignageDashboard />
-              </PrivateRoute>
+              <ErrorBoundary fallback={
+                <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">디지털 사이니지 페이지 오류</h2>
+                    <p className="text-gray-600 mb-4">디지털 사이니지 페이지에 일시적인 문제가 있습니다.</p>
+                    <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                      헬스케어 페이지로 이동
+                    </a>
+                  </div>
+                </div>
+              }>
+                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                  <DigitalSignageDashboard />
+                </PrivateRoute>
+              </ErrorBoundary>
             }
           />
           <Route
             path="/signage/*"
             element={
-              <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                <DigitalSignageDashboard />
-              </PrivateRoute>
+              <ErrorBoundary fallback={
+                <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">디지털 사이니지 페이지 오류</h2>
+                    <p className="text-gray-600 mb-4">디지털 사이니지 페이지에 일시적인 문제가 있습니다.</p>
+                    <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                      헬스케어 페이지로 이동
+                    </a>
+                  </div>
+                </div>
+              }>
+                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                  <DigitalSignageDashboard />
+                </PrivateRoute>
+              </ErrorBoundary>
             }
           />
 
