@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🌐 GitHub 저장소 정보
+
+### 주요 저장소
+- **메인 플랫폼**: https://github.com/Renagang21/o4o-platform
+- **문서**: https://github.com/Renagang21/o4o-platform/tree/main/docs  
+- **공통 코어**: https://github.com/Renagang21/common-core
+
 ## 🚨 중요 프로젝트 방침 (IMPORTANT PROJECT POLICIES)
 
 ### ⚠️ 환경 설정 방침
@@ -289,3 +296,86 @@ NODE_ENV=development
 - Implement proper error handling with meaningful messages
 
 This platform emphasizes **simplicity over complexity** while maintaining enterprise-grade reliability and performance.
+
+## 🚨 반복되는 코딩 실수 패턴 및 해결방안
+
+### 1. Import 경로 오류 (가장 빈번한 실수)
+**문제 패턴:**
+```typescript
+// ❌ 잘못된 import - components 경로 누락
+import { DropshippingRouter } from '@shared/dropshipping';
+
+// ✅ 올바른 import
+import { DropshippingRouter } from '@shared/components/dropshipping';
+// 또는 직접 경로 사용 (더 안전)
+import { DropshippingRouter } from '../../shared/components/dropshipping';
+```
+
+**필수 확인사항:**
+- shared 폴더 구조: `shared/components/[module-name]`
+- vite.config.ts의 alias 설정 확인
+- 실제 파일 위치와 import 경로 일치 여부
+
+### 2. 빌드 검증 없는 배포
+**문제:** 로컬에서 `npm run build` 없이 바로 커밋&푸시
+
+**필수 작업 절차:**
+```bash
+# 1. 수정 전 빌드 상태 확인
+npm run build
+
+# 2. 코드 수정
+
+# 3. 수정 후 반드시 빌드 테스트
+npm run build
+
+# 4. 빌드 성공 시에만 커밋
+git add .
+git commit -m "fix: [구체적 수정 내용]"
+```
+
+### 3. Error Boundary 남용
+**문제:** 근본 원인(import 에러) 해결 대신 Error Boundary로 감싸기만 함
+
+**올바른 접근:**
+1. 먼저 import 에러 해결
+2. 빌드 성공 확인
+3. 그 다음 Error Boundary는 예외 상황 대비용으로만 사용
+
+### 4. 개발/운영 환경 혼동
+**문제:** 운영 서버에서 개발 모드로 실행
+
+**환경 설정 원칙:**
+- 개발: NODE_ENV=development
+- 운영: NODE_ENV=production
+- 절대 운영에서 VITE_DEV_MODE=true 사용 금지
+
+## 📋 Claude Code 필수 체크리스트
+
+### 작업 시작 전
+- [ ] 현재 빌드 상태 확인: `npm run build`
+- [ ] 프로젝트 구조 파악: `ls -la shared/components/`
+- [ ] 최근 커밋 확인: `git log --oneline -5`
+
+### 코드 수정 시
+- [ ] Import 경로 정확성 확인 (특히 @shared 사용 시)
+- [ ] 각 수정 후 빌드 테스트
+- [ ] TypeScript 타입 에러 확인: `npx tsc --noEmit`
+
+### 커밋 전
+- [ ] `npm run build` 성공 확인
+- [ ] `npm run type-check` 성공 확인
+- [ ] 브라우저에서 로컬 테스트
+- [ ] 기존 기능 영향도 확인
+
+### 자주 하는 실수 방지
+- [ ] @shared/[module] → @shared/components/[module] 경로 확인
+- [ ] 새 기능이 기존 기능을 깨트리지 않는지 확인
+- [ ] Error Boundary는 마지막 수단으로만 사용
+- [ ] 운영 환경에서 개발 모드 설정 금지
+
+## 📚 상세 문서 참조
+
+프론트엔드 개발 및 버그 수정에 대한 더 자세한 내용은 다음 문서를 참고하세요:
+- **종합 가이드**: `docs/technical/o4o-platform-comprehensive-guide.md`
+- **프론트엔드 버그 수정 가이드**: `docs/technical/frontend-bug-fixing-guide.md`
