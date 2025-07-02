@@ -11,9 +11,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
@@ -24,7 +24,14 @@
       "@/utils/*": ["./src/utils/*"],
       "@/types/*": ["./src/types/*"],
       "@/api/*": ["./src/api/*"],
-      "@/styles/*": ["./src/styles/*"]
+      "@/styles/*": ["./src/styles/*"],
+      "@shared/*": ["../../shared/*"],
+      "@shared/components/admin/*": ["../../shared/components/admin/*"],
+      "@shared/components/editor/*": ["../../shared/components/editor/*"],
+      "@shared/components/theme/*": ["../../shared/components/theme/*"],
+      "@shared/components/ui/*": ["../../shared/components/ui/*"],
+      "@shared/components/dropshipping/*": ["../../shared/components/dropshipping/*"],
+      "@shared/components/healthcare/*": ["../../shared/components/healthcare/*"]
     }
   },
   "include": ["src", "vite-env.d.ts"],

@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 // Temporarily comment out Toaster until React version compatibility is fixed
 // import { Toaster } from 'react-hot-toast'
-import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
+import { MultiThemeProvider } from '@shared/components/theme/MultiThemeContext'
 import App from './App'
 import './styles/globals.css'
 
