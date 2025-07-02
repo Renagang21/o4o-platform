@@ -41,17 +41,9 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
   build: {
-    sourcemap: process.env.NODE_ENV === 'development',
-    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
-    target: 'es2015',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'utils': ['zustand', 'axios', 'react-hot-toast'],
-        },
-      },
-    },
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2020',
   },
   optimizeDeps: {
     exclude: ['@vite/client', '@vite/env'],

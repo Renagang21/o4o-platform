@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TheDANGHomeEditor from '../../../shared/components/editor/TheDANGHomeEditor';
+// import { TheDANGHomeEditor } from '@shared/components/editor';
 
 const TheDANGStyleEditorPage: React.FC = () => {
   const [savedContent, setSavedContent] = useState<string>('');
@@ -137,11 +137,14 @@ const TheDANGStyleEditorPage: React.FC = () => {
 
         {/* Editor */}
         <div className="bg-white rounded-lg shadow-sm">
-          <TheDANGHomeEditor
+          {/* <TheDANGHomeEditor
             initialContent={initialContent}
             onUpdate={handleContentUpdate}
             editable={true}
-          />
+          /> */}
+          <div className="p-6 text-center text-gray-500">
+            Editor temporarily disabled for production build
+          </div>
         </div>
       </div>
 
