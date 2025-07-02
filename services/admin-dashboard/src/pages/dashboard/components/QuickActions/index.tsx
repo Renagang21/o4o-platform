@@ -12,7 +12,7 @@ import {
   Package, 
   Percent, 
   BarChart3, 
-  Handshake, 
+  Users, 
   Settings 
 } from 'lucide-react';
 
@@ -23,7 +23,7 @@ const QuickActions: React.FC = () => {
       title: '새 상품 추가',
       description: '새로운 상품을 등록합니다',
       icon: <Plus className="w-5 h-5" />,
-      color: 'blue',
+      color: 'blue' as const,
       href: '/products/new',
       badge: null
     },
@@ -32,7 +32,7 @@ const QuickActions: React.FC = () => {
       title: '새 페이지 생성',
       description: '새로운 콘텐츠 페이지를 만듭니다',
       icon: <FileText className="w-5 h-5" />,
-      color: 'green',
+      color: 'green' as const,
       href: '/pages/new',
       badge: null
     },
@@ -41,7 +41,7 @@ const QuickActions: React.FC = () => {
       title: '사용자 승인',
       description: '대기 중인 사용자를 승인합니다',
       icon: <UserCheck className="w-5 h-5" />,
-      color: 'orange',
+      color: 'orange' as const,
       href: '/users/pending',
       badge: 3 // 실제로는 API에서 가져올 값
     },
@@ -50,7 +50,7 @@ const QuickActions: React.FC = () => {
       title: '주문 처리',
       description: '주문 상태를 업데이트합니다',
       icon: <Package className="w-5 h-5" />,
-      color: 'purple',
+      color: 'purple' as const,
       href: '/orders',
       badge: 12 // 실제로는 API에서 가져올 값
     },
@@ -59,7 +59,7 @@ const QuickActions: React.FC = () => {
       title: '쿠폰 생성',
       description: '새로운 할인 쿠폰을 만듭니다',
       icon: <Percent className="w-5 h-5" />,
-      color: 'pink',
+      color: 'pink' as const,
       href: '/coupons/new',
       badge: null
     },
@@ -68,7 +68,7 @@ const QuickActions: React.FC = () => {
       title: '상세 리포트',
       description: '전체 분석 리포트를 확인합니다',
       icon: <BarChart3 className="w-5 h-5" />,
-      color: 'indigo',
+      color: 'indigo' as const,
       href: '/analytics',
       badge: null
     },
@@ -76,8 +76,8 @@ const QuickActions: React.FC = () => {
       id: 'partner-approval',
       title: '파트너 승인',
       description: '파트너 신청을 검토합니다',
-      icon: <Handshake className="w-5 h-5" />,
-      color: 'gray',
+      icon: <Users className="w-5 h-5" />,
+      color: 'gray' as const,
       href: '/partners/pending',
       badge: null,
       disabled: true, // 파트너스 시스템 미구현
@@ -88,7 +88,7 @@ const QuickActions: React.FC = () => {
       title: '정책 설정',
       description: '관리자 정책을 설정합니다',
       icon: <Settings className="w-5 h-5" />,
-      color: 'yellow',
+      color: 'yellow' as const,
       href: '/settings/policies',
       badge: null,
       highlight: true // 새로 추가된 기능 강조

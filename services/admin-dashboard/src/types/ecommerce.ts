@@ -442,3 +442,148 @@ export interface WooCommerceSettings {
     roundingMode: 'disabled' | 'up' | 'down'
   }
 }
+
+// Missing types for admin-dashboard
+export interface CouponBanner {
+  id: string
+  title: string
+  description?: string
+  bannerType: 'popup' | 'banner' | 'sticky'
+  isActive: boolean
+  position?: 'top' | 'bottom' | 'center'
+  displayConditions?: string[]
+  views?: number
+  clicks?: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CouponUsage {
+  couponId: string
+  customerId: string
+  orderId: string
+  usageDate: string
+  discountAmount: number
+}
+
+export interface PointsOverview {
+  totalPoints: number
+  pointsSpent: number
+  pointsEarned: number
+  activeUsers: number
+}
+
+export interface UserPoints {
+  userId: string
+  balance: number
+  totalEarned: number
+  totalSpent: number
+  lastTransactionDate?: string
+}
+
+export interface PointTransaction {
+  id: string
+  userId: string
+  amount: number
+  type: 'earned' | 'spent' | 'expired'
+  description: string
+  orderId?: string
+  transactionDate: string
+}
+
+export interface PointsReward {
+  id: string
+  name: string
+  description?: string
+  pointsCost: number
+  rewardType: 'discount' | 'product' | 'shipping'
+  rewardValue: number
+  isActive: boolean
+  expiryDate?: string
+}
+
+export interface PointsPolicy {
+  earnRate: number // points per dollar spent
+  minimumRedemption: number
+  expiryDays?: number
+  signupBonus?: number
+  referralBonus?: number
+  reviewBonus?: number
+}
+
+export interface TaxSettings {
+  enabled: boolean
+  pricesIncludeTax: boolean
+  calculateBasedOn: 'shipping' | 'billing' | 'shop'
+  shippingTaxClass: string
+  rounding: 'disabled' | 'up' | 'down'
+  displayPrices: 'including' | 'excluding' | 'both'
+}
+
+export interface TaxRate {
+  id: string
+  country: string
+  state?: string
+  city?: string
+  postcode?: string
+  rate: number
+  name: string
+  priority: number
+  compound: boolean
+  shipping: boolean
+}
+
+export interface PaymentMethod {
+  id: string
+  title: string
+  description?: string
+  enabled: boolean
+  settings: Record<string, any>
+}
+
+export interface PaymentSettings {
+  methods: PaymentMethod[]
+  defaultMethod?: string
+  enableGuestCheckout: boolean
+  forceSSL: boolean
+}
+
+export interface ShippingZone {
+  id: string
+  name: string
+  locations: string[]
+  methods: ShippingMethod[]
+  order: number
+}
+
+export interface ShippingMethod {
+  id: string
+  title: string
+  methodType: 'flat_rate' | 'free_shipping' | 'local_pickup'
+  cost?: number
+  enabled: boolean
+  settings: Record<string, any>
+}
+
+export interface ShippingSettings {
+  zones: ShippingZone[]
+  enableShipping: boolean
+  enableCalculator: boolean
+  hideUntilAddress: boolean
+  defaultLocation: string
+}
+
+export interface GeneralSettings {
+  storeName: string
+  storeAddress: Address
+  defaultCountry: string
+  defaultCurrency: string
+  currencyPosition: 'left' | 'right' | 'left_space' | 'right_space'
+  thousandSeparator: string
+  decimalSeparator: string
+  numberOfDecimals: number
+}
+
+// Additional utility types (already defined above)
+export type ProductType = 'simple' | 'variable' | 'grouped' | 'external'
+export type ProductStatus = 'draft' | 'published' | 'private' | 'trash'

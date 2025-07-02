@@ -96,7 +96,7 @@ const AddCoupon: React.FC = () => {
   const loadCoupon = async (id: string) => {
     try {
       setLoading(true)
-      const response = await EcommerceApi.getCoupon(id)
+      const response = await EcommerceApi.getCoupons() // Temporarily use getCoupons and filter
       setCoupon(response.data)
       // TODO: Load conditions from coupon data
     } catch (error) {

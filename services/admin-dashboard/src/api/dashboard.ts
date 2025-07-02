@@ -8,7 +8,55 @@ import { api } from './base';
 // Dashboard API endpoints
 export const dashboardApi = {
   // 통계 데이터 조회
-  async getStats() {
+  async getStats(): Promise<{
+    users: {
+      total: number;
+      pending: number;
+      today: number;
+      activeRate: number;
+      change: number;
+      trend: 'up' | 'down';
+    };
+    sales: {
+      today: number;
+      changePercent: number;
+      monthlyTotal: number;
+      monthlyTarget: number;
+      trend: 'up' | 'down';
+    };
+    products: {
+      active: number;
+      lowStock: number;
+      newThisWeek: number;
+      bestsellers: Array<{
+        id: string;
+        name: string;
+        sales: number;
+      }>;
+      change: number;
+      trend: 'up' | 'down';
+    };
+    content: {
+      publishedPages: number;
+      draftContent: number;
+      totalMedia: number;
+      todayViews: number;
+      change: number;
+      trend: 'up' | 'down';
+    };
+    partners: {
+      active: number;
+      pending: number;
+      totalCommission: number;
+      topPartners: Array<{
+        id: string;
+        name: string;
+        commission: number;
+      }>;
+      change: number;
+      trend: 'up' | 'down';
+    };
+  }> {
     try {
       // 병렬로 여러 엔드포인트에서 데이터 수집
       const [usersResponse, salesResponse, productsResponse, contentResponse] = await Promise.all([

@@ -7,7 +7,7 @@ import {
   Eye,
   Edit,
   Trash2,
-  Clone,
+  Copy,
   FileText,
   Users,
   TrendingUp,
@@ -668,7 +668,7 @@ const AllPosts: React.FC = () => {
                             className="text-green-600 hover:text-green-700"
                             title="복제"
                           >
-                            <Clone className="w-4 h-4" />
+                            <Copy className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeletePost(post.id)}

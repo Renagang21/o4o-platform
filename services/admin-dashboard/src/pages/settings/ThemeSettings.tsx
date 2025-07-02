@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Check, Palette, Moon, Sun } from 'lucide-react'
-import { useMultiTheme, ThemeName, themes } from '@/shared/components/theme/MultiThemeContext'
+import { useMultiTheme, ThemeName, themes } from '@shared/components/theme/MultiThemeContext'
 
 const ThemeSettings: React.FC = () => {
   const { currentTheme, setTheme } = useMultiTheme()

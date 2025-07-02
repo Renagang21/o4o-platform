@@ -12,7 +12,7 @@ import {
   AlertCircle,
   CheckCircle,
   Settings,
-  Test,
+  TestTube,
   Link as LinkIcon,
   Smartphone
 } from 'lucide-react'

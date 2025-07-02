@@ -8,7 +8,7 @@ import {
   Server, 
   Database, 
   HardDrive, 
-  Memory, 
+  MemoryStick, 
   Wifi, 
   Clock,
   AlertTriangle,
@@ -161,7 +161,7 @@ const SystemHealth: React.FC<SystemHealthProps> = ({
     {
       key: 'memory',
       name: '메모리',
-      icon: <Memory className="w-4 h-4" />,
+      icon: <MemoryStick className="w-4 h-4" />,
       data: health?.memory,
       details: health?.memory ? 
         `${formatBytes(health.memory.usage)} / ${formatBytes(health.memory.total)} (${formatPercentage(health.memory.usage, health.memory.total)}%)` : ''
@@ -257,15 +257,15 @@ const SystemHealth: React.FC<SystemHealthProps> = ({
                     <div>
                       <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                         <span>사용량</span>
-                        <span>{formatPercentage(data.usage, data.total)}%</span>
+                        <span>{('usage' in data && 'total' in data) ? formatPercentage(data.usage, data.total) : '0'}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${
-                            data.usage / data.total > 0.8 ? 'bg-red-500' :
-                            data.usage / data.total > 0.6 ? 'bg-yellow-500' : 'bg-green-500'
+                            ('usage' in data && 'total' in data) && data.usage / data.total > 0.8 ? 'bg-red-500' :
+                            ('usage' in data && 'total' in data) && data.usage / data.total > 0.6 ? 'bg-yellow-500' : 'bg-green-500'
                           }`}
-                          style={{ width: `${Math.min((data.usage / data.total) * 100, 100)}%` }}
+                          style={{ width: `${('usage' in data && 'total' in data) ? Math.min((data.usage / data.total) * 100, 100) : 0}%` }}
                         ></div>
                       </div>
                     </div>

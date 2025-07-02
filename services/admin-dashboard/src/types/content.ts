@@ -251,6 +251,12 @@ export interface Template {
   createdBy: string
   createdAt: string
   updatedAt: string
+  source?: string // Template source (custom, system, etc.)
+  is_active?: boolean // Active status
+  preview_image?: string // Preview image URL
+  template_data?: any // Template specific data
+  created_at?: string // Snake case version of createdAt
+  updated_at?: string // Snake case version of updatedAt
 }
 
 export interface Menu {

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Handshake, Clock, DollarSign, Star, ArrowUpRight, Construction } from 'lucide-react';
+import { Users, Clock, DollarSign, Star, ArrowUpRight, Construction } from 'lucide-react';
 
 interface PartnerStatsProps {
   data?: {
@@ -131,7 +131,7 @@ const PartnerStats: React.FC<PartnerStatsProps> = ({ data, isLoading = false }) 
             </p>
           </div>
           <div className="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center">
-            <Handshake className="w-6 h-6 text-indigo-600" />
+            <Users className="w-6 h-6 text-indigo-600" />
           </div>
         </div>
 

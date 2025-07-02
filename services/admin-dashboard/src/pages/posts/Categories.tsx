@@ -290,7 +290,7 @@ const Categories: React.FC = () => {
               
               {/* Status */}
               {!category.isActive && (
-                <EyeOff className="w-4 h-4 text-red-500" title="비활성" />
+                <EyeOff className="w-4 h-4 text-red-500" />
               )}
             </div>
             
