@@ -4,7 +4,7 @@
   "description": "O4O Platform - Microservices Architecture",
   "private": true,
   "workspaces": [
-    "services/*"
+    "apps/*"
   ],
   "engines": {
     "node": ">=20.0.0 <21.0.0",
