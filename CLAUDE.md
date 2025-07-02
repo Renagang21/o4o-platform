@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 🚨 중요 프로젝트 방침 (IMPORTANT PROJECT POLICIES)
 
 ### ⚠️ 환경 설정 방침
-- **Docker 사용 안 함**: AWS Lightsail을 사용하고 있어서 MVP 제작 과정에서는 Docker를 사용하지 않습니다
+- **Docker 사용 안 함**: 현재 개발 환경에는 Docker가 설치되어 있지 않으며, AWS Lightsail을 사용하고 있어서 MVP 제작 과정에서는 Docker를 사용하지 않습니다
 - **개발 환경**: WSL Ubuntu + Node.js 직접 설치 방식 사용
 - **배포 환경**: AWS Lightsail (neture.co.kr)
 - **프로세스 관리**: 컨테이너화 없이 PM2로 직접 관리
@@ -22,7 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Node.js 18.19.1 → 20 업그레이드 필요
 - 개발 서버 실행 시 네트워크 설정 확인 필요
 
-**중요**: Docker나 컨테이너 관련 솔루션을 제안하지 마세요. 현재 프로젝트는 직접 Node.js를 실행하는 방식으로 진행합니다.
+**중요**: Docker나 컨테이너 관련 솔루션을 제안하지 마세요. 개발 환경에 Docker가 설치되어 있지 않으며, 현재 프로젝트는 직접 Node.js를 실행하는 방식으로 진행합니다.
 
 ## 🚀 Quick Start Commands
 
@@ -325,7 +325,7 @@ NODE_ENV=development
 3. **API responses follow standard format** - maintain consistency
 4. **Role-based access control** is critical - test with different user roles
 5. **Transaction integrity** must be maintained in all order operations
-6. **NO Docker** - 직접 Node.js와 PostgreSQL을 로컬에 설치하여 사용
+6. **NO Docker** - 개발 환경에 Docker가 설치되어 있지 않으므로 직접 Node.js와 PostgreSQL을 로컬에 설치하여 사용
 7. **환경 이슈 대응** - WSL 포트 바인딩 문제 시 네트워크 설정 확인
 8. **Node.js 버전** - 20.x 버전 필수 (18.x에서는 일부 패키지 호환성 문제)
 
