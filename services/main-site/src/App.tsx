@@ -6,7 +6,7 @@ import { useAuthStore } from './stores/authStore';
 import Login from './pages/auth/Login';
 import AuthCallback from './pages/auth/AuthCallback';
 
-// User Type Dashboards
+// User Type Dashboards (non-shared components)
 import AdminDashboard from './pages/admin/Dashboard';
 import SupplierDashboard from './pages/supplier/Dashboard';
 import SupplierProductList from './pages/supplier/ProductList';
@@ -18,31 +18,26 @@ import CustomerShop from './pages/customer/Shop';
 // Digital Signage Pages
 import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
-// TheDANG Style Home
+// TheDANG Style Home (without editor)
 import TheDANGStyleHome from './pages/TheDANGStyleHome';
-import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
-
-// Fullscreen Editor Test
-import { FullScreenEditorSimpleTest } from './pages/FullScreenEditorSimpleTest';
-
-// Admin Dashboard Test
-import { AdminDashboardTest } from './pages/AdminDashboardTest';
-
-// Dropshipping
-import { DropshippingPage } from './pages/DropshippingPage';
-
-// Healthcare
-import { HealthcarePage } from './pages/healthcare';
-import HealthcareDemo from './components/healthcare/HealthcareDemo';
+// Temporarily disabled: import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
 
 // Test Dashboard
 import { TestDashboard } from './features/test-dashboard';
 
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
-import { 
-  ErrorBoundary,
-} from './components/ErrorBoundary';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Temporary placeholder for disabled features
+const DisabledFeaturePage: React.FC = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <h1 className="text-2xl font-bold text-gray-900 mb-4">Feature Temporarily Disabled</h1>
+      <p className="text-gray-600">This feature is temporarily disabled during production build conversion.</p>
+    </div>
+  </div>
+);
 
 const App: React.FC = () => {
   const { checkAuth } = useAuthStore();
@@ -53,137 +48,53 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        {/* Toast 컴포넌트 임시 제거 - 504 에러 해결 후 복구 예정 */}
-        
+    <ErrorBoundary>
+      <Router>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<TheDANGStyleHome />} />
-          <Route path="/home" element={<TheDANGStyleHome />} />
-          <Route path="/editor/home" element={
-            <EditorErrorBoundary>
-              <TheDANGStyleEditorPage />
-            </EditorErrorBoundary>
-          } />
-          <Route path="/editor-fullscreen" element={
-            <EditorErrorBoundary>
-              <FullScreenEditorSimpleTest />
-            </EditorErrorBoundary>
-          } />
-          <Route path="/admin-test/*" element={
-            <AdminErrorBoundary>
-              <AdminDashboardTest />
-            </AdminErrorBoundary>
-          } />
-          <Route path="/dropshipping/*" element={
-            <DropshippingErrorBoundary>
-              <DropshippingPage />
-            </DropshippingErrorBoundary>
-          } />
-          <Route path="/healthcare" element={
-            <HealthcareErrorBoundary>
-              <HealthcarePage />
-            </HealthcareErrorBoundary>
-          } />
-          <Route path="/healthcare/demo" element={
-            <HealthcareErrorBoundary>
-              <HealthcareDemo />
-            </HealthcareErrorBoundary>
-          } />
-          
-          {/* Test Dashboard */}
-          <Route path="/test-dashboard" element={
-            <ErrorBoundary fallback={
-              <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">테스트 대시보드 오류</h2>
-                  <p className="text-gray-600 mb-4">테스트 대시보드에 일시적인 문제가 있습니다.</p>
-                  <a href="/healthcare" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    헬스케어 페이지로 이동
-                  </a>
-                </div>
-              </div>
-            }>
-              <TestDashboard />
-            </ErrorBoundary>
-          } />
-          
-          <Route path="/auth/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           
-          {/* Protected Routes - Admin */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <PrivateRoute allowedUserTypes={['admin']}>
-                <AdminDashboard />
-              </PrivateRoute>
-            }
-          />
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </PrivateRoute>
+          } />
           
-          {/* Protected Routes - Supplier */}
-          <Route
-            path="/supplier/dashboard"
-            element={
-              <PrivateRoute allowedUserTypes={['supplier']}>
-                <SupplierDashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/supplier/products"
-            element={
-              <PrivateRoute allowedUserTypes={['supplier']}>
-                <SupplierProductList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/supplier/products/new"
-            element={
-              <PrivateRoute allowedUserTypes={['supplier']}>
-                <SupplierProductForm />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/supplier/products/:id"
-            element={
-              <PrivateRoute allowedUserTypes={['supplier']}>
-                <SupplierProductDetail />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/supplier/products/:id/edit"
-            element={
-              <PrivateRoute allowedUserTypes={['supplier']}>
-                <SupplierProductForm />
-              </PrivateRoute>
-            }
-          />
+          {/* Protected Supplier Routes */}
+          <Route path="/supplier" element={
+            <PrivateRoute allowedRoles={['supplier']}>
+              <SupplierDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/supplier/products" element={
+            <PrivateRoute allowedRoles={['supplier']}>
+              <SupplierProductList />
+            </PrivateRoute>
+          } />
+          <Route path="/supplier/products/new" element={
+            <PrivateRoute allowedRoles={['supplier']}>
+              <SupplierProductForm />
+            </PrivateRoute>
+          } />
+          <Route path="/supplier/products/:id" element={
+            <PrivateRoute allowedRoles={['supplier']}>
+              <SupplierProductDetail />
+            </PrivateRoute>
+          } />
           
-          {/* Protected Routes - Retailer */}
-          <Route
-            path="/retailer/dashboard"
-            element={
-              <PrivateRoute allowedUserTypes={['retailer']}>
-                <RetailerDashboard />
-              </PrivateRoute>
-            }
-          />
+          {/* Protected Retailer Routes */}
+          <Route path="/retailer" element={
+            <PrivateRoute allowedRoles={['retailer']}>
+              <RetailerDashboard />
+            </PrivateRoute>
+          } />
           
-          {/* Protected Routes - Customer */}
-          <Route
-            path="/shop"
-            element={
-              <PrivateRoute allowedUserTypes={['customer']}>
-                <CustomerShop />
-              </PrivateRoute>
-            }
-          />
-
+          {/* Customer Routes */}
+          <Route path="/shop" element={<CustomerShop />} />
+          
           {/* Digital Signage Routes */}
           <Route
             path="/signage"
@@ -202,11 +113,23 @@ const App: React.FC = () => {
             }
           />
 
+          {/* Test Dashboard */}
+          <Route path="/test-dashboard" element={<TestDashboard />} />
+          
+          {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
+          <Route path="/editor" element={<DisabledFeaturePage />} />
+          <Route path="/editor-demo" element={<DisabledFeaturePage />} />
+          <Route path="/thedang-editor" element={<DisabledFeaturePage />} />
+          <Route path="/fullscreen-editor" element={<DisabledFeaturePage />} />
+          <Route path="/admin-test" element={<DisabledFeaturePage />} />
+          <Route path="/dropshipping" element={<DisabledFeaturePage />} />
+          <Route path="/healthcare" element={<DisabledFeaturePage />} />
+          
           {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/auth/login" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
-    </Router>
+      </Router>
+    </ErrorBoundary>
   );
 };
 

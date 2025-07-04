@@ -5,6 +5,8 @@ import {
   Settings, Eye, Tv, RefreshCw, Clock 
 } from 'lucide-react';
 import Navbar from '../../components/Navbar';
+import { BetaFeedbackWidget } from '../../components/beta/BetaFeedbackWidget';
+import { EnhancedBetaFeedbackWidget } from '../../components/beta/LiveSupportWidget';
 
 interface SignageContent {
   id: string;
@@ -308,6 +310,12 @@ const SignageDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Enhanced Beta Feedback Widget with Live Support */}
+      <EnhancedBetaFeedbackWidget 
+        page="signage-dashboard" 
+        feature="signage_management"
+      />
     </div>
   );
 };

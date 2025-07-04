@@ -19,25 +19,33 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["../../shared/*"],
-      "@shared/editor": ["../../shared/components/editor"],
-      "@shared/editor/*": ["../../shared/components/editor/*"],
-      "@shared/dropshipping": ["../../shared/components/dropshipping"],
-      "@shared/dropshipping/*": ["../../shared/components/dropshipping/*"],
-      "@shared/healthcare": ["../../shared/components/healthcare"],
-      "@shared/healthcare/*": ["../../shared/components/healthcare/*"],
-      "@shared/ui": ["../../shared/components/ui"],
-      "@shared/ui/*": ["../../shared/components/ui/*"],
-      "@o4o/shared/ui": ["../../shared/components/ui"],
-      "@o4o/shared/healthcare": ["../../shared/components/healthcare"]
+      "@o4o/ui": ["../../packages/ui"],
+      "@o4o/ui/*": ["../../packages/ui/*"],
+      "@o4o/lib": ["../../packages/lib"],
+      "@o4o/lib/*": ["../../packages/lib/*"],
+      "@o4o/types": ["../../packages/types"],
+      "@o4o/types/*": ["../../packages/types/*"],
+      "@o4o/config": ["../../packages/config"],
+      "@o4o/config/*": ["../../packages/config/*"]
     },
 
-    /* Linting */
-    "strict": false,
-    "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    /* Linting - STRICT MODE ENABLED */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false
   },
   "include": ["src"],
   "exclude": [

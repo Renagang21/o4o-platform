@@ -1,6 +1,6 @@
 import React from 'react';
-import { MultiThemeProvider } from '../../../../shared/components/theme/MultiThemeContext';
-import { ThemeSelector, ThemeSelectorCompact } from '../../../../shared/components/theme/ThemeSelector';
+import { MultiThemeProvider } from '@o4o/ui/theme/MultiThemeContext';
+import { ThemeSelector, ThemeSelectorCompact } from '@o4o/ui/theme/ThemeSelector';
 
 // Example of how to integrate the new theme system into the existing app
 export const ThemeIntegrationExample: React.FC = () => {

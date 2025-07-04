@@ -8,20 +8,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@shared': path.resolve(__dirname, '../../shared'),
-      '@shared/editor': path.resolve(__dirname, '../../shared/components/editor'),
-      '@shared/editor/fullscreen': path.resolve(__dirname, '../../shared/components/editor/fullscreen'),
-      '@shared/admin': path.resolve(__dirname, '../../shared/components/admin'),
-      '@shared/theme': path.resolve(__dirname, '../../shared/components/theme'),
-      '@shared/components/admin': path.resolve(__dirname, '../../shared/components/admin'),
-      '@shared/components/ui': path.resolve(__dirname, '../../shared/components/ui'),
-      '@shared/components/dropshipping': path.resolve(__dirname, '../../shared/components/dropshipping'),
-      '@shared/components/healthcare': path.resolve(__dirname, '../../shared/components/healthcare'),
-      '@shared/ui': path.resolve(__dirname, '../../shared/components/ui'),
-      '@shared/dropshipping': path.resolve(__dirname, '../../shared/components/dropshipping'),
-      '@shared/healthcare': path.resolve(__dirname, '../../shared/components/healthcare'),
-      '@o4o/shared/ui': path.resolve(__dirname, '../../shared/components/ui'),
-      '@o4o/shared/healthcare': path.resolve(__dirname, '../../shared/components/healthcare'),
+      '@o4o/ui': path.resolve(__dirname, '../../packages/ui'),
+      '@o4o/lib': path.resolve(__dirname, '../../packages/lib'),
+      '@o4o/types': path.resolve(__dirname, '../../packages/types'),
+      '@o4o/config': path.resolve(__dirname, '../../packages/config'),
     },
   },
   server: {
@@ -38,17 +28,9 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
   build: {
-    sourcemap: process.env.NODE_ENV === 'development',
-    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
-    target: 'es2015',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'utils': ['zustand', 'axios', 'react-hot-toast'],
-        },
-      },
-    },
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2020',
   },
   optimizeDeps: {
     exclude: ['@vite/client', '@vite/env'],

@@ -5,7 +5,7 @@ import {
   AllPages,
   AddNewPage,
   PageEditor
-} from '@shared/components/admin';
+} from '@o4o/ui/admin';
 
 type AdminPage = 'dashboard' | 'pages' | 'pages-new' | 'pages-edit';
 

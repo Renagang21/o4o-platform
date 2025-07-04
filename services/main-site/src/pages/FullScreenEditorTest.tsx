@@ -1,5 +1,5 @@
 import React from 'react';
-import { FullScreenEditor } from '@shared/components/editor';
+import { FullScreenEditor } from '@o4o/ui/editor';
 
 export function FullScreenEditorTest() {
   const handleSave = async (content: string) => {

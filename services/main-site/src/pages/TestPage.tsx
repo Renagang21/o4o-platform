@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { NotionEditor } from '@shared/components/editor/NotionEditor';
-import { GutenbergEditor } from '@shared/components/editor/GutenbergEditor';
+import { NotionEditor } from '@o4o/ui/editor/NotionEditor';
+import { GutenbergEditor } from '@o4o/ui/editor/GutenbergEditor';
 
 const TestPage: React.FC = () => {
   const [showNotionEditor, setShowNotionEditor] = useState(false);

@@ -18,11 +18,11 @@ import {
   ExternalLink,
   Copy
 } from 'lucide-react';
-import { TiptapEditor } from '@shared/components/editor/TiptapEditor';
-import { EnhancedTiptapEditor } from '@shared/components/editor/EnhancedTiptapEditor';
-import { ContentCloneManager } from '@shared/components/editor/ContentCloneManager';
-import SEOMetadataManager from '@shared/components/editor/SEOMetadataManager';
-import ContentPreview from '@shared/components/editor/ContentPreview';
+import { TiptapEditor } from '@o4o/ui/editor/TiptapEditor';
+import { EnhancedTiptapEditor } from '@o4o/ui/editor/EnhancedTiptapEditor';
+import { ContentCloneManager } from '@o4o/ui/editor/ContentCloneManager';
+import SEOMetadataManager from '@o4o/ui/editor/SEOMetadataManager';
+import ContentPreview from '@o4o/ui/editor/ContentPreview';
 import { JSONContent } from '@tiptap/react';
 
 // 컨텐츠 타입 정의
