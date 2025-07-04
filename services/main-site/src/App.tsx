@@ -40,11 +40,12 @@ const DisabledFeaturePage: React.FC = () => (
 );
 
 const App: React.FC = () => {
-  const { initialize, isAuthenticated, user } = useAuthStore();
+  const { checkAuth } = useAuthStore();
 
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    // 앱 시작 시 인증 상태 확인
+    checkAuth();
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -95,8 +96,23 @@ const App: React.FC = () => {
           <Route path="/shop" element={<CustomerShop />} />
           
           {/* Digital Signage Routes */}
-          <Route path="/signage" element={<DigitalSignageDashboard />} />
-          
+          <Route
+            path="/signage"
+            element={
+                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                  <DigitalSignageDashboard />
+                </PrivateRoute>
+            }
+          />
+          <Route
+            path="/signage/*"
+            element={
+                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                  <DigitalSignageDashboard />
+                </PrivateRoute>
+            }
+          />
+
           {/* Test Dashboard */}
           <Route path="/test-dashboard" element={<TestDashboard />} />
           
