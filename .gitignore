@@ -169,4 +169,3 @@ config/development.json
 !.gitlab-ci.yml
 !.travis.yml
 !.circleci/
-.archive/
