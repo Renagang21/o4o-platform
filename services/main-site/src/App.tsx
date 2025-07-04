@@ -42,11 +42,6 @@ import { TestDashboard } from './features/test-dashboard';
 import PrivateRoute from './components/auth/PrivateRoute';
 import { 
   ErrorBoundary,
-  DropshippingErrorBoundary,
-  HealthcareErrorBoundary,
-  EditorErrorBoundary,
-  AdminErrorBoundary,
-  SignageErrorBoundary
 } from './components/ErrorBoundary';
 
 const App: React.FC = () => {
@@ -193,21 +188,17 @@ const App: React.FC = () => {
           <Route
             path="/signage"
             element={
-              <SignageErrorBoundary>
                 <PrivateRoute allowedUserTypes={['admin', 'manager']}>
                   <DigitalSignageDashboard />
                 </PrivateRoute>
-              </SignageErrorBoundary>
             }
           />
           <Route
             path="/signage/*"
             element={
-              <SignageErrorBoundary>
                 <PrivateRoute allowedUserTypes={['admin', 'manager']}>
                   <DigitalSignageDashboard />
                 </PrivateRoute>
-              </SignageErrorBoundary>
             }
           />
 

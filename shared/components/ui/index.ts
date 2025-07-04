@@ -44,5 +44,5 @@ export { default as UserRoleSwitch } from './UserRoleSwitch';
 export { default as ExternalResourceWidget } from './ExternalResourceWidget';
 
 // Additional UI components that may exist
-export { default as DropdownMenu } from './Dropdown-menu';
+// // export { default as DropdownMenu } from './Dropdown-menu';
 export { default as ScrollArea } from './Scroll-area';

@@ -64,7 +64,7 @@ const TaxSettings: React.FC = () => {
   const loadSettings = async () => {
     try {
       setLoading(true)
-      const response = await EcommerceApi.getTaxSettings()
+      const response = await EcommerceApi.getSettings()
       setSettings(response.data)
     } catch (error) {
       console.error('Failed to load tax settings:', error)
@@ -77,7 +77,7 @@ const TaxSettings: React.FC = () => {
   const handleSave = async () => {
     try {
       setSaving(true)
-      await EcommerceApi.updateTaxSettings(settings)
+      await EcommerceApi.updateSettings(settings)
       setHasChanges(false)
       toast.success('세금 설정이 저장되었습니다.')
     } catch (error) {
