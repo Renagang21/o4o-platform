@@ -2,9 +2,35 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🌐 GitHub 저장소 정보
+## 🌐 GitHub 저장소 정보 및 아키텍처
 
-### 주요 저장소
+### 📁 Multi-Repo + Shared Core 아키텍처
+
+**전체 저장소 구조:**
+- **o4o-platform**: 메인 플랫폼 (프론트엔드, 전자상거래, 메인 서비스) - https://github.com/Renagang21/o4o-platform
+- **common-core**: 공통 기능 모듈 (인증, 결제, 유틸리티) - https://github.com/Renagang21/common-core
+- **ai-services**: AI 관련 서비스 (향후 계획)
+- **rpa-services**: RPA 관련 서비스 (향후 계획)
+
+### 🏗️ 아키텍처 패턴: Multi-Repo + Shared Core
+
+**핵심 설계 원칙:**
+1. **도메인별 독립 저장소**: 각 주요 서비스(o4o-platform 등)는 별도의 독립 저장소로 운영
+2. **중앙 집중형 공통 모듈**: 인증, 결제, 공통 라이브러리는 common-core 저장소에서 중앙 관리
+3. **패키지 기반 재사용**: 다양한 서비스/언어에서 공통 코어를 NPM 패키지 형태로 재사용
+4. **Cross-domain 호환성**: 여러 도메인 서비스 간 일관된 공통 기능 제공
+
+**현재 개발 상태:**
+- **o4o-platform**: 🔥 **주력 개발 중** (React 19, Node.js 20, TypeScript 5.8)
+- **common-core**: 📦 필요 시 연동/확장 (인증, 결제 모듈 포함)
+- **기타 서비스**: 📋 향후 확장 계획
+
+**협업 및 용어:**
+- "Multi-Repo + Shared Core" 또는 "Cross-domain Shared Core" 구조로 명명
+- 각 개별 서비스는 monorepo/mini-monorepo 구조 가능
+- 공통 모듈은 common-core에서 버전 관리 및 배포
+
+### 주요 저장소 링크
 - **메인 플랫폼**: https://github.com/Renagang21/o4o-platform
 - **문서**: https://github.com/Renagang21/o4o-platform/tree/main/docs  
 - **공통 코어**: https://github.com/Renagang21/common-core
@@ -88,20 +114,34 @@ npm run migration:revert   # Revert last migration
 
 ## 🏗️ Architecture Overview
 
-### Project Structure
-This is a **monorepo workspace** with microservices architecture:
+### o4o-platform 내부 구조 (Mini-Monorepo)
+현재 **o4o-platform**은 **monorepo workspace** 구조로 여러 마이크로서비스를 포함:
 
 ```
 o4o-platform/
-├── services/
-│   ├── api-server/          # Express.js + TypeORM + PostgreSQL
-│   ├── main-site/           # React 19 + Vite + TailwindCSS  
-│   ├── ecommerce/           # E-commerce modules
-│   └── [other-services]/    # Future microservices
-├── scripts/                 # Automation scripts
-├── docs/                    # Comprehensive documentation
-└── .github/workflows/       # CI/CD automation
+├── 📁 services/                 # 마이크로서비스들
+│   ├── api-server/              # Express.js + TypeORM + PostgreSQL (활성)
+│   ├── main-site/               # React 19 + Vite + TailwindCSS (활성)
+│   ├── admin-dashboard/         # 관리자 대시보드 (활성)
+│   ├── crowdfunding/            # 크라우드펀딩 서비스 (부분 구현)
+│   ├── ecommerce/               # 이커머스 서비스 (레거시)
+│   ├── forum/                   # 포럼 서비스 (플레이스홀더)
+│   └── signage/                 # 사이니지 서비스 (플레이스홀더)
+├── 📁 packages/                 # 공통 패키지 (Phase 2에서 추가됨)
+│   ├── ui/                      # UI 컴포넌트 라이브러리
+│   ├── lib/                     # 공통 라이브러리
+│   ├── types/                   # TypeScript 타입 정의
+│   └── config/                  # 설정 파일들
+├── 📁 scripts/                  # 자동화 스크립트
+├── 📁 docs/                     # 종합 문서
+├── 📁 .github/workflows/        # CI/CD 자동화
+└── 📄 설정 파일들                # package.json, tsconfig.json 등
 ```
+
+**Multi-Repo + Shared Core와의 관계:**
+- **o4o-platform**: 메인 플랫폼의 모든 서비스를 하나의 저장소에서 관리 (Mini-Monorepo)
+- **common-core**: 여러 저장소에서 공유할 수 있는 핵심 기능 (Cross-Repo 공유)
+- 향후 **ai-services**, **rpa-services** 등이 별도 저장소로 생성될 때 common-core를 공유 사용
 
 ### Core Technologies
 - **Backend**: Node.js 20, TypeScript 5.8, Express.js, TypeORM
@@ -403,3 +443,19 @@ git commit -m "fix: [구체적 수정 내용]"
 - [ ] Build 성공 확인
 
 **이 지침서는 프론트엔드 작업의 모든 기준이 됩니다. 새로운 기능 개발 시 반드시 준수해주세요.**
+
+## 🔹 아키텍처 참고사항 (Architecture Reference)
+
+### Multi-Repo + Shared Core 개념 요약
+이 프로젝트는 **Multi-Repo + Shared Core** 아키텍처를 채택하여:
+1. **확장성**: 각 도메인별 독립 저장소로 수평 확장 용이
+2. **모듈화**: 공통 기능의 중앙 집중 관리로 코드 재사용성 극대화  
+3. **유연성**: 다양한 기술 스택과 언어 환경에서의 공통 모듈 활용
+4. **협업 효율성**: 팀별 독립 개발과 공통 표준의 균형
+
+### 향후 확장 시 고려사항
+- AI/ML 서비스, RPA 서비스 등 신규 도메인 추가 시 별도 저장소 생성
+- 인증, 결제, 공통 유틸리티는 common-core에서 NPM 패키지로 제공
+- 각 서비스는 독립적 배포/버전 관리하되 공통 모듈은 표준화된 인터페이스 유지
+
+**이 구조는 확장 가능한 마이크로서비스 생태계 구축을 목표로 설계되었습니다.**
