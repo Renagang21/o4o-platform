@@ -1,0 +1,431 @@
+name: Deploy Main Site (Production)
+
+# 메인 사이트 점진적 배포 워크플로우
+# 트리거: services/main-site 경로 변경 시
+# 단계: Build → Optimize → Deploy → Health Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/main-site/**'
+      - 'shared/**'
+      - '.github/workflows/deploy-main-site.yml'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy without path changes'
+        required: false
+        default: 'false'
+
+env:
+  SERVICE_NAME: main-site
+  SERVICE_PORT: 3000
+  PM2_APP_NAME: o4o-main-site
+  DEPLOY_PATH: /home/ubuntu/o4o-platform
+  NODE_VERSION: '20.x'
+
+jobs:
+  # 단계 1: 빌드 및 최적화
+  build-and-optimize:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd services/main-site
+        npm ci
+        
+    - name: TypeScript type check
+      run: |
+        cd services/main-site
+        npm run type-check
+        
+    - name: ESLint check
+      run: |
+        cd services/main-site
+        npm run lint
+        
+    - name: Build shared components
+      run: |
+        cd shared
+        npm run build
+        
+    - name: Create production environment file
+      run: |
+        cd services/main-site
+        cat > .env.production << 'EOF'
+        NODE_ENV=production
+        VITE_API_BASE_URL=https://api.neture.co.kr
+        VITE_APP_TITLE=O4O Platform
+        VITE_ADMIN_URL=https://admin.neture.co.kr
+        VITE_SITE_URL=https://neture.co.kr
+        VITE_ENABLE_ANALYTICS=true
+        VITE_ENABLE_ERROR_REPORTING=true
+        VITE_BUILD_TIMESTAMP=${{ github.run_number }}
+        EOF
+        
+    - name: Build application for production
+      run: |
+        cd services/main-site
+        npm run build
+        
+    - name: Analyze bundle size
+      run: |
+        cd services/main-site
+        npm run build:analyze || true
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: main-site-build
+        path: |
+          services/main-site/dist/
+          services/main-site/package.json
+          services/main-site/package-lock.json
+          services/main-site/.env.production
+        retention-days: 1
+        
+    - name: Upload build analysis
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-analysis
+        path: |
+          services/main-site/dist/stats.html
+          services/main-site/dist/bundle-analyzer-report.html
+        retention-days: 7
+        if-no-files-found: ignore
+
+  # 단계 2: 성능 및 보안 테스트
+  quality-check:
+    needs: build-and-optimize
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: main-site-build
+        path: services/main-site/
+        
+    - name: Setup Lighthouse CI
+      run: npm install -g @lhci/cli@0.12.x
+      
+    - name: Run Lighthouse CI
+      run: |
+        cd services/main-site
+        lhci autorun --config=../../.lighthouserc.json || true
+        
+    - name: Security audit
+      run: |
+        cd services/main-site
+        npm audit --audit-level=high || true
+
+  # 단계 3: 운영 서버 배포
+  deploy:
+    needs: [build-and-optimize, quality-check]
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: main-site-build
+        path: services/main-site/
+        
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Create backup of current deployment
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          if [ -d 'services/main-site' ]; then
+            echo 'Creating backup of current main-site...'
+            rm -rf services/main-site.backup
+            cp -r services/main-site services/main-site.backup
+          fi
+        "
+        
+    - name: Create deployment directory
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          mkdir -p ${{ env.DEPLOY_PATH }}/services/main-site
+        "
+        
+    - name: Deploy static files to Nginx
+      run: |
+        # 정적 파일을 별도 디렉토리에 배포 (CDN 역할)
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          mkdir -p /var/www/neture.co.kr
+        "
+        
+        rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          services/main-site/dist/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:/var/www/neture.co.kr/
+          
+    - name: Deploy application files
+      run: |
+        rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          services/main-site/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/services/main-site/
+          
+    - name: Install production dependencies
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/services/main-site
+          npm ci --only=production
+        "
+        
+    - name: Setup PM2 ecosystem file
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cat > ${{ env.DEPLOY_PATH }}/main-site.ecosystem.config.js << 'EOF'
+          module.exports = {
+            apps: [{
+              name: '${{ env.PM2_APP_NAME }}',
+              script: 'serve',
+              args: [
+                'dist',
+                '-s',
+                '-l', '${{ env.SERVICE_PORT }}',
+                '--cors'
+              ],
+              cwd: '${{ env.DEPLOY_PATH }}/services/main-site',
+              instances: 'max',
+              exec_mode: 'cluster',
+              max_memory_restart: '512M',
+              error_file: '${{ env.DEPLOY_PATH }}/logs/main-site-error.log',
+              out_file: '${{ env.DEPLOY_PATH }}/logs/main-site-out.log',
+              log_file: '${{ env.DEPLOY_PATH }}/logs/main-site-combined.log',
+              time: true,
+              autorestart: true,
+              max_restarts: 10,
+              min_uptime: '10s',
+              kill_timeout: 30000,
+              env: {
+                NODE_ENV: 'production',
+                PORT: '${{ env.SERVICE_PORT }}'
+              }
+            }]
+          };
+          EOF
+        "
+        
+    - name: Install serve globally
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          npm install -g serve@14
+        "
+        
+    - name: Deploy with PM2 (Zero-downtime)
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          
+          # PM2 프로세스 존재 여부 확인
+          if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
+            echo 'Reloading existing PM2 process...'
+            pm2 reload main-site.ecosystem.config.js --update-env
+          else
+            echo 'Starting new PM2 process...'
+            pm2 start main-site.ecosystem.config.js
+          fi
+          
+          # PM2 상태 저장
+          pm2 save
+        "
+
+  # 단계 4: 배포 후 헬스체크 및 성능 테스트
+  health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Wait for service startup
+      run: sleep 30
+      
+    - name: Basic health check
+      run: |
+        for i in {1..10}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://neture.co.kr/ || echo "000")
+            
+          if [ "$response" = "200" ]; then
+            echo "✅ 메인 사이트 헬스체크 성공 (응답 코드: $response)"
+            break
+          else
+            echo "⏳ 메인 사이트 헬스체크 대기 중... (시도 $i/10, 응답 코드: $response)"
+            if [ $i -eq 10 ]; then
+              echo "❌ 메인 사이트 헬스체크 실패"
+              exit 1
+            fi
+            sleep 10
+          fi
+        done
+        
+    - name: Static assets check
+      run: |
+        # 주요 정적 자원 확인
+        assets=(
+          "/assets/index.css"
+          "/assets/index.js"
+          "/favicon.ico"
+        )
+        
+        for asset in "${assets[@]}"; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://neture.co.kr$asset")
+            
+          if [ "$response" = "200" ]; then
+            echo "✅ 정적 자원 확인 성공: $asset"
+          else
+            echo "⚠️  정적 자원 확인 실패: $asset (응답 코드: $response)"
+          fi
+        done
+        
+    - name: Page load speed test
+      run: |
+        # 페이지 로드 시간 측정
+        load_time=$(curl -s -o /dev/null -w "%{time_total}" https://neture.co.kr/)
+        
+        echo "📊 페이지 로드 시간: ${load_time}초"
+        
+        # 3초 이상이면 경고
+        if (( $(echo "$load_time > 3.0" | bc -l) )); then
+          echo "⚠️  페이지 로드 시간이 느립니다 (${load_time}초)"
+        else
+          echo "✅ 페이지 로드 시간 양호 (${load_time}초)"
+        fi
+        
+    - name: API connectivity test
+      run: |
+        # 메인 사이트에서 API 서버 연결 테스트
+        response=$(curl -s "https://neture.co.kr/api/health" || echo "failed")
+        
+        if echo "$response" | grep -q "healthy"; then
+          echo "✅ API 서버 연결 확인 성공"
+        else
+          echo "⚠️  API 서버 연결 확인 필요"
+        fi
+
+  # 단계 5: SEO 및 접근성 검사
+  seo-accessibility-check:
+    needs: health-check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lighthouse CI
+      run: npm install -g @lhci/cli@0.12.x
+      
+    - name: Run production Lighthouse audit
+      run: |
+        lhci autorun \
+          --config=.lighthouserc.json \
+          --collect.url=https://neture.co.kr \
+          --collect.url=https://neture.co.kr/about \
+          --collect.url=https://neture.co.kr/products || true
+          
+    - name: Meta tags verification
+      run: |
+        # 주요 메타 태그 확인
+        content=$(curl -s https://neture.co.kr/)
+        
+        if echo "$content" | grep -q "<title>"; then
+          echo "✅ Title 태그 확인"
+        else
+          echo "❌ Title 태그 누락"
+        fi
+        
+        if echo "$content" | grep -q "description"; then
+          echo "✅ Description 메타 태그 확인"
+        else
+          echo "❌ Description 메타 태그 누락"
+        fi
+        
+        if echo "$content" | grep -q "og:"; then
+          echo "✅ Open Graph 태그 확인"
+        else
+          echo "❌ Open Graph 태그 누락"
+        fi
+
+  # 단계 6: 배포 완료 알림
+  notify:
+    needs: [deploy, health-check, seo-accessibility-check]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Deployment success notification
+      if: needs.health-check.result == 'success'
+      run: |
+        echo "🚀 메인 사이트 배포 성공!"
+        echo "📍 서비스 URL: https://neture.co.kr"
+        echo "🕐 배포 시간: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "📊 헬스체크: 통과"
+        echo "🔍 SEO 검사: 완료"
+        
+    - name: Deployment failure notification
+      if: needs.health-check.result == 'failure' || needs.deploy.result == 'failure'
+      run: |
+        echo "❌ 메인 사이트 배포 실패!"
+        echo "🔍 로그를 확인하여 문제를 해결하세요."
+        exit 1
+
+  # 단계 7: 롤백 준비 (실패 시)
+  rollback:
+    needs: [deploy, health-check]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+    - name: Rollback to previous version
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          
+          # 이전 백업에서 복원
+          if [ -d 'services/main-site.backup' ]; then
+            echo '이전 버전으로 롤백 중...'
+            rm -rf services/main-site
+            mv services/main-site.backup services/main-site
+            
+            # 정적 파일도 복원
+            rsync -av services/main-site/dist/ /var/www/neture.co.kr/
+            
+            # PM2 재시작
+            pm2 restart ${{ env.PM2_APP_NAME }}
+            echo '롤백 완료'
+          else
+            echo '백업 파일이 없습니다. 수동 복구가 필요합니다.'
+          fi
+        "
+        
+    - name: Rollback notification
+      run: |
+        echo "🔄 메인 사이트 롤백 완료"
+        echo "⚠️  수동 확인이 필요합니다."
