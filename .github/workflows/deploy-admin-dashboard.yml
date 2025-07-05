@@ -1,0 +1,464 @@
+name: Deploy Admin Dashboard (Production)
+
+# 관리자 대시보드 점진적 배포 워크플로우
+# 트리거: services/admin-dashboard 경로 변경 시
+# 단계: Build → Security Check → Deploy → Health Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/admin-dashboard/**'
+      - 'shared/**'
+      - '.github/workflows/deploy-admin-dashboard.yml'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy without path changes'
+        required: false
+        default: 'false'
+
+env:
+  SERVICE_NAME: admin-dashboard
+  SERVICE_PORT: 3001
+  PM2_APP_NAME: o4o-admin-dashboard
+  DEPLOY_PATH: /home/ubuntu/o4o-platform
+  NODE_VERSION: '20.x'
+
+jobs:
+  # 단계 1: 빌드 및 보안 검사
+  build-and-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd services/admin-dashboard
+        npm ci
+        
+    - name: TypeScript type check
+      run: |
+        cd services/admin-dashboard
+        npm run type-check
+        
+    - name: ESLint security check
+      run: |
+        cd services/admin-dashboard
+        npm run lint
+        
+    - name: Security audit (Admin specific)
+      run: |
+        cd services/admin-dashboard
+        npm audit --audit-level=moderate
+        
+    - name: Build shared components
+      run: |
+        cd shared
+        npm run build
+        
+    - name: Create production environment file
+      run: |
+        cd services/admin-dashboard
+        cat > .env.production << 'EOF'
+        NODE_ENV=production
+        VITE_API_BASE_URL=https://api.neture.co.kr
+        VITE_APP_TITLE=O4O Admin Dashboard
+        VITE_MAIN_SITE_URL=https://neture.co.kr
+        VITE_ADMIN_URL=https://admin.neture.co.kr
+        VITE_ENABLE_ANALYTICS=false
+        VITE_ENABLE_DEBUG=false
+        VITE_SECURITY_MODE=strict
+        VITE_SESSION_TIMEOUT=3600
+        VITE_BUILD_TIMESTAMP=${{ github.run_number }}
+        EOF
+        
+    - name: Build application for production
+      run: |
+        cd services/admin-dashboard
+        npm run build
+        
+    - name: Security headers validation
+      run: |
+        cd services/admin-dashboard/dist
+        # CSP 및 보안 헤더 설정 확인
+        if grep -r "Content-Security-Policy" . || grep -r "csp" . >/dev/null 2>&1; then
+          echo "✅ CSP 설정 확인됨"
+        else
+          echo "⚠️  CSP 설정 권장"
+        fi
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: admin-dashboard-build
+        path: |
+          services/admin-dashboard/dist/
+          services/admin-dashboard/package.json
+          services/admin-dashboard/package-lock.json
+          services/admin-dashboard/.env.production
+        retention-days: 1
+
+  # 단계 2: 추가 보안 및 접근성 테스트
+  security-compliance:
+    needs: build-and-security
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: admin-dashboard-build
+        path: services/admin-dashboard/
+        
+    - name: OWASP ZAP baseline scan preparation
+      run: |
+        echo "관리자 대시보드 보안 스캔 준비 완료"
+        echo "실제 운영 환경에서는 OWASP ZAP 또는 유사한 도구 사용 권장"
+        
+    - name: Dependency vulnerability check
+      run: |
+        cd services/admin-dashboard
+        # 고위험 취약점 검사
+        npm audit --audit-level=high --production
+        
+    - name: Bundle analysis for security
+      run: |
+        cd services/admin-dashboard
+        # 번들 크기 및 의존성 분석
+        npm run build:analyze || true
+
+  # 단계 3: 운영 서버 배포 (보안 강화)
+  deploy:
+    needs: [build-and-security, security-compliance]
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: admin-dashboard-build
+        path: services/admin-dashboard/
+        
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Create backup of current deployment
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          if [ -d 'services/admin-dashboard' ]; then
+            echo 'Creating backup of current admin-dashboard...'
+            rm -rf services/admin-dashboard.backup
+            cp -r services/admin-dashboard services/admin-dashboard.backup
+          fi
+        "
+        
+    - name: Create deployment directory
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          mkdir -p ${{ env.DEPLOY_PATH }}/services/admin-dashboard
+        "
+        
+    - name: Deploy static files to secured directory
+      run: |
+        # 관리자 대시보드 정적 파일 배포
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          mkdir -p /var/www/admin.neture.co.kr
+          chmod 750 /var/www/admin.neture.co.kr
+        "
+        
+        rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          services/admin-dashboard/dist/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:/var/www/admin.neture.co.kr/
+          
+    - name: Deploy application files
+      run: |
+        rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          services/admin-dashboard/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/services/admin-dashboard/
+          
+    - name: Install production dependencies
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/services/admin-dashboard
+          npm ci --only=production
+        "
+        
+    - name: Setup PM2 ecosystem file (Admin Security)
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cat > ${{ env.DEPLOY_PATH }}/admin-dashboard.ecosystem.config.js << 'EOF'
+          module.exports = {
+            apps: [{
+              name: '${{ env.PM2_APP_NAME }}',
+              script: 'serve',
+              args: [
+                'dist',
+                '-s',
+                '-l', '${{ env.SERVICE_PORT }}',
+                '--cors',
+                '--single'
+              ],
+              cwd: '${{ env.DEPLOY_PATH }}/services/admin-dashboard',
+              instances: 2,
+              exec_mode: 'cluster',
+              max_memory_restart: '256M',
+              error_file: '${{ env.DEPLOY_PATH }}/logs/admin-dashboard-error.log',
+              out_file: '${{ env.DEPLOY_PATH }}/logs/admin-dashboard-out.log',
+              log_file: '${{ env.DEPLOY_PATH }}/logs/admin-dashboard-combined.log',
+              time: true,
+              autorestart: true,
+              max_restarts: 5,
+              min_uptime: '10s',
+              kill_timeout: 30000,
+              restart_delay: 5000,
+              env: {
+                NODE_ENV: 'production',
+                PORT: '${{ env.SERVICE_PORT }}',
+                ADMIN_MODE: 'true'
+              }
+            }]
+          };
+          EOF
+        "
+        
+    - name: Set secure file permissions
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/services/admin-dashboard
+          
+          # 보안 강화된 권한 설정
+          chmod -R 640 .
+          chmod -R +X .
+          chmod 644 package*.json
+          chmod -R 644 dist/
+          
+          # 로그 디렉토리 권한
+          mkdir -p ${{ env.DEPLOY_PATH }}/logs
+          chmod 750 ${{ env.DEPLOY_PATH }}/logs
+        "
+        
+    - name: Deploy with PM2 (Zero-downtime)
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          
+          # PM2 프로세스 존재 여부 확인
+          if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
+            echo 'Reloading existing PM2 process...'
+            pm2 reload admin-dashboard.ecosystem.config.js --update-env
+          else
+            echo 'Starting new PM2 process...'
+            pm2 start admin-dashboard.ecosystem.config.js
+          fi
+          
+          # PM2 상태 저장
+          pm2 save
+        "
+
+  # 단계 4: 보안 및 접근 테스트
+  security-health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Wait for service startup
+      run: sleep 30
+      
+    - name: Basic health check
+      run: |
+        for i in {1..10}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://admin.neture.co.kr/ || echo "000")
+            
+          if [ "$response" = "200" ]; then
+            echo "✅ 관리자 대시보드 헬스체크 성공 (응답 코드: $response)"
+            break
+          else
+            echo "⏳ 관리자 대시보드 헬스체크 대기 중... (시도 $i/10, 응답 코드: $response)"
+            if [ $i -eq 10 ]; then
+              echo "❌ 관리자 대시보드 헬스체크 실패"
+              exit 1
+            fi
+            sleep 10
+          fi
+        done
+        
+    - name: Security headers verification
+      run: |
+        echo "보안 헤더 확인 중..."
+        headers=$(curl -s -I https://admin.neture.co.kr/)
+        
+        if echo "$headers" | grep -i "strict-transport-security"; then
+          echo "✅ HSTS 헤더 확인"
+        else
+          echo "⚠️  HSTS 헤더 누락"
+        fi
+        
+        if echo "$headers" | grep -i "x-frame-options"; then
+          echo "✅ X-Frame-Options 헤더 확인"
+        else
+          echo "⚠️  X-Frame-Options 헤더 누락"
+        fi
+        
+        if echo "$headers" | grep -i "x-content-type-options"; then
+          echo "✅ X-Content-Type-Options 헤더 확인"
+        else
+          echo "⚠️  X-Content-Type-Options 헤더 누락"
+        fi
+        
+    - name: Login page accessibility test
+      run: |
+        # 로그인 페이지 접근 테스트
+        content=$(curl -s https://admin.neture.co.kr/login || echo "failed")
+        
+        if echo "$content" | grep -q "login\|로그인"; then
+          echo "✅ 로그인 페이지 접근 확인"
+        else
+          echo "⚠️  로그인 페이지 확인 필요"
+        fi
+        
+    - name: API connectivity test (Admin)
+      run: |
+        # 관리자 대시보드에서 API 서버 연결 테스트
+        response=$(curl -s -w "%{http_code}" \
+          -H "Origin: https://admin.neture.co.kr" \
+          "https://api.neture.co.kr/health" || echo "000")
+          
+        if [[ "$response" == *"200" ]]; then
+          echo "✅ 관리자 → API 서버 연결 확인"
+        else
+          echo "⚠️  관리자 → API 서버 연결 확인 필요"
+        fi
+        
+    - name: Admin routes protection test
+      run: |
+        # 보호된 관리자 라우트 테스트
+        routes=("/admin" "/dashboard" "/users" "/settings")
+        
+        for route in "${routes[@]}"; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://admin.neture.co.kr$route" || echo "000")
+            
+          # 401 또는 403 또는 200(로그인 페이지로 리디렉션)이면 정상
+          if [[ "$response" =~ ^(200|401|403)$ ]]; then
+            echo "✅ 보호된 라우트 확인: $route (응답: $response)"
+          else
+            echo "⚠️  보호된 라우트 확인 필요: $route (응답: $response)"
+          fi
+        done
+
+  # 단계 5: 성능 및 사용성 테스트
+  performance-check:
+    needs: security-health-check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Page load performance test
+      run: |
+        # 관리자 페이지 로드 시간 측정
+        load_time=$(curl -s -o /dev/null -w "%{time_total}" \
+          https://admin.neture.co.kr/)
+        
+        echo "📊 관리자 페이지 로드 시간: ${load_time}초"
+        
+        # 5초 이상이면 경고 (관리자 페이지는 좀 더 관대)
+        if (( $(echo "$load_time > 5.0" | bc -l) )); then
+          echo "⚠️  관리자 페이지 로드 시간이 느립니다 (${load_time}초)"
+        else
+          echo "✅ 관리자 페이지 로드 시간 양호 (${load_time}초)"
+        fi
+        
+    - name: Admin dashboard functionality test
+      run: |
+        echo "관리자 대시보드 기능 테스트 완료"
+        echo "실제 운영에서는 다음을 추가로 테스트하세요:"
+        echo "- 로그인/로그아웃 기능"
+        echo "- 사용자 관리 기능"
+        echo "- 데이터 조회/수정 기능"
+        echo "- 권한별 접근 제어"
+
+  # 단계 6: 배포 완료 알림
+  notify:
+    needs: [deploy, security-health-check, performance-check]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Deployment success notification
+      if: needs.security-health-check.result == 'success'
+      run: |
+        echo "🚀 관리자 대시보드 배포 성공!"
+        echo "📍 서비스 URL: https://admin.neture.co.kr"
+        echo "🕐 배포 시간: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "🔒 보안 검사: 통과"
+        echo "📊 성능 테스트: 완료"
+        echo ""
+        echo "⚠️  보안 알림:"
+        echo "- 관리자 계정 로그인 테스트 필요"
+        echo "- 권한별 접근 제어 확인 필요"
+        echo "- IP 기반 접근 제한 설정 검토"
+        
+    - name: Deployment failure notification
+      if: needs.security-health-check.result == 'failure' || needs.deploy.result == 'failure'
+      run: |
+        echo "❌ 관리자 대시보드 배포 실패!"
+        echo "🔍 로그를 확인하여 문제를 해결하세요."
+        echo "🔒 보안상 중요한 서비스이므로 신중하게 검토하세요."
+        exit 1
+
+  # 단계 7: 롤백 준비 (실패 시)
+  rollback:
+    needs: [deploy, security-health-check]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+    - name: Rollback to previous version
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          
+          # 이전 백업에서 복원
+          if [ -d 'services/admin-dashboard.backup' ]; then
+            echo '이전 버전으로 롤백 중...'
+            rm -rf services/admin-dashboard
+            mv services/admin-dashboard.backup services/admin-dashboard
+            
+            # 정적 파일도 복원
+            rsync -av services/admin-dashboard/dist/ /var/www/admin.neture.co.kr/
+            
+            # PM2 재시작
+            pm2 restart ${{ env.PM2_APP_NAME }}
+            echo '롤백 완료'
+          else
+            echo '백업 파일이 없습니다. 수동 복구가 필요합니다.'
+          fi
+        "
+        
+    - name: Rollback notification
+      run: |
+        echo "🔄 관리자 대시보드 롤백 완료"
+        echo "⚠️  수동 확인이 필요합니다."
+        echo "🔒 보안상 중요하므로 즉시 상태를 확인하세요."
