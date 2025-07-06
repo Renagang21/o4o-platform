@@ -1,1 +1,25 @@
-{"name": "@o4o/auth-context", "version": "1.0.0", "main": "src/index.ts", "types": "src/index.ts", "private": true}
+{
+  "name": "@o4o/auth-context",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "dependencies": {
+    "arg": "^5.0.2",
+    "chokidar": "^4.0.3",
+    "color-name-list": "^11.23.0",
+    "dlv": "^1.1.3",
+    "fast-glob": "^3.3.3",
+    "normalize-path": "^3.0.0",
+    "object-hash": "^3.0.0",
+    "postcss-selector-parser": "^7.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.20.1",
+    "util-deprecate": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6"
+  }
+}
