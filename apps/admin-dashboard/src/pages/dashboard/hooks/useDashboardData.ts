@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../../../api/dashboard';
 
 // Types
@@ -127,19 +127,14 @@ export const useDashboardData = () => {
     isLoading: statsLoading,
     error: statsError,
     refetch: refetchStats
-  } = useQuery<DashboardStats>(
-    ['dashboard', 'stats', manualRefreshTrigger],
-    () => dashboardApi.getStats(),
-    {
-      enabled: false, // 수동 새로고침만 허용
-      staleTime: 5 * 60 * 1000, // 5분간 fresh
-      cacheTime: 10 * 60 * 1000, // 10분간 캐시 유지
-      retry: 2,
-      onError: (error) => {
-        console.error('Dashboard stats error:', error);
-      }
-    }
-  );
+  } = useQuery<DashboardStats>({
+    queryKey: ['dashboard', 'stats', manualRefreshTrigger],
+    queryFn: () => dashboardApi.getStats(),
+    enabled: false, // 수동 새로고침만 허용
+    staleTime: 5 * 60 * 1000, // 5분간 fresh
+    gcTime: 10 * 60 * 1000, // 10분간 캐시 유지
+    retry: 2
+  });
 
   // Chart data query
   const {
@@ -147,16 +142,14 @@ export const useDashboardData = () => {
     isLoading: chartLoading,
     error: chartError,
     refetch: refetchCharts
-  } = useQuery<ChartData>(
-    ['dashboard', 'charts', manualRefreshTrigger],
-    () => dashboardApi.getChartData(),
-    {
-      enabled: false,
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
-      retry: 2
-    }
-  );
+  } = useQuery<ChartData>({
+    queryKey: ['dashboard', 'charts', manualRefreshTrigger],
+    queryFn: () => dashboardApi.getChartData(),
+    enabled: false,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 2
+  });
 
   // Notifications query
   const {
@@ -168,45 +161,39 @@ export const useDashboardData = () => {
     total: number;
     urgent: number;
     approval: number;
-  }>(
-    ['dashboard', 'notifications', manualRefreshTrigger],
-    () => dashboardApi.getNotifications(),
-    {
-      enabled: false,
-      staleTime: 2 * 60 * 1000, // 알림은 2분간만 fresh
-      retry: 2
-    }
-  );
+  }>({
+    queryKey: ['dashboard', 'notifications', manualRefreshTrigger],
+    queryFn: () => dashboardApi.getNotifications(),
+    enabled: false,
+    staleTime: 2 * 60 * 1000, // 알림은 2분간만 fresh
+    retry: 2
+  });
 
   // Activities query
   const {
     data: activities,
     isLoading: activitiesLoading,
     refetch: refetchActivities
-  } = useQuery<ActivityItem[]>(
-    ['dashboard', 'activities', manualRefreshTrigger],
-    () => dashboardApi.getRecentActivities(),
-    {
-      enabled: false,
-      staleTime: 3 * 60 * 1000, // 3분간 fresh
-      retry: 2
-    }
-  );
+  } = useQuery<ActivityItem[]>({
+    queryKey: ['dashboard', 'activities', manualRefreshTrigger],
+    queryFn: () => dashboardApi.getRecentActivities(),
+    enabled: false,
+    staleTime: 3 * 60 * 1000, // 3분간 fresh
+    retry: 2
+  });
 
   // System health query
   const {
     data: systemHealth,
     isLoading: healthLoading,
     refetch: refetchHealth
-  } = useQuery<SystemHealth>(
-    ['dashboard', 'health', manualRefreshTrigger],
-    () => dashboardApi.getSystemHealth(),
-    {
-      enabled: false,
-      staleTime: 30 * 1000, // 30초간만 fresh (시스템 상태는 자주 확인)
-      retry: 1
-    }
-  );
+  } = useQuery<SystemHealth>({
+    queryKey: ['dashboard', 'health', manualRefreshTrigger],
+    queryFn: () => dashboardApi.getSystemHealth(),
+    enabled: false,
+    staleTime: 30 * 1000, // 30초간만 fresh (시스템 상태는 자주 확인)
+    retry: 1
+  });
 
   // 전체 로딩 상태
   const isLoading = statsLoading || chartLoading || notificationsLoading || 

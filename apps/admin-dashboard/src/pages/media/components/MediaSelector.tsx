@@ -12,7 +12,7 @@ import { ContentApi } from '@/api/contentApi'
 import MediaGrid from './MediaGrid'
 import MediaList from './MediaList'
 import MediaUploader from './MediaUploader'
-import { useInfiniteQuery } from 'react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 import toast from 'react-hot-toast'
 
@@ -51,9 +51,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     isFetchingNextPage,
     isLoading,
     refetch
-  } = useInfiniteQuery(
-    ['mediaFiles', filters],
-    async ({ pageParam = 1 }) => {
+  } = useInfiniteQuery({
+    queryKey: ['mediaFiles', filters],
+    queryFn: async ({ pageParam = 1 }) => {
       const response = await ContentApi.getMediaFiles(
         pageParam,
         50,
@@ -63,16 +63,15 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       )
       return response
     },
-    {
-      getNextPageParam: (lastPage) => {
-        const { pagination } = lastPage
-        if (pagination && pagination.currentPage < pagination.totalPages) {
-          return pagination.currentPage + 1
-        }
-        return undefined
+    getNextPageParam: (lastPage) => {
+      const { pagination } = lastPage
+      if (pagination && pagination.currentPage < pagination.totalPages) {
+        return pagination.currentPage + 1
       }
-    }
-  )
+      return undefined
+    },
+    initialPageParam: 1
+  })
 
   // Auto-load more when scrolled to bottom
   useEffect(() => {

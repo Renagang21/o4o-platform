@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { EcommerceApi } from '@/api/ecommerceApi';
 import { Product, ProductFilters } from '@/types/ecommerce';
 // import { toast } from 'react-hot-toast';
@@ -17,7 +17,7 @@ export const useProducts = (
   return useQuery({
     queryKey: ['products', page, limit, filters],
     queryFn: () => EcommerceApi.getProducts(page, limit, filters),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000, // 5분
   });
 };
@@ -40,7 +40,7 @@ export const useCreateProduct = () => {
     mutationFn: (productData: Partial<Product>) => 
       EcommerceApi.createProduct(productData),
     onSuccess: () => {
-      queryClient.invalidateQueries(['products']);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 생성되었습니다.');
     },
     onError: (error: any) => {
@@ -59,8 +59,8 @@ export const useUpdateProduct = () => {
       productData: Partial<Product> 
     }) => EcommerceApi.updateProduct(productId, productData),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(['products']);
-      queryClient.invalidateQueries(['product', variables.productId]);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
       toast.success('상품이 성공적으로 수정되었습니다.');
     },
     onError: (error: any) => {
@@ -76,7 +76,7 @@ export const useDeleteProduct = () => {
   return useMutation({
     mutationFn: (productId: string) => EcommerceApi.deleteProduct(productId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['products']);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 삭제되었습니다.');
     },
     onError: (error: any) => {
@@ -92,7 +92,7 @@ export const useDuplicateProduct = () => {
   return useMutation({
     mutationFn: (productId: string) => EcommerceApi.duplicateProduct(productId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['products']);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 복제되었습니다.');
     },
     onError: (error: any) => {

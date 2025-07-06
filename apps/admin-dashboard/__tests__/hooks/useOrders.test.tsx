@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import { useOrders, useOrder, useUpdateOrderStatus, useRefundOrder, useBulkOrderAction } from '../../src/hooks/useOrders';
 import { EcommerceApi } from '../../src/api/ecommerceApi';
@@ -23,7 +23,7 @@ const createTestWrapper = () => {
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0,
+        gcTime: 0,
       },
       mutations: {
         retry: false,

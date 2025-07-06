@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { EcommerceApi } from '@/api/ecommerceApi';
 import { OrderFilters, OrderStatus } from '@/types/ecommerce';
 
@@ -17,7 +17,7 @@ export const useOrders = (
   return useQuery({
     queryKey: ['orders', page, limit, filters],
     queryFn: () => EcommerceApi.getOrders(page, limit, filters),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000, // 2분 (주문은 더 자주 업데이트)
   });
 };
@@ -47,8 +47,8 @@ export const useUpdateOrderStatus = () => {
       note?: string;
     }) => EcommerceApi.updateOrderStatus(orderId, status, note),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(['orders']);
-      queryClient.invalidateQueries(['order', variables.orderId]);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       toast.success(`주문 상태가 '${variables.status}'로 변경되었습니다.`);
     },
     onError: (error: any) => {
@@ -74,8 +74,8 @@ export const useRefundOrder = () => {
       items?: Array<{ orderItemId: string; quantity: number; amount: number }>;
     }) => EcommerceApi.refundOrder(orderId, amount, reason, items),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(['orders']);
-      queryClient.invalidateQueries(['order', variables.orderId]);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       toast.success('주문 환불이 성공적으로 처리되었습니다.');
     },
     onError: (error: any) => {
@@ -98,7 +98,7 @@ export const useBulkOrderAction = () => {
       };
     }) => EcommerceApi.bulkOrderAction(action),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(['orders']);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
       
       if (variables.action === 'update_status') {
         toast.success(`${variables.orderIds.length}개 주문의 상태가 변경되었습니다.`);

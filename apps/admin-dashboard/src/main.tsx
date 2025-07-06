@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 // Temporarily comment out Toaster until React version compatibility is fixed
 // import { Toaster } from 'react-hot-toast'
 import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
