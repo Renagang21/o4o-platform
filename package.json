@@ -16,6 +16,8 @@
     "npm": "10.9.2"
   },
   "scripts": {
+    "install:all": "npm install && npm run install:workspaces",
+    "install:workspaces": "npm install --workspaces",
     "dev:api": "cd apps/api-server && npm run dev",
     "dev:web": "cd apps/main-site && npm run dev",
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:admin\"",
