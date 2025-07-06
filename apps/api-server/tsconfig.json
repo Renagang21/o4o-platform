@@ -20,9 +20,7 @@
     "strictFunctionTypes": false,
     "noImplicitThis": false,
     "noImplicitReturns": false,
-    "strictPropertyInitialization": false,
-    "suppressImplicitAnyIndexErrors": true,
-    "noStrictGenericChecks": true
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/**/*"

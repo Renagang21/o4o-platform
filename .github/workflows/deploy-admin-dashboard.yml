@@ -1,14 +1,14 @@
 name: Deploy Admin Dashboard (Production)
 
 # 관리자 대시보드 점진적 배포 워크플로우
-# 트리거: services/admin-dashboard 경로 변경 시
+# 트리거: apps/admin-dashboard 경로 변경 시
 # 단계: Build → Security Check → Deploy → Health Check
 
 on:
   push:
     branches: [main]
     paths:
-      - 'services/admin-dashboard/**'
+      - 'apps/admin-dashboard/**'
       - 'shared/**'
       - '.github/workflows/deploy-admin-dashboard.yml'
   workflow_dispatch:
@@ -43,22 +43,22 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         npm ci
         
     - name: TypeScript type check
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         npm run type-check
         
     - name: ESLint security check
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         npm run lint
         
     - name: Security audit (Admin specific)
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         npm audit --audit-level=moderate
         
     - name: Build shared components
@@ -68,7 +68,7 @@ jobs:
         
     - name: Create production environment file
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         cat > .env.production << 'EOF'
         NODE_ENV=production
         VITE_API_BASE_URL=https://api.neture.co.kr
@@ -84,12 +84,12 @@ jobs:
         
     - name: Build application for production
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         npm run build
         
     - name: Security headers validation
       run: |
-        cd services/admin-dashboard/dist
+        cd apps/admin-dashboard/dist
         # CSP 및 보안 헤더 설정 확인
         if grep -r "Content-Security-Policy" . || grep -r "csp" . >/dev/null 2>&1; then
           echo "✅ CSP 설정 확인됨"
@@ -102,10 +102,10 @@ jobs:
       with:
         name: admin-dashboard-build
         path: |
-          services/admin-dashboard/dist/
-          services/admin-dashboard/package.json
-          services/admin-dashboard/package-lock.json
-          services/admin-dashboard/.env.production
+          apps/admin-dashboard/dist/
+          apps/admin-dashboard/package.json
+          apps/admin-dashboard/package-lock.json
+          apps/admin-dashboard/.env.production
         retention-days: 1
 
   # 단계 2: 추가 보안 및 접근성 테스트
@@ -121,7 +121,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: admin-dashboard-build
-        path: services/admin-dashboard/
+        path: apps/admin-dashboard/
         
     - name: OWASP ZAP baseline scan preparation
       run: |
@@ -130,13 +130,13 @@ jobs:
         
     - name: Dependency vulnerability check
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         # 고위험 취약점 검사
         npm audit --audit-level=high --production
         
     - name: Bundle analysis for security
       run: |
-        cd services/admin-dashboard
+        cd apps/admin-dashboard
         # 번들 크기 및 의존성 분석
         npm run build:analyze || true
 
@@ -154,7 +154,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: admin-dashboard-build
-        path: services/admin-dashboard/
+        path: apps/admin-dashboard/
         
     - name: Setup SSH key
       uses: webfactory/ssh-agent@v0.7.0
@@ -165,17 +165,17 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
-          if [ -d 'services/admin-dashboard' ]; then
+          if [ -d 'apps/admin-dashboard' ]; then
             echo 'Creating backup of current admin-dashboard...'
-            rm -rf services/admin-dashboard.backup
-            cp -r services/admin-dashboard services/admin-dashboard.backup
+            rm -rf apps/admin-dashboard.backup
+            cp -r apps/admin-dashboard apps/admin-dashboard.backup
           fi
         "
         
     - name: Create deployment directory
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          mkdir -p ${{ env.DEPLOY_PATH }}/services/admin-dashboard
+          mkdir -p ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
         "
         
     - name: Deploy static files to secured directory
@@ -188,20 +188,20 @@ jobs:
         
         rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
-          services/admin-dashboard/dist/ \
+          apps/admin-dashboard/dist/ \
           ubuntu@${{ secrets.SERVER_HOST }}:/var/www/admin.neture.co.kr/
           
     - name: Deploy application files
       run: |
         rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
-          services/admin-dashboard/ \
-          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/services/admin-dashboard/
+          apps/admin-dashboard/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/apps/admin-dashboard/
           
     - name: Install production dependencies
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/services/admin-dashboard
+          cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
           npm ci --only=production
         "
         
@@ -220,7 +220,7 @@ jobs:
                 '--cors',
                 '--single'
               ],
-              cwd: '${{ env.DEPLOY_PATH }}/services/admin-dashboard',
+              cwd: '${{ env.DEPLOY_PATH }}/apps/admin-dashboard',
               instances: 2,
               exec_mode: 'cluster',
               max_memory_restart: '256M',
@@ -246,7 +246,7 @@ jobs:
     - name: Set secure file permissions
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/services/admin-dashboard
+          cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
           
           # 보안 강화된 권한 설정
           chmod -R 640 .
@@ -441,13 +441,13 @@ jobs:
           cd ${{ env.DEPLOY_PATH }}
           
           # 이전 백업에서 복원
-          if [ -d 'services/admin-dashboard.backup' ]; then
+          if [ -d 'apps/admin-dashboard.backup' ]; then
             echo '이전 버전으로 롤백 중...'
-            rm -rf services/admin-dashboard
-            mv services/admin-dashboard.backup services/admin-dashboard
+            rm -rf apps/admin-dashboard
+            mv apps/admin-dashboard.backup apps/admin-dashboard
             
             # 정적 파일도 복원
-            rsync -av services/admin-dashboard/dist/ /var/www/admin.neture.co.kr/
+            rsync -av apps/admin-dashboard/dist/ /var/www/admin.neture.co.kr/
             
             # PM2 재시작
             pm2 restart ${{ env.PM2_APP_NAME }}

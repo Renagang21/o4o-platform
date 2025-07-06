@@ -1,14 +1,14 @@
 name: Deploy API Server (Production)
 
 # API 서버 점진적 배포 워크플로우
-# 트리거: services/api-server 경로 변경 시
+# 트리거: apps/api-server 경로 변경 시
 # 단계: Build → Test → Deploy → Health Check
 
 on:
   push:
     branches: [main]
     paths:
-      - 'services/api-server/**'
+      - 'apps/api-server/**'
       - '.github/workflows/deploy-api-server.yml'
   workflow_dispatch:
     inputs:
@@ -42,22 +42,22 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
-        cd services/api-server
+        cd apps/api-server
         npm ci
         
     - name: TypeScript type check
       run: |
-        cd services/api-server
+        cd apps/api-server
         npm run type-check
         
     - name: Run tests
       run: |
-        cd services/api-server
+        cd apps/api-server
         npm run test
         
     - name: Build application
       run: |
-        cd services/api-server
+        cd apps/api-server
         npm run build
         
     - name: Upload build artifacts
@@ -65,9 +65,9 @@ jobs:
       with:
         name: api-server-build
         path: |
-          services/api-server/dist/
-          services/api-server/package.json
-          services/api-server/package-lock.json
+          apps/api-server/dist/
+          apps/api-server/package.json
+          apps/api-server/package-lock.json
         retention-days: 1
 
   # 단계 2: 운영 서버 배포
@@ -84,7 +84,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: api-server-build
-        path: services/api-server/
+        path: apps/api-server/
         
     - name: Setup SSH key
       uses: webfactory/ssh-agent@v0.7.0
@@ -94,13 +94,13 @@ jobs:
     - name: Create deployment directory
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          mkdir -p ${{ env.DEPLOY_PATH }}/services/api-server
+          mkdir -p ${{ env.DEPLOY_PATH }}/apps/api-server
         "
         
     - name: Create environment file
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          cat > ${{ env.DEPLOY_PATH }}/services/api-server/.env.production << 'EOF'
+          cat > ${{ env.DEPLOY_PATH }}/apps/api-server/.env.production << 'EOF'
           NODE_ENV=production
           PORT=${{ env.SERVICE_PORT }}
           
@@ -130,20 +130,20 @@ jobs:
       run: |
         rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
-          services/api-server/ \
-          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/services/api-server/
+          apps/api-server/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/apps/api-server/
           
     - name: Install production dependencies
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/services/api-server
+          cd ${{ env.DEPLOY_PATH }}/apps/api-server
           npm ci --only=production
         "
         
     - name: Run database migrations
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/services/api-server
+          cd ${{ env.DEPLOY_PATH }}/apps/api-server
           npm run migration:run
         "
         
@@ -155,7 +155,7 @@ jobs:
             apps: [{
               name: '${{ env.PM2_APP_NAME }}',
               script: './dist/src/index.js',
-              cwd: '${{ env.DEPLOY_PATH }}/services/api-server',
+              cwd: '${{ env.DEPLOY_PATH }}/apps/api-server',
               instances: 'max',
               exec_mode: 'cluster',
               env_file: '.env.production',
@@ -300,10 +300,10 @@ jobs:
           cd ${{ env.DEPLOY_PATH }}
           
           # 이전 백업에서 복원
-          if [ -d 'services/api-server.backup' ]; then
+          if [ -d 'apps/api-server.backup' ]; then
             echo '이전 버전으로 롤백 중...'
-            rm -rf services/api-server
-            mv services/api-server.backup services/api-server
+            rm -rf apps/api-server
+            mv apps/api-server.backup apps/api-server
             
             # PM2 재시작
             pm2 restart ${{ env.PM2_APP_NAME }}

@@ -164,7 +164,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                 <DropdownMenuItem
                   onClick={() => {
                     // 프로필 페이지로 이동
-                    toast.info('프로필 페이지로 이동');
+                    toast('프로필 페이지로 이동');
                   }}
                 >
                   <User className="mr-2 h-4 w-4" />
@@ -174,7 +174,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                 <DropdownMenuItem
                   onClick={() => {
                     // 계정 설정 페이지로 이동
-                    toast.info('계정 설정 페이지로 이동');
+                    toast('계정 설정 페이지로 이동');
                   }}
                 >
                   <SettingsIcon className="mr-2 h-4 w-4" />

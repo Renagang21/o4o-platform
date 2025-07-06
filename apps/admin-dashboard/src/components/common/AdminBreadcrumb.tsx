@@ -49,7 +49,7 @@ const AdminBreadcrumb: React.FC<AdminBreadcrumbProps> = ({ items, className = ''
     }
     
     let currentPath = ''
-    pathSegments.forEach((segment, index) => {
+    pathSegments.forEach((segment: string, index: number) => {
       currentPath += `/${segment}`
       
       if (segment !== 'dashboard') {

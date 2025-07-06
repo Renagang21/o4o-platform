@@ -134,14 +134,12 @@ test.describe('Content CRUD Operations', () => {
     await editTitleInput.fill(testData.updatedTitle);
     
     // 내용 수정
-    let contentUpdated = false;
     for (const selector of contentSelectors) {
       try {
         const contentInput = page.locator(selector);
         if (await contentInput.isVisible({ timeout: 1000 })) {
           await contentInput.clear();
           await contentInput.fill(testData.updatedContent);
-          contentUpdated = true;
           break;
         }
       } catch (e) {
