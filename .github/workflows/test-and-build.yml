@@ -36,13 +36,13 @@ jobs:
           npm run install:all
           
       - name: 🔍 Type check
-        run: npm run type-check --workspace=${{ matrix.service }}
+        run: npm run type-check --workspace=@o4o/${{ matrix.service }}
         
       - name: 🧹 Lint check
-        run: npm run lint --workspace=${{ matrix.service }}
+        run: npm run lint --workspace=@o4o/${{ matrix.service }}
         
       - name: 🧪 Run tests
-        run: npm run test --workspace=${{ matrix.service }}
+        run: npm run test --workspace=@o4o/${{ matrix.service }}
         
       - name: 📊 Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -77,7 +77,7 @@ jobs:
           npm run install:all
           
       - name: 🏗️ Build service
-        run: npm run build --workspace=${{ matrix.service }}
+        run: npm run build --workspace=@o4o/${{ matrix.service }}
         
       - name: 📦 Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -138,7 +138,7 @@ jobs:
           npm run install:all
           
       - name: 🧪 Run tests with coverage
-        run: npm run test:coverage --workspace=admin-dashboard
+        run: npm run test:coverage --workspace=@o4o/admin-dashboard
         
       - name: 📊 SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
