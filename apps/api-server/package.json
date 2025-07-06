@@ -1,5 +1,5 @@
 {
-  "name": "o4o-platform-api-server",
+  "name": "@o4o/api-server",
   "version": "1.0.0",
   "description": "O4O Platform API Server",
   "main": "dist/main.js",
