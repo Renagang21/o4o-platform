@@ -9,4 +9,4 @@ export {
   sampleFeatureTests,
   sampleRecentUpdates,
   sampleQuickLinks
-} from '@/features/test-dashboard/data/sampleData';
+} from '@/features/test-dashboard/data/sampleData.ts';
