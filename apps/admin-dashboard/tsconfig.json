@@ -25,7 +25,8 @@
       "@/types/*": ["./src/types/*"],
       "@/api/*": ["./src/api/*"],
       "@/styles/*": ["./src/styles/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "include": ["src", "vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
