@@ -3,14 +3,14 @@ import { AppDataSource } from '../database/connection';
 import { Product, ProductStatus } from '../entities/Product';
 import { Category } from '../entities/Category';
 import { Like, In } from 'typeorm';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../types/auth';
 
 export class ProductsController {
   private productRepository = AppDataSource.getRepository(Product);
   private categoryRepository = AppDataSource.getRepository(Category);
 
   // 상품 목록 조회 (필터링, 페이징, 정렬)
-  getProducts = async (req: AuthRequest, res: Response) => {
+  getProducts = async (req: Request, res: Response) => {
     try {
       const {
         page = 1,
@@ -68,14 +68,15 @@ export class ProductsController {
       const [products, totalCount] = await queryBuilder.getManyAndCount();
 
       // 사용자 역할에 따른 가격 조정
-      const userRole = req.user?.role || 'customer';
+      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const roleString = String(userRole);
       const productsWithUserPrice = products.map(product => ({
         ...product,
         price: product.getPriceForUser(userRole),
         // 민감한 정보 제거
         cost: undefined,
-        wholesalePrice: userRole === 'business' ? product.wholesalePrice : undefined,
-        affiliatePrice: userRole === 'affiliate' ? product.affiliatePrice : undefined,
+        wholesalePrice: roleString === 'business' ? product.wholesalePrice : undefined,
+        affiliatePrice: roleString === 'affiliate' ? product.affiliatePrice : undefined,
       }));
 
       res.json({
@@ -102,7 +103,7 @@ export class ProductsController {
   };
 
   // 상품 상세 조회
-  getProduct = async (req: AuthRequest, res: Response) => {
+  getProduct = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       
@@ -123,14 +124,15 @@ export class ProductsController {
       }
 
       // 사용자 역할에 따른 가격 조정
-      const userRole = req.user?.role || 'customer';
+      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const roleString = String(userRole);
       const productWithUserPrice = {
         ...product,
         price: product.getPriceForUser(userRole),
         // 민감한 정보 제거
         cost: undefined,
-        wholesalePrice: userRole === 'business' ? product.wholesalePrice : undefined,
-        affiliatePrice: userRole === 'affiliate' ? product.affiliatePrice : undefined,
+        wholesalePrice: roleString === 'business' ? product.wholesalePrice : undefined,
+        affiliatePrice: roleString === 'affiliate' ? product.affiliatePrice : undefined,
       };
 
       res.json({
@@ -147,10 +149,10 @@ export class ProductsController {
   };
 
   // 상품 생성 (관리자만)
-  createProduct = async (req: AuthRequest, res: Response) => {
+  createProduct = async (req: Request, res: Response) => {
     try {
       // 관리자 권한 확인
-      if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
+      if ((req as AuthRequest).user?.role !== 'admin' && (req as AuthRequest).user?.role !== 'manager') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -173,7 +175,7 @@ export class ProductsController {
 
       const product = this.productRepository.create({
         ...productData,
-        createdBy: req.user.id,
+        createdBy: (req as AuthRequest).user!.id,
         slug: productData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       });
 
@@ -193,10 +195,10 @@ export class ProductsController {
   };
 
   // 상품 수정 (관리자만)
-  updateProduct = async (req: AuthRequest, res: Response) => {
+  updateProduct = async (req: Request, res: Response) => {
     try {
       // 관리자 권한 확인
-      if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
+      if ((req as AuthRequest).user?.role !== 'admin' && (req as AuthRequest).user?.role !== 'manager') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -246,10 +248,10 @@ export class ProductsController {
   };
 
   // 상품 삭제 (관리자만)
-  deleteProduct = async (req: AuthRequest, res: Response) => {
+  deleteProduct = async (req: Request, res: Response) => {
     try {
       // 관리자 권한 확인
-      if (req.user?.role !== 'admin') {
+      if ((req as AuthRequest).user?.role !== 'admin') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -284,7 +286,7 @@ export class ProductsController {
   };
 
   // 추천 상품 조회
-  getFeaturedProducts = async (req: AuthRequest, res: Response) => {
+  getFeaturedProducts = async (req: Request, res: Response) => {
     try {
       const { limit = 10 } = req.query;
 
@@ -298,7 +300,8 @@ export class ProductsController {
       });
 
       // 사용자 역할에 따른 가격 조정
-      const userRole = req.user?.role || 'customer';
+      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const roleString = String(userRole);
       const productsWithUserPrice = products.map(product => ({
         ...product,
         price: product.getPriceForUser(userRole),

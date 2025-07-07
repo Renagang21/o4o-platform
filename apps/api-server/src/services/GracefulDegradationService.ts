@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertSeverity } from '../entities/Alert';
+import { PricingResult } from '../types/auth';
 import { signageService } from './signageService';
 import { cacheService } from './cacheService';
 
@@ -346,7 +347,7 @@ export class GracefulDegradationService {
       enabled: true,
       degradationLevel: degradation.level,
       fallbackData: parameters.fallbackData || {}
-    }, parameters.ttl || 3600);
+    } as any, parameters.ttl || 3600);
     
     console.log(`🗄️ Enabled cache fallback for: ${target}`);
   }
@@ -358,7 +359,7 @@ export class GracefulDegradationService {
       enabled: true,
       staticContent: parameters.staticContent || 'Service temporarily unavailable',
       degradationLevel: degradation.level
-    }, 7200); // 2 hours
+    } as any, 7200); // 2 hours
     
     console.log(`📄 Enabled static content for: ${target}`);
   }
@@ -371,7 +372,7 @@ export class GracefulDegradationService {
       disabledComponents: parameters.disabledComponents || [],
       simplifiedLayout: parameters.simplifiedLayout || true,
       degradationLevel: degradation.level
-    }, 3600);
+    } as any, 3600);
     
     console.log(`🎨 Enabled simplified UI for: ${target}`);
   }
@@ -384,7 +385,7 @@ export class GracefulDegradationService {
       requestsPerMinute: parameters.requestsPerMinute || 60,
       burstLimit: parameters.burstLimit || 10,
       degradationLevel: degradation.level
-    }, 1800); // 30 minutes
+    } as any, 1800); // 30 minutes
     
     console.log(`🚦 Enabled rate limiting for: ${target} (${parameters.requestsPerMinute || 60} req/min)`);
   }
@@ -397,7 +398,7 @@ export class GracefulDegradationService {
       maxQueueSize: parameters.maxQueueSize || 1000,
       processingRate: parameters.processingRate || 10,
       degradationLevel: degradation.level
-    }, 1800);
+    } as any, 1800);
     
     console.log(`📥 Enabled request queuing for: ${target} (max: ${parameters.maxQueueSize || 1000})`);
   }
@@ -410,7 +411,7 @@ export class GracefulDegradationService {
       redirectUrl: parameters.redirectUrl,
       percentage: parameters.percentage || 100,
       degradationLevel: degradation.level
-    }, 1800);
+    } as any, 1800);
     
     console.log(`🔀 Enabled traffic redirection for: ${target} to ${parameters.redirectUrl}`);
   }
@@ -630,13 +631,13 @@ export class GracefulDegradationService {
       `Graceful degradation activated due to system issues. Level: ${degradation.level}, Affected features: ${degradation.affectedFeatures.join(', ')}`,
       AlertSeverity.HIGH,
       'graceful-degradation',
-      {
+      JSON.stringify({
         degradationId: degradation.id,
         level: degradation.level,
         trigger: degradation.trigger,
         affectedFeatures: degradation.affectedFeatures,
         userImpact: degradation.userImpact
-      }
+      })
     );
 
     await this.alertRepo.save(alert);

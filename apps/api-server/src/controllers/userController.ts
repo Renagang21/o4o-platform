@@ -1,22 +1,29 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../services/authService';
-import { AuthRequest } from '../middleware/auth';
-import { UserRole } from '../entities/User';
+import { AuthService } from '../services/AuthService';
+import { UserRole, AuthRequest } from '../types/auth';
+import { AppDataSource } from '../database/connection';
+import { User } from '../entities/User';
 
 export class UserController {
-  private authService = new AuthService();
+  private authService: AuthService;
+
+  constructor() {
+    const userRepository = AppDataSource.getRepository(User);
+    this.authService = new AuthService(userRepository);
+  }
 
   // 현재 사용자 정보 조회
-  async getProfile(req: AuthRequest, res: Response) {
+  async getProfile(req: Request, res: Response) {
     try {
-      if (!req.user) {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
         });
       }
 
-      const user = await this.authService.getUserById(req.user.id);
+      const user = await this.authService.getUserById(authReq.user.id);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -51,7 +58,7 @@ export class UserController {
       const { userId } = req.params;
       const { role } = req.body;
 
-      if (!Object.values(UserRole).includes(role)) {
+      if (!Object.values(UserRole).includes(role as UserRole)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid role'
@@ -81,9 +88,10 @@ export class UserController {
   }
 
   // 비즈니스 정보 업데이트
-  async updateBusinessInfo(req: AuthRequest, res: Response) {
+  async updateBusinessInfo(req: Request, res: Response) {
     try {
-      if (!req.user) {
+      const authReq = req as AuthRequest;
+      if (!authReq.user) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
@@ -100,7 +108,7 @@ export class UserController {
         });
       }
 
-      const user = await this.authService.updateUserBusinessInfo(req.user.id, businessInfo);
+      const user = await this.authService.updateUserBusinessInfo(authReq.user.id, businessInfo);
       if (!user) {
         return res.status(404).json({
           success: false,

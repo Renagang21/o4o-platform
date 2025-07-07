@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { CustomPostType, FieldGroup, FieldSchema } from '../entities/CustomPostType';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../types/auth';
 
 export class CPTController {
   // ============= Custom Post Type Management =============
@@ -60,7 +60,7 @@ export class CPTController {
   }
 
   // Create new CPT
-  static async createCPT(req: AuthRequest, res: Response) {
+  static async createCPT(req: Request, res: Response) {
     try {
       const { 
         slug, 
@@ -104,7 +104,7 @@ export class CPTController {
         supports: ['title'],
         ...settings
       };
-      cpt.createdBy = req.user?.id || '';
+      cpt.createdBy = (req as AuthRequest).user?.id || '';
 
       await cptRepo.save(cpt);
 
@@ -257,7 +257,7 @@ export class CPTController {
   }
 
   // Create new post
-  static async createPost(req: AuthRequest, res: Response) {
+  static async createPost(req: Request, res: Response) {
     try {
       const { slug } = req.params;
       const { title, fields, content, status, meta } = req.body;
@@ -292,7 +292,7 @@ export class CPTController {
       post.content = content;
       post.status = status || PostStatus.DRAFT;
       post.meta = meta;
-      post.authorId = req.user?.id || '';
+      post.authorId = (req as AuthRequest).user?.id || '';
 
       if (status === PostStatus.PUBLISHED) {
         post.publishedAt = new Date();

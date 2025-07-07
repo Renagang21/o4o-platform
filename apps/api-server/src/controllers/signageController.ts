@@ -1,5 +1,5 @@
-import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
+import { Request, Response } from 'express';
+import { AuthRequest } from '../types/auth';
 import { AppDataSource } from '../database/connection';
 import { SignageContent, ContentStatus } from '../entities/SignageContent';
 import { Store } from '../entities/Store';
@@ -22,7 +22,7 @@ export class SignageController {
   private userRepository = AppDataSource.getRepository(User);
 
   // Content Management
-  async getContents(req: AuthRequest, res: Response) {
+  async getContents(req: Request, res: Response) {
     try {
       const {
         page = 1,
@@ -34,7 +34,7 @@ export class SignageController {
         isPublic
       } = req.query;
 
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
       const skip = (Number(page) - 1) * Number(limit);
 
       const queryBuilder = this.contentRepository
@@ -101,10 +101,10 @@ export class SignageController {
     }
   }
 
-  async getContentById(req: AuthRequest, res: Response) {
+  async getContentById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       const content = await this.contentRepository.findOne({
         where: { id },
@@ -138,10 +138,10 @@ export class SignageController {
     }
   }
 
-  async createContent(req: AuthRequest, res: Response) {
+  async createContent(req: Request, res: Response) {
     try {
       const { title, description, type, url, tags, isPublic } = req.body;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       // Validate user role
       if (!['business', 'affiliate', 'manager', 'admin'].includes(user.role)) {
@@ -203,10 +203,10 @@ export class SignageController {
     }
   }
 
-  async updateContent(req: AuthRequest, res: Response) {
+  async updateContent(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       const content = await this.contentRepository.findOne({ where: { id } });
       if (!content) {
@@ -245,10 +245,10 @@ export class SignageController {
     }
   }
 
-  async deleteContent(req: AuthRequest, res: Response) {
+  async deleteContent(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       const content = await this.contentRepository.findOne({ where: { id } });
       if (!content) {
@@ -276,11 +276,11 @@ export class SignageController {
     }
   }
 
-  async approveRejectContent(req: AuthRequest, res: Response) {
+  async approveRejectContent(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const { action, reason } = req.body;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       if (user.role !== 'admin') {
         return res.status(403).json({
@@ -318,9 +318,9 @@ export class SignageController {
   }
 
   // Store Management
-  async getStores(req: AuthRequest, res: Response) {
+  async getStores(req: Request, res: Response) {
     try {
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
       let stores;
 
       if (user.role === 'admin') {
@@ -349,9 +349,9 @@ export class SignageController {
     }
   }
 
-  async createStore(req: AuthRequest, res: Response) {
+  async createStore(req: Request, res: Response) {
     try {
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
       if (user.role !== 'admin') {
         return res.status(403).json({
           success: false,
@@ -372,10 +372,10 @@ export class SignageController {
     }
   }
 
-  async updateStore(req: AuthRequest, res: Response) {
+  async updateStore(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       const store = await this.storeRepository.findOne({ where: { id } });
       if (!store) {
@@ -412,10 +412,10 @@ export class SignageController {
     }
   }
 
-  async deleteStore(req: AuthRequest, res: Response) {
+  async deleteStore(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const user = req.user as User;
+      const user = (req as AuthRequest).user as unknown as User;
 
       if (user.role !== 'admin') {
         return res.status(403).json({
@@ -444,95 +444,95 @@ export class SignageController {
   }
 
   // Placeholder methods for remaining endpoints
-  async getStorePlaylists(req: AuthRequest, res: Response) {
+  async getStorePlaylists(req: Request, res: Response) {
     res.json({ success: true, data: { playlists: [] } });
   }
 
-  async createPlaylist(req: AuthRequest, res: Response) {
+  async createPlaylist(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async updatePlaylist(req: AuthRequest, res: Response) {
+  async updatePlaylist(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async deletePlaylist(req: AuthRequest, res: Response) {
+  async deletePlaylist(req: Request, res: Response) {
     res.json({ success: true, message: 'Playlist deleted' });
   }
 
-  async getPlaylistItems(req: AuthRequest, res: Response) {
+  async getPlaylistItems(req: Request, res: Response) {
     res.json({ success: true, data: { items: [] } });
   }
 
-  async addPlaylistItem(req: AuthRequest, res: Response) {
+  async addPlaylistItem(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async updatePlaylistItem(req: AuthRequest, res: Response) {
+  async updatePlaylistItem(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async deletePlaylistItem(req: AuthRequest, res: Response) {
+  async deletePlaylistItem(req: Request, res: Response) {
     res.json({ success: true, message: 'Item deleted' });
   }
 
-  async reorderPlaylistItems(req: AuthRequest, res: Response) {
+  async reorderPlaylistItems(req: Request, res: Response) {
     res.json({ success: true, message: 'Items reordered' });
   }
 
-  async getStoreSchedules(req: AuthRequest, res: Response) {
+  async getStoreSchedules(req: Request, res: Response) {
     res.json({ success: true, data: { schedules: [] } });
   }
 
-  async createSchedule(req: AuthRequest, res: Response) {
+  async createSchedule(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async updateSchedule(req: AuthRequest, res: Response) {
+  async updateSchedule(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async deleteSchedule(req: AuthRequest, res: Response) {
+  async deleteSchedule(req: Request, res: Response) {
     res.json({ success: true, message: 'Schedule deleted' });
   }
 
-  async getActiveSchedule(req: AuthRequest, res: Response) {
+  async getActiveSchedule(req: Request, res: Response) {
     res.json({ success: true, data: { activeSchedule: null } });
   }
 
-  async getTemplates(req: AuthRequest, res: Response) {
+  async getTemplates(req: Request, res: Response) {
     res.json({ success: true, data: { templates: [] } });
   }
 
-  async createTemplate(req: AuthRequest, res: Response) {
+  async createTemplate(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async updateTemplate(req: AuthRequest, res: Response) {
+  async updateTemplate(req: Request, res: Response) {
     res.json({ success: true, data: {} });
   }
 
-  async deleteTemplate(req: AuthRequest, res: Response) {
+  async deleteTemplate(req: Request, res: Response) {
     res.json({ success: true, message: 'Template deleted' });
   }
 
-  async getContentUsageAnalytics(req: AuthRequest, res: Response) {
+  async getContentUsageAnalytics(req: Request, res: Response) {
     res.json({ success: true, data: { totalPlays: 0, totalDuration: 0, averagePlayDuration: 0, topContents: [] } });
   }
 
-  async getStorePerformanceAnalytics(req: AuthRequest, res: Response) {
+  async getStorePerformanceAnalytics(req: Request, res: Response) {
     res.json({ success: true, data: [] });
   }
 
-  async getPlaybackStatus(req: AuthRequest, res: Response) {
+  async getPlaybackStatus(req: Request, res: Response) {
     res.json({ success: true, data: { isPlaying: false } });
   }
 
-  async changePlaybackContent(req: AuthRequest, res: Response) {
+  async changePlaybackContent(req: Request, res: Response) {
     res.json({ success: true, message: 'Playback changed' });
   }
 
-  async controlPlayback(req: AuthRequest, res: Response) {
+  async controlPlayback(req: Request, res: Response) {
     res.json({ success: true, message: 'Playback controlled' });
   }
 }

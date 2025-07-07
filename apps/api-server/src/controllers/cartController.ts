@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Product } from '../entities/Product';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../types/auth';
 
 export class CartController {
   private cartRepository = AppDataSource.getRepository(Cart);
@@ -11,9 +11,9 @@ export class CartController {
   private productRepository = AppDataSource.getRepository(Product);
 
   // 장바구니 조회
-  getCart = async (req: AuthRequest, res: Response) => {
+  getCart = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
 
       if (!userId) {
         return res.status(401).json({
@@ -35,7 +35,7 @@ export class CartController {
       }
 
       // 사용자 역할에 따른 가격 조정
-      const userRole = req.user?.role || 'customer';
+      const userRole = (req as AuthRequest).user?.role || 'customer';
       const cartWithUserPrices = {
         ...cart,
         items: cart.items.map(item => ({
@@ -61,9 +61,9 @@ export class CartController {
   };
 
   // 장바구니에 상품 추가
-  addToCart = async (req: AuthRequest, res: Response) => {
+  addToCart = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
       const { productId, quantity = 1 } = req.body;
 
       if (!userId) {
@@ -122,7 +122,7 @@ export class CartController {
         where: { cartId: cart.id, productId }
       });
 
-      const userRole = req.user?.role || 'customer';
+      const userRole = (req as AuthRequest).user?.role || 'customer';
       const priceForUser = product.getPriceForUser(userRole);
 
       if (existingItem) {
@@ -176,9 +176,9 @@ export class CartController {
   };
 
   // 장바구니 아이템 수량 수정
-  updateCartItem = async (req: AuthRequest, res: Response) => {
+  updateCartItem = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
       const { itemId } = req.params;
       const { quantity } = req.body;
 
@@ -247,9 +247,9 @@ export class CartController {
   };
 
   // 장바구니에서 아이템 제거
-  removeCartItem = async (req: AuthRequest, res: Response) => {
+  removeCartItem = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
       const { itemId } = req.params;
 
       if (!userId) {
@@ -298,9 +298,9 @@ export class CartController {
   };
 
   // 장바구니 비우기
-  clearCart = async (req: AuthRequest, res: Response) => {
+  clearCart = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
 
       if (!userId) {
         return res.status(401).json({

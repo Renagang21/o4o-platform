@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { forumService, ForumSearchOptions } from '../services/forumService';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../types/auth';
 import { PostType, PostStatus } from '../entities/ForumPost';
 
 export class ForumController {
@@ -50,10 +50,10 @@ export class ForumController {
     }
   };
 
-  createCategory = async (req: AuthRequest, res: Response) => {
+  createCategory = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
-      const userRole = req.user?.role;
+      const userId = (req as AuthRequest).user?.id;
+      const userRole = (req as AuthRequest).user?.role;
 
       if (!userId || !['admin', 'manager'].includes(userRole || '')) {
         return res.status(403).json({
@@ -78,10 +78,10 @@ export class ForumController {
     }
   };
 
-  updateCategory = async (req: AuthRequest, res: Response) => {
+  updateCategory = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
-      const userRole = req.user?.role;
+      const userId = (req as AuthRequest).user?.id;
+      const userRole = (req as AuthRequest).user?.role;
       const { categoryId } = req.params;
 
       if (!userId || !['admin', 'manager'].includes(userRole || '')) {
@@ -152,10 +152,10 @@ export class ForumController {
     }
   };
 
-  getPostById = async (req: AuthRequest, res: Response) => {
+  getPostById = async (req: Request, res: Response) => {
     try {
       const { postId } = req.params;
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
       
       const post = await forumService.getPost(postId, userId);
       
@@ -167,7 +167,7 @@ export class ForumController {
       }
 
       // 접근 권한 확인
-      if (!post.canUserView(req.user?.role || '')) {
+      if (!post.canUserView((req as AuthRequest).user?.role || '')) {
         return res.status(403).json({
           success: false,
           error: 'Access denied'
@@ -187,10 +187,10 @@ export class ForumController {
     }
   };
 
-  getPostBySlug = async (req: AuthRequest, res: Response) => {
+  getPostBySlug = async (req: Request, res: Response) => {
     try {
       const { slug } = req.params;
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
       
       const post = await forumService.getPostBySlug(slug, userId);
       
@@ -202,7 +202,7 @@ export class ForumController {
       }
 
       // 접근 권한 확인
-      if (!post.canUserView(req.user?.role || '')) {
+      if (!post.canUserView((req as AuthRequest).user?.role || '')) {
         return res.status(403).json({
           success: false,
           error: 'Access denied'
@@ -222,10 +222,10 @@ export class ForumController {
     }
   };
 
-  createPost = async (req: AuthRequest, res: Response) => {
+  createPost = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
-      const userRole = req.user?.role;
+      const userId = (req as AuthRequest).user?.id;
+      const userRole = (req as AuthRequest).user?.role;
 
       if (!userId) {
         return res.status(401).json({
@@ -252,10 +252,10 @@ export class ForumController {
     }
   };
 
-  updatePost = async (req: AuthRequest, res: Response) => {
+  updatePost = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
-      const userRole = req.user?.role || '';
+      const userId = (req as AuthRequest).user?.id;
+      const userRole = (req as AuthRequest).user?.role || '';
       const { postId } = req.params;
 
       if (!userId) {
@@ -310,9 +310,9 @@ export class ForumController {
     }
   };
 
-  createComment = async (req: AuthRequest, res: Response) => {
+  createComment = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as AuthRequest).user?.id;
 
       if (!userId) {
         return res.status(401).json({
@@ -338,9 +338,9 @@ export class ForumController {
   };
 
   // Statistics endpoint
-  getStatistics = async (req: AuthRequest, res: Response) => {
+  getStatistics = async (req: Request, res: Response) => {
     try {
-      const userRole = req.user?.role;
+      const userRole = (req as AuthRequest).user?.role;
 
       // 통계는 로그인된 사용자만 조회 가능
       if (!userRole) {

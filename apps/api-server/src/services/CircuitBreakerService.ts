@@ -518,13 +518,13 @@ export class CircuitBreakerService {
         message,
         severity,
         stats.serviceName,
-        {
+        JSON.stringify({
           circuitId: stats.circuitId,
           circuitState: stats.state,
           errorRate: stats.errorRate,
           responseTime: stats.averageResponseTime,
           timestamp: new Date().toISOString()
-        }
+        })
       );
 
       alert.alertType = AlertType.CIRCUIT_BREAKER;

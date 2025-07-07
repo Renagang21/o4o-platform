@@ -10,6 +10,7 @@ import {
   LoginRequest, 
   LoginResponse,
   UserRole,
+  UserStatus,
   CookieConfig 
 } from '../types/auth';
 
@@ -17,7 +18,7 @@ export class AuthService {
   private userRepository: Repository<User>;
   private jwtSecret: string;
   private jwtRefreshSecret: string;
-  private cookieConfig: CookieConfig;
+  private cookieConfig: any;
 
   constructor(userRepository: Repository<User>) {
     this.userRepository = userRepository;
@@ -79,9 +80,11 @@ export class AuthService {
     
     // Access Token (15분)
     const accessTokenPayload: AccessTokenPayload = {
+      userId: user.id,
       sub: user.id,
+      email: user.email,
       role: user.role,
-      permissions: user.permissions,
+      permissions: (user as any).permissions || [],
       domain,
       exp: Math.floor(Date.now() / 1000) + (15 * 60), // 15분
       iat: Math.floor(Date.now() / 1000)
@@ -89,7 +92,9 @@ export class AuthService {
 
     // Refresh Token (7일)
     const refreshTokenPayload: RefreshTokenPayload = {
+      userId: user.id,
       sub: user.id,
+      tokenVersion: 1,
       tokenFamily,
       exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 7일
       iat: Math.floor(Date.now() / 1000)
@@ -183,8 +188,7 @@ export class AuthService {
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || 'customer',
-      permissions: userData.permissions || this.getDefaultPermissions(userData.role || 'customer')
+      role: userData.role || UserRole.CUSTOMER
     });
 
     return await this.userRepository.save(user);
@@ -227,5 +231,82 @@ export class AuthService {
   // 쿠키 설정 반환
   getCookieConfig(): CookieConfig {
     return this.cookieConfig;
+  }
+
+  // === 추가된 메서드들 (Phase 2) ===
+
+  // 사용자 ID로 조회
+  async getUserById(id: string): Promise<User | null> {
+    try {
+      return await this.userRepository.findOne({ where: { id } });
+    } catch (error) {
+      console.error('Error getting user by id:', error);
+      return null;
+    }
+  }
+
+  // 사용자 역할 변경
+  async updateUserRole(userId: string, role: UserRole): Promise<User> {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    await this.userRepository.update(userId, { role });
+    const updatedUser = await this.getUserById(userId);
+    if (!updatedUser) {
+      throw new Error('Failed to update user role');
+    }
+    
+    return updatedUser;
+  }
+
+  // 비즈니스 정보 업데이트
+  async updateUserBusinessInfo(userId: string, businessInfo: any): Promise<User> {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    await this.userRepository.update(userId, { businessInfo });
+    const updatedUser = await this.getUserById(userId);
+    if (!updatedUser) {
+      throw new Error('Failed to update business info');
+    }
+    
+    return updatedUser;
+  }
+
+  // 역할별 사용자 목록 조회
+  async getUsersByRole(role: UserRole): Promise<User[]> {
+    try {
+      return await this.userRepository.find({ 
+        where: { role, isActive: true },
+        select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
+      });
+    } catch (error) {
+      console.error('Error getting users by role:', error);
+      return [];
+    }
+  }
+
+  // 사용자 계정 정지
+  async suspendUser(userId: string): Promise<User> {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    await this.userRepository.update(userId, { 
+      isActive: false, 
+      status: UserStatus.SUSPENDED 
+    });
+    
+    const suspendedUser = await this.getUserById(userId);
+    if (!suspendedUser) {
+      throw new Error('Failed to suspend user');
+    }
+    
+    return suspendedUser;
   }
 }

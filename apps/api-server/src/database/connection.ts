@@ -146,3 +146,6 @@ export async function closeDatabaseConnection() {
 
 // 기본 내보내기
 export default AppDataSource;
+
+// initializeDatabase function for backward compatibility
+export const initializeDatabase = () => AppDataSource.initialize();

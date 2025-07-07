@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { AppDataSource } from '../database/connection';
 import { User, UserStatus } from '../entities/User';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../types/auth';
 import { Like, SelectQueryBuilder } from 'typeorm';
 
-export const getPendingUsers = async (req: AuthRequest, res: Response) => {
+export const getPendingUsers = async (req: Request, res: Response) => {
   try {
     const { page = 1, limit = 10, businessType } = req.query;
     const offset = (Number(page) - 1) * Number(limit);
@@ -61,7 +61,7 @@ export const getPendingUsers = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getAllUsers = async (req: AuthRequest, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const { 
       page = 1, 
@@ -148,7 +148,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const approveUser = async (req: AuthRequest, res: Response) => {
+export const approveUser = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -187,7 +187,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     await userRepository.update(userId, {
       status: UserStatus.APPROVED,
       approvedAt: new Date(),
-      approvedBy: req.user!.id
+      approvedBy: (req as AuthRequest).user!.id
     });
 
     // TODO: 승인 이메일 발송
@@ -212,7 +212,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const rejectUser = async (req: AuthRequest, res: Response) => {
+export const rejectUser = async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -275,7 +275,7 @@ export const rejectUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const suspendUser = async (req: AuthRequest, res: Response) => {
+export const suspendUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const { reason } = req.body;
@@ -329,7 +329,7 @@ export const suspendUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const reactivateUser = async (req: AuthRequest, res: Response) => {
+export const reactivateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
@@ -382,7 +382,7 @@ export const reactivateUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getDashboardStats = async (req: AuthRequest, res: Response) => {
+export const getDashboardStats = async (req: Request, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
 

@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { AppDataSource } from './database/connection';
-import apiV1Router from './routes/v1';
+// import apiV1Router from './routes/v1'; // Disabled - using main.ts instead
 
 // 환경 변수 검증
 const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'];
@@ -78,8 +78,8 @@ if (NODE_ENV === 'development') {
 
 // ==================== 라우트 설정 ==================== //
 
-// API v1 라우터 연결
-app.use('/api/v1', apiV1Router);
+// API v1 라우터 연결 - disabled, using main.ts instead
+// app.use('/api/v1', apiV1Router);
 
 // 루트 엔드포인트
 app.get('/', (req, res) => {
