@@ -117,8 +117,8 @@ router.post('/register',
       user.email = email;
       user.password = hashedPassword;
       user.name = name;
-      user.role = UserRole.CUSTOMER; // 기본 역할
-      user.status = UserStatus.PENDING; // 관리자 승인 필요
+      user.role = 'customer'; // 기본 역할
+      user.status = 'pending'; // 관리자 승인 필요
 
       await userRepository.save(user);
 

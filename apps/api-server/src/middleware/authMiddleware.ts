@@ -4,7 +4,7 @@ import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { BetaUser } from '../entities/BetaUser';
 import { AuthService } from '../services/AuthService';
-import { UserRole, UserStatus, AccessTokenPayload, AuthRequest } from '../types/auth';
+import { UserRole, AccessTokenPayload } from '../types/auth';
 
 // Request 타입 확장 (새 SSO 시스템용)
 declare global {
@@ -15,12 +15,29 @@ declare global {
   }
 }
 
+// Legacy AuthRequest (기존 시스템 호환성)
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    name?: string;
+    status?: string;
+    businessInfo?: any;
+    betaUserId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    lastLoginAt?: Date;
+    [key: string]: any;
+  };
+}
+
 export class AuthMiddleware {
   private userRepository = AppDataSource.getRepository(User);
   private betaUserRepository = AppDataSource.getRepository(BetaUser);
 
   // Standard authentication for regular users
-  verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+  verifyToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -51,7 +68,7 @@ export class AuthMiddleware {
         });
       }
 
-      if (user.status !== UserStatus.APPROVED) {
+      if (user.status !== 'approved') {
         return res.status(403).json({ 
           error: 'Account not approved',
           code: 'ACCOUNT_NOT_APPROVED',
@@ -81,7 +98,7 @@ export class AuthMiddleware {
   };
 
   // Beta user authentication
-  verifyBetaUser = async (req: Request, res: Response, next: NextFunction) => {
+  verifyBetaUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -146,7 +163,7 @@ export class AuthMiddleware {
   };
 
   // Optional authentication - doesn't fail if no token
-  optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
+  optionalAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1];
@@ -187,7 +204,7 @@ export class AuthMiddleware {
           select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
         });
         
-        if (user && user.status === UserStatus.APPROVED) {
+        if (user && user.status === 'approved') {
           req.user = {
             id: user.id,
             email: user.email,
@@ -211,7 +228,7 @@ export class AuthMiddleware {
 
   // Role-based authorization
   requireRole = (roles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
       if (!req.user) {
         return res.status(401).json({ 
           error: 'Authentication required',
@@ -239,7 +256,7 @@ export class AuthMiddleware {
   requireManagerOrAdmin = this.requireRole(['admin', 'manager']);
 
   // Analytics access (admin, manager, or beta users for their own data)
-  requireAnalyticsAccess = (req: Request, res: Response, next: NextFunction) => {
+  requireAnalyticsAccess = (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ 
         error: 'Authentication required',
@@ -328,7 +345,7 @@ export class AuthMiddleware {
         });
       }
 
-      if (!allowedRoles.includes(req.user.role as UserRole)) {
+      if (!allowedRoles.includes(req.user.role)) {
         return res.status(403).json({
           success: false,
           message: 'Insufficient permissions'
@@ -457,7 +474,7 @@ export class AuthMiddleware {
 
       const allowedRoles = Object.keys(this.API_PERMISSIONS[category]) as UserRole[];
       
-      if (!allowedRoles.includes(req.user.role as UserRole)) {
+      if (!allowedRoles.includes(req.user.role)) {
         return res.status(403).json({
           success: false,
           message: `Access denied for ${category} API`
@@ -471,6 +488,3 @@ export class AuthMiddleware {
 
 // Export singleton instance
 export const authMiddleware = new AuthMiddleware();
-
-// Export alias for roleGuard
-export const roleGuard = authMiddleware.requireRoles;

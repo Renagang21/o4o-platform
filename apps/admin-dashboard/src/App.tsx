@@ -19,6 +19,8 @@ import Settings from '@/pages/settings/Settings';
 import Pages from '@/pages/pages/Pages';
 import Media from '@/pages/media/Media';
 import CustomFields from '@/pages/custom-fields/CustomFields';
+import { BlockEditorTest } from '@/pages/BlockEditorTest';
+import { BlockEditorDemo } from '@/pages/BlockEditorDemo';
 
 // SSO 클라이언트 인스턴스 생성
 const ssoClient = new SSOClient(
@@ -152,6 +154,12 @@ function App() {
                         <Settings />
                       </AdminProtectedRoute>
                     } />
+                    
+                    {/* 블록 에디터 테스트 (개발용) */}
+                    <Route path="/block-editor-test" element={<BlockEditorTest />} />
+                    
+                    {/* 블록 에디터 데모 */}
+                    <Route path="/block-editor" element={<BlockEditorDemo />} />
                     
                     {/* 404 핸들링 */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

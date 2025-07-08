@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
-import { UserRole, UserStatus } from '../types/auth';
 // import { IsEmail, IsEnum, IsArray, IsOptional } from 'class-validator';
+// import { UserRole } from '../types/auth';
 
-// Re-export types for external use
-export { UserRole, UserStatus };
+// Temporary type definition
+export type UserRole = 'customer' | 'admin' | 'seller' | 'supplier' | 'manager';
+export type UserStatus = 'active' | 'inactive' | 'pending';
 
 @Entity('users')
 @Index(['email'], { unique: true })
@@ -33,8 +34,8 @@ export class User {
 
   @Column({ 
     type: 'enum', 
-    enum: UserStatus,
-    default: UserStatus.PENDING
+    enum: ['active', 'inactive', 'pending'],
+    default: 'pending'
   })
   status!: UserStatus;
 
@@ -43,10 +44,10 @@ export class User {
 
   @Column({ 
     type: 'enum', 
-    enum: UserRole,
-    default: UserRole.CUSTOMER
+    enum: ['customer', 'admin', 'seller', 'supplier', 'manager'],
+    default: 'customer'
   })
-  // @IsEnum(UserRole)
+  // @IsEnum(['customer', 'admin', 'seller', 'supplier', 'manager'])
   role!: UserRole;
 
   @Column({ type: 'json', default: () => "'[]'" })
@@ -83,24 +84,6 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt!: Date;
-
-  // 승인 관련 필드
-  @Column({ type: 'timestamp', nullable: true })
-  // @IsOptional()
-  approvedAt?: Date;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  // @IsOptional()
-  approvedBy?: string; // 승인한 관리자 ID
-
-  // 소셜 로그인 제공자 정보
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  // @IsOptional()
-  provider?: string; // 'local', 'google', 'kakao' 등
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  // @IsOptional()
-  provider_id?: string; // 외부 제공자 사용자 ID
 
   // 계정 잠금 상태 확인
   get isLocked(): boolean {

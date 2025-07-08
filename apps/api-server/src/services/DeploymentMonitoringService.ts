@@ -1162,13 +1162,13 @@ export class DeploymentMonitoringService {
         : `Deployment ${deployment.version} failed: ${reason}`,
       success ? AlertSeverity.LOW : AlertSeverity.HIGH,
       'deployment-monitoring',
-      JSON.stringify({
+      {
         deploymentId: deployment.id,
         version: deployment.version,
         environment: deployment.environment,
         success,
         reason
-      })
+      }
     );
 
     alert.alertType = AlertType.DEPLOYMENT;
@@ -1183,14 +1183,14 @@ export class DeploymentMonitoringService {
         : `Rollback failed for deployment ${deployment.version}`,
       success ? AlertSeverity.MEDIUM : AlertSeverity.CRITICAL,
       'deployment-monitoring',
-      JSON.stringify({
+      {
         deploymentId: deployment.id,
         rollbackId: rollbackInfo.id,
         version: deployment.version,
         triggeredBy: rollbackInfo.triggeredBy,
         reason: rollbackInfo.reason,
         success
-      })
+      }
     );
 
     alert.alertType = AlertType.DEPLOYMENT;

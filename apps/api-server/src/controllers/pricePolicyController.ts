@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { PricePolicy, PricePolicyType, DiscountType, UserRole } from '../entities/PricePolicy';
 import { Product } from '../entities/Product';
 import { PricingService } from '../services/pricingService';
-import { AuthRequest } from '../types/auth';
+import { AuthRequest } from '../middleware/auth';
 
 export class PricePolicyController {
   private pricePolicyRepository = AppDataSource.getRepository(PricePolicy);
@@ -11,10 +11,10 @@ export class PricePolicyController {
   private pricingService = new PricingService();
 
   // 가격 정책 목록 조회
-  getPricePolicies = async (req: Request, res: Response) => {
+  getPricePolicies = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
-      if ((req as AuthRequest).user?.role !== 'admin' && (req as AuthRequest).user?.role !== 'manager') {
+      if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -88,7 +88,7 @@ export class PricePolicyController {
   };
 
   // 가격 정책 상세 조회
-  getPricePolicy = async (req: Request, res: Response) => {
+  getPricePolicy = async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
 
@@ -118,10 +118,10 @@ export class PricePolicyController {
   };
 
   // 가격 정책 생성
-  createPricePolicy = async (req: Request, res: Response) => {
+  createPricePolicy = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
-      if ((req as AuthRequest).user?.role !== 'admin' && (req as AuthRequest).user?.role !== 'manager') {
+      if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -130,7 +130,7 @@ export class PricePolicyController {
 
       const policyData = {
         ...req.body,
-        createdBy: (req as AuthRequest).user!.id
+        createdBy: req.user.id
       };
 
       // 데이터 검증
@@ -173,10 +173,10 @@ export class PricePolicyController {
   };
 
   // 가격 정책 수정
-  updatePricePolicy = async (req: Request, res: Response) => {
+  updatePricePolicy = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
-      if ((req as AuthRequest).user?.role !== 'admin' && (req as AuthRequest).user?.role !== 'manager') {
+      if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -224,10 +224,10 @@ export class PricePolicyController {
   };
 
   // 가격 정책 삭제 (비활성화)
-  deletePricePolicy = async (req: Request, res: Response) => {
+  deletePricePolicy = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
-      if ((req as AuthRequest).user?.role !== 'admin') {
+      if (req.user?.role !== 'admin') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -262,7 +262,7 @@ export class PricePolicyController {
   };
 
   // 가격 계산 시뮬레이션
-  simulatePrice = async (req: Request, res: Response) => {
+  simulatePrice = async (req: AuthRequest, res: Response) => {
     try {
       const {
         productId,
@@ -336,10 +336,10 @@ export class PricePolicyController {
   };
 
   // 사용자별 적용 가능한 정책 조회
-  getUserPolicies = async (req: Request, res: Response) => {
+  getUserPolicies = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
-      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const userId = req.user?.id;
+      const userRole = req.user?.role || 'customer';
 
       if (!userId) {
         return res.status(401).json({
@@ -388,10 +388,10 @@ export class PricePolicyController {
   };
 
   // 가격 정책 통계
-  getPolicyStatistics = async (req: Request, res: Response) => {
+  getPolicyStatistics = async (req: AuthRequest, res: Response) => {
     try {
       // 관리자 권한 확인
-      if ((req as AuthRequest).user?.role !== 'admin' && (req as AuthRequest).user?.role !== 'manager') {
+      if (req.user?.role !== 'admin' && req.user?.role !== 'manager') {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'

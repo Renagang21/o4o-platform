@@ -12,16 +12,6 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 10000,
     teardownTimeout: 10000,
-    // Exclude E2E test files to prevent conflicts with Playwright
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/cypress/**',
-      '**/*.{playwright,e2e}.{js,ts}',
-      '**/e2e/**',           // E2E 폴더 전체 제외
-      '**/*.spec.ts',        // .spec.ts 파일 제외 (Playwright용)
-      '**/*.e2e.{js,ts}'     // .e2e.js/ts 파일 제외
-    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

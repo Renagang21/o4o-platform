@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { Payment, PaymentType, PaymentProvider, PaymentGatewayStatus } from '../entities/Payment';
 import { Order, PaymentStatus, OrderStatus } from '../entities/Order';
 import { Product } from '../entities/Product';
-import { AuthRequest } from '../types/auth';
+import { AuthRequest } from '../middleware/auth';
 
 export class PaymentController {
   private paymentRepository = AppDataSource.getRepository(Payment);
@@ -11,9 +11,9 @@ export class PaymentController {
   private productRepository = AppDataSource.getRepository(Product);
 
   // 결제 요청 생성
-  createPaymentRequest = async (req: Request, res: Response) => {
+  createPaymentRequest = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = req.user?.id;
       const { orderId, paymentMethod, provider = PaymentProvider.IAMPORT } = req.body;
 
       if (!userId) {
@@ -225,9 +225,9 @@ export class PaymentController {
   };
 
   // 환불 처리
-  processRefund = async (req: Request, res: Response) => {
+  processRefund = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = req.user?.id;
       const { paymentId, amount, reason } = req.body;
 
       if (!userId) {
@@ -250,7 +250,7 @@ export class PaymentController {
       }
 
       // 관리자가 아닌 경우 본인 결제만 환불 가능
-      if ((req as AuthRequest).user?.role !== 'admin' && originalPayment.userId !== userId) {
+      if (req.user?.role !== 'admin' && originalPayment.userId !== userId) {
         return res.status(403).json({
           success: false,
           error: 'Insufficient permissions'
@@ -374,9 +374,9 @@ export class PaymentController {
   };
 
   // 결제 내역 조회
-  getPaymentHistory = async (req: Request, res: Response) => {
+  getPaymentHistory = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = req.user?.id;
       const { page = 1, limit = 10, type, status } = req.query;
 
       if (!userId) {

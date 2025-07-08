@@ -1,0 +1,260 @@
+{
+  "save": {
+    "success": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "id": "test-post-123",
+          "title": "Test Post",
+          "saved_at": "2024-01-01T12:00:00Z",
+          "version": 1
+        }
+      }
+    },
+    "error": {
+      "status": 500,
+      "body": {
+        "success": false,
+        "error": "서버 오류가 발생했습니다.",
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    "conflict": {
+      "status": 409,
+      "body": {
+        "success": false,
+        "error": "문서가 다른 사용자에 의해 수정되었습니다.",
+        "code": "DOCUMENT_CONFLICT",
+        "conflict": true,
+        "server_version": 2,
+        "client_version": 1
+      }
+    },
+    "unauthorized": {
+      "status": 401,
+      "body": {
+        "success": false,
+        "error": "인증이 필요합니다.",
+        "code": "UNAUTHORIZED"
+      }
+    }
+  },
+  "load": {
+    "success": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "id": "test-post-123",
+          "title": "Test Post",
+          "version": 1,
+          "created_at": "2024-01-01T10:00:00Z",
+          "modified_at": "2024-01-01T12:00:00Z",
+          "fields": {
+            "blocks": [
+              {
+                "id": "block-1",
+                "type": "paragraph",
+                "content": "저장 테스트 내용",
+                "attributes": {
+                  "align": "left",
+                  "fontSize": "normal",
+                  "textColor": "#000000",
+                  "backgroundColor": "#ffffff"
+                },
+                "metadata": {
+                  "created": "2024-01-01T10:00:00Z",
+                  "modified": "2024-01-01T12:00:00Z",
+                  "version": 1
+                }
+              },
+              {
+                "id": "block-2",
+                "type": "heading",
+                "content": "저장 테스트 제목",
+                "attributes": {
+                  "level": 2,
+                  "align": "left",
+                  "textColor": "#000000",
+                  "anchor": ""
+                },
+                "metadata": {
+                  "created": "2024-01-01T10:00:00Z",
+                  "modified": "2024-01-01T12:00:00Z",
+                  "version": 1
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "notFound": {
+      "status": 404,
+      "body": {
+        "success": false,
+        "error": "문서를 찾을 수 없습니다.",
+        "code": "DOCUMENT_NOT_FOUND"
+      }
+    },
+    "empty": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "id": "new-post",
+          "title": "새 문서",
+          "version": 0,
+          "fields": {
+            "blocks": []
+          }
+        }
+      }
+    }
+  },
+  "autosave": {
+    "success": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "autosaved_at": "2024-01-01T12:00:00Z",
+          "draft_id": "draft-123"
+        }
+      }
+    },
+    "throttled": {
+      "status": 429,
+      "body": {
+        "success": false,
+        "error": "자동 저장 요청이 너무 빈번합니다.",
+        "code": "RATE_LIMIT_EXCEEDED",
+        "retry_after": 30
+      }
+    }
+  },
+  "validation": {
+    "invalidBlock": {
+      "status": 400,
+      "body": {
+        "success": false,
+        "error": "유효하지 않은 블록 데이터입니다.",
+        "code": "VALIDATION_ERROR",
+        "details": {
+          "field": "blocks.0.type",
+          "message": "지원하지 않는 블록 타입입니다."
+        }
+      }
+    },
+    "missingContent": {
+      "status": 400,
+      "body": {
+        "success": false,
+        "error": "필수 내용이 누락되었습니다.",
+        "code": "VALIDATION_ERROR",
+        "details": {
+          "field": "blocks.0.content",
+          "message": "블록 내용은 필수입니다."
+        }
+      }
+    }
+  },
+  "network": {
+    "timeout": {
+      "action": "abort",
+      "reason": "timedout"
+    },
+    "offline": {
+      "action": "abort",
+      "reason": "failed"
+    },
+    "slow": {
+      "delay": 10000,
+      "status": 200,
+      "body": {
+        "success": true,
+        "message": "응답이 지연되었습니다."
+      }
+    }
+  },
+  "blockOperations": {
+    "createBlock": {
+      "status": 201,
+      "body": {
+        "success": true,
+        "data": {
+          "id": "new-block-id",
+          "type": "paragraph",
+          "content": "",
+          "attributes": {},
+          "metadata": {
+            "created": "2024-01-01T12:00:00Z",
+            "modified": "2024-01-01T12:00:00Z",
+            "version": 1
+          }
+        }
+      }
+    },
+    "updateBlock": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "updated_at": "2024-01-01T12:00:00Z",
+          "version": 2
+        }
+      }
+    },
+    "deleteBlock": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "deleted_at": "2024-01-01T12:00:00Z"
+        }
+      }
+    }
+  },
+  "versioning": {
+    "getVersions": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "versions": [
+            {
+              "version": 1,
+              "created_at": "2024-01-01T10:00:00Z",
+              "author": "Test User",
+              "changes": "초기 생성"
+            },
+            {
+              "version": 2,
+              "created_at": "2024-01-01T11:00:00Z",
+              "author": "Test User",
+              "changes": "블록 추가"
+            },
+            {
+              "version": 3,
+              "created_at": "2024-01-01T12:00:00Z",
+              "author": "Test User",
+              "changes": "내용 수정"
+            }
+          ]
+        }
+      }
+    },
+    "revertVersion": {
+      "status": 200,
+      "body": {
+        "success": true,
+        "data": {
+          "reverted_to": 2,
+          "new_version": 4,
+          "reverted_at": "2024-01-01T12:30:00Z"
+        }
+      }
+    }
+  }
+}

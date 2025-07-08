@@ -2,12 +2,23 @@ import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
-import { AuthRequest, UserRole, UserStatus } from '../types/auth';
 
-// Re-export AuthRequest for backward compatibility
-export { AuthRequest };
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    name?: string;
+    status?: string;
+    businessInfo?: any;
+    createdAt?: Date;
+    updatedAt?: Date;
+    lastLoginAt?: Date;
+    [key: string]: any;
+  };
+}
 
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -38,7 +49,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       });
     }
 
-    if (user.status !== UserStatus.APPROVED) {
+    if (user.status !== 'active') {
       return res.status(403).json({ 
         error: 'Account not active',
         code: 'ACCOUNT_NOT_ACTIVE',
@@ -46,12 +57,16 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       });
     }
 
-    (req as AuthRequest).user = {
+    (req as any).user = {
       id: user.id,
-      userId: user.id,
       email: user.email,
-      role: user.role as any, // Type casting needed as role is string in DB
-      status: user.status as any // Type casting needed as status is string in DB
+      name: user.name,
+      role: user.role,
+      status: user.status,
+      businessInfo: user.businessInfo,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      lastLoginAt: user.lastLoginAt
     };
     next();
   } catch (error) {
@@ -63,21 +78,20 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
 };
 
 export const requireRole = (roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const authReq = req as AuthRequest;
-    if (!authReq.user) {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
       return res.status(401).json({ 
         error: 'Authentication required',
         code: 'AUTH_REQUIRED'
       });
     }
 
-    if (!roles.includes(authReq.user.role)) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({ 
         error: 'Insufficient permissions',
         code: 'INSUFFICIENT_PERMISSIONS',
         required: roles,
-        current: authReq.user.role
+        current: req.user.role
       });
     }
 
@@ -87,43 +101,3 @@ export const requireRole = (roles: string[]) => {
 
 export const requireAdmin = requireRole(['admin']);
 export const requireManagerOrAdmin = requireRole(['admin', 'manager']);
-
-// Optional authentication - doesn't fail if no token
-export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-      return next();
-    }
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      return next();
-    }
-
-    const decoded = jwt.verify(token, jwtSecret) as any;
-    const userRepository = AppDataSource.getRepository(User);
-    
-    const user = await userRepository.findOne({ 
-      where: { id: decoded.userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
-    });
-    
-    if (user && user.status === UserStatus.APPROVED) {
-      (req as AuthRequest).user = {
-        id: user.id,
-        userId: user.id,
-        email: user.email,
-        role: user.role as any,
-        status: user.status as any
-      };
-    }
-
-    next();
-  } catch (error) {
-    // Continue without authentication
-    next();
-  }
-};

@@ -1,0 +1,170 @@
+{
+  "testPosts": [
+    {
+      "id": "test-post-1",
+      "title": "E2E 테스트 포스트 1",
+      "blocks": [
+        {
+          "id": "block-heading-1",
+          "type": "heading",
+          "content": "메인 제목",
+          "attributes": { 
+            "level": 1, 
+            "align": "center",
+            "textColor": "#000000"
+          },
+          "metadata": {
+            "created": "2024-01-01T00:00:00Z",
+            "modified": "2024-01-01T00:00:00Z",
+            "version": 1
+          }
+        },
+        {
+          "id": "block-paragraph-1",
+          "type": "paragraph",
+          "content": "첫 번째 단락 내용입니다.",
+          "attributes": { 
+            "align": "left",
+            "fontSize": "normal",
+            "textColor": "#000000",
+            "backgroundColor": "#ffffff"
+          },
+          "metadata": {
+            "created": "2024-01-01T00:00:00Z",
+            "modified": "2024-01-01T00:00:00Z",
+            "version": 1
+          }
+        },
+        {
+          "id": "block-heading-2",
+          "type": "heading",
+          "content": "부제목",
+          "attributes": { 
+            "level": 2, 
+            "align": "left",
+            "textColor": "#333333"
+          },
+          "metadata": {
+            "created": "2024-01-01T00:00:00Z",
+            "modified": "2024-01-01T00:00:00Z",
+            "version": 1
+          }
+        },
+        {
+          "id": "block-paragraph-2",
+          "type": "paragraph",
+          "content": "두 번째 단락 내용입니다.",
+          "attributes": { 
+            "align": "justify",
+            "fontSize": "normal",
+            "textColor": "#000000",
+            "backgroundColor": "#f9f9f9"
+          },
+          "metadata": {
+            "created": "2024-01-01T00:00:00Z",
+            "modified": "2024-01-01T00:00:00Z",
+            "version": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-post-2",
+      "title": "E2E 테스트 포스트 2",
+      "blocks": [
+        {
+          "id": "block-simple-1",
+          "type": "paragraph",
+          "content": "간단한 테스트 내용",
+          "attributes": { 
+            "align": "center",
+            "fontSize": "large",
+            "textColor": "#ff0000",
+            "backgroundColor": "#ffffff"
+          },
+          "metadata": {
+            "created": "2024-01-01T00:00:00Z",
+            "modified": "2024-01-01T00:00:00Z",
+            "version": 1
+          }
+        }
+      ]
+    }
+  ],
+  "blockTemplates": {
+    "paragraph": {
+      "type": "paragraph",
+      "content": "",
+      "attributes": {
+        "align": "left",
+        "fontSize": "normal",
+        "textColor": "#000000",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "heading": {
+      "type": "heading",
+      "content": "",
+      "attributes": {
+        "level": 2,
+        "align": "left",
+        "textColor": "#000000",
+        "anchor": ""
+      }
+    },
+    "image": {
+      "type": "image",
+      "content": "",
+      "attributes": {
+        "src": "",
+        "alt": "",
+        "caption": "",
+        "align": "center",
+        "width": 600,
+        "height": 400,
+        "linkUrl": "",
+        "linkTarget": "_self"
+      }
+    },
+    "list": {
+      "type": "list",
+      "content": "",
+      "attributes": {
+        "ordered": false,
+        "items": [],
+        "reversed": false,
+        "start": 1
+      }
+    }
+  },
+  "testScenarios": {
+    "basicEditing": {
+      "description": "기본 편집 시나리오",
+      "steps": [
+        { "action": "createParagraph", "content": "첫 번째 단락" },
+        { "action": "createHeading", "content": "제목", "level": 2 },
+        { "action": "createParagraph", "content": "두 번째 단락" }
+      ]
+    },
+    "complexFormatting": {
+      "description": "복잡한 포맷팅 시나리오",
+      "steps": [
+        { "action": "createHeading", "content": "메인 제목", "level": 1 },
+        { "action": "setAlignment", "target": "last", "value": "center" },
+        { "action": "setTextColor", "target": "last", "value": "#ff0000" },
+        { "action": "createParagraph", "content": "스타일이 적용된 단락" },
+        { "action": "setAlignment", "target": "last", "value": "justify" },
+        { "action": "setFontSize", "target": "last", "value": "large" }
+      ]
+    },
+    "reordering": {
+      "description": "블록 재정렬 시나리오",
+      "steps": [
+        { "action": "createParagraph", "content": "첫 번째" },
+        { "action": "createParagraph", "content": "두 번째" },
+        { "action": "createParagraph", "content": "세 번째" },
+        { "action": "moveBlock", "from": 0, "to": 2 }
+      ]
+    }
+  }
+}

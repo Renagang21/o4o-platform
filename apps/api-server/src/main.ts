@@ -175,7 +175,3 @@ const startServer = async () => {
 };
 
 startServer().catch(console.error);
-
-// Export services for other modules
-export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
-export const realtimeFeedbackService = new (require('./services/realtimeFeedbackService').RealtimeFeedbackService)();

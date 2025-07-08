@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { AuthRequest } from '../types/auth';
+import { AuthRequest } from '../middleware/auth';
 import { betaUserService, BetaUserRegistrationData, BetaFeedbackData, BetaUserSearchOptions, BetaFeedbackSearchOptions } from '../services/betaUserService';
 import { BetaUserStatus, BetaUserType, InterestArea } from '../entities/BetaUser';
 import { BetaFeedback, FeedbackType, FeedbackStatus, FeedbackPriority, SignageFeature } from '../entities/BetaFeedback';
@@ -224,9 +224,9 @@ export class BetaUserController {
 
   // Admin endpoints (require authentication)
   
-  async getBetaUsers(req: Request, res: Response) {
+  async getBetaUsers(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -273,9 +273,9 @@ export class BetaUserController {
     }
   }
 
-  async getBetaUserById(req: Request, res: Response) {
+  async getBetaUserById(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       
       if (!['admin', 'manager'].includes(user.role)) {
@@ -316,9 +316,9 @@ export class BetaUserController {
     }
   }
 
-  async approveBetaUser(req: Request, res: Response) {
+  async approveBetaUser(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       const { notes } = req.body;
       
@@ -362,9 +362,9 @@ export class BetaUserController {
     }
   }
 
-  async updateBetaUserStatus(req: Request, res: Response) {
+  async updateBetaUserStatus(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       const { status } = req.body;
       
@@ -420,9 +420,9 @@ export class BetaUserController {
 
   // Feedback management endpoints
 
-  async getFeedback(req: Request, res: Response) {
+  async getFeedback(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -472,9 +472,9 @@ export class BetaUserController {
     }
   }
 
-  async getFeedbackById(req: Request, res: Response) {
+  async getFeedbackById(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       
       if (!['admin', 'manager'].includes(user.role)) {
@@ -515,9 +515,9 @@ export class BetaUserController {
     }
   }
 
-  async assignFeedback(req: Request, res: Response) {
+  async assignFeedback(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       const { assigneeId } = req.body;
       
@@ -561,9 +561,9 @@ export class BetaUserController {
     }
   }
 
-  async respondToFeedback(req: Request, res: Response) {
+  async respondToFeedback(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       const { response } = req.body;
       
@@ -627,9 +627,9 @@ export class BetaUserController {
     }
   }
 
-  async updateFeedbackStatus(req: Request, res: Response) {
+  async updateFeedbackStatus(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       const { status } = req.body;
       
@@ -683,9 +683,9 @@ export class BetaUserController {
     }
   }
 
-  async updateFeedbackPriority(req: Request, res: Response) {
+  async updateFeedbackPriority(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       const { id } = req.params;
       const { priority } = req.body;
       
@@ -741,9 +741,9 @@ export class BetaUserController {
 
   // Analytics endpoints
 
-  async getBetaAnalytics(req: Request, res: Response) {
+  async getBetaAnalytics(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       
       if (user.role !== 'admin') {
         return res.status(403).json({
@@ -777,9 +777,9 @@ export class BetaUserController {
     }
   }
 
-  async getHighPriorityFeedback(req: Request, res: Response) {
+  async getHighPriorityFeedback(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -813,9 +813,9 @@ export class BetaUserController {
     }
   }
 
-  async getUnassignedFeedback(req: Request, res: Response) {
+  async getUnassignedFeedback(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -850,9 +850,9 @@ export class BetaUserController {
   }
 
   // Real-time conversation methods
-  async createConversation(req: Request, res: Response) {
+  async createConversation(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
       
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -894,10 +894,10 @@ export class BetaUserController {
     }
   }
 
-  async getConversation(req: Request, res: Response) {
+  async getConversation(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       const conversationRepo = AppDataSource.getRepository(FeedbackConversation);
       const conversation = await conversationRepo.findOne({
@@ -945,11 +945,11 @@ export class BetaUserController {
     }
   }
 
-  async sendMessage(req: Request, res: Response) {
+  async sendMessage(req: AuthRequest, res: Response) {
     try {
       const { id: conversationId } = req.params;
       const { content, messageType = MessageType.TEXT } = req.body;
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       const conversationRepo = AppDataSource.getRepository(FeedbackConversation);
       const messageRepo = AppDataSource.getRepository(ConversationMessage);
@@ -1007,11 +1007,11 @@ export class BetaUserController {
     }
   }
 
-  async updateConversationStatus(req: Request, res: Response) {
+  async updateConversationStatus(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -1055,10 +1055,10 @@ export class BetaUserController {
     }
   }
 
-  async getUserConversations(req: Request, res: Response) {
+  async getUserConversations(req: AuthRequest, res: Response) {
     try {
       const { betaUserId } = req.params;
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -1152,10 +1152,10 @@ export class BetaUserController {
     }
   }
 
-  async markFeedbackViewed(req: Request, res: Response) {
+  async markFeedbackViewed(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
@@ -1199,9 +1199,9 @@ export class BetaUserController {
     }
   }
 
-  async getRealtimeStats(req: Request, res: Response) {
+  async getRealtimeStats(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       if (user.role !== 'admin') {
         return res.status(403).json({
@@ -1260,9 +1260,9 @@ export class BetaUserController {
     }
   }
 
-  async getPendingNotifications(req: Request, res: Response) {
+  async getPendingNotifications(req: AuthRequest, res: Response) {
     try {
-      const user = (req as AuthRequest).user as unknown as User;
+      const user = req.user as User;
 
       if (!['admin', 'manager'].includes(user.role)) {
         return res.status(403).json({
