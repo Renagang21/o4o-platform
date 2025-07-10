@@ -15,8 +15,8 @@ import SupplierProductDetail from './pages/supplier/ProductDetail';
 import RetailerDashboard from './pages/retailer/Dashboard';
 import CustomerShop from './pages/customer/Shop';
 
-// Digital Signage Pages
-import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
+// Digital Signage Pages - 삭제됨
+// import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
 // TheDANG Style Home (without editor)
 import TheDANGStyleHome from './pages/TheDANGStyleHome';
@@ -95,12 +95,12 @@ const App: React.FC = () => {
           {/* Customer Routes */}
           <Route path="/shop" element={<CustomerShop />} />
           
-          {/* Digital Signage Routes */}
+          {/* Digital Signage Routes - 삭제됨 */}
           <Route
             path="/signage"
             element={
                 <PrivateRoute allowedRoles={['admin', 'manager']}>
-                  <DigitalSignageDashboard />
+                  <DisabledFeaturePage />
                 </PrivateRoute>
             }
           />
@@ -108,7 +108,7 @@ const App: React.FC = () => {
             path="/signage/*"
             element={
                 <PrivateRoute allowedRoles={['admin', 'manager']}>
-                  <DigitalSignageDashboard />
+                  <DisabledFeaturePage />
                 </PrivateRoute>
             }
           />

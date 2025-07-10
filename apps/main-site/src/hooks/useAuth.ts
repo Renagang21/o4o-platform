@@ -6,8 +6,8 @@ export const useAuth = () => {
 
   const login = async (data: LoginRequest) => {
     try {
-      await context.login(data);
-      return { success: true };
+      const success = await context.login(data.email, data.password);
+      return { success };
     } catch (error: any) {
       return {
         success: false,

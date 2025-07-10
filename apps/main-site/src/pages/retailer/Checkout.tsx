@@ -47,8 +47,8 @@ export default function Checkout() {
 
     // 사용자 정보로 폼 초기값 설정
     if (user) {
-      setValue('recipientName', user.name);
-      setValue('phone', user.phone);
+      setValue('recipientName', user.name || '');
+      setValue('phone', user.phone || '');
     }
   }, [location.state, user, navigate, setValue]);
 

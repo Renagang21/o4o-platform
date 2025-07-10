@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           toast.error('이메일 또는 비밀번호가 올바르지 않습니다.');
           break;
         case 'ACCOUNT_PENDING':
-          toast.warning('계정 승인 대기 중입니다. 관리자 승인 후 이용하실 수 있습니다.');
+          toast('계정 승인 대기 중입니다. 관리자 승인 후 이용하실 수 있습니다.', { icon: '⚠️' });
           break;
         case 'ACCOUNT_REJECTED':
           toast.error('계정이 거부되었습니다. 관리자에게 문의하세요.');
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     Cookies.remove('authToken');
     Cookies.remove('user');
     setUser(null);
-    toast.info('로그아웃되었습니다.');
+    toast('로그아웃되었습니다.', { icon: '👋' });
   };
 
   // 사용자 정보 업데이트
@@ -174,7 +174,7 @@ export const usePermissions = (): UserPermissions => {
     isPartner: user?.role === 'partner', 
     isUser: user?.role === 'user',
     isManagerOrAdmin: user?.role === 'admin' || user?.role === 'manager',
-    hasRole: (roles: UserRole[]) => user ? roles.includes(user.role) : false,
+    hasRole: (roles: UserRole[]) => user && user.role ? roles.includes(user.role) : false,
     canAccessAdmin: user?.role === 'admin' || user?.role === 'manager',
   };
 };

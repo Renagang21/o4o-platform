@@ -51,8 +51,8 @@ export default function CustomerCheckout() {
     setSelectedItems(items);
 
     // 사용자 정보로 폼 초기값 설정
-    setValue('recipientName', user.name);
-    setValue('phone', user.phone);
+    setValue('recipientName', user.name || '');
+    setValue('phone', user.phone || '');
   }, [location.state, user, navigate, setValue]);
 
   // 고객용 가격 계산 (할인 없음)
