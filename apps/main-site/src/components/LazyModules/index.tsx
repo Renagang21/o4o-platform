@@ -21,8 +21,9 @@ const LazyDropshippingPage = lazy(() => import('../../pages/DropshippingPage').t
 const LazyHealthcarePage = lazy(() => import('../../pages/healthcare/HealthcarePage').then(module => ({ default: module.HealthcarePage })));
 const LazyHealthcareDemo = lazy(() => import('../../components/healthcare/HealthcareDemo'));
 const LazyTheDANGStyleEditorPage = lazy(() => import('../../pages/TheDANGStyleEditorPage'));
-const LazyFullScreenEditorSimpleTest = lazy(() => import('../../pages/FullScreenEditorSimpleTest').then(module => ({ default: module.FullScreenEditorSimpleTest })));
-const LazyAdminDashboardTest = lazy(() => import('../../pages/AdminDashboardTest').then(module => ({ default: module.AdminDashboardTest })));
+// 삭제된 컴포넌트들
+// const LazyFullScreenEditorSimpleTest = lazy(() => import('../../pages/FullScreenEditorSimpleTest').then(module => ({ default: module.FullScreenEditorSimpleTest })));
+// const LazyAdminDashboardTest = lazy(() => import('../../pages/AdminDashboardTest').then(module => ({ default: module.AdminDashboardTest })));
 
 // 안전한 Lazy 래퍼 컴포넌트들
 export const SafeDropshippingPage: React.FC = () => (
