@@ -2,7 +2,7 @@ name: 🧪 Test & Build Pipeline
 
 on:
   push:
-    branches: [ main, develop, 'feature/*', 'fix/*' ]
+    branches: [ main, develop, 'feature/*', 'fix/*', 'release/*' ]
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:  # 수동 트리거 허용
