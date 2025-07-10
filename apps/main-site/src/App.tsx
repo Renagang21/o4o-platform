@@ -23,7 +23,7 @@ import TheDANGStyleHome from './pages/TheDANGStyleHome';
 // Temporarily disabled: import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
 
 // Test Dashboard
-import { TestDashboard } from './features/test-dashboard';
+// import { TestDashboard } from './features/test-dashboard'; // 삭제됨
 
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
@@ -113,8 +113,8 @@ const App: React.FC = () => {
             }
           />
 
-          {/* Test Dashboard */}
-          <Route path="/test-dashboard" element={<TestDashboard />} />
+          {/* Test Dashboard - 삭제됨 */}
+          {/* <Route path="/test-dashboard" element={<TestDashboard />} /> */}
           
           {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
           <Route path="/editor" element={<DisabledFeaturePage />} />
