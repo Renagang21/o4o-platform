@@ -5,7 +5,7 @@ import { Alert, AlertSeverity, AlertType } from '../entities/Alert';
 import { WebhookService } from './webhookService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import * as fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import * as path from 'path';
 
 const execAsync = promisify(exec);

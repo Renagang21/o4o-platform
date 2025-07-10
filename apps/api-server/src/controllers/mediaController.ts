@@ -5,7 +5,7 @@ import { User } from '../entities/User';
 import { ImageProcessingService } from '../services/imageProcessingService';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 export class MediaController {

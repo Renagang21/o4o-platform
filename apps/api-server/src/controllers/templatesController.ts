@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { Template } from '../entities/Template';
 import { User } from '../entities/User';
 import path from 'path';
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 
 export class TemplatesController {
   private templateRepository = AppDataSource.getRepository(Template);

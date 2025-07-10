@@ -10,6 +10,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
