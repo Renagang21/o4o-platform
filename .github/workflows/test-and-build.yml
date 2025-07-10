@@ -143,10 +143,16 @@ jobs:
         run: npm run test:coverage --workspace=@o4o/admin-dashboard
         
       - name: 📊 SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=renagang21
+            -Dsonar.projectKey=o4o-platform
+            -Dsonar.sources=apps/,packages/
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
 
   # 🚀 배포 준비 (main 브랜치만)
   deploy-staging:
