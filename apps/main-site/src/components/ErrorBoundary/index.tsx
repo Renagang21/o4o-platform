@@ -1,4 +1,5 @@
 import React from 'react';
+import { ModuleErrorBoundary } from './ModuleErrorBoundary';
 
 export { ErrorBoundary } from '../ErrorBoundary';
 export { ModuleErrorBoundary } from './ModuleErrorBoundary';
