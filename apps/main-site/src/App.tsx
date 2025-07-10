@@ -99,7 +99,7 @@ const App: React.FC = () => {
           <Route
             path="/signage"
             element={
-                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                <PrivateRoute allowedRoles={['admin', 'manager']}>
                   <DigitalSignageDashboard />
                 </PrivateRoute>
             }
@@ -107,7 +107,7 @@ const App: React.FC = () => {
           <Route
             path="/signage/*"
             element={
-                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
+                <PrivateRoute allowedRoles={['admin', 'manager']}>
                   <DigitalSignageDashboard />
                 </PrivateRoute>
             }

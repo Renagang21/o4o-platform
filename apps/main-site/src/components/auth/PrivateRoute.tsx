@@ -5,10 +5,10 @@ import { UserType } from '../../types/user';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
-  allowedUserTypes?: UserType[];
+  allowedRoles?: string[];
 }
 
-export default function PrivateRoute({ children, allowedUserTypes }: PrivateRouteProps) {
+export default function PrivateRoute({ children, allowedRoles }: PrivateRouteProps) {
   const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
 
@@ -18,7 +18,7 @@ export default function PrivateRoute({ children, allowedUserTypes }: PrivateRout
   }
 
   // 특정 사용자 타입만 허용하는 경우
-  if (allowedUserTypes && !allowedUserTypes.includes(user.userType)) {
+  if (allowedRoles && !allowedRoles.includes(user.userType)) {
     // 권한이 없는 경우 사용자 타입별 기본 페이지로 리다이렉트
     switch (user.userType) {
       case 'admin':

@@ -15,7 +15,7 @@ const roleLabel: Record<string, string> = {
 };
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ user, onLogout, onPasswordChange }) => {
-  const joinDate = user._id.length === 24 ? new Date(parseInt(user._id.substring(0, 8), 16) * 1000) : new Date();
+  const joinDate = user._id && user._id.length === 24 ? new Date(parseInt(user._id.substring(0, 8), 16) * 1000) : new Date();
   const formattedDate = joinDate.toISOString().slice(0, 10);
 
   return (
@@ -30,11 +30,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, onLogout, onPasswordCha
       <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
         <Shield size={18} />
         <span className="font-medium">역할:</span>
-        <span>{roleLabel[user.roles[0]]}</span>
-        {user.roles.includes('yaksa' as UserRole) && (
+        <span>{user.roles && user.roles[0] ? roleLabel[user.roles[0]] || user.roles[0] : 'Unknown'}</span>
+        {user.roles?.includes('yaksa' as UserRole) && (
           <span className="ml-2 px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs">약사 인증 대기/승인</span>
         )}
-        {user.roles.includes('admin' as UserRole) && (
+        {user.roles?.includes('admin' as UserRole) && (
           <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-800 text-xs">관리자</span>
         )}
       </div>

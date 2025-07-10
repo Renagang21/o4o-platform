@@ -91,7 +91,7 @@ class TokenManager {
     }, delay);
   }
 
-  private async refreshAccessToken(): Promise<string | null> {
+  public async refreshAccessToken(): Promise<string | null> {
     if (this.isRefreshing) {
       // 이미 갱신 중이면 큐에 추가하고 대기
       return new Promise((resolve) => {

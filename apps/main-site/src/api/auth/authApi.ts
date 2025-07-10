@@ -42,10 +42,10 @@ export const authApi = {
       } catch (error) {
         console.error('SSO 로그인 실패, 레거시 시스템으로 폴백:', error);
         // SSO 실패 시 레거시 시스템으로 폴백
-        return this.legacyLogin(data);
+        return authApi?.legacyLogin(data) || Promise.reject(new Error('Auth API not available'));
       }
     } else {
-      return this.legacyLogin(data);
+      return authApi?.legacyLogin(data) || Promise.reject(new Error('Auth API not available'));
     }
   },
 
