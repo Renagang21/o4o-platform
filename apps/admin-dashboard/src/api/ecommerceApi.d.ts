@@ -1,0 +1,77 @@
+import { Product, Order, Customer, Coupon, InventoryItem, StockMovement, ProductFilters, OrderFilters, BulkProductAction, BulkOrderAction, SalesReport, ProductAnalytics, ProductCategory, ProductTag, EcommerceSettings } from '@/types/ecommerce';
+import { ApiResponse, PaginatedResponse } from '@/types';
+export declare class EcommerceApi {
+    static getProducts(page?: number, limit?: number, filters?: ProductFilters): Promise<PaginatedResponse<Product>>;
+    static getProduct(productId: string): Promise<ApiResponse<Product>>;
+    static createProduct(productData: Partial<Product>): Promise<ApiResponse<Product>>;
+    static updateProduct(productId: string, productData: Partial<Product>): Promise<ApiResponse<Product>>;
+    static deleteProduct(productId: string): Promise<ApiResponse<void>>;
+    static bulkProductAction(action: BulkProductAction): Promise<ApiResponse<void>>;
+    static duplicateProduct(productId: string): Promise<ApiResponse<Product>>;
+    static getCategories(): Promise<ApiResponse<ProductCategory[]>>;
+    static createCategory(categoryData: Partial<ProductCategory>): Promise<ApiResponse<ProductCategory>>;
+    static updateCategory(categoryId: string, categoryData: Partial<ProductCategory>): Promise<ApiResponse<ProductCategory>>;
+    static deleteCategory(categoryId: string): Promise<ApiResponse<void>>;
+    static getTags(): Promise<ApiResponse<ProductTag[]>>;
+    static createTag(tagData: Partial<ProductTag>): Promise<ApiResponse<ProductTag>>;
+    static getOrders(page?: number, limit?: number, filters?: OrderFilters): Promise<PaginatedResponse<Order>>;
+    static getOrder(orderId: string): Promise<ApiResponse<Order>>;
+    static updateOrderStatus(orderId: string, status: string, note?: string): Promise<ApiResponse<Order>>;
+    static refundOrder(orderId: string, amount: number, reason?: string, items?: Array<{
+        orderItemId: string;
+        quantity: number;
+        amount: number;
+    }>): Promise<ApiResponse<void>>;
+    static bulkOrderAction(action: BulkOrderAction): Promise<ApiResponse<void>>;
+    static getCustomers(page?: number, limit?: number, search?: string): Promise<PaginatedResponse<Customer>>;
+    static getCustomer(customerId: string): Promise<ApiResponse<Customer>>;
+    static getCustomerOrders(customerId: string): Promise<ApiResponse<Order[]>>;
+    static getCoupons(page?: number, limit?: number): Promise<PaginatedResponse<Coupon>>;
+    static getCoupon(_id: string): Promise<ApiResponse<Coupon>>;
+    static createCoupon(couponData: Partial<Coupon>): Promise<ApiResponse<Coupon>>;
+    static updateCoupon(couponId: string, couponData: Partial<Coupon>): Promise<ApiResponse<Coupon>>;
+    static deleteCoupon(couponId: string): Promise<ApiResponse<void>>;
+    static getInventory(page?: number, limit?: number, lowStock?: boolean): Promise<PaginatedResponse<InventoryItem>>;
+    static updateStock(productId: string, quantity: number, type: 'set' | 'increase' | 'decrease', note?: string): Promise<ApiResponse<void>>;
+    static getStockMovements(productId?: string, page?: number, limit?: number): Promise<PaginatedResponse<StockMovement>>;
+    static getSalesReport(period: 'today' | 'week' | 'month' | 'year' | 'custom', startDate?: string, endDate?: string): Promise<ApiResponse<SalesReport>>;
+    static getProductAnalytics(productId?: string, period?: string): Promise<ApiResponse<ProductAnalytics | ProductAnalytics[]>>;
+    static getDashboardStats(): Promise<ApiResponse<{
+        todaySales: number;
+        todayOrders: number;
+        totalProducts: number;
+        lowStockProducts: number;
+        pendingOrders: number;
+        totalCustomers: number;
+    }>>;
+    static getSettings(): Promise<ApiResponse<EcommerceSettings>>;
+    static updateSettings(settings: Partial<EcommerceSettings>): Promise<ApiResponse<EcommerceSettings>>;
+    static getPointsOverview(): Promise<ApiResponse<any>>;
+    static getTopPointsUsers(): Promise<ApiResponse<any[]>>;
+    static getPointsTransactions(page?: number, limit?: number): Promise<PaginatedResponse<any>>;
+    static getPointsRewards(): Promise<ApiResponse<any[]>>;
+    static createPointsReward(reward: any): Promise<ApiResponse<any>>;
+    static updatePointsReward(id: string, reward: any): Promise<ApiResponse<any>>;
+    static deletePointsReward(_id: string): Promise<ApiResponse<void>>;
+    static getPointsPolicy(): Promise<ApiResponse<any>>;
+    static updatePointsPolicy(policy: any): Promise<ApiResponse<any>>;
+    static exportPointsTransactions(_filters: any): Promise<ApiResponse<any>>;
+    static getGeneralSettings(): Promise<ApiResponse<any>>;
+    static getPaymentSettings(): Promise<ApiResponse<any>>;
+    static testPaymentProvider(provider: string): Promise<ApiResponse<any>>;
+    static getShippingSettings(): Promise<ApiResponse<any>>;
+    static updateShippingSettings(settings: any): Promise<ApiResponse<any>>;
+    static uploadMedia(file: File): Promise<ApiResponse<{
+        id: string;
+        url: string;
+        filename: string;
+    }>>;
+    static exportProducts(filters?: ProductFilters): Promise<Blob>;
+    static exportOrders(filters?: OrderFilters): Promise<Blob>;
+    static getCouponBanners(): Promise<ApiResponse<any[]>>;
+    static createCouponBanner(banner: any): Promise<ApiResponse<any>>;
+    static updateCouponBanner(id: string, banner: any): Promise<ApiResponse<any>>;
+    static deleteCouponBanner(_id: string): Promise<ApiResponse<void>>;
+    static getCouponUsage(): Promise<ApiResponse<any[]>>;
+}
+//# sourceMappingURL=ecommerceApi.d.ts.map

@@ -7,7 +7,6 @@ import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../en
 import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert';
 import { BetaUser } from '../entities/BetaUser';
 import { BetaFeedback } from '../entities/BetaFeedback';
-import { ContentUsageLog } from '../entities/ContentUsageLog';
 
 export interface SessionData {
   betaUserId: string;
@@ -69,7 +68,6 @@ export class AnalyticsService {
   private alertRepo: Repository<Alert>;
   private betaUserRepo: Repository<BetaUser>;
   private betaFeedbackRepo: Repository<BetaFeedback>;
-  private contentUsageLogRepo: Repository<ContentUsageLog>;
 
   constructor() {
     this.userSessionRepo = AppDataSource.getRepository(UserSession);
@@ -79,7 +77,6 @@ export class AnalyticsService {
     this.alertRepo = AppDataSource.getRepository(Alert);
     this.betaUserRepo = AppDataSource.getRepository(BetaUser);
     this.betaFeedbackRepo = AppDataSource.getRepository(BetaFeedback);
-    this.contentUsageLogRepo = AppDataSource.getRepository(ContentUsageLog);
   }
 
   // Session Management
@@ -322,45 +319,12 @@ export class AnalyticsService {
   }
 
   async getContentUsageMetrics(days: number = 7): Promise<any> {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    const contentLogs = await this.contentUsageLogRepo.find({
-      where: { createdAt: { $gte: startDate } } as any,
-      relations: ['content', 'store']
-    });
-
-    const contentUsage = contentLogs.reduce((acc, log) => {
-      if (log.content) {
-        const contentId = log.content.id;
-        if (!acc[contentId]) {
-          acc[contentId] = {
-            contentId,
-            title: log.content.title,
-            type: log.content.type,
-            views: 0,
-            totalDuration: 0,
-            uniqueStores: new Set()
-          };
-        }
-        acc[contentId].views++;
-        acc[contentId].totalDuration += log.duration || 0;
-        acc[contentId].uniqueStores.add(log.storeId);
-      }
-      return acc;
-    }, {} as any);
-
+    // Legacy content usage metrics - signage service removed
     return {
-      totalContentViews: contentLogs.length,
-      uniqueContent: Object.keys(contentUsage).length,
-      topContent: Object.values(contentUsage)
-        .map((c: any) => ({
-          ...c,
-          uniqueStores: c.uniqueStores.size,
-          avgDuration: c.totalDuration / c.views
-        }))
-        .sort((a: any, b: any) => b.views - a.views)
-        .slice(0, 10)
+      totalViews: 0,
+      uniqueContent: 0,
+      averageDuration: 0,
+      topContent: []
     };
   }
 

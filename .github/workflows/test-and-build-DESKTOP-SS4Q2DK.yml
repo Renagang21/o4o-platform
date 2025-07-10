@@ -1,0 +1,236 @@
+name: 🧪 Monorepo CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'feature/*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:  # 수동 트리거 허용
+
+env:
+  NODE_VERSION: '20.18.0'
+  CACHE_VERSION: v2
+
+jobs:
+  # 🏗️ 환경 준비 (한 번만 실행)
+  setup:
+    name: 🏗️ Setup Environment
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📥 Install dependencies
+        run: npm ci
+      
+      - name: 📋 Cache workspace info
+        id: cache
+        run: |
+          echo "Dependencies installed successfully"
+          echo "cache-hit=true" >> $GITHUB_OUTPUT
+
+  # 🧪 테스트 및 빌드 (각 서비스별 병렬 실행)
+  test-and-build:
+    name: 🧪 Test & Build (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [api-server, main-site, admin-dashboard]
+    
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📥 Restore dependencies
+        run: npm ci
+      
+      # 🔍 Type Check
+      - name: 🔍 Type check (${{ matrix.service }})
+        working-directory: ./apps/${{ matrix.service }}
+        run: npm run type-check
+      
+      # 🧹 Lint Check
+      - name: 🧹 Lint check (${{ matrix.service }})
+        working-directory: ./apps/${{ matrix.service }}
+        run: npm run lint
+      
+      # 🧪 Unit Tests
+      - name: 🧪 Run tests (${{ matrix.service }})
+        working-directory: ./apps/${{ matrix.service }}
+        run: npm run test
+      
+      # 📊 Test Coverage (admin-dashboard만)
+      - name: 📊 Test coverage (${{ matrix.service }})
+        if: matrix.service == 'admin-dashboard'
+        working-directory: ./apps/${{ matrix.service }}
+        run: npm run test:coverage
+        continue-on-error: true
+      
+      # 🏗️ Build
+      - name: 🏗️ Build (${{ matrix.service }})
+        working-directory: ./apps/${{ matrix.service }}
+        run: npm run build
+      
+      # 📦 Upload build artifacts
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.service }}
+          path: apps/${{ matrix.service }}/dist/
+          retention-days: 7
+
+  # 🔒 보안 스캔 (선택적 실행)
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: setup
+    continue-on-error: true  # 토큰 없어도 파이프라인 계속 진행
+    
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📥 Restore dependencies
+        run: npm ci
+      
+      - name: 🔍 NPM security audit
+        run: npm audit --audit-level moderate || true
+      
+      - name: 🛡️ Snyk security scan
+        if: env.SNYK_TOKEN != ''
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium
+        continue-on-error: true
+
+  # 📊 코드 품질 분석 (선택적 실행)
+  quality:
+    name: 📊 Code Quality Analysis
+    runs-on: ubuntu-latest
+    needs: [setup, test-and-build]
+    continue-on-error: true  # 토큰 없어도 파이프라인 계속 진행
+    
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # SonarCloud 분석을 위해 전체 히스토리 필요
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📥 Restore dependencies
+        run: npm ci
+      
+      - name: 📊 SonarCloud analysis
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        continue-on-error: true
+
+  # 📱 E2E 테스트 (admin-dashboard만, 선택적)
+  e2e-test:
+    name: 📱 E2E Tests
+    runs-on: ubuntu-latest
+    needs: test-and-build
+    if: contains(github.event.head_commit.message, '[e2e]') || github.ref == 'refs/heads/main'
+    continue-on-error: true
+    
+    steps:
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📥 Restore dependencies
+        run: npm ci
+      
+      - name: 📱 Install Playwright
+        working-directory: ./apps/admin-dashboard
+        run: npx playwright install --with-deps
+      
+      - name: 🧪 Run E2E tests
+        working-directory: ./apps/admin-dashboard
+        run: npm run test:e2e
+      
+      - name: 📊 Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: apps/admin-dashboard/test-results/
+          retention-days: 7
+
+  # ✅ 최종 상태 확인
+  pipeline-status:
+    name: ✅ Pipeline Status
+    runs-on: ubuntu-latest
+    needs: [test-and-build, security, quality]
+    if: always()
+    
+    steps:
+      - name: 📊 Check pipeline results
+        run: |
+          echo "=== Pipeline Status Summary ==="
+          echo "Test & Build: ${{ needs.test-and-build.result }}"
+          echo "Security Scan: ${{ needs.security.result }}"
+          echo "Quality Analysis: ${{ needs.quality.result }}"
+          
+          # 필수 작업(test-and-build) 성공 여부 확인
+          if [[ "${{ needs.test-and-build.result }}" == "success" ]]; then
+            echo "✅ Core pipeline passed successfully!"
+            echo "status=success" >> $GITHUB_ENV
+          else
+            echo "❌ Core pipeline failed!"
+            echo "status=failure" >> $GITHUB_ENV
+            exit 1
+          fi
+      
+      - name: 🎉 Success notification
+        if: env.status == 'success'
+        run: |
+          echo "🎉 All core checks passed!"
+          echo "✅ Ready for merge or deployment"
+      
+      - name: 📝 Pipeline summary
+        run: |
+          echo "## 📊 CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Core Tests & Build | ${{ needs.test-and-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality Analysis | ${{ needs.quality.result }} |" >> $GITHUB_STEP_SUMMARY

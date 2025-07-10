@@ -18,7 +18,6 @@ import ecommerceRoutes from './routes/ecommerce';
 import cptRoutes from './routes/cpt';
 import postCreationRoutes from './routes/post-creation';
 import servicesRoutes from './routes/services';
-import signageRoutes from './routes/signage';
 import contentRoutes from './routes/content';
 
 // 환경변수 로드
@@ -79,7 +78,6 @@ app.use('/api/ecommerce', ecommerceRoutes);
 app.use('/api/cpt', cptRoutes);
 app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
-app.use('/api/signage', signageRoutes);
 app.use('/api', contentRoutes);
 
 // 헬스체크 엔드포인트
@@ -107,7 +105,6 @@ app.get('/', (req, res) => {
       cpt: '/api/cpt',
       postCreation: '/api/post-creation',
       services: '/api/services',
-      signage: '/api/signage',
       content: {
         pages: '/api/admin/pages',
         media: '/api/admin/media',

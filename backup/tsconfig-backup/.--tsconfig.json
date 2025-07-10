@@ -1,0 +1,100 @@
+{
+  "compilerOptions": {
+    // 🎯 기본 옵션
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    
+    // 📁 경로 설정
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@api/*": ["./apps/api-server/src/*"],
+      "@web/*": ["./apps/main-site/src/*"],
+      "@admin/*": ["./apps/admin-dashboard/src/*"],
+      "@o4o/shared-components": ["./packages/shared-components/src"],
+      "@o4o/shared-types": ["./packages/shared-types/src"],
+      "@o4o/shared-utils": ["./packages/shared-utils/src"],
+      "@tests/*": ["./tests/*"]
+    },
+    "rootDirs": ["./apps", "./packages", "./tests"],
+    
+    // 📤 출력 설정
+    "outDir": "./dist",
+    "rootDir": "./",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    
+    // 🔷 타입 검사 옵션
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    
+    // 📦 모듈 설정
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    
+    // 🔧 고급 옵션
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    
+    // ⚛️ JSX 설정 (React)
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    
+    // 🎯 추가 검사
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": false,
+    
+    // 📊 타입 정보
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "types": ["node", "jest", "@types/testing-library__jest-dom"]
+  },
+  "include": [
+    "apps/**/*",
+    "packages/**/*",
+    "tests/**/*",
+    "scripts/**/*",
+    "*.config.ts",
+    "*.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    "coverage",
+    "playwright-report",
+    "test-results",
+    "**/*.min.js",
+    "**/node_modules",
+    "**/dist",
+    "**/build"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
+}

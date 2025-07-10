@@ -13,16 +13,16 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
-      "@api/*": ["./services/api-server/src/*"],
-      "@web/*": ["./services/main-site/src/*"],
-      "@shared/*": ["./shared/*"],
+      "@api/*": ["./apps/api-server/src/*"],
+      "@web/*": ["./apps/main-site/src/*"],
+      "@admin/*": ["./apps/admin-dashboard/src/*"],
+      "@o4o/shared-components": ["./packages/shared-components/src"],
+      "@o4o/shared-types": ["./packages/shared-types/src"],
+      "@o4o/shared-utils": ["./packages/shared-utils/src"],
       "@tests/*": ["./tests/*"]
     },
-    "rootDirs": ["./services", "./shared", "./tests"],
     
     // 📤 출력 설정
-    "outDir": "./dist",
-    "rootDir": "./",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -69,14 +69,8 @@
     "typeRoots": ["./node_modules/@types", "./types"],
     "types": ["node", "jest", "@types/testing-library__jest-dom"]
   },
-  "include": [
-    "services/**/*",
-    "shared/**/*",
-    "tests/**/*",
-    "scripts/**/*",
-    "*.config.ts",
-    "*.config.js"
-  ],
+  "files": [],
+  "include": [],
   "exclude": [
     "node_modules",
     "dist",

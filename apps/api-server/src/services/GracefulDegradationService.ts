@@ -3,7 +3,6 @@ import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertSeverity } from '../entities/Alert';
 import { PricingResult } from '../types/auth';
-import { signageService } from './signageService';
 import { cacheService } from './cacheService';
 
 export enum DegradationLevel {
@@ -194,10 +193,6 @@ export class GracefulDegradationService {
         
         case 'cache':
           await cacheService.getCachedPricingResult('health-check');
-          return false; // Service is available
-        
-        case 'signage':
-          await signageService.getSignageAnalytics();
           return false; // Service is available
         
         default:

@@ -1,0 +1,18 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import MediaItem from './MediaItem';
+import { formatFileSize } from '@/utils/format';
+const MediaList = ({ files, selectedFiles, onFileSelect, onSelectAll }) => {
+    const allSelected = files.length > 0 && files.every(file => selectedFiles.includes(file.id));
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+    return (_jsxs("div", { className: "overflow-x-auto", children: [_jsxs("table", { className: "w-full", children: [_jsx("thead", { className: "bg-gray-50 border-b border-gray-200", children: _jsxs("tr", { children: [_jsx("th", { className: "px-6 py-3 text-left", children: _jsx("input", { type: "checkbox", checked: allSelected, onChange: onSelectAll, className: "rounded border-gray-300 text-admin-blue focus:ring-admin-blue" }) }), _jsx("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "\uD30C\uC77C" }), _jsx("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "\uC720\uD615" }), _jsx("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "\uD06C\uAE30" }), _jsx("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "\uD06C\uAE30(px)" }), _jsx("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "\uC5C5\uB85C\uB4DC" }), _jsx("th", { className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider", children: "\uC5C5\uB85C\uB354" })] }) }), _jsx("tbody", { className: "bg-white divide-y divide-gray-200", children: files.map((file) => (_jsxs("tr", { className: "hover:bg-gray-50", children: [_jsx("td", { className: "px-6 py-4", children: _jsx("input", { type: "checkbox", checked: selectedFiles.includes(file.id), onChange: () => onFileSelect(file.id), className: "rounded border-gray-300 text-admin-blue focus:ring-admin-blue" }) }), _jsx("td", { className: "px-6 py-4", children: _jsx(MediaItem, { item: file, view: "list", isSelected: selectedFiles.includes(file.id), onSelect: () => onFileSelect(file.id) }) }), _jsx("td", { className: "px-6 py-4 text-sm text-gray-900", children: file.mimeType.split('/')[1]?.toUpperCase() || file.type }), _jsx("td", { className: "px-6 py-4 text-sm text-gray-900", children: formatFileSize(file.size) }), _jsx("td", { className: "px-6 py-4 text-sm text-gray-900", children: file.dimensions ? (_jsxs("span", { children: [file.dimensions.width, " \u00D7 ", file.dimensions.height] })) : (_jsx("span", { className: "text-gray-400", children: "-" })) }), _jsx("td", { className: "px-6 py-4 text-sm text-gray-900", children: formatDate(file.uploadedAt) }), _jsx("td", { className: "px-6 py-4 text-sm text-gray-900", children: file.uploadedBy })] }, file.id))) })] }), files.length === 0 && (_jsx("div", { className: "text-center py-12 text-gray-500", children: _jsx("p", { children: "\uC120\uD0DD\uB41C \uC870\uAC74\uC5D0 \uB9DE\uB294 \uD30C\uC77C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4." }) }))] }));
+};
+export default MediaList;
+//# sourceMappingURL=MediaList.js.map
