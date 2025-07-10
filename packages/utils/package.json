@@ -1,0 +1,15 @@
+{
+  "name": "@o4o/utils",
+  "version": "1.0.0",
+  "description": "Shared utility functions for O4O Platform",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

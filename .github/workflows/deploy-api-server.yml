@@ -1,0 +1,319 @@
+name: Deploy API Server (Production)
+
+# API 서버 점진적 배포 워크플로우
+# 트리거: apps/api-server 경로 변경 시
+# 단계: Build → Test → Deploy → Health Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api-server/**'
+      - '.github/workflows/deploy-api-server.yml'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy without path changes'
+        required: false
+        default: 'false'
+
+env:
+  SERVICE_NAME: api-server
+  SERVICE_PORT: 4000
+  PM2_APP_NAME: o4o-api-server
+  DEPLOY_PATH: /home/ubuntu/o4o-platform
+  NODE_VERSION: '20.x'
+
+jobs:
+  # 단계 1: 빌드 및 테스트
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd apps/api-server
+        npm ci
+        
+    - name: TypeScript type check
+      run: |
+        cd apps/api-server
+        npm run type-check
+        
+    - name: Run tests
+      run: |
+        cd apps/api-server
+        npm run test
+        
+    - name: Build application
+      run: |
+        cd apps/api-server
+        npm run build
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-server-build
+        path: |
+          apps/api-server/dist/
+          apps/api-server/package.json
+          apps/api-server/package-lock.json
+        retention-days: 1
+
+  # 단계 2: 운영 서버 배포
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: api-server-build
+        path: apps/api-server/
+        
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Create deployment directory
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          mkdir -p ${{ env.DEPLOY_PATH }}/apps/api-server
+        "
+        
+    - name: Create environment file
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cat > ${{ env.DEPLOY_PATH }}/apps/api-server/.env.production << 'EOF'
+          NODE_ENV=production
+          PORT=${{ env.SERVICE_PORT }}
+          
+          # Database Configuration
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          
+          # JWT Configuration
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          
+          # CORS Configuration
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          
+          # Logging Configuration
+          LOG_LEVEL=${{ secrets.LOG_LEVEL }}
+          
+          # Health Check
+          HEALTH_CHECK_KEY=${{ secrets.HEALTH_CHECK_KEY }}
+          EOF
+        "
+        
+    - name: Deploy application files
+      run: |
+        rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          apps/api-server/ \
+          ubuntu@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/apps/api-server/
+          
+    - name: Install production dependencies
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/apps/api-server
+          npm ci --only=production
+        "
+        
+    - name: Run database migrations
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/apps/api-server
+          npm run migration:run
+        "
+        
+    - name: Setup PM2 ecosystem file
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cat > ${{ env.DEPLOY_PATH }}/ecosystem.config.js << 'EOF'
+          module.exports = {
+            apps: [{
+              name: '${{ env.PM2_APP_NAME }}',
+              script: './dist/src/index.js',
+              cwd: '${{ env.DEPLOY_PATH }}/apps/api-server',
+              instances: 'max',
+              exec_mode: 'cluster',
+              env_file: '.env.production',
+              max_memory_restart: '1G',
+              node_args: '--max-old-space-size=1024',
+              error_file: '${{ env.DEPLOY_PATH }}/logs/api-server-error.log',
+              out_file: '${{ env.DEPLOY_PATH }}/logs/api-server-out.log',
+              log_file: '${{ env.DEPLOY_PATH }}/logs/api-server-combined.log',
+              time: true,
+              autorestart: true,
+              max_restarts: 10,
+              min_uptime: '10s',
+              kill_timeout: 30000,
+              wait_ready: true,
+              listen_timeout: 10000,
+              health_check_grace_period: 30000
+            }]
+          };
+          EOF
+        "
+        
+    - name: Create logs directory
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          mkdir -p ${{ env.DEPLOY_PATH }}/logs
+        "
+        
+    - name: Deploy with PM2 (Zero-downtime)
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          
+          # PM2 프로세스 존재 여부 확인
+          if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
+            echo 'Reloading existing PM2 process...'
+            pm2 reload ecosystem.config.js --update-env
+          else
+            echo 'Starting new PM2 process...'
+            pm2 start ecosystem.config.js
+          fi
+          
+          # PM2 상태 저장
+          pm2 save
+        "
+
+  # 단계 3: 배포 후 헬스체크
+  health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Wait for service startup
+      run: sleep 30
+      
+    - name: Health check
+      run: |
+        # API 서버 헬스체크
+        for i in {1..10}; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "X-Health-Check-Key: ${{ secrets.HEALTH_CHECK_KEY }}" \
+            https://api.neture.co.kr/health || echo "000")
+            
+          if [ "$response" = "200" ]; then
+            echo "✅ API 서버 헬스체크 성공 (응답 코드: $response)"
+            break
+          else
+            echo "⏳ API 서버 헬스체크 대기 중... (시도 $i/10, 응답 코드: $response)"
+            if [ $i -eq 10 ]; then
+              echo "❌ API 서버 헬스체크 실패"
+              exit 1
+            fi
+            sleep 10
+          fi
+        done
+        
+    - name: Database connection check
+      run: |
+        response=$(curl -s -H "X-Health-Check-Key: ${{ secrets.HEALTH_CHECK_KEY }}" \
+          https://api.neture.co.kr/health/database)
+          
+        if echo "$response" | grep -q "\"status\":\"healthy\""; then
+          echo "✅ 데이터베이스 연결 확인 성공"
+        else
+          echo "❌ 데이터베이스 연결 확인 실패"
+          echo "Response: $response"
+          exit 1
+        fi
+        
+    - name: API endpoints smoke test
+      run: |
+        # 주요 API 엔드포인트 smoke test
+        endpoints=(
+          "/health"
+          "/api/auth/health"
+          "/api/ecommerce/health"
+        )
+        
+        for endpoint in "${endpoints[@]}"; do
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://api.neture.co.kr$endpoint")
+            
+          if [ "$response" = "200" ] || [ "$response" = "401" ]; then
+            echo "✅ $endpoint 엔드포인트 정상 (응답 코드: $response)"
+          else
+            echo "❌ $endpoint 엔드포인트 오류 (응답 코드: $response)"
+            exit 1
+          fi
+        done
+
+  # 단계 4: 배포 완료 알림
+  notify:
+    needs: [deploy, health-check]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Deployment success notification
+      if: needs.health-check.result == 'success'
+      run: |
+        echo "🚀 API 서버 배포 성공!"
+        echo "📍 서비스 URL: https://api.neture.co.kr"
+        echo "🕐 배포 시간: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "📊 헬스체크: 통과"
+        
+    - name: Deployment failure notification
+      if: needs.health-check.result == 'failure' || needs.deploy.result == 'failure'
+      run: |
+        echo "❌ API 서버 배포 실패!"
+        echo "🔍 로그를 확인하여 문제를 해결하세요."
+        exit 1
+
+  # 단계 5: 롤백 준비 (실패 시)
+  rollback:
+    needs: [deploy, health-check]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+    - name: Rollback to previous version
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          
+          # 이전 백업에서 복원
+          if [ -d 'apps/api-server.backup' ]; then
+            echo '이전 버전으로 롤백 중...'
+            rm -rf apps/api-server
+            mv apps/api-server.backup apps/api-server
+            
+            # PM2 재시작
+            pm2 restart ${{ env.PM2_APP_NAME }}
+            echo '롤백 완료'
+          else
+            echo '백업 파일이 없습니다. 수동 복구가 필요합니다.'
+          fi
+        "
+        
+    - name: Rollback notification
+      run: |
+        echo "🔄 API 서버 롤백 완료"
+        echo "⚠️  수동 확인이 필요합니다."

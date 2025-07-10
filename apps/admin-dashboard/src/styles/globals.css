@@ -1,0 +1,209 @@
+/* Import all theme variations - must come first */
+@import './themes/index.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+/* WordPress Admin-inspired styles */
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  body {
+    @apply bg-gray-50 font-sans;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-gray-900;
+  }
+}
+
+@layer components {
+  /* WordPress-style buttons */
+  .wp-button {
+    @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded border;
+    @apply transition-colors duration-200;
+  }
+  
+  .wp-button-primary {
+    @apply wp-button bg-admin-blue text-white border-admin-blue;
+    @apply hover:bg-admin-blue-dark hover:border-admin-blue-dark;
+  }
+  
+  .wp-button-secondary {
+    @apply wp-button bg-gray-50 text-gray-700 border-gray-300;
+    @apply hover:bg-gray-100 hover:border-gray-400;
+  }
+  
+  .wp-button-danger {
+    @apply wp-button bg-admin-red text-white border-admin-red;
+    @apply hover:bg-red-700 hover:border-red-700;
+  }
+  
+  /* WordPress-style form elements */
+  .wp-input {
+    @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded;
+    @apply focus:outline-none focus:ring-2 focus:ring-admin-blue focus:border-transparent;
+    @apply transition-colors duration-200;
+  }
+  
+  .wp-textarea {
+    @apply wp-input resize-none;
+  }
+  
+  .wp-select {
+    @apply wp-input pr-8 bg-white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+  }
+  
+  /* WordPress-style tables */
+  .wp-table {
+    @apply w-full border border-gray-200 rounded-lg overflow-hidden;
+  }
+  
+  .wp-table th {
+    @apply bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+    @apply border-b border-gray-200;
+  }
+  
+  .wp-table td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+    @apply border-b border-gray-200;
+  }
+  
+  .wp-table tbody tr:hover {
+    @apply bg-gray-50;
+  }
+  
+  /* WordPress-style cards */
+  .wp-card {
+    @apply bg-white border border-gray-200 rounded-lg shadow-sm;
+  }
+  
+  .wp-card-header {
+    @apply px-6 py-4 border-b border-gray-200;
+  }
+  
+  .wp-card-title {
+    @apply text-lg font-semibold text-gray-900;
+  }
+  
+  .wp-card-body {
+    @apply p-6;
+  }
+  
+  /* WordPress-style notices */
+  .wp-notice {
+    @apply p-4 rounded-md border-l-4;
+  }
+  
+  .wp-notice-success {
+    @apply wp-notice bg-green-50 border-green-400 text-green-800;
+  }
+  
+  .wp-notice-error {
+    @apply wp-notice bg-red-50 border-red-400 text-red-800;
+  }
+  
+  .wp-notice-warning {
+    @apply wp-notice bg-yellow-50 border-yellow-400 text-yellow-800;
+  }
+  
+  .wp-notice-info {
+    @apply wp-notice bg-blue-50 border-blue-400 text-blue-800;
+  }
+  
+  /* Sidebar styles */
+  .admin-sidebar {
+    @apply bg-sidebar-bg text-sidebar-text;
+  }
+  
+  .admin-sidebar-item {
+    @apply flex items-center px-4 py-3 text-sm hover:bg-sidebar-hover;
+    @apply transition-colors duration-200;
+  }
+  
+  .admin-sidebar-item.active {
+    @apply bg-sidebar-active text-white;
+  }
+  
+  .admin-sidebar-item.active::before {
+    content: '';
+    @apply absolute left-0 w-1 h-full bg-white;
+  }
+  
+  /* Loading states */
+  .loading-spinner {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-admin-blue;
+  }
+  
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+}

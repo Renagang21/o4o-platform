@@ -1,0 +1,120 @@
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './stores/authStore';
+
+// Auth Pages
+import Login from './pages/auth/Login';
+import AuthCallback from './pages/auth/AuthCallback';
+
+// User Type Dashboards (non-shared components)
+import AdminDashboard from './pages/admin/Dashboard';
+import SupplierDashboard from './pages/supplier/Dashboard';
+import SupplierProductList from './pages/supplier/ProductList';
+import SupplierProductForm from './pages/supplier/ProductForm';
+import SupplierProductDetail from './pages/supplier/ProductDetail';
+import RetailerDashboard from './pages/retailer/Dashboard';
+import CustomerShop from './pages/customer/Shop';
+
+// Digital Signage Pages
+import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
+
+// TheDANG Style Home (without editor)
+import TheDANGStyleHome from './pages/TheDANGStyleHome';
+// Temporarily disabled: import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
+
+// Test Dashboard
+import { TestDashboard } from './features/test-dashboard';
+
+// Components
+import PrivateRoute from './components/auth/PrivateRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Temporary placeholder for disabled features
+const DisabledFeaturePage: React.FC = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <h1 className="text-2xl font-bold text-gray-900 mb-4">Feature Temporarily Disabled</h1>
+      <p className="text-gray-600">This feature is temporarily disabled during production build conversion.</p>
+    </div>
+  </div>
+);
+
+const App: React.FC = () => {
+  const { initialize, isAuthenticated, user } = useAuthStore();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  return (
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<TheDANGStyleHome />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={
+            <PrivateRoute allowedUserTypes={['admin']}>
+              <AdminDashboard />
+            </PrivateRoute>
+          } />
+          
+          {/* Protected Supplier Routes */}
+          <Route path="/supplier" element={
+            <PrivateRoute allowedUserTypes={['supplier']}>
+              <SupplierDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/supplier/products" element={
+            <PrivateRoute allowedUserTypes={['supplier']}>
+              <SupplierProductList />
+            </PrivateRoute>
+          } />
+          <Route path="/supplier/products/new" element={
+            <PrivateRoute allowedUserTypes={['supplier']}>
+              <SupplierProductForm />
+            </PrivateRoute>
+          } />
+          <Route path="/supplier/products/:id" element={
+            <PrivateRoute allowedUserTypes={['supplier']}>
+              <SupplierProductDetail />
+            </PrivateRoute>
+          } />
+          
+          {/* Protected Retailer Routes */}
+          <Route path="/retailer" element={
+            <PrivateRoute allowedUserTypes={['retailer']}>
+              <RetailerDashboard />
+            </PrivateRoute>
+          } />
+          
+          {/* Customer Routes */}
+          <Route path="/shop" element={<CustomerShop />} />
+          
+          {/* Digital Signage Routes */}
+          <Route path="/signage" element={<DigitalSignageDashboard />} />
+          
+          {/* Test Dashboard */}
+          <Route path="/test-dashboard" element={<TestDashboard />} />
+          
+          {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
+          <Route path="/editor" element={<DisabledFeaturePage />} />
+          <Route path="/editor-demo" element={<DisabledFeaturePage />} />
+          <Route path="/thedang-editor" element={<DisabledFeaturePage />} />
+          <Route path="/fullscreen-editor" element={<DisabledFeaturePage />} />
+          <Route path="/admin-test" element={<DisabledFeaturePage />} />
+          <Route path="/dropshipping" element={<DisabledFeaturePage />} />
+          <Route path="/healthcare" element={<DisabledFeaturePage />} />
+          
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </ErrorBoundary>
+  );
+};
+
+export default App;

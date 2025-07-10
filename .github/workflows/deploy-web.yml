@@ -1,0 +1,81 @@
+name: Deploy Web Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install root dependencies
+        run: npm ci
+      
+      - name: Install main-site dependencies
+        working-directory: services/main-site
+        run: npm ci
+      
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 13.125.144.8
+          username: ubuntu
+          key: ${{ secrets.WEB_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/o4o-platform
+            
+            # Git pull latest changes
+            git pull origin main
+            
+            # Verify monorepo structure
+            echo "Verifying monorepo structure:"
+            ls -la
+            echo "Checking shared directory:"
+            ls -la shared/ || echo "WARNING: shared directory not found!"
+            echo "Checking shared/components:"
+            ls -la shared/components/ || echo "WARNING: shared/components not found!"
+            
+            # Install dependencies
+            npm ci
+            cd services/main-site
+            npm ci
+            
+            # Stop existing PM2 processes
+            pm2 delete web-app || true
+            
+            # Create .env file for development
+            cat > .env << EOF
+            NODE_ENV=development
+            VITE_API_BASE_URL=http://localhost:4000/api
+            VITE_SITE_URL=http://neture.co.kr:3000
+            VITE_DOMAIN=neture.co.kr
+            VITE_APP_NAME=main-site
+            VITE_APP_TITLE=매장 경쟁력 강화를 지원하는 플랫폼
+            VITE_APP_DESCRIPTION=매장 경쟁력 강화를 지원하는 플랫폼
+            VITE_AUTH_TOKEN_KEY=neture_auth_token
+            VITE_AUTH_REFRESH_TOKEN_KEY=neture_refresh_token
+            VITE_DEV_MODE=true
+            VITE_LOG_LEVEL=debug
+            VITE_DEV_SERVER_PORT=3000
+            EOF
+            
+            # Start development server with PM2
+            pm2 start npm --name "web-app" -- run dev
+            pm2 save
+            
+            # Wait a moment for server to start
+            sleep 5
+            
+            # Check status
+            pm2 status
+            echo "Development server deployment completed at $(date)"

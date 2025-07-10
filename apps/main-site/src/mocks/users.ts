@@ -1,0 +1,168 @@
+import { User, Supplier, Retailer } from '../types/user';
+
+// 일반 사용자 Mock 데이터
+export const mockUsers: User[] = [
+  {
+    _id: '1',
+    id: '1',
+    email: 'admin@o4o.com',
+    name: '시스템 관리자',
+    phone: '010-1234-5678',
+    role: 'admin',
+    userType: 'admin',
+    status: 'active',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    avatar: '/avatars/admin.jpg',
+    lastLoginAt: '2024-03-01T09:00:00Z',
+  },
+  {
+    _id: '4',
+    id: '4',
+    email: 'customer1@gmail.com',
+    name: '김고객',
+    phone: '010-4567-8901',
+    role: 'customer',
+    userType: 'customer',
+    status: 'active',
+    createdAt: '2024-02-15T00:00:00Z',
+    updatedAt: '2024-02-15T00:00:00Z',
+  },
+];
+
+// 공급자 Mock 데이터
+export const mockSuppliers: Supplier[] = [
+  {
+    _id: '2',
+    id: '2',
+    email: 'supplier1@abc.com',
+    name: '김철수',
+    phone: '010-2345-6789',
+    userType: 'supplier',
+    role: 'supplier',
+    status: 'active',
+    companyName: 'ABC전자',
+    businessNumber: '123-45-67890',
+    address: '서울시 강남구 테헤란로 123',
+    contactPerson: '김철수',
+    approvalStatus: 'approved',
+    createdAt: '2024-01-15T00:00:00Z',
+    updatedAt: '2024-01-15T00:00:00Z',
+    website: 'https://abc-electronics.com',
+    description: '전자제품 전문 공급업체',
+  },
+  {
+    _id: '5',
+    id: '5',
+    email: 'supplier2@def.com',
+    name: '박영희',
+    phone: '010-5678-9012',
+    userType: 'supplier',
+    role: 'supplier',
+    status: 'active',
+    companyName: 'DEF생활용품',
+    businessNumber: '234-56-78901',
+    address: '서울시 서초구 반포대로 456',
+    contactPerson: '박영희',
+    approvalStatus: 'approved',
+    createdAt: '2024-01-20T00:00:00Z',
+    updatedAt: '2024-01-20T00:00:00Z',
+    description: '생활용품 및 주방용품 전문',
+  },
+  {
+    _id: '6',
+    id: '6',
+    email: 'supplier3@pending.com',
+    name: '최대기',
+    phone: '010-6789-0123',
+    userType: 'supplier',
+    role: 'supplier',
+    status: 'pending',
+    companyName: '대기전자',
+    businessNumber: '345-67-89012',
+    address: '경기도 성남시 분당구 판교로 789',
+    contactPerson: '최대기',
+    approvalStatus: 'pending',
+    createdAt: '2024-03-01T00:00:00Z',
+    updatedAt: '2024-03-01T00:00:00Z',
+  },
+];
+
+// 리테일러 Mock 데이터
+export const mockRetailers: Retailer[] = [
+  {
+    _id: '3',
+    id: '3',
+    email: 'retailer1@xyz.com',
+    name: '이영희',
+    phone: '010-3456-7890',
+    userType: 'retailer',
+    role: 'retailer',
+    status: 'active',
+    storeName: 'XYZ마트',
+    storeAddress: '부산시 해운대구 센텀대로 456',
+    businessNumber: '456-78-90123',
+    grade: 'vip',
+    approvalStatus: 'approved',
+    managerName: '이영희',
+    storeType: '대형마트',
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z',
+  },
+  {
+    _id: '7',
+    id: '7',
+    email: 'retailer2@abc.com',
+    name: '정민수',
+    phone: '010-7890-1234',
+    userType: 'retailer',
+    role: 'retailer',
+    status: 'active',
+    storeName: '동네편의점',
+    storeAddress: '서울시 마포구 서교동 123-45',
+    businessNumber: '567-89-01234',
+    grade: 'gold',
+    approvalStatus: 'approved',
+    managerName: '정민수',
+    storeType: '편의점',
+    createdAt: '2024-02-10T00:00:00Z',
+    updatedAt: '2024-02-10T00:00:00Z',
+  },
+  {
+    _id: '8',
+    id: '8',
+    email: 'retailer3@premium.com',
+    name: '김프리미엄',
+    phone: '010-8901-2345',
+    userType: 'retailer',
+    role: 'retailer',
+    status: 'active',
+    storeName: '프리미엄스토어',
+    storeAddress: '서울시 강남구 압구정로 678',
+    businessNumber: '678-90-12345',
+    grade: 'premium',
+    approvalStatus: 'approved',
+    managerName: '김프리미엄',
+    storeType: '전문점',
+    createdAt: '2024-02-20T00:00:00Z',
+    updatedAt: '2024-02-20T00:00:00Z',
+  },
+];
+
+// 모든 사용자 통합 (로그인 시뮬레이션용)
+export const allMockUsers = [
+  ...mockUsers,
+  ...mockSuppliers,
+  ...mockRetailers,
+];
+
+// 테스트용 비밀번호 (모든 사용자 동일)
+export const TEST_PASSWORD = 'password123';
+
+// 사용자 타입별 기본 계정 정보
+export const defaultAccounts = {
+  admin: { email: 'admin@o4o.com', password: TEST_PASSWORD },
+  supplier: { email: 'supplier1@abc.com', password: TEST_PASSWORD },
+  retailer: { email: 'retailer1@xyz.com', password: TEST_PASSWORD },
+  customer: { email: 'customer1@gmail.com', password: TEST_PASSWORD },
+};

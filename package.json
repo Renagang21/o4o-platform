@@ -1,0 +1,50 @@
+{
+  "name": "o4o-platform",
+  "version": "1.0.0",
+  "description": "O4O Platform - Clean Monorepo Architecture",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0 <21.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:admin\"",
+    "dev:api": "npm run dev --workspace=@o4o/api-server",
+    "dev:web": "npm run dev --workspace=@o4o/main-site",
+    "dev:admin": "npm run dev --workspace=@o4o/admin-dashboard",
+    "build": "npm run build --workspaces --if-present",
+    "build:api": "npm run build --workspace=@o4o/api-server",
+    "build:web": "npm run build --workspace=@o4o/main-site",
+    "build:admin": "npm run build --workspace=@o4o/admin-dashboard",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "lint": "eslint --config ./eslint.config.js apps/*/src/**/*.{ts,tsx} packages/*/src/**/*.{ts,tsx}",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "npm run test --workspaces --if-present",
+    "test:e2e": "npm run test:e2e --workspaces --if-present",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/*/dist packages/*/dist",
+    "install:all": "npm install && npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.25.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "o4o",
+    "platform",
+    "monorepo",
+    "typescript",
+    "react",
+    "node"
+  ],
+  "author": "O4O Platform Team",
+  "license": "MIT"
+}
