@@ -274,35 +274,27 @@ jobs:
           echo "version=v$VERSION-$TIMESTAMP" >> $GITHUB_OUTPUT
           echo "Generated version tag: v$VERSION-$TIMESTAMP"
           
-      - name: 📝 Generate changelog
-        id: changelog
-        run: |
-          # 최근 커밋들로부터 changelog 생성
-          git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0)..HEAD > CHANGELOG.md
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          cat CHANGELOG.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          
       - name: 🏷️ Create GitHub Release
         run: |
-          # 기존 태그 확인 및 릴리스 생성
-          if ! git tag -l | grep -q "^${{ steps.tag.outputs.version }}$"; then
-            gh release create "${{ steps.tag.outputs.version }}" \
-              --title "Release ${{ steps.tag.outputs.version }}" \
-              --notes "## 🎉 What's New
+          # 릴리스 생성 (간단한 노트 포함)
+          VERSION_TAG="${{ steps.tag.outputs.version }}"
+          COMMIT_SHA="${{ github.sha }}"
+          
+          if ! git tag -l | grep -q "^$VERSION_TAG$"; then
+            gh release create "$VERSION_TAG" \
+              --title "Release $VERSION_TAG" \
+              --notes "## 🚀 Release $VERSION_TAG
 
-            ${{ steps.changelog.outputs.changelog }}
-
-            ## 🚀 Deployment
-            - ✅ Staging: Ready for deployment
-            - 🔄 Production: Ready for deployment
-
-            ## 📊 Metrics
-            - Test Coverage: See artifacts
-            - Build Size: See artifacts
-            - Performance: See E2E test results"
+            **Build Information:**
+            - Commit: $COMMIT_SHA
+            - Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+            
+            **Deployment Status:**
+            - ✅ Ready for deployment
+            - 📦 Artifacts available
+            - 🧪 All tests passed"
           else
-            echo "⚠️ Tag ${{ steps.tag.outputs.version }} already exists, skipping release creation"
+            echo "⚠️ Tag $VERSION_TAG already exists, skipping release creation"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
