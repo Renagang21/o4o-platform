@@ -159,13 +159,8 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        # Base64 decode를 사용하여 키 저장 (줄바꿈 문제 방지)
-        echo "${{ secrets.WEB_SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
+        echo "${{ secrets.WEB_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        # SSH 에이전트 시작 및 키 추가
-        eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/id_rsa
-        # Known hosts 추가
         ssh-keyscan -H ${{ secrets.WEB_SERVER_HOST }} >> ~/.ssh/known_hosts
         
     - name: Create backup of current deployment
