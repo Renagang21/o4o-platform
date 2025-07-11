@@ -29,7 +29,7 @@ app.use(helmet({
 
 // CORS 설정 (CLAUDE.md 정책 기반)
 const corsOptions = {
-  origin: function (origin: string | undefined, callback: Function) {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // 개발 환경에서는 localhost 허용
     if (NODE_ENV === 'development') {
       callback(null, true);
