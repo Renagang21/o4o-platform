@@ -1,0 +1,92 @@
+# GitHub Labeler Configuration
+# Automatically assigns labels to pull requests based on file changes
+
+# Frontend Changes
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: 'apps/main-site/**/*'
+    - any-glob-to-any-file: 'apps/admin-dashboard/**/*'
+
+# Backend Changes  
+backend:
+  - changed-files:
+    - any-glob-to-any-file: 'apps/api-server/**/*'
+
+# Package Changes
+packages:
+  - changed-files:
+    - any-glob-to-any-file: 'packages/**/*'
+
+# Infrastructure Changes
+ci/cd:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**/*'
+    - any-glob-to-any-file: 'scripts/**/*'
+
+# Configuration Changes
+config:
+  - changed-files:
+    - any-glob-to-any-file: '*.json'
+    - any-glob-to-any-file: '*.yml'
+    - any-glob-to-any-file: '*.yaml'
+    - any-glob-to-any-file: '*.toml'
+    - any-glob-to-any-file: '*.config.*'
+
+# Documentation Changes
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: '*.md'
+    - any-glob-to-any-file: 'docs/**/*'
+
+# Dependencies
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file: '**/package.json'
+    - any-glob-to-any-file: '**/package-lock.json'
+    - any-glob-to-any-file: '**/yarn.lock'
+
+# Testing
+testing:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.test.*'
+    - any-glob-to-any-file: '**/*.spec.*'
+    - any-glob-to-any-file: '**/test/**/*'
+    - any-glob-to-any-file: '**/tests/**/*'
+
+# TypeScript/JavaScript
+typescript:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.ts'
+    - any-glob-to-any-file: '**/*.tsx'
+    - any-glob-to-any-file: 'tsconfig*.json'
+
+javascript:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.js'
+    - any-glob-to-any-file: '**/*.jsx'
+
+# Styles
+styles:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.css'
+    - any-glob-to-any-file: '**/*.scss'
+    - any-glob-to-any-file: '**/*.sass'
+    - any-glob-to-any-file: 'tailwind.config.*'
+
+# Security
+security:
+  - changed-files:
+    - any-glob-to-any-file: '**/.env*'
+    - any-glob-to-any-file: '**/security/**/*'
+    - any-glob-to-any-file: 'sonar-project.properties'
+
+# Size Labels (for large changes)
+large-change:
+  - changed-files:
+    - any-glob-to-any-file: '**/*'
+      count: '>20'
+
+small-change:
+  - changed-files:
+    - any-glob-to-any-file: '**/*'
+      count: '<=5'
