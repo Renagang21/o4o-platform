@@ -193,17 +193,17 @@ jobs:
           echo "✅ Staging deployment completed"
           
       - name: 🔍 Health check
+        if: secrets.STAGING_HOST != ''
         run: |
           echo "🏥 Running health checks..."
           sleep 10  # 서비스 시작 대기
+          curl -f "http://${{ secrets.STAGING_HOST }}/health" || echo "⚠️ Health check failed, but continuing..."
+          echo "✅ Staging deployment completed!"
           
-          # 헬스체크 (URL이 설정되지 않은 경우 기본 성공 처리)
-          if [ -n "${{ secrets.STAGING_HOST }}" ]; then
-            curl -f "http://${{ secrets.STAGING_HOST }}/health" || echo "⚠️ Health check failed, but continuing..."
-          else
-            echo "ℹ️ STAGING_HOST not configured, skipping health check"
-          fi
-          
+      - name: 🔍 Health check (fallback)
+        if: secrets.STAGING_HOST == ''
+        run: |
+          echo "ℹ️ STAGING_HOST not configured, skipping health check"
           echo "✅ Staging deployment completed!"
 
   # 📱 E2E 테스트 (스테이징 환경)
@@ -230,15 +230,15 @@ jobs:
         run: npx playwright install --with-deps
         
       - name: 🧪 Run E2E tests
+        if: secrets.STAGING_HOST != ''
         env:
           BASE_URL: http://${{ secrets.STAGING_HOST }}
-        run: |
-          if [ -n "${{ secrets.STAGING_HOST }}" ]; then
-            npm run test:e2e || echo "⚠️ E2E tests failed, but continuing..."
-          else
-            echo "ℹ️ STAGING_HOST not configured, skipping E2E tests"
-          fi
+        run: npm run test:e2e || echo "⚠️ E2E tests failed, but continuing..."
         continue-on-error: true
+        
+      - name: 🧪 Skip E2E tests (no staging host)
+        if: secrets.STAGING_HOST == ''
+        run: echo "ℹ️ STAGING_HOST not configured, skipping E2E tests"
         
       - name: 📊 Upload E2E test results
         uses: actions/upload-artifact@v4
