@@ -95,15 +95,31 @@ jobs:
         with:
           name: deployment-package
       
-      - name: Create release
-        uses: actions/create-release@v1
+      - name: 🏷️ Create GitHub Release
+        run: |
+          # 동적 태그 생성 및 중복 확인
+          VERSION="v${{ needs.build-production.outputs.version }}"
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          TAG_NAME="${VERSION}-${TIMESTAMP}"
+          
+          if ! git tag -l | grep -q "^${TAG_NAME}$"; then
+            gh release create "${TAG_NAME}" \
+              --title "Release ${TAG_NAME}" \
+              --notes "## 🚀 Production Release ${VERSION}
+
+            **Build Information:**
+            - Version: ${{ needs.build-production.outputs.version }}
+            - Timestamp: ${TIMESTAMP}
+            - Commit: ${{ github.sha }}
+
+            **Deployment Status:**
+            - ✅ Production: Ready for deployment
+            - 📦 Artifacts: Available for download"
+          else
+            echo "⚠️ Tag ${TAG_NAME} already exists, skipping release creation"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ needs.build-production.outputs.version }}
-          release_name: Release ${{ needs.build-production.outputs.version }}
-          draft: false
-          prerelease: false
       
       - name: Deploy to production
         run: |
