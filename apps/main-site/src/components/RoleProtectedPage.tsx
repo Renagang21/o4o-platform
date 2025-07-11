@@ -40,7 +40,7 @@ export default function RoleProtectedPage({
   // 접근 기록 로그
   React.useEffect(() => {
     if (user) logAccess(user.id, location.pathname);
-    // eslint-disable-next-line
+     
   }, [user, location.pathname]);
 
   return <>{children}</>;

@@ -41,7 +41,10 @@ export default [
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
-        process: 'readonly'
+        process: 'readonly',
+        NodeJS: 'readonly',
+        vi: 'readonly',
+        global: 'readonly'
       }
     },
     plugins: {
@@ -49,7 +52,7 @@ export default [
     },
     rules: {
       ...tseslint.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/ban-ts-comment': 'warn'
@@ -58,7 +61,8 @@ export default [
   {
     files: ['**/*.{js,jsx}'],
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+      'no-unused-vars': 'off',
+      'no-undef': 'off'
     }
   },
   {

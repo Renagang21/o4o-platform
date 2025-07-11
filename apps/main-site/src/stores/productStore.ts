@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Product, ProductFilters, ProductFormData, Category, CategoryGroup } from '../types/product';
-import { mockProducts, getProductsBySupplier, getProductsByCategory, searchProducts } from '../mocks/products';
+import { mockProducts, getProductsBySupplier, searchProducts } from '../mocks/products';
 import { mockCategories, mockCategoryGroups, flatCategories } from '../mocks/categories';
 
 interface ProductState {
