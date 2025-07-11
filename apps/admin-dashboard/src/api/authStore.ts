@@ -71,7 +71,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await apiClient.get('/auth/me')
           set({ user: response.data, isAuthenticated: true })
-        } catch (error) {
+        } catch {
           // Token might be expired
           get().logout()
         }

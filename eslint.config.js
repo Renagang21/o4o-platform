@@ -14,6 +14,34 @@ export default [
         ecmaFeatures: {
           jsx: true
         }
+      },
+      globals: {
+        console: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        URLSearchParams: 'readonly',
+        FormData: 'readonly',
+        File: 'readonly',
+        Blob: 'readonly',
+        fetch: 'readonly',
+        URL: 'readonly',
+        Event: 'readonly',
+        EventTarget: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLSpanElement: 'readonly',
+        Element: 'readonly',
+        Node: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        CustomEvent: 'readonly',
+        React: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        process: 'readonly'
       }
     },
     plugins: {

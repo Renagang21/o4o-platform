@@ -22,7 +22,7 @@ apiClient.interceptors.request.use(
         if (parsed.state?.token) {
           config.headers['Authorization'] = `Bearer ${parsed.state.token}`
         }
-      } catch (e) {
+      } catch {
         console.warn('Failed to parse stored auth token')
       }
     }
