@@ -1,7 +1,8 @@
 import React from 'react';
+import { ModuleErrorBoundary } from './ModuleErrorBoundary';
 
 export { ErrorBoundary } from '../ErrorBoundary';
-export { ModuleErrorBoundary } from './ModuleErrorBoundary';
+export { ModuleErrorBoundary };
 
 // 각 모듈별 특화된 Error Boundary 컴포넌트들
 export const DropshippingErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => (
