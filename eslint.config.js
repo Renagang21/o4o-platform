@@ -57,7 +57,27 @@ export default [
         process: 'readonly',
         NodeJS: 'readonly',
         vi: 'readonly',
-        global: 'readonly'
+        global: 'readonly',
+        IntersectionObserver: 'readonly',
+        btoa: 'readonly',
+        atob: 'readonly',
+        Buffer: 'readonly',
+        Express: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        setImmediate: 'readonly',
+        clearImmediate: 'readonly',
+        AbortController: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLAnchorElement: 'readonly',
+        HTMLVideoElement: 'readonly',
+        HTMLSelectElement: 'readonly',
+        ResizeObserver: 'readonly',
+        MutationObserver: 'readonly',
+        PerformanceObserver: 'readonly',
+        screen: 'readonly',
+        Function: 'readonly'
       }
     },
     plugins: {
@@ -68,7 +88,14 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/ban-ts-comment': 'warn'
+      '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-namespace': 'warn',
+      'no-case-declarations': 'off',
+      'no-redeclare': 'off',
+      'no-unreachable': 'warn',
+      'no-useless-escape': 'warn',
+      'no-constant-binary-expression': 'warn'
     }
   },
   {
