@@ -87,9 +87,11 @@ jobs:
         path: apps/api-server/
         
     - name: Setup SSH key
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.APISERVER_SSH_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.APISERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.APISERVER_HOST }} >> ~/.ssh/known_hosts
         
     - name: Create deployment directory
       run: |
