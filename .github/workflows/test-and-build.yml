@@ -251,8 +251,10 @@ jobs:
         run: |
           # package.json에서 버전 읽기
           VERSION=$(node -p "require('./package.json').version")
-          echo "version=v$VERSION" >> $GITHUB_OUTPUT
-          echo "Generated version tag: v$VERSION"
+          # 타임스탬프 추가하여 고유한 태그 생성
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          echo "version=v$VERSION-$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "Generated version tag: v$VERSION-$TIMESTAMP"
           
       - name: 📝 Generate changelog
         id: changelog
