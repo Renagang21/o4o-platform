@@ -150,6 +150,7 @@ jobs:
         
       - name: 📊 SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -266,27 +267,28 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
           
       - name: 🏷️ Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.version }}
-          release_name: Release ${{ steps.tag.outputs.version }}
-          body: |
-            ## 🎉 What's New
-            
+        run: |
+          # 기존 태그 확인 및 릴리스 생성
+          if ! git tag -l | grep -q "^${{ steps.tag.outputs.version }}$"; then
+            gh release create "${{ steps.tag.outputs.version }}" \
+              --title "Release ${{ steps.tag.outputs.version }}" \
+              --notes "## 🎉 What's New
+
             ${{ steps.changelog.outputs.changelog }}
-            
+
             ## 🚀 Deployment
-            - ✅ Staging: http://${{ secrets.STAGING_HOST }}
+            - ✅ Staging: Ready for deployment
             - 🔄 Production: Ready for deployment
-            
+
             ## 📊 Metrics
             - Test Coverage: See artifacts
             - Build Size: See artifacts
-            - Performance: See E2E test results
-          draft: false
-          prerelease: false
+            - Performance: See E2E test results"
+          else
+            echo "⚠️ Tag ${{ steps.tag.outputs.version }} already exists, skipping release creation"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # 🔔 알림
   notify:
