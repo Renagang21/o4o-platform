@@ -22,7 +22,7 @@ jobs:
         run: npm ci
       
       - name: Install main-site dependencies
-        working-directory: services/main-site
+        working-directory: apps/main-site
         run: npm ci
       
       - name: Deploy to Server
@@ -47,7 +47,7 @@ jobs:
             
             # Install dependencies
             npm ci
-            cd services/main-site
+            cd apps/main-site
             npm ci
             
             # Stop existing PM2 processes
