@@ -358,7 +358,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           
       - name: 📊 Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v10
+        uses: treosh/lighthouse-ci-action@v12
         continue-on-error: true
         if: secrets.STAGING_HOST != ''
         with:
