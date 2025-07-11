@@ -9,7 +9,7 @@ on:
     branches: [main]
     paths:
       - 'apps/admin-dashboard/**'
-      - 'shared/**'
+      - 'packages/**'
       - '.github/workflows/deploy-admin-dashboard.yml'
   workflow_dispatch:
     inputs:
@@ -61,10 +61,9 @@ jobs:
         cd apps/admin-dashboard
         npm audit --audit-level=moderate
         
-    - name: Build shared components
+    - name: Build packages
       run: |
-        cd shared
-        npm run build
+        npm run build:packages
         
     - name: Create production environment file
       run: |

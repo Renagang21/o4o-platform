@@ -9,7 +9,7 @@ on:
     branches: [main]
     paths:
       - 'apps/main-site/**'
-      - 'shared/**'
+      - 'packages/**'
       - '.github/workflows/deploy-main-site.yml'
   workflow_dispatch:
     inputs:
@@ -56,10 +56,9 @@ jobs:
         cd apps/main-site
         npm run lint
         
-    - name: Build shared components
+    - name: Build packages
       run: |
-        cd shared
-        npm run build
+        npm run build:packages
         
     - name: Create production environment file
       run: |
