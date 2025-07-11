@@ -45,7 +45,7 @@ jobs:
         run: npm run test --workspace=@o4o/${{ matrix.service }}
         
       - name: 📊 Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         if: matrix.service == 'admin-dashboard'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
