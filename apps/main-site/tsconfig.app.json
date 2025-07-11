@@ -20,7 +20,6 @@
     "paths": {
       "@/*": ["./src/*"],
       "@o4o/ui": ["../../packages/ui"],
-      "@o4o/lib": ["../../packages/lib"],
       "@o4o/types": ["../../packages/types"],
       "@o4o/config": ["../../packages/config"]
     }

@@ -30,7 +30,6 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@o4o/lib": "file:../../packages/lib",
     "@o4o/types": "file:../../packages/types",
     "@o4o/ui": "file:../../packages/ui",
     "@tanstack/react-query": "^5.0.0",

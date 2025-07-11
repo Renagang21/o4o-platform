@@ -209,6 +209,30 @@ The project uses React 19 and requires strict version compatibility. All package
 - TailwindCSS v4 with new PostCSS architecture
 - ESLint 9.x with flat config system
 
+## Dependency Management Process
+
+### 🚨 CRITICAL: Dependency problems cause the most issues in development
+
+**Development Process:**
+1. **Before Development**: Always check and maintain dependency consistency
+2. **During Development**: Follow existing package versions, avoid adding new dependencies
+3. **After Development**: Perform comprehensive dependency audit
+4. **During Debugging**: If dependency issues are found, resolve them AFTER debugging is complete
+
+**Dependency Audit Checklist:**
+- [ ] Check version consistency across all workspaces
+- [ ] Verify no invalid or missing packages
+- [ ] Remove extraneous/unused dependencies
+- [ ] Ensure ESLint, TypeScript, and React versions are aligned
+- [ ] Update shared libraries to consistent versions
+- [ ] Run `npm ls --depth=0` to identify conflicts
+
+**Common Dependency Issues:**
+- ESLint version mismatches between root and workspaces
+- Missing shared packages (@o4o/lib, @o4o/utils)
+- Inconsistent versions of axios, date-fns, zustand, react-router-dom
+- Extraneous packages causing conflicts
+
 ## Important Notes
 
 - No Docker usage for development (as per user requirement)
@@ -217,3 +241,4 @@ The project uses React 19 and requires strict version compatibility. All package
 - Follow existing code conventions and patterns
 - Use existing utilities and libraries rather than adding new ones
 - Maintain strict version compatibility for React 19
+- **DEPENDENCY MANAGEMENT IS CRITICAL** - follow the process above religiously

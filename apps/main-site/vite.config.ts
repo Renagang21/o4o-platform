@@ -9,7 +9,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@o4o/ui': path.resolve(__dirname, '../../packages/ui'),
-      '@o4o/lib': path.resolve(__dirname, '../../packages/lib'),
       '@o4o/types': path.resolve(__dirname, '../../packages/types'),
       '@o4o/config': path.resolve(__dirname, '../../packages/config'),
     },

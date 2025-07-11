@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { JSONContent } from '@tiptap/react'
 import toast from 'react-hot-toast'
-import { useVersionStore } from '@o4o/lib/editor/versions'
+import { useVersionStore } from '@/stores/editorVersionStore'
 
 // localStorage key for content storage
 const CONTENT_STORAGE_KEY = 'o4o-editor-content'
