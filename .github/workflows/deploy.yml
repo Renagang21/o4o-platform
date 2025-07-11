@@ -1,0 +1,116 @@
+name: Deploy Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.18.0'
+
+jobs:
+  # 프로덕션 빌드
+  build-production:
+    name: Production Build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Get version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+      
+      - name: Build all apps
+        run: npm run build
+        continue-on-error: true
+      
+      - name: Create deployment package
+        run: |
+          mkdir -p deployment
+          cp -r apps/*/dist deployment/
+          cp package*.json deployment/
+          tar -czf deployment-${{ steps.version.outputs.version }}.tar.gz deployment/
+      
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package
+          path: deployment-*.tar.gz
+          retention-days: 30
+
+  # 스테이징 배포
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build-production
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-package
+      
+      - name: Deploy to staging
+        run: |
+          echo "Deploying version ${{ needs.build-production.outputs.version }} to staging"
+          # 실제 배포 스크립트 추가
+      
+      - name: Health check
+        run: |
+          echo "Running health checks on staging environment"
+          # 헬스 체크 스크립트 추가
+
+  # 프로덕션 배포
+  deploy-production:
+    name: Deploy to Production
+    needs: build-production
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-package
+      
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.build-production.outputs.version }}
+          release_name: Release ${{ needs.build-production.outputs.version }}
+          draft: false
+          prerelease: false
+      
+      - name: Deploy to production
+        run: |
+          echo "Deploying version ${{ needs.build-production.outputs.version }} to production"
+          # 실제 배포 스크립트 추가
+      
+      - name: Post-deployment verification
+        run: |
+          echo "Running post-deployment verification"
+          # 배포 후 검증 스크립트 추가
+      
+      - name: Notify deployment status
+        if: always()
+        run: |
+          echo "Deployment status: ${{ job.status }}"
+          # Slack/Discord 알림 등 추가

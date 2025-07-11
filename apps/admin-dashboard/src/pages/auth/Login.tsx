@@ -20,13 +20,13 @@ const Login: React.FC = () => {
 
   // 이미 인증된 관리자는 대시보드로 리다이렉트
   useEffect(() => {
-    if (isAuthenticated && isAdmin()) {
+    if (isAuthenticated && isAdmin) {
       toast.success('이미 로그인되어 있습니다.');
     }
   }, [isAuthenticated, isAdmin]);
 
   if (isAuthenticated) {
-    if (isAdmin()) {
+    if (isAdmin) {
       return <Navigate to={fromLocation} replace />;
     } else {
       // 일반 사용자가 관리자 페이지에 접근하려는 경우
@@ -68,14 +68,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      await login(
-        { email, password },
-        { 
-          rememberMe,
-          redirectUrl: fromLocation,
-          maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : undefined // 30일
-        }
-      );
+      await login({ email, password });
       
       toast.success('관리자 로그인 성공!');
     } catch (error: any) {

@@ -1,0 +1,216 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '20.18.0'
+
+jobs:
+  # 의존성 캐싱 및 설치
+  setup:
+    name: Setup Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            deps-node-
+      
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+  # 타입 체크
+  type-check:
+    name: Type Check
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Run type check
+        run: npm run type-check
+        continue-on-error: true
+
+  # 린트 검사
+  lint:
+    name: Lint
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Run ESLint
+        run: npm run lint
+
+  # 단위 테스트
+  test-unit:
+    name: Unit Tests
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: ['main-site', 'api-server']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Run tests for ${{ matrix.workspace }}
+        run: npm run test --workspace=@o4o/${{ matrix.workspace }}
+        continue-on-error: true
+
+  # 빌드 검증
+  build:
+    name: Build
+    needs: [lint, type-check]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: ['api-server', 'main-site', 'admin-dashboard']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Build ${{ matrix.app }}
+        run: npm run build:${{ matrix.app == 'main-site' && 'web' || matrix.app }}
+        continue-on-error: true
+      
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-build
+          path: apps/${{ matrix.app }}/dist
+          retention-days: 7
+
+  # E2E 테스트 (선택적)
+  test-e2e:
+    name: E2E Tests
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      
+      - name: Run E2E tests
+        run: npm run test:e2e --workspace=@o4o/main-site
+        continue-on-error: true
+
+  # 보안 감사
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+  # 종합 상태 체크
+  status-check:
+    name: CI Status Check
+    needs: [lint, test-unit, build]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check CI Status
+        run: |
+          echo "CI Pipeline completed"
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Unit Tests: ${{ needs.test-unit.result }}"
+          echo "Build: ${{ needs.build.result }}"

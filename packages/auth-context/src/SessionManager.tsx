@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect, useRef } from 'react';
 interface SessionManagerProps {
   children: ReactNode;
   warningBeforeExpiry?: number;
-  onSessionExpiring?: () => void;
+  onSessionExpiring?: (remainingSeconds: number) => void;
 }
 
 export const SessionManager: React.FC<SessionManagerProps> = ({

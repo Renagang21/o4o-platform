@@ -46,9 +46,8 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
 
   // 역할 기반 접근 제어
   if (requiredRoles.length > 0) {
-    const userRole = user.role || '';
-    const userRoles = [userRole]; // 단일 role을 배열로 변환
-    const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
+    const userRole = user.role;
+    const hasRequiredRole = requiredRoles.includes(userRole);
     
     if (!hasRequiredRole) {
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;

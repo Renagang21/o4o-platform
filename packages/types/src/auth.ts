@@ -1,3 +1,4 @@
+// Authentication related types
 export interface User {
   id: string;
   email: string;
@@ -9,13 +10,14 @@ export interface User {
   status?: 'active' | 'inactive' | 'pending';
 }
 
-export interface AuthResponse {
-  token: string;
+export interface AuthToken {
+  accessToken: string;
   refreshToken: string;
-  user: User;
+  expiresAt: Date;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
+export interface SessionStatus {
+  isValid: boolean;
+  expiresAt: Date;
+  remainingTime: number;
 }

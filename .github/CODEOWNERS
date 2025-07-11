@@ -1,0 +1,36 @@
+# O4O Platform Code Owners
+# 각 영역별 코드 리뷰어 자동 할당
+
+# 전체 프로젝트
+* @o4o-platform/core-team
+
+# API 서버
+/apps/api-server/ @o4o-platform/backend-team
+/apps/api-server/src/entities/ @o4o-platform/database-team
+/apps/api-server/src/routes/ @o4o-platform/api-team
+
+# 프론트엔드 - 메인 사이트
+/apps/main-site/ @o4o-platform/frontend-team
+/apps/main-site/src/components/ @o4o-platform/ui-team
+/apps/main-site/src/pages/ @o4o-platform/frontend-team
+
+# 프론트엔드 - 어드민
+/apps/admin-dashboard/ @o4o-platform/admin-team
+
+# 공유 패키지
+/packages/types/ @o4o-platform/core-team
+/packages/auth-*/ @o4o-platform/security-team
+/packages/ui/ @o4o-platform/ui-team
+/packages/utils/ @o4o-platform/core-team
+
+# 설정 파일
+*.json @o4o-platform/devops-team
+*.yml @o4o-platform/devops-team
+*.yaml @o4o-platform/devops-team
+
+# 문서
+*.md @o4o-platform/docs-team
+/docs/ @o4o-platform/docs-team
+
+# CI/CD
+/.github/ @o4o-platform/devops-team

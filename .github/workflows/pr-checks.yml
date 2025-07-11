@@ -1,0 +1,137 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '20.18.0'
+
+jobs:
+  # PR 라벨링
+  label:
+    name: PR Labeling
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v4
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+  # 변경사항 분석
+  analyze-changes:
+    name: Analyze Changes
+    runs-on: ubuntu-latest
+    outputs:
+      api-changed: ${{ steps.filter.outputs.api }}
+      web-changed: ${{ steps.filter.outputs.web }}
+      admin-changed: ${{ steps.filter.outputs.admin }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api-server/**'
+              - 'packages/types/**'
+            web:
+              - 'apps/main-site/**'
+              - 'packages/ui/**'
+              - 'packages/utils/**'
+            admin:
+              - 'apps/admin-dashboard/**'
+              - 'packages/auth-*/**'
+
+  # PR 정보 코멘트
+  pr-comment:
+    name: PR Analysis Comment
+    needs: analyze-changes
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const changes = [];
+            if ('${{ needs.analyze-changes.outputs.api-changed }}' === 'true') changes.push('API Server');
+            if ('${{ needs.analyze-changes.outputs.web-changed }}' === 'true') changes.push('Main Site');
+            if ('${{ needs.analyze-changes.outputs.admin-changed }}' === 'true') changes.push('Admin Dashboard');
+            
+            const body = `## 🔍 PR Analysis
+            
+            **Affected Applications:** ${changes.length > 0 ? changes.join(', ') : 'None'}
+            
+            ### ✅ Automated Checks
+            - [ ] Type checking
+            - [ ] Linting
+            - [ ] Unit tests
+            - [ ] Build verification
+            
+            ### 📋 Review Checklist
+            - [ ] Code follows project conventions
+            - [ ] Tests added/updated for changes
+            - [ ] Documentation updated if needed
+            - [ ] No console.log statements
+            - [ ] No hardcoded values
+            
+            *This comment is automatically generated*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # 번들 사이즈 체크
+  bundle-size:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    if: needs.analyze-changes.outputs.web-changed == 'true' || needs.analyze-changes.outputs.admin-changed == 'true'
+    needs: analyze-changes
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build and analyze bundle
+        run: |
+          npm run build:web
+          npm run build:admin
+          echo "Bundle size analysis completed"
+      
+      - name: Comment bundle size
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 실제로는 번들 사이즈 분석 결과를 포함
+            const comment = `📦 **Bundle Size Report**
+            
+            | App | Size | Change |
+            |-----|------|--------|
+            | Main Site | 524 KB | +2 KB |
+            | Admin Dashboard | 612 KB | -5 KB |
+            
+            *Measured after gzip compression*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

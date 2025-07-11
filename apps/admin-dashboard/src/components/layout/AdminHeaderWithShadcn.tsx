@@ -31,7 +31,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
   const handleLogout = async () => {
     try {
-      await logout({ reason: 'user_initiated' });
+      logout();
       toast.success('로그아웃되었습니다.');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -40,28 +40,28 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
   };
 
   const getSessionStatusColor = () => {
-    switch (sessionStatus.status) {
-      case 'active':
-        return 'text-green-600';
-      case 'expiring_soon':
-        return 'text-yellow-600';
-      case 'expired':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
+    if (!sessionStatus) return 'text-gray-600';
+    
+    const remainingMinutes = Math.floor(sessionStatus.remainingTime / 60000);
+    if (remainingMinutes > 10) {
+      return 'text-green-600';
+    } else if (remainingMinutes > 5) {
+      return 'text-yellow-600';
+    } else {
+      return 'text-red-600';
     }
   };
 
   const getSessionStatusText = () => {
-    switch (sessionStatus.status) {
-      case 'active':
-        return '활성';
-      case 'expiring_soon':
-        return `${Math.floor((sessionStatus.remainingSeconds || 0) / 60)}분 남음`;
-      case 'expired':
-        return '만료됨';
-      default:
-        return '알 수 없음';
+    if (!sessionStatus) return 'Unknown';
+    
+    const remainingMinutes = Math.floor(sessionStatus.remainingTime / 60000);
+    if (remainingMinutes > 10) {
+      return 'Active';
+    } else if (remainingMinutes > 5) {
+      return 'Expiring Soon';
+    } else {
+      return 'Expired';
     }
   };
 
@@ -191,7 +191,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                   className="text-orange-600 focus:text-orange-600"
                   onClick={() => {
                     toast.success('모든 기기에서 로그아웃됩니다.');
-                    logout({ everywhere: true });
+                    logout();
                   }}
                 >
                   <Shield className="mr-2 h-4 w-4" />

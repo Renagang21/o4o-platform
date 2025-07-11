@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 문서
+    url: https://github.com/o4o-platform/docs
+    about: 프로젝트 문서를 확인해주세요
+  - name: 💬 디스커션
+    url: https://github.com/o4o-platform/o4o-platform/discussions
+    about: 질문이나 아이디어를 공유해주세요
+  - name: 🔒 보안 이슈
+    url: https://github.com/o4o-platform/o4o-platform/security/policy
+    about: 보안 관련 이슈는 여기로 보고해주세요

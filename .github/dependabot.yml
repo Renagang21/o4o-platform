@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # npm 의존성 업데이트
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    groups:
+      # React 관련 패키지 그룹화
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      # 테스팅 도구 그룹화
+      testing:
+        patterns:
+          - "*test*"
+          - "vitest*"
+          - "@playwright/*"
+      # 린팅 도구 그룹화
+      linting:
+        patterns:
+          - "eslint*"
+          - "prettier*"
+          - "@typescript-eslint/*"
+      # Tiptap 에디터 그룹화
+      tiptap:
+        patterns:
+          - "@tiptap/*"
+    ignore:
+      # React 19 호환성 유지를 위해 특정 버전 고정
+      - dependency-name: "react"
+        versions: ["< 19.0.0"]
+      - dependency-name: "react-dom"
+        versions: ["< 19.0.0"]
+    
+  # GitHub Actions 업데이트
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
