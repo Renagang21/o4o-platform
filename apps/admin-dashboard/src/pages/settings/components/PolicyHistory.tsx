@@ -23,7 +23,7 @@ interface PolicyHistoryItem {
   id: string;
   category: string;
   action: 'create' | 'update' | 'delete';
-  changes: Record<string, any>;
+  changes: Record<string, unknown>;
   userId: string;
   userName: string;
   timestamp: string;
@@ -296,7 +296,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
     return colors[action as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const renderChangeDetails = (changes: Record<string, any>) => {
+  const renderChangeDetails = (changes: Record<string, unknown>) => {
     return Object.entries(changes).map(([key, value]) => {
       if (typeof value === 'object' && value.from !== undefined && value.to !== undefined) {
         return (

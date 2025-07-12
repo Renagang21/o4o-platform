@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import { User, UserFilters, UserBulkAction, UserFormData, UserStats } from '@/types/user'
+import { User, UserFilters, UserBulkAction, UserFormData, UserStats, UserActivityLog } from '@/types/user'
 import { ApiResponse, PaginatedResponse } from '@/types'
 
 export class UserApi {
@@ -102,7 +102,7 @@ export class UserApi {
     return response.data
   }
 
-  static async getUserActivity(userId: string): Promise<ApiResponse<any[]>> {
+  static async getUserActivity(userId: string): Promise<ApiResponse<UserActivityLog[]>> {
     const response = await apiClient.get(`/admin/users/${userId}/activity`)
     return response.data
   }

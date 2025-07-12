@@ -17,7 +17,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
   onRefresh,
   loading = false
 }) => {
-  const updateFilter = (key: keyof IUserFilters, value: any) => {
+  const updateFilter = (key: keyof IUserFilters, value: string | string[] | undefined) => {
     onFiltersChange({
       ...filters,
       [key]: value === '' ? undefined : value

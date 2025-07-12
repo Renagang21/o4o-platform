@@ -7,26 +7,59 @@ export default {
   theme: {
     extend: {
       colors: {
-        // WordPress-style admin colors
-        admin: {
-          blue: '#0073aa',
-          'blue-dark': '#005177',
-          'blue-light': '#00a0d2',
-          gray: '#23282d',
-          'gray-light': '#32373c',
-          'gray-lighter': '#40464d',
-          'gray-lightest': '#646970',
-          green: '#00a32a',
-          orange: '#f56e28',
-          red: '#d63638',
-          yellow: '#dba617'
+        // Default gray colors for compatibility
+        gray: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+          950: '#030712',
         },
-        // Modern admin theme
+        // WordPress-style admin colors (updated to match CSS variables)
+        admin: {
+          blue: 'var(--wp-admin-blue)',
+          'blue-dark': 'var(--wp-admin-blue-dark)',
+          'blue-light': 'var(--wp-admin-blue-light)',
+          red: 'var(--wp-admin-red)',
+          green: 'var(--wp-admin-green)',
+          orange: 'var(--wp-admin-orange)',
+          purple: 'var(--wp-admin-purple)',
+          gray: 'var(--wp-admin-gray)',
+          'gray-light': 'var(--wp-admin-gray-light)',
+          'gray-dark': 'var(--wp-admin-gray-dark)'
+        },
+        // WordPress sidebar colors
         sidebar: {
-          bg: '#1e293b',
-          hover: '#334155',
-          active: '#0ea5e9',
-          text: '#cbd5e1'
+          bg: 'var(--wp-sidebar-bg)',
+          hover: 'var(--wp-sidebar-hover)',
+          active: 'var(--wp-sidebar-active)',
+          text: 'var(--wp-sidebar-text)',
+          border: 'var(--wp-sidebar-border)'
+        },
+        // WordPress background colors
+        'wp-bg': {
+          primary: 'var(--wp-bg-primary)',
+          secondary: 'var(--wp-bg-secondary)',
+          tertiary: 'var(--wp-bg-tertiary)'
+        },
+        // WordPress text colors
+        'wp-text': {
+          primary: 'var(--wp-text-primary)',
+          secondary: 'var(--wp-text-secondary)',
+          tertiary: 'var(--wp-text-tertiary)',
+          white: 'var(--wp-text-white)'
+        },
+        // WordPress border colors
+        'wp-border': {
+          primary: 'var(--wp-border-primary)',
+          secondary: 'var(--wp-border-secondary)',
+          tertiary: 'var(--wp-border-tertiary)'
         },
         // Shadcn/ui colors
         border: "hsl(var(--border))",

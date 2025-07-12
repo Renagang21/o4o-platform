@@ -4,6 +4,7 @@ import { Save, ArrowLeft, User, Mail, Building } from 'lucide-react'
 import { UserFormData, UserRole, ROLE_LABELS, BUSINESS_TYPES } from '@/types/user'
 import { UserApi } from '@/api/userApi'
 import toast from 'react-hot-toast'
+import { AxiosError } from 'axios'
 
 const AddUser: React.FC = () => {
   const { userId } = useParams()
@@ -71,9 +72,10 @@ const AddUser: React.FC = () => {
       }
       
       navigate('/users')
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to save user:', error)
-      toast.error(error.response?.data?.message || '저장에 실패했습니다.')
+      const axiosError = error as AxiosError<{ message?: string }>
+      toast.error(axiosError.response?.data?.message || '저장에 실패했습니다.')
     } finally {
       setLoading(false)
     }

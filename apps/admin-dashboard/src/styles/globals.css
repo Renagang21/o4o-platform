@@ -7,6 +7,51 @@
 
 @layer base {
   :root {
+    /* WordPress Color Scheme */
+    --wp-color-primary: #0073aa;
+    --wp-color-primary-dark: #005177;
+    --wp-color-primary-light: #00a0d2;
+    --wp-color-success: #46b450;
+    --wp-color-warning: #ffb900;
+    --wp-color-error: #d63638;
+    --wp-color-info: #00a0d2;
+    
+    /* WordPress Admin Colors */
+    --wp-admin-blue: #0073aa;
+    --wp-admin-blue-dark: #005177;
+    --wp-admin-blue-light: #00a0d2;
+    --wp-admin-red: #d63638;
+    --wp-admin-green: #46b450;
+    --wp-admin-orange: #ffb900;
+    --wp-admin-purple: #826eb4;
+    --wp-admin-gray: #646970;
+    --wp-admin-gray-light: #dcdcde;
+    --wp-admin-gray-dark: #3c434a;
+    
+    /* WordPress Sidebar Colors */
+    --wp-sidebar-bg: #23282d;
+    --wp-sidebar-text: #a7aaad;
+    --wp-sidebar-hover: #32373c;
+    --wp-sidebar-active: #0073aa;
+    --wp-sidebar-border: #3c434a;
+    
+    /* WordPress Background Colors */
+    --wp-bg-primary: #f6f7f7;
+    --wp-bg-secondary: #ffffff;
+    --wp-bg-tertiary: #f0f0f1;
+    
+    /* WordPress Text Colors */
+    --wp-text-primary: #1d2327;
+    --wp-text-secondary: #646970;
+    --wp-text-tertiary: #a7aaad;
+    --wp-text-white: #ffffff;
+    
+    /* WordPress Border Colors */
+    --wp-border-primary: #c3c4c7;
+    --wp-border-secondary: #dcdcde;
+    --wp-border-tertiary: #f0f0f1;
+    
+    /* Legacy Shadcn/ui variables for compatibility */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -55,16 +100,16 @@
 /* WordPress Admin-inspired styles */
 @layer base {
   * {
-    @apply border-gray-200;
+    @apply border-wp-border-secondary;
   }
   
   body {
-    @apply bg-gray-50 font-sans;
+    @apply bg-wp-bg-primary font-sans;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-gray-900;
+    @apply font-semibold text-wp-text-primary;
   }
 }
 
@@ -81,8 +126,8 @@
   }
   
   .wp-button-secondary {
-    @apply wp-button bg-gray-50 text-gray-700 border-gray-300;
-    @apply hover:bg-gray-100 hover:border-gray-400;
+    @apply wp-button bg-wp-bg-tertiary text-wp-text-primary border-wp-border-primary;
+    @apply hover:bg-wp-bg-secondary hover:border-wp-border-secondary;
   }
   
   .wp-button-danger {
@@ -92,7 +137,7 @@
   
   /* WordPress-style form elements */
   .wp-input {
-    @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded;
+    @apply block w-full px-3 py-2 text-sm border border-wp-border-primary rounded;
     @apply focus:outline-none focus:ring-2 focus:ring-admin-blue focus:border-transparent;
     @apply transition-colors duration-200;
   }
@@ -111,34 +156,34 @@
   
   /* WordPress-style tables */
   .wp-table {
-    @apply w-full border border-gray-200 rounded-lg overflow-hidden;
+    @apply w-full border border-wp-border-secondary rounded-lg overflow-hidden;
   }
   
   .wp-table th {
-    @apply bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
-    @apply border-b border-gray-200;
+    @apply bg-wp-bg-tertiary px-6 py-3 text-left text-xs font-medium text-wp-text-secondary uppercase tracking-wider;
+    @apply border-b border-wp-border-secondary;
   }
   
   .wp-table td {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
-    @apply border-b border-gray-200;
+    @apply px-6 py-4 whitespace-nowrap text-sm text-wp-text-primary;
+    @apply border-b border-wp-border-secondary;
   }
   
   .wp-table tbody tr:hover {
-    @apply bg-gray-50;
+    @apply bg-wp-bg-tertiary;
   }
   
   /* WordPress-style cards */
   .wp-card {
-    @apply bg-white border border-gray-200 rounded-lg shadow-sm;
+    @apply bg-white border border-wp-border-secondary rounded-lg shadow-sm;
   }
   
   .wp-card-header {
-    @apply px-6 py-4 border-b border-gray-200;
+    @apply px-6 py-4 border-b border-wp-border-secondary;
   }
   
   .wp-card-title {
-    @apply text-lg font-semibold text-gray-900;
+    @apply text-lg font-semibold text-wp-text-primary;
   }
   
   .wp-card-body {
@@ -196,14 +241,14 @@
   }
   
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    @apply bg-wp-bg-tertiary;
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
+    @apply bg-wp-border-primary rounded-full;
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+    @apply bg-admin-gray;
   }
 }

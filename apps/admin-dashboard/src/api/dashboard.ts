@@ -155,8 +155,8 @@ export const dashboardApi = {
       const notifications = response.data.notifications || [];
 
       // 알림 타입별 카운트
-      const urgent = notifications.filter((n: any) => n.type === 'urgent').length;
-      const approval = notifications.filter((n: any) => n.type === 'approval').length;
+      const urgent = notifications.filter((n: { type: string }) => n.type === 'urgent').length;
+      const approval = notifications.filter((n: { type: string }) => n.type === 'approval').length;
 
       return {
         items: notifications,

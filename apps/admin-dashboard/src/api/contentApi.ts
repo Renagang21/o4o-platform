@@ -11,7 +11,8 @@ import {
   ApiResponse,
   ContentFilters,
   PostType,
-  PostStatus
+  PostStatus,
+  TipTapJSONContent
 } from '@/types/content'
 import { api } from './base'
 
@@ -79,7 +80,7 @@ export class ContentApi {
     return response.data
   }
 
-  static async savePostDraft(id: string, content: any): Promise<ApiResponse<void>> {
+  static async savePostDraft(id: string, content: TipTapJSONContent): Promise<ApiResponse<void>> {
     const response = await api.post(`/admin/posts/${id}/autosave`, { content })
     return response.data
   }
@@ -152,7 +153,7 @@ export class ContentApi {
     return response.data
   }
 
-  static async savePageDraft(id: string, content: any): Promise<ApiResponse<void>> {
+  static async savePageDraft(id: string, content: TipTapJSONContent): Promise<ApiResponse<void>> {
     const response = await api.post(`/admin/pages/${id}/autosave`, { content })
     return response.data
   }
@@ -356,12 +357,12 @@ export class ContentApi {
     return response.data
   }
 
-  static async exportFieldGroups(ids?: string[]): Promise<ApiResponse<any>> {
+  static async exportFieldGroups(ids?: string[]): Promise<ApiResponse<{ downloadUrl: string }>> {
     const response = await api.post('/admin/custom-fields/export', { ids })
     return response.data
   }
 
-  static async importFieldGroups(data: any): Promise<ApiResponse<FieldGroup[]>> {
+  static async importFieldGroups(data: FormData): Promise<ApiResponse<FieldGroup[]>> {
     const response = await api.post('/admin/custom-fields/import', data)
     return response.data
   }

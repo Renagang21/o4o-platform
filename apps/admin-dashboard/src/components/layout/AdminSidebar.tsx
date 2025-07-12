@@ -188,7 +188,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
     >
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-700">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <Home className="w-8 h-8 text-white" />
             <span className="text-lg font-bold text-white">O4O Admin</span>
@@ -207,7 +207,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4 border-t border-sidebar-border">
           <div className="text-xs text-sidebar-text text-center">
             O4O Platform Admin v1.0.0
           </div>

@@ -1,143 +1,204 @@
 /**
- * Quick Actions Component
- * 8개 빠른 액션 버튼
+ * Quick Actions Widget (MVP)
+ * 빠른 작업 위젯 - 관리자 주요 작업 버튼 모음
  */
 
-
-import ActionButton from './ActionButton';
+import { memo, useState } from 'react';
 import { 
-  Plus, 
-  FileText, 
-  UserCheck, 
-  Package, 
-  Percent, 
-  BarChart3, 
-  Users2, 
-  Settings 
+  Users,
+  Package,
+  FileText,
+  BarChart3,
+  MessageSquare,
+  RefreshCw,
+  ExternalLink,
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 
-const QuickActions: React.FC = () => {
-  const actions = [
+interface QuickActionsProps {
+  className?: string;
+}
+
+// 빠른 작업 아이템 타입 정의
+interface QuickActionItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  href?: string;
+  onClick?: () => void;
+  badge?: string | number;
+  external?: boolean;
+}
+
+const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
+  const [isLoading] = useState<string | null>(null);
+
+  // 빠른 작업 항목들
+  const quickActions: QuickActionItem[] = [
     {
-      id: 'new-product',
-      title: '새 상품 추가',
+      id: 'add-product',
+      title: '상품 등록',
       description: '새로운 상품을 등록합니다',
-      icon: <Plus className="w-5 h-5" />,
-      color: 'blue' as const,
-      href: '/products/new',
-      badge: null
-    },
-    {
-      id: 'new-page',
-      title: '새 페이지 생성',
-      description: '새로운 콘텐츠 페이지를 만듭니다',
-      icon: <FileText className="w-5 h-5" />,
-      color: 'green' as const,
-      href: '/pages/new',
-      badge: null
-    },
-    {
-      id: 'user-approval',
-      title: '사용자 승인',
-      description: '대기 중인 사용자를 승인합니다',
-      icon: <UserCheck className="w-5 h-5" />,
-      color: 'orange' as const,
-      href: '/users/pending',
-      badge: 3 // 실제로는 API에서 가져올 값
-    },
-    {
-      id: 'order-management',
-      title: '주문 처리',
-      description: '주문 상태를 업데이트합니다',
       icon: <Package className="w-5 h-5" />,
-      color: 'purple' as const,
-      href: '/orders',
-      badge: 12 // 실제로는 API에서 가져올 값
+      color: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+      href: '/admin/products/new',
     },
     {
-      id: 'coupon-create',
-      title: '쿠폰 생성',
-      description: '새로운 할인 쿠폰을 만듭니다',
-      icon: <Percent className="w-5 h-5" />,
-      color: 'pink' as const,
-      href: '/coupons/new',
-      badge: null
+      id: 'add-user',
+      title: '사용자 추가',
+      description: '새로운 사용자를 추가합니다',
+      icon: <Users className="w-5 h-5" />,
+      color: 'bg-green-50 text-green-600 hover:bg-green-100',
+      href: '/admin/users/new',
     },
     {
-      id: 'detailed-report',
-      title: '상세 리포트',
-      description: '전체 분석 리포트를 확인합니다',
+      id: 'create-post',
+      title: '게시글 작성',
+      description: '새 게시글을 작성합니다',
+      icon: <FileText className="w-5 h-5" />,
+      color: 'bg-purple-50 text-purple-600 hover:bg-purple-100',
+      href: '/admin/posts/new',
+    },
+    {
+      id: 'manage-orders',
+      title: '주문 관리',
+      description: '대기 중인 주문을 확인합니다',
+      icon: <Package className="w-5 h-5" />,
+      color: 'bg-orange-50 text-orange-600 hover:bg-orange-100',
+      href: '/admin/orders',
+      badge: 12,
+    },
+    {
+      id: 'forum-moderation',
+      title: '포럼 관리',
+      description: '승인 대기 게시글을 확인합니다',
+      icon: <MessageSquare className="w-5 h-5" />,
+      color: 'bg-pink-50 text-pink-600 hover:bg-pink-100',
+      href: '/admin/forum/moderation',
+      badge: 5,
+    },
+    {
+      id: 'analytics',
+      title: '통계 보기',
+      description: '상세 분석 리포트를 확인합니다',
       icon: <BarChart3 className="w-5 h-5" />,
-      color: 'indigo' as const,
-      href: '/analytics',
-      badge: null
+      color: 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100',
+      href: '/admin/analytics',
     },
-    {
-      id: 'partner-approval',
-      title: '파트너 승인',
-      description: '파트너 신청을 검토합니다',
-      icon: <Users2 className="w-5 h-5" />,
-      color: 'gray' as const,
-      href: '/partners/pending',
-      badge: null,
-      disabled: true, // 파트너스 시스템 미구현
-      tooltip: '파트너스 시스템 준비 중입니다'
-    },
-    {
-      id: 'policy-settings',
-      title: '정책 설정',
-      description: '관리자 정책을 설정합니다',
-      icon: <Settings className="w-5 h-5" />,
-      color: 'yellow' as const,
-      href: '/settings/policies',
-      badge: null,
-      highlight: true // 새로 추가된 기능 강조
-    }
   ];
 
-  return (
-    <div className="wp-card">
-      <div className="wp-card-header">
-        <h3 className="wp-card-title">빠른 작업</h3>
-        <p className="text-sm text-gray-600 mt-1">
-          자주 사용하는 기능에 빠르게 접근하세요
-        </p>
-      </div>
-      
-      <div className="wp-card-body">
-        <div className="grid grid-cols-1 gap-3">
-          {actions.map((action) => (
-            <ActionButton
-              key={action.id}
-              {...action}
-            />
-          ))}
-        </div>
+  const handleActionClick = (action: QuickActionItem) => {
+    if (action.onClick) {
+      action.onClick();
+    } else if (action.href) {
+      if (action.external) {
+        window.open(action.href, '_blank');
+      } else {
+        // React Router 네비게이션 로직 (실제 구현시)
+        window.location.href = action.href;
+      }
+    }
+  };
 
-        {/* Quick Stats */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <p className="text-xs text-gray-500">대기 중인 작업</p>
-              <p className="text-lg font-bold text-orange-600">15개</p>
+  return (
+    <div className={`space-y-6 ${className}`}>
+      {/* 위젯 헤더 */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+          <Zap className="w-5 h-5 mr-2 text-blue-600" />
+          빠른 작업
+        </h2>
+        <div className="text-xs text-wp-text-secondary">
+          자주 사용하는 관리 작업
+        </div>
+      </div>
+
+      {/* 빠른 작업 그리드 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {quickActions.map((action) => (
+          <button
+            key={action.id}
+            onClick={() => handleActionClick(action)}
+            disabled={isLoading === action.id}
+            className={`
+              relative p-4 rounded-lg border border-gray-200 transition-all duration-200
+              hover:shadow-md hover:border-gray-300 active:scale-95
+              disabled:opacity-50 disabled:cursor-not-allowed
+              ${action.color}
+              group
+            `}
+          >
+            {/* 로딩 스피너 */}
+            {isLoading === action.id && (
+              <div className="absolute inset-0 bg-white/80 rounded-lg flex items-center justify-center">
+                <RefreshCw className="w-5 h-5 animate-spin text-wp-text-secondary" />
+              </div>
+            )}
+
+            {/* 배지 */}
+            {action.badge && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full min-w-[20px] h-5 flex items-center justify-center">
+                {action.badge}
+              </div>
+            )}
+
+            {/* 아이콘 */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-white/50">
+                {action.icon}
+              </div>
+              {action.external && (
+                <ExternalLink className="w-4 h-4 opacity-50" />
+              )}
+              {action.href && !action.external && (
+                <ChevronRight className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+              )}
             </div>
-            <div>
-              <p className="text-xs text-gray-500">오늘 완료</p>
-              <p className="text-lg font-bold text-green-600">8개</p>
+
+            {/* 텍스트 */}
+            <div className="text-left">
+              <h3 className="font-medium text-sm text-gray-900 mb-1">
+                {action.title}
+              </h3>
+              <p className="text-xs text-wp-text-secondary leading-relaxed">
+                {action.description}
+              </p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* 추가 정보 */}
+      <div className="wp-card">
+        <div className="wp-card-body">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center space-x-4 text-wp-text-secondary">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                <span>승인 대기: 17건</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                <span>검토 필요: 8건</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <span>정상 작동: 모든 서비스</span>
+              </div>
+            </div>
+            <div className="text-xs text-wp-text-secondary">
+              마지막 업데이트: 방금 전
             </div>
           </div>
-        </div>
-
-        {/* Help Text */}
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-700">
-            💡 <strong>Tip:</strong> 키보드 단축키로 더 빠르게 접근할 수 있습니다. 
-            Ctrl+Shift+N으로 새 상품 추가
-          </p>
         </div>
       </div>
     </div>
   );
-};
+});
+
+QuickActions.displayName = 'QuickActions';
 
 export default QuickActions;

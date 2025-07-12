@@ -43,7 +43,7 @@ export const useCreateProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 생성되었습니다.');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.response?.data?.message || '상품 생성에 실패했습니다.');
     },
   });
@@ -63,7 +63,7 @@ export const useUpdateProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
       toast.success('상품이 성공적으로 수정되었습니다.');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.response?.data?.message || '상품 수정에 실패했습니다.');
     },
   });
@@ -79,7 +79,7 @@ export const useDeleteProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 삭제되었습니다.');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.response?.data?.message || '상품 삭제에 실패했습니다.');
     },
   });
@@ -95,7 +95,7 @@ export const useDuplicateProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 복제되었습니다.');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error?.response?.data?.message || '상품 복제에 실패했습니다.');
     },
   });

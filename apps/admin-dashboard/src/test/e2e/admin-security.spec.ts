@@ -270,11 +270,15 @@ test.describe('Admin Dashboard 보안 기능', () => {
     await adminLogin(page);
     
     // CSP 위반 감지를 위한 이벤트 리스너 설정
-    const cspViolations: any[] = [];
+    const cspViolations: Array<{ type: string; violatedDirective: string; blockedURI: string }> = [];
     
     page.on('console', msg => {
       if (msg.type() === 'error' && msg.text().includes('Content Security Policy')) {
-        cspViolations.push(msg.text());
+        cspViolations.push({
+          type: 'error',
+          violatedDirective: 'unknown',
+          blockedURI: msg.text()
+        });
       }
     });
     

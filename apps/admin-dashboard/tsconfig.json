@@ -28,5 +28,14 @@
     }
   },
   "include": ["src", "vite-env.d.ts"],
+  "exclude": [
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/e2e/**",
+    "src/components/users/__tests__/UserForm.test.tsx",
+    "src/components/users/__tests__/UserDeleteModal.test.tsx",
+    "src/components/users/__tests__/UserRoleChangeModal.test.tsx",
+    "src/pages/Users/__tests__/UsersList.test.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

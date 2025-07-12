@@ -39,7 +39,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     return (
       <span 
         className={`px-2 py-1 text-xs font-medium rounded-full ${
-          statusClasses[status as keyof typeof statusClasses] || 'bg-gray-100 text-gray-800'
+          statusClasses[status as keyof typeof statusClasses] || 'bg-wp-bg-tertiary text-wp-text-primary'
         }`}
         data-testid="product-status-badge"
       >
@@ -80,13 +80,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* 상품 정보 */}
         <div className="space-y-2">
           <div className="flex items-start justify-between">
-            <h3 className="font-medium text-gray-900 line-clamp-2" data-testid="product-name">
+            <h3 className="font-medium text-wp-text-primary line-clamp-2" data-testid="product-name">
               {product.name}
             </h3>
             {getStatusBadge(product.status)}
           </div>
 
-          <div className="text-sm text-gray-600" data-testid="product-sku">
+          <div className="text-sm text-wp-text-secondary" data-testid="product-sku">
             SKU: {product.sku}
           </div>
 
@@ -96,7 +96,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
             
             {product.wholesalePrice && (
-              <div className="text-sm text-gray-600" data-testid="wholesale-price">
+              <div className="text-sm text-wp-text-secondary" data-testid="wholesale-price">
                 도매가: {formatPrice(product.wholesalePrice)}
               </div>
             )}
@@ -146,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {onDuplicate && (
             <button
               onClick={() => onDuplicate(product.id)}
-              className="px-3 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              className="px-3 py-2 text-sm border border-wp-border-primary rounded hover:bg-wp-bg-tertiary"
               data-testid="duplicate-button"
             >
               복제

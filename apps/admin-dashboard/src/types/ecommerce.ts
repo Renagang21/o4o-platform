@@ -469,14 +469,14 @@ export interface PaymentMethod {
   description: string
   enabled: boolean
   supports: string[]
-  settings: Record<string, any>
+  settings: Record<string, unknown>
 }
 
 export interface PaymentSettings {
   testMode: boolean
   methods?: PaymentMethod[]
   enabledMethods: string[]
-  providers: Record<string, any>
+  providers: Record<string, unknown>
   
   // Payment configuration
   fees: Record<string, { rate: number; fixed: number }>
@@ -673,8 +673,8 @@ export interface PointsOverview {
     issued: number
     used: number
   }>
-  topUsers?: any[]  // Added for compatibility
-  recentTransactions?: any[]  // Added for compatibility
+  topUsers?: TopPointsUser[]  // Added for compatibility
+  recentTransactions?: PointTransaction[]  // Added for compatibility
 }
 
 // User Points for individual user
@@ -697,6 +697,18 @@ export interface UserPoints {
   totalSpent: number
 }
 
+
+// Top Points User
+export interface TopPointsUser {
+  userId: string
+  userName: string
+  userEmail: string
+  totalPoints: number
+  earnedPoints: number
+  redeemedPoints: number
+  rank?: number
+}
+
 // Point Transaction for tracking point movements
 export interface PointTransaction {
   id: string
@@ -712,7 +724,7 @@ export interface PointTransaction {
   expiresAt?: string
   createdAt: string
   createdBy?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   
   // 상태 관련 (Status)
   status: 'pending' | 'completed' | 'failed' | 'cancelled'
