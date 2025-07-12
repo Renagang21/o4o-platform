@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
-import { MediaFile, MediaFolder } from '../entities/MediaFile';
+import { MediaFile } from '../entities/MediaFile';
+import { MediaFolder } from '../entities/MediaFolder';
 import { User } from '../entities/User';
 import { ImageProcessingService } from '../services/imageProcessingService';
 import multer from 'multer';

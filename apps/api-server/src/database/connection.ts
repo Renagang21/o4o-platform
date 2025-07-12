@@ -1,5 +1,7 @@
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
+import { MediaFile } from '../entities/MediaFile';
+import { MediaFolder } from '../entities/MediaFolder';
 // Temporarily disabled problematic entities due to OneDrive sync issues
 // import { BetaUser } from '../entities/BetaUser';
 // import { AnalyticsReport } from '../entities/AnalyticsReport';
@@ -50,6 +52,8 @@ export const AppDataSource = new DataSource({
   // 엔티티 등록 (temporarily minimal for OneDrive sync issues)
   entities: [
     User,
+    MediaFile,
+    MediaFolder,
     // BetaUser,
     // AnalyticsReport,
     // Alert,

@@ -1,4 +1,3 @@
-;
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AdminProtectedRoute, SessionManager } from '@o4o/auth-context';
 import { AuthClient } from '@o4o/auth-client';
@@ -72,11 +71,11 @@ function App() {
   };
 
   // 개발 환경에서는 DevAuthProvider 사용
-  const AuthProviderComponent = process.env.NODE_ENV === 'development' ? DevAuthProvider : AuthProvider;
+  const AuthProviderComponent = import.meta.env.DEV ? DevAuthProvider : AuthProvider;
   
   return (
     <AuthProviderComponent 
-      {...(process.env.NODE_ENV !== 'development' ? {
+      {...(!import.meta.env.DEV ? {
         ssoClient,
         autoRefresh: true,
         onAuthError: handleAuthError,

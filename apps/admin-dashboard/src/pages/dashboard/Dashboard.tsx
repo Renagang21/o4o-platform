@@ -64,35 +64,35 @@ const Dashboard = memo(() => {
       </div>
 
       {/* Footer 정보 */}
-      <div className="mt-12 pt-8 border-t border-gray-200">
+      <div className="mt-12 pt-8 border-t border-wp-border-primary">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
           <div className="wp-card">
             <div className="wp-card-body text-center">
               <div className="text-2xl font-bold text-blue-600 mb-1">5</div>
-              <div className="text-sm text-gray-600">활성 위젯</div>
+              <div className="text-sm text-wp-text-secondary">활성 위젯</div>
             </div>
           </div>
           <div className="wp-card">
             <div className="wp-card-body text-center">
               <div className="text-2xl font-bold text-green-600 mb-1">실시간</div>
-              <div className="text-sm text-gray-600">데이터 업데이트</div>
+              <div className="text-sm text-wp-text-secondary">데이터 업데이트</div>
             </div>
           </div>
           <div className="wp-card">
             <div className="wp-card-body text-center">
               <div className="text-2xl font-bold text-purple-600 mb-1">MSW</div>
-              <div className="text-sm text-gray-600">모의 API 연동</div>
+              <div className="text-sm text-wp-text-secondary">모의 API 연동</div>
             </div>
           </div>
           <div className="wp-card">
             <div className="wp-card-body text-center">
               <div className="text-2xl font-bold text-orange-600 mb-1">MVP</div>
-              <div className="text-sm text-gray-600">프로토타입 완성</div>
+              <div className="text-sm text-wp-text-secondary">프로토타입 완성</div>
             </div>
           </div>
         </div>
         
-        <div className="text-center mt-6 text-xs text-gray-500">
+        <div className="text-center mt-6 text-xs text-wp-text-secondary">
           <p>
             📊 **Dashboard MVP v1.0** - StatsOverview, RealtimeStats, RecentActivity, QuickActions, SystemStatus 위젯 구현 완료
           </p>

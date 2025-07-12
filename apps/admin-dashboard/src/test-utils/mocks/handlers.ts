@@ -34,8 +34,7 @@ export const handlers = [
   // =============================================================================
   
   // 로그인 핸들러
-  http.post(`${API_BASE}/auth/login`, async ({ request }) => {
-    const { email, password } = await request.json() as any;
+  http.post(`${API_BASE}/auth/login`, async () => {
     
     // 개발 환경에서는 모든 로그인 성공 처리
     return HttpResponse.json({
@@ -50,8 +49,7 @@ export const handlers = [
   }),
 
   // 현재 사용자 정보 조회
-  http.get(`${API_BASE}/auth/me`, ({ request }) => {
-    const authHeader = request.headers.get('Authorization');
+  http.get(`${API_BASE}/auth/me`, () => {
     
     // 개발 환경에서는 항상 관리자 반환
     return HttpResponse.json({

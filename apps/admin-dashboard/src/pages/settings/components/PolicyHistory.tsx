@@ -296,31 +296,41 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
     return colors[action as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
+  interface ChangeDetail {
+    from?: unknown;
+    to?: unknown;
+    added?: unknown;
+    removed?: unknown;
+  }
+
   const renderChangeDetails = (changes: Record<string, unknown>) => {
     return Object.entries(changes).map(([key, value]) => {
-      if (typeof value === 'object' && value.from !== undefined && value.to !== undefined) {
+      if (value && typeof value === 'object' && 'from' in value && 'to' in value) {
+        const changeValue = value as ChangeDetail;
         return (
           <div key={key} className="text-xs text-gray-600 mt-1">
             <span className="font-medium">{key}:</span>
-            <span className="mx-1">{String(value.from)}</span>
+            <span className="mx-1">{String(changeValue.from)}</span>
             <ArrowUpRight className="w-3 h-3 inline text-gray-400" />
-            <span className="mx-1">{String(value.to)}</span>
+            <span className="mx-1">{String(changeValue.to)}</span>
           </div>
         );
-      } else if (typeof value === 'object' && value.added) {
+      } else if (value && typeof value === 'object' && 'added' in value) {
+        const changeValue = value as ChangeDetail;
         return (
           <div key={key} className="text-xs text-green-600 mt-1">
             <Plus className="w-3 h-3 inline mr-1" />
             <span className="font-medium">추가:</span>
-            <span className="ml-1">{JSON.stringify(value.added)}</span>
+            <span className="ml-1">{JSON.stringify(changeValue.added)}</span>
           </div>
         );
-      } else if (typeof value === 'object' && value.removed) {
+      } else if (value && typeof value === 'object' && 'removed' in value) {
+        const changeValue = value as ChangeDetail;
         return (
           <div key={key} className="text-xs text-red-600 mt-1">
             <Minus className="w-3 h-3 inline mr-1" />
             <span className="font-medium">삭제:</span>
-            <span className="ml-1">{JSON.stringify(value.removed)}</span>
+            <span className="ml-1">{JSON.stringify(changeValue.removed)}</span>
           </div>
         );
       }

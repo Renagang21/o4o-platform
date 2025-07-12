@@ -233,6 +233,117 @@ The project uses React 19 and requires strict version compatibility. All package
 - Inconsistent versions of axios, date-fns, zustand, react-router-dom
 - Extraneous packages causing conflicts
 
+## Troubleshooting Guide
+
+### 🚨 White Screen (백지 화면) Debugging Process
+
+When encountering a white/blank screen in the admin dashboard or any React app, follow this systematic approach:
+
+#### Step 1: Server Log Analysis
+```bash
+# Check if the dev server is running properly
+tail -f /tmp/admin-dashboard.log
+# Look for: compilation errors, missing modules, port conflicts
+```
+
+#### Step 2: TypeScript Compilation Check
+```bash
+# Run type checking to find compilation errors
+npm run type-check
+
+# Common errors and fixes:
+# - "Property 'response' does not exist on type 'Error'"
+#   Fix: Use axios.isAxiosError(error) type guard
+# - Type mismatches
+#   Fix: Define proper types in packages/types
+```
+
+#### Step 3: Browser Console Inspection
+1. Open Chrome DevTools (F12)
+2. Check Console tab for JavaScript errors
+3. Common runtime errors:
+   - `process is not defined` - Node.js code in browser
+   - `Cannot read property of undefined` - Missing null checks
+   - Module import errors - Check file paths
+
+#### Step 4: Environment Variable Issues
+```typescript
+// ❌ WRONG - Node.js only
+if (process.env.NODE_ENV === 'development')
+
+// ✅ CORRECT - Vite compatible
+if (import.meta.env.DEV)
+
+// For custom env vars in Vite:
+import.meta.env.VITE_API_URL  // Must prefix with VITE_
+```
+
+#### Step 5: CSS/TailwindCSS Errors
+```bash
+# Check for undefined CSS classes
+grep -r "gray-[0-9]" src/  # Find hardcoded gray classes
+
+# Fix: Use theme-defined classes
+# ❌ border-gray-200
+# ✅ border-wp-border-secondary
+```
+
+#### Step 6: Authentication Issues
+```javascript
+// For dev environment, check if DevAuthProvider is working
+localStorage.getItem('admin-auth-storage')  // Should contain user data
+
+// Clear and retry
+localStorage.clear()
+window.location.reload()
+```
+
+### Common Issues and Solutions
+
+| Problem | Root Cause | Solution |
+|---------|-----------|----------|
+| White screen | JavaScript runtime error | Check browser console |
+| `process is not defined` | Using Node.js globals in browser | Use `import.meta.env` |
+| CSS not loading | Undefined Tailwind classes | Use defined theme classes |
+| "No access permission" | Auth token missing/invalid | Check DevAuthProvider setup |
+| TypeScript build fails | Type errors | Run `npm run type-check` |
+| Module not found | Wrong import path | Check file exists and path |
+
+### Debug Workflow Checklist
+```bash
+# 1. Initial checks
+[ ] Server running? (check logs)
+[ ] TypeScript compiling? (npm run type-check)
+[ ] Build successful? (npm run build)
+
+# 2. Browser checks
+[ ] Console errors? (F12)
+[ ] Network failures? (Network tab)
+[ ] Local storage issues? (Application tab)
+
+# 3. Code checks
+[ ] Environment variables correct?
+[ ] Import paths valid?
+[ ] Dependencies installed? (npm install)
+```
+
+### Prevention Checklist
+Before committing, always run:
+```bash
+# Full validation suite
+npm run type-check && npm run lint && npm run build && npm run test
+```
+
+### MSW (Mock Service Worker) Issues
+```javascript
+// If MSW is blocking real API calls in development:
+// 1. Check if MSW is enabled in main.tsx
+// 2. Temporarily disable:
+async function enableMocking() {
+  return Promise.resolve(); // Disable MSW
+}
+```
+
 ## Important Notes
 
 - No Docker usage for development (as per user requirement)
@@ -242,3 +353,4 @@ The project uses React 19 and requires strict version compatibility. All package
 - Use existing utilities and libraries rather than adding new ones
 - Maintain strict version compatibility for React 19
 - **DEPENDENCY MANAGEMENT IS CRITICAL** - follow the process above religiously
+- **ALWAYS CHECK BROWSER CONSOLE** - Most white screen issues show errors there

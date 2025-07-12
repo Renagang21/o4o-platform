@@ -76,8 +76,8 @@ const StatsOverview = memo<StatsOverviewProps>(({ className = '' }) => {
         <div className="wp-card-body">
           <div className="text-center py-8">
             <div className="text-red-500 mb-2">⚠️</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">통계 로드 실패</h3>
-            <p className="text-sm text-gray-600">통계 데이터를 불러오는 중 오류가 발생했습니다.</p>
+            <h3 className="text-lg font-medium text-wp-text-primary mb-2">통계 로드 실패</h3>
+            <p className="text-sm text-wp-text-secondary">통계 데이터를 불러오는 중 오류가 발생했습니다.</p>
             <button 
               onClick={() => window.location.reload()} 
               className="mt-4 wp-button wp-button-primary wp-button-sm"
@@ -94,10 +94,10 @@ const StatsOverview = memo<StatsOverviewProps>(({ className = '' }) => {
     <div className={`space-y-6 ${className}`}>
       {/* 위젯 헤더 */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">통합 개요</h2>
+        <h2 className="text-lg font-semibold text-wp-text-primary">통합 개요</h2>
         <div className="flex items-center space-x-2">
           {isLoading && (
-            <div className="flex items-center text-sm text-gray-500">
+            <div className="flex items-center text-sm text-wp-text-secondary">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
               업데이트 중...
             </div>

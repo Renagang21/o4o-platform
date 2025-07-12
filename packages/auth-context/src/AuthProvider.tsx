@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 import { AuthContext } from './AuthContext';
 import { AuthClient } from '@o4o/auth-client';
 import type { User, SessionStatus } from '@o4o/types';
@@ -16,11 +16,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssoClient,
   onAuthError
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  // 로컬 스토리지에서 초기 상태 읽기
+  const getInitialState = () => {
+    if (typeof window === 'undefined') return null;
+    
+    const stored = localStorage.getItem('admin-auth-storage');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed.state && parsed.state.user) {
+          return parsed.state.user;
+        }
+      } catch (e) {
+        console.error('Failed to parse auth storage:', e);
+      }
+    }
+    return null;
+  };
+
+  const [user, setUser] = useState<User | null>(getInitialState());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const authClient = ssoClient || new AuthClient(process.env.VITE_API_BASE_URL || '');
+  const authClient = ssoClient || new AuthClient(
+    typeof window !== 'undefined' && (window as any).import?.meta?.env?.VITE_API_BASE_URL || ''
+  );
 
   const login = async (credentials: { email: string; password: string }) => {
     try {

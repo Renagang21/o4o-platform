@@ -2,24 +2,26 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-// Temporarily comment out Toaster until React version compatibility is fixed
-// import { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
 import App from './App'
 import './styles/globals.css'
 
-// MSW 개발 환경 설정
+// MSW 개발 환경 설정 - 임시로 비활성화
 async function enableMocking() {
-  if (process.env.NODE_ENV !== 'development') {
-    return
-  }
-
-  const { worker } = await import('./test-utils/mocks/browser')
+  // MSW 임시 비활성화 - 백지 화면 문제 해결을 위해
+  return Promise.resolve();
   
-  // MSW 서비스 워커 시작
-  return worker.start({
-    onUnhandledRequest: 'bypass', // 처리되지 않은 요청은 실제 네트워크로 전달
-  })
+  // if (!import.meta.env.DEV) {
+  //   return
+  // }
+
+  // const { worker } = await import('./test-utils/mocks/browser')
+  
+  // // MSW 서비스 워커 시작
+  // return worker.start({
+  //   onUnhandledRequest: 'bypass', // 처리되지 않은 요청은 실제 네트워크로 전달
+  // })
 }
 
 const queryClient = new QueryClient({
@@ -39,7 +41,7 @@ enableMocking().then(() => {
         <BrowserRouter>
           <MultiThemeProvider defaultTheme="light">
             <App />
-            <div id="toaster" />
+            <Toaster position="top-center" reverseOrder={false} />
           </MultiThemeProvider>
         </BrowserRouter>
       </QueryClientProvider>

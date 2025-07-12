@@ -665,9 +665,25 @@ export class EcommerceApi {
 
   static async updateShippingSettings(settings: Partial<ShippingSettings>): Promise<ApiResponse<ShippingSettings>> {
     // Mock implementation
+    const defaultSettings: ShippingSettings = {
+      enableShipping: true,
+      enableFreeShipping: false,
+      freeShippingThreshold: 50000,
+      defaultShippingClass: 'standard',
+      enableShippingCalculator: true,
+      enablePickup: false,
+      pickupInstructions: '',
+      zones: [],
+      weightRules: [],
+      pickup: {
+        enabled: false,
+        locations: []
+      }
+    };
+    
     return {
       success: true,
-      data: settings,
+      data: { ...defaultSettings, ...settings },
       message: 'Shipping settings updated successfully'
     }
   }
