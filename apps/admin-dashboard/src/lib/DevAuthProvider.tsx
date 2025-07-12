@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { AuthProvider } from '@o4o/auth-context';
 import axios from 'axios';
 
