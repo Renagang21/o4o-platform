@@ -15,8 +15,8 @@ import SupplierProductDetail from './pages/supplier/ProductDetail';
 import RetailerDashboard from './pages/retailer/Dashboard';
 import CustomerShop from './pages/customer/Shop';
 
-// Digital Signage Pages
-import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
+// Digital Signage Pages - Temporarily disabled
+// import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
 // TheDANG Style Home (without editor)
 import TheDANGStyleHome from './pages/TheDANGStyleHome';
@@ -95,23 +95,9 @@ const App: React.FC = () => {
           {/* Customer Routes */}
           <Route path="/shop" element={<CustomerShop />} />
           
-          {/* Digital Signage Routes */}
-          <Route
-            path="/signage"
-            element={
-                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                  <DigitalSignageDashboard />
-                </PrivateRoute>
-            }
-          />
-          <Route
-            path="/signage/*"
-            element={
-                <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                  <DigitalSignageDashboard />
-                </PrivateRoute>
-            }
-          />
+          {/* Digital Signage Routes - Temporarily disabled */}
+          <Route path="/signage" element={<DisabledFeaturePage />} />
+          <Route path="/signage/*" element={<DisabledFeaturePage />} />
 
           {/* Test Dashboard */}
           <Route path="/test-dashboard" element={<TestDashboard />} />

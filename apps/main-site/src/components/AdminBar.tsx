@@ -70,9 +70,9 @@ const AdminBar: React.FC = () => {
                   <Link to="/forum/write" className="block px-4 py-2 hover:bg-gray-50 border-b">
                     💬 새 포럼 글
                   </Link>
-                  <Link to="/signage/content/upload" className="block px-4 py-2 hover:bg-gray-50 border-b">
+                  {/* <Link to="/signage/content/upload" className="block px-4 py-2 hover:bg-gray-50 border-b">
                     📺 새 사이니지 콘텐츠
-                  </Link>
+                  </Link> */}
                   <Link to="/admin/content" className="block px-4 py-2 hover:bg-gray-50">
                     📄 새 페이지
                   </Link>
@@ -128,12 +128,13 @@ const AdminBar: React.FC = () => {
                   <Link to="/dropshipping/dashboard" className="block px-4 py-2 hover:bg-gray-50 border-b">
                     🛍️ 드랍쉬핑 대시보드
                   </Link>
-                  <Link to="/signage/dashboard" className="block px-4 py-2 hover:bg-gray-50 border-b">
+                  {/* <Link to="/signage/dashboard" className="block px-4 py-2 hover:bg-gray-50 border-b">
                     📺 사이니지 대시보드
-                  </Link>
-                  <Link to="/forum/dashboard" className="block px-4 py-2 hover:bg-gray-50">
+                  </Link> */}
+                  {/* Forum has been moved to a separate app */}
+                  {/* <Link to="/forum/dashboard" className="block px-4 py-2 hover:bg-gray-50">
                     💬 포럼 대시보드
-                  </Link>
+                  </Link> */}
                 </div>
               )}
             </div>

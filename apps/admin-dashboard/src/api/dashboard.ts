@@ -5,6 +5,17 @@
 
 import { api } from './base';
 
+// Notification type
+interface Notification {
+  id: string;
+  type: 'urgent' | 'approval' | 'info' | 'warning';
+  title: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+  [key: string]: unknown;
+}
+
 // Dashboard Stats type
 interface DashboardStats {
   users: {
@@ -155,8 +166,8 @@ export const dashboardApi = {
       const notifications = response.data.notifications || [];
 
       // 알림 타입별 카운트
-      const urgent = notifications.filter((n: any) => n.type === 'urgent').length;
-      const approval = notifications.filter((n: any) => n.type === 'approval').length;
+      const urgent = notifications.filter((n: Notification) => n.type === 'urgent').length;
+      const approval = notifications.filter((n: Notification) => n.type === 'approval').length;
 
       return {
         items: notifications,

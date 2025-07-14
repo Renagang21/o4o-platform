@@ -51,8 +51,11 @@ export const useUpdateOrderStatus = () => {
       queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       toast.success(`주문 상태가 '${variables.status}'로 변경되었습니다.`);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '주문 상태 변경에 실패했습니다.');
+    onError: (error) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || '주문 상태 변경에 실패했습니다.';
+      toast.error(errorMessage);
     },
   });
 };
@@ -78,8 +81,11 @@ export const useRefundOrder = () => {
       queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       toast.success('주문 환불이 성공적으로 처리되었습니다.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '주문 환불 처리에 실패했습니다.');
+    onError: (error) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || '주문 환불 처리에 실패했습니다.';
+      toast.error(errorMessage);
     },
   });
 };
@@ -108,8 +114,11 @@ export const useBulkOrderAction = () => {
         toast.success('주문 데이터 내보내기가 완료되었습니다.');
       }
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '대량 작업 처리에 실패했습니다.');
+    onError: (error) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || '대량 작업 처리에 실패했습니다.';
+      toast.error(errorMessage);
     },
   });
 };

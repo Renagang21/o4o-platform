@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import useToast from '../hooks/useToast';
+import { useToast } from '@o4o/utils';
 
 interface ProductFormData {
   name: string;

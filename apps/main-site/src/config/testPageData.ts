@@ -27,7 +27,7 @@ export const testPageData: TestPageData = {
       path: '/signage',
       icon: '📺',
       category: 'feature',
-      status: 'active'
+      status: 'coming'
     },
     {
       id: 'test-admin',
@@ -41,11 +41,11 @@ export const testPageData: TestPageData = {
     {
       id: 'test-forum',
       title: '포럼',
-      description: '커뮤니티 MVP 기능 테스트',
-      path: '/forum',
+      description: '커뮤니티 MVP 기능 테스트 (별도 앱으로 이전됨)',
+      path: '#',
       icon: '💬',
       category: 'feature',
-      status: 'coming_soon'
+      status: 'moved'
     },
     {
       id: 'test-dashboard',

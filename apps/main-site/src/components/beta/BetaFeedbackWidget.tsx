@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BetaFeedbackModal } from './BetaFeedbackModal';
 import { BetaRegistrationModal } from './BetaRegistrationModal';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '@o4o/utils';
 
 interface BetaFeedbackWidgetProps {
   page?: string;

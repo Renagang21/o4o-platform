@@ -5,8 +5,8 @@
   "type": "module",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "engines": {
     "node": ">=20.0.0 <21.0.0",
@@ -17,13 +17,21 @@
     "dev:api": "npm run dev --workspace=@o4o/api-server",
     "dev:web": "npm run dev --workspace=@o4o/main-site",
     "dev:admin": "npm run dev --workspace=@o4o/admin-dashboard",
+    "dev:healthcare": "npm run dev --workspace=@o4o/healthcare",
+    "dev:signage": "npm run dev --workspace=@o4o/digital-signage",
+    "dev:forum": "npm run dev --workspace=@o4o/forum",
+    "dev:funding": "npm run dev --workspace=@o4o/funding",
     "build": "npm run build:packages && npm run build:apps",
     "build:packages": "npm run build --workspace=@o4o/types && npm run build --workspace=@o4o/utils && npm run build --workspace=@o4o/ui && npm run build --workspace=@o4o/auth-client && npm run build --workspace=@o4o/auth-context",
-    "build:apps": "npm run build --workspace=@o4o/api-server && npm run build --workspace=@o4o/main-site && npm run build --workspace=@o4o/admin-dashboard",
+    "build:apps": "npm run build --workspace=@o4o/api-server && npm run build --workspace=@o4o/main-site && npm run build --workspace=@o4o/admin-dashboard && npm run build --workspace=@o4o/healthcare && npm run build --workspace=@o4o/digital-signage && npm run build --workspace=@o4o/forum && npm run build --workspace=@o4o/funding",
     "build:all": "npm run build",
     "build:api": "npm run build:packages && npm run build --workspace=@o4o/api-server",
     "build:web": "npm run build:packages && npm run build --workspace=@o4o/main-site",
     "build:admin": "npm run build:packages && npm run build --workspace=@o4o/admin-dashboard",
+    "build:healthcare": "npm run build:packages && npm run build --workspace=@o4o/healthcare",
+    "build:signage": "npm run build:packages && npm run build --workspace=@o4o/digital-signage",
+    "build:forum": "npm run build:packages && npm run build --workspace=@o4o/forum",
+    "build:funding": "npm run build:packages && npm run build --workspace=@o4o/funding",
     "type-check": "npm run build:packages && npm run type-check --workspaces --if-present",
     "lint": "eslint --config ./eslint.config.js apps/*/src/**/*.{ts,tsx} packages/*/src/**/*.{ts,tsx}",
     "lint:fix": "npm run lint -- --fix",

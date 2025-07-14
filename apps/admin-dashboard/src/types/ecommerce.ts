@@ -837,3 +837,4 @@ export interface PointsPolicy {
   createdAt: string
   updatedAt: string
 }
+

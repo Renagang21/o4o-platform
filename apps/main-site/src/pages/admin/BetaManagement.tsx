@@ -7,8 +7,7 @@ import { Table } from '../../components/common/Table';
 import { Modal } from '../../components/common/Modal';
 import { Badge } from '../../components/common/Badge';
 import { Tabs } from '../../components/common/Tabs';
-import { useToast } from '../../hooks/useToast';
-import { useAuth } from '../../hooks/useAuth';
+import { useToast, useAuth } from '@o4o/utils';
 
 interface BetaUser {
   id: string;

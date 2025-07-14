@@ -144,8 +144,9 @@ export const servicesAPI = {
   getEcommerceServices: () =>
     apiClient.get('/services/ecommerce'),
   
-  getCrowdfundingServices: () =>
-    apiClient.get('/services/crowdfunding'),
+  // Crowdfunding moved to separate app
+  // getCrowdfundingServices: () =>
+  //   apiClient.get('/services/crowdfunding'),
   
   getForumServices: () =>
     apiClient.get('/services/forum'),

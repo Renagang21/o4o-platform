@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSocialLoginConfig } from './SocialLoginConfigContext';
-import useToast from '../../hooks/useToast';
+import { useToast } from '@o4o/utils';
 
 const SocialLoginConfigPage: React.FC = () => {
   const { config, setConfig, saveConfig, loadConfig } = useSocialLoginConfig();

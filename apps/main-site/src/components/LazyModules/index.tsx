@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { 
   DropshippingErrorBoundary, 
-  HealthcareErrorBoundary, 
+  // HealthcareErrorBoundary, 
   EditorErrorBoundary, 
   AdminErrorBoundary 
 } from '../ErrorBoundary';
@@ -18,8 +18,8 @@ const LoadingSpinner: React.FC<{ module: string }> = ({ module }) => (
 
 // Lazy load 컴포넌트들
 const LazyDropshippingPage = lazy(() => import('../../pages/DropshippingPage').then(module => ({ default: module.DropshippingPage })));
-const LazyHealthcarePage = lazy(() => import('../../pages/healthcare/HealthcarePage').then(module => ({ default: module.HealthcarePage })));
-const LazyHealthcareDemo = lazy(() => import('../../components/healthcare/HealthcareDemo'));
+// const LazyHealthcarePage = lazy(() => import('../../pages/healthcare/HealthcarePage').then(module => ({ default: module.HealthcarePage })));
+// const LazyHealthcareDemo = lazy(() => import('../../components/healthcare/HealthcareDemo'));
 const LazyTheDANGStyleEditorPage = lazy(() => import('../../pages/TheDANGStyleEditorPage'));
 const LazyFullScreenEditorSimpleTest = lazy(() => import('../../pages/FullScreenEditorSimpleTest').then(module => ({ default: module.FullScreenEditorSimpleTest })));
 const LazyAdminDashboardTest = lazy(() => import('../../pages/AdminDashboardTest').then(module => ({ default: module.AdminDashboardTest })));
@@ -33,21 +33,21 @@ export const SafeDropshippingPage: React.FC = () => (
   </DropshippingErrorBoundary>
 );
 
-export const SafeHealthcarePage: React.FC = () => (
-  <HealthcareErrorBoundary>
-    <Suspense fallback={<LoadingSpinner module="헬스케어" />}>
-      <LazyHealthcarePage />
-    </Suspense>
-  </HealthcareErrorBoundary>
-);
+// export const SafeHealthcarePage: React.FC = () => (
+//   <HealthcareErrorBoundary>
+//     <Suspense fallback={<LoadingSpinner module="헬스케어" />}>
+//       <LazyHealthcarePage />
+//     </Suspense>
+//   </HealthcareErrorBoundary>
+// );
 
-export const SafeHealthcareDemo: React.FC = () => (
-  <HealthcareErrorBoundary>
-    <Suspense fallback={<LoadingSpinner module="헬스케어 데모" />}>
-      <LazyHealthcareDemo />
-    </Suspense>
-  </HealthcareErrorBoundary>
-);
+// export const SafeHealthcareDemo: React.FC = () => (
+//   <HealthcareErrorBoundary>
+//     <Suspense fallback={<LoadingSpinner module="헬스케어 데모" />}>
+//       <LazyHealthcareDemo />
+//     </Suspense>
+//   </HealthcareErrorBoundary>
+// );
 
 export const SafeTheDANGStyleEditorPage: React.FC = () => (
   <EditorErrorBoundary>

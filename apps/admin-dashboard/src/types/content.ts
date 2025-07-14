@@ -1,4 +1,18 @@
 // Content Management Types
+
+// TipTap JSONContent type
+export interface JSONContent {
+  type?: string
+  attrs?: Record<string, any>
+  content?: JSONContent[]
+  marks?: {
+    type: string
+    attrs?: Record<string, any>
+    [key: string]: any
+  }[]
+  text?: string
+  [key: string]: any
+}
 export type PostStatus = 'draft' | 'published' | 'private' | 'archived' | 'scheduled'
 export type PostType = 'post' | 'page' | 'notice' | 'news' | 'product'
 
@@ -17,7 +31,7 @@ export interface SEOMetadata {
   canonicalUrl?: string
   noindex?: boolean
   nofollow?: boolean
-  schema?: Record<string, any>
+  schema?: Record<string, unknown>
   score?: number
 }
 
@@ -25,7 +39,7 @@ export interface Post {
   id: string
   title: string
   slug: string
-  content: any // TipTap JSONContent
+  content: JSONContent
   excerpt?: string
   type: PostType
   status: PostStatus
@@ -44,7 +58,7 @@ export interface Post {
   createdAt: string
   updatedAt: string
   seo: SEOMetadata
-  customFields?: Record<string, any>
+  customFields?: Record<string, unknown>
   template?: string
   parentId?: string // For hierarchical content
   order?: number
@@ -243,7 +257,7 @@ export interface Template {
   type: 'page' | 'post' | 'archive' | 'single'
   description?: string
   thumbnail?: string
-  content: any // TipTap JSONContent or custom structure
+  content: JSONContent | Record<string, unknown>
   customFields?: string[] // Field group IDs
   isDefault?: boolean
   category?: string

@@ -43,9 +43,12 @@ export const useAuthStore = create<AuthState>()(
           
           // Set authorization header for future requests
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        } catch (error: any) {
+        } catch (error) {
+          const errorMessage = error instanceof Error 
+            ? error.message 
+            : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Login failed'
           set({
-            error: error.response?.data?.message || 'Login failed',
+            error: errorMessage,
             loading: false
           })
           throw error

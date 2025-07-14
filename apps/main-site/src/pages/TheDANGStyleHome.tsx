@@ -20,7 +20,7 @@ const TheDANGStyleHome: React.FC = () => {
       title: 'Digital Signage',
       description: '스마트 디지털 사이니지 관리',
       icon: '📺',
-      status: 'available',
+      status: 'coming_soon',  // Temporarily disabled
       href: '/signage',
       color: 'from-green-500 to-green-600'
     },
@@ -36,10 +36,10 @@ const TheDANGStyleHome: React.FC = () => {
     {
       id: 'forum',
       title: 'Community Forum',
-      description: '전문가와 고객이 만나는 커뮤니티',
+      description: '전문가와 고객이 만나는 커뮤니티 (별도 앱으로 이전됨)',
       icon: '💬',
-      status: 'coming_soon',
-      href: '/forum',
+      status: 'moved',
+      href: '#',
       color: 'from-purple-500 to-purple-600'
     }
   ];
@@ -184,10 +184,12 @@ const TheDANGStyleHome: React.FC = () => {
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         service.status === 'available' 
                           ? 'bg-green-100 text-green-800' 
+                          : service.status === 'moved'
+                          ? 'bg-blue-100 text-blue-800'
                           : 'bg-gray-100 text-gray-600'
                       }`}
                     >
-                      {service.status === 'available' ? '이용 가능' : '출시 예정'}
+                      {service.status === 'available' ? '이용 가능' : service.status === 'moved' ? '별도 앱' : '출시 예정'}
                     </span>
                     
                     {service.status === 'available' ? (
@@ -227,7 +229,7 @@ const TheDANGStyleHome: React.FC = () => {
                 <li><Link to="/shop" className="text-gray-400 hover:text-white transition-colors">E-commerce</Link></li>
                 <li><Link to="/signage" className="text-gray-400 hover:text-white transition-colors">Digital Signage</Link></li>
                 <li><Link to="/crowdfunding" className="text-gray-400 hover:text-white transition-colors">Crowdfunding</Link></li>
-                <li><Link to="/forum" className="text-gray-400 hover:text-white transition-colors">Community</Link></li>
+                <li><span className="text-gray-400" title="Forum has been moved to a separate app">Community (별도 앱)</span></li>
               </ul>
             </div>
           </div>

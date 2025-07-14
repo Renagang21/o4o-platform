@@ -18,7 +18,8 @@ const AppHeader: React.FC = () => {
         <Link to="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">yaksa.site</Link>
         <nav className="flex items-center gap-4">
           <Link to="/" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium">홈</Link>
-          <Link to="/forum" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium">커뮤니티</Link>
+          {/* Forum has been moved to a separate app */}
+          {/* <Link to="/forum" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium">커뮤니티</Link> */}
           {user?.roles.includes('yaksa' as UserRole) && (
             <Link to="/products/new" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium">제품 등록</Link>
           )}

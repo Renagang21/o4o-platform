@@ -137,11 +137,11 @@ export const sampleMainServices: ServiceLink[] = [
     id: "forum",
     name: "forum", 
     displayName: "포럼",
-    description: "커뮤니티 게시판, 사용자 소통 공간",
-    url: "/forum",
+    description: "커뮤니티 게시판, 사용자 소통 공간 (별도 앱으로 이전됨)",
+    url: "#",
     icon: "message-circle",
     color: "#0891b2",
-    status: "development", 
+    status: "moved", 
     newTab: false
   }
 ];

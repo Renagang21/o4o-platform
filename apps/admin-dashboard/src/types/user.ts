@@ -111,3 +111,14 @@ export const BUSINESS_TYPES = [
 ] as const
 
 export type BusinessType = typeof BUSINESS_TYPES[number]
+
+export interface UserActivity {
+  id: string
+  userId: string
+  type: 'login' | 'logout' | 'pageView' | 'action' | 'purchase' | 'update'
+  description: string
+  details?: Record<string, unknown>
+  ipAddress?: string
+  userAgent?: string
+  createdAt: string
+}

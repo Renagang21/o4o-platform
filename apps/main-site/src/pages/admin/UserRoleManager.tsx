@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useUserRoleManager, UserRole } from './UserRoleManagerContext';
-import useToast from '../../hooks/useToast';
+import { useToast } from '@o4o/utils';
 import { logRoleChange } from '../../utils/logRoleChange';
 
 const roleLabels: Record<UserRole, string> = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
-import useToast from '../hooks/useToast';
+import { useToast } from '@o4o/utils';
 
 const toastStyles = {
   success: 'bg-green-100 text-green-800 border-green-300',

@@ -56,7 +56,7 @@ export class ModuleErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      const { moduleName, fallbackUrl = '/healthcare' } = this.props;
+      const { moduleName, fallbackUrl = '/' } = this.props;
       
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -87,7 +87,7 @@ export class ModuleErrorBoundary extends Component<Props, State> {
                 href={fallbackUrl}
                 className="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                헬스케어 페이지로 이동
+                홈페이지로 이동
               </a>
               
               <a

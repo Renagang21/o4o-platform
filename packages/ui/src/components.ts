@@ -12,3 +12,9 @@ export interface InputProps {
   value?: string;
   onChange?: (value: string) => void;
 }
+
+// Export beta components
+export * from './components/beta';
+
+// Export navigation components
+export { default as Navbar } from './components/navigation/Navbar';

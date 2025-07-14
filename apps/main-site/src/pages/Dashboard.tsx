@@ -55,17 +55,17 @@ const services = [
   },
   {
     id: 'crowdfunding',
-    title: '크라우드펀딩',
+    title: '크라우드펀딩 (별도 앱)',
     icon: Coins,
-    description: '혁신적인 프로젝트 펀딩 및 투자 플랫폼',
+    description: '혁신적인 프로젝트 펀딩 및 투자 플랫폼 (별도 앱으로 이전됨)',
     features: ['프로젝트 생성', '펀딩 관리', '후원자 소통', '수익 분석'],
     color: 'from-purple-500 to-pink-600'
   },
   {
     id: 'forum',
-    title: '커뮤니티 포럼',
+    title: '커뮤니티 포럼 (별도 앱)',
     icon: MessageSquare,
-    description: '업계 전문가 네트워크 및 지식 공유',
+    description: '업계 전문가 네트워크 및 지식 공유 (별도 앱으로 이전됨)',
     features: ['전문가 네트워크', '지식 공유', '비즈니스 상담', 'Q&A'],
     color: 'from-teal-500 to-cyan-600'
   },
@@ -124,7 +124,7 @@ const Dashboard: React.FC = () => {
           ai: { status: 'maintenance', version: '1.0.0' },
           rpa: { status: 'maintenance', version: '1.0.0' },
           ecommerce: { status: 'operational', version: '1.0.0' },
-          crowdfunding: { status: 'beta', version: '0.9.0' },
+          crowdfunding: { status: 'maintenance', version: '1.0.0' },
           forum: { status: 'operational', version: '1.0.0' },
           signage: { status: 'beta', version: '0.9.0' }
         });
@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
       ai: '/services/ai',
       rpa: '/services/rpa',
       ecommerce: '/services/ecommerce',
-      crowdfunding: '/services/crowdfunding',
+      crowdfunding: '#', // Moved to separate app
       forum: '/services/forum',
       signage: '/services/signage'
     };

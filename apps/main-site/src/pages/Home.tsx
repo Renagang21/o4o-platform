@@ -21,11 +21,11 @@ const Home: React.FC = () => {
     {
       id: 'crowdfunding',
       title: '크라우드펀딩',
-      description: '투명성 기반 신뢰도 펀딩',
+      description: '투명성 기반 신뢰도 펀딩 (별도 앱으로 이전됨)',
       icon: '🚀',
       features: ['투명성 허브', '전문가 검증', '파트너 크로스 프로모션', '드랍쉬핑 연동'],
-      status: 'coming_soon',
-      href: '/crowdfunding',
+      status: 'moved',
+      href: '#',
       color: 'from-orange-500 to-red-600'
     },
     {
@@ -41,11 +41,11 @@ const Home: React.FC = () => {
     {
       id: 'forum',
       title: '포럼',
-      description: '전문가와 고객이 만나는 지식 커뮤니티',
+      description: '전문가와 고객이 만나는 지식 커뮤니티 (별도 앱으로 이전됨)',
       icon: '💬',
       features: ['전문가 상담', 'Q&A 시스템', '제품별 커뮤니티', '실시간 정보 공유'],
-      status: 'coming_soon',
-      href: '/forum',
+      status: 'moved',
+      href: '#',
       color: 'from-purple-500 to-pink-600'
     }
   ];
@@ -115,10 +115,12 @@ const Home: React.FC = () => {
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         service.status === 'available' 
                           ? 'bg-green-100 text-green-800' 
+                          : service.status === 'moved'
+                          ? 'bg-blue-100 text-blue-800'
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {service.status === 'available' ? '이용 가능' : '출시 예정'}
+                      {service.status === 'available' ? '이용 가능' : service.status === 'moved' ? '별도 앱' : '출시 예정'}
                     </span>
                   </div>
 
@@ -143,6 +145,13 @@ const Home: React.FC = () => {
                     >
                       시작하기
                     </Link>
+                  ) : service.status === 'moved' ? (
+                    <button
+                      disabled
+                      className="w-full bg-white bg-opacity-50 text-white text-center py-3 px-6 rounded-lg font-medium cursor-not-allowed"
+                    >
+                      별도 앱으로 이전됨
+                    </button>
                   ) : (
                     <button
                       disabled

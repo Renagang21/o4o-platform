@@ -5,7 +5,7 @@ import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Card } from '../common/Card';
 import { Alert } from '../common/Alert';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '@o4o/utils';
 
 interface BetaFeedbackData {
   betaUserEmail: string;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard, { Product } from '../components/ProductCard';
-import useToast from '../hooks/useToast';
+import { useToast } from '@o4o/utils';
 
 const tempProducts: Product[] = [
   {

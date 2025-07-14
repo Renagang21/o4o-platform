@@ -16,7 +16,7 @@ const Login: React.FC = () => {
 
   // 리다이렉트 URL 처리
   const redirectUrl = searchParams.get('redirect') || '/dashboard';
-  const fromLocation = (location.state as any)?.from?.pathname || redirectUrl;
+  const fromLocation = (location.state as { from?: { pathname?: string } })?.from?.pathname || redirectUrl;
 
   // 이미 인증된 관리자는 대시보드로 리다이렉트
   useEffect(() => {
@@ -71,11 +71,11 @@ const Login: React.FC = () => {
       await login({ email, password });
       
       toast.success('관리자 로그인 성공!');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Admin login failed:', error);
       
       // 구체적인 에러 메시지 표시
-      let errorMessage = error.message || '로그인에 실패했습니다.';
+      let errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
       
       if (errorMessage.includes('Invalid credentials')) {
         errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.';

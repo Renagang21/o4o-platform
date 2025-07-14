@@ -41,16 +41,16 @@ export const getDefaultHomeData = (): HomePageData => ({
     {
       id: 'crowdfunding',
       title: '크라우드펀딩',
-      description: '투명성 기반 신뢰도 펀딩',
+      description: '투명성 기반 신뢰도 펀딩 (별도 앱으로 이전됨)',
       icon: '🚀',
       features: ['투명성 허브', '전문가 검증', '파트너 크로스 프로모션', '드랍쉬핑 연동'],
-      status: 'coming_soon',
-      href: '/crowdfunding',
-      adminHref: '/crowdfunding/dashboard',
-      userHref: '/crowdfunding',
+      status: 'moved',
+      href: '#', // Crowdfunding has been moved to a separate app
+      adminHref: '#',
+      userHref: '#',
       color: 'from-orange-500 to-red-600',
-      buttonText: '곧 출시 예정',
-      isEditable: true // 편집 가능한 배너
+      buttonText: '별도 앱으로 이전됨',
+      isEditable: false
     },
     {
       id: 'signage',
@@ -69,13 +69,13 @@ export const getDefaultHomeData = (): HomePageData => ({
     {
       id: 'forum',
       title: '포럼',
-      description: '전문가와 고객이 만나는 지식 커뮤니티',
+      description: '전문가와 고객이 만나는 지식 커뮤니티 (별도 앱으로 이전됨)',
       icon: '💬',
       features: ['전문가 상담', 'Q&A 시스템', '카테고리별 게시판', '실시간 소통'],
-      status: 'available',
-      href: '/forum', // 모든 사용자가 여기로
-      adminHref: '/forum/dashboard',
-      userHref: '/forum/dashboard',
+      status: 'moved',
+      href: '#', // Forum has been moved to a separate app
+      adminHref: '#',
+      userHref: '#',
       color: 'from-purple-500 to-pink-600',
       buttonText: '시작하기',
       isEditable: false

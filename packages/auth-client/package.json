@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "axios": "^1.6.2",
+    "axios": "^1.10.0",
     "js-cookie": "^3.0.5"
   },
   "devDependencies": {
