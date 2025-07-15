@@ -20,7 +20,20 @@ addEventListener('activate', function (event) {
   event.waitUntil(self.clients.claim())
 })
 
+// 허용된 출처 목록 정의
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',          // main-site 개발 환경
+  'http://localhost:3001',          // admin-dashboard 개발 환경
+  'https://www.neture.co.kr',       // 프로덕션 환경
+  'https://admin.neture.co.kr'      // 프로덕션 관리자 환경
+];
+
 addEventListener('message', async function (event) {
+  // 출처 검증: 허용된 출처가 아니면 즉시 중단
+  if (!ALLOWED_ORIGINS.includes(event.origin)) {
+    return;
+  }
+  
   const clientId = Reflect.get(event.source || {}, 'id')
 
   if (!clientId || !self.clients) {
