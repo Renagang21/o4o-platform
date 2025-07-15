@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { AuthContext } from './AuthContext';
 import { AuthClient } from '@o4o/auth-client';
 import type { User, SessionStatus } from '@o4o/types';

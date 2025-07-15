@@ -23,7 +23,8 @@ import { ContentUsageLog } from '../entities/ContentUsageLog';
 
 // Import Content Management entities
 import { Page } from '../entities/Page';
-import { MediaFile, MediaFolder } from '../entities/MediaFile';
+import { MediaFile } from '../entities/MediaFile';
+import { MediaFolder } from '../entities/MediaFolder';
 import { Template } from '../entities/Template';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 
