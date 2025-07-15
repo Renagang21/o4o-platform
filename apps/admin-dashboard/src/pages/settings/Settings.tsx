@@ -2,16 +2,7 @@ import React from 'react'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon } from 'lucide-react'
 import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
-
-const GeneralSettings: React.FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-wp-text-secondary">
-        <p>일반 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
+import GeneralSettings from './GeneralSettings'
 
 const UserSettings: React.FC = () => (
   <div className="wp-card">

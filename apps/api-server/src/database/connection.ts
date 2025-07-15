@@ -2,6 +2,12 @@ import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
+import { Product } from '../entities/Product';
+import { Order } from '../entities/Order';
+import { OrderItem } from '../entities/OrderItem';
+import { Cart } from '../entities/Cart';
+import { CartItem } from '../entities/CartItem';
+import { Category } from '../entities/Category';
 // Temporarily disabled problematic entities due to OneDrive sync issues
 // import { BetaUser } from '../entities/BetaUser';
 // import { AnalyticsReport } from '../entities/AnalyticsReport';
@@ -54,6 +60,12 @@ export const AppDataSource = new DataSource({
     User,
     MediaFile,
     MediaFolder,
+    Product,
+    Order,
+    OrderItem,
+    Cart,
+    CartItem,
+    Category,
     // BetaUser,
     // AnalyticsReport,
     // Alert,

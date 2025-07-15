@@ -10,7 +10,8 @@ import {
   Settings,
   X,
   ChevronDown,
-  Home
+  Home,
+  Tag
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -52,6 +53,7 @@ const menuItems: MenuItem[] = [
     children: [
       { id: 'content-posts', label: '게시글', icon: <FileText className="w-4 h-4" />, path: '/content/posts' },
       { id: 'content-pages', label: '페이지', icon: <FileText className="w-4 h-4" />, path: '/content/pages' },
+      { id: 'content-categories', label: '카테고리 & 태그', icon: <Tag className="w-4 h-4" />, path: '/categories' },
       { id: 'content-cpt', label: 'CPT 관리', icon: <FileText className="w-4 h-4" />, path: '/content/cpt' },
       { id: 'content-media', label: '미디어 라이브러리', icon: <FileText className="w-4 h-4" />, path: '/content/media' }
     ]

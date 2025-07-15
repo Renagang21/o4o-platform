@@ -12,6 +12,36 @@ export class ProductsController {
   // 상품 목록 조회 (필터링, 페이징, 정렬)
   getProducts = async (req: Request, res: Response) => {
     try {
+      // 개발 환경에서 DB 연결 없이 테스트 데이터 반환
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          data: [
+            {
+              id: '1',
+              name: '테스트 상품 1',
+              description: '개발 환경 테스트 상품입니다',
+              price: 10000,
+              stock: 100,
+              status: 'active',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            },
+            {
+              id: '2',
+              name: '테스트 상품 2',
+              description: '개발 환경 테스트 상품입니다',
+              price: 20000,
+              stock: 50,
+              status: 'active',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            }
+          ],
+          total: 2,
+          page: 1,
+          limit: 20
+        });
+      }
       const {
         page = 1,
         limit = 20,

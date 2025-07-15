@@ -24,6 +24,7 @@ const Settings = lazy(() => import('@/pages/settings/Settings'));
 const Pages = lazy(() => import('@/pages/pages/Pages'));
 const Media = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
+const Categories = lazy(() => import('@/pages/categories/Categories'));
 
 // Loading component
 const PageLoader = () => (
@@ -188,6 +189,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['analytics:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Analytics />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 카테고리 & 태그 */}
+                    <Route path="/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Categories />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
