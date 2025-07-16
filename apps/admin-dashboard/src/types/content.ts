@@ -2,6 +2,18 @@
 export type PostStatus = 'draft' | 'published' | 'private' | 'archived' | 'scheduled'
 export type PostType = 'post' | 'page' | 'notice' | 'news' | 'product'
 
+// TipTap Editor Types
+export interface TipTapJSONContent {
+  type?: string
+  attrs?: Record<string, unknown>
+  content?: TipTapJSONContent[]
+  marks?: {
+    type: string
+    attrs?: Record<string, unknown>
+  }[]
+  text?: string
+}
+
 export interface SEOMetadata {
   title?: string
   description?: string
@@ -17,7 +29,7 @@ export interface SEOMetadata {
   canonicalUrl?: string
   noindex?: boolean
   nofollow?: boolean
-  schema?: Record<string, any>
+  schema?: Record<string, unknown>
   score?: number
 }
 
@@ -25,7 +37,7 @@ export interface Post {
   id: string
   title: string
   slug: string
-  content: any // TipTap JSONContent
+  content: TipTapJSONContent
   excerpt?: string
   type: PostType
   status: PostStatus
@@ -44,7 +56,7 @@ export interface Post {
   createdAt: string
   updatedAt: string
   seo: SEOMetadata
-  customFields?: Record<string, any>
+  customFields?: Record<string, unknown>
   template?: string
   parentId?: string // For hierarchical content
   order?: number
@@ -113,7 +125,7 @@ export interface MediaFile {
     width: number
     height: number
   }
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   uploadedBy: string
   uploadedAt: string
   updatedAt: string
@@ -246,7 +258,7 @@ export interface Template {
   description?: string
   thumbnail?: string
   preview?: string
-  content: any // TipTap JSONContent or custom structure
+  content: TipTapJSONContent // TipTap JSONContent or custom structure
   customFields?: string[] | Record<string, any> // Field group IDs or actual fields
   settings?: Record<string, any>
   isDefault?: boolean
@@ -332,9 +344,9 @@ export interface EditorContent {
   content?: EditorContent[]
   marks?: Array<{
     type: string
-    attrs?: Record<string, any>
+    attrs?: Record<string, unknown>
   }>
-  attrs?: Record<string, any>
+  attrs?: Record<string, unknown>
   text?: string
 }
 

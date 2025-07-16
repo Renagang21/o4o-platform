@@ -34,3 +34,34 @@ mockResizeObserver.mockReturnValue({
   disconnect: () => null
 });
 window.ResizeObserver = mockResizeObserver;
+
+// Mock UI components that might not exist
+vi.mock('@/components/ui/dropdown-menu', () => ({
+  DropdownMenu: vi.fn(({ children }) => children),
+  DropdownMenuContent: vi.fn(({ children }) => children),
+  DropdownMenuItem: vi.fn(({ children }) => children),
+  DropdownMenuLabel: vi.fn(({ children }) => children),
+  DropdownMenuSeparator: vi.fn(() => null),
+  DropdownMenuTrigger: vi.fn(({ children }) => children),
+}));
+
+// Mock react-router-dom
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+    useParams: () => ({ id: 'test-id' }),
+    useLocation: () => ({ pathname: '/test' }),
+  };
+});
+
+// Mock API client
+vi.mock('../api/base', () => ({
+  default: {
+    get: vi.fn().mockResolvedValue({ data: {} }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+    put: vi.fn().mockResolvedValue({ data: {} }),
+    delete: vi.fn().mockResolvedValue({ data: {} }),
+  }
+}));

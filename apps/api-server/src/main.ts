@@ -199,16 +199,21 @@ app.use('*', (req, res) => {
 
 // 서버 시작
 const startServer = async () => {
-  // 데이터베이스 초기화
-  await AppDataSource.initialize();
-  console.log('✅ Database connection established');
+  try {
+    // 데이터베이스 초기화 시도
+    await AppDataSource.initialize();
+    console.log('✅ Database connection established');
+  } catch (dbError) {
+    console.log('⚠️  Database connection failed:', dbError.message);
+    console.log('📌 Running in development mode without database');
+  }
   
   httpServer.listen(port, () => {
     console.log(`🚀 Neture API Server running on port ${port}`);
     console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 API Base URL: http://localhost:${port}/api`);
     console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3011'}`);
-    console.log('💾 Database: o4o_platform connected successfully');
+    console.log(`📡 Health check: http://localhost:${port}/api/health`);
   });
 };
 
@@ -216,4 +221,4 @@ startServer().catch(console.error);
 
 // Export services for other modules
 export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
-export const realtimeFeedbackService = new (require('./services/realtimeFeedbackService').RealtimeFeedbackService)();
+// Note: realtimeFeedbackService should be initialized after server starts, not here

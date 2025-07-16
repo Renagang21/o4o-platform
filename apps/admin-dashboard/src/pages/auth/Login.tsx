@@ -31,16 +31,16 @@ const Login: React.FC = () => {
     } else {
       // 일반 사용자가 관리자 페이지에 접근하려는 경우
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-wp-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
             <div className="text-center">
               <div className="mx-auto h-16 w-16 bg-red-500 rounded-full flex items-center justify-center">
                 <AlertTriangle className="h-8 w-8 text-white" />
               </div>
-              <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+              <h2 className="mt-6 text-center text-3xl font-bold text-wp-text-primary">
                 접근 권한 없음
               </h2>
-              <p className="mt-2 text-center text-sm text-gray-600">
+              <p className="mt-2 text-center text-sm text-wp-text-secondary">
                 관리자 권한이 필요합니다
               </p>
               <div className="mt-4">
@@ -92,17 +92,17 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-wp-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* 헤더 */}
         <div>
           <div className="mx-auto h-16 w-16 bg-admin-blue rounded-full flex items-center justify-center">
             <Lock className="h-8 w-8 text-white" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-bold text-wp-text-primary">
             O4O Admin
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-wp-text-secondary">
             관리자 계정으로 로그인하세요
           </p>
         </div>
@@ -152,11 +152,11 @@ const Login: React.FC = () => {
           <div className="space-y-4">
             {/* 이메일 입력 */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-wp-text-primary mb-1">
                 이메일 주소
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-wp-text-secondary" />
                 <input
                   id="email"
                   name="email"
@@ -174,11 +174,11 @@ const Login: React.FC = () => {
 
             {/* 비밀번호 입력 */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-wp-text-primary mb-1">
                 비밀번호
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-wp-text-secondary" />
                 <input
                   id="password"
                   name="password"
@@ -194,7 +194,7 @@ const Login: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-wp-text-secondary hover:text-wp-text-primary"
                   disabled={isLoading}
                 >
                   {showPassword ? (
@@ -216,10 +216,10 @@ const Login: React.FC = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-admin-blue focus:ring-admin-blue border-gray-300 rounded"
+                className="h-4 w-4 text-admin-blue focus:ring-admin-blue border-wp-border-primary rounded"
                 disabled={isLoading}
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-wp-text-primary">
                 30일간 로그인 상태 유지
               </label>
             </div>
@@ -257,7 +257,7 @@ const Login: React.FC = () => {
 
           {/* 추가 정보 */}
           <div className="text-center space-y-2">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-wp-text-secondary">
               관리자 계정이 필요하신가요?{' '}
               <a 
                 href="mailto:admin@neture.co.kr?subject=관리자 계정 요청" 
@@ -267,10 +267,10 @@ const Login: React.FC = () => {
               </a>
             </p>
             
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-wp-text-secondary">
               <a 
                 href="/"
-                className="hover:text-gray-600"
+                className="hover:text-wp-text-primary"
               >
                 메인 사이트로 돌아가기
               </a>
@@ -279,9 +279,9 @@ const Login: React.FC = () => {
         </form>
 
         {/* 보안 정보 */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg border">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">🔒 보안 안내</h3>
-          <ul className="text-xs text-gray-600 space-y-1">
+        <div className="mt-8 p-4 bg-wp-bg-tertiary rounded-lg border">
+          <h3 className="text-sm font-medium text-wp-text-primary mb-2">🔒 보안 안내</h3>
+          <ul className="text-xs text-wp-text-secondary space-y-1">
             <li>• 세션은 8시간 후 자동 만료됩니다</li>
             <li>• 비정상적인 접근 시 계정이 자동으로 잠길 수 있습니다</li>
             <li>• 모든 관리자 활동은 로그로 기록됩니다</li>

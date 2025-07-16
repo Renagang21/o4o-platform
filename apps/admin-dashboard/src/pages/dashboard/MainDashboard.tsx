@@ -36,8 +36,7 @@ const MainDashboard: React.FC = () => {
     stats, 
     chartData, 
     notifications, 
-    activities, 
-    systemHealth,
+    activities,
     isLoading,
     error,
     refreshAllData
@@ -239,10 +238,7 @@ const MainDashboard: React.FC = () => {
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
                 시스템 상태
               </h2>
-              <SystemHealth 
-                health={systemHealth}
-                isLoading={isLoading}
-              />
+              <SystemHealth />
             </div>
           </div>
         </section>

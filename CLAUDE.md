@@ -274,15 +274,6 @@ The project uses React 19 and requires strict version compatibility. All package
 - Inconsistent versions of axios, date-fns, zustand, react-router-dom
 - Extraneous packages causing conflicts
 
-## CI/CD and GitHub Actions
-
-The project uses GitHub Actions for:
-- CI/CD Pipeline with build and test verification
-- CodeQL security analysis
-- Separate deployment workflows for each app
-- PR checks and auto-labeling
-- Automated dependency updates with Dependabot
-
 ## Important Notes
 
 - No Docker usage for development
@@ -293,3 +284,4 @@ The project uses GitHub Actions for:
 - Maintain strict version compatibility for React 19
 - Check for MSW handlers before implementing new API endpoints
 - **DEPENDENCY MANAGEMENT IS CRITICAL** - follow the process above religiously
+- **ALWAYS CHECK BROWSER CONSOLE** - Most white screen issues show errors there

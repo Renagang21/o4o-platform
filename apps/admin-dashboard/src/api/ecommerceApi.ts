@@ -14,7 +14,17 @@ import {
   ProductAnalytics,
   ProductCategory,
   ProductTag,
-  EcommerceSettings
+  EcommerceSettings,
+  PointsOverview,
+  TopPointsUser,
+  PointTransaction,
+  PointsReward,
+  PointsPolicy,
+  GeneralSettings,
+  PaymentSettings,
+  ShippingSettings,
+  CouponBanner,
+  CouponUsage
 } from '@/types/ecommerce'
 import { ApiResponse, PaginatedResponse } from '@/types'
 
@@ -311,20 +321,33 @@ export class EcommerceApi {
 
 
   // Points System
-  static async getPointsOverview(): Promise<ApiResponse<any>> {
+  static async getPointsOverview(): Promise<ApiResponse<PointsOverview>> {
     // Mock implementation
     return {
       success: true,
       data: {
-        totalPoints: 0,
+        totalActivePoints: 0,
+        totalExpiredPoints: 0,
+        totalExpired: 0,
+        totalRedeemedPoints: 0,
+        totalUsed: 0,
+        totalIssued: 0,
+        currentCirculation: 0,
+        totalMembersWithPoints: 0,
         activeUsers: 0,
-        pendingRewards: 0
+        averagePointsPerMember: 0,
+        averageBalance: 0,
+        monthlyEarnedPoints: 0,
+        monthlyRedeemedPoints: 0,
+        pointsExpiringNext30Days: 0,
+        conversionRate: 0,
+        roi: 0
       },
       message: 'Points overview retrieved successfully'
     }
   }
 
-  static async getTopPointsUsers(): Promise<ApiResponse<any[]>> {
+  static async getTopPointsUsers(): Promise<ApiResponse<TopPointsUser[]>> {
     // Mock implementation
     return {
       success: true,
@@ -333,7 +356,7 @@ export class EcommerceApi {
     }
   }
 
-  static async getPointsTransactions(page = 1, limit = 20): Promise<PaginatedResponse<any>> {
+  static async getPointsTransactions(page = 1, limit = 20): Promise<PaginatedResponse<PointTransaction>> {
     // Mock implementation
     return {
       data: [],
@@ -347,7 +370,7 @@ export class EcommerceApi {
     }
   }
 
-  static async getPointsRewards(): Promise<ApiResponse<any[]>> {
+  static async getPointsRewards(): Promise<ApiResponse<PointsReward[]>> {
     // Mock implementation
     return {
       success: true,
@@ -356,20 +379,78 @@ export class EcommerceApi {
     }
   }
 
-  static async createPointsReward(reward: any): Promise<ApiResponse<any>> {
+  static async createPointsReward(reward: Partial<PointsReward>): Promise<ApiResponse<PointsReward>> {
     // Mock implementation
     return {
       success: true,
-      data: { ...reward, id: Date.now().toString() },
+      data: { 
+        id: Date.now().toString(),
+        name: reward.name || '',
+        title: reward.title || reward.name || '',
+        description: reward.description || '',
+        pointsCost: reward.pointsCost || 0,
+        costPoints: reward.costPoints || reward.pointsCost || 0,
+        rewardType: reward.rewardType || 'discount',
+        type: reward.type || reward.rewardType || 'discount',
+        rewardValue: reward.rewardValue || 0,
+        value: reward.value || reward.rewardValue || 0,
+        valueType: reward.valueType || 'fixed',
+        isActive: reward.isActive ?? true,
+        status: reward.status || 'active',
+        stockLimit: reward.stockLimit || 0,
+        currentStock: reward.currentStock || reward.stockLimit || 0,
+        minOrderAmount: reward.minOrderAmount || 0,
+        userLimit: reward.userLimit || 0,
+        usageLimit: reward.usageLimit || 0,
+        expiryDays: reward.expiryDays || 0,
+        termsConditions: reward.termsConditions || '',
+        category: reward.category || '',
+        priority: reward.priority || 0,
+        totalRedemptions: reward.totalRedemptions || 0,
+        redemptionCount: reward.redemptionCount || 0,
+        pendingRedemptions: reward.pendingRedemptions || 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...reward
+      },
       message: 'Points reward created successfully'
     }
   }
 
-  static async updatePointsReward(id: string, reward: any): Promise<ApiResponse<any>> {
+  static async updatePointsReward(id: string, reward: Partial<PointsReward>): Promise<ApiResponse<PointsReward>> {
     // Mock implementation
     return {
       success: true,
-      data: { ...reward, id },
+      data: { 
+        id,
+        name: reward.name || '',
+        title: reward.title || reward.name || '',
+        description: reward.description || '',
+        pointsCost: reward.pointsCost || 0,
+        costPoints: reward.costPoints || reward.pointsCost || 0,
+        rewardType: reward.rewardType || 'discount',
+        type: reward.type || reward.rewardType || 'discount',
+        rewardValue: reward.rewardValue || 0,
+        value: reward.value || reward.rewardValue || 0,
+        valueType: reward.valueType || 'fixed',
+        isActive: reward.isActive ?? true,
+        status: reward.status || 'active',
+        stockLimit: reward.stockLimit || 0,
+        currentStock: reward.currentStock || reward.stockLimit || 0,
+        minOrderAmount: reward.minOrderAmount || 0,
+        userLimit: reward.userLimit || 0,
+        usageLimit: reward.usageLimit || 0,
+        expiryDays: reward.expiryDays || 0,
+        termsConditions: reward.termsConditions || '',
+        category: reward.category || '',
+        priority: reward.priority || 0,
+        totalRedemptions: reward.totalRedemptions || 0,
+        redemptionCount: reward.redemptionCount || 0,
+        pendingRedemptions: reward.pendingRedemptions || 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...reward
+      },
       message: 'Points reward updated successfully'
     }
   }
@@ -383,29 +464,89 @@ export class EcommerceApi {
     }
   }
 
-  static async getPointsPolicy(): Promise<ApiResponse<any>> {
+  static async getPointsPolicy(): Promise<ApiResponse<PointsPolicy>> {
     // Mock implementation
     return {
       success: true,
       data: {
-        pointsPerDollar: 1,
-        minimumRedemption: 100,
-        expirationDays: 365
+        id: '1',
+        name: 'Default Policy',
+        type: 'earning',
+        isActive: true,
+        purchaseRate: 1,
+        minimumEarnAmount: 0,
+        maxDailyEarn: 1000,
+        maxMonthlyEarn: 10000,
+        roundingRule: 'round',
+        enableTierSystem: false,
+        tierRates: {},
+        tierThresholds: {},
+        minimumSpend: 100,
+        maximumSpendRatio: 0.5,
+        conversionRate: 1,
+        allowPartialSpend: true,
+        enablePointsExpiry: true,
+        expiryMonths: 12,
+        expiryWarningDays: 30,
+        autoExpireInactive: false,
+        inactivityMonths: 6,
+        enableBonusPoints: false,
+        bonusRates: {},
+        rules: {
+          pointsPerDollar: 1,
+          minimumOrderAmount: 0,
+          excludeDiscountedItems: false,
+          excludeShipping: true,
+          excludeTax: true,
+          expirationDays: 365
+        },
+        priority: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
       message: 'Points policy retrieved successfully'
     }
   }
 
-  static async updatePointsPolicy(policy: any): Promise<ApiResponse<any>> {
+  static async updatePointsPolicy(policy: Partial<PointsPolicy>): Promise<ApiResponse<PointsPolicy>> {
     // Mock implementation
     return {
       success: true,
-      data: policy,
+      data: {
+        id: '1',
+        name: 'Default Policy',
+        type: 'earning',
+        isActive: true,
+        purchaseRate: 1,
+        minimumEarnAmount: 0,
+        maxDailyEarn: 1000,
+        maxMonthlyEarn: 10000,
+        roundingRule: 'round',
+        enableTierSystem: false,
+        tierRates: {},
+        tierThresholds: {},
+        minimumSpend: 100,
+        maximumSpendRatio: 0.5,
+        conversionRate: 1,
+        allowPartialSpend: true,
+        enablePointsExpiry: true,
+        expiryMonths: 12,
+        expiryWarningDays: 30,
+        autoExpireInactive: false,
+        inactivityMonths: 6,
+        enableBonusPoints: false,
+        bonusRates: {},
+        rules: {},
+        priority: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...policy
+      },
       message: 'Points policy updated successfully'
     }
   }
 
-  static async exportPointsTransactions(_filters: any): Promise<ApiResponse<any>> {
+  static async exportPointsTransactions(_filters: Record<string, unknown>): Promise<ApiResponse<{ downloadUrl: string }>> {
     // Mock implementation
     return {
       success: true,
@@ -415,33 +556,83 @@ export class EcommerceApi {
   }
 
   // Settings
-  static async getGeneralSettings(): Promise<ApiResponse<any>> {
+  static async getGeneralSettings(): Promise<ApiResponse<GeneralSettings>> {
     // Mock implementation
     return {
       success: true,
       data: {
         storeName: 'O4O Store',
-        storeAddress: '',
+        storeDescription: 'O4O Platform Store',
+        storeAddress: {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: 'KR'
+        },
+        contactInfo: {
+          phone: '',
+          email: '',
+          website: ''
+        },
+        businessHours: {},
         currency: 'KRW',
-        timezone: 'Asia/Seoul'
-      },
+        language: 'ko',
+        timezone: 'Asia/Seoul',
+        dateFormat: 'YYYY-MM-DD',
+        timeFormat: 'HH:mm',
+        enableInventoryManagement: true,
+        enableReviews: true,
+        enableWishlist: true,
+        requiresLogin: false,
+        showOutOfStock: true,
+        imageSizes: {
+          thumbnail: { width: 150, height: 150 },
+          catalog: { width: 300, height: 300 },
+          single: { width: 600, height: 600 }
+        },
+        orderNumberFormat: 'ORD-{number}',
+        defaultOrderStatus: 'pending',
+        enableGuestCheckout: true,
+        requireOrderNotes: false,
+        autoCompleteOrders: false,
+        orderRetentionDays: 365,
+        seoTitle: 'O4O Store',
+        seoDescription: '',
+        seoKeywords: '',
+        enableSitemap: true,
+        enableRichSnippets: true
+      } as GeneralSettings,
       message: 'General settings retrieved successfully'
     }
   }
 
-  static async getPaymentSettings(): Promise<ApiResponse<any>> {
+  static async getPaymentSettings(): Promise<ApiResponse<PaymentSettings>> {
     // Mock implementation
     return {
       success: true,
       data: {
+        testMode: false,
         methods: [],
-        defaultMethod: 'stripe'
+        enabledMethods: ['stripe'],
+        providers: {},
+        fees: {},
+        defaultMethod: 'stripe',
+        minimumOrderAmount: 0,
+        enablePartialPayment: false,
+        enableInstallment: false,
+        maxInstallmentMonths: 0,
+        installmentOptions: [],
+        currencies: ['KRW'],
+        webhookUrl: '',
+        returnUrl: '',
+        failUrl: ''
       },
       message: 'Payment settings retrieved successfully'
     }
   }
 
-  static async testPaymentProvider(provider: string): Promise<ApiResponse<any>> {
+  static async testPaymentProvider(provider: string): Promise<ApiResponse<{ status: string }>> {
     // Mock implementation
     return {
       success: true,
@@ -450,23 +641,50 @@ export class EcommerceApi {
     }
   }
 
-  static async getShippingSettings(): Promise<ApiResponse<any>> {
+  static async getShippingSettings(): Promise<ApiResponse<ShippingSettings>> {
     // Mock implementation
     return {
       success: true,
       data: {
+        enableShipping: true,
+        enableFreeShipping: true,
+        freeShippingThreshold: 50000,
+        defaultShippingClass: 'standard',
+        enableShippingCalculator: true,
+        enablePickup: true,
+        pickupInstructions: '',
         zones: [],
-        methods: []
+        weightRules: [],
+        pickup: {
+          enabled: true,
+          locations: []
+        }
       },
       message: 'Shipping settings retrieved successfully'
     }
   }
 
-  static async updateShippingSettings(settings: any): Promise<ApiResponse<any>> {
+  static async updateShippingSettings(settings: Partial<ShippingSettings>): Promise<ApiResponse<ShippingSettings>> {
     // Mock implementation
+    const defaultSettings: ShippingSettings = {
+      enableShipping: true,
+      enableFreeShipping: false,
+      freeShippingThreshold: 50000,
+      defaultShippingClass: 'standard',
+      enableShippingCalculator: true,
+      enablePickup: false,
+      pickupInstructions: '',
+      zones: [],
+      weightRules: [],
+      pickup: {
+        enabled: false,
+        locations: []
+      }
+    };
+    
     return {
       success: true,
-      data: settings,
+      data: { ...defaultSettings, ...settings },
       message: 'Shipping settings updated successfully'
     }
   }
@@ -512,7 +730,7 @@ export class EcommerceApi {
   }
 
   // Coupon Banner methods
-  static async getCouponBanners(): Promise<ApiResponse<any[]>> {
+  static async getCouponBanners(): Promise<ApiResponse<CouponBanner[]>> {
     // Mock implementation
     return {
       success: true,
@@ -521,20 +739,46 @@ export class EcommerceApi {
     }
   }
 
-  static async createCouponBanner(banner: any): Promise<ApiResponse<any>> {
+  static async createCouponBanner(banner: Partial<CouponBanner>): Promise<ApiResponse<CouponBanner>> {
     // Mock implementation
     return {
       success: true,
-      data: { ...banner, id: Date.now().toString() },
+      data: {
+        id: Date.now().toString(),
+        title: banner.title || '',
+        description: banner.description || '',
+        couponCode: banner.couponCode || '',
+        discountType: banner.discountType || 'percent',
+        discountAmount: banner.discountAmount || 0,
+        isActive: banner.isActive ?? true,
+        displayLocation: banner.displayLocation || 'header',
+        priority: banner.priority || 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...banner
+      },
       message: 'Coupon banner created successfully'
     }
   }
 
-  static async updateCouponBanner(id: string, banner: any): Promise<ApiResponse<any>> {
+  static async updateCouponBanner(id: string, banner: Partial<CouponBanner>): Promise<ApiResponse<CouponBanner>> {
     // Mock implementation
     return {
       success: true,
-      data: { ...banner, id },
+      data: {
+        id,
+        title: banner.title || '',
+        description: banner.description || '',
+        couponCode: banner.couponCode || '',
+        discountType: banner.discountType || 'percent',
+        discountAmount: banner.discountAmount || 0,
+        isActive: banner.isActive ?? true,
+        displayLocation: banner.displayLocation || 'header',
+        priority: banner.priority || 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...banner
+      },
       message: 'Coupon banner updated successfully'
     }
   }
@@ -549,7 +793,7 @@ export class EcommerceApi {
   }
 
   // Coupon Usage methods
-  static async getCouponUsage(): Promise<ApiResponse<any[]>> {
+  static async getCouponUsage(): Promise<ApiResponse<CouponUsage[]>> {
     // Mock implementation
     return {
       success: true,

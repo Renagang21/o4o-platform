@@ -70,12 +70,12 @@ const AdminBreadcrumb: React.FC<AdminBreadcrumbProps> = ({ items, className = ''
   }
   
   return (
-    <nav className={`flex items-center space-x-2 text-sm text-gray-600 mb-6 ${className}`}>
+    <nav className={`flex items-center space-x-2 text-sm text-wp-text-secondary mb-6 ${className}`}>
       <Home className="w-4 h-4" />
       
       {breadcrumbItems.map((item, index) => (
         <React.Fragment key={index}>
-          {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+          {index > 0 && <ChevronRight className="w-4 h-4 text-wp-text-secondary" />}
           
           {item.path ? (
             <Link
@@ -85,7 +85,7 @@ const AdminBreadcrumb: React.FC<AdminBreadcrumbProps> = ({ items, className = ''
               {item.label}
             </Link>
           ) : (
-            <span className="text-gray-900 font-semibold">
+            <span className="text-wp-text-primary font-semibold">
               {item.label}
             </span>
           )}

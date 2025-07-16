@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { EcommerceApi } from '@/api/ecommerceApi';
 import { OrderFilters, OrderStatus } from '@/types/ecommerce';
+import axios from 'axios';
 
 // 임시 toast 모킹 (react-hot-toast 미설치)
 const toast = {
@@ -51,8 +52,12 @@ export const useUpdateOrderStatus = () => {
       queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       toast.success(`주문 상태가 '${variables.status}'로 변경되었습니다.`);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '주문 상태 변경에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '주문 상태 변경에 실패했습니다.');
+      } else {
+        toast.error('주문 상태 변경에 실패했습니다.');
+      }
     },
   });
 };
@@ -78,8 +83,12 @@ export const useRefundOrder = () => {
       queryClient.invalidateQueries({ queryKey: ['order', variables.orderId] });
       toast.success('주문 환불이 성공적으로 처리되었습니다.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '주문 환불 처리에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '주문 환불 처리에 실패했습니다.');
+      } else {
+        toast.error('주문 환불 처리에 실패했습니다.');
+      }
     },
   });
 };
@@ -108,8 +117,12 @@ export const useBulkOrderAction = () => {
         toast.success('주문 데이터 내보내기가 완료되었습니다.');
       }
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '대량 작업 처리에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '대량 작업 처리에 실패했습니다.');
+      } else {
+        toast.error('대량 작업 처리에 실패했습니다.');
+      }
     },
   });
 };

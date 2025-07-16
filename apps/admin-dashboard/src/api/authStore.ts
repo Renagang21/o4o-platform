@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { AuthUser } from '@/types'
 import { apiClient } from './client'
+import { AxiosError } from 'axios'
 
 interface AuthState {
   user: AuthUser | null
@@ -43,9 +44,10 @@ export const useAuthStore = create<AuthState>()(
           
           // Set authorization header for future requests
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        } catch (error: any) {
+        } catch (error) {
+          const axiosError = error as AxiosError<{ message?: string }>
           set({
-            error: error.response?.data?.message || 'Login failed',
+            error: axiosError.response?.data?.message || 'Login failed',
             loading: false
           })
           throw error

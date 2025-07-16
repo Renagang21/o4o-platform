@@ -9,6 +9,23 @@ export { AuthRequest };
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // 개발 환경에서 DB 연결 없이 인증 우회
+    if (!AppDataSource.isInitialized && process.env.NODE_ENV === 'development') {
+      (req as AuthRequest).user = {
+        id: 'dev-user-1',
+        userId: 'dev-user-1',
+        email: 'admin@o4o.com',
+        name: '개발 관리자',
+        role: UserRole.ADMIN,
+        status: UserStatus.APPROVED,
+        businessInfo: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastLoginAt: new Date()
+      };
+      return next();
+    }
+
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 

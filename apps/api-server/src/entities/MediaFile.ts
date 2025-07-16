@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
 import { User } from './User'
+import { MediaFolder } from './MediaFolder'
 
 export interface MediaSize {
   name: string // thumbnail, small, medium, large, original
@@ -85,42 +86,6 @@ export class MediaFile {
 
   @CreateDateColumn()
   uploadedAt!: Date
-
-  @UpdateDateColumn()
-  updatedAt!: Date
-}
-
-@Entity('media_folders')
-export class MediaFolder {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string
-
-  @Column({ length: 255 })
-  name!: string
-
-  @Column({ unique: true, length: 255 })
-  slug!: string
-
-  @Column({ type: 'uuid', nullable: true })
-  parentId!: string
-
-  @ManyToOne(() => MediaFolder, folder => folder.children, { nullable: true })
-  @JoinColumn({ name: 'parentId' })
-  parent!: MediaFolder
-
-  @OneToMany(() => MediaFolder, folder => folder.parent)
-  children!: MediaFolder[]
-
-  files?: MediaFile[]
-
-  @Column({ default: 0 })
-  fileCount!: number
-
-  @Column({ type: 'bigint', default: 0 })
-  totalSize!: number
-
-  @CreateDateColumn()
-  createdAt!: Date
 
   @UpdateDateColumn()
   updatedAt!: Date

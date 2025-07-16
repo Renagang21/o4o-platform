@@ -12,7 +12,7 @@ interface Notification {
   type: 'new_feedback' | 'feedback_update' | 'new_message' | 'urgent_feedback' | 'new_registration';
   title: string;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
   timestamp: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
   feedbackId?: string;

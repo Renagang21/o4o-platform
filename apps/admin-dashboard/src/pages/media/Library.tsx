@@ -21,7 +21,7 @@ import { MediaFile, MediaFolder } from '@/types/content'
 import { ContentApi } from '@/api/contentApi'
 import MediaGrid from './components/MediaGrid'
 import MediaList from './components/MediaList'
-import MediaUploader from './components/MediaUploader'
+import MediaUploader from '@/components/media/MediaUploader'
 import toast from 'react-hot-toast'
 
 const Library: React.FC = () => {
@@ -682,11 +682,27 @@ const Library: React.FC = () => {
 
       {/* Upload Modal */}
       {showUploader && (
-        <MediaUploader
-          onUpload={handleFileUpload}
-          onClose={() => setShowUploader(false)}
-          currentFolder={currentFolder}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">파일 업로드</h3>
+                <button
+                  onClick={() => setShowUploader(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <MediaUploader
+                onUploadComplete={(files) => {
+                  handleFileUpload(files.map(f => new File([f.url], f.name)));
+                  setShowUploader(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Create Folder Modal */}

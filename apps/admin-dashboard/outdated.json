@@ -1,0 +1,142 @@
+{
+  "@playwright/test": {
+    "current": "1.54.0",
+    "wanted": "1.54.1",
+    "latest": "1.54.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@playwright/test"
+  },
+  "@tanstack/react-query": {
+    "current": "5.82.0",
+    "wanted": "5.83.0",
+    "latest": "5.83.0",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tanstack/react-query"
+  },
+  "@tiptap/extension-code-block": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-code-block"
+  },
+  "@tiptap/extension-code-block-lowlight": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-code-block-lowlight"
+  },
+  "@tiptap/extension-image": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-image"
+  },
+  "@tiptap/extension-link": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-link"
+  },
+  "@tiptap/extension-placeholder": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-placeholder"
+  },
+  "@tiptap/extension-table": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-table"
+  },
+  "@tiptap/extension-table-cell": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-table-cell"
+  },
+  "@tiptap/extension-table-header": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-table-header"
+  },
+  "@tiptap/extension-table-row": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/extension-table-row"
+  },
+  "@tiptap/react": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/react"
+  },
+  "@tiptap/starter-kit": {
+    "current": "2.25.1",
+    "wanted": "2.26.1",
+    "latest": "2.26.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/@tiptap/starter-kit"
+  },
+  "date-fns": {
+    "current": "3.6.0",
+    "wanted": "3.6.0",
+    "latest": "4.1.0",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/date-fns"
+  },
+  "lucide-react": {
+    "current": "0.523.0",
+    "wanted": "0.523.0",
+    "latest": "0.525.0",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/lucide-react"
+  },
+  "msw": {
+    "current": "2.10.3",
+    "wanted": "2.10.4",
+    "latest": "2.10.4",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/msw"
+  },
+  "postcss-nested": {
+    "current": "6.2.0",
+    "wanted": "6.2.0",
+    "latest": "7.0.2",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/postcss-nested"
+  },
+  "recharts": {
+    "current": "2.15.4",
+    "wanted": "2.15.4",
+    "latest": "3.1.0",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/recharts"
+  },
+  "tailwind-merge": {
+    "current": "2.6.0",
+    "wanted": "2.6.0",
+    "latest": "3.3.1",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/node_modules/tailwind-merge"
+  },
+  "tailwindcss": {
+    "current": "3.4.17",
+    "wanted": "3.4.17",
+    "latest": "4.1.11",
+    "dependent": "admin-dashboard",
+    "location": "/home/sohae21/Coding/o4o-platform/apps/admin-dashboard/node_modules/tailwindcss"
+  }
+}

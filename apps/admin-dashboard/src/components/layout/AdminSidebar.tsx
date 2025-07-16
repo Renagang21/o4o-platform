@@ -11,7 +11,8 @@ import {
   X,
   ChevronDown,
   Home,
-  Globe
+  Globe,
+  Tag
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -54,6 +55,7 @@ const menuItems: MenuItem[] = [
       { id: 'content-posts', label: '게시글', icon: <FileText className="w-4 h-4" />, path: '/content/posts' },
       { id: 'content-pages', label: '페이지', icon: <FileText className="w-4 h-4" />, path: '/content/pages' },
       { id: 'content-homepage', label: '홈페이지 편집', icon: <Globe className="w-4 h-4" />, path: '/homepage-editor' },
+      { id: 'content-categories', label: '카테고리 & 태그', icon: <Tag className="w-4 h-4" />, path: '/categories' },
       { id: 'content-cpt', label: 'CPT 관리', icon: <FileText className="w-4 h-4" />, path: '/content/cpt' },
       { id: 'content-media', label: '미디어 라이브러리', icon: <FileText className="w-4 h-4" />, path: '/content/media' }
     ]
@@ -190,7 +192,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
     >
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-700">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <Home className="w-8 h-8 text-white" />
             <span className="text-lg font-bold text-white">O4O Admin</span>
@@ -209,7 +211,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4 border-t border-sidebar-border">
           <div className="text-xs text-sidebar-text text-center">
             O4O Platform Admin v1.0.0
           </div>

@@ -101,7 +101,7 @@ export interface CustomPost {
   type: string
   authorId: string
   featuredImage?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   publishedAt?: string
   createdAt: string
   updatedAt: string

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { EcommerceApi } from '@/api/ecommerceApi';
 import { Product, ProductFilters } from '@/types/ecommerce';
+import axios from 'axios';
 // import { toast } from 'react-hot-toast';
 // 임시 toast 모킹 (react-hot-toast 미설치)
 const toast = {
@@ -43,8 +44,12 @@ export const useCreateProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 생성되었습니다.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '상품 생성에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '상품 생성에 실패했습니다.');
+      } else {
+        toast.error('상품 생성에 실패했습니다.');
+      }
     },
   });
 };
@@ -63,8 +68,12 @@ export const useUpdateProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
       toast.success('상품이 성공적으로 수정되었습니다.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '상품 수정에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '상품 수정에 실패했습니다.');
+      } else {
+        toast.error('상품 수정에 실패했습니다.');
+      }
     },
   });
 };
@@ -79,8 +88,12 @@ export const useDeleteProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 삭제되었습니다.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '상품 삭제에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '상품 삭제에 실패했습니다.');
+      } else {
+        toast.error('상품 삭제에 실패했습니다.');
+      }
     },
   });
 };
@@ -95,8 +108,12 @@ export const useDuplicateProduct = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('상품이 성공적으로 복제되었습니다.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || '상품 복제에 실패했습니다.');
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || '상품 복제에 실패했습니다.');
+      } else {
+        toast.error('상품 복제에 실패했습니다.');
+      }
     },
   });
 };

@@ -48,7 +48,7 @@ export interface PolicyHistory {
   id: string;
   category: string;
   action: 'create' | 'update' | 'delete';
-  changes: Record<string, any>;
+  changes: Record<string, unknown>;
   userId: string;
   userName: string;
   timestamp: string;
@@ -237,7 +237,7 @@ export const policySettingsApi = {
   },
 
   // Test policy configurations
-  async testPolicyConfiguration(category: string, settings: any): Promise<{
+  async testPolicyConfiguration(category: string, settings: Record<string, unknown>): Promise<{
     success: boolean;
     results: Array<{
       test: string;
@@ -287,7 +287,7 @@ export const policySettingsApi = {
     name: string;
     description: string;
     category: string;
-    settings: any;
+    settings: Record<string, unknown>;
     isDefault: boolean;
   }>> {
     try {
@@ -313,7 +313,7 @@ export const policySettingsApi = {
     name: string;
     description: string;
     category: string;
-    settings: any;
+    settings: Record<string, unknown>;
   }): Promise<void> {
     try {
       await api.post('/admin/policy-settings/templates', template);

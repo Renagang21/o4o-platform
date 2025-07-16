@@ -2,21 +2,12 @@ import React from 'react'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon } from 'lucide-react'
 import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
-
-const GeneralSettings: React.FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-gray-500">
-        <p>일반 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
+import GeneralSettings from './GeneralSettings'
 
 const UserSettings: React.FC = () => (
   <div className="wp-card">
     <div className="wp-card-body">
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-wp-text-secondary">
         <p>사용자 설정 페이지는 개발 중입니다.</p>
       </div>
     </div>
@@ -26,7 +17,7 @@ const UserSettings: React.FC = () => (
 const EmailSettings: React.FC = () => (
   <div className="wp-card">
     <div className="wp-card-body">
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-wp-text-secondary">
         <p>이메일 설정 페이지는 개발 중입니다.</p>
       </div>
     </div>
@@ -36,7 +27,7 @@ const EmailSettings: React.FC = () => (
 const IntegrationSettings: React.FC = () => (
   <div className="wp-card">
     <div className="wp-card-body">
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-wp-text-secondary">
         <p>연동 설정 페이지는 개발 중입니다.</p>
       </div>
     </div>
@@ -58,12 +49,12 @@ const Settings: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">설정</h1>
-        <p className="text-gray-600 mt-1">시스템 설정을 관리합니다</p>
+        <h1 className="text-2xl font-bold text-wp-text-primary">설정</h1>
+        <p className="text-wp-text-secondary mt-1">시스템 설정을 관리합니다</p>
       </div>
 
       {/* Settings Navigation Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-wp-border-secondary">
         <nav className="-mb-px flex space-x-8">
           {settingsTabs.map((tab) => {
             const isActive = tab.path === currentPath || (tab.path === '' && currentPath === 'settings')
@@ -75,7 +66,7 @@ const Settings: React.FC = () => {
                   flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm
                   ${isActive
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-wp-text-secondary hover:text-wp-text-primary hover:border-wp-border-primary'
                   }
                 `}
               >
