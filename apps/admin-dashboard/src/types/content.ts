@@ -240,15 +240,28 @@ export interface LocationRule {
 export interface Template {
   id: string
   name: string
-  type: 'page' | 'post' | 'archive' | 'single'
+  slug?: string
+  type: 'page' | 'post' | 'archive' | 'single' | 'product' | string
+  layoutType?: 'personal-blog' | 'photo-blog' | 'complex-blog' | 'custom'
   description?: string
   thumbnail?: string
+  preview?: string
   content: any // TipTap JSONContent or custom structure
-  customFields?: string[] // Field group IDs
+  customFields?: string[] | Record<string, any> // Field group IDs or actual fields
+  settings?: Record<string, any>
   isDefault?: boolean
+  active?: boolean
+  featured?: boolean
+  status?: 'active' | 'inactive' | 'draft'
   category?: string
   tags?: string[]
-  createdBy: string
+  version?: string
+  compatibility?: {
+    minVersion?: string
+    maxVersion?: string
+    requiredPlugins?: string[]
+  }
+  createdBy?: string
   createdAt: string
   updatedAt: string
 }

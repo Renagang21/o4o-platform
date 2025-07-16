@@ -20,6 +20,7 @@ import postCreationRoutes from './routes/post-creation';
 import servicesRoutes from './routes/services';
 import signageRoutes from './routes/signage';
 import contentRoutes from './routes/content';
+import publicRoutes from './routes/public';
 
 // 환경변수 로드
 dotenv.config();
@@ -40,10 +41,20 @@ const io = new Server(httpServer, {
 const port = process.env.PORT || 4000;
 console.log('🚀 Starting server on port:', port);
 
-// Rate limiting
+// Rate limiting for authenticated endpoints
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15분
   max: 100, // 최대 100 요청
+  message: {
+    error: 'Too many requests from this IP',
+    code: 'RATE_LIMIT_EXCEEDED'
+  }
+});
+
+// More lenient rate limiting for public endpoints
+const publicLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 300, // 최대 300 요청 (public endpoints need more)
   message: {
     error: 'Too many requests from this IP',
     code: 'RATE_LIMIT_EXCEEDED'
@@ -56,10 +67,33 @@ app.use(helmet({
   contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
 }));
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3011",
-  credentials: true
-}));
+// CORS configuration for multiple origins
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || "http://localhost:3011",
+      "http://localhost:3000", // main-site
+      "http://localhost:3001", // admin dashboard
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -68,7 +102,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const uploadsPath = process.env.UPLOAD_DIR || './uploads';
 app.use('/uploads', express.static(uploadsPath));
 
-// Rate limiting 적용
+// Apply rate limiting to public endpoints first (more lenient)
+app.use('/api/public', publicLimiter);
+
+// Apply standard rate limiting to other endpoints
 app.use('/api/', limiter);
 
 // API 라우트
@@ -80,6 +117,7 @@ app.use('/api/cpt', cptRoutes);
 app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
+app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api', contentRoutes);
 
 // 헬스체크 엔드포인트

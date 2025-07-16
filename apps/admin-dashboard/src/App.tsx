@@ -19,6 +19,9 @@ import Settings from '@/pages/settings/Settings';
 import Pages from '@/pages/pages/Pages';
 import Media from '@/pages/media/Media';
 import CustomFields from '@/pages/custom-fields/CustomFields';
+import HomepageEditor from '@/pages/templates/HomepageEditor';
+import Shortcodes from '@/pages/documentation/Shortcodes';
+import ProductForm from '@/pages/ecommerce/ProductForm';
 
 // SSO 클라이언트 인스턴스 생성
 const ssoClient = new AuthClient(
@@ -105,6 +108,13 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
+                    {/* 홈페이지 편집기 */}
+                    <Route path="/homepage-editor" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <HomepageEditor />
+                      </AdminProtectedRoute>
+                    } />
+                    
                     {/* 미디어 관리 */}
                     <Route path="/media/*" element={
                       <AdminProtectedRoute requiredPermissions={['media:read']}>
@@ -113,9 +123,21 @@ function App() {
                     } />
                     
                     {/* 이커머스 관리 */}
-                    <Route path="/products/*" element={
+                    <Route path="/products" element={
                       <AdminProtectedRoute requiredPermissions={['products:read']}>
                         <Products />
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/products/new" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <ProductForm />
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/products/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <ProductForm />
                       </AdminProtectedRoute>
                     } />
                     
@@ -143,6 +165,13 @@ function App() {
                     <Route path="/settings/*" element={
                       <AdminProtectedRoute requiredPermissions={['settings:read']}>
                         <Settings />
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 도움말 */}
+                    <Route path="/shortcodes" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Shortcodes />
                       </AdminProtectedRoute>
                     } />
                     

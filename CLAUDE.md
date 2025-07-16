@@ -9,14 +9,24 @@ O4O Platform is a comprehensive multi-tenant e-commerce platform built with a mo
 ### Technology Stack
 
 **Frontend:**
-- React 19 with TypeScript, Vite, TailwindCSS
-- Zustand (state), React Query (server state), React Hook Form
-- Socket.io-client for real-time features
+- React 19.1.0 with TypeScript 5.8.3, Vite 6.3.5, TailwindCSS 4.1.11
+- State: Zustand 5.0.5, Server State: @tanstack/react-query 5.0.0
+- Forms: react-hook-form 7.49.3, Routing: react-router-dom 7.6.0
+- Real-time: socket.io-client 4.7.4, Animation: motion 12.19.2
+- Rich Text: Tiptap 2.22.x suite
 
 **Backend:**
-- Node.js 20 with Express and TypeScript
-- TypeORM with PostgreSQL, Redis for caching
-- JWT authentication, Socket.io for WebSockets
+- Node.js 20.x with Express 4.x and TypeScript 5.8.3
+- Database: PostgreSQL with TypeORM 0.3.20
+- Caching: Redis with ioredis
+- Authentication: JWT with jsonwebtoken
+- Real-time: socket.io 4.6.1
+- Security: helmet, cors, express-rate-limit
+
+**Testing & Tools:**
+- Testing: Vitest 2.1.8, Playwright 1.43.0, MSW 2.10.2
+- Linting: ESLint 9.29.0 (flat config)
+- Process: nodemon, concurrently
 
 ## Development Commands
 
@@ -43,6 +53,10 @@ npm run build
 npm run build:api
 npm run build:web
 npm run build:admin
+
+# Clean and reinstall everything
+npm run clean        # Remove all node_modules and dist
+npm run install:all  # Install and build everything
 ```
 
 ### Code Quality
@@ -58,6 +72,9 @@ npm run lint:fix  # Auto-fix issues
 npm run test              # Run all tests
 npm run test:e2e         # E2E tests
 npm run test:coverage    # With coverage
+
+# Run single test file (from app directory)
+npm run test -- path/to/test.spec.ts
 ```
 
 ### API Server Specific
@@ -65,7 +82,11 @@ npm run test:coverage    # With coverage
 # From apps/api-server directory
 npm run migration:generate -- -n MigrationName
 npm run migration:run
+npm run migration:revert
 npm run create-admin      # Create admin user
+npm run db:test          # Test database connection
+npm run prettier         # Check formatting
+npm run prettier:fix     # Fix formatting
 ```
 
 ## Architecture Overview
@@ -83,6 +104,8 @@ npm run create-admin      # Create admin user
   /types            - Shared TypeScript definitions
   /ui               - Shared UI components
   /utils            - Shared utilities
+
+/scripts             - Build and utility scripts
 ```
 
 ### Key Architectural Patterns
@@ -92,16 +115,19 @@ npm run create-admin      # Create admin user
 3. **Real-time Updates**: Socket.io for live notifications and updates
 4. **Role-Based Access**: Four main roles - Admin, Business, Affiliate, Customer
 5. **Database Schema**: TypeORM entities with soft deletes and audit fields
+6. **Frontend Patterns**: Custom hooks for API calls, context providers for global state
+7. **Error Handling**: Error boundaries in frontend, circuit breakers in backend
 
 ### Core Features by Module
 
 1. **User Management**: Multi-role system with approval workflows
-2. **Content Management**: Posts, pages, custom post types, media library
+2. **Content Management**: Posts, pages, custom post types (CPT), media library
 3. **E-commerce**: Products with role-based pricing, orders, inventory
-4. **Digital Signage**: Display management system
-5. **Community/Forum**: User-generated content and discussions
-6. **Analytics**: Dashboard with real-time metrics
-7. **Beta Management**: Feature flagging for beta users
+4. **Digital Signage**: Display management with playlists and scheduling
+5. **Community/Forum**: Categories, posts, comments with moderation
+6. **Analytics**: Dashboard with real-time metrics and reporting
+7. **Beta Management**: Feature flagging and beta feedback system
+8. **Operations**: Performance monitoring, auto-recovery, health checks
 
 ## Environment Setup
 
@@ -115,6 +141,8 @@ Key environment variables:
 - `JWT_*`: Authentication tokens
 - `AWS_*`: S3 storage (optional)
 - `SMTP_*`: Email service
+- `STRIPE_*`: Payment processing (optional)
+- `KCP_*`: Korean payment gateway (optional)
 
 ## Testing Strategy
 
@@ -124,6 +152,7 @@ Key environment variables:
 npm run test              # Run all tests
 npm run test:unit        # Unit tests only
 npm run test:coverage    # With coverage report
+npm run test:watch       # Watch mode
 ```
 
 ### E2E Tests (Playwright)
@@ -138,7 +167,8 @@ npm run test:e2e:ui      # Interactive UI
 - Unit tests: Alongside source files as `*.test.ts(x)`
 - Integration tests: In `src/test/integration/`
 - E2E tests: In `e2e/` or `tests/` directory
-- Mocks: Using MSW for API mocking
+- Test utilities: Custom render with providers in `src/test/test-utils.tsx`
+- API Mocks: MSW handlers in `src/test/mocks/`
 
 ## Common Development Tasks
 
@@ -148,12 +178,14 @@ npm run test:e2e:ui      # Interactive UI
 3. Use shared components from packages/ui
 4. Add TypeScript types to packages/types if shared
 5. Follow existing API endpoint patterns
+6. Use existing custom hooks pattern (useProducts, useOrders, etc.)
 
 ### Working with Database
 1. Create entity in `apps/api-server/src/entities/`
 2. Generate migration: `npm run migration:generate -- -n FeatureName`
-3. Run migration: `npm run migration:run`
-4. Follow existing repository patterns
+3. Review generated migration in `src/migrations/`
+4. Run migration: `npm run migration:run`
+5. Follow existing repository patterns in `src/repositories/`
 
 ### API Development
 1. Routes in `apps/api-server/src/routes/`
@@ -161,6 +193,7 @@ npm run test:e2e:ui      # Interactive UI
 3. Services contain business logic
 4. Use existing middleware for auth/validation
 5. Follow RESTful conventions
+6. Add API documentation comments
 
 ### Frontend Development
 1. Use existing UI components from packages/ui
@@ -168,16 +201,24 @@ npm run test:e2e:ui      # Interactive UI
 3. Use Zustand for global state
 4. React Query for server state
 5. Follow existing styling patterns with TailwindCSS
+6. Use lazy loading for code splitting
+7. Implement error boundaries for sections
+
+### Working with Themes
+The platform supports multiple themes based on time of day:
+- noon, afternoon, dusk, evening, twilight
+- Themes are managed via ThemeContext
+- CSS variables are defined in globals.css
 
 ## Package Version Compatibility
 
 ### Critical Version Requirements
-The project uses React 19 and requires strict version compatibility. All packages have been verified for React 19 compatibility as of 2025-06-28.
+The project uses React 19 and requires strict version compatibility. All packages have been verified for React 19 compatibility.
 
 #### Core Dependencies
 - **React**: ^19.1.0 (NOT 18.x)
 - **React DOM**: ^19.1.0
-- **Node.js**: 20.18.0 (must be >=20.0.0 <21.0.0)
+- **Node.js**: Must be >=20.0.0 <21.0.0 (strict requirement)
 - **TypeScript**: ~5.8.3
 - **Vite**: ^6.3.5
 
@@ -188,8 +229,8 @@ The project uses React 19 and requires strict version compatibility. All package
 - All extensions: ^2.22.0
 
 **UI/Animation**:
-- motion: ^12.19.2 (framer-motion replacement)
-- tailwindcss: ^4.1.11
+- motion: ^12.19.2 (framer-motion replacement for React 19)
+- tailwindcss: ^4.1.11 (v4 with new architecture)
 - lucide-react: ^0.523.0
 
 **React Ecosystem**:
@@ -199,7 +240,7 @@ The project uses React 19 and requires strict version compatibility. All package
 - react-hook-form: ^7.49.3
 
 **Development Tools**:
-- eslint: ^9.29.0
+- eslint: ^9.29.0 (flat config)
 - vitest: ^2.1.8
 - @playwright/test: ^1.43.0
 
@@ -233,12 +274,22 @@ The project uses React 19 and requires strict version compatibility. All package
 - Inconsistent versions of axios, date-fns, zustand, react-router-dom
 - Extraneous packages causing conflicts
 
+## CI/CD and GitHub Actions
+
+The project uses GitHub Actions for:
+- CI/CD Pipeline with build and test verification
+- CodeQL security analysis
+- Separate deployment workflows for each app
+- PR checks and auto-labeling
+- Automated dependency updates with Dependabot
+
 ## Important Notes
 
-- No Docker usage for development (as per user requirement)
+- No Docker usage for development
 - Node.js version must be >=20.0.0 <21.0.0
 - Always run lint and type-check before committing
 - Follow existing code conventions and patterns
 - Use existing utilities and libraries rather than adding new ones
 - Maintain strict version compatibility for React 19
+- Check for MSW handlers before implementing new API endpoints
 - **DEPENDENCY MANAGEMENT IS CRITICAL** - follow the process above religiously

@@ -1,123 +1,97 @@
-import { useState, useCallback } from 'react';
-import { productApi } from '../api/products/productApi';
-import {
-  Product,
-  ProductCreateRequest,
-  ProductUpdateRequest,
-  ProductListParams,
-  ProductListResponse,
-} from '../api/products/types';
+import { useQuery } from '@tanstack/react-query';
+import axiosInstance from '@/api/config/axios';
+import { Product, ProductFilters } from '@/types/ecommerce';
+import { PaginatedResponse, ApiResponse } from '@/types';
 
-export const useProducts = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+// Get products list
+export const useProducts = (
+  page = 1,
+  limit = 20,
+  filters: ProductFilters = {}
+) => {
+  return useQuery({
+    queryKey: ['products', page, limit, filters],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...Object.fromEntries(
+          Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
+        )
+      });
 
-  const getProducts = useCallback(async (params: ProductListParams) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await productApi.getProducts(params);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      const response = await axiosInstance.get<PaginatedResponse<Product>>(
+        `/api/v1/public/products?${params}`
+      );
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
 
-  const getProduct = useCallback(async (id: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const product = await productApi.getProduct(id);
-      return product;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+// Get single product
+export const useProduct = (productId: string, enabled = true) => {
+  return useQuery({
+    queryKey: ['product', productId],
+    queryFn: async () => {
+      const response = await axiosInstance.get<ApiResponse<Product>>(
+        `/api/v1/public/products/${productId}`
+      );
+      return response.data;
+    },
+    enabled: !!productId && enabled,
+    staleTime: 5 * 60 * 1000,
+  });
+};
 
-  const createProduct = useCallback(async (data: ProductCreateRequest) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const product = await productApi.createProduct(data);
-      return product;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+// Get featured products
+export const useFeaturedProducts = (limit = 8) => {
+  return useQuery({
+    queryKey: ['featured-products', limit],
+    queryFn: async () => {
+      const response = await axiosInstance.get<PaginatedResponse<Product>>(
+        `/api/v1/public/products?featured=true&limit=${limit}`
+      );
+      return response.data;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
 
-  const updateProduct = useCallback(async (id: string, data: ProductUpdateRequest) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const product = await productApi.updateProduct(id, data);
-      return product;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+// Get products by category
+export const useProductsByCategory = (
+  categorySlug: string,
+  page = 1,
+  limit = 20
+) => {
+  return useQuery({
+    queryKey: ['products-by-category', categorySlug, page, limit],
+    queryFn: async () => {
+      const response = await axiosInstance.get<PaginatedResponse<Product>>(
+        `/api/v1/public/products?category=${categorySlug}&page=${page}&limit=${limit}`
+      );
+      return response.data;
+    },
+    enabled: !!categorySlug,
+    staleTime: 5 * 60 * 1000,
+  });
+};
 
-  const deleteProduct = useCallback(async (id: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      await productApi.deleteProduct(id);
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const uploadProductImage = useCallback(async (file: File) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const result = await productApi.uploadProductImage(file);
-      return result;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const updateProductStatus = useCallback(async (id: string, status: Product['status']) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const product = await productApi.updateProductStatus(id, status);
-      return product;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  return {
-    isLoading,
-    error,
-    getProducts,
-    getProduct,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    uploadProductImage,
-    updateProductStatus,
-  };
-}; 
+// Search products
+export const useProductSearch = (
+  searchTerm: string,
+  page = 1,
+  limit = 20
+) => {
+  return useQuery({
+    queryKey: ['product-search', searchTerm, page, limit],
+    queryFn: async () => {
+      const response = await axiosInstance.get<PaginatedResponse<Product>>(
+        `/api/v1/public/products?search=${encodeURIComponent(searchTerm)}&page=${page}&limit=${limit}`
+      );
+      return response.data;
+    },
+    enabled: searchTerm.length > 2, // Only search with 3+ characters
+    staleTime: 3 * 60 * 1000,
+  });
+};
