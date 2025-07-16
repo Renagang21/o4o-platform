@@ -337,6 +337,7 @@ export class EcommerceApi {
     // Mock implementation
     return {
       data: [],
+      total: 0,
       pagination: {
         current: page,
         total: 0,

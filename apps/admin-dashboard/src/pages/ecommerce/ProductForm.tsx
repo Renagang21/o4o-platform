@@ -5,16 +5,12 @@ import {
   Save, 
   Package,
   DollarSign,
-  Tag,
   Image as ImageIcon,
-  FileText,
-  Settings,
-  X,
-  Plus
+  X
 } from 'lucide-react';
 import { useProduct, useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
 import { Product } from '@/types/ecommerce';
-import { TipTapEditor } from '@/components/common/TipTapEditor';
+// import TipTapEditor from '@/components/ui/TipTapEditor';
 
 const ProductForm: React.FC = () => {
   const navigate = useNavigate();
@@ -33,17 +29,16 @@ const ProductForm: React.FC = () => {
     sku: '',
     description: '',
     shortDescription: '',
-    price: 0,
-    compareAtPrice: 0,
-    costPrice: 0,
+    retailPrice: 0,
+    wholesalePrice: 0,
+    cost: 0,
     stockQuantity: 0,
-    stockStatus: 'in_stock',
-    trackInventory: true,
+    stockStatus: 'instock',
+    manageStock: true,
     weight: 0,
     dimensions: { length: 0, width: 0, height: 0 },
-    type: 'physical',
-    status: 'active',
-    visibility: 'visible',
+    type: 'simple',
+    status: 'published',
     featured: false,
     tags: [],
     images: [],
@@ -51,7 +46,7 @@ const ProductForm: React.FC = () => {
     metaDescription: '',
   });
 
-  const [activeTab, setActiveTab] = useState('general');
+  // const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
 
   // Load product data in edit mode
@@ -205,10 +200,12 @@ const ProductForm: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   상세 설명
                 </label>
-                <TipTapEditor
-                  content={formData.description || ''}
-                  onChange={(content) => handleInputChange('description', content)}
+                <textarea
+                  value={formData.description || ''}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="상품에 대한 상세한 설명을 입력하세요"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={5}
                 />
               </div>
             </div>
@@ -228,8 +225,8 @@ const ProductForm: React.FC = () => {
                 </label>
                 <input
                   type="number"
-                  value={formData.price || 0}
-                  onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
+                  value={formData.retailPrice || 0}
+                  onChange={(e) => handleInputChange('retailPrice', parseFloat(e.target.value))}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   min="0"
@@ -242,8 +239,8 @@ const ProductForm: React.FC = () => {
                 </label>
                 <input
                   type="number"
-                  value={formData.compareAtPrice || 0}
-                  onChange={(e) => handleInputChange('compareAtPrice', parseFloat(e.target.value))}
+                  value={formData.wholesalePrice || 0}
+                  onChange={(e) => handleInputChange('wholesalePrice', parseFloat(e.target.value))}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="0"
                 />
@@ -255,8 +252,8 @@ const ProductForm: React.FC = () => {
                 </label>
                 <input
                   type="number"
-                  value={formData.costPrice || 0}
-                  onChange={(e) => handleInputChange('costPrice', parseFloat(e.target.value))}
+                  value={formData.cost || 0}
+                  onChange={(e) => handleInputChange('cost', parseFloat(e.target.value))}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="0"
                 />
@@ -315,8 +312,8 @@ const ProductForm: React.FC = () => {
                 <input
                   type="checkbox"
                   id="trackInventory"
-                  checked={formData.trackInventory || false}
-                  onChange={(e) => handleInputChange('trackInventory', e.target.checked)}
+                  checked={formData.manageStock || false}
+                  onChange={(e) => handleInputChange('manageStock', e.target.checked)}
                   className="rounded"
                 />
                 <label htmlFor="trackInventory" className="ml-2 text-sm text-gray-700">
@@ -324,7 +321,7 @@ const ProductForm: React.FC = () => {
                 </label>
               </div>
 
-              {formData.trackInventory && (
+              {formData.manageStock && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -382,16 +379,16 @@ const ProductForm: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  공개 설정
+                  상태
                 </label>
                 <select
-                  value={formData.visibility || 'visible'}
-                  onChange={(e) => handleInputChange('visibility', e.target.value)}
+                  value={formData.status || 'published'}
+                  onChange={(e) => handleInputChange('status', e.target.value as any)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="visible">공개</option>
-                  <option value="hidden">비공개</option>
-                  <option value="password">비밀번호 보호</option>
+                  <option value="published">공개</option>
+                  <option value="draft">임시저장</option>
+                  <option value="private">비공개</option>
                 </select>
               </div>
 
@@ -424,7 +421,7 @@ const ProductForm: React.FC = () => {
               <option value="service">서비스</option>
             </select>
 
-            {formData.type === 'physical' && (
+            {(formData.type === 'simple' || formData.type === 'variable') && (
               <div className="mt-4 space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">

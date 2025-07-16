@@ -10,8 +10,6 @@ import {
   Trash2, 
   Copy,
   Package,
-  DollarSign,
-  AlertCircle,
   MoreVertical,
   Download,
   Upload
@@ -38,7 +36,7 @@ const Products: React.FC = () => {
   const duplicateProduct = useDuplicateProduct();
 
   const products = productsData?.data || [];
-  const totalPages = productsData?.totalPages || 1;
+  const totalPages = Math.ceil((productsData?.total || 0) / 20);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +109,7 @@ const Products: React.FC = () => {
 
         <div className="flex items-center justify-between mb-2">
           <span className="text-lg font-semibold">
-            {formatCurrency(product.price)}
+            {formatCurrency(product.retailPrice || 0)}
           </span>
           <span className={`text-xs px-2 py-1 rounded-full ${
             product.stockQuantity > 0 
@@ -126,14 +124,14 @@ const Products: React.FC = () => {
 
         <div className="flex gap-2 mt-3">
           <span className={`text-xs px-2 py-1 rounded ${
-            product.status === 'active' 
+            product.status === 'published' 
               ? 'bg-green-100 text-green-800' 
               : 'bg-gray-100 text-gray-800'
           }`}>
-            {product.status === 'active' ? '판매중' : '판매중지'}
+            {product.status === 'published' ? '판매중' : product.status === 'draft' ? '임시저장' : '비공개'}
           </span>
           <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
-            {product.type === 'physical' ? '실물' : product.type === 'digital' ? '디지털' : '서비스'}
+            {product.type === 'simple' ? '단순상품' : product.type === 'variable' ? '가변상품' : '기타'}
           </span>
         </div>
       </div>
@@ -179,21 +177,21 @@ const Products: React.FC = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          product.status === 'active' 
+          product.status === 'published' 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
         }`}>
-          {product.status === 'active' ? '판매중' : '판매중지'}
+          {product.status === 'published' ? '판매중' : product.status === 'draft' ? '임시저장' : '비공개'}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        {formatCurrency(product.price)}
+        {formatCurrency(product.retailPrice || 0)}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
         {product.stockQuantity}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        {product.category?.name || '-'}
+        {product.categories?.[0]?.name || '-'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <button

@@ -168,6 +168,8 @@ export interface ApiResponse<T> {
 
 export interface PaginatedResponse<T> {
   data: T[]
+  total: number
+  totalPages?: number
   pagination: {
     current: number
     total: number
