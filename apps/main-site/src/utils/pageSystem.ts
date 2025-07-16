@@ -1,10 +1,22 @@
 // 🏠 페이지 콘텐츠 관리 시스템
 
+// Tiptap JSON content structure
+export interface TiptapJSONContent {
+  type: string;
+  attrs?: Record<string, unknown>;
+  content?: TiptapJSONContent[];
+  marks?: Array<{
+    type: string;
+    attrs?: Record<string, unknown>;
+  }>;
+  text?: string;
+}
+
 export interface PageContent {
   slug: string;
   title: string;
   content: string; // HTML
-  json: any; // Tiptap JSON
+  json: TiptapJSONContent; // Tiptap JSON
   status: 'draft' | 'published';
   createdAt: string;
   updatedAt: string;

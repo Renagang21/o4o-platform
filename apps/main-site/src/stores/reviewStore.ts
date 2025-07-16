@@ -152,7 +152,8 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           // 정렬
           filteredReviews.sort((a, b) => {
             const { sortBy, sortOrder } = mergedFilters;
-            let aValue: any, bValue: any;
+            let aValue: number | Date;
+            let bValue: number | Date;
             
             switch (sortBy) {
               case 'newest':
@@ -182,9 +183,17 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             }
             
             const order = sortBy === 'oldest' || sortBy === 'rating_low' ? 'asc' : 'desc';
-            return order === 'asc' ? 
-              (aValue < bValue ? -1 : aValue > bValue ? 1 : 0) :
-              (aValue > bValue ? -1 : aValue < bValue ? 1 : 0);
+            
+            if (aValue instanceof Date && bValue instanceof Date) {
+              return order === 'asc' ? 
+                aValue.getTime() - bValue.getTime() :
+                bValue.getTime() - aValue.getTime();
+            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+              return order === 'asc' ? 
+                aValue - bValue :
+                bValue - aValue;
+            }
+            return 0;
           });
           
           // 페이지네이션
@@ -495,7 +504,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             reviewId,
             reporterId,
             reporterName: '', // 실제로는 reporterId로 사용자명 조회
-            reason: reason as any,
+            reason: reason as ReviewReport['reason'],
             description,
             status: 'pending',
             createdAt: new Date().toISOString(),

@@ -133,7 +133,8 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       // 정렬
       filteredProducts.sort((a, b) => {
         const { sortBy, sortOrder } = mergedFilters;
-        let aValue: any, bValue: any;
+        let aValue: string | number | Date;
+        let bValue: string | number | Date;
         
         switch (sortBy) {
           case 'name':
@@ -159,15 +160,20 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
             break;
         }
         
-        if (typeof aValue === 'string') {
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
           return sortOrder === 'asc' 
             ? aValue.localeCompare(bValue)
             : bValue.localeCompare(aValue);
-        } else {
+        } else if (aValue instanceof Date && bValue instanceof Date) {
+          return sortOrder === 'asc' 
+            ? aValue.getTime() - bValue.getTime()
+            : bValue.getTime() - aValue.getTime();
+        } else if (typeof aValue === 'number' && typeof bValue === 'number') {
           return sortOrder === 'asc' 
             ? aValue - bValue
             : bValue - aValue;
         }
+        return 0;
       });
       
       // 페이지네이션
