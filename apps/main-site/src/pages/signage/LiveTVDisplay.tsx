@@ -24,7 +24,18 @@ interface PlaybackStatus {
     id: string;
     name: string;
     loop: boolean;
-    items: any[];
+    items: Array<{
+      id: string;
+      order: number;
+      duration: number;
+      content: {
+        id: string;
+        title: string;
+        type: 'youtube' | 'vimeo';
+        url: string;
+        videoId: string;
+      };
+    }>;
   };
   schedule?: {
     id: string;

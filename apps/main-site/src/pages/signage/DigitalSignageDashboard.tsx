@@ -5,6 +5,19 @@ import StoreManagement from './StoreManagement';
 import PlaylistManager from './PlaylistManager';
 import ScheduleManager from './ScheduleManager';
 
+interface Store {
+  id: string;
+  name: string;
+  status: 'active' | 'inactive' | 'maintenance';
+  location?: string;
+}
+
+interface StorePerformance {
+  storeId: string;
+  totalDuration: number;
+  contentCount: number;
+}
+
 interface DashboardStats {
   totalStores: number;
   activeStores: number;
@@ -54,14 +67,17 @@ export default function DigitalSignageDashboard() {
       const contentData = await contentResponse.json();
       const analyticsData = await analyticsResponse.json();
 
+      const stores = storesData.data?.stores as Store[] || [];
+      const performances = analyticsData.data as StorePerformance[] || [];
+
       setStats({
-        totalStores: storesData.data?.stores?.length || 0,
-        activeStores: storesData.data?.stores?.filter((s: any) => s.status === 'active').length || 0,
+        totalStores: stores.length,
+        activeStores: stores.filter((s) => s.status === 'active').length,
         totalContent: contentData.data?.pagination?.total || 0,
         approvedContent: 0, // Would need separate API call
         totalPlaylists: 0, // Would need separate API call
         activeSchedules: 0, // Would need separate API call
-        totalPlaytime: analyticsData.data?.reduce((sum: number, store: any) => sum + store.totalDuration, 0) || 0,
+        totalPlaytime: performances.reduce((sum, store) => sum + store.totalDuration, 0),
         recentActivity: []
       });
     } catch (err) {

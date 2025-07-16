@@ -85,7 +85,18 @@ export const authAPI = {
   },
 
   // 프로필 업데이트
-  updateProfile: (data: any) => {
+  updateProfile: (data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    businessInfo?: {
+      businessName?: string;
+      businessType?: string;
+      businessNumber?: string;
+      address?: string;
+      phone?: string;
+    };
+  }) => {
     return apiClient.put('/auth/profile', data);
   },
 

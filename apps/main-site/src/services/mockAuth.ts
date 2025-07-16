@@ -114,7 +114,13 @@ export const mockAuthService = {
     email: string;
     password: string;
     name: string;
-    businessInfo?: any;
+    businessInfo?: {
+      businessName?: string;
+      businessType?: string;
+      businessNumber?: string;
+      address?: string;
+      phone?: string;
+    };
   }) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     

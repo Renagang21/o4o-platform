@@ -9,7 +9,7 @@ import {
   Globe
 } from 'lucide-react';
 import { ContentApi } from '../../api/contentApi';
-import { Template } from '../../types/content';
+import { Template, TipTapJSONContent } from '../../types/content';
 
 interface Block {
   id: string;
@@ -17,6 +17,37 @@ interface Block {
   content: any;
   settings?: Record<string, any>;
 }
+
+// Helper functions for converting between Block[] and TipTapJSONContent
+const blocksToTipTap = (blocks: Block[]): TipTapJSONContent => {
+  return {
+    type: 'doc',
+    content: blocks.map(block => ({
+      type: 'custom-block',
+      attrs: {
+        id: block.id,
+        blockType: block.type,
+        content: block.content,
+        settings: block.settings
+      }
+    }))
+  };
+};
+
+const tipTapToBlocks = (content: TipTapJSONContent): Block[] => {
+  if (!content || !content.content || !Array.isArray(content.content)) {
+    return [];
+  }
+  
+  return content.content
+    .filter(node => node.type === 'custom-block' && node.attrs)
+    .map(node => ({
+      id: node.attrs?.id as string || `block-${Date.now()}-${Math.random()}`,
+      type: node.attrs?.blockType as string || 'paragraph',
+      content: node.attrs?.content || {},
+      settings: node.attrs?.settings as Record<string, any> || {}
+    }));
+};
 
 const blockTypes = [
   { type: 'hero', label: 'Hero Section', icon: '🏔️' },
@@ -50,7 +81,7 @@ const HomepageEditor: React.FC = () => {
       
       if (homepageTemplate) {
         setTemplate(homepageTemplate);
-        setBlocks(homepageTemplate.content || []);
+        setBlocks(tipTapToBlocks(homepageTemplate.content));
       } else {
         // Create new homepage template if not exists
         const newTemplate: Partial<Template> = {
@@ -58,7 +89,7 @@ const HomepageEditor: React.FC = () => {
           type: 'page',
           layoutType: 'custom',
           description: 'Main homepage template',
-          content: [],
+          content: blocksToTipTap([]),
           status: 'active',
           isDefault: true,
           active: true,
@@ -153,7 +184,7 @@ const HomepageEditor: React.FC = () => {
       setSaving(true);
       const updateResponse = await ContentApi.updateTemplate(template.id, {
         ...template,
-        content: blocks,
+        content: blocksToTipTap(blocks),
         updatedAt: new Date().toISOString(),
       });
       setTemplate(updateResponse.data);

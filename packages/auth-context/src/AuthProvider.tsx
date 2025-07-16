@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
   
   const authClient = ssoClient || new AuthClient(
-    typeof window !== 'undefined' && (window as Window & { import?: { meta?: { env?: { VITE_API_BASE_URL?: string } } } }).import?.meta?.env?.VITE_API_BASE_URL || ''
+    typeof window !== 'undefined' && (window as any).import?.meta?.env?.VITE_API_BASE_URL || ''
   );
 
   const login = async (credentials: { email: string; password: string }) => {

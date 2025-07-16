@@ -11,6 +11,23 @@ import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import axios from '../../api/client';
 
+interface VideoContent {
+  id: string;
+  title: string;
+  description?: string;
+  url: string;
+  thumbnail: string;
+  duration: number;
+  platform: 'youtube' | 'vimeo';
+  status: 'pending' | 'approved' | 'rejected' | 'inactive';
+  tags: string[];
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
+  authorId: string;
+  authorName?: string;
+}
+
 interface SearchOptions {
   query?: string;
   contentType?: 'youtube' | 'vimeo';
@@ -26,7 +43,7 @@ interface SearchOptions {
 }
 
 interface SearchResult {
-  content: any[];
+  content: VideoContent[];
   totalCount: number;
   pagination: {
     page: number;
@@ -275,7 +292,7 @@ const ContentSearchManager: React.FC = () => {
                     value={searchOptions.status || ''}
                     onChange={(e) => setSearchOptions(prev => ({ 
                       ...prev, 
-                      status: e.target.value as any 
+                      status: e.target.value as 'pending' | 'approved' | 'rejected' | 'inactive' | undefined 
                     }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -293,7 +310,7 @@ const ContentSearchManager: React.FC = () => {
                     value={searchOptions.sortBy || 'latest'}
                     onChange={(e) => setSearchOptions(prev => ({ 
                       ...prev, 
-                      sortBy: e.target.value as any 
+                      sortBy: e.target.value as 'latest' | 'popular' | 'duration' | 'name' 
                     }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >

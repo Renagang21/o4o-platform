@@ -27,6 +27,7 @@
   "include": [
     "apps/*/src/**/*",
     "packages/*/src/**/*",
+    "packages/*/src/types/**/*.d.ts",
     "*.ts",
     "*.tsx"
   ],

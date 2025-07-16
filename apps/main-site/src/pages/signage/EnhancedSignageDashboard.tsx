@@ -110,7 +110,7 @@ const EnhancedSignageDashboard: React.FC = () => {
   // Fetch Contents
   const fetchContents = useCallback(async () => {
     try {
-      const params: any = {
+      const params: Record<string, string | number> = {
         page: 1,
         limit: 20,
         sortBy: 'latest'

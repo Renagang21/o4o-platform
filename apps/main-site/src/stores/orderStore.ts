@@ -282,7 +282,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             );
           } else {
             // 새 아이템 추가
-            const userGrade = user.userType === 'retailer' ? (user as any).grade || 'gold' : 'gold';
+            const userGrade = user.userType === 'retailer' && 'grade' in user ? user.grade || 'gold' : 'gold';
             const unitPrice = product.pricing[userGrade as keyof typeof product.pricing];
             
             const newCartItem: CartItem = {
@@ -412,7 +412,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             buyerId: user.id,
             buyerType: user.userType === 'customer' ? 'customer' : 'retailer',
             buyerName: user.name,
-            buyerGrade: user.userType === 'retailer' ? (user as any).grade : undefined,
+            buyerGrade: user.userType === 'retailer' && 'grade' in user ? user.grade : undefined,
             items: orderItems,
             subtotalAmount: summary.subtotal,
             discountAmount: summary.discount,
@@ -550,8 +550,8 @@ export const useOrderStore = create<OrderState & OrderActions>()(
         
         // 등급별 할인 계산
         let discountRate = 0;
-        if (user?.userType === 'retailer') {
-          const grade = (user as any).grade;
+        if (user?.userType === 'retailer' && 'grade' in user) {
+          const grade = user.grade;
           switch (grade) {
             case 'vip':
               discountRate = 0.05; // 5% 추가 할인
@@ -569,7 +569,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
         const discount = Math.floor(subtotal * discountRate);
         
         // 배송비 계산 (5만원 이상 무료배송 또는 VIP 무료배송)
-        const isVip = user?.userType === 'retailer' && (user as any).grade === 'vip';
+        const isVip = user?.userType === 'retailer' && 'grade' in user && user.grade === 'vip';
         const shipping = (subtotal >= 50000 || isVip) ? 0 : 3000;
         
         // 부가세 (10%)
