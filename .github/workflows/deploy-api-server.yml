@@ -17,6 +17,10 @@ on:
         required: false
         default: 'false'
 
+concurrency:
+  group: deploy-api-server-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   SERVICE_NAME: api-server
   SERVICE_PORT: 4000

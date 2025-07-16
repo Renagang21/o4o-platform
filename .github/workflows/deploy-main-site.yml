@@ -18,6 +18,10 @@ on:
         required: false
         default: 'false'
 
+concurrency:
+  group: deploy-main-site-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   SERVICE_NAME: main-site
   SERVICE_PORT: 3000

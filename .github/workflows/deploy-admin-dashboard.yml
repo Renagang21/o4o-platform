@@ -18,6 +18,10 @@ on:
         required: false
         default: 'false'
 
+concurrency:
+  group: deploy-admin-dashboard-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   SERVICE_NAME: admin-dashboard
   SERVICE_PORT: 3001
