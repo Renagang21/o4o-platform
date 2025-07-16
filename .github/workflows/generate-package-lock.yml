@@ -9,6 +9,10 @@ on:
       - 'packages/*/package.json'
   workflow_dispatch:
 
+concurrency:
+  group: generate-package-lock-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   generate-lock-file:
     name: 🔧 Generate package-lock.json
