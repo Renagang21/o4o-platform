@@ -22,8 +22,22 @@ interface UploadFile {
   webpUrl?: string;
 }
 
+interface MediaItem {
+  id: string;
+  url: string;
+  webpUrl?: string;
+  name: string;
+  type: string;
+  size: number;
+  createdAt?: string;
+  altText?: string;
+  width?: number;
+  height?: number;
+  thumbnailUrl?: string;
+}
+
 interface MediaUploaderProps {
-  onUploadComplete?: (files: any[]) => void;
+  onUploadComplete?: (files: MediaItem[]) => void;
   accept?: Record<string, string[]>;
   maxFiles?: number;
   maxSize?: number; // in bytes
@@ -76,8 +90,8 @@ export default function MediaUploader({
       queryClient.invalidateQueries({ queryKey: ['media'] });
       toast.success('파일이 업로드되었습니다');
     },
-    onError: (error: any, variables) => {
-      const message = error.response?.data?.message || '업로드 실패';
+    onError: (error: unknown, variables) => {
+      const message = error instanceof Error ? error.message : '업로드 실패';
       updateFileStatus(variables.fileId, 'error', { error: message });
       toast.error(message);
     }
@@ -278,8 +292,9 @@ export default function MediaUploader({
             const completedFiles = files
               .filter(f => f.status === 'completed')
               .map(f => ({
+                id: f.id,
                 name: f.file.name,
-                url: f.uploadedUrl,
+                url: f.uploadedUrl || '',
                 webpUrl: f.webpUrl,
                 size: f.file.size,
                 type: f.file.type

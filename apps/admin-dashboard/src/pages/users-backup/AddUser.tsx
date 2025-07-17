@@ -81,14 +81,14 @@ const AddUser: React.FC = () => {
     }
   }
 
-  const updateFormData = (field: keyof UserFormData, value: any) => {
+  const updateFormData = (field: keyof UserFormData, value: string | boolean | UserRole | object) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }))
   }
 
-  const updateBusinessInfo = (field: string, value: any) => {
+  const updateBusinessInfo = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       businessInfo: {

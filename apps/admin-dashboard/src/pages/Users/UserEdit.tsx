@@ -81,8 +81,8 @@ const UserEdit: React.FC = () => {
       // 사용자 목록 페이지로 이동
       navigate('/users');
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data?.message || error.message || '사용자 정보 수정 중 오류가 발생했습니다.';
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : '사용자 정보 수정 중 오류가 발생했습니다.';
       
       toast.error(
         <div className="flex items-center">

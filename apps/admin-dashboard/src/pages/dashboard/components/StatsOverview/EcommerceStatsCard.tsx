@@ -19,7 +19,7 @@ import { EcommerceStatsResponse, DashboardApiUtils } from '../../../../types/das
 interface EcommerceStatsCardProps {
   data?: EcommerceStatsResponse['data'];
   isLoading?: boolean;
-  error?: any;
+  error?: Error;
 }
 
 const EcommerceStatsCard = memo<EcommerceStatsCardProps>(({ 

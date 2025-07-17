@@ -4,8 +4,8 @@ import axiosInstance from '../config/axios';
 export interface TemplateBlock {
   id: string;
   type: string;
-  content: any;
-  settings?: Record<string, any>;
+  content: Record<string, unknown>;
+  settings?: Record<string, unknown>;
 }
 
 export interface TemplateResponse {
@@ -50,7 +50,7 @@ export interface PostResponse {
     title: string;
     slug: string;
     content: string;
-    customFields: Record<string, any>;
+    customFields: Record<string, unknown>;
     metadata: {
       excerpt: string;
       featuredImage: string | null;

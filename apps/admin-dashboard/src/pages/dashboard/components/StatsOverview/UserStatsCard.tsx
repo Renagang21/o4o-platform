@@ -21,7 +21,7 @@ import { UserStatsResponse, DashboardApiUtils } from '../../../../types/dashboar
 interface UserStatsCardProps {
   data?: UserStatsResponse['data'];
   isLoading?: boolean;
-  error?: any;
+  error?: Error;
 }
 
 const UserStatsCard = memo<UserStatsCardProps>(({ 

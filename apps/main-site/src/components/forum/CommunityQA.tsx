@@ -275,7 +275,7 @@ const CommunityQA: React.FC = () => {
               
               <select 
                 value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'recent' | 'popular' | 'unanswered')}
                 className="w-full p-2 border border-gray-200 rounded-lg text-sm"
               >
                 <option value="recent">최신순</option>

@@ -105,7 +105,7 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({
     }));
   }, []);
 
-  const handleInputChange = (field: keyof BetaFeedbackData, value: any) => {
+  const handleInputChange = <K extends keyof BetaFeedbackData>(field: K, value: BetaFeedbackData[K]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

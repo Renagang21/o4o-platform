@@ -12,7 +12,7 @@ import { shortcodeParser } from '@/utils/shortcodeParser';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 
 // Block component mapping
-const blockComponents: Record<string, React.ComponentType<any>> = {
+const blockComponents: Record<string, React.ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
   paragraph: ParagraphBlock,
   heading: HeadingBlock,
   image: ImageBlock,

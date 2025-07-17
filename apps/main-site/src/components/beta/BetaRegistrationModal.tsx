@@ -88,7 +88,7 @@ export const BetaRegistrationModal: React.FC<BetaRegistrationModalProps> = ({
     referralSource: ''
   });
 
-  const handleInputChange = (field: keyof BetaRegistrationData, value: any) => {
+  const handleInputChange = <K extends keyof BetaRegistrationData>(field: K, value: BetaRegistrationData[K]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

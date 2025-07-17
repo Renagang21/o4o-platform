@@ -74,8 +74,9 @@ export default function ReadingSettings() {
       queryClient.invalidateQueries({ queryKey: ['settings', 'reading'] });
       toast.success('읽기 설정이 저장되었습니다');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || '설정 저장에 실패했습니다');
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : '설정 저장에 실패했습니다';
+      toast.error(message);
     }
   });
 

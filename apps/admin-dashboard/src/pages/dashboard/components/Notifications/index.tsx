@@ -124,7 +124,7 @@ const Notifications: React.FC<NotificationsProps> = ({
               {filters.map(filterOption => (
                 <button
                   key={filterOption.key}
-                  onClick={() => setFilter(filterOption.key as any)}
+                  onClick={() => setFilter(filterOption.key as 'all' | 'urgent' | 'approval' | 'success' | 'info')}
                   className={`
                     px-3 py-1 text-xs rounded-full border transition-colors
                     ${filter === filterOption.key 

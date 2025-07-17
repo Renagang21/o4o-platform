@@ -45,7 +45,7 @@ interface Survey {
 interface SurveyResult {
   surveyId: string;
   userId: string;
-  responses: { [questionId: string]: any };
+  responses: { [questionId: string]: unknown };
   completedAt: string;
   timeSpent: number;
 }
@@ -70,7 +70,7 @@ const SmartSurveyIntegration: React.FC = () => {
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [activeSurvey, setActiveSurvey] = useState<Survey | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [responses, setResponses] = useState<{ [questionId: string]: any }>({});
+  const [responses, setResponses] = useState<{ [questionId: string]: unknown }>({});
   const [showResults, setShowResults] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [surveyTrigger, setSurveyTrigger] = useState<string | null>(null);
@@ -211,7 +211,7 @@ const SmartSurveyIntegration: React.FC = () => {
     setSurveyTrigger(null);
   };
 
-  const handleAnswer = (questionId: string, answer: any) => {
+  const handleAnswer = (questionId: string, answer: unknown) => {
     setResponses(prev => ({
       ...prev,
       [questionId]: answer

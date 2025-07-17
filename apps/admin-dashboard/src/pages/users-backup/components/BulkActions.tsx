@@ -26,7 +26,7 @@ const BulkActions: React.FC<BulkActionsProps> = ({
     } else {
       // TODO: Get selected user IDs from parent component
       onBulkAction({
-        action: action as any,
+        action: action as UserBulkAction['action'],
         userIds: [], // This should be passed from parent
         reason: undefined
       })
@@ -36,7 +36,7 @@ const BulkActions: React.FC<BulkActionsProps> = ({
   const handleReasonSubmit = () => {
     if (showReasonModal && reason.trim()) {
       onBulkAction({
-        action: showReasonModal as any,
+        action: showReasonModal as UserBulkAction['action'],
         userIds: [], // This should be passed from parent
         reason: reason.trim()
       })

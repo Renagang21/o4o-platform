@@ -29,7 +29,7 @@ import PageHeader from '../../components/common/PageHeader';
 import DataTable from '../../components/common/DataTable';
 import UserDeleteModal from '../../components/users/UserDeleteModal';
 import UserRoleChangeModal from '../../components/users/UserRoleChangeModal';
-import { User, UserFilters, UserRole, ROLE_LABELS, STATUS_LABELS } from '../../types/user';
+import { User, UserFilters, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '../../types/user';
 import apiClient from '../../api/base';
 
 // API 응답 타입 정의
@@ -163,11 +163,12 @@ const UsersList: React.FC = () => {
         </div>
       );
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : '사용자 삭제 중 오류가 발생했습니다.';
       toast.error(
         <div className="flex items-center">
           <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-          {error.response?.data?.message || '사용자 삭제 중 오류가 발생했습니다.'}
+          {message}
         </div>
       );
     }
@@ -191,11 +192,12 @@ const UsersList: React.FC = () => {
         </div>
       );
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : '역할 변경 중 오류가 발생했습니다.';
       toast.error(
         <div className="flex items-center">
           <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-          {error.response?.data?.message || '역할 변경 중 오류가 발생했습니다.'}
+          {message}
         </div>
       );
     }
@@ -503,7 +505,7 @@ const UsersList: React.FC = () => {
               <div className="flex items-center space-x-4">
                 <select
                   value={filters.role}
-                  onChange={(e) => handleFilterChange({ role: e.target.value as any })}
+                  onChange={(e) => handleFilterChange({ role: e.target.value as UserRole | 'all' })}
                   className="wp-input-field"
                 >
                   <option value="all">모든 역할</option>
@@ -515,7 +517,7 @@ const UsersList: React.FC = () => {
 
                 <select
                   value={filters.status}
-                  onChange={(e) => handleFilterChange({ status: e.target.value as any })}
+                  onChange={(e) => handleFilterChange({ status: e.target.value as UserStatus | 'all' })}
                   className="wp-input-field"
                 >
                   <option value="all">모든 상태</option>

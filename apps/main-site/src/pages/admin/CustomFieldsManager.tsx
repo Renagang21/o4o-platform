@@ -744,7 +744,7 @@ const CustomFieldsManager: React.FC = () => {
                             </label>
                             <select
                               value={field.type}
-                              onChange={(e) => updateField(field.id, { type: e.target.value as any })}
+                              onChange={(e) => updateField(field.id, { type: e.target.value as 'text' | 'textarea' | 'number' | 'date' | 'datetime' | 'select' | 'radio' | 'checkbox' | 'image' | 'gallery' | 'url' | 'email' | 'password' | 'wysiwyg' | 'repeater' | 'relation' | 'location' })}
                               className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
                             >
                               {Object.entries(groupedFieldTypes).map(([groupName, types]) => (

@@ -16,7 +16,7 @@ const SSOLoginForm: React.FC = () => {
   const location = useLocation();
   
   // 로그인 후 리다이렉트할 경로
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +33,8 @@ const SSOLoginForm: React.FC = () => {
       
       // 로그인 성공 시 원래 가려던 페이지 또는 대시보드로 이동
       navigate(from, { replace: true });
-    } catch (err: any) {
-      setError(err.message || '로그인에 실패했습니다.');
+    } catch (err: unknown) {
+      setError((err as Error).message || '로그인에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }

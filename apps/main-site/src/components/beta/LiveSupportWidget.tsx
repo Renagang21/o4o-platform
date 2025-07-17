@@ -455,7 +455,7 @@ export const EnhancedBetaFeedbackWidget: React.FC<EnhancedBetaFeedbackWidgetProp
           {quickActions.map(action => (
             <button
               key={action.id}
-              onClick={() => setActiveMode(action.id as any)}
+              onClick={() => setActiveMode(action.id as 'feedback' | 'support')}
               className={`flex-1 p-3 text-sm font-medium transition-colors relative ${
                 activeMode === action.id
                   ? 'bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300'

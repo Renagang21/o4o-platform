@@ -291,8 +291,8 @@ export interface DeadTupleInfo {
 
 export interface DatabaseDashboard {
   metrics: DatabasePerformanceMetrics;
-  alerts: any[];
-  recommendations: any[];
+  alerts: DatabasePerformanceAlert[];
+  recommendations: IndexRecommendation[];
   health: DatabaseHealthCheck;
 }
 

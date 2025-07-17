@@ -64,7 +64,7 @@ interface CommissionSettings {
 interface ProductInfoHubProps {
   productId: string;
   userRole: 'supplier' | 'reseller' | 'partner' | 'customer';
-  onSave?: (data: any) => void;
+  onSave?: (data: ProductBasicInfo) => void;
   readonly?: boolean;
 }
 

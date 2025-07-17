@@ -83,7 +83,7 @@ export const authApi = {
 
   // 로그아웃 - 양쪽 시스템 모두 정리
   logout: async (): Promise<void> => {
-    const promises: Promise<any>[] = [];
+    const promises: Promise<void>[] = [];
 
     // SSO 로그아웃
     if (USE_SSO && ssoAuthAPI.isAuthenticated()) {

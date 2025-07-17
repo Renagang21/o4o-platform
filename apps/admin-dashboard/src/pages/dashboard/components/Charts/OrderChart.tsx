@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 import { Package, TrendingUp } from 'lucide-react';
 
 interface OrderData {
@@ -44,7 +44,7 @@ const OrderChart: React.FC<OrderChartProps> = ({ data, isLoading = false }) => {
   const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -71,7 +71,14 @@ const OrderChart: React.FC<OrderChartProps> = ({ data, isLoading = false }) => {
   };
 
   // 커스텀 라벨
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percentage }: any) => {
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percentage }: {
+    cx: number;
+    cy: number;
+    midAngle: number;
+    innerRadius: number;
+    outerRadius: number;
+    percentage: number;
+  }) => {
     if (percentage < 5) return null; // 5% 미만은 라벨 숨김
 
     const RADIAN = Math.PI / 180;

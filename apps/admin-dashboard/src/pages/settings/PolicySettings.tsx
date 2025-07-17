@@ -199,7 +199,7 @@ const PolicySettings: React.FC = () => {
     }
   };
 
-  const updateSettings = useCallback((category: keyof PolicySettings, updates: any) => {
+  const updateSettings = useCallback((category: keyof PolicySettings, updates: Partial<PolicySettings[keyof PolicySettings]>) => {
     if (!settings) return;
     
     setSettings(prev => ({

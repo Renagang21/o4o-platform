@@ -29,7 +29,7 @@ interface MediaFile {
   size: number;
   type: string;
   thumbnailUrl?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapImageSelectorProps) {
@@ -77,7 +77,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
   };
 
   // Handle upload complete
-  const handleUploadComplete = (uploadedFiles: any[]) => {
+  const handleUploadComplete = (uploadedFiles: MediaFile[]) => {
     if (uploadedFiles.length > 0) {
       const firstImage = uploadedFiles[0];
       handleSelectImage({

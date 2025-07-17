@@ -56,7 +56,7 @@ const ProductForm: React.FC = () => {
     }
   }, [productData]);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: keyof Product, value: string | number | boolean | object) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -91,7 +91,7 @@ const ProductForm: React.FC = () => {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
-    handleInputChange('slug', slug);
+    handleInputChange('slug', slug || '');
   };
 
   if (isLoading && isEditMode) {
@@ -383,7 +383,7 @@ const ProductForm: React.FC = () => {
                 </label>
                 <select
                   value={formData.status || 'published'}
-                  onChange={(e) => handleInputChange('status', e.target.value as any)}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="published">공개</option>

@@ -112,7 +112,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             {filters.map(filterOption => (
               <button
                 key={filterOption.key}
-                onClick={() => setFilter(filterOption.key as any)}
+                onClick={() => setFilter(filterOption.key as 'all' | 'user' | 'order' | 'product' | 'content')}
                 className={`
                   px-3 py-1 text-xs rounded-full border transition-colors
                   ${filter === filterOption.key 

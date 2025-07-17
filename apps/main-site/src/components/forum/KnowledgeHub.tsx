@@ -229,7 +229,7 @@ const KnowledgeHub: React.FC = () => {
               <div className="flex space-x-2">
                 <select 
                   value={sortBy} 
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) => setSortBy(e.target.value as 'popular' | 'recent' | 'expert')}
                   className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="popular">인기순</option>

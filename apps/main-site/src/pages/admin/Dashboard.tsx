@@ -7,6 +7,14 @@ import { mockProducts } from '../../mocks/products';
 import { mockOrders } from '../../mocks/orders';
 import { mockUsers } from '../../mocks/users';
 
+interface Activity {
+  type: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  id: string;
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -24,7 +32,7 @@ export default function AdminDashboard() {
     totalCustomers: 0,
   });
 
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
     if (!user || user.userType !== 'admin') {

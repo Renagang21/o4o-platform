@@ -521,7 +521,7 @@ const TrustVerificationSystem: React.FC = () => {
           <div className="flex space-x-2">
             <select 
               value={filterStatus} 
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'verified' | 'pending' | 'disputed')}
               className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">모든 상태</option>
@@ -532,7 +532,7 @@ const TrustVerificationSystem: React.FC = () => {
             
             <select 
               value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'trust-score' | 'recent' | 'community-rating')}
               className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="trust-score">신뢰도 높은 순</option>

@@ -286,7 +286,7 @@ const Products: React.FC = () => {
           <div className="border-t pt-4 grid grid-cols-4 gap-4">
             <select
               value={filters.status || ''}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value as any })}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value || undefined })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">모든 상태</option>
@@ -296,7 +296,7 @@ const Products: React.FC = () => {
             
             <select
               value={filters.type || ''}
-              onChange={(e) => setFilters({ ...filters, type: e.target.value as any })}
+              onChange={(e) => setFilters({ ...filters, type: e.target.value || undefined })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">모든 유형</option>
@@ -316,7 +316,7 @@ const Products: React.FC = () => {
             
             <select
               value={filters.stockStatus || ''}
-              onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value as any })}
+              onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value || undefined })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">재고 상태</option>

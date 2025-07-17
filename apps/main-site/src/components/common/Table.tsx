@@ -25,7 +25,7 @@ interface TableProps<T> {
   rowKey?: keyof T;
 }
 
-const Table = <T extends Record<string, any>>({
+const Table = <T extends Record<string, unknown>>({
   columns,
   data,
   variant = 'default',

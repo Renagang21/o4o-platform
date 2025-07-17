@@ -138,7 +138,7 @@ const Categories: React.FC = () => {
     }
   }
 
-  const updateFormData = (key: string, value: any) => {
+  const updateFormData = (key: keyof Category, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [key]: value

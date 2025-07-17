@@ -19,7 +19,7 @@ import { ForumStatsResponse, DashboardApiUtils } from '../../../../types/dashboa
 interface ForumStatsCardProps {
   data?: ForumStatsResponse['data'];
   isLoading?: boolean;
-  error?: any;
+  error?: Error;
 }
 
 const ForumStatsCard = memo<ForumStatsCardProps>(({ 

@@ -517,7 +517,7 @@ const TransparencyHub: React.FC<{ projectId: string }> = ({ projectId }) => {
         ].map(tab => (
           <button 
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as 'overview' | 'documents' | 'experts' | 'partners' | 'compliance')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
               activeTab === tab.id 
                 ? 'bg-white text-blue-600 shadow-sm' 

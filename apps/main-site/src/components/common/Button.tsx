@@ -32,7 +32,7 @@ const Button = (
     as: Component = 'button',
     onClick,
     ...props
-  }: ButtonProps
+  }: ButtonProps & React.ComponentPropsWithoutRef<'button'>
 ) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
     
@@ -66,7 +66,7 @@ const Button = (
         className={buttonStyles}
         disabled={disabled || isLoading}
         onClick={onClick}
-        {...(props as any)}
+        {...props}
       >
         {isLoading && (
           <svg

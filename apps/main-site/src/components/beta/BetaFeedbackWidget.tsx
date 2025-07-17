@@ -105,7 +105,7 @@ export const BetaFeedbackWidget: React.FC<BetaFeedbackWidgetProps> = ({
           onSuccess={() => showToast('피드백이 제출되었습니다. 감사합니다!', 'success')}
           initialData={{
             betaUserEmail,
-            type: feedbackType as any,
+            type: feedbackType as 'bug_report' | 'feature_request' | 'general_feedback' | 'usability' | 'performance' | 'suggestion' | 'complaint',
             feature,
             currentUrl: window.location.href
           }}
@@ -227,14 +227,14 @@ export const BetaFeedbackWidget: React.FC<BetaFeedbackWidgetProps> = ({
 // Beta Status Checker Component
 interface BetaStatusProps {
   email: string;
-  onStatusChange?: (status: any) => void;
+  onStatusChange?: (status: { approved: boolean; betaLevel: string; accessGranted: boolean }) => void;
 }
 
 export const BetaStatusChecker: React.FC<BetaStatusProps> = ({
   email,
   onStatusChange
 }) => {
-  const [status, setStatus] = useState<any>(null);
+  const [status, setStatus] = useState<{ approved: boolean; betaLevel: string; accessGranted: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
 
   const checkStatus = async () => {

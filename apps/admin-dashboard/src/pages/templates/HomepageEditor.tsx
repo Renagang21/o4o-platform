@@ -14,7 +14,14 @@ import { Template, TipTapJSONContent } from '../../types/content';
 interface Block {
   id: string;
   type: string;
-  content: any;
+  content: {
+    title?: string;
+    subtitle?: string;
+    text?: string;
+    alt?: string;
+    url?: string;
+    [key: string]: any;
+  };
   settings?: Record<string, any>;
 }
 
@@ -394,24 +401,24 @@ const BlockContent: React.FC<{ block: Block }> = ({ block }) => {
     case 'hero':
       return (
         <div className="bg-gray-100 p-4 rounded">
-          <h3 className="font-bold">{block.content.title}</h3>
-          <p className="text-gray-600">{block.content.subtitle}</p>
+          <h3 className="font-bold">{(block.content as any).title}</h3>
+          <p className="text-gray-600">{(block.content as any).subtitle}</p>
         </div>
       );
     case 'heading':
-      return <h3 className="font-bold">{block.content.text}</h3>;
+      return <h3 className="font-bold">{(block.content as any).text}</h3>;
     case 'paragraph':
-      return <p>{block.content.text}</p>;
+      return <p>{(block.content as any).text}</p>;
     case 'button':
       return (
         <button className="px-4 py-2 bg-blue-600 text-white rounded">
-          {block.content.text}
+          {(block.content as any).text}
         </button>
       );
     case 'image':
       return (
         <div className="bg-gray-100 p-8 text-center rounded">
-          <span className="text-gray-500">Image: {block.content.alt || 'No description'}</span>
+          <span className="text-gray-500">Image: {(block.content as any).alt || 'No description'}</span>
         </div>
       );
     default:
@@ -427,7 +434,7 @@ const BlockEditor: React.FC<{
   const updateContent = (key: string, value: any) => {
     onUpdate({
       content: {
-        ...block.content,
+        ...(block.content as any),
         [key]: value,
       },
     });

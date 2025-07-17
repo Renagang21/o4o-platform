@@ -281,7 +281,7 @@ const Tags: React.FC = () => {
     }
   }
 
-  const updateFormData = (key: string, value: any) => {
+  const updateFormData = (key: keyof Tag, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [key]: value
@@ -402,7 +402,7 @@ const Tags: React.FC = () => {
             <div className="flex items-center gap-2">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'name' | 'postCount' | 'createdAt')}
                 className="wp-select"
               >
                 <option value="name">이름순</option>

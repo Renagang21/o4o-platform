@@ -333,7 +333,7 @@ const CustomerTierManager: React.FC<CustomerTierManagerProps> = ({
   const handleTierManualUpdate = (customerId: string, newTier: string) => {
     setCustomers(prev => prev.map(customer => 
       customer.id === customerId 
-        ? { ...customer, tier: newTier as any }
+        ? { ...customer, tier: newTier as B2CTier | B2BTier }
         : customer
     ));
     onTierUpdate?.(customerId, newTier);

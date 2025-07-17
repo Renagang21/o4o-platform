@@ -177,7 +177,7 @@ const RecentActivity = memo<RecentActivityProps>(({ className = '' }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">활동 타입</label>
                 <select
                   value={filters.types?.[0] || ''}
-                  onChange={(e) => setFilters({ ...filters, types: e.target.value ? [e.target.value as any] : undefined })}
+                  onChange={(e) => setFilters({ ...filters, types: e.target.value ? [e.target.value as ActivityItem['type']] : undefined })}
                   className="wp-input-field wp-input-sm"
                 >
                   <option value="">전체</option>
@@ -197,7 +197,7 @@ const RecentActivity = memo<RecentActivityProps>(({ className = '' }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">우선순위</label>
                 <select
                   value={filters.priorities?.[0] || ''}
-                  onChange={(e) => setFilters({ ...filters, priorities: e.target.value ? [e.target.value as any] : undefined })}
+                  onChange={(e) => setFilters({ ...filters, priorities: e.target.value ? [e.target.value as ActivityItem['priority']] : undefined })}
                   className="wp-input-field wp-input-sm"
                 >
                   <option value="">전체</option>

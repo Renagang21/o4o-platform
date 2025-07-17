@@ -500,7 +500,7 @@ const ContentManagement: React.FC = () => {
                 ].map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveEditTab(tab.id as any)}
+                    onClick={() => setActiveEditTab(tab.id as 'content' | 'seo')}
                     className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
                       activeEditTab === tab.id
                         ? 'border-blue-500 text-blue-600'

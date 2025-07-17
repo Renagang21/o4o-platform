@@ -169,21 +169,21 @@ const StatsOverview = memo<StatsOverviewProps>(({ className = '' }) => {
         <EcommerceStatsCard 
           data={ecommerceData?.data}
           isLoading={ecommerceLoading}
-          error={ecommerceError}
+          error={ecommerceError || undefined}
         />
 
         {/* 포럼 통계 카드 */}
         <ForumStatsCard 
           data={forumData?.data}
           isLoading={forumLoading}
-          error={forumError}
+          error={forumError || undefined}
         />
 
         {/* 사용자 통계 카드 */}
         <UserStatsCard 
           data={userData?.data}
           isLoading={userLoading}
-          error={userError}
+          error={userError || undefined}
         />
       </div>
 
