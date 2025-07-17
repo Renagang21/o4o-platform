@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Eye, Settings, Layout, Home, DollarSign, Info, Mail, ArrowLeft, Plus, Edit3, Globe, Smartphone, Monitor } from 'lucide-react';
 import DOMPurify from 'dompurify';
+import { PageContent, PageSection, PageInfo, DefaultPageContents, BannerSection, FeaturesSection, ContentSection, ProgressSection } from '../../types/page-manager';
 
 const PageManager = () => {
   const [currentPage, setCurrentPage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [pageContent, setPageContent] = useState<any>({});
+  const [pageContent, setPageContent] = useState<PageContent>({ title: '', sections: [] });
   const [previewMode, setPreviewMode] = useState('desktop');
 
   // 워드프레스 스타일 페이지 목록
-  const pages = [
+  const pages: PageInfo[] = [
     { id: 'home', name: '홈페이지', icon: <Home className="w-4 h-4" />, url: '/' },
     { id: 'crowdfunding', name: '크라우드펀딩', icon: <DollarSign className="w-4 h-4" />, url: '/crowdfunding' },
     { id: 'about', name: '회사소개', icon: <Info className="w-4 h-4" />, url: '/about' },
@@ -29,8 +30,8 @@ const PageManager = () => {
   }, [currentPage]);
 
   // 기본 페이지 콘텐츠 생성
-  const getDefaultPageContent = (pageId: string) => {
-    const defaults: any = {
+  const getDefaultPageContent = (pageId: string): PageContent => {
+    const defaults: DefaultPageContents = {
       home: {
         title: 'Welcome to Neture',
         hero: {
@@ -107,17 +108,17 @@ const PageManager = () => {
       content: type === 'content' ? '<p>여기에 내용을 입력하세요.</p>' : {}
     };
     
-    setPageContent((prev: any) => ({
+    setPageContent((prev) => ({
       ...prev,
       sections: [...(prev.sections || []), newSection]
     }));
   };
 
   // 섹션 업데이트
-  const updateSection = (sectionId: string, updates: any) => {
-    setPageContent((prev: any) => ({
+  const updateSection = (sectionId: string, updates: Partial<PageSection>) => {
+    setPageContent((prev) => ({
       ...prev,
-      sections: prev.sections?.map((section: any) => 
+      sections: prev.sections?.map((section) => 
         section.id === sectionId ? { ...section, ...updates } : section
       ) || []
     }));
@@ -126,9 +127,9 @@ const PageManager = () => {
   // 섹션 삭제
   const deleteSection = (sectionId: string) => {
     if (confirm('이 섹션을 삭제하시겠습니까?')) {
-      setPageContent((prev: any) => ({
+      setPageContent((prev) => ({
         ...prev,
-        sections: prev.sections?.filter((section: any) => section.id !== sectionId) || []
+        sections: prev.sections?.filter((section) => section.id !== sectionId) || []
       }));
     }
   };
@@ -361,8 +362,8 @@ const PageManager = () => {
                   </div>
                 )}
 
-                {/* 동적 섹션들 */}
-                {pageContent.sections?.map((section: any, index: number) => (
+                {/* 동적 셉션들 */}
+                {pageContent.sections?.map((section, index) => (
                   <div 
                     key={section.id} 
                     className={`relative ${isEditing ? 'border-2 border-dashed border-blue-300 hover:border-blue-500' : ''}`}
@@ -406,7 +407,7 @@ const PageManager = () => {
                       <div className="p-8">
                         <h2 className="text-3xl font-bold text-center mb-12">{section.title}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                          {section.items?.map((item: any, idx: number) => (
+                          {(section as FeaturesSection).items?.map((item, idx) => (
                             <div key={idx} className="text-center">
                               <div className="text-4xl mb-4">{item.icon}</div>
                               <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
