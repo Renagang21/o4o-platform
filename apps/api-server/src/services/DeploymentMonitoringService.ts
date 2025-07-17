@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertSeverity, AlertType } from '../entities/Alert';
@@ -584,7 +584,7 @@ export class DeploymentMonitoringService {
       const metrics = await this.systemMetricsRepo.find({
         where: {
           metricName: metricName,
-          createdAt: { $gte: startTime, $lte: endTime } as any
+          createdAt: Between(startTime, endTime)
         },
         order: { createdAt: 'ASC' }
       });

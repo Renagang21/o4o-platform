@@ -25,8 +25,8 @@ export class VideoHelper {
     } else if (type === 'vimeo') {
       const patterns = [
         /vimeo\.com\/(\d+)/,
-        /vimeo\.com\/channels\/[^\/]+\/(\d+)/,
-        /vimeo\.com\/groups\/[^\/]+\/videos\/(\d+)/
+        /vimeo\.com\/channels\/[^/]+\/(\d+)/,
+        /vimeo\.com\/groups\/[^/]+\/videos\/(\d+)/
       ];
       
       for (const pattern of patterns) {

@@ -6,6 +6,14 @@ import crypto from 'crypto';
 import sharp from 'sharp';
 import { AnalyticsService } from './AnalyticsService';
 
+interface OptimizationStats {
+  successful: number;
+  failed: number;
+  totalOriginalSize: number;
+  totalOptimizedSize: number;
+  totalSavings: number;
+}
+
 /**
  * CDN 최적화 서비스
  * 
@@ -833,13 +841,29 @@ export class CDNOptimizationService {
   /**
    * 최적화 통계 조회
    */
-  private async getOptimizationStats(): Promise<any> {
+  private async getOptimizationStats(): Promise<OptimizationStats> {
     try {
       const latest = await this.redis.hget('optimization_status', 'latest');
-      return latest ? JSON.parse(latest) : {};
+      if (latest) {
+        return JSON.parse(latest);
+      }
+      // Return default OptimizationStats with all required properties
+      return {
+        successful: 0,
+        failed: 0,
+        totalOriginalSize: 0,
+        totalOptimizedSize: 0,
+        totalSavings: 0
+      };
     } catch (error) {
       console.warn('Failed to get optimization stats:', error);
-      return {};
+      return {
+        successful: 0,
+        failed: 0,
+        totalOriginalSize: 0,
+        totalOptimizedSize: 0,
+        totalSavings: 0
+      };
     }
   }
 
@@ -993,12 +1017,7 @@ interface CDNReport {
     end: string;
   };
   cacheStats: CDNCacheStats;
-  optimizationStats: {
-    totalAssets: number;
-    optimizedAssets: number;
-    totalSavings: number;
-    avgCompressionRatio: number;
-  };
+  optimizationStats: OptimizationStats;
   assetUsage: AssetUsageStats[];
   recommendations: string[];
 }

@@ -334,7 +334,7 @@ export class CPTController {
     return true;
   }
 
-  private static validatePostFields(fields: Record<string, any>, fieldGroups: FieldGroup[]) {
+  private static validatePostFields(fields: Record<string, unknown>, fieldGroups: FieldGroup[]) {
     const errors: string[] = [];
     let valid = true;
 
@@ -359,7 +359,7 @@ export class CPTController {
               break;
             case 'email':
               const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              if (!emailRegex.test(fieldValue)) {
+              if (!emailRegex.test(fieldValue as string)) {
                 errors.push(`${fieldSchema.label}의 이메일 형식이 올바르지 않습니다.`);
                 valid = false;
               }

@@ -421,17 +421,20 @@ export class PaymentController {
       const [payments, totalCount] = await queryBuilder.getManyAndCount();
 
       // 민감한 정보 제거
-      const sanitizedPayments: SanitizedPayment[] = payments.map(payment => ({
-        ...payment,
-        gatewayResponse: undefined as any,
-        webhookData: undefined as any,
-        paymentDetails: payment.paymentDetails ? {
-          cardNumber: payment.getMaskedCardNumber(),
-          cardType: payment.paymentDetails.cardType,
-          bankName: payment.paymentDetails.bankName,
-          accountNumber: payment.getMaskedAccountNumber()
-        } : undefined
-      }));
+      const sanitizedPayments: SanitizedPayment[] = payments.map(payment => {
+        const { gatewayResponse, webhookData, ...sanitizedPayment } = payment;
+        return {
+          ...sanitizedPayment,
+          gatewayResponse: undefined,
+          webhookData: undefined,
+          paymentDetails: payment.paymentDetails ? {
+            cardNumber: payment.getMaskedCardNumber(),
+            cardType: payment.paymentDetails.cardType,
+            bankName: payment.paymentDetails.bankName,
+            accountNumber: payment.getMaskedAccountNumber()
+          } : undefined
+        } as SanitizedPayment;
+      });
 
       res.json({
         success: true,

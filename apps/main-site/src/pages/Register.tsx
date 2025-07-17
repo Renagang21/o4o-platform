@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 import { authAPI } from '../api/client';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 // 간소화된 회원가입 데이터 타입
 interface SimpleRegisterData {
@@ -87,17 +88,20 @@ const Register: React.FC = () => {
         navigate('/login');
       }, 3000);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Registration error:', error);
       
       let errorMessage = '회원가입에 실패했습니다.';
       
-      if (error.response?.data?.code === 'EMAIL_EXISTS') {
-        errorMessage = '이미 등록된 이메일입니다.';
-      } else if (error.response?.data?.details) {
-        errorMessage = error.response.data.details.map((err: any) => err.msg).join(', ');
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
+      if (error instanceof AxiosError && error.response?.data) {
+        const responseData = error.response.data;
+        if (responseData.code === 'EMAIL_EXISTS') {
+          errorMessage = '이미 등록된 이메일입니다.';
+        } else if (responseData.details && Array.isArray(responseData.details)) {
+          errorMessage = responseData.details.map((err: { msg: string }) => err.msg).join(', ');
+        } else if (responseData.error) {
+          errorMessage = responseData.error;
+        }
       }
       
       setError(errorMessage);

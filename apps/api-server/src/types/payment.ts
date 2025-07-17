@@ -37,6 +37,7 @@ export interface PaymentDetailsData {
   virtualAccountNumber?: string;
   virtualAccountBank?: string;
   virtualAccountExpiry?: string;
+  [key: string]: string | undefined;
 }
 
 // Payment metadata types

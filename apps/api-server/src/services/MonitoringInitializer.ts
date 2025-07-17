@@ -1,7 +1,7 @@
 import { OperationsMonitoringService } from './OperationsMonitoringService';
 import { StatusPageService } from './StatusPageService';
 import { autoRecoveryService } from './AutoRecoveryService';
-import { ComponentType } from '../entities/StatusPage';
+import { ComponentType, IncidentImpact, IncidentStatus } from '../entities/StatusPage';
 
 export class MonitoringInitializer {
   private operationsService: OperationsMonitoringService;
@@ -197,7 +197,7 @@ export class MonitoringInitializer {
     const sampleIncident = {
       title: 'Sample Performance Degradation',
       description: 'This is a sample incident created for testing purposes. API response times are higher than normal.',
-      impact: 'minor' as any,
+      impact: IncidentImpact.MINOR,
       affectedComponents: [components[0].id],
       createdBy: 'system'
     };
@@ -210,7 +210,7 @@ export class MonitoringInitializer {
       setTimeout(async () => {
         try {
           await this.statusPageService.updateIncident(incident.id, {
-            status: 'resolved' as any,
+            status: IncidentStatus.RESOLVED,
             message: 'Performance has returned to normal levels. Monitoring continues.',
             updatedBy: 'system'
           });

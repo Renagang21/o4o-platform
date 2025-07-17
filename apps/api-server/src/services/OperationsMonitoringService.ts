@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual, LessThan, Not, In } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../entities/Alert';
@@ -723,8 +723,8 @@ export class OperationsMonitoringService {
         where: {
           metricType: rule.metricType,
           metricCategory: rule.metricCategory,
-          createdAt: { $gte: new Date(Date.now() - rule.condition.duration * 60 * 1000) }
-        } as any,
+          createdAt: MoreThanOrEqual(new Date(Date.now() - rule.condition.duration * 60 * 1000))
+        },
         order: { createdAt: 'DESC' }
       });
 
@@ -800,8 +800,8 @@ export class OperationsMonitoringService {
       where: {
         status: AlertStatus.ACTIVE,
         isEscalated: false,
-        severity: { $in: [AlertSeverity.HIGH, AlertSeverity.CRITICAL] }
-      } as any
+        severity: In([AlertSeverity.HIGH, AlertSeverity.CRITICAL])
+      }
     });
 
     for (const alert of escalationCandidates) {
@@ -1042,13 +1042,13 @@ export class OperationsMonitoringService {
 
     // Clean up old metrics
     await this.systemMetricsRepo.delete({
-      createdAt: { $lt: metricsRetentionDate } as any
+      createdAt: LessThan(metricsRetentionDate)
     });
 
     // Clean up old resolved alerts
     await this.alertRepo.delete({
       status: AlertStatus.RESOLVED,
-      resolvedAt: { $lt: alertsRetentionDate } as any
+      resolvedAt: LessThan(alertsRetentionDate)
     });
 
     console.log('🧹 Old data cleanup completed');
@@ -1125,8 +1125,8 @@ export class OperationsMonitoringService {
       where: {
         metricType,
         metricCategory,
-        createdAt: { $gte: startDate }
-      } as any,
+        createdAt: MoreThanOrEqual(startDate)
+      },
       order: { createdAt: 'ASC' }
     });
   }

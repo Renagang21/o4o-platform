@@ -2,6 +2,9 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { Settings, GeneralSettings, ReadingSettings, ThemeSettings, EmailSettings } from '../entities/Settings';
 
+export type SettingsType = 'general' | 'reading' | 'theme' | 'email';
+export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | Record<string, unknown>;
+
 export class SettingsService {
   private settingsRepository: Repository<Settings>;
 
@@ -10,7 +13,7 @@ export class SettingsService {
   }
 
   // Get settings by type
-  async getSettings(type: string): Promise<any> {
+  async getSettings(type: SettingsType): Promise<SettingsValue> {
     const setting = await this.settingsRepository.findOne({
       where: { key: type }
     });
@@ -24,7 +27,7 @@ export class SettingsService {
   }
 
   // Update settings
-  async updateSettings(type: string, value: any): Promise<any> {
+  async updateSettings(type: SettingsType, value: SettingsValue): Promise<SettingsValue> {
     let setting = await this.settingsRepository.findOne({
       where: { key: type }
     });
@@ -44,20 +47,20 @@ export class SettingsService {
   }
 
   // Get specific setting value
-  async getSettingValue(type: string, key: string): Promise<any> {
+  async getSettingValue(type: SettingsType, key: string): Promise<unknown> {
     const settings = await this.getSettings(type);
-    return settings?.[key];
+    return (settings as Record<string, unknown>)?.[key];
   }
 
   // Update specific setting value
-  async updateSettingValue(type: string, key: string, value: any): Promise<any> {
+  async updateSettingValue(type: SettingsType, key: string, value: unknown): Promise<SettingsValue> {
     const settings = await this.getSettings(type) || {};
-    settings[key] = value;
+    (settings as Record<string, unknown>)[key] = value;
     return await this.updateSettings(type, settings);
   }
 
   // Get default settings based on type
-  private getDefaultSettings(type: string): any {
+  private getDefaultSettings(type: SettingsType): SettingsValue {
     switch (type) {
       case 'general':
         return {
@@ -115,7 +118,7 @@ export class SettingsService {
 
   // Initialize default settings if not exists
   async initializeSettings(): Promise<void> {
-    const types = ['general', 'reading', 'theme', 'email'];
+    const types: SettingsType[] = ['general', 'reading', 'theme', 'email'];
     
     for (const type of types) {
       const exists = await this.settingsRepository.findOne({

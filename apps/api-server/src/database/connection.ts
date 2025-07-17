@@ -137,7 +137,7 @@ export async function checkDatabaseHealth() {
       host: DB_HOST,
       port: DB_PORT,
       database: DB_NAME,
-      connectionCount: (AppDataSource.driver as any)?.pool?.size || 0,
+      connectionCount: (AppDataSource.driver as { pool?: { size?: number } })?.pool?.size || 0,
       maxConnections: 20,
       timestamp: new Date().toISOString()
     };

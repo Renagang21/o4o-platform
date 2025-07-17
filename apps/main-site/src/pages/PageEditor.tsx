@@ -33,7 +33,7 @@ const PageEditor: React.FC = () => {
     }
   }, [slug]);
 
-  const handleSave = async (html: string, json: any) => {
+  const handleSave = async (html: string, json: Record<string, unknown>) => {
     if (!pageContent || !slug) return;
 
     try {

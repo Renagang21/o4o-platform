@@ -36,14 +36,14 @@ export default function ProductReviews({ productId, productName }: ProductReview
   const summary = reviewSummaries.find(s => s.productId === productId);
 
   const handleSortChange = (sortBy: string) => {
-    setFilters({ sortBy: sortBy as any });
+    setFilters({ sortBy: sortBy as 'newest' | 'oldest' | 'rating_high' | 'rating_low' | 'helpful' });
     fetchReviewsByProduct(productId);
   };
 
   const handleFilterChange = (rating?: number, type?: string) => {
     setFilters({ 
-      rating: rating as any, 
-      type: type as any,
+      rating: rating as 1 | 2 | 3 | 4 | 5 | undefined, 
+      type: type as 'purchase' | 'experience' | undefined,
       isPurchaseVerified: type === 'verified' ? true : undefined 
     });
     fetchReviewsByProduct(productId);
@@ -100,11 +100,11 @@ export default function ProductReviews({ productId, productName }: ProductReview
 
   return (
     <div className="bg-white">
-      {/* ¬ð ”} */}
+      {/* ï¿½ï¿½ ï¿½} */}
       {summary && (
         <div className="border-b border-gray-200 pb-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">à ¬ð</h2>
+            <h2 className="text-2xl font-bold text-gray-900">ï¿½ ï¿½ï¿½</h2>
             <div className="text-right">
               <div className="flex items-center">
                 <div className="flex items-center mr-2">
@@ -114,14 +114,14 @@ export default function ProductReviews({ productId, productName }: ProductReview
                   {summary.averageRating.toFixed(1)}
                 </span>
               </div>
-              <p className="text-sm text-gray-500">{summary.totalCount} ¬ð</p>
+              <p className="text-sm text-gray-500">{summary.totalCount} ï¿½ï¿½</p>
             </div>
           </div>
 
-          {/* É „ì */}
+          {/* ï¿½ ï¿½ï¿½ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">É „ì</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">ï¿½ ï¿½ï¿½</h3>
               <div className="space-y-2">
                 {[5, 4, 3, 2, 1].map((rating) => (
                   <div key={rating} className="flex items-center">
@@ -147,10 +147,10 @@ export default function ProductReviews({ productId, productName }: ProductReview
               </div>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">”œ(</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">ï¿½ï¿½(</h3>
               <div className="flex items-center">
                 <div className="text-3xl font-bold text-green-600">{summary.recommendationRate}%</div>
-                <div className="ml-2 text-sm text-gray-500">àt ”œ</div>
+                <div className="ml-2 text-sm text-gray-500">ï¿½t ï¿½ï¿½</div>
               </div>
             </div>
           </div>
@@ -160,13 +160,13 @@ export default function ProductReviews({ productId, productName }: ProductReview
       {/* D0  , */}
       <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
         <div className="flex items-center space-x-4">
-          {/* É D0 */}
+          {/* ï¿½ D0 */}
           <select
             value={filters.rating || ''}
             onChange={(e) => handleFilterChange(e.target.value ? parseInt(e.target.value) : undefined)}
             className="border-gray-300 rounded-md text-sm"
           >
-            <option value="">¨à É</option>
+            <option value="">ï¿½ï¿½ ï¿½</option>
             <option value="5">PPPPP 5</option>
             <option value="4">PPPP 4</option>
             <option value="3">PPP 3</option>
@@ -174,15 +174,15 @@ export default function ProductReviews({ productId, productName }: ProductReview
             <option value="1">P 1</option>
           </select>
 
-          {/* lä Ux D0 */}
+          {/* lï¿½ Ux D0 */}
           <select
             value={filters.isPurchaseVerified === true ? 'verified' : filters.isPurchaseVerified === false ? 'unverified' : ''}
             onChange={(e) => handleFilterChange(undefined, e.target.value)}
             className="border-gray-300 rounded-md text-sm"
           >
-            <option value="">´ ¬ð</option>
-            <option value="verified">lä Ux ¬ð</option>
-            <option value="unverified">´Ø ¬ð</option>
+            <option value="">ï¿½ ï¿½ï¿½</option>
+            <option value="verified">lï¿½ Ux ï¿½ï¿½</option>
+            <option value="unverified">ï¿½ï¿½ ï¿½ï¿½</option>
           </select>
         </div>
 
@@ -192,15 +192,15 @@ export default function ProductReviews({ productId, productName }: ProductReview
           onChange={(e) => handleSortChange(e.target.value)}
           className="border-gray-300 rounded-md text-sm"
         >
-          <option value="newest">\à</option>
-          <option value="oldest">$˜</option>
-          <option value="rating_high">É ’@</option>
-          <option value="rating_low">É ®@</option>
-          <option value="helpful">ÄÀ(</option>
+          <option value="newest">\ï¿½</option>
+          <option value="oldest">$ï¿½</option>
+          <option value="rating_high">ï¿½ ï¿½@</option>
+          <option value="rating_low">ï¿½ ï¿½@</option>
+          <option value="helpful">ï¿½ï¿½(</option>
         </select>
       </div>
 
-      {/* ¬ð ©] */}
+      {/* ï¿½ï¿½ ï¿½] */}
       {isLoading ? (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -210,14 +210,14 @@ export default function ProductReviews({ productId, productName }: ProductReview
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10m0 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2m0 0v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">DÁ ¬ð  ÆµÈä</h3>
-          <p className="mt-1 text-sm text-gray-500">« ˆø ¬ð| ‘1tô8”!</p>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">Dï¿½ ï¿½ï¿½  Æµï¿½ï¿½</h3>
+          <p className="mt-1 text-sm text-gray-500">ï¿½ ï¿½ï¿½ ï¿½ï¿½| ï¿½1tï¿½8ï¿½!</p>
         </div>
       ) : (
         <div className="space-y-6">
           {reviews.map((review) => (
             <div key={review.id} className="border-b border-gray-200 pb-6">
-              {/* ¬ð äT */}
+              {/* ï¿½ï¿½ ï¿½T */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center">
@@ -226,12 +226,12 @@ export default function ProductReviews({ productId, productName }: ProductReview
                   <span className="text-sm font-medium text-gray-900">{review.userName}</span>
                   {review.isPurchaseVerified && (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      lä Ux
+                      lï¿½ Ux
                     </span>
                   )}
                   {review.userType === 'retailer' && (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      ¬L|ì
+                      ï¿½L|ï¿½
                     </span>
                   )}
                 </div>
@@ -240,30 +240,30 @@ export default function ProductReviews({ productId, productName }: ProductReview
                 </div>
               </div>
 
-              {/* ¬ð © */}
+              {/* ï¿½ï¿½ ï¿½ */}
               <h4 className="text-lg font-medium text-gray-900 mb-2">{review.title}</h4>
 
-              {/* ¬ð ´© */}
+              {/* ï¿½ï¿½ ï¿½ï¿½ */}
               <p className="text-gray-700 mb-4">{review.content}</p>
 
-              {/* ¬ð tøÀ */}
+              {/* ï¿½ï¿½ tï¿½ï¿½ */}
               {review.images && review.images.length > 0 && (
                 <div className="flex space-x-2 mb-4">
                   {review.images.map((image) => (
                     <img
                       key={image.id}
                       src={image.url}
-                      alt={image.alt || '¬ð tøÀ'}
+                      alt={image.alt || 'ï¿½ï¿½ tï¿½ï¿½'}
                       className="w-20 h-20 object-cover rounded cursor-pointer"
                       onClick={() => {
-                        // tøÀ U  ¨ì l  ¥
+                        // tï¿½ï¿½ U  ï¿½ï¿½ l  ï¿½
                       }}
                     />
                   ))}
                 </div>
               )}
 
-              {/* ¬ð aX */}
+              {/* ï¿½ï¿½ aX */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <button
@@ -277,7 +277,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 6v4m-5 8h2.5A1.5 1.5 0 008 16.5v-5A1.5 1.5 0 006.5 10H4a2 2 0 00-2 2v6a2 2 0 002 2z" />
                     </svg>
-                    <span>ÄÀ( ({review.helpfulCount})</span>
+                    <span>ï¿½ï¿½( ({review.helpfulCount})</span>
                   </button>
                 </div>
                 
@@ -286,7 +286,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
                     onClick={() => handleReportClick(review.id)}
                     className="text-sm text-gray-400 hover:text-gray-600"
                   >
-                    àà
+                    ï¿½ï¿½
                   </button>
                 )}
               </div>
@@ -295,17 +295,17 @@ export default function ProductReviews({ productId, productName }: ProductReview
         </div>
       )}
 
-      {/* àà ¨ì */}
+      {/* ï¿½ï¿½ ï¿½ï¿½ */}
       {showReportModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <form onSubmit={handleReportSubmit}>
               <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">¬ð àà</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">ï¿½ï¿½ ï¿½ï¿½</h3>
                 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    àà ¬ 
+                    ï¿½ï¿½ ï¿½ 
                   </label>
                   <select
                     value={reportReason}
@@ -313,25 +313,25 @@ export default function ProductReviews({ productId, productName }: ProductReview
                     className="w-full border-gray-300 rounded-md"
                     required
                   >
-                    <option value=""> ÝX8”</option>
-                    <option value="spam">¤8</option>
-                    <option value="inappropriate">€\ ´©</option>
-                    <option value="fake">È ¬ð</option>
-                    <option value="offensive">•$/D)</option>
-                    <option value="other">0À</option>
+                    <option value=""> ï¿½X8ï¿½</option>
+                    <option value="spam">ï¿½8</option>
+                    <option value="inappropriate">ï¿½\ ï¿½ï¿½</option>
+                    <option value="fake">ï¿½ ï¿½ï¿½</option>
+                    <option value="offensive">ï¿½$/D)</option>
+                    <option value="other">0ï¿½</option>
                   </select>
                 </div>
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Á8 $…
+                    ï¿½8 $ï¿½
                   </label>
                   <textarea
                     value={reportDescription}
                     onChange={(e) => setReportDescription(e.target.value)}
                     className="w-full border-gray-300 rounded-md"
                     rows={3}
-                    placeholder="àà ¬ Ð  \ 8\ $…D …%tü8”"
+                    placeholder="ï¿½ï¿½ ï¿½ ï¿½  \ ï¿½8\ $ï¿½D ï¿½%tï¿½8ï¿½"
                   />
                 </div>
 
@@ -341,13 +341,13 @@ export default function ProductReviews({ productId, productName }: ProductReview
                     onClick={() => setShowReportModal(false)}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                   >
-                    èŒ
+                    ï¿½
                   </button>
                   <button
                     type="submit"
                     className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
                   >
-                    ààX0
+                    ï¿½ï¿½X0
                   </button>
                 </div>
               </div>

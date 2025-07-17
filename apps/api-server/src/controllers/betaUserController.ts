@@ -245,7 +245,7 @@ export class BetaUserController {
         interestArea: req.query.interestArea as InterestArea,
         page: parseInt(req.query.page as string) || 1,
         limit: Math.min(parseInt(req.query.limit as string) || 20, 100),
-        sortBy: req.query.sortBy as any || 'latest',
+        sortBy: (req.query.sortBy as BetaUserSearchOptions['sortBy']) || 'latest',
         sortOrder: req.query.sortOrder as 'ASC' | 'DESC' || 'DESC',
         dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
         dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined
@@ -444,7 +444,7 @@ export class BetaUserController {
         assignedTo: req.query.assignedTo as string,
         page: parseInt(req.query.page as string) || 1,
         limit: Math.min(parseInt(req.query.limit as string) || 20, 100),
-        sortBy: req.query.sortBy as any || 'latest',
+        sortBy: (req.query.sortBy as BetaFeedbackSearchOptions['sortBy']) || 'latest',
         sortOrder: req.query.sortOrder as 'ASC' | 'DESC' || 'DESC',
         dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
         dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined

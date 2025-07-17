@@ -12,7 +12,7 @@
 // BASE API RESPONSE STRUCTURE
 // =============================================================================
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
@@ -679,8 +679,8 @@ export interface ActivityItem {
 
   // 추가 컨텍스트
   context?: {
-    oldValue?: any;               // 업데이트 활동에서 이전 값
-    newValue?: any;               // 업데이트 활동에서 새로운 값
+    oldValue?: unknown;               // 업데이트 활동에서 이전 값
+    newValue?: unknown;               // 업데이트 활동에서 새로운 값
     reason?: string;              // 거부/취소 등의 사유
     additionalInfo?: Record<string, unknown>;
   };
@@ -1579,7 +1579,7 @@ export const isApiSuccess = <T>(response: ApiResponse<T> | DashboardApiError): r
   return response.success === true;
 };
 
-export const isApiError = (response: ApiResponse<any> | DashboardApiError): response is DashboardApiError => {
+export const isApiError = (response: ApiResponse<unknown> | DashboardApiError): response is DashboardApiError => {
   return response.success === false;
 };
 

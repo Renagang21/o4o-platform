@@ -44,9 +44,9 @@ const ForgotPassword: React.FC = () => {
 
       setSuccess(true);
       setLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Password reset error:', error);
-      setError(error.message || '비밀번호 재설정 요청에 실패했습니다. 다시 시도해주세요.');
+      setError(error instanceof Error ? error.message : '비밀번호 재설정 요청에 실패했습니다. 다시 시도해주세요.');
       setLoading(false);
     }
   };

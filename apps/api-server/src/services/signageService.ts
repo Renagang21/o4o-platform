@@ -381,17 +381,12 @@ export class SignageService {
 
   // Analytics method for health checking
   async getSignageAnalytics() {
-    try {
-      // Simple health check without depending on missing methods
-      return {
-        activeDisplaysCount: 0,
-        totalContent: 0,
-        systemStatus: 'healthy'
-      };
-    } catch (error) {
-      console.error('Error getting signage analytics:', error);
-      throw error;
-    }
+    // Simple health check without depending on missing methods
+    return {
+      activeDisplaysCount: 0,
+      totalContent: 0,
+      systemStatus: 'healthy'
+    };
   }
 }
 

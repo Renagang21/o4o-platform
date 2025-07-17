@@ -5,6 +5,7 @@ import { AnalyticsService } from './AnalyticsService';
 import { PerformanceOptimizationService } from './PerformanceOptimizationService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { TypeOrmDriver } from '../types/database';
 
 const execAsync = promisify(exec);
 
@@ -181,7 +182,7 @@ export class AutoScalingService {
     
     // 현재 활성 연결 수
     const activeConnections = AppDataSource.isInitialized ? 
-      (AppDataSource.driver as any).pool?.totalCount || 0 : 0;
+      (AppDataSource.driver as TypeOrmDriver).pool?.totalCount || 0 : 0;
 
     // 최근 요청 수 (Redis에서 조회)
     const requestRate = await this.getRequestRate();
@@ -964,7 +965,7 @@ export class AutoScalingService {
   /**
    * 최근 스케일링 이벤트 조회
    */
-  private async getRecentScalingEvents(): Promise<any[]> {
+  private async getRecentScalingEvents(): Promise<ScalingEvent[]> {
     try {
       const events = await this.redis.lrange('scaling_events', 0, 19);
       return events.map(e => JSON.parse(e));
@@ -1067,6 +1068,10 @@ interface ScalingAction {
   timestamp: string;
 }
 
+interface ScalingEvent extends ScalingAction {
+  instanceCount: number;
+}
+
 interface HealthCheck {
   status: 'healthy' | 'unhealthy';
   load: number;
@@ -1074,7 +1079,7 @@ interface HealthCheck {
   timestamp: string;
 }
 
-interface ScalingEvent {
+interface DetailedScalingEvent {
   id: string;
   timestamp: Date;
   eventType: 'scale_up' | 'scale_down' | 'instance_started' | 'instance_stopped' | 'instance_failed';

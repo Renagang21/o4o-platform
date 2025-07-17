@@ -1,21 +1,21 @@
 import { Request, Response } from 'express';
-import { settingsService } from '../services/settingsService';
+import { settingsService, SettingsType } from '../services/settingsService';
 
 export class SettingsController {
   // GET /api/settings/:type
   async getSettings(req: Request, res: Response) {
     try {
       const { type } = req.params;
-      const validTypes = ['general', 'reading', 'theme', 'email'];
+      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email'];
 
-      if (!validTypes.includes(type)) {
+      if (!validTypes.includes(type as SettingsType)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid settings type'
         });
       }
 
-      const settings = await settingsService.getSettings(type);
+      const settings = await settingsService.getSettings(type as SettingsType);
 
       res.json({
         success: true,
@@ -35,16 +35,16 @@ export class SettingsController {
   async updateSettings(req: Request, res: Response) {
     try {
       const { type } = req.params;
-      const validTypes = ['general', 'reading', 'theme', 'email'];
+      const validTypes: SettingsType[] = ['general', 'reading', 'theme', 'email'];
 
-      if (!validTypes.includes(type)) {
+      if (!validTypes.includes(type as SettingsType)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid settings type'
         });
       }
 
-      const settings = await settingsService.updateSettings(type, req.body);
+      const settings = await settingsService.updateSettings(type as SettingsType, req.body);
 
       res.json({
         success: true,

@@ -667,9 +667,9 @@ export class PerformanceOptimizationService {
         const numValue = isNaN(Number(value)) ? value : Number(value);
         
         if (currentSection === 'stats' && key in result.stats) {
-          (result.stats as any)[key] = numValue;
+          (result.stats as Record<string, number | string>)[key] = numValue;
         } else if (currentSection === 'memory' && key in result.memory) {
-          (result.memory as any)[key] = numValue;
+          (result.memory as Record<string, number | string>)[key] = numValue;
         } else if (currentSection === 'keyspace') {
           // Parse keyspace db0:keys=10,expires=2,avg_ttl=3600
           const dbMatch = key.match(/db(\d+)/);

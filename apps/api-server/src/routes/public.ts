@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { Template } from '../entities/Template';
 import { Page } from '../entities/Page';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
-import { Product } from '../entities/Product';
+import { Product, ProductStatus } from '../entities/Product';
 import { MockDataService } from '../services/MockDataService';
 
 const router = Router();
@@ -127,7 +127,7 @@ router.get('/templates/:type', async (req, res) => {
     
     const template = await templateRepository.findOne({
       where: { 
-        type: type as any,
+        type: type as 'page' | 'post' | 'product' | 'archive' | 'single',
         active: true,
         featured: true
       }
@@ -316,8 +316,8 @@ router.get('/products/:idOrSlug', async (req, res) => {
     // Try to find by ID first, then by slug
     let product = await productRepository.findOne({
       where: [
-        { id: idOrSlug, status: 'active' as any },
-        { slug: idOrSlug, status: 'active' as any }
+        { id: idOrSlug, status: ProductStatus.ACTIVE },
+        { slug: idOrSlug, status: ProductStatus.ACTIVE }
       ]
     });
 
@@ -383,7 +383,7 @@ router.get('/featured-products', async (req, res) => {
     const products = await productRepository.find({
       where: {
         featured: true,
-        status: 'active' as any
+        status: ProductStatus.ACTIVE
       },
       order: {
         createdAt: 'DESC'

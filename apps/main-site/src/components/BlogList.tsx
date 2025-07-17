@@ -10,7 +10,7 @@ interface Post {
   title: string;
   slug: string;
   excerpt?: string;
-  content?: any;
+  content?: Record<string, unknown>;
   author?: {
     name: string;
     avatar?: string;

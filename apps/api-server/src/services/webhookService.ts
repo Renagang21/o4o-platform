@@ -4,6 +4,7 @@ import { AppDataSource } from '../database/connection';
 import { Payment, PaymentProvider, PaymentGatewayStatus } from '../entities/Payment';
 import { Order, PaymentStatus, OrderStatus, PaymentMethod } from '../entities/Order';
 import { inventoryService } from './inventoryService';
+import { PaymentWebhookData } from '../types/payment';
 
 export interface WebhookPayload {
   provider: PaymentProvider;
@@ -295,7 +296,7 @@ export class WebhookService {
       await queryRunner.manager.update(Payment, payment.id, {
         status: newPaymentStatus,
         gatewayTransactionId: webhookData.gatewayTransactionId,
-        webhookData: webhookData.metadata as any,
+        webhookData: webhookData.metadata as PaymentWebhookData,
         ...(webhookData.status === 'failed' && { 
           failureReason: (webhookData.metadata?.failureReason as string) || 'Payment failed' 
         })

@@ -1,7 +1,7 @@
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
-import { Alert, AlertType, AlertSeverity } from '../entities/Alert';
+import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert';
 
 export enum CircuitState {
   CLOSED = 'closed',
@@ -501,7 +501,7 @@ export class CircuitBreakerService {
       where: {
         alertType: AlertType.CIRCUIT_BREAKER,
         source: stats.serviceName,
-        status: { $ne: 'resolved' } as any
+        status: Not(AlertStatus.RESOLVED)
       }
     });
 

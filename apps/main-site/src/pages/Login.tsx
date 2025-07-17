@@ -19,7 +19,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
 
   // 로그인 후 리다이렉트할 경로
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/dashboard';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,10 +49,10 @@ const Login: React.FC = () => {
         navigate(from, { replace: true });
       }
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       
-      let errorMessage = error.message || '로그인에 실패했습니다.';
+      let errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
       
       // 에러 메시지 개선
       if (errorMessage.includes('Invalid credentials')) {

@@ -15,7 +15,7 @@ interface Page {
   id: string;
   title: string;
   slug: string;
-  content: any;
+  content: { blocks?: Array<{ type: string; data: Record<string, unknown> }> } | string;
   template?: string;
 }
 

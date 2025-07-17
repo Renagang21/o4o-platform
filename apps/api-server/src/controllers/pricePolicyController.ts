@@ -4,6 +4,7 @@ import { PricePolicy, PricePolicyType, DiscountType, UserRole } from '../entitie
 import { Product } from '../entities/Product';
 import { PricingService } from '../services/pricingService';
 import { AuthRequest } from '../types/auth';
+import { LessThan } from 'typeorm';
 
 export class PricePolicyController {
   private pricePolicyRepository = AppDataSource.getRepository(PricePolicy);
@@ -410,7 +411,7 @@ export class PricePolicyController {
         this.pricePolicyRepository.count({
           where: {
             isActive: true,
-            endDate: { $lt: new Date() } as any
+            endDate: LessThan(new Date())
           }
         }),
         this.pricePolicyRepository

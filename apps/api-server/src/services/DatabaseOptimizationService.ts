@@ -156,15 +156,15 @@ export class DatabaseOptimizationService {
         LIMIT 20
       `, [this.performanceThresholds.slowQueryThreshold]);
 
-      return queries.map((q: Record<string, any>) => ({
-        query: q.query,
-        calls: parseInt(q.calls),
-        totalTime: parseFloat(q.total_time),
-        meanTime: parseFloat(q.mean_time),
-        maxTime: parseFloat(q.max_time),
-        minTime: parseFloat(q.min_time),
-        rows: parseInt(q.rows),
-        hitPercent: parseFloat(q.hit_percent) || 0
+      return queries.map((q: Record<string, unknown>) => ({
+        query: q.query as string,
+        calls: parseInt(String(q.calls)),
+        totalTime: parseFloat(String(q.total_time)),
+        meanTime: parseFloat(String(q.mean_time)),
+        maxTime: parseFloat(String(q.max_time)),
+        minTime: parseFloat(String(q.min_time)),
+        rows: parseInt(String(q.rows)),
+        hitPercent: parseFloat(String(q.hit_percent)) || 0
       }));
 
     } catch (error) {
@@ -469,13 +469,13 @@ export class DatabaseOptimizationService {
         ORDER BY pg_relation_size(indexrelid) DESC
       `);
 
-      return indexes.map((idx: Record<string, any>) => ({
-        schema: idx.schemaname,
-        table: idx.tablename,
-        index: idx.indexname,
-        size: idx.size,
-        tupRead: parseInt(idx.idx_tup_read),
-        tupFetch: parseInt(idx.idx_tup_fetch)
+      return indexes.map((idx: Record<string, unknown>) => ({
+        schema: idx.schemaname as string,
+        table: idx.tablename as string,
+        index: idx.indexname as string,
+        size: idx.size as string,
+        tupRead: parseInt(String(idx.idx_tup_read)),
+        tupFetch: parseInt(String(idx.idx_tup_fetch))
       }));
 
     } catch (error) {
@@ -501,7 +501,7 @@ export class DatabaseOptimizationService {
         HAVING count(*) > 1
       `);
 
-      return duplicates.map((dup: Record<string, any>) => ({
+      return duplicates.map((dup: Record<string, unknown>) => ({
         table: dup.tablename,
         indexes: dup.indexes,
         sizes: dup.sizes
@@ -533,15 +533,15 @@ export class DatabaseOptimizationService {
         ORDER BY idx_scan DESC
       `);
 
-      return stats.map((stat: Record<string, any>) => ({
-        schema: stat.schemaname,
-        table: stat.tablename,
-        index: stat.indexname,
-        tupRead: parseInt(stat.idx_tup_read),
-        tupFetch: parseInt(stat.idx_tup_fetch),
-        scan: parseInt(stat.idx_scan),
-        size: stat.size,
-        sizeBytes: parseInt(stat.size_bytes)
+      return stats.map((stat: Record<string, unknown>) => ({
+        schema: stat.schemaname as string,
+        table: stat.tablename as string,
+        index: stat.indexname as string,
+        tupRead: parseInt(String(stat.idx_tup_read)),
+        tupFetch: parseInt(String(stat.idx_tup_fetch)),
+        scan: parseInt(String(stat.idx_scan)),
+        size: stat.size as string,
+        sizeBytes: parseInt(String(stat.size_bytes))
       }));
 
     } catch (error) {
@@ -725,13 +725,13 @@ export class DatabaseOptimizationService {
         LIMIT 20
       `);
 
-      return sizes.map((size: Record<string, any>) => ({
-        schema: size.schemaname,
-        table: size.tablename,
-        totalSize: size.size,
-        totalSizeBytes: parseInt(size.size_bytes),
-        tableSize: size.table_size,
-        indexSize: size.index_size
+      return sizes.map((size: Record<string, unknown>) => ({
+        schema: size.schemaname as string,
+        table: size.tablename as string,
+        totalSize: size.size as string,
+        totalSizeBytes: parseInt(String(size.size_bytes)),
+        tableSize: size.table_size as string,
+        indexSize: size.index_size as string
       }));
 
     } catch (error) {
@@ -776,7 +776,7 @@ export class DatabaseOptimizationService {
         ORDER BY query_start
       `);
 
-      return connections.map((conn: Record<string, any>) => ({
+      return connections.map((conn: Record<string, unknown>) => ({
         pid: conn.pid,
         username: conn.usename,
         applicationName: conn.application_name,
@@ -815,11 +815,11 @@ export class DatabaseOptimizationService {
       `);
 
       return {
-        lockModes: locks.map((lock: Record<string, any>) => ({
-          mode: lock.mode,
-          count: parseInt(lock.count)
+        lockModes: locks.map((lock: Record<string, unknown>) => ({
+          mode: lock.mode as string,
+          count: parseInt(String(lock.count))
         })),
-        waitingLocks: parseInt(waitingLocks[0].waiting_locks)
+        waitingLocks: parseInt(String(waitingLocks[0].waiting_locks))
       };
 
     } catch (error) {

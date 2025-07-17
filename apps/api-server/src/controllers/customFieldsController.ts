@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
+import { In } from 'typeorm';
 
 export class CustomFieldsController {
   private fieldGroupRepository = AppDataSource.getRepository(FieldGroup);
@@ -257,7 +258,7 @@ export class CustomFieldsController {
       const fieldIds = fields.map(f => f.id);
       
       if (fieldIds.length > 0) {
-        await this.customFieldValueRepository.delete({ fieldId: fieldIds as any });
+        await this.customFieldValueRepository.delete({ fieldId: In(fieldIds) });
       }
 
       // Delete field group (cascade will delete fields)
@@ -517,7 +518,17 @@ export class CustomFieldsController {
       });
 
       // Group values by field group
-      const groupedValues: Record<string, any> = {};
+      interface GroupedFieldValue {
+        groupId: string;
+        groupTitle: string;
+        fields: Record<string, {
+          fieldId: string;
+          fieldLabel: string;
+          fieldType: string;
+          value: unknown;
+        }>;
+      }
+      const groupedValues: Record<string, GroupedFieldValue> = {};
       
       values.forEach(value => {
         const groupId = value.field.group.id;

@@ -7,11 +7,9 @@ import { AuthService } from '../services/AuthService';
 import { UserRole, UserStatus, AccessTokenPayload, AuthRequest } from '../types/auth';
 
 // Request 타입 확장 (새 SSO 시스템용)
-declare global {
-  namespace Express {
-    interface Request {
-      user?: AccessTokenPayload;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: AccessTokenPayload;
   }
 }
 

@@ -247,7 +247,7 @@ export class MediaController {
                 height: processedImages.originalDimensions.height,
                 sizes: processedImages.sizes,
                 formats: processedImages.formats,
-                metadata: validation.metadata
+                metadata: validation.metadata as unknown as Record<string, unknown>
               };
 
               // Remove original uploaded file (we have processed versions)

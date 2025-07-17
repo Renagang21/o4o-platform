@@ -145,7 +145,7 @@ export class TemplatesController {
   // POST /api/admin/templates
   async createTemplate(req: Request, res: Response) {
     try {
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({
           success: false,
@@ -233,7 +233,7 @@ export class TemplatesController {
   async updateTemplate(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
 
       const template = await this.templateRepository.findOne({ where: { id } });
       if (!template) {
@@ -308,7 +308,7 @@ export class TemplatesController {
   async deleteTemplate(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
 
       const template = await this.templateRepository.findOne({ where: { id } });
       if (!template) {
@@ -349,7 +349,7 @@ export class TemplatesController {
   // POST /api/admin/templates/import
   async importTemplate(req: Request, res: Response) {
     try {
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
       const { templateData } = req.body;
 
       if (!templateData) {
@@ -483,7 +483,7 @@ export class TemplatesController {
   }
 
   // Helper method to get system templates
-  private async getSystemTemplates(type?: string): Promise<any[]> {
+  private async getSystemTemplates(type?: string): Promise<Partial<Template>[]> {
     try {
       const templatesDir = path.join(process.cwd(), 'templates', 'system');
       

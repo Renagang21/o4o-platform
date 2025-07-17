@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { AnalyticsService } from './AnalyticsService';
 import { AnalyticsReport, ReportType, ReportCategory } from '../entities/AnalyticsReport';
@@ -16,6 +16,22 @@ export interface SmtpConfig {
     user: string;
     pass: string;
   };
+}
+
+interface BetaProgramInsights {
+  totalUsers: number;
+  activeUsers: number;
+  activeUsersPercentage: number;
+  newUsers: number;
+  newUsersPercentage: number;
+  lowEngagementUsers: number;
+  lowEngagementPercentage: number;
+  averageEngagement: number;
+  churnRate: number;
+  engagementScore: number;
+  retentionRate: number;
+  timestamp: Date;
+  [key: string]: unknown;  // Index signature for compatibility with metadata
 }
 
 export interface NotificationConfig {
@@ -229,7 +245,7 @@ export class ScheduledReportingService {
       // Check for performance issues
       const recentMetrics = await this.systemMetricsRepo.find({
         where: {
-          createdAt: { $gte: fiveMinutesAgo } as any,
+          createdAt: MoreThanOrEqual(fiveMinutesAgo),
           metricCategory: MetricCategory.RESPONSE_TIME
         },
         order: { createdAt: 'DESC' }
@@ -256,7 +272,7 @@ export class ScheduledReportingService {
       // Check for error spikes
       const errorCount = await this.systemMetricsRepo.count({
         where: {
-          createdAt: { $gte: fiveMinutesAgo } as any,
+          createdAt: MoreThanOrEqual(fiveMinutesAgo),
           metricCategory: MetricCategory.ERROR_COUNT
         }
       });
@@ -278,7 +294,7 @@ export class ScheduledReportingService {
       const activeSessions = await this.userSessionRepo.count({
         where: {
           status: SessionStatus.ACTIVE,
-          lastActivityAt: { $gte: fiveMinutesAgo } as any
+          lastActivityAt: MoreThanOrEqual(fiveMinutesAgo)
         }
       });
 
@@ -384,7 +400,7 @@ export class ScheduledReportingService {
         );
       }
 
-      if (insights.lowEngagementUsers > insights.totalActiveUsers * 0.5) {
+      if (insights.lowEngagementUsers > insights.activeUsers * 0.5) {
         await this.analyticsService.createAlert(
           AlertType.BUSINESS,
           AlertSeverity.MEDIUM,
@@ -392,7 +408,7 @@ export class ScheduledReportingService {
           `${insights.lowEngagementUsers} beta users have low engagement`,
           'low_engagement_users',
           insights.lowEngagementUsers,
-          insights.totalActiveUsers * 0.3,
+          insights.activeUsers * 0.3,
           insights
         );
       }
@@ -510,7 +526,7 @@ export class ScheduledReportingService {
   }
 
   // Helper Methods
-  private async getBetaProgramInsights(): Promise<any> {
+  private async getBetaProgramInsights(): Promise<BetaProgramInsights> {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
@@ -522,9 +538,9 @@ export class ScheduledReportingService {
       averageEngagement
     ] = await Promise.all([
       this.betaUserRepo.count(),
-      this.betaUserRepo.count({ where: { lastActiveAt: { $gte: threeDaysAgo } } as any }),
-      this.betaUserRepo.count({ where: { createdAt: { $gte: threeDaysAgo } } as any }),
-      this.betaUserRepo.count({ where: { feedbackCount: { $lte: 1 }, loginCount: { $lte: 2 } } as any }),
+      this.betaUserRepo.count({ where: { lastActiveAt: MoreThanOrEqual(threeDaysAgo) } }),
+      this.betaUserRepo.count({ where: { createdAt: MoreThanOrEqual(threeDaysAgo) } }),
+      this.betaUserRepo.count({ where: { feedbackCount: LessThanOrEqual(1), loginCount: LessThanOrEqual(2) } }),
       this.calculateAverageEngagement()
     ]);
 
@@ -533,9 +549,12 @@ export class ScheduledReportingService {
     return {
       totalUsers,
       activeUsers,
+      activeUsersPercentage: totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100 * 10) / 10 : 0,
       newUsers,
+      newUsersPercentage: totalUsers > 0 ? Math.round((newUsers / totalUsers) * 100 * 10) / 10 : 0,
       lowEngagementUsers,
-      totalActiveUsers: activeUsers,
+      lowEngagementPercentage: activeUsers > 0 ? Math.round((lowEngagementUsers / activeUsers) * 100 * 10) / 10 : 0,
+      averageEngagement,
       churnRate: Math.round(churnRate * 10) / 10,
       engagementScore: averageEngagement,
       retentionRate: Math.round((activeUsers / totalUsers) * 100 * 10) / 10,

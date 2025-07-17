@@ -785,9 +785,6 @@ export interface PointsPolicy {
   type: 'earning' | 'redemption' | 'expiration' | 'tier'
   isActive: boolean
   
-  // 인덱스 시그니처 추가 (Index signature for dynamic access)
-  [key: string]: any
-  
   // 구매/적립 관련 (Purchase/Earning)
   purchaseRate: number
   minimumEarnAmount: number
@@ -817,7 +814,7 @@ export interface PointsPolicy {
   enableBonusPoints: boolean
   bonusRates: Record<string, number>
   
-  rules: {
+  rules?: {
     pointsPerDollar?: number
     minimumOrderAmount?: number
     excludeDiscountedItems?: boolean
@@ -844,6 +841,9 @@ export interface PointsPolicy {
       end: string
     }
   }
+  
+  // 인덱스 시그니처 추가 (모든 다른 속성들이 정의된 후에)
+  [key: string]: unknown
   priority: number
   description?: string
   createdAt: string

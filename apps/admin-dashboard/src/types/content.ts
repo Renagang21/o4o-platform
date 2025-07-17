@@ -159,7 +159,7 @@ export interface CustomField {
   type: CustomFieldType
   description?: string
   required: boolean
-  defaultValue?: any
+  defaultValue?: string | number | boolean | string[] | number[]
   placeholder?: string
   validation?: ValidationRules
   conditionalLogic?: ConditionalLogic[]
@@ -222,7 +222,7 @@ export interface ValidationRules {
 export interface ConditionalLogic {
   field: string
   operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'empty' | 'not_empty'
-  value: any
+  value: string | number | boolean | string[]
   action: 'show' | 'hide' | 'enable' | 'disable'
 }
 
@@ -259,8 +259,8 @@ export interface Template {
   thumbnail?: string
   preview?: string
   content: TipTapJSONContent // TipTap JSONContent or custom structure
-  customFields?: string[] | Record<string, any> // Field group IDs or actual fields
-  settings?: Record<string, any>
+  customFields?: string[] | Record<string, unknown> // Field group IDs or actual fields
+  settings?: Record<string, unknown>
   isDefault?: boolean
   active?: boolean
   featured?: boolean

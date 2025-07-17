@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert';
@@ -916,7 +916,7 @@ export class AutoRecoveryService {
     return await this.systemMetricsRepo.find({
       where: {
         metricName: alert.metricName,
-        createdAt: { $gte: since } as any
+        createdAt: MoreThanOrEqual(since)
       },
       order: { createdAt: 'DESC' }
     });

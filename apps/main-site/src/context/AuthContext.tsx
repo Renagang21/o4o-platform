@@ -173,11 +173,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isSSO 
         },
       });
-    } catch (error: any) {
+    } catch (error) {
       dispatch({
         type: 'LOGIN_FAILURE',
         payload: {
-          message: error.message || '로그인에 실패했습니다.',
+          message: error instanceof Error ? error.message : '로그인에 실패했습니다.',
           code: 'LOGIN_ERROR',
         },
       });
@@ -195,11 +195,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         type: 'REGISTER_SUCCESS',
         payload: { user: response.user },
       });
-    } catch (error: any) {
+    } catch (error) {
       dispatch({
         type: 'REGISTER_FAILURE',
         payload: {
-          message: error.message || '회원가입에 실패했습니다.',
+          message: error instanceof Error ? error.message : '회원가입에 실패했습니다.',
           code: 'REGISTER_ERROR',
         },
       });

@@ -129,7 +129,7 @@ export interface CustomField {
   required: boolean
   description?: string
   options?: string[]
-  defaultValue?: any
+  defaultValue?: string | number | boolean | string[]
 }
 
 export interface DashboardStats {

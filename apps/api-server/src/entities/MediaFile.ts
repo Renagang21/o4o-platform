@@ -76,7 +76,7 @@ export class MediaFile {
   uploader!: User
 
   @Column({ type: 'json', nullable: true })
-  metadata!: Record<string, any> // EXIF, color profile, etc.
+  metadata!: Record<string, unknown> // EXIF, color profile, etc.
 
   @Column({ default: 0 })
   downloads!: number

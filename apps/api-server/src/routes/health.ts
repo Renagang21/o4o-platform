@@ -114,7 +114,25 @@ router.get('/system', async (req: Request, res: Response) => {
 });
 
 // Helper functions
-async function performHealthCheck(): Promise<any> {
+interface HealthCheckResponse {
+  status: string;
+  timestamp: string;
+  uptime: number;
+  responseTime: number;
+  version: string;
+  environment: string;
+  database: {
+    status: string;
+    error?: string;
+  };
+  memory: {
+    used: number;
+    total: number;
+    percentage: number;
+  };
+}
+
+async function performHealthCheck(): Promise<HealthCheckResponse> {
   const start = Date.now();
   
   // Check database connectivity
@@ -150,7 +168,14 @@ async function performHealthCheck(): Promise<any> {
   };
 }
 
-async function performDetailedHealthCheck(): Promise<any> {
+interface DetailedHealthCheckResponse {
+  status: string;
+  timestamp: string;
+  responseTime: number;
+  checks: HealthComponent[];
+}
+
+async function performDetailedHealthCheck(): Promise<DetailedHealthCheckResponse> {
   const start = Date.now();
   
   const checks = await Promise.all([
@@ -187,7 +212,16 @@ async function checkReadiness(): Promise<boolean> {
   }
 }
 
-async function checkDatabaseHealth(): Promise<any> {
+interface HealthComponent {
+  component: string;
+  status: string;
+  responseTime?: number;
+  details?: Record<string, unknown>;
+  error?: string;
+  timestamp: string;
+}
+
+async function checkDatabaseHealth(): Promise<HealthComponent> {
   const start = Date.now();
   
   try {
@@ -232,7 +266,7 @@ async function checkDatabaseHealth(): Promise<any> {
   }
 }
 
-async function checkSystemHealth(): Promise<any> {
+async function checkSystemHealth(): Promise<HealthComponent> {
   const memUsage = process.memoryUsage();
   const systemMem = {
     total: os.totalmem(),
@@ -280,7 +314,7 @@ async function checkSystemHealth(): Promise<any> {
   };
 }
 
-async function checkMemoryHealth(): Promise<any> {
+async function checkMemoryHealth(): Promise<HealthComponent> {
   const memUsage = process.memoryUsage();
   const systemMem = {
     total: os.totalmem(),
@@ -313,7 +347,7 @@ async function checkMemoryHealth(): Promise<any> {
   };
 }
 
-async function checkDiskHealth(): Promise<any> {
+async function checkDiskHealth(): Promise<HealthComponent> {
   try {
     const { exec } = require('child_process');
     const { promisify } = require('util');

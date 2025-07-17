@@ -6,7 +6,7 @@ export class Settings {
   key!: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  value: any;
+  value: GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | Record<string, unknown> | null;
 
   @Column({ type: 'varchar', length: 50 })
   type!: string; // 'general', 'reading', 'theme', 'email', etc.

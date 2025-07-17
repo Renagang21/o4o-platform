@@ -47,10 +47,10 @@ export class Template {
   content!: { blocks: TemplateBlock[] }
 
   @Column({ type: 'json', nullable: true })
-  settings!: Record<string, any>
+  settings!: Record<string, unknown>
 
   @Column({ type: 'json', nullable: true })
-  customFields!: Record<string, any>
+  customFields!: Record<string, unknown>
 
   @Column({ type: 'text', nullable: true })
   preview!: string // Base64 screenshot or preview image URL

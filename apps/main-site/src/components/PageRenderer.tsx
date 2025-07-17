@@ -2,11 +2,17 @@ import React from 'react';
 import TemplateRenderer from './TemplateRenderer';
 import Footer from './home/Footer';
 
+interface PageContent {
+  blocks?: Array<{ type: string; data: Record<string, unknown> }>;
+  type?: string;
+  [key: string]: unknown;
+}
+
 interface Page {
   id: string;
   title: string;
   slug: string;
-  content: any;
+  content: PageContent | string;
   template?: string;
   featuredImage?: string;
 }
@@ -17,7 +23,7 @@ interface PageRendererProps {
 
 const PageRenderer: React.FC<PageRendererProps> = ({ page }) => {
   // If page has template blocks, use TemplateRenderer
-  if (page.content?.blocks && Array.isArray(page.content.blocks)) {
+  if (typeof page.content === 'object' && page.content.blocks && Array.isArray(page.content.blocks)) {
     return (
       <div className="page-content">
         <TemplateRenderer blocks={page.content.blocks} />
