@@ -6,6 +6,7 @@ import { useOrderStore } from '../../stores/orderStore';
 import { useAuthStore } from '../../stores/authStore';
 import { CreateOrderRequest, PaymentMethod, Address } from '../../types/order';
 import { CartItem } from '../../types/order';
+import { Retailer } from '../../types/user';
 
 interface CheckoutForm {
   recipientName: string;
@@ -48,7 +49,7 @@ export default function Checkout() {
     // 사용자 정보로 폼 초기값 설정
     if (user) {
       setValue('recipientName', user.name);
-      setValue('phone', user.phone);
+      setValue('phone', user.phone || '');
     }
   }, [location.state, user, navigate, setValue]);
 
@@ -95,7 +96,7 @@ export default function Checkout() {
 
   const getUserGrade = () => {
     if (user?.userType === 'retailer') {
-      return (user as any).grade || 'gold';
+      return (user as Retailer).grade || 'gold';
     }
     return 'gold';
   };

@@ -8,7 +8,7 @@ import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../e
 import { BetaUser } from '../entities/BetaUser';
 import { BetaFeedback } from '../entities/BetaFeedback';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
-import { AnalyticsMetadata, MetricTags, ErrorContext } from '@o4o/types';
+import type { AnalyticsMetadata, MetricTags, ErrorContext } from '@o4o/types';
 
 export interface SessionData {
   betaUserId: string;

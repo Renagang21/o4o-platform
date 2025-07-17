@@ -5,6 +5,7 @@ import { useProductStore } from '../../stores/productStore';
 import { useOrderStore } from '../../stores/orderStore';
 import { useAuthStore } from '../../stores/authStore';
 import ProductReviews from '../../components/ProductReviews';
+import { Retailer } from '../../types/user';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +33,7 @@ export default function ProductDetail() {
 
   const getUserGrade = () => {
     if (user?.userType === 'retailer') {
-      return (user as any).grade || 'gold';
+      return (user as Retailer).grade || 'gold';
     }
     return 'gold';
   };

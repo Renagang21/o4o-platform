@@ -124,7 +124,7 @@ export const getPerformanceDashboard = async (req: Request, res: Response) => {
         lastUpdated: new Date().toISOString(),
         alerts: [
           ...optimizationReport.alerts,
-          ...scalingDashboard.recentEvents.filter(e => e.type === 'scale_down'),
+          ...scalingDashboard.recentEvents.filter((e) => e.type === 'scale_down'),
           ...databaseDashboard.alerts
         ].slice(0, 10),
         recommendations: [

@@ -237,3 +237,78 @@ export interface VacuumAnalyzeResult {
   duration: number;
   error?: string;
 }
+
+// Additional types needed by DatabaseOptimizationService
+export interface QueryAnalysis {
+  query: string;
+  executionTime: number;
+  rowsReturned: number;
+  cost: number;
+  plan?: PlanNode;
+}
+
+export interface IndexAnalysis {
+  tableName: string;
+  indexName: string;
+  size: string;
+  scans: number;
+  effectiveness: number;
+}
+
+export interface CacheHitRate {
+  rate: number;
+  hits: number;
+  misses: number;
+}
+
+export interface ConnectionPoolMetrics {
+  active: number;
+  idle: number;
+  total: number;
+  waitingClients: number;
+}
+
+export interface DatabaseHealthCheck {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  checks: Record<string, boolean>;
+  issues: string[];
+}
+
+export interface VacuumStatus {
+  tableName: string;
+  lastVacuum: Date | null;
+  lastAutoVacuum: Date | null;
+  deadTuples: number;
+  liveTuples: number;
+}
+
+export interface DeadTupleInfo {
+  tableName: string;
+  deadTuples: number;
+  liveTuples: number;
+  ratio: number;
+}
+
+export interface DatabaseDashboard {
+  metrics: DatabasePerformanceMetrics;
+  alerts: any[];
+  recommendations: any[];
+  health: DatabaseHealthCheck;
+}
+
+export interface DatabasePerformanceMetrics {
+  queryPerformance: {
+    avgExecutionTime: number;
+    slowQueries: number;
+    totalQueries: number;
+  };
+  connectionPool: ConnectionPoolMetrics;
+  cache: CacheHitRate;
+  storage: {
+    databaseSize: string;
+    tableCount: number;
+    indexCount: number;
+  };
+}
+
+// PerformanceReport is defined in performance.ts

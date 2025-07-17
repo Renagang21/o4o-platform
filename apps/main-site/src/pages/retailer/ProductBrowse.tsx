@@ -5,6 +5,7 @@ import { useProductStore } from '../../stores/productStore';
 import { useOrderStore } from '../../stores/orderStore';
 import { useAuthStore } from '../../stores/authStore';
 import { Product } from '../../types/product';
+import { Retailer } from '../../types/user';
 
 export default function ProductBrowse() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export default function ProductBrowse() {
 
   const getUserGrade = () => {
     if (user?.userType === 'retailer') {
-      return (user as any).grade || 'gold';
+      return (user as Retailer).grade || 'gold';
     }
     return 'gold';
   };
@@ -195,8 +196,8 @@ export default function ProductBrowse() {
                 value={`${sortBy}_${sortOrder}`}
                 onChange={(e) => {
                   const [newSortBy, newSortOrder] = e.target.value.split('_');
-                  setSortBy(newSortBy as any);
-                  setSortOrder(newSortOrder as any);
+                  setSortBy(newSortBy as 'name' | 'price' | 'sales' | 'rating');
+                  setSortOrder(newSortOrder as 'asc' | 'desc');
                 }}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >

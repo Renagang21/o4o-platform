@@ -347,7 +347,7 @@ export class GracefulDegradationService {
     if (feature) {
       feature.isDegraded = true;
       feature.degradationLevel = degradation.level;
-      feature.currentState = { ...feature.currentState, functionality: parameters.features.reduce((acc, feat) => ({ ...acc, [feat]: false }), feature.currentState.functionality || {}) };
+      feature.currentState = { ...feature.currentState, functionality: parameters.features.reduce((acc: Record<string, boolean>, feat: string) => ({ ...acc, [feat]: false }), feature.currentState.functionality || {}) };
       degradation.affectedFeatures.push(featureId);
       
       console.log(`⬇️ Reduced functionality for: ${featureId}`);
