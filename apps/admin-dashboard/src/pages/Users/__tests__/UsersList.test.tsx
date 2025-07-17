@@ -111,9 +111,9 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 describe('UsersList 컴포넌트', () => {
-  let mockGet: any;
-  let mockDelete: any;
-  let mockPut: any;
+  let mockGet: ReturnType<typeof vi.fn>;
+  let mockDelete: ReturnType<typeof vi.fn>;
+  let mockPut: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();

@@ -1,9 +1,26 @@
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { CacheService } from './cacheService';
 import { AnalyticsService } from './AnalyticsService';
 import Redis from 'ioredis';
 import { performance } from 'perf_hooks';
+import { TypeOrmDriver } from '../types/database';
+import {
+  QueryBuilderWithExecute,
+  QueryType,
+  PerformanceMetric as ImportedPerformanceMetric,
+  OptimizedResponse as ImportedOptimizedResponse,
+  CacheHeaders as ImportedCacheHeaders,
+  PerformanceReport as ImportedPerformanceReport,
+  SlowQueryInfo,
+  PerformanceAlert,
+  PerformanceAlertData,
+  CompressionLevel,
+  RedisInfo,
+  QueryPerformanceMetrics,
+  CacheMetrics,
+  SystemMetrics
+} from '@o4o/types';
 
 /**
  * 성능 최적화 서비스
@@ -60,18 +77,18 @@ export class PerformanceOptimizationService {
   /**
    * 데이터베이스 쿼리 최적화
    */
-  async optimizeQuery(
-    queryBuilder: any,
-    queryType: 'select' | 'update' | 'delete' | 'insert',
+  async optimizeQuery<T>(
+    queryBuilder: QueryBuilderWithExecute<T> | SelectQueryBuilder<T>,
+    queryType: QueryType,
     cacheKey?: string,
     cacheTTL: number = 300
-  ): Promise<any> {
+  ): Promise<T[]> {
     const startTime = performance.now();
     
     try {
       // 캐시 확인 (SELECT 쿼리만)
       if (queryType === 'select' && cacheKey) {
-        const cachedResult = await this.getCachedResult(cacheKey);
+        const cachedResult = await this.getCachedResult<T>(cacheKey);
         if (cachedResult) {
           await this.recordQueryPerformance('cache_hit', performance.now() - startTime);
           return cachedResult;
@@ -79,7 +96,15 @@ export class PerformanceOptimizationService {
       }
 
       // 쿼리 실행
-      const result = await queryBuilder.getMany ? queryBuilder.getMany() : queryBuilder.execute();
+      let result: T[];
+      if ('getMany' in queryBuilder && queryBuilder.getMany) {
+        result = await queryBuilder.getMany();
+      } else if ('execute' in queryBuilder) {
+        const execResult = await queryBuilder.execute();
+        result = execResult as T[];
+      } else {
+        throw new Error('Invalid query builder');
+      }
       const executionTime = performance.now() - startTime;
 
       // 느린 쿼리 감지
@@ -89,13 +114,13 @@ export class PerformanceOptimizationService {
 
       // 결과 캐시 (SELECT 쿼리만)
       if (queryType === 'select' && cacheKey && result) {
-        await this.cacheResult(cacheKey, result, cacheTTL);
+        await this.cacheResult(cacheKey, result as unknown[], cacheTTL);
       }
 
       // 성능 메트릭 기록
       await this.recordQueryPerformance(queryType, executionTime);
 
-      return result;
+      return result as T[];
     } catch (error) {
       await this.recordQueryError(queryType, error as Error);
       throw error;
@@ -105,10 +130,10 @@ export class PerformanceOptimizationService {
   /**
    * 캐시된 결과 조회
    */
-  private async getCachedResult(cacheKey: string): Promise<any | null> {
+  private async getCachedResult<T>(cacheKey: string): Promise<T[] | null> {
     try {
       const cached = await this.redis.get(`query:${cacheKey}`);
-      return cached ? JSON.parse(cached) : null;
+      return cached ? JSON.parse(cached) as T[] : null;
     } catch (error) {
       console.warn('Failed to get cached query result:', error);
       return null;
@@ -118,7 +143,7 @@ export class PerformanceOptimizationService {
   /**
    * 쿼리 결과 캐시
    */
-  private async cacheResult(cacheKey: string, result: any, ttl: number): Promise<void> {
+  private async cacheResult(cacheKey: string, result: unknown[], ttl: number): Promise<void> {
     try {
       await this.redis.setex(
         `query:${cacheKey}`,
@@ -133,11 +158,12 @@ export class PerformanceOptimizationService {
   /**
    * 느린 쿼리 처리
    */
-  private async handleSlowQuery(queryBuilder: any, executionTime: number): Promise<void> {
-    const queryInfo = {
-      sql: queryBuilder.getSql ? queryBuilder.getSql() : 'Unknown',
+  private async handleSlowQuery<T>(queryBuilder: QueryBuilderWithExecute<T> | SelectQueryBuilder<T>, executionTime: number): Promise<void> {
+    const queryInfo: SlowQueryInfo = {
+      query: queryBuilder.getSql ? queryBuilder.getSql() : 'Unknown',
       executionTime,
-      timestamp: new Date().toISOString()
+      timestamp: new Date(),
+      optimized: false
     };
 
     // 느린 쿼리 로그 저장
@@ -145,7 +171,12 @@ export class PerformanceOptimizationService {
     await this.redis.ltrim('slow_queries', 0, 99); // 최근 100개만 보관
 
     // 알림 생성
-    await this.createPerformanceAlert('slow_query', queryInfo);
+    await this.createPerformanceAlert('slow_query', {
+      metric: 'query_time',
+      currentValue: executionTime,
+      threshold: this.slowQueryThreshold,
+      details: queryInfo.query
+    });
 
     console.warn(`Slow query detected: ${executionTime}ms`, queryInfo);
   }
@@ -199,40 +230,41 @@ export class PerformanceOptimizationService {
   /**
    * API 응답 최적화
    */
-  async optimizeAPIResponse(
-    data: any,
-    compressionLevel: 'low' | 'medium' | 'high' = 'medium',
+  async optimizeAPIResponse<T>(
+    data: T,
+    compressionLevel: CompressionLevel = 'medium',
     includeMetadata: boolean = false
-  ): Promise<OptimizedResponse> {
+  ): Promise<ImportedOptimizedResponse<T>> {
     const startTime = performance.now();
 
     try {
       // 데이터 압축
       const compressedData = await this.compressData(data, compressionLevel);
+      const dataStr = JSON.stringify(data);
+      const compressedStr = JSON.stringify(compressedData);
 
       // 메타데이터 추가
       const metadata = includeMetadata ? {
         compressed: true,
-        compressionRatio: data.length / compressedData.length,
+        compressionRatio: dataStr.length / compressedStr.length,
         processingTime: performance.now() - startTime,
         timestamp: new Date().toISOString()
       } : undefined;
 
       return {
-        data: compressedData,
-        metadata,
-        cacheHeaders: this.generateCacheHeaders(data)
+        data: compressedData as T,
+        compressed: true,
+        cacheHeaders: this.generateCacheHeaders(data),
+        size: compressedStr.length,
+        compressionRatio: metadata?.compressionRatio
       };
     } catch (error) {
       console.error('API response optimization failed:', error);
       return {
         data,
-        metadata: includeMetadata ? {
-          compressed: false,
-          error: (error as Error).message,
-          processingTime: performance.now() - startTime,
-          timestamp: new Date().toISOString()
-        } : undefined
+        compressed: false,
+        cacheHeaders: this.generateCacheHeaders(data),
+        size: JSON.stringify(data).length
       };
     }
   }
@@ -240,7 +272,7 @@ export class PerformanceOptimizationService {
   /**
    * 데이터 압축
    */
-  private async compressData(data: any, level: 'low' | 'medium' | 'high'): Promise<any> {
+  private async compressData<T>(data: T, level: CompressionLevel): Promise<T> {
     // 간단한 압축 로직 (실제로는 gzip 등 사용)
     if (typeof data === 'object') {
       return this.removeUnnecessaryFields(data, level);
@@ -251,13 +283,13 @@ export class PerformanceOptimizationService {
   /**
    * 불필요한 필드 제거
    */
-  private removeUnnecessaryFields(data: any, level: 'low' | 'medium' | 'high'): any {
+  private removeUnnecessaryFields<T>(data: T, level: CompressionLevel): T {
     if (Array.isArray(data)) {
-      return data.map(item => this.removeUnnecessaryFields(item, level));
+      return data.map(item => this.removeUnnecessaryFields(item, level)) as T;
     }
 
     if (typeof data === 'object' && data !== null) {
-      const cleaned = { ...data };
+      const cleaned: any = { ...data };
 
       // 레벨별 필드 제거
       if (level === 'low') {
@@ -277,7 +309,7 @@ export class PerformanceOptimizationService {
         delete cleaned.internalNotes;
       }
 
-      return cleaned;
+      return cleaned as T;
     }
 
     return data;
@@ -286,19 +318,19 @@ export class PerformanceOptimizationService {
   /**
    * 캐시 헤더 생성
    */
-  private generateCacheHeaders(data: any): CacheHeaders {
+  private generateCacheHeaders<T>(data: T): ImportedCacheHeaders {
     return {
-      'Cache-Control': 'public, max-age=300',
-      'ETag': this.generateETag(data),
-      'Last-Modified': new Date().toUTCString(),
-      'Vary': 'Accept-Encoding'
+      cacheControl: 'public, max-age=300',
+      etag: this.generateETag(data),
+      lastModified: new Date().toUTCString(),
+      expires: new Date(Date.now() + 300000).toUTCString()
     };
   }
 
   /**
    * ETag 생성
    */
-  private generateETag(data: any): string {
+  private generateETag<T>(data: T): string {
     const hash = require('crypto').createHash('md5');
     hash.update(JSON.stringify(data));
     return hash.digest('hex');
@@ -313,7 +345,7 @@ export class PerformanceOptimizationService {
       memoryUsage: process.memoryUsage(),
       cpuUsage: process.cpuUsage(),
       activeConnections: AppDataSource.isInitialized ? 
-        (AppDataSource.driver as any).pool?.totalCount || 0 : 0,
+        ((AppDataSource.driver as TypeOrmDriver).pool?.totalCount) || 0 : 0,
       cacheHitRate: await this.calculateCacheHitRate(),
       queryMetrics: Object.fromEntries(this.performanceMetrics)
     };
@@ -356,7 +388,7 @@ export class PerformanceOptimizationService {
   /**
    * 성능 임계값 체크
    */
-  private async checkPerformanceThresholds(metrics: any): Promise<void> {
+  private async checkPerformanceThresholds(metrics: PerformanceMetrics): Promise<void> {
     const thresholds = {
       memoryUsage: 80, // 80% 메모리 사용률
       cacheHitRate: 70, // 70% 캐시 히트율
@@ -365,7 +397,7 @@ export class PerformanceOptimizationService {
     };
 
     // 메모리 사용률 체크
-    const memoryUsagePercent = (metrics.memoryUsage.used / metrics.memoryUsage.total) * 100;
+    const memoryUsagePercent = (metrics.memoryUsage.heapUsed / metrics.memoryUsage.heapTotal) * 100;
     if (memoryUsagePercent > thresholds.memoryUsage) {
       await this.createPerformanceAlert('high_memory_usage', {
         current: memoryUsagePercent,
@@ -393,14 +425,15 @@ export class PerformanceOptimizationService {
   /**
    * 성능 알림 생성
    */
-  private async createPerformanceAlert(type: string, data: any): Promise<void> {
-    const alert = {
-      type,
+  private async createPerformanceAlert(type: PerformanceAlertType, data: PerformanceAlertData): Promise<void> {
+    const alert: PerformanceAlert = {
+      id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      type: type as PerformanceAlert['type'],
       severity: 'warning',
       message: `Performance issue detected: ${type}`,
       data,
-      timestamp: new Date().toISOString(),
-      source: 'PerformanceOptimizationService'
+      timestamp: new Date(),
+      resolved: false
     };
 
     await this.redis.lpush('performance_alerts', JSON.stringify(alert));
@@ -456,7 +489,7 @@ export class PerformanceOptimizationService {
   /**
    * 메모리 정보 파싱
    */
-  private parseMemoryInfo(info: string): { usedMemory: number; maxMemory: number } {
+  private parseMemoryInfo(info: string): MemoryInfo {
     const lines = info.split('\r\n');
     let usedMemory = 0;
     let maxMemory = 0;
@@ -480,7 +513,7 @@ export class PerformanceOptimizationService {
 
     try {
       // 연결 풀 상태 확인
-      const pool = (AppDataSource.driver as any).pool;
+      const pool = (AppDataSource.driver as TypeOrmDriver).pool;
       if (pool) {
         const poolStats = {
           totalCount: pool.totalCount,
@@ -531,22 +564,30 @@ export class PerformanceOptimizationService {
   /**
    * 캐시 통계 조회
    */
-  private async getCacheStats(): Promise<any> {
+  private async getCacheStats(): Promise<CacheMetrics> {
     try {
       const info = await this.redis.info('all');
-      const stats = this.parseRedisInfo(info);
-      return stats;
+      return this.convertToCacheMetrics(info);
     } catch (error) {
       console.warn('Failed to get cache stats:', error);
-      return {};
+      return {
+        hits: 0,
+        misses: 0,
+        sets: 0,
+        deletes: 0,
+        evictions: 0,
+        hitRate: 0,
+        memoryUsage: 0,
+        keyCount: 0
+      };
     }
   }
 
   /**
    * Redis 정보 파싱
    */
-  private parseRedisInfo(info: string): any {
-    const stats: any = {};
+  private parseRedisInfo(info: string): Partial<RedisInfo> {
+    const stats: Record<string, string | number> = {};
     const lines = info.split('\r\n');
 
     for (const line of lines) {
@@ -556,28 +597,31 @@ export class PerformanceOptimizationService {
       }
     }
 
-    return stats;
+    return stats as Partial<RedisInfo>;
   }
 
   /**
    * 성능 리포트 생성
    */
-  async generatePerformanceReport(): Promise<PerformanceReport> {
+  async generatePerformanceReport(): Promise<ImportedPerformanceReport> {
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000); // 24시간 전
 
-    const report: PerformanceReport = {
-      generatedAt: endTime.toISOString(),
-      period: {
-        start: startTime.toISOString(),
-        end: endTime.toISOString()
-      },
-      queryMetrics: Object.fromEntries(this.performanceMetrics),
+    const memoryUsage = process.memoryUsage();
+    const cpuUsage = process.cpuUsage();
+    
+    const report: ImportedPerformanceReport = {
+      timestamp: endTime,
+      queryMetrics: await this.getQueryMetrics(),
       cacheMetrics: await this.getCacheStats(),
       systemMetrics: {
-        memoryUsage: process.memoryUsage(),
-        cpuUsage: process.cpuUsage(),
-        uptime: process.uptime()
+        cpuUsage: (cpuUsage.user + cpuUsage.system) / 1000000,
+        memoryUsage: memoryUsage.heapUsed / memoryUsage.heapTotal * 100,
+        activeConnections: AppDataSource.isInitialized ? 
+          ((AppDataSource.driver as TypeOrmDriver).pool?.totalCount) || 0 : 0,
+        requestsPerSecond: 0,
+        averageResponseTime: this.calculateAverageResponseTime(),
+        errorRate: this.calculateErrorRate()
       },
       slowQueries: await this.getSlowQueries(),
       alerts: await this.getPerformanceAlerts(),
@@ -590,10 +634,10 @@ export class PerformanceOptimizationService {
   /**
    * 느린 쿼리 조회
    */
-  private async getSlowQueries(): Promise<any[]> {
+  private async getSlowQueries(): Promise<SlowQueryInfo[]> {
     try {
       const queries = await this.redis.lrange('slow_queries', 0, -1);
-      return queries.map(q => JSON.parse(q));
+      return queries.map(q => JSON.parse(q) as SlowQueryInfo);
     } catch (error) {
       console.warn('Failed to get slow queries:', error);
       return [];
@@ -603,14 +647,95 @@ export class PerformanceOptimizationService {
   /**
    * 성능 알림 조회
    */
-  private async getPerformanceAlerts(): Promise<any[]> {
+  private async getPerformanceAlerts(): Promise<PerformanceAlert[]> {
     try {
       const alerts = await this.redis.lrange('performance_alerts', 0, -1);
-      return alerts.map(a => JSON.parse(a));
+      return alerts.map(a => JSON.parse(a) as PerformanceAlert);
     } catch (error) {
       console.warn('Failed to get performance alerts:', error);
       return [];
     }
+  }
+
+  /**
+   * Query metrics 조회
+   */
+  private async getQueryMetrics(): Promise<QueryPerformanceMetrics> {
+    let totalQueries = 0;
+    let totalTime = 0;
+    let slowQueries = 0;
+
+    for (const [_, metric] of this.performanceMetrics) {
+      totalQueries += metric.count;
+      totalTime += metric.totalTime;
+      if (metric.avgTime > this.slowQueryThreshold) {
+        slowQueries++;
+      }
+    }
+
+    const cacheHitRate = await this.calculateCacheHitRate();
+    const avgQueryTime = totalQueries > 0 ? totalTime / totalQueries : 0;
+
+    return {
+      totalQueries,
+      averageQueryTime: avgQueryTime,
+      slowQueries,
+      cacheHitRate,
+      errorRate: this.calculateErrorRate()
+    };
+  }
+
+  /**
+   * 평균 응답 시간 계산
+   */
+  private calculateAverageResponseTime(): number {
+    let totalTime = 0;
+    let totalCount = 0;
+
+    for (const [_, metric] of this.performanceMetrics) {
+      totalTime += metric.totalTime;
+      totalCount += metric.count;
+    }
+
+    return totalCount > 0 ? totalTime / totalCount : 0;
+  }
+
+  /**
+   * 에러율 계산
+   */
+  private calculateErrorRate(): number {
+    // TODO: Implement actual error rate calculation based on error logs
+    return 0;
+  }
+
+  /**
+   * Cache metrics 변환
+   */
+  private convertToCacheMetrics(redisInfoStr: string): CacheMetrics {
+    const redisInfo = this.parseRedisInfo(redisInfoStr);
+    const stats = redisInfo.stats || {};
+    const memory = redisInfo.memory || {};
+    const keyspace = redisInfo.keyspace || {};
+
+    let totalKeys = 0;
+    for (const db in keyspace) {
+      totalKeys += keyspace[db].keys || 0;
+    }
+
+    const hits = stats.keyspace_hits || 0;
+    const misses = stats.keyspace_misses || 0;
+    const total = hits + misses;
+
+    return {
+      hits,
+      misses,
+      sets: 0, // Not available in Redis INFO
+      deletes: 0, // Not available in Redis INFO
+      evictions: stats.evicted_keys || 0,
+      hitRate: total > 0 ? (hits / total) * 100 : 0,
+      memoryUsage: memory.used_memory || 0,
+      keyCount: totalKeys
+    };
   }
 
   /**
@@ -667,7 +792,7 @@ export class PerformanceOptimizationService {
   }
 }
 
-// 타입 정의
+// Custom type definitions (not in @o4o/types)
 interface PerformanceMetric {
   type: string;
   count: number;
@@ -678,44 +803,28 @@ interface PerformanceMetric {
   lastUpdated: Date;
 }
 
-interface OptimizedResponse {
-  data: any;
-  metadata?: {
-    compressed: boolean;
-    compressionRatio?: number;
-    processingTime: number;
-    timestamp: string;
-    error?: string;
-  };
-  cacheHeaders?: CacheHeaders;
-}
-
-interface CacheHeaders {
-  'Cache-Control': string;
-  'ETag': string;
-  'Last-Modified': string;
-  'Vary': string;
-}
-
-interface PerformanceReport {
-  generatedAt: string;
-  period: {
-    start: string;
-    end: string;
-  };
-  queryMetrics: any;
-  cacheMetrics: any;
-  systemMetrics: any;
-  slowQueries: any[];
-  alerts: any[];
-  recommendations: string[];
-}
-
 interface OptimizationSettings {
   slowQueryThreshold?: number;
   autoOptimizationEnabled?: boolean;
   cacheStrategy?: 'aggressive' | 'moderate' | 'conservative';
-  compressionLevel?: 'low' | 'medium' | 'high';
+  compressionLevel?: CompressionLevel;
+}
+
+// Additional type definitions
+type PerformanceAlertType = 'slow_query' | 'high_memory_usage' | 'low_cache_hit_rate' | 'high_db_connections' | 'auto_optimization_failed';
+
+interface MemoryInfo {
+  usedMemory: number;
+  maxMemory: number;
+}
+
+interface PerformanceMetrics {
+  timestamp: string;
+  memoryUsage: NodeJS.MemoryUsage;
+  cpuUsage: NodeJS.CpuUsage;
+  activeConnections: number;
+  cacheHitRate: number;
+  queryMetrics: Record<string, PerformanceMetric>;
 }
 
 // 싱글톤 인스턴스

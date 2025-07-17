@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Eye, Settings, Layout, Home, DollarSign, Info, Mail, ArrowLeft, Plus, Edit3, Globe, Smartphone, Monitor } from 'lucide-react';
+import DOMPurify from 'dompurify';
 
 const PageManager = () => {
   const [currentPage, setCurrentPage] = useState('');
@@ -420,7 +421,7 @@ const PageManager = () => {
                     {section.type === 'content' && (
                       <div className="p-8">
                         <h2 className="text-3xl font-bold mb-6">{section.title}</h2>
-                        <div dangerouslySetInnerHTML={{ __html: section.content || '<p>여기에 내용을 입력하세요.</p>' }} />
+                        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(section.content || '<p>여기에 내용을 입력하세요.</p>') }} />
                       </div>
                     )}
 

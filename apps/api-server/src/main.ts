@@ -204,7 +204,7 @@ const startServer = async () => {
     await AppDataSource.initialize();
     console.log('✅ Database connection established');
   } catch (dbError) {
-    console.log('⚠️  Database connection failed:', dbError.message);
+    console.log('⚠️  Database connection failed:', (dbError as Error).message);
     console.log('📌 Running in development mode without database');
   }
   

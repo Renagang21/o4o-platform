@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const TheDANGStyleHome: React.FC = () => {
   // 환경별 관리자 대시보드 URL 설정
   const adminDashboardUrl = process.env.NODE_ENV === 'production' 
-    ? 'https://admin.neture.co.kr' 
+    ? (import.meta.env.VITE_ADMIN_DASHBOARD_URL || 'https://admin.neture.co.kr')
     : 'http://localhost:3012';
 
   const services = [

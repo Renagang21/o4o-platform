@@ -19,6 +19,7 @@ import {
   Tablet
 } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import DOMPurify from 'dompurify';
 
 interface TemplateField {
   name: string;
@@ -878,7 +879,7 @@ const TemplatesManager: React.FC = () => {
                   <div 
                     className="p-4"
                     dangerouslySetInnerHTML={{
-                      __html: `
+                      __html: DOMPurify.sanitize(`
                         <style>${editingTemplate.cssContent}</style>
                         ${editingTemplate.htmlContent
                           .replace(/\[field name="title"\]/g, '샘플 제목')
@@ -892,7 +893,7 @@ const TemplatesManager: React.FC = () => {
                           .replace(/\[field name="excerpt"\]/g, '이것은 짧은 요약 텍스트입니다.')
                           .replace(/\[field name="permalink"\]/g, '#')
                           .replace(/\[related limit="\d+"\]/g, '<div class="related-items">관련 항목들이 여기에 표시됩니다.</div>')
-                        }`
+                        }`)
                     }}
                   />
                 </div>

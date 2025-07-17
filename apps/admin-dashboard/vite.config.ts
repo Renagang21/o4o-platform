@@ -22,13 +22,21 @@ export default defineConfig({
       '@/utils': path.resolve(__dirname, './src/utils'),
       '@/types': path.resolve(__dirname, './src/types'),
       '@/api': path.resolve(__dirname, './src/api'),
-      '@/styles': path.resolve(__dirname, './src/styles')
+      '@/styles': path.resolve(__dirname, './src/styles'),
+      '@o4o/types': path.resolve(__dirname, '../../packages/types/src'),
+      '@o4o/utils': path.resolve(__dirname, '../../packages/utils/src'),
+      '@o4o/ui': path.resolve(__dirname, '../../packages/ui/src'),
+      '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/src'),
+      '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/src')
     }
   },
   server: {
     port: 3001,
     host: '0.0.0.0',
     strictPort: true
+  },
+  optimizeDeps: {
+    include: ['@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']
   },
   build: {
     outDir: 'dist',

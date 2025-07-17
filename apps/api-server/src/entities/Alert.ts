@@ -7,6 +7,42 @@ import {
   Index
 } from 'typeorm';
 
+// Type definitions for Alert context and metadata
+export interface AlertContext {
+  userId?: string;
+  sessionId?: string;
+  requestId?: string;
+  userAgent?: string;
+  ipAddress?: string;
+  timestamp?: string;
+  environment?: string;
+  version?: string;
+  [key: string]: unknown;
+}
+
+export interface UsageDetails {
+  userCount?: number;
+  sessionCount?: number;
+  requestCount?: number;
+  [key: string]: unknown;
+}
+
+export interface SystemDetails {
+  memoryUsage?: number;
+  cpuUsage?: number;
+  diskUsage?: number;
+  processCount?: number;
+  [key: string]: unknown;
+}
+
+export interface BusinessDetails {
+  revenue?: number;
+  orderCount?: number;
+  customerCount?: number;
+  conversionRate?: number;
+  [key: string]: unknown;
+}
+
 export enum AlertType {
   PERFORMANCE = 'performance',
   ERROR = 'error',
@@ -93,17 +129,7 @@ export class Alert {
 
   // Context and metadata
   @Column({ type: 'json', nullable: true })
-  context?: {
-    userId?: string;
-    sessionId?: string;
-    requestId?: string;
-    userAgent?: string;
-    ipAddress?: string;
-    timestamp?: string;
-    environment?: string;
-    version?: string;
-    [key: string]: any;
-  };
+  context?: AlertContext;
 
   @Column({ type: 'json', nullable: true })
   metadata?: {
@@ -130,7 +156,7 @@ export class Alert {
     userAgent?: string;
     
     // Custom properties
-    [key: string]: any;
+    [key: string]: unknown;
   };
 
   // Alert management
@@ -215,7 +241,7 @@ export class Alert {
     unit: string,
     source?: string,
     endpoint?: string,
-    context?: any
+    context?: AlertContext
   ): Partial<Alert> {
     return {
       alertType: AlertType.PERFORMANCE,
@@ -248,7 +274,7 @@ export class Alert {
       stackTrace?: string;
       errorCode?: string;
     },
-    context?: any
+    context?: AlertContext
   ): Partial<Alert> {
     return {
       alertType: AlertType.ERROR,
@@ -274,8 +300,8 @@ export class Alert {
     thresholdValue: number,
     operator: string,
     unit: string,
-    usageDetails?: any,
-    context?: any
+    usageDetails?: UsageDetails,
+    context?: AlertContext
   ): Partial<Alert> {
     return {
       alertType: AlertType.USAGE,
@@ -305,7 +331,7 @@ export class Alert {
       sourceIP?: string;
       userAgent?: string;
     },
-    context?: any
+    context?: AlertContext
   ): Partial<Alert> {
     return {
       alertType: AlertType.SECURITY,
@@ -327,8 +353,8 @@ export class Alert {
     severity: AlertSeverity,
     source?: string,
     component?: string,
-    systemDetails?: any,
-    context?: any
+    systemDetails?: SystemDetails,
+    context?: AlertContext
   ): Partial<Alert> {
     return {
       alertType: AlertType.SYSTEM,
@@ -352,8 +378,8 @@ export class Alert {
     message: string,
     severity: AlertSeverity,
     source?: string,
-    businessDetails?: any,
-    context?: any
+    businessDetails?: BusinessDetails,
+    context?: AlertContext
   ): Partial<Alert> {
     return {
       alertType: AlertType.BUSINESS,

@@ -1,9 +1,21 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { Payment, PaymentType, PaymentProvider, PaymentGatewayStatus } from '../entities/Payment';
-import { Order, PaymentStatus, OrderStatus } from '../entities/Order';
+import { Order, PaymentStatus, OrderStatus, PaymentMethod } from '../entities/Order';
 import { Product } from '../entities/Product';
 import { AuthRequest } from '../types/auth';
+import { 
+  GatewayResponse, 
+  RefundGatewayResponse, 
+  PaymentWebhookData, 
+  SanitizedPayment,
+  CreatePaymentRequest,
+  ProcessPaymentCompletionRequest,
+  ProcessRefundRequest,
+  PaymentHistoryQuery,
+  PaymentMethodInfo,
+  PaymentDetailsData
+} from '../types/payment';
 
 export class PaymentController {
   private paymentRepository = AppDataSource.getRepository(Payment);
@@ -81,7 +93,7 @@ export class PaymentController {
       const savedPayment = await this.paymentRepository.save(payment);
 
       // 결제 게이트웨이별 처리
-      let gatewayResponse;
+      let gatewayResponse: GatewayResponse;
       switch (provider) {
         case PaymentProvider.IAMPORT:
           gatewayResponse = await this.processIamportPayment(savedPayment, order);
@@ -111,7 +123,7 @@ export class PaymentController {
       // 게이트웨이 응답 저장
       await this.paymentRepository.update(savedPayment.id, {
         gatewayPaymentId: gatewayResponse.paymentId,
-        gatewayResponse: gatewayResponse as any
+        gatewayResponse: gatewayResponse
       });
 
       res.status(201).json({
@@ -172,7 +184,7 @@ export class PaymentController {
             paymentStatus: PaymentStatus.PAID,
             status: OrderStatus.CONFIRMED,
             paymentId: payment.id,
-            paymentMethod: payment.method as any
+            paymentMethod: payment.method as PaymentMethod
           });
 
           // 결제 세부 정보 저장
@@ -311,7 +323,7 @@ export class PaymentController {
           await queryRunner.manager.update(Payment, savedRefund.id, {
             status: PaymentGatewayStatus.COMPLETED,
             gatewayTransactionId: gatewayResponse.refundTransactionId,
-            gatewayResponse: gatewayResponse as any,
+            gatewayResponse: gatewayResponse,
             refundProcessedAt: new Date()
           });
 
@@ -409,7 +421,7 @@ export class PaymentController {
       const [payments, totalCount] = await queryBuilder.getManyAndCount();
 
       // 민감한 정보 제거
-      const sanitizedPayments = payments.map(payment => ({
+      const sanitizedPayments: SanitizedPayment[] = payments.map(payment => ({
         ...payment,
         gatewayResponse: undefined,
         webhookData: undefined,
@@ -486,7 +498,7 @@ export class PaymentController {
   };
 
   // 결제 게이트웨이별 처리 메서드들
-  private async processIamportPayment(payment: Payment, order: Order) {
+  private async processIamportPayment(payment: Payment, order: Order): Promise<GatewayResponse> {
     // 아임포트 결제 요청 로직
     try {
       // 실제 구현에서는 아임포트 SDK 사용
@@ -500,7 +512,7 @@ export class PaymentController {
     }
   }
 
-  private async processTossPayment(payment: Payment, order: Order) {
+  private async processTossPayment(payment: Payment, order: Order): Promise<GatewayResponse> {
     // 토스페이먼츠 결제 요청 로직
     try {
       return {
@@ -513,7 +525,7 @@ export class PaymentController {
     }
   }
 
-  private async processKakaoPayment(payment: Payment, order: Order) {
+  private async processKakaoPayment(payment: Payment, order: Order): Promise<GatewayResponse> {
     // 카카오페이 결제 요청 로직
     try {
       return {
@@ -526,7 +538,7 @@ export class PaymentController {
     }
   }
 
-  private async processGatewayRefund(originalPayment: Payment, amount: number, reason: string) {
+  private async processGatewayRefund(originalPayment: Payment, amount: number, reason: string): Promise<RefundGatewayResponse> {
     // 게이트웨이별 환불 처리
     try {
       switch (originalPayment.provider) {
@@ -551,7 +563,7 @@ export class PaymentController {
     }
   }
 
-  private sanitizePaymentDetails(details: any) {
+  private sanitizePaymentDetails(details: PaymentDetailsData): PaymentDetailsData {
     // 민감한 정보 마스킹
     if (details.cardNumber) {
       details.cardNumber = details.cardNumber.replace(/(\d{4})\d{8}(\d{4})/, '$1********$2');

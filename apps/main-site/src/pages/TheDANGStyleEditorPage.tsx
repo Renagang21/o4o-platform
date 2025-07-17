@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TheDANGHomeEditor from '@shared/components/editor/TheDANGHomeEditor';
+import DOMPurify from 'dompurify';
 
 const TheDANGStyleEditorPage: React.FC = () => {
   const [savedContent, setSavedContent] = useState<string>('');
@@ -157,7 +158,7 @@ const TheDANGStyleEditorPage: React.FC = () => {
             </h3>
             <div 
               className="thedang-theme border border-gray-200 rounded"
-              dangerouslySetInnerHTML={{ __html: savedContent }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(savedContent) }}
             />
           </div>
         </div>

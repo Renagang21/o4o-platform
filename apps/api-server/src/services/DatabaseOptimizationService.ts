@@ -3,6 +3,24 @@ import { Repository, SelectQueryBuilder, EntityMetadata } from 'typeorm';
 import { performance } from 'perf_hooks';
 import Redis from 'ioredis';
 import { AnalyticsService } from './AnalyticsService';
+import {
+  SlowQuery as ImportedSlowQuery,
+  IndexInfo,
+  DuplicateIndex as ImportedDuplicateIndex,
+  TableStats as ImportedTableStats,
+  TableSize as ImportedTableSize,
+  ConnectionInfo,
+  LockInfo,
+  QueryPlan,
+  PlanNode,
+  QueryResult,
+  DatabasePerformanceThresholds as ImportedPerformanceThresholds,
+  ConnectionPoolStats as ImportedConnectionPoolStats,
+  IndexRecommendation as ImportedIndexRecommendation,
+  QueryCacheEntry as ImportedQueryCacheEntry,
+  DatabaseMetrics,
+  QueryPattern as ImportedQueryPattern
+} from '@o4o/types';
 
 /**
  * 데이터베이스 최적화 서비스
@@ -138,7 +156,7 @@ export class DatabaseOptimizationService {
         LIMIT 20
       `, [this.performanceThresholds.slowQueryThreshold]);
 
-      return queries.map((q: any) => ({
+      return queries.map((q: Record<string, any>) => ({
         query: q.query,
         calls: parseInt(q.calls),
         totalTime: parseFloat(q.total_time),
@@ -187,7 +205,12 @@ export class DatabaseOptimizationService {
 
       // 심각한 성능 문제인 경우 알림
       if (query.meanTime > this.performanceThresholds.verySlowQueryThreshold) {
-        await this.createPerformanceAlert('very_slow_query', query);
+        await this.createPerformanceAlert('very_slow_query', {
+          query: query.query,
+          meanTime: query.meanTime,
+          calls: query.calls,
+          rows: query.rows
+        });
       }
 
     } catch (error) {
@@ -200,13 +223,14 @@ export class DatabaseOptimizationService {
    */
   private async getQueryExecutionPlan(query: string): Promise<ExecutionPlan> {
     try {
-      const plan = await AppDataSource.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${query}`);
+      const plan = await AppDataSource.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${query}`) as Array<{ 'QUERY PLAN': QueryPlan[] }>;
+      const queryPlan = plan[0]['QUERY PLAN'][0] as QueryPlan;
       return {
-        plan: plan[0]['QUERY PLAN'][0],
-        totalCost: plan[0]['QUERY PLAN'][0]['Total Cost'],
-        actualTime: plan[0]['QUERY PLAN'][0]['Actual Total Time'],
-        planningTime: plan[0]['QUERY PLAN'][0]['Planning Time'],
-        executionTime: plan[0]['QUERY PLAN'][0]['Execution Time']
+        plan: queryPlan.Plan,
+        totalCost: queryPlan.Plan['Total Cost'],
+        actualTime: queryPlan.Plan['Actual Total Time'] || 0,
+        planningTime: queryPlan['Planning Time'] || 0,
+        executionTime: queryPlan['Execution Time'] || 0
       };
     } catch (error) {
       console.warn('Failed to get execution plan:', error);
@@ -445,7 +469,7 @@ export class DatabaseOptimizationService {
         ORDER BY pg_relation_size(indexrelid) DESC
       `);
 
-      return indexes.map((idx: any) => ({
+      return indexes.map((idx: Record<string, any>) => ({
         schema: idx.schemaname,
         table: idx.tablename,
         index: idx.indexname,
@@ -477,7 +501,7 @@ export class DatabaseOptimizationService {
         HAVING count(*) > 1
       `);
 
-      return duplicates.map((dup: any) => ({
+      return duplicates.map((dup: Record<string, any>) => ({
         table: dup.tablename,
         indexes: dup.indexes,
         sizes: dup.sizes
@@ -509,7 +533,7 @@ export class DatabaseOptimizationService {
         ORDER BY idx_scan DESC
       `);
 
-      return stats.map((stat: any) => ({
+      return stats.map((stat: Record<string, any>) => ({
         schema: stat.schemaname,
         table: stat.tablename,
         index: stat.indexname,
@@ -589,7 +613,15 @@ export class DatabaseOptimizationService {
     if (!AppDataSource.isInitialized) return;
 
     try {
-      const pool = (AppDataSource.driver as any).pool;
+      const pool = (AppDataSource.driver as { pool?: {
+        totalCount: number;
+        idleCount: number;
+        waitingCount?: number;
+        max?: number;
+        acquiredCount?: number;
+        releasedCount?: number;
+        release(): Promise<void>;
+      } }).pool;
       
       if (pool) {
         this.connectionPoolStats = {
@@ -693,7 +725,7 @@ export class DatabaseOptimizationService {
         LIMIT 20
       `);
 
-      return sizes.map((size: any) => ({
+      return sizes.map((size: Record<string, any>) => ({
         schema: size.schemaname,
         table: size.tablename,
         totalSize: size.size,
@@ -744,7 +776,7 @@ export class DatabaseOptimizationService {
         ORDER BY query_start
       `);
 
-      return connections.map((conn: any) => ({
+      return connections.map((conn: Record<string, any>) => ({
         pid: conn.pid,
         username: conn.usename,
         applicationName: conn.application_name,
@@ -783,7 +815,7 @@ export class DatabaseOptimizationService {
       `);
 
       return {
-        lockModes: locks.map((lock: any) => ({
+        lockModes: locks.map((lock: Record<string, any>) => ({
           mode: lock.mode,
           count: parseInt(lock.count)
         })),
@@ -884,7 +916,15 @@ export class DatabaseOptimizationService {
    */
   private async optimizeConnectionPool(): Promise<void> {
     try {
-      const pool = (AppDataSource.driver as any).pool;
+      const pool = (AppDataSource.driver as { pool?: {
+        totalCount: number;
+        idleCount: number;
+        waitingCount?: number;
+        max?: number;
+        acquiredCount?: number;
+        releasedCount?: number;
+        release(): Promise<void>;
+      } }).pool;
       
       if (pool) {
         // 유휴 연결이 너무 많으면 일부 해제
@@ -935,7 +975,7 @@ export class DatabaseOptimizationService {
   /**
    * 성능 알림 생성
    */
-  private async createPerformanceAlert(type: string, data: any): Promise<void> {
+  private async createPerformanceAlert(type: string, data: Record<string, unknown>): Promise<void> {
     const alert = {
       type,
       severity: 'warning',
@@ -971,43 +1011,102 @@ export class DatabaseOptimizationService {
   /**
    * 쿼리 성능 통계 조회
    */
-  private async getQueryPerformanceStats(): Promise<any> {
+  private async getQueryPerformanceStats(): Promise<DatabaseMetrics['queryPerformance']> {
     try {
       const cached = await this.redis.hget('query_performance_stats', 'current');
-      return cached ? JSON.parse(cached) : {};
+      return cached ? JSON.parse(cached) : {
+        totalQueries: 0,
+        slowQueries: 0,
+        averageQueryTime: 0,
+        cacheHitRate: 0
+      };
     } catch (error) {
-      return {};
+      return {
+        totalQueries: 0,
+        slowQueries: 0,
+        averageQueryTime: 0,
+        cacheHitRate: 0
+      };
     }
   }
 
   /**
    * 인덱스 분석 결과 조회
    */
-  private async getIndexAnalysisResults(): Promise<any> {
+  private async getIndexAnalysisResults(): Promise<{
+    unusedIndexes: UnusedIndex[];
+    duplicateIndexes: DuplicateIndex[];
+    indexStats: IndexUsageStats[];
+    recommendations: IndexRecommendation[];
+    analyzedAt: string;
+  }> {
     try {
       const cached = await this.redis.hget('index_analysis', 'latest');
-      return cached ? JSON.parse(cached) : {};
+      return cached ? JSON.parse(cached) : {
+        unusedIndexes: [],
+        duplicateIndexes: [],
+        indexStats: [],
+        recommendations: [],
+        analyzedAt: new Date().toISOString()
+      };
     } catch (error) {
-      return {};
+      return {
+        unusedIndexes: [],
+        duplicateIndexes: [],
+        indexStats: [],
+        recommendations: [],
+        analyzedAt: new Date().toISOString()
+      };
     }
   }
 
   /**
    * 테이블 통계 결과 조회
    */
-  private async getTableStatsResults(): Promise<any> {
+  private async getTableStatsResults(): Promise<{
+    tableSizes: TableSize[];
+    dbSize: string;
+    activeConnections: ActiveConnection[];
+    lockStats: LockStats;
+    collectedAt: string;
+  }> {
     try {
       const cached = await this.redis.hget('db_stats', 'latest');
-      return cached ? JSON.parse(cached) : {};
+      return cached ? JSON.parse(cached) : {
+        tableSizes: [],
+        dbSize: 'Unknown',
+        activeConnections: [],
+        lockStats: {
+          lockModes: [],
+          waitingLocks: 0
+        },
+        collectedAt: new Date().toISOString()
+      };
     } catch (error) {
-      return {};
+      return {
+        tableSizes: [],
+        dbSize: 'Unknown',
+        activeConnections: [],
+        lockStats: {
+          lockModes: [],
+          waitingLocks: 0
+        },
+        collectedAt: new Date().toISOString()
+      };
     }
   }
 
   /**
    * 최근 알림 조회
    */
-  private async getRecentAlerts(): Promise<any[]> {
+  private async getRecentAlerts(): Promise<Array<{
+    type: string;
+    severity: string;
+    message: string;
+    data: Record<string, unknown>;
+    timestamp: string;
+    source: string;
+  }>> {
     try {
       const alerts = await this.redis.lrange('db_performance_alerts', 0, 9);
       return alerts.map(a => JSON.parse(a));
@@ -1019,7 +1118,7 @@ export class DatabaseOptimizationService {
   /**
    * 최적화 권장사항 조회
    */
-  private async getOptimizationRecommendations(): Promise<any[]> {
+  private async getOptimizationRecommendations(): Promise<IndexRecommendation[]> {
     try {
       const analysis = await this.getIndexAnalysisResults();
       return analysis.recommendations || [];
@@ -1033,25 +1132,25 @@ export class DatabaseOptimizationService {
     return require('crypto').createHash('md5').update(query).digest('hex');
   }
 
-  private containsSeqScan(plan: any): boolean {
+  private containsSeqScan(plan: PlanNode): boolean {
     if (!plan) return false;
     if (plan['Node Type'] === 'Seq Scan') return true;
     if (plan.Plans) {
-      return plan.Plans.some((p: any) => this.containsSeqScan(p));
+      return plan.Plans.some((p: PlanNode) => this.containsSeqScan(p));
     }
     return false;
   }
 
-  private containsSort(plan: any): boolean {
+  private containsSort(plan: PlanNode): boolean {
     if (!plan) return false;
     if (plan['Node Type'] === 'Sort') return true;
     if (plan.Plans) {
-      return plan.Plans.some((p: any) => this.containsSort(p));
+      return plan.Plans.some((p: PlanNode) => this.containsSort(p));
     }
     return false;
   }
 
-  private extractTableFromPlan(plan: any): string {
+  private extractTableFromPlan(plan: PlanNode): string {
     if (plan['Relation Name']) return plan['Relation Name'];
     if (plan.Plans) {
       for (const p of plan.Plans) {
@@ -1109,7 +1208,12 @@ export class DatabaseOptimizationService {
     return 'other';
   }
 
-  private generatePatternOptimization(pattern: QueryPattern): any {
+  private generatePatternOptimization(pattern: QueryPattern): {
+    pattern: string;
+    optimization: string;
+    frequency: number;
+    avgTime: number;
+  } {
     return {
       pattern: pattern.pattern,
       optimization: `Consider optimizing ${pattern.type} queries`,
@@ -1132,7 +1236,7 @@ export class DatabaseOptimizationService {
 }
 
 // 타입 정의
-interface PerformanceThresholds {
+interface PerformanceThresholds extends ImportedPerformanceThresholds {
   slowQueryThreshold: number;
   verySlowQueryThreshold: number;
   highConnectionUsage: number;
@@ -1142,7 +1246,7 @@ interface PerformanceThresholds {
   deadlockThreshold: number;
 }
 
-interface ConnectionPoolStats {
+interface ConnectionPoolStats extends ImportedConnectionPoolStats {
   activeConnections: number;
   idleConnections: number;
   totalConnections: number;
@@ -1152,7 +1256,7 @@ interface ConnectionPoolStats {
   releasedConnections: number;
 }
 
-interface SlowQuery {
+interface SlowQuery extends Partial<ImportedSlowQuery> {
   query: string;
   calls: number;
   totalTime: number;
@@ -1164,7 +1268,7 @@ interface SlowQuery {
 }
 
 interface ExecutionPlan {
-  plan: any;
+  plan: PlanNode | null;
   totalCost: number;
   actualTime: number;
   planningTime: number;
@@ -1196,7 +1300,7 @@ interface QueryAnalysis {
   analyzedAt: string;
 }
 
-interface QueryPattern {
+interface QueryPattern extends Partial<ImportedQueryPattern> {
   type: string;
   pattern: string;
   frequency: number;
@@ -1269,16 +1373,35 @@ interface LockStats {
 
 interface DatabaseDashboard {
   connectionPool: ConnectionPoolStats;
-  queryPerformance: any;
-  indexAnalysis: any;
-  tableStats: any;
-  alerts: any[];
-  recommendations: any[];
+  queryPerformance: DatabaseMetrics['queryPerformance'];
+  indexAnalysis: {
+    unusedIndexes: UnusedIndex[];
+    duplicateIndexes: DuplicateIndex[];
+    indexStats: IndexUsageStats[];
+    recommendations: IndexRecommendation[];
+    analyzedAt: string;
+  };
+  tableStats: {
+    tableSizes: TableSize[];
+    dbSize: string;
+    activeConnections: ActiveConnection[];
+    lockStats: LockStats;
+    collectedAt: string;
+  };
+  alerts: Array<{
+    type: string;
+    severity: string;
+    message: string;
+    data: Record<string, unknown>;
+    timestamp: string;
+    source: string;
+  }>;
+  recommendations: IndexRecommendation[];
 }
 
-interface QueryCacheEntry {
+interface QueryCacheEntry extends Partial<ImportedQueryCacheEntry> {
   query: string;
-  result: any;
+  result: QueryResult<unknown>;
   cachedAt: Date;
   hits: number;
 }

@@ -6,6 +6,39 @@ import {
   Index
 } from 'typeorm';
 
+// Type definitions for metrics
+export interface MetricTags {
+  userId?: string;
+  sessionId?: string;
+  userAgent?: string;
+  ipAddress?: string;
+  country?: string;
+  device?: string;
+  browser?: string;
+  [key: string]: unknown;
+}
+
+export interface MetricMetadata {
+  // Performance context
+  requestSize?: number;
+  responseSize?: number;
+  cacheHit?: boolean;
+  queryCount?: number;
+  
+  // Error context
+  errorType?: string;
+  errorMessage?: string;
+  stackTrace?: string;
+  
+  // Business context
+  featureName?: string;
+  actionType?: string;
+  conversionStep?: string;
+  
+  // Custom properties
+  [key: string]: unknown;
+}
+
 export enum MetricType {
   PERFORMANCE = 'performance',
   USAGE = 'usage',
@@ -107,39 +140,11 @@ export class SystemMetrics {
 
   // Context information
   @Column({ type: 'json', nullable: true })
-  tags?: {
-    userId?: string;
-    sessionId?: string;
-    userAgent?: string;
-    ipAddress?: string;
-    country?: string;
-    device?: string;
-    browser?: string;
-    [key: string]: any;
-  };
+  tags?: MetricTags;
 
   // Additional metadata
   @Column({ type: 'json', nullable: true })
-  metadata?: {
-    // Performance context
-    requestSize?: number;
-    responseSize?: number;
-    cacheHit?: boolean;
-    queryCount?: number;
-    
-    // Error context
-    errorType?: string;
-    errorMessage?: string;
-    stackTrace?: string;
-    
-    // Business context
-    featureName?: string;
-    actionType?: string;
-    conversionStep?: string;
-    
-    // Custom properties
-    [key: string]: any;
-  };
+  metadata?: MetricMetadata;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -152,7 +157,7 @@ export class SystemMetrics {
     unit: string,
     source?: string,
     endpoint?: string,
-    metadata?: any
+    metadata?: MetricMetadata
   ): Partial<SystemMetrics> {
     return {
       metricType: MetricType.PERFORMANCE,
@@ -171,8 +176,8 @@ export class SystemMetrics {
     name: string,
     value: number,
     unit: string,
-    tags?: any,
-    metadata?: any
+    tags?: MetricTags,
+    metadata?: MetricMetadata
   ): Partial<SystemMetrics> {
     return {
       metricType: MetricType.USAGE,
@@ -215,7 +220,7 @@ export class SystemMetrics {
     value: number,
     unit: string,
     component?: string,
-    metadata?: any
+    metadata?: MetricMetadata
   ): Partial<SystemMetrics> {
     return {
       metricType: MetricType.SYSTEM,
@@ -233,8 +238,8 @@ export class SystemMetrics {
     name: string,
     value: number,
     unit: string,
-    tags?: any,
-    metadata?: any
+    tags?: MetricTags,
+    metadata?: MetricMetadata
   ): Partial<SystemMetrics> {
     return {
       metricType: MetricType.BUSINESS,

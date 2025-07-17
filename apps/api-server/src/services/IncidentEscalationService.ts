@@ -4,6 +4,17 @@ import { Alert, AlertSeverity, AlertStatus } from '../entities/Alert';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { WebhookService } from './webhookService';
 import * as crypto from 'crypto';
+import { 
+  EscalationActionParameters, 
+  IncidentMetadata, 
+  CommunicationMetadata, 
+  EscalationContext,
+  NotifyTeamParameters,
+  CreateIncidentParameters,
+  ConferenceBridgeParameters,
+  StatusPageParameters,
+  JiraTicketParameters
+} from '../types/escalation';
 
 export enum EscalationLevel {
   L1_MONITORING = 'l1_monitoring',
@@ -43,7 +54,7 @@ export interface EscalationRule {
 export interface EscalationAction {
   type: 'notify_team' | 'create_incident' | 'start_conference' | 'send_sms' | 'page_oncall' | 'update_status_page' | 'create_jira_ticket';
   target: string;
-  parameters: any;
+  parameters: EscalationActionParameters;
   retryCount?: number;
   timeout?: number;
 }
@@ -60,7 +71,7 @@ export interface IncidentEscalation {
   assignedTo?: string;
   businessImpact: BusinessImpact;
   communicationLog: CommunicationEntry[];
-  metadata?: any;
+  metadata?: IncidentMetadata;
 }
 
 export interface EscalationStep {
@@ -91,7 +102,7 @@ export interface CommunicationEntry {
   recipients: string[];
   message: string;
   status: 'sent' | 'failed' | 'delivered' | 'acknowledged';
-  metadata?: any;
+  metadata?: CommunicationMetadata;
 }
 
 export interface OnCallSchedule {
@@ -153,7 +164,7 @@ export class IncidentEscalationService {
   }
 
   // Main escalation logic
-  async escalateAlert(alert: Alert, context?: any): Promise<IncidentEscalation> {
+  async escalateAlert(alert: Alert, context?: EscalationContext): Promise<IncidentEscalation> {
     console.log(`⬆️ Escalating alert: ${alert.title} (ID: ${alert.id})`);
 
     const businessImpact = await this.assessBusinessImpact(alert);
@@ -436,7 +447,7 @@ export class IncidentEscalationService {
   }
 
   // Team notification methods
-  async notifyTeam(target: string, parameters: any): Promise<{ output: string }> {
+  async notifyTeam(target: string, parameters: NotifyTeamParameters): Promise<{ output: string }> {
     console.log(`📢 Notifying team: ${target}`);
 
     const team = this.onCallSchedules.get(target);
@@ -516,7 +527,7 @@ export class IncidentEscalationService {
     }
     
     // Extract from metadata if available
-    if (alert.metadata?.affectedServices) {
+    if (alert.metadata?.affectedServices && Array.isArray(alert.metadata.affectedServices)) {
       services.push(...alert.metadata.affectedServices);
     }
     
@@ -702,22 +713,22 @@ Please acknowledge and take appropriate action immediately.
     }
   }
 
-  private async createExternalIncident(escalation: IncidentEscalation, parameters: any): Promise<void> {
+  private async createExternalIncident(escalation: IncidentEscalation, parameters: CreateIncidentParameters): Promise<void> {
     // Implementation would integrate with external incident management system
     console.log(`🎫 Creating external incident for escalation ${escalation.id}`);
   }
 
-  private async startConferenceBridge(escalation: IncidentEscalation, parameters: any): Promise<void> {
+  private async startConferenceBridge(escalation: IncidentEscalation, parameters: ConferenceBridgeParameters): Promise<void> {
     // Implementation would start a conference call/bridge
     console.log(`📞 Starting conference bridge for escalation ${escalation.id}`);
   }
 
-  private async updateStatusPage(escalation: IncidentEscalation, parameters: any): Promise<void> {
+  private async updateStatusPage(escalation: IncidentEscalation, parameters: StatusPageParameters): Promise<void> {
     // Implementation would update public status page
     console.log(`📊 Updating status page for escalation ${escalation.id}`);
   }
 
-  private async createJiraTicket(escalation: IncidentEscalation, parameters: any): Promise<void> {
+  private async createJiraTicket(escalation: IncidentEscalation, parameters: JiraTicketParameters): Promise<void> {
     // Implementation would create JIRA ticket
     console.log(`🎫 Creating JIRA ticket for escalation ${escalation.id}`);
   }

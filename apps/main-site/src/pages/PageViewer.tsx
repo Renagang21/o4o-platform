@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, ArrowLeft } from 'lucide-react';
 import { loadPageContent, PageContent } from '../utils/pageSystem';
+import DOMPurify from 'dompurify';
 
 // 사용자 권한 확인
 const isAdmin = () => {
@@ -144,7 +145,7 @@ const PageViewer: React.FC = () => {
           <div className="px-8 py-8">
             <div 
               className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: pageContent.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(pageContent.content) }}
             />
           </div>
 

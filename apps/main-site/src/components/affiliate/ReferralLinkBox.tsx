@@ -4,7 +4,7 @@ import { Copy, Share2, Mail, MessageCircle, Facebook, Twitter, Check } from 'luc
 const ReferralLinkBox: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
-  const referralLink = 'https://o4o.com/ref/partner123';
+  const referralLink = `${import.meta.env.VITE_PUBLIC_URL || 'https://o4o.com'}/ref/partner123`;
 
   const handleCopy = async () => {
     try {
@@ -20,7 +20,7 @@ const ReferralLinkBox: React.FC = () => {
 
   const shareLinks = {
     email: `mailto:?subject=O4O 제휴 프로그램 참여하기&body=제휴 프로그램에 참여하세요: ${referralLink}`,
-    kakao: `https://sharer.kakao.com/talk/friends/picker/link?app_key=YOUR_KAKAO_APP_KEY&link=${encodeURIComponent(referralLink)}`,
+    kakao: `https://sharer.kakao.com/talk/friends/picker/link?app_key=${import.meta.env.VITE_KAKAO_APP_KEY || 'YOUR_KAKAO_APP_KEY'}&link=${encodeURIComponent(referralLink)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`,
     twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(referralLink)}&text=O4O 제휴 프로그램에 참여하세요!`
   };

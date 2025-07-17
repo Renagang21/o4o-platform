@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Order } from './Order';
 import { User } from './User';
+import { GatewayResponse, PaymentWebhookData, PaymentDetailsData, PaymentMetadata } from '../types/payment';
 
 export enum PaymentType {
   PAYMENT = 'payment',
@@ -90,23 +91,14 @@ export class Payment {
 
   // 결제 세부 정보
   @Column({ type: 'json', nullable: true })
-  paymentDetails?: {
-    cardNumber?: string; // 마스킹된 카드번호
-    cardType?: string;
-    bankCode?: string;
-    bankName?: string;
-    accountNumber?: string; // 마스킹된 계좌번호
-    virtualAccountNumber?: string;
-    virtualAccountBank?: string;
-    virtualAccountExpiry?: string;
-  };
+  paymentDetails?: PaymentDetailsData;
 
   // 게이트웨이 응답 데이터
   @Column({ type: 'json', nullable: true })
-  gatewayResponse?: any;
+  gatewayResponse?: GatewayResponse;
 
   @Column({ type: 'json', nullable: true })
-  webhookData?: any;
+  webhookData?: PaymentWebhookData;
 
   // 실패/취소 정보
   @Column({ nullable: true })
@@ -139,12 +131,7 @@ export class Payment {
 
   // 메타데이터
   @Column({ type: 'json', nullable: true })
-  metadata?: {
-    ipAddress?: string;
-    userAgent?: string;
-    source?: string;
-    adminNotes?: string;
-  };
+  metadata?: PaymentMetadata;
 
   @CreateDateColumn()
   createdAt!: Date;

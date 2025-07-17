@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Award
 } from 'lucide-react';
+import DOMPurify from 'dompurify';
 
 interface Answer {
   id: string;
@@ -448,7 +449,7 @@ const CommunityQA: React.FC = () => {
                       <div 
                         className="whitespace-pre-line text-gray-700"
                         dangerouslySetInnerHTML={{ 
-                          __html: answer.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                          __html: DOMPurify.sanitize(answer.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')) 
                         }}
                       />
                     </div>

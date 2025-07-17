@@ -19,8 +19,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@o4o/ui": ["../../packages/ui"],
-      "@o4o/types": ["../../packages/types"],
+      "@o4o/types": ["../../packages/types/src"],
+      "@o4o/utils": ["../../packages/utils/src"],
+      "@o4o/ui": ["../../packages/ui/src"],
+      "@o4o/auth-client": ["../../packages/auth-client/src"],
+      "@o4o/auth-context": ["../../packages/auth-context/src"],
       "@o4o/config": ["../../packages/config"]
     }
   },

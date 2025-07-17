@@ -18,6 +18,7 @@ const UserDetail = lazy(() => import('@/pages/Users/UserDetail'));
 const Content = lazy(() => import('@/pages/content/Content'));
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
+const OrderDetail = lazy(() => import('@/pages/ecommerce/OrderDetail'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 const Pages = lazy(() => import('@/pages/pages/Pages'));
@@ -203,10 +204,17 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/orders/*" element={
+                    <Route path="/orders" element={
                       <AdminProtectedRoute requiredPermissions={['orders:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Orders />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/orders/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['orders:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OrderDetail />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

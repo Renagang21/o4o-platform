@@ -531,7 +531,7 @@ export class StatusPageController {
           byComponent: {} // Would calculate from metrics
         },
         incidentTrends: {
-          byDay: [], // Would calculate from incident data
+          byDay: [] as Array<{ date: string; count: number }>, // Would calculate from incident data
           byImpact: {
             critical: incidents.filter(i => i.impact === IncidentImpact.CRITICAL).length,
             major: incidents.filter(i => i.impact === IncidentImpact.MAJOR).length,

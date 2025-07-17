@@ -16,7 +16,8 @@ async function globalSetup(config: FullConfig) {
     
     // API 헬스체크
     console.log('🔍 API 서버 연결 확인 중...');
-    const apiResponse = await page.request.get('http://localhost:4000/health');
+    const apiUrl = process.env.VITE_SSO_API_URL || 'http://localhost:4000';
+    const apiResponse = await page.request.get(`${apiUrl}/health`);
     if (!apiResponse.ok()) {
       throw new Error(`API 서버가 응답하지 않습니다: ${apiResponse.status()}`);
     }
@@ -24,7 +25,8 @@ async function globalSetup(config: FullConfig) {
     
     // 웹 서버 연결 확인
     console.log('🔍 웹 서버 연결 확인 중...');
-    const webResponse = await page.request.get(baseURL || 'http://localhost:3000');
+    const webUrl = baseURL || process.env.VITE_DEV_SERVER_PORT ? `http://localhost:${process.env.VITE_DEV_SERVER_PORT}` : 'http://localhost:3000';
+    const webResponse = await page.request.get(webUrl);
     if (!webResponse.ok()) {
       throw new Error(`웹 서버가 응답하지 않습니다: ${webResponse.status()}`);
     }
@@ -33,7 +35,7 @@ async function globalSetup(config: FullConfig) {
     // 테스트용 관리자 계정 생성 (이미 존재하면 무시)
     console.log('👤 테스트 계정 준비 중...');
     try {
-      await page.request.post('http://localhost:4000/api/v1/business/auth/register', {
+      await page.request.post(`${apiUrl}/api/v1/business/auth/register`, {
         data: {
           email: 'test-admin@neture.co.kr',
           password: 'TestAdmin123!',
@@ -47,7 +49,7 @@ async function globalSetup(config: FullConfig) {
     }
     
     try {
-      await page.request.post('http://localhost:4000/api/v1/business/auth/register', {
+      await page.request.post(`${apiUrl}/api/v1/business/auth/register`, {
         data: {
           email: 'test-user@neture.co.kr',
           password: 'TestUser123!',

@@ -1,9 +1,27 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
-import { Page } from '../entities/Page';
+import { Page, PageRevision } from '../entities/Page';
 import { User } from '../entities/User';
 import { CustomFieldValue } from '../entities/CustomField';
 import { v4 as uuidv4 } from 'uuid';
+import { In } from 'typeorm';
+
+// Type definitions
+interface PageTreeNode extends Page {
+  children: PageTreeNode[];
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}
+
+interface PageData extends Partial<Page> {
+  customFields?: Record<string, unknown>;
+}
 
 export class PagesController {
   private pageRepository = AppDataSource.getRepository(Page);
@@ -83,7 +101,7 @@ export class PagesController {
             relations: ['field']
           });
 
-          const customFields: Record<string, any> = {};
+          const customFields: Record<string, unknown> = {};
           customFieldValues.forEach(cfv => {
             customFields[cfv.field.name] = cfv.value;
           });
@@ -142,7 +160,7 @@ export class PagesController {
         relations: ['field']
       });
 
-      const customFields: Record<string, any> = {};
+      const customFields: Record<string, unknown> = {};
       customFieldValues.forEach(cfv => {
         customFields[cfv.field.name] = cfv.value;
       });
@@ -167,7 +185,7 @@ export class PagesController {
   // POST /api/admin/pages
   async createPage(req: Request, res: Response) {
     try {
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id;
       if (!userId) {
         return res.status(401).json({
           success: false,
@@ -274,7 +292,7 @@ export class PagesController {
   async updatePage(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id;
 
       const page = await this.pageRepository.findOne({ where: { id } });
       if (!page) {
@@ -418,7 +436,7 @@ export class PagesController {
   async clonePage(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id;
 
       const originalPage = await this.pageRepository.findOne({ where: { id } });
       if (!originalPage) {
@@ -434,7 +452,7 @@ export class PagesController {
         relations: ['field']
       });
 
-      const customFields: Record<string, any> = {};
+      const customFields: Record<string, unknown> = {};
       customFieldValues.forEach(cfv => {
         customFields[cfv.field.name] = cfv.value;
       });
@@ -447,7 +465,7 @@ export class PagesController {
         counter++;
       }
 
-      const pageData: any = { ...originalPage };
+      const pageData: PageData = { ...originalPage };
       delete pageData.id;
       delete pageData.createdAt;
       delete pageData.updatedAt;
@@ -465,7 +483,7 @@ export class PagesController {
       });
 
       const savedClone = await this.pageRepository.save(clonedPage);
-      const savedCloneId = Array.isArray(savedClone) ? (savedClone as any)[0].id : (savedClone as any).id;
+      const savedCloneId = Array.isArray(savedClone) ? (savedClone as Page[])[0].id : (savedClone as Page).id;
 
       // Save custom field values for clone
       if (customFields && Object.keys(customFields).length > 0) {
@@ -497,7 +515,7 @@ export class PagesController {
     try {
       const { id } = req.params;
       const { content } = req.body;
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id;
 
       const page = await this.pageRepository.findOne({ where: { id } });
       if (!page) {
@@ -531,7 +549,7 @@ export class PagesController {
   async bulkUpdatePages(req: Request, res: Response) {
     try {
       const { ids, data } = req.body;
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id;
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({
@@ -576,7 +594,7 @@ export class PagesController {
 
       // Check for pages with children
       const pagesWithChildren = await this.pageRepository.find({
-        where: { id: ids as any },
+        where: { id: In(ids) },
         relations: ['children']
       });
 
@@ -592,7 +610,7 @@ export class PagesController {
 
       // Delete custom field values
       await this.customFieldValueRepository.delete({
-        entityId: ids as any,
+        entityId: In(ids),
         entityType: 'page'
       });
 
@@ -668,7 +686,7 @@ export class PagesController {
 
       // Get author details for each revision
       const revisionsWithAuthors = await Promise.all(
-        revisions.map(async (revision: any) => {
+        revisions.map(async (revision: PageRevision) => {
           const author = await this.userRepository.findOne({ where: { id: revision.author } });
           return {
             ...revision,
@@ -695,7 +713,7 @@ export class PagesController {
   async restorePageRevision(req: Request, res: Response) {
     try {
       const { id, revisionId } = req.params;
-      const userId = (req as any).user?.id;
+      const userId = (req as AuthenticatedRequest).user?.id;
 
       const page = await this.pageRepository.findOne({ where: { id } });
       if (!page) {
@@ -706,7 +724,7 @@ export class PagesController {
       }
 
       const revisions = page.revisions || [];
-      const revision = revisions.find((r: any) => r.id === revisionId);
+      const revision = revisions.find((r: PageRevision) => r.id === revisionId);
 
       if (!revision) {
         return res.status(404).json({
@@ -763,7 +781,7 @@ export class PagesController {
       });
 
       // Build hierarchical tree
-      const buildTree = (parentId: string | null): any[] => {
+      const buildTree = (parentId: string | null): PageTreeNode[] => {
         return pages
           .filter(page => page.parentId === parentId)
           .map(page => ({
@@ -789,7 +807,7 @@ export class PagesController {
   }
 
   // Helper method to save custom field values
-  private async saveCustomFieldValues(entityId: string, entityType: string, customFields: Record<string, any>) {
+  private async saveCustomFieldValues(entityId: string, entityType: string, customFields: Record<string, unknown>) {
     // Delete existing values
     await this.customFieldValueRepository.delete({
       entityId,

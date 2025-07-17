@@ -23,7 +23,7 @@ import Redis from 'ioredis';
  */
 export class PerformanceMonitoringInitializer {
   private redis: Redis;
-  private services: Map<string, any> = new Map();
+  private services: Map<string, MonitoringService> = new Map();
   private isInitialized: boolean = false;
   private healthCheckInterval?: NodeJS.Timeout;
   private serviceStatus: Map<string, ServiceStatus> = new Map();
@@ -100,7 +100,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing Analytics Service...');
       const analyticsService = new AnalyticsService();
-      this.services.set('analytics', analyticsService);
+      this.services.set('analytics', analyticsService as unknown as MonitoringService);
       this.serviceStatus.set('analytics', { status: 'running', lastCheck: new Date() });
       console.log('✅ Analytics Service initialized');
     } catch (error) {
@@ -117,7 +117,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing Performance Optimization Service...');
       const performanceService = new PerformanceOptimizationService();
-      this.services.set('performance', performanceService);
+      this.services.set('performance', performanceService as unknown as MonitoringService);
       this.serviceStatus.set('performance', { status: 'running', lastCheck: new Date() });
       console.log('✅ Performance Optimization Service initialized');
     } catch (error) {
@@ -134,7 +134,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing Database Optimization Service...');
       const databaseService = new DatabaseOptimizationService();
-      this.services.set('database', databaseService);
+      this.services.set('database', databaseService as unknown as MonitoringService);
       this.serviceStatus.set('database', { status: 'running', lastCheck: new Date() });
       console.log('✅ Database Optimization Service initialized');
     } catch (error) {
@@ -151,7 +151,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing CDN Optimization Service...');
       const cdnService = new CDNOptimizationService();
-      this.services.set('cdn', cdnService);
+      this.services.set('cdn', cdnService as unknown as MonitoringService);
       this.serviceStatus.set('cdn', { status: 'running', lastCheck: new Date() });
       console.log('✅ CDN Optimization Service initialized');
     } catch (error) {
@@ -168,7 +168,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing Auto Scaling Service...');
       const scalingService = new AutoScalingService();
-      this.services.set('scaling', scalingService);
+      this.services.set('scaling', scalingService as unknown as MonitoringService);
       this.serviceStatus.set('scaling', { status: 'running', lastCheck: new Date() });
       console.log('✅ Auto Scaling Service initialized');
     } catch (error) {
@@ -185,7 +185,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing Operations Monitoring Service...');
       const operationsService = new OperationsMonitoringService();
-      this.services.set('operations', operationsService);
+      this.services.set('operations', operationsService as unknown as MonitoringService);
       this.serviceStatus.set('operations', { status: 'running', lastCheck: new Date() });
       console.log('✅ Operations Monitoring Service initialized');
     } catch (error) {
@@ -202,7 +202,7 @@ export class PerformanceMonitoringInitializer {
     try {
       console.log('🔄 Initializing Deployment Monitoring Service...');
       const deploymentService = new DeploymentMonitoringService();
-      this.services.set('deployment', deploymentService);
+      this.services.set('deployment', deploymentService as unknown as MonitoringService);
       this.serviceStatus.set('deployment', { status: 'running', lastCheck: new Date() });
       console.log('✅ Deployment Monitoring Service initialized');
     } catch (error) {
@@ -292,25 +292,25 @@ export class PerformanceMonitoringInitializer {
   /**
    * 크로스 서비스 메시지 처리
    */
-  private async handleCrossServiceMessage(channel: string, message: any): Promise<void> {
+  private async handleCrossServiceMessage(channel: string, message: CrossServiceMessage): Promise<void> {
     console.log(`📨 Received cross-service message on ${channel}:`, message);
 
     // 채널별 메시지 처리
     switch (channel) {
       case 'performance:alerts':
-        await this.handlePerformanceAlert(message);
+        await this.handlePerformanceAlert(message as PerformanceAlert);
         break;
       case 'scaling:events':
-        await this.handleScalingEvent(message);
+        await this.handleScalingEvent(message as ScalingEvent);
         break;
       case 'database:issues':
-        await this.handleDatabaseIssue(message);
+        await this.handleDatabaseIssue(message as unknown as DatabaseIssue);
         break;
       case 'cdn:events':
-        await this.handleCDNEvent(message);
+        await this.handleCDNEvent(message as CDNEvent);
         break;
       case 'deployment:status':
-        await this.handleDeploymentStatus(message);
+        await this.handleDeploymentStatus(message as DeploymentStatus);
         break;
     }
   }
@@ -318,7 +318,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 성능 알림 처리
    */
-  private async handlePerformanceAlert(alert: any): Promise<void> {
+  private async handlePerformanceAlert(alert: PerformanceAlert): Promise<void> {
     // 스케일링 서비스에 알림 전달
     if (alert.type === 'high_cpu' || alert.type === 'high_memory') {
       await this.redis.publish('scaling:trigger', JSON.stringify({
@@ -334,7 +334,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 스케일링 이벤트 처리
    */
-  private async handleScalingEvent(event: any): Promise<void> {
+  private async handleScalingEvent(event: ScalingEvent): Promise<void> {
     // 성능 모니터링에 스케일링 완료 알림
     if (event.type === 'scale_complete') {
       await this.redis.publish('performance:scaling_complete', JSON.stringify(event));
@@ -350,7 +350,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 데이터베이스 이슈 처리
    */
-  private async handleDatabaseIssue(issue: any): Promise<void> {
+  private async handleDatabaseIssue(issue: DatabaseIssue): Promise<void> {
     // 심각한 이슈인 경우 즉시 알림
     if (issue.severity === 'critical') {
       await this.redis.publish('operations:critical_alert', JSON.stringify(issue));
@@ -363,7 +363,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * CDN 이벤트 처리
    */
-  private async handleCDNEvent(event: any): Promise<void> {
+  private async handleCDNEvent(event: CDNEvent): Promise<void> {
     // 캐시 미스율이 높은 경우 성능 최적화 트리거
     if (event.type === 'low_hit_rate') {
       await this.redis.publish('performance:cdn_optimization', JSON.stringify(event));
@@ -373,7 +373,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 배포 상태 처리
    */
-  private async handleDeploymentStatus(status: any): Promise<void> {
+  private async handleDeploymentStatus(status: DeploymentStatus): Promise<void> {
     // 배포 완료 시 성능 모니터링 강화
     if (status.type === 'deployment_complete') {
       await this.redis.publish('performance:monitor_enhanced', JSON.stringify(status));
@@ -559,7 +559,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 특정 서비스 조회
    */
-  getService(serviceName: string): any {
+  getService(serviceName: string): MonitoringService | undefined {
     return this.services.get(serviceName);
   }
 
@@ -590,7 +590,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 최신 헬스 체크 결과 조회
    */
-  private async getLatestHealthCheck(): Promise<any> {
+  private async getLatestHealthCheck(): Promise<HealthCheckResult | null> {
     try {
       const latest = await this.redis.hget('performance_health', 'latest');
       return latest ? JSON.parse(latest) : null;
@@ -602,7 +602,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 집계된 메트릭 조회
    */
-  private async getAggregatedMetrics(): Promise<any> {
+  private async getAggregatedMetrics(): Promise<AggregatedMetrics> {
     // 각 서비스의 핵심 메트릭 집계
     const metrics = {
       performance: {},
@@ -622,7 +622,7 @@ export class PerformanceMonitoringInitializer {
   /**
    * 시스템 알림 조회
    */
-  private async getSystemAlerts(): Promise<any[]> {
+  private async getSystemAlerts(): Promise<SystemAlert[]> {
     try {
       const alerts = await this.redis.lrange('system_alerts', 0, 9);
       return alerts.map(a => JSON.parse(a));
@@ -694,6 +694,76 @@ interface ServiceStatus {
   error?: Error;
 }
 
+interface MonitoringService {
+  healthCheck?: () => Promise<{ status: string; message: string }>;
+  shutdown?: () => Promise<void>;
+  [key: string]: unknown;
+}
+
+interface CrossServiceMessage {
+  type: string;
+  data?: unknown;
+  timestamp?: string;
+  [key: string]: unknown;
+}
+
+interface PerformanceAlert {
+  type: string;
+  severity: string;
+  message: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface ScalingEvent {
+  type: string;
+  action: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface DatabaseIssue {
+  severity: string;
+  message: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface CDNEvent {
+  type: string;
+  hitRate?: number;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface DeploymentStatus {
+  type: string;
+  status: string;
+  timestamp: string;
+  [key: string]: unknown;
+}
+
+interface AggregatedMetrics {
+  performance: Record<string, unknown>;
+  scaling: Record<string, unknown>;
+  database: Record<string, unknown>;
+  cdn: Record<string, unknown>;
+  system: {
+    memory: NodeJS.MemoryUsage;
+    cpu: NodeJS.CpuUsage;
+    uptime: number;
+  };
+}
+
+interface SystemAlert {
+  type: string;
+  severity: string;
+  message: string;
+  data?: unknown;
+  timestamp: string;
+  source: string;
+}
+
 interface HealthCheckResult {
   timestamp: string;
   overallStatus: 'healthy' | 'warning' | 'error';
@@ -713,10 +783,10 @@ interface HealthCheckResult {
 interface IntegratedDashboard {
   timestamp: string;
   systemStatus: 'operational' | 'initializing' | 'error';
-  services: any;
-  healthCheck: any;
-  metrics: any;
-  alerts: any[];
+  services: Record<string, ServiceStatus>;
+  healthCheck: HealthCheckResult | null;
+  metrics: AggregatedMetrics;
+  alerts: SystemAlert[];
   recommendations: string[];
 }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 
 interface ParagraphBlockProps {
@@ -41,7 +42,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
     <p 
       className="paragraph-block"
       style={style}
-      dangerouslySetInnerHTML={{ __html: text }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }}
     />
   );
 };

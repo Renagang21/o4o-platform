@@ -28,7 +28,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
   try {
     const health = await performDetailedHealthCheck();
     
-    const overallHealthy = health.checks.every(check => check.status === 'healthy');
+    const overallHealthy = health.checks.every((check: { status: string }) => check.status === 'healthy');
     
     res.status(overallHealthy ? 200 : 503).json(health);
   } catch (error) {

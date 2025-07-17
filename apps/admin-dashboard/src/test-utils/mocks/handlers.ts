@@ -10,7 +10,13 @@ import {
   SAMPLE_RECENT_ACTIVITIES,
   SAMPLE_SYSTEM_HEALTH
 } from '../../types/dashboard-api';
-import { UserBulkAction } from '../../types/user';
+import { UserBulkAction, User, UserFormData, UserRole, BusinessInfo } from '../../types/user';
+import { 
+  Product, 
+  OrderStatus, 
+  BulkProductAction, 
+  BulkOrderAction 
+} from '../../types/ecommerce';
 
 // API Base URL (환경에 따라 변경)
 const API_BASE = 'http://localhost:4000/api';
@@ -157,7 +163,7 @@ export const handlers = [
   }),
 
   http.post(`${API_BASE}/ecommerce/products`, async ({ request }) => {
-    const productData = await request.json() as any;
+    const productData = await request.json() as Partial<Product>;
     
     const newProduct = createMockProduct({
       ...productData,
@@ -175,7 +181,7 @@ export const handlers = [
 
   http.put(`${API_BASE}/ecommerce/products/:id`, async ({ params, request }) => {
     const { id } = params;
-    const updateData = await request.json() as any;
+    const updateData = await request.json() as Partial<Product>;
     
     const updatedProduct = createMockProduct({
       id: id as string,
@@ -278,7 +284,7 @@ export const handlers = [
 
   http.put(`${API_BASE}/ecommerce/orders/:id/status`, async ({ params, request }) => {
     const { id } = params;
-    const { status, note } = await request.json() as any;
+    const { status, note } = await request.json() as { status: OrderStatus; note?: string };
     
     const updatedOrder = createMockOrder({
       id: id as string,
@@ -296,7 +302,7 @@ export const handlers = [
 
   http.post(`${API_BASE}/ecommerce/orders/:id/refund`, async ({ params, request }) => {
     const { id } = params;
-    const { amount, reason, items } = await request.json() as any;
+    const { amount, reason, items } = await request.json() as { amount: number; reason: string; items: Array<{ orderItemId: string; quantity: number; amount: number }> };
     
     return HttpResponse.json({
       success: true,
@@ -313,7 +319,7 @@ export const handlers = [
 
   // Bulk Operations
   http.post(`${API_BASE}/ecommerce/products/bulk`, async ({ request }) => {
-    const bulkAction = await request.json() as any;
+    const bulkAction = await request.json() as BulkProductAction;
     
     return HttpResponse.json({
       success: true,
@@ -323,7 +329,7 @@ export const handlers = [
   }),
 
   http.post(`${API_BASE}/ecommerce/orders/bulk`, async ({ request }) => {
-    const bulkAction = await request.json() as any;
+    const bulkAction = await request.json() as BulkOrderAction;
     
     return HttpResponse.json({
       success: true,
@@ -574,7 +580,7 @@ export const handlers = [
 
   // Create User
   http.post(`${API_BASE}/users`, async ({ request }) => {
-    const userData = await request.json() as any;
+    const userData = await request.json() as UserFormData;
     
     // 이메일 중복 검사 시뮬레이션
     if (userData.email === 'duplicate@example.com') {
@@ -586,8 +592,11 @@ export const handlers = [
     }
 
     const newUser = createMockUser({
-      ...userData,
       id: `user_${Date.now()}`,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+      businessInfo: userData.businessInfo as BusinessInfo | undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status: 'approved'
@@ -603,7 +612,7 @@ export const handlers = [
   // Update User
   http.put(`${API_BASE}/users/:id`, async ({ params, request }) => {
     const { id } = params;
-    const updateData = await request.json() as any;
+    const updateData = await request.json() as Partial<User>;
 
     const updatedUser = createMockUser({
       id: id as string,
@@ -630,7 +639,7 @@ export const handlers = [
 
   // Bulk User Actions
   http.post(`${API_BASE}/users/bulk`, async ({ request }) => {
-    const bulkAction: UserBulkAction = await request.json() as any;
+    const bulkAction = await request.json() as UserBulkAction;
     
     const actionLabels = {
       approve: '승인',
@@ -650,7 +659,7 @@ export const handlers = [
 
   // Bulk User Delete
   http.delete(`${API_BASE}/users`, async ({ request }) => {
-    const { userIds } = await request.json() as any;
+    const { userIds } = await request.json() as { userIds: string[] };
 
     return HttpResponse.json({
       success: true,
@@ -661,7 +670,7 @@ export const handlers = [
 
   // Change User Role (Bulk)
   http.put(`${API_BASE}/users/roles`, async ({ request }) => {
-    const { userIds, role } = await request.json() as any;
+    const { userIds, role } = await request.json() as { userIds: string[]; role: UserRole };
 
     return HttpResponse.json({
       success: true,

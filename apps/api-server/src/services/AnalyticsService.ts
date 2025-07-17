@@ -8,6 +8,7 @@ import { Alert, AlertType, AlertSeverity, AlertStatus, AlertChannel } from '../e
 import { BetaUser } from '../entities/BetaUser';
 import { BetaFeedback } from '../entities/BetaFeedback';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
+import { AnalyticsMetadata, MetricTags, ErrorContext } from '@o4o/types';
 
 export interface SessionData {
   betaUserId: string;
@@ -28,7 +29,7 @@ export interface ActionData {
   pageUrl?: string;
   targetElement?: string;
   responseTime?: number;
-  metadata?: any;
+  metadata?: AnalyticsMetadata;
 }
 
 export interface MetricData {
@@ -40,8 +41,8 @@ export interface MetricData {
   source?: string;
   endpoint?: string;
   component?: string;
-  tags?: any;
-  metadata?: any;
+  tags?: MetricTags;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AnalyticsOverview {
@@ -143,9 +144,8 @@ export class AnalyticsService {
     
     // Update session activity
     await this.updateSession(data.sessionId, {
-      actions: () => 'actions + 1',
       lastActivityAt: new Date()
-    } as any);
+    });
     
     return savedAction;
   }
@@ -161,10 +161,12 @@ export class AnalyticsService {
       metadata: { pageUrl, loadTime }
     });
 
-    // Update session page views
-    await this.updateSession(sessionId, {
-      pageViews: () => 'pageViews + 1'
-    } as any);
+    // Update session page views count separately
+    const session = await this.userSessionRepo.findOne({ where: { sessionId } });
+    if (session) {
+      session.pageViews = (session.pageViews || 0) + 1;
+      await this.userSessionRepo.save(session);
+    }
   }
 
   async trackError(betaUserId: string, sessionId: string, error: {
@@ -186,10 +188,12 @@ export class AnalyticsService {
       }
     });
 
-    // Update session error count
-    await this.updateSession(sessionId, {
-      errorsEncountered: () => 'errorsEncountered + 1'
-    } as any);
+    // Update session error count separately
+    const session = await this.userSessionRepo.findOne({ where: { sessionId } });
+    if (session) {
+      session.errorsEncountered = (session.errorsEncountered || 0) + 1;
+      await this.userSessionRepo.save(session);
+    }
   }
 
   // Metrics Collection
@@ -227,7 +231,7 @@ export class AnalyticsService {
     });
   }
 
-  async recordUsageMetric(metricName: string, value: number, unit: string, tags?: any): Promise<void> {
+  async recordUsageMetric(metricName: string, value: number, unit: string, tags?: MetricTags): Promise<void> {
     await this.recordMetric({
       metricType: MetricType.USAGE,
       metricCategory: MetricCategory.ACTIVE_USERS,
@@ -258,13 +262,21 @@ export class AnalyticsService {
       errorRate
     ] = await Promise.all([
       this.betaUserRepo.count(),
-      this.betaUserRepo.count({ where: { lastActiveAt: { $gte: startDate } } as any }),
-      this.betaUserRepo.count({ where: { createdAt: { $gte: startDate } } as any }),
-      this.userSessionRepo.count({ where: { createdAt: { $gte: startDate } } as any }),
+      this.betaUserRepo.createQueryBuilder('user')
+        .where('user.lastActiveAt >= :startDate', { startDate })
+        .getCount(),
+      this.betaUserRepo.createQueryBuilder('user')
+        .where('user.createdAt >= :startDate', { startDate })
+        .getCount(),
+      this.userSessionRepo.createQueryBuilder('session')
+        .where('session.createdAt >= :startDate', { startDate })
+        .getCount(),
       this.getAverageSessionDuration(startDate),
       this.getTotalPageViews(startDate),
       this.getTotalActions(startDate),
-      this.betaFeedbackRepo.count({ where: { createdAt: { $gte: startDate } } as any }),
+      this.betaFeedbackRepo.createQueryBuilder('feedback')
+        .where('feedback.createdAt >= :startDate', { startDate })
+        .getCount(),
       this.getTotalErrors(startDate),
       this.getAverageResponseTime(startDate),
       this.getErrorRate(startDate)
@@ -291,14 +303,31 @@ export class AnalyticsService {
     };
   }
 
-  async getUserEngagementMetrics(days: number = 7): Promise<any> {
+  async getUserEngagementMetrics(days: number = 7): Promise<{
+    totalSessions: number;
+    averageEngagementScore: number;
+    averageSessionDuration: number;
+    averagePageViews: number;
+    averageActions: number;
+    topUsers: Array<{
+      userId: string;
+      sessionId: string;
+      duration: number;
+      pageViews: number;
+      actions: number;
+      feedback: number;
+      errors: number;
+      engagementScore: number;
+    }>;
+  }> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const sessions = await this.userSessionRepo.find({
-      where: { createdAt: { $gte: startDate } } as any,
-      relations: ['betaUser']
-    });
+    const sessions = await this.userSessionRepo
+      .createQueryBuilder('session')
+      .leftJoinAndSelect('session.betaUser', 'betaUser')
+      .where('session.createdAt >= :startDate', { startDate })
+      .getMany();
 
     const engagementData = sessions.map(session => ({
       userId: session.betaUserId,
@@ -321,14 +350,28 @@ export class AnalyticsService {
     };
   }
 
-  async getContentUsageMetrics(days: number = 7): Promise<any> {
+  async getContentUsageMetrics(days: number = 7): Promise<{
+    totalContentViews: number;
+    uniqueContent: number;
+    topContent: Array<{
+      contentId: string;
+      title: string;
+      type: string;
+      views: number;
+      totalDuration: number;
+      uniqueStores: number;
+      avgDuration: number;
+    }>;
+  }> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const contentLogs = await this.contentUsageLogRepo.find({
-      where: { createdAt: { $gte: startDate } } as any,
-      relations: ['content', 'store']
-    });
+    const contentLogs = await this.contentUsageLogRepo
+      .createQueryBuilder('log')
+      .leftJoinAndSelect('log.content', 'content')
+      .leftJoinAndSelect('log.store', 'store')
+      .where('log.createdAt >= :startDate', { startDate })
+      .getMany();
 
     const contentUsage = contentLogs.reduce((acc, log) => {
       if (log.content) {
@@ -348,18 +391,25 @@ export class AnalyticsService {
         acc[contentId].uniqueStores.add(log.storeId);
       }
       return acc;
-    }, {} as any);
+    }, {} as Record<string, {
+      contentId: string;
+      title: string;
+      type: string;
+      views: number;
+      totalDuration: number;
+      uniqueStores: Set<string>;
+    }>);
 
     return {
       totalContentViews: contentLogs.length,
       uniqueContent: Object.keys(contentUsage).length,
       topContent: Object.values(contentUsage)
-        .map((c: any) => ({
+        .map((c) => ({
           ...c,
           uniqueStores: c.uniqueStores.size,
           avgDuration: c.totalDuration / c.views
         }))
-        .sort((a: any, b: any) => b.views - a.views)
+        .sort((a, b) => b.views - a.views)
         .slice(0, 10)
     };
   }
@@ -406,7 +456,7 @@ export class AnalyticsService {
     metricName?: string,
     currentValue?: number,
     thresholdValue?: number,
-    context?: any
+    context?: Record<string, unknown>
   ): Promise<Alert> {
     const alert = new Alert();
     alert.alertType = type;
@@ -444,7 +494,7 @@ export class AnalyticsService {
         metric.metricName,
         metric.value,
         1000,
-        { endpoint: metric.endpoint, source: metric.source }
+        { endpoint: metric.endpoint, source: metric.source } as Record<string, unknown>
       );
     }
 
@@ -458,7 +508,7 @@ export class AnalyticsService {
         metric.metricName,
         metric.value,
         5,
-        { source: metric.source }
+        { source: metric.source } as Record<string, unknown>
       );
     }
 
@@ -472,7 +522,7 @@ export class AnalyticsService {
         metric.metricName,
         metric.value,
         85,
-        { component: metric.component }
+        { component: metric.component } as Record<string, unknown>
       );
     }
   }
@@ -587,18 +637,18 @@ export class AnalyticsService {
   }
 
   private async getTotalActions(startDate: Date): Promise<number> {
-    return await this.userActionRepo.count({
-      where: { createdAt: { $gte: startDate } } as any
-    });
+    return await this.userActionRepo
+      .createQueryBuilder('action')
+      .where('action.createdAt >= :startDate', { startDate })
+      .getCount();
   }
 
   private async getTotalErrors(startDate: Date): Promise<number> {
-    return await this.userActionRepo.count({
-      where: { 
-        createdAt: { $gte: startDate },
-        isError: true
-      } as any
-    });
+    return await this.userActionRepo
+      .createQueryBuilder('action')
+      .where('action.createdAt >= :startDate', { startDate })
+      .andWhere('action.isError = :isError', { isError: true })
+      .getCount();
   }
 
   private async getAverageResponseTime(startDate: Date): Promise<number> {
@@ -614,8 +664,15 @@ export class AnalyticsService {
 
   private async getErrorRate(startDate: Date): Promise<number> {
     const [totalRequests, errorRequests] = await Promise.all([
-      this.userActionRepo.count({ where: { createdAt: { $gte: startDate } } as any }),
-      this.userActionRepo.count({ where: { createdAt: { $gte: startDate }, isError: true } as any })
+      this.userActionRepo
+        .createQueryBuilder('action')
+        .where('action.createdAt >= :startDate', { startDate })
+        .getCount(),
+      this.userActionRepo
+        .createQueryBuilder('action')
+        .where('action.createdAt >= :startDate', { startDate })
+        .andWhere('action.isError = :isError', { isError: true })
+        .getCount()
     ]);
     
     return totalRequests > 0 ? (errorRequests / totalRequests) * 100 : 0;
@@ -632,7 +689,14 @@ export class AnalyticsService {
     return 'excellent';
   }
 
-  private async generateReportData(category: ReportCategory, startDate: Date, endDate: Date): Promise<any> {
+  private async generateReportData(category: ReportCategory, startDate: Date, endDate: Date): Promise<{
+    summary: AnalyticsOverview;
+    userMetrics: Awaited<ReturnType<typeof this.getUserEngagementMetrics>>;
+    systemMetrics: Record<string, unknown>;
+    contentMetrics: Awaited<ReturnType<typeof this.getContentUsageMetrics>>;
+    feedbackMetrics: Record<string, unknown>;
+    businessMetrics: Record<string, unknown>;
+  }> {
     // Implementation for generating specific report data based on category
     // This would be a comprehensive method that gathers all necessary data
     return {

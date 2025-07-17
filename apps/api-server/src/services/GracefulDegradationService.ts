@@ -5,6 +5,20 @@ import { Alert, AlertSeverity } from '../entities/Alert';
 import { PricingResult } from '../types/auth';
 import { signageService } from './signageService';
 import { cacheService } from './cacheService';
+import {
+  DegradationMetadata,
+  DegradationParameters,
+  DisableFeatureParams,
+  ReduceFunctionalityParams,
+  CacheFallbackParams,
+  StaticContentParams,
+  SimplifiedUIParams,
+  RateLimitParams,
+  RequestQueuingParams,
+  RedirectTrafficParams,
+  FeatureState,
+  IsolationParameters
+} from '@o4o/types';
 
 export enum DegradationLevel {
   NONE = 'none',
@@ -39,13 +53,13 @@ export interface DegradationTrigger {
   threshold?: number;
   duration?: number; // minutes
   service?: string;
-  metadata?: any;
+  metadata?: DegradationMetadata;
 }
 
 export interface DegradationAction {
   type: 'disable_feature' | 'reduce_functionality' | 'cache_fallback' | 'static_content' | 'simplified_ui' | 'rate_limit' | 'queue_requests' | 'redirect_traffic';
   target: string;
-  parameters: any;
+  parameters: DegradationParameters;
   description: string;
 }
 
@@ -63,15 +77,15 @@ export interface ActiveDegradation {
     description: string;
     affectedUserCount?: number;
   };
-  metadata?: any;
+  metadata?: DegradationMetadata;
 }
 
 export interface FeatureDegradation {
   featureId: string;
   featureName: string;
-  normalState: any;
-  degradedState: any;
-  currentState: any;
+  normalState: FeatureState;
+  degradedState: FeatureState;
+  currentState: FeatureState;
   isDegraded: boolean;
   degradationLevel: DegradationLevel;
   fallbackMethods: string[];
@@ -202,7 +216,7 @@ export class GracefulDegradationService {
         
         default:
           // Generic HTTP health check
-          if (trigger.metadata?.healthCheckUrl) {
+          if (trigger.metadata && 'healthCheckUrl' in trigger.metadata && typeof trigger.metadata.healthCheckUrl === 'string') {
             const response = await fetch(trigger.metadata.healthCheckUrl);
             return !response.ok; // Service unavailable if not OK
           }
@@ -279,35 +293,35 @@ export class GracefulDegradationService {
   private async applyDegradationAction(action: DegradationAction, degradation: ActiveDegradation): Promise<void> {
     switch (action.type) {
       case 'disable_feature':
-        await this.disableFeature(action.target, action.parameters, degradation);
+        await this.disableFeature(action.target, action.parameters as DisableFeatureParams, degradation);
         break;
       
       case 'reduce_functionality':
-        await this.reduceFunctionality(action.target, action.parameters, degradation);
+        await this.reduceFunctionality(action.target, action.parameters as ReduceFunctionalityParams, degradation);
         break;
       
       case 'cache_fallback':
-        await this.enableCacheFallback(action.target, action.parameters, degradation);
+        await this.enableCacheFallback(action.target, action.parameters as CacheFallbackParams, degradation);
         break;
       
       case 'static_content':
-        await this.enableStaticContent(action.target, action.parameters, degradation);
+        await this.enableStaticContent(action.target, action.parameters as StaticContentParams, degradation);
         break;
       
       case 'simplified_ui':
-        await this.enableSimplifiedUI(action.target, action.parameters, degradation);
+        await this.enableSimplifiedUI(action.target, action.parameters as SimplifiedUIParams, degradation);
         break;
       
       case 'rate_limit':
-        await this.enableRateLimit(action.target, action.parameters, degradation);
+        await this.enableRateLimit(action.target, action.parameters as RateLimitParams, degradation);
         break;
       
       case 'queue_requests':
-        await this.enableRequestQueuing(action.target, action.parameters, degradation);
+        await this.enableRequestQueuing(action.target, action.parameters as RequestQueuingParams, degradation);
         break;
       
       case 'redirect_traffic':
-        await this.redirectTraffic(action.target, action.parameters, degradation);
+        await this.redirectTraffic(action.target, action.parameters as RedirectTrafficParams, degradation);
         break;
       
       default:
@@ -316,7 +330,7 @@ export class GracefulDegradationService {
   }
 
   // Specific degradation actions
-  private async disableFeature(featureId: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async disableFeature(featureId: string, parameters: DisableFeatureParams, degradation: ActiveDegradation): Promise<void> {
     const feature = this.featureStates.get(featureId);
     if (feature) {
       feature.isDegraded = true;
@@ -328,92 +342,123 @@ export class GracefulDegradationService {
     }
   }
 
-  private async reduceFunctionality(featureId: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async reduceFunctionality(featureId: string, parameters: ReduceFunctionalityParams, degradation: ActiveDegradation): Promise<void> {
     const feature = this.featureStates.get(featureId);
     if (feature) {
       feature.isDegraded = true;
       feature.degradationLevel = degradation.level;
-      feature.currentState = { ...feature.currentState, ...parameters.reducedState };
+      feature.currentState = { ...feature.currentState, functionality: parameters.features.reduce((acc, feat) => ({ ...acc, [feat]: false }), feature.currentState.functionality || {}) };
       degradation.affectedFeatures.push(featureId);
       
       console.log(`⬇️ Reduced functionality for: ${featureId}`);
     }
   }
 
-  private async enableCacheFallback(target: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async enableCacheFallback(target: string, parameters: CacheFallbackParams, degradation: ActiveDegradation): Promise<void> {
     // Enable extended cache usage for the target service
     const cacheKey = `degradation_fallback_${target}`;
-    await cacheService.cachePricingResult(cacheKey, {
+    // Store degradation state in cache using a generic key-value approach
+    const cacheData = {
       enabled: true,
       degradationLevel: degradation.level,
       fallbackData: parameters.fallbackData || {}
-    } as any, parameters.ttl || 3600);
+    };
+    // Use direct redis access through cacheService
+    if (cacheService.redis && cacheService.isEnabled) {
+      await cacheService.redis.setex(cacheKey, parameters.ttl || 3600, JSON.stringify(cacheData));
+    }
     
     console.log(`🗄️ Enabled cache fallback for: ${target}`);
   }
 
-  private async enableStaticContent(target: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async enableStaticContent(target: string, parameters: StaticContentParams, degradation: ActiveDegradation): Promise<void> {
     // Switch to static content delivery for the target
     const staticKey = `static_content_${target}`;
-    await cacheService.cachePricingResult(staticKey, {
+    // Store static content configuration in cache
+    const staticData = {
       enabled: true,
-      staticContent: parameters.staticContent || 'Service temporarily unavailable',
+      staticContent: parameters.contentPath || 'Service temporarily unavailable',
       degradationLevel: degradation.level
-    } as any, 7200); // 2 hours
+    };
+    if (cacheService.redis && cacheService.isEnabled) {
+      await cacheService.redis.setex(staticKey, parameters.expiryTime || 7200, JSON.stringify(staticData));
+    }
     
     console.log(`📄 Enabled static content for: ${target}`);
   }
 
-  private async enableSimplifiedUI(target: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async enableSimplifiedUI(target: string, parameters: SimplifiedUIParams, degradation: ActiveDegradation): Promise<void> {
     // Enable simplified UI mode
     const uiKey = `simplified_ui_${target}`;
-    await cacheService.cachePricingResult(uiKey, {
+    // Store UI simplification settings in cache
+    const uiData = {
       enabled: true,
-      disabledComponents: parameters.disabledComponents || [],
-      simplifiedLayout: parameters.simplifiedLayout || true,
+      removeAnimations: parameters.removeAnimations,
+      disableImages: parameters.disableImages || false,
+      minimalCSS: parameters.minimalCSS || false,
+      essentialOnly: parameters.essentialOnly || false,
       degradationLevel: degradation.level
-    } as any, 3600);
+    };
+    if (cacheService.redis && cacheService.isEnabled) {
+      await cacheService.redis.setex(uiKey, 3600, JSON.stringify(uiData));
+    }
     
     console.log(`🎨 Enabled simplified UI for: ${target}`);
   }
 
-  private async enableRateLimit(target: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async enableRateLimit(target: string, parameters: RateLimitParams, degradation: ActiveDegradation): Promise<void> {
     // Implement rate limiting for the target
     const rateLimitKey = `rate_limit_${target}`;
-    await cacheService.cachePricingResult(rateLimitKey, {
+    // Store rate limit configuration in cache
+    const rateLimitData = {
       enabled: true,
       requestsPerMinute: parameters.requestsPerMinute || 60,
-      burstLimit: parameters.burstLimit || 10,
+      burstSize: parameters.burstSize || 10,
+      keyBy: parameters.keyBy || 'ip',
       degradationLevel: degradation.level
-    } as any, 1800); // 30 minutes
+    };
+    if (cacheService.redis && cacheService.isEnabled) {
+      await cacheService.redis.setex(rateLimitKey, 1800, JSON.stringify(rateLimitData));
+    }
     
-    console.log(`🚦 Enabled rate limiting for: ${target} (${parameters.requestsPerMinute || 60} req/min)`);
+    console.log(`🚦 Enabled rate limiting for: ${target} (${parameters.requestsPerMinute} req/min)`);
   }
 
-  private async enableRequestQueuing(target: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async enableRequestQueuing(target: string, parameters: RequestQueuingParams, degradation: ActiveDegradation): Promise<void> {
     // Enable request queuing for the target
     const queueKey = `request_queue_${target}`;
-    await cacheService.cachePricingResult(queueKey, {
+    // Store request queuing configuration in cache
+    const queueData = {
       enabled: true,
       maxQueueSize: parameters.maxQueueSize || 1000,
-      processingRate: parameters.processingRate || 10,
+      timeoutMs: parameters.timeoutMs || 30000,
+      priority: parameters.priority || 'fifo',
       degradationLevel: degradation.level
-    } as any, 1800);
+    };
+    if (cacheService.redis && cacheService.isEnabled) {
+      await cacheService.redis.setex(queueKey, 1800, JSON.stringify(queueData));
+    }
     
     console.log(`📥 Enabled request queuing for: ${target} (max: ${parameters.maxQueueSize || 1000})`);
   }
 
-  private async redirectTraffic(target: string, parameters: any, degradation: ActiveDegradation): Promise<void> {
+  private async redirectTraffic(target: string, parameters: RedirectTrafficParams, degradation: ActiveDegradation): Promise<void> {
     // Implement traffic redirection
     const redirectKey = `traffic_redirect_${target}`;
-    await cacheService.cachePricingResult(redirectKey, {
+    // Store traffic redirection configuration in cache
+    const redirectData = {
       enabled: true,
-      redirectUrl: parameters.redirectUrl,
+      targetUrl: parameters.targetUrl,
       percentage: parameters.percentage || 100,
+      preservePath: parameters.preservePath || false,
+      statusCode: parameters.statusCode || 302,
       degradationLevel: degradation.level
-    } as any, 1800);
+    };
+    if (cacheService.redis && cacheService.isEnabled) {
+      await cacheService.redis.setex(redirectKey, 1800, JSON.stringify(redirectData));
+    }
     
-    console.log(`🔀 Enabled traffic redirection for: ${target} to ${parameters.redirectUrl}`);
+    console.log(`🔀 Enabled traffic redirection for: ${target} to ${parameters.targetUrl}`);
   }
 
   // Degradation reversion
@@ -457,7 +502,7 @@ export class GracefulDegradationService {
   }
 
   private getOppositeOperator(operator: string): '>' | '<' | '>=' | '<=' | '=' | '!=' {
-    const opposites: { [key: string]: any } = {
+    const opposites: { [key: string]: '>' | '<' | '>=' | '<=' | '=' | '!=' } = {
       '>': '<=',
       '<': '>=',
       '>=': '<',
@@ -465,7 +510,7 @@ export class GracefulDegradationService {
       '=': '!=',
       '!=': '='
     };
-    return opposites[operator] || operator as any;
+    return opposites[operator] || operator as '>' | '<' | '>=' | '<=' | '=' | '!=';
   }
 
   private async revertDegradation(ruleId: string): Promise<void> {
@@ -522,7 +567,7 @@ export class GracefulDegradationService {
   }
 
   // Component isolation
-  async isolateComponent(componentId: string, parameters?: any): Promise<{ output: string }> {
+  async isolateComponent(componentId: string, parameters?: IsolationParameters): Promise<{ output: string }> {
     console.log(`🔒 Isolating component: ${componentId}`);
 
     const isolationRule: DegradationRule = {
@@ -537,7 +582,11 @@ export class GracefulDegradationService {
         {
           type: 'disable_feature',
           target: componentId,
-          parameters: parameters || {},
+          parameters: {
+            featureName: componentId,
+            fallbackMessage: parameters?.fallbackFunction || `${componentId} is temporarily disabled`,
+            affectedEndpoints: []
+          } as DisableFeatureParams,
           description: `Disable ${componentId} component`
         }
       ],
@@ -666,13 +715,13 @@ export class GracefulDegradationService {
           {
             type: 'cache_fallback',
             target: 'api-responses',
-            parameters: { extendedTtl: true },
+            parameters: { cacheKey: 'api-responses', ttl: 7200, staleWhileRevalidate: true } as CacheFallbackParams,
             description: 'Use extended cache for API responses'
           },
           {
             type: 'reduce_functionality',
             target: 'signage-analytics',
-            parameters: { reducedState: { realtime: false, polling: 300000 } },
+            parameters: { features: ['realtime', 'polling'], level: 'minimal', preserveCore: true } as ReduceFunctionalityParams,
             description: 'Reduce signage analytics frequency'
           }
         ],
@@ -708,13 +757,13 @@ export class GracefulDegradationService {
           {
             type: 'cache_fallback',
             target: 'all-queries',
-            parameters: { fallbackData: 'cached_responses' },
+            parameters: { cacheKey: 'all-queries', ttl: 3600, fallbackData: 'cached_responses' } as CacheFallbackParams,
             description: 'Use cached data for all queries'
           },
           {
             type: 'static_content',
             target: 'dynamic-pages',
-            parameters: { staticContent: 'Database maintenance in progress' },
+            parameters: { contentPath: 'Database maintenance in progress', expiryTime: 7200 } as StaticContentParams,
             description: 'Show static maintenance message'
           }
         ],
@@ -749,13 +798,13 @@ export class GracefulDegradationService {
           {
             type: 'rate_limit',
             target: 'api-endpoints',
-            parameters: { requestsPerMinute: 30, burstLimit: 5 },
+            parameters: { requestsPerMinute: 30, burstSize: 5, keyBy: 'ip' } as RateLimitParams,
             description: 'Reduce API rate limits'
           },
           {
             type: 'simplified_ui',
             target: 'web-interface',
-            parameters: { disabledComponents: ['analytics', 'realtime-updates'] },
+            parameters: { removeAnimations: true, disableImages: false, minimalCSS: false, essentialOnly: true } as SimplifiedUIParams,
             description: 'Simplify web interface'
           }
         ],
@@ -786,9 +835,9 @@ export class GracefulDegradationService {
       {
         featureId: 'signage-analytics',
         featureName: 'Signage Analytics',
-        normalState: { realtime: true, polling: 30000, fullMetrics: true },
-        degradedState: { realtime: false, polling: 300000, fullMetrics: false },
-        currentState: { realtime: true, polling: 30000, fullMetrics: true },
+        normalState: { enabled: true, functionality: { realtime: true, polling: true, fullMetrics: true }, limits: { pollingInterval: 30000 } },
+        degradedState: { enabled: true, functionality: { realtime: false, polling: true, fullMetrics: false }, limits: { pollingInterval: 300000 } },
+        currentState: { enabled: true, functionality: { realtime: true, polling: true, fullMetrics: true }, limits: { pollingInterval: 30000 } },
         isDegraded: false,
         degradationLevel: DegradationLevel.NONE,
         fallbackMethods: ['cached_data', 'simplified_metrics']
@@ -796,9 +845,9 @@ export class GracefulDegradationService {
       {
         featureId: 'api-responses',
         featureName: 'API Response Caching',
-        normalState: { enabled: true, ttl: 300, compression: true },
-        degradedState: { enabled: true, ttl: 3600, compression: false },
-        currentState: { enabled: true, ttl: 300, compression: true },
+        normalState: { enabled: true, functionality: { compression: true }, limits: { ttl: 300 } },
+        degradedState: { enabled: true, functionality: { compression: false }, limits: { ttl: 3600 } },
+        currentState: { enabled: true, functionality: { compression: true }, limits: { ttl: 300 } },
         isDegraded: false,
         degradationLevel: DegradationLevel.NONE,
         fallbackMethods: ['extended_cache', 'static_responses']
@@ -806,9 +855,9 @@ export class GracefulDegradationService {
       {
         featureId: 'web-interface',
         featureName: 'Web User Interface',
-        normalState: { fullUI: true, animations: true, realTimeUpdates: true },
-        degradedState: { fullUI: false, animations: false, realTimeUpdates: false },
-        currentState: { fullUI: true, animations: true, realTimeUpdates: true },
+        normalState: { enabled: true, functionality: { fullUI: true, animations: true, realTimeUpdates: true } },
+        degradedState: { enabled: true, functionality: { fullUI: false, animations: false, realTimeUpdates: false } },
+        currentState: { enabled: true, functionality: { fullUI: true, animations: true, realTimeUpdates: true } },
         isDegraded: false,
         degradationLevel: DegradationLevel.NONE,
         fallbackMethods: ['simplified_ui', 'static_pages']
@@ -848,7 +897,7 @@ export class GracefulDegradationService {
     return await this.systemMetricsRepo.find({
       where: {
         metricName: metricName,
-        createdAt: { $gte: since } as any
+        createdAt: { $gte: since } as unknown as Date
       },
       order: { createdAt: 'DESC' }
     });

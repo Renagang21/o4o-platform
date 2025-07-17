@@ -2,8 +2,8 @@ import Redis from 'ioredis';
 import { PricingResult } from './pricingService';
 
 export class CacheService {
-  private redis!: Redis;
-  private isEnabled: boolean;
+  public redis!: Redis;
+  public isEnabled: boolean;
 
   constructor() {
     this.isEnabled = process.env.REDIS_ENABLED === 'true';

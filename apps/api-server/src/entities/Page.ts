@@ -4,7 +4,7 @@ import { User } from './User'
 export interface Block {
   id: string
   type: string
-  data: any
+  data: unknown
   order: number
 }
 
@@ -23,7 +23,14 @@ export interface SEOMetadata {
   canonicalUrl?: string
   noindex?: boolean
   nofollow?: boolean
-  schema?: Record<string, any>
+  schema?: Record<string, unknown>
+}
+
+export interface PageRevision {
+  id: string
+  timestamp: string
+  author: string
+  changes: Partial<Page>
 }
 
 @Entity('pages')
@@ -79,7 +86,7 @@ export class Page {
   seo!: SEOMetadata
 
   @Column({ type: 'json', nullable: true })
-  customFields!: Record<string, any>
+  customFields!: Record<string, unknown>
 
   @Column({ type: 'datetime', nullable: true })
   publishedAt!: Date
@@ -117,10 +124,10 @@ export class Page {
   commentStatus!: string
 
   @Column({ type: 'json', nullable: true })
-  layoutSettings!: Record<string, any>
+  layoutSettings!: Record<string, unknown>
 
   @Column({ type: 'json', nullable: true })
-  revisions!: any[]
+  revisions!: PageRevision[]
 
   @CreateDateColumn()
   createdAt!: Date

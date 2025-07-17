@@ -8,12 +8,19 @@ import { BarChart3 } from 'lucide-react';
 
 // MVP 위젯 컴포넌트 import
 import StatsOverview from './components/StatsOverview';
+import EcommerceStats from './components/EcommerceStats';
 import RealtimeStats from './components/RealtimeStats';
 import RecentActivity from './components/RecentActivity';
 import QuickActions from './components/QuickActions';
 import SystemStatus from './components/SystemHealth';
+import Charts from './components/Charts';
+import { useDashboardData } from './hooks/useDashboardData';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 const Dashboard = memo(() => {
+  const { chartData, isLoading: chartsLoading } = useDashboardData();
+  const { data: dashboardData, isLoading: statsLoading } = useDashboardStats();
+
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -31,6 +38,11 @@ const Dashboard = memo(() => {
           마지막 업데이트: 방금 전
         </div>
       </div>
+
+      {/* E-commerce 통계 위젯 */}
+      <section>
+        <EcommerceStats />
+      </section>
 
       {/* 통합 개요 위젯 */}
       <section>
@@ -63,6 +75,14 @@ const Dashboard = memo(() => {
         </div>
       </div>
 
+      {/* E-commerce Charts Section */}
+      <section>
+        <Charts 
+          data={dashboardData?.chartData || chartData} 
+          isLoading={statsLoading || chartsLoading} 
+        />
+      </section>
+
       {/* Footer 정보 */}
       <div className="mt-12 pt-8 border-t border-wp-border-primary">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
@@ -94,10 +114,10 @@ const Dashboard = memo(() => {
         
         <div className="text-center mt-6 text-xs text-wp-text-secondary">
           <p>
-            📊 **Dashboard MVP v1.0** - StatsOverview, RealtimeStats, RecentActivity, QuickActions, SystemStatus 위젯 구현 완료
+            📊 **Dashboard v2.0** - E-commerce Statistics, Sales Charts, Order Analytics 통합 완료
           </p>
           <p className="mt-1">
-            🔄 MSW를 통한 모의 API 데이터 연동 및 React Query 기반 상태 관리 적용
+            🔄 실시간 데이터 연동 및 React Query 기반 상태 관리 적용
           </p>
         </div>
       </div>

@@ -10,6 +10,47 @@ import {
 import { BetaUser } from './BetaUser';
 import { UserSession } from './UserSession';
 
+// Type definition for action metadata
+export interface ActionMetadata {
+  // Content-specific
+  contentId?: string;
+  contentType?: string;
+  contentTitle?: string;
+  playlistId?: string;
+  templateId?: string;
+  
+  // UI-specific
+  clickPosition?: { x: number; y: number };
+  scrollPosition?: number;
+  viewportSize?: { width: number; height: number };
+  
+  // Form-specific
+  formId?: string;
+  fieldName?: string;
+  fieldValue?: string;
+  
+  // Search-specific
+  searchQuery?: string;
+  searchResults?: number;
+  filterCriteria?: string[];
+  
+  // Performance-specific
+  memoryUsage?: number;
+  networkLatency?: number;
+  renderTime?: number;
+  
+  // Feedback-specific
+  feedbackId?: string;
+  rating?: number;
+  
+  // Target-specific
+  targetId?: string;
+  targetName?: string;
+  
+  // Custom properties
+  [key: string]: unknown;
+}
+
 export enum ActionType {
   // Navigation actions
   PAGE_VIEW = 'page_view',
@@ -153,37 +194,7 @@ export class UserAction {
 
   // Additional metadata
   @Column({ type: 'json', nullable: true })
-  metadata?: {
-    // Content-specific
-    contentId?: string;
-    contentType?: string;
-    contentTitle?: string;
-    playlistId?: string;
-    templateId?: string;
-    
-    // UI-specific
-    clickPosition?: { x: number; y: number };
-    scrollPosition?: number;
-    viewportSize?: { width: number; height: number };
-    
-    // Form-specific
-    formId?: string;
-    fieldName?: string;
-    fieldValue?: string;
-    
-    // Search-specific
-    searchQuery?: string;
-    searchResults?: number;
-    filterCriteria?: string[];
-    
-    // Performance-specific
-    memoryUsage?: number;
-    networkLatency?: number;
-    renderTime?: number;
-    
-    // Custom properties
-    [key: string]: any;
-  };
+  metadata?: ActionMetadata;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -194,7 +205,7 @@ export class UserAction {
     sessionId: string,
     pageUrl: string,
     loadTime?: number,
-    metadata?: any
+    metadata?: ActionMetadata
   ): Partial<UserAction> {
     return {
       betaUserId,
@@ -214,7 +225,7 @@ export class UserAction {
     actionType: ActionType,
     contentId: string,
     contentTitle: string,
-    metadata?: any
+    metadata?: ActionMetadata
   ): Partial<UserAction> {
     return {
       betaUserId,
@@ -236,7 +247,7 @@ export class UserAction {
     actionType: ActionType,
     targetId: string,
     targetName: string,
-    metadata?: any
+    metadata?: ActionMetadata
   ): Partial<UserAction> {
     return {
       betaUserId,
@@ -258,7 +269,7 @@ export class UserAction {
     actionType: ActionType,
     feedbackId?: string,
     rating?: number,
-    metadata?: any
+    metadata?: ActionMetadata
   ): Partial<UserAction> {
     return {
       betaUserId,
@@ -280,7 +291,7 @@ export class UserAction {
     pageUrl: string,
     errorMessage: string,
     errorCode?: string,
-    metadata?: any
+    metadata?: ActionMetadata
   ): Partial<UserAction> {
     return {
       betaUserId,

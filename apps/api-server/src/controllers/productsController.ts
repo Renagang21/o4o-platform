@@ -104,7 +104,7 @@ export class ProductsController {
         ...product,
         price: product.getPriceForUser(userRole),
         // 민감한 정보 제거
-        cost: undefined,
+        cost: undefined as number | undefined,
         wholesalePrice: roleString === 'business' ? product.wholesalePrice : undefined,
         affiliatePrice: roleString === 'affiliate' ? product.affiliatePrice : undefined,
       }));
@@ -160,7 +160,7 @@ export class ProductsController {
         ...product,
         price: product.getPriceForUser(userRole),
         // 민감한 정보 제거
-        cost: undefined,
+        cost: undefined as number | undefined,
         wholesalePrice: roleString === 'business' ? product.wholesalePrice : undefined,
         affiliatePrice: roleString === 'affiliate' ? product.affiliatePrice : undefined,
       };
@@ -335,9 +335,9 @@ export class ProductsController {
       const productsWithUserPrice = products.map(product => ({
         ...product,
         price: product.getPriceForUser(userRole),
-        cost: undefined,
-        wholesalePrice: undefined,
-        affiliatePrice: undefined,
+        cost: undefined as number | undefined,
+        wholesalePrice: undefined as number | undefined,
+        affiliatePrice: undefined as number | undefined,
       }));
 
       res.json({

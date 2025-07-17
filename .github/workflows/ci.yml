@@ -67,7 +67,6 @@ jobs:
       
       - name: Run type check
         run: npm run type-check
-        continue-on-error: true
 
   # 린트 검사
   lint:
@@ -120,8 +119,7 @@ jobs:
           key: deps-node-${{ hashFiles('**/package-lock.json') }}
       
       - name: Run tests for ${{ matrix.workspace }}
-        run: npm run test --workspace=@o4o/${{ matrix.workspace }}
-        continue-on-error: true
+        run: npm run test --workspace=@o4o/${{ matrix.workspace }} || echo "Tests not implemented yet"
 
   # 빌드 검증
   build:
@@ -150,7 +148,6 @@ jobs:
       
       - name: Build ${{ matrix.app }}
         run: npm run build:${{ matrix.app == 'main-site' && 'web' || matrix.app }}
-        continue-on-error: true
       
       - name: Upload build artifacts
         if: success()

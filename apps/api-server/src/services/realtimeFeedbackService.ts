@@ -5,12 +5,20 @@ import { FeedbackConversation, ConversationMessage, ConversationStatus, MessageT
 import { BetaUser } from '../entities/BetaUser';
 import { User } from '../entities/User';
 
+export interface NotificationData {
+  feedbackId?: string;
+  conversationId?: string;
+  messageId?: string;
+  updateType?: string;
+  [key: string]: unknown;
+}
+
 export interface NotificationPayload {
   id: string;
   type: 'new_feedback' | 'feedback_update' | 'new_message' | 'conversation_status' | 'urgent_feedback';
   title: string;
   message: string;
-  data?: any;
+  data?: NotificationData;
   timestamp: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
   userId?: string;
@@ -441,7 +449,7 @@ export class RealtimeFeedbackService {
     };
   }
 
-  private async getPendingNotifications(userId: string) {
+  private async getPendingNotifications(userId: string): Promise<NotificationPayload[]> {
     // This would fetch from a notification storage if implemented
     // For now, return empty array
     return [];

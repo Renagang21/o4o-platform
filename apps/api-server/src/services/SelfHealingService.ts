@@ -11,13 +11,50 @@ import * as path from 'path';
 
 const execAsync = promisify(exec);
 
+// Type definitions for service parameters
+export interface ServiceRestartParameters {
+  graceful?: boolean;
+  timeout?: number;
+  verifyRestart?: boolean;
+  [key: string]: unknown;
+}
+
+export interface CacheClearParameters {
+  cacheTypes?: string[];
+  pattern?: string;
+  [key: string]: unknown;
+}
+
+export interface ConnectionResetParameters {
+  maxConnections?: number;
+  [key: string]: unknown;
+}
+
+export interface ScaleResourceParameters {
+  action?: string;
+  factor?: number;
+  [key: string]: unknown;
+}
+
+export interface ServiceState {
+  restartCount: number;
+  lastRestart: Date | null;
+  [key: string]: unknown;
+}
+
+export interface HealingContext {
+  serviceName?: string;
+  target?: string;
+  [key: string]: unknown;
+}
+
 export interface HealingAction {
   id: string;
   name: string;
   description: string;
   target: string;
   type: 'service_restart' | 'cache_clear' | 'connection_reset' | 'resource_scale' | 'memory_cleanup' | 'disk_cleanup' | 'process_kill' | 'file_cleanup' | 'config_reload';
-  parameters: any;
+  parameters: Record<string, unknown>;
   safetyChecks: SafetyCheck[];
   rollbackActions?: HealingAction[];
   maxRetries: number;
@@ -49,7 +86,7 @@ export interface HealingAttempt {
   }[];
   executionLog: string[];
   rollbackPerformed: boolean;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SystemHealth {
@@ -112,7 +149,7 @@ export class SelfHealingService {
   private maxConcurrentHealing: number = 3;
   
   // Service tracking
-  private serviceStates: Map<string, any> = new Map();
+  private serviceStates: Map<string, ServiceState> = new Map();
   private lastHealthCheck: Date | null = null;
 
   constructor() {
@@ -139,14 +176,14 @@ export class SelfHealingService {
   }
 
   // Service restart functionality
-  async restartService(serviceName: string, parameters?: any): Promise<{ output: string }> {
+  async restartService(serviceName: string, parameters?: ServiceRestartParameters): Promise<{ output: string }> {
     console.log(`🔄 Restarting service: ${serviceName}`);
     
     const action = this.healingActions.get('restart-service') || await this.createServiceRestartAction(serviceName, parameters);
     return await this.executeHealingAction(action, { serviceName, ...parameters });
   }
 
-  private async createServiceRestartAction(serviceName: string, parameters: any): Promise<HealingAction> {
+  private async createServiceRestartAction(serviceName: string, parameters: ServiceRestartParameters): Promise<HealingAction> {
     return {
       id: `restart-${serviceName}`,
       name: `Restart ${serviceName}`,
@@ -181,7 +218,7 @@ export class SelfHealingService {
   }
 
   // Cache clearing functionality
-  async clearCache(target: string, parameters?: any): Promise<{ output: string }> {
+  async clearCache(target: string, parameters?: CacheClearParameters): Promise<{ output: string }> {
     console.log(`🗑️ Clearing cache: ${target}`);
     
     let output = '';
@@ -225,7 +262,7 @@ export class SelfHealingService {
     cacheService.clearAll?.();
   }
 
-  private async clearRedisCache(parameters?: any): Promise<void> {
+  private async clearRedisCache(parameters?: { pattern?: string }): Promise<void> {
     try {
       // Implementation would use actual Redis client
       const pattern = parameters?.pattern || '*';
@@ -258,7 +295,7 @@ export class SelfHealingService {
   }
 
   // Connection reset functionality
-  async resetConnections(target: string, parameters?: any): Promise<{ output: string }> {
+  async resetConnections(target: string, parameters?: ConnectionResetParameters): Promise<{ output: string }> {
     console.log(`🔌 Resetting connections: ${target}`);
     
     let output = '';
@@ -286,7 +323,7 @@ export class SelfHealingService {
     return { output };
   }
 
-  private async resetDatabaseConnections(parameters?: any): Promise<string> {
+  private async resetDatabaseConnections(parameters?: { maxConnections?: number }): Promise<string> {
     const maxConnections = parameters?.maxConnections || 20;
     
     try {
@@ -312,14 +349,14 @@ export class SelfHealingService {
     }
   }
 
-  private async resetRedisConnections(parameters?: any): Promise<string> {
+  private async resetRedisConnections(parameters?: Record<string, unknown>): Promise<string> {
     // Implementation would reset Redis connections
     console.log('Resetting Redis connections');
     return 'Redis connections reset';
   }
 
   // Resource scaling functionality
-  async scaleResources(target: string, parameters?: any): Promise<{ output: string }> {
+  async scaleResources(target: string, parameters?: ScaleResourceParameters): Promise<{ output: string }> {
     console.log(`📈 Scaling resources: ${target}`);
     
     const action = parameters?.action || 'scale_up';
@@ -497,10 +534,10 @@ export class SelfHealingService {
     
     for (const service of criticalServices) {
       const status = await this.checkServiceStatus(service);
-      const state = this.serviceStates.get(service) || {};
+      const state = this.serviceStates.get(service) || { restartCount: 0, lastRestart: null };
       
       services[service] = {
-        status: status as any,
+        status: status as 'running' | 'stopped' | 'error' | 'unknown',
         restartCount: state.restartCount || 0,
         lastRestart: state.lastRestart
       };
@@ -687,7 +724,7 @@ export class SelfHealingService {
   }
 
   // Healing action execution
-  private async executeHealingAction(action: HealingAction, context: any): Promise<{ output: string }> {
+  private async executeHealingAction(action: HealingAction, context: HealingContext): Promise<{ output: string }> {
     const attemptId = `healing_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     const attempt: HealingAttempt = {
@@ -754,7 +791,7 @@ export class SelfHealingService {
     }
   }
 
-  private async performSafetyCheck(check: SafetyCheck, context: any): Promise<{
+  private async performSafetyCheck(check: SafetyCheck, context: HealingContext): Promise<{
     check: SafetyCheck;
     passed: boolean;
     output?: string;
@@ -813,7 +850,7 @@ export class SelfHealingService {
     }
   }
 
-  private async performHealingAction(action: HealingAction, context: any, attempt: HealingAttempt): Promise<string> {
+  private async performHealingAction(action: HealingAction, context: HealingContext, attempt: HealingAttempt): Promise<string> {
     attempt.executionLog.push(`Starting ${action.type} on ${action.target}`);
     
     switch (action.type) {
@@ -841,14 +878,14 @@ export class SelfHealingService {
     }
   }
 
-  private async executeServiceRestart(serviceName: string, parameters: any, attempt: HealingAttempt): Promise<string> {
+  private async executeServiceRestart(serviceName: string, parameters: ServiceRestartParameters, attempt: HealingAttempt): Promise<string> {
     const graceful = parameters.graceful !== false;
     const timeout = parameters.timeout || 30;
     
     attempt.executionLog.push(`Restarting ${serviceName} (graceful: ${graceful})`);
     
     // Track restart
-    const state = this.serviceStates.get(serviceName) || {};
+    const state = this.serviceStates.get(serviceName) || { restartCount: 0, lastRestart: null };
     state.restartCount = (state.restartCount || 0) + 1;
     state.lastRestart = new Date();
     this.serviceStates.set(serviceName, state);
@@ -1075,7 +1112,7 @@ export class SelfHealingService {
 
   async forceHealing(issueType: string, component: string): Promise<{ output: string }> {
     const issue: SystemIssue = {
-      type: issueType as any,
+      type: issueType as SystemIssue['type'],
       severity: 'high',
       description: `Manual healing request for ${component}`,
       affectedComponent: component,
