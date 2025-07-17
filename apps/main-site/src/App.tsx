@@ -21,6 +21,7 @@ import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 // TheDANG Style Home (without editor)
 import TheDANGStyleHome from './pages/TheDANGStyleHome';
 import HomeDynamic from './pages/HomeDynamic';
+import HomeWithSettings from './pages/HomeWithSettings';
 // Temporarily disabled: import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
 
 // Test Dashboard
@@ -53,7 +54,7 @@ const App: React.FC = () => {
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<HomeDynamic />} />
+          <Route path="/" element={<HomeWithSettings />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           

@@ -87,8 +87,10 @@ const Orders: React.FC = () => {
       }
     }
 
+    const action = bulkAction.startsWith('status_') ? 'update_status' : bulkAction as 'delete' | 'export';
+    
     await bulkOrderAction.mutateAsync({
-      action: bulkAction as any,
+      action,
       orderIds: selectedOrders,
       data: bulkAction.startsWith('status_') ? {
         status: bulkAction.replace('status_', '') as OrderStatus
@@ -219,7 +221,7 @@ const Orders: React.FC = () => {
               </label>
               <select
                 value={filters.status || ''}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value as any })}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value as OrderStatus })}
                 className="w-full border rounded-lg px-3 py-2"
               >
                 <option value="">전체 상태</option>

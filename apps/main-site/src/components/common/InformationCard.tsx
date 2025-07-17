@@ -173,7 +173,12 @@ const InformationCard: React.FC<InformationCardProps> = ({
 };
 
 // 개별 정보 섹션 컴포넌트들
-export const TechnicalInfoSection: React.FC<{ data: any }> = ({ data }) => (
+interface TechnicalData {
+  specifications?: string[];
+  features?: string[];
+}
+
+export const TechnicalInfoSection: React.FC<{ data: TechnicalData }> = ({ data }) => (
   <div className="space-y-3">
     <div className="grid grid-cols-2 gap-4">
       <div>
@@ -202,12 +207,22 @@ export const TechnicalInfoSection: React.FC<{ data: any }> = ({ data }) => (
   </div>
 );
 
-export const SafetyInfoSection: React.FC<{ data: any }> = ({ data }) => (
+interface SafetyTest {
+  name: string;
+  result: string;
+}
+
+interface SafetyData {
+  safetyTests?: SafetyTest[];
+  warnings?: string[];
+}
+
+export const SafetyInfoSection: React.FC<{ data: SafetyData }> = ({ data }) => (
   <div className="space-y-3">
     <div className="bg-info-safety bg-opacity-10 border border-info-safety border-opacity-20 rounded-lg p-3">
       <h5 className="font-medium text-info-safety mb-2">🛡️ 안전성 데이터</h5>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-        {data.safetyTests?.map((test: any, index: number) => (
+        {data.safetyTests?.map((test, index) => (
           <div key={index} className="flex items-center justify-between">
             <span className="text-gray-700">{test.name}:</span>
             <span className="font-medium text-info-safety">{test.result}</span>
@@ -232,12 +247,22 @@ export const SafetyInfoSection: React.FC<{ data: any }> = ({ data }) => (
   </div>
 );
 
-export const UsageInfoSection: React.FC<{ data: any }> = ({ data }) => (
+interface UsageInstruction {
+  title: string;
+  description: string;
+}
+
+interface UsageData {
+  instructions?: UsageInstruction[];
+  tips?: string[];
+}
+
+export const UsageInfoSection: React.FC<{ data: UsageData }> = ({ data }) => (
   <div className="space-y-3">
     <div>
       <h5 className="font-medium text-info-usage mb-2">📋 사용법 안내</h5>
       <div className="space-y-2">
-        {data.instructions?.map((instruction: any, index: number) => (
+        {data.instructions?.map((instruction, index) => (
           <div key={index} className="flex items-start space-x-3">
             <span className="flex items-center justify-center w-6 h-6 bg-info-usage text-white text-xs font-bold rounded-full flex-shrink-0">
               {index + 1}

@@ -190,7 +190,7 @@ export class SignageService {
     contentId?: string,
     playlistId?: string,
     duration?: number,
-    metadata?: any
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const log = this.logRepository.create({
       storeId,

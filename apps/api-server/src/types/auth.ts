@@ -26,7 +26,7 @@ export interface JWTPayload {
   role: UserRole;
   status: UserStatus;
   name?: string;
-  businessInfo?: any;
+  businessInfo?: BusinessInfo;
   createdAt?: Date;
   updatedAt?: Date;
   lastLoginAt?: Date;
@@ -51,7 +51,7 @@ export interface RegisterData {
   lastName?: string;
   name?: string;
   role?: UserRole;
-  businessInfo?: any;
+  businessInfo?: BusinessInfo;
 }
 
 export interface UserApprovalData {
@@ -76,6 +76,7 @@ export interface BusinessInfo {
     phone: string;
     website?: string;
   };
+  metadata?: Record<string, string | number | boolean>;
 }
 
 // Token-specific types
@@ -86,7 +87,7 @@ export interface AccessTokenPayload {
   role?: UserRole | string; // Allow string for backward compatibility
   name?: string;
   status?: UserStatus | string;
-  businessInfo?: any;
+  businessInfo?: BusinessInfo;
   permissions?: string[];
   domain?: string;
   sub?: string; // JWT standard claim
@@ -120,8 +121,22 @@ export interface LoginRequest {
   domain?: string;
 }
 
+export interface UserData {
+  id: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  businessInfo?: BusinessInfo;
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt?: Date;
+}
+
 export interface LoginResponse {
-  user: any; // Will be replaced with proper User type
+  user: UserData;
   tokens: AuthTokens;
   success?: boolean;
 }
@@ -142,11 +157,11 @@ export interface CookieConfig {
 export interface PricingResult {
   enabled?: boolean;
   degradationLevel?: string;
-  fallbackData?: any;
+  fallbackData?: Record<string, unknown>;
   staticContent?: string;
   fallbackUrl?: string;
   readOnlyMode?: boolean;
   essentialOnly?: boolean;
   disabledFeatures?: string[];
-  [key: string]: any;
+  metadata?: Record<string, string | number | boolean | string[]>;
 }

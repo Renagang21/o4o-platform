@@ -1,7 +1,8 @@
 import crypto from 'crypto';
+import { QueryRunner } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { Payment, PaymentProvider, PaymentGatewayStatus } from '../entities/Payment';
-import { Order, PaymentStatus, OrderStatus } from '../entities/Order';
+import { Order, PaymentStatus, OrderStatus, PaymentMethod } from '../entities/Order';
 import { inventoryService } from './inventoryService';
 
 export interface WebhookPayload {
@@ -11,9 +12,73 @@ export interface WebhookPayload {
   status: 'success' | 'failed' | 'cancelled';
   amount: number;
   currency: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   signature?: string;
   timestamp?: number;
+}
+
+export interface IamportWebhookPayload {
+  imp_uid: string;
+  merchant_uid: string;
+  status: string;
+  amount: number;
+  currency?: string;
+  pay_method?: string;
+  pg_provider?: string;
+  paid_at?: number;
+  failed_at?: number;
+  cancelled_at?: number;
+  receipt_url?: string;
+}
+
+export interface TossPaymentsWebhookPayload {
+  paymentKey: string;
+  orderId: string;
+  status: string;
+  amount: {
+    total: number;
+    currency: string;
+  };
+  method?: string;
+  requestedAt?: string;
+  approvedAt?: string;
+  failedAt?: string;
+  cancelledAt?: string;
+}
+
+export interface KakaoPayWebhookPayload {
+  tid: string;
+  partner_order_id: string;
+  partner_user_id: string;
+  payment_method_type: string;
+  amount: {
+    total: number;
+    tax_free: number;
+    vat: number;
+  };
+  status: string;
+  created_at: string;
+  approved_at?: string;
+  canceled_at?: string;
+}
+
+export interface NaverPayWebhookPayload {
+  paymentId: string;
+  merchantPayKey: string;
+  merchantUserKey: string;
+  primaryMethod: string;
+  totalPayAmount: number;
+  paymentStatus: string;
+  paymentDate?: string;
+  detail?: {
+    productItems: Array<{
+      categoryType: string;
+      categoryId: string;
+      uid: string;
+      name: string;
+      count: number;
+    }>;
+  };
 }
 
 export class WebhookService {
@@ -70,7 +135,7 @@ export class WebhookService {
   /**
    * 아임포트 웹훅을 처리합니다.
    */
-  async handleIamportWebhook(payload: any, signature: string): Promise<{ success: boolean; message: string }> {
+  async handleIamportWebhook(payload: IamportWebhookPayload, signature: string): Promise<{ success: boolean; message: string }> {
     const secret = process.env.IAMPORT_WEBHOOK_SECRET;
     if (!secret) {
       return { success: false, message: 'Webhook secret not configured' };
@@ -93,7 +158,7 @@ export class WebhookService {
       status: payload.status === 'paid' ? 'success' : 'failed',
       amount: payload.amount,
       currency: payload.currency || 'KRW',
-      metadata: payload
+      metadata: payload as unknown as Record<string, unknown>
     };
 
     return await this.processWebhook(webhookData);
@@ -102,7 +167,7 @@ export class WebhookService {
   /**
    * 토스페이먼츠 웹훅을 처리합니다.
    */
-  async handleTossPaymentsWebhook(payload: any, signature: string): Promise<{ success: boolean; message: string }> {
+  async handleTossPaymentsWebhook(payload: TossPaymentsWebhookPayload, signature: string): Promise<{ success: boolean; message: string }> {
     const secret = process.env.TOSS_PAYMENTS_WEBHOOK_SECRET;
     if (!secret) {
       return { success: false, message: 'Webhook secret not configured' };
@@ -123,9 +188,9 @@ export class WebhookService {
       transactionId: payload.orderId,
       gatewayTransactionId: payload.paymentKey,
       status: payload.status === 'DONE' ? 'success' : 'failed',
-      amount: payload.totalAmount,
-      currency: payload.currency || 'KRW',
-      metadata: payload
+      amount: payload.amount.total,
+      currency: payload.amount.currency || 'KRW',
+      metadata: payload as unknown as Record<string, unknown>
     };
 
     return await this.processWebhook(webhookData);
@@ -134,7 +199,7 @@ export class WebhookService {
   /**
    * 카카오페이 웹훅을 처리합니다.
    */
-  async handleKakaoPayWebhook(payload: any, signature: string): Promise<{ success: boolean; message: string }> {
+  async handleKakaoPayWebhook(payload: KakaoPayWebhookPayload, signature: string): Promise<{ success: boolean; message: string }> {
     const secret = process.env.KAKAO_PAY_WEBHOOK_SECRET;
     if (!secret) {
       return { success: false, message: 'Webhook secret not configured' };
@@ -157,7 +222,7 @@ export class WebhookService {
       status: payload.status === 'SUCCESS_PAYMENT' ? 'success' : 'failed',
       amount: payload.amount.total,
       currency: 'KRW',
-      metadata: payload
+      metadata: payload as unknown as Record<string, unknown>
     };
 
     return await this.processWebhook(webhookData);
@@ -166,7 +231,7 @@ export class WebhookService {
   /**
    * 네이버페이 웹훅을 처리합니다.
    */
-  async handleNaverPayWebhook(payload: any, signature: string): Promise<{ success: boolean; message: string }> {
+  async handleNaverPayWebhook(payload: NaverPayWebhookPayload, signature: string): Promise<{ success: boolean; message: string }> {
     const secret = process.env.NAVER_PAY_WEBHOOK_SECRET;
     if (!secret) {
       return { success: false, message: 'Webhook secret not configured' };
@@ -186,10 +251,10 @@ export class WebhookService {
       provider: PaymentProvider.NAVER_PAY,
       transactionId: payload.merchantPayKey,
       gatewayTransactionId: payload.paymentId,
-      status: payload.detail.admissionState === 'SUCCESS' ? 'success' : 'failed',
-      amount: payload.body.totalPayAmount,
+      status: payload.paymentStatus === 'SUCCESS' ? 'success' : 'failed',
+      amount: payload.totalPayAmount,
       currency: 'KRW',
-      metadata: payload
+      metadata: payload as unknown as Record<string, unknown>
     };
 
     return await this.processWebhook(webhookData);
@@ -230,9 +295,9 @@ export class WebhookService {
       await queryRunner.manager.update(Payment, payment.id, {
         status: newPaymentStatus,
         gatewayTransactionId: webhookData.gatewayTransactionId,
-        webhookData: webhookData.metadata,
+        webhookData: webhookData.metadata as any,
         ...(webhookData.status === 'failed' && { 
-          failureReason: webhookData.metadata?.failureReason || 'Payment failed' 
+          failureReason: (webhookData.metadata?.failureReason as string) || 'Payment failed' 
         })
       });
 
@@ -266,7 +331,7 @@ export class WebhookService {
    * 결제 성공 시 처리 로직입니다.
    */
   private async handleSuccessfulPayment(
-    queryRunner: any, 
+    queryRunner: QueryRunner, 
     payment: Payment, 
     webhookData: WebhookPayload
   ): Promise<void> {
@@ -275,8 +340,7 @@ export class WebhookService {
       paymentStatus: PaymentStatus.PAID,
       status: OrderStatus.CONFIRMED,
       paymentId: payment.id,
-      paymentMethod: payment.method as any,
-      paidAt: new Date()
+      paymentMethod: payment.method as PaymentMethod
     });
 
     // 재고 확정 (예약된 재고를 실제 차감)
@@ -309,7 +373,7 @@ export class WebhookService {
    * 결제 실패 시 처리 로직입니다.
    */
   private async handleFailedPayment(
-    queryRunner: any, 
+    queryRunner: QueryRunner, 
     payment: Payment, 
     webhookData: WebhookPayload
   ): Promise<void> {
@@ -401,7 +465,7 @@ export class WebhookService {
   /**
    * 외부 URL에 웹훅을 전송합니다.
    */
-  async sendWebhook(url: string, payload: any): Promise<void> {
+  async sendWebhook(url: string, payload: Record<string, unknown>): Promise<void> {
     try {
       const response = await fetch(url, {
         method: 'POST',

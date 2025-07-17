@@ -26,7 +26,12 @@ export class AnalyticsMiddleware {
     return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
       const startTime = Date.now();
       const sessionId = req.headers['x-session-id'] as string || uuidv4();
-      const betaUserId = req.headers['x-beta-user-id'] as string || (req as any).user?.betaUserId;
+      interface UserWithBetaId extends Request {
+        user?: {
+          betaUserId?: string;
+        };
+      }
+      const betaUserId = req.headers['x-beta-user-id'] as string || (req as UserWithBetaId).user?.betaUserId;
       const userAgent = req.headers['user-agent'] || 'Unknown';
       const ipAddress = req.ip || req.connection.remoteAddress || 'Unknown';
 
@@ -315,7 +320,7 @@ export class AnalyticsMiddleware {
             // Update session feedback count
             await this.analyticsService.updateSession(req.analytics.sessionId, {
               feedbackSubmitted: 1
-            } as any);
+            });
           } catch (error) {
             console.error('Feedback tracking error:', error);
           }
@@ -364,7 +369,7 @@ export class AnalyticsMiddleware {
               // Update session content viewed count
               await this.analyticsService.updateSession(req.analytics.sessionId, {
                 contentViewed: 1
-              } as any);
+              });
             }
           } catch (error) {
             console.error('Content usage tracking error:', error);

@@ -41,14 +41,14 @@ export interface DeploymentInfo {
   healthChecks: HealthCheck[];
   metrics: DeploymentMetrics;
   rollbackInfo?: RollbackInfo;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface HealthCheck {
   name: string;
   url?: string;
   command?: string;
-  expectedResponse?: any;
+  expectedResponse?: string | number | boolean | Record<string, unknown>;
   timeout: number; // seconds
   retries: number;
   interval: number; // seconds for monitoring
@@ -112,7 +112,7 @@ export interface RollbackStep {
   type: 'git_revert' | 'database_migration' | 'service_restart' | 'config_restore' | 'cache_clear' | 'script_execution';
   command?: string;
   target?: string;
-  parameters?: any;
+  parameters?: Record<string, string | number | boolean>;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   startTime?: Date;
   endTime?: Date;
@@ -507,13 +507,16 @@ export class DeploymentMonitoringService {
     }
   }
 
-  private compareObjects(actual: any, expected: any): boolean {
+  private compareObjects(actual: unknown, expected: unknown): boolean {
     if (typeof expected !== 'object' || expected === null) {
       return actual === expected;
     }
 
-    for (const key in expected) {
-      if (!(key in actual) || !this.compareObjects(actual[key], expected[key])) {
+    const expectedObj = expected as Record<string, unknown>;
+    const actualObj = actual as Record<string, unknown>;
+
+    for (const key in expectedObj) {
+      if (!(key in actualObj) || !this.compareObjects(actualObj[key], expectedObj[key])) {
         return false;
       }
     }
@@ -640,7 +643,11 @@ export class DeploymentMonitoringService {
     isHealthy: boolean;
     shouldRollback: boolean;
     reason: string;
-    details: any;
+    details: {
+      healthChecks?: { passed: boolean; failedChecks?: string[] };
+      performance?: { passed: boolean; degradedMetrics?: string[] };
+      stability?: { passed: boolean; issues?: string[] };
+    };
   }> {
     const validationResults = {
       healthChecks: this.validateHealthChecks(deployment),
@@ -795,7 +802,7 @@ export class DeploymentMonitoringService {
   }
 
   // Rollback functionality
-  async rollbackDeployment(target: string, parameters?: any): Promise<{ output: string }> {
+  async rollbackDeployment(target: string, parameters?: Record<string, string | number | boolean>): Promise<{ output: string }> {
     console.log(`🔄 Rolling back deployment: ${target}`);
 
     let deployment: DeploymentInfo | undefined;
@@ -813,7 +820,7 @@ export class DeploymentMonitoringService {
       throw new Error(`Deployment not found: ${target}`);
     }
 
-    const rollbackInfo = await this.executeRollback(deployment, 'manual', parameters?.reason || 'Manual rollback requested');
+    const rollbackInfo = await this.executeRollback(deployment, 'manual', typeof parameters?.reason === 'string' ? parameters.reason : 'Manual rollback requested');
 
     return { output: `Rollback initiated for deployment ${deployment.id} (Rollback ID: ${rollbackInfo.id})` };
   }
@@ -1020,7 +1027,7 @@ export class DeploymentMonitoringService {
     return `Configuration ${target} restored successfully`;
   }
 
-  private async executeCustomScript(command: string, parameters?: any): Promise<string> {
+  private async executeCustomScript(command: string, parameters?: Record<string, string | number | boolean>): Promise<string> {
     try {
       const { stdout, stderr } = await execAsync(`${command} ${JSON.stringify(parameters || {})}`);
       return stdout || stderr;

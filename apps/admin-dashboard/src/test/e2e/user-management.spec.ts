@@ -8,8 +8,8 @@ import { test, expect, Page } from '@playwright/test';
 // 테스트 헬퍼 함수들
 async function loginAsAdmin(page: Page) {
   await page.goto('/login');
-  await page.fill('[data-testid="email-input"]', 'admin@example.com');
-  await page.fill('[data-testid="password-input"]', 'password123');
+  await page.fill('[data-testid="email-input"]', process.env.TEST_ADMIN_EMAIL || 'admin@example.com');
+  await page.fill('[data-testid="password-input"]', process.env.TEST_ADMIN_PASSWORD || 'test-password');
   await page.click('[data-testid="login-button"]');
   await page.waitForURL('/dashboard');
 }

@@ -105,7 +105,7 @@ export class PaymentController {
           gatewayResponse = await this.processKakaoPayment(savedPayment, order);
           break;
         default:
-          gatewayResponse = { error: 'Unsupported payment provider' };
+          gatewayResponse = { paymentId: '', error: 'Unsupported payment provider' };
       }
 
       if (gatewayResponse.error) {
@@ -423,8 +423,8 @@ export class PaymentController {
       // 민감한 정보 제거
       const sanitizedPayments: SanitizedPayment[] = payments.map(payment => ({
         ...payment,
-        gatewayResponse: undefined,
-        webhookData: undefined,
+        gatewayResponse: undefined as any,
+        webhookData: undefined as any,
         paymentDetails: payment.paymentDetails ? {
           cardNumber: payment.getMaskedCardNumber(),
           cardType: payment.paymentDetails.cardType,
@@ -508,7 +508,7 @@ export class PaymentController {
         method: 'redirect'
       };
     } catch (error) {
-      return { error: 'Iamport payment initialization failed' };
+      return { paymentId: '', error: 'Iamport payment initialization failed' };
     }
   }
 
@@ -521,7 +521,7 @@ export class PaymentController {
         method: 'redirect'
       };
     } catch (error) {
-      return { error: 'Toss Payments initialization failed' };
+      return { paymentId: '', error: 'Toss Payments initialization failed' };
     }
   }
 
@@ -534,7 +534,7 @@ export class PaymentController {
         method: 'redirect'
       };
     } catch (error) {
-      return { error: 'Kakao Pay initialization failed' };
+      return { paymentId: '', error: 'Kakao Pay initialization failed' };
     }
   }
 

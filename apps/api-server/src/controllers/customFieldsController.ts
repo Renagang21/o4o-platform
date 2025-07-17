@@ -122,17 +122,17 @@ export class CustomFieldsController {
 
       // Create fields if provided
       if (fields.length > 0) {
-        const fieldEntities: any[] = [];
-        for (let index = 0; index < fields.length; index++) {
-          const field = fields[index];
-          fieldEntities.push(this.customFieldRepository.create({
+        const fieldEntities = fields.map((field: Partial<CustomField>, index: number) => 
+          this.customFieldRepository.create({
             ...field,
             groupId: savedFieldGroup.id,
             order: field.order !== undefined ? field.order : index
-          }));
-        }
+          })
+        );
 
-        await this.customFieldRepository.save(fieldEntities);
+        for (const fieldEntity of fieldEntities) {
+          await this.customFieldRepository.save(fieldEntity);
+        }
       }
 
       // Get complete field group with fields
@@ -203,17 +203,18 @@ export class CustomFieldsController {
 
         // Create new fields
         if (fields.length > 0) {
-          const fieldEntities: any[] = [];
-          for (let index = 0; index < fields.length; index++) {
-            const field = fields[index];
-            fieldEntities.push(this.customFieldRepository.create({
+          const fieldEntities = fields.map((field: Partial<CustomField>, index: number) => 
+            this.customFieldRepository.create({
               ...field,
               groupId: id,
               order: field.order !== undefined ? field.order : index
-            }));
-          }
+            })
+          );
 
-          await this.customFieldRepository.save(fieldEntities);
+          // Save each field individually
+          for (const fieldEntity of fieldEntities) {
+            await this.customFieldRepository.save(fieldEntity);
+          }
         }
       }
 
@@ -716,14 +717,16 @@ export class CustomFieldsController {
 
           // Create fields
           if (groupData.fields && Array.isArray(groupData.fields)) {
-            const fieldEntities = groupData.fields.map((fieldData: any) => 
+            const fieldEntities = groupData.fields.map((fieldData: Partial<CustomField>) => 
               this.customFieldRepository.create({
                 ...fieldData,
                 groupId: savedFieldGroup.id
               })
             );
 
-            await this.customFieldRepository.save(fieldEntities);
+            for (const fieldEntity of fieldEntities) {
+            await this.customFieldRepository.save(fieldEntity);
+          }
           }
 
           results.push({

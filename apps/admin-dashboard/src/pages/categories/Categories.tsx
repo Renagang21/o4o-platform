@@ -70,7 +70,7 @@ export default function Categories() {
 
   // Create/Update mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Partial<Category | Tag>) => {
       const endpoint = selectedTab === 'categories' ? '/api/categories' : '/api/tags';
       if (editingItem) {
         return apiClient.put(`${endpoint}/${editingItem.id}`, data);
@@ -82,7 +82,7 @@ export default function Categories() {
       toast.success(editingItem ? '수정되었습니다' : '생성되었습니다');
       handleCloseDialog();
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || '오류가 발생했습니다');
     }
   });
@@ -97,7 +97,7 @@ export default function Categories() {
       queryClient.invalidateQueries({ queryKey: [selectedTab] });
       toast.success('삭제되었습니다');
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       toast.error(error.response?.data?.message || '삭제 중 오류가 발생했습니다');
     }
   });
@@ -204,7 +204,7 @@ export default function Categories() {
         </div>
       ) : items && items.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((item: any) => (
+          {items.map((item: Category | Tag) => (
             <Card key={item.id}>
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
@@ -238,7 +238,7 @@ export default function Categories() {
                 {item.description && (
                   <p className="text-sm text-gray-600 mb-3">{item.description}</p>
                 )}
-                {item.parentName && (
+                {'parentName' in item && item.parentName && (
                   <Badge variant="outline" className="mb-3">
                     상위: {item.parentName}
                   </Badge>

@@ -81,7 +81,7 @@ export class ForumPost {
   tags?: string[];
 
   @Column({ type: 'json', nullable: true })
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 
   @Column({ type: 'timestamp', nullable: true })
   publishedAt?: Date;

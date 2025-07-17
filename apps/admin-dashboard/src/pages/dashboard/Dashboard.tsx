@@ -19,7 +19,7 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 const Dashboard = memo(() => {
   const { chartData, isLoading: chartsLoading } = useDashboardData();
-  const { data: dashboardData, isLoading: statsLoading } = useDashboardStats();
+  const { isLoading: statsLoading } = useDashboardStats();
 
   return (
     <div className="space-y-8">
@@ -78,7 +78,7 @@ const Dashboard = memo(() => {
       {/* E-commerce Charts Section */}
       <section>
         <Charts 
-          data={dashboardData?.chartData || chartData} 
+          data={chartData} 
           isLoading={statsLoading || chartsLoading} 
         />
       </section>

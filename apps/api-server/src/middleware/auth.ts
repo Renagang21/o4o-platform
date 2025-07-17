@@ -40,7 +40,14 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not configured');
     }
-    const decoded = jwt.verify(token, jwtSecret) as any;
+    interface JWTDecoded {
+      userId: string;
+      email?: string;
+      role?: string;
+      iat?: number;
+      exp?: number;
+    }
+    const decoded = jwt.verify(token, jwtSecret) as JWTDecoded;
     const userRepository = AppDataSource.getRepository(User);
     
     const user = await userRepository.findOne({ 
@@ -67,8 +74,13 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       id: user.id,
       userId: user.id,
       email: user.email,
-      role: user.role as any, // Type casting needed as role is string in DB
-      status: user.status as any // Type casting needed as status is string in DB
+      role: user.role as UserRole,
+      status: user.status as UserStatus,
+      name: user.name,
+      businessInfo: user.businessInfo,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      lastLoginAt: user.lastLoginAt
     };
     next();
   } catch (error) {
@@ -120,7 +132,14 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
       return next();
     }
 
-    const decoded = jwt.verify(token, jwtSecret) as any;
+    interface JWTDecoded {
+      userId: string;
+      email?: string;
+      role?: string;
+      iat?: number;
+      exp?: number;
+    }
+    const decoded = jwt.verify(token, jwtSecret) as JWTDecoded;
     const userRepository = AppDataSource.getRepository(User);
     
     const user = await userRepository.findOne({ 
@@ -133,8 +152,13 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
         id: user.id,
         userId: user.id,
         email: user.email,
-        role: user.role as any,
-        status: user.status as any
+        role: user.role as UserRole,
+        status: user.status as UserStatus,
+        name: user.name,
+        businessInfo: user.businessInfo,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        lastLoginAt: user.lastLoginAt
       };
     }
 

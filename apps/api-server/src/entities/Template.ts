@@ -4,7 +4,7 @@ import { User } from './User'
 export interface TemplateBlock {
   id: string
   type: string
-  data: any
+  data: Record<string, unknown>
   order: number
 }
 

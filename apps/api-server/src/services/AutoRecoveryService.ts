@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricType, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertType, AlertSeverity, AlertStatus } from '../entities/Alert';
-import { OperationsMonitoringService } from './OperationsMonitoringService';
+import { OperationsMonitoringService, SystemStatus } from './OperationsMonitoringService';
 import { CircuitBreakerService } from './CircuitBreakerService';
 import { GracefulDegradationService } from './GracefulDegradationService';
 import { IncidentEscalationService } from './IncidentEscalationService';
@@ -39,7 +39,7 @@ export interface RecoveryAction {
 export interface RecoveryStep {
   type: 'restart_service' | 'clear_cache' | 'reset_connections' | 'scale_resources' | 'rollback_deployment' | 'isolate_component' | 'execute_script' | 'notify_team';
   target: string;
-  parameters?: { [key: string]: any };
+  parameters?: { [key: string]: string | number | boolean | null | string[] };
   timeout?: number; // seconds
   retryCount?: number;
   successCondition?: string;
@@ -65,7 +65,7 @@ export interface RecoveryAttempt {
     improvements: string[];
     remainingIssues: string[];
   };
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AutoRecoveryStats {
@@ -357,13 +357,13 @@ export class AutoRecoveryService {
         return await this.selfHealing.scaleResources(step.target, step.parameters);
       
       case 'rollback_deployment':
-        return await this.deploymentMonitoring.rollbackDeployment(step.target, step.parameters);
+        return await this.deploymentMonitoring.rollbackDeployment(step.target, step.parameters as Record<string, string | number | boolean>);
       
       case 'isolate_component':
-        return await this.gracefulDegradation.isolateComponent(step.target, step.parameters);
+        return await this.gracefulDegradation.isolateComponent(step.target, step.parameters as Record<string, string | number | boolean>);
       
       case 'execute_script':
-        return await this.executeCustomScript(step.target, step.parameters);
+        return await this.executeCustomScript(step.target, step.parameters as Record<string, string | number | boolean>);
       
       case 'notify_team':
         return await this.incidentEscalation.notifyTeam(step.target, step.parameters);
@@ -373,7 +373,7 @@ export class AutoRecoveryService {
     }
   }
 
-  private async executeCustomScript(scriptPath: string, parameters?: any): Promise<{ output: string }> {
+  private async executeCustomScript(scriptPath: string, parameters?: Record<string, string | number | boolean>): Promise<{ output: string }> {
     const { stdout, stderr } = await execAsync(`bash ${scriptPath} ${JSON.stringify(parameters || {})}`);
     
     if (stderr) {
@@ -816,7 +816,7 @@ export class AutoRecoveryService {
     
     await this.incidentEscalation.escalateAlert(alert, {
       reason,
-      autoRecoveryAttempt: attempt,
+      autoRecoveryAttempt: attempt ? 1 : 0,
       escalationLevel: 'manual_intervention',
       urgency: alert.severity === AlertSeverity.CRITICAL ? 'immediate' : 'high'
     });
@@ -942,9 +942,39 @@ export class AutoRecoveryService {
     );
   }
 
-  private async recordSystemHealthMetrics(systemStatus: any): Promise<void> {
+  private async recordSystemHealthMetrics(systemStatus: SystemStatus): Promise<void> {
     // Record various health metrics from system status
-    // Implementation depends on systemStatus structure
+    const memoryUsagePercent = systemStatus.infrastructure?.server?.memoryUsage?.percentage || 0;
+    const cpuLoadAvg = systemStatus.infrastructure?.server?.loadAverage?.[0] || 0;
+    const diskUsagePercent = systemStatus.infrastructure?.server?.diskUsage ? 
+      (systemStatus.infrastructure.server.diskUsage.used / systemStatus.infrastructure.server.diskUsage.total) * 100 : 0;
+
+    await this.systemMetricsRepo.save([
+      SystemMetrics.createSystemMetric(
+        MetricCategory.CPU_USAGE,
+        'CPU Load Average',
+        cpuLoadAvg,
+        'load',
+        'system',
+        { timestamp: new Date().toISOString() }
+      ),
+      SystemMetrics.createSystemMetric(
+        MetricCategory.MEMORY_USAGE,
+        'Memory Usage',
+        memoryUsagePercent,
+        '%',
+        'system',
+        { timestamp: new Date().toISOString() }
+      ),
+      SystemMetrics.createSystemMetric(
+        MetricCategory.MEMORY_USAGE,
+        'Disk Usage',
+        diskUsagePercent,
+        '%',
+        'system-disk',
+        { timestamp: new Date().toISOString() }
+      )
+    ]);
   }
 
   // Public API methods

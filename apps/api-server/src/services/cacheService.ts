@@ -181,7 +181,7 @@ export class CacheService {
    */
   async cacheSessionCart(
     sessionId: string, 
-    cartData: any, 
+    cartData: Record<string, unknown>, 
     ttlSeconds: number = 3600
   ): Promise<void> {
     if (!this.isEnabled) return;
@@ -200,7 +200,7 @@ export class CacheService {
   /**
    * 세션 기반 장바구니를 조회합니다.
    */
-  async getSessionCart(sessionId: string): Promise<any | null> {
+  async getSessionCart(sessionId: string): Promise<Record<string, unknown> | null> {
     if (!this.isEnabled) return null;
 
     try {
@@ -217,7 +217,7 @@ export class CacheService {
    */
   async cachePaymentSession(
     sessionId: string, 
-    paymentData: any, 
+    paymentData: Record<string, unknown>, 
     ttlSeconds: number = 1800
   ): Promise<void> {
     if (!this.isEnabled) return;
@@ -236,7 +236,7 @@ export class CacheService {
   /**
    * 결제 세션을 조회합니다.
    */
-  async getPaymentSession(sessionId: string): Promise<any | null> {
+  async getPaymentSession(sessionId: string): Promise<Record<string, unknown> | null> {
     if (!this.isEnabled) return null;
 
     try {
@@ -275,7 +275,7 @@ export class CacheService {
     userRole: string,
     userId?: string,
     quantity?: number,
-    additionalParams?: any
+    additionalParams?: Record<string, string | number>
   ): string {
     const parts = [
       `product:${productId}`,
@@ -331,6 +331,41 @@ export class CacheService {
     } catch (error) {
       return { status: 'error', message: `Redis cache error: ${(error as Error).message}` };
     }
+  }
+
+  /**
+   * Generic cache set method
+   */
+  async setCache(key: string, value: unknown, ttlSeconds: number = 300): Promise<void> {
+    if (!this.isEnabled) return;
+
+    try {
+      await this.redis.setex(
+        key,
+        ttlSeconds,
+        JSON.stringify(value)
+      );
+    } catch (error) {
+      console.warn('Failed to set cache:', error);
+    }
+  }
+
+  /**
+   * Generic cache get method
+   */
+  async getCache<T>(key: string): Promise<T | null> {
+    if (!this.isEnabled) return null;
+
+    try {
+      const cached = await this.redis.get(key);
+      if (cached) {
+        return JSON.parse(cached) as T;
+      }
+    } catch (error) {
+      console.warn('Failed to get cache:', error);
+    }
+
+    return null;
   }
 }
 

@@ -74,4 +74,7 @@ export interface EscalationContext {
   manualNotes?: string;
   relatedIncidents?: string[];
   additionalData?: Record<string, unknown>;
+  autoRecoveryAttempt?: number;
+  escalationLevel?: string;
+  urgency?: string;
 }

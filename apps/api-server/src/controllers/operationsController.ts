@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { OperationsMonitoringService, SystemStatus, HealthCheckResult, AlertRule } from '../services/OperationsMonitoringService';
-import { MetricType, MetricCategory } from '../entities/SystemMetrics';
+import { MetricType, MetricCategory, SystemMetrics } from '../entities/SystemMetrics';
 import { AlertSeverity, AlertStatus } from '../entities/Alert';
 
 export class OperationsController {
@@ -174,14 +174,18 @@ export class OperationsController {
     try {
       const { status, severity, limit = 50, offset = 0 } = req.query;
       
-      let whereConditions: any = {};
+      interface AlertWhereConditions {
+        status?: string;
+        severity?: string;
+      }
+      let whereConditions: AlertWhereConditions = {};
       
       if (status) {
-        whereConditions.status = status;
+        whereConditions.status = String(status);
       }
       
       if (severity) {
-        whereConditions.severity = severity;
+        whereConditions.severity = String(severity);
       }
 
       const alerts = await this.operationsService.getActiveAlerts();
@@ -511,7 +515,11 @@ export class OperationsController {
   }
 
   // Utility Methods
-  private formatMetricsForChart(metrics: any[]): any[] {
+  private formatMetricsForChart(metrics: SystemMetrics[]): Array<{
+    timestamp: Date;
+    value: number;
+    unit: string;
+  }> {
     return metrics.map(metric => ({
       timestamp: metric.createdAt,
       value: parseFloat(metric.value),
@@ -519,7 +527,7 @@ export class OperationsController {
     }));
   }
 
-  private calculateAverage(metrics: any[]): number {
+  private calculateAverage(metrics: SystemMetrics[]): number {
     if (metrics.length === 0) return 0;
     const sum = metrics.reduce((acc, metric) => acc + parseFloat(metric.value), 0);
     return Math.round((sum / metrics.length) * 100) / 100;
@@ -541,7 +549,18 @@ export class OperationsController {
     return timeRangeMap[timeRange] || 24;
   }
 
-  private async getPerformanceData(hours: number): Promise<any> {
+  private async getPerformanceData(hours: number): Promise<{
+    responseTime: {
+      current: number;
+      average: number;
+      trend: 'up' | 'down' | 'stable';
+    };
+    errorRate: {
+      current: number;
+      average: number;
+      trend: 'up' | 'down' | 'stable';
+    };
+  }> {
     const [responseTime, errorRate] = await Promise.all([
       this.operationsService.getMetricsHistory(MetricType.PERFORMANCE, MetricCategory.RESPONSE_TIME, hours),
       this.operationsService.getMetricsHistory(MetricType.ERROR, MetricCategory.ERROR_RATE, hours)
@@ -549,19 +568,35 @@ export class OperationsController {
 
     return {
       responseTime: {
-        current: responseTime[responseTime.length - 1]?.value || 0,
+        current: responseTime[responseTime.length - 1] ? parseFloat(responseTime[responseTime.length - 1].value) : 0,
         average: this.calculateAverage(responseTime),
         trend: this.calculateTrend(responseTime)
       },
       errorRate: {
-        current: errorRate[errorRate.length - 1]?.value || 0,
+        current: errorRate[errorRate.length - 1] ? parseFloat(errorRate[errorRate.length - 1].value) : 0,
         average: this.calculateAverage(errorRate),
         trend: this.calculateTrend(errorRate)
       }
     };
   }
 
-  private async getInfrastructureData(hours: number): Promise<any> {
+  private async getInfrastructureData(hours: number): Promise<{
+    cpu: {
+      current: number;
+      average: number;
+      trend: 'up' | 'down' | 'stable';
+    };
+    memory: {
+      current: number;
+      average: number;
+      trend: 'up' | 'down' | 'stable';
+    };
+    disk: {
+      current: number;
+      average: number;
+      trend: 'up' | 'down' | 'stable';
+    };
+  }> {
     const [cpu, memory, disk] = await Promise.all([
       this.operationsService.getMetricsHistory(MetricType.SYSTEM, MetricCategory.CPU_USAGE, hours),
       this.operationsService.getMetricsHistory(MetricType.SYSTEM, MetricCategory.MEMORY_USAGE, hours),
@@ -570,24 +605,24 @@ export class OperationsController {
 
     return {
       cpu: {
-        current: cpu[cpu.length - 1]?.value || 0,
+        current: cpu[cpu.length - 1] ? parseFloat(cpu[cpu.length - 1].value) : 0,
         average: this.calculateAverage(cpu),
         trend: this.calculateTrend(cpu)
       },
       memory: {
-        current: memory[memory.length - 1]?.value || 0,
+        current: memory[memory.length - 1] ? parseFloat(memory[memory.length - 1].value) : 0,
         average: this.calculateAverage(memory),
         trend: this.calculateTrend(memory)
       },
       disk: {
-        current: disk[disk.length - 1]?.value || 0,
+        current: disk[disk.length - 1] ? parseFloat(disk[disk.length - 1].value) : 0,
         average: this.calculateAverage(disk),
         trend: this.calculateTrend(disk)
       }
     };
   }
 
-  private calculateTrend(metrics: any[]): 'up' | 'down' | 'stable' {
+  private calculateTrend(metrics: SystemMetrics[]): 'up' | 'down' | 'stable' {
     if (metrics.length < 2) return 'stable';
     
     const recent = metrics.slice(-5);
@@ -606,7 +641,13 @@ export class OperationsController {
     return 'stable';
   }
 
-  private async getRecentIncidents(): Promise<any[]> {
+  private async getRecentIncidents(): Promise<Array<{
+    id: string;
+    title: string;
+    status: AlertStatus;
+    startTime: Date;
+    resolvedTime?: Date;
+  }>> {
     const alerts = await this.operationsService.getActiveAlerts();
     const incidents = alerts
       .filter(alert => alert.severity === AlertSeverity.CRITICAL)

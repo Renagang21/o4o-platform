@@ -26,11 +26,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAuthenticated = !!user && user.status === 'approved';
 
   // 사용자 데이터 정규화 함수 (id 속성 추가)
-  const normalizeUserData = (userData: any): User => {
+  const normalizeUserData = (userData: Partial<User> & { _id?: string }): User => {
     return {
       ...userData,
-      id: userData._id || userData.id, // MongoDB _id를 id로 매핑
-    };
+      id: userData._id || userData.id || '', // MongoDB _id를 id로 매핑
+    } as User;
   };
 
   // 로그인
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(normalizedUser);
       toast.success('로그인되었습니다.');
       return true;
-    } catch (error: any) {
+    } catch (error) {
       const errorMessage = error.response?.data?.error || '로그인에 실패했습니다.';
       const errorCode = error.response?.data?.code;
 

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { Repository, Between, MoreThan, LessThan } from 'typeorm';
+import { Repository, Between, MoreThan, LessThan, FindOperator } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { AnalyticsService } from '../services/AnalyticsService';
 import { UserSession, SessionStatus } from '../entities/UserSession';
-import { UserAction } from '../entities/UserAction';
+import { UserAction, ActionType } from '../entities/UserAction';
 import { SystemMetrics, MetricType } from '../entities/SystemMetrics';
-import { AnalyticsReport, ReportType, ReportCategory } from '../entities/AnalyticsReport';
-import { Alert, AlertStatus, AlertSeverity } from '../entities/Alert';
+import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport';
+import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert';
 import { BetaUser } from '../entities/BetaUser';
 
 export class AnalyticsController {
@@ -240,13 +240,19 @@ export class AnalyticsController {
     try {
       const days = parseInt(req.query.days as string) || 7;
       const userId = req.query.userId as string;
-      const actionType = req.query.actionType as string;
+      const actionType = req.query.actionType as ActionType;
       const limit = parseInt(req.query.limit as string) || 50;
 
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
 
-      const whereClause: any = {
+      interface ActionWhereClause {
+        createdAt: FindOperator<Date>;
+        betaUserId?: string;
+        actionType?: ActionType;
+      }
+      
+      const whereClause: ActionWhereClause = {
         createdAt: MoreThan(startDate)
       };
 
@@ -280,7 +286,7 @@ export class AnalyticsController {
           count: parseInt(item.count)
         });
         return acc;
-      }, {} as Record<string, any[]>);
+      }, {} as Record<string, Array<{ type: string; count: number }>>);
 
       res.json({
         success: true,
@@ -323,9 +329,15 @@ export class AnalyticsController {
       const limit = parseInt(req.query.limit as string) || 20;
       const type = req.query.type as ReportType;
       const category = req.query.category as ReportCategory;
-      const status = req.query.status as string;
+      const status = req.query.status as ReportStatus;
 
-      const whereClause: any = {};
+      interface ReportWhereClause {
+        reportType?: ReportType;
+        reportCategory?: ReportCategory;
+        status?: ReportStatus;
+      }
+      
+      const whereClause: ReportWhereClause = {};
       if (type) whereClause.reportType = type;
       if (category) whereClause.reportCategory = category;
       if (status) whereClause.status = status;
@@ -470,9 +482,15 @@ export class AnalyticsController {
       const limit = parseInt(req.query.limit as string) || 20;
       const severity = req.query.severity as AlertSeverity;
       const status = req.query.status as AlertStatus;
-      const type = req.query.type as string;
+      const type = req.query.type as AlertType;
 
-      const whereClause: any = {};
+      interface AlertWhereClause {
+        severity?: AlertSeverity;
+        status?: AlertStatus;
+        alertType?: AlertType;
+      }
+      
+      const whereClause: AlertWhereClause = {};
       if (severity) whereClause.severity = severity;
       if (status) whereClause.status = status;
       if (type) whereClause.alertType = type;
@@ -537,7 +555,12 @@ export class AnalyticsController {
     try {
       const { id } = req.params;
       const { note } = req.body;
-      const userId = (req as any).user?.id || 'system';
+      interface AuthRequest extends Request {
+        user?: {
+          id: string;
+        };
+      }
+      const userId = (req as AuthRequest).user?.id || 'system';
 
       const alert = await this.alertRepo.findOne({ where: { id } });
       if (!alert) {
@@ -574,7 +597,12 @@ export class AnalyticsController {
     try {
       const { id } = req.params;
       const { note, action } = req.body;
-      const userId = (req as any).user?.id || 'system';
+      interface AuthRequest extends Request {
+        user?: {
+          id: string;
+        };
+      }
+      const userId = (req as AuthRequest).user?.id || 'system';
 
       const alert = await this.alertRepo.findOne({ where: { id } });
       if (!alert) {
@@ -674,7 +702,18 @@ export class AnalyticsController {
     return result.map(item => parseInt(item.activeUsers));
   }
 
-  private analyzeUserSessions(sessions: UserSession[]): any {
+  private analyzeUserSessions(sessions: UserSession[]): {
+    avgDuration: number;
+    avgPageViews: number;
+    avgActions: number;
+    deviceTypes: Record<string, number>;
+    browsers: Record<string, number>;
+    engagementDistribution: {
+      low: number;
+      medium: number;
+      high: number;
+    };
+  } {
     if (sessions.length === 0) {
       return {
         avgDuration: 0,
@@ -682,7 +721,11 @@ export class AnalyticsController {
         avgActions: 0,
         deviceTypes: {},
         browsers: {},
-        engagementDistribution: {}
+        engagementDistribution: {
+          low: 0,
+          medium: 0,
+          high: 0
+        }
       };
     }
 
@@ -718,7 +761,12 @@ export class AnalyticsController {
     };
   }
 
-  private analyzePerformanceMetrics(metrics: SystemMetrics[]): any {
+  private analyzePerformanceMetrics(metrics: SystemMetrics[]): {
+    avgResponseTime: number;
+    maxResponseTime: number;
+    minResponseTime: number;
+    trends: number[];
+  } {
     if (metrics.length === 0) {
       return {
         avgResponseTime: 0,
@@ -730,7 +778,7 @@ export class AnalyticsController {
 
     const responseTimes = metrics
       .filter(m => m.metricCategory === 'response_time')
-      .map(m => m.value);
+      .map(m => parseFloat(m.value));
 
     return {
       avgResponseTime: responseTimes.reduce((sum, rt) => sum + rt, 0) / responseTimes.length,
@@ -740,7 +788,11 @@ export class AnalyticsController {
     };
   }
 
-  private analyzeErrorMetrics(metrics: SystemMetrics[]): any {
+  private analyzeErrorMetrics(metrics: SystemMetrics[]): {
+    totalErrors: number;
+    errorRate: number;
+    errorTrends: number[];
+  } {
     if (metrics.length === 0) {
       return {
         totalErrors: 0,
@@ -751,7 +803,7 @@ export class AnalyticsController {
 
     const errorCounts = metrics
       .filter(m => m.metricCategory === 'error_count')
-      .map(m => m.value);
+      .map(m => parseFloat(m.value));
 
     return {
       totalErrors: errorCounts.reduce((sum, count) => sum + count, 0),
@@ -760,7 +812,11 @@ export class AnalyticsController {
     };
   }
 
-  private analyzeUsageMetrics(metrics: SystemMetrics[]): any {
+  private analyzeUsageMetrics(metrics: SystemMetrics[]): {
+    activeUsers: number;
+    pageViews: number;
+    usageTrends: number[];
+  } {
     if (metrics.length === 0) {
       return {
         activeUsers: 0,
@@ -773,13 +829,18 @@ export class AnalyticsController {
     const pageViewMetrics = metrics.filter(m => m.metricCategory === 'page_views');
 
     return {
-      activeUsers: activeUserMetrics.length > 0 ? activeUserMetrics[activeUserMetrics.length - 1].value : 0,
-      pageViews: pageViewMetrics.reduce((sum, pv) => sum + pv.value, 0),
-      usageTrends: activeUserMetrics.map(m => m.value).slice(-24)
+      activeUsers: activeUserMetrics.length > 0 ? parseFloat(activeUserMetrics[activeUserMetrics.length - 1].value) : 0,
+      pageViews: pageViewMetrics.reduce((sum, pv) => sum + parseFloat(pv.value), 0),
+      usageTrends: activeUserMetrics.map(m => parseFloat(m.value)).slice(-24)
     };
   }
 
-  private async getEndpointPerformance(startDate: Date): Promise<any[]> {
+  private async getEndpointPerformance(startDate: Date): Promise<Array<{
+    endpoint: string;
+    avgResponseTime: number;
+    maxResponseTime: number;
+    requestCount: number;
+  }>> {
     const result = await this.systemMetricsRepo
       .createQueryBuilder('metric')
       .select('metric.endpoint', 'endpoint')
@@ -806,7 +867,10 @@ export class AnalyticsController {
     return totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100 * 10) / 10 : 0;
   }
 
-  private calculateSystemHealth(performanceAnalysis: any, errorAnalysis: any): string {
+  private calculateSystemHealth(
+    performanceAnalysis: { avgResponseTime: number },
+    errorAnalysis: { errorRate: number }
+  ): string {
     const avgResponseTime = performanceAnalysis.avgResponseTime || 0;
     const errorRate = errorAnalysis.errorRate || 0;
 

@@ -1,5 +1,6 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { authMiddleware } from '../middleware/authMiddleware';
+import { AuthRequest } from '../types/auth';
 import {
   getPerformanceDashboard,
   getOptimizationStatus,
@@ -44,8 +45,9 @@ router.put('/settings', authMiddleware.verifyToken, requireAdminRole, updatePerf
 /**
  * 관리자 권한 확인 미들웨어
  */
-function requireAdminRole(req: any, res: any, next: any) {
-  if (req.user?.role !== 'admin') {
+function requireAdminRole(req: Request, res: Response, next: NextFunction) {
+  const authReq = req as AuthRequest;
+  if (authReq.user?.role !== 'admin') {
     return res.status(403).json({
       success: false,
       error: 'Admin role required for this operation'

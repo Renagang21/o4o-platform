@@ -168,7 +168,7 @@ export class StatusPageComponent {
     region?: string;
     provider?: string;
     dependencies?: string[];
-    [key: string]: any;
+    custom?: Record<string, string | number | boolean>;
   };
 
   @CreateDateColumn()
@@ -234,7 +234,8 @@ export class StatusPageMetric {
     region?: string;
     endpoint?: string;
     statusCode?: number;
-    [key: string]: any;
+    responseTime?: number;
+    custom?: Record<string, string | number | boolean>;
   };
 
   // Static factory methods

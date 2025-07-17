@@ -88,7 +88,7 @@ export class AnalyticsReport {
     totalErrors?: number;
     systemUptime?: number;
     avgResponseTime?: number;
-    [key: string]: any;
+    [key: string]: number | undefined;
   };
 
   @Column({ type: 'json', nullable: true })

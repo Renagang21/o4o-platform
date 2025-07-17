@@ -3,6 +3,7 @@ import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
+import { BusinessInfo } from '../types/user';
 import { 
   AccessTokenPayload, 
   RefreshTokenPayload, 
@@ -18,12 +19,21 @@ export class AuthService {
   private userRepository: Repository<User>;
   private jwtSecret: string;
   private jwtRefreshSecret: string;
-  private cookieConfig: any;
+  private cookieConfig: CookieConfig['options'];
 
   constructor(userRepository: Repository<User>) {
     this.userRepository = userRepository;
-    this.jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
-    this.jwtRefreshSecret = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key';
+    
+    // JWT 시크릿 필수 환경변수 검증
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+    if (!process.env.JWT_REFRESH_SECRET) {
+      throw new Error('JWT_REFRESH_SECRET environment variable is required');
+    }
+    
+    this.jwtSecret = process.env.JWT_SECRET;
+    this.jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
     
     // CLAUDE.md 정책 기반 쿠키 설정
     this.cookieConfig = {
@@ -31,8 +41,7 @@ export class AuthService {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
-      path: '/'
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7일
     };
   }
 
@@ -84,7 +93,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
-      permissions: (user as any).permissions || [],
+      permissions: user.permissions || [],
       domain,
       exp: Math.floor(Date.now() / 1000) + (15 * 60), // 15분
       iat: Math.floor(Date.now() / 1000)
@@ -230,7 +239,10 @@ export class AuthService {
 
   // 쿠키 설정 반환
   getCookieConfig(): CookieConfig {
-    return this.cookieConfig;
+    return {
+      name: 'refreshToken',
+      options: this.cookieConfig
+    };
   }
 
   // === 추가된 메서드들 (Phase 2) ===
@@ -262,7 +274,7 @@ export class AuthService {
   }
 
   // 비즈니스 정보 업데이트
-  async updateUserBusinessInfo(userId: string, businessInfo: any): Promise<User> {
+  async updateUserBusinessInfo(userId: string, businessInfo: BusinessInfo): Promise<User> {
     const user = await this.getUserById(userId);
     if (!user) {
       throw new Error('User not found');

@@ -114,7 +114,15 @@ export interface MonitoringConfig {
     email: {
       enabled: boolean;
       recipients: string[];
-      smtpConfig: any;
+      smtpConfig: {
+        host: string;
+        port: number;
+        secure: boolean;
+        auth: {
+          user: string;
+          pass: string;
+        };
+      };
     };
     slack: {
       enabled: boolean;

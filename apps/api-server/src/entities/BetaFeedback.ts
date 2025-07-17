@@ -159,7 +159,7 @@ export class BetaFeedback {
     duplicateOf?: string;
     estimatedEffort?: number;
     businessImpact?: string;
-    [key: string]: any;
+    [key: string]: string | number | string[] | undefined;
   };
 
   // Real-time fields

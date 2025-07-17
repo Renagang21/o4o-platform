@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
-import { MediaFile } from '../entities/MediaFile';
+import { MediaFile, MediaSize } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
 import { User } from '../entities/User';
 import { ImageProcessingService } from '../services/imageProcessingService';
@@ -183,7 +183,12 @@ export class MediaController {
 
       try {
         const files = req.files as Express.Multer.File[];
-        const userId = (req as any).user?.id;
+        interface AuthRequest extends Request {
+          user?: {
+            id: string;
+          };
+        }
+        const userId = (req as AuthRequest).user?.id;
         const { folderId } = req.body;
 
         if (!files || files.length === 0) {
@@ -362,9 +367,10 @@ export class MediaController {
       if (mediaFile.formats) {
         Object.values(mediaFile.formats).forEach(formatSizes => {
           if (formatSizes) {
-            Object.values(formatSizes).forEach((size: any) => {
-              if (size && size.url) {
-                const fullPath = path.join(process.env.UPLOAD_DIR || './uploads', size.url.replace('/uploads/', ''));
+            Object.values(formatSizes).forEach((size) => {
+              const typedSize = size as MediaSize;
+              if (typedSize && typedSize.url) {
+                const fullPath = path.join(process.env.UPLOAD_DIR || './uploads', typedSize.url.replace('/uploads/', ''));
                 filesToDelete.push(fullPath);
               }
             });
@@ -424,9 +430,10 @@ export class MediaController {
         if (mediaFile.formats) {
           Object.values(mediaFile.formats).forEach(formatSizes => {
             if (formatSizes) {
-              Object.values(formatSizes).forEach((size: any) => {
-                if (size && size.url) {
-                  const fullPath = path.join(process.env.UPLOAD_DIR || './uploads', size.url.replace('/uploads/', ''));
+              Object.values(formatSizes).forEach((size) => {
+                const typedSize = size as MediaSize;
+                if (typedSize && typedSize.url) {
+                  const fullPath = path.join(process.env.UPLOAD_DIR || './uploads', typedSize.url.replace('/uploads/', ''));
                   filesToDelete.push(fullPath);
                 }
               });
@@ -473,7 +480,11 @@ export class MediaController {
       });
 
       // Build hierarchical tree
-      const buildTree = (parentId: string | null): any[] => {
+      interface FolderTree extends MediaFolder {
+        children: FolderTree[];
+      }
+
+      const buildTree = (parentId: string | null): FolderTree[] => {
         return folders
           .filter(folder => folder.parentId === parentId)
           .map(folder => ({

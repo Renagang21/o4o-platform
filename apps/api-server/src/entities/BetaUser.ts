@@ -113,7 +113,7 @@ export class BetaUser {
     utmSource?: string;
     utmMedium?: string;
     utmCampaign?: string;
-    [key: string]: any;
+    [key: string]: string | undefined;
   };
 
   @CreateDateColumn()

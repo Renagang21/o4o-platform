@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, Not, MoreThanOrEqual, In, IsNull } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { 
   StatusPageIncident, 
@@ -94,14 +94,14 @@ export class StatusPageService {
     ] = await Promise.all([
       this.componentRepo.find({ where: { isActive: true }, order: { sortOrder: 'ASC' } }),
       this.incidentRepo.find({ 
-        where: { isPublic: true, status: { $ne: IncidentStatus.RESOLVED } } as any,
+        where: { isPublic: true, status: Not(IncidentStatus.RESOLVED) },
         order: { createdAt: 'DESC' }
       }),
       this.incidentRepo.find({
         where: { 
           isPublic: true,
-          createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
-        } as any,
+          createdAt: MoreThanOrEqual(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) // Last 7 days
+        },
         order: { createdAt: 'DESC' },
         take: 10
       }),
@@ -150,8 +150,8 @@ export class StatusPageService {
       where: {
         componentId,
         metricName: 'uptime',
-        timestamp: { $gte: startDate }
-      } as any,
+        timestamp: MoreThanOrEqual(startDate)
+      },
       order: { timestamp: 'ASC' }
     });
 
@@ -159,16 +159,15 @@ export class StatusPageService {
       where: {
         componentId,
         metricName: 'response_time',
-        timestamp: { $gte: startDate }
-      } as any,
+        timestamp: MoreThanOrEqual(startDate)
+      },
       order: { timestamp: 'ASC' }
     });
 
     const incidents = await this.incidentRepo.find({
       where: {
-        affectedComponents: { $contains: [componentId] },
-        createdAt: { $gte: startDate }
-      } as any
+        createdAt: MoreThanOrEqual(startDate)
+      }
     });
 
     // Group data by day
@@ -295,8 +294,8 @@ export class StatusPageService {
     return await this.incidentRepo.find({
       where: { 
         isPublic: true,
-        status: { $ne: IncidentStatus.RESOLVED }
-      } as any,
+        status: Not(IncidentStatus.RESOLVED)
+      },
       order: { createdAt: 'DESC' }
     });
   }
@@ -371,10 +370,10 @@ export class StatusPageService {
     const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     return await this.maintenanceRepo.find({
-      where: {
-        status: 'scheduled',
-        scheduledStart: { $gte: now, $lte: oneWeekFromNow }
-      } as any,
+      where: [
+        { status: 'scheduled', scheduledStart: MoreThanOrEqual(now) },
+        { status: 'scheduled', scheduledEnd: MoreThanOrEqual(now) }
+      ],
       order: { scheduledStart: 'ASC' }
     });
   }
@@ -387,7 +386,7 @@ export class StatusPageService {
   }
 
   // Metrics and Monitoring
-  async recordMetric(componentId: string, metricName: string, value: number, unit: string, metadata?: any): Promise<void> {
+  async recordMetric(componentId: string, metricName: string, value: number, unit: string, metadata?: Record<string, unknown>): Promise<void> {
     const metric = new StatusPageMetric();
     metric.componentId = componentId;
     metric.metricName = metricName;
@@ -429,7 +428,7 @@ export class StatusPageService {
 
   async performHealthChecks(): Promise<void> {
     const components = await this.componentRepo.find({ 
-      where: { isActive: true, healthCheckUrl: { $ne: null } } as any 
+      where: { isActive: true, healthCheckUrl: Not(IsNull()) } 
     });
 
     const healthCheckPromises = components.map(async (component) => {
@@ -467,13 +466,13 @@ export class StatusPageService {
     if (subscriber) {
       // Update existing subscriber
       if (componentIds) subscriber.subscribedComponents = componentIds;
-      if (notificationTypes) subscriber.notificationTypes = notificationTypes as any;
+      if (notificationTypes) subscriber.notificationTypes = notificationTypes as ('incident' | 'maintenance' | 'status_change')[];
     } else {
       // Create new subscriber
       subscriber = new StatusPageSubscriber();
       subscriber.email = email;
       subscriber.subscribedComponents = componentIds;
-      subscriber.notificationTypes = notificationTypes as any;
+      subscriber.notificationTypes = notificationTypes as ('incident' | 'maintenance' | 'status_change')[];
       subscriber.confirmationToken = crypto.randomUUID();
       subscriber.unsubscribeToken = crypto.randomUUID();
     }
@@ -582,15 +581,15 @@ export class StatusPageService {
     const uptimeMetrics = await this.metricRepo.find({
       where: {
         metricName: 'uptime',
-        timestamp: { $gte: last24Hours }
-      } as any
+        timestamp: MoreThanOrEqual(last24Hours)
+      }
     });
 
     const responseTimeMetrics = await this.metricRepo.find({
       where: {
         metricName: 'response_time',
-        timestamp: { $gte: last24Hours }
-      } as any
+        timestamp: MoreThanOrEqual(last24Hours)
+      }
     });
 
     // Calculate uptime percentages
@@ -719,9 +718,8 @@ export class StatusPageService {
     for (const componentId of componentIds) {
       const activeIncidents = await this.incidentRepo.find({
         where: {
-          affectedComponents: { $contains: [componentId] },
-          status: { $ne: IncidentStatus.RESOLVED }
-        } as any
+          status: Not(IncidentStatus.RESOLVED)
+        }
       });
 
       // Only restore to operational if no other incidents

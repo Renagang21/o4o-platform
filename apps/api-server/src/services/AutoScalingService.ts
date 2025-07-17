@@ -944,9 +944,13 @@ export class AutoScalingService {
         healthStatus: i.healthStatus,
         currentLoad: i.currentLoad,
         port: i.port,
+        processId: i.processId,
         createdAt: i.createdAt.toISOString()
       })),
-      scalingRules: Object.fromEntries(this.scalingRules),
+      scalingRules: Array.from(this.scalingRules.entries()).reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {} as { [key: string]: ScalingRule }),
       recentEvents: events,
       configuration: {
         minInstances: this.minInstances,
@@ -1070,11 +1074,28 @@ interface HealthCheck {
   timestamp: string;
 }
 
+interface ScalingEvent {
+  id: string;
+  timestamp: Date;
+  eventType: 'scale_up' | 'scale_down' | 'instance_started' | 'instance_stopped' | 'instance_failed';
+  instanceCount: number;
+  trigger: string;
+  message: string;
+}
+
 interface ScalingDashboard {
   currentMetrics: SystemMetrics;
-  instances: any[];
-  scalingRules: any;
-  recentEvents: any[];
+  instances: Array<{
+    id: string;
+    status: 'starting' | 'running' | 'stopping' | 'stopped' | 'failed';
+    healthStatus: 'healthy' | 'unhealthy' | 'unknown';
+    currentLoad: number;
+    port: number;
+    processId: number | null;
+    createdAt: string;
+  }>;
+  scalingRules: { [key: string]: ScalingRule };
+  recentEvents: ScalingEvent[];
   configuration: {
     minInstances: number;
     maxInstances: number;

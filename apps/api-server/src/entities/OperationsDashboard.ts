@@ -525,7 +525,7 @@ export interface DashboardWidget {
       critical?: number;
     };
     filters?: {
-      [key: string]: any;
+      [key: string]: string | number | boolean | string[];
     };
     displayOptions?: {
       showLegend?: boolean;
@@ -534,6 +534,6 @@ export interface DashboardWidget {
       colorScheme?: string;
       aggregation?: 'avg' | 'sum' | 'min' | 'max' | 'count';
     };
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }

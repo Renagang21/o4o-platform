@@ -47,7 +47,7 @@ export class UserController {
       console.error('Get profile error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: error instanceof Error ? error.message : 'Internal server error'
       });
     }
   }
@@ -82,7 +82,7 @@ export class UserController {
       console.error('Update user role error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: error instanceof Error ? error.message : 'Internal server error'
       });
     }
   }

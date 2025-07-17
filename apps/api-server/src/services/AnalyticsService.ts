@@ -202,7 +202,7 @@ export class AnalyticsService {
     metric.metricType = data.metricType;
     metric.metricCategory = data.metricCategory;
     metric.metricName = data.metricName;
-    metric.value = data.value;
+    metric.value = data.value.toString();
     metric.unit = data.unit;
     metric.source = data.source;
     metric.endpoint = data.endpoint;
@@ -485,42 +485,42 @@ export class AnalyticsService {
 
   async checkAlertConditions(metric: SystemMetrics): Promise<void> {
     // Performance alerts
-    if (metric.metricCategory === MetricCategory.RESPONSE_TIME && metric.value > 1000) {
+    if (metric.metricCategory === MetricCategory.RESPONSE_TIME && parseFloat(metric.value) > 1000) {
       await this.createAlert(
         AlertType.PERFORMANCE,
         AlertSeverity.HIGH,
         'High Response Time',
         `API response time is ${metric.value}ms, which exceeds the threshold of 1000ms`,
         metric.metricName,
-        metric.value,
+        parseFloat(metric.value),
         1000,
         { endpoint: metric.endpoint, source: metric.source } as Record<string, unknown>
       );
     }
 
     // Error rate alerts
-    if (metric.metricCategory === MetricCategory.ERROR_RATE && metric.value > 5) {
+    if (metric.metricCategory === MetricCategory.ERROR_RATE && parseFloat(metric.value) > 5) {
       await this.createAlert(
         AlertType.ERROR,
         AlertSeverity.CRITICAL,
         'High Error Rate',
         `Error rate is ${metric.value}%, which exceeds the threshold of 5%`,
         metric.metricName,
-        metric.value,
+        parseFloat(metric.value),
         5,
         { source: metric.source } as Record<string, unknown>
       );
     }
 
     // Memory usage alerts
-    if (metric.metricCategory === MetricCategory.MEMORY_USAGE && metric.value > 85) {
+    if (metric.metricCategory === MetricCategory.MEMORY_USAGE && parseFloat(metric.value) > 85) {
       await this.createAlert(
         AlertType.SYSTEM,
         AlertSeverity.HIGH,
         'High Memory Usage',
         `Memory usage is ${metric.value}%, which exceeds the threshold of 85%`,
         metric.metricName,
-        metric.value,
+        parseFloat(metric.value),
         85,
         { component: metric.component } as Record<string, unknown>
       );
@@ -690,7 +690,7 @@ export class AnalyticsService {
   }
 
   private async generateReportData(category: ReportCategory, startDate: Date, endDate: Date): Promise<{
-    summary: AnalyticsOverview;
+    summary: AnalyticsOverview & Record<string, number>;
     userMetrics: Awaited<ReturnType<typeof this.getUserEngagementMetrics>>;
     systemMetrics: Record<string, unknown>;
     contentMetrics: Awaited<ReturnType<typeof this.getContentUsageMetrics>>;
@@ -700,7 +700,7 @@ export class AnalyticsService {
     // Implementation for generating specific report data based on category
     // This would be a comprehensive method that gathers all necessary data
     return {
-      summary: await this.getAnalyticsOverview(Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))),
+      summary: await this.getAnalyticsOverview(Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))) as AnalyticsOverview & Record<string, number>,
       userMetrics: await this.getUserEngagementMetrics(Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))),
       systemMetrics: {}, // TODO: Implement system metrics gathering
       contentMetrics: await this.getContentUsageMetrics(Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))),

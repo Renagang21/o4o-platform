@@ -17,7 +17,7 @@ export interface ValidationRules {
 export interface ConditionalLogic {
   field: string
   operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than'
-  value: any
+  value: string | number | boolean | null
 }
 
 export interface LocationRule {
@@ -180,7 +180,7 @@ export class CustomFieldValue {
   entityType!: string // 'page', 'post', 'user', 'term', etc.
 
   @Column({ type: 'json' })
-  value!: any
+  value!: string | number | boolean | Date | null | string[] | Record<string, unknown>
 
   @CreateDateColumn()
   createdAt!: Date

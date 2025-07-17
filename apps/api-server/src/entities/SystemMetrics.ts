@@ -121,7 +121,7 @@ export class SystemMetrics {
   metricName!: string;
 
   @Column({ type: 'decimal', precision: 15, scale: 4 })
-  value!: number;
+  value!: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   unit?: string; // ms, bytes, %, count, etc.
@@ -163,7 +163,7 @@ export class SystemMetrics {
       metricType: MetricType.PERFORMANCE,
       metricCategory: category,
       metricName: name,
-      value,
+      value: value.toString(),
       unit,
       source,
       endpoint,
@@ -183,7 +183,7 @@ export class SystemMetrics {
       metricType: MetricType.USAGE,
       metricCategory: category,
       metricName: name,
-      value,
+      value: value.toString(),
       unit,
       tags,
       metadata
@@ -206,7 +206,7 @@ export class SystemMetrics {
       metricType: MetricType.ERROR,
       metricCategory: category,
       metricName: name,
-      value,
+      value: value.toString(),
       unit: 'count',
       source,
       endpoint,
@@ -226,7 +226,7 @@ export class SystemMetrics {
       metricType: MetricType.SYSTEM,
       metricCategory: category,
       metricName: name,
-      value,
+      value: value.toString(),
       unit,
       component,
       metadata
@@ -245,7 +245,7 @@ export class SystemMetrics {
       metricType: MetricType.BUSINESS,
       metricCategory: category,
       metricName: name,
-      value,
+      value: value.toString(),
       unit,
       tags,
       metadata
@@ -261,7 +261,7 @@ export class SystemMetrics {
     if (this.unit === 'ms') {
       return `${this.value}ms`;
     } else if (this.unit === 'bytes') {
-      return this.formatBytes(this.value);
+      return this.formatBytes(parseFloat(this.value));
     } else if (this.unit === '%') {
       return `${this.value}%`;
     } else if (this.unit === 'count') {
@@ -293,26 +293,28 @@ export class SystemMetrics {
   getPerformanceRating(): 'excellent' | 'good' | 'average' | 'poor' | 'unknown' {
     if (!this.isPerformanceMetric()) return 'unknown';
 
+    const numValue = parseFloat(this.value);
+
     switch (this.metricCategory) {
       case MetricCategory.RESPONSE_TIME:
       case MetricCategory.LOAD_TIME:
       case MetricCategory.API_LATENCY:
-        if (this.value < 100) return 'excellent';
-        if (this.value < 300) return 'good';
-        if (this.value < 1000) return 'average';
+        if (numValue < 100) return 'excellent';
+        if (numValue < 300) return 'good';
+        if (numValue < 1000) return 'average';
         return 'poor';
         
       case MetricCategory.ERROR_RATE:
-        if (this.value < 0.1) return 'excellent';
-        if (this.value < 1) return 'good';
-        if (this.value < 5) return 'average';
+        if (numValue < 0.1) return 'excellent';
+        if (numValue < 1) return 'good';
+        if (numValue < 5) return 'average';
         return 'poor';
         
       case MetricCategory.CPU_USAGE:
       case MetricCategory.MEMORY_USAGE:
-        if (this.value < 50) return 'excellent';
-        if (this.value < 70) return 'good';
-        if (this.value < 85) return 'average';
+        if (numValue < 50) return 'excellent';
+        if (numValue < 70) return 'good';
+        if (numValue < 85) return 'average';
         return 'poor';
         
       default:

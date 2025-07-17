@@ -289,7 +289,7 @@ export class PerformanceOptimizationService {
     }
 
     if (typeof data === 'object' && data !== null) {
-      const cleaned: any = { ...data };
+      const cleaned: Record<string, unknown> = { ...data as Record<string, unknown> };
 
       // 레벨별 필드 제거
       if (level === 'low') {
@@ -524,13 +524,10 @@ export class PerformanceOptimizationService {
         // 유휴 연결이 너무 많으면 정리
         if (poolStats.idleCount > 10) {
           // 일부 유휴 연결 해제
-          for (let i = 0; i < Math.floor(poolStats.idleCount / 2); i++) {
-            try {
-              await pool.release();
-            } catch (error) {
-              break;
-            }
-          }
+          // Note: pool.release() is not a standard method for TypeORM connection pools
+          // Connection pool management is typically handled automatically by TypeORM
+          console.log(`Pool has ${poolStats.idleCount} idle connections`);
+          // Consider using TypeORM's built-in connection pool configuration instead
         }
       }
 
@@ -586,18 +583,117 @@ export class PerformanceOptimizationService {
   /**
    * Redis 정보 파싱
    */
-  private parseRedisInfo(info: string): Partial<RedisInfo> {
-    const stats: Record<string, string | number> = {};
+  private parseRedisInfo(info: string): RedisInfo {
+    const result: RedisInfo = {
+      server: {
+        redis_version: '',
+        redis_mode: '',
+        uptime_in_seconds: 0,
+        process_id: 0
+      },
+      clients: {
+        connected_clients: 0,
+        client_recent_max_input_buffer: 0,
+        client_recent_max_output_buffer: 0,
+        blocked_clients: 0
+      },
+      memory: {
+        used_memory: 0,
+        used_memory_human: '',
+        used_memory_rss: 0,
+        used_memory_peak: 0,
+        used_memory_peak_human: '',
+        total_system_memory: 0,
+        total_system_memory_human: '',
+        maxmemory: 0,
+        maxmemory_human: '',
+        maxmemory_policy: ''
+      },
+      persistence: {
+        loading: 0,
+        rdb_changes_since_last_save: 0,
+        rdb_bgsave_in_progress: 0,
+        rdb_last_save_time: 0,
+        aof_enabled: 0,
+        aof_rewrite_in_progress: 0
+      },
+      stats: {
+        total_connections_received: 0,
+        total_commands_processed: 0,
+        instantaneous_ops_per_sec: 0,
+        rejected_connections: 0,
+        sync_full: 0,
+        sync_partial_ok: 0,
+        sync_partial_err: 0,
+        expired_keys: 0,
+        evicted_keys: 0,
+        keyspace_hits: 0,
+        keyspace_misses: 0,
+        pubsub_channels: 0,
+        pubsub_patterns: 0,
+        latest_fork_usec: 0
+      },
+      replication: {
+        role: '',
+        connected_slaves: 0,
+        master_replid: '',
+        master_replid2: '',
+        master_repl_offset: 0,
+        repl_backlog_active: 0,
+        repl_backlog_size: 0,
+        repl_backlog_first_byte_offset: 0,
+        repl_backlog_histlen: 0
+      },
+      cpu: {
+        used_cpu_sys: 0,
+        used_cpu_user: 0,
+        used_cpu_sys_children: 0,
+        used_cpu_user_children: 0
+      },
+      keyspace: {}
+    };
+    
     const lines = info.split('\r\n');
-
+    let currentSection = '';
+    
     for (const line of lines) {
+      if (line.startsWith('# ')) {
+        currentSection = line.substring(2).toLowerCase();
+        continue;
+      }
+      
       if (line.includes(':')) {
         const [key, value] = line.split(':');
-        stats[key] = isNaN(Number(value)) ? value : Number(value);
+        const numValue = isNaN(Number(value)) ? value : Number(value);
+        
+        if (currentSection === 'stats' && key in result.stats) {
+          (result.stats as any)[key] = numValue;
+        } else if (currentSection === 'memory' && key in result.memory) {
+          (result.memory as any)[key] = numValue;
+        } else if (currentSection === 'keyspace') {
+          // Parse keyspace db0:keys=10,expires=2,avg_ttl=3600
+          const dbMatch = key.match(/db(\d+)/);
+          if (dbMatch) {
+            const dbKey = key;
+            const keyspaceData: { keys: number; expires: number; avg_ttl: number } = {
+              keys: 0,
+              expires: 0,
+              avg_ttl: 0
+            };
+            const kvPairs = value.split(',');
+            kvPairs.forEach(kv => {
+              const [k, v] = kv.split('=');
+              if (k === 'keys') keyspaceData.keys = parseInt(v) || 0;
+              else if (k === 'expires') keyspaceData.expires = parseInt(v) || 0;
+              else if (k === 'avg_ttl') keyspaceData.avg_ttl = parseInt(v) || 0;
+            });
+            result.keyspace[dbKey] = keyspaceData;
+          }
+        }
       }
     }
-
-    return stats as Partial<RedisInfo>;
+    
+    return result;
   }
 
   /**
@@ -722,18 +818,20 @@ export class PerformanceOptimizationService {
       totalKeys += keyspace[db].keys || 0;
     }
 
-    const hits = stats.keyspace_hits || 0;
-    const misses = stats.keyspace_misses || 0;
+    const hits = 'keyspace_hits' in stats ? (stats.keyspace_hits as number) : 0;
+    const misses = 'keyspace_misses' in stats ? (stats.keyspace_misses as number) : 0;
     const total = hits + misses;
+    const evictions = 'evicted_keys' in stats ? (stats.evicted_keys as number) : 0;
+    const memoryUsed = 'used_memory' in memory ? (memory.used_memory as number) : 0;
 
     return {
       hits,
       misses,
       sets: 0, // Not available in Redis INFO
       deletes: 0, // Not available in Redis INFO
-      evictions: stats.evicted_keys || 0,
+      evictions,
       hitRate: total > 0 ? (hits / total) * 100 : 0,
-      memoryUsage: memory.used_memory || 0,
+      memoryUsage: memoryUsed,
       keyCount: totalKeys
     };
   }

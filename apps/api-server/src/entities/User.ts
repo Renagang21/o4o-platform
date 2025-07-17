@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth';
+import { BusinessInfo } from '../types/user';
 // import { IsEmail, IsEnum, IsArray, IsOptional } from 'class-validator';
 
 // Re-export types for external use
@@ -39,7 +40,7 @@ export class User {
   status!: UserStatus;
 
   @Column({ type: 'json', nullable: true })
-  businessInfo?: any;
+  businessInfo?: BusinessInfo;
 
   @Column({ 
     type: 'enum', 
@@ -121,6 +122,7 @@ export class User {
       lastName: this.lastName,
       fullName: this.fullName,
       role: this.role,
+      status: this.status,
       permissions: this.permissions,
       isActive: this.isActive,
       isEmailVerified: this.isEmailVerified,

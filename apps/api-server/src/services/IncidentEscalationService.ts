@@ -71,7 +71,7 @@ export interface IncidentEscalation {
   assignedTo?: string;
   businessImpact: BusinessImpact;
   communicationLog: CommunicationEntry[];
-  metadata?: IncidentMetadata;
+  metadata?: IncidentMetadata | EscalationContext;
 }
 
 export interface EscalationStep {
@@ -470,7 +470,7 @@ export class IncidentEscalationService {
       const contact = team.contacts[userId];
       if (contact) {
         try {
-          await this.sendNotification(contact, message, level, 'primary');
+          await this.sendNotification(contact, message, level as EscalationLevel, 'primary');
           notificationCount++;
         } catch (error) {
           console.error(`Failed to notify ${contact.name}:`, error);
@@ -689,11 +689,11 @@ Please acknowledge and take appropriate action immediately.
   private async executeEscalationAction(escalation: IncidentEscalation, action: EscalationAction): Promise<void> {
     switch (action.type) {
       case 'notify_team':
-        await this.notifyTeam(action.target, action.parameters);
+        await this.notifyTeam(action.target, action.parameters as NotifyTeamParameters);
         break;
       
       case 'create_incident':
-        await this.createExternalIncident(escalation, action.parameters);
+        await this.createExternalIncident(escalation, action.parameters as CreateIncidentParameters);
         break;
       
       case 'start_conference':
@@ -701,11 +701,11 @@ Please acknowledge and take appropriate action immediately.
         break;
       
       case 'update_status_page':
-        await this.updateStatusPage(escalation, action.parameters);
+        await this.updateStatusPage(escalation, action.parameters as StatusPageParameters);
         break;
       
       case 'create_jira_ticket':
-        await this.createJiraTicket(escalation, action.parameters);
+        await this.createJiraTicket(escalation, action.parameters as JiraTicketParameters);
         break;
       
       default:

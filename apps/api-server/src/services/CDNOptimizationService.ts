@@ -693,7 +693,7 @@ export class CDNOptimizationService {
   /**
    * CDN 알림 생성
    */
-  private async createCDNAlert(type: string, data: any): Promise<void> {
+  private async createCDNAlert(type: string, data: Record<string, unknown>): Promise<void> {
     const alert = {
       type,
       severity: 'warning',
@@ -949,7 +949,7 @@ interface OptimizationResult {
   success: boolean;
   error?: string;
   processingTime?: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 interface CDNCacheStats {
@@ -993,7 +993,12 @@ interface CDNReport {
     end: string;
   };
   cacheStats: CDNCacheStats;
-  optimizationStats: any;
+  optimizationStats: {
+    totalAssets: number;
+    optimizedAssets: number;
+    totalSavings: number;
+    avgCompressionRatio: number;
+  };
   assetUsage: AssetUsageStats[];
   recommendations: string[];
 }

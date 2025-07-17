@@ -60,7 +60,21 @@ export class MockDataService {
     return this.templates.get(name);
   }
 
-  static updateTemplate(name: string, data: any) {
+  static updateTemplate(name: string, data: {
+    id: string;
+    name: string;
+    type: string;
+    layoutType: string;
+    active: boolean;
+    content: Array<{
+      id: string;
+      type: string;
+      content: Record<string, unknown>;
+      settings?: Record<string, unknown>;
+    }>;
+    version: string;
+    createdAt: string;
+  }) {
     this.templates.set(name, {
       ...data,
       updatedAt: new Date().toISOString()
@@ -76,7 +90,15 @@ export class MockDataService {
     return this.pages.get(slug);
   }
 
-  static updatePage(slug: string, data: any) {
+  static updatePage(slug: string, data: {
+    id: string;
+    title: string;
+    slug: string;
+    content: string;
+    status: string;
+    template?: string;
+    createdAt: string;
+  }) {
     this.pages.set(slug, {
       ...data,
       updatedAt: new Date().toISOString()

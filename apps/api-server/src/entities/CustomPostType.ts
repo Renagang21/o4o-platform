@@ -24,7 +24,7 @@ export interface FieldSchema {
   };
   showIf?: {
     field: string;
-    equals: any;
+    equals: string | number | boolean;
   };
   relationType?: string; // for relation type
 }

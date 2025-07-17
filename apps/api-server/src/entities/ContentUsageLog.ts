@@ -71,7 +71,14 @@ export class ContentUsageLog {
     playlistId: string,
     eventType: LogEventType,
     duration?: number,
-    metadata?: any
+    metadata?: {
+      userAgent?: string;
+      resolution?: string;
+      volume?: number;
+      position?: number;
+      templateId?: string;
+      zoneId?: string;
+    }
   ): Partial<ContentUsageLog> {
     return {
       storeId,
@@ -87,7 +94,7 @@ export class ContentUsageLog {
   static createScheduleLog(
     storeId: string,
     eventType: LogEventType,
-    metadata?: any
+    metadata?: Record<string, unknown>
   ): Partial<ContentUsageLog> {
     return {
       storeId,

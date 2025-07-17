@@ -42,7 +42,7 @@ export interface ServiceCall {
   success: boolean;
   responseTime: number;
   error?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 class CircuitBreaker {

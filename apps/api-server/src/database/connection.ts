@@ -8,6 +8,7 @@ import { OrderItem } from '../entities/OrderItem';
 import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Category } from '../entities/Category';
+import { Settings } from '../entities/Settings';
 // Temporarily disabled problematic entities due to OneDrive sync issues
 // import { BetaUser } from '../entities/BetaUser';
 // import { AnalyticsReport } from '../entities/AnalyticsReport';
@@ -66,6 +67,7 @@ export const AppDataSource = new DataSource({
     Cart,
     CartItem,
     Category,
+    Settings,
     // BetaUser,
     // AnalyticsReport,
     // Alert,
@@ -160,8 +162,8 @@ export async function closeDatabaseConnection() {
   }
 }
 
-// 기본 내보내기
-export default AppDataSource;
-
 // initializeDatabase function for backward compatibility
 export const initializeDatabase = () => AppDataSource.initialize();
+
+// TypeORM CLI를 위한 default export
+export default AppDataSource;

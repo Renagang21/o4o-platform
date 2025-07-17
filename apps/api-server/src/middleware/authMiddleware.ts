@@ -37,7 +37,15 @@ export class AuthMiddleware {
         throw new Error('JWT_SECRET is not configured');
       }
 
-      const decoded = jwt.verify(token, jwtSecret) as any;
+      interface JWTDecoded {
+        userId: string;
+        betaUserId?: string;
+        email?: string;
+        role?: string;
+        iat?: number;
+        exp?: number;
+      }
+      const decoded = jwt.verify(token, jwtSecret) as JWTDecoded;
       
       const user = await this.userRepository.findOne({ 
         where: { id: decoded.userId },
@@ -98,7 +106,15 @@ export class AuthMiddleware {
         throw new Error('JWT_SECRET is not configured');
       }
 
-      const decoded = jwt.verify(token, jwtSecret) as any;
+      interface JWTDecoded {
+        userId: string;
+        betaUserId?: string;
+        email?: string;
+        role?: string;
+        iat?: number;
+        exp?: number;
+      }
+      const decoded = jwt.verify(token, jwtSecret) as JWTDecoded;
       
       // Check if it's a beta user token
       if (decoded.betaUserId) {
@@ -160,7 +176,15 @@ export class AuthMiddleware {
         return next();
       }
 
-      const decoded = jwt.verify(token, jwtSecret) as any;
+      interface JWTDecoded {
+        userId: string;
+        betaUserId?: string;
+        email?: string;
+        role?: string;
+        iat?: number;
+        exp?: number;
+      }
+      const decoded = jwt.verify(token, jwtSecret) as JWTDecoded;
       
       // Try beta user first
       if (decoded.betaUserId) {

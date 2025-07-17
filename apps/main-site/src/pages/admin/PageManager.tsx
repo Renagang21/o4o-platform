@@ -256,7 +256,7 @@ const PageManager = () => {
                     <input
                       type="text"
                       value={pageContent.title || ''}
-                      onChange={(e) => setPageContent((prev: any) => ({ ...prev, title: e.target.value }))}
+                      onChange={(e) => setPageContent((prev) => ({ ...prev, title: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-lg"
                     />
                   </div>
@@ -270,7 +270,7 @@ const PageManager = () => {
                           type="text"
                           placeholder="Hero 제목"
                           value={pageContent.hero.title || ''}
-                          onChange={(e) => setPageContent((prev: any) => ({
+                          onChange={(e) => setPageContent((prev) => ({
                             ...prev,
                             hero: { ...prev.hero, title: e.target.value }
                           }))}
@@ -279,7 +279,7 @@ const PageManager = () => {
                         <textarea
                           placeholder="Hero 부제목"
                           value={pageContent.hero.subtitle || ''}
-                          onChange={(e) => setPageContent((prev: any) => ({
+                          onChange={(e) => setPageContent((prev) => ({
                             ...prev,
                             hero: { ...prev.hero, subtitle: e.target.value }
                           }))}
@@ -290,7 +290,7 @@ const PageManager = () => {
                           type="text"
                           placeholder="버튼 텍스트"
                           value={pageContent.hero.ctaText || ''}
-                          onChange={(e) => setPageContent((prev: any) => ({
+                          onChange={(e) => setPageContent((prev) => ({
                             ...prev,
                             hero: { ...prev.hero, ctaText: e.target.value }
                           }))}

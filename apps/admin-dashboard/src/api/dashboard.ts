@@ -5,6 +5,7 @@
 
 import { api } from './base';
 import { EcommerceApi } from './ecommerceApi';
+import { SalesDataItem, Notification, Activity, OrderStatusData, UserChartData, SystemHealthStatus } from '../types/dashboard';
 
 // Dashboard Stats type
 interface DashboardStats {
@@ -170,7 +171,7 @@ export const dashboardApi = {
 
       // Process sales data for chart
       const salesData = salesReportResponse.data?.salesByDay || [];
-      const chartSalesData = salesData.map((item: any) => ({
+      const chartSalesData = salesData.map((item: SalesDataItem) => ({
         date: item.date,
         amount: item.sales || 0,
         orders: item.orders || 0
@@ -179,11 +180,11 @@ export const dashboardApi = {
       // Calculate order status distribution
       const orders = ordersResponse.data || [];
       const statusCounts: Record<string, number> = {};
-      orders.forEach((order: any) => {
+      orders.forEach((order) => {
         statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
       });
 
-      const orderStatusData = [
+      const orderStatusData: OrderStatusData[] = [
         { status: '대기중', count: statusCounts['pending'] || 0, color: '#f59e0b' },
         { status: '처리중', count: statusCounts['processing'] || 0, color: '#3b82f6' },
         { status: '배송중', count: statusCounts['shipped'] || 0, color: '#8b5cf6' },
@@ -258,8 +259,8 @@ export const dashboardApi = {
   },
 
   // Default data generators (fallback)
-  getDefaultSalesData() {
-    const data = [];
+  getDefaultSalesData(): SalesDataItem[] {
+    const data: SalesDataItem[] = [];
     const today = new Date();
     
     for (let i = 29; i >= 0; i--) {
@@ -276,7 +277,7 @@ export const dashboardApi = {
     return data;
   },
 
-  getDefaultOrdersData() {
+  getDefaultOrdersData(): OrderStatusData[] {
     return [
       { status: '처리중', count: 45, color: '#3b82f6' },
       { status: '배송중', count: 23, color: '#f59e0b' },
@@ -285,8 +286,8 @@ export const dashboardApi = {
     ];
   },
 
-  getDefaultUsersData() {
-    const data = [];
+  getDefaultUsersData(): UserChartData[] {
+    const data: UserChartData[] = [];
     const today = new Date();
     
     for (let i = 6; i >= 0; i--) {
@@ -303,7 +304,7 @@ export const dashboardApi = {
     return data;
   },
 
-  getDefaultNotifications() {
+  getDefaultNotifications(): Notification[] {
     return [
       {
         id: '1',
@@ -342,7 +343,7 @@ export const dashboardApi = {
     ];
   },
 
-  getDefaultActivities() {
+  getDefaultActivities(): Activity[] {
     return [
       {
         id: '1',
@@ -385,7 +386,7 @@ export const dashboardApi = {
     ];
   },
 
-  getDefaultSystemHealth() {
+  getDefaultSystemHealth(): SystemHealthStatus {
     return {
       api: {
         status: 'healthy' as const,

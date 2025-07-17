@@ -79,7 +79,7 @@ export const useDashboardStats = () => {
         for (let i = 29; i >= 0; i--) {
           const date = subDays(today, i);
           const dayData = salesReport.data?.salesByDay?.find(
-            (d: any) => format(new Date(d.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+            (d: { date: string; sales: number; orders: number }) => format(new Date(d.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
           );
           
           salesChartData.push({

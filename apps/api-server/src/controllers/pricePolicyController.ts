@@ -453,7 +453,19 @@ export class PricePolicyController {
   };
 
   // 가격 정책 데이터 검증
-  private validatePolicyData(data: any): string | null {
+  private validatePolicyData(data: {
+    name?: string;
+    type?: PricePolicyType;
+    discountType?: DiscountType;
+    discountValue?: number;
+    startDate?: string;
+    endDate?: string;
+    minQuantity?: number;
+    maxQuantity?: number;
+    minOrderAmount?: number;
+    maxOrderAmount?: number;
+    priority?: number;
+  }): string | null {
     // 필수 필드 검증
     if (!data.name || !data.type || !data.discountType || data.discountValue === undefined) {
       return 'Missing required fields: name, type, discountType, discountValue';

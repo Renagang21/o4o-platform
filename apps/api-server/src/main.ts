@@ -21,6 +21,7 @@ import servicesRoutes from './routes/services';
 import signageRoutes from './routes/signage';
 import contentRoutes from './routes/content';
 import publicRoutes from './routes/public';
+import settingsRoutes from './routes/settingsRoutes';
 
 // 환경변수 로드
 dotenv.config();
@@ -118,6 +119,7 @@ app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
+app.use('/api/settings', settingsRoutes);
 app.use('/api', contentRoutes);
 
 // 헬스체크 엔드포인트

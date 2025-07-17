@@ -83,7 +83,7 @@ export class FeedbackConversation {
     avgResponseTime?: number;
     satisfactionRating?: number;
     escalationLevel?: number;
-    [key: string]: any;
+    [key: string]: number | undefined;
   };
 
   @CreateDateColumn()
@@ -238,7 +238,7 @@ export class ConversationMessage {
     deliveredAt?: Date;
     ipAddress?: string;
     userAgent?: string;
-    [key: string]: any;
+    [key: string]: boolean | Date | string | undefined;
   };
 
   @CreateDateColumn()

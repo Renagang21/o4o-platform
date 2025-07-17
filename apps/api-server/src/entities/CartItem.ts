@@ -32,7 +32,7 @@ export class CartItem {
     name: string;
     image: string;
     sku: string;
-    attributes?: any;
+    attributes?: Record<string, string | number | boolean>;
   };
 
   @CreateDateColumn()

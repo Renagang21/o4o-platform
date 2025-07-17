@@ -142,9 +142,16 @@ export const useDashboardData = () => {
     isLoading: chartLoading,
     error: chartError,
     refetch: refetchCharts
-  } = useQuery<ChartData>({
+  } = useQuery({
     queryKey: ['dashboard', 'charts', manualRefreshTrigger],
-    queryFn: () => dashboardApi.getChartData(),
+    queryFn: async (): Promise<ChartData> => {
+      const data = await dashboardApi.getChartData();
+      return {
+        sales: data.sales as Array<{ date: string; amount: number; orders: number; }>,
+        orders: data.orders,
+        users: data.users
+      };
+    },
     enabled: false,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

@@ -10,13 +10,57 @@ import ProductStats from './ProductStats';
 import ContentStats from './ContentStats';
 import PartnerStats from './PartnerStats';
 
+interface UserStatsData {
+  total: number;
+  pending: number;
+  today: number;
+  activeRate: number;
+  change: number;
+  trend: 'up' | 'down';
+}
+
+interface SalesStatsData {
+  today: number;
+  changePercent: number;
+  monthlyTotal: number;
+  monthlyTarget: number;
+  trend: 'up' | 'down';
+}
+
+interface ProductStatsData {
+  active: number;
+  lowStock: number;
+  newThisWeek: number;
+  bestsellers: { id: string; name: string; sales: number; }[];
+  change: number;
+  trend: 'up' | 'down';
+}
+
+interface ContentStatsData {
+  publishedPages: number;
+  draftContent: number;
+  totalMedia: number;
+  todayViews: number;
+  change: number;
+  trend: 'up' | 'down';
+}
+
+interface PartnerStatsData {
+  active: number;
+  pending: number;
+  totalCommission: number;
+  topPartners: { id: string; name: string; commission: number; }[];
+  change: number;
+  trend: 'up' | 'down';
+}
+
 interface StatsCardsProps {
   stats?: {
-    users: any;
-    sales: any;
-    products: any;
-    content: any;
-    partners: any;
+    users: UserStatsData;
+    sales: SalesStatsData;
+    products: ProductStatsData;
+    content: ContentStatsData;
+    partners: PartnerStatsData;
   };
   isLoading?: boolean;
 }

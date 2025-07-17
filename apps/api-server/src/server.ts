@@ -123,7 +123,7 @@ app.use('*', (req, res) => {
 });
 
 // 전역 에러 핸들러
-app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('❌ Server Error:', error);
 
   // CORS 에러 처리
@@ -135,7 +135,8 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
     });
   }
 
-  res.status(error.status || 500).json({
+  const errorStatus = 'status' in error && typeof error.status === 'number' ? error.status : 500;
+  res.status(errorStatus).json({
     success: false,
     message: error.message || 'Internal server error',
     error: NODE_ENV === 'development' ? error.stack : undefined,

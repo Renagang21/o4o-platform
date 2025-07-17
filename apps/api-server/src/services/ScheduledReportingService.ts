@@ -8,11 +8,21 @@ import { UserSession, SessionStatus } from '../entities/UserSession';
 import { SystemMetrics, MetricCategory, MetricType } from '../entities/SystemMetrics';
 import { BetaUser } from '../entities/BetaUser';
 
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth: {
+    user: string;
+    pass: string;
+  };
+}
+
 export interface NotificationConfig {
   email?: {
     enabled: boolean;
     recipients: string[];
-    smtpConfig?: any;
+    smtpConfig?: SmtpConfig;
   };
   slack?: {
     enabled: boolean;
@@ -227,7 +237,7 @@ export class ScheduledReportingService {
 
       // Alert if average response time > 1000ms
       if (recentMetrics.length > 0) {
-        const avgResponseTime = recentMetrics.reduce((sum, m) => sum + m.value, 0) / recentMetrics.length;
+        const avgResponseTime = recentMetrics.reduce((sum, m) => sum + parseFloat(m.value), 0) / recentMetrics.length;
         
         if (avgResponseTime > 1000) {
           await this.analyticsService.createAlert(
@@ -414,7 +424,7 @@ export class ScheduledReportingService {
     await this.sendNotification('Alert Escalated', message, true);
   }
 
-  async sendErrorNotification(title: string, error: any): Promise<void> {
+  async sendErrorNotification(title: string, error: Error | unknown): Promise<void> {
     const message = `Error in scheduled reporting: ${title}\nError: ${error instanceof Error ? error.message : String(error)}`;
     await this.sendNotification(title, message, true);
   }

@@ -6,49 +6,51 @@
 
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    # pkgs.go
-    # pkgs.python311
-    # pkgs.python311Packages.pip
-    # pkgs.nodejs_20
-    # pkgs.nodePackages.nodemon
+    # 필수 Node.js 환경만
+    pkgs.nodejs_20
+    
+    # 기본 개발 도구만
+    pkgs.git
+    pkgs.curl
   ];
 
-  # Sets environment variables in the workspace
-  env = {};
+  # 최소한의 환경 변수만
+  env = {
+    NODE_ENV = "development";
+  };
+
   idx = {
-    # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
+    # 필수 VS Code 확장만
     extensions = [
-      # "vscodevim.vim"
+      "ms-vscode.vscode-typescript-next"
+      "esbenp.prettier-vscode"
+      "dbaeumer.vscode-eslint"
     ];
 
-    # Enable previews
+    # 간단한 preview 설정만
     previews = {
       enable = true;
       previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
+        # Main Site만 우선
+        web = {
+          command = ["npm" "run" "dev"];
+          manager = "web";
+          cwd = "apps/main-site";
+          env = {
+            PORT = "$PORT";
+          };
+        };
       };
     };
 
-    # Workspace lifecycle hooks
+    # 자동 실행 스크립트 제거 (수동으로 실행)
     workspace = {
-      # Runs when a workspace is first created
       onCreate = {
-        # Example: install JS dependencies from NPM
-        # npm-install = "npm install";
+        # 기본 의존성 설치만
+        install-deps = "npm install";
       };
-      # Runs when the workspace is (re)started
       onStart = {
-        # Example: start a background task to watch and re-build backend code
-        # watch-backend = "npm run watch-backend";
+        # 자동 시작 제거
       };
     };
   };

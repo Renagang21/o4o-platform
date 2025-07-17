@@ -103,7 +103,12 @@ export interface BetaAnalytics {
     recentActivity: Array<{
       type: 'registration' | 'feedback' | 'login';
       betaUser: BetaUser;
-      details: any;
+      details: {
+        feedbackTitle?: string;
+        feedbackType?: FeedbackType;
+        ipAddress?: string;
+        userAgent?: string;
+      };
       timestamp: Date;
     }>;
   };
@@ -121,7 +126,11 @@ export class BetaUserService {
   }
 
   // Beta User Registration
-  async registerBetaUser(data: BetaUserRegistrationData, metadata?: any): Promise<BetaUser> {
+  async registerBetaUser(data: BetaUserRegistrationData, metadata?: {
+    browserInfo?: string;
+    ipAddress?: string;
+    userAgent?: string;
+  }): Promise<BetaUser> {
     // Check if email already exists
     const existingUser = await this.betaUserRepository.findOne({
       where: { email: data.email }
@@ -138,8 +147,7 @@ export class BetaUserService {
         referralSource: data.referralSource,
         utmSource: data.utmSource,
         utmMedium: data.utmMedium,
-        utmCampaign: data.utmCampaign,
-        registrationTimestamp: new Date()
+        utmCampaign: data.utmCampaign
       }
     });
 
@@ -534,7 +542,7 @@ export class BetaUserService {
   }
 
   // Helper method to format count arrays
-  private formatCountArray(data: any[], enumValues: string[]): Record<string, number> {
+  private formatCountArray(data: Array<{ count: string; [key: string]: string }>, enumValues: string[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     // Initialize all enum values with 0

@@ -1,3 +1,4 @@
+import { MoreThanOrEqual } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { ForumCategory } from '../entities/ForumCategory';
 import { ForumPost, PostStatus, PostType } from '../entities/ForumPost';
@@ -78,10 +79,10 @@ export class ForumService {
 
   async getCategories(includeInactive: boolean = false): Promise<ForumCategory[]> {
     const cacheKey = `forum_categories_${includeInactive}`;
-    const cached = await cacheService.getCachedPricingResult(cacheKey);
+    const cached = await cacheService.getCache<ForumCategory[]>(cacheKey);
     
     if (cached) {
-      return cached as any;
+      return cached;
     }
 
     const queryBuilder = this.categoryRepository
@@ -99,7 +100,7 @@ export class ForumService {
     const categories = await queryBuilder.getMany();
 
     // 캐시에 저장 (10분)
-    await cacheService.cachePricingResult(cacheKey, categories as any, 600);
+    await cacheService.setCache(cacheKey, categories, 600);
 
     return categories;
   }
@@ -390,10 +391,10 @@ export class ForumService {
   // Statistics and Analytics
   async getForumStatistics(): Promise<ForumStatistics> {
     const cacheKey = 'forum_statistics';
-    const cached = await cacheService.getCachedPricingResult(cacheKey);
+    const cached = await cacheService.getCache<ForumStatistics>(cacheKey);
     
     if (cached) {
-      return cached as any;
+      return cached;
     }
 
     const today = new Date();
@@ -415,13 +416,13 @@ export class ForumService {
       this.postRepository.count({ 
         where: { 
           status: PostStatus.PUBLISHED,
-          createdAt: { $gte: today } as any
+          createdAt: MoreThanOrEqual(today)
         } 
       }),
       this.commentRepository.count({ 
         where: { 
           status: CommentStatus.PUBLISHED,
-          createdAt: { $gte: today } as any
+          createdAt: MoreThanOrEqual(today)
         } 
       }),
       this.getPopularTags(10),
@@ -441,7 +442,7 @@ export class ForumService {
     };
 
     // 캐시에 저장 (5분)
-    await cacheService.cachePricingResult(cacheKey, statistics as any, 300);
+    await cacheService.setCache(cacheKey, statistics, 300);
 
     return statistics;
   }

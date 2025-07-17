@@ -1,8 +1,9 @@
 import React from 'react'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon } from 'lucide-react'
+import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon, BookOpen } from 'lucide-react'
 import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
 import GeneralSettings from './GeneralSettings'
+import ReadingSettings from './ReadingSettings'
 
 const UserSettings: React.FC = () => (
   <div className="wp-card">
@@ -36,6 +37,7 @@ const IntegrationSettings: React.FC = () => (
 
 const settingsTabs = [
   { id: 'general', label: '일반 설정', icon: <SettingsIcon className="w-4 h-4" />, path: '' },
+  { id: 'reading', label: '읽기 설정', icon: <BookOpen className="w-4 h-4" />, path: 'reading' },
   { id: 'theme', label: '테마 설정', icon: <Palette className="w-4 h-4" />, path: 'theme' },
   { id: 'users', label: '사용자 설정', icon: <Users className="w-4 h-4" />, path: 'users' },
   { id: 'email', label: '이메일 설정', icon: <Mail className="w-4 h-4" />, path: 'email' },
@@ -81,6 +83,7 @@ const Settings: React.FC = () => {
       {/* Settings Content */}
       <Routes>
         <Route index element={<GeneralSettings />} />
+        <Route path="reading" element={<ReadingSettings />} />
         <Route path="theme" element={<ThemeSettingsWithAuth />} />
         <Route path="users" element={<UserSettings />} />
         <Route path="email" element={<EmailSettings />} />

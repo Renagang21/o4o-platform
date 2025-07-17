@@ -42,7 +42,7 @@ export class CustomPost {
 
   // All custom field data stored as JSON
   @Column({ type: 'json', default: {} })
-  fields!: Record<string, any>;
+  fields!: Record<string, string | number | boolean | Date | null | string[] | Record<string, unknown>>;
 
   // Optional content for rich text
   @Column({ type: 'text', nullable: true })
@@ -78,12 +78,12 @@ export class CustomPost {
   updatedAt!: Date;
 
   // Helper method to get field value with type safety
-  getField(fieldName: string): any {
-    return this.fields[fieldName];
+  getField<T = string | number | boolean | Date | null | string[] | Record<string, unknown>>(fieldName: string): T | undefined {
+    return this.fields[fieldName] as T;
   }
 
   // Helper method to set field value
-  setField(fieldName: string, value: any): void {
+  setField(fieldName: string, value: string | number | boolean | Date | null | string[] | Record<string, unknown>): void {
     this.fields = { ...this.fields, [fieldName]: value };
   }
 
