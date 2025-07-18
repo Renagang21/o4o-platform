@@ -79,9 +79,9 @@ jobs:
       - name: Build packages if not cached
         run: |
           # Check if packages are built
-          if [ ! -d "packages/types/dist" ]; then
+          if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            npm run build:packages
+            bash scripts/build-packages.sh
           else
             echo "Packages already built (from cache)"
           fi
@@ -122,9 +122,9 @@ jobs:
       - name: Build packages if not cached
         run: |
           # Check if packages are built
-          if [ ! -d "packages/types/dist" ]; then
+          if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            npm run build:packages
+            bash scripts/build-packages.sh
           else
             echo "Packages already built (from cache)"
           fi
@@ -168,9 +168,9 @@ jobs:
       - name: Build packages if not cached
         run: |
           # Check if packages are built
-          if [ ! -d "packages/types/dist" ]; then
+          if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            npm run build:packages
+            bash scripts/build-packages.sh
           else
             echo "Packages already built (from cache)"
           fi
@@ -214,7 +214,7 @@ jobs:
       - name: Build shared packages
         run: |
           # Always build packages in the build job to ensure they're fresh
-          npm run build:packages
+          bash scripts/build-packages.sh
       
       - name: Build ${{ matrix.app }}
         run: npm run build:${{ matrix.app == 'api-server' && 'api' || (matrix.app == 'main-site' && 'web' || 'admin') }}
@@ -261,9 +261,9 @@ jobs:
       - name: Build packages if not cached
         run: |
           # Check if packages are built
-          if [ ! -d "packages/types/dist" ]; then
+          if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            npm run build:packages
+            bash scripts/build-packages.sh
           else
             echo "Packages already built (from cache)"
           fi

@@ -50,7 +50,7 @@ jobs:
     - name: Build shared packages
       run: |
         echo "Building shared packages first..."
-        npm run build:packages
+        bash scripts/build-packages.sh
     
     - name: Type check
       run: npm run type-check
@@ -86,7 +86,7 @@ jobs:
     - name: Build shared packages
       run: |
         echo "Building shared packages first..."
-        npm run build:packages
+        bash scripts/build-packages.sh
         
     - name: TypeScript type check
       run: |
@@ -100,7 +100,7 @@ jobs:
         
     - name: Build packages
       run: |
-        npm run build:packages
+        bash scripts/build-packages.sh
         
     - name: Create production environment file
       run: |
@@ -194,9 +194,10 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.WEB_SSH_KEY }}" > ~/.ssh/id_rsa
+        echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        echo "SSH key setup completed"
         
     - name: Create backup of current deployment
       run: |
@@ -446,6 +447,14 @@ jobs:
     if: failure()
     
     steps:
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        echo "SSH key setup completed"
+        
     - name: Rollback to previous version
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "

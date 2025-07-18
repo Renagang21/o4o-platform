@@ -50,12 +50,12 @@ jobs:
     - name: Build shared packages
       run: |
         echo "Building shared packages first..."
-        npm run build:packages
+        bash scripts/build-packages.sh
         
     - name: Install API server dependencies
       run: |
         cd apps/api-server
-        npm install
+        npm ci
         
     - name: TypeScript type check
       run: |
@@ -105,9 +105,10 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        echo "SSH key setup completed"
         
     - name: Create deployment directory
       run: |
@@ -315,9 +316,10 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        echo "SSH key setup completed"
         
     - name: Rollback to previous version
       run: |

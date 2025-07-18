@@ -358,6 +358,54 @@ cd apps/main-site && npm run build
 - **ALWAYS CHECK BROWSER CONSOLE** - Most white screen issues show errors there
 - **BUILD ORDER MATTERS** - Always build packages before apps
 
+## CI/CD Critical Guidelines
+
+### 🚨 Prevent CI/CD Failures
+
+**Package Dependencies**:
+- All apps MUST explicitly declare @o4o/* package dependencies in their package.json
+- Use `"@o4o/types": "file:../../packages/types"` format
+- Never rely on implicit workspace resolution
+
+**Build Order**:
+1. Always run `npm run build:packages` BEFORE building apps
+2. In CI, packages must be built before running type-check
+3. Order: npm ci → build:packages → app-specific commands
+
+**TypeScript Configuration**:
+- Do NOT use path mappings for @o4o packages in tsconfig.json
+- Let npm workspaces handle module resolution
+- Ensure all imports use proper package names (@o4o/types, not relative paths)
+
+**Workspace Commands**:
+- Use `npm run command --workspace=@o4o/app-name` from root
+- Avoid `cd apps/xxx && npm run` in CI - it breaks module resolution
+- Examples:
+  ```bash
+  # Good
+  npm run type-check --workspace=@o4o/api-server
+  npm run build --workspace=@o4o/main-site
+  
+  # Bad (breaks in CI)
+  cd apps/api-server && npm run type-check
+  ```
+
+**SSH Deployment**:
+- Always set up SSH keys in EVERY job that needs them
+- Include SSH setup in rollback jobs too
+- Use explicit key paths: `-i ~/.ssh/id_rsa`
+
+**Environment Differences**:
+- CI starts with clean environment (no dist folders)
+- Local development may have cached builds
+- Always test with `npm run clean && npm run build` locally
+
+**Common CI/CD Errors and Solutions**:
+1. "Cannot find module '@o4o/types'": Missing package dependency or build order issue
+2. "Permission denied (publickey)": Missing SSH key setup in job
+3. "implicit any error": Missing type annotations - CI uses strict TypeScript
+4. "Script not found": Using wrong script names (build:api vs build:api-server)
+
 ## Troubleshooting Guide
 
 ### Common Issues and Solutions
@@ -419,6 +467,23 @@ cd apps/main-site && npm run build
 - Use `strictNullChecks` to catch null/undefined errors
 - Set `noImplicitAny: true` to force explicit typing
 - Enable `esModuleInterop` for proper module imports
+
+#### Query Parameter Type Safety
+```typescript
+// BAD: Assuming req.query values are numbers
+const { limit = 20 } = req.query as { limit?: number };
+
+// GOOD: req.query values are always strings
+const { limit = '20' } = req.query as { limit?: string };
+const limitNum = parseInt(limit) || 20;
+
+// BETTER: Use validation library
+import { z } from 'zod';
+const querySchema = z.object({
+  limit: z.string().optional().transform(v => parseInt(v || '20'))
+});
+const { limit } = querySchema.parse(req.query);
+```
 
 #### Import Management
 - Always use absolute imports with @ aliases
@@ -528,11 +593,17 @@ const user = await userRepository.findOne({
 - Both keys registered on respective servers
 
 ### GitHub Secrets Required
-- SSH_API_PRIVATE_KEY
-- SSH_WEB_PRIVATE_KEY
-- SSH_API_HOST
-- SSH_WEB_HOST
-- SSH_USERNAME
+- API_SSH_KEY (SSH private key for API server)
+- WEB_SSH_KEY (SSH private key for web servers)
+- API_HOST (API server hostname)
+- WEB_HOST (Web server hostname)
+- API_USER (API server username)
+- WEB_USER (Web server username)
+- DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME
+- JWT_SECRET, JWT_EXPIRES_IN
+- CORS_ORIGIN
+- LOG_LEVEL
+- HEALTH_CHECK_KEY
 
 ## Security Guidelines
 
