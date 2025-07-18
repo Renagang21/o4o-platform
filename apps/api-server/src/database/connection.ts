@@ -31,7 +31,8 @@ import { Settings } from '../entities/Settings';
 const DB_HOST = process.env.DB_HOST || 'localhost';
 const DB_PORT = parseInt(process.env.DB_PORT || '5432');
 const DB_USERNAME = process.env.DB_USERNAME || 'postgres';
-const DB_PASSWORD = process.env.DB_PASSWORD || '';
+// DB_PASSWORD는 반드시 문자열로 처리
+const DB_PASSWORD = String(process.env.DB_PASSWORD || '');
 const DB_NAME = process.env.DB_NAME || 'o4o_platform';
 const NODE_ENV = process.env.NODE_ENV || 'development';
 

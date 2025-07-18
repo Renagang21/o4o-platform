@@ -368,27 +368,27 @@ cd apps/main-site && npm run build
 
 ## Recent Updates (2025)
 
-### SSH Deployment Improvements
-- All deployment workflows now use `shimataro/ssh-key-action@v2` or `webfactory/ssh-agent`
-- Known hosts configuration is mandatory to prevent "Host key verification failed"
-- Support for multiple SSH key formats (OpenSSH, RSA, PKCS8)
+### Simplified SSH Deployment
+- **One Standard Method**: Simple bash script for all workflows
+- **Manual Key Generation**: Generate keys directly on server when needed
+- **Required**: Always add known_hosts before SSH operations
 
-### Workflow Enhancements
-- Zero-downtime deployments using PM2 reload
-- Automatic rollback on deployment failure
-- Health checks after each deployment
-- Performance monitoring for frontend deployments
+### Key Changes
+- Removed complex SSH actions - use simple bash commands
+- Fixed npm ci issues - use npm install when needed
+- Unified all deployment workflows to use same SSH setup
 
-### Scripts Added
-- `scripts/setup-ssh-known-hosts.sh` - Automated known_hosts configuration
-- `scripts/ssh-key-converter.py` - SSH key format detection and conversion
-- `scripts/validate-deploy-env.sh` - Pre-deployment environment validation
+### Quick Fixes
+```bash
+# SSH Issues: Regenerate on server
+ssh user@server "cd ~/.ssh && ssh-keygen -t rsa -b 4096 -f github_actions_key -N ''"
 
-### Best Practices Updates
-- Always add known_hosts before SSH operations
-- Use workspace commands from root directory in CI/CD
-- Build packages before running type-check in CI
-- Test SSH connectivity before deployment operations
+# NPM Issues: Clean install
+rm -rf node_modules package-lock.json && npm install
+
+# Build Issues: Always build packages first  
+npm run build:packages && npm run build
+```
 
 ## CI/CD Critical Guidelines
 
@@ -403,6 +403,25 @@ cd apps/main-site && npm run build
 1. Always run `npm run build:packages` BEFORE building apps
 2. In CI, packages must be built before running type-check
 3. Order: npm ci → build:packages → app-specific commands
+
+**NPM CI Issues & Solutions**:
+```bash
+# Problem: npm ci fails with workspace errors
+# Solution 1: Clean install from root
+rm -rf node_modules package-lock.json
+rm -rf apps/*/node_modules packages/*/node_modules
+npm install
+
+# Solution 2: Use npm install instead of npm ci in CI/CD
+# Change in workflows:
+- run: npm ci    # Old
+- run: npm install --prefer-offline --no-audit  # New
+
+# Solution 3: Ensure package-lock.json is up to date
+npm install
+git add package-lock.json
+git commit -m "fix: update package-lock.json"
+```
 
 **TypeScript Configuration**:
 - Do NOT use path mappings for @o4o packages in tsconfig.json
@@ -423,43 +442,47 @@ cd apps/main-site && npm run build
   ```
 
 **SSH Deployment Setup**:
-### 🔑 SSH Key Configuration
-1. **Key Format Requirements**:
-   - Supports RSA, PKCS8, and OpenSSH formats
-   - No passphrase allowed
-   - Unix line endings (LF) required
+### 🔑 SSH Key Configuration (Simplified)
 
-2. **GitHub Actions SSH Setup**:
-   ```yaml
-   # Method 1: Using shimataro/ssh-key-action (Recommended)
-   - name: Setup SSH key
-     uses: shimataro/ssh-key-action@v2
-     with:
-       key: ${{ secrets.API_SSH_KEY }}
-       known_hosts: unnecessary
-       if_key_exists: replace
-   
-   # Method 2: Using webfactory/ssh-agent
-   - name: Setup SSH Agent
-     uses: webfactory/ssh-agent@v0.9.0
-     with:
-       ssh-private-key: ${{ secrets.API_SSH_KEY }}
-   ```
+#### Standard Setup for All Workflows:
+```yaml
+- name: Setup SSH
+  run: |
+    mkdir -p ~/.ssh
+    echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+    chmod 600 ~/.ssh/id_rsa
+    ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+    ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts
+```
 
-3. **Known Hosts Configuration** (REQUIRED):
-   ```yaml
-   - name: Add SSH known hosts
-     run: |
-       mkdir -p ~/.ssh
-       ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-       ssh-keyscan -H domain.com >> ~/.ssh/known_hosts
-       chmod 644 ~/.ssh/known_hosts
-   ```
+#### Manual SSH Key Generation on Server:
+When SSH issues persist, regenerate keys directly on the server:
 
-4. **Common SSH Issues**:
-   - "Host key verification failed": Missing known_hosts setup
-   - "Permission denied (publickey)": Wrong key format or missing key
-   - "ssh-keygen -p interactive mode": Use shimataro/ssh-key-action instead
+```bash
+# 1. On API Server
+ssh ubuntu@api.neture.co.kr
+cd ~/.ssh
+ssh-keygen -t rsa -b 4096 -f github_actions_key -N ""
+cat github_actions_key.pub >> authorized_keys
+cat github_actions_key  # Copy this to GitHub Secrets as API_SSH_KEY
+
+# 2. On Web Server  
+ssh ubuntu@neture.co.kr
+cd ~/.ssh
+ssh-keygen -t rsa -b 4096 -f github_actions_key -N ""
+cat github_actions_key.pub >> authorized_keys
+cat github_actions_key  # Copy this to GitHub Secrets as WEB_SSH_KEY
+
+# 3. Set correct permissions
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/github_actions_key
+```
+
+#### Common SSH Issues:
+- "Host key verification failed": Always add known_hosts before SSH commands
+- "Permission denied (publickey)": Regenerate keys on server (see above)
+- "Invalid key format": Ensure complete key including BEGIN/END lines
 
 **Environment Differences**:
 - CI starts with clean environment (no dist folders)
@@ -762,26 +785,41 @@ const user = await userRepository.findOne({
 - Both keys registered on respective servers
 
 ### GitHub Secrets Required
-- **SSH Keys**:
-  - API_SSH_KEY (SSH private key for API server)
-  - WEB_SSH_KEY (SSH private key for web servers)
-  
-- **Server Configuration**:
-  - API_HOST (API server hostname)
-  - WEB_HOST (Web server hostname)
-  - API_USER (API server username)
-  - WEB_USER (Web server username)
-  - API_HOST_IP (Optional: for known_hosts)
-  - WEB_HOST_IP (Optional: for known_hosts)
-  
-- **Database**:
-  - DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME
-  
-- **Application**:
-  - JWT_SECRET, JWT_EXPIRES_IN
-  - CORS_ORIGIN
-  - LOG_LEVEL
-  - HEALTH_CHECK_KEY
+
+⚠️ **IMPORTANT**: All values with numbers must be added as strings to prevent type conversion issues!
+
+#### SSH Keys:
+- `API_SSH_KEY` - SSH private key for API server
+- `WEB_SSH_KEY` - SSH private key for web servers
+
+#### Server Configuration:
+- `API_HOST` - API server hostname (e.g., `api.neture.co.kr`)
+- `WEB_HOST` - Web server hostname (e.g., `neture.co.kr`)
+- `API_USER` - API server username (e.g., `ubuntu`)
+- `WEB_USER` - Web server username (e.g., `ubuntu`)
+
+#### Database (CRITICAL - Must be strings!):
+- `DB_HOST` - Database hostname
+- `DB_PORT` - Database port (e.g., `'5432'` not `5432`)
+- `DB_USERNAME` - Database username
+- `DB_PASSWORD` - Database password (⚠️ MUST be quoted if numeric!)
+- `DB_NAME` - Database name
+
+#### Application:
+- `JWT_SECRET` - JWT secret key (generate with `openssl rand -base64 32`)
+- `JWT_EXPIRES_IN` - JWT expiration (e.g., `'7d'`)
+- `CORS_ORIGIN` - Allowed origins (e.g., `'https://neture.co.kr'`)
+- `LOG_LEVEL` - Logging level (e.g., `'info'`)
+- `HEALTH_CHECK_KEY` - Health check auth key
+
+#### Example for numeric password:
+```
+# Wrong: Will cause "password must be a string" error
+DB_PASSWORD: 12345678
+
+# Correct: Always add as string in GitHub Secrets
+DB_PASSWORD: "12345678"
+```
 
 ## Security Guidelines
 
