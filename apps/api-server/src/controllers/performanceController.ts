@@ -546,7 +546,7 @@ export const getRealtimeMetrics = async (req: Request, res: Response) => {
  */
 export const getPerformanceAlerts = async (req: Request, res: Response) => {
   try {
-    const { severity, limit = 20 } = req.query;
+    const { severity, limit = 20 } = req.query as { severity?: string; limit?: number };
 
     const [
       performanceReport,

@@ -65,6 +65,12 @@ jobs:
             */*/node_modules
           key: deps-node-${{ hashFiles('**/package-lock.json') }}
       
+      - name: Install dependencies if not cached
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci
+          fi
+      
       - name: Run type check
         run: npm run type-check
 
@@ -89,6 +95,12 @@ jobs:
             node_modules
             */*/node_modules
           key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Install dependencies if not cached
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci
+          fi
       
       - name: Run ESLint
         run: npm run lint
@@ -145,6 +157,12 @@ jobs:
             node_modules
             */*/node_modules
           key: deps-node-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Install dependencies if not cached
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci
+          fi
       
       - name: Build shared packages
         run: npm run build:packages

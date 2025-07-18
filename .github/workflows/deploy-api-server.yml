@@ -99,13 +99,13 @@ jobs:
         
     - name: Create deployment directory
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           mkdir -p ${{ env.DEPLOY_PATH }}/apps/api-server
         "
         
     - name: Create environment file
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cat > ${{ env.DEPLOY_PATH }}/apps/api-server/.env.production << 'EOF'
           NODE_ENV=production
           PORT=${{ env.SERVICE_PORT }}
@@ -135,27 +135,27 @@ jobs:
     - name: Deploy application files
       run: |
         rsync -avz --delete \
-          -e "ssh -o StrictHostKeyChecking=no" \
+          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/api-server/ \
           ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:${{ env.DEPLOY_PATH }}/apps/api-server/
           
     - name: Install production dependencies
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
           npm ci --only=production
         "
         
     - name: Run database migrations
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
           npm run migration:run
         "
         
     - name: Setup PM2 ecosystem file
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cat > ${{ env.DEPLOY_PATH }}/ecosystem.config.js << 'EOF'
           module.exports = {
             apps: [{
@@ -185,13 +185,13 @@ jobs:
         
     - name: Create logs directory
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           mkdir -p ${{ env.DEPLOY_PATH }}/logs
         "
         
     - name: Deploy with PM2 (Zero-downtime)
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # PM2 프로세스 존재 여부 확인
@@ -302,7 +302,7 @@ jobs:
     steps:
     - name: Rollback to previous version
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # 이전 백업에서 복원

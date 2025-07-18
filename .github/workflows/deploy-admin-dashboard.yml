@@ -168,7 +168,7 @@ jobs:
         
     - name: Create backup of current deployment
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           if [ -d 'apps/admin-dashboard' ]; then
             echo 'Creating backup of current admin-dashboard...'
@@ -179,40 +179,40 @@ jobs:
         
     - name: Create deployment directory
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           mkdir -p ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
         "
         
     - name: Deploy static files to secured directory
       run: |
         # 관리자 대시보드 정적 파일 배포
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           mkdir -p /var/www/admin.neture.co.kr
           chmod 750 /var/www/admin.neture.co.kr
         "
         
         rsync -avz --delete \
-          -e "ssh -o StrictHostKeyChecking=no" \
+          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/admin.neture.co.kr/
           
     - name: Deploy application files
       run: |
         rsync -avz --delete \
-          -e "ssh -o StrictHostKeyChecking=no" \
+          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:${{ env.DEPLOY_PATH }}/apps/admin-dashboard/
           
     - name: Install production dependencies
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
           npm ci --only=production
         "
         
     - name: Setup PM2 ecosystem file (Admin Security)
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cat > ${{ env.DEPLOY_PATH }}/admin-dashboard.ecosystem.config.js << 'EOF'
           module.exports = {
             apps: [{
@@ -250,7 +250,7 @@ jobs:
         
     - name: Set secure file permissions
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
           
           # 보안 강화된 권한 설정
@@ -266,7 +266,7 @@ jobs:
         
     - name: Deploy with PM2 (Zero-downtime)
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # PM2 프로세스 존재 여부 확인
@@ -442,7 +442,7 @@ jobs:
     steps:
     - name: Rollback to previous version
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # 이전 백업에서 복원
