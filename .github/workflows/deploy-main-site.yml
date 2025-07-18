@@ -184,13 +184,13 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.WEB_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        echo "${{ secrets.WEB_SSH_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.WEB_SERVER_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts
         
     - name: Create backup of current deployment
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           if [ -d 'apps/main-site' ]; then
             echo 'Creating backup of current main-site...'
@@ -201,39 +201,39 @@ jobs:
         
     - name: Create deployment directory
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           mkdir -p ${{ env.DEPLOY_PATH }}/apps/main-site
         "
         
     - name: Deploy static files to Nginx
       run: |
         # 정적 파일을 별도 디렉토리에 배포 (CDN 역할)
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           mkdir -p /var/www/neture.co.kr
         "
         
         rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
           apps/main-site/dist/ \
-          ubuntu@${{ secrets.WEB_SERVER_HOST }}:/var/www/neture.co.kr/
+          ubuntu@${{ secrets.WEB_HOST }}:/var/www/neture.co.kr/
           
     - name: Deploy application files
       run: |
         rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
           apps/main-site/ \
-          ubuntu@${{ secrets.WEB_SERVER_HOST }}:${{ env.DEPLOY_PATH }}/apps/main-site/
+          ubuntu@${{ secrets.WEB_HOST }}:${{ env.DEPLOY_PATH }}/apps/main-site/
           
     - name: Install production dependencies
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/main-site
           npm ci --only=production
         "
         
     - name: Setup PM2 ecosystem file
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           cat > ${{ env.DEPLOY_PATH }}/main-site.ecosystem.config.js << 'EOF'
           module.exports = {
             apps: [{
@@ -268,13 +268,13 @@ jobs:
         
     - name: Install serve globally
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           npm install -g serve@14
         "
         
     - name: Deploy with PM2 (Zero-downtime)
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # PM2 프로세스 존재 여부 확인
@@ -438,7 +438,7 @@ jobs:
     steps:
     - name: Rollback to previous version
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_SERVER_HOST }} "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # 이전 백업에서 복원

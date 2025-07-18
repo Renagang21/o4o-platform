@@ -18,9 +18,9 @@ jobs:
     - name: 🏥 서버 상태 확인
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.APISERVER_HOST }}
-        username: ${{ secrets.APISERVER_USER }}
-        key: ${{ secrets.APISERVER_SSH_KEY }}
+        host: ${{ secrets.API_HOST }}
+        username: ${{ secrets.API_USER }}
+        key: ${{ secrets.API_SSH_KEY }}
         timeout: 60s
         script: |
           echo "=== 🏥 서버 헬스체크 시작 ==="

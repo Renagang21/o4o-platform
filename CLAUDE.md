@@ -274,6 +274,77 @@ The project uses React 19 and requires strict version compatibility. All package
 - Inconsistent versions of axios, date-fns, zustand, react-router-dom
 - Extraneous packages causing conflicts
 
+## NPM Scripts Reference
+
+### Script Execution Hierarchy
+The monorepo uses npm workspaces with scripts at two levels:
+1. **Root scripts** - Orchestrate builds across all packages/apps
+2. **Workspace scripts** - Individual package/app specific scripts
+
+### Essential Scripts
+
+#### Development
+```bash
+npm run dev              # Start all services (API:4000, Web:3000, Admin:3001)
+npm run dev:api          # API server only
+npm run dev:web          # Main site only
+npm run dev:admin        # Admin dashboard only
+```
+
+#### Building
+```bash
+npm run build            # Build all (packages → apps)
+npm run build:packages   # Build shared packages in dependency order
+npm run build:apps       # Build all applications
+npm run build:[app]      # Build specific app with packages
+```
+
+#### Code Quality & Testing
+```bash
+npm run type-check       # Type check all workspaces
+npm run lint             # Lint all TS/TSX files
+npm run lint:fix         # Auto-fix linting issues
+npm run test             # Run all tests
+npm run test:e2e         # Run E2E tests
+npm run test:coverage    # With coverage report
+```
+
+#### Maintenance
+```bash
+npm run clean            # Remove all node_modules and dist
+npm run install:all      # Clean install and build everything
+```
+
+### CI/CD Script Patterns
+
+#### Standard Build Flow
+```bash
+npm ci                   # Clean install
+npm run build:packages   # Build dependencies
+npm run build            # Build applications
+```
+
+#### Package Build Order
+```
+types → utils → ui → auth-client → auth-context
+```
+
+#### Workspace Commands
+```bash
+# Run script in specific workspace
+npm run build --workspace=@o4o/main-site
+
+# Run from app directory
+cd apps/main-site && npm run build
+```
+
+### Troubleshooting Scripts
+
+1. **Script Not Found**: Check execution location (root vs app directory)
+2. **Build Order Issues**: Always `build:packages` before `build:apps`
+3. **Missing Scripts**: Check case sensitivity and workspace flag
+4. **Bundle Analysis**: Use `build:analyze` for size optimization
+
 ## Important Notes
 
 - No Docker usage for development
@@ -285,3 +356,248 @@ The project uses React 19 and requires strict version compatibility. All package
 - Check for MSW handlers before implementing new API endpoints
 - **DEPENDENCY MANAGEMENT IS CRITICAL** - follow the process above religiously
 - **ALWAYS CHECK BROWSER CONSOLE** - Most white screen issues show errors there
+- **BUILD ORDER MATTERS** - Always build packages before apps
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+#### Prevent Dependency Resolution Issues
+- Always configure Vite aliases for @o4o/* packages pointing to /src
+- Include proper ESM exports in all package.json files
+- Maintain consistent versions across workspaces
+- Build packages before apps: types → utils → ui → auth-client → auth-context
+
+#### Prevent Runtime Errors
+1. Always run `npm run type-check` before committing
+2. Build packages in correct order before apps
+3. Handle loading and error states in components
+4. Implement error boundaries for graceful failures
+5. Use proper null checks and optional chaining
+
+#### Mock Mode Development
+- Set `USE_MOCK=true` in `.env` for DB-less development
+- Test credentials: admin@example.com / password123
+- Mock mode auto-creates default templates
+
+#### Build Performance Best Practices
+- Lazy load heavy components and routes
+- Use dynamic imports for optional features
+- Keep chunks under 500KB with code splitting
+- Minimize dependencies in packages
+- Run build:analyze regularly to monitor bundle size
+
+## Code Quality Standards
+
+### Critical Metrics to Maintain
+- **Console statements**: 0 - Use proper logging (winston/pino)
+- **Any types**: 0 - Use unknown, generics, or specific types
+- **File size**: <300 lines - Split large files into modules
+- **Circular dependencies**: 0 - Use dependency injection
+- **Security issues**: 0 - No dangerouslySetInnerHTML, eval, or hardcoded secrets
+
+### TypeScript Standards
+- Always enable strict mode in all tsconfig.json files
+- Use unknown instead of any for unknown types
+- Implement proper type guards for runtime validation
+- Add discriminated unions for complex types
+- Follow patterns in TYPESCRIPT_GUIDELINES.md
+
+### Performance Requirements
+- Implement React.memo for expensive components
+- Use useMemo/useCallback for optimization
+- Lazy load all page components
+- Code split by route
+- Keep bundle chunks <500KB
+
+## Development Best Practices
+
+### Prevent Common Errors
+
+#### TypeScript Configuration
+- Always enable `strict: true` in tsconfig.json
+- Use `strictNullChecks` to catch null/undefined errors
+- Set `noImplicitAny: true` to force explicit typing
+- Enable `esModuleInterop` for proper module imports
+
+#### Import Management
+- Always use absolute imports with @ aliases
+- Ensure all entities are properly imported before use
+- Avoid circular dependencies - use dependency injection pattern
+- Use barrel exports (index.ts) for cleaner imports
+- Group imports: external → @o4o packages → relative imports
+
+#### Type Safety Patterns
+```typescript
+// BAD: Using any
+const processData = (data: any) => data.value;
+
+// GOOD: Using generics or unknown
+const processData = <T extends { value: string }>(data: T) => data.value;
+const handleUnknown = (data: unknown) => {
+  if (isValidData(data)) return data.value;
+};
+
+// Type Guards
+function isUser(obj: unknown): obj is User {
+  return obj !== null && 
+    typeof obj === 'object' &&
+    'id' in obj &&
+    'email' in obj;
+}
+
+// Discriminated Unions
+type ApiResponse<T> = 
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string };
+```
+
+#### Environment Variables
+```typescript
+// BAD: Hardcoding secrets
+const JWT_SECRET = "my-secret-key";
+
+// GOOD: Using env with validation
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error('JWT_SECRET is required');
+
+// BETTER: Centralized config with validation
+export const config = {
+  jwt: {
+    secret: requireEnv('JWT_SECRET'),
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+  },
+  db: {
+    host: requireEnv('DB_HOST'),
+    port: parseInt(process.env.DB_PORT || '5432')
+  }
+};
+```
+
+#### Error Handling Patterns
+```typescript
+// Always use try-catch with proper error types
+try {
+  const result = await apiCall();
+  return { success: true, data: result };
+} catch (error) {
+  // Type-safe error handling
+  if (error instanceof ValidationError) {
+    return { success: false, error: error.message };
+  }
+  // Log unexpected errors
+  logger.error('Unexpected error:', error);
+  return { success: false, error: 'Internal server error' };
+}
+```
+
+#### Database Query Safety
+```typescript
+// BAD: SQL injection risk
+const query = `SELECT * FROM users WHERE email = '${email}'`;
+
+// GOOD: Using TypeORM query builder
+const user = await userRepository
+  .createQueryBuilder('user')
+  .where('user.email = :email', { email })
+  .getOne();
+
+// GOOD: Using repository methods
+const user = await userRepository.findOne({ 
+  where: { email } 
+});
+```
+
+## Deployment & Infrastructure
+
+### Server Architecture
+- **API Server**: api.neture.co.kr
+  - PM2 Process: o4o-api-server
+  - Path: /home/ubuntu/o4o-platform
+  - Port: 4000
+  
+- **Web Servers**:
+  - admin.neture.co.kr - Admin Dashboard
+  - neture.co.kr - Main Site
+  - Static files via PM2 + serve
+  - Path: /var/www/{domain}/
+
+### SSH Key Mapping
+- API Deploy: Uses SSH_API_PRIVATE_KEY
+- Web Deploy: Uses SSH_WEB_PRIVATE_KEY
+- Both keys registered on respective servers
+
+### GitHub Secrets Required
+- SSH_API_PRIVATE_KEY
+- SSH_WEB_PRIVATE_KEY
+- SSH_API_HOST
+- SSH_WEB_HOST
+- SSH_USERNAME
+
+## Security Guidelines
+
+### Security Best Practices
+1. **Environment Variables** - All secrets must be in .env, never in code
+2. **Safe HTML Rendering** - Use DOMPurify if HTML rendering needed
+3. **Input Validation** - Validate and sanitize all user inputs
+4. **Database Queries** - Always use TypeORM query builder or parameterized queries
+5. **Rate Limiting** - Configure express-rate-limit for all endpoints
+6. **Authentication** - Use JWT with proper expiration and refresh tokens
+7. **CORS** - Configure strict CORS policies for production
+
+### Environment Variables
+- Store all secrets in .env files
+- Never commit .env files
+- Use different secrets for development/production
+- Rotate keys regularly
+
+## TypeScript Migration Strategy
+
+### File-by-File Approach
+1. Add `// @ts-strict` to top of file
+2. Fix all type errors in that file
+3. Replace any with unknown or specific types
+4. Add proper return types to all functions
+5. Implement type guards for runtime checks
+
+### Pre-commit Hooks
+```json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run type-check && npm run lint"
+    }
+  }
+}
+```
+
+## Performance Optimization Patterns
+
+### React Optimization
+```typescript
+// Memoize expensive components
+export default React.memo(ExpensiveComponent);
+
+// Memoize expensive calculations
+const expensiveValue = useMemo(() => calculateExpensive(data), [data]);
+
+// Memoize callbacks
+const handleClick = useCallback(() => {
+  doSomething(id);
+}, [id]);
+```
+
+### Code Splitting
+```typescript
+// Lazy load routes
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
+// Lazy load heavy components
+const RichTextEditor = lazy(() => import('./components/RichTextEditor'));
+```
+
+### Bundle Optimization
+- Use build:analyze to identify large dependencies
+- Consider alternatives to heavy libraries
+- Implement tree shaking
+- Use dynamic imports for optional features
