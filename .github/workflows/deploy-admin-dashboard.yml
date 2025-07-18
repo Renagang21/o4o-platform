@@ -170,8 +170,18 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "SSH key setup completed"
+        
+    - name: Add SSH known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H admin.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Also add IP if available
+        if [ -n "${{ secrets.WEB_HOST_IP }}" ]; then
+          ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        fi
+        chmod 644 ~/.ssh/known_hosts
         
     - name: Create backup of current deployment
       run: |
@@ -452,8 +462,18 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "SSH key setup completed"
+        
+    - name: Add SSH known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H admin.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Also add IP if available
+        if [ -n "${{ secrets.WEB_HOST_IP }}" ]; then
+          ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        fi
+        chmod 644 ~/.ssh/known_hosts
         
     - name: Rollback to previous version
       run: |

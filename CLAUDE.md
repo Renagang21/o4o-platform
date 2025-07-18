@@ -390,10 +390,44 @@ cd apps/main-site && npm run build
   cd apps/api-server && npm run type-check
   ```
 
-**SSH Deployment**:
-- Always set up SSH keys in EVERY job that needs them
-- Include SSH setup in rollback jobs too
-- Use explicit key paths: `-i ~/.ssh/id_rsa`
+**SSH Deployment Setup**:
+### 🔑 SSH Key Configuration
+1. **Key Format Requirements**:
+   - Supports RSA, PKCS8, and OpenSSH formats
+   - No passphrase allowed
+   - Unix line endings (LF) required
+
+2. **GitHub Actions SSH Setup**:
+   ```yaml
+   # Method 1: Using shimataro/ssh-key-action (Recommended)
+   - name: Setup SSH key
+     uses: shimataro/ssh-key-action@v2
+     with:
+       key: ${{ secrets.API_SSH_KEY }}
+       known_hosts: unnecessary
+       if_key_exists: replace
+   
+   # Method 2: Using webfactory/ssh-agent
+   - name: Setup SSH Agent
+     uses: webfactory/ssh-agent@v0.9.0
+     with:
+       ssh-private-key: ${{ secrets.API_SSH_KEY }}
+   ```
+
+3. **Known Hosts Configuration** (REQUIRED):
+   ```yaml
+   - name: Add SSH known hosts
+     run: |
+       mkdir -p ~/.ssh
+       ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+       ssh-keyscan -H domain.com >> ~/.ssh/known_hosts
+       chmod 644 ~/.ssh/known_hosts
+   ```
+
+4. **Common SSH Issues**:
+   - "Host key verification failed": Missing known_hosts setup
+   - "Permission denied (publickey)": Wrong key format or missing key
+   - "ssh-keygen -p interactive mode": Use shimataro/ssh-key-action instead
 
 **Environment Differences**:
 - CI starts with clean environment (no dist folders)
@@ -405,6 +439,7 @@ cd apps/main-site && npm run build
 2. "Permission denied (publickey)": Missing SSH key setup in job
 3. "implicit any error": Missing type annotations - CI uses strict TypeScript
 4. "Script not found": Using wrong script names (build:api vs build:api-server)
+5. "Host key verification failed": Add known_hosts configuration before SSH commands
 
 ## Troubleshooting Guide
 

@@ -105,6 +105,18 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.API_SSH_KEY }}
         
+    # Known hosts 설정
+    - name: Add SSH known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Also add IP if available
+        if [ -n "${{ secrets.API_HOST_IP }}" ]; then
+          ssh-keyscan -H ${{ secrets.API_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        fi
+        chmod 644 ~/.ssh/known_hosts
+        
     # 대체 방법: Python 스크립트로 키 처리
     - name: Setup SSH Key (Alternative)
       if: failure()

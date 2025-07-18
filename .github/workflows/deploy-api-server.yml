@@ -113,6 +113,17 @@ jobs:
         known_hosts: unnecessary
         if_key_exists: replace
         
+    - name: Add SSH known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Also add IP if available
+        if [ -n "${{ secrets.API_HOST_IP }}" ]; then
+          ssh-keyscan -H ${{ secrets.API_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        fi
+        chmod 644 ~/.ssh/known_hosts
+        
     - name: Create deployment directory
       run: |
         ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
@@ -322,6 +333,17 @@ jobs:
         key: ${{ secrets.API_SSH_KEY }}
         known_hosts: unnecessary
         if_key_exists: replace
+        
+    - name: Add SSH known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Also add IP if available
+        if [ -n "${{ secrets.API_HOST_IP }}" ]; then
+          ssh-keyscan -H ${{ secrets.API_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        fi
+        chmod 644 ~/.ssh/known_hosts
         
     - name: Rollback to previous version
       run: |
