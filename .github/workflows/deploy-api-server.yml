@@ -111,6 +111,41 @@ jobs:
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
         ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts
         
+    - name: Check existing configuration
+      run: |
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+          echo '=== Checking existing API server configuration ==='
+          
+          # Check if PM2 is running with existing config
+          if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
+            echo 'PM2 process found. Checking environment...'
+            pm2 env ${{ env.PM2_APP_NAME }} | grep -E 'DB_|NODE_ENV' | head -10 || true
+          fi
+          
+          # Check for existing working configuration files
+          if [ -d ${{ env.DEPLOY_PATH }}/apps/api-server ]; then
+            echo 'Existing deployment found'
+            cd ${{ env.DEPLOY_PATH }}/apps/api-server
+            
+            # List all env files
+            echo 'Environment files:'
+            ls -la .env* 2>/dev/null || echo 'No .env files found'
+            
+            # Check package.json for database info
+            if [ -f package.json ]; then
+              echo 'Checking package.json for DB scripts...'
+              grep -E 'migration|typeorm|database' package.json | head -5 || true
+            fi
+          fi
+          
+          # Check PostgreSQL config
+          echo '=== PostgreSQL Configuration ==='
+          if [ -f /etc/postgresql/*/main/postgresql.conf ]; then
+            echo 'PostgreSQL installed locally'
+            sudo grep -E '^port|^listen_addresses' /etc/postgresql/*/main/postgresql.conf 2>/dev/null || echo 'Cannot read PostgreSQL config'
+          fi
+        "
+        
     - name: Create deployment directory
       run: |
         ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
@@ -168,8 +203,40 @@ jobs:
           if [ -f .env.production ]; then
             echo 'DB_PASSWORD length:' \$(grep DB_PASSWORD .env.production | wc -c)
             echo 'Environment file exists'
+            echo '=== Current DB Settings ==='
+            grep -E 'DB_HOST|DB_PORT|DB_USERNAME|DB_NAME' .env.production | sed 's/=.*/=***/'
+            echo 'DB_PASSWORD format check:'
+            grep DB_PASSWORD .env.production | sed 's/DB_PASSWORD=./DB_PASSWORD=*/' | sed 's/.$/***/'
           else
             echo 'ERROR: .env.production not found!'
+          fi
+          
+          # Check if there's an existing working configuration
+          if [ -f .env ]; then
+            echo '=== Found .env file ==='
+            echo 'Checking for working DB configuration...'
+            grep -E 'DB_|DATABASE_URL' .env | sed 's/password=[^@]*/password=***/'
+          fi
+        "
+        
+    - name: Test database connection
+      run: |
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/apps/api-server
+          echo 'Testing database connection...'
+          
+          # Try to connect with the current settings
+          if [ -f .env.production ]; then
+            export \$(cat .env.production | grep -v '^#' | xargs)
+            echo 'Using .env.production settings'
+          fi
+          
+          # Test PostgreSQL connection
+          PGPASSWORD=\$DB_PASSWORD psql -h \$DB_HOST -p \$DB_PORT -U \$DB_USERNAME -d \$DB_NAME -c '\conninfo' 2>&1 | head -5 || echo 'Connection test failed'
+          
+          # Check if postgres service is running locally
+          if command -v systemctl &> /dev/null; then
+            systemctl is-active postgresql || echo 'PostgreSQL service not running locally'
           fi
         "
         
