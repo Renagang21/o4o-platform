@@ -34,9 +34,12 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+            apps/*/node_modules
+            packages/*/node_modules
+            packages/*/dist
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/*/src/**') }}
           restore-keys: |
+            deps-node-${{ hashFiles('**/package-lock.json') }}-
             deps-node-
       
       - name: Install dependencies
@@ -62,13 +65,25 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+            apps/*/node_modules
+            packages/*/node_modules
+            packages/*/dist
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/*/src/**') }}
       
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
             npm ci
+          fi
+      
+      - name: Build packages if not cached
+        run: |
+          # Check if packages are built
+          if [ ! -d "packages/types/dist" ]; then
+            echo "Building packages..."
+            npm run build:packages
+          else
+            echo "Packages already built (from cache)"
           fi
       
       - name: Run type check
@@ -93,13 +108,25 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+            apps/*/node_modules
+            packages/*/node_modules
+            packages/*/dist
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/*/src/**') }}
       
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
             npm ci
+          fi
+      
+      - name: Build packages if not cached
+        run: |
+          # Check if packages are built
+          if [ ! -d "packages/types/dist" ]; then
+            echo "Building packages..."
+            npm run build:packages
+          else
+            echo "Packages already built (from cache)"
           fi
       
       - name: Run ESLint
@@ -127,8 +154,26 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+            apps/*/node_modules
+            packages/*/node_modules
+            packages/*/dist
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/*/src/**') }}
+      
+      - name: Install dependencies if not cached
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci
+          fi
+      
+      - name: Build packages if not cached
+        run: |
+          # Check if packages are built
+          if [ ! -d "packages/types/dist" ]; then
+            echo "Building packages..."
+            npm run build:packages
+          else
+            echo "Packages already built (from cache)"
+          fi
       
       - name: Run tests for ${{ matrix.workspace }}
         run: npm run test --workspace=@o4o/${{ matrix.workspace }} || echo "Tests not implemented yet"
@@ -155,8 +200,10 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+            apps/*/node_modules
+            packages/*/node_modules
+            packages/*/dist
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/*/src/**') }}
       
       - name: Install dependencies if not cached
         run: |
@@ -165,7 +212,9 @@ jobs:
           fi
       
       - name: Build shared packages
-        run: npm run build:packages
+        run: |
+          # Always build packages in the build job to ensure they're fresh
+          npm run build:packages
       
       - name: Build ${{ matrix.app }}
         run: npm run build:${{ matrix.app == 'api-server' && 'api' || (matrix.app == 'main-site' && 'web' || 'admin') }}
@@ -198,8 +247,26 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: deps-node-${{ hashFiles('**/package-lock.json') }}
+            apps/*/node_modules
+            packages/*/node_modules
+            packages/*/dist
+          key: deps-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('packages/*/src/**') }}
+      
+      - name: Install dependencies if not cached
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci
+          fi
+      
+      - name: Build packages if not cached
+        run: |
+          # Check if packages are built
+          if [ ! -d "packages/types/dist" ]; then
+            echo "Building packages..."
+            npm run build:packages
+          else
+            echo "Packages already built (from cache)"
+          fi
       
       - name: Install Playwright
         run: npx playwright install --with-deps

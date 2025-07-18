@@ -21,13 +21,7 @@
     "noImplicitThis": false,
     "noImplicitReturns": false,
     "strictPropertyInitialization": false,
-    "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@o4o/types": ["../../packages/types/dist"],
-      "@o4o/utils": ["../../packages/utils/dist"],
-      "@o4o/auth-client": ["../../packages/auth-client/dist"]
-    }
+    "composite": true
   },
   "include": [
     "src/**/*"

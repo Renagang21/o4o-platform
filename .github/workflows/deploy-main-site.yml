@@ -47,6 +47,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
+    - name: Build shared packages
+      run: |
+        echo "Building shared packages first..."
+        npm run build:packages
+    
     - name: Type check
       run: npm run type-check
     
@@ -77,6 +82,11 @@ jobs:
         npm ci
         cd apps/main-site
         npm ci
+    
+    - name: Build shared packages
+      run: |
+        echo "Building shared packages first..."
+        npm run build:packages
         
     - name: TypeScript type check
       run: |

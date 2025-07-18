@@ -46,23 +46,28 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
+    
+    - name: Build shared packages
+      run: |
+        echo "Building shared packages first..."
+        npm run build:packages
+        
+    - name: Install API server dependencies
+      run: |
         cd apps/api-server
         npm install
         
     - name: TypeScript type check
       run: |
-        cd apps/api-server
-        npm run type-check
+        npm run type-check --workspace=@o4o/api-server
         
     - name: Run tests
       run: |
-        cd apps/api-server
-        npm run test
+        npm run test --workspace=@o4o/api-server
         
     - name: Build application
       run: |
-        cd apps/api-server
-        npm run build
+        npm run build --workspace=@o4o/api-server
         
     - name: Validate build output
       run: |
@@ -150,7 +155,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
-          npm ci --only=production
+          npm install --only=production
         "
         
     - name: Run database migrations
@@ -307,6 +312,13 @@ jobs:
     if: failure()
     
     steps:
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        
     - name: Rollback to previous version
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
