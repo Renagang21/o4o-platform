@@ -146,8 +146,11 @@ jobs:
             */*/node_modules
           key: deps-node-${{ hashFiles('**/package-lock.json') }}
       
+      - name: Build shared packages
+        run: npm run build:packages
+      
       - name: Build ${{ matrix.app }}
-        run: npm run build:${{ matrix.app == 'main-site' && 'web' || matrix.app }}
+        run: npm run build:${{ matrix.app == 'api-server' && 'api' || (matrix.app == 'main-site' && 'web' || 'admin') }}
       
       - name: Upload build artifacts
         if: success()

@@ -7,7 +7,7 @@ updates:
       interval: "monthly"  # Changed from weekly to monthly
       day: "monday"
       time: "09:00"
-    open-pull-requests-limit: 5  # Reduced from 10 to 5
+    open-pull-requests-limit: 3  # Further reduced to minimize API calls
     groups:
       # React 관련 패키지 그룹화
       react:
@@ -44,6 +44,13 @@ updates:
           - "@types/*"
         exclude-patterns:
           - "@types/react*"
+      # 유틸리티 라이브러리 그룹화
+      utilities:
+        patterns:
+          - "lodash*"
+          - "date-fns*"
+          - "axios*"
+          - "zod*"
     ignore:
       # React 19 호환성 유지를 위해 특정 버전 고정
       - dependency-name: "react"
