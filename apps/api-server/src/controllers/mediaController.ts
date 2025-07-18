@@ -574,7 +574,7 @@ export class MediaController {
         });
       }
 
-      const updates: Partial<MediaFolder> = {};
+      const updates: any = {};
 
       if (name && name.trim() !== folder.name) {
         updates.name = name.trim();

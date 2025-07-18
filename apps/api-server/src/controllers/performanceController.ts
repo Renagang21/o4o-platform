@@ -546,7 +546,7 @@ export const getRealtimeMetrics = async (req: Request, res: Response) => {
  */
 export const getPerformanceAlerts = async (req: Request, res: Response) => {
   try {
-    const { severity, limit = 20 } = req.query as { severity?: string; limit?: number };
+    const { severity, limit = '20' } = req.query as { severity?: string; limit?: string };
 
     const [
       performanceReport,
@@ -574,7 +574,8 @@ export const getPerformanceAlerts = async (req: Request, res: Response) => {
     alerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     // 제한 적용
-    alerts = alerts.slice(0, parseInt(limit as string));
+    const limitNum = parseInt(limit) || 20;
+    alerts = alerts.slice(0, limitNum);
 
     res.json({
       success: true,
