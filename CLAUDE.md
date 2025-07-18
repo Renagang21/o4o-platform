@@ -106,6 +106,12 @@ npm run prettier:fix     # Fix formatting
   /utils            - Shared utilities
 
 /scripts             - Build and utility scripts
+/.github/workflows   - CI/CD pipelines
+
+/docs               - Project documentation
+  /api              - API documentation
+  /deployment       - Deployment guides
+  /development      - Development guides
 ```
 
 ### Key Architectural Patterns
@@ -357,6 +363,32 @@ cd apps/main-site && npm run build
 - **DEPENDENCY MANAGEMENT IS CRITICAL** - follow the process above religiously
 - **ALWAYS CHECK BROWSER CONSOLE** - Most white screen issues show errors there
 - **BUILD ORDER MATTERS** - Always build packages before apps
+- **SSH KEYS** - Use OpenSSH, RSA, or PKCS8 format without passphrase
+- **KNOWN_HOSTS** - Always configure before SSH operations in CI/CD
+
+## Recent Updates (2025)
+
+### SSH Deployment Improvements
+- All deployment workflows now use `shimataro/ssh-key-action@v2` or `webfactory/ssh-agent`
+- Known hosts configuration is mandatory to prevent "Host key verification failed"
+- Support for multiple SSH key formats (OpenSSH, RSA, PKCS8)
+
+### Workflow Enhancements
+- Zero-downtime deployments using PM2 reload
+- Automatic rollback on deployment failure
+- Health checks after each deployment
+- Performance monitoring for frontend deployments
+
+### Scripts Added
+- `scripts/setup-ssh-known-hosts.sh` - Automated known_hosts configuration
+- `scripts/ssh-key-converter.py` - SSH key format detection and conversion
+- `scripts/validate-deploy-env.sh` - Pre-deployment environment validation
+
+### Best Practices Updates
+- Always add known_hosts before SSH operations
+- Use workspace commands from root directory in CI/CD
+- Build packages before running type-check in CI
+- Test SSH connectivity before deployment operations
 
 ## CI/CD Critical Guidelines
 
@@ -445,30 +477,108 @@ cd apps/main-site && npm run build
 
 ### Common Issues and Solutions
 
-#### Prevent Dependency Resolution Issues
+#### 🔴 White Screen Errors
+**Always check browser console first!** Most issues show clear error messages.
+
+Common causes:
+1. **Missing dependencies**: Run `npm install` from root
+2. **Build order issues**: Run `npm run build:packages` first
+3. **Environment variables**: Check `.env` files exist
+4. **API connection**: Verify API server is running
+
+Debug steps:
+```bash
+# Clean rebuild
+npm run clean
+npm install
+npm run build:packages
+npm run dev
+```
+
+#### 🟡 Dependency Resolution Issues
 - Always configure Vite aliases for @o4o/* packages pointing to /src
 - Include proper ESM exports in all package.json files
 - Maintain consistent versions across workspaces
 - Build packages before apps: types → utils → ui → auth-client → auth-context
 
-#### Prevent Runtime Errors
+Common fixes:
+```bash
+# Check for version conflicts
+npm ls --depth=0
+
+# Find duplicate packages
+npm dedupe
+
+# Clear all caches
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### 🟢 Runtime Error Prevention
 1. Always run `npm run type-check` before committing
 2. Build packages in correct order before apps
 3. Handle loading and error states in components
 4. Implement error boundaries for graceful failures
 5. Use proper null checks and optional chaining
 
-#### Mock Mode Development
+#### 🔵 Mock Mode Development
 - Set `USE_MOCK=true` in `.env` for DB-less development
 - Test credentials: admin@example.com / password123
 - Mock mode auto-creates default templates
+- MSW intercepts API calls automatically
 
-#### Build Performance Best Practices
+#### ⚡ Build Performance Best Practices
 - Lazy load heavy components and routes
 - Use dynamic imports for optional features
 - Keep chunks under 500KB with code splitting
 - Minimize dependencies in packages
 - Run build:analyze regularly to monitor bundle size
+
+### Debugging Tips
+
+#### 1. TypeScript Errors
+```bash
+# Check specific workspace
+npm run type-check --workspace=@o4o/api-server
+
+# Generate tsconfig paths
+npx tsc --showConfig > tsconfig.debug.json
+```
+
+#### 2. Module Not Found
+```bash
+# Verify package is built
+ls packages/*/dist
+
+# Check import paths
+grep -r "from '@o4o" src/
+
+# Rebuild specific package
+npm run build --workspace=@o4o/types
+```
+
+#### 3. API Connection Issues
+```bash
+# Test API health
+curl http://localhost:4000/health
+
+# Check CORS headers
+curl -H "Origin: http://localhost:3000" \
+     -I http://localhost:4000/api/auth/health
+```
+
+#### 4. PM2 Process Issues
+```bash
+# Check PM2 status
+pm2 status
+
+# View logs
+pm2 logs o4o-api-server --lines 100
+
+# Restart with clean state
+pm2 delete all
+pm2 start ecosystem.config.js
+```
 
 ## Code Quality Standards
 
@@ -622,23 +732,56 @@ const user = await userRepository.findOne({
   - Static files via PM2 + serve
   - Path: /var/www/{domain}/
 
+### GitHub Actions Workflows
+
+#### Deployment Workflows
+1. **deploy-api-server.yml**
+   - Triggers: Push to `apps/api-server/**`
+   - Stages: Build → Test → Deploy → Health Check
+   - Uses: shimataro/ssh-key-action for SSH setup
+
+2. **deploy-admin-dashboard.yml**
+   - Triggers: Push to `apps/admin-dashboard/**`
+   - Stages: Build → Security Check → Deploy → Health Check
+   - Special: Enhanced security validations for admin panel
+
+3. **deploy-main-site.yml**
+   - Triggers: Push to `apps/main-site/**`
+   - Stages: Build → Optimize → Deploy → Performance Check
+   - Features: Lighthouse CI integration
+
+#### CI/CD Workflows
+1. **ci.yml** - Main CI pipeline (build, test, lint)
+2. **pr-checks.yml** - Pull request validations
+3. **codeql.yml** - Security analysis
+4. **server-health-check.yml** - Periodic health monitoring
+
 ### SSH Key Mapping
-- API Deploy: Uses SSH_API_PRIVATE_KEY
-- Web Deploy: Uses SSH_WEB_PRIVATE_KEY
+- API Deploy: Uses API_SSH_KEY
+- Web Deploy: Uses WEB_SSH_KEY
 - Both keys registered on respective servers
 
 ### GitHub Secrets Required
-- API_SSH_KEY (SSH private key for API server)
-- WEB_SSH_KEY (SSH private key for web servers)
-- API_HOST (API server hostname)
-- WEB_HOST (Web server hostname)
-- API_USER (API server username)
-- WEB_USER (Web server username)
-- DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME
-- JWT_SECRET, JWT_EXPIRES_IN
-- CORS_ORIGIN
-- LOG_LEVEL
-- HEALTH_CHECK_KEY
+- **SSH Keys**:
+  - API_SSH_KEY (SSH private key for API server)
+  - WEB_SSH_KEY (SSH private key for web servers)
+  
+- **Server Configuration**:
+  - API_HOST (API server hostname)
+  - WEB_HOST (Web server hostname)
+  - API_USER (API server username)
+  - WEB_USER (Web server username)
+  - API_HOST_IP (Optional: for known_hosts)
+  - WEB_HOST_IP (Optional: for known_hosts)
+  
+- **Database**:
+  - DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME
+  
+- **Application**:
+  - JWT_SECRET, JWT_EXPIRES_IN
+  - CORS_ORIGIN
+  - LOG_LEVEL
+  - HEALTH_CHECK_KEY
 
 ## Security Guidelines
 

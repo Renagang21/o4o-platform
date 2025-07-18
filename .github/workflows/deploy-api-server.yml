@@ -47,9 +47,7 @@ jobs:
       run: bash scripts/validate-deploy-env.sh
       
     - name: Install dependencies
-      run: |
-        npm ci
-        bash scripts/setup-ci-env.sh
+      run: npm ci
     
     - name: Build shared packages
       run: |
@@ -57,9 +55,8 @@ jobs:
         bash scripts/build-packages.sh
         
     - name: Install API server dependencies
-      run: |
-        cd apps/api-server
-        npm ci
+      working-directory: apps/api-server
+      run: npm ci
         
     - name: TypeScript type check
       run: |
@@ -106,23 +103,13 @@ jobs:
         name: api-server-build
         path: apps/api-server/
         
-    - name: Setup SSH key
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.API_SSH_KEY }}
-        known_hosts: unnecessary
-        if_key_exists: replace
-        
-    - name: Add SSH known hosts
+    - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
-        # Also add IP if available
-        if [ -n "${{ secrets.API_HOST_IP }}" ]; then
-          ssh-keyscan -H ${{ secrets.API_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        fi
-        chmod 644 ~/.ssh/known_hosts
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts
         
     - name: Create deployment directory
       run: |
@@ -327,23 +314,13 @@ jobs:
     if: failure()
     
     steps:
-    - name: Setup SSH key
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.API_SSH_KEY }}
-        known_hosts: unnecessary
-        if_key_exists: replace
-        
-    - name: Add SSH known hosts
+    - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
-        # Also add IP if available
-        if [ -n "${{ secrets.API_HOST_IP }}" ]; then
-          ssh-keyscan -H ${{ secrets.API_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        fi
-        chmod 644 ~/.ssh/known_hosts
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts
         
     - name: Rollback to previous version
       run: |
