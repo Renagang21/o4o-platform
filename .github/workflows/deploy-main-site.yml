@@ -27,7 +27,7 @@ env:
   SERVICE_PORT: 3000
   PM2_APP_NAME: o4o-main-site
   DEPLOY_PATH: /home/ubuntu/o4o-platform
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '20.18.0'
 
 jobs:
   # 품질 검증 단계

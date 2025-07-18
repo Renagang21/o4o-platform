@@ -26,7 +26,7 @@ env:
   SERVICE_PORT: 4000
   PM2_APP_NAME: o4o-api-server
   DEPLOY_PATH: /home/ubuntu/o4o-platform
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '20.18.0'
 
 jobs:
   # 단계 1: 빌드 및 테스트
@@ -47,7 +47,7 @@ jobs:
       run: |
         npm ci
         cd apps/api-server
-        npm ci
+        npm install
         
     - name: TypeScript type check
       run: |
@@ -63,6 +63,13 @@ jobs:
       run: |
         cd apps/api-server
         npm run build
+        
+    - name: Validate build output
+      run: |
+        cd apps/api-server
+        test -f dist/main.js || (echo "Error: dist/main.js not found" && exit 1)
+        test -d dist || (echo "Error: dist directory not found" && exit 1)
+        echo "Build validation successful"
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -160,7 +167,7 @@ jobs:
           module.exports = {
             apps: [{
               name: '${{ env.PM2_APP_NAME }}',
-              script: './dist/src/index.js',
+              script: './dist/main.js',
               cwd: '${{ env.DEPLOY_PATH }}/apps/api-server',
               instances: 'max',
               exec_mode: 'cluster',

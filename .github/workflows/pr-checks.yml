@@ -112,6 +112,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Build packages first
+        run: npm run build:packages
+      
       - name: Build and analyze bundle
         run: |
           npm run build:web
