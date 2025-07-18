@@ -108,7 +108,6 @@ jobs:
         
     - name: Setup SSH key
       run: |
-        # Debug SSH key format
         echo "🔍 Setting up SSH key..."
         
         # Create SSH directory
@@ -133,68 +132,54 @@ jobs:
         echo "Last line: $(tail -n 1 ~/.ssh/id_rsa)"
         echo "Total lines: $(wc -l < ~/.ssh/id_rsa)"
         
-        # Check key format and convert if needed
+        # Check key format
         KEY_FORMAT="unknown"
         if grep -q "BEGIN RSA PRIVATE KEY" ~/.ssh/id_rsa; then
           KEY_FORMAT="rsa"
           echo "✅ Key is in RSA format"
         elif grep -q "BEGIN PRIVATE KEY" ~/.ssh/id_rsa; then
           KEY_FORMAT="pkcs8"
-          echo "⚠️  Key is in PKCS#8 format, converting to RSA..."
-          # Convert PKCS#8 to RSA format
-          openssl rsa -in ~/.ssh/id_rsa -out ~/.ssh/id_rsa.converted 2>/dev/null || true
-          if [ -f ~/.ssh/id_rsa.converted ]; then
-            mv ~/.ssh/id_rsa.converted ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            echo "✅ Successfully converted to RSA format"
-          fi
+          echo "✅ Key is in PKCS#8 format"
         elif grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/id_rsa; then
           KEY_FORMAT="openssh"
-          echo "⚠️  Key is in OpenSSH format, converting to RSA..."
-          # Convert OpenSSH to RSA format
-          ssh-keygen -p -m PEM -f ~/.ssh/id_rsa -N "" 2>/dev/null || true
-          echo "✅ Attempted conversion to RSA format"
+          echo "✅ Key is in OpenSSH format"
         fi
         
-        # Validate the key
-        echo "Validating SSH key..."
-        if ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-          echo "✅ SSH key validation successful"
-          ssh-keygen -l -f ~/.ssh/id_rsa
-        else
-          echo "❌ SSH key validation failed"
-          echo "Error details:"
-          ssh-keygen -l -f ~/.ssh/id_rsa 2>&1 || true
-          
-          # Try to use the key anyway with ssh-add
-          eval "$(ssh-agent -s)"
-          if ssh-add ~/.ssh/id_rsa 2>/dev/null; then
-            echo "✅ Key added to ssh-agent successfully"
-          else
-            echo "❌ Failed to add key to ssh-agent"
-            echo "Please ensure your SSH key:"
-            echo "1. Is in PEM format (begins with -----BEGIN RSA PRIVATE KEY-----)"
-            echo "2. Has no passphrase"
-            echo "3. Uses Unix line endings (LF)"
-            echo "4. Is the complete key including header and footer"
-            exit 1
-          fi
-        fi
-        
-        # Setup SSH config for better compatibility
+        # Setup SSH config for all key formats
         cat > ~/.ssh/config << 'EOF'
         Host *
           StrictHostKeyChecking no
           UserKnownHostsFile=/dev/null
           IdentityFile ~/.ssh/id_rsa
           IdentitiesOnly yes
-          PubkeyAcceptedKeyTypes +ssh-rsa
-          HostKeyAlgorithms +ssh-rsa
+          PubkeyAcceptedKeyTypes +ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521
+          HostKeyAlgorithms +ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521
+          PubkeyAuthentication yes
+          PasswordAuthentication no
+          AddKeysToAgent yes
         EOF
         chmod 600 ~/.ssh/config
         
-        # Add host to known hosts
-        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Start SSH agent and add key
+        eval "$(ssh-agent -s)"
+        
+        # Add the key to ssh-agent (works with all formats)
+        if ssh-add ~/.ssh/id_rsa 2>/dev/null; then
+          echo "✅ SSH key added to ssh-agent successfully"
+        else
+          echo "⚠️  Could not add key to ssh-agent, but may still work with direct auth"
+        fi
+        
+        # Validate SSH connectivity
+        echo "Testing SSH connection..."
+        if ssh -o ConnectTimeout=10 -o BatchMode=yes ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "echo 'SSH connection successful'" 2>/dev/null; then
+          echo "✅ SSH connection test successful"
+        else
+          echo "❌ SSH connection test failed"
+          echo "Debugging connection..."
+          ssh -vvv -o ConnectTimeout=10 -o BatchMode=yes ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "echo 'test'" 2>&1 | grep -E "(debug1|denied|failed|error)" || true
+          exit 1
+        fi
         
         echo "✅ SSH setup completed"
         
@@ -403,7 +388,6 @@ jobs:
     steps:
     - name: Setup SSH key
       run: |
-        # Debug SSH key format
         echo "🔍 Setting up SSH key..."
         
         # Create SSH directory
@@ -428,68 +412,54 @@ jobs:
         echo "Last line: $(tail -n 1 ~/.ssh/id_rsa)"
         echo "Total lines: $(wc -l < ~/.ssh/id_rsa)"
         
-        # Check key format and convert if needed
+        # Check key format
         KEY_FORMAT="unknown"
         if grep -q "BEGIN RSA PRIVATE KEY" ~/.ssh/id_rsa; then
           KEY_FORMAT="rsa"
           echo "✅ Key is in RSA format"
         elif grep -q "BEGIN PRIVATE KEY" ~/.ssh/id_rsa; then
           KEY_FORMAT="pkcs8"
-          echo "⚠️  Key is in PKCS#8 format, converting to RSA..."
-          # Convert PKCS#8 to RSA format
-          openssl rsa -in ~/.ssh/id_rsa -out ~/.ssh/id_rsa.converted 2>/dev/null || true
-          if [ -f ~/.ssh/id_rsa.converted ]; then
-            mv ~/.ssh/id_rsa.converted ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            echo "✅ Successfully converted to RSA format"
-          fi
+          echo "✅ Key is in PKCS#8 format"
         elif grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/id_rsa; then
           KEY_FORMAT="openssh"
-          echo "⚠️  Key is in OpenSSH format, converting to RSA..."
-          # Convert OpenSSH to RSA format
-          ssh-keygen -p -m PEM -f ~/.ssh/id_rsa -N "" 2>/dev/null || true
-          echo "✅ Attempted conversion to RSA format"
+          echo "✅ Key is in OpenSSH format"
         fi
         
-        # Validate the key
-        echo "Validating SSH key..."
-        if ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-          echo "✅ SSH key validation successful"
-          ssh-keygen -l -f ~/.ssh/id_rsa
-        else
-          echo "❌ SSH key validation failed"
-          echo "Error details:"
-          ssh-keygen -l -f ~/.ssh/id_rsa 2>&1 || true
-          
-          # Try to use the key anyway with ssh-add
-          eval "$(ssh-agent -s)"
-          if ssh-add ~/.ssh/id_rsa 2>/dev/null; then
-            echo "✅ Key added to ssh-agent successfully"
-          else
-            echo "❌ Failed to add key to ssh-agent"
-            echo "Please ensure your SSH key:"
-            echo "1. Is in PEM format (begins with -----BEGIN RSA PRIVATE KEY-----)"
-            echo "2. Has no passphrase"
-            echo "3. Uses Unix line endings (LF)"
-            echo "4. Is the complete key including header and footer"
-            exit 1
-          fi
-        fi
-        
-        # Setup SSH config for better compatibility
+        # Setup SSH config for all key formats
         cat > ~/.ssh/config << 'EOF'
         Host *
           StrictHostKeyChecking no
           UserKnownHostsFile=/dev/null
           IdentityFile ~/.ssh/id_rsa
           IdentitiesOnly yes
-          PubkeyAcceptedKeyTypes +ssh-rsa
-          HostKeyAlgorithms +ssh-rsa
+          PubkeyAcceptedKeyTypes +ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521
+          HostKeyAlgorithms +ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-ed25519,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521
+          PubkeyAuthentication yes
+          PasswordAuthentication no
+          AddKeysToAgent yes
         EOF
         chmod 600 ~/.ssh/config
         
-        # Add host to known hosts
-        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        # Start SSH agent and add key
+        eval "$(ssh-agent -s)"
+        
+        # Add the key to ssh-agent (works with all formats)
+        if ssh-add ~/.ssh/id_rsa 2>/dev/null; then
+          echo "✅ SSH key added to ssh-agent successfully"
+        else
+          echo "⚠️  Could not add key to ssh-agent, but may still work with direct auth"
+        fi
+        
+        # Validate SSH connectivity
+        echo "Testing SSH connection..."
+        if ssh -o ConnectTimeout=10 -o BatchMode=yes ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "echo 'SSH connection successful'" 2>/dev/null; then
+          echo "✅ SSH connection test successful"
+        else
+          echo "❌ SSH connection test failed"
+          echo "Debugging connection..."
+          ssh -vvv -o ConnectTimeout=10 -o BatchMode=yes ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "echo 'test'" 2>&1 | grep -E "(debug1|denied|failed|error)" || true
+          exit 1
+        fi
         
         echo "✅ SSH setup completed"
         
