@@ -16,7 +16,7 @@ jobs:
     
     steps:
     - name: 🏥 서버 상태 확인
-      uses: appleboy/ssh-action@v1.0.3
+      uses: appleboy/ssh-action@v1.2.2
       with:
         host: ${{ secrets.API_HOST }}
         username: ${{ secrets.API_USER }}
