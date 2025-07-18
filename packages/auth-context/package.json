@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node build.js",
+    "build:tsc": "tsc",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

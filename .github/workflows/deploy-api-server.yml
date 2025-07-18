@@ -43,6 +43,9 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
     
+    - name: Validate environment
+      run: bash scripts/validate-deploy-env.sh
+      
     - name: Install dependencies
       run: |
         npm ci
@@ -105,17 +108,44 @@ jobs:
         
     - name: Setup SSH key
       run: |
+        # Debug SSH key in CI
+        echo "🔍 Debugging SSH key..."
+        bash scripts/debug-ssh-key.sh "${{ secrets.API_SSH_KEY }}"
+        
+        # Setup SSH
         mkdir -p ~/.ssh
         echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
-        # Verify key format
+        # Additional debugging
+        echo "SSH key file info:"
+        ls -la ~/.ssh/id_rsa
+        file ~/.ssh/id_rsa
+        
+        # Try different key formats if needed
         if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-          echo "ERROR: Invalid SSH key format"
-          echo "Key starts with: $(head -n 1 ~/.ssh/id_rsa | cut -c1-50)..."
-          exit 1
+          echo "⚠️  Standard format failed, trying to convert..."
+          
+          # Try to fix potential format issues
+          # Remove any extra whitespace and ensure proper line endings
+          echo "${{ secrets.API_SSH_KEY }}" | sed 's/[[:space:]]*$//' | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
+            echo "❌ SSH key validation failed after conversion attempt"
+            echo "Please check that the SSH key in GitHub Secrets:"
+            echo "1. Is in PEM format (begins with -----BEGIN RSA PRIVATE KEY-----)"
+            echo "2. Has no passphrase"
+            echo "3. Uses Unix line endings (LF)"
+            echo "4. Is the complete key including header and footer"
+            exit 1
+          fi
         fi
         
+        echo "✅ SSH key validation successful"
+        ssh-keygen -l -f ~/.ssh/id_rsa
+        
+        # Setup known hosts
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "SSH key setup completed"
         
@@ -324,17 +354,44 @@ jobs:
     steps:
     - name: Setup SSH key
       run: |
+        # Debug SSH key in CI
+        echo "🔍 Debugging SSH key..."
+        bash scripts/debug-ssh-key.sh "${{ secrets.API_SSH_KEY }}"
+        
+        # Setup SSH
         mkdir -p ~/.ssh
         echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
-        # Verify key format
+        # Additional debugging
+        echo "SSH key file info:"
+        ls -la ~/.ssh/id_rsa
+        file ~/.ssh/id_rsa
+        
+        # Try different key formats if needed
         if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-          echo "ERROR: Invalid SSH key format"
-          echo "Key starts with: $(head -n 1 ~/.ssh/id_rsa | cut -c1-50)..."
-          exit 1
+          echo "⚠️  Standard format failed, trying to convert..."
+          
+          # Try to fix potential format issues
+          # Remove any extra whitespace and ensure proper line endings
+          echo "${{ secrets.API_SSH_KEY }}" | sed 's/[[:space:]]*$//' | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
+            echo "❌ SSH key validation failed after conversion attempt"
+            echo "Please check that the SSH key in GitHub Secrets:"
+            echo "1. Is in PEM format (begins with -----BEGIN RSA PRIVATE KEY-----)"
+            echo "2. Has no passphrase"
+            echo "3. Uses Unix line endings (LF)"
+            echo "4. Is the complete key including header and footer"
+            exit 1
+          fi
         fi
         
+        echo "✅ SSH key validation successful"
+        ssh-keygen -l -f ~/.ssh/id_rsa
+        
+        # Setup known hosts
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "SSH key setup completed"
         
