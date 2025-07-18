@@ -45,7 +45,9 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: |
+        npm ci
+        bash scripts/setup-ci-env.sh
     
     - name: Build shared packages
       run: |
@@ -80,6 +82,7 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
+        bash scripts/setup-ci-env.sh
         cd apps/main-site
         npm ci
     

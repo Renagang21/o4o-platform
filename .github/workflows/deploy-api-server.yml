@@ -46,6 +46,7 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
+        bash scripts/setup-ci-env.sh
     
     - name: Build shared packages
       run: |
@@ -107,6 +108,14 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        
+        # Verify key format
+        if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
+          echo "ERROR: Invalid SSH key format"
+          echo "Key starts with: $(head -n 1 ~/.ssh/id_rsa | cut -c1-50)..."
+          exit 1
+        fi
+        
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "SSH key setup completed"
         
@@ -318,6 +327,14 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        
+        # Verify key format
+        if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
+          echo "ERROR: Invalid SSH key format"
+          echo "Key starts with: $(head -n 1 ~/.ssh/id_rsa | cut -c1-50)..."
+          exit 1
+        fi
+        
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
         echo "SSH key setup completed"
         
