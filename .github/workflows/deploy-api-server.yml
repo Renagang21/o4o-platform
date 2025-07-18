@@ -108,32 +108,71 @@ jobs:
         
     - name: Setup SSH key
       run: |
-        # Debug SSH key in CI
-        echo "🔍 Debugging SSH key..."
-        bash scripts/debug-ssh-key.sh "${{ secrets.API_SSH_KEY }}"
+        # Debug SSH key format
+        echo "🔍 Setting up SSH key..."
         
-        # Setup SSH
+        # Create SSH directory
         mkdir -p ~/.ssh
-        echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        chmod 700 ~/.ssh
         
-        # Additional debugging
+        # Save the SSH key with proper formatting
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa.tmp
+        
+        # Fix common SSH key issues
+        # 1. Remove Windows line endings
+        # 2. Ensure proper line breaks
+        # 3. Remove any extra whitespace
+        cat ~/.ssh/id_rsa.tmp | sed 's/\r$//' | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        rm ~/.ssh/id_rsa.tmp
+        
+        # Debug key info
         echo "SSH key file info:"
         ls -la ~/.ssh/id_rsa
-        file ~/.ssh/id_rsa
+        echo "First line: $(head -n 1 ~/.ssh/id_rsa)"
+        echo "Last line: $(tail -n 1 ~/.ssh/id_rsa)"
+        echo "Total lines: $(wc -l < ~/.ssh/id_rsa)"
         
-        # Try different key formats if needed
-        if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-          echo "⚠️  Standard format failed, trying to convert..."
+        # Check key format and convert if needed
+        KEY_FORMAT="unknown"
+        if grep -q "BEGIN RSA PRIVATE KEY" ~/.ssh/id_rsa; then
+          KEY_FORMAT="rsa"
+          echo "✅ Key is in RSA format"
+        elif grep -q "BEGIN PRIVATE KEY" ~/.ssh/id_rsa; then
+          KEY_FORMAT="pkcs8"
+          echo "⚠️  Key is in PKCS#8 format, converting to RSA..."
+          # Convert PKCS#8 to RSA format
+          openssl rsa -in ~/.ssh/id_rsa -out ~/.ssh/id_rsa.converted 2>/dev/null || true
+          if [ -f ~/.ssh/id_rsa.converted ]; then
+            mv ~/.ssh/id_rsa.converted ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            echo "✅ Successfully converted to RSA format"
+          fi
+        elif grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/id_rsa; then
+          KEY_FORMAT="openssh"
+          echo "⚠️  Key is in OpenSSH format, converting to RSA..."
+          # Convert OpenSSH to RSA format
+          ssh-keygen -p -m PEM -f ~/.ssh/id_rsa -N "" 2>/dev/null || true
+          echo "✅ Attempted conversion to RSA format"
+        fi
+        
+        # Validate the key
+        echo "Validating SSH key..."
+        if ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
+          echo "✅ SSH key validation successful"
+          ssh-keygen -l -f ~/.ssh/id_rsa
+        else
+          echo "❌ SSH key validation failed"
+          echo "Error details:"
+          ssh-keygen -l -f ~/.ssh/id_rsa 2>&1 || true
           
-          # Try to fix potential format issues
-          # Remove any extra whitespace and ensure proper line endings
-          echo "${{ secrets.API_SSH_KEY }}" | sed 's/[[:space:]]*$//' | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-            echo "❌ SSH key validation failed after conversion attempt"
-            echo "Please check that the SSH key in GitHub Secrets:"
+          # Try to use the key anyway with ssh-add
+          eval "$(ssh-agent -s)"
+          if ssh-add ~/.ssh/id_rsa 2>/dev/null; then
+            echo "✅ Key added to ssh-agent successfully"
+          else
+            echo "❌ Failed to add key to ssh-agent"
+            echo "Please ensure your SSH key:"
             echo "1. Is in PEM format (begins with -----BEGIN RSA PRIVATE KEY-----)"
             echo "2. Has no passphrase"
             echo "3. Uses Unix line endings (LF)"
@@ -142,22 +181,32 @@ jobs:
           fi
         fi
         
-        echo "✅ SSH key validation successful"
-        ssh-keygen -l -f ~/.ssh/id_rsa
+        # Setup SSH config for better compatibility
+        cat > ~/.ssh/config << 'EOF'
+        Host *
+          StrictHostKeyChecking no
+          UserKnownHostsFile=/dev/null
+          IdentityFile ~/.ssh/id_rsa
+          IdentitiesOnly yes
+          PubkeyAcceptedKeyTypes +ssh-rsa
+          HostKeyAlgorithms +ssh-rsa
+        EOF
+        chmod 600 ~/.ssh/config
         
-        # Setup known hosts
+        # Add host to known hosts
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        echo "SSH key setup completed"
+        
+        echo "✅ SSH setup completed"
         
     - name: Create deployment directory
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           mkdir -p ${{ env.DEPLOY_PATH }}/apps/api-server
         "
         
     - name: Create environment file
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cat > ${{ env.DEPLOY_PATH }}/apps/api-server/.env.production << 'EOF'
           NODE_ENV=production
           PORT=${{ env.SERVICE_PORT }}
@@ -187,27 +236,27 @@ jobs:
     - name: Deploy application files
       run: |
         rsync -avz --delete \
-          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
+          -e "ssh" \
           apps/api-server/ \
           ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:${{ env.DEPLOY_PATH }}/apps/api-server/
           
     - name: Install production dependencies
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
           npm install --only=production
         "
         
     - name: Run database migrations
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
           npm run migration:run
         "
         
     - name: Setup PM2 ecosystem file
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cat > ${{ env.DEPLOY_PATH }}/ecosystem.config.js << 'EOF'
           module.exports = {
             apps: [{
@@ -237,13 +286,13 @@ jobs:
         
     - name: Create logs directory
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           mkdir -p ${{ env.DEPLOY_PATH }}/logs
         "
         
     - name: Deploy with PM2 (Zero-downtime)
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # PM2 프로세스 존재 여부 확인
@@ -354,32 +403,71 @@ jobs:
     steps:
     - name: Setup SSH key
       run: |
-        # Debug SSH key in CI
-        echo "🔍 Debugging SSH key..."
-        bash scripts/debug-ssh-key.sh "${{ secrets.API_SSH_KEY }}"
+        # Debug SSH key format
+        echo "🔍 Setting up SSH key..."
         
-        # Setup SSH
+        # Create SSH directory
         mkdir -p ~/.ssh
-        echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        chmod 700 ~/.ssh
         
-        # Additional debugging
+        # Save the SSH key with proper formatting
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa.tmp
+        
+        # Fix common SSH key issues
+        # 1. Remove Windows line endings
+        # 2. Ensure proper line breaks
+        # 3. Remove any extra whitespace
+        cat ~/.ssh/id_rsa.tmp | sed 's/\r$//' | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        rm ~/.ssh/id_rsa.tmp
+        
+        # Debug key info
         echo "SSH key file info:"
         ls -la ~/.ssh/id_rsa
-        file ~/.ssh/id_rsa
+        echo "First line: $(head -n 1 ~/.ssh/id_rsa)"
+        echo "Last line: $(tail -n 1 ~/.ssh/id_rsa)"
+        echo "Total lines: $(wc -l < ~/.ssh/id_rsa)"
         
-        # Try different key formats if needed
-        if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-          echo "⚠️  Standard format failed, trying to convert..."
+        # Check key format and convert if needed
+        KEY_FORMAT="unknown"
+        if grep -q "BEGIN RSA PRIVATE KEY" ~/.ssh/id_rsa; then
+          KEY_FORMAT="rsa"
+          echo "✅ Key is in RSA format"
+        elif grep -q "BEGIN PRIVATE KEY" ~/.ssh/id_rsa; then
+          KEY_FORMAT="pkcs8"
+          echo "⚠️  Key is in PKCS#8 format, converting to RSA..."
+          # Convert PKCS#8 to RSA format
+          openssl rsa -in ~/.ssh/id_rsa -out ~/.ssh/id_rsa.converted 2>/dev/null || true
+          if [ -f ~/.ssh/id_rsa.converted ]; then
+            mv ~/.ssh/id_rsa.converted ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            echo "✅ Successfully converted to RSA format"
+          fi
+        elif grep -q "BEGIN OPENSSH PRIVATE KEY" ~/.ssh/id_rsa; then
+          KEY_FORMAT="openssh"
+          echo "⚠️  Key is in OpenSSH format, converting to RSA..."
+          # Convert OpenSSH to RSA format
+          ssh-keygen -p -m PEM -f ~/.ssh/id_rsa -N "" 2>/dev/null || true
+          echo "✅ Attempted conversion to RSA format"
+        fi
+        
+        # Validate the key
+        echo "Validating SSH key..."
+        if ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
+          echo "✅ SSH key validation successful"
+          ssh-keygen -l -f ~/.ssh/id_rsa
+        else
+          echo "❌ SSH key validation failed"
+          echo "Error details:"
+          ssh-keygen -l -f ~/.ssh/id_rsa 2>&1 || true
           
-          # Try to fix potential format issues
-          # Remove any extra whitespace and ensure proper line endings
-          echo "${{ secrets.API_SSH_KEY }}" | sed 's/[[:space:]]*$//' | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          if ! ssh-keygen -l -f ~/.ssh/id_rsa >/dev/null 2>&1; then
-            echo "❌ SSH key validation failed after conversion attempt"
-            echo "Please check that the SSH key in GitHub Secrets:"
+          # Try to use the key anyway with ssh-add
+          eval "$(ssh-agent -s)"
+          if ssh-add ~/.ssh/id_rsa 2>/dev/null; then
+            echo "✅ Key added to ssh-agent successfully"
+          else
+            echo "❌ Failed to add key to ssh-agent"
+            echo "Please ensure your SSH key:"
             echo "1. Is in PEM format (begins with -----BEGIN RSA PRIVATE KEY-----)"
             echo "2. Has no passphrase"
             echo "3. Uses Unix line endings (LF)"
@@ -388,16 +476,26 @@ jobs:
           fi
         fi
         
-        echo "✅ SSH key validation successful"
-        ssh-keygen -l -f ~/.ssh/id_rsa
+        # Setup SSH config for better compatibility
+        cat > ~/.ssh/config << 'EOF'
+        Host *
+          StrictHostKeyChecking no
+          UserKnownHostsFile=/dev/null
+          IdentityFile ~/.ssh/id_rsa
+          IdentitiesOnly yes
+          PubkeyAcceptedKeyTypes +ssh-rsa
+          HostKeyAlgorithms +ssh-rsa
+        EOF
+        chmod 600 ~/.ssh/config
         
-        # Setup known hosts
+        # Add host to known hosts
         ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        echo "SSH key setup completed"
+        
+        echo "✅ SSH setup completed"
         
     - name: Rollback to previous version
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
           # 이전 백업에서 복원
