@@ -124,7 +124,7 @@ export const getPerformanceDashboard = async (req: Request, res: Response) => {
         lastUpdated: new Date().toISOString(),
         alerts: [
           ...optimizationReport.alerts,
-          ...scalingDashboard.recentEvents.filter((e) => e.type === 'scale_down'),
+          ...scalingDashboard.recentEvents.filter((e: any) => e.type === 'scale_down'),
           ...databaseDashboard.alerts
         ].slice(0, 10),
         recommendations: [
@@ -557,12 +557,12 @@ export const getPerformanceAlerts = async (req: Request, res: Response) => {
     ]);
 
     let alerts = [
-      ...performanceReport.alerts.map((a) => ({ 
+      ...performanceReport.alerts.map((a: any) => ({ 
         ...a, 
         category: 'performance',
         timestamp: a.timestamp instanceof Date ? a.timestamp.toISOString() : a.timestamp 
       })),
-      ...databaseDashboard.alerts.map((a) => ({ ...a, category: 'database' }))
+      ...databaseDashboard.alerts.map((a: any) => ({ ...a, category: 'database' }))
     ];
 
     // 심각도 필터링
