@@ -366,28 +366,45 @@ cd apps/main-site && npm run build
 - **SSH KEYS** - Use OpenSSH, RSA, or PKCS8 format without passphrase
 - **KNOWN_HOSTS** - Always configure before SSH operations in CI/CD
 
-## Recent Updates (2025)
+## Recent Updates (2025-07)
 
-### Simplified SSH Deployment
-- **One Standard Method**: Simple bash script for all workflows
-- **Manual Key Generation**: Generate keys directly on server when needed
-- **Required**: Always add known_hosts before SSH operations
+### Deployment Issues Resolved
+1. **SSH Connection**: Fixed "Host key verification failed" by adding known_hosts
+2. **NPM CI Error**: Changed `npm ci` to `npm install` for production deployments
+3. **Database Password**: Fixed "password must be a string" error with proper quoting
 
-### Key Changes
-- Removed complex SSH actions - use simple bash commands
-- Fixed npm ci issues - use npm install when needed
-- Unified all deployment workflows to use same SSH setup
+### Database Configuration
+- **Database Name**: `o4o_platform` (confirmed in all environments)
+- **Password Issues**: Always quote numeric passwords in GitHub Secrets
+- **Connection String**: Environment variables must be sourced before migrations
+
+### Deployment Debugging
+Added diagnostic steps to deployment workflow:
+```yaml
+# Check existing configuration
+- name: Check existing configuration
+  run: |
+    pm2 env ${{ env.PM2_APP_NAME }} | grep DB_
+    ls -la .env*
+
+# Test database connection
+- name: Test database connection
+  run: |
+    export $(cat .env.production | grep -v '^#' | xargs)
+    PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USERNAME -d $DB_NAME -c '\conninfo'
+```
 
 ### Quick Fixes
 ```bash
 # SSH Issues: Regenerate on server
-ssh user@server "cd ~/.ssh && ssh-keygen -t rsa -b 4096 -f github_actions_key -N ''"
+ssh ubuntu@server "cd ~/.ssh && ssh-keygen -t rsa -b 4096 -f github_actions_key -N ''"
+cat github_actions_key  # Copy to GitHub Secrets
 
-# NPM Issues: Clean install
-rm -rf node_modules package-lock.json && npm install
+# NPM Issues: Use install instead of ci
+npm install --production  # Works without package-lock.json
 
-# Build Issues: Always build packages first  
-npm run build:packages && npm run build
+# DB Password Issues: Check actual password on server
+ssh ubuntu@api.neture.co.kr "cd /home/ubuntu/o4o-platform/apps/api-server && cat .env*"
 ```
 
 ## CI/CD Critical Guidelines
@@ -406,21 +423,20 @@ npm run build:packages && npm run build
 
 **NPM CI Issues & Solutions**:
 ```bash
-# Problem: npm ci fails with workspace errors
-# Solution 1: Clean install from root
+# Problem 1: "npm ci can only install with an existing package-lock.json"
+# Solution: Use npm install for production deployments
+- run: npm ci --only=production    # Old (fails on server)
+- run: npm install --production     # New (works without package-lock.json)
+
+# Problem 2: Workspace errors in CI/CD
+# Solution: Clean install from root
 rm -rf node_modules package-lock.json
 rm -rf apps/*/node_modules packages/*/node_modules
 npm install
 
-# Solution 2: Use npm install instead of npm ci in CI/CD
-# Change in workflows:
-- run: npm ci    # Old
-- run: npm install --prefer-offline --no-audit  # New
-
-# Solution 3: Ensure package-lock.json is up to date
-npm install
-git add package-lock.json
-git commit -m "fix: update package-lock.json"
+# Problem 3: CI/CD performance
+# Use these flags for faster installs:
+npm install --prefer-offline --no-audit --no-fund
 ```
 
 **TypeScript Configuration**:
@@ -601,6 +617,23 @@ pm2 logs o4o-api-server --lines 100
 # Restart with clean state
 pm2 delete all
 pm2 start ecosystem.config.js
+```
+
+#### 5. Database Connection Issues
+```bash
+# Error: "password authentication failed"
+# 1. Check GitHub Secrets match actual DB password
+# 2. Verify password is quoted in GitHub Secrets
+
+# Error: "password must be a string"
+# Solution in connection.ts:
+const DB_PASSWORD = String(process.env.DB_PASSWORD || '');
+
+# Test connection manually:
+PGPASSWORD='your_password' psql -h localhost -U postgres -d o4o_platform
+
+# Check existing config on server:
+ssh ubuntu@api.neture.co.kr "pm2 env o4o-api-server | grep DB_"
 ```
 
 ## Code Quality Standards
@@ -799,11 +832,11 @@ const user = await userRepository.findOne({
 - `WEB_USER` - Web server username (e.g., `ubuntu`)
 
 #### Database (CRITICAL - Must be strings!):
-- `DB_HOST` - Database hostname
-- `DB_PORT` - Database port (e.g., `'5432'` not `5432`)
-- `DB_USERNAME` - Database username
+- `DB_HOST` - Database hostname (e.g., `localhost` or RDS endpoint)
+- `DB_PORT` - Database port (e.g., `"5432"` not `5432`)
+- `DB_USERNAME` - Database username (e.g., `"postgres"`)
 - `DB_PASSWORD` - Database password (⚠️ MUST be quoted if numeric!)
-- `DB_NAME` - Database name
+- `DB_NAME` - Database name (`"o4o_platform"`)
 
 #### Application:
 - `JWT_SECRET` - JWT secret key (generate with `openssl rand -base64 32`)
