@@ -47,7 +47,7 @@ jobs:
       run: bash scripts/validate-deploy-env.sh
       
     - name: Install dependencies
-      run: npm ci
+      run: npm install --prefer-offline
     
     - name: Build shared packages
       run: |
@@ -56,7 +56,7 @@ jobs:
         
     - name: Install API server dependencies
       working-directory: apps/api-server
-      run: npm ci
+      run: npm install --prefer-offline
         
     - name: TypeScript type check
       run: |
@@ -160,10 +160,27 @@ jobs:
           npm install --only=production
         "
         
+    - name: Verify environment variables
+      run: |
+        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/apps/api-server
+          echo 'Checking environment file...'
+          if [ -f .env.production ]; then
+            echo 'DB_PASSWORD length:' \$(grep DB_PASSWORD .env.production | wc -c)
+            echo 'Environment file exists'
+          else
+            echo 'ERROR: .env.production not found!'
+          fi
+        "
+        
     - name: Run database migrations
       run: |
         ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
+          # Source the environment file before running migrations
+          if [ -f .env.production ]; then
+            export \$(cat .env.production | grep -v '^#' | xargs)
+          fi
           npm run migration:run
         "
         
