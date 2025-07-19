@@ -18,7 +18,12 @@ This guide covers the deployment process for the O4O Platform admin dashboard to
 
 ```bash
 # Clone or update the repository
-cd /home/sohae21/Coding/o4o-platform
+cd /home/ubuntu/o4o-platform
+# Or use environment variable
+cd $DEPLOY_PATH
+
+# Update from GitHub
+git pull origin main
 
 # Install dependencies
 npm install
@@ -104,6 +109,7 @@ sudo tail -f /var/log/nginx/admin.neture.co.kr.error.log
 ### Port Issues
 - Ensure ports 3001 (frontend) and 4000 (API) are not in use
 - Check with: `sudo lsof -i :3001` and `sudo lsof -i :4000`
+- Alternative: `ss -tlnp | grep :3001`
 
 ### Database Connection
 - If running without database, the API will use mock data in development mode
@@ -112,6 +118,35 @@ sudo tail -f /var/log/nginx/admin.neture.co.kr.error.log
 ### SSL Issues
 - Ensure domain DNS is properly configured before running SSL setup
 - Check certificate status: `sudo certbot certificates`
+
+### Git Pull Issues
+```bash
+# Divergent branches error
+git config pull.rebase false
+git pull origin main
+
+# Unrelated histories error
+git pull origin main --allow-unrelated-histories
+
+# Permission denied errors
+sudo chown -R ubuntu:ubuntu .
+```
+
+### PM2 Path Issues
+- Check PM2 process working directory: `pm2 describe <app-name> | grep cwd`
+- Ensure ecosystem.config.js uses environment variables, not hardcoded paths
+- For development mode: `pm2 start npm -- run dev`
+
+### Vite Host Blocking (502 Error)
+- Error: "This host is not allowed"
+- Solution: Edit vite.config.ts
+```typescript
+server: {
+  host: true,  // Allow all hosts
+  port: 3001
+}
+```
+- Restart PM2 after changes
 
 ## Directory Structure
 

@@ -185,4 +185,44 @@ These scripts provide bundle analysis with graceful fallback.
     npm run build:analyze || true
 ```
 
+### PM2 Development Mode
+
+For running applications with PM2 in development mode:
+
+```bash
+# Admin Dashboard Development
+pm2 start npm --name "o4o-admin-dashboard" -- run dev -- --port 3001
+
+# API Server Development
+pm2 start npm --name "o4o-api-server" -- run dev
+
+# Main Site Development
+pm2 start npm --name "o4o-main-site" -- run dev -- --port 3000
+```
+
+### Production Build and Serve
+
+```bash
+# Build for production
+npm run build
+
+# Serve with static server (requires serve package)
+npm install -g serve
+pm2 start serve --name "admin-prod" -- -s dist -l 3001
+```
+
+### Common Script Issues
+
+1. **package-lock.json out of sync**
+   ```bash
+   # Solution: Use npm install instead of npm ci
+   npm install
+   ```
+
+2. **Vite host blocking in development**
+   - Add `host: true` to vite.config.ts server configuration
+
+3. **Build order matters**
+   - Always run `npm run build:packages` before building apps
+
 This documentation ensures consistency across all workflows and helps prevent script-related CI/CD failures.

@@ -405,6 +405,19 @@ npm install --production  # Works without package-lock.json
 
 # DB Password Issues: Check actual password on server
 ssh ubuntu@api.neture.co.kr "cd /home/ubuntu/o4o-platform/apps/api-server && cat .env*"
+
+# Git Divergent Branches: Set merge strategy
+git config pull.rebase false
+git pull origin main
+# Or force reset to GitHub version
+git fetch origin
+git reset --hard origin/main
+
+# Vite Host Blocking Issues
+# Edit vite.config.ts and set:
+server: {
+  host: true  // Allow all hosts
+}
 ```
 
 ## CI/CD Critical Guidelines
@@ -456,6 +469,29 @@ npm install --prefer-offline --no-audit --no-fund
   # Bad (breaks in CI)
   cd apps/api-server && npm run type-check
   ```
+
+**PM2 Configuration**:
+- Always use environment variables for paths
+- Avoid hardcoded paths in ecosystem.config.js
+```javascript
+// Good
+cwd: process.env.PM2_APP_PATH || '/home/ubuntu/o4o-platform/apps/admin-dashboard'
+
+// Bad
+cwd: '/home/sohae21/Coding/o4o-platform/apps/admin-dashboard'
+```
+
+**Development vs Production Servers**:
+- Development: Use Vite dev server for hot reload
+- Production: Use `serve` package for static files
+```bash
+# Development (with PM2)
+pm2 start npm --name "admin-dashboard-dev" -- run dev -- --port 3001
+
+# Production (requires serve package)
+npm install serve
+pm2 start npx --name "o4o-admin-dashboard" -- serve -s dist -l 3001
+```
 
 **SSH Deployment Setup**:
 ### 🔑 SSH Key Configuration (Simplified)
