@@ -80,13 +80,7 @@ security:
     - any-glob-to-any-file: '**/security/**/*'
     - any-glob-to-any-file: 'sonar-project.properties'
 
-# Size Labels (for large changes)
-large-change:
-  - changed-files:
-    - any-glob-to-any-file: '**/*'
-      count: '>20'
-
-small-change:
-  - changed-files:
-    - any-glob-to-any-file: '**/*'
-      count: '<=5'
+# Size Labels (Note: actions/labeler doesn't support file count-based labeling)
+# These labels need to be applied through a different mechanism
+# large-change: For PRs with >20 files
+# small-change: For PRs with <=5 files

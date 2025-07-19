@@ -1,0 +1,72 @@
+name: PR Size Labeler
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  size-label:
+    name: Apply Size Labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply size labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Get the number of files changed in the PR
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const fileCount = files.length;
+            console.log(`PR contains ${fileCount} changed files`);
+            
+            // Get current labels
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const currentLabelNames = currentLabels.map(label => label.name);
+            
+            // Remove any existing size labels
+            const sizeLabels = ['small-change', 'large-change'];
+            for (const label of sizeLabels) {
+              if (currentLabelNames.includes(label)) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  name: label
+                });
+              }
+            }
+            
+            // Add appropriate size label
+            let newLabel = null;
+            if (fileCount <= 5) {
+              newLabel = 'small-change';
+            } else if (fileCount > 20) {
+              newLabel = 'large-change';
+            }
+            
+            if (newLabel) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  labels: [newLabel]
+                });
+                console.log(`Applied label: ${newLabel}`);
+              } catch (error) {
+                console.error(`Failed to apply label ${newLabel}:`, error.message);
+              }
+            }
