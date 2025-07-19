@@ -1,12 +1,12 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
-import Library from './Library'
+import MediaLibrary from '../content/MediaLibrary'
 
 const Media: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Library />} />
-      <Route path="/library" element={<Library />} />
+      <Route path="/" element={<MediaLibrary />} />
+      <Route path="/library" element={<MediaLibrary />} />
     </Routes>
   )
 }

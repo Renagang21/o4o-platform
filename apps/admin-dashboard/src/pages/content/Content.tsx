@@ -1,21 +1,44 @@
 import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import PostList from './PostList'
+import PostForm from './PostForm'
+import PageList from './PageList'
+import PageForm from './PageForm'
+import CPTList from './CPTList'
+import CPTForm from './CPTForm'
+import CustomFieldBuilder from './CustomFieldBuilder'
+import DynamicContentList from './DynamicContentList'
+import ACFManager from './ACFManager'
+import ACFFieldGroupForm from './ACFFieldGroupForm'
+import MediaLibrary from './MediaLibrary'
+import TemplateManager from './TemplateManager'
+import WidgetManager from './WidgetManager'
 
 const Content: React.FC = () => {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">콘텐츠 관리</h1>
-        <p className="text-gray-600 mt-1">사이트의 콘텐츠를 관리합니다</p>
-      </div>
-
-      <div className="wp-card">
-        <div className="wp-card-body">
-          <div className="text-center py-12 text-gray-500">
-            <p>콘텐츠 관리 페이지는 개발 중입니다.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="posts" replace />} />
+      <Route path="posts" element={<PostList />} />
+      <Route path="posts/new" element={<PostForm />} />
+      <Route path="posts/:id/edit" element={<PostForm />} />
+      <Route path="pages" element={<PageList />} />
+      <Route path="pages/new" element={<PageForm />} />
+      <Route path="pages/:id/edit" element={<PageForm />} />
+      <Route path="cpt" element={<CPTList />} />
+      <Route path="cpt/new" element={<CPTForm />} />
+      <Route path="cpt/:id/edit" element={<CPTForm />} />
+      <Route path="cpt/:cptId/fields" element={<CustomFieldBuilder />} />
+      <Route path="acf" element={<ACFManager />} />
+      <Route path="acf/new" element={<ACFFieldGroupForm />} />
+      <Route path="acf/:id/edit" element={<ACFFieldGroupForm />} />
+      <Route path="media" element={<MediaLibrary />} />
+      <Route path="templates" element={<TemplateManager />} />
+      <Route path="widgets" element={<WidgetManager />} />
+      {/* Dynamic routes for custom post types */}
+      <Route path=":slug" element={<DynamicContentList />} />
+      <Route path=":slug/new" element={<PostForm />} />
+      <Route path=":slug/:id/edit" element={<PostForm />} />
+    </Routes>
   )
 }
 

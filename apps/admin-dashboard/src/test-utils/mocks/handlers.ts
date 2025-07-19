@@ -17,6 +17,13 @@ import {
   BulkProductAction, 
   BulkOrderAction 
 } from '../../types/ecommerce';
+import { postHandlers } from '../../test/mocks/handlers/posts';
+import { menuHandlers } from '../../test/mocks/handlers/menus';
+import { customPostTypeHandlers } from '../../test/mocks/handlers/custom-post-types';
+import { acfHandlers } from '../../test/mocks/handlers/acf';
+import { mediaHandlers } from '../../test/mocks/handlers/media';
+import { templateHandlers } from '../../test/mocks/handlers/templates';
+import { widgetHandlers } from '../../test/mocks/handlers/widgets';
 
 // API Base URL (환경에 따라 변경)
 const API_BASE = 'http://localhost:4000/api';
@@ -35,6 +42,27 @@ const mockAdminUser = {
 };
 
 export const handlers = [
+  // Post/Page handlers
+  ...postHandlers,
+  
+  // Menu handlers
+  ...menuHandlers,
+  
+  // Custom Post Type handlers
+  ...customPostTypeHandlers,
+  
+  // ACF handlers
+  ...acfHandlers,
+  
+  // Media handlers
+  ...mediaHandlers,
+  
+  // Template handlers
+  ...templateHandlers,
+  
+  // Widget handlers
+  ...widgetHandlers,
+  
   // =============================================================================
   // AUTHENTICATION HANDLERS - 최우선 순위
   // =============================================================================

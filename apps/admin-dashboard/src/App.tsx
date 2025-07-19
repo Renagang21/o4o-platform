@@ -29,6 +29,8 @@ const Categories = lazy(() => import('@/pages/categories/Categories'));
 const HomepageEditor = lazy(() => import('@/pages/templates/HomepageEditor'));
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
+const Menus = lazy(() => import('@/pages/menus/Menus'));
+// const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
 
 // Loading component
 const PageLoader = () => (
@@ -238,6 +240,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['categories:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Categories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 메뉴 관리 */}
+                    <Route path="/menus/*" element={
+                      <AdminProtectedRoute requiredPermissions={['menus:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Menus />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

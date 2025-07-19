@@ -13,3 +13,12 @@ export function formatCurrency(amount: number, currency: string = 'KRW'): string
     maximumFractionDigits: 0,
   }).format(amount)
 }
+
+export function formatDate(date: string | Date): string {
+  const d = new Date(date)
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d)
+}

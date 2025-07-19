@@ -63,8 +63,12 @@ const menuItems: MenuItem[] = [
       { id: 'content-pages', label: '페이지', icon: <FileText className="w-4 h-4" />, path: '/content/pages' },
       { id: 'content-homepage', label: '홈페이지 편집', icon: <Globe className="w-4 h-4" />, path: '/homepage-editor' },
       { id: 'content-categories', label: '카테고리 & 태그', icon: <Tag className="w-4 h-4" />, path: '/categories' },
+      { id: 'content-menus', label: '메뉴 관리', icon: <FileText className="w-4 h-4" />, path: '/menus' },
       { id: 'content-cpt', label: 'CPT 관리', icon: <FileText className="w-4 h-4" />, path: '/content/cpt' },
-      { id: 'content-media', label: '미디어 라이브러리', icon: <FileText className="w-4 h-4" />, path: '/content/media' }
+      { id: 'content-acf', label: 'ACF 관리', icon: <FileText className="w-4 h-4" />, path: '/content/acf' },
+      { id: 'content-media', label: '미디어 라이브러리', icon: <FileText className="w-4 h-4" />, path: '/content/media' },
+      { id: 'content-templates', label: '템플릿 관리', icon: <FileText className="w-4 h-4" />, path: '/content/templates' },
+      { id: 'content-widgets', label: '위젯 관리', icon: <FileText className="w-4 h-4" />, path: '/content/widgets' }
     ]
   },
   {
