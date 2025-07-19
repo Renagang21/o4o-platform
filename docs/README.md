@@ -23,6 +23,7 @@ Welcome to the O4O Platform documentation. This directory contains comprehensive
 - [CI/CD Audit Report](./ci-cd/CI_CD_AUDIT_REPORT.md) - CI/CD pipeline analysis
 - [CI Fix Summary](./ci-cd/CI_FIX_SUMMARY.md) - CI/CD fixes and improvements
 - [Secrets Required](./ci-cd/SECRETS_REQUIRED.md) - GitHub secrets configuration
+- [CI/CD Failure Investigation Report](./ci-cd/CI_CD_FAILURE_INVESTIGATION_REPORT.md) - package-lock.json desynchronization analysis and fixes
 
 ### 🧪 [Testing](./testing/)
 - [Test Guide](./testing/TEST_GUIDE.md) - Comprehensive testing guide
@@ -35,6 +36,7 @@ Welcome to the O4O Platform documentation. This directory contains comprehensive
 - [System Diagnostic Report](./reports/SYSTEM_DIAGNOSTIC_REPORT.md) - System health analysis
 - [Error Analysis Report](./reports/O4O_PLATFORM_ERROR_ANALYSIS_REPORT.md) - Common errors and solutions
 - [Admin Dashboard Status](./reports/ADMIN_DASHBOARD_STATUS.md) - Admin dashboard implementation status
+- [Admin Dashboard Comprehensive Analysis](./reports/O4O_ADMIN_DASHBOARD_COMPREHENSIVE_ANALYSIS.md) - Detailed admin dashboard analysis and roadmap
 
 ### 🏗️ [Architecture](./architecture/)
 *(Architecture documentation to be added)*
@@ -45,6 +47,11 @@ Welcome to the O4O Platform documentation. This directory contains comprehensive
 ### 📖 [Guides](./guides/)
 - [AI Collaboration Guide](./guides/AI_COLLABORATION_GUIDE.md) - Guidelines for working with AI assistants
 - [AI Development Lecture Material](./guides/AI_DEVELOPMENT_LECTURE_MATERIAL.md) - Educational material for AI-assisted development
+
+### 🛠️ [Troubleshooting](./troubleshooting/)
+- [502 Bad Gateway Solutions](./troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md) - 502 error troubleshooting guide
+- [Server Git Merge Guide](./troubleshooting/SERVER_GIT_MERGE_GUIDE.md) - Resolving git merge conflicts on servers
+- [Server PM2 Fix Guide](./troubleshooting/SERVER_PM2_FIX_GUIDE.md) - PM2 path issues and solutions
 
 ## 🔍 Quick Links
 
@@ -63,6 +70,9 @@ Welcome to the O4O Platform documentation. This directory contains comprehensive
 - [Error Analysis](./reports/O4O_PLATFORM_ERROR_ANALYSIS_REPORT.md)
 - [Deployment Fixes](./deployment/DEPLOYMENT_FIX.md)
 - [System Diagnostics](./reports/SYSTEM_DIAGNOSTIC_REPORT.md)
+- [502 Bad Gateway Solutions](./troubleshooting/502-BAD-GATEWAY-SOLUTIONS.md)
+- [Git Merge Issues](./troubleshooting/SERVER_GIT_MERGE_GUIDE.md)
+- [PM2 Path Issues](./troubleshooting/SERVER_PM2_FIX_GUIDE.md)
 
 ## 📝 Documentation Standards
 
@@ -82,4 +92,10 @@ When adding new documentation:
 
 ## 📅 Last Updated
 
-This documentation structure was created on: July 19, 2025
+This documentation structure was last updated on: July 19, 2025
+
+### Recent Updates
+- Added CI/CD Failure Investigation Report to ci-cd section
+- Added Admin Dashboard Comprehensive Analysis to reports section
+- Added Server Git Merge Guide and PM2 Fix Guide to new troubleshooting section
+- Reorganized documentation from root directory to proper subdirectories
