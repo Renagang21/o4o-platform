@@ -21,7 +21,7 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-      - uses: actions/labeler@v4
+      - uses: actions/labeler@v5
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           sync-labels: false  # Don't create missing labels, only apply existing ones
