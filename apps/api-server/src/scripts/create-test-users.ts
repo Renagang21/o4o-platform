@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { AppDataSource } from '../database/datasource';
+import { AppDataSource } from '../database/connection';
 import { User, UserRole, UserStatus } from '../entities/User';
 import bcrypt from 'bcryptjs';
 

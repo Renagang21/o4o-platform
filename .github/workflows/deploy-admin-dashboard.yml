@@ -204,8 +204,9 @@ jobs:
       run: |
         # 관리자 대시보드 정적 파일 배포
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          mkdir -p /var/www/admin.neture.co.kr
-          chmod 750 /var/www/admin.neture.co.kr
+          sudo mkdir -p /var/www/admin.neture.co.kr
+          sudo chmod 750 /var/www/admin.neture.co.kr
+          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/admin.neture.co.kr
         "
         
         rsync -avz --delete \
