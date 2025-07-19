@@ -65,6 +65,8 @@ export default [
         Express: 'readonly',
         require: 'readonly',
         module: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
         setImmediate: 'readonly',
         clearImmediate: 'readonly',
         AbortController: 'readonly',
