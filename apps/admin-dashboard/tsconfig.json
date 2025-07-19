@@ -24,7 +24,12 @@
       "@/utils/*": ["./src/utils/*"],
       "@/types/*": ["./src/types/*"],
       "@/api/*": ["./src/api/*"],
-      "@/styles/*": ["./src/styles/*"]
+      "@/styles/*": ["./src/styles/*"],
+      "@o4o/auth-client": ["../../packages/auth-client/src"],
+      "@o4o/auth-context": ["../../packages/auth-context/src"],
+      "@o4o/types": ["../../packages/types/src"],
+      "@o4o/utils": ["../../packages/utils/src"],
+      "@o4o/ui": ["../../packages/ui/src"]
     }
   },
   "include": ["src", "vite-env.d.ts"],

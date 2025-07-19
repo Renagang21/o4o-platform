@@ -1,7 +1,8 @@
 
 import { useState, useEffect, FC } from 'react';
-import { Menu, Bell, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
+import { Menu, Bell, User, LogOut, Settings as SettingsIcon, Shield, Clock, Home, Plus, Eye } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   DropdownMenu,
@@ -67,26 +68,54 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
 
   return (
-    <header className="bg-white border-b border-wp-border-secondary px-6 py-4">
-      <div className="flex items-center justify-between">
-        {/* Left side */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden p-2 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          
-          <div>
-            <h1 className="text-xl font-semibold text-wp-text-primary">
-              관리자 대시보드
-            </h1>
-            <p className="text-sm text-wp-text-secondary">
-              O4O 플랫폼 통합 관리 시스템 (SSO)
-            </p>
-          </div>
+    <header className="bg-[#23282d] text-white">
+      {/* WordPress 스타일 상단바 */}
+      <div className="h-8 bg-[#1d2327] flex items-center px-4 text-xs">
+        <div className="flex items-center gap-4 flex-1">
+          <Link to="/" className="flex items-center gap-1 hover:text-[#00b9eb]">
+            <Home className="w-3 h-3" />
+            <span>O4O Platform</span>
+          </Link>
+          <span className="text-[#a7aaad]">|</span>
+          <a href="https://neture.co.kr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-[#00b9eb]">
+            <Eye className="w-3 h-3" />
+            <span>사이트 방문</span>
+          </a>
+          <span className="text-[#a7aaad]">|</span>
+          <Link to="/content/posts/new" className="flex items-center gap-1 hover:text-[#00b9eb]">
+            <Plus className="w-3 h-3" />
+            <span>새로 만들기</span>
+          </Link>
         </div>
+        <div className="flex items-center gap-3">
+          <span className="text-[#a7aaad]">안녕하세요, {user?.name || 'Admin'}님</span>
+          <button onClick={handleLogout} className="hover:text-[#00b9eb]">
+            로그아웃
+          </button>
+        </div>
+      </div>
+
+      {/* 메인 헤더 */}
+      <div className="bg-white border-b border-wp-border-secondary px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Left side */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onMenuClick}
+              className="lg:hidden p-2 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            
+            <div>
+              <h1 className="text-xl font-semibold text-wp-text-primary">
+                관리자 대시보드
+              </h1>
+              <p className="text-sm text-wp-text-secondary">
+                O4O 플랫폼 통합 관리 시스템
+              </p>
+            </div>
+          </div>
 
         {/* Right side */}
         <div className="flex items-center gap-4">
@@ -215,6 +244,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
       </div>
     </header>
   );

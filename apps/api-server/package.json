@@ -21,6 +21,7 @@
     "prettier": "prettier --check src/**/*.ts",
     "prettier:fix": "prettier --write src/**/*.ts",
     "create-admin": "npx ts-node ../../scripts/create-admin.ts",
+    "create-test-users": "npx ts-node src/scripts/create-test-users.ts",
     "db:test": "node ../../scripts/test-database.js",
     "db:setup": "docker-compose -f ../../docker-compose.dev.yml up -d postgres redis",
     "db:stop": "docker-compose -f ../../docker-compose.dev.yml stop postgres redis",

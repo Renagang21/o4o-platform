@@ -12,7 +12,8 @@ import {
   ChevronDown,
   Home,
   Globe,
-  Tag
+  Tag,
+  Store
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -30,6 +31,12 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  {
+    id: 'home',
+    label: '홈',
+    icon: <Home className="w-5 h-5" />,
+    path: '/'
+  },
   {
     id: 'dashboard',
     label: '대시보드',
@@ -69,6 +76,17 @@ const menuItems: MenuItem[] = [
       { id: 'orders', label: '주문 관리', icon: <ShoppingCart className="w-4 h-4" />, path: '/orders' },
       { id: 'categories', label: '카테고리', icon: <Package className="w-4 h-4" />, path: '/products/categories' },
       { id: 'inventory', label: '재고 관리', icon: <Package className="w-4 h-4" />, path: '/products/inventory' }
+    ]
+  },
+  {
+    id: 'vendors',
+    label: '벤더 관리',
+    icon: <Store className="w-5 h-5" />,
+    children: [
+      { id: 'vendors-all', label: '전체 벤더', icon: <Store className="w-4 h-4" />, path: '/vendors' },
+      { id: 'vendors-pending', label: '승인 대기', icon: <Store className="w-4 h-4" />, path: '/vendors/pending' },
+      { id: 'vendors-commission', label: '수수료 관리', icon: <Store className="w-4 h-4" />, path: '/vendors/commission' },
+      { id: 'vendors-reports', label: '벤더 리포트', icon: <Store className="w-4 h-4" />, path: '/vendors/reports' }
     ]
   },
   {

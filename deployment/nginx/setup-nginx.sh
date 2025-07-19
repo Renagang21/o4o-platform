@@ -1,5 +1,6 @@
 #!/bin/bash
 # Nginx Setup Script for admin.neture.co.kr
+# Note: For complete setup of all sites, use setup-nginx-all.sh
 
 set -e
 
@@ -11,9 +12,12 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Copy Nginx configuration
 echo "📋 Copying Nginx configuration..."
-cp /home/sohae21/Coding/o4o-platform/deployment/nginx/admin.neture.co.kr.conf /etc/nginx/sites-available/
+cp "$SCRIPT_DIR/admin.neture.co.kr.conf" /etc/nginx/sites-available/
 
 # Create symbolic link
 echo "🔗 Creating symbolic link..."

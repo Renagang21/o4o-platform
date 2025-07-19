@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   const [searchParams] = useSearchParams();
 
   // 리다이렉트 URL 처리
-  const redirectUrl = searchParams.get('redirect') || '/dashboard';
+  const redirectUrl = searchParams.get('redirect') || '/';
   const fromLocation = (location.state as any)?.from?.pathname || redirectUrl;
 
   // 이미 인증된 관리자는 대시보드로 리다이렉트

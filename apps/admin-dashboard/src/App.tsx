@@ -10,6 +10,7 @@ import AdminLayout from '@/components/layout/AdminLayout';
 
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
+const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
 const UsersList = lazy(() => import('@/pages/Users/UsersList'));
 const UserCreate = lazy(() => import('@/pages/Users/UserCreate'));
@@ -106,7 +107,11 @@ function App() {
               >
                 <AdminLayout>
                   <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminHome />
+                      </Suspense>
+                    } />
                     <Route path="/dashboard" element={
                       <Suspense fallback={<PageLoader />}>
                         <Dashboard />
@@ -265,7 +270,7 @@ function App() {
                     } />
                     
                     {/* 404 핸들링 */}
-                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </AdminLayout>
               </AdminProtectedRoute>
