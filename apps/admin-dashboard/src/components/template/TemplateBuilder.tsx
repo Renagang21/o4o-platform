@@ -460,7 +460,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                     <Label htmlFor="template-type">타입</Label>
                     <Select
                       value={builderState.template.type}
-                      onValueChange={(value: any) => updateTemplate({ type: value })}
+                      onValueChange={(value) => updateTemplate({ type: value as any })}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -477,7 +477,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                     <Label htmlFor="template-category">카테고리</Label>
                     <Select
                       value={builderState.template.category}
-                      onValueChange={(value: any) => updateTemplate({ category: value })}
+                      onValueChange={(value) => updateTemplate({ category: value as any })}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -650,7 +650,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
 }
 
 // Helper functions
-function getDefaultContent(type: TemplateBlockType): Record<string, any> {
+function getDefaultContent(type: TemplateBlockType): Record<string, unknown> {
   switch (type) {
     case 'hero':
       return {
@@ -674,7 +674,7 @@ function getDefaultContent(type: TemplateBlockType): Record<string, any> {
   }
 }
 
-function getDefaultSettings(_type: TemplateBlockType): any {
+function getDefaultSettings(_type: TemplateBlockType): Record<string, unknown> {
   return {
     margin: { top: '0', right: '0', bottom: '1rem', left: '0' },
     padding: { top: '1rem', right: '1rem', bottom: '1rem', left: '1rem' },

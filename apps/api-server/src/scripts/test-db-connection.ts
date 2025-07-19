@@ -71,9 +71,9 @@ async function testConnection() {
     await client1.connect();
     console.log('✅ Connection successful with original password');
     await client1.end();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('❌ Connection failed with original password');
-    console.log(`Error: ${error.message}`);
+    console.log(`Error: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   // Test 2: Using String() converted password
@@ -95,9 +95,9 @@ async function testConnection() {
     console.log(`Version: ${result.rows[0].version.split(',')[0]}`);
     
     await client2.end();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('❌ Connection failed with String() converted password');
-    console.log(`Error: ${error.message}`);
+    console.log(`Error: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   // Test 3: TypeORM-style configuration
@@ -120,9 +120,9 @@ async function testConnection() {
     console.log('✅ TypeORM DataSource initialized successfully');
     
     await testDataSource.destroy();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('❌ TypeORM DataSource initialization failed');
-    console.log(`Error: ${error.message}`);
+    console.log(`Error: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

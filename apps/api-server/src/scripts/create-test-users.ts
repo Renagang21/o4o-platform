@@ -10,7 +10,7 @@ interface TestUser {
   role: UserRole;
   firstName: string;
   lastName: string;
-  businessInfo?: any;
+  businessInfo?: Record<string, unknown>;
 }
 
 const TEST_USERS: TestUser[] = [

@@ -60,7 +60,7 @@ interface WidgetTypeDefinition {
   description: string
   icon: React.ReactNode
   category: string
-  defaultContent: Record<string, any>
+  defaultContent: Record<string, unknown>
 }
 
 const widgetTypes: WidgetTypeDefinition[] = [
@@ -241,7 +241,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
     }
   }
 
-  const updateContent = (key: string, value: any) => {
+  const updateContent = (key: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       content: {
@@ -251,7 +251,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
     }))
   }
 
-  const updateSettings = (key: keyof WidgetSettings, value: any) => {
+  const updateSettings = (key: keyof WidgetSettings, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       settings: {
@@ -261,13 +261,13 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
     }))
   }
 
-  const updateNestedSettings = (category: string, key: string, value: any) => {
+  const updateNestedSettings = (category: string, key: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       settings: {
         ...prev.settings,
         [category]: {
-          ...(prev.settings as any)[category],
+          ...((prev.settings as unknown as Record<string, unknown>)[category] as Record<string, unknown> || {}),
           [key]: value
         }
       }
@@ -477,10 +477,10 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
             <div>
               <Label>소셜 링크</Label>
               <div className="space-y-2 mt-2">
-                {(formData.content.links || []).map((link: any, index: number) => (
+                {(formData.content.links || []).map((link: Record<string, unknown>, index: number) => (
                   <div key={index} className="flex gap-2">
                     <Select
-                      value={link.platform}
+                      value={String(link.platform || '')}
                       onValueChange={(value) => {
                         const newLinks = [...(formData.content.links || [])]
                         newLinks[index] = { ...link, platform: value }
@@ -499,7 +499,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
                       </SelectContent>
                     </Select>
                     <Input
-                      value={link.url}
+                      value={String(link.url || '')}
                       onChange={(e) => {
                         const newLinks = [...(formData.content.links || [])]
                         newLinks[index] = { ...link, url: e.target.value }
@@ -512,7 +512,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        const newLinks = (formData.content.links || []).filter((_: any, i: number) => i !== index)
+                        const newLinks = (formData.content.links || []).filter((_: unknown, i: number) => i !== index)
                         updateContent('links', newLinks)
                       }}
                     >

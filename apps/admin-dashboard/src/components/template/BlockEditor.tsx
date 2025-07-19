@@ -33,7 +33,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
   // Update content
-  const updateContent = (key: string, value: any) => {
+  const updateContent = (key: string, value: unknown) => {
     onChange({
       content: {
         ...block.content,
@@ -53,13 +53,13 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
   // }
 
   // Update nested settings
-  const updateNestedSettings = (category: string, key: string, value: any) => {
-    const currentSettings = block.settings as any
+  const updateNestedSettings = (category: string, key: string, value: unknown) => {
+    const currentSettings = block.settings as Record<string, unknown>
     onChange({
       settings: {
         ...block.settings,
         [category]: {
-          ...currentSettings[category],
+          ...(currentSettings[category] as Record<string, unknown> || {}),
           [key]: value
         }
       }
@@ -94,8 +94,8 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
   // Spacing controls
   const SpacingControls: React.FC<{
     label: string
-    value: any
-    onChange: (value: any) => void
+    value: Record<string, string>
+    onChange: (value: Record<string, string>) => void
   }> = ({ label, value = {}, onChange }) => (
     <Card>
       <CardHeader className="pb-3">
@@ -176,10 +176,10 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
             </div>
             <div>
               <Label>버튼</Label>
-              {(block.content.buttons || []).map((button: any, index: number) => (
+              {(block.content.buttons || []).map((button: Record<string, unknown>, index: number) => (
                 <div key={index} className="flex gap-2 mt-2">
                   <Input
-                    value={button.text || ''}
+                    value={String(button.text || '')}
                     onChange={(e) => {
                       const newButtons = [...(block.content.buttons || [])]
                       newButtons[index] = { ...button, text: e.target.value }
@@ -188,7 +188,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                     placeholder="버튼 텍스트"
                   />
                   <Input
-                    value={button.url || ''}
+                    value={String(button.url || '')}
                     onChange={(e) => {
                       const newButtons = [...(block.content.buttons || [])]
                       newButtons[index] = { ...button, url: e.target.value }
@@ -200,7 +200,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                     size="sm"
                     variant="ghost"
                     onClick={() => {
-                      const newButtons = (block.content.buttons || []).filter((_: any, i: number) => i !== index)
+                      const newButtons = (block.content.buttons || []).filter((_: unknown, i: number) => i !== index)
                       updateContent('buttons', newButtons)
                     }}
                   >
@@ -365,11 +365,11 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                 </SelectContent>
               </Select>
             </div>
-            {(block.content.columns || []).map((column: any, index: number) => (
+            {(block.content.columns || []).map((column: Record<string, unknown>, index: number) => (
               <div key={index}>
                 <Label>컬럼 {index + 1} 내용</Label>
                 <Textarea
-                  value={column.content || ''}
+                  value={String(column.content || '')}
                   onChange={(e) => {
                     const newColumns = [...(block.content.columns || [])]
                     newColumns[index] = { ...column, content: e.target.value }
@@ -444,13 +444,13 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
           {/* Spacing */}
           <SpacingControls
             label="여백 (Margin)"
-            value={block.settings.margin}
+            value={block.settings.margin as Record<string, string> || {}}
             onChange={(value) => updateNestedSettings('margin', '', value)}
           />
 
           <SpacingControls
             label="패딩 (Padding)"
-            value={block.settings.padding}
+            value={block.settings.padding as Record<string, string> || {}}
             onChange={(value) => updateNestedSettings('padding', '', value)}
           />
 

@@ -574,7 +574,7 @@ export class MediaController {
         });
       }
 
-      const updates: any = {};
+      const updates: Record<string, unknown> = {};
 
       if (name && name.trim() !== folder.name) {
         updates.name = name.trim();

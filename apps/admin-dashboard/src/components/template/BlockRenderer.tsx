@@ -112,7 +112,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
               )}
               {block.content.buttons && (
                 <div className="flex flex-wrap gap-4 justify-center">
-                  {block.content.buttons.map((button: any, index: number) => (
+                  {block.content.buttons.map((button: Record<string, unknown>, index: number) => (
                     <button
                       key={index}
                       className={`px-6 py-3 rounded-lg font-medium transition-colors ${
@@ -121,7 +121,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
                           : 'bg-white text-gray-900 hover:bg-gray-100'
                       }`}
                     >
-                      {button.text}
+                      {String(button.text)}
                     </button>
                   ))}
                 </div>
@@ -226,12 +226,12 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
         const columnCount = block.content.columns?.length || 2
         return (
           <div className={`grid grid-cols-1 md:grid-cols-${columnCount} gap-6`}>
-            {(block.content.columns || []).map((column: any, index: number) => (
+            {(block.content.columns || []).map((column: Record<string, unknown>, index: number) => (
               <div key={index} className="space-y-4">
                 <div className="p-4 border border-gray-200 rounded-lg min-h-[100px]">
                   {column.content ? (
                     <div className="prose prose-sm">
-                      {column.content.split('\n').map((line: string, i: number) => (
+                      {String(column.content || '').split('\n').map((line: string, i: number) => (
                         <p key={i}>{line}</p>
                       ))}
                     </div>
