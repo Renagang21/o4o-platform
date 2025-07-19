@@ -3,10 +3,8 @@ module.exports = {
     {
       // API Server Configuration
       name: 'o4o-api-server',
-      script: './apps/api-server/src/main.ts',
-      interpreter: 'node',
-      interpreter_args: '-r ts-node/register',
-      cwd: '/home/sohae21/Coding/o4o-platform',
+      script: './apps/api-server/dist/main.js',
+      cwd: process.env.PM2_APP_PATH || '/home/ubuntu/o4o-platform',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
@@ -18,7 +16,7 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: 5432,
         DB_USERNAME: 'postgres',
-        DB_PASSWORD: process.env.DB_PASSWORD,
+        DB_PASSWORD: String(process.env.DB_PASSWORD || ''),
         DB_NAME: 'o4o_platform',
         JWT_SECRET: process.env.JWT_SECRET,
         REFRESH_SECRET: process.env.REFRESH_SECRET,

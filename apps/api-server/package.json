@@ -23,6 +23,7 @@
     "create-admin": "npx ts-node ../../scripts/create-admin.ts",
     "create-test-users": "npx ts-node src/scripts/create-test-users.ts",
     "db:test": "node ../../scripts/test-database.js",
+    "db:test:detailed": "npx ts-node src/scripts/test-db-connection.ts",
     "db:setup": "docker-compose -f ../../docker-compose.dev.yml up -d postgres redis",
     "db:stop": "docker-compose -f ../../docker-compose.dev.yml stop postgres redis",
     "db:reset": "docker-compose -f ../../docker-compose.dev.yml down -v && docker-compose -f ../../docker-compose.dev.yml up -d postgres redis",

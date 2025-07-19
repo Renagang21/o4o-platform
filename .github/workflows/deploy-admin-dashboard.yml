@@ -200,15 +200,26 @@ jobs:
           mkdir -p ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
         "
         
+    - name: Ensure deployment directories exist
+      run: |
+        # 서버 관리자가 미리 생성해야 하는 디렉토리
+        # 만약 디렉토리가 없다면 서버 관리자에게 다음 명령어 실행 요청:
+        # sudo mkdir -p /var/www/admin.neture.co.kr
+        # sudo chown -R ubuntu:ubuntu /var/www/admin.neture.co.kr
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          if [ ! -d /var/www/admin.neture.co.kr ]; then
+            echo 'ERROR: /var/www/admin.neture.co.kr does not exist.'
+            echo 'Please ask server admin to run:'
+            echo 'sudo mkdir -p /var/www/admin.neture.co.kr'
+            echo 'sudo chown -R ubuntu:ubuntu /var/www/admin.neture.co.kr'
+            exit 1
+          fi
+          echo 'Directory exists, proceeding with deployment...'
+        "
+    
     - name: Deploy static files to secured directory
       run: |
         # 관리자 대시보드 정적 파일 배포
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          sudo mkdir -p /var/www/admin.neture.co.kr
-          sudo chmod 750 /var/www/admin.neture.co.kr
-          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/admin.neture.co.kr
-        "
-        
         rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/dist/ \
@@ -225,7 +236,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
-          npm ci --only=production
+          npm install --production
         "
         
     - name: Setup PM2 ecosystem file (Admin Security)

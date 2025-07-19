@@ -252,7 +252,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/main-site
-          npm ci --only=production
+          npm install --production
         "
         
     - name: Setup PM2 ecosystem file
