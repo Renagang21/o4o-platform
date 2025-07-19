@@ -73,6 +73,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.53.2",
+    "serve": "^14.2.4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
