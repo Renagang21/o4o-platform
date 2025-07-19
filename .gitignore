@@ -37,6 +37,9 @@ Thumbs.db
 # Logs
 logs/
 *.log
+*-errors.log
+*-output.log
+ci-*.log
 
 # Coverage reports
 coverage/
@@ -68,9 +71,18 @@ temp/
 # Backup files
 *.backup
 *.bak
+*.backup-*
+*DESKTOP-*.ts
+*DESKTOP-*.tsx
 
 # AWS
 .aws/
 
 # Local development
 *.local
+
+# Temporary reports
+*_REPORT.md
+*_ANALYSIS_REPORT.md
+CI_CD_FAILURE_INVESTIGATION_REPORT.md
+O4O_PLATFORM_SERVER_SYNC_ANALYSIS_REPORT.md
