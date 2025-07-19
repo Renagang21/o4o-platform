@@ -19,10 +19,12 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
     steps:
       - uses: actions/labeler@v4
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          sync-labels: false  # Don't create missing labels, only apply existing ones
 
   # 변경사항 분석
   analyze-changes:
@@ -57,6 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      issues: write
     steps:
       - name: Comment PR
         uses: actions/github-script@v7
@@ -100,6 +103,9 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.analyze-changes.outputs.web-changed == 'true' || needs.analyze-changes.outputs.admin-changed == 'true'
     needs: analyze-changes
+    permissions:
+      pull-requests: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
       

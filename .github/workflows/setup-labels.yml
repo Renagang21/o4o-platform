@@ -1,0 +1,73 @@
+name: Setup Repository Labels
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/labeler.yml'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  setup-labels:
+    name: Create Missing Labels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create/Update Labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = [
+              { name: 'frontend', color: '0052CC', description: 'Frontend changes' },
+              { name: 'backend', color: '5319E7', description: 'Backend changes' },
+              { name: 'packages', color: 'FBCA04', description: 'Package changes' },
+              { name: 'ci/cd', color: '0E8A16', description: 'CI/CD changes' },
+              { name: 'config', color: '84B6EB', description: 'Configuration changes' },
+              { name: 'documentation', color: '006B75', description: 'Documentation changes' },
+              { name: 'dependencies', color: 'FF9800', description: 'Dependency updates' },
+              { name: 'testing', color: 'C5DEF5', description: 'Testing changes' },
+              { name: 'typescript', color: '2B7489', description: 'TypeScript changes' },
+              { name: 'javascript', color: 'F0DB4F', description: 'JavaScript changes' },
+              { name: 'styles', color: 'E91E63', description: 'Styling changes' },
+              { name: 'security', color: 'D73A4A', description: 'Security-related changes' },
+              { name: 'large-change', color: 'B60205', description: 'Large PR (>20 files)' },
+              { name: 'small-change', color: '008672', description: 'Small PR (≤5 files)' }
+            ];
+            
+            for (const label of labels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  // Label already exists, update it
+                  try {
+                    await github.rest.issues.updateLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: label.name,
+                      color: label.color,
+                      description: label.description
+                    });
+                    console.log(`Updated label: ${label.name}`);
+                  } catch (updateError) {
+                    console.error(`Failed to update label ${label.name}:`, updateError);
+                  }
+                } else {
+                  console.error(`Failed to create label ${label.name}:`, error);
+                }
+              }
+            }
