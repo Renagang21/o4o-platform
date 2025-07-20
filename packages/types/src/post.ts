@@ -1,6 +1,19 @@
 // Post and Page types for CMS functionality
 
-import type { Category, Tag } from './common';
+import type { Tag } from './common';
+
+// Define PostCategory for posts (different from ecommerce Category)
+export interface PostCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  parentId?: string;
+  parentName?: string;
+  postCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export type PostStatus = 'draft' | 'published' | 'scheduled' | 'trash';
 export type PostType = 'post' | 'page';
@@ -32,7 +45,7 @@ export interface Post {
     avatar?: string;
   };
   categoryIds?: string[];
-  categories?: Category[];
+  categories?: PostCategory[];
   tagIds?: string[];
   tags?: Tag[];
   featuredImageId?: string;

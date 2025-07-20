@@ -1,8 +1,4 @@
-export function formatCurrency(amount: number, currency: string = 'KRW'): string {
-  return new Intl.NumberFormat('ko-KR', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// Re-export from @o4o/utils
+export { formatCurrency } from '@o4o/utils/pricing';
+
+// Add any main-site specific utilities here

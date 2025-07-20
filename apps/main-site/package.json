@@ -33,6 +33,7 @@
   "dependencies": {
     "@o4o/types": "file:../../packages/types",
     "@o4o/ui": "file:../../packages/ui",
+    "@o4o/utils": "file:../../packages/utils",
     "@tanstack/react-query": "^5.82.0",
     "@types/dompurify": "^3.0.5",
     "axios": "^1.10.0",

@@ -55,25 +55,7 @@ export interface UpdateProfilePayload {
   address?: string;
 }
 
-// Product types for API
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  discountPrice?: number;
-  images: string[];
-  categoryId: string;
-  categoryName?: string;
-  tags: string[];
-  stock: number;
-  isActive: boolean;
-  sellerId: string;
-  sellerName?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
+// API Payload types for product operations
 export interface CreateProductPayload {
   name: string;
   description: string;
@@ -89,49 +71,24 @@ export interface UpdateProductPayload extends Partial<CreateProductPayload> {
   isActive?: boolean;
 }
 
-// Order types for API
-export interface Order {
-  id: string;
-  orderNumber: string;
-  userId: string;
-  userName?: string;
-  items: OrderItem[];
-  totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  shippingAddress: Address;
-  paymentMethod: string;
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface OrderItem {
-  productId: string;
-  productName: string;
-  price: number;
-  quantity: number;
-  subtotal: number;
-}
-
-export interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-}
-
+// API Payload types for order operations
 export interface CreateOrderPayload {
   items: Array<{
     productId: string;
     quantity: number;
   }>;
-  shippingAddress: Address;
+  shippingAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
   paymentMethod: string;
 }
 
 // Review types for API
-export interface Review {
+export interface ApiReview {
   id: string;
   productId: string;
   userId: string;
@@ -164,8 +121,8 @@ export interface Payment {
   updatedAt: Date;
 }
 
-// Filter types
-export interface ProductFilters {
+// API Filter types
+export interface ApiProductFilters {
   categoryId?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -175,9 +132,9 @@ export interface ProductFilters {
   search?: string;
 }
 
-export interface OrderFilters {
-  status?: Order['status'];
-  paymentStatus?: Order['paymentStatus'];
+export interface ApiOrderFilters {
+  status?: string;
+  paymentStatus?: string;
   dateFrom?: Date;
   dateTo?: Date;
   userId?: string;

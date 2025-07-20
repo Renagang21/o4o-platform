@@ -1,64 +1,62 @@
-// E-commerce types
+// Import common types from @o4o/types
+import {
+  Product as BaseProduct,
+  Order as BaseOrder,
+  OrderItem as BaseOrderItem,
+  OrderStatus as BaseOrderStatus,
+  Category as BaseCategory,
+  ProductStatus as BaseProductStatus,
+  ProductType as BaseProductType,
+  PaymentStatus,
+  PaymentMethod,
+  Address as BaseAddress
+} from '@o4o/types'
 
-// Basic enums and types
-export type ProductStatus = 'draft' | 'published' | 'private' | 'trash'
-export type ProductType = 'simple' | 'variable' | 'grouped' | 'external'
+// Re-export common types
+export {
+  PaymentStatus,
+  PaymentMethod
+} from '@o4o/types'
 
-export interface Product {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  shortDescription?: string
-  sku: string
+// Admin-specific enums and types
+export type ProductStatus = BaseProductStatus | 'private' | 'trash'
+export type ProductType = BaseProductType | 'grouped' | 'external'
+
+// Admin-specific Product interface extending base
+export interface Product extends Omit<BaseProduct, 'status' | 'pricing'> {
+  // Override status with admin-specific status
+  status: ProductStatus
+  type: ProductType
   
-  // Pricing (role-based)
+  // Admin-specific pricing (replacing the base pricing)
   retailPrice: number
   wholesalePrice?: number
   affiliatePrice?: number
   cost?: number
   
-  // Inventory
-  stockQuantity: number
+  // Additional admin fields
+  sku: string
   manageStock: boolean
   lowStockThreshold?: number
   stockStatus: 'instock' | 'outofstock' | 'onbackorder'
   
-  // Product attributes
-  weight?: number
-  dimensions?: {
-    length: number
-    width: number
-    height: number
-  }
-  
-  // Status and settings
-  status: ProductStatus
-  type: ProductType
   featured: boolean
   virtual: boolean
   downloadable: boolean
   
-  // Media
   images: ProductImage[]
   featuredImage?: string
   gallery?: string[]
   
-  // Categorization
   categories: ProductCategory[]
   tags: ProductTag[]
   attributes: ProductAttribute[]
   
-  // SEO
   metaTitle?: string
   metaDescription?: string
   
-  // Timestamps
-  createdAt: string
-  updatedAt: string
   createdBy: string
   
-  // Stats
   totalSales: number
   averageRating: number
   reviewCount: number
@@ -71,13 +69,8 @@ export interface ProductImage {
   sortOrder: number
 }
 
-export interface ProductCategory {
-  id: string
-  name: string
-  slug: string
-  description?: string
+export interface ProductCategory extends BaseCategory {
   image?: string
-  parent?: string
   count: number
 }
 
@@ -99,68 +92,46 @@ export interface ProductAttribute {
   sortOrder: number
 }
 
-export interface Order {
-  id: string
-  orderNumber: string
+export interface Order extends Omit<BaseOrder, 'items' | 'shippingAddress' | 'status'> {
   status: OrderStatus
   
-  // Customer info
+  // Admin-specific customer info
   customerId: string
   customerName: string
   customerEmail: string
   
-  // Pricing
+  // Override base pricing fields with admin-specific names
   subtotal: number
   tax: number
   shipping: number
   discount: number
   total: number
   
-  // Items
   items: OrderItem[]
   
-  // Addresses
   billingAddress: Address
   shippingAddress: Address
   
-  // Payment
-  paymentMethod: string
-  paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'refunded'
+  // Admin-specific payment fields
+  paymentStatus: PaymentStatus | 'processing' | 'cancelled' | 'refunded'
   transactionId?: string
   
-  // Shipping
   shippingMethod: string
-  trackingNumber?: string
   
-  // Notes
   customerNote?: string
   adminNote?: string
   
-  // Timestamps
-  createdAt: string
   updatedAt: string
   completedAt?: string
   
-  // Refunds
   refunds: OrderRefund[]
 }
 
-export type OrderStatus = 
-  | 'pending'
-  | 'processing' 
-  | 'on-hold'
-  | 'completed'
-  | 'cancelled'
-  | 'refunded'
-  | 'failed'
+export type OrderStatus = BaseOrderStatus | 'on-hold' | 'completed' | 'refunded' | 'failed'
 
-export interface OrderItem {
-  id: string
-  productId: string
-  productName: string
+export interface OrderItem extends BaseOrderItem {
   productSku: string
   variationId?: string
-  quantity: number
   price: number
   total: number
   tax: number
@@ -174,7 +145,7 @@ export interface OrderItemMeta {
   displayValue?: string
 }
 
-export interface Address {
+export interface Address extends Omit<BaseAddress, 'recipientName' | 'address' | 'detailAddress' | 'zipCode' | 'deliveryRequest'> {
   firstName: string
   lastName: string
   company?: string
@@ -184,7 +155,6 @@ export interface Address {
   state: string
   postalCode: string
   country: string
-  phone?: string
   email?: string
 }
 

@@ -248,6 +248,7 @@ jobs:
           if [ -f .env.production ]; then
             export \$(cat .env.production | grep -v '^#' | xargs)
           fi
+          export NODE_ENV=production
           npm run migration:run
         "
         

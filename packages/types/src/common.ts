@@ -12,17 +12,7 @@ export interface PaginatedResponse<T> {
   pageSize: number;
 }
 
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  parentId?: string;
-  parentName?: string;
-  postCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Category type moved to ecommerce.ts to avoid conflicts
 
 export interface Tag {
   id: string;

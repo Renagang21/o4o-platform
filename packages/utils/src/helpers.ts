@@ -1,8 +1,4 @@
 // Helper utility functions
-export const formatDate = (date: Date): string => {
-  return date.toLocaleDateString();
-};
-
 export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
@@ -42,10 +38,6 @@ export const throttle = <T extends (...args: unknown[]) => unknown>(
       }
     }, wait);
   };
-};
-
-export const formatNumber = (num: number): string => {
-  return new Intl.NumberFormat('ko-KR').format(num);
 };
 
 export const parseQueryString = (query: string): Record<string, string> => {
