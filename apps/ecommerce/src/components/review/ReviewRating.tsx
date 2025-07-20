@@ -1,6 +1,6 @@
 import React from 'react';
 import { Star } from 'lucide-react';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 
 interface ReviewRatingProps {
   rating: number;

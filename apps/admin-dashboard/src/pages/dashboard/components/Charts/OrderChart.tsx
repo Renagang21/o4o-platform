@@ -72,10 +72,10 @@ const OrderChart: React.FC<OrderChartProps> = ({ data, isLoading = false }) => {
 
   // 커스텀 라벨
   const renderCustomLabel = (props: any) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
-    const percentage = percent * 100;
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, percentage } = props;
+    const displayPercentage = percentage || (percent * 100);
     
-    if (percentage < 5) return null; // 5% 미만은 라벨 숨김
+    if (displayPercentage < 5) return null; // 5% 미만은 라벨 숨김
 
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -92,7 +92,7 @@ const OrderChart: React.FC<OrderChartProps> = ({ data, isLoading = false }) => {
         fontSize={12}
         fontWeight="600"
       >
-        {`${percentage.toFixed(0)}%`}
+        {`${displayPercentage.toFixed(0)}%`}
       </text>
     );
   };

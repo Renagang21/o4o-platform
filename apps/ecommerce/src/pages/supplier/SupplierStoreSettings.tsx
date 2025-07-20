@@ -10,15 +10,13 @@ import {
   useCheckSlugAvailability,
   useGenerateSlug
 } from '@/hooks';
-import { SupplierProfileFormData } from '@o4o/types/ecommerce';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Input } from '@o4o/ui/components/ui/input';
-import { Textarea } from '@o4o/ui/components/ui/textarea';
-import { Label } from '@o4o/ui/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/ui/components/ui/card';
-import { Alert, AlertDescription } from '@o4o/ui/components/ui/alert';
-import { Skeleton } from '@o4o/ui/components/ui/skeleton';
-import { Badge } from '@o4o/ui/components/ui/badge';
+import { Button } from '@o4o/ui';
+import { Input } from '@o4o/ui';
+import { Textarea } from '@o4o/ui';
+import { Label } from '@o4o/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
+import { Skeleton } from '@o4o/ui';
 import { 
   Store, 
   Upload, 
@@ -30,7 +28,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 
 const profileSchema = z.object({
   storeName: z.string().min(2, '매장 이름은 2자 이상이어야 합니다').max(50),
@@ -199,7 +197,7 @@ export function SupplierStoreSettings() {
   if (!profile) {
     return (
       <div className="container py-8">
-        <Alert variant="destructive">
+        <Alert className="border-destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             판매자 프로필을 불러올 수 없습니다.

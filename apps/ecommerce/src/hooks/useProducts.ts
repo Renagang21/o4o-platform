@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Product, ProductFilters, ProductsResponse } from '@o4o/types/ecommerce';
+import { Product, ProductFilters, ProductsResponse } from '@o4o/types';
 import { api } from '@/lib/api';
 import { useCartStore } from '@/stores/useCartStore';
 import { useWishlistStore } from '@/stores/useWishlistStore';
@@ -90,7 +90,7 @@ export const useFeaturedProducts = (limit: number = 8) => {
 };
 
 // Create product review
-export const useCreateReview = () => {
+export const useCreateProductReview = () => {
   const queryClient = useQueryClient();
   
   return useMutation({

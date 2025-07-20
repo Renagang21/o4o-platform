@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@o4o/auth-context';
+import { authClient } from '@o4o/auth-client';
 import { Button, Input, Card, CardHeader, CardContent, CardFooter } from '@o4o/ui';
 import { useForm } from 'react-hook-form';
 
@@ -13,7 +13,6 @@ interface RegisterForm {
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
   const [error, setError] = useState('');
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<RegisterForm>();
 
@@ -22,13 +21,13 @@ export function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       setError('');
-      await registerUser({
+      await authClient.api.post('/auth/register', {
         name: data.name,
         email: data.email,
         password: data.password,
         role: 'customer'
       });
-      navigate('/');
+      navigate('/login');
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 

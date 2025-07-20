@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product } from '@o4o/types/ecommerce';
+import { Product } from '@o4o/types';
 import { ProductCard } from './ProductCard';
 import { cn } from '@o4o/utils';
 

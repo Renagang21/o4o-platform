@@ -1,7 +1,7 @@
 import React from 'react';
-import { formatCurrency, formatPercentage } from '@o4o/utils/format';
+import { formatCurrency, formatPercentage } from '@o4o/utils';
 import { cn } from '@o4o/utils';
-import { PriceByRole } from '@o4o/types/ecommerce';
+import { PriceByRole } from '@o4o/types';
 
 interface PriceDisplayProps {
   price: number;
@@ -25,9 +25,22 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
   className
 }) => {
   // Get role-based price if available
-  const displayPrice = priceByRole && userRole && priceByRole[userRole] 
-    ? priceByRole[userRole] 
-    : price;
+  const displayPrice = (() => {
+    if (!priceByRole || !userRole) return price;
+    
+    // Handle direct role prices
+    if (userRole === 'customer' || userRole === 'business' || userRole === 'affiliate') {
+      return (priceByRole as any)[userRole] || price;
+    }
+    
+    // Handle retailer prices with grades
+    if (userRole === 'retailer' && typeof priceByRole.retailer === 'object') {
+      // Would need retailer grade to get specific price
+      return priceByRole.retailer.gold || price;
+    }
+    
+    return price;
+  })();
 
   const discount = compareAtPrice && compareAtPrice > displayPrice
     ? ((compareAtPrice - displayPrice) / compareAtPrice) * 100

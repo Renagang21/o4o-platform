@@ -2,60 +2,50 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
 import { Search, Calendar, Package } from 'lucide-react';
-import { Order } from '@o4o/types/ecommerce';
+import { Order } from '@o4o/types';
 import { OrderItem } from '@/components/order';
 import { useAuth } from '@o4o/auth-context';
-import { authClient } from '@o4o/auth-client';
 
 // Mock orders data
 const mockOrders: Order[] = [
   {
     id: '1',
     orderNumber: 'ORD-2025-0001',
-    userId: '1',
-    status: 'delivered',
+    buyerId: '1',
+    buyerType: 'customer',
+    buyerName: '홍길동',
+    buyerEmail: 'user@example.com',
+    status: 'delivered' as const,
+    paymentStatus: 'completed' as const,
+    paymentMethod: 'card' as const,
+    currency: 'KRW',
     items: [
       {
         id: '1',
-        orderId: '1',
         productId: '1',
+        productName: '프리미엄 무선 헤드폰',
+        productSku: 'WH-001',
+        productImage: 'https://via.placeholder.com/100x100',
         quantity: 2,
-        price: 89000,
-        product: {
-          id: '1',
-          name: '프리미엄 무선 헤드폰',
-          slug: 'premium-wireless-headphones',
-          price: 89000,
-          images: [{ id: '1', url: 'https://via.placeholder.com/100x100', alt: '헤드폰' }],
-          status: 'published',
-          manageStock: true,
-          stockQuantity: 15
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        unitPrice: 89000,
+        totalPrice: 178000,
+        supplierId: '1',
+        supplierName: '테크 서플라이'
       },
       {
         id: '2',
-        orderId: '1',
         productId: '2',
+        productName: '스마트 워치 프로',
+        productSku: 'SW-PRO-001',
+        productImage: 'https://via.placeholder.com/100x100',
         quantity: 1,
-        price: 259000,
-        product: {
-          id: '2',
-          name: '스마트 워치 프로',
-          slug: 'smart-watch-pro',
-          price: 259000,
-          images: [{ id: '2', url: 'https://via.placeholder.com/100x100', alt: '스마트워치' }],
-          status: 'published',
-          manageStock: true,
-          stockQuantity: 8
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        unitPrice: 259000,
+        totalPrice: 259000,
+        supplierId: '1',
+        supplierName: '테크 서플라이'
       }
     ],
     summary: {
-      itemCount: 3,
       subtotal: 437000,
       discount: 0,
       shipping: 0,
@@ -64,43 +54,52 @@ const mockOrders: Order[] = [
     },
     shippingAddress: {
       recipientName: '홍길동',
-      recipientPhone: '010-1234-5678',
-      postalCode: '12345',
+      phone: '010-1234-5678',
+      zipCode: '12345',
       address: '서울시 강남구 테헤란로 123',
-      addressDetail: '10층'
+      detailAddress: '10층',
+      city: '서울',
+      country: 'KR'
     },
-    paymentMethod: 'card',
+    billingAddress: {
+      recipientName: '홍길동',
+      phone: '010-1234-5678',
+      zipCode: '12345',
+      address: '서울시 강남구 테헤란로 123',
+      detailAddress: '10층',
+      city: '서울',
+      country: 'KR'
+    },
+    orderDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
     id: '2',
     orderNumber: 'ORD-2025-0002',
-    userId: '1',
-    status: 'shipped',
+    buyerId: '1',
+    buyerType: 'customer',
+    buyerName: '홍길동',
+    buyerEmail: 'user@example.com',
+    status: 'shipped' as const,
+    paymentStatus: 'completed' as const,
+    paymentMethod: 'kakao_pay' as const,
+    currency: 'KRW',
     items: [
       {
         id: '3',
-        orderId: '2',
         productId: '3',
+        productName: '블루투스 키보드',
+        productSku: 'KB-BT-001',
+        productImage: 'https://via.placeholder.com/100x100',
         quantity: 1,
-        price: 59000,
-        product: {
-          id: '3',
-          name: '블루투스 키보드',
-          slug: 'bluetooth-keyboard',
-          price: 59000,
-          images: [{ id: '3', url: 'https://via.placeholder.com/100x100', alt: '키보드' }],
-          status: 'published',
-          manageStock: true,
-          stockQuantity: 25
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        unitPrice: 59000,
+        totalPrice: 59000,
+        supplierId: '1',
+        supplierName: '테크 서플라이'
       }
     ],
     summary: {
-      itemCount: 1,
       subtotal: 59000,
       discount: 0,
       shipping: 0,
@@ -109,12 +108,23 @@ const mockOrders: Order[] = [
     },
     shippingAddress: {
       recipientName: '홍길동',
-      recipientPhone: '010-1234-5678',
-      postalCode: '12345',
+      phone: '010-1234-5678',
+      zipCode: '12345',
       address: '서울시 강남구 테헤란로 123',
-      addressDetail: '10층'
+      detailAddress: '10층',
+      city: '서울',
+      country: 'KR'
     },
-    paymentMethod: 'kakao_pay',
+    billingAddress: {
+      recipientName: '홍길동',
+      phone: '010-1234-5678',
+      zipCode: '12345',
+      address: '서울시 강남구 테헤란로 123',
+      detailAddress: '10층',
+      city: '서울',
+      country: 'KR'
+    },
+    orderDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
   }
@@ -130,19 +140,19 @@ const orderTabs = [
 ];
 
 export function OrdersPage() {
-  const { user } = useAuth();
+  const { } = useAuth();
   const queryClient = useQueryClient();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
-  const [dateRange, setDateRange] = useState<{ start?: string; end?: string }>({});
+  const [dateRange] = useState<{ start?: string; end?: string }>({});
 
   // Fetch orders
   const { data: orders = mockOrders, isLoading } = useQuery({
     queryKey: ['orders', { status: activeTab, search: searchTerm, dateRange }],
     queryFn: async () => {
       // TODO: Replace with actual API call
-      // const response = await authClient.get('/api/v1/orders', {
+      // const response = await authClient.api.get('/api/v1/orders', {
       //   params: { status: activeTab !== 'all' ? activeTab : undefined, search: searchTerm, ...dateRange }
       // });
       // return response.data;
@@ -163,7 +173,7 @@ export function OrdersPage() {
         filtered = filtered.filter(order =>
           order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
           order.items.some(item => 
-            item.product.name.toLowerCase().includes(searchTerm.toLowerCase())
+            item.productName.toLowerCase().includes(searchTerm.toLowerCase())
           )
         );
       }
@@ -174,9 +184,9 @@ export function OrdersPage() {
 
   // Cancel order mutation
   const cancelOrderMutation = useMutation({
-    mutationFn: async (orderId: string) => {
+    mutationFn: async () => {
       // TODO: Replace with actual API call
-      // const response = await authClient.post(`/api/v1/orders/${orderId}/cancel`);
+      // const response = await authClient.api.post(`/api/v1/orders/${orderId}/cancel`);
       // return response.data;
       // TODO: Log order cancellation for debugging
       // console.log('Cancel order:', orderId);
@@ -186,19 +196,19 @@ export function OrdersPage() {
     }
   });
 
-  const handleTrackOrder = (orderId: string) => {
+  const handleTrackOrder = () => {
     // TODO: Implement tracking
-    alert(`배송 추적: ${orderId}`);
+    alert('배송 추적');
   };
 
-  const handleReorder = (orderId: string) => {
+  const handleReorder = () => {
     // TODO: Implement reorder
-    alert(`재주문: ${orderId}`);
+    alert('재주문');
   };
 
-  const handleReview = (orderId: string) => {
+  const handleReview = () => {
     // TODO: Navigate to review page
-    alert(`리뷰 작성: ${orderId}`);
+    alert('리뷰 작성');
   };
 
   if (isLoading) {
@@ -240,7 +250,7 @@ export function OrdersPage() {
       </div>
 
       {/* Order Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs defaultValue={activeTab}>
         <TabsList className="w-full justify-start">
           {orderTabs.map(tab => {
             const count = tab.value === 'all' 
@@ -253,7 +263,7 @@ export function OrdersPage() {
                 }).length;
             
             return (
-              <TabsTrigger key={tab.value} value={tab.value}>
+              <TabsTrigger key={tab.value} value={tab.value} onClick={() => setActiveTab(tab.value)}>
                 {tab.label} {count > 0 && `(${count})`}
               </TabsTrigger>
             );
@@ -281,7 +291,7 @@ export function OrdersPage() {
                 <OrderItem
                   key={order.id}
                   order={order}
-                  onCancel={(orderId) => cancelOrderMutation.mutate(orderId)}
+                  onCancel={() => cancelOrderMutation.mutate()}
                   onTrack={handleTrackOrder}
                   onReorder={handleReorder}
                   onReview={handleReview}

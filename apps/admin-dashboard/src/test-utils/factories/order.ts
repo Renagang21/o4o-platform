@@ -7,19 +7,26 @@ export const createMockOrder = (overrides?: Partial<Order>): Order => {
     orderNumber: 'ORD-' + Date.now(),
     status: 'pending' as OrderStatus,
     
-    // Customer info
+    // Admin-specific customer info
     buyerId: 'buyer_' + Math.random().toString(36).substr(2, 9),
     buyerName: 'Test Customer',
     buyerType: 'customer' as const,
     buyerEmail: 'test@example.com',
-    customerId: 'cust_' + Math.random().toString(36).substr(2, 9),
+    customerId: 'customer_' + Math.random().toString(36).substr(2, 9),
     customerName: 'Test Customer',
     customerEmail: 'test@example.com',
     
     // Order date
     orderDate: new Date().toISOString(),
     
-    // Order summary
+    // Direct pricing fields (not in summary)
+    subtotal: 20000,
+    discount: 0,
+    shipping: 3000,
+    tax: 2000,
+    total: 25000,
+    
+    // Base Order fields
     summary: {
       subtotal: 20000,
       discount: 0,
@@ -29,12 +36,6 @@ export const createMockOrder = (overrides?: Partial<Order>): Order => {
     },
     currency: 'KRW',
     
-    // Pricing
-    subtotal: 20000,
-    tax: 2000,
-    shipping: 3000,
-    discount: 0,
-    total: 25000,
     
     // Items
     items: [
@@ -43,30 +44,36 @@ export const createMockOrder = (overrides?: Partial<Order>): Order => {
     
     // Addresses
     billingAddress: {
+      // Admin-specific fields
       firstName: 'Test',
       lastName: 'Customer',
-      recipientName: 'Test Customer',
       address1: '123 Test Street',
+      postalCode: '12345',
+      
+      // Base Address fields
+      recipientName: 'Test Customer',
       address: '123 Test Street',
       detailAddress: 'Apt 101',
       city: 'Seoul',
       state: 'Seoul',
-      postalCode: '12345',
       zipCode: '12345',
       country: 'KR',
       phone: '010-1234-5678',
       email: 'test@example.com',
     },
     shippingAddress: {
+      // Admin-specific fields
       firstName: 'Test',
       lastName: 'Customer',
-      recipientName: 'Test Customer',
       address1: '123 Test Street',
+      postalCode: '12345',
+      
+      // Base Address fields
+      recipientName: 'Test Customer',
       address: '123 Test Street',
       detailAddress: 'Apt 101',
       city: 'Seoul',
       state: 'Seoul',
-      postalCode: '12345',
       zipCode: '12345',
       country: 'KR',
       phone: '010-1234-5678',
@@ -102,6 +109,7 @@ export const createMockOrderItem = (overrides?: Partial<OrderItem>): OrderItem =
     quantity: 2,
     unitPrice: 10000,
     totalPrice: 20000,
+    // Admin-specific fields
     price: 10000,
     total: 20000,
     tax: 2000,
@@ -150,9 +158,9 @@ export const createMockOrders = {
   // 대량 주문
   bulk: () => createMockOrder({
     items: [
-      createMockOrderItem({ quantity: 10, total: 100000 }),
-      createMockOrderItem({ quantity: 5, total: 50000 }),
-      createMockOrderItem({ quantity: 3, total: 30000 }),
+      createMockOrderItem({ quantity: 10, totalPrice: 100000, total: 100000 }),
+      createMockOrderItem({ quantity: 5, totalPrice: 50000, total: 50000 }),
+      createMockOrderItem({ quantity: 3, totalPrice: 30000, total: 30000 }),
     ],
     subtotal: 180000,
     total: 205000,

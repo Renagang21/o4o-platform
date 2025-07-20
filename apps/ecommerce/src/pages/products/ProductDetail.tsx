@@ -1,15 +1,15 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useProduct, useAddToCart } from '@/hooks';
 import { useWishlistStore } from '@/stores';
 import { PriceDisplay } from '@/components/common/PriceDisplay';
 import { StockStatus } from '@/components/common/StockStatus';
 import { ProductReviewSection } from '@/components/review';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Badge } from '@o4o/ui/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui/components/ui/tabs';
-import { Skeleton } from '@o4o/ui/components/ui/skeleton';
-import { Alert, AlertDescription } from '@o4o/ui/components/ui/alert';
+import { Button } from '@o4o/ui';
+import { Badge } from '@o4o/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
+import { Skeleton } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
 import { 
   ShoppingCart, 
   Heart, 
@@ -19,14 +19,12 @@ import {
   TruckIcon,
   AlertCircle
 } from 'lucide-react';
-import { formatCurrency } from '@o4o/utils';
 import { toast } from 'sonner';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 import { useAuth } from '@o4o/auth-context';
 
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: product, isLoading, error } = useProduct(id!);
   const addToCart = useAddToCart();
@@ -42,7 +40,7 @@ export function ProductDetail() {
   if (error || !product) {
     return (
       <div className="container py-8">
-        <Alert variant="destructive">
+        <Alert className="border-destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             상품을 불러오는 중 오류가 발생했습니다.
@@ -57,7 +55,7 @@ export function ProductDetail() {
 
   const handleAddToCart = () => {
     addToCart.mutate(
-      { productId: product.id, quantity },
+      { product, quantity },
       {
         onSuccess: () => {
           toast.success('장바구니에 추가되었습니다.');
@@ -145,7 +143,8 @@ export function ProductDetail() {
           {/* Price */}
           <div className="pb-6 border-b">
             <PriceDisplay
-              pricing={product.pricing}
+              price={product.pricing.customer}
+              priceByRole={product.pricing}
               userRole={user?.role}
               size="lg"
               showSavings
@@ -156,7 +155,11 @@ export function ProductDetail() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">재고 상태</span>
-              <StockStatus inventory={product.inventory} />
+              <StockStatus 
+                stockQuantity={product.inventory.stockQuantity}
+                lowStockThreshold={product.inventory.lowStockThreshold}
+                manageStock={product.inventory.manageStock}
+              />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">상품 코드</span>

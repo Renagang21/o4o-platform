@@ -3,10 +3,9 @@ import {
   Review, 
   ReviewsResponse, 
   ReviewFilters, 
-  CreateReviewDto, 
   UpdateReviewDto,
   ReviewStats
-} from '@o4o/types/ecommerce';
+} from '@o4o/types';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { ApiError } from '@/types/api';
@@ -128,7 +127,7 @@ export const useDeleteReview = () => {
 
   return useMutation({
     mutationFn: api.reviews.deleteReview,
-    onSuccess: (_, reviewId) => {
+    onSuccess: () => {
       // Invalidate all reviews queries
       queryClient.invalidateQueries({ 
         queryKey: ['reviews'] 
@@ -205,7 +204,7 @@ export const useApproveReview = () => {
 
   return useMutation({
     mutationFn: api.reviews.admin.approveReview,
-    onSuccess: (review) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
       toast.success('리뷰가 승인되었습니다.');
     },

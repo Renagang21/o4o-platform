@@ -1,23 +1,21 @@
 import React from 'react';
-import { ReviewFilters, ReviewStatus } from '@o4o/types/ecommerce';
+import { ReviewFilters, ReviewStatus } from '@o4o/types';
 import { ReviewList } from '@/components/review';
-import { Card, CardContent, CardHeader, CardTitle } from '@o4o/ui/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui/components/ui/tabs';
-import { Alert, AlertDescription } from '@o4o/ui/components/ui/alert';
-import { Badge } from '@o4o/ui/components/ui/badge';
-import { Input } from '@o4o/ui/components/ui/input';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Skeleton } from '@o4o/ui/components/ui/skeleton';
-import { AlertCircle, Search, Filter } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@o4o/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
+import { Badge } from '@o4o/ui';
+import { Input } from '@o4o/ui';
+import { Button } from '@o4o/ui';
+import { Skeleton } from '@o4o/ui';
+import { AlertCircle, Search } from 'lucide-react';
 import {
   useAdminReviews,
   useApproveReview,
   useRejectReview,
-  useHideReview,
   useDeleteReview
 } from '@/hooks/useReviews';
 import { toast } from 'sonner';
-import { cn } from '@o4o/ui/lib/utils';
 
 export function ReviewManagement() {
   const [filters, setFilters] = React.useState<ReviewFilters>({
@@ -32,7 +30,6 @@ export function ReviewManagement() {
   // Mutations
   const approveReview = useApproveReview();
   const rejectReview = useRejectReview();
-  const hideReview = useHideReview();
   const deleteReview = useDeleteReview();
 
   const handleTabChange = (status: string) => {
@@ -63,11 +60,6 @@ export function ReviewManagement() {
     }
   };
 
-  const handleHide = (reviewId: string) => {
-    if (confirm('이 리뷰를 숨김 처리하시겠습니까?')) {
-      hideReview.mutate(reviewId);
-    }
-  };
 
   const handleDelete = (reviewId: string) => {
     if (confirm('이 리뷰를 완전히 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
@@ -138,9 +130,9 @@ export function ReviewManagement() {
       </div>
 
       {/* Reviews Tabs */}
-      <Tabs value={filters.status} onValueChange={handleTabChange}>
+      <Tabs defaultValue={filters.status}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value={ReviewStatus.PENDING}>
+          <TabsTrigger value={ReviewStatus.PENDING} onClick={() => handleTabChange(ReviewStatus.PENDING)}>
             대기 중
             {stats.pending > 0 && (
               <Badge variant="secondary" className="ml-2">
@@ -148,9 +140,9 @@ export function ReviewManagement() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value={ReviewStatus.APPROVED}>승인됨</TabsTrigger>
-          <TabsTrigger value={ReviewStatus.REJECTED}>거부됨</TabsTrigger>
-          <TabsTrigger value={ReviewStatus.HIDDEN}>숨김</TabsTrigger>
+          <TabsTrigger value={ReviewStatus.APPROVED} onClick={() => handleTabChange(ReviewStatus.APPROVED)}>승인됨</TabsTrigger>
+          <TabsTrigger value={ReviewStatus.REJECTED} onClick={() => handleTabChange(ReviewStatus.REJECTED)}>거부됨</TabsTrigger>
+          <TabsTrigger value={ReviewStatus.HIDDEN} onClick={() => handleTabChange(ReviewStatus.HIDDEN)}>숨김</TabsTrigger>
         </TabsList>
 
         <TabsContent value={filters.status} className="mt-6">
@@ -166,7 +158,7 @@ export function ReviewManagement() {
                 {reviewsData && reviewsData.reviews.length > 0 ? (
                   <ReviewList
                     reviews={reviewsData}
-                    onEdit={(reviewId) => {
+                    onEdit={() => {
                       // Admin can't edit user reviews
                       toast.error('관리자는 사용자 리뷰를 수정할 수 없습니다.');
                     }}

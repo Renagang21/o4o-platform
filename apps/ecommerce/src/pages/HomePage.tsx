@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@o4o/ui';
 import { ArrowRight, Package, Shield, Truck } from 'lucide-react';
 import { ProductCarousel } from '@/components/product';
-import { Product } from '@o4o/types/ecommerce';
+import { Product } from '@o4o/types';
 
 // Mock data for demo - replace with actual API call
 const mockProducts: Product[] = [
@@ -10,55 +10,166 @@ const mockProducts: Product[] = [
     id: '1',
     name: '프리미엄 무선 헤드폰',
     slug: 'premium-wireless-headphones',
-    price: 89000,
-    compareAtPrice: 129000,
-    stockQuantity: 15,
-    images: [{ id: '1', url: 'https://via.placeholder.com/300x300', alt: '헤드폰' }],
-    featured: true,
-    status: 'published',
-    manageStock: true,
+    sku: 'WH-001',
+    description: '고품질 무선 헤드폰',
+    shortDescription: '프리미엄 사운드',
+    pricing: {
+      customer: 89000,
+      business: 80100,
+      affiliate: 84550,
+      retailer: { gold: 84550, premium: 82000, vip: 80100 }
+    },
+    inventory: {
+      stockQuantity: 15,
+      minOrderQuantity: 1,
+      lowStockThreshold: 5,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'in_stock' as const
+    },
+    images: [{ id: '1', url: 'https://via.placeholder.com/300x300', alt: '헤드폰', sortOrder: 0, isFeatured: true }],
+    categories: [],
+    tags: [],
+    specifications: {},
+    attributes: {},
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.5,
-    reviewCount: 128
-  },
+    reviewCount: 128,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: '1',
+    isFeatured: true,
+    isVirtual: false,
+    isDownloadable: false
+  } as Product,
   {
     id: '2',
     name: '스마트 워치 프로',
     slug: 'smart-watch-pro',
-    price: 259000,
-    compareAtPrice: 299000,
-    stockQuantity: 8,
-    images: [{ id: '2', url: 'https://via.placeholder.com/300x300', alt: '스마트워치' }],
-    featured: true,
-    status: 'published',
-    manageStock: true,
+    sku: 'SW-PRO-001',
+    description: '첨단 기능의 스마트 워치',
+    shortDescription: '프로급 스마트워치',
+    pricing: {
+      customer: 259000,
+      business: 233100,
+      affiliate: 246050,
+      retailer: { gold: 246050, premium: 240000, vip: 233100 }
+    },
+    inventory: {
+      stockQuantity: 8,
+      minOrderQuantity: 1,
+      lowStockThreshold: 3,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'in_stock' as const
+    },
+    images: [{ id: '2', url: 'https://via.placeholder.com/300x300', alt: '스마트워치', sortOrder: 0, isFeatured: true }],
+    categories: [],
+    tags: [],
+    specifications: {},
+    attributes: {},
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.8,
-    reviewCount: 89
-  },
+    reviewCount: 89,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: '1',
+    isFeatured: true,
+    isVirtual: false,
+    isDownloadable: false
+  } as Product,
   {
     id: '3',
     name: '블루투스 키보드',
     slug: 'bluetooth-keyboard',
-    price: 59000,
-    stockQuantity: 25,
-    images: [{ id: '3', url: 'https://via.placeholder.com/300x300', alt: '키보드' }],
-    status: 'published',
-    manageStock: true,
+    sku: 'KB-BT-001',
+    description: '무선 블루투스 키보드',
+    shortDescription: '휴대용 키보드',
+    pricing: {
+      customer: 59000,
+      business: 53100,
+      affiliate: 56050,
+      retailer: { gold: 56050, premium: 54280, vip: 53100 }
+    },
+    inventory: {
+      stockQuantity: 25,
+      minOrderQuantity: 1,
+      lowStockThreshold: 5,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'in_stock' as const
+    },
+    images: [{ id: '3', url: 'https://via.placeholder.com/300x300', alt: '키보드', sortOrder: 0, isFeatured: true }],
+    categories: [],
+    tags: [],
+    specifications: {},
+    attributes: {},
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.2,
-    reviewCount: 45
-  },
+    reviewCount: 45,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: '1',
+    isFeatured: false,
+    isVirtual: false,
+    isDownloadable: false
+  } as Product,
   {
     id: '4',
     name: '휴대용 충전기',
     slug: 'portable-charger',
-    price: 35000,
-    compareAtPrice: 45000,
-    stockQuantity: 0,
-    images: [{ id: '4', url: 'https://via.placeholder.com/300x300', alt: '충전기' }],
-    status: 'published',
-    manageStock: true,
+    sku: 'PC-001',
+    description: '대용량 휴대용 충전기',
+    shortDescription: '10000mAh 보조배터리',
+    pricing: {
+      customer: 35000,
+      business: 31500,
+      affiliate: 33250,
+      retailer: { gold: 33250, premium: 32200, vip: 31500 }
+    },
+    inventory: {
+      stockQuantity: 0,
+      minOrderQuantity: 1,
+      lowStockThreshold: 5,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'out_of_stock' as const
+    },
+    images: [{ id: '4', url: 'https://via.placeholder.com/300x300', alt: '충전기', sortOrder: 0, isFeatured: true }],
+    categories: [],
+    tags: [],
+    specifications: {},
+    attributes: {},
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.6,
-    reviewCount: 234
-  }
+    reviewCount: 234,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: '1',
+    isFeatured: false,
+    isVirtual: false,
+    isDownloadable: false
+  } as Product
 ];
 
 export function HomePage() {

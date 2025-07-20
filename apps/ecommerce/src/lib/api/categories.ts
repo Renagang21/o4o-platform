@@ -1,5 +1,5 @@
 import { authClient } from '@o4o/auth-client';
-import { Category } from '@o4o/types/ecommerce';
+import { Category } from '@o4o/types';
 
 export const categoriesApi = {
   // Get all categories

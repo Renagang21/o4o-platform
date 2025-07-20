@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Checkbox, RadioGroup, RadioGroupItem, Label, Slider, Button } from '@o4o/ui';
-import { formatCurrency } from '@o4o/utils/format';
+import { formatCurrency } from '@o4o/utils';
 import { cn } from '@o4o/utils';
 
 interface ProductFiltersProps {
@@ -123,8 +123,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <h4 className="font-medium text-sm">가격대</h4>
         <div className="px-2">
           <Slider
-            value={currentPriceRange}
-            onValueChange={onPriceRangeChange}
+            value={currentPriceRange[1]}
+            onChange={(e) => onPriceRangeChange([currentPriceRange[0], parseInt(e.target.value)])}
             min={priceRange.min}
             max={priceRange.max}
             step={1000}

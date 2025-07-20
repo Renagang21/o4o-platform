@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
-import { Product } from '@o4o/types/ecommerce';
-import { formatCurrency } from '@o4o/utils/format';
+import { Product } from '@o4o/types';
+import { formatCurrency } from '@o4o/utils';
 import { cn } from '@o4o/utils';
 
 interface ProductCarouselProps {
@@ -30,7 +30,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-play functionality
   useEffect(() => {
@@ -143,8 +143,10 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
 };
 
 const CarouselCard: React.FC<{ product: Product }> = ({ product }) => {
-  const discount = product.compareAtPrice && product.compareAtPrice > product.price
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+  const customerPrice = product.pricing?.customer || 0;
+  const compareAtPrice = (product as any).compareAtPrice || 0;
+  const discount = compareAtPrice > customerPrice
+    ? Math.round(((compareAtPrice - customerPrice) / compareAtPrice) * 100)
     : 0;
 
   return (
@@ -172,7 +174,7 @@ const CarouselCard: React.FC<{ product: Product }> = ({ product }) => {
                 -{discount}%
               </span>
             )}
-            {product.featured && (
+            {product.isFeatured && (
               <span className="block px-2 py-1 text-xs font-medium bg-yellow-400 text-yellow-900 rounded">
                 추천
               </span>
@@ -189,17 +191,17 @@ const CarouselCard: React.FC<{ product: Product }> = ({ product }) => {
           {/* Price */}
           <div className="flex items-center space-x-2">
             <span className="text-base font-semibold">
-              {formatCurrency(product.price)}
+              {formatCurrency(customerPrice)}
             </span>
-            {product.compareAtPrice && product.compareAtPrice > product.price && (
+            {compareAtPrice > customerPrice && (
               <span className="text-sm text-muted-foreground line-through">
-                {formatCurrency(product.compareAtPrice)}
+                {formatCurrency(compareAtPrice)}
               </span>
             )}
           </div>
 
           {/* Stock Status */}
-          {product.stockQuantity === 0 && (
+          {product.inventory?.stockQuantity === 0 && (
             <span className="inline-block mt-2 px-2 py-1 text-xs font-medium bg-muted text-muted-foreground rounded">
               품절
             </span>

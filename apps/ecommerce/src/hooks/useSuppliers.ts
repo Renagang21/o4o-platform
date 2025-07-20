@@ -2,10 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   SupplierProfile,
   SupplierPublicProfile,
-  SupplierProfileFormData,
   SupplierStats,
   ProductFilters
-} from '@o4o/types/ecommerce';
+} from '@o4o/types';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { ApiError } from '@/types/api';

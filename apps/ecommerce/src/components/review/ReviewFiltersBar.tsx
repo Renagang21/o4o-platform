@@ -1,15 +1,14 @@
-import React from 'react';
-import { ReviewFilters } from '@o4o/types/ecommerce';
+import type { ReviewFilters } from '@o4o/types';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@o4o/ui/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@o4o/ui/components/ui/toggle-group';
+} from '@o4o/ui';
+import { ToggleGroup, ToggleGroupItem } from '@o4o/ui';
 import { Star, CheckCircle } from 'lucide-react';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 
 interface ReviewFiltersBarProps {
   filters: ReviewFilters;
@@ -57,7 +56,7 @@ export function ReviewFiltersBar({
         {/* Sort */}
         <Select
           value={filters.sort || 'recent'}
-          onValueChange={handleSortChange}
+          onChange={(e) => handleSortChange(e.target.value)}
         >
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -76,7 +75,7 @@ export function ReviewFiltersBar({
         <ToggleGroup
           type="single"
           value={filters.rating?.toString() || 'all'}
-          onValueChange={handleRatingFilter}
+          onValueChange={(value) => handleRatingFilter(typeof value === 'string' ? value : value[0] || '')}
         >
           <ToggleGroupItem value="all" className="gap-1">
             전체
@@ -97,7 +96,7 @@ export function ReviewFiltersBar({
         <ToggleGroup
           type="single"
           value={filters.verified === true ? 'verified' : 'all'}
-          onValueChange={handleVerifiedFilter}
+          onValueChange={(value) => handleVerifiedFilter(typeof value === 'string' ? value : value[0] || '')}
         >
           <ToggleGroupItem value="all">
             모든 리뷰

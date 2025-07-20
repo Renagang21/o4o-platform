@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ProductFilters } from '@o4o/types/ecommerce';
+import { ProductFilters } from '@o4o/types';
 
 interface ProductFiltersStore extends ProductFilters {
   // Setters
@@ -58,8 +58,8 @@ export const useProductFiltersStore = create<ProductFiltersStore>((set, get) => 
     if (state.inStock) params.inStock = state.inStock;
     if (state.featured) params.featured = state.featured;
     if (state.sort && state.sort !== 'newest') params.sort = state.sort;
-    if (state.page > 1) params.page = state.page;
-    if (state.limit !== 20) params.limit = state.limit;
+    if (state.page && state.page > 1) params.page = state.page;
+    if (state.limit && state.limit !== 20) params.limit = state.limit;
     
     return params;
   }

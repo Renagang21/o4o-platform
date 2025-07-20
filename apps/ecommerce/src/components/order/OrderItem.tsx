@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Truck, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
 import { Button, Badge } from '@o4o/ui';
-import { Order } from '@o4o/types/ecommerce';
-import { formatCurrency, formatDate } from '@o4o/utils/format';
+import { Order } from '@o4o/types';
+import { formatCurrency, formatDate } from '@o4o/utils';
 import { cn } from '@o4o/utils';
 
 interface OrderItemProps {
@@ -22,6 +22,7 @@ const orderStatusConfig = {
   shipped: { label: '배송 중', color: 'bg-purple-100 text-purple-800', icon: Truck },
   delivered: { label: '배송 완료', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   cancelled: { label: '주문 취소', color: 'bg-red-100 text-red-800', icon: XCircle },
+  returned: { label: '반품', color: 'bg-gray-100 text-gray-800', icon: RefreshCw },
   refunded: { label: '환불 완료', color: 'bg-gray-100 text-gray-800', icon: RefreshCw }
 };
 
@@ -50,7 +51,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({
             주문번호: {order.orderNumber}
           </Link>
           <p className="text-sm text-muted-foreground">
-            {formatDate(order.createdAt, { format: 'long' })}
+            {formatDate(order.createdAt, 'long')}
           </p>
         </div>
         
@@ -64,10 +65,10 @@ export const OrderItem: React.FC<OrderItemProps> = ({
       <div className="space-y-2">
         {order.items.slice(0, 2).map(item => (
           <div key={item.id} className="flex items-center gap-3">
-            {item.product.images && item.product.images[0] ? (
+            {item.productImage ? (
               <img
-                src={item.product.images[0].url}
-                alt={item.product.name}
+                src={item.productImage}
+                alt={item.productName}
                 className="w-12 h-12 object-cover rounded"
               />
             ) : (
@@ -77,9 +78,9 @@ export const OrderItem: React.FC<OrderItemProps> = ({
             )}
             
             <div className="flex-1">
-              <p className="text-sm font-medium line-clamp-1">{item.product.name}</p>
+              <p className="text-sm font-medium line-clamp-1">{item.productName}</p>
               <p className="text-sm text-muted-foreground">
-                {formatCurrency(item.price)} x {item.quantity}개
+                {formatCurrency(item.unitPrice)} x {item.quantity}개
               </p>
             </div>
           </div>
@@ -96,7 +97,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({
       <div className="pt-2 border-t">
         <div className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            총 {order.summary.itemCount}개 상품
+            총 {order.items.length}개 상품
           </p>
           <p className="font-semibold">
             {formatCurrency(order.summary.total)}

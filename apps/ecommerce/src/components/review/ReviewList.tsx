@@ -1,11 +1,10 @@
-import React from 'react';
-import { ReviewsResponse, ReviewFilters } from '@o4o/types/ecommerce';
+import { ReviewsResponse, ReviewFilters } from '@o4o/types';
 import { ReviewItem } from './ReviewItem';
 import { ReviewFiltersBar } from './ReviewFiltersBar';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Skeleton } from '@o4o/ui/components/ui/skeleton';
+import { Button } from '@o4o/ui';
+import { Skeleton } from '@o4o/ui';
 import { AlertCircle } from 'lucide-react';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 
 interface ReviewListProps {
   reviews?: ReviewsResponse;

@@ -6,17 +6,19 @@ import {
   OrderStatus as BaseOrderStatus,
   Category as BaseCategory,
   ProductStatus as BaseProductStatus,
+  ProductDimensions,
   PaymentStatus,
-  Address as BaseAddress
+  PaymentMethod,
+  Address as BaseAddress,
+  ProductImage
 } from '@o4o/types'
 
 // Re-export common types
-export type {
-  PaymentStatus
-} from '@o4o/types'
+export type { PaymentStatus }
+export type { PaymentMethod }
 
 // Admin-specific enums and types
-export type ProductStatus = BaseProductStatus | 'private' | 'trash'
+export type ProductStatus = BaseProductStatus | 'private' | 'trash' | 'published'
 export type ProductType = 'simple' | 'variable' | 'grouped' | 'external'
 
 // Admin-specific Product interface extending base
@@ -38,6 +40,7 @@ export interface Product extends Omit<BaseProduct, 'status' | 'pricing' | 'inven
   lowStockThreshold?: number
   stockStatus: 'instock' | 'outofstock' | 'onbackorder'
   weight?: number
+  dimensions?: ProductDimensions
   
   featured: boolean
   virtual: boolean
@@ -61,15 +64,7 @@ export interface Product extends Omit<BaseProduct, 'status' | 'pricing' | 'inven
   reviewCount: number
 }
 
-export interface ProductImage {
-  id: string
-  url: string
-  alt: string
-  title?: string
-  caption?: string
-  sortOrder: number
-  isFeatured: boolean
-}
+// ProductImage is imported from @o4o/types
 
 export interface ProductCategory extends BaseCategory {
   image?: string

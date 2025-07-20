@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Cart, CartItem, Product } from '@o4o/types/ecommerce';
+import { Cart, CartItem, Product } from '@o4o/types';
 import { authClient } from '@o4o/auth-client';
 
 interface CartStore {
@@ -47,7 +47,7 @@ export const useCartStore = create<CartStore>()(
         optimisticAddToCart(product, quantity);
         
         try {
-          const response = await authClient.api.post('/cart/items', {
+          await authClient.api.post('/cart/items', {
             productId: product.id,
             quantity
           });
@@ -124,6 +124,13 @@ export const useCartStore = create<CartStore>()(
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             }],
+            summary: {
+              subtotal: product.pricing.customer * quantity,
+              discount: 0,
+              shipping: 0,
+              tax: 0,
+              total: product.pricing.customer * quantity
+            },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };

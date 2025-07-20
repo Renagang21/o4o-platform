@@ -1,13 +1,13 @@
 import React from 'react';
-import { Product, ReviewFilters, CreateReviewDto, UpdateReviewDto } from '@o4o/types/ecommerce';
+import { Product, ReviewFilters, CreateReviewDto, UpdateReviewDto } from '@o4o/types';
 import { ReviewStats } from './ReviewStats';
 import { ReviewList } from './ReviewList';
 import { ReviewForm } from './ReviewForm';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@o4o/ui/components/ui/dialog';
-import { Alert, AlertDescription } from '@o4o/ui/components/ui/alert';
-import { Skeleton } from '@o4o/ui/components/ui/skeleton';
+import { Button } from '@o4o/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
+import { Skeleton } from '@o4o/ui';
 import { PenSquare, AlertCircle } from 'lucide-react';
 import {
   useProductReviews,
@@ -21,7 +21,7 @@ import {
 } from '@/hooks/useReviews';
 import { useAuth } from '@o4o/auth-context';
 import { toast } from 'sonner';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 
 interface ProductReviewSectionProps {
   product: Product;

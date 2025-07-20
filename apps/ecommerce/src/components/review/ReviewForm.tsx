@@ -2,14 +2,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CreateReviewDto, Review } from '@o4o/types/ecommerce';
+import { CreateReviewDto, Review } from '@o4o/types';
 import { ReviewRating } from './ReviewRating';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Textarea } from '@o4o/ui/components/ui/textarea';
-import { Input } from '@o4o/ui/components/ui/input';
-import { Label } from '@o4o/ui/components/ui/label';
+import { Button } from '@o4o/ui';
+import { Textarea } from '@o4o/ui';
+import { Input } from '@o4o/ui';
+import { Label } from '@o4o/ui';
 import { ImagePlus, X } from 'lucide-react';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 
 const reviewSchema = z.object({
   rating: z.number().min(1, '평점을 선택해주세요').max(5),

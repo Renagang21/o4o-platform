@@ -6,20 +6,20 @@ import {
   SupplierStats,
   ProductsResponse,
   ProductFilters
-} from '@o4o/types/ecommerce';
+} from '@o4o/types';
 
 const API_URL = '/api/v1/suppliers';
 
 export const suppliersApi = {
   // Get public supplier profile by slug
   getPublicProfile: async (slug: string): Promise<SupplierPublicProfile> => {
-    const response = await authClient.get<SupplierPublicProfile>(`${API_URL}/shop/${slug}`);
+    const response = await authClient.api.get<SupplierPublicProfile>(`${API_URL}/shop/${slug}`);
     return response.data;
   },
 
   // Get supplier's public products
   getPublicProducts: async (supplierId: string, filters?: ProductFilters): Promise<ProductsResponse> => {
-    const response = await authClient.get<ProductsResponse>(`${API_URL}/${supplierId}/products`, {
+    const response = await authClient.api.get<ProductsResponse>(`${API_URL}/${supplierId}/products`, {
       params: filters
     });
     return response.data;
@@ -27,13 +27,13 @@ export const suppliersApi = {
 
   // Get current supplier's profile (authenticated)
   getMyProfile: async (): Promise<SupplierProfile> => {
-    const response = await authClient.get<SupplierProfile>(`${API_URL}/profile`);
+    const response = await authClient.api.get<SupplierProfile>(`${API_URL}/profile`);
     return response.data;
   },
 
   // Update supplier profile
   updateProfile: async (data: SupplierProfileFormData): Promise<SupplierProfile> => {
-    const response = await authClient.put<SupplierProfile>(`${API_URL}/profile`, data);
+    const response = await authClient.api.put<SupplierProfile>(`${API_URL}/profile`, data);
     return response.data;
   },
 
@@ -42,7 +42,7 @@ export const suppliersApi = {
     const formData = new FormData();
     formData.append('logo', file);
 
-    const response = await authClient.post<{ url: string }>(`${API_URL}/profile/logo`, formData, {
+    const response = await authClient.api.post<{ url: string }>(`${API_URL}/profile/logo`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -56,7 +56,7 @@ export const suppliersApi = {
     const formData = new FormData();
     formData.append('banner', file);
 
-    const response = await authClient.post<{ url: string }>(`${API_URL}/profile/banner`, formData, {
+    const response = await authClient.api.post<{ url: string }>(`${API_URL}/profile/banner`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -67,19 +67,19 @@ export const suppliersApi = {
 
   // Get supplier statistics
   getStats: async (): Promise<SupplierStats> => {
-    const response = await authClient.get<SupplierStats>(`${API_URL}/stats`);
+    const response = await authClient.api.get<SupplierStats>(`${API_URL}/stats`);
     return response.data;
   },
 
   // Check if slug is available
   checkSlugAvailability: async (slug: string): Promise<{ available: boolean }> => {
-    const response = await authClient.get<{ available: boolean }>(`${API_URL}/check-slug/${slug}`);
+    const response = await authClient.api.get<{ available: boolean }>(`${API_URL}/check-slug/${slug}`);
     return response.data;
   },
 
   // Generate slug from store name
   generateSlug: async (storeName: string): Promise<{ slug: string }> => {
-    const response = await authClient.post<{ slug: string }>(`${API_URL}/generate-slug`, { storeName });
+    const response = await authClient.api.post<{ slug: string }>(`${API_URL}/generate-slug`, { storeName });
     return response.data;
   }
 };

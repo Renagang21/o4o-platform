@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Category } from '@o4o/types/ecommerce';
+import { Category } from '@o4o/types';
 import { api } from '@/lib/api';
 
 // Fetch all categories

@@ -34,7 +34,14 @@
       "@o4o/auth-context": ["../../packages/auth-context/src"]
     }
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "../../packages/types/src/**/*",
+    "../../packages/ui/src/**/*",
+    "../../packages/utils/src/**/*",
+    "../../packages/auth-client/src/**/*",
+    "../../packages/auth-context/src/**/*"
+  ],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

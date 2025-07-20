@@ -1,7 +1,7 @@
 import React from 'react';
-import { Review } from '@o4o/types/ecommerce';
+import { Review } from '@o4o/types';
 import { ReviewRating } from './ReviewRating';
-import { Button } from '@o4o/ui/components/ui/button';
+import { Button } from '@o4o/ui';
 import { 
   ThumbsUp, 
   ThumbsDown, 
@@ -16,9 +16,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@o4o/ui/components/ui/dropdown-menu';
+} from '@o4o/ui';
 import { formatDate } from '@o4o/utils';
-import { cn } from '@o4o/ui/lib/utils';
+import { cn } from '@o4o/utils';
 import { useAuth } from '@o4o/auth-context';
 
 interface ReviewItemProps {

@@ -3,75 +3,93 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Input, Card, Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
 import { ShoppingCart, Heart, Share2, ChevronLeft, ChevronRight, Package, Truck, Shield, Star } from 'lucide-react';
-import { Product } from '@o4o/types/ecommerce';
+import { Product } from '@o4o/types';
 import { PriceDisplay, StockStatus } from '@/components/common';
 import { ProductGrid } from '@/components/product';
 import { ProductReviewSection } from '@/components/review';
 import { useAuth } from '@o4o/auth-context';
-import { authClient } from '@o4o/auth-client';
-import { formatCurrency } from '@o4o/utils/format';
 
 // Mock data - replace with actual API call
 const mockProduct: Product = {
   id: '1',
   name: '프리미엄 무선 헤드폰',
   slug: 'premium-wireless-headphones',
+  sku: 'WH-001',
   description: '최고급 사운드와 노이즈 캔슬링 기능을 갖춘 프리미엄 헤드폰입니다. 장시간 착용해도 편안한 인체공학적 디자인과 함께 최대 30시간의 배터리 수명을 제공합니다.',
-  price: 89000,
-  compareAtPrice: 129000,
-  stockQuantity: 15,
-  categories: [{ id: '1', name: '전자제품', slug: 'electronics' }],
+  shortDescription: '프리미엄 무선 헤드폰',
+  pricing: {
+    customer: 89000,
+    business: 80100,
+    affiliate: 84550,
+    retailer: {
+      gold: 84550,
+      premium: 82000,
+      vip: 80100
+    }
+  },
+  inventory: {
+    stockQuantity: 15,
+    minOrderQuantity: 1,
+    lowStockThreshold: 5,
+    manageStock: true,
+    allowBackorder: false,
+    stockStatus: 'in_stock' as const
+  },
+  categories: ['1'], // category IDs
+  tags: ['무선', '노이즈캔슬링', '블루투스'],
   images: [
-    { id: '1', url: 'https://via.placeholder.com/600x600', alt: '헤드폰 정면' },
-    { id: '2', url: 'https://via.placeholder.com/600x600', alt: '헤드폰 측면' },
-    { id: '3', url: 'https://via.placeholder.com/600x600', alt: '헤드폰 착용' }
+    { 
+      id: '1', 
+      url: 'https://via.placeholder.com/600x600', 
+      alt: '헤드폰 정면',
+      sortOrder: 0,
+      isFeatured: true
+    },
+    { 
+      id: '2', 
+      url: 'https://via.placeholder.com/600x600', 
+      alt: '헤드폰 측면',
+      sortOrder: 1,
+      isFeatured: false
+    },
+    { 
+      id: '3', 
+      url: 'https://via.placeholder.com/600x600', 
+      alt: '헤드폰 착용',
+      sortOrder: 2,
+      isFeatured: false
+    }
   ],
-  featured: true,
-  status: 'published',
-  manageStock: true,
+  featuredImageUrl: 'https://via.placeholder.com/600x600',
+  isFeatured: true,
+  status: 'active' as const,
+  approvalStatus: 'approved' as const,
+  supplierId: '1',
+  supplierName: '테크 서플라이',
+  specifications: {
+    '색상': '블랙',
+    '연결방식': '블루투스 5.0',
+    '배터리': '최대 30시간',
+    '충전시간': '2시간'
+  },
+  attributes: {},
+  viewCount: 0,
+  salesCount: 0,
   rating: 4.5,
   reviewCount: 128,
-  tags: ['무선', '노이즈캔슬링', '블루투스'],
-  attributes: [
-    { name: '색상', value: '블랙' },
-    { name: '연결방식', value: '블루투스 5.0' },
-    { name: '배터리', value: '최대 30시간' },
-    { name: '충전시간', value: '2시간' }
-  ]
+  isVirtual: false,
+  isDownloadable: false,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  createdBy: 'admin'
 };
 
-const relatedProducts: Product[] = [
-  {
-    id: '2',
-    name: '스마트 워치 프로',
-    slug: 'smart-watch-pro',
-    price: 259000,
-    compareAtPrice: 299000,
-    stockQuantity: 8,
-    images: [{ id: '2', url: 'https://via.placeholder.com/300x300', alt: '스마트워치' }],
-    status: 'published',
-    manageStock: true,
-    rating: 4.8,
-    reviewCount: 89
-  },
-  {
-    id: '3',
-    name: '블루투스 키보드',
-    slug: 'bluetooth-keyboard',
-    price: 59000,
-    stockQuantity: 25,
-    images: [{ id: '3', url: 'https://via.placeholder.com/300x300', alt: '키보드' }],
-    status: 'published',
-    manageStock: true,
-    rating: 4.2,
-    reviewCount: 45
-  }
-];
+const relatedProducts: Product[] = [];
 
 export function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { } = useAuth();
   
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -82,14 +100,14 @@ export function ProductDetailPage() {
     queryKey: ['product', id],
     queryFn: async () => {
       // TODO: Replace with actual API call
-      // const response = await authClient.get(`/api/v1/products/${id}`);
+      // const response = await authClient.api.get(`/api/v1/products/${id}`);
       // return response.data;
       return mockProduct;
     }
   });
 
   const handleQuantityChange = (value: number) => {
-    if (value >= 1 && value <= product.stockQuantity) {
+    if (value >= 1 && value <= product.inventory.stockQuantity) {
       setQuantity(value);
     }
   };
@@ -232,8 +250,7 @@ export function ProductDetailPage() {
 
             {/* Price */}
             <PriceDisplay
-              price={product.price}
-              compareAtPrice={product.compareAtPrice}
+              price={product.pricing.customer}
               size="xl"
               showSavings
             />
@@ -241,18 +258,18 @@ export function ProductDetailPage() {
 
           {/* Stock Status */}
           <StockStatus
-            stockQuantity={product.stockQuantity}
-            manageStock={product.manageStock}
+            stockQuantity={product.inventory.stockQuantity}
+            manageStock={product.inventory.manageStock}
             showQuantity
           />
 
           {/* Options */}
-          {product.attributes && product.attributes.length > 0 && (
+          {product.attributes && Object.keys(product.attributes).length > 0 && (
             <div className="space-y-4">
-              {product.attributes.map((attr) => (
-                <div key={attr.name}>
-                  <label className="text-sm font-medium mb-1 block">{attr.name}</label>
-                  <div className="font-medium">{attr.value}</div>
+              {Object.entries(product.attributes).map(([key, value]) => (
+                <div key={key}>
+                  <label className="text-sm font-medium mb-1 block">{key}</label>
+                  <div className="font-medium">{value}</div>
                 </div>
               ))}
             </div>
@@ -277,18 +294,18 @@ export function ProductDetailPage() {
                   onChange={(e) => handleQuantityChange(Number(e.target.value))}
                   className="w-20 text-center"
                   min={1}
-                  max={product.stockQuantity}
+                  max={product.inventory.stockQuantity}
                 />
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= product.stockQuantity}
+                  disabled={quantity >= product.inventory.stockQuantity}
                 >
                   +
                 </Button>
                 <span className="text-sm text-muted-foreground ml-2">
-                  (재고: {product.stockQuantity}개)
+                  (재고: {product.inventory.stockQuantity}개)
                 </span>
               </div>
             </div>
@@ -296,7 +313,7 @@ export function ProductDetailPage() {
             <div className="flex gap-2">
               <Button
                 onClick={handleAddToCart}
-                disabled={product.stockQuantity === 0}
+                disabled={product.inventory.stockQuantity === 0}
                 className="flex-1"
                 size="lg"
               >
@@ -305,7 +322,7 @@ export function ProductDetailPage() {
               </Button>
               <Button
                 onClick={handleBuyNow}
-                disabled={product.stockQuantity === 0}
+                disabled={product.inventory.stockQuantity === 0}
                 variant="default"
                 size="lg"
               >
@@ -362,8 +379,8 @@ export function ProductDetailPage() {
             <h3 className="text-lg font-semibold mb-4">상품 설명</h3>
             <div className="prose max-w-none">
               <p>{product.description}</p>
-              {product.longDescription && (
-                <div dangerouslySetInnerHTML={{ __html: product.longDescription }} />
+              {product.description && (
+                <div dangerouslySetInnerHTML={{ __html: product.description }} />
               )}
             </div>
           </Card>
@@ -372,13 +389,13 @@ export function ProductDetailPage() {
         <TabsContent value="specs" className="mt-6">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">상품 사양</h3>
-            {product.attributes && product.attributes.length > 0 ? (
+            {product.attributes && Object.keys(product.attributes).length > 0 ? (
               <table className="w-full">
                 <tbody>
-                  {product.attributes.map((attr, index) => (
-                    <tr key={attr.name} className={index % 2 === 0 ? 'bg-muted/50' : ''}>
-                      <td className="py-2 px-4 font-medium">{attr.name}</td>
-                      <td className="py-2 px-4">{attr.value}</td>
+                  {Object.entries(product.attributes).map(([key, value], index) => (
+                    <tr key={key} className={index % 2 === 0 ? 'bg-muted/50' : ''}>
+                      <td className="py-2 px-4 font-medium">{key}</td>
+                      <td className="py-2 px-4">{value}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -400,9 +417,8 @@ export function ProductDetailPage() {
         <ProductGrid
           products={relatedProducts}
           columns={4}
-          onAddToCart={(productId) => {
+          onAddToCart={() => {
             // TODO: Implement add to cart
-            // addToCart(productId, 1);
           }}
         />
       </div>

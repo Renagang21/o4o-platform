@@ -1,7 +1,7 @@
 import { authClient } from '@o4o/auth-client';
-import { Order, OrderFilters, OrdersResponse, EcommerceApiResponse } from '@o4o/types/ecommerce';
+import { Order, OrderFilters, OrdersResponse, EcommerceApiResponse } from '@o4o/types';
 
-interface CreateOrderData {
+export interface CreateOrderData {
   items?: Array<{
     productId: string;
     quantity: number;

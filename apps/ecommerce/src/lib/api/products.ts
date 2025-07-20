@@ -1,5 +1,5 @@
 import { authClient } from '@o4o/auth-client';
-import { Product, ProductFilters, ProductsResponse, EcommerceApiResponse, ReviewsResponse } from '@o4o/types/ecommerce';
+import { Product, ProductFilters, ProductsResponse, EcommerceApiResponse, ReviewsResponse } from '@o4o/types';
 
 export const productsApi = {
   // Get all products with filters

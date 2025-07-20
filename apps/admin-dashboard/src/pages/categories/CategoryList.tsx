@@ -39,11 +39,11 @@ const CategoryList: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Fetch categories
-  const { data: categories = [], isLoading } = useQuery({
+  const { data: categories = [], isLoading } = useQuery<AdminCategory[]>({
     queryKey: ['categories'],
     queryFn: async () => {
       const response = await authClient.api.get('/categories')
-      return response.data
+      return response.data as AdminCategory[]
     }
   })
 

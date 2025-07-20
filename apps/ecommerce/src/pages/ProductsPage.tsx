@@ -3,10 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Input, Button, Select, Card } from '@o4o/ui';
 import { Search, Filter, Grid, List } from 'lucide-react';
-import { Product, ProductFilters } from '@o4o/types/ecommerce';
+import { Product } from '@o4o/types';
 import { ProductGrid } from '@/components/product';
-import { useAuth } from '@o4o/auth-context';
-import { authClient } from '@o4o/auth-client';
 
 // Mock data - replace with actual API call
 const mockProducts: Product[] = [
@@ -14,47 +12,157 @@ const mockProducts: Product[] = [
     id: '1',
     name: '프리미엄 무선 헤드폰',
     slug: 'premium-wireless-headphones',
+    sku: 'WH-001',
     description: '최고급 사운드와 노이즈 캔슬링 기능을 갖춘 프리미엄 헤드폰',
-    price: 89000,
-    compareAtPrice: 129000,
-    stockQuantity: 15,
-    categories: [{ id: '1', name: '전자제품', slug: 'electronics' }],
-    images: [{ id: '1', url: 'https://via.placeholder.com/400x400', alt: '헤드폰' }],
-    featured: true,
-    status: 'published',
-    manageStock: true,
+    shortDescription: '프리미엄 무선 헤드폰',
+    pricing: {
+      customer: 89000,
+      business: 80100,
+      affiliate: 84550,
+      retailer: {
+        gold: 84550,
+        premium: 82000,
+        vip: 80100
+      }
+    },
+    inventory: {
+      stockQuantity: 15,
+      minOrderQuantity: 1,
+      lowStockThreshold: 5,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'in_stock' as const
+    },
+    categories: ['1'], // category IDs
+    tags: [],
+    images: [{
+      id: '1',
+      url: 'https://via.placeholder.com/400x400',
+      alt: '헤드폰',
+      sortOrder: 0,
+      isFeatured: true
+    }],
+    featuredImageUrl: 'https://via.placeholder.com/400x400',
+    isFeatured: true,
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    specifications: {},
+    attributes: {},
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.5,
-    reviewCount: 128
+    reviewCount: 128,
+    isVirtual: false,
+    isDownloadable: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'admin'
   },
   {
     id: '2',
     name: '스마트 워치 프로',
     slug: 'smart-watch-pro',
+    sku: 'SW-PRO-001',
     description: '건강 관리와 피트니스 추적을 위한 스마트 워치',
-    price: 259000,
-    compareAtPrice: 299000,
-    stockQuantity: 8,
-    categories: [{ id: '1', name: '전자제품', slug: 'electronics' }],
-    images: [{ id: '2', url: 'https://via.placeholder.com/400x400', alt: '스마트워치' }],
-    featured: true,
-    status: 'published',
-    manageStock: true,
+    shortDescription: '스마트 워치',
+    pricing: {
+      customer: 259000,
+      business: 233100,
+      affiliate: 246050,
+      retailer: {
+        gold: 246050,
+        premium: 238780,
+        vip: 233100
+      }
+    },
+    inventory: {
+      stockQuantity: 8,
+      minOrderQuantity: 1,
+      lowStockThreshold: 3,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'in_stock' as const
+    },
+    categories: ['1'], // category IDs
+    tags: [],
+    images: [{
+      id: '2',
+      url: 'https://via.placeholder.com/400x400',
+      alt: '스마트워치',
+      sortOrder: 0,
+      isFeatured: true
+    }],
+    featuredImageUrl: 'https://via.placeholder.com/400x400',
+    isFeatured: true,
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    specifications: {},
+    attributes: {},
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.8,
-    reviewCount: 89
+    reviewCount: 89,
+    isVirtual: false,
+    isDownloadable: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'admin'
   },
   {
     id: '3',
     name: '블루투스 키보드',
     slug: 'bluetooth-keyboard',
+    sku: 'KB-BT-001',
     description: '편안한 타이핑을 위한 인체공학적 블루투스 키보드',
-    price: 59000,
-    stockQuantity: 25,
-    categories: [{ id: '2', name: '컴퓨터 액세서리', slug: 'computer-accessories' }],
-    images: [{ id: '3', url: 'https://via.placeholder.com/400x400', alt: '키보드' }],
-    status: 'published',
-    manageStock: true,
+    shortDescription: '블루투스 키보드',
+    pricing: {
+      customer: 59000,
+      business: 53100,
+      affiliate: 56050,
+      retailer: {
+        gold: 56050,
+        premium: 54280,
+        vip: 53100
+      }
+    },
+    inventory: {
+      stockQuantity: 25,
+      minOrderQuantity: 1,
+      lowStockThreshold: 5,
+      manageStock: true,
+      allowBackorder: false,
+      stockStatus: 'in_stock' as const
+    },
+    categories: ['2'], // category IDs
+    tags: [],
+    images: [{
+      id: '3',
+      url: 'https://via.placeholder.com/400x400',
+      alt: '키보드',
+      sortOrder: 0,
+      isFeatured: true
+    }],
+    featuredImageUrl: 'https://via.placeholder.com/400x400',
+    isFeatured: false,
+    status: 'active' as const,
+    approvalStatus: 'approved' as const,
+    supplierId: '1',
+    supplierName: '테크 서플라이',
+    specifications: {},
+    attributes: {},
+    viewCount: 0,
+    salesCount: 0,
     rating: 4.2,
-    reviewCount: 45
+    reviewCount: 45,
+    isVirtual: false,
+    isDownloadable: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'admin'
   }
 ];
 
@@ -76,7 +184,6 @@ const sortOptions = [
 
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
   
   // Filter states
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -105,7 +212,7 @@ export function ProductsPage() {
     queryKey: ['products', { search, category, sortBy, minPrice, maxPrice }],
     queryFn: async () => {
       // TODO: Replace with actual API call
-      // const response = await authClient.get('/api/v1/products', {
+      // const response = await authClient.api.get('/api/v1/products', {
       //   params: { search, category, sortBy, minPrice, maxPrice }
       // });
       // return response.data;
@@ -121,26 +228,32 @@ export function ProductsPage() {
       }
       
       if (category) {
-        filtered = filtered.filter(p => 
-          p.categories?.some(c => c.slug === category)
-        );
+        // For now, just check if category '1' is electronics, '2' is computer-accessories
+        const categoryMap: Record<string, string> = {
+          'electronics': '1',
+          'computer-accessories': '2'
+        };
+        const categoryId = categoryMap[category];
+        if (categoryId) {
+          filtered = filtered.filter(p => p.categories.includes(categoryId));
+        }
       }
       
       if (minPrice) {
-        filtered = filtered.filter(p => p.price >= Number(minPrice));
+        filtered = filtered.filter(p => p.pricing.customer >= Number(minPrice));
       }
       
       if (maxPrice) {
-        filtered = filtered.filter(p => p.price <= Number(maxPrice));
+        filtered = filtered.filter(p => p.pricing.customer <= Number(maxPrice));
       }
       
       // Sort
       filtered.sort((a, b) => {
         switch (sortBy) {
           case 'price-asc':
-            return a.price - b.price;
+            return a.pricing.customer - b.pricing.customer;
           case 'price-desc':
-            return b.price - a.price;
+            return b.pricing.customer - a.pricing.customer;
           case 'rating':
             return (b.rating || 0) - (a.rating || 0);
           default:
@@ -152,10 +265,8 @@ export function ProductsPage() {
     }
   });
 
-  const handleAddToCart = (productId: string) => {
+  const handleAddToCart = () => {
     // TODO: Implement add to cart
-    // TODO: Log add to cart action for debugging
-    // console.log('Add to cart:', productId);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -214,7 +325,7 @@ export function ProductsPage() {
                 <label className="text-sm font-medium mb-1 block">카테고리</label>
                 <Select
                   value={category}
-                  onValueChange={setCategory}
+                  onChange={(e) => setCategory(e.target.value)}
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>
@@ -259,7 +370,7 @@ export function ProductsPage() {
             <label className="text-sm font-medium">정렬:</label>
             <Select
               value={sortBy}
-              onValueChange={setSortBy}
+              onChange={(e) => setSortBy(e.target.value)}
               className="w-40"
             >
               {sortOptions.map(option => (

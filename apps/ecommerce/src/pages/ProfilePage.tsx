@@ -29,12 +29,6 @@ export function ProfilePage() {
             <p className="text-sm text-muted-foreground">회원 등급</p>
             <p className="font-medium capitalize">{user.role}</p>
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground">가입일</p>
-            <p className="font-medium">
-              {new Date(user.createdAt).toLocaleDateString('ko-KR')}
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

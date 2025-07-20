@@ -1,5 +1,5 @@
 import { authClient } from '@o4o/auth-client';
-import { Cart, EcommerceApiResponse } from '@o4o/types/ecommerce';
+import { Cart, EcommerceApiResponse } from '@o4o/types';
 
 export const cartApi = {
   // Get current user's cart

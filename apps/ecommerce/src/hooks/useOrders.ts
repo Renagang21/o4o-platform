@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Order, OrderFilters, OrdersResponse } from '@o4o/types/ecommerce';
+import { Order, OrderFilters, OrdersResponse } from '@o4o/types';
 import { api } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 

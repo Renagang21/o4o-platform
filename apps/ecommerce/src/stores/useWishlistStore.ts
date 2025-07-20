@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Product } from '@o4o/types/ecommerce';
+import { Product } from '@o4o/types';
 import { authClient } from '@o4o/auth-client';
 
 interface WishlistItem {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Button } from '@o4o/ui';
-import { formatCurrency } from '@o4o/utils/format';
-import { OrderSummary } from '@o4o/types/ecommerce';
+import { formatCurrency } from '@o4o/utils';
+import { OrderSummary } from '@o4o/types';
 import { cn } from '@o4o/utils';
 import { ShoppingBag, Truck, Tag } from 'lucide-react';
 
@@ -111,12 +111,12 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
       {/* Checkout Button */}
       <Button
         onClick={onCheckout}
-        disabled={loading || summary.itemCount === 0}
+        disabled={loading || summary.total === 0}
         className="w-full"
         size="lg"
       >
         <ShoppingBag className="h-5 w-5 mr-2" />
-        {loading ? '처리 중...' : `결제하기 (${summary.itemCount}개)`}
+        {loading ? '처리 중...' : '결제하기'}
       </Button>
     </Card>
   );

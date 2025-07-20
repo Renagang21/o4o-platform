@@ -5,8 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button, Input, Card, Label, RadioGroup, RadioGroupItem, Textarea, Checkbox } from '@o4o/ui';
 import { CreditCard, Smartphone, Building, Wallet, AlertCircle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
-import { authClient } from '@o4o/auth-client';
-import { formatCurrency } from '@o4o/utils/format';
+import { formatCurrency } from '@o4o/utils';
 
 interface CheckoutForm {
   // Shipping Info
@@ -64,7 +63,7 @@ export function CheckoutPage() {
   } = useForm<CheckoutForm>({
     defaultValues: {
       recipientName: user?.name || '',
-      recipientPhone: user?.phone || '',
+      recipientPhone: (user as any)?.phone || '',
       paymentMethod: 'card',
       deliveryRequest: deliveryRequests[0],
       agreeToTerms: false
@@ -76,9 +75,9 @@ export function CheckoutPage() {
 
   // Create order mutation
   const createOrderMutation = useMutation({
-    mutationFn: async (data: CheckoutForm) => {
+    mutationFn: async (_data: CheckoutForm) => {
       // TODO: Replace with actual API call
-      // const response = await authClient.post('/api/v1/orders', {
+      // const response = await authClient.api.post('/api/v1/orders', {
       //   ...data,
       //   items: selectedCartItems,
       //   summary: orderSummary
@@ -213,7 +212,7 @@ export function CheckoutPage() {
             
             <RadioGroup
               value={watch('paymentMethod')}
-              onValueChange={(value) => setValue('paymentMethod', value)}
+              onValueChange={(value) => setValue('paymentMethod', value as CheckoutForm['paymentMethod'])}
             >
               <div className="grid grid-cols-2 gap-4">
                 {paymentMethods.map(method => {

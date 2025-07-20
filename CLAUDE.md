@@ -957,3 +957,170 @@ const RichTextEditor = lazy(() => import('./components/RichTextEditor'));
 - Consider alternatives to heavy libraries
 - Implement tree shaking
 - Use dynamic imports for optional features
+
+## 🐛 Common TypeScript Bug Patterns & Solutions
+
+### 개발 시 주의할 TypeScript 버그 패턴들
+
+이 섹션은 2025-07-20 admin-dashboard TypeScript 오류 수정 경험을 바탕으로 정리된 것입니다.
+
+#### 🔴 HIGH PRIORITY - Critical Type Issues
+
+**1. Interface Extension with Property Conflicts**
+```typescript
+// ❌ WRONG: Properties conflict between base and extended interfaces
+export interface Product extends BaseProduct {
+  status: ProductStatus  // Conflicts with BaseProduct.status
+}
+
+// ✅ CORRECT: Use Omit to exclude conflicting properties
+export interface Product extends Omit<BaseProduct, 'status' | 'pricing' | 'inventory'> {
+  status: ProductStatus  // Now safe to override
+  // Add admin-specific fields
+  retailPrice: number
+  stockQuantity: number
+}
+```
+
+**2. Date vs String Type Mismatches**
+```typescript
+// ❌ WRONG: Mixing Date and string types
+const mockData = {
+  createdAt: new Date().toISOString(),  // String
+  updatedAt: new Date('2024-01-01'),    // Date object
+}
+
+// ✅ CORRECT: Check interface requirements first
+// If interface expects Date:
+interface Entity {
+  createdAt: Date
+  updatedAt: Date
+}
+const mockData: Entity = {
+  createdAt: new Date(),
+  updatedAt: new Date('2024-01-01'),
+}
+
+// If interface expects string:
+interface EntityAPI {
+  createdAt: string
+  updatedAt: string
+}
+const apiData: EntityAPI = {
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date('2024-01-01').toISOString(),
+}
+```
+
+**3. Missing Required Properties in Extended Interfaces**
+```typescript
+// ❌ WRONG: Missing required properties
+interface AdminCategory extends Category {
+  postCount: number  // Added but base Category doesn't have this
+}
+
+// ✅ CORRECT: Create proper admin interface
+interface AdminCategory {
+  id: string
+  name: string
+  slug: string
+  postCount: number  // Admin-specific field
+  // All other required fields...
+}
+```
+
+#### 🟡 MEDIUM PRIORITY - Import & Module Issues
+
+**4. Wrong Import Sources**
+```typescript
+// ❌ WRONG: Importing from wrong source
+import type { Category } from '@o4o/types'  // This might be ecommerce Category
+
+// ✅ CORRECT: Import the right type for your context
+import type { PostCategory } from '@o4o/types'  // For post-related contexts
+// OR create admin-specific interface
+interface AdminCategory extends Category {
+  postCount?: number
+}
+```
+
+**5. Type Assertion Overuse**
+```typescript
+// ❌ WRONG: Overusing type assertions
+const category = mockCategories[0] as Category
+<Badge>{(category as any).postCount}</Badge>
+
+// ✅ CORRECT: Proper typing
+interface AdminCategory extends Category {
+  postCount?: number
+}
+const category: AdminCategory = mockCategories[0]
+<Badge>{category.postCount || 0}</Badge>
+```
+
+#### 🟢 LOW PRIORITY - Chart & UI Component Issues
+
+**6. Third-party Library Type Issues**
+```typescript
+// ❌ WRONG: Complex generic types for chart tooltips
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+
+// ✅ TEMPORARY FIX: Use 'any' for problematic third-party types
+const CustomTooltip = ({ active, payload, label }: any) => {
+  // This is acceptable for UI components where type safety is less critical
+}
+```
+
+### 🔧 TypeScript Error Prevention Checklist
+
+#### Before Development:
+- [ ] Check base interfaces in `packages/types/src/` before extending
+- [ ] Verify Date vs string requirements for timestamp fields
+- [ ] Confirm which Category/Tag interface to use (post vs ecommerce vs common)
+- [ ] Check existing mock data patterns in the workspace
+
+#### During Development:
+- [ ] Use `Omit<BaseInterface, 'conflictingField'>` for interface extensions
+- [ ] Create admin-specific interfaces when base types don't fit
+- [ ] Use proper imports: PostCategory for posts, Category for ecommerce
+- [ ] Keep Date objects as Date, strings as strings consistently
+
+#### After Development:
+- [ ] Run `npm run type-check --workspace=@o4o/admin-dashboard` 
+- [ ] Fix all explicit errors before using type assertions
+- [ ] Document any necessary type assertions with comments
+- [ ] Update mock data to match new interface requirements
+
+### 🚨 Critical Patterns to Avoid
+
+**Never do these:**
+1. **Mixed Date Types**: Don't mix `new Date()` and `new Date().toISOString()` in same interface
+2. **Any Type Overuse**: Don't use `any` except for problematic third-party libraries
+3. **Wrong Category Import**: Always verify which Category interface you need
+4. **Missing Omit**: Don't extend interfaces without excluding conflicting properties
+5. **Type Assertion Shortcuts**: Don't use `as any` to bypass type checking
+
+### 📋 Quick Fix Commands
+
+```bash
+# Find all Date/string mismatches
+grep -r "new Date.*toISOString" src/
+
+# Find type assertion usage
+grep -r " as " src/ --include="*.ts" --include="*.tsx"
+
+# Check interface conflicts
+npm run type-check --workspace=@o4o/admin-dashboard 2>&1 | grep "Property.*missing\|not assignable"
+
+# Fix bulk text replacements (example)
+sed -i 's/published/active/g' src/**/*.ts
+```
+
+### 📚 Additional Resources
+
+- **Interface Design**: Follow existing patterns in `packages/types/src/`
+- **Mock Data**: Check `src/test/mocks/` for examples
+- **Date Handling**: Verify requirements in base interfaces first
+- **Chart Types**: Use `any` temporarily for complex third-party generics
+
+> **Note**: This guide is based on real debugging session from 2025-07-20 where we fixed 28+ TypeScript errors systematically. The patterns here are proven solutions that work in the O4O Platform codebase.

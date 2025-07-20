@@ -7,14 +7,14 @@ import {
   UpdateReviewDto,
   ReviewHelpfulDto,
   ReviewStats
-} from '@o4o/types/ecommerce';
+} from '@o4o/types';
 
 const API_URL = '/api/v1/reviews';
 
 export const reviewsApi = {
   // Get reviews for a product
   getProductReviews: async (productId: string, filters?: ReviewFilters): Promise<ReviewsResponse> => {
-    const response = await authClient.get<ReviewsResponse>(`${API_URL}/product/${productId}`, {
+    const response = await authClient.api.get<ReviewsResponse>(`${API_URL}/product/${productId}`, {
       params: filters
     });
     return response.data;
@@ -22,13 +22,13 @@ export const reviewsApi = {
 
   // Get review by ID
   getReview: async (id: string): Promise<Review> => {
-    const response = await authClient.get<Review>(`${API_URL}/${id}`);
+    const response = await authClient.api.get<Review>(`${API_URL}/${id}`);
     return response.data;
   },
 
   // Get user's reviews
   getUserReviews: async (filters?: ReviewFilters): Promise<ReviewsResponse> => {
-    const response = await authClient.get<ReviewsResponse>(`${API_URL}/my-reviews`, {
+    const response = await authClient.api.get<ReviewsResponse>(`${API_URL}/my-reviews`, {
       params: filters
     });
     return response.data;
@@ -36,35 +36,35 @@ export const reviewsApi = {
 
   // Create a new review
   createReview: async (data: CreateReviewDto): Promise<Review> => {
-    const response = await authClient.post<Review>(API_URL, data);
+    const response = await authClient.api.post<Review>(API_URL, data);
     return response.data;
   },
 
   // Update a review
   updateReview: async (id: string, data: UpdateReviewDto): Promise<Review> => {
-    const response = await authClient.put<Review>(`${API_URL}/${id}`, data);
+    const response = await authClient.api.put<Review>(`${API_URL}/${id}`, data);
     return response.data;
   },
 
   // Delete a review
   deleteReview: async (id: string): Promise<void> => {
-    await authClient.delete(`${API_URL}/${id}`);
+    await authClient.api.delete(`${API_URL}/${id}`);
   },
 
   // Mark review as helpful/unhelpful
   markHelpful: async (id: string, data: ReviewHelpfulDto): Promise<Review> => {
-    const response = await authClient.post<Review>(`${API_URL}/${id}/helpful`, data);
+    const response = await authClient.api.post<Review>(`${API_URL}/${id}/helpful`, data);
     return response.data;
   },
 
   // Report a review
   reportReview: async (id: string, reason: string): Promise<void> => {
-    await authClient.post(`${API_URL}/${id}/report`, { reason });
+    await authClient.api.post(`${API_URL}/${id}/report`, { reason });
   },
 
   // Get review statistics for a product
   getProductReviewStats: async (productId: string): Promise<ReviewStats> => {
-    const response = await authClient.get<ReviewStats>(`${API_URL}/product/${productId}/stats`);
+    const response = await authClient.api.get<ReviewStats>(`${API_URL}/product/${productId}/stats`);
     return response.data;
   },
 
@@ -75,7 +75,7 @@ export const reviewsApi = {
       formData.append(`images[${index}]`, file);
     });
 
-    const response = await authClient.post<{ urls: string[] }>(`${API_URL}/upload`, formData, {
+    const response = await authClient.api.post<{ urls: string[] }>(`${API_URL}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -86,7 +86,7 @@ export const reviewsApi = {
 
   // Check if user can review a product
   canReviewProduct: async (productId: string): Promise<{ canReview: boolean; reason?: string }> => {
-    const response = await authClient.get<{ canReview: boolean; reason?: string }>(
+    const response = await authClient.api.get<{ canReview: boolean; reason?: string }>(
       `${API_URL}/product/${productId}/can-review`
     );
     return response.data;
@@ -96,7 +96,7 @@ export const reviewsApi = {
   admin: {
     // Get all reviews (admin only)
     getAllReviews: async (filters?: ReviewFilters): Promise<ReviewsResponse> => {
-      const response = await authClient.get<ReviewsResponse>(`${API_URL}/admin`, {
+      const response = await authClient.api.get<ReviewsResponse>(`${API_URL}/admin`, {
         params: filters
       });
       return response.data;
@@ -104,25 +104,25 @@ export const reviewsApi = {
 
     // Approve review
     approveReview: async (id: string): Promise<Review> => {
-      const response = await authClient.post<Review>(`${API_URL}/${id}/approve`);
+      const response = await authClient.api.post<Review>(`${API_URL}/${id}/approve`);
       return response.data;
     },
 
     // Reject review
     rejectReview: async (id: string, reason?: string): Promise<Review> => {
-      const response = await authClient.post<Review>(`${API_URL}/${id}/reject`, { reason });
+      const response = await authClient.api.post<Review>(`${API_URL}/${id}/reject`, { reason });
       return response.data;
     },
 
     // Hide review
     hideReview: async (id: string): Promise<Review> => {
-      const response = await authClient.post<Review>(`${API_URL}/${id}/hide`);
+      const response = await authClient.api.post<Review>(`${API_URL}/${id}/hide`);
       return response.data;
     },
 
     // Unhide review
     unhideReview: async (id: string): Promise<Review> => {
-      const response = await authClient.post<Review>(`${API_URL}/${id}/unhide`);
+      const response = await authClient.api.post<Review>(`${API_URL}/${id}/unhide`);
       return response.data;
     }
   }

@@ -2,12 +2,12 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupplierPublicProfile, useSupplierPublicProducts } from '@/hooks';
 import { ProductGrid } from '@/components/product';
-import { Button } from '@o4o/ui/components/ui/button';
-import { Card, CardContent, CardHeader } from '@o4o/ui/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui/components/ui/tabs';
-import { Badge } from '@o4o/ui/components/ui/badge';
-import { Skeleton } from '@o4o/ui/components/ui/skeleton';
-import { Alert, AlertDescription } from '@o4o/ui/components/ui/alert';
+import { Button } from '@o4o/ui';
+import { Card, CardContent, CardHeader } from '@o4o/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
+import { Badge } from '@o4o/ui';
+import { Skeleton } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
 import { 
   Store, 
   Package, 
@@ -15,13 +15,10 @@ import {
   Shield, 
   Clock,
   MapPin,
-  Phone,
-  Mail,
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { cn } from '@o4o/ui/lib/utils';
-import { ProductFilters } from '@o4o/types/ecommerce';
+import { ProductFilters } from '@o4o/types';
 
 export function SupplierShop() {
   const { slug } = useParams<{ slug: string }>();
@@ -51,7 +48,7 @@ export function SupplierShop() {
   if (supplierError || !supplier) {
     return (
       <div className="container py-8">
-        <Alert variant="destructive">
+        <Alert className="border-destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             매장을 찾을 수 없습니다.
@@ -142,16 +139,15 @@ export function SupplierShop() {
               <>
                 <ProductGrid
                   products={productsData.products}
-                  onAddToCart={(productId) => {
+                  onAddToCart={() => {
                     // TODO: Implement add to cart
-                    // addToCart(productId, 1);
                   }}
                 />
                 
                 {/* Pagination */}
-                {productsData.totalPages > 1 && (
+                {productsData.pagination.totalPages > 1 && (
                   <div className="flex justify-center gap-2 mt-8">
-                    {[...Array(productsData.totalPages)].map((_, i) => (
+                    {[...Array(productsData.pagination.totalPages)].map((_, i) => (
                       <Button
                         key={i}
                         variant={productFilters.page === i + 1 ? 'default' : 'outline'}
