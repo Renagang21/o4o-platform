@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
-import type { Post, Category, Tag, PostListResponse } from '@o4o/types';
+import type { Post, PostCategory, Tag, PostListResponse } from '@o4o/types';
 
 // Mock data
-const mockCategories: Category[] = [
+const mockCategories: PostCategory[] = [
   {
     id: '1',
     name: '기술',
@@ -323,7 +323,7 @@ export const postHandlers = [
   // Create category
   http.post('/api/v1/categories', async ({ request }) => {
     const data = await request.json() as any;
-    const newCategory: Category = {
+    const newCategory: PostCategory = {
       id: `cat-${Date.now()}`,
       name: data.name,
       slug: data.slug,

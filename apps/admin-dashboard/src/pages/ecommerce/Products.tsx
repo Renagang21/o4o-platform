@@ -124,11 +124,11 @@ const Products: React.FC = () => {
 
         <div className="flex gap-2 mt-3">
           <span className={`text-xs px-2 py-1 rounded ${
-            product.status === 'published' 
+            product.status === 'active' 
               ? 'bg-green-100 text-green-800' 
               : 'bg-gray-100 text-gray-800'
           }`}>
-            {product.status === 'published' ? '판매중' : product.status === 'draft' ? '임시저장' : '비공개'}
+            {product.status === 'active' ? '판매중' : product.status === 'draft' ? '임시저장' : '비공개'}
           </span>
           <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
             {product.type === 'simple' ? '단순상품' : product.type === 'variable' ? '가변상품' : '기타'}
@@ -177,11 +177,11 @@ const Products: React.FC = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          product.status === 'published' 
+          product.status === 'active' 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
         }`}>
-          {product.status === 'published' ? '판매중' : product.status === 'draft' ? '임시저장' : '비공개'}
+          {product.status === 'active' ? '판매중' : product.status === 'draft' ? '임시저장' : '비공개'}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

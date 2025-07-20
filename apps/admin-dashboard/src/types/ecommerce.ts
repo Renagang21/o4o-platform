@@ -6,24 +6,21 @@ import {
   OrderStatus as BaseOrderStatus,
   Category as BaseCategory,
   ProductStatus as BaseProductStatus,
-  ProductType as BaseProductType,
   PaymentStatus,
-  PaymentMethod,
   Address as BaseAddress
 } from '@o4o/types'
 
 // Re-export common types
-export {
-  PaymentStatus,
-  PaymentMethod
+export type {
+  PaymentStatus
 } from '@o4o/types'
 
 // Admin-specific enums and types
 export type ProductStatus = BaseProductStatus | 'private' | 'trash'
-export type ProductType = BaseProductType | 'grouped' | 'external'
+export type ProductType = 'simple' | 'variable' | 'grouped' | 'external'
 
 // Admin-specific Product interface extending base
-export interface Product extends Omit<BaseProduct, 'status' | 'pricing'> {
+export interface Product extends Omit<BaseProduct, 'status' | 'pricing' | 'inventory' | 'tags' | 'categories' | 'attributes'> {
   // Override status with admin-specific status
   status: ProductStatus
   type: ProductType
@@ -34,11 +31,13 @@ export interface Product extends Omit<BaseProduct, 'status' | 'pricing'> {
   affiliatePrice?: number
   cost?: number
   
-  // Additional admin fields
+  // Additional admin fields - flattened from base inventory for easier admin access
   sku: string
   manageStock: boolean
+  stockQuantity: number
   lowStockThreshold?: number
   stockStatus: 'instock' | 'outofstock' | 'onbackorder'
+  weight?: number
   
   featured: boolean
   virtual: boolean
@@ -65,13 +64,17 @@ export interface Product extends Omit<BaseProduct, 'status' | 'pricing'> {
 export interface ProductImage {
   id: string
   url: string
-  alt?: string
+  alt: string
+  title?: string
+  caption?: string
   sortOrder: number
+  isFeatured: boolean
 }
 
 export interface ProductCategory extends BaseCategory {
   image?: string
   count: number
+  postCount?: number
 }
 
 export interface ProductTag {
@@ -96,6 +99,9 @@ export interface Order extends Omit<BaseOrder, 'items' | 'shippingAddress' | 'st
   status: OrderStatus
   
   // Admin-specific customer info
+  buyerId: string
+  buyerName: string
+  buyerType: 'customer' | 'business' | 'affiliate'
   customerId: string
   customerName: string
   customerEmail: string
@@ -106,6 +112,7 @@ export interface Order extends Omit<BaseOrder, 'items' | 'shippingAddress' | 'st
   shipping: number
   discount: number
   total: number
+  orderDate: string
   
   items: OrderItem[]
   
@@ -113,7 +120,7 @@ export interface Order extends Omit<BaseOrder, 'items' | 'shippingAddress' | 'st
   shippingAddress: Address
   
   // Admin-specific payment fields
-  paymentStatus: PaymentStatus | 'processing' | 'cancelled' | 'refunded'
+  paymentStatus: PaymentStatus
   transactionId?: string
   
   shippingMethod: string
@@ -131,10 +138,15 @@ export type OrderStatus = BaseOrderStatus | 'on-hold' | 'completed' | 'refunded'
 
 export interface OrderItem extends BaseOrderItem {
   productSku: string
+  productImage: string
   variationId?: string
+  unitPrice: number
+  totalPrice: number
   price: number
   total: number
   tax: number
+  supplierId: string
+  supplierName: string
   meta?: OrderItemMeta[]
 }
 
@@ -145,17 +157,20 @@ export interface OrderItemMeta {
   displayValue?: string
 }
 
-export interface Address extends Omit<BaseAddress, 'recipientName' | 'address' | 'detailAddress' | 'zipCode' | 'deliveryRequest'> {
+export interface Address extends BaseAddress {
+  // Additional admin-specific fields
   firstName: string
   lastName: string
   company?: string
   address1: string
   address2?: string
-  city: string
-  state: string
   postalCode: string
-  country: string
-  email?: string
+  
+  // Satisfy base Address requirements
+  recipientName: string
+  zipCode: string
+  address: string
+  detailAddress: string
 }
 
 export interface OrderRefund {
@@ -432,8 +447,8 @@ export interface TaxClass {
   rate: number
 }
 
-// Payment-related types
-export interface PaymentMethod {
+// Payment-related types  
+export interface AdminPaymentMethod {
   id: string
   title: string
   description: string
@@ -444,7 +459,7 @@ export interface PaymentMethod {
 
 export interface PaymentSettings {
   testMode: boolean
-  methods?: PaymentMethod[]
+  methods?: AdminPaymentMethod[]
   enabledMethods: string[]
   providers: Record<string, unknown>
   

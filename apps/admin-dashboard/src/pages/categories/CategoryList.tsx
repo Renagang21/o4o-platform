@@ -12,6 +12,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
 import type { Category } from '@o4o/types'
+
+// Admin-specific category interface that extends base Category
+interface AdminCategory extends Category {
+  postCount?: number
+}
 import toast from 'react-hot-toast'
 
 interface CategoryFormData {
@@ -23,7 +28,7 @@ interface CategoryFormData {
 
 const CategoryList: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null)
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
     slug: '',
@@ -74,7 +79,7 @@ const CategoryList: React.FC = () => {
     }
   })
 
-  const handleOpenDialog = (category?: Category) => {
+  const handleOpenDialog = (category?: AdminCategory) => {
     if (category) {
       setEditingCategory(category)
       setFormData({
@@ -125,9 +130,9 @@ const CategoryList: React.FC = () => {
   }
 
   // Build hierarchical category tree
-  const buildCategoryTree = (categories: Category[]) => {
-    const categoryMap = new Map<string, Category & { children?: Category[] }>()
-    const rootCategories: (Category & { children?: Category[] })[] = []
+  const buildCategoryTree = (categories: AdminCategory[]) => {
+    const categoryMap = new Map<string, AdminCategory & { children?: AdminCategory[] }>()
+    const rootCategories: (AdminCategory & { children?: AdminCategory[] })[] = []
 
     // First pass: create map
     categories.forEach(cat => {
@@ -151,7 +156,7 @@ const CategoryList: React.FC = () => {
     return rootCategories
   }
 
-  const renderCategoryCard = (category: Category & { children?: Category[] }, level = 0) => {
+  const renderCategoryCard = (category: AdminCategory & { children?: AdminCategory[] }, level = 0) => {
     return (
       <div key={category.id} className={level > 0 ? 'ml-8' : ''}>
         <Card className="mb-4">
@@ -299,8 +304,8 @@ const CategoryList: React.FC = () => {
                     <SelectContent>
                       <SelectItem value="">없음</SelectItem>
                       {categories
-                        .filter((cat: Category) => cat.id !== editingCategory?.id)
-                        .map((cat: Category) => (
+                        .filter((cat: AdminCategory) => cat.id !== editingCategory?.id)
+                        .map((cat: AdminCategory) => (
                           <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </SelectItem>

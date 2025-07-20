@@ -134,8 +134,8 @@ export const handlers = [
 
     // Mock 데이터 생성
     let products = [
-      createMockProduct({ id: 'prod_1', name: 'MacBook Pro M3', status: 'published' }),
-      createMockProduct({ id: 'prod_2', name: 'iPhone 15 Pro', status: 'published' }),
+      createMockProduct({ id: 'prod_1', name: 'MacBook Pro M3', status: 'active' }),
+      createMockProduct({ id: 'prod_2', name: 'iPhone 15 Pro', status: 'active' }),
       createMockProducts.draft(),
       createMockProducts.outOfStock(),
       createMockProducts.featured(),

@@ -14,8 +14,7 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  Legend,
-  TooltipProps
+  Legend
 } from 'recharts';
 import { TrendingUp, Calendar } from 'lucide-react';
 
@@ -92,7 +91,7 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, isLoading = false }) => {
   }, [processedData]);
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">

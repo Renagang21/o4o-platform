@@ -27,10 +27,13 @@ export const createMockProduct = (overrides?: Partial<Product>): Product => {
       length: 10,
       width: 10,
       height: 5,
+      weight: 1.5,
+      unit: 'cm' as const,
+      weightUnit: 'kg' as const,
     },
     
     // Status and settings
-    status: 'published' as ProductStatus,
+    status: 'active' as ProductStatus,
     type: 'simple' as ProductType,
     featured: false,
     virtual: false,
@@ -45,6 +48,7 @@ export const createMockProduct = (overrides?: Partial<Product>): Product => {
     categories: [],
     tags: [],
     attributes: [],
+    specifications: {},
     
     // SEO
     metaTitle: 'Test Product - SEO Title',
@@ -59,6 +63,16 @@ export const createMockProduct = (overrides?: Partial<Product>): Product => {
     totalSales: 0,
     averageRating: 0,
     reviewCount: 0,
+    rating: 0,
+    viewCount: 0,
+    salesCount: 0,
+    shortDescription: 'Short description for test product',
+    supplierId: 'supplier_' + Math.random().toString(36).substr(2, 9),
+    supplierName: 'Test Supplier',
+    approvalStatus: 'approved' as const,
+    isFeatured: false,
+    isVirtual: false,
+    isDownloadable: false,
   };
 
   return { ...baseProduct, ...overrides };

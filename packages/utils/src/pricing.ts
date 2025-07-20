@@ -12,7 +12,6 @@ import type {
   PriceDisplay,
   PriceDisplayConfig,
   PriceValidationResult,
-  LocalizationConfig,
   CurrencyInfo
 } from '@o4o/types';
 

@@ -16,7 +16,6 @@ import {
   ComposedChart,
   Line,
   LineChart,
-  TooltipProps
 } from 'recharts';
 import { Users, UserPlus, Activity, TrendingUp } from 'lucide-react';
 
@@ -109,13 +108,13 @@ const UserChart: React.FC<UserChartProps> = ({ data, isLoading = false }) => {
   }, [processedData]);
 
   // 커스텀 툴팁
-  const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="text-sm font-medium text-gray-900 mb-2">{label}</p>
           <div className="space-y-1">
-            {payload && payload.map((entry, index: number) => (
+            {payload && payload.map((entry: any, index: number) => (
               <div key={index} className="flex items-center">
                 <div 
                   className="w-3 h-3 rounded-full mr-2"

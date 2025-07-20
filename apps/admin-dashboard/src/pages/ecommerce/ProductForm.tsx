@@ -36,9 +36,9 @@ const ProductForm: React.FC = () => {
     stockStatus: 'instock',
     manageStock: true,
     weight: 0,
-    dimensions: { length: 0, width: 0, height: 0 },
+    dimensions: { length: 0, width: 0, height: 0, weight: 0, unit: 'cm', weightUnit: 'kg' },
     type: 'simple',
-    status: 'published',
+    status: 'active',
     featured: false,
     tags: [],
     images: [],
@@ -382,11 +382,11 @@ const ProductForm: React.FC = () => {
                   상태
                 </label>
                 <select
-                  value={formData.status || 'published'}
+                  value={formData.status || 'active'}
                   onChange={(e) => handleInputChange('status', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="published">공개</option>
+                  <option value="active">공개</option>
                   <option value="draft">임시저장</option>
                   <option value="private">비공개</option>
                 </select>

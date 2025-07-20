@@ -388,7 +388,7 @@ const Orders: React.FC = () => {
                       <div className="flex items-center gap-1">
                         <CreditCard className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-900">
-                          {getPaymentMethodLabel(order.paymentMethod)}
+                          {getPaymentMethodLabel(order.paymentMethod || '')}
                         </span>
                       </div>
                       {order.paymentStatus === 'completed' ? (
