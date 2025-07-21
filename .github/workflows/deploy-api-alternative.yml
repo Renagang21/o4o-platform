@@ -43,7 +43,7 @@ jobs:
     # 방법 2: webfactory/ssh-agent 사용
     - name: Method 2 - Using webfactory/ssh-agent
       if: github.event.inputs.method == 'webfactory-ssh-agent'
-      uses: webfactory/ssh-agent@v0.8.0
+      uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.API_SSH_KEY }}
         
