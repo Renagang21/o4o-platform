@@ -38,8 +38,8 @@ export function useInfinitePosts(filters?: PostFilters) {
       return response.data;
     },
     getNextPageParam: (lastPage) => {
-      const { page, totalPages } = lastPage.pagination;
-      return page < totalPages ? page + 1 : undefined;
+      const { current, totalPages } = lastPage.pagination;
+      return current < totalPages ? current + 1 : undefined;
     },
     initialPageParam: 1,
   });

@@ -118,7 +118,7 @@ export default function VendorLayout() {
                 </div>
               </div>
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-700">{user?.business_name || user?.name}</p>
+                <p className="text-sm font-medium text-gray-700">{user?.name}</p>
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
               <button

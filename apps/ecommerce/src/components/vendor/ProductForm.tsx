@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@o4o/ui';
-import type { Product } from '@o4o/types';
+import type { Product, ProductDimensions } from '@o4o/types';
 
 interface ProductFormProps {
   product?: Product;
@@ -41,7 +41,7 @@ interface ProductFormData {
   compareAtPrice?: number;
   cost?: number;
   stockQuantity: number;
-  stockStatus: 'in_stock' | 'out_of_stock' | 'pre_order';
+  stockStatus: 'in_stock' | 'out_of_stock' | 'on_backorder';
   images: string[];
   variants: ProductVariant[];
   seoTitle?: string;
@@ -91,19 +91,19 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
         name: product.name || '',
         description: product.description || '',
         sku: product.sku || '',
-        category: product.category?.name || '',
-        price: product.price || 0,
-        compareAtPrice: product.compareAtPrice,
+        category: product.categories?.[0] || '',
+        price: product.pricing?.customer || 0,
+        compareAtPrice: 0, // Not in Product interface
         cost: product.cost,
-        stockQuantity: product.inventory?.quantity || 0,
+        stockQuantity: product.inventory?.stockQuantity || 0,
         stockStatus: product.inventory?.stockStatus || 'in_stock',
         images: product.images?.map(img => img.url) || [],
         variants: [],
-        seoTitle: product.seo?.title,
-        seoDescription: product.seo?.description,
-        tags: product.tags?.map(tag => tag.name) || [],
-        weight: product.shipping?.weight,
-        dimensions: product.shipping?.dimensions || {}
+        seoTitle: product.seo?.metaTitle,
+        seoDescription: product.seo?.metaDescription,
+        tags: product.tags || [],
+        weight: product.shippingInfo?.weight,
+        dimensions: product.shippingInfo?.dimensions || {}
       });
     }
   }, [product]);
@@ -147,29 +147,42 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
         name: formData.name,
         description: formData.description,
         sku: formData.sku,
-        price: formData.price,
-        compareAtPrice: formData.compareAtPrice,
+        pricing: {
+          customer: formData.price,
+          business: formData.price * 0.8, // Example discount
+          affiliate: formData.price * 0.85,
+          retailer: {
+            gold: formData.price * 0.75,
+            premium: formData.price * 0.7,
+            vip: formData.price * 0.65
+          }
+        },
         cost: formData.cost,
         inventory: {
-          quantity: formData.stockQuantity,
-          stockStatus: formData.stockStatus,
-          trackQuantity: true
+          stockQuantity: formData.stockQuantity,
+          stockStatus: formData.stockStatus as 'in_stock' | 'out_of_stock' | 'on_backorder',
+          minOrderQuantity: 1,
+          lowStockThreshold: 10,
+          manageStock: true,
+          allowBackorder: false
         },
         images: formData.images.map((url, index) => ({
           id: `img-${index}`,
           url,
           alt: formData.name,
-          position: index
+          sortOrder: index,
+          isFeatured: index === 0
         })),
         seo: {
-          title: formData.seoTitle || formData.name,
-          description: formData.seoDescription || formData.description
+          metaTitle: formData.seoTitle || formData.name,
+          metaDescription: formData.seoDescription || formData.description
         },
-        shipping: {
+        shippingInfo: formData.weight ? {
           weight: formData.weight,
-          dimensions: formData.dimensions
-        },
-        tags: formData.tags.map(tag => ({ name: tag }))
+          dimensions: formData.dimensions as ProductDimensions,
+          shippingCost: 0
+        } : undefined,
+        tags: formData.tags
       });
       onClose();
     } catch (error) {

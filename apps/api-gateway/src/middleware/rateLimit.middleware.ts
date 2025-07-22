@@ -60,6 +60,7 @@ export class RateLimitMiddleware {
       return rateLimit({
         ...baseConfig,
         store: new RedisStore({
+          // @ts-expect-error - RedisStore types might not match exactly
           client: this.redis,
           prefix: 'rl:',
           sendCommand: (...args: string[]) => (this.redis as any).call(...args)

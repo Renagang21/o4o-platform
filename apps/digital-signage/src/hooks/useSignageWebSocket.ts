@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useSignageWebSocket = (storeId?: string) => {
@@ -21,21 +22,21 @@ export const useSignageWebSocket = (storeId?: string) => {
     socket.emit('join-store', storeId);
 
     // Listen for content updates
-    socket.on('content-updated', (data) => {
+    socket.on('content-updated', (data: unknown) => {
       console.log('Content updated:', data);
       queryClient.invalidateQueries({ queryKey: ['signage', 'content'] });
       queryClient.invalidateQueries({ queryKey: ['signage', 'display', storeId] });
     });
 
     // Listen for schedule changes
-    socket.on('schedule-changed', (data) => {
+    socket.on('schedule-changed', (data: unknown) => {
       console.log('Schedule changed:', data);
       queryClient.invalidateQueries({ queryKey: ['signage', 'schedules'] });
       queryClient.invalidateQueries({ queryKey: ['signage', 'display', storeId] });
     });
 
     // Listen for display control commands
-    socket.on('display-control', (command) => {
+    socket.on('display-control', (command: unknown) => {
       console.log('Display control command:', command);
       // Handle display control commands (play, pause, next, etc.)
       window.dispatchEvent(new CustomEvent('display-control', { detail: command }));
@@ -49,7 +50,7 @@ export const useSignageWebSocket = (storeId?: string) => {
   }, [storeId, queryClient]);
 
   // Send display status updates
-  const sendDisplayStatus = (status: any) => {
+  const sendDisplayStatus = (status: unknown) => {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('display-status', { storeId, ...status });
     }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { createProxyMiddleware, Options } from 'http-proxy-middleware';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import type { Options, Filter, RequestHandler } from 'http-proxy-middleware';
 import { ServiceRegistry } from '../services/ServiceRegistry.js';
 import { AuthRequest } from './auth.middleware.js';
 import { createLogger } from '../utils/logger.js';
@@ -35,14 +36,14 @@ export class ProxyMiddleware {
       throw new Error(`Service ${serviceKey} not found in registry`);
     }
 
-    const proxyOptions: Options = {
+    const proxyOptions = {
       target: service.url,
       changeOrigin: true,
       timeout: service.timeout || 10000,
       proxyTimeout: service.timeout || 10000,
       
       // Path rewriting
-      pathRewrite: (path, req) => {
+      pathRewrite: (path: string, req: Request) => {
         // Remove /api/v1 prefix as backend services handle their own paths
         const newPath = path.replace(/^\/api\/v\d+/, '/api');
         logger.debug('Path rewrite', { original: path, rewritten: newPath });
@@ -50,7 +51,8 @@ export class ProxyMiddleware {
       },
       
       // Request interceptor
-      onProxyReq: (proxyReq, req, res) => {
+      on: {
+        proxyReq: (proxyReq: any, req: any, res: any) => {
         const authReq = req as AuthRequest;
         
         // Forward auth headers
@@ -84,23 +86,19 @@ export class ProxyMiddleware {
           target: service.url,
           user: authReq.user?.id
         });
-      },
-      
-      // Response interceptor
-      onProxyRes: (proxyRes, req, res) => {
-        // Log proxy response
-        logger.debug('Proxy response', {
-          status: proxyRes.statusCode,
-          path: req.path,
-          service: serviceKey
-        });
-        
-        // Add service header
-        proxyRes.headers['X-Served-By'] = service.name;
-      },
-      
-      // Error handler
-      onError: (err, req, res) => {
+        },
+        proxyRes: (proxyRes: any, req: any, res: any) => {
+          // Log proxy response
+          logger.debug('Proxy response', {
+            status: proxyRes.statusCode,
+            path: req.path,
+            service: serviceKey
+          });
+          
+          // Add service header
+          proxyRes.headers['X-Served-By'] = service.name;
+        },
+        error: (err: any, req: any, res: any) => {
         logger.error('Proxy error', {
           error: err.message,
           service: serviceKey,
@@ -122,7 +120,8 @@ export class ProxyMiddleware {
           });
         }
       }
-    };
+      }
+    } as Options;
 
     const proxy = createProxyMiddleware(proxyOptions);
     this.proxies.set(serviceKey, proxy);

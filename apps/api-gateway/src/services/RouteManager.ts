@@ -121,7 +121,7 @@ export class RouteManager {
         middlewares.push(this.proxyMiddleware.routeToService(route));
         
         // Register route
-        router[methodLower](path, ...middlewares);
+        (router as any)[methodLower](path, ...middlewares);
         
         logger.debug('Route registered', {
           method,

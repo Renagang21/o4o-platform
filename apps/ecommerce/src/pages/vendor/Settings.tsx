@@ -40,7 +40,7 @@ export default function VendorSettings() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('store');
   const [settings, setSettings] = useState<StoreSettings>({
-    storeName: user?.business_name || 'My Store',
+    storeName: user?.name || 'My Store',
     storeDescription: '고품질 전자제품 및 액세서리를 판매하는 온라인 스토어입니다.',
     logo: '/api/placeholder/200/200',
     email: user?.email || 'store@example.com',

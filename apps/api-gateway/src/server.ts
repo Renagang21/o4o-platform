@@ -86,8 +86,8 @@ app.use(cors({
   exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset']
 }));
 
-app.use(compression());
-app.use(responseTime());
+app.use(compression() as express.RequestHandler);
+app.use(responseTime() as express.RequestHandler);
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

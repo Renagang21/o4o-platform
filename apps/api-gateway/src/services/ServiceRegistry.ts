@@ -179,8 +179,8 @@ export class ServiceRegistry {
     
     try {
       const response = await client.get(config.healthCheck, {
-        timeout: 5000,
-        retry: 0 // Don't retry health checks
+        timeout: 5000
+        // Don't retry health checks
       });
       
       const responseTime = Date.now() - start;

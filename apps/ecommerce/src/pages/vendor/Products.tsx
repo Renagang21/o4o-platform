@@ -87,24 +87,42 @@ export default function VendorProducts() {
     // API에서 상품 상세 정보 가져오기는 ProductForm 내부에서 처리
     const product = products.find(p => p.id === id);
     if (product) {
-      // Mock 데이터를 BaseProduct 형식으로 변환
-      const baseProduct: BaseProduct = {
+      // Convert to BaseProduct format
+      const baseProduct: Partial<BaseProduct> = {
         id: product.id,
         name: product.name,
-        description: '', // API에서 가져올 예정
+        description: '', // Will be fetched from API
         sku: product.sku,
-        price: product.price,
-        status: product.status === 'active' ? 'published' : 'draft',
-        slug: product.name.toLowerCase().replace(/\s+/g, '-'),
-        images: product.image ? [{ id: '1', url: product.image, alt: product.name, position: 0 }] : [],
-        category: categories.find(c => c.name === product.category),
-        inventory: {
-          quantity: product.stock,
-          stockStatus: product.status === 'out_of_stock' ? 'out_of_stock' : 'in_stock',
-          trackQuantity: true
+        pricing: {
+          customer: product.price,
+          business: product.price * 0.8,
+          affiliate: product.price * 0.85,
+          retailer: {
+            gold: product.price * 0.75,
+            premium: product.price * 0.7,
+            vip: product.price * 0.65
+          }
         },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        status: product.status === 'active' ? 'active' : 'draft',
+        slug: product.name.toLowerCase().replace(/\s+/g, '-'),
+        images: product.image ? [{ 
+          id: '1', 
+          url: product.image, 
+          alt: product.name, 
+          sortOrder: 0,
+          isFeatured: true
+        }] : [],
+        categories: categories.filter((c: any) => c.name === product.category).map((c: any) => c.id),
+        inventory: {
+          stockQuantity: product.stock,
+          stockStatus: product.status === 'out_of_stock' ? 'out_of_stock' : 'in_stock',
+          manageStock: true,
+          minOrderQuantity: 1,
+          lowStockThreshold: 10,
+          allowBackorder: false
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       setEditingProduct(baseProduct);
       setIsFormOpen(true);

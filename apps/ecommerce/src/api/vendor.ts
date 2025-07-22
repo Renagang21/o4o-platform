@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { authClient } from '@o4o/auth-client';
+import { cookieAuthClient } from '@o4o/auth-client';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
@@ -15,7 +15,7 @@ const vendorApi = axios.create({
 // Request 인터셉터 - 인증 토큰 추가
 vendorApi.interceptors.request.use(
   async (config) => {
-    const token = authClient.getAccessToken();
+    const token = cookieAuthClient.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -36,8 +36,8 @@ vendorApi.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        await authClient.refreshToken();
-        const newToken = authClient.getAccessToken();
+        await cookieAuthClient.refreshToken();
+        const newToken = cookieAuthClient.getAccessToken();
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return vendorApi(originalRequest);
