@@ -27,6 +27,14 @@ import { ForumCategory } from '../entities/ForumCategory';
 import { ForumComment } from '../entities/ForumComment';
 import { ForumPost } from '../entities/ForumPost';
 import { ForumTag } from '../entities/ForumTag';
+// Digital Signage entities
+import { SignageContent } from '../entities/SignageContent';
+import { SignageSchedule } from '../entities/SignageSchedule';
+import { Store } from '../entities/Store';
+import { StorePlaylist } from '../entities/StorePlaylist';
+import { PlaylistItem } from '../entities/PlaylistItem';
+import { ScreenTemplate } from '../entities/ScreenTemplate';
+import { ContentUsageLog } from '../entities/ContentUsageLog';
 // import { OperationsDashboard } from '../entities/OperationsDashboard';
 // import { Payment } from '../entities/Payment';
 // import { PricePolicy } from '../entities/PricePolicy';
@@ -91,6 +99,14 @@ export const AppDataSource = new DataSource({
     ForumPost,
     ForumComment,
     ForumTag,
+    // Digital Signage entities
+    SignageContent,
+    SignageSchedule,
+    Store,
+    StorePlaylist,
+    PlaylistItem,
+    ScreenTemplate,
+    ContentUsageLog,
     // BetaUser,
     // AnalyticsReport,
     // Alert,
