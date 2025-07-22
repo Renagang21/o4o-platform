@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware, roleGuard } from '../middleware/authMiddleware';
+import { authenticateToken as authMiddleware, requireRole } from '../middleware/auth';
 import { VendorStatsController } from '../controllers/vendor/vendorStatsController';
 import { VendorProductController } from '../controllers/vendor/vendorProductController';
 import { VendorOrderController } from '../controllers/vendor/vendorOrderController';
@@ -13,7 +13,7 @@ const vendorOrderController = new VendorOrderController();
 
 // 모든 벤더 라우트는 인증 필요 + 벤더 권한 체크
 router.use(authMiddleware);
-router.use(roleGuard(['business', 'supplier']));
+router.use(requireRole(['seller', 'supplier']));
 
 // 통계 관련
 router.get('/stats/dashboard', vendorStatsController.getDashboardStats);

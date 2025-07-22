@@ -194,11 +194,11 @@ router.post('/logout', async (req, res) => {
       const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
         // Revoke all refresh tokens for this user
-        await authService.revokeAllUserTokens(payload.userId);
+        await authService.revokeAllUserTokens(payload.userId || payload.sub || '');
         
         // Remove SSO session
         if (sessionId) {
-          await SessionSyncService.removeSession(sessionId, payload.userId);
+          await SessionSyncService.removeSession(sessionId, payload.userId || payload.sub || '');
         }
       }
     }

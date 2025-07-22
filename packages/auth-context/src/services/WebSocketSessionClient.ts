@@ -27,7 +27,6 @@ export interface SessionStatus {
 
 export class WebSocketSessionClient {
   private socket: Socket | null = null;
-  private token: string | null = null;
   private sessionCheckInterval: NodeJS.Timeout | null = null;
   private onSessionEvent?: (event: SessionEvent) => void;
   private onForceLogout?: (reason: string) => void;
@@ -48,7 +47,7 @@ export class WebSocketSessionClient {
       return;
     }
 
-    this.token = token;
+    // Token is passed directly to socket.io auth, no need to store it
     if (callbacks?.onSessionEvent) {
       this.onSessionEvent = callbacks.onSessionEvent;
     }
@@ -204,7 +203,6 @@ export class WebSocketSessionClient {
    * Update authentication token (e.g., after refresh)
    */
   updateToken(newToken: string) {
-    this.token = newToken;
     if (this.socket) {
       // Reconnect with new token
       this.disconnect();

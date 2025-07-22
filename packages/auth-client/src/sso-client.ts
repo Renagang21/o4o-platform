@@ -53,7 +53,7 @@ export class SSOClient {
   /**
    * Handle storage events from other tabs
    */
-  private handleStorageEvent = (event: StorageEvent): void => {
+  private handleStorageEvent = (event: StorageEvent): void => { // eslint-disable-line no-undef
     if (event.key === 'sso:logout') {
       // Another tab logged out
       this.handleLogout();

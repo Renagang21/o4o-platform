@@ -47,7 +47,18 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
             // Verify new access token
             const newPayload = authService.verifyAccessToken(tokens.accessToken);
             if (newPayload) {
-              (req as AuthRequest).user = newPayload;
+              (req as AuthRequest).user = {
+                id: newPayload.userId || newPayload.sub || '',
+                userId: newPayload.userId || newPayload.sub || '',
+                email: newPayload.email || '',
+                role: newPayload.role as UserRole || UserRole.CUSTOMER,
+                status: newPayload.status as UserStatus || UserStatus.ACTIVE,
+                name: newPayload.name,
+                businessInfo: newPayload.businessInfo,
+                createdAt: newPayload.createdAt as Date || new Date(),
+                updatedAt: newPayload.updatedAt as Date || new Date(),
+                lastLoginAt: newPayload.lastLoginAt as Date
+              };
               return next();
             }
           }
@@ -60,7 +71,18 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         });
       }
 
-      (req as AuthRequest).user = payload;
+      (req as AuthRequest).user = {
+        id: payload.userId || payload.sub || '',
+        userId: payload.userId || payload.sub || '',
+        email: payload.email || '',
+        role: payload.role as UserRole || UserRole.CUSTOMER,
+        status: payload.status as UserStatus || UserStatus.ACTIVE,
+        name: payload.name,
+        businessInfo: payload.businessInfo,
+        createdAt: payload.createdAt as Date || new Date(),
+        updatedAt: payload.updatedAt as Date || new Date(),
+        lastLoginAt: payload.lastLoginAt as Date
+      };
       return next();
     }
 
@@ -164,7 +186,18 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     if (accessToken) {
       const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
-        (req as AuthRequest).user = payload;
+        (req as AuthRequest).user = {
+          id: payload.userId || payload.sub || '',
+          userId: payload.userId || payload.sub || '',
+          email: payload.email || '',
+          role: payload.role as UserRole || UserRole.CUSTOMER,
+          status: payload.status as UserStatus || UserStatus.ACTIVE,
+          name: payload.name,
+          businessInfo: payload.businessInfo,
+          createdAt: payload.createdAt as Date || new Date(),
+          updatedAt: payload.updatedAt as Date || new Date(),
+          lastLoginAt: payload.lastLoginAt as Date
+        };
         return next();
       }
     }

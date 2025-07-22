@@ -85,7 +85,7 @@ export class SocialAuthService {
     sessionId: string;
   }> {
     // Generate tokens
-    const tokens = await authService.generateTokens(user);
+    const tokens = await authService.generateTokens(user, 'neture.co.kr');
     
     // Create SSO session
     const sessionId = SessionSyncService.generateSessionId();

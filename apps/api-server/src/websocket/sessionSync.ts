@@ -1,7 +1,7 @@
 import { Server as SocketServer, Socket } from 'socket.io';
-import { redisClient } from '../config/redis';
-import { sessionSyncService } from '../services/sessionSyncService';
-import { logger } from '../utils/logger';
+import redisClient from '../config/redis';
+import { SessionSyncService } from '../services/sessionSyncService';
+import logger from '../utils/logger';
 import jwt from 'jsonwebtoken';
 
 interface SessionEventData {
@@ -63,7 +63,7 @@ export class WebSocketSessionSync {
         socket.join(`user:${userId}`);
 
         // Send current session status
-        const sessions = await sessionSyncService.getUserSessions(userId);
+        const sessions = await SessionSyncService.getUserSessions(userId);
         socket.emit('session:status', {
           sessions,
           activeSessions: sessions.length
@@ -71,7 +71,7 @@ export class WebSocketSessionSync {
 
         // Handle socket events
         socket.on('session:check', async () => {
-          const sessions = await sessionSyncService.getUserSessions(userId);
+          const sessions = await SessionSyncService.getUserSessions(userId);
           socket.emit('session:status', {
             sessions,
             activeSessions: sessions.length
@@ -80,9 +80,9 @@ export class WebSocketSessionSync {
 
         socket.on('session:logout', async (data: { sessionId?: string; allDevices?: boolean }) => {
           if (data.allDevices) {
-            await sessionSyncService.logoutAllDevices(userId);
+            await SessionSyncService.logoutAllDevices(userId);
           } else if (data.sessionId) {
-            await sessionSyncService.removeSession(userId, data.sessionId);
+            await SessionSyncService.removeSession(userId, data.sessionId);
           }
         });
 

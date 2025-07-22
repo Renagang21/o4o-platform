@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { authService } from '../services/AuthService';
+import { UserRole } from '../types/auth';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -46,7 +47,11 @@ export const authenticateCookie = async (
           // Verify new access token
           const newPayload = authService.verifyAccessToken(tokens.accessToken);
           if (newPayload) {
-            req.user = newPayload;
+            req.user = {
+              userId: newPayload.userId || newPayload.sub || '',
+              email: newPayload.email || '',
+              role: String(newPayload.role || UserRole.CUSTOMER)
+            };
             next();
             return;
           }
@@ -61,7 +66,11 @@ export const authenticateCookie = async (
       return;
     }
 
-    req.user = payload;
+    req.user = {
+      userId: payload.userId || payload.sub || '',
+      email: payload.email || '',
+      role: String(payload.role || UserRole.CUSTOMER)
+    };
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
@@ -115,7 +124,11 @@ export const optionalAuth = async (
     if (accessToken) {
       const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
-        req.user = payload;
+        req.user = {
+          userId: payload.userId || payload.sub || '',
+          email: payload.email || '',
+          role: String(payload.role || UserRole.CUSTOMER)
+        };
       }
     }
     

@@ -2,6 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
+import { Request, Response } from 'express';
 import { User } from '../entities/User';
 import { BusinessInfo } from '../types/user';
 import { 
@@ -15,7 +16,7 @@ import {
   CookieConfig 
 } from '../types/auth';
 
-export class AuthService {
+class AuthService {
   private userRepository: Repository<User>;
   private jwtSecret: string;
   private jwtRefreshSecret: string;
@@ -45,9 +46,9 @@ export class AuthService {
     };
   }
 
-  // 사용자 로그인
-  async login(loginData: LoginRequest): Promise<LoginResponse> {
-    const { email, password, domain = 'neture.co.kr' } = loginData;
+  // 사용자 로그인 (Updated signature)
+  async login(email: string, password: string, userAgent: string, ipAddress: string): Promise<LoginResponse & { sessionId: string }> {
+    const domain = 'neture.co.kr';
 
     // 사용자 조회
     const user = await this.userRepository.findOne({ 
@@ -76,10 +77,14 @@ export class AuthService {
     // 토큰 생성
     const tokens = await this.generateTokens(user, domain);
 
+    // Generate session ID for SSO
+    const sessionId = uuidv4();
+
     return {
       success: true,
       user: user.toPublicData(),
-      tokens
+      tokens,
+      sessionId
     };
   }
 
@@ -124,22 +129,19 @@ export class AuthService {
   }
 
   // Access Token 검증
-  async verifyAccessToken(token: string): Promise<AccessTokenPayload> {
+  verifyAccessToken(token: string): AccessTokenPayload | null {
     try {
       const payload = jwt.verify(token, this.jwtSecret) as AccessTokenPayload;
       
-      // 사용자 존재 및 활성 상태 확인
-      const user = await this.userRepository.findOne({
-        where: { id: payload.sub, isActive: true }
-      });
-
-      if (!user) {
-        throw new Error('User not found or inactive');
-      }
-
-      return payload;
+      // Return the payload with all required fields
+      return {
+        userId: payload.userId || payload.sub || '',
+        email: payload.email || '',
+        role: payload.role || UserRole.CUSTOMER,
+        ...payload
+      };
     } catch (error) {
-      throw new Error('Invalid or expired access token');
+      return null;
     }
   }
 
@@ -321,7 +323,97 @@ export class AuthService {
     
     return suspendedUser;
   }
+
+  // Request metadata extraction
+  getRequestMetadata(req: Request): { userAgent: string; ipAddress: string } {
+    const userAgent = req.get('user-agent') || 'unknown';
+    const ipAddress = req.ip || (req.headers['x-forwarded-for'] as string) || 'unknown';
+    return { userAgent, ipAddress };
+  }
+
+  // Rotate refresh token (refresh token rotation)
+  async rotateRefreshToken(refreshToken: string, userAgent: string, ipAddress: string): Promise<AuthTokens | null> {
+    try {
+      const payload = jwt.verify(refreshToken, this.jwtRefreshSecret) as RefreshTokenPayload;
+      
+      const user = await this.userRepository.findOne({
+        where: { 
+          id: payload.sub || payload.userId, 
+          isActive: true,
+          refreshTokenFamily: payload.tokenFamily 
+        }
+      });
+
+      if (!user) {
+        return null;
+      }
+
+      // Generate new tokens with rotation
+      const domain = 'neture.co.kr'; // Default domain
+      return await this.generateTokens(user, domain);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Set auth cookies
+  setAuthCookies(res: Response, tokens: AuthTokens): void {
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    // Access token cookie
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+
+    // Refresh token cookie
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+  }
+
+  // Clear auth cookies
+  clearAuthCookies(res: Response): void {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.clearCookie('sessionId');
+  }
+
+  // Revoke all user tokens
+  async revokeAllUserTokens(userId: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user) {
+      user.refreshTokenFamily = null;
+      await this.userRepository.save(user);
+    }
+  }
 }
 
-// Create and export singleton instance
-export const authService = new AuthService();
+// Export the class
+export { AuthService };
+
+// Create singleton instance
+let authServiceInstance: AuthService | null = null;
+
+export const getAuthService = (): AuthService => {
+  if (!authServiceInstance) {
+    const { AppDataSource } = require('../database/connection');
+    const { User } = require('../entities/User');
+    const userRepository = AppDataSource.getRepository(User);
+    authServiceInstance = new AuthService(userRepository);
+  }
+  return authServiceInstance;
+};
+
+// Export singleton instance for backward compatibility
+export const authService = new Proxy({} as AuthService, {
+  get(_target, prop, receiver) {
+    const service = getAuthService();
+    return Reflect.get(service, prop, receiver);
+  }
+});

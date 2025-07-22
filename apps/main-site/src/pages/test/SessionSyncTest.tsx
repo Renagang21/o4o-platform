@@ -80,7 +80,7 @@ export default function SessionSyncTest() {
 
   // Listen for session events via localStorage (cross-tab)
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
+    const handleStorageChange = (e: StorageEvent) => { // eslint-disable-line no-undef
       if (e.key === 'auth-sync') {
         const data = JSON.parse(e.newValue || '{}');
         setLastEvent(`Cross-tab event: ${data.event}`);
