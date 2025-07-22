@@ -1,5 +1,8 @@
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
+import { RefreshToken } from '../entities/RefreshToken';
+import { PasswordResetToken } from '../entities/PasswordResetToken';
+import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
 import { Product } from '../entities/Product';
@@ -65,6 +68,9 @@ export const AppDataSource = new DataSource({
   // 엔티티 등록 (temporarily minimal for OneDrive sync issues)
   entities: [
     User,
+    RefreshToken,
+    PasswordResetToken,
+    EmailVerificationToken,
     MediaFile,
     MediaFolder,
     Product,

@@ -196,6 +196,19 @@ export function formatRelativeTime(
 }
 
 /**
+ * Format date from now (convenience wrapper for formatRelativeTime)
+ * @param date Date to format
+ * @param locale Locale for formatting (default: 'ko-KR')
+ * @returns Formatted relative time string
+ */
+export function formatDateFromNow(
+  date: Date | string | number,
+  locale: string = 'ko-KR'
+): string {
+  return formatRelativeTime(date, new Date(), locale);
+}
+
+/**
  * Format phone number to Korean format
  * @param phoneNumber Phone number string
  * @returns Formatted phone number

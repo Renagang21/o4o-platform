@@ -42,6 +42,46 @@ const shortcodeExamples = [
     description: '전체 주문 내역을 요약해서 보여줍니다.'
   },
   {
+    title: '상품 그리드 (Product Grid)',
+    content: '[product-grid limit="8" columns="4"]',
+    description: '상품 목록을 그리드 형태로 표시합니다.'
+  },
+  {
+    title: '상품 그리드 - 카테고리별',
+    content: '[product-grid category="electronics" limit="6" sort="price-asc"]',
+    description: '특정 카테고리의 상품을 가격 오름차순으로 표시'
+  },
+  {
+    title: '플래시 세일 타이머 (Flash Sale Timer)',
+    content: '[flash-sale-timer end-time="2025-12-31T23:59:59" discount-percent="70"]',
+    description: '할인 세일 종료까지 남은 시간을 표시합니다.'
+  },
+  {
+    title: '플래시 세일 타이머 - 커스텀 제목',
+    content: '[flash-sale-timer end-time="2025-12-31T23:59:59" title="연말 특가 세일!" show-seconds="false"]',
+    description: '커스텀 제목과 초 단위 없이 표시'
+  },
+  {
+    title: '고객 리뷰 (Customer Reviews)',
+    content: '[customer-reviews limit="5" sort="helpful"]',
+    description: '상품 리뷰를 표시합니다.'
+  },
+  {
+    title: '고객 리뷰 - 높은 평점만',
+    content: '[customer-reviews min-rating="4" show-verified="true"]',
+    description: '4점 이상 리뷰만, 인증된 구매자 표시'
+  },
+  {
+    title: '관련 상품 (Related Products)',
+    content: '[related-products limit="4" title="추천 상품"]',
+    description: '관련 상품을 표시합니다.'
+  },
+  {
+    title: '관련 상품 - 캐러셀 레이아웃',
+    content: '[related-products layout="carousel" limit="6" show-rating="true"]',
+    description: '캐러셀 형태로 관련 상품 표시'
+  },
+  {
     title: '복합 사용 예제',
     content: `
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -61,6 +101,23 @@ const shortcodeExamples = [
   </div>
 </div>`,
     description: '여러 숏코드를 함께 사용하는 예제'
+  },
+  {
+    title: '상품 상세 페이지 예제',
+    content: `
+<div class="space-y-8">
+  [flash-sale-timer end-time="2025-12-31T23:59:59" discount-percent="50"]
+  
+  <div class="mt-8">
+    <h2 class="text-2xl font-bold mb-4">고객 리뷰</h2>
+    [customer-reviews limit="3" sort="newest"]
+  </div>
+  
+  <div class="mt-8">
+    [related-products title="함께 보면 좋은 상품" layout="carousel"]
+  </div>
+</div>`,
+    description: '상품 상세 페이지에서 활용 가능한 숏코드 조합'
   }
 ];
 

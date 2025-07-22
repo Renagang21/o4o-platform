@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
-import { BetaUser } from '../entities/BetaUser';
-import { AuthService } from '../services/AuthService';
+// import { BetaUser } from '../entities/BetaUser';
+import { AuthService } from '../services/authService';
 import { UserRole, UserStatus, AccessTokenPayload, AuthRequest } from '../types/auth';
 
 // Request 타입 확장 (새 SSO 시스템용)

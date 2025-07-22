@@ -1,0 +1,45 @@
+{
+  "name": "@o4o/api-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway for O4O Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --experimental-specifier-resolution=node src/server.ts",
+    "build": "tsc",
+    "start": "node --experimental-specifier-resolution=node dist/server.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.0",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0",
+    "express-rate-limit": "^7.5.0",
+    "rate-limit-redis": "^4.2.0",
+    "ioredis": "^5.4.2",
+    "winston": "^3.17.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.7.9",
+    "express-async-errors": "^3.1.1",
+    "compression": "^1.7.6",
+    "response-time": "^2.3.2",
+    "dotenv": "^16.4.7",
+    "cookie-parser": "^1.4.6",
+    "@o4o/types": "file:../../packages/types",
+    "@o4o/utils": "file:../../packages/utils"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/response-time": "^2.3.8",
+    "typescript": "~5.8.3",
+    "nodemon": "^3.1.10",
+    "vitest": "^2.1.8",
+    "@vitest/ui": "^2.1.8"
+  }
+}

@@ -19,7 +19,8 @@
   "dependencies": {
     "react": "^19.1.0",
     "@o4o/auth-client": "file:../auth-client",
-    "@o4o/types": "file:../types"
+    "@o4o/types": "file:../types",
+    "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",

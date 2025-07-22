@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../services/AuthService';
+import { AuthService } from '../services/authService';
 import { UserRole, AuthRequest } from '../types/auth';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';

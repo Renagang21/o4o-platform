@@ -33,6 +33,7 @@ export {
   formatFileSize,
   formatPercentage,
   formatRelativeTime,
+  formatDateFromNow,
   formatPhoneNumber
 } from './format';
 

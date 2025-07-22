@@ -26,6 +26,7 @@ import HomeWithSettings from './pages/HomeWithSettings';
 
 // Test Dashboard
 import { TestDashboard } from './features/test-dashboard';
+import SessionSyncTest from './pages/test/SessionSyncTest';
 
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
@@ -117,6 +118,7 @@ const App: React.FC = () => {
 
           {/* Test Dashboard */}
           <Route path="/test-dashboard" element={<TestDashboard />} />
+          <Route path="/test/session-sync" element={<SessionSyncTest />} />
           
           {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
           <Route path="/editor" element={<DisabledFeaturePage />} />

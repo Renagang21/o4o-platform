@@ -1,0 +1,127 @@
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { AuthService } from '../services/authService';
+
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: string;
+  };
+}
+
+/**
+ * Middleware to authenticate requests using httpOnly cookies
+ */
+export const authenticateCookie = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const accessToken = req.cookies.accessToken;
+    
+    if (!accessToken) {
+      res.status(401).json({
+        error: 'Access token not provided',
+        code: 'NO_ACCESS_TOKEN'
+      });
+      return;
+    }
+
+    const payload = AuthService.verifyAccessToken(accessToken);
+    
+    if (!payload) {
+      // Try to refresh the token
+      const refreshToken = req.cookies.refreshToken;
+      
+      if (refreshToken) {
+        const { userAgent, ipAddress } = AuthService.getRequestMetadata(req);
+        const tokens = await AuthService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+        
+        if (tokens) {
+          // Set new cookies
+          AuthService.setAuthCookies(res, tokens);
+          
+          // Verify new access token
+          const newPayload = AuthService.verifyAccessToken(tokens.accessToken);
+          if (newPayload) {
+            req.user = newPayload;
+            next();
+            return;
+          }
+        }
+      }
+      
+      AuthService.clearAuthCookies(res);
+      res.status(401).json({
+        error: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+      return;
+    }
+
+    req.user = payload;
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    AuthService.clearAuthCookies(res);
+    res.status(401).json({
+      error: 'Authentication failed',
+      code: 'AUTH_FAILED'
+    });
+  }
+};
+
+/**
+ * Middleware for role-based access control
+ */
+export const requireRole = (roles: string | string[]) => {
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
+  
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED'
+      });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        error: 'Insufficient permissions',
+        code: 'FORBIDDEN',
+        requiredRoles: allowedRoles,
+        userRole: req.user.role
+      });
+    }
+
+    next();
+  };
+};
+
+/**
+ * Middleware for optional authentication
+ * Adds user to request if valid token exists, but doesn't fail if not
+ */
+export const optionalAuth = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const accessToken = req.cookies.accessToken;
+    
+    if (accessToken) {
+      const payload = AuthService.verifyAccessToken(accessToken);
+      if (payload) {
+        req.user = payload;
+      }
+    }
+    
+    next();
+  } catch (error) {
+    // Ignore errors in optional auth
+    next();
+  }
+};

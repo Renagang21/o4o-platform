@@ -1,0 +1,65 @@
+# Prometheus configuration for O4O Platform
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'o4o-platform'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Node Exporter - System metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: 
+          - 'localhost:9100'
+        labels:
+          instance: 'api-server'
+
+  # API Server metrics
+  - job_name: 'api-server'
+    static_configs:
+      - targets: 
+          - 'localhost:4000'
+    metrics_path: '/metrics'
+
+  # PostgreSQL Exporter
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: 
+          - 'localhost:9187'
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: 
+          - 'localhost:9121'
+
+  # Blackbox Exporter - Endpoint monitoring
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - https://api.neture.co.kr/api/health
+          - https://neture.co.kr
+          - https://admin.neture.co.kr
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9115

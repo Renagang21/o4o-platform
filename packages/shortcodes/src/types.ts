@@ -20,6 +20,15 @@ export interface ShortcodeProps {
 export type ShortcodeComponent = ComponentType<ShortcodeProps>;
 
 /**
+ * 숏코드 속성 정의
+ */
+export interface ShortcodeAttributeDefinition {
+  type: 'string' | 'number' | 'boolean';
+  required?: boolean;
+  default?: any;
+}
+
+/**
  * 숏코드 정의
  */
 export interface ShortcodeDefinition {
@@ -27,6 +36,7 @@ export interface ShortcodeDefinition {
   component: ShortcodeComponent;
   description?: string;
   defaultAttributes?: ShortcodeAttributes;
+  attributes?: Record<string, ShortcodeAttributeDefinition>;
   validate?: (attributes: ShortcodeAttributes) => boolean;
 }
 

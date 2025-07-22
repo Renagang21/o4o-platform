@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth';
 import { BusinessInfo } from '../types/user';
+import { RefreshToken } from './RefreshToken';
 // import { IsEmail, IsEnum, IsArray, IsOptional } from 'class-validator';
 
 // Re-export types for external use
@@ -31,6 +32,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 200, nullable: true })
   name?: string;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  avatar?: string;
 
   @Column({ 
     type: 'enum', 
@@ -112,6 +116,10 @@ export class User {
   get fullName(): string {
     return `${this.firstName || ''} ${this.lastName || ''}`.trim() || this.email;
   }
+
+  // Refresh tokens relationship
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+  refreshTokens: RefreshToken[];
 
   // 민감 정보 제거한 공개 데이터
   toPublicData() {

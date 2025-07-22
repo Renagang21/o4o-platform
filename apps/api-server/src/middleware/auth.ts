@@ -3,6 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { AuthRequest, UserRole, UserStatus } from '../types/auth';
+import { AuthService } from '../services/authService';
 
 // Re-export AuthRequest for backward compatibility
 export { AuthRequest };
@@ -26,6 +27,44 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       return next();
     }
 
+    // First try cookie-based authentication
+    const accessToken = req.cookies?.accessToken;
+    if (accessToken) {
+      const payload = AuthService.verifyAccessToken(accessToken);
+      
+      if (!payload) {
+        // Try to refresh the token
+        const refreshToken = req.cookies?.refreshToken;
+        
+        if (refreshToken) {
+          const { userAgent, ipAddress } = AuthService.getRequestMetadata(req);
+          const tokens = await AuthService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+          
+          if (tokens) {
+            // Set new cookies
+            AuthService.setAuthCookies(res, tokens);
+            
+            // Verify new access token
+            const newPayload = AuthService.verifyAccessToken(tokens.accessToken);
+            if (newPayload) {
+              (req as AuthRequest).user = newPayload;
+              return next();
+            }
+          }
+        }
+        
+        AuthService.clearAuthCookies(res);
+        return res.status(401).json({
+          error: 'Invalid or expired token',
+          code: 'INVALID_TOKEN'
+        });
+      }
+
+      (req as AuthRequest).user = payload;
+      return next();
+    }
+
+    // Fall back to JWT Bearer token authentication for backward compatibility
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
@@ -120,6 +159,17 @@ export const requireManagerOrAdmin = requireRole(['admin', 'manager']);
 // Optional authentication - doesn't fail if no token
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // First try cookie-based authentication
+    const accessToken = req.cookies?.accessToken;
+    if (accessToken) {
+      const payload = AuthService.verifyAccessToken(accessToken);
+      if (payload) {
+        (req as AuthRequest).user = payload;
+        return next();
+      }
+    }
+
+    // Fall back to JWT Bearer token authentication
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 

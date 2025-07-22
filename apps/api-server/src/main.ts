@@ -4,14 +4,22 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import passport from './config/passport';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import Redis from 'ioredis';
 
 // Database connection
 import { AppDataSource } from './database/connection';
+import { SessionSyncService } from './services/sessionSyncService';
+import { WebSocketSessionSync } from './websocket/sessionSync';
 
 // 라우트 imports 
 import authRoutes from './routes/auth';
+import authV2Routes from './routes/auth-v2';
+import socialAuthRoutes from './routes/social-auth';
 import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
 import ecommerceRoutes from './routes/ecommerce';
@@ -23,6 +31,8 @@ import contentRoutes from './routes/content';
 import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
 import crowdfundingRoutes from './routes/crowdfunding';
+import linkedAccountsRoutes from './routes/linked-accounts';
+import vendorRoutes from './routes/vendor';
 
 // 환경변수 로드
 dotenv.config();
@@ -34,7 +44,21 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3011",
+    origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+      const allowedOrigins = [
+        process.env.FRONTEND_URL || "http://localhost:3011",
+        "http://localhost:3000", // main-site
+        "http://localhost:3001", // admin dashboard
+        "http://localhost:3002", // ecommerce
+        "http://localhost:3003", // crowdfunding
+      ];
+      
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -99,8 +123,26 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Session middleware for passport (required for OAuth)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'o4o-platform-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    domain: process.env.COOKIE_DOMAIN || undefined, // Enable cross-subdomain cookies
+    sameSite: 'lax'
+  }
+}));
+
+// Initialize passport
+app.use(passport.initialize());
 
 // Static file serving for uploads
 const uploadsPath = process.env.UPLOAD_DIR || './uploads';
@@ -114,6 +156,9 @@ app.use('/api/', limiter);
 
 // API 라우트
 app.use('/api/auth', authRoutes);
+app.use('/api/v1/auth/v2', authV2Routes); // Cookie-based auth routes
+app.use('/api/v1/auth', socialAuthRoutes); // Social auth routes
+app.use('/api/v1/auth', linkedAccountsRoutes); // Linked accounts routes
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
@@ -124,6 +169,7 @@ app.use('/api/signage', signageRoutes);
 app.use('/api/crowdfunding', crowdfundingRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/settings', settingsRoutes);
+app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api', contentRoutes);
 
 // 헬스체크 엔드포인트
@@ -163,7 +209,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Socket.IO 연결 처리
+// Socket.IO 연결 처리 (기존 기능 유지)
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
@@ -213,6 +259,36 @@ const startServer = async () => {
     console.log('⚠️  Database connection failed:', (dbError as Error).message);
     console.log('📌 Running in development mode without database');
   }
+
+  // Redis 초기화
+  let webSocketSessionSync: WebSocketSessionSync | null = null;
+  try {
+    const redisClient = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD
+    });
+
+    redisClient.on('connect', () => {
+      console.log('✅ Redis connected');
+    });
+
+    redisClient.on('error', (err) => {
+      console.log('⚠️  Redis connection error:', err.message);
+    });
+
+    // Initialize SessionSyncService
+    SessionSyncService.initialize(redisClient);
+    
+    // Initialize WebSocket session sync if enabled
+    if (process.env.SESSION_SYNC_ENABLED === 'true') {
+      webSocketSessionSync = new WebSocketSessionSync(io);
+      console.log('✅ WebSocket session sync initialized');
+    }
+  } catch (redisError) {
+    console.log('⚠️  Redis initialization failed:', (redisError as Error).message);
+    console.log('📌 Running without session synchronization');
+  }
   
   httpServer.listen(port, () => {
     console.log(`🚀 Neture API Server running on port ${port}`);
@@ -220,6 +296,8 @@ const startServer = async () => {
     console.log(`🌐 API Base URL: http://localhost:${port}/api`);
     console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3011'}`);
     console.log(`📡 Health check: http://localhost:${port}/api/health`);
+    console.log(`🍪 Cookie Domain: ${process.env.COOKIE_DOMAIN || 'none (default)'}`);
+    console.log(`🔄 Session Sync: ${process.env.SESSION_SYNC_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
   });
 };
 
@@ -227,4 +305,5 @@ startServer().catch(console.error);
 
 // Export services for other modules
 export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
+export { io }; // Export io instance for use in other modules
 // Note: realtimeFeedbackService should be initialized after server starts, not here
