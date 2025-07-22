@@ -12,6 +12,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SupplierShop } from './pages/shop/SupplierShop';
 import { SupplierStoreSettings } from './pages/supplier/SupplierStoreSettings';
+import { ShortcodeDemo } from './pages/ShortcodeDemo';
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
       {
         path: 'supplier/store-settings',
         element: <SupplierStoreSettings />,
+      },
+      {
+        path: 'shortcode-demo',
+        element: <ShortcodeDemo />,
       },
     ],
   },

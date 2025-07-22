@@ -63,7 +63,7 @@ export function CheckoutPage() {
   } = useForm<CheckoutForm>({
     defaultValues: {
       recipientName: user?.name || '',
-      recipientPhone: (user as any)?.phone || '',
+      recipientPhone: '',
       paymentMethod: 'card',
       deliveryRequest: deliveryRequests[0],
       agreeToTerms: false

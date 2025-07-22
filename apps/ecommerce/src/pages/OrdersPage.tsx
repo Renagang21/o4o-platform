@@ -140,7 +140,7 @@ const orderTabs = [
 ];
 
 export function OrdersPage() {
-  const { } = useAuth();
+  useAuth(); // for authentication check
   const queryClient = useQueryClient();
   
   const [searchTerm, setSearchTerm] = useState('');

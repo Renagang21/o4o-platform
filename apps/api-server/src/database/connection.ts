@@ -9,16 +9,21 @@ import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Category } from '../entities/Category';
 import { Settings } from '../entities/Settings';
+import { FundingProject } from '../entities/crowdfunding/FundingProject';
+import { FundingReward } from '../entities/crowdfunding/FundingReward';
+import { FundingBacking } from '../entities/crowdfunding/FundingBacking';
+import { BackerReward } from '../entities/crowdfunding/BackerReward';
+import { FundingUpdate } from '../entities/crowdfunding/FundingUpdate';
 // Temporarily disabled problematic entities due to OneDrive sync issues
 // import { BetaUser } from '../entities/BetaUser';
 // import { AnalyticsReport } from '../entities/AnalyticsReport';
 // import { Alert } from '../entities/Alert';
 // import { BetaFeedback } from '../entities/BetaFeedback';
 // import { FeedbackConversation } from '../entities/FeedbackConversation';
-// import { ForumCategory } from '../entities/ForumCategory';
-// import { ForumComment } from '../entities/ForumComment';
-// import { ForumPost } from '../entities/ForumPost';
-// import { ForumTag } from '../entities/ForumTag';
+import { ForumCategory } from '../entities/ForumCategory';
+import { ForumComment } from '../entities/ForumComment';
+import { ForumPost } from '../entities/ForumPost';
+import { ForumTag } from '../entities/ForumTag';
 // import { OperationsDashboard } from '../entities/OperationsDashboard';
 // import { Payment } from '../entities/Payment';
 // import { PricePolicy } from '../entities/PricePolicy';
@@ -69,6 +74,17 @@ export const AppDataSource = new DataSource({
     CartItem,
     Category,
     Settings,
+    // Crowdfunding entities
+    FundingProject,
+    FundingReward,
+    FundingBacking,
+    BackerReward,
+    FundingUpdate,
+    // Forum entities
+    ForumCategory,
+    ForumPost,
+    ForumComment,
+    ForumTag,
     // BetaUser,
     // AnalyticsReport,
     // Alert,

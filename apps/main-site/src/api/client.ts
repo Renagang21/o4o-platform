@@ -147,9 +147,6 @@ export const servicesAPI = {
   getCrowdfundingServices: () =>
     apiClient.get('/services/crowdfunding'),
   
-  getForumServices: () =>
-    apiClient.get('/services/forum'),
-  
   getSignageServices: () =>
     apiClient.get('/services/signage'),
 };

@@ -89,7 +89,7 @@ const relatedProducts: Product[] = [];
 export function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { } = useAuth();
+  useAuth(); // for authentication check
   
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);

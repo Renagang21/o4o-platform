@@ -39,20 +39,6 @@ export const getDefaultHomeData = (): HomePageData => ({
       isEditable: false
     },
     {
-      id: 'crowdfunding',
-      title: '크라우드펀딩',
-      description: '투명성 기반 신뢰도 펀딩',
-      icon: '🚀',
-      features: ['투명성 허브', '전문가 검증', '파트너 크로스 프로모션', '드랍쉬핑 연동'],
-      status: 'coming_soon',
-      href: '/crowdfunding',
-      adminHref: '/crowdfunding/dashboard',
-      userHref: '/crowdfunding',
-      color: 'from-orange-500 to-red-600',
-      buttonText: '곧 출시 예정',
-      isEditable: true // 편집 가능한 배너
-    },
-    {
       id: 'signage',
       title: '디지털 사이니지',
       description: '매장 TV 콘텐츠 관리 시스템',

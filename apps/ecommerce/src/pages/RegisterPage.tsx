@@ -31,7 +31,7 @@ export function RegisterPage() {
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
-        : (err as any).response?.data?.message || '회원가입에 실패했습니다.';
+        : '회원가입에 실패했습니다.';
       setError(errorMessage);
     }
   };

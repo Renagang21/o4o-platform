@@ -1,0 +1,30 @@
+{
+  "name": "@o4o/crowdfunding-types",
+  "version": "1.0.0",
+  "description": "Crowdfunding type definitions for O4O Platform",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "echo 'Types package - no dev mode'",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "crowdfunding",
+    "types",
+    "typescript"
+  ],
+  "author": "O4O Platform Team",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "~5.8.3"
+  },
+  "dependencies": {
+    "@o4o/types": "file:../types"
+  }
+}

@@ -22,6 +22,7 @@ import signageRoutes from './routes/signage';
 import contentRoutes from './routes/content';
 import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
+import crowdfundingRoutes from './routes/crowdfunding';
 
 // 환경변수 로드
 dotenv.config();
@@ -75,6 +76,8 @@ const corsOptions = {
       process.env.FRONTEND_URL || "http://localhost:3011",
       "http://localhost:3000", // main-site
       "http://localhost:3001", // admin dashboard
+      "http://localhost:3002", // ecommerce
+      "http://localhost:3003", // crowdfunding
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -118,6 +121,7 @@ app.use('/api/cpt', cptRoutes);
 app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
+app.use('/api/crowdfunding', crowdfundingRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/settings', settingsRoutes);
 app.use('/api', contentRoutes);

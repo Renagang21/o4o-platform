@@ -27,6 +27,7 @@ export {
 // Export formatting functions from format.ts
 export {
   formatCurrency,
+  formatPrice,
   formatNumber,
   formatDate,
   formatFileSize,
@@ -37,3 +38,11 @@ export {
 
 // Export cn utility
 export { cn } from './cn';
+
+// Export specific string utilities to avoid conflicts
+export { 
+  generateSlug,
+  truncate,
+  toTitleCase,
+  randomString
+} from './string';

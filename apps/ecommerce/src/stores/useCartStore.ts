@@ -121,6 +121,7 @@ export const useCartStore = create<CartStore>()(
               productId: product.id,
               product,
               quantity,
+              unitPrice: product.pricing.customer,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             }],
@@ -146,7 +147,23 @@ export const useCartStore = create<CartStore>()(
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
             );
-            set({ cart: { ...cart, items: updatedItems } });
+            // 새로운 summary 계산
+            const newSubtotal = updatedItems.reduce((sum, item) => {
+              const price = item.unitPrice || item.product?.pricing.customer || 0;
+              return sum + (price * item.quantity);
+            }, 0);
+            
+            set({ 
+              cart: { 
+                ...cart, 
+                items: updatedItems,
+                summary: {
+                  ...cart.summary,
+                  subtotal: newSubtotal,
+                  total: newSubtotal + cart.summary.shipping + cart.summary.tax - cart.summary.discount
+                }
+              } 
+            });
           } else {
             // Add new item
             const newItem: CartItem = {
@@ -155,10 +172,28 @@ export const useCartStore = create<CartStore>()(
               productId: product.id,
               product,
               quantity,
+              unitPrice: product.pricing.customer,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             };
-            set({ cart: { ...cart, items: [...cart.items, newItem] } });
+            // 새로운 summary 계산
+            const newItems = [...cart.items, newItem];
+            const newSubtotal = newItems.reduce((sum, item) => {
+              const price = item.unitPrice || item.product?.pricing.customer || 0;
+              return sum + (price * item.quantity);
+            }, 0);
+            
+            set({ 
+              cart: { 
+                ...cart, 
+                items: newItems,
+                summary: {
+                  ...cart.summary,
+                  subtotal: newSubtotal,
+                  total: newSubtotal + cart.summary.shipping + cart.summary.tax - cart.summary.discount
+                }
+              } 
+            });
           }
         }
       },

@@ -394,7 +394,7 @@ export const DropdownMenuTrigger: React.FC<React.HTMLAttributes<HTMLButtonElemen
   ...props 
 }) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<any>, props);
+    return React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, props);
   }
   return <button {...props}>{children}</button>;
 };
@@ -603,7 +603,7 @@ export const DialogTrigger: React.FC<React.HTMLAttributes<HTMLButtonElement> & {
   ...props 
 }) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<any>, props);
+    return React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, props);
   }
   return <button {...props}>{children}</button>;
 };

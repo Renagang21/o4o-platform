@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Checkbox } from '@o4o/ui';
 import { Trash2, ShoppingCart as CartIcon } from 'lucide-react';
-import { Cart, OrderSummary } from '@o4o/types';
+import { Cart, OrderSummary, Product } from '@o4o/types';
 import { CartItem, CartSummary } from '@/components/cart';
 import { useAuth } from '@o4o/auth-context';
 
@@ -68,7 +68,7 @@ const mockCart: Cart = {
         isFeatured: false,
         isVirtual: false,
         isDownloadable: false
-      } as any,
+      } as Product,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     },
@@ -121,7 +121,7 @@ const mockCart: Cart = {
         isFeatured: false,
         isVirtual: false,
         isDownloadable: false
-      } as any,
+      } as Product,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -150,12 +150,11 @@ export function CartPage() {
 
   // Update quantity mutation
   const updateQuantityMutation = useMutation({
-    mutationFn: async ({ }: { itemId: string; quantity: number }) => {
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
       // TODO: Replace with actual API call
+      console.log('Update quantity:', itemId, quantity);
       // const response = await authClient.patch(`/api/v1/cart/items/${itemId}`, { quantity });
       // return response.data;
-      // TODO: Log quantity update for debugging
-      // console.log('Update quantity:', itemId, quantity);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });

@@ -103,7 +103,7 @@ const paymentMethodLabels: Record<string, string> = {
 export function OrderDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { } = useAuth(); // user not used
+  useAuth(); // for authentication check
   const queryClient = useQueryClient();
 
   // Fetch order details

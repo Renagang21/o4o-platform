@@ -29,6 +29,15 @@ export function formatCurrency(
 }
 
 /**
+ * Alias for formatCurrency with default KRW
+ * @param amount 금액
+ * @returns 포맷된 원화 문자열
+ */
+export function formatPrice(amount: number | string): string {
+  return formatCurrency(amount, 'KRW', 'ko-KR');
+}
+
+/**
  * Format number with locale-specific formatting
  * @param value 숫자 값
  * @param options Intl.NumberFormatOptions
