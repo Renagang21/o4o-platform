@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { Product } from '../../entities/Product';
-import { ProductImage } from '../../entities/ProductImage';
 import { Category } from '../../entities/Category';
 import { Like, In } from 'typeorm';
 import slugify from 'slugify';
@@ -71,11 +70,11 @@ export class VendorProductController {
           id: product.id,
           name: product.name,
           sku: product.sku,
-          category: product.category?.name || 'Uncategorized',
-          price: product.price,
-          stock: product.inventory?.quantity || 0,
-          status: product.inventory?.stockStatus || 'out_of_stock',
-          image: product.images?.[0]?.url || '/api/placeholder/100/100',
+          category: product.categoryId || 'Uncategorized',
+          price: 0, // TODO: Add pricing to Product entity
+          stock: 0, // TODO: Add inventory to Product entity
+          status: product.status,
+          image: product.images?.[0] || '/api/placeholder/100/100',
           sales: stats?.totalSales || 0
         };
       });
@@ -150,43 +149,18 @@ export class VendorProductController {
         description: productData.description,
         sku: productData.sku,
         slug: slugify(productData.name, { lower: true, strict: true }),
-        price: productData.price,
-        compareAtPrice: productData.compareAtPrice,
-        cost: productData.cost,
         status: productData.status || 'draft',
-        category,
-        inventory: {
-          quantity: productData.inventory?.quantity || 0,
-          stockStatus: productData.inventory?.stockStatus || 'in_stock',
-          trackQuantity: productData.inventory?.trackQuantity !== false
-        },
-        seo: productData.seo ? {
-          title: productData.seo.title || productData.name,
-          description: productData.seo.description || productData.description,
-          keywords: productData.seo.keywords
-        } : undefined,
-        shipping: productData.shipping ? {
-          weight: productData.shipping.weight,
-          dimensions: productData.shipping.dimensions,
-          requiresShipping: true
-        } : undefined
+        categoryId: category?.id,
+        weight: productData.shipping?.weight,
+        dimensions: productData.shipping?.dimensions,
+        requiresShipping: productData.shipping?.requiresShipping || true,
+        images: productData.images?.map((img: any) => img.url || img),
+        featuredImage: productData.images?.[0]?.url || productData.images?.[0]
       });
 
       const savedProduct = await productRepository.save(product);
 
-      // 이미지 추가
-      if (productData.images && productData.images.length > 0) {
-        const imageRepository = AppDataSource.getRepository(ProductImage);
-        const images = productData.images.map((img: any, index: number) => 
-          imageRepository.create({
-            productId: savedProduct.id,
-            url: img.url,
-            alt: img.alt || savedProduct.name,
-            position: img.position || index
-          })
-        );
-        await imageRepository.save(images);
-      }
+      // Images are already saved in the product entity
 
       // 태그 추가 (구현 필요)
 
@@ -225,33 +199,26 @@ export class VendorProductController {
       if (updateData.name) product.name = updateData.name;
       if (updateData.description) product.description = updateData.description;
       if (updateData.sku) product.sku = updateData.sku;
-      if (updateData.price !== undefined) product.price = updateData.price;
-      if (updateData.compareAtPrice !== undefined) product.compareAtPrice = updateData.compareAtPrice;
-      if (updateData.cost !== undefined) product.cost = updateData.cost;
+      // TODO: Add price fields to Product entity
+      // if (updateData.price !== undefined) product.price = updateData.price;
+      // if (updateData.compareAtPrice !== undefined) product.compareAtPrice = updateData.compareAtPrice;
+      // if (updateData.cost !== undefined) product.cost = updateData.cost;
       if (updateData.status) product.status = updateData.status;
 
-      // 재고 정보 업데이트
-      if (updateData.inventory) {
-        if (!product.inventory) {
-          product.inventory = {} as any;
-        }
-        Object.assign(product.inventory, updateData.inventory);
-      }
+      // TODO: Add inventory management to Product entity
+      // if (updateData.inventory) { ... }
 
-      // SEO 정보 업데이트
+      // SEO fields
       if (updateData.seo) {
-        if (!product.seo) {
-          product.seo = {} as any;
-        }
-        Object.assign(product.seo, updateData.seo);
+        if (updateData.seo.title) product.metaTitle = updateData.seo.title;
+        if (updateData.seo.description) product.metaDescription = updateData.seo.description;
       }
 
-      // 배송 정보 업데이트
+      // Shipping fields
       if (updateData.shipping) {
-        if (!product.shipping) {
-          product.shipping = {} as any;
-        }
-        Object.assign(product.shipping, updateData.shipping);
+        if (updateData.shipping.weight !== undefined) product.weight = updateData.shipping.weight;
+        if (updateData.shipping.dimensions) product.dimensions = updateData.shipping.dimensions;
+        if (updateData.shipping.requiresShipping !== undefined) product.requiresShipping = updateData.shipping.requiresShipping;
       }
 
       const updatedProduct = await productRepository.save(product);

@@ -322,3 +322,6 @@ export class AuthService {
     return suspendedUser;
   }
 }
+
+// Create and export singleton instance
+export const authService = new AuthService();

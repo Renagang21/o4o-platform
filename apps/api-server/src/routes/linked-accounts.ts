@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/auth';
-import { sessionSyncService } from '../services/sessionSyncService';
+import { SessionSyncService } from '../services/sessionSyncService';
 
 const router = Router();
 
@@ -50,7 +50,7 @@ router.get('/linked-accounts', authenticateToken, async (req, res) => {
 router.get('/sessions', authenticateToken, async (req, res) => {
   try {
     const userId = req.user!.id;
-    const sessions = await sessionSyncService.getUserSessions(userId);
+    const sessions = await SessionSyncService.getUserSessions(userId);
 
     res.json({
       success: true,
@@ -74,7 +74,7 @@ router.delete('/sessions/:sessionId', authenticateToken, async (req, res) => {
     const userId = req.user!.id;
     const { sessionId } = req.params;
 
-    await sessionSyncService.removeSession(sessionId, userId);
+    await SessionSyncService.removeSession(sessionId, userId);
 
     res.json({
       success: true,
@@ -96,7 +96,7 @@ router.post('/logout-all-devices', authenticateToken, async (req, res) => {
   try {
     const userId = req.user!.id;
     
-    await sessionSyncService.logoutAllDevices(userId);
+    await SessionSyncService.logoutAllDevices(userId);
 
     res.json({
       success: true,

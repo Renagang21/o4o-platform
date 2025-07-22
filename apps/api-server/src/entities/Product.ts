@@ -118,6 +118,20 @@ export class Product {
   @JoinColumn({ name: 'createdBy' })
   creator!: User;
 
+  @Column({ nullable: true })
+  vendorId?: string;
+
+  // 배송 정보
+  @Column({ type: 'json', nullable: true })
+  shipping?: {
+    weight?: number;
+    length?: number;
+    width?: number;
+    height?: number;
+    shippingClass?: string;
+    freeShipping?: boolean;
+  };
+
   @CreateDateColumn()
   createdAt!: Date;
 

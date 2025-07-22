@@ -1,15 +1,12 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../services/authService';
+import { authService } from '../services/AuthService';
 import { UserRole, AuthRequest } from '../types/auth';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 
 export class UserController {
-  private authService: AuthService;
-
   constructor() {
-    const userRepository = AppDataSource.getRepository(User);
-    this.authService = new AuthService(userRepository);
+    // AuthService uses static methods
   }
 
   // 현재 사용자 정보 조회
@@ -23,7 +20,7 @@ export class UserController {
         });
       }
 
-      const user = await this.authService.getUserById(authReq.user.id);
+      const user = await authService.getUserById(authReq.user.id);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -65,7 +62,7 @@ export class UserController {
         });
       }
 
-      const user = await this.authService.updateUserRole(userId, role);
+      const user = await authService.updateUserRole(userId, role);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -108,7 +105,7 @@ export class UserController {
         });
       }
 
-      const user = await this.authService.updateUserBusinessInfo(authReq.user.id, businessInfo);
+      const user = await authService.updateUserBusinessInfo(authReq.user.id, businessInfo);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -137,7 +134,7 @@ export class UserController {
 
       let users;
       if (role && Object.values(UserRole).includes(role as UserRole)) {
-        users = await this.authService.getUsersByRole(role as UserRole);
+        users = await authService.getUsersByRole(role as UserRole);
       } else {
         // 모든 사용자 조회 로직을 추가할 수 있습니다
         return res.status(400).json({
@@ -165,7 +162,7 @@ export class UserController {
     try {
       const { userId } = req.params;
 
-      const user = await this.authService.suspendUser(userId);
+      const user = await authService.suspendUser(userId);
       if (!user) {
         return res.status(404).json({
           success: false,

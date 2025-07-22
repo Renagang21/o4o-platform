@@ -1,9 +1,11 @@
 // Authentication related types
+export type UserRole = 'admin' | 'business' | 'affiliate' | 'customer' | 'seller' | 'supplier' | 'manager' | 'retailer';
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'business' | 'affiliate' | 'customer';
+  role: UserRole;
   isApproved?: boolean;
   avatar?: string;
   lastLoginAt?: Date;

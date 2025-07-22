@@ -45,6 +45,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/user-event": "^14.6.1",
+    "@types/socket.io-client": "^1.4.36",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "concurrently": "^9.1.0",
@@ -61,5 +62,9 @@
     "node"
   ],
   "author": "O4O Platform Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "rate-limit-redis": "^4.2.1",
+    "slugify": "^1.6.6"
+  }
 }

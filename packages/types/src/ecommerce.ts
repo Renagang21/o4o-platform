@@ -4,13 +4,13 @@
 // 통합된 전자상거래 타입 정의 - O4O 플랫폼용
 // 역할 기반 가격 정책과 다중 비즈니스 모델 지원
 
-import type { User } from './auth';
+import type { User, UserRole } from './auth';
 
 // =============================================================================
 // CORE ENUMS
 // =============================================================================
 
-export type UserRole = 'customer' | 'business' | 'affiliate' | 'retailer' | 'supplier' | 'admin';
+// UserRole is now imported from auth.ts which includes all roles
 
 export type ProductStatus = 
   | 'draft'         // 초안

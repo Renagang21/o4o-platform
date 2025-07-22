@@ -58,8 +58,8 @@ export class CookieAuthClient {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await this.api.post('/auth/v2/login', credentials);
     // Store token if returned (for WebSocket auth)
-    if (response.data.tokens?.accessToken) {
-      this.currentToken = response.data.tokens.accessToken;
+    if (response.data.token) {
+      this.currentToken = response.data.token;
     }
     return response.data;
   }

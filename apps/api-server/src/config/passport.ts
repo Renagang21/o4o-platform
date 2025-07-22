@@ -76,7 +76,7 @@ passport.use(new KakaoStrategy({
   clientID: process.env.KAKAO_CLIENT_ID || '',
   clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
   callbackURL: '/api/v1/auth/kakao/callback'
-}, async (accessToken, refreshToken, profile, done) => {
+}, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
     
@@ -104,7 +104,7 @@ passport.use(new KakaoStrategy({
     // Create new user
     user = userRepo.create({
       email,
-      name: profile.displayName || profile.username,
+      name: profile.displayName || profile.username || profile._json?.properties?.nickname || '',
       provider: 'kakao',
       provider_id: String(profile.id),
       role: UserRole.CUSTOMER,
@@ -129,7 +129,7 @@ passport.use(new NaverStrategy({
   clientID: process.env.NAVER_CLIENT_ID || '',
   clientSecret: process.env.NAVER_CLIENT_SECRET || '',
   callbackURL: '/api/v1/auth/naver/callback'
-}, async (accessToken, refreshToken, profile, done) => {
+}, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
     

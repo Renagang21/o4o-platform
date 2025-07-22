@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { AuthRequest, UserRole, UserStatus } from '../types/auth';
-import { AuthService } from '../services/authService';
+import { authService } from '../services/AuthService';
 
 // Re-export AuthRequest for backward compatibility
 export { AuthRequest };
@@ -30,22 +30,22 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     // First try cookie-based authentication
     const accessToken = req.cookies?.accessToken;
     if (accessToken) {
-      const payload = AuthService.verifyAccessToken(accessToken);
+      const payload = authService.verifyAccessToken(accessToken);
       
       if (!payload) {
         // Try to refresh the token
         const refreshToken = req.cookies?.refreshToken;
         
         if (refreshToken) {
-          const { userAgent, ipAddress } = AuthService.getRequestMetadata(req);
-          const tokens = await AuthService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+          const { userAgent, ipAddress } = authService.getRequestMetadata(req);
+          const tokens = await authService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
           
           if (tokens) {
             // Set new cookies
-            AuthService.setAuthCookies(res, tokens);
+            authService.setAuthCookies(res, tokens);
             
             // Verify new access token
-            const newPayload = AuthService.verifyAccessToken(tokens.accessToken);
+            const newPayload = authService.verifyAccessToken(tokens.accessToken);
             if (newPayload) {
               (req as AuthRequest).user = newPayload;
               return next();
@@ -53,7 +53,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
           }
         }
         
-        AuthService.clearAuthCookies(res);
+        authService.clearAuthCookies(res);
         return res.status(401).json({
           error: 'Invalid or expired token',
           code: 'INVALID_TOKEN'
@@ -162,7 +162,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     // First try cookie-based authentication
     const accessToken = req.cookies?.accessToken;
     if (accessToken) {
-      const payload = AuthService.verifyAccessToken(accessToken);
+      const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
         (req as AuthRequest).user = payload;
         return next();

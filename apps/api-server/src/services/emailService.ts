@@ -55,7 +55,7 @@ export class EmailService {
   private async initializeTransporter(): Promise<void> {
     try {
       // Create transporter
-      this.transporter = nodemailer.createTransporter(this.config);
+      this.transporter = nodemailer.createTransport(this.config);
 
       // Verify connection
       await this.transporter.verify();

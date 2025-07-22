@@ -10,8 +10,7 @@ export interface SSOAuthProviderProps extends CookieAuthProviderProps {
 export const SSOAuthProvider: React.FC<SSOAuthProviderProps> = ({ 
   children, 
   onAuthChange,
-  enableSSO = true,
-  ssoCheckInterval = 30000
+  enableSSO = true
 }) => {
   useEffect(() => {
     if (!enableSSO) return;

@@ -125,8 +125,8 @@ export const CookieAuthProvider: React.FC<CookieAuthProviderProps> = ({
         onAuthChange?.(response.user);
         
         // Initialize WebSocket session sync with new token
-        if (response.tokens?.accessToken) {
-          initializeSessionSync(response.tokens.accessToken);
+        if (response.token) {
+          initializeSessionSync(response.token);
         }
       }
     } catch (err: any) {

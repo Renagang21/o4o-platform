@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
-// import { BetaUser } from '../entities/BetaUser';
-import { AuthService } from '../services/authService';
+import { BetaUser } from '../entities/BetaUser';
+import { authService } from '../services/AuthService';
 import { UserRole, UserStatus, AccessTokenPayload, AuthRequest } from '../types/auth';
 
 // Request 타입 확장 (새 SSO 시스템용)
@@ -321,10 +321,6 @@ export class AuthMiddleware {
         });
       }
 
-      // AuthService 인스턴스 생성
-      const userRepository = AppDataSource.getRepository(User);
-      const authService = new AuthService(userRepository);
-
       // 토큰 검증
       const payload = await authService.verifyAccessToken(token);
       req.user = payload;
@@ -423,9 +419,6 @@ export class AuthMiddleware {
       const token = authHeader && authHeader.split(' ')[1];
 
       if (token) {
-        const userRepository = AppDataSource.getRepository(User);
-        const authService = new AuthService(userRepository);
-        
         try {
           const payload = await authService.verifyAccessToken(token);
           req.user = payload;

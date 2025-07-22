@@ -46,4 +46,9 @@ export class OrderItem {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  // Getter for price (alias for unitPrice)
+  get price(): number {
+    return this.unitPrice;
+  }
 }

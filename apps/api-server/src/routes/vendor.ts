@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware } from '../middlewares/authMiddleware';
-import { roleMiddleware } from '../middlewares/roleMiddleware';
+import { authMiddleware, roleGuard } from '../middleware/authMiddleware';
 import { VendorStatsController } from '../controllers/vendor/vendorStatsController';
 import { VendorProductController } from '../controllers/vendor/vendorProductController';
 import { VendorOrderController } from '../controllers/vendor/vendorOrderController';
@@ -14,7 +13,7 @@ const vendorOrderController = new VendorOrderController();
 
 // 모든 벤더 라우트는 인증 필요 + 벤더 권한 체크
 router.use(authMiddleware);
-router.use(roleMiddleware(['business', 'supplier']));
+router.use(roleGuard(['business', 'supplier']));
 
 // 통계 관련
 router.get('/stats/dashboard', vendorStatsController.getDashboardStats);
@@ -44,7 +43,7 @@ router.get('/profile', (req, res) => {
     id: req.user?.id,
     name: req.user?.name,
     email: req.user?.email,
-    businessName: req.user?.business_name,
+    businessName: req.user?.businessInfo?.companyName || req.user?.name,
     role: req.user?.role
   });
 });
@@ -58,7 +57,7 @@ router.put('/profile', (req, res) => {
 router.get('/settings', (req, res) => {
   // TODO: 벤더 설정 조회
   res.json({
-    storeName: req.user?.business_name || 'My Store',
+    storeName: req.user?.businessInfo?.companyName || req.user?.name || 'My Store',
     storeDescription: '',
     shippingFee: 3000,
     freeShippingThreshold: 50000,

@@ -183,3 +183,5 @@ export class SessionSyncService {
     });
   }
 }
+
+export const sessionSyncService = new SessionSyncService();

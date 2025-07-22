@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { AuthService } from '../services/authService';
+import { authService } from '../services/AuthService';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -29,22 +29,22 @@ export const authenticateCookie = async (
       return;
     }
 
-    const payload = AuthService.verifyAccessToken(accessToken);
+    const payload = authService.verifyAccessToken(accessToken);
     
     if (!payload) {
       // Try to refresh the token
       const refreshToken = req.cookies.refreshToken;
       
       if (refreshToken) {
-        const { userAgent, ipAddress } = AuthService.getRequestMetadata(req);
-        const tokens = await AuthService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+        const { userAgent, ipAddress } = authService.getRequestMetadata(req);
+        const tokens = await authService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
         
         if (tokens) {
           // Set new cookies
-          AuthService.setAuthCookies(res, tokens);
+          authService.setAuthCookies(res, tokens);
           
           // Verify new access token
-          const newPayload = AuthService.verifyAccessToken(tokens.accessToken);
+          const newPayload = authService.verifyAccessToken(tokens.accessToken);
           if (newPayload) {
             req.user = newPayload;
             next();
@@ -53,7 +53,7 @@ export const authenticateCookie = async (
         }
       }
       
-      AuthService.clearAuthCookies(res);
+      authService.clearAuthCookies(res);
       res.status(401).json({
         error: 'Invalid or expired token',
         code: 'INVALID_TOKEN'
@@ -65,7 +65,7 @@ export const authenticateCookie = async (
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    AuthService.clearAuthCookies(res);
+    authService.clearAuthCookies(res);
     res.status(401).json({
       error: 'Authentication failed',
       code: 'AUTH_FAILED'
@@ -113,7 +113,7 @@ export const optionalAuth = async (
     const accessToken = req.cookies.accessToken;
     
     if (accessToken) {
-      const payload = AuthService.verifyAccessToken(accessToken);
+      const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
         req.user = payload;
       }

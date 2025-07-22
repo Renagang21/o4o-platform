@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection';
 import { User, UserRole, UserStatus } from '../entities/User';
-import { AuthService } from '../services/authService';
+import { authService } from '../services/AuthService';
 import { SessionSyncService } from '../services/sessionSyncService';
 import { PasswordResetService } from '../services/passwordResetService';
 import { authenticateCookie, AuthRequest } from '../middleware/auth-v2';
@@ -22,9 +22,9 @@ router.post('/login',
       }
 
       const { email, password } = req.body;
-      const { userAgent, ipAddress } = AuthService.getRequestMetadata(req);
+      const { userAgent, ipAddress } = authService.getRequestMetadata(req);
 
-      const result = await AuthService.login(email, password, userAgent, ipAddress);
+      const result = await authService.login(email, password, userAgent, ipAddress);
       
       if (!result) {
         return res.status(401).json({
@@ -34,7 +34,7 @@ router.post('/login',
       }
 
       // Set httpOnly cookies
-      AuthService.setAuthCookies(res, result.tokens);
+      authService.setAuthCookies(res, result.tokens);
       
       // Set session ID cookie for SSO
       res.cookie('sessionId', result.sessionId, {
@@ -156,11 +156,11 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
-    const { userAgent, ipAddress } = AuthService.getRequestMetadata(req);
-    const tokens = await AuthService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+    const { userAgent, ipAddress } = authService.getRequestMetadata(req);
+    const tokens = await authService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
     
     if (!tokens) {
-      AuthService.clearAuthCookies(res);
+      authService.clearAuthCookies(res);
       return res.status(401).json({
         error: 'Invalid refresh token',
         code: 'INVALID_REFRESH_TOKEN'
@@ -168,7 +168,7 @@ router.post('/refresh', async (req, res) => {
     }
 
     // Set new cookies
-    AuthService.setAuthCookies(res, tokens);
+    authService.setAuthCookies(res, tokens);
 
     res.json({
       success: true,
@@ -176,7 +176,7 @@ router.post('/refresh', async (req, res) => {
     });
   } catch (error) {
     console.error('Token refresh error:', error);
-    AuthService.clearAuthCookies(res);
+    authService.clearAuthCookies(res);
     res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR'
@@ -191,10 +191,10 @@ router.post('/logout', async (req, res) => {
     const sessionId = req.cookies.sessionId;
     
     if (accessToken) {
-      const payload = AuthService.verifyAccessToken(accessToken);
+      const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
         // Revoke all refresh tokens for this user
-        await AuthService.revokeAllUserTokens(payload.userId);
+        await authService.revokeAllUserTokens(payload.userId);
         
         // Remove SSO session
         if (sessionId) {
@@ -204,7 +204,7 @@ router.post('/logout', async (req, res) => {
     }
 
     // Clear cookies
-    AuthService.clearAuthCookies(res);
+    authService.clearAuthCookies(res);
     res.clearCookie('sessionId', {
       domain: process.env.COOKIE_DOMAIN || undefined
     });
@@ -216,7 +216,7 @@ router.post('/logout', async (req, res) => {
   } catch (error) {
     console.error('Logout error:', error);
     // Still clear cookies even if error occurs
-    AuthService.clearAuthCookies(res);
+    authService.clearAuthCookies(res);
     res.clearCookie('sessionId', {
       domain: process.env.COOKIE_DOMAIN || undefined
     });
@@ -267,13 +267,13 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
     }
 
     // Revoke all refresh tokens
-    await AuthService.revokeAllUserTokens(req.user.userId);
+    await authService.revokeAllUserTokens(req.user.userId);
     
     // Remove all SSO sessions
     await SessionSyncService.removeAllUserSessions(req.user.userId);
     
     // Clear current session cookies
-    AuthService.clearAuthCookies(res);
+    authService.clearAuthCookies(res);
     res.clearCookie('sessionId', {
       domain: process.env.COOKIE_DOMAIN || undefined
     });

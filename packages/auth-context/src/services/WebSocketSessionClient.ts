@@ -1,4 +1,11 @@
-import { io, Socket } from 'socket.io-client';
+const io = require('socket.io-client');
+
+interface Socket {
+  on(event: string, listener: (...args: any[]) => void): void;
+  emit(event: string, ...args: any[]): void;
+  disconnect(): void;
+  connected: boolean;
+}
 
 export interface SessionEvent {
   event: 'created' | 'removed' | 'logout_all' | 'refreshed';
@@ -91,11 +98,11 @@ export class WebSocketSessionClient {
       this.checkSession(); // Check session immediately on connect
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on('disconnect', (reason: string) => {
       console.log('[Session Sync] Disconnected:', reason);
     });
 
-    this.socket.on('connect_error', (error) => {
+    this.socket.on('connect_error', (error: Error) => {
       console.error('[Session Sync] Connection error:', error.message);
     });
 

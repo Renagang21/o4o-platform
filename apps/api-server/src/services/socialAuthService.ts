@@ -1,6 +1,6 @@
 import { AppDataSource } from '../database/connection';
 import { User, UserRole, UserStatus } from '../entities/User';
-import { AuthService } from './authService';
+import { authService } from './AuthService';
 import { SessionSyncService } from './sessionSyncService';
 import { emailService } from './emailService';
 import { Response } from 'express';
@@ -85,14 +85,14 @@ export class SocialAuthService {
     sessionId: string;
   }> {
     // Generate tokens
-    const tokens = await AuthService.generateTokens(user);
+    const tokens = await authService.generateTokens(user);
     
     // Create SSO session
     const sessionId = SessionSyncService.generateSessionId();
     await SessionSyncService.createSession(user, sessionId);
     
     // Set cookies
-    AuthService.setAuthCookies(res, tokens);
+    authService.setAuthCookies(res, tokens);
     
     // Set session ID cookie for SSO
     res.cookie('sessionId', sessionId, {

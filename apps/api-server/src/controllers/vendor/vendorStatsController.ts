@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
-import { Order } from '../../entities/Order';
-import { Product } from '../../entities/Product';
+import { Order, OrderStatus } from '../../entities/Order';
+import { Product, ProductStatus } from '../../entities/Product';
 import { User } from '../../entities/User';
 import { Between, MoreThan } from 'typeorm';
 
@@ -35,17 +35,17 @@ export class VendorStatsController {
 
       // 전체 주문 수
       const totalOrders = await orderRepository.count({
-        where: { vendorId, status: 'completed' }
+        where: { vendorId, status: OrderStatus.DELIVERED }
       });
 
       // 신규 주문 (pending)
       const newOrders = await orderRepository.count({
-        where: { vendorId, status: 'pending' }
+        where: { vendorId, status: OrderStatus.PENDING }
       });
 
       // 활성 상품 수
       const activeProducts = await productRepository.count({
-        where: { vendorId, status: 'published' }
+        where: { vendorId, status: ProductStatus.ACTIVE }
       });
 
       // 이번 달 매출
@@ -88,7 +88,7 @@ export class VendorStatsController {
         newOrders,
         activeProducts,
         monthSales,
-        growthRate: parseFloat(growthRate)
+        growthRate: parseFloat(String(growthRate))
       });
     } catch (error) {
       console.error('Error fetching vendor stats:', error);
@@ -180,13 +180,13 @@ export class VendorStatsController {
         where: { vendorId },
         order: { createdAt: 'DESC' },
         take: parseInt(limit as string),
-        relations: ['customer', 'items', 'items.product']
+        relations: ['user', 'items', 'items.product']
       });
 
       const formattedOrders = recentOrders.map(order => ({
         id: order.id,
         orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
-        customer: order.customer.name,
+        customer: order.user.name,
         total: order.totalAmount,
         status: order.status,
         createdAt: order.createdAt,

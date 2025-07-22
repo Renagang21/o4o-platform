@@ -43,6 +43,9 @@ export class Order {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
+  @Column({ nullable: true })
+  vendorId?: string;
+
   @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true })
   items!: OrderItem[];
 

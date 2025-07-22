@@ -3,7 +3,8 @@
 // =============================================================================
 // 가격 계산 및 역할별 가격 관리를 위한 유틸리티 타입들
 
-import type { UserRole, RetailerGrade, PriceByRole } from './ecommerce';
+import type { RetailerGrade, PriceByRole } from './ecommerce';
+import type { UserRole } from './auth';
 
 // =============================================================================
 // PRICING CONFIGURATION

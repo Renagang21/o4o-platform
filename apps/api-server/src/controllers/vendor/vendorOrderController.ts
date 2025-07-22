@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { Order } from '../../entities/Order';
-import { OrderStatus } from '../../types/order.types';
+import { OrderStatus } from '../../entities/Order';
 import { Between, Like } from 'typeorm';
 
 export class VendorOrderController {
@@ -25,7 +25,7 @@ export class VendorOrderController {
       const orderRepository = AppDataSource.getRepository(Order);
       const queryBuilder = orderRepository
         .createQueryBuilder('order')
-        .leftJoinAndSelect('order.customer', 'customer')
+        .leftJoinAndSelect('order.user', 'user')
         .leftJoinAndSelect('order.items', 'items')
         .leftJoinAndSelect('items.product', 'product')
         .where('order.vendorId = :vendorId', { vendorId });
@@ -67,8 +67,8 @@ export class VendorOrderController {
         id: order.id,
         orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
         customer: {
-          name: order.customer.name,
-          email: order.customer.email
+          name: order.user.name,
+          email: order.user.email
         },
         items: order.items.map(item => ({
           id: item.id,
@@ -112,7 +112,7 @@ export class VendorOrderController {
       const orderRepository = AppDataSource.getRepository(Order);
       const order = await orderRepository.findOne({
         where: { id, vendorId },
-        relations: ['customer', 'items', 'items.product', 'shipping']
+        relations: ['user', 'items', 'items.product']
       });
 
       if (!order) {
@@ -123,10 +123,10 @@ export class VendorOrderController {
         id: order.id,
         orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
         customer: {
-          id: order.customer.id,
-          name: order.customer.name,
-          email: order.customer.email,
-          phone: order.customer.phone
+          id: order.user.id,
+          name: order.user.name,
+          email: order.user.email,
+          phone: null // TODO: Add phone to User entity
         },
         items: order.items.map(item => ({
           id: item.id,
@@ -138,7 +138,7 @@ export class VendorOrderController {
           subtotal: item.price * item.quantity
         })),
         subtotal: order.subtotal,
-        shippingAmount: order.shippingAmount,
+        shippingAmount: order.shippingFee,
         taxAmount: order.taxAmount,
         discountAmount: order.discountAmount,
         totalAmount: order.totalAmount,
@@ -147,7 +147,12 @@ export class VendorOrderController {
         paymentMethod: order.paymentMethod,
         shippingAddress: order.shippingAddress,
         billingAddress: order.billingAddress,
-        shipping: order.shipping,
+        shipping: {
+          carrier: null,
+          trackingNumber: null,
+          shippedAt: null,
+          deliveredAt: null
+        },
         notes: order.notes,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt
@@ -181,14 +186,13 @@ export class VendorOrderController {
 
       // 상태 변경 유효성 검사
       const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
-        'pending': ['confirmed', 'cancelled'],
-        'confirmed': ['processing', 'cancelled'],
-        'processing': ['shipped', 'cancelled'],
-        'shipped': ['delivered', 'returned'],
-        'delivered': ['returned'],
-        'cancelled': [],
-        'returned': [],
-        'refunded': []
+        [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+        [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+        [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+        [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED, OrderStatus.REFUNDED],
+        [OrderStatus.DELIVERED]: [OrderStatus.REFUNDED],
+        [OrderStatus.CANCELLED]: [],
+        [OrderStatus.REFUNDED]: []
       };
 
       if (status && !allowedTransitions[order.status]?.includes(status)) {
@@ -201,22 +205,8 @@ export class VendorOrderController {
       if (status) {
         order.status = status;
 
-        // 배송 정보 업데이트
-        if (status === 'shipped' && (trackingNumber || carrier)) {
-          if (!order.shipping) {
-            order.shipping = {} as any;
-          }
-          if (trackingNumber) order.shipping.trackingNumber = trackingNumber;
-          if (carrier) order.shipping.carrier = carrier;
-          order.shipping.shippedAt = new Date();
-        }
-
-        // 배송 완료 처리
-        if (status === 'delivered') {
-          if (order.shipping) {
-            order.shipping.deliveredAt = new Date();
-          }
-        }
+        // TODO: Implement shipping tracking once shipping entity is added
+        // For now, we'll just update the status
       }
 
       const updatedOrder = await orderRepository.save(order);
@@ -228,7 +218,7 @@ export class VendorOrderController {
         order: {
           id: updatedOrder.id,
           status: updatedOrder.status,
-          shipping: updatedOrder.shipping
+          shipping: null // TODO: Add shipping tracking
         }
       });
     } catch (error) {

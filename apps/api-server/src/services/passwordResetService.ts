@@ -5,6 +5,7 @@ import { User } from '../entities/User';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { emailService } from './emailService';
+import { UserStatus } from '../types/auth';
 
 export class PasswordResetService {
   private static readonly RESET_TOKEN_EXPIRY_HOURS = 1;
@@ -171,8 +172,8 @@ export class PasswordResetService {
     verificationToken.user.isEmailVerified = true;
     
     // If user was pending, approve them
-    if (verificationToken.user.status === 'pending') {
-      verificationToken.user.status = 'active';
+    if (verificationToken.user.status === UserStatus.PENDING) {
+      verificationToken.user.status = UserStatus.ACTIVE;
       verificationToken.user.approvedAt = new Date();
     }
     
