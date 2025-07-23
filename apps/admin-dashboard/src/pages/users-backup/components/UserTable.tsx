@@ -85,7 +85,7 @@ const UserTable: React.FC<UserTableProps> = ({
                   ref={input => {
                     if (input) input.indeterminate = someSelected
                   }}
-                  onChange={(e) => onSelectAll(e.target.checked)}
+                  onChange={(e: any) => onSelectAll(e.target.checked)}
                   className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
                 />
               </th>

@@ -226,7 +226,7 @@ const MenuBuilder: React.FC = () => {
     }
 
     if (editingItem) {
-      setMenuItems(menuItems.map(item => 
+      setMenuItems(menuItems.map((item: any) => 
         item.id === editingItem.id ? newItem : item
       ))
     } else {
@@ -272,7 +272,7 @@ const MenuBuilder: React.FC = () => {
     newItems.splice(targetIndex, 0, draggedItem)
 
     // Update order values
-    newItems.forEach((item, index) => {
+    newItems.forEach((item, index: any) => {
       item.order = index
     })
 
@@ -282,7 +282,7 @@ const MenuBuilder: React.FC = () => {
   }
 
   const toggleItemExpanded = (itemId: string) => {
-    setMenuItems(menuItems.map(item => 
+    setMenuItems(menuItems.map((item: any) => 
       item.id === itemId ? { ...item, isExpanded: !item.isExpanded } : item
     ))
   }
@@ -413,7 +413,7 @@ const MenuBuilder: React.FC = () => {
                 <Input
                   id="name"
                   value={menuName}
-                  onChange={(e) => setMenuName(e.target.value)}
+                  onChange={(e: any) => setMenuName(e.target.value)}
                   placeholder="예: 주 메뉴"
                   className="mt-2"
                 />
@@ -442,7 +442,7 @@ const MenuBuilder: React.FC = () => {
                 <Input
                   id="description"
                   value={menuDescription}
-                  onChange={(e) => setMenuDescription(e.target.value)}
+                  onChange={(e: any) => setMenuDescription(e.target.value)}
                   placeholder="메뉴 설명"
                   className="mt-2"
                 />
@@ -573,7 +573,7 @@ const MenuBuilder: React.FC = () => {
             <CardContent>
               {menuItems.length > 0 ? (
                 <div>
-                  {menuItems.map(item => renderMenuItem(item))}
+                  {menuItems.map((item: any) => renderMenuItem(item))}
                 </div>
               ) : (
                 <div className="text-center py-12 text-gray-500">
@@ -603,7 +603,7 @@ const MenuBuilder: React.FC = () => {
               <Input
                 id="itemLabel"
                 value={itemFormData.label}
-                onChange={(e) => setItemFormData({ ...itemFormData, label: e.target.value })}
+                onChange={(e: any) => setItemFormData({ ...itemFormData, label: e.target.value })}
                 placeholder="메뉴에 표시될 텍스트"
               />
             </div>
@@ -612,7 +612,7 @@ const MenuBuilder: React.FC = () => {
               <Input
                 id="itemUrl"
                 value={itemFormData.url}
-                onChange={(e) => setItemFormData({ ...itemFormData, url: e.target.value })}
+                onChange={(e: any) => setItemFormData({ ...itemFormData, url: e.target.value })}
                 placeholder="https://example.com 또는 /page-slug"
               />
             </div>
@@ -636,7 +636,7 @@ const MenuBuilder: React.FC = () => {
               <Input
                 id="itemCssClass"
                 value={itemFormData.cssClass}
-                onChange={(e) => setItemFormData({ ...itemFormData, cssClass: e.target.value })}
+                onChange={(e: any) => setItemFormData({ ...itemFormData, cssClass: e.target.value })}
                 placeholder="custom-class"
               />
             </div>

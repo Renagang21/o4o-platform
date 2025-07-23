@@ -144,7 +144,7 @@ const Products: React.FC = () => {
         <input
           type="checkbox"
           checked={selectedProducts.includes(product.id)}
-          onChange={(e) => {
+          onChange={(e: any) => {
             if (e.target.checked) {
               setSelectedProducts([...selectedProducts, product.id]);
             } else {
@@ -248,7 +248,7 @@ const Products: React.FC = () => {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 placeholder="상품명, SKU로 검색..."
                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -286,7 +286,7 @@ const Products: React.FC = () => {
           <div className="border-t pt-4 grid grid-cols-4 gap-4">
             <select
               value={filters.status || ''}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value || undefined })}
+              onChange={(e: any) => setFilters({ ...filters, status: e.target.value || undefined })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">모든 상태</option>
@@ -296,7 +296,7 @@ const Products: React.FC = () => {
             
             <select
               value={filters.type || ''}
-              onChange={(e) => setFilters({ ...filters, type: e.target.value || undefined })}
+              onChange={(e: any) => setFilters({ ...filters, type: e.target.value || undefined })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">모든 유형</option>
@@ -307,7 +307,7 @@ const Products: React.FC = () => {
             
             <select
               value={filters.category || ''}
-              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+              onChange={(e: any) => setFilters({ ...filters, category: e.target.value })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">모든 카테고리</option>
@@ -316,7 +316,7 @@ const Products: React.FC = () => {
             
             <select
               value={filters.stockStatus || ''}
-              onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value || undefined })}
+              onChange={(e: any) => setFilters({ ...filters, stockStatus: e.target.value || undefined })}
               className="border rounded-lg px-3 py-2"
             >
               <option value="">재고 상태</option>
@@ -360,7 +360,7 @@ const Products: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <input
                     type="checkbox"
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       if (e.target.checked) {
                         setSelectedProducts(products.map(p => p.id));
                       } else {

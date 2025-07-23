@@ -176,7 +176,7 @@ let folders = [...mockFolders];
 
 export const mediaHandlers = [
   // Get media items
-  http.get('/api/v1/media', ({ request }) => {
+  http.get('/api/v1/media', ({ request }: any) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '24');
@@ -214,7 +214,7 @@ export const mediaHandlers = [
     }
 
     // Sort by date
-    filteredItems.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    filteredItems.sort((a: any, b: any) => b.createdAt.getTime() - a.createdAt.getTime());
 
     // Pagination
     const startIndex = (page - 1) * limit;
@@ -234,7 +234,7 @@ export const mediaHandlers = [
   }),
 
   // Get single media item
-  http.get('/api/v1/media/:id', ({ params }) => {
+  http.get('/api/v1/media/:id', ({ params }: any) => {
     const item = mediaItems.find(m => m.id === params.id);
     if (!item) {
       return HttpResponse.json({ error: 'Media not found' }, { status: 404 });
@@ -243,7 +243,7 @@ export const mediaHandlers = [
   }),
 
   // Upload media
-  http.post('/api/v1/media/upload', async ({ request }) => {
+  http.post('/api/v1/media/upload', async ({ request }: any) => {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const title = formData.get('title') as string;
@@ -287,7 +287,7 @@ export const mediaHandlers = [
   }),
 
   // Update media
-  http.put('/api/v1/media/:id', async ({ params, request }) => {
+  http.put('/api/v1/media/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = mediaItems.findIndex(m => m.id === params.id);
 
@@ -305,7 +305,7 @@ export const mediaHandlers = [
   }),
 
   // Delete media
-  http.delete('/api/v1/media/:id', ({ params }) => {
+  http.delete('/api/v1/media/:id', ({ params }: any) => {
     const index = mediaItems.findIndex(m => m.id === params.id);
 
     if (index === -1) {
@@ -317,7 +317,7 @@ export const mediaHandlers = [
   }),
 
   // Bulk operations
-  http.post('/api/v1/media/bulk', async ({ request }) => {
+  http.post('/api/v1/media/bulk', async ({ request }: any) => {
     const data = await request.json() as any;
     const { action, mediaIds } = data;
 
@@ -335,7 +335,7 @@ export const mediaHandlers = [
   }),
 
   // Create folder
-  http.post('/api/v1/media/folders', async ({ request }) => {
+  http.post('/api/v1/media/folders', async ({ request }: any) => {
     const data = await request.json() as any;
     const newFolder: MediaFolder = {
       id: `folder-${Date.now()}`,
@@ -352,7 +352,7 @@ export const mediaHandlers = [
   }),
 
   // Update folder
-  http.put('/api/v1/media/folders/:id', async ({ params, request }) => {
+  http.put('/api/v1/media/folders/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = folders.findIndex(f => f.id === params.id);
 
@@ -370,7 +370,7 @@ export const mediaHandlers = [
   }),
 
   // Delete folder
-  http.delete('/api/v1/media/folders/:id', ({ params }) => {
+  http.delete('/api/v1/media/folders/:id', ({ params }: any) => {
     const index = folders.findIndex(f => f.id === params.id);
 
     if (index === -1) {

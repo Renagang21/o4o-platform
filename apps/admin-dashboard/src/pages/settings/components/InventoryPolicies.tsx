@@ -168,7 +168,7 @@ const InventoryPolicies: React.FC<InventoryPoliciesProps> = ({ settings, onUpdat
                     min="1"
                     max="100"
                     value={settings.lowStockThreshold}
-                    onChange={(e) => handleLowStockThresholdChange(parseInt(e.target.value) || 1)}
+                    onChange={(e: any) => handleLowStockThresholdChange(parseInt(e.target.value) || 1)}
                     className="wp-input"
                     placeholder="10"
                   />
@@ -200,7 +200,7 @@ const InventoryPolicies: React.FC<InventoryPoliciesProps> = ({ settings, onUpdat
                     min="1"
                     max={settings.lowStockThreshold - 1}
                     value={settings.criticalStockThreshold}
-                    onChange={(e) => handleCriticalStockThresholdChange(parseInt(e.target.value) || 1)}
+                    onChange={(e: any) => handleCriticalStockThresholdChange(parseInt(e.target.value) || 1)}
                     className="wp-input"
                     placeholder="3"
                   />

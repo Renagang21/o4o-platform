@@ -170,7 +170,7 @@ const PostListPage = () => {
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="all">모든 카테고리</option>
-                    {categories?.map(cat => (
+                    {categories?.map((cat: any) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
                       </option>
@@ -186,7 +186,7 @@ const PostListPage = () => {
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="all">모든 유형</option>
-                    {Object.entries(postTypeConfig).map(([type, config]) => (
+                    {Object.entries(postTypeConfig).map(([type, config]: any) => (
                       <option key={type} value={type}>
                         {config.label}
                       </option>
@@ -253,7 +253,7 @@ const PostListPage = () => {
           viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'
         )}>
           {isLoading ? (
-            [...Array(6)].map((_, i) => (
+            [...Array(6)].map((_: any, i: any) => (
               <Card key={i}>
                 <CardContent className="p-6">
                   <Skeleton className="h-4 w-24 mb-4" />
@@ -287,7 +287,7 @@ const PostListPage = () => {
             </Card>
           ) : (
             <>
-              {posts.map((post) => {
+              {posts.map((post: any) => {
                 const typeConfig = post.type ? postTypeConfig[post.type] : null;
                 const TypeIcon = typeConfig?.icon || FileText;
                 
@@ -412,7 +412,7 @@ const PostListPage = () => {
                             
                             {post.tags && post.tags.length > 0 && (
                               <div className="flex gap-2 mb-3 flex-wrap">
-                                {post.tags.map(tag => (
+                                {post.tags.map((tag: any) => (
                                   <Badge key={tag} variant="secondary" className="text-xs">
                                     #{tag}
                                   </Badge>

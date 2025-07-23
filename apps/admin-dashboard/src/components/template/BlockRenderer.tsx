@@ -337,19 +337,19 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
       }`}>
         <div className="flex items-center gap-1 bg-white border rounded-lg shadow-sm p-1">
           <span className="text-xs text-gray-600 px-2">{block.type}</span>
-          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onMove('up') }}>
+          <Button size="sm" variant="ghost" onClick={(e: any) => { e.stopPropagation(); onMove('up') }}>
             <ArrowUp className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onMove('down') }}>
+          <Button size="sm" variant="ghost" onClick={(e: any) => { e.stopPropagation(); onMove('down') }}>
             <ArrowDown className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onDuplicate() }}>
+          <Button size="sm" variant="ghost" onClick={(e: any) => { e.stopPropagation(); onDuplicate() }}>
             <Copy className="w-3 h-3" />
           </Button>
           <Button 
             size="sm" 
             variant="ghost" 
-            onClick={(e) => { e.stopPropagation(); onDelete() }}
+            onClick={(e: any) => { e.stopPropagation(); onDelete() }}
             className="text-red-600 hover:text-red-700"
           >
             <Trash2 className="w-3 h-3" />
@@ -389,7 +389,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
           size="sm"
           variant="outline"
           className="bg-white shadow-sm"
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation()
             onAddBlock('paragraph')
           }}

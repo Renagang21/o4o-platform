@@ -283,7 +283,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>텍스트 내용</Label>
               <Textarea
                 value={formData.content.text || ''}
-                onChange={(e) => updateContent('text', e.target.value)}
+                onChange={(e: any) => updateContent('text', e.target.value)}
                 placeholder="텍스트 내용을 입력하세요"
                 rows={6}
               />
@@ -304,7 +304,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
             <Label>HTML 코드</Label>
             <Textarea
               value={formData.content.html || ''}
-              onChange={(e) => updateContent('html', e.target.value)}
+              onChange={(e: any) => updateContent('html', e.target.value)}
               placeholder="HTML 코드를 입력하세요"
               rows={8}
               className="font-mono text-sm"
@@ -319,7 +319,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>이미지 URL</Label>
               <Input
                 value={formData.content.url || ''}
-                onChange={(e) => updateContent('url', e.target.value)}
+                onChange={(e: any) => updateContent('url', e.target.value)}
                 placeholder="https://example.com/image.jpg"
               />
             </div>
@@ -327,7 +327,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>대체 텍스트</Label>
               <Input
                 value={formData.content.alt || ''}
-                onChange={(e) => updateContent('alt', e.target.value)}
+                onChange={(e: any) => updateContent('alt', e.target.value)}
                 placeholder="이미지 설명"
               />
             </div>
@@ -335,7 +335,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>링크 URL (선택사항)</Label>
               <Input
                 value={formData.content.link || ''}
-                onChange={(e) => updateContent('link', e.target.value)}
+                onChange={(e: any) => updateContent('link', e.target.value)}
                 placeholder="https://example.com"
               />
             </div>
@@ -367,7 +367,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Input
                 type="number"
                 value={formData.content.count || 5}
-                onChange={(e) => updateContent('count', parseInt(e.target.value) || 5)}
+                onChange={(e: any) => updateContent('count', parseInt(e.target.value) || 5)}
                 min="1"
                 max="20"
               />
@@ -392,7 +392,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
                 <Input
                   type="number"
                   value={formData.content.excerptLength || 100}
-                  onChange={(e) => updateContent('excerptLength', parseInt(e.target.value) || 100)}
+                  onChange={(e: any) => updateContent('excerptLength', parseInt(e.target.value) || 100)}
                   min="50"
                   max="300"
                 />
@@ -408,7 +408,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>플레이스홀더</Label>
               <Input
                 value={formData.content.placeholder || ''}
-                onChange={(e) => updateContent('placeholder', e.target.value)}
+                onChange={(e: any) => updateContent('placeholder', e.target.value)}
                 placeholder="검색..."
               />
             </div>
@@ -416,7 +416,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>버튼 텍스트</Label>
               <Input
                 value={formData.content.buttonText || ''}
-                onChange={(e) => updateContent('buttonText', e.target.value)}
+                onChange={(e: any) => updateContent('buttonText', e.target.value)}
                 placeholder="검색"
               />
             </div>
@@ -500,7 +500,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
                     </Select>
                     <Input
                       value={String(link.url || '')}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         const newLinks = [...(formData.content.links || [])]
                         newLinks[index] = { ...link, url: e.target.value }
                         updateContent('links', newLinks)
@@ -542,7 +542,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>주소</Label>
               <Textarea
                 value={formData.content.address || ''}
-                onChange={(e) => updateContent('address', e.target.value)}
+                onChange={(e: any) => updateContent('address', e.target.value)}
                 placeholder="주소를 입력하세요"
                 rows={2}
               />
@@ -551,7 +551,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>전화번호</Label>
               <Input
                 value={formData.content.phone || ''}
-                onChange={(e) => updateContent('phone', e.target.value)}
+                onChange={(e: any) => updateContent('phone', e.target.value)}
                 placeholder="02-1234-5678"
               />
             </div>
@@ -559,7 +559,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>이메일</Label>
               <Input
                 value={formData.content.email || ''}
-                onChange={(e) => updateContent('email', e.target.value)}
+                onChange={(e: any) => updateContent('email', e.target.value)}
                 placeholder="contact@example.com"
               />
             </div>
@@ -567,7 +567,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>웹사이트</Label>
               <Input
                 value={formData.content.website || ''}
-                onChange={(e) => updateContent('website', e.target.value)}
+                onChange={(e: any) => updateContent('website', e.target.value)}
                 placeholder="https://example.com"
               />
             </div>
@@ -588,7 +588,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>제목</Label>
               <Input
                 value={formData.content.title || ''}
-                onChange={(e) => updateContent('title', e.target.value)}
+                onChange={(e: any) => updateContent('title', e.target.value)}
                 placeholder="뉴스레터 구독"
               />
             </div>
@@ -596,7 +596,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>설명</Label>
               <Textarea
                 value={formData.content.description || ''}
-                onChange={(e) => updateContent('description', e.target.value)}
+                onChange={(e: any) => updateContent('description', e.target.value)}
                 placeholder="최신 소식을 받아보세요"
                 rows={2}
               />
@@ -605,7 +605,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>플레이스홀더</Label>
               <Input
                 value={formData.content.placeholder || ''}
-                onChange={(e) => updateContent('placeholder', e.target.value)}
+                onChange={(e: any) => updateContent('placeholder', e.target.value)}
                 placeholder="이메일 주소"
               />
             </div>
@@ -613,7 +613,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>버튼 텍스트</Label>
               <Input
                 value={formData.content.buttonText || ''}
-                onChange={(e) => updateContent('buttonText', e.target.value)}
+                onChange={(e: any) => updateContent('buttonText', e.target.value)}
                 placeholder="구독하기"
               />
             </div>
@@ -621,7 +621,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
               <Label>성공 메시지</Label>
               <Input
                 value={formData.content.successMessage || ''}
-                onChange={(e) => updateContent('successMessage', e.target.value)}
+                onChange={(e: any) => updateContent('successMessage', e.target.value)}
                 placeholder="구독해주셔서 감사합니다!"
               />
             </div>
@@ -736,7 +736,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
         <CardContent>
           <Textarea
             value={formData.settings.customCSS || ''}
-            onChange={(e) => updateSettings('customCSS', e.target.value)}
+            onChange={(e: any) => updateSettings('customCSS', e.target.value)}
             placeholder=".my-widget { color: red; }"
             rows={4}
             className="font-mono text-sm"
@@ -784,7 +784,7 @@ const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
                   <Label>위젯 제목</Label>
                   <Input
                     value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e: any) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="위젯 제목"
                   />
                 </div>

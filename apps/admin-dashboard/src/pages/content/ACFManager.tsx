@@ -95,7 +95,7 @@ const ACFManager: React.FC = () => {
   }
 
   const getFieldCount = (fieldGroup: ACFFieldGroup) => {
-    return fieldGroup.fields.reduce((count, field) => {
+    return fieldGroup.fields.reduce((count: any, field: any) => {
       if (field.type === 'repeater' || field.type === 'group' || field.type === 'flexible_content') {
         // Count sub-fields for complex field types
         return count + 1 + ((field as any).subFields?.length || 0)

@@ -310,7 +310,7 @@ const OrderDetail: React.FC = () => {
                 <div className="flex gap-3">
                   <textarea
                     value={orderNote}
-                    onChange={(e) => setOrderNote(e.target.value)}
+                    onChange={(e: any) => setOrderNote(e.target.value)}
                     placeholder="주문 메모 추가..."
                     className="flex-1 px-3 py-2 border rounded-lg resize-none"
                     rows={2}
@@ -354,7 +354,7 @@ const OrderDetail: React.FC = () => {
                 </label>
                 <select
                   value={order.status}
-                  onChange={(e) => handleStatusChange(e.target.value)}
+                  onChange={(e: any) => handleStatusChange(e.target.value)}
                   className="w-full border rounded-lg px-3 py-2"
                 >
                   <option value="pending">대기중</option>
@@ -423,7 +423,7 @@ const OrderDetail: React.FC = () => {
                   <div className="pt-3 border-t">
                     <a
                       href={`#/users/${order.customerId}`}
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.preventDefault();
                         navigate(`/users/${order.customerId}`);
                       }}
@@ -456,7 +456,7 @@ const OrderDetail: React.FC = () => {
                   <input
                     type="number"
                     value={refundAmount}
-                    onChange={(e) => setRefundAmount(e.target.value)}
+                    onChange={(e: any) => setRefundAmount(e.target.value)}
                     placeholder={order.total.toString()}
                     max={order.total}
                     className="w-full pl-8 pr-3 py-2 border rounded-lg"
@@ -472,7 +472,7 @@ const OrderDetail: React.FC = () => {
                 </label>
                 <textarea
                   value={refundReason}
-                  onChange={(e) => setRefundReason(e.target.value)}
+                  onChange={(e: any) => setRefundReason(e.target.value)}
                   placeholder="환불 사유를 입력하세요..."
                   className="w-full px-3 py-2 border rounded-lg resize-none"
                   rows={3}

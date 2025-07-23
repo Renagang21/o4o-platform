@@ -43,7 +43,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   return (
     <div className={cn(`grid ${gridCols[columns]} gap-6`, className)}>
-      {products.map((product) => (
+      {products.map((product: any) => (
         <ProductCard
           key={product.id}
           product={product}

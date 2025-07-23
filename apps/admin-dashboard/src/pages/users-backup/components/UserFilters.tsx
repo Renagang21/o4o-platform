@@ -36,7 +36,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
                 type="text"
                 placeholder="이름, 이메일, 전화번호로 검색..."
                 value={filters.search || ''}
-                onChange={(e) => updateFilter('search', e.target.value)}
+                onChange={(e: any) => updateFilter('search', e.target.value)}
                 className="wp-input pl-10"
               />
             </div>
@@ -47,7 +47,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
             {/* 역할 필터 */}
             <select
               value={filters.role || 'all'}
-              onChange={(e) => updateFilter('role', e.target.value)}
+              onChange={(e: any) => updateFilter('role', e.target.value)}
               className="wp-select min-w-[120px]"
             >
               <option value="all">전체 역할</option>
@@ -59,7 +59,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
             {/* 상태 필터 */}
             <select
               value={filters.status || 'all'}
-              onChange={(e) => updateFilter('status', e.target.value)}
+              onChange={(e: any) => updateFilter('status', e.target.value)}
               className="wp-select min-w-[120px]"
             >
               <option value="all">전체 상태</option>
@@ -71,7 +71,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({
             {/* 사업체 유형 필터 */}
             <select
               value={filters.businessType || 'all'}
-              onChange={(e) => updateFilter('businessType', e.target.value)}
+              onChange={(e: any) => updateFilter('businessType', e.target.value)}
               className="wp-select min-w-[140px]"
             >
               <option value="all">전체 사업체</option>
@@ -84,14 +84,14 @@ const UserFilters: React.FC<UserFiltersProps> = ({
             <input
               type="date"
               value={filters.dateFrom || ''}
-              onChange={(e) => updateFilter('dateFrom', e.target.value)}
+              onChange={(e: any) => updateFilter('dateFrom', e.target.value)}
               className="wp-input"
               placeholder="시작일"
             />
             <input
               type="date"
               value={filters.dateTo || ''}
-              onChange={(e) => updateFilter('dateTo', e.target.value)}
+              onChange={(e: any) => updateFilter('dateTo', e.target.value)}
               className="wp-input"
               placeholder="종료일"
             />

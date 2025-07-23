@@ -258,7 +258,7 @@ const CPTForm: React.FC = () => {
                     id="menuPosition"
                     type="number"
                     value={formData.menuPosition}
-                    onChange={(e) => setFormData({ ...formData, menuPosition: parseInt(e.target.value) || 5 })}
+                    onChange={(e: any) => setFormData({ ...formData, menuPosition: parseInt(e.target.value) || 5 })}
                     className="mt-2"
                   />
                   <p className="text-xs text-gray-500 mt-1">숫자가 작을수록 상단에 표시</p>
@@ -270,7 +270,7 @@ const CPTForm: React.FC = () => {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
+                  onChange={(e: any) => handleNameChange(e.target.value)}
                   placeholder="예: 제품"
                   className="mt-2"
                   required
@@ -283,7 +283,7 @@ const CPTForm: React.FC = () => {
                   <Input
                     id="singularName"
                     value={formData.singularName}
-                    onChange={(e) => setFormData({ ...formData, singularName: e.target.value })}
+                    onChange={(e: any) => setFormData({ ...formData, singularName: e.target.value })}
                     placeholder="예: 제품"
                     className="mt-2"
                   />
@@ -293,7 +293,7 @@ const CPTForm: React.FC = () => {
                   <Input
                     id="pluralName"
                     value={formData.pluralName}
-                    onChange={(e) => setFormData({ ...formData, pluralName: e.target.value })}
+                    onChange={(e: any) => setFormData({ ...formData, pluralName: e.target.value })}
                     placeholder="예: 제품들"
                     className="mt-2"
                   />
@@ -305,7 +305,7 @@ const CPTForm: React.FC = () => {
                 <Input
                   id="slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, slug: e.target.value })}
                   placeholder="예: product"
                   className="mt-2"
                   required
@@ -318,7 +318,7 @@ const CPTForm: React.FC = () => {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="이 게시물 유형에 대한 설명"
                   rows={3}
                   className="mt-2"

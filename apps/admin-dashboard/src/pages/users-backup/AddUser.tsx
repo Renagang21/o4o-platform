@@ -149,7 +149,7 @@ const AddUser: React.FC = () => {
                   id="name"
                   type="text"
                   value={formData.name}
-                  onChange={(e) => updateFormData('name', e.target.value)}
+                  onChange={(e: any) => updateFormData('name', e.target.value)}
                   className="wp-input"
                   required
                 />
@@ -163,7 +163,7 @@ const AddUser: React.FC = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => updateFormData('email', e.target.value)}
+                  onChange={(e: any) => updateFormData('email', e.target.value)}
                   className="wp-input"
                   required
                 />
@@ -178,7 +178,7 @@ const AddUser: React.FC = () => {
                 <select
                   id="role"
                   value={formData.role}
-                  onChange={(e) => updateFormData('role', e.target.value as UserRole)}
+                  onChange={(e: any) => updateFormData('role', e.target.value as UserRole)}
                   className="wp-select"
                   required
                 >
@@ -197,7 +197,7 @@ const AddUser: React.FC = () => {
                     id="password"
                     type="password"
                     value={formData.password || ''}
-                    onChange={(e) => updateFormData('password', e.target.value)}
+                    onChange={(e: any) => updateFormData('password', e.target.value)}
                     className="wp-input"
                     required={!isEditMode}
                     minLength={8}
@@ -230,7 +230,7 @@ const AddUser: React.FC = () => {
                     id="businessName"
                     type="text"
                     value={formData.businessInfo?.businessName || ''}
-                    onChange={(e) => updateBusinessInfo('businessName', e.target.value)}
+                    onChange={(e: any) => updateBusinessInfo('businessName', e.target.value)}
                     className="wp-input"
                     required={needsBusinessInfo}
                   />
@@ -243,7 +243,7 @@ const AddUser: React.FC = () => {
                   <select
                     id="businessType"
                     value={formData.businessInfo?.businessType || ''}
-                    onChange={(e) => updateBusinessInfo('businessType', e.target.value)}
+                    onChange={(e: any) => updateBusinessInfo('businessType', e.target.value)}
                     className="wp-select"
                     required={needsBusinessInfo}
                   >
@@ -264,7 +264,7 @@ const AddUser: React.FC = () => {
                     id="businessNumber"
                     type="text"
                     value={formData.businessInfo?.businessNumber || ''}
-                    onChange={(e) => updateBusinessInfo('businessNumber', e.target.value)}
+                    onChange={(e: any) => updateBusinessInfo('businessNumber', e.target.value)}
                     className="wp-input"
                     placeholder="000-00-00000"
                   />
@@ -278,7 +278,7 @@ const AddUser: React.FC = () => {
                     id="representativeName"
                     type="text"
                     value={formData.businessInfo?.representativeName || ''}
-                    onChange={(e) => updateBusinessInfo('representativeName', e.target.value)}
+                    onChange={(e: any) => updateBusinessInfo('representativeName', e.target.value)}
                     className="wp-input"
                   />
                 </div>
@@ -292,7 +292,7 @@ const AddUser: React.FC = () => {
                   id="businessAddress"
                   type="text"
                   value={formData.businessInfo?.businessAddress || ''}
-                  onChange={(e) => updateBusinessInfo('businessAddress', e.target.value)}
+                  onChange={(e: any) => updateBusinessInfo('businessAddress', e.target.value)}
                   className="wp-input"
                 />
               </div>
@@ -314,7 +314,7 @@ const AddUser: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={formData.sendWelcomeEmail}
-                  onChange={(e) => updateFormData('sendWelcomeEmail', e.target.checked)}
+                  onChange={(e: any) => updateFormData('sendWelcomeEmail', e.target.checked)}
                   className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
                 />
                 <span className="text-sm text-gray-700">

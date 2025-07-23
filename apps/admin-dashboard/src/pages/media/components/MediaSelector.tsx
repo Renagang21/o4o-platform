@@ -158,7 +158,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                   type="text"
                   placeholder="파일명으로 검색..."
                   value={filters.searchTerm}
-                  onChange={(e) => updateFilter('searchTerm', e.target.value)}
+                  onChange={(e: any) => updateFilter('searchTerm', e.target.value)}
                   className="wp-input pl-10"
                 />
               </div>
@@ -168,7 +168,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
               {allowedTypes.length > 1 && (
                 <select
                   value={filters.fileType}
-                  onChange={(e) => updateFilter('fileType', e.target.value)}
+                  onChange={(e: any) => updateFilter('fileType', e.target.value)}
                   className="wp-select"
                 >
                   <option value="">모든 파일</option>

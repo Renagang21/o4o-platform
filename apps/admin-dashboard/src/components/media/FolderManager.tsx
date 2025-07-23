@@ -100,7 +100,7 @@ const FolderTreeItem: React.FC<FolderTreeItemProps> = ({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
+            <Button variant="ghost" size="sm" onClick={(e: any) => e.stopPropagation()}>
               <MoreVertical className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -341,7 +341,7 @@ const FolderManager: React.FC<FolderManagerProps> = ({ isOpen, onClose, onFolder
               <Input
                 id="folderName"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="예: 2024년 이미지"
               />
             </div>
@@ -352,7 +352,7 @@ const FolderManager: React.FC<FolderManagerProps> = ({ isOpen, onClose, onFolder
                 id="parentFolder"
                 className="w-full px-3 py-2 border rounded-md"
                 value={formData.parentId || ''}
-                onChange={(e) => setFormData({ ...formData, parentId: e.target.value || undefined })}
+                onChange={(e: any) => setFormData({ ...formData, parentId: e.target.value || undefined })}
               >
                 <option value="">최상위</option>
                 {folders.map((folder: MediaFolder) => (
@@ -368,7 +368,7 @@ const FolderManager: React.FC<FolderManagerProps> = ({ isOpen, onClose, onFolder
               <Textarea
                 id="folderDescription"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="폴더에 대한 설명"
                 rows={2}
               />

@@ -170,7 +170,7 @@ export const LiveSupportWidget: React.FC<LiveSupportWidgetProps> = ({
       } else {
         showToast(data.error?.message || '실시간 지원 요청에 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Start live support error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }

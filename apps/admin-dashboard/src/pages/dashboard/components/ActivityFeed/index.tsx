@@ -35,7 +35,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   );
 
   // 타입별 카운트
-  const counts = activities.reduce((acc, activity) => {
+  const counts = activities.reduce((acc: any, activity: any) => {
     acc[activity.type] = (acc[activity.type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

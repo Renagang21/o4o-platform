@@ -74,7 +74,7 @@ export const policySettingsApi = {
     try {
       const response = await api.get('/admin/policy-settings');
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch policy settings:', error);
       throw new Error('정책 설정을 불러올 수 없습니다.');
     }
@@ -85,7 +85,7 @@ export const policySettingsApi = {
     try {
       const response = await api.put('/admin/policy-settings/partners', settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update partner policies:', error);
       throw new Error('파트너스 정책 업데이트에 실패했습니다.');
     }
@@ -95,7 +95,7 @@ export const policySettingsApi = {
     try {
       const response = await api.put('/admin/policy-settings/sales', settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update sales policies:', error);
       throw new Error('매출 정책 업데이트에 실패했습니다.');
     }
@@ -105,7 +105,7 @@ export const policySettingsApi = {
     try {
       const response = await api.put('/admin/policy-settings/inventory', settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update inventory policies:', error);
       throw new Error('재고 정책 업데이트에 실패했습니다.');
     }
@@ -115,7 +115,7 @@ export const policySettingsApi = {
     try {
       const response = await api.put('/admin/policy-settings/users', settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update user security policies:', error);
       throw new Error('사용자 보안 정책 업데이트에 실패했습니다.');
     }
@@ -126,7 +126,7 @@ export const policySettingsApi = {
     try {
       const response = await api.put('/admin/policy-settings', settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update all policy settings:', error);
       throw new Error('정책 설정 일괄 업데이트에 실패했습니다.');
     }
@@ -137,7 +137,7 @@ export const policySettingsApi = {
     try {
       const response = await api.post('/admin/policy-settings/validate', settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to validate policy settings:', error);
       throw new Error('정책 설정 검증에 실패했습니다.');
     }
@@ -152,7 +152,7 @@ export const policySettingsApi = {
 
       const response = await api.get(`/admin/policy-settings/history?${params}`);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch policy history:', error);
       throw new Error('정책 변경 히스토리를 불러올 수 없습니다.');
     }
@@ -165,7 +165,7 @@ export const policySettingsApi = {
         responseType: 'blob'
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to export policy settings:', error);
       throw new Error('정책 설정 내보내기에 실패했습니다.');
     }
@@ -182,7 +182,7 @@ export const policySettingsApi = {
         }
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to import policy settings:', error);
       throw new Error('정책 설정 가져오기에 실패했습니다.');
     }
@@ -194,7 +194,7 @@ export const policySettingsApi = {
       const params = category ? `?category=${category}` : '';
       const response = await api.post(`/admin/policy-settings/reset${params}`);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reset policy settings:', error);
       throw new Error('정책 설정 초기화에 실패했습니다.');
     }
@@ -230,7 +230,7 @@ export const policySettingsApi = {
     try {
       const response = await api.get('/admin/policy-settings/stats');
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch policy statistics:', error);
       throw new Error('정책 통계를 불러올 수 없습니다.');
     }
@@ -248,7 +248,7 @@ export const policySettingsApi = {
     try {
       const response = await api.post(`/admin/policy-settings/test/${category}`, settings);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to test policy configuration:', error);
       throw new Error('정책 설정 테스트에 실패했습니다.');
     }
@@ -267,7 +267,7 @@ export const policySettingsApi = {
     try {
       const response = await api.get('/admin/policy-settings/notifications');
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch policy notifications:', error);
       return [];
     }
@@ -276,7 +276,7 @@ export const policySettingsApi = {
   async markNotificationAsRead(notificationId: string): Promise<void> {
     try {
       await api.put(`/admin/policy-settings/notifications/${notificationId}/read`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to mark notification as read:', error);
     }
   },
@@ -293,7 +293,7 @@ export const policySettingsApi = {
     try {
       const response = await api.get('/admin/policy-settings/templates');
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch policy templates:', error);
       return [];
     }
@@ -303,7 +303,7 @@ export const policySettingsApi = {
     try {
       const response = await api.post(`/admin/policy-settings/templates/${templateId}/apply`);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to apply policy template:', error);
       throw new Error('정책 템플릿 적용에 실패했습니다.');
     }
@@ -317,7 +317,7 @@ export const policySettingsApi = {
   }): Promise<void> {
     try {
       await api.post('/admin/policy-settings/templates', template);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save policy template:', error);
       throw new Error('정책 템플릿 저장에 실패했습니다.');
     }
@@ -335,7 +335,7 @@ export const policySettingsApi = {
     try {
       const response = await api.get('/admin/policy-settings/compliance');
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to check policy compliance:', error);
       throw new Error('정책 준수 검사에 실패했습니다.');
     }
@@ -350,7 +350,7 @@ export const policySettingsApi = {
     try {
       const response = await api.post('/admin/policy-settings/backup', { name });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create policy backup:', error);
       throw new Error('정책 백업 생성에 실패했습니다.');
     }
@@ -365,7 +365,7 @@ export const policySettingsApi = {
     try {
       const response = await api.get('/admin/policy-settings/backups');
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch policy backups:', error);
       return [];
     }
@@ -375,7 +375,7 @@ export const policySettingsApi = {
     try {
       const response = await api.post(`/admin/policy-settings/backup/${backupId}/restore`);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to restore policy backup:', error);
       throw new Error('정책 백업 복원에 실패했습니다.');
     }

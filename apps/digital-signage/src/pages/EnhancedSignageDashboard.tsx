@@ -90,7 +90,7 @@ const EnhancedSignageDashboard: React.FC = () => {
     try {
       const response = await axios.get('/api/signage/analytics');
       setAnalytics(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch analytics:', error);
     }
   }, []);
@@ -101,7 +101,7 @@ const EnhancedSignageDashboard: React.FC = () => {
       const params = selectedStore ? { storeId: selectedStore.id } : {};
       const response = await axios.get('/api/signage/dashboard/live', { params });
       setLiveDashboard(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch live dashboard:', error);
     }
   }, [selectedStore]);
@@ -121,7 +121,7 @@ const EnhancedSignageDashboard: React.FC = () => {
       
       const response = await axios.get('/api/signage/contents', { params });
       setContents(response.data.data.contents);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch contents:', error);
       toast.error('Failed to load contents');
     }
@@ -135,7 +135,7 @@ const EnhancedSignageDashboard: React.FC = () => {
       if (response.data.data.stores.length > 0 && !selectedStore) {
         setSelectedStore(response.data.data.stores[0]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch stores:', error);
     }
   }, [selectedStore]);
@@ -175,7 +175,7 @@ const EnhancedSignageDashboard: React.FC = () => {
       await axios.post(`/api/signage/stores/${storeId}/playback/control`, { action });
       toast.success(`Playback ${action} command sent`);
       fetchLiveDashboard();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Failed to control playback');
     }
   };
@@ -186,7 +186,7 @@ const EnhancedSignageDashboard: React.FC = () => {
       await axios.patch(`/api/signage/contents/${contentId}/approval`, { action, reason });
       toast.success(`Content ${action}d successfully`);
       fetchContents();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(`Failed to ${action} content`);
     }
   };

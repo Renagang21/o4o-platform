@@ -211,7 +211,7 @@ const TemplateManager: React.FC = () => {
               <Input
                 placeholder="템플릿 검색..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>

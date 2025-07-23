@@ -47,7 +47,7 @@ export const useRefresh = (
       ]);
       
       setLastRefreshTime(new Date());
-    } catch (error) {
+    } catch (error: any) {
       console.error('Refresh failed:', error);
       throw error;
     } finally {

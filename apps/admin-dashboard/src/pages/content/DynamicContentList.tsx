@@ -184,7 +184,7 @@ const DynamicContentList: React.FC = () => {
           <Input
             placeholder="제목, 내용으로 검색..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: any) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>

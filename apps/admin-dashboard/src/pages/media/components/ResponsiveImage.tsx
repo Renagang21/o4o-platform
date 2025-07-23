@@ -366,7 +366,7 @@ const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
           {imageFormats?.avif && (
             <source
               srcSet={Object.entries(imageFormats.avif)
-                .filter(([_, url]) => url)
+                .filter(([_, url]: any) => url)
                 .map(([size, url]) => {
                   const widths = { thumbnail: 150, small: 300, medium: 768, large: 1200, original: 2400 }
                   return `${url} ${widths[size as keyof typeof widths]}w`
@@ -381,7 +381,7 @@ const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
           {imageFormats?.webp && (
             <source
               srcSet={Object.entries(imageFormats.webp)
-                .filter(([_, url]) => url)
+                .filter(([_, url]: any) => url)
                 .map(([size, url]) => {
                   const widths = { thumbnail: 150, small: 300, medium: 768, large: 1200, original: 2400 }
                   return `${url} ${widths[size as keyof typeof widths]}w`

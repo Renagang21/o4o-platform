@@ -193,7 +193,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품을 불러오는 중 오류가 발생했습니다.',
         isLoading: false,
@@ -219,7 +219,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '공급자 상품을 불러오는 중 오류가 발생했습니다.',
         isLoading: false,
@@ -242,7 +242,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         currentProduct: product,
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품을 불러오는 중 오류가 발생했습니다.',
         isLoading: false,
@@ -281,7 +281,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 등록 중 오류가 발생했습니다.',
         isLoading: false,
@@ -315,7 +315,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 수정 중 오류가 발생했습니다.',
         isLoading: false,
@@ -343,7 +343,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 삭제 중 오류가 발생했습니다.',
         isLoading: false,
@@ -372,7 +372,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 상태 변경 중 오류가 발생했습니다.',
         isLoading: false,
@@ -408,7 +408,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '승인 상태 변경 중 오류가 발생했습니다.',
         isLoading: false,
@@ -456,7 +456,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '검색 중 오류가 발생했습니다.',
         isLoading: false,

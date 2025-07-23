@@ -172,7 +172,7 @@ export function SupplierStoreSettings() {
     if (logoFile) {
       try {
         await uploadLogo.mutateAsync(logoFile);
-      } catch (error) {
+      } catch (error: any) {
         return;
       }
     }
@@ -181,7 +181,7 @@ export function SupplierStoreSettings() {
     if (bannerFile) {
       try {
         await uploadBanner.mutateAsync(bannerFile);
-      } catch (error) {
+      } catch (error: any) {
         return;
       }
     }

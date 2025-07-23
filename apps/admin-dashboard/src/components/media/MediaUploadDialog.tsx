@@ -196,7 +196,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
       ))
 
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       // Update status to error
       setUploadFiles(prev => prev.map(f =>
         f.id === uploadFile.id 
@@ -219,7 +219,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
       try {
         await uploadFile(file)
         successCount++
-      } catch (error) {
+      } catch (error: any) {
         errorCount++
         console.error('Upload error:', error)
       }
@@ -383,7 +383,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
                             <Input
                               id={`title-${uploadFile.id}`}
                               value={uploadFile.metadata?.title || ''}
-                              onChange={(e) => updateFileMetadata(uploadFile.id, { title: e.target.value })}
+                              onChange={(e: any) => updateFileMetadata(uploadFile.id, { title: e.target.value })}
                               placeholder="미디어 제목"
                             />
                           </div>
@@ -393,7 +393,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
                               <Input
                                 id={`alt-${uploadFile.id}`}
                                 value={uploadFile.metadata?.alt || ''}
-                                onChange={(e) => updateFileMetadata(uploadFile.id, { alt: e.target.value })}
+                                onChange={(e: any) => updateFileMetadata(uploadFile.id, { alt: e.target.value })}
                                 placeholder="이미지 설명"
                               />
                             </div>
@@ -403,7 +403,7 @@ const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
                             <Textarea
                               id={`caption-${uploadFile.id}`}
                               value={uploadFile.metadata?.caption || ''}
-                              onChange={(e) => updateFileMetadata(uploadFile.id, { caption: e.target.value })}
+                              onChange={(e: any) => updateFileMetadata(uploadFile.id, { caption: e.target.value })}
                               placeholder="미디어 캡션"
                               rows={2}
                             />

@@ -63,7 +63,7 @@ export const PaymentMethods: React.FC<ShortcodeProps> = ({ attributes }) => {
       <h3 className="font-medium text-lg">결제 수단 선택</h3>
       
       <div className="space-y-2">
-        {paymentMethods.map((method) => {
+        {paymentMethods.map((method: any) => {
           const Icon = method.icon;
           const isSelected = selectedMethod === method.id;
           

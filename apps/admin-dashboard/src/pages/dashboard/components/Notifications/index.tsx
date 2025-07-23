@@ -38,7 +38,7 @@ const Notifications: React.FC<NotificationsProps> = ({
   });
 
   // 타입별 카운트
-  const counts = notifications.reduce((acc, notification) => {
+  const counts = notifications.reduce((acc: any, notification: any) => {
     acc[notification.type] = (acc[notification.type] || 0) + 1;
     if (!notification.read) {
       acc.unread = (acc.unread || 0) + 1;
@@ -148,7 +148,7 @@ const Notifications: React.FC<NotificationsProps> = ({
                 type="checkbox"
                 id="unread-only"
                 checked={showOnlyUnread}
-                onChange={(e) => setShowOnlyUnread(e.target.checked)}
+                onChange={(e: any) => setShowOnlyUnread(e.target.checked)}
                 className="mr-2 text-blue-600"
               />
               <label htmlFor="unread-only" className="text-xs text-gray-600">

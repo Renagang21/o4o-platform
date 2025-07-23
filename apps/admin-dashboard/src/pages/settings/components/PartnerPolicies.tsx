@@ -59,7 +59,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
 
   const handleTierDelete = (index: number) => {
     if (confirm('이 등급을 삭제하시겠습니까?')) {
-      const newTiers = settings.tierLevels.filter((_, i) => i !== index);
+      const newTiers = settings.tierLevels.filter((_, i: any) => i !== index);
       onUpdate({ tierLevels: newTiers });
     }
   };
@@ -72,7 +72,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
     
     const newTiers = [...settings.tierLevels, newTier];
     // Sort by minSales ascending
-    newTiers.sort((a, b) => a.minSales - b.minSales);
+    newTiers.sort((a: any, b: any) => a.minSales - b.minSales);
     
     onUpdate({ tierLevels: newTiers });
     setNewTier({ name: '', minSales: 0, commissionRate: 0 });
@@ -167,7 +167,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                   max="30"
                   step="0.1"
                   value={settings.commissionRate}
-                  onChange={(e) => handleCommissionRateChange(parseFloat(e.target.value) || 0)}
+                  onChange={(e: any) => handleCommissionRateChange(parseFloat(e.target.value) || 0)}
                   className="wp-input pr-8"
                   placeholder="5.0"
                 />
@@ -230,7 +230,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                         <input
                           type="text"
                           value={tier.name}
-                          onChange={(e) => handleTierUpdate(index, { ...tier, name: e.target.value })}
+                          onChange={(e: any) => handleTierUpdate(index, { ...tier, name: e.target.value })}
                           className="wp-input"
                           placeholder="브론즈"
                         />
@@ -243,7 +243,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                           type="number"
                           min="0"
                           value={tier.minSales}
-                          onChange={(e) => handleTierUpdate(index, { ...tier, minSales: parseInt(e.target.value) || 0 })}
+                          onChange={(e: any) => handleTierUpdate(index, { ...tier, minSales: parseInt(e.target.value) || 0 })}
                           className="wp-input"
                           placeholder="1000000"
                         />
@@ -258,7 +258,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                           max="30"
                           step="0.1"
                           value={tier.commissionRate}
-                          onChange={(e) => handleTierUpdate(index, { ...tier, commissionRate: parseFloat(e.target.value) || 0 })}
+                          onChange={(e: any) => handleTierUpdate(index, { ...tier, commissionRate: parseFloat(e.target.value) || 0 })}
                           className="wp-input"
                           placeholder="5.0"
                         />
@@ -329,7 +329,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                       <input
                         type="text"
                         value={newTier.name}
-                        onChange={(e) => setNewTier({ ...newTier, name: e.target.value })}
+                        onChange={(e: any) => setNewTier({ ...newTier, name: e.target.value })}
                         className="wp-input"
                         placeholder="다이아몬드"
                       />
@@ -342,7 +342,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                         type="number"
                         min="0"
                         value={newTier.minSales}
-                        onChange={(e) => setNewTier({ ...newTier, minSales: parseInt(e.target.value) || 0 })}
+                        onChange={(e: any) => setNewTier({ ...newTier, minSales: parseInt(e.target.value) || 0 })}
                         className="wp-input"
                         placeholder="20000000"
                       />
@@ -357,7 +357,7 @@ const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate })
                         max="30"
                         step="0.1"
                         value={newTier.commissionRate}
-                        onChange={(e) => setNewTier({ ...newTier, commissionRate: parseFloat(e.target.value) || 0 })}
+                        onChange={(e: any) => setNewTier({ ...newTier, commissionRate: parseFloat(e.target.value) || 0 })}
                         className="wp-input"
                         placeholder="15.0"
                       />

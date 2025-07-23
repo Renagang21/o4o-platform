@@ -61,7 +61,7 @@ const LiveTVDisplay: React.FC = () => {
       setPlaybackStatus(response.data.data);
       setIsConnected(true);
       setError(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch playback status:', error);
       setIsConnected(false);
       setError('Connection lost. Retrying...');

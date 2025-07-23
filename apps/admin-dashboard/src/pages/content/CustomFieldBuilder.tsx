@@ -475,7 +475,7 @@ const CustomFieldBuilder: React.FC = () => {
               <Input
                 id="groupName"
                 value={groupFormData.name}
-                onChange={(e) => setGroupFormData({
+                onChange={(e: any) => setGroupFormData({
                   ...groupFormData,
                   name: e.target.value,
                   key: generateKey(e.target.value)
@@ -488,7 +488,7 @@ const CustomFieldBuilder: React.FC = () => {
               <Input
                 id="groupKey"
                 value={groupFormData.key}
-                onChange={(e) => setGroupFormData({ ...groupFormData, key: e.target.value })}
+                onChange={(e: any) => setGroupFormData({ ...groupFormData, key: e.target.value })}
                 placeholder="예: product_info"
               />
             </div>
@@ -497,7 +497,7 @@ const CustomFieldBuilder: React.FC = () => {
               <Textarea
                 id="groupDescription"
                 value={groupFormData.description}
-                onChange={(e) => setGroupFormData({ ...groupFormData, description: e.target.value })}
+                onChange={(e: any) => setGroupFormData({ ...groupFormData, description: e.target.value })}
                 placeholder="이 필드 그룹에 대한 설명"
                 rows={2}
               />
@@ -548,7 +548,7 @@ const CustomFieldBuilder: React.FC = () => {
                 <Input
                   id="fieldName"
                   value={fieldFormData.name}
-                  onChange={(e) => setFieldFormData({
+                  onChange={(e: any) => setFieldFormData({
                     ...fieldFormData,
                     name: e.target.value,
                     key: generateKey(e.target.value),
@@ -562,7 +562,7 @@ const CustomFieldBuilder: React.FC = () => {
                 <Input
                   id="fieldKey"
                   value={fieldFormData.key}
-                  onChange={(e) => setFieldFormData({ ...fieldFormData, key: e.target.value })}
+                  onChange={(e: any) => setFieldFormData({ ...fieldFormData, key: e.target.value })}
                   placeholder="예: price"
                 />
               </div>
@@ -598,7 +598,7 @@ const CustomFieldBuilder: React.FC = () => {
               <Input
                 id="fieldLabel"
                 value={fieldFormData.label}
-                onChange={(e) => setFieldFormData({ ...fieldFormData, label: e.target.value })}
+                onChange={(e: any) => setFieldFormData({ ...fieldFormData, label: e.target.value })}
                 placeholder="편집 화면에 표시될 레이블"
               />
             </div>
@@ -608,7 +608,7 @@ const CustomFieldBuilder: React.FC = () => {
               <Textarea
                 id="fieldDescription"
                 value={fieldFormData.description}
-                onChange={(e) => setFieldFormData({ ...fieldFormData, description: e.target.value })}
+                onChange={(e: any) => setFieldFormData({ ...fieldFormData, description: e.target.value })}
                 placeholder="필드 사용 방법에 대한 설명"
                 rows={2}
               />
@@ -619,7 +619,7 @@ const CustomFieldBuilder: React.FC = () => {
               <Input
                 id="fieldPlaceholder"
                 value={fieldFormData.placeholder}
-                onChange={(e) => setFieldFormData({ ...fieldFormData, placeholder: e.target.value })}
+                onChange={(e: any) => setFieldFormData({ ...fieldFormData, placeholder: e.target.value })}
                 placeholder="입력 필드에 표시될 힌트 텍스트"
               />
             </div>
@@ -642,7 +642,7 @@ const CustomFieldBuilder: React.FC = () => {
                     id="fieldMin"
                     type="number"
                     value={fieldFormData.min}
-                    onChange={(e) => setFieldFormData({ ...fieldFormData, min: parseInt(e.target.value) })}
+                    onChange={(e: any) => setFieldFormData({ ...fieldFormData, min: parseInt(e.target.value) })}
                   />
                 </div>
                 <div>
@@ -651,7 +651,7 @@ const CustomFieldBuilder: React.FC = () => {
                     id="fieldMax"
                     type="number"
                     value={fieldFormData.max}
-                    onChange={(e) => setFieldFormData({ ...fieldFormData, max: parseInt(e.target.value) })}
+                    onChange={(e: any) => setFieldFormData({ ...fieldFormData, max: parseInt(e.target.value) })}
                   />
                 </div>
               </div>
@@ -664,7 +664,7 @@ const CustomFieldBuilder: React.FC = () => {
                   id="fieldMaxLength"
                   type="number"
                   value={fieldFormData.maxLength}
-                  onChange={(e) => setFieldFormData({ ...fieldFormData, maxLength: parseInt(e.target.value) })}
+                  onChange={(e: any) => setFieldFormData({ ...fieldFormData, maxLength: parseInt(e.target.value) })}
                 />
               </div>
             )}
@@ -678,7 +678,7 @@ const CustomFieldBuilder: React.FC = () => {
                       <Input
                         placeholder="레이블"
                         value={option.label}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           const newOptions = [...(fieldFormData.options || [])]
                           newOptions[index] = { ...option, label: e.target.value }
                           setFieldFormData({ ...fieldFormData, options: newOptions })
@@ -687,7 +687,7 @@ const CustomFieldBuilder: React.FC = () => {
                       <Input
                         placeholder="값"
                         value={option.value}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           const newOptions = [...(fieldFormData.options || [])]
                           newOptions[index] = { ...option, value: e.target.value }
                           setFieldFormData({ ...fieldFormData, options: newOptions })
@@ -697,7 +697,7 @@ const CustomFieldBuilder: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          const newOptions = fieldFormData.options?.filter((_, i) => i !== index)
+                          const newOptions = fieldFormData.options?.filter((_, i: any) => i !== index)
                           setFieldFormData({ ...fieldFormData, options: newOptions })
                         }}
                       >

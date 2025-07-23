@@ -390,7 +390,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation()
                             moveBlock(block.id, 'up')
                           }}
@@ -401,7 +401,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation()
                             moveBlock(block.id, 'down')
                           }}
@@ -412,7 +412,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation()
                             duplicateBlock(block.id)
                           }}
@@ -422,7 +422,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation()
                             deleteBlock(block.id)
                           }}
@@ -442,7 +442,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                     <Input
                       id="template-name"
                       value={builderState.template.name}
-                      onChange={(e) => updateTemplate({ name: e.target.value })}
+                      onChange={(e: any) => updateTemplate({ name: e.target.value })}
                       placeholder="템플릿 이름을 입력하세요"
                     />
                   </div>
@@ -451,7 +451,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                     <Textarea
                       id="template-description"
                       value={builderState.template.description}
-                      onChange={(e) => updateTemplate({ description: e.target.value })}
+                      onChange={(e: any) => updateTemplate({ description: e.target.value })}
                       placeholder="템플릿 설명을 입력하세요"
                       rows={3}
                     />

@@ -132,7 +132,7 @@ const PostList: React.FC = () => {
               <Input
                 placeholder="게시글 검색..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -191,7 +191,7 @@ const PostList: React.FC = () => {
                       type="checkbox"
                       className="rounded border-gray-300"
                       checked={selectedPosts.length === posts.length}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         if (e.target.checked) {
                           setSelectedPosts(posts.map((p: Post) => p.id))
                         } else {
@@ -216,7 +216,7 @@ const PostList: React.FC = () => {
                         type="checkbox"
                         className="rounded border-gray-300"
                         checked={selectedPosts.includes(post.id)}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           if (e.target.checked) {
                             setSelectedPosts([...selectedPosts, post.id])
                           } else {

@@ -71,7 +71,7 @@ export default function ProductDetail() {
     try {
       await addToCart(currentProduct.id, quantity);
       toast.success(`${quantity}개가 장바구니에 추가되었습니다!`);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('장바구니 추가에 실패했습니다.');
     }
   };

@@ -475,7 +475,7 @@ export const widgetHandlers = [
   // Get all widgets and areas
   http.get('/api/v1/widgets', () => {
     const response: WidgetListResponse = {
-      widgets: widgets.sort((a, b) => a.order - b.order),
+      widgets: widgets.sort((a: any, b: any) => a.order - b.order),
       areas: widgetAreas,
       total: widgets.length
     }
@@ -483,7 +483,7 @@ export const widgetHandlers = [
   }),
 
   // Get single widget
-  http.get('/api/v1/widgets/:id', ({ params }) => {
+  http.get('/api/v1/widgets/:id', ({ params }: any) => {
     const widget = widgets.find(w => w.id === params.id)
     if (!widget) {
       return HttpResponse.json({ error: 'Widget not found' }, { status: 404 })
@@ -492,7 +492,7 @@ export const widgetHandlers = [
   }),
 
   // Create widget
-  http.post('/api/v1/widgets', async ({ request }) => {
+  http.post('/api/v1/widgets', async ({ request }: any) => {
     const data = await request.json() as CreateWidgetDto
     
     const newWidget: Widget = {
@@ -523,7 +523,7 @@ export const widgetHandlers = [
   }),
 
   // Update widget
-  http.put('/api/v1/widgets/:id', async ({ params, request }) => {
+  http.put('/api/v1/widgets/:id', async ({ params, request }: any) => {
     const data = await request.json() as UpdateWidgetDto
     const index = widgets.findIndex(w => w.id === params.id)
 
@@ -549,7 +549,7 @@ export const widgetHandlers = [
   }),
 
   // Delete widget
-  http.delete('/api/v1/widgets/:id', ({ params }) => {
+  http.delete('/api/v1/widgets/:id', ({ params }: any) => {
     const index = widgets.findIndex(w => w.id === params.id)
     
     if (index === -1) {
@@ -561,7 +561,7 @@ export const widgetHandlers = [
   }),
 
   // Reorder widgets
-  http.patch('/api/v1/widgets/reorder', async ({ request }) => {
+  http.patch('/api/v1/widgets/reorder', async ({ request }: any) => {
     const data = await request.json() as { widgetId: string; newOrder: number; newPosition?: WidgetPosition }
     const { widgetId, newOrder, newPosition } = data
     
@@ -589,7 +589,7 @@ export const widgetHandlers = [
   }),
 
   // Get widget templates
-  http.get('/api/v1/widget-templates', ({ request }) => {
+  http.get('/api/v1/widget-templates', ({ request }: any) => {
     const url = new URL(request.url)
     const category = url.searchParams.get('category')
     const search = url.searchParams.get('search')
@@ -620,7 +620,7 @@ export const widgetHandlers = [
   }),
 
   // Apply widget template
-  http.post('/api/v1/widget-templates/:id/apply', async ({ params, request }) => {
+  http.post('/api/v1/widget-templates/:id/apply', async ({ params, request }: any) => {
     const data = await request.json() as { targetArea: WidgetPosition; replaceExisting: boolean }
     const { targetArea, replaceExisting } = data
     const template = mockWidgetTemplates.find(t => t.id === params.id)
@@ -678,7 +678,7 @@ export const widgetHandlers = [
   }),
 
   // Update widget area settings
-  http.put('/api/v1/widget-areas/:id', async ({ params, request }) => {
+  http.put('/api/v1/widget-areas/:id', async ({ params, request }: any) => {
     const data = await request.json() as Partial<WidgetArea>
     const index = widgetAreas.findIndex(a => a.id === params.id)
 

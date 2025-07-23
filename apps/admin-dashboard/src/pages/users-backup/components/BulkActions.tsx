@@ -155,7 +155,7 @@ const BulkActions: React.FC<BulkActionsProps> = ({
             
             <textarea
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e: any) => setReason(e.target.value)}
               placeholder="사유를 입력해주세요..."
               className="wp-textarea w-full h-24 mb-4"
               required

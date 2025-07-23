@@ -116,7 +116,7 @@ const WidgetManager: React.FC = () => {
   })
 
   // Group widgets by position
-  const widgetsByPosition = widgets.reduce((acc, widget) => {
+  const widgetsByPosition = widgets.reduce((acc: any, widget: any) => {
     if (!acc[widget.position]) {
       acc[widget.position] = []
     }
@@ -126,7 +126,7 @@ const WidgetManager: React.FC = () => {
 
   // Sort widgets by order within each position
   Object.keys(widgetsByPosition).forEach(position => {
-    widgetsByPosition[position as WidgetPosition].sort((a, b) => a.order - b.order)
+    widgetsByPosition[position as WidgetPosition].sort((a: any, b: any) => a.order - b.order)
   })
 
   const handleEdit = (widget: Widget) => {
@@ -272,7 +272,7 @@ const WidgetManager: React.FC = () => {
 
                         {/* Widgets in this area */}
                         <div className={`grid gap-3 ${area.settings.columns > 1 ? `grid-cols-${area.settings.columns}` : 'grid-cols-1'}`}>
-                          {widgetsByPosition[area.position]?.map((widget) => (
+                          {widgetsByPosition[area.position]?.map((widget: any) => (
                             <div
                               key={widget.id}
                               className={`border rounded-lg p-3 transition-all ${
@@ -432,7 +432,7 @@ const WidgetManager: React.FC = () => {
               <Input
                 placeholder="위젯 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="max-w-md"
               />
             </div>

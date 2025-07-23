@@ -167,7 +167,7 @@ const DataTable = <T extends object>({
                     <input
                       type="checkbox"
                       checked={selectAll}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      onChange={(e: any) => handleSelectAll(e.target.checked)}
                       className="rounded border-wp-border-primary text-admin-blue focus:ring-admin-blue"
                     />
                   </th>
@@ -244,7 +244,7 @@ const DataTable = <T extends object>({
                         <input
                           type="checkbox"
                           checked={isItemSelected(item)}
-                          onChange={(e) => handleSelectItem(item, e.target.checked)}
+                          onChange={(e: any) => handleSelectItem(item, e.target.checked)}
                           className="rounded border-wp-border-primary text-admin-blue focus:ring-admin-blue"
                         />
                       </td>
@@ -287,7 +287,7 @@ const DataTable = <T extends object>({
               <span>페이지 당</span>
               <select
                 value={pagination.pageSize}
-                onChange={(e) => pagination.onPageSizeChange(Number(e.target.value))}
+                onChange={(e: any) => pagination.onPageSizeChange(Number(e.target.value))}
                 className="wp-select py-1 px-2 text-sm"
               >
                 <option value={10}>10개</option>

@@ -248,7 +248,7 @@ const ACFFieldGroupForm: React.FC = () => {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({
+                  onChange={(e: any) => setFormData({
                     ...formData,
                     name: e.target.value,
                     key: generateKey(e.target.value)
@@ -263,7 +263,7 @@ const ACFFieldGroupForm: React.FC = () => {
                 <Input
                   id="key"
                   value={formData.key}
-                  onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, key: e.target.value })}
                   placeholder="예: product_info"
                   required
                 />
@@ -274,7 +274,7 @@ const ACFFieldGroupForm: React.FC = () => {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="이 필드 그룹에 대한 설명"
                   rows={3}
                 />
@@ -432,7 +432,7 @@ const ACFFieldGroupForm: React.FC = () => {
 
                         <Input
                           value={rule.value}
-                          onChange={(e) => {
+                          onChange={(e: any) => {
                             const newLocation = [...(formData.location || [])]
                             newLocation[groupIndex].rules[ruleIndex].value = e.target.value
                             setFormData({ ...formData, location: newLocation })

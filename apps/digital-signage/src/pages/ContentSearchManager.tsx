@@ -94,7 +94,7 @@ const ContentSearchManager: React.FC = () => {
 
       const response = await axios.post('/api/signage/contents/search', searchPayload);
       setSearchResult(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Search failed');
       console.error('Search error:', error);
     } finally {
@@ -145,7 +145,7 @@ const ContentSearchManager: React.FC = () => {
       toast.success(`Deleted ${selectedContent.size} items`);
       setSelectedContent(new Set());
       searchContent();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Failed to delete content');
     }
   };
@@ -158,7 +158,7 @@ const ContentSearchManager: React.FC = () => {
       await axios.delete(`/api/signage/contents/${contentId}`);
       toast.success('Content deleted');
       searchContent();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Failed to delete content');
     }
   };

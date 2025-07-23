@@ -547,6 +547,260 @@ chmod 600 ~/.ssh/github_actions_key
 4. "Script not found": Using wrong script names (build:api vs build:api-server)
 5. "Host key verification failed": Add known_hosts configuration before SSH commands
 
+## TypeScript & Import Management Best Practices
+
+### 🚨 Critical Rules to Prevent CI/CD Failures
+
+**Import Management**:
+1. **NEVER import React as a namespace in React 17+**
+   ```typescript
+   // ❌ WRONG - Will cause unused import warnings
+   import React from 'react';
+   
+   // ✅ CORRECT - Import only what you need
+   import { useState, useEffect } from 'react';
+   ```
+
+2. **Remove ALL unused imports before committing**
+   - CI/CD will fail on ANY unused import warning
+   - Use ESLint auto-fix: `npm run lint:fix`
+   - Common unused imports to check:
+     - React (when using new JSX transform)
+     - Unused icon imports from lucide-react
+     - Unused UI components (Badge, CardHeader, CardTitle)
+     - Unused type imports
+
+3. **Socket.io-client Import Pattern**
+   ```typescript
+   // ✅ CORRECT - Default import
+   import io from 'socket.io-client';
+   
+   // For TypeScript, use 'any' type for socket refs if needed
+   const socketRef = useRef<any>(null);
+   ```
+
+4. **Handle Missing Components Gracefully**
+   ```typescript
+   // If a component doesn't exist yet, comment it out
+   // import { Navbar } from '../components/Navbar'; // TODO: Create Navbar component
+   ```
+
+**TypeScript Strict Mode Compliance**:
+1. **Always add type annotations for parameters**
+   ```typescript
+   // ❌ WRONG
+   products.map(item => item.name)
+   
+   // ✅ CORRECT
+   products.map((item: any) => item.name)
+   // Or better with proper types
+   products.map((item: Product) => item.name)
+   ```
+
+2. **Avoid unused variable warnings**
+   ```typescript
+   // ❌ WRONG - Will fail CI/CD
+   const [selectedMetric, setSelectedMetric] = useState('sales');
+   // If only using selectedMetric
+   
+   // ✅ CORRECT - Prefix with underscore
+   const [selectedMetric] = useState('sales');
+   // Or if not using at all
+   const [_selectedMetric, setSelectedMetric] = useState('sales');
+   ```
+
+3. **Type assertion when needed**
+   ```typescript
+   // When TypeScript can't infer types correctly
+   setEditingProduct(baseProduct as BaseProduct);
+   ```
+
+**Pre-commit Checklist**:
+- [ ] Run `npm run type-check` for your workspace
+- [ ] Run `npm run lint` and fix ALL warnings
+- [ ] Run `npm audit` and resolve security issues
+- [ ] Remove all unused imports
+- [ ] Add type annotations for all parameters
+- [ ] Ensure no unused variables (prefix with _ if needed)
+- [ ] Test with `npm run build` locally
+
+**Quick Commands to Check Before Push**:
+```bash
+# Check specific workspace
+npm run type-check --workspace=@o4o/digital-signage
+npm run type-check --workspace=@o4o/ecommerce
+
+# Fix imports automatically
+npm run lint:fix --workspace=@o4o/digital-signage
+
+# Check all workspaces
+npm run type-check
+```
+
+## 🚨 Complete CI/CD Failure Prevention Guide
+
+### NPM Security Audit Issues
+
+**Common Security Vulnerabilities and Fixes**:
+
+1. **form-data vulnerability**
+   ```bash
+   # Update to latest version
+   npm update form-data
+   # Or use audit fix
+   npm audit fix
+   ```
+
+2. **on-headers vulnerability in serve package**
+   ```bash
+   # May require major version update
+   npm audit fix --force
+   # Or update serve manually
+   npm install serve@latest
+   ```
+
+**Security Audit Best Practices**:
+- Run `npm audit` before every commit
+- Fix all moderate and above vulnerabilities
+- Document any accepted low-risk vulnerabilities
+- Keep dependencies updated regularly
+
+### ESLint 'any' Type Warnings
+
+**🔴 CRITICAL: CI/CD will fail on ANY ESLint warning!**
+
+**Common Patterns to Fix**:
+
+1. **Unexpected any type**
+   ```typescript
+   // ❌ WRONG - Will fail CI/CD
+   products.map(item => item.name)
+   
+   // ✅ CORRECT - Add type annotation
+   products.map((item: Product) => item.name)
+   // Or if type is unknown
+   products.map((item: any) => item.name)
+   ```
+
+2. **MSW Handler Types**
+   ```typescript
+   // ❌ WRONG
+   http.post('/api/users', async ({ request }) => {
+   
+   // ✅ CORRECT
+   http.post('/api/users', async ({ request }: any) => {
+   ```
+
+3. **Event Handler Types**
+   ```typescript
+   // ❌ WRONG
+   onChange={(e) => setValue(e.target.value)}
+   
+   // ✅ CORRECT
+   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+   // Or simpler
+   onChange={(e: any) => setValue(e.target.value)}
+   ```
+
+4. **Catch Block Types**
+   ```typescript
+   // ❌ WRONG
+   } catch (error) {
+   
+   // ✅ CORRECT
+   } catch (error: any) {
+   // Or better
+   } catch (error: unknown) {
+   ```
+
+### Other Common ESLint Issues
+
+1. **Empty Pattern Destructuring**
+   ```typescript
+   // ❌ WRONG - no-empty-pattern
+   export default function SignageDetail({}: SignageDetailProps) {
+   
+   // ✅ CORRECT
+   export default function SignageDetail(_props: SignageDetailProps) {
+   // Or use the props
+   export default function SignageDetail(props: SignageDetailProps) {
+   ```
+
+2. **Constant Binary Expression**
+   ```typescript
+   // ❌ WRONG - no-constant-binary-expression
+   {true && content.url && (
+   
+   // ✅ CORRECT
+   {content.url && (
+   ```
+
+3. **Useless Escape**
+   ```typescript
+   // ❌ WRONG - no-useless-escape
+   const regex = /\@/g;
+   
+   // ✅ CORRECT
+   const regex = /@/g;
+   ```
+
+### Complete Pre-Push Validation
+
+```bash
+# 1. Check TypeScript
+npm run type-check
+
+# 2. Check ESLint (MUST have 0 warnings)
+npm run lint
+
+# 3. Check security vulnerabilities
+npm audit --audit-level=moderate
+
+# 4. Build everything
+npm run build
+
+# 5. Run tests
+npm run test
+
+# If any step fails, fix before pushing!
+```
+
+### Quick Fix Commands
+
+```bash
+# Auto-fix most lint issues
+npm run lint:fix
+
+# Fix security issues
+npm audit fix
+
+# Fix specific workspace
+npm run lint:fix --workspace=@o4o/admin-dashboard
+
+# Update all dependencies
+npm update
+```
+
+### CI/CD Failure Checklist
+
+When CI/CD fails, check in this order:
+1. ❌ **TypeScript errors** → Run `npm run type-check`
+2. ❌ **ESLint warnings** → Run `npm run lint` (MUST be 0 warnings)
+3. ❌ **Security vulnerabilities** → Run `npm audit`
+4. ❌ **Missing dependencies** → Run `npm install`
+5. ❌ **Build order** → Run `npm run build:packages` first
+
+### Zero-Tolerance Rules for CI/CD
+
+1. **NO any types without annotation** - Every `any` must be explicit
+2. **NO unused imports** - Remove immediately
+3. **NO ESLint warnings** - Not even one!
+4. **NO moderate+ security vulnerabilities** - Fix or document
+5. **NO empty destructuring patterns** - Use underscore prefix
+6. **NO implicit any errors** - Add type annotations
+
+Remember: **CI/CD has ZERO tolerance for warnings!**
+
 ## Troubleshooting Guide
 
 ### Common Issues and Solutions

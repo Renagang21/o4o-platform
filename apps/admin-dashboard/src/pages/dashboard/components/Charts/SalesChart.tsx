@@ -59,7 +59,7 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, isLoading = false }) => {
 
     const filteredData = data.slice(-periodDays[period]);
 
-    return filteredData.map(item => ({
+    return filteredData.map((item: any) => ({
       ...item,
       date: new Date(item.date).toLocaleDateString('ko-KR', {
         month: 'short',
@@ -78,9 +78,9 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, isLoading = false }) => {
   const stats = useMemo(() => {
     if (!processedData.length) return { total: 0, average: 0, highest: 0, growth: 0 };
 
-    const total = processedData.reduce((sum, item) => sum + item.amount, 0);
+    const total = processedData.reduce((sum: any, item: any) => sum + item.amount, 0);
     const average = total / processedData.length;
-    const highest = Math.max(...processedData.map(item => item.amount));
+    const highest = Math.max(...processedData.map((item: any) => item.amount));
     
     // 성장률 계산 (첫째 날 vs 마지막 날)
     const firstDay = processedData[0]?.amount || 0;

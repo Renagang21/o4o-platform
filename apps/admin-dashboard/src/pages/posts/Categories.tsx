@@ -377,7 +377,7 @@ const Categories: React.FC = () => {
               type="text"
               placeholder="카테고리 이름이나 설명으로 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="wp-input pl-10"
             />
           </div>
@@ -448,7 +448,7 @@ const Categories: React.FC = () => {
                   <input
                     type="text"
                     value={formData.name || ''}
-                    onChange={(e) => updateFormData('name', e.target.value)}
+                    onChange={(e: any) => updateFormData('name', e.target.value)}
                     className="wp-input"
                     placeholder="카테고리 이름을 입력하세요"
                     autoFocus
@@ -460,7 +460,7 @@ const Categories: React.FC = () => {
                   <input
                     type="text"
                     value={formData.slug || ''}
-                    onChange={(e) => updateFormData('slug', e.target.value)}
+                    onChange={(e: any) => updateFormData('slug', e.target.value)}
                     className="wp-input"
                     placeholder="자동 생성됩니다"
                   />
@@ -473,7 +473,7 @@ const Categories: React.FC = () => {
                   <label className="wp-label">설명</label>
                   <textarea
                     value={formData.description || ''}
-                    onChange={(e) => updateFormData('description', e.target.value)}
+                    onChange={(e: any) => updateFormData('description', e.target.value)}
                     className="wp-input min-h-[80px]"
                     placeholder="카테고리에 대한 설명을 입력하세요"
                   />
@@ -483,7 +483,7 @@ const Categories: React.FC = () => {
                   <label className="wp-label">상위 카테고리</label>
                   <select
                     value={formData.parentId || ''}
-                    onChange={(e) => updateFormData('parentId', e.target.value)}
+                    onChange={(e: any) => updateFormData('parentId', e.target.value)}
                     className="wp-select"
                   >
                     <option value="">최상위 카테고리</option>
@@ -506,13 +506,13 @@ const Categories: React.FC = () => {
                       <input
                         type="color"
                         value={formData.color || '#3b82f6'}
-                        onChange={(e) => updateFormData('color', e.target.value)}
+                        onChange={(e: any) => updateFormData('color', e.target.value)}
                         className="w-10 h-10 rounded border border-gray-300"
                       />
                       <input
                         type="text"
                         value={formData.color || '#3b82f6'}
-                        onChange={(e) => updateFormData('color', e.target.value)}
+                        onChange={(e: any) => updateFormData('color', e.target.value)}
                         className="wp-input flex-1"
                         placeholder="#3b82f6"
                       />
@@ -524,7 +524,7 @@ const Categories: React.FC = () => {
                     <input
                       type="number"
                       value={formData.order || 0}
-                      onChange={(e) => updateFormData('order', parseInt(e.target.value))}
+                      onChange={(e: any) => updateFormData('order', parseInt(e.target.value))}
                       className="wp-input"
                       min="0"
                     />
@@ -536,7 +536,7 @@ const Categories: React.FC = () => {
                     type="checkbox"
                     id="isActive"
                     checked={formData.isActive || false}
-                    onChange={(e) => updateFormData('isActive', e.target.checked)}
+                    onChange={(e: any) => updateFormData('isActive', e.target.checked)}
                     className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
                   />
                   <label htmlFor="isActive" className="text-sm text-gray-700">

@@ -156,7 +156,7 @@ const WidgetLibrary: React.FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
             <Input
               placeholder="템플릿 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>

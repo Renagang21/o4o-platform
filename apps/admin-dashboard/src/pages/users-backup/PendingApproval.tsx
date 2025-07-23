@@ -146,7 +146,7 @@ const PendingApproval: React.FC = () => {
                 type="text"
                 placeholder="이름, 이메일, 사업체명으로 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="wp-input"
               />
             </div>
@@ -155,7 +155,7 @@ const PendingApproval: React.FC = () => {
             <div className="flex gap-2">
               <select
                 value={businessTypeFilter}
-                onChange={(e) => setBusinessTypeFilter(e.target.value)}
+                onChange={(e: any) => setBusinessTypeFilter(e.target.value)}
                 className="wp-select min-w-[150px]"
               >
                 <option value="all">전체 사업체</option>

@@ -205,7 +205,7 @@ const PostForm: React.FC = () => {
                 id="title"
                 placeholder="게시글 제목을 입력하세요"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e: any) => setFormData({ ...formData, title: e.target.value })}
                 className="mt-2"
               />
             </div>
@@ -241,7 +241,7 @@ const PostForm: React.FC = () => {
                       id="excerpt"
                       placeholder="게시글 요약을 입력하세요 (선택사항)"
                       value={formData.excerpt}
-                      onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                      onChange={(e: any) => setFormData({ ...formData, excerpt: e.target.value })}
                       className="mt-2"
                       rows={3}
                     />
@@ -258,7 +258,7 @@ const PostForm: React.FC = () => {
                       id="seoTitle"
                       placeholder="검색 결과에 표시될 제목"
                       value={formData.meta?.seoTitle}
-                      onChange={(e) => setFormData({
+                      onChange={(e: any) => setFormData({
                         ...formData,
                         meta: { ...formData.meta, seoTitle: e.target.value }
                       })}
@@ -271,7 +271,7 @@ const PostForm: React.FC = () => {
                       id="seoDescription"
                       placeholder="검색 결과에 표시될 설명"
                       value={formData.meta?.seoDescription}
-                      onChange={(e) => setFormData({
+                      onChange={(e: any) => setFormData({
                         ...formData,
                         meta: { ...formData.meta, seoDescription: e.target.value }
                       })}
@@ -285,11 +285,11 @@ const PostForm: React.FC = () => {
                       id="seoKeywords"
                       placeholder="키워드를 쉼표로 구분하여 입력"
                       value={formData.meta?.seoKeywords?.join(', ')}
-                      onChange={(e) => setFormData({
+                      onChange={(e: any) => setFormData({
                         ...formData,
                         meta: {
                           ...formData.meta,
-                          seoKeywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean)
+                          seoKeywords: e.target.value.split(',').map((k: any) => k.trim()).filter(Boolean)
                         }
                       })}
                       className="mt-2"
@@ -305,7 +305,7 @@ const PostForm: React.FC = () => {
                         id="slug"
                         placeholder="url-friendly-slug"
                         value={formData.slug || ''}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                        onChange={(e: any) => setFormData({ ...formData, slug: e.target.value })}
                         className="mt-2"
                       />
                       <p className="text-sm text-gray-500 mt-1">
@@ -360,7 +360,7 @@ const PostForm: React.FC = () => {
                     id="password"
                     type="password"
                     value={formData.password || ''}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e: any) => setFormData({ ...formData, password: e.target.value })}
                     className="mt-2"
                   />
                 </div>
@@ -380,12 +380,12 @@ const PostForm: React.FC = () => {
                   <Input
                     type="date"
                     value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
+                    onChange={(e: any) => setScheduledDate(e.target.value)}
                   />
                   <Input
                     type="time"
                     value={scheduledTime}
-                    onChange={(e) => setScheduledTime(e.target.value)}
+                    onChange={(e: any) => setScheduledTime(e.target.value)}
                   />
                 </div>
               )}
@@ -434,7 +434,7 @@ const PostForm: React.FC = () => {
                       type="checkbox"
                       className="rounded border-gray-300"
                       checked={selectedCategories.includes(category.id)}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         if (e.target.checked) {
                           setSelectedCategories([...selectedCategories, category.id])
                         } else {
@@ -465,7 +465,7 @@ const PostForm: React.FC = () => {
                       type="checkbox"
                       className="rounded border-gray-300"
                       checked={selectedTags.includes(tag.id)}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         if (e.target.checked) {
                           setSelectedTags([...selectedTags, tag.id])
                         } else {

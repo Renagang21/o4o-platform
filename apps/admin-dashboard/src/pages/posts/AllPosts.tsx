@@ -432,7 +432,7 @@ const AllPosts: React.FC = () => {
                     type="text"
                     placeholder="제목, 내용, 작성자로 검색..."
                     value={filters.searchTerm}
-                    onChange={(e) => updateFilter('searchTerm', e.target.value)}
+                    onChange={(e: any) => updateFilter('searchTerm', e.target.value)}
                     className="wp-input pl-10"
                   />
                 </div>
@@ -441,7 +441,7 @@ const AllPosts: React.FC = () => {
               <div className="flex flex-wrap gap-2">
                 <select
                   value={filters.status}
-                  onChange={(e) => updateFilter('status', e.target.value)}
+                  onChange={(e: any) => updateFilter('status', e.target.value)}
                   className="wp-select min-w-[120px]"
                 >
                   <option value="">전체 상태</option>
@@ -453,7 +453,7 @@ const AllPosts: React.FC = () => {
 
                 <select
                   value={filters.category}
-                  onChange={(e) => updateFilter('category', e.target.value)}
+                  onChange={(e: any) => updateFilter('category', e.target.value)}
                   className="wp-select min-w-[120px]"
                 >
                   <option value="">전체 카테고리</option>
@@ -482,7 +482,7 @@ const AllPosts: React.FC = () => {
                   <label className="wp-label">작성자</label>
                   <select
                     value={filters.author}
-                    onChange={(e) => updateFilter('author', e.target.value)}
+                    onChange={(e: any) => updateFilter('author', e.target.value)}
                     className="wp-select"
                   >
                     <option value="">전체 작성자</option>
@@ -498,7 +498,7 @@ const AllPosts: React.FC = () => {
                   <input
                     type="date"
                     value={filters.dateFrom}
-                    onChange={(e) => updateFilter('dateFrom', e.target.value)}
+                    onChange={(e: any) => updateFilter('dateFrom', e.target.value)}
                     className="wp-input"
                   />
                 </div>
@@ -507,7 +507,7 @@ const AllPosts: React.FC = () => {
                   <input
                     type="date"
                     value={filters.dateTo}
-                    onChange={(e) => updateFilter('dateTo', e.target.value)}
+                    onChange={(e: any) => updateFilter('dateTo', e.target.value)}
                     className="wp-input"
                   />
                 </div>
@@ -536,7 +536,7 @@ const AllPosts: React.FC = () => {
               </span>
               <div className="flex items-center gap-2">
                 <select
-                  onChange={(e) => e.target.value && handleBulkAction(e.target.value)}
+                  onChange={(e: any) => e.target.value && handleBulkAction(e.target.value)}
                   className="wp-select"
                   value=""
                 >
@@ -694,7 +694,7 @@ const AllPosts: React.FC = () => {
               </span>
               <select
                 value={pageSize}
-                onChange={(e) => setPageSize(parseInt(e.target.value))}
+                onChange={(e: any) => setPageSize(parseInt(e.target.value))}
                 className="wp-select w-20"
               >
                 <option value={10}>10</option>

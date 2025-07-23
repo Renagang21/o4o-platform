@@ -157,7 +157,7 @@ const ProductForm: React.FC = () => {
                 <input
                   type="text"
                   value={formData.name || ''}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e: any) => handleInputChange('name', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -171,7 +171,7 @@ const ProductForm: React.FC = () => {
                   <input
                     type="text"
                     value={formData.slug || ''}
-                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                    onChange={(e: any) => handleInputChange('slug', e.target.value)}
                     className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <button
@@ -190,7 +190,7 @@ const ProductForm: React.FC = () => {
                 </label>
                 <textarea
                   value={formData.shortDescription || ''}
-                  onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                  onChange={(e: any) => handleInputChange('shortDescription', e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -202,7 +202,7 @@ const ProductForm: React.FC = () => {
                 </label>
                 <textarea
                   value={formData.description || ''}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e: any) => handleInputChange('description', e.target.value)}
                   placeholder="상품에 대한 상세한 설명을 입력하세요"
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={5}
@@ -226,7 +226,7 @@ const ProductForm: React.FC = () => {
                 <input
                   type="number"
                   value={formData.retailPrice || 0}
-                  onChange={(e) => handleInputChange('retailPrice', parseFloat(e.target.value))}
+                  onChange={(e: any) => handleInputChange('retailPrice', parseFloat(e.target.value))}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   min="0"
@@ -240,7 +240,7 @@ const ProductForm: React.FC = () => {
                 <input
                   type="number"
                   value={formData.wholesalePrice || 0}
-                  onChange={(e) => handleInputChange('wholesalePrice', parseFloat(e.target.value))}
+                  onChange={(e: any) => handleInputChange('wholesalePrice', parseFloat(e.target.value))}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="0"
                 />
@@ -253,7 +253,7 @@ const ProductForm: React.FC = () => {
                 <input
                   type="number"
                   value={formData.cost || 0}
-                  onChange={(e) => handleInputChange('cost', parseFloat(e.target.value))}
+                  onChange={(e: any) => handleInputChange('cost', parseFloat(e.target.value))}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="0"
                 />
@@ -269,7 +269,7 @@ const ProductForm: React.FC = () => {
                   <input
                     type="number"
                     value={formData.wholesalePrice || 0}
-                    onChange={(e) => handleInputChange('wholesalePrice', parseFloat(e.target.value))}
+                    onChange={(e: any) => handleInputChange('wholesalePrice', parseFloat(e.target.value))}
                     className="w-32 px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                   />
@@ -279,7 +279,7 @@ const ProductForm: React.FC = () => {
                   <input
                     type="number"
                     value={formData.affiliatePrice || 0}
-                    onChange={(e) => handleInputChange('affiliatePrice', parseFloat(e.target.value))}
+                    onChange={(e: any) => handleInputChange('affiliatePrice', parseFloat(e.target.value))}
                     className="w-32 px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                   />
@@ -303,7 +303,7 @@ const ProductForm: React.FC = () => {
                 <input
                   type="text"
                   value={formData.sku || ''}
-                  onChange={(e) => handleInputChange('sku', e.target.value)}
+                  onChange={(e: any) => handleInputChange('sku', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -313,7 +313,7 @@ const ProductForm: React.FC = () => {
                   type="checkbox"
                   id="trackInventory"
                   checked={formData.manageStock || false}
-                  onChange={(e) => handleInputChange('manageStock', e.target.checked)}
+                  onChange={(e: any) => handleInputChange('manageStock', e.target.checked)}
                   className="rounded"
                 />
                 <label htmlFor="trackInventory" className="ml-2 text-sm text-gray-700">
@@ -330,7 +330,7 @@ const ProductForm: React.FC = () => {
                     <input
                       type="number"
                       value={formData.stockQuantity || 0}
-                      onChange={(e) => handleInputChange('stockQuantity', parseInt(e.target.value))}
+                      onChange={(e: any) => handleInputChange('stockQuantity', parseInt(e.target.value))}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min="0"
                     />
@@ -342,7 +342,7 @@ const ProductForm: React.FC = () => {
                     </label>
                     <select
                       value={formData.stockStatus || 'in_stock'}
-                      onChange={(e) => handleInputChange('stockStatus', e.target.value)}
+                      onChange={(e: any) => handleInputChange('stockStatus', e.target.value)}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="in_stock">재고 있음</option>
@@ -369,7 +369,7 @@ const ProductForm: React.FC = () => {
                 </label>
                 <select
                   value={formData.status || 'active'}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  onChange={(e: any) => handleInputChange('status', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="active">판매중</option>
@@ -383,7 +383,7 @@ const ProductForm: React.FC = () => {
                 </label>
                 <select
                   value={formData.status || 'active'}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  onChange={(e: any) => handleInputChange('status', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="active">공개</option>
@@ -397,7 +397,7 @@ const ProductForm: React.FC = () => {
                   type="checkbox"
                   id="featured"
                   checked={formData.featured || false}
-                  onChange={(e) => handleInputChange('featured', e.target.checked)}
+                  onChange={(e: any) => handleInputChange('featured', e.target.checked)}
                   className="rounded"
                 />
                 <label htmlFor="featured" className="ml-2 text-sm text-gray-700">
@@ -413,7 +413,7 @@ const ProductForm: React.FC = () => {
             
             <select
               value={formData.type || 'physical'}
-              onChange={(e) => handleInputChange('type', e.target.value)}
+              onChange={(e: any) => handleInputChange('type', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="physical">실물 상품</option>
@@ -430,7 +430,7 @@ const ProductForm: React.FC = () => {
                   <input
                     type="number"
                     value={formData.weight || 0}
-                    onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
+                    onChange={(e: any) => handleInputChange('weight', parseFloat(e.target.value))}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     min="0"
                     step="0.1"
@@ -446,7 +446,7 @@ const ProductForm: React.FC = () => {
                       type="number"
                       placeholder="길이"
                       value={formData.dimensions?.length || 0}
-                      onChange={(e) => handleInputChange('dimensions', {
+                      onChange={(e: any) => handleInputChange('dimensions', {
                         ...formData.dimensions,
                         length: parseFloat(e.target.value)
                       })}
@@ -457,7 +457,7 @@ const ProductForm: React.FC = () => {
                       type="number"
                       placeholder="너비"
                       value={formData.dimensions?.width || 0}
-                      onChange={(e) => handleInputChange('dimensions', {
+                      onChange={(e: any) => handleInputChange('dimensions', {
                         ...formData.dimensions,
                         width: parseFloat(e.target.value)
                       })}
@@ -468,7 +468,7 @@ const ProductForm: React.FC = () => {
                       type="number"
                       placeholder="높이"
                       value={formData.dimensions?.height || 0}
-                      onChange={(e) => handleInputChange('dimensions', {
+                      onChange={(e: any) => handleInputChange('dimensions', {
                         ...formData.dimensions,
                         height: parseFloat(e.target.value)
                       })}
@@ -533,7 +533,7 @@ const ProductForm: React.FC = () => {
                 <input
                   type="text"
                   value={formData.metaTitle || ''}
-                  onChange={(e) => handleInputChange('metaTitle', e.target.value)}
+                  onChange={(e: any) => handleInputChange('metaTitle', e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -544,7 +544,7 @@ const ProductForm: React.FC = () => {
                 </label>
                 <textarea
                   value={formData.metaDescription || ''}
-                  onChange={(e) => handleInputChange('metaDescription', e.target.value)}
+                  onChange={(e: any) => handleInputChange('metaDescription', e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

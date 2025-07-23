@@ -197,7 +197,7 @@ const UserForm: React.FC<UserFormProps> = ({
       }
 
       await onSubmit(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Form submission error:', error);
     }
   };

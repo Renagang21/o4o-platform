@@ -176,7 +176,7 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({
       } else {
         showToast(data.error?.message || '피드백 제출 중 오류가 발생했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Feedback submission error:', error);
       showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     } finally {

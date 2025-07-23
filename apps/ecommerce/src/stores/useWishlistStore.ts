@@ -38,7 +38,7 @@ export const useWishlistStore = create<WishlistStore>()(
         try {
           const response = await authClient.api.get('/wishlist');
           set({ items: response.data.items, isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
           const message = error instanceof Error ? error.message : 'Failed to fetch wishlist';
           set({ error: message, isLoading: false });
         }
@@ -67,11 +67,11 @@ export const useWishlistStore = create<WishlistStore>()(
           });
           
           // Update with server response
-          const updatedItems = items.map(item =>
+          const updatedItems = items.map((item: any) =>
             item.id === newItem.id ? { ...item, id: response.data.id } : item
           );
           set({ items: updatedItems });
-        } catch (error) {
+        } catch (error: any) {
           // Revert on error
           set({ items: items.filter(item => item.id !== newItem.id) });
           throw error;
@@ -89,7 +89,7 @@ export const useWishlistStore = create<WishlistStore>()(
         
         try {
           await authClient.api.delete(`/wishlist/items/${productId}`);
-        } catch (error) {
+        } catch (error: any) {
           // Revert on error
           set({ items });
           throw error;
@@ -104,7 +104,7 @@ export const useWishlistStore = create<WishlistStore>()(
         
         try {
           await authClient.api.delete('/wishlist');
-        } catch (error) {
+        } catch (error: any) {
           // Revert on error
           set({ items });
           throw error;

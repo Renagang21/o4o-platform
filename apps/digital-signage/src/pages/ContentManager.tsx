@@ -84,7 +84,7 @@ const ContentManager: React.FC = () => {
         fileInputRef.current.value = '';
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('업로드 실패:', error);
       alert('업로드에 실패했습니다. 다시 시도해주세요.');
     } finally {
@@ -311,14 +311,14 @@ const ContentManager: React.FC = () => {
             ))}
           </div>
           
-          {/* 빈 상태 */}
-          {false && (
+          {/* 빈 상태 - Currently disabled */}
+          {/* {contents.length === 0 && (
             <div className="text-center py-8">
               <File className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">아직 업로드된 콘텐츠가 없습니다.</p>
               <p className="text-sm text-gray-400">위에서 새 콘텐츠를 업로드해보세요.</p>
             </div>
-          )}
+          )} */}
         </div>
       </div>
       

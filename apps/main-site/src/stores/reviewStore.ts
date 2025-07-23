@@ -213,7 +213,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -239,7 +239,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '상품 리뷰를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -265,7 +265,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '사용자 리뷰를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -288,7 +288,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             currentReview: review,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -334,7 +334,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           
           // 상품 평점 업데이트
           get().updateProductRating(data.productId);
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 작성 중 오류가 발생했습니다.',
             isLoading: false,
@@ -368,7 +368,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           
           // 상품 평점 업데이트
           get().updateProductRating(updatedReview.productId);
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 수정 중 오류가 발생했습니다.',
             isLoading: false,
@@ -397,7 +397,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           
           // 상품 평점 업데이트
           get().updateProductRating(deletedReview.productId);
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 삭제 중 오류가 발생했습니다.',
             isLoading: false,
@@ -426,7 +426,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           
           // 상품 평점 업데이트
           get().updateProductRating(mockReviews[reviewIndex].productId);
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 승인 중 오류가 발생했습니다.',
             isLoading: false,
@@ -455,7 +455,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           
           // 상품 평점 업데이트
           get().updateProductRating(mockReviews[reviewIndex].productId);
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 숨김 처리 중 오류가 발생했습니다.',
             isLoading: false,
@@ -486,7 +486,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           }
           
           mockReviews[reviewIndex] = { ...review };
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '도움됨 처리 중 오류가 발생했습니다.',
           });
@@ -513,7 +513,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           mockReviewReports.push(newReport);
           
           set({ isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 신고 중 오류가 발생했습니다.',
             isLoading: false,
@@ -527,7 +527,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           
           const summary = getReviewSummary(productId);
           return summary || null;
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 요약을 불러오는 중 오류가 발생했습니다.',
           });
@@ -564,7 +564,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
           set(state => ({
             reviewSummaries: [...mockReviewSummaries],
           }));
-        } catch (error) {
+        } catch (error: any) {
           console.error('상품 평점 업데이트 중 오류:', error);
         }
       },
@@ -606,7 +606,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             reviewStats: mockReviewStats,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 통계를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -624,7 +624,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             reviewReports: mockReviewReports,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '리뷰 신고를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -652,7 +652,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             reviewReports: [...mockReviewReports],
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '신고 처리 중 오류가 발생했습니다.',
             isLoading: false,

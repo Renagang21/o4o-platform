@@ -416,7 +416,7 @@ let libraryItems = [...mockLibraryItems]
 
 export const templateHandlers = [
   // Get templates
-  http.get('/api/v1/templates', ({ request }) => {
+  http.get('/api/v1/templates', ({ request }: any) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '1')
     const limit = parseInt(url.searchParams.get('limit') || '12')
@@ -450,7 +450,7 @@ export const templateHandlers = [
     }
 
     // Sort by updated date
-    filteredTemplates.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    filteredTemplates.sort((a: any, b: any) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
     // Pagination
     const startIndex = (page - 1) * limit
@@ -469,7 +469,7 @@ export const templateHandlers = [
   }),
 
   // Get single template
-  http.get('/api/v1/templates/:id', ({ params }) => {
+  http.get('/api/v1/templates/:id', ({ params }: any) => {
     const template = templates.find(t => t.id === params.id)
     if (!template) {
       return HttpResponse.json({ error: 'Template not found' }, { status: 404 })
@@ -478,7 +478,7 @@ export const templateHandlers = [
   }),
 
   // Create template
-  http.post('/api/v1/templates', async ({ request }) => {
+  http.post('/api/v1/templates', async ({ request }: any) => {
     const data = await request.json() as CreateTemplateDto
     
     const newTemplate: Template = {
@@ -541,7 +541,7 @@ export const templateHandlers = [
   }),
 
   // Update template
-  http.put('/api/v1/templates/:id', async ({ params, request }) => {
+  http.put('/api/v1/templates/:id', async ({ params, request }: any) => {
     const data = await request.json() as UpdateTemplateDto
     const index = templates.findIndex(t => t.id === params.id)
 
@@ -588,7 +588,7 @@ export const templateHandlers = [
   }),
 
   // Delete template
-  http.delete('/api/v1/templates/:id', ({ params }) => {
+  http.delete('/api/v1/templates/:id', ({ params }: any) => {
     const index = templates.findIndex(t => t.id === params.id)
 
     if (index === -1) {
@@ -600,7 +600,7 @@ export const templateHandlers = [
   }),
 
   // Duplicate template
-  http.post('/api/v1/templates/:id/duplicate', ({ params }) => {
+  http.post('/api/v1/templates/:id/duplicate', ({ params }: any) => {
     const original = templates.find(t => t.id === params.id)
 
     if (!original) {
@@ -625,7 +625,7 @@ export const templateHandlers = [
   }),
 
   // Get template library
-  http.get('/api/v1/template-library', ({ request }) => {
+  http.get('/api/v1/template-library', ({ request }: any) => {
     const url = new URL(request.url)
     const search = url.searchParams.get('search')
     const category = url.searchParams.get('category')
@@ -660,7 +660,7 @@ export const templateHandlers = [
     }
 
     // Sort by popularity
-    filteredItems.sort((a, b) => b.popularity - a.popularity)
+    filteredItems.sort((a: any, b: any) => b.popularity - a.popularity)
 
     const response: TemplateLibraryResponse = {
       items: filteredItems,
@@ -676,7 +676,7 @@ export const templateHandlers = [
   }),
 
   // Import template from library
-  http.post('/api/v1/template-library/:id/import', ({ params }) => {
+  http.post('/api/v1/template-library/:id/import', ({ params }: any) => {
     const libraryItem = libraryItems.find(item => item.id === params.id)
 
     if (!libraryItem) {

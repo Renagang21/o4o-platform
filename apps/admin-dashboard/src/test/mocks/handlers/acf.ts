@@ -165,7 +165,7 @@ export const acfHandlers = [
   }),
 
   // Get single field group
-  http.get('/api/v1/acf/field-groups/:id', ({ params }) => {
+  http.get('/api/v1/acf/field-groups/:id', ({ params }: any) => {
     const fieldGroup = fieldGroups.find(fg => fg.id === params.id);
     if (!fieldGroup) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });
@@ -174,7 +174,7 @@ export const acfHandlers = [
   }),
 
   // Create field group
-  http.post('/api/v1/acf/field-groups', async ({ request }) => {
+  http.post('/api/v1/acf/field-groups', async ({ request }: any) => {
     const data = await request.json() as any;
     const newFieldGroup: ACFFieldGroup = {
       id: `fg-${Date.now()}`,
@@ -188,7 +188,7 @@ export const acfHandlers = [
   }),
 
   // Update field group
-  http.put('/api/v1/acf/field-groups/:id', async ({ params, request }) => {
+  http.put('/api/v1/acf/field-groups/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = fieldGroups.findIndex(fg => fg.id === params.id);
     
@@ -206,7 +206,7 @@ export const acfHandlers = [
   }),
 
   // Delete field group
-  http.delete('/api/v1/acf/field-groups/:id', ({ params }) => {
+  http.delete('/api/v1/acf/field-groups/:id', ({ params }: any) => {
     const index = fieldGroups.findIndex(fg => fg.id === params.id);
     
     if (index === -1) {
@@ -218,7 +218,7 @@ export const acfHandlers = [
   }),
 
   // Duplicate field group
-  http.post('/api/v1/acf/field-groups/:id/duplicate', ({ params }) => {
+  http.post('/api/v1/acf/field-groups/:id/duplicate', ({ params }: any) => {
     const fieldGroup = fieldGroups.find(fg => fg.id === params.id);
     
     if (!fieldGroup) {

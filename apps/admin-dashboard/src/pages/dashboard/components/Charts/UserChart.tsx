@@ -63,7 +63,7 @@ const UserChart: React.FC<UserChartProps> = ({ data, isLoading = false }) => {
       return defaultData;
     }
 
-    return data.map(item => ({
+    return data.map((item: any) => ({
       ...item,
       date: new Date(item.date).toLocaleDateString('ko-KR', {
         month: 'short',
@@ -86,11 +86,11 @@ const UserChart: React.FC<UserChartProps> = ({ data, isLoading = false }) => {
       growthRate: 0 
     };
 
-    const totalNewUsers = processedData.reduce((sum, item) => sum + item.newUsers, 0);
-    const avgActiveUsers = processedData.reduce((sum, item) => sum + item.activeUsers, 0) / processedData.length;
+    const totalNewUsers = processedData.reduce((sum: any, item: any) => sum + item.newUsers, 0);
+    const avgActiveUsers = processedData.reduce((sum: any, item: any) => sum + item.activeUsers, 0) / processedData.length;
     
     // 가장 활성 사용자가 많은 날
-    const peakDayData = processedData.reduce((max, item) => 
+    const peakDayData = processedData.reduce((max: any, item: any) => 
       item.activeUsers > max.activeUsers ? item : max
     );
     

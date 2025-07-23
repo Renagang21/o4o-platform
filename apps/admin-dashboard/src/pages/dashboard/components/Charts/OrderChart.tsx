@@ -31,15 +31,15 @@ const OrderChart: React.FC<OrderChartProps> = ({ data, isLoading = false }) => {
       ];
     }
 
-    const total = data.reduce((sum, item) => sum + item.count, 0);
+    const total = data.reduce((sum: any, item: any) => sum + item.count, 0);
     
-    return data.map(item => ({
+    return data.map((item: any) => ({
       ...item,
       percentage: total > 0 ? (item.count / total) * 100 : 0
     }));
   }, [data]);
 
-  const totalOrders = processedData.reduce((sum, item) => sum + item.count, 0);
+  const totalOrders = processedData.reduce((sum: any, item: any) => sum + item.count, 0);
   const completedOrders = processedData.find(item => item.status === '완료')?.count || 0;
   const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 

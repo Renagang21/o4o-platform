@@ -129,7 +129,7 @@ const TemplateLayoutManager: React.FC = () => {
                 type="text"
                 placeholder="템플릿 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -139,7 +139,7 @@ const TemplateLayoutManager: React.FC = () => {
               <Filter className="w-4 h-4 text-gray-500" />
               <select
                 value={selectedLayoutType}
-                onChange={(e) => setSelectedLayoutType(e.target.value)}
+                onChange={(e: any) => setSelectedLayoutType(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">모든 레이아웃</option>

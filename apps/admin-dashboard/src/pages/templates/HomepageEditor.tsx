@@ -358,7 +358,7 @@ const BlockPreview: React.FC<{
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="flex items-center space-x-1">
           <button
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               onMove('up');
             }}
@@ -368,7 +368,7 @@ const BlockPreview: React.FC<{
             ↑
           </button>
           <button
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               onMove('down');
             }}
@@ -378,7 +378,7 @@ const BlockPreview: React.FC<{
             ↓
           </button>
           <button
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.stopPropagation();
               onDelete();
             }}
@@ -449,7 +449,7 @@ const BlockEditor: React.FC<{
             <input
               type="text"
               value={block.content.title || ''}
-              onChange={(e) => updateContent('title', e.target.value)}
+              onChange={(e: any) => updateContent('title', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             />
           </div>
@@ -458,7 +458,7 @@ const BlockEditor: React.FC<{
             <input
               type="text"
               value={block.content.subtitle || ''}
-              onChange={(e) => updateContent('subtitle', e.target.value)}
+              onChange={(e: any) => updateContent('subtitle', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             />
           </div>
@@ -472,7 +472,7 @@ const BlockEditor: React.FC<{
             <input
               type="text"
               value={block.content.text || ''}
-              onChange={(e) => updateContent('text', e.target.value)}
+              onChange={(e: any) => updateContent('text', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             />
           </div>
@@ -480,7 +480,7 @@ const BlockEditor: React.FC<{
             <label className="block text-sm font-medium mb-1">Level</label>
             <select
               value={block.content.level || 2}
-              onChange={(e) => updateContent('level', parseInt(e.target.value))}
+              onChange={(e: any) => updateContent('level', parseInt(e.target.value))}
               className="w-full px-3 py-2 border rounded-lg"
             >
               {[1, 2, 3, 4, 5, 6].map(level => (
@@ -496,7 +496,7 @@ const BlockEditor: React.FC<{
           <label className="block text-sm font-medium mb-1">Text</label>
           <textarea
             value={block.content.text || ''}
-            onChange={(e) => updateContent('text', e.target.value)}
+            onChange={(e: any) => updateContent('text', e.target.value)}
             className="w-full px-3 py-2 border rounded-lg"
             rows={4}
           />
@@ -510,7 +510,7 @@ const BlockEditor: React.FC<{
             <input
               type="text"
               value={block.content.text || ''}
-              onChange={(e) => updateContent('text', e.target.value)}
+              onChange={(e: any) => updateContent('text', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             />
           </div>
@@ -519,7 +519,7 @@ const BlockEditor: React.FC<{
             <input
               type="text"
               value={block.content.url || ''}
-              onChange={(e) => updateContent('url', e.target.value)}
+              onChange={(e: any) => updateContent('url', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             />
           </div>

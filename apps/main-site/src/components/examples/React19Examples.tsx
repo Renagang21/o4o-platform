@@ -37,7 +37,7 @@ function OptimisticTodoList() {
     try {
       const newTodo = await addTodoAction(text);
       setTodos(prev => [...prev, newTodo]);
-    } catch (error) {
+    } catch (error: any) {
       // 에러 시 자동으로 이전 상태로 롤백
       console.error('Failed to add todo:', error);
     }

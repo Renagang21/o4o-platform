@@ -242,7 +242,7 @@ const MediaDetails: React.FC<MediaDetailsProps> = ({
                     <Input
                       id="title"
                       value={editData.title || ''}
-                      onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                      onChange={(e: any) => setEditData({ ...editData, title: e.target.value })}
                       placeholder="미디어 제목"
                     />
                   </div>
@@ -253,7 +253,7 @@ const MediaDetails: React.FC<MediaDetailsProps> = ({
                       <Input
                         id="alt"
                         value={editData.alt || ''}
-                        onChange={(e) => setEditData({ ...editData, alt: e.target.value })}
+                        onChange={(e: any) => setEditData({ ...editData, alt: e.target.value })}
                         placeholder="이미지를 설명하는 텍스트"
                       />
                       <p className="text-xs text-gray-500 mt-1">
@@ -267,7 +267,7 @@ const MediaDetails: React.FC<MediaDetailsProps> = ({
                     <Textarea
                       id="caption"
                       value={editData.caption || ''}
-                      onChange={(e) => setEditData({ ...editData, caption: e.target.value })}
+                      onChange={(e: any) => setEditData({ ...editData, caption: e.target.value })}
                       placeholder="미디어 캡션"
                       rows={2}
                     />
@@ -278,7 +278,7 @@ const MediaDetails: React.FC<MediaDetailsProps> = ({
                     <Textarea
                       id="description"
                       value={editData.description || ''}
-                      onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                      onChange={(e: any) => setEditData({ ...editData, description: e.target.value })}
                       placeholder="미디어에 대한 상세 설명"
                       rows={3}
                     />
@@ -289,9 +289,9 @@ const MediaDetails: React.FC<MediaDetailsProps> = ({
                     <Input
                       id="tags"
                       value={editData.tags?.join(', ') || ''}
-                      onChange={(e) => setEditData({ 
+                      onChange={(e: any) => setEditData({ 
                         ...editData, 
-                        tags: e.target.value.split(',').map(tag => tag.trim()).filter(Boolean)
+                        tags: e.target.value.split(',').map((tag: any) => tag.trim()).filter(Boolean)
                       })}
                       placeholder="태그1, 태그2, 태그3"
                     />

@@ -189,7 +189,7 @@ let posts = [...mockPosts, ...mockPages];
 
 export const postHandlers = [
   // Get posts/pages list
-  http.get('/api/v1/posts', ({ request }) => {
+  http.get('/api/v1/posts', ({ request }: any) => {
     const url = new URL(request.url);
     const type = url.searchParams.get('type') || 'post';
     const status = url.searchParams.get('status');
@@ -226,7 +226,7 @@ export const postHandlers = [
   }),
 
   // Get single post
-  http.get('/api/v1/posts/:id', ({ params }) => {
+  http.get('/api/v1/posts/:id', ({ params }: any) => {
     const post = posts.find(p => p.id === params.id);
     if (!post) {
       return HttpResponse.json({ error: 'Post not found' }, { status: 404 });
@@ -235,7 +235,7 @@ export const postHandlers = [
   }),
 
   // Create post
-  http.post('/api/v1/posts', async ({ request }) => {
+  http.post('/api/v1/posts', async ({ request }: any) => {
     const data = await request.json() as any;
     const newPost: Post = {
       id: `post-${Date.now()}`,
@@ -256,7 +256,7 @@ export const postHandlers = [
   }),
 
   // Update post
-  http.put('/api/v1/posts/:id', async ({ params, request }) => {
+  http.put('/api/v1/posts/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = posts.findIndex(p => p.id === params.id);
     
@@ -274,7 +274,7 @@ export const postHandlers = [
   }),
 
   // Delete post
-  http.delete('/api/v1/posts/:id', ({ params }) => {
+  http.delete('/api/v1/posts/:id', ({ params }: any) => {
     const index = posts.findIndex(p => p.id === params.id);
     
     if (index === -1) {
@@ -286,7 +286,7 @@ export const postHandlers = [
   }),
 
   // Duplicate post
-  http.post('/api/v1/posts/:id/duplicate', ({ params }) => {
+  http.post('/api/v1/posts/:id/duplicate', ({ params }: any) => {
     const post = posts.find(p => p.id === params.id);
     
     if (!post) {
@@ -321,7 +321,7 @@ export const postHandlers = [
   }),
 
   // Create category
-  http.post('/api/v1/categories', async ({ request }) => {
+  http.post('/api/v1/categories', async ({ request }: any) => {
     const data = await request.json() as any;
     const newCategory: PostCategory = {
       id: `cat-${Date.now()}`,
@@ -339,7 +339,7 @@ export const postHandlers = [
   }),
 
   // Update category
-  http.put('/api/v1/categories/:id', async ({ params, request }) => {
+  http.put('/api/v1/categories/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = mockCategories.findIndex(c => c.id === params.id);
     
@@ -357,7 +357,7 @@ export const postHandlers = [
   }),
 
   // Delete category
-  http.delete('/api/v1/categories/:id', ({ params }) => {
+  http.delete('/api/v1/categories/:id', ({ params }: any) => {
     const index = mockCategories.findIndex(c => c.id === params.id);
     
     if (index === -1) {
@@ -369,7 +369,7 @@ export const postHandlers = [
   }),
 
   // Create tag
-  http.post('/api/v1/tags', async ({ request }) => {
+  http.post('/api/v1/tags', async ({ request }: any) => {
     const data = await request.json() as any;
     const newTag: Tag = {
       id: `tag-${Date.now()}`,
@@ -386,7 +386,7 @@ export const postHandlers = [
   }),
 
   // Update tag
-  http.put('/api/v1/tags/:id', async ({ params, request }) => {
+  http.put('/api/v1/tags/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = mockTags.findIndex(t => t.id === params.id);
     
@@ -404,7 +404,7 @@ export const postHandlers = [
   }),
 
   // Delete tag
-  http.delete('/api/v1/tags/:id', ({ params }) => {
+  http.delete('/api/v1/tags/:id', ({ params }: any) => {
     const index = mockTags.findIndex(t => t.id === params.id);
     
     if (index === -1) {
@@ -416,7 +416,7 @@ export const postHandlers = [
   }),
 
   // Bulk delete tags
-  http.post('/api/v1/tags/bulk-delete', async ({ request }) => {
+  http.post('/api/v1/tags/bulk-delete', async ({ request }: any) => {
     const { ids } = await request.json() as { ids: string[] };
     
     ids.forEach(id => {

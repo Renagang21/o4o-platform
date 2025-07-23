@@ -146,7 +146,7 @@ const PageList: React.FC = () => {
               <Input
                 placeholder="페이지 검색..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -205,7 +205,7 @@ const PageList: React.FC = () => {
                       type="checkbox"
                       className="rounded border-gray-300"
                       checked={selectedPages.length === pages.length}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         if (e.target.checked) {
                           setSelectedPages(pages.map((p: Post) => p.id))
                         } else {
@@ -230,7 +230,7 @@ const PageList: React.FC = () => {
                         type="checkbox"
                         className="rounded border-gray-300"
                         checked={selectedPages.includes(page.id)}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           if (e.target.checked) {
                             setSelectedPages([...selectedPages, page.id])
                           } else {

@@ -166,7 +166,7 @@ export default function CategoryTagSelector({
           <Input
             placeholder="태그 검색..."
             value={searchTag}
-            onChange={(e) => setSearchTag(e.target.value)}
+            onChange={(e: any) => setSearchTag(e.target.value)}
             className="w-full"
           />
         </div>
@@ -200,7 +200,7 @@ export default function CategoryTagSelector({
           <Input
             placeholder="새 태그 입력..."
             value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
+            onChange={(e: any) => setTagInput(e.target.value)}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();

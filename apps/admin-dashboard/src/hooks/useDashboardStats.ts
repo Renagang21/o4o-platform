@@ -141,7 +141,7 @@ export const useDashboardStats = () => {
             users: userChartData
           }
         };
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to fetch dashboard statistics:', error);
         
         // Return default data on error

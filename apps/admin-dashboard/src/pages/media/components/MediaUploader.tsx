@@ -44,7 +44,7 @@ const MediaUploader: React.FC<MediaUploaderProps> = ({
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     // Handle rejected files
     if (rejectedFiles.length > 0) {
-      rejectedFiles.forEach(({ file, errors }) => {
+      rejectedFiles.forEach(({ file, errors }: any) => {
         errors.forEach((error: any) => {
           let message = '업로드할 수 없는 파일입니다.'
           if (error.code === 'file-too-large') {
@@ -77,7 +77,7 @@ const MediaUploader: React.FC<MediaUploaderProps> = ({
     onDrop,
     maxFiles,
     maxSize: maxFileSize,
-    accept: allowedTypes.reduce((acc, type) => {
+    accept: allowedTypes.reduce((acc: any, type: any) => {
       const [category, extension] = type.split('/')
       if (extension === '*') {
         if (category === 'image') {
@@ -144,7 +144,7 @@ const MediaUploader: React.FC<MediaUploaderProps> = ({
   }
 
   const removeFile = (index: number) => {
-    setUploadingFiles(prev => prev.filter((_, i) => i !== index))
+    setUploadingFiles(prev => prev.filter((_, i: any) => i !== index))
   }
 
   const getFileIcon = (file: File) => {

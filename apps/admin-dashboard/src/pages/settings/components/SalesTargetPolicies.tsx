@@ -166,7 +166,7 @@ const SalesTargetPolicies: React.FC<SalesTargetPoliciesProps> = ({ settings, onU
                 min="0"
                 step="1000000"
                 value={settings.monthlyTarget}
-                onChange={(e) => handleTargetChange(parseInt(e.target.value) || 0)}
+                onChange={(e: any) => handleTargetChange(parseInt(e.target.value) || 0)}
                 className="wp-input"
                 placeholder="50000000"
               />
@@ -214,7 +214,7 @@ const SalesTargetPolicies: React.FC<SalesTargetPoliciesProps> = ({ settings, onU
                       max="100"
                       step="5"
                       value={settings.alertThreshold}
-                      onChange={(e) => handleAlertThresholdChange(parseInt(e.target.value) || 0)}
+                      onChange={(e: any) => handleAlertThresholdChange(parseInt(e.target.value) || 0)}
                       className="wp-input pr-8"
                       placeholder="80"
                     />
@@ -252,7 +252,7 @@ const SalesTargetPolicies: React.FC<SalesTargetPoliciesProps> = ({ settings, onU
                       max="200"
                       step="5"
                       value={settings.bonusThreshold}
-                      onChange={(e) => handleBonusThresholdChange(parseInt(e.target.value) || 100)}
+                      onChange={(e: any) => handleBonusThresholdChange(parseInt(e.target.value) || 100)}
                       className="wp-input pr-8"
                       placeholder="110"
                     />

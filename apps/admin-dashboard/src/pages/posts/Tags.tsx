@@ -85,7 +85,7 @@ const Tags: React.FC = () => {
     }
 
     // Sort
-    filtered.sort((a, b) => {
+    filtered.sort((a: any, b: any) => {
       let comparison = 0
       
       switch (sortBy) {
@@ -234,7 +234,7 @@ const Tags: React.FC = () => {
       .filter(tag => tag && tag.postCount > 0)
 
     if (tagsWithPosts.length > 0) {
-      const totalPosts = tagsWithPosts.reduce((sum, tag) => sum + (tag?.postCount || 0), 0)
+      const totalPosts = tagsWithPosts.reduce((sum: any, tag: any) => sum + (tag?.postCount || 0), 0)
       if (!confirm(`선택된 태그 중 ${tagsWithPosts.length}개가 총 ${totalPosts}개의 게시물에서 사용 중입니다. 정말 삭제하시겠습니까?`)) {
         return
       }
@@ -355,7 +355,7 @@ const Tags: React.FC = () => {
               <input
                 type="text"
                 value={quickTagName}
-                onChange={(e) => setQuickTagName(e.target.value)}
+                onChange={(e: any) => setQuickTagName(e.target.value)}
                 placeholder="태그 이름을 입력하고 Enter를 누르세요"
                 className="wp-input flex-1"
                 autoFocus
@@ -393,7 +393,7 @@ const Tags: React.FC = () => {
                   type="text"
                   placeholder="태그 이름, 설명, 슬러그로 검색..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: any) => setSearchTerm(e.target.value)}
                   className="wp-input pl-10"
                 />
               </div>
@@ -402,7 +402,7 @@ const Tags: React.FC = () => {
             <div className="flex items-center gap-2">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'name' | 'postCount' | 'createdAt')}
+                onChange={(e: any) => setSortBy(e.target.value as 'name' | 'postCount' | 'createdAt')}
                 className="wp-select"
               >
                 <option value="name">이름순</option>
@@ -569,7 +569,7 @@ const Tags: React.FC = () => {
                 </span>
                 <select
                   value={pageSize}
-                  onChange={(e) => setPageSize(parseInt(e.target.value))}
+                  onChange={(e: any) => setPageSize(parseInt(e.target.value))}
                   className="wp-select w-20"
                 >
                   <option value={25}>25</option>
@@ -645,7 +645,7 @@ const Tags: React.FC = () => {
                   <input
                     type="text"
                     value={formData.name || ''}
-                    onChange={(e) => updateFormData('name', e.target.value)}
+                    onChange={(e: any) => updateFormData('name', e.target.value)}
                     className="wp-input"
                     placeholder="태그 이름을 입력하세요"
                     autoFocus
@@ -657,7 +657,7 @@ const Tags: React.FC = () => {
                   <input
                     type="text"
                     value={formData.slug || ''}
-                    onChange={(e) => updateFormData('slug', e.target.value)}
+                    onChange={(e: any) => updateFormData('slug', e.target.value)}
                     className="wp-input"
                     placeholder="자동 생성됩니다"
                   />
@@ -670,7 +670,7 @@ const Tags: React.FC = () => {
                   <label className="wp-label">설명</label>
                   <textarea
                     value={formData.description || ''}
-                    onChange={(e) => updateFormData('description', e.target.value)}
+                    onChange={(e: any) => updateFormData('description', e.target.value)}
                     className="wp-input min-h-[80px]"
                     placeholder="태그에 대한 설명을 입력하세요"
                   />
@@ -682,13 +682,13 @@ const Tags: React.FC = () => {
                     <input
                       type="color"
                       value={formData.color || '#3b82f6'}
-                      onChange={(e) => updateFormData('color', e.target.value)}
+                      onChange={(e: any) => updateFormData('color', e.target.value)}
                       className="w-10 h-10 rounded border border-gray-300"
                     />
                     <input
                       type="text"
                       value={formData.color || '#3b82f6'}
-                      onChange={(e) => updateFormData('color', e.target.value)}
+                      onChange={(e: any) => updateFormData('color', e.target.value)}
                       className="wp-input flex-1"
                       placeholder="#3b82f6"
                     />
@@ -772,7 +772,7 @@ const Tags: React.FC = () => {
                   <label className="wp-label">대상 태그 (유지됨)</label>
                   <select
                     value={mergeToTag?.id || ''}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       const selectedTag = tags.find(t => t.id === e.target.value)
                       setMergeToTag(selectedTag || null)
                     }}

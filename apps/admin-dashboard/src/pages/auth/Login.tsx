@@ -164,7 +164,7 @@ const Login: React.FC = () => {
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e: any) => setEmail(e.target.value)}
                   className="wp-input pl-10"
                   placeholder="admin@neture.co.kr"
                   disabled={isLoading}
@@ -186,7 +186,7 @@ const Login: React.FC = () => {
                   autoComplete="current-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e: any) => setPassword(e.target.value)}
                   className="wp-input pl-10 pr-10"
                   placeholder="비밀번호를 입력하세요"
                   disabled={isLoading}
@@ -215,7 +215,7 @@ const Login: React.FC = () => {
                 name="remember-me"
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                onChange={(e: any) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-admin-blue focus:ring-admin-blue border-wp-border-primary rounded"
                 disabled={isLoading}
               />

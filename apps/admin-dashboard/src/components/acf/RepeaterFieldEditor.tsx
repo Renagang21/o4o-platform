@@ -42,7 +42,7 @@ const RepeaterFieldEditor: React.FC<RepeaterFieldEditorProps> = ({ field, onChan
   }
 
   const handleDeleteSubField = (index: number) => {
-    const newSubFields = field.subFields?.filter((_, i) => i !== index) || []
+    const newSubFields = field.subFields?.filter((_, i: any) => i !== index) || []
     onChange({
       ...field,
       subFields: newSubFields,
@@ -68,7 +68,7 @@ const RepeaterFieldEditor: React.FC<RepeaterFieldEditorProps> = ({ field, onChan
             type="number"
             min="0"
             value={field.minRows || ''}
-            onChange={(e) => onChange({
+            onChange={(e: any) => onChange({
               ...field,
               minRows: e.target.value ? parseInt(e.target.value) : undefined,
             })}
@@ -82,7 +82,7 @@ const RepeaterFieldEditor: React.FC<RepeaterFieldEditorProps> = ({ field, onChan
             type="number"
             min="0"
             value={field.maxRows || ''}
-            onChange={(e) => onChange({
+            onChange={(e: any) => onChange({
               ...field,
               maxRows: e.target.value ? parseInt(e.target.value) : undefined,
             })}
@@ -96,7 +96,7 @@ const RepeaterFieldEditor: React.FC<RepeaterFieldEditorProps> = ({ field, onChan
         <Input
           id="buttonLabel"
           value={field.buttonLabel || ''}
-          onChange={(e) => onChange({
+          onChange={(e: any) => onChange({
             ...field,
             buttonLabel: e.target.value,
           })}

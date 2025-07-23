@@ -33,7 +33,7 @@ const UserRoleChangeModal: React.FC<UserRoleChangeModalProps> = ({
   const willRemoveAllAdmins = selectedRole !== 'admin' && currentAdminCount === users.length;
   
   // 역할 변경 대상 분석
-  const roleChanges = users.reduce((acc, user) => {
+  const roleChanges = users.reduce((acc: any, user: any) => {
     if (user.role !== selectedRole) {
       acc[user.role] = (acc[user.role] || 0) + 1;
     }
@@ -162,7 +162,7 @@ const UserRoleChangeModal: React.FC<UserRoleChangeModalProps> = ({
                       <span className="text-wp-text-secondary">
                         {ROLE_LABELS[fromRole as UserRole]}에서 {ROLE_LABELS[selectedRole]}로
                       </span>
-                      <span className="font-medium text-blue-900">{count}명</span>
+                      <span className="font-medium text-blue-900">{String(count)}명</span>
                     </div>
                   ))}
                 </div>

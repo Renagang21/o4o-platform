@@ -150,7 +150,7 @@ const TagList: React.FC = () => {
   }
 
   // Sort tags by post count
-  const sortedTags = [...tags].sort((a, b) => (b.postCount || 0) - (a.postCount || 0))
+  const sortedTags = [...tags].sort((a: any, b: any) => (b.postCount || 0) - (a.postCount || 0))
 
   // Get tag size based on post count
   const getTagSize = (postCount: number) => {
@@ -312,7 +312,7 @@ const TagList: React.FC = () => {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     setFormData({
                       ...formData,
                       name: e.target.value,
@@ -328,7 +328,7 @@ const TagList: React.FC = () => {
                 <Input
                   id="slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, slug: e.target.value })}
                   placeholder="react"
                   required
                 />
@@ -339,7 +339,7 @@ const TagList: React.FC = () => {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="이 태그에 대한 설명을 입력하세요"
                   rows={3}
                 />

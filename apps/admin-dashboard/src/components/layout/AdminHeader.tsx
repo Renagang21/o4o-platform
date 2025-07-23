@@ -34,7 +34,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
     try {
       logout();
       toast.success('로그아웃되었습니다.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Logout failed:', error);
       toast.error('로그아웃 처리 중 오류가 발생했습니다.');
     }

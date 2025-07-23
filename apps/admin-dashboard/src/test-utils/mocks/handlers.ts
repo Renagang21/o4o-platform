@@ -124,7 +124,7 @@ export const handlers = [
     });
   }),
   // Products API Handlers
-  http.get(`${API_BASE}/ecommerce/products`, ({ request }) => {
+  http.get(`${API_BASE}/ecommerce/products`, ({ request }: any) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '20');
@@ -175,7 +175,7 @@ export const handlers = [
     });
   }),
 
-  http.get(`${API_BASE}/ecommerce/products/:id`, ({ params }) => {
+  http.get(`${API_BASE}/ecommerce/products/:id`, ({ params }: any) => {
     const { id } = params;
     
     // Mock 상품 데이터 반환
@@ -190,7 +190,7 @@ export const handlers = [
     });
   }),
 
-  http.post(`${API_BASE}/ecommerce/products`, async ({ request }) => {
+  http.post(`${API_BASE}/ecommerce/products`, async ({ request }: any) => {
     const productData = await request.json() as Partial<Product>;
     
     const newProduct = createMockProduct({
@@ -207,7 +207,7 @@ export const handlers = [
     }, { status: 201 });
   }),
 
-  http.put(`${API_BASE}/ecommerce/products/:id`, async ({ params, request }) => {
+  http.put(`${API_BASE}/ecommerce/products/:id`, async ({ params, request }: any) => {
     const { id } = params;
     const updateData = await request.json() as Partial<Product>;
     
@@ -224,7 +224,7 @@ export const handlers = [
     });
   }),
 
-  http.delete(`${API_BASE}/ecommerce/products/:id`, ({ params }) => {
+  http.delete(`${API_BASE}/ecommerce/products/:id`, ({ params }: any) => {
     const { id } = params;
     
     return HttpResponse.json({
@@ -233,7 +233,7 @@ export const handlers = [
     });
   }),
 
-  http.post(`${API_BASE}/ecommerce/products/:id/duplicate`, ({ params }) => {
+  http.post(`${API_BASE}/ecommerce/products/:id/duplicate`, ({ params }: any) => {
     const { id } = params;
     
     const duplicatedProduct = createMockProduct({
@@ -251,7 +251,7 @@ export const handlers = [
   }),
 
   // Orders API Handlers
-  http.get(`${API_BASE}/ecommerce/orders`, ({ request }) => {
+  http.get(`${API_BASE}/ecommerce/orders`, ({ request }: any) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '20');
@@ -296,7 +296,7 @@ export const handlers = [
     });
   }),
 
-  http.get(`${API_BASE}/ecommerce/orders/:id`, ({ params }) => {
+  http.get(`${API_BASE}/ecommerce/orders/:id`, ({ params }: any) => {
     const { id } = params;
     
     const order = createMockOrder({ 
@@ -310,7 +310,7 @@ export const handlers = [
     });
   }),
 
-  http.put(`${API_BASE}/ecommerce/orders/:id/status`, async ({ params, request }) => {
+  http.put(`${API_BASE}/ecommerce/orders/:id/status`, async ({ params, request }: any) => {
     const { id } = params;
     const { status, note } = await request.json() as { status: OrderStatus; note?: string };
     
@@ -328,7 +328,7 @@ export const handlers = [
     });
   }),
 
-  http.post(`${API_BASE}/ecommerce/orders/:id/refund`, async ({ params, request }) => {
+  http.post(`${API_BASE}/ecommerce/orders/:id/refund`, async ({ params, request }: any) => {
     const { id } = params;
     const { amount, reason, items } = await request.json() as { amount: number; reason: string; items: Array<{ orderItemId: string; quantity: number; amount: number }> };
     
@@ -346,7 +346,7 @@ export const handlers = [
   }),
 
   // Bulk Operations
-  http.post(`${API_BASE}/ecommerce/products/bulk`, async ({ request }) => {
+  http.post(`${API_BASE}/ecommerce/products/bulk`, async ({ request }: any) => {
     const bulkAction = await request.json() as BulkProductAction;
     
     return HttpResponse.json({
@@ -356,7 +356,7 @@ export const handlers = [
     });
   }),
 
-  http.post(`${API_BASE}/ecommerce/orders/bulk`, async ({ request }) => {
+  http.post(`${API_BASE}/ecommerce/orders/bulk`, async ({ request }: any) => {
     const bulkAction = await request.json() as BulkOrderAction;
     
     return HttpResponse.json({
@@ -546,7 +546,7 @@ export const handlers = [
     }
 
     // 최신순 정렬
-    users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    users.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // 페이지네이션
     const totalUsers = users.length;
@@ -638,7 +638,7 @@ export const handlers = [
   }),
 
   // Update User
-  http.put(`${API_BASE}/users/:id`, async ({ params, request }) => {
+  http.put(`${API_BASE}/users/:id`, async ({ params, request }: any) => {
     const { id } = params;
     const updateData = await request.json() as Partial<User>;
 
@@ -656,7 +656,7 @@ export const handlers = [
   }),
 
   // Delete User
-  http.delete(`${API_BASE}/users/:id`, ({ params }) => {
+  http.delete(`${API_BASE}/users/:id`, ({ params }: any) => {
     const { id } = params;
 
     return HttpResponse.json({
@@ -686,7 +686,7 @@ export const handlers = [
   }),
 
   // Bulk User Delete
-  http.delete(`${API_BASE}/users`, async ({ request }) => {
+  http.delete(`${API_BASE}/users`, async ({ request }: any) => {
     const { userIds } = await request.json() as { userIds: string[] };
 
     return HttpResponse.json({
@@ -697,7 +697,7 @@ export const handlers = [
   }),
 
   // Change User Role (Bulk)
-  http.put(`${API_BASE}/users/roles`, async ({ request }) => {
+  http.put(`${API_BASE}/users/roles`, async ({ request }: any) => {
     const { userIds, role } = await request.json() as { userIds: string[]; role: UserRole };
 
     return HttpResponse.json({

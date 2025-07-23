@@ -167,7 +167,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Get single custom post type
-  http.get('/api/v1/custom-post-types/:id', ({ params }) => {
+  http.get('/api/v1/custom-post-types/:id', ({ params }: any) => {
     const cpt = customPostTypes.find(c => c.id === params.id);
     if (!cpt) {
       return HttpResponse.json({ error: 'Custom post type not found' }, { status: 404 });
@@ -176,7 +176,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Create custom post type
-  http.post('/api/v1/custom-post-types', async ({ request }) => {
+  http.post('/api/v1/custom-post-types', async ({ request }: any) => {
     const data = await request.json() as any;
     const newCPT: CustomPostType = {
       id: `cpt-${Date.now()}`,
@@ -191,7 +191,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Update custom post type
-  http.put('/api/v1/custom-post-types/:id', async ({ params, request }) => {
+  http.put('/api/v1/custom-post-types/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = customPostTypes.findIndex(c => c.id === params.id);
     
@@ -209,7 +209,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Delete custom post type
-  http.delete('/api/v1/custom-post-types/:id', ({ params }) => {
+  http.delete('/api/v1/custom-post-types/:id', ({ params }: any) => {
     const index = customPostTypes.findIndex(c => c.id === params.id);
     
     if (index === -1) {
@@ -221,7 +221,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Update field groups for custom post type
-  http.put('/api/v1/custom-post-types/:id/field-groups', async ({ params, request }) => {
+  http.put('/api/v1/custom-post-types/:id/field-groups', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = customPostTypes.findIndex(c => c.id === params.id);
     
@@ -239,7 +239,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Get custom post type posts (dynamic endpoint)
-  http.get('/api/v1/posts', ({ request }) => {
+  http.get('/api/v1/posts', ({ request }: any) => {
     const url = new URL(request.url);
     const postType = url.searchParams.get('post_type');
     

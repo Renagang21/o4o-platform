@@ -245,7 +245,7 @@ const UsersList: React.FC = () => {
           type="checkbox"
           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           checked={selectedUsers.includes(user.id)}
-          onChange={(e) => handleSelectUser(user.id, e.target.checked)}
+          onChange={(e: any) => handleSelectUser(user.id, e.target.checked)}
         />
       ),
       width: '50px',
@@ -496,7 +496,7 @@ const UsersList: React.FC = () => {
                     placeholder="사용자 이름 또는 이메일 검색..."
                     className="wp-input-field pl-10"
                     value={filters.search}
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onChange={(e: any) => handleSearch(e.target.value)}
                   />
                 </div>
               </div>
@@ -505,7 +505,7 @@ const UsersList: React.FC = () => {
               <div className="flex items-center space-x-4">
                 <select
                   value={filters.role}
-                  onChange={(e) => handleFilterChange({ role: e.target.value as UserRole | 'all' })}
+                  onChange={(e: any) => handleFilterChange({ role: e.target.value as UserRole | 'all' })}
                   className="wp-input-field"
                 >
                   <option value="all">모든 역할</option>
@@ -517,7 +517,7 @@ const UsersList: React.FC = () => {
 
                 <select
                   value={filters.status}
-                  onChange={(e) => handleFilterChange({ status: e.target.value as UserStatus | 'all' })}
+                  onChange={(e: any) => handleFilterChange({ status: e.target.value as UserStatus | 'all' })}
                   className="wp-input-field"
                 >
                   <option value="all">모든 상태</option>
@@ -628,7 +628,7 @@ const UsersList: React.FC = () => {
                   type="checkbox"
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   checked={selectedUsers.length > 0 && usersData?.data.users && selectedUsers.length === usersData.data.users.length}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  onChange={(e: any) => handleSelectAll(e.target.checked)}
                 />
                 <span className="text-sm text-gray-600">
                   전체 선택 ({usersData?.data.users?.length || 0}명)

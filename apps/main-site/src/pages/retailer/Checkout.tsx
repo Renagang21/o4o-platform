@@ -83,7 +83,7 @@ export default function Checkout() {
       navigate(`/retailer/orders/${order.id}`, {
         state: { newOrder: true }
       });
-    } catch (error) {
+    } catch (error: any) {
       toast.error('주문 처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);

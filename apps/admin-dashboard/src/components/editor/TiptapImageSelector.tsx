@@ -134,7 +134,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
               <Input
                 placeholder="이미지 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -212,7 +212,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
                       <Input
                         id="alt-text"
                         value={altText}
-                        onChange={(e) => setAltText(e.target.value)}
+                        onChange={(e: any) => setAltText(e.target.value)}
                         placeholder="이미지 설명을 입력하세요"
                       />
                     </div>

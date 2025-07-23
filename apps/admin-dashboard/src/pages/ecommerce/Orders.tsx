@@ -169,7 +169,7 @@ const Orders: React.FC = () => {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 placeholder="주문번호, 고객명, 이메일로 검색..."
                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -221,7 +221,7 @@ const Orders: React.FC = () => {
               </label>
               <select
                 value={filters.status || ''}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value as OrderStatus })}
+                onChange={(e: any) => setFilters({ ...filters, status: e.target.value as OrderStatus })}
                 className="w-full border rounded-lg px-3 py-2"
               >
                 <option value="">전체 상태</option>
@@ -260,7 +260,7 @@ const Orders: React.FC = () => {
           <div className="flex items-center gap-2">
             <select
               value={bulkAction}
-              onChange={(e) => setBulkAction(e.target.value)}
+              onChange={(e: any) => setBulkAction(e.target.value)}
               className="border rounded px-3 py-1"
             >
               <option value="">일괄 작업 선택</option>
@@ -301,7 +301,7 @@ const Orders: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={selectedOrders.length === orders.length}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       if (e.target.checked) {
                         setSelectedOrders(orders.map(o => o.id));
                       } else {
@@ -343,7 +343,7 @@ const Orders: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={selectedOrders.includes(order.id)}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           if (e.target.checked) {
                             setSelectedOrders([...selectedOrders, order.id]);
                           } else {
@@ -356,7 +356,7 @@ const Orders: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <a
                         href={`#/orders/${order.id}`}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.preventDefault();
                           navigate(`/orders/${order.id}`);
                         }}
@@ -411,9 +411,9 @@ const Orders: React.FC = () => {
                         </button>
                         <select
                           value={order.status}
-                          onChange={(e) => handleQuickStatusChange(order.id, e.target.value)}
+                          onChange={(e: any) => handleQuickStatusChange(order.id, e.target.value)}
                           className="text-sm border rounded px-2 py-1"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e: any) => e.stopPropagation()}
                         >
                           <option value="pending">대기중</option>
                           <option value="processing">처리중</option>

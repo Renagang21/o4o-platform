@@ -34,7 +34,7 @@ export const useCartStore = create<CartStore>()(
         try {
           const response = await authClient.api.get('/cart');
           set({ cart: response.data, isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
           const message = error instanceof Error ? error.message : 'Failed to fetch cart';
           set({ error: message, isLoading: false });
         }
@@ -54,7 +54,7 @@ export const useCartStore = create<CartStore>()(
           
           // Refresh cart to get server state
           await get().fetchCart();
-        } catch (error) {
+        } catch (error: any) {
           // Revert on error
           await get().fetchCart();
           throw error;
@@ -71,7 +71,7 @@ export const useCartStore = create<CartStore>()(
           await authClient.api.patch(`/cart/items/${itemId}`, { quantity });
           // Refresh cart to get server state
           await get().fetchCart();
-        } catch (error) {
+        } catch (error: any) {
           // Revert on error
           await get().fetchCart();
           throw error;
@@ -88,7 +88,7 @@ export const useCartStore = create<CartStore>()(
           await authClient.api.delete(`/cart/items/${itemId}`);
           // Refresh cart to get server state
           await get().fetchCart();
-        } catch (error) {
+        } catch (error: any) {
           // Revert on error
           await get().fetchCart();
           throw error;
@@ -100,7 +100,7 @@ export const useCartStore = create<CartStore>()(
         try {
           await authClient.api.delete('/cart');
           set({ cart: null });
-        } catch (error) {
+        } catch (error: any) {
           await get().fetchCart();
           throw error;
         }
@@ -142,7 +142,7 @@ export const useCartStore = create<CartStore>()(
           
           if (existingItem) {
             // Update quantity
-            const updatedItems = cart.items.map(item =>
+            const updatedItems = cart.items.map((item: any) =>
               item.id === existingItem.id
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
@@ -202,7 +202,7 @@ export const useCartStore = create<CartStore>()(
         const { cart } = get();
         if (!cart) return;
         
-        const updatedItems = cart.items.map(item =>
+        const updatedItems = cart.items.map((item: any) =>
           item.id === itemId ? { ...item, quantity } : item
         );
         set({ cart: { ...cart, items: updatedItems } });

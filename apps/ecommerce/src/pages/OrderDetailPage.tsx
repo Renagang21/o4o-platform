@@ -252,7 +252,7 @@ export function OrderDetailPage() {
         <h2 className="text-lg font-semibold mb-4">주문 상품</h2>
         
         <div className="space-y-4">
-          {order.items.map(item => (
+          {order.items.map((item: any) => (
             <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
               <img
                 src={item.productImage}

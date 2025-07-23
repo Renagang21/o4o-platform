@@ -341,7 +341,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
   const exportHistory = () => {
     const csvContent = [
       ['시간', '카테고리', '액션', '사용자', '설명'].join(','),
-      ...filteredItems.map(item => [
+      ...filteredItems.map((item: any) => [
         new Date(item.timestamp).toLocaleString('ko-KR'),
         getCategoryName(item.category),
         getActionName(item.action),
@@ -357,7 +357,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
     link.click();
   };
 
-  const uniqueUsers = [...new Set(historyItems.map(item => item.userName))];
+  const uniqueUsers = [...new Set(historyItems.map((item: any) => item.userName))];
 
   return (
     <div className="space-y-6">
@@ -404,7 +404,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
                   type="text"
                   placeholder="검색..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: any) => setSearchTerm(e.target.value)}
                   className="wp-input pl-10"
                 />
               </div>
@@ -414,7 +414,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
             <div>
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e: any) => setSelectedCategory(e.target.value)}
                 className="wp-input"
               >
                 <option value="all">모든 카테고리</option>
@@ -429,7 +429,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
             <div>
               <select
                 value={selectedAction}
-                onChange={(e) => setSelectedAction(e.target.value)}
+                onChange={(e: any) => setSelectedAction(e.target.value)}
                 className="wp-input"
               >
                 <option value="all">모든 액션</option>
@@ -443,7 +443,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
             <div>
               <select
                 value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
+                onChange={(e: any) => setDateRange(e.target.value)}
                 className="wp-input"
               >
                 <option value="all">전체 기간</option>
@@ -458,7 +458,7 @@ const PolicyHistory: React.FC<PolicyHistoryProps> = ({
             <div>
               <select
                 value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
+                onChange={(e: any) => setSelectedUser(e.target.value)}
                 className="wp-input"
               >
                 <option value="all">모든 사용자</option>

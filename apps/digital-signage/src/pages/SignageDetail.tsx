@@ -17,7 +17,7 @@ interface SignageContent {
 }
 
 const SignageDetail: React.FC = () => {
-  const { } = useParams<{ id: string }>();
+  const { id: _id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   // Mock 데이터

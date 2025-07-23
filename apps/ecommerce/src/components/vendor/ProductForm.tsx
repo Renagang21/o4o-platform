@@ -177,7 +177,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
         tags: formData.tags
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save product:', error);
     } finally {
       setLoading(false);

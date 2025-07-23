@@ -253,7 +253,7 @@ const CPTList: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <Settings2 className="w-4 h-4 text-gray-500" />
                       <span className="text-sm text-gray-600">
-                        {postType.fieldGroups.reduce((acc, group) => acc + group.fields.length, 0)}개 커스텀 필드
+                        {postType.fieldGroups.reduce((acc: any, group: any) => acc + group.fields.length, 0)}개 커스텀 필드
                       </span>
                     </div>
                   )}

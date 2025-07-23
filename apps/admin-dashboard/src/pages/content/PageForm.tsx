@@ -181,7 +181,7 @@ const PageForm: React.FC = () => {
                 id="title"
                 placeholder="페이지 제목을 입력하세요"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e: any) => setFormData({ ...formData, title: e.target.value })}
                 className="mt-2"
               />
             </div>
@@ -268,7 +268,7 @@ const PageForm: React.FC = () => {
                       type="number"
                       placeholder="0"
                       value={formData.order || ''}
-                      onChange={(e) => setFormData({ 
+                      onChange={(e: any) => setFormData({ 
                         ...formData, 
                         order: e.target.value ? parseInt(e.target.value) : undefined 
                       })}
@@ -287,7 +287,7 @@ const PageForm: React.FC = () => {
                       id="seoTitle"
                       placeholder="검색 결과에 표시될 제목"
                       value={formData.meta?.seoTitle}
-                      onChange={(e) => setFormData({
+                      onChange={(e: any) => setFormData({
                         ...formData,
                         meta: { ...formData.meta, seoTitle: e.target.value }
                       })}
@@ -300,7 +300,7 @@ const PageForm: React.FC = () => {
                       id="seoDescription"
                       placeholder="검색 결과에 표시될 설명"
                       value={formData.meta?.seoDescription}
-                      onChange={(e) => setFormData({
+                      onChange={(e: any) => setFormData({
                         ...formData,
                         meta: { ...formData.meta, seoDescription: e.target.value }
                       })}
@@ -314,11 +314,11 @@ const PageForm: React.FC = () => {
                       id="seoKeywords"
                       placeholder="키워드를 쉼표로 구분하여 입력"
                       value={formData.meta?.seoKeywords?.join(', ')}
-                      onChange={(e) => setFormData({
+                      onChange={(e: any) => setFormData({
                         ...formData,
                         meta: {
                           ...formData.meta,
-                          seoKeywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean)
+                          seoKeywords: e.target.value.split(',').map((k: any) => k.trim()).filter(Boolean)
                         }
                       })}
                       className="mt-2"
@@ -334,7 +334,7 @@ const PageForm: React.FC = () => {
                         id="slug"
                         placeholder="url-friendly-slug"
                         value={formData.slug || ''}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                        onChange={(e: any) => setFormData({ ...formData, slug: e.target.value })}
                         className="mt-2"
                       />
                       <p className="text-sm text-gray-500 mt-1">
@@ -347,7 +347,7 @@ const PageForm: React.FC = () => {
                         id="excerpt"
                         placeholder="페이지 요약을 입력하세요 (선택사항)"
                         value={formData.excerpt}
-                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                        onChange={(e: any) => setFormData({ ...formData, excerpt: e.target.value })}
                         className="mt-2"
                         rows={3}
                       />
@@ -400,7 +400,7 @@ const PageForm: React.FC = () => {
                     id="password"
                     type="password"
                     value={formData.password || ''}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e: any) => setFormData({ ...formData, password: e.target.value })}
                     className="mt-2"
                   />
                 </div>

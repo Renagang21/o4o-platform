@@ -114,7 +114,7 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onClose, onImport }) 
         filtered = filtered.filter(item => item.featured)
         break
       case 'popular':
-        filtered = filtered.sort((a, b) => b.popularity - a.popularity)
+        filtered = filtered.sort((a: any, b: any) => b.popularity - a.popularity)
         break
     }
 
@@ -181,7 +181,7 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onClose, onImport }) 
                 <Input
                   placeholder="템플릿 검색..."
                   value={filter.search || ''}
-                  onChange={(e) => setFilter({ ...filter, search: e.target.value })}
+                  onChange={(e: any) => setFilter({ ...filter, search: e.target.value })}
                   className="pl-10"
                 />
               </div>

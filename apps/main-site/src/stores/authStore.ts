@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           
           console.log('로그인 성공:', user);
           
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '로그인 중 오류가 발생했습니다.',
             isLoading: false,
@@ -156,7 +156,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             // Token invalid, logout
             get().logout();
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Auth check failed:', error);
           get().logout();
         }

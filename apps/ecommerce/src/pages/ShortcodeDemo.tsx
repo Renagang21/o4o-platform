@@ -202,7 +202,7 @@ export function ShortcodeDemo() {
   const handleAddToCart = async (product: Product) => {
     try {
       await addToCart(product, 1);
-    } catch (error) {
+    } catch (error: any) {
       console.error('장바구니 추가 실패:', error);
     }
   };

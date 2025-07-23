@@ -140,7 +140,7 @@ export const menuHandlers = [
   }),
 
   // Get single menu
-  http.get('/api/v1/menus/:id', ({ params }) => {
+  http.get('/api/v1/menus/:id', ({ params }: any) => {
     const menu = menus.find(m => m.id === params.id);
     if (!menu) {
       return HttpResponse.json({ error: 'Menu not found' }, { status: 404 });
@@ -149,7 +149,7 @@ export const menuHandlers = [
   }),
 
   // Create menu
-  http.post('/api/v1/menus', async ({ request }) => {
+  http.post('/api/v1/menus', async ({ request }: any) => {
     const data = await request.json() as any;
     const newMenu: Menu = {
       id: `menu-${Date.now()}`,
@@ -163,7 +163,7 @@ export const menuHandlers = [
   }),
 
   // Update menu
-  http.put('/api/v1/menus/:id', async ({ params, request }) => {
+  http.put('/api/v1/menus/:id', async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = menus.findIndex(m => m.id === params.id);
     
@@ -181,7 +181,7 @@ export const menuHandlers = [
   }),
 
   // Delete menu
-  http.delete('/api/v1/menus/:id', ({ params }) => {
+  http.delete('/api/v1/menus/:id', ({ params }: any) => {
     const index = menus.findIndex(m => m.id === params.id);
     
     if (index === -1) {
@@ -193,7 +193,7 @@ export const menuHandlers = [
   }),
 
   // Toggle menu active status
-  http.patch('/api/v1/menus/:id/active', async ({ params, request }) => {
+  http.patch('/api/v1/menus/:id/active', async ({ params, request }: any) => {
     const { isActive } = await request.json() as { isActive: boolean };
     const index = menus.findIndex(m => m.id === params.id);
     

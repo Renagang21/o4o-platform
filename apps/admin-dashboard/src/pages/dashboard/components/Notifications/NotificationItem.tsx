@@ -154,7 +154,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {!read && (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       handleMarkRead();
                     }}
@@ -166,7 +166,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 )}
                 
                 <button
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     handleDismiss();
                   }}
@@ -189,7 +189,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           {/* Action Button */}
           {actionUrl && (
             <button
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 handleAction();
               }}

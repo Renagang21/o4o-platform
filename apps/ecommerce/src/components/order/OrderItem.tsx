@@ -63,7 +63,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({
 
       {/* Order Items Preview */}
       <div className="space-y-2">
-        {order.items.slice(0, 2).map(item => (
+        {order.items.slice(0, 2).map((item: any) => (
           <div key={item.id} className="flex items-center gap-3">
             {item.productImage ? (
               <img

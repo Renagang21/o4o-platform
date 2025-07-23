@@ -135,7 +135,7 @@ export default function GeneralSettings() {
               <Input
                 id="siteName"
                 value={settings.siteName}
-                onChange={(e) => handleChange('siteName', e.target.value)}
+                onChange={(e: any) => handleChange('siteName', e.target.value)}
                 placeholder="O4O Platform"
               />
             </div>
@@ -144,7 +144,7 @@ export default function GeneralSettings() {
               <Input
                 id="siteUrl"
                 value={settings.siteUrl}
-                onChange={(e) => handleChange('siteUrl', e.target.value)}
+                onChange={(e: any) => handleChange('siteUrl', e.target.value)}
                 placeholder="https://admin.neture.co.kr"
               />
             </div>
@@ -154,7 +154,7 @@ export default function GeneralSettings() {
             <Textarea
               id="siteDescription"
               value={settings.siteDescription}
-              onChange={(e) => handleChange('siteDescription', e.target.value)}
+              onChange={(e: any) => handleChange('siteDescription', e.target.value)}
               placeholder="사이트에 대한 간단한 설명을 입력하세요"
               rows={3}
             />
@@ -165,7 +165,7 @@ export default function GeneralSettings() {
               id="adminEmail"
               type="email"
               value={settings.adminEmail}
-              onChange={(e) => handleChange('adminEmail', e.target.value)}
+              onChange={(e: any) => handleChange('adminEmail', e.target.value)}
               placeholder="admin@example.com"
             />
           </div>
@@ -350,7 +350,7 @@ export default function GeneralSettings() {
                 <Textarea
                   id="maintenanceMessage"
                   value={settings.maintenanceMessage}
-                  onChange={(e) => handleChange('maintenanceMessage', e.target.value)}
+                  onChange={(e: any) => handleChange('maintenanceMessage', e.target.value)}
                   placeholder="잠시 시스템 점검 중입니다. 곧 정상 서비스하겠습니다."
                   rows={3}
                 />

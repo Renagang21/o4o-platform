@@ -103,7 +103,7 @@ const Library: React.FC = () => {
   const calculateStats = (filesData: MediaFile[]) => {
     const stats = {
       totalFiles: filesData.length,
-      totalSize: filesData.reduce((sum, file) => sum + file.size, 0),
+      totalSize: filesData.reduce((sum: any, file: any) => sum + file.size, 0),
       images: filesData.filter(f => f.type === 'image').length,
       videos: filesData.filter(f => f.type === 'video').length,
       documents: filesData.filter(f => f.type === 'document').length,
@@ -439,7 +439,7 @@ const Library: React.FC = () => {
                     type="text"
                     placeholder="파일명, Alt 텍스트, 설명으로 검색..."
                     value={filters.searchTerm}
-                    onChange={(e) => updateFilter('searchTerm', e.target.value)}
+                    onChange={(e: any) => updateFilter('searchTerm', e.target.value)}
                     className="wp-input pl-10"
                   />
                 </div>
@@ -448,7 +448,7 @@ const Library: React.FC = () => {
               <div className="flex flex-wrap gap-2">
                 <select
                   value={filters.fileType}
-                  onChange={(e) => updateFilter('fileType', e.target.value)}
+                  onChange={(e: any) => updateFilter('fileType', e.target.value)}
                   className="wp-select min-w-[120px]"
                 >
                   <option value="">전체 파일</option>
@@ -494,7 +494,7 @@ const Library: React.FC = () => {
                   <label className="wp-label">업로드 날짜</label>
                   <select
                     value={filters.dateRange}
-                    onChange={(e) => updateFilter('dateRange', e.target.value)}
+                    onChange={(e: any) => updateFilter('dateRange', e.target.value)}
                     className="wp-select"
                   >
                     <option value="">전체 기간</option>
@@ -508,7 +508,7 @@ const Library: React.FC = () => {
                   <label className="wp-label">파일 크기</label>
                   <select
                     value={filters.sizeRange}
-                    onChange={(e) => updateFilter('sizeRange', e.target.value)}
+                    onChange={(e: any) => updateFilter('sizeRange', e.target.value)}
                     className="wp-select"
                   >
                     <option value="">전체 크기</option>
@@ -627,7 +627,7 @@ const Library: React.FC = () => {
                 </span>
                 <select
                   value={pageSize}
-                  onChange={(e) => setPageSize(parseInt(e.target.value))}
+                  onChange={(e: any) => setPageSize(parseInt(e.target.value))}
                   className="wp-select w-20"
                 >
                   <option value={25}>25</option>
@@ -726,7 +726,7 @@ const Library: React.FC = () => {
                   <input
                     type="text"
                     value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
+                    onChange={(e: any) => setNewFolderName(e.target.value)}
                     className="wp-input"
                     placeholder="새 폴더 이름을 입력하세요"
                     autoFocus

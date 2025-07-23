@@ -243,7 +243,7 @@ export function CartPage() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedItems(new Set(cart.items.map(item => item.id)));
+      setSelectedItems(new Set(cart.items.map((item: any) => item.id)));
     } else {
       setSelectedItems(new Set());
     }
@@ -262,7 +262,7 @@ export function CartPage() {
   const handleCheckout = () => {
     if (selectedItems.size === 0 && cart.items.length > 0) {
       // If no items selected, select all
-      setSelectedItems(new Set(cart.items.map(item => item.id)));
+      setSelectedItems(new Set(cart.items.map((item: any) => item.id)));
     }
     navigate('/checkout');
   };
@@ -344,7 +344,7 @@ export function CartPage() {
 
           {/* Cart Items List */}
           <div className="space-y-4">
-            {cart.items.map(item => (
+            {cart.items.map((item: any) => (
               <CartItem
                 key={item.id}
                 item={item}

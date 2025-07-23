@@ -78,12 +78,12 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
         <input
           type="color"
           value={value || '#000000'}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e: any) => onChange(e.target.value)}
           className="w-8 h-8 rounded border cursor-pointer"
         />
         <Input
           value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e: any) => onChange(e.target.value)}
           placeholder="#000000"
           className="flex-1"
         />
@@ -107,7 +107,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
             <Label className="text-xs">Top</Label>
             <Input
               value={value.top || ''}
-              onChange={(e) => onChange({ ...value, top: e.target.value })}
+              onChange={(e: any) => onChange({ ...value, top: e.target.value })}
               placeholder="0px"
               className="text-xs h-8"
             />
@@ -116,7 +116,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
             <Label className="text-xs">Right</Label>
             <Input
               value={value.right || ''}
-              onChange={(e) => onChange({ ...value, right: e.target.value })}
+              onChange={(e: any) => onChange({ ...value, right: e.target.value })}
               placeholder="0px"
               className="text-xs h-8"
             />
@@ -125,7 +125,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
             <Label className="text-xs">Bottom</Label>
             <Input
               value={value.bottom || ''}
-              onChange={(e) => onChange({ ...value, bottom: e.target.value })}
+              onChange={(e: any) => onChange({ ...value, bottom: e.target.value })}
               placeholder="0px"
               className="text-xs h-8"
             />
@@ -134,7 +134,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
             <Label className="text-xs">Left</Label>
             <Input
               value={value.left || ''}
-              onChange={(e) => onChange({ ...value, left: e.target.value })}
+              onChange={(e: any) => onChange({ ...value, left: e.target.value })}
               placeholder="0px"
               className="text-xs h-8"
             />
@@ -154,7 +154,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>제목</Label>
               <Input
                 value={block.content.title || ''}
-                onChange={(e) => updateContent('title', e.target.value)}
+                onChange={(e: any) => updateContent('title', e.target.value)}
                 placeholder="Hero 제목"
               />
             </div>
@@ -162,7 +162,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>부제목</Label>
               <Input
                 value={block.content.subtitle || ''}
-                onChange={(e) => updateContent('subtitle', e.target.value)}
+                onChange={(e: any) => updateContent('subtitle', e.target.value)}
                 placeholder="Hero 부제목"
               />
             </div>
@@ -170,7 +170,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>배경 이미지</Label>
               <Input
                 value={block.content.backgroundImage || ''}
-                onChange={(e) => updateContent('backgroundImage', e.target.value)}
+                onChange={(e: any) => updateContent('backgroundImage', e.target.value)}
                 placeholder="이미지 URL"
               />
             </div>
@@ -180,7 +180,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                 <div key={index} className="flex gap-2 mt-2">
                   <Input
                     value={String(button.text || '')}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       const newButtons = [...(block.content.buttons || [])]
                       newButtons[index] = { ...button, text: e.target.value }
                       updateContent('buttons', newButtons)
@@ -189,7 +189,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                   />
                   <Input
                     value={String(button.url || '')}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       const newButtons = [...(block.content.buttons || [])]
                       newButtons[index] = { ...button, url: e.target.value }
                       updateContent('buttons', newButtons)
@@ -231,7 +231,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>텍스트</Label>
               <Input
                 value={block.content.text || ''}
-                onChange={(e) => updateContent('text', e.target.value)}
+                onChange={(e: any) => updateContent('text', e.target.value)}
                 placeholder="제목 텍스트"
               />
             </div>
@@ -263,7 +263,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
             <Label>텍스트</Label>
             <Textarea
               value={block.content.text || ''}
-              onChange={(e) => updateContent('text', e.target.value)}
+              onChange={(e: any) => updateContent('text', e.target.value)}
               placeholder="단락 텍스트를 입력하세요"
               rows={4}
             />
@@ -277,7 +277,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>이미지 URL</Label>
               <Input
                 value={block.content.src || ''}
-                onChange={(e) => updateContent('src', e.target.value)}
+                onChange={(e: any) => updateContent('src', e.target.value)}
                 placeholder="https://example.com/image.jpg"
               />
             </div>
@@ -285,7 +285,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>대체 텍스트</Label>
               <Input
                 value={block.content.alt || ''}
-                onChange={(e) => updateContent('alt', e.target.value)}
+                onChange={(e: any) => updateContent('alt', e.target.value)}
                 placeholder="이미지 설명"
               />
             </div>
@@ -293,7 +293,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>캡션</Label>
               <Input
                 value={block.content.caption || ''}
-                onChange={(e) => updateContent('caption', e.target.value)}
+                onChange={(e: any) => updateContent('caption', e.target.value)}
                 placeholder="이미지 캡션"
               />
             </div>
@@ -307,7 +307,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>텍스트</Label>
               <Input
                 value={block.content.text || ''}
-                onChange={(e) => updateContent('text', e.target.value)}
+                onChange={(e: any) => updateContent('text', e.target.value)}
                 placeholder="버튼 텍스트"
               />
             </div>
@@ -315,7 +315,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>URL</Label>
               <Input
                 value={block.content.url || ''}
-                onChange={(e) => updateContent('url', e.target.value)}
+                onChange={(e: any) => updateContent('url', e.target.value)}
                 placeholder="https://example.com"
               />
             </div>
@@ -370,7 +370,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                 <Label>컬럼 {index + 1} 내용</Label>
                 <Textarea
                   value={String(column.content || '')}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     const newColumns = [...(block.content.columns || [])]
                     newColumns[index] = { ...column, content: e.target.value }
                     updateContent('columns', newColumns)
@@ -491,7 +491,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                   <Label className="text-sm">이미지 URL</Label>
                   <Input
                     value={block.settings.background?.image?.url || ''}
-                    onChange={(e) => updateNestedSettings('background', 'image', {
+                    onChange={(e: any) => updateNestedSettings('background', 'image', {
                       ...block.settings.background?.image,
                       url: e.target.value
                     })}
@@ -512,7 +512,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                 <Label className="text-sm">두께</Label>
                 <Input
                   value={block.settings.border?.width || ''}
-                  onChange={(e) => updateNestedSettings('border', 'width', e.target.value)}
+                  onChange={(e: any) => updateNestedSettings('border', 'width', e.target.value)}
                   placeholder="1px"
                 />
               </div>
@@ -525,7 +525,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
                 <Label className="text-sm">둥근 모서리</Label>
                 <Input
                   value={block.settings.border?.radius || ''}
-                  onChange={(e) => updateNestedSettings('border', 'radius', e.target.value)}
+                  onChange={(e: any) => updateNestedSettings('border', 'radius', e.target.value)}
                   placeholder="4px"
                 />
               </div>

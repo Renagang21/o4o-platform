@@ -208,7 +208,7 @@ const MediaLibrary: React.FC = () => {
             <Input
               placeholder="미디어 검색..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -362,7 +362,7 @@ const MediaLibrary: React.FC = () => {
                 {/* Selection checkbox */}
                 <div
                   className="absolute top-2 left-2 z-10"
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.stopPropagation()
                     toggleItemSelection(item.id)
                   }}
@@ -389,7 +389,7 @@ const MediaLibrary: React.FC = () => {
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation()
                         setSelectedMedia(item)
                       }}
@@ -397,7 +397,7 @@ const MediaLibrary: React.FC = () => {
                       <Eye className="w-4 h-4" />
                     </Button>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenuTrigger asChild onClick={(e: any) => e.stopPropagation()}>
                         <Button size="sm" variant="secondary">
                           <MoreVertical className="w-4 h-4" />
                         </Button>

@@ -38,7 +38,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
           <Input
             id={`${field.id}-name`}
             value={field.name}
-            onChange={(e) => handleNameChange(e.target.value)}
+            onChange={(e: any) => handleNameChange(e.target.value)}
             placeholder="예: 가격"
           />
         </div>
@@ -47,7 +47,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
           <Input
             id={`${field.id}-key`}
             value={field.key}
-            onChange={(e) => onChange({ ...field, key: e.target.value })}
+            onChange={(e: any) => onChange({ ...field, key: e.target.value })}
             placeholder="예: price"
           />
         </div>
@@ -58,7 +58,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
         <Input
           id={`${field.id}-label`}
           value={field.label}
-          onChange={(e) => onChange({ ...field, label: e.target.value })}
+          onChange={(e: any) => onChange({ ...field, label: e.target.value })}
           placeholder="편집 화면에 표시될 레이블"
         />
       </div>
@@ -68,7 +68,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
         <Textarea
           id={`${field.id}-description`}
           value={field.description || ''}
-          onChange={(e) => onChange({ ...field, description: e.target.value })}
+          onChange={(e: any) => onChange({ ...field, description: e.target.value })}
           placeholder="필드 사용 방법에 대한 설명"
           rows={2}
         />
@@ -79,7 +79,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
         <Input
           id={`${field.id}-placeholder`}
           value={field.placeholder || ''}
-          onChange={(e) => onChange({ ...field, placeholder: e.target.value })}
+          onChange={(e: any) => onChange({ ...field, placeholder: e.target.value })}
           placeholder="입력 필드에 표시될 힌트 텍스트"
         />
       </div>
@@ -102,7 +102,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
               id={`${field.id}-min`}
               type="number"
               value={field.min || ''}
-              onChange={(e) => onChange({ 
+              onChange={(e: any) => onChange({ 
                 ...field, 
                 min: e.target.value ? parseInt(e.target.value) : undefined 
               })}
@@ -114,7 +114,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
               id={`${field.id}-max`}
               type="number"
               value={field.max || ''}
-              onChange={(e) => onChange({ 
+              onChange={(e: any) => onChange({ 
                 ...field, 
                 max: e.target.value ? parseInt(e.target.value) : undefined 
               })}
@@ -130,7 +130,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
             id={`${field.id}-maxLength`}
             type="number"
             value={field.maxLength || ''}
-            onChange={(e) => onChange({ 
+            onChange={(e: any) => onChange({ 
               ...field, 
               maxLength: e.target.value ? parseInt(e.target.value) : undefined 
             })}
@@ -147,7 +147,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
                 <Input
                   placeholder="레이블"
                   value={option.label}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     const newOptions = [...(field.options || [])]
                     newOptions[index] = { ...option, label: e.target.value }
                     onChange({ ...field, options: newOptions })
@@ -156,7 +156,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
                 <Input
                   placeholder="값"
                   value={option.value}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     const newOptions = [...(field.options || [])]
                     newOptions[index] = { ...option, value: e.target.value }
                     onChange({ ...field, options: newOptions })
@@ -166,7 +166,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    const newOptions = field.options?.filter((_, i) => i !== index)
+                    const newOptions = field.options?.filter((_, i: any) => i !== index)
                     onChange({ ...field, options: newOptions })
                   }}
                 >
@@ -200,7 +200,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
                   id={`${field.id}-minWidth`}
                   type="number"
                   value={field.minWidth || ''}
-                  onChange={(e) => onChange({ 
+                  onChange={(e: any) => onChange({ 
                     ...field, 
                     minWidth: e.target.value ? parseInt(e.target.value) : undefined 
                   })}
@@ -212,7 +212,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
                   id={`${field.id}-minHeight`}
                   type="number"
                   value={field.minHeight || ''}
-                  onChange={(e) => onChange({ 
+                  onChange={(e: any) => onChange({ 
                     ...field, 
                     minHeight: e.target.value ? parseInt(e.target.value) : undefined 
                   })}
@@ -230,7 +230,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
             id={`${field.id}-rows`}
             type="number"
             value={field.rows || 10}
-            onChange={(e) => onChange({ 
+            onChange={(e: any) => onChange({ 
               ...field, 
               rows: e.target.value ? parseInt(e.target.value) : 10 
             })}
@@ -245,7 +245,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
           <Textarea
             id={`${field.id}-defaultValue`}
             value={field.defaultValue || ''}
-            onChange={(e) => onChange({ ...field, defaultValue: e.target.value })}
+            onChange={(e: any) => onChange({ ...field, defaultValue: e.target.value })}
             placeholder="필드의 기본값"
             rows={3}
           />
@@ -264,7 +264,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
           <Input
             id={`${field.id}-defaultValue`}
             value={field.defaultValue || ''}
-            onChange={(e) => onChange({ ...field, defaultValue: e.target.value })}
+            onChange={(e: any) => onChange({ ...field, defaultValue: e.target.value })}
             placeholder="필드의 기본값"
           />
         )}
