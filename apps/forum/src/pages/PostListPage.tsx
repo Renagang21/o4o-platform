@@ -288,7 +288,7 @@ const PostListPage = () => {
           ) : (
             <>
               {posts.map((post: any) => {
-                const typeConfig = post.type ? postTypeConfig[post.type] : null;
+                const typeConfig = post.type ? postTypeConfig[post.type as keyof typeof postTypeConfig] : null;
                 const TypeIcon = typeConfig?.icon || FileText;
                 
                 return viewMode === 'grid' ? (
