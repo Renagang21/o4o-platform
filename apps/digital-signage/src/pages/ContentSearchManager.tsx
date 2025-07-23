@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
-  Search, Filter, Upload, Calendar, Tag, Clock, 
-  ChevronLeft, ChevronRight, Grid, List, SortAsc,
+  Search, Filter, Upload, Tag, Clock, 
+  ChevronLeft, ChevronRight, Grid, List,
   Youtube, Video, Eye, Edit, Trash2, CheckCircle,
-  XCircle, AlertCircle, Download, Share2
+  XCircle, AlertCircle
 } from 'lucide-react';
-import Navbar from '../../components/Navbar';
-import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../hooks/useToast';
-import axios from '../../api/client';
+// import Navbar from '../../components/Navbar';
+import { useAuth } from '@o4o/auth-context';
+import { useToast } from '../hooks/useToast';
+// import axios from '../../api/client';
+import axios from 'axios';
 
 interface VideoContent {
   id: string;
@@ -17,8 +18,10 @@ interface VideoContent {
   description?: string;
   url: string;
   thumbnail: string;
+  thumbnailUrl?: string; // Alias for thumbnail
   duration: number;
   platform: 'youtube' | 'vimeo';
+  type?: 'youtube' | 'vimeo'; // Alias for platform
   status: 'pending' | 'approved' | 'rejected' | 'inactive';
   tags: string[];
   viewCount: number;
@@ -26,6 +29,10 @@ interface VideoContent {
   updatedAt: string;
   authorId: string;
   authorName?: string;
+  createdBy?: string; // Alias for authorId
+  creator?: {
+    username: string;
+  };
 }
 
 interface SearchOptions {
@@ -54,8 +61,7 @@ interface SearchResult {
 
 const ContentSearchManager: React.FC = () => {
   const { user } = useAuth();
-  const { showToast } = useToast();
-  const navigate = useNavigate();
+  const toast = useToast();
 
   // State
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
@@ -89,12 +95,12 @@ const ContentSearchManager: React.FC = () => {
       const response = await axios.post('/api/signage/contents/search', searchPayload);
       setSearchResult(response.data.data);
     } catch (error) {
-      showToast('Search failed', 'error');
+      toast.error('Search failed');
       console.error('Search error:', error);
     } finally {
       setLoading(false);
     }
-  }, [searchOptions, selectedTags, showToast]);
+  }, [searchOptions, selectedTags, toast]);
 
   // Initial search
   useEffect(() => {
@@ -136,11 +142,11 @@ const ContentSearchManager: React.FC = () => {
       for (const contentId of selectedContent) {
         await axios.delete(`/api/signage/contents/${contentId}`);
       }
-      showToast(`Deleted ${selectedContent.size} items`, 'success');
+      toast.success(`Deleted ${selectedContent.size} items`);
       setSelectedContent(new Set());
       searchContent();
     } catch (error) {
-      showToast('Failed to delete content', 'error');
+      toast.error('Failed to delete content');
     }
   };
 
@@ -150,10 +156,10 @@ const ContentSearchManager: React.FC = () => {
     
     try {
       await axios.delete(`/api/signage/contents/${contentId}`);
-      showToast('Content deleted', 'success');
+      toast.success('Content deleted');
       searchContent();
     } catch (error) {
-      showToast('Failed to delete content', 'error');
+      toast.error('Failed to delete content');
     }
   };
 
@@ -184,13 +190,13 @@ const ContentSearchManager: React.FC = () => {
   };
 
   // Content type icon
-  const getContentIcon = (type: string) => {
+  const getContentIcon = (type: string | undefined) => {
     return type === 'youtube' ? Youtube : Video;
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {/* <Navbar /> */}
       
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40">
@@ -432,9 +438,9 @@ const ContentSearchManager: React.FC = () => {
                     <div key={content.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
                       {/* Thumbnail */}
                       <div className="relative aspect-video">
-                        {content.thumbnailUrl ? (
+                        {(content.thumbnailUrl || content.thumbnail) ? (
                           <img
-                            src={content.thumbnailUrl}
+                            src={content.thumbnailUrl || content.thumbnail || ''}
                             alt={content.title}
                             className="w-full h-full object-cover rounded-t-lg"
                             onError={(e) => {
@@ -589,8 +595,8 @@ const ContentSearchManager: React.FC = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="h-10 w-10 flex-shrink-0">
-                                {content.thumbnailUrl ? (
-                                  <img className="h-10 w-10 rounded-full object-cover" src={content.thumbnailUrl} alt="" />
+                                {(content.thumbnailUrl || content.thumbnail) ? (
+                                  <img className="h-10 w-10 rounded-full object-cover" src={content.thumbnailUrl || content.thumbnail || ''} alt="" />
                                 ) : (
                                   <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                                     <ContentIcon className="w-5 h-5 text-gray-400" />

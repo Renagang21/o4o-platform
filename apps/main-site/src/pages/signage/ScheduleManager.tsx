@@ -30,7 +30,6 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
   const [activeSchedule, setActiveSchedule] = useState<Schedule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -165,7 +164,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
           <p className="text-gray-600">Manage content schedules for this store</p>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {/* TODO: Implement create modal */}}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -306,7 +305,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Schedules</h3>
             <p className="text-gray-600 mb-4">Create your first schedule to automate content playback</p>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {/* TODO: Implement create modal */}}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center mx-auto"
             >
               <Plus className="w-4 h-4 mr-2" />

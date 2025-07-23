@@ -1,9 +1,7 @@
-import React from 'react';
 import { 
   TrendingUp, 
   ShoppingCart, 
   Package, 
-  Users,
   DollarSign,
   ArrowUpRight,
   ArrowDownRight,
@@ -22,10 +20,7 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
+  ResponsiveContainer
 } from 'recharts';
 import { useVendorDashboardStats, useVendorSalesChart, useVendorRecentOrders } from '../../hooks/vendor/useVendorStats';
 
@@ -148,7 +143,7 @@ export default function VendorDashboard() {
   };
 
   // 차트 데이터 포맷
-  const formattedSalesData = salesData?.map(item => ({
+  const formattedSalesData = salesData?.map((item: any) => ({
     date: formatChartDate(item.date),
     sales: item.sales,
     orders: item.orders

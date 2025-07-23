@@ -46,8 +46,6 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
   const [playlistItems, setPlaylistItems] = useState<PlaylistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
 
   useEffect(() => {
     fetchPlaylists();
@@ -243,7 +241,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">Playlists</h2>
               <button
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => {/* TODO: Implement create modal */}}
                 className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center"
               >
                 <Plus className="w-3 h-3 mr-1" />
@@ -325,7 +323,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setShowAddItemModal(true)}
+                    onClick={() => {/* TODO: Implement add item modal */}}
                     className="bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 flex items-center"
                   >
                     <Plus className="w-3 h-3 mr-1" />
@@ -443,7 +441,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Empty Playlist</h3>
                   <p className="text-gray-600 mb-4">Add content to get started</p>
                   <button
-                    onClick={() => setShowAddItemModal(true)}
+                    onClick={() => {/* TODO: Implement add item modal */}}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center mx-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />

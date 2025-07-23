@@ -1,21 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   TrendingUp, 
   TrendingDown,
-  Calendar,
   Download,
   DollarSign,
   ShoppingCart,
   Users,
-  Package,
-  BarChart3,
-  PieChart as PieChartIcon
+  BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, Button } from '@o4o/ui';
 import { formatCurrency } from '@o4o/utils';
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   PieChart,
@@ -67,7 +62,7 @@ const customerMetrics = [
 
 export default function VendorAnalytics() {
   const [dateRange, setDateRange] = useState('month');
-  const [selectedMetric, setSelectedMetric] = useState('sales');
+  const [_selectedMetric] = useState('sales');
 
   const totalSales = salesByMonth.reduce((sum, month) => sum + month.sales, 0);
   const totalOrders = salesByMonth.reduce((sum, month) => sum + month.orders, 0);

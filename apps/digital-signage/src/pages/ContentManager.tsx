@@ -1,22 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, Upload, File, Image, Video, Trash2, Edit3, Save } from 'lucide-react';
-import Navbar from '../../components/Navbar';
-import { BetaFeedbackWidget } from '../../components/beta/BetaFeedbackWidget';
-
-interface SignageContent {
-  id: string;
-  title: string;
-  type: 'video' | 'image' | 'slideshow';
-  url: string;
-  thumbnail: string;
-  duration?: number;
-  createdAt: string;
-  isActive: boolean;
-}
+// import Navbar from '../../components/Navbar';
+// import { BetaFeedbackWidget } from '../../components/beta/BetaFeedbackWidget';
 
 const ContentManager: React.FC = () => {
-  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -106,7 +94,7 @@ const ContentManager: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {/* <Navbar /> */}
       
       {/* 헤더 */}
       <div className="bg-white border-b">
@@ -335,10 +323,10 @@ const ContentManager: React.FC = () => {
       </div>
       
       {/* Beta Feedback Widget */}
-      <BetaFeedbackWidget 
+      {/* <BetaFeedbackWidget 
         page="content-manager" 
         feature="content_management"
-      />
+      /> */}
     </div>
   );
 };

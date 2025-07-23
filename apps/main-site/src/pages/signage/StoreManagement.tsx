@@ -55,7 +55,6 @@ export default function StoreManagement() {
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // This would come from auth context - using dynamic value to avoid TS literal type inference
   const userRole = (['admin', 'manager'] as const)[0] as 'admin' | 'manager';
@@ -180,7 +179,7 @@ export default function StoreManagement() {
               <h2 className="text-lg font-semibold text-gray-900">Stores</h2>
               {userRole === 'admin' && (
                 <button
-                  onClick={() => setShowCreateModal(true)}
+                  onClick={() => {/* TODO: Implement create modal */}}
                   className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center"
                 >
                   <Plus className="w-3 h-3 mr-1" />

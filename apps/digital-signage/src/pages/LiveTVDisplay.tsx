@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
-  Wifi, WifiOff, Clock, Calendar, Volume2, VolumeX,
+  Wifi, WifiOff, Calendar, Volume2, VolumeX,
   AlertCircle, RefreshCw, Maximize2, Minimize2
 } from 'lucide-react';
-import axios from '../../api/client';
+import axios from 'axios';
 
 interface PlaybackStatus {
   isPlaying: boolean;
@@ -53,7 +53,6 @@ const LiveTVDisplay: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
   // Fetch playback status
   const fetchPlaybackStatus = useCallback(async () => {
@@ -77,7 +76,7 @@ const LiveTVDisplay: React.FC = () => {
       fetchPlaybackStatus();
     }, 10000); // Refresh every 10 seconds
     
-    setRefreshInterval(interval);
+    // Auto-refresh is set but not stored in state
     
     return () => {
       if (interval) clearInterval(interval);

@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  ArrowLeft, Monitor, Play, Pause, Upload, Settings, Eye, Tv, 
-  RefreshCw, Clock, BarChart3, Search, Filter, TrendingUp,
-  Activity, AlertCircle, CheckCircle, XCircle, Calendar,
-  Users, Layers, PlayCircle, PauseCircle
+  ArrowLeft, Monitor, Play, Pause, Upload, Settings, Tv, 
+  RefreshCw, Clock, BarChart3, Search, TrendingUp,
+  Activity, AlertCircle, CheckCircle, XCircle,
+  Layers, PlayCircle, PauseCircle
 } from 'lucide-react';
-import Navbar from '../../components/Navbar';
-import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../hooks/useToast';
-import axios from '../../api/client';
+// import Navbar from '../../components/Navbar';
+import { useAuth } from '@o4o/auth-context';
+import { useToast } from '../hooks/useToast';
+import axios from 'axios';
 
 // Types
 interface SignageContent {
@@ -73,7 +73,7 @@ interface LiveDashboard {
 
 const EnhancedSignageDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const toast = useToast();
   
   // State
   const [contents, setContents] = useState<SignageContent[]>([]);
@@ -84,7 +84,6 @@ const EnhancedSignageDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [loading, setLoading] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
   // Fetch Analytics
   const fetchAnalytics = useCallback(async () => {
@@ -124,9 +123,9 @@ const EnhancedSignageDashboard: React.FC = () => {
       setContents(response.data.data.contents);
     } catch (error) {
       console.error('Failed to fetch contents:', error);
-      showToast('Failed to load contents', 'error');
+      toast.error('Failed to load contents');
     }
-  }, [searchQuery, filterStatus, selectedStore, showToast]);
+  }, [searchQuery, filterStatus, selectedStore, toast]);
 
   // Fetch Stores
   const fetchStores = useCallback(async () => {
@@ -163,7 +162,7 @@ const EnhancedSignageDashboard: React.FC = () => {
       fetchLiveDashboard();
     }, 30000); // 30 seconds
     
-    setRefreshInterval(interval);
+    // Auto-refresh is set but not stored in state
     
     return () => {
       if (interval) clearInterval(interval);
@@ -174,10 +173,10 @@ const EnhancedSignageDashboard: React.FC = () => {
   const handlePlaybackControl = async (storeId: string, action: 'play' | 'pause' | 'stop' | 'restart') => {
     try {
       await axios.post(`/api/signage/stores/${storeId}/playback/control`, { action });
-      showToast(`Playback ${action} command sent`, 'success');
+      toast.success(`Playback ${action} command sent`);
       fetchLiveDashboard();
     } catch (error) {
-      showToast('Failed to control playback', 'error');
+      toast.error('Failed to control playback');
     }
   };
 
@@ -185,10 +184,10 @@ const EnhancedSignageDashboard: React.FC = () => {
   const handleContentApproval = async (contentId: string, action: 'approve' | 'reject', reason?: string) => {
     try {
       await axios.patch(`/api/signage/contents/${contentId}/approval`, { action, reason });
-      showToast(`Content ${action}d successfully`, 'success');
+      toast.success(`Content ${action}d successfully`);
       fetchContents();
     } catch (error) {
-      showToast(`Failed to ${action} content`, 'error');
+      toast.error(`Failed to ${action} content`);
     }
   };
 
@@ -237,7 +236,7 @@ const EnhancedSignageDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {/* <Navbar /> */}
       
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40">

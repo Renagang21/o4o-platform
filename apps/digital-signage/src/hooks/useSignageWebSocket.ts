@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
-import type { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useSignageWebSocket = (storeId?: string) => {
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<any>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -50,14 +49,14 @@ export const useSignageWebSocket = (storeId?: string) => {
   }, [storeId, queryClient]);
 
   // Send display status updates
-  const sendDisplayStatus = (status: unknown) => {
+  const sendDisplayStatus = (status: Record<string, any>) => {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('display-status', { storeId, ...status });
     }
   };
 
   // Send playback events
-  const sendPlaybackEvent = (event: any) => {
+  const sendPlaybackEvent = (event: Record<string, any>) => {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit('playback-event', { storeId, ...event });
     }

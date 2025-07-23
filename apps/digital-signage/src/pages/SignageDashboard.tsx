@@ -4,9 +4,9 @@ import {
   ArrowLeft, Monitor, Play, Pause, Upload, 
   Settings, Eye, Tv, RefreshCw, Clock 
 } from 'lucide-react';
-import Navbar from '../../components/Navbar';
-import { BetaFeedbackWidget } from '../../components/beta/BetaFeedbackWidget';
-import { EnhancedBetaFeedbackWidget } from '../../components/beta/LiveSupportWidget';
+// import Navbar from '../../components/Navbar';
+// import { BetaFeedbackWidget } from '../../components/beta/BetaFeedbackWidget';
+// import { EnhancedBetaFeedbackWidget } from '../../components/beta/LiveSupportWidget';
 
 interface SignageContent {
   id: string;
@@ -81,7 +81,7 @@ const SignageDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {/* <Navbar /> */}
       
       {/* 헤더 */}
       <div className="bg-white border-b">
@@ -312,10 +312,10 @@ const SignageDashboard: React.FC = () => {
       </div>
       
       {/* Enhanced Beta Feedback Widget with Live Support */}
-      <EnhancedBetaFeedbackWidget 
+      {/* <EnhancedBetaFeedbackWidget 
         page="signage-dashboard" 
         feature="signage_management"
-      />
+      /> */}
     </div>
   );
 };

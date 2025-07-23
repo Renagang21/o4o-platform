@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Monitor, Video, Calendar, BarChart3, Play, Users, Clock, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Monitor, Video, Calendar, BarChart3, Play, Clock, TrendingUp } from 'lucide-react';
 import SignageContent from './SignageContent';
 import StoreManagement from './StoreManagement';
 import PlaylistManager from './PlaylistManager';
@@ -37,7 +37,7 @@ interface DashboardStats {
 export default function DigitalSignageDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('');
+  const [selectedStoreId] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   // This would come from auth context - using dynamic value to avoid TS literal type inference

@@ -64,7 +64,7 @@ export class RateLimitMiddleware {
           client: this.redis,
           prefix: 'rl:',
           sendCommand: (...args: string[]) => (this.redis as any).call(...args)
-        })
+        }) as any
       });
     }
 

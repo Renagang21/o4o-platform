@@ -43,7 +43,7 @@ export class ProxyMiddleware {
       proxyTimeout: service.timeout || 10000,
       
       // Path rewriting
-      pathRewrite: (path: string, req: Request) => {
+      pathRewrite: (path: string) => {
         // Remove /api/v1 prefix as backend services handle their own paths
         const newPath = path.replace(/^\/api\/v\d+/, '/api');
         logger.debug('Path rewrite', { original: path, rewritten: newPath });
@@ -121,7 +121,7 @@ export class ProxyMiddleware {
         }
       }
       }
-    } as Options;
+    };
 
     const proxy = createProxyMiddleware(proxyOptions);
     this.proxies.set(serviceKey, proxy);

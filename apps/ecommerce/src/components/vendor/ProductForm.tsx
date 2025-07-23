@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   X, 
   Upload, 
   Plus, 
   Trash2, 
   Save,
-  ArrowLeft,
-  Image as ImageIcon,
   AlertCircle
 } from 'lucide-react';
 import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
   Button, 
   Input, 
   Textarea,
@@ -64,7 +57,6 @@ interface ProductVariant {
 }
 
 export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormProps) {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
   const [errors, setErrors] = useState<Record<string, string>>({});

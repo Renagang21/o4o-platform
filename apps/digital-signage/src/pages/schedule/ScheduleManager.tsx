@@ -1,6 +1,20 @@
+import { useState } from 'react';
 import SignageScheduler from '../../components/signage/SignageScheduler';
 
+interface TimeRange {
+  start: string;
+  end: string;
+}
+
 export default function ScheduleManager() {
+  const [schedule, setSchedule] = useState<{
+    days: string[];
+    timeRanges: TimeRange[];
+  }>({
+    days: [],
+    timeRanges: []
+  });
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -9,7 +23,7 @@ export default function ScheduleManager() {
           Manage content schedules for your digital displays
         </p>
       </div>
-      <SignageScheduler />
+      <SignageScheduler schedule={schedule} onChange={setSchedule} />
     </div>
   );
 }

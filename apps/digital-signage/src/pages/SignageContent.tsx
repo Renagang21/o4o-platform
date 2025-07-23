@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Eye, Edit, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, Eye, Edit, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 interface Content {
   id: string;
@@ -36,7 +36,6 @@ export default function SignageContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ContentFilters>({});
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -171,7 +170,7 @@ export default function SignageContent() {
           <p className="text-gray-600">Manage video content for digital signage displays</p>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => console.log('Create modal would open')}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
         >
           <Plus className="w-4 h-4 mr-2" />

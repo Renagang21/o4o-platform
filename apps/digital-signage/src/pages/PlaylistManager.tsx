@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Play, Edit, Trash2, GripVertical, Clock, Video, Image } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Play, Edit, Trash2, Clock, Video, Image } from 'lucide-react';
 
 interface PlaylistItem {
   id: string;
@@ -46,8 +46,6 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
   const [playlistItems, setPlaylistItems] = useState<PlaylistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
 
   useEffect(() => {
     fetchPlaylists();
@@ -105,7 +103,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
     }
   };
 
-  const handleMoveUp = async (itemId: string, currentIndex: number) => {
+  const handleMoveUp = async (_itemId: string, currentIndex: number) => {
     if (currentIndex === 0 || !selectedPlaylist) return;
     
     const items = Array.from(playlistItems);
@@ -143,7 +141,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
     }
   };
 
-  const handleMoveDown = async (itemId: string, currentIndex: number) => {
+  const handleMoveDown = async (_itemId: string, currentIndex: number) => {
     if (currentIndex === playlistItems.length - 1 || !selectedPlaylist) return;
     
     const items = Array.from(playlistItems);
@@ -243,7 +241,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">Playlists</h2>
               <button
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => console.log('Create modal would open')}
                 className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center"
               >
                 <Plus className="w-3 h-3 mr-1" />
@@ -325,7 +323,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setShowAddItemModal(true)}
+                    onClick={() => console.log('Add item modal would open')}
                     className="bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700 flex items-center"
                   >
                     <Plus className="w-3 h-3 mr-1" />
@@ -443,7 +441,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Empty Playlist</h3>
                   <p className="text-gray-600 mb-4">Add content to get started</p>
                   <button
-                    onClick={() => setShowAddItemModal(true)}
+                    onClick={() => console.log('Add item modal would open')}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center mx-auto"
                   >
                     <Plus className="w-4 h-4 mr-2" />

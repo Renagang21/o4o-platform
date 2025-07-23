@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -13,11 +13,8 @@ import {
   LogOut,
   Store,
   TrendingUp,
-  DollarSign,
-  Users
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
-import { Button } from '@o4o/ui';
 
 interface NavItem {
   name: string;

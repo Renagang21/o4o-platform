@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
   Filter,
-  MoreVertical,
   Edit,
   Trash2,
   Eye,
@@ -11,7 +10,7 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge } from '@o4o/ui';
+import { Card, CardContent, Button, Input } from '@o4o/ui';
 import { formatCurrency } from '@o4o/utils';
 import { useNavigate } from 'react-router-dom';
 import { ProductForm } from '../../components/vendor/ProductForm';
@@ -24,17 +23,6 @@ import {
   useDeleteProduct 
 } from '../../hooks/vendor/useVendorProducts';
 
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: 'active' | 'inactive' | 'out_of_stock';
-  image: string;
-  sales: number;
-}
 
 const statusConfig = {
   active: { label: '판매중', color: 'bg-green-100 text-green-800' },
@@ -70,7 +58,7 @@ export default function VendorProducts() {
   const pagination = productsData?.pagination;
 
   // 카테고리 목록 구성
-  const categoryOptions = ['all', ...categories.map(cat => cat.name)];
+  const categoryOptions = ['all', ...categories.map((cat: any) => cat.name)];
 
   // 검색/카테고리 변경 시 페이지 리셋
   useEffect(() => {
@@ -85,7 +73,7 @@ export default function VendorProducts() {
 
   const handleEditProduct = async (id: string) => {
     // API에서 상품 상세 정보 가져오기는 ProductForm 내부에서 처리
-    const product = products.find(p => p.id === id);
+    const product = products.find((p: any) => p.id === id);
     if (product) {
       // Convert to BaseProduct format
       const baseProduct: Partial<BaseProduct> = {
@@ -124,7 +112,7 @@ export default function VendorProducts() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
-      setEditingProduct(baseProduct);
+      setEditingProduct(baseProduct as BaseProduct);
       setIsFormOpen(true);
     }
   };
@@ -169,7 +157,7 @@ export default function VendorProducts() {
               <div>
                 <p className="text-sm text-gray-600">판매중</p>
                 <p className="text-2xl font-bold">
-                  {products.filter(p => p.status === 'active' || p.status === 'in_stock').length}
+                  {products.filter((p: any) => p.status === 'active' || p.status === 'in_stock').length}
                 </p>
               </div>
               <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -184,7 +172,7 @@ export default function VendorProducts() {
               <div>
                 <p className="text-sm text-gray-600">품절</p>
                 <p className="text-2xl font-bold">
-                  {products.filter(p => p.status === 'out_of_stock').length}
+                  {products.filter((p: any) => p.status === 'out_of_stock').length}
                 </p>
               </div>
               <AlertCircle className="h-8 w-8 text-red-500" />
@@ -197,7 +185,7 @@ export default function VendorProducts() {
               <div>
                 <p className="text-sm text-gray-600">재고 부족</p>
                 <p className="text-2xl font-bold">
-                  {products.filter(p => p.stock > 0 && p.stock < 10).length}
+                  {products.filter((p: any) => p.stock > 0 && p.stock < 10).length}
                 </p>
               </div>
               <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
@@ -292,7 +280,7 @@ export default function VendorProducts() {
                     </td>
                   </tr>
                 ) : (
-                  products.map((product) => {
+                  products.map((product: any) => {
                     const status = statusConfig[product.status as keyof typeof statusConfig] || statusConfig.active;
                     return (
                       <tr key={product.id} className="hover:bg-gray-50">
@@ -390,7 +378,7 @@ export default function VendorProducts() {
                        Math.abs(page - currentPage) <= 2;
               })
               .map((page, index, array) => (
-                <React.Fragment key={page}>
+                <div key={page}>
                   {index > 0 && array[index - 1] < page - 1 && (
                     <span className="px-3 py-1">...</span>
                   )}
@@ -401,7 +389,7 @@ export default function VendorProducts() {
                   >
                     {page}
                   </Button>
-                </React.Fragment>
+                </div>
               ))}
             <Button
               variant="outline"
