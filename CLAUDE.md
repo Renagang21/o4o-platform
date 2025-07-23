@@ -744,6 +744,67 @@ npm run type-check
    const regex = /@/g;
    ```
 
+### TypeScript Type Errors to Avoid
+
+1. **Index Signature Errors (TS7053)**
+   ```typescript
+   // ❌ WRONG - Element implicitly has an 'any' type
+   const typeConfig = post.type ? postTypeConfig[post.type] : null;
+   
+   // ✅ CORRECT - Add type assertion
+   const typeConfig = post.type ? postTypeConfig[post.type as keyof typeof postTypeConfig] : null;
+   ```
+
+2. **ReactNode Type Errors (TS2322)**
+   ```typescript
+   // ❌ WRONG - Type 'unknown' is not assignable to type 'ReactNode'
+   <span>{count}</span>
+   
+   // ✅ CORRECT - Convert to string
+   <span>{String(count)}</span>
+   // Or with type assertion
+   <span>{count as React.ReactNode}</span>
+   ```
+
+3. **Unused Destructured Parameters (TS6133)**
+   ```typescript
+   // ❌ WRONG - 'id' is declared but never used
+   const { id } = useParams();
+   
+   // ✅ CORRECT - Prefix with underscore
+   const { id: _id } = useParams();
+   ```
+
+4. **Implicit Any in Array Methods**
+   ```typescript
+   // ❌ WRONG - Parameter 'k' implicitly has an 'any' type
+   e.target.value.split(',').map(k => k.trim())
+   
+   // ✅ CORRECT - Add type annotation
+   e.target.value.split(',').map((k: any) => k.trim())
+   // Or better with string type
+   e.target.value.split(',').map((k: string) => k.trim())
+   ```
+
+### Workspace Conflicts
+
+**CRITICAL: Avoid backup directories in the project**
+```bash
+# ❌ NEVER create backup directories inside the project
+cp -r apps/admin-dashboard apps/admin-dashboard.backup
+
+# ✅ CORRECT - Backup outside the project
+cp -r apps/admin-dashboard ~/backups/admin-dashboard.backup
+
+# Or add to .gitignore and exclude from workspaces
+# In package.json:
+"workspaces": [
+  "packages/*",
+  "apps/*",
+  "!apps/*.backup"
+]
+```
+
 ### Complete Pre-Push Validation
 
 ```bash
@@ -798,8 +859,44 @@ When CI/CD fails, check in this order:
 4. **NO moderate+ security vulnerabilities** - Fix or document
 5. **NO empty destructuring patterns** - Use underscore prefix
 6. **NO implicit any errors** - Add type annotations
+7. **NO type errors** - All TypeScript must compile cleanly
+8. **NO workspace conflicts** - No duplicate workspace names
 
 Remember: **CI/CD has ZERO tolerance for warnings!**
+
+### Type Checking Best Practices
+
+1. **Always run type-check before pushing**
+   ```bash
+   # Check all workspaces
+   npm run type-check
+   
+   # Check specific workspace
+   npm run type-check --workspace=@o4o/forum
+   ```
+
+2. **Common TypeScript Configurations**
+   - Ensure `strict: true` in tsconfig.json
+   - Use `noImplicitAny: true`
+   - Enable `strictNullChecks: true`
+
+3. **Fix Type Errors Immediately**
+   - Don't use `@ts-ignore` or `@ts-expect-error`
+   - Add proper type annotations
+   - Use type assertions only when necessary
+
+4. **Type-Safe Patterns**
+   ```typescript
+   // For dynamic object access
+   const value = obj[key as keyof typeof obj];
+   
+   // For unknown types in React
+   {String(unknownValue)}
+   {unknownValue as React.ReactNode}
+   
+   // For unused parameters
+   const { id: _id, ...rest } = props;
+   ```
 
 ## Troubleshooting Guide
 
