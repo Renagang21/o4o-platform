@@ -1,9 +1,55 @@
 import { http, HttpResponse } from 'msw';
+import type { OrderStatus } from '@o4o/types';
+import type { OrderStatusUpdateData, OrderRefundData } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
+// Mock order item with additional fields for testing
+interface MockOrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productSku: string;
+  productImage: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  supplierId?: string;
+  supplierName?: string;
+  variantOptions?: any;
+  [key: string]: any;
+}
+
+// Mock order type with additional fields for testing
+interface MockOrder {
+  id: string;
+  orderNumber: string;
+  customerName?: string;
+  customerEmail?: string;
+  status?: OrderStatus;
+  totalAmount?: number;
+  items?: MockOrderItem[];
+  shippingInfo?: any;
+  paymentInfo?: any;
+  statusHistory?: Array<{
+    id: string;
+    status: string;
+    changedAt: string;
+    changedBy: string;
+    reason: string;
+    notes?: string;
+  }>;
+  trackingNumber?: string;
+  estimatedDelivery?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  notes?: string;
+  refundInfo?: any;
+  [key: string]: any;
+}
+
 // Mock order data with detailed status information
-let mockOrders = [
+let mockOrders: MockOrder[] = [
   {
     id: 'order-1',
     orderNumber: 'ORD-2025-0001',
@@ -16,7 +62,8 @@ let mockOrders = [
         id: 'item-1',
         productId: 'prod-1',
         productName: '프리미엄 오메가3',
-        sku: 'OMEGA3-001',
+        productSku: 'OMEGA3-001',
+        productImage: '/images/products/omega3.jpg',
         quantity: 2,
         unitPrice: 39000,
         totalPrice: 78000,
@@ -26,7 +73,8 @@ let mockOrders = [
         id: 'item-2',
         productId: 'prod-2',
         productName: '비타민D',
-        sku: 'VITD-001',
+        productSku: 'VITD-001',
+        productImage: '/images/products/vitd.jpg',
         quantity: 1,
         unitPrice: 11000,
         totalPrice: 11000
@@ -72,7 +120,8 @@ let mockOrders = [
         id: 'item-3',
         productId: 'prod-3',
         productName: '종합비타민 프리미엄',
-        sku: 'MULTI-PREM-001',
+        productSku: 'MULTI-PREM-001',
+        productImage: '/images/products/multi-premium.jpg',
         quantity: 3,
         unitPrice: 52000,
         totalPrice: 156000,
@@ -125,7 +174,8 @@ let mockOrders = [
         id: 'item-4',
         productId: 'prod-4',
         productName: '프로바이오틱스',
-        sku: 'PROBIO-001',
+        productSku: 'PROBIO-001',
+        productImage: '/images/products/probio.jpg',
         quantity: 1,
         unitPrice: 67000,
         totalPrice: 67000,
@@ -186,14 +236,15 @@ let mockOrders = [
     orderNumber: 'ORD-2025-0004',
     customerName: '최완료',
     customerEmail: 'completed@example.com',
-    status: 'completed',
+    status: 'delivered',
     totalAmount: 234000,
     items: [
       {
         id: 'item-5',
         productId: 'prod-5',
         productName: '콜라겐 플러스',
-        sku: 'COLLAGEN-001',
+        productSku: 'COLLAGEN-001',
+        productImage: '/images/products/collagen.jpg',
         quantity: 2,
         unitPrice: 89000,
         totalPrice: 178000,
@@ -203,7 +254,8 @@ let mockOrders = [
         id: 'item-6',
         productId: 'prod-6',
         productName: '루테인',
-        sku: 'LUTEIN-001',
+        productSku: 'LUTEIN-001',
+        productImage: '/images/products/lutein.jpg',
         quantity: 1,
         unitPrice: 56000,
         totalPrice: 56000
@@ -261,7 +313,7 @@ let mockOrders = [
       },
       {
         id: 'hist-13',
-        status: 'completed',
+        status: 'delivered',
         changedAt: '2025-01-24T10:00:00Z',
         changedBy: 'system',
         reason: '주문 완료',
@@ -284,7 +336,8 @@ let mockOrders = [
         id: 'item-7',
         productId: 'prod-7',
         productName: '마그네슘',
-        sku: 'MAG-001',
+        productSku: 'MAG-001',
+        productImage: '/images/products/mag.jpg',
         quantity: 1,
         unitPrice: 45000,
         totalPrice: 45000
@@ -327,7 +380,7 @@ let mockOrders = [
 
 export const orderStatusHandlers = [
   // Get orders with filtering
-  http.get(`${API_BASE}/v1/ecommerce/orders`, ({ request }: any) => {
+  http.get(`${API_BASE}/v1/ecommerce/orders`, ({ request }) => {
     const url = new URL(request.url);
     const search = url.searchParams.get('search');
     const status = url.searchParams.get('status');
@@ -340,9 +393,9 @@ export const orderStatusHandlers = [
     if (search) {
       const searchLower = search.toLowerCase();
       filteredOrders = filteredOrders.filter(order =>
-        order.orderNumber.toLowerCase().includes(searchLower) ||
-        order.customerName.toLowerCase().includes(searchLower) ||
-        order.customerEmail.toLowerCase().includes(searchLower)
+        order.orderNumber?.toLowerCase().includes(searchLower) ||
+        order.customerName?.toLowerCase().includes(searchLower) ||
+        order.customerEmail?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -352,7 +405,11 @@ export const orderStatusHandlers = [
     }
 
     // Sort by creation date (newest first)
-    filteredOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    filteredOrders.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
 
     // Pagination
     const startIndex = (page - 1) * limit;
@@ -374,7 +431,9 @@ export const orderStatusHandlers = [
   // Get order statistics
   http.get(`${API_BASE}/v1/ecommerce/orders/stats`, () => {
     const stats = mockOrders.reduce((acc, order) => {
-      acc[order.status] = (acc[order.status] || 0) + 1;
+      if (order.status) {
+        acc[order.status] = (acc[order.status] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
 
@@ -388,15 +447,16 @@ export const orderStatusHandlers = [
         delivered: stats.delivered || 0,
         completed: stats.completed || 0,
         cancelled: stats.cancelled || 0,
-        refunded: stats.refunded || 0,
+        returned: stats.returned || 0,
         total: mockOrders.length
       }
     });
   }),
 
   // Get single order
-  http.get(`${API_BASE}/v1/ecommerce/orders/:id`, ({ params }: any) => {
-    const order = mockOrders.find(o => o.id === params.id);
+  http.get(`${API_BASE}/v1/ecommerce/orders/:id`, ({ params }) => {
+    const { id } = params as { id: string };
+    const order = mockOrders.find(o => o.id === id);
     
     if (!order) {
       return HttpResponse.json(
@@ -412,9 +472,9 @@ export const orderStatusHandlers = [
   }),
 
   // Update order status
-  http.put(`${API_BASE}/v1/ecommerce/orders/:id/status`, async ({ params, request }: any) => {
-    const { id } = params;
-    const data = await request.json();
+  http.put(`${API_BASE}/v1/ecommerce/orders/:id/status`, async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const data = await request.json() as OrderStatusUpdateData;
     
     const orderIndex = mockOrders.findIndex(o => o.id === id);
     if (orderIndex === -1) {
@@ -430,7 +490,7 @@ export const orderStatusHandlers = [
     // Add status history entry
     const newHistoryEntry = {
       id: `hist-${Date.now()}`,
-      status: data.newStatus,
+      status: data.newStatus as string,
       changedAt: now,
       changedBy: 'admin',
       reason: data.reason || '관리자 상태 변경',
@@ -440,12 +500,12 @@ export const orderStatusHandlers = [
     // Update order
     mockOrders[orderIndex] = {
       ...order,
-      status: data.newStatus,
+      status: data.newStatus as OrderStatus,
       updatedAt: now,
       trackingNumber: data.trackingNumber || order.trackingNumber,
       estimatedDelivery: data.estimatedDelivery || order.estimatedDelivery,
       statusHistory: [...(order.statusHistory || []), newHistoryEntry]
-    } as any;
+    };
 
     return HttpResponse.json({
       success: true,
@@ -455,9 +515,9 @@ export const orderStatusHandlers = [
   }),
 
   // Process refund
-  http.post(`${API_BASE}/v1/ecommerce/orders/:id/refund`, async ({ params, request }: any) => {
-    const { id } = params;
-    const data = await request.json();
+  http.post(`${API_BASE}/v1/ecommerce/orders/:id/refund`, async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const data = await request.json() as OrderRefundData;
     
     const orderIndex = mockOrders.findIndex(o => o.id === id);
     if (orderIndex === -1) {
@@ -482,20 +542,20 @@ export const orderStatusHandlers = [
     // Add status history entry
     const newHistoryEntry = {
       id: `hist-${Date.now()}`,
-      status: 'refunded' as const,
+      status: 'returned' as const,
       changedAt: now,
       changedBy: 'admin',
       reason: data.reason || '환불 처리',
-      notes: `환불 금액: ₩${refundInfo.amount.toLocaleString()}`
+      notes: `환불 금액: ₩${(refundInfo.amount || 0).toLocaleString()}`
     };
 
     // Update order
     mockOrders[orderIndex] = {
       ...order,
-      status: 'refunded',
+      status: 'returned' as OrderStatus,
       updatedAt: now,
       statusHistory: [...(order.statusHistory || []), newHistoryEntry]
-    } as any;
+    };
 
     return HttpResponse.json({
       success: true,
@@ -520,17 +580,16 @@ export const orderStatusHandlers = [
           { key: 'delivered', label: '배송완료', description: '상품이 배송 완료되었습니다', color: '#10b981' },
           { key: 'completed', label: '완료', description: '주문이 완전히 완료되었습니다', color: '#059669' },
           { key: 'cancelled', label: '취소', description: '주문이 취소되었습니다', color: '#6b7280' },
-          { key: 'refunded', label: '환불', description: '주문이 환불 처리되었습니다', color: '#ef4444' }
+          { key: 'returned', label: '반품', description: '주문이 반품 처리되었습니다', color: '#ef4444' }
         ],
         transitions: {
           pending: ['confirmed', 'cancelled'],
           confirmed: ['processing', 'cancelled'],
           processing: ['shipped', 'cancelled'],
           shipped: ['delivered', 'cancelled'],
-          delivered: ['completed', 'refunded'],
-          completed: ['refunded'],
-          cancelled: ['refunded'],
-          refunded: []
+          delivered: ['returned'],
+          cancelled: ['returned'],
+          returned: []
         }
       }
     });

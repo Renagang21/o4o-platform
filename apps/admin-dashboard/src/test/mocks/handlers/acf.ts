@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import type { ACFFieldGroup, ACFRepeaterField, ACFGalleryField } from '@o4o/types';
+import type { ACFGroupData } from '../types';
 
 // Mock data
 const mockFieldGroups: ACFFieldGroup[] = [
@@ -167,8 +168,9 @@ export const acfHandlers = [
   }),
 
   // Get single field group
-  http.get(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }: any) => {
-    const fieldGroup = fieldGroups.find(fg => fg.id === params.id);
+  http.get(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }) => {
+    const { id } = params as { id: string };
+    const fieldGroup = fieldGroups.find(fg => fg.id === id);
     if (!fieldGroup) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });
     }
@@ -176,23 +178,31 @@ export const acfHandlers = [
   }),
 
   // Create field group
-  http.post(`${API_BASE}/v1/acf/field-groups`, async ({ request }: any) => {
-    const data = await request.json() as any;
-    const newFieldGroup: ACFFieldGroup = {
+  http.post(`${API_BASE}/v1/acf/field-groups`, async ({ request }) => {
+    const data = await request.json() as ACFGroupData;
+    const { title, fields, location, ...restData } = data;
+    const newFieldGroup = {
       id: `fg-${Date.now()}`,
-      ...data,
+      name: title || 'New Field Group',
+      key: `field_${Date.now()}`,
+      order: 0,
+      position: 'normal',
+      fields: fields || [],
+      location: location || [],
       createdAt: new Date(),
       updatedAt: new Date(),
-    };
+      ...restData,
+    } as unknown as ACFFieldGroup;
     
     fieldGroups.push(newFieldGroup);
     return HttpResponse.json(newFieldGroup, { status: 201 });
   }),
 
   // Update field group
-  http.put(`${API_BASE}/v1/acf/field-groups/:id`, async ({ params, request }: any) => {
-    const data = await request.json() as any;
-    const index = fieldGroups.findIndex(fg => fg.id === params.id);
+  http.put(`${API_BASE}/v1/acf/field-groups/:id`, async ({ params, request }) => {
+    const data = await request.json() as Partial<ACFGroupData>;
+    const { id } = params as { id: string };
+    const index = fieldGroups.findIndex(fg => fg.id === id);
     
     if (index === -1) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });
@@ -201,15 +211,18 @@ export const acfHandlers = [
     fieldGroups[index] = {
       ...fieldGroups[index],
       ...data,
+      fields: data.fields || fieldGroups[index].fields,
+      location: data.location || fieldGroups[index].location,
       updatedAt: new Date(),
-    };
+    } as ACFFieldGroup;
     
     return HttpResponse.json(fieldGroups[index]);
   }),
 
   // Delete field group
-  http.delete(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }: any) => {
-    const index = fieldGroups.findIndex(fg => fg.id === params.id);
+  http.delete(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }) => {
+    const { id } = params as { id: string };
+    const index = fieldGroups.findIndex(fg => fg.id === id);
     
     if (index === -1) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });

@@ -1,6 +1,39 @@
 import { http, HttpResponse } from 'msw';
+import type { TossTestData, TossPaymentProcessData, TossCancelData, RefundProcessData, RefundCreateData } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
+// Test result type
+interface TestResult {
+  id: string;
+  testType: string;
+  status: string;
+  result?: string;
+  error?: string;
+  executedAt: string;
+}
+
+// Refund type  
+interface MockRefund {
+  id: string;
+  orderId: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  paymentKey: string;
+  requestedAmount: number;
+  approvedAmount?: number;
+  reason: string;
+  status: string;
+  requestedAt: string;
+  processedAt?: string;
+  completedAt?: string;
+  adminNote?: string;
+  tossRefundKey?: string;
+  receiptUrl?: string;
+  items: any[];
+  [key: string]: any;
+}
 
 // Mock Toss Payments configuration
 let mockTossConfig = {
@@ -26,7 +59,7 @@ let mockTossConfig = {
 };
 
 // Mock test results
-let mockTests = [
+let mockTests: TestResult[] = [
   {
     id: 'test-1',
     testType: 'connection',
@@ -62,7 +95,7 @@ const mockStats = {
 };
 
 // Mock refund data
-let mockRefunds = [
+let mockRefunds: MockRefund[] = [
   {
     id: 'refund-1',
     orderId: 'order-1',
@@ -167,8 +200,8 @@ export const tossPaymentsHandlers = [
   }),
 
   // Update Toss Payments configuration
-  http.put(`${API_BASE}/v1/payments/toss/config`, async ({ request }: any) => {
-    const data = await request.json();
+  http.put(`${API_BASE}/v1/payments/toss/config`, async ({ request }) => {
+    const data = await request.json() as any;
     
     // Update mock config
     mockTossConfig = {
@@ -198,8 +231,9 @@ export const tossPaymentsHandlers = [
   }),
 
   // Run test
-  http.post(`${API_BASE}/v1/payments/toss/test`, async ({ request }: any) => {
-    const { testType } = await request.json();
+  http.post(`${API_BASE}/v1/payments/toss/test`, async ({ request }) => {
+    const data = await request.json();
+    const { testType } = data as TossTestData;
     
     // Simulate test execution
     await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
@@ -263,7 +297,7 @@ export const tossPaymentsHandlers = [
       executedAt: new Date().toISOString()
     };
 
-    mockTests.unshift(newTest as any); // Add to beginning of array
+    mockTests.unshift(newTest); // Add to beginning of array
 
     // Keep only latest 50 tests
     if (mockTests.length > 50) {
@@ -294,8 +328,9 @@ export const tossPaymentsHandlers = [
   }),
 
   // Update payment methods
-  http.put(`${API_BASE}/v1/payments/toss/methods`, async ({ request }: any) => {
-    const { supportedMethods } = await request.json();
+  http.put(`${API_BASE}/v1/payments/toss/methods`, async ({ request }) => {
+    const data = await request.json();
+    const { supportedMethods } = data as { supportedMethods: any[] };
     
     mockTossConfig.supportedMethods = supportedMethods;
     mockTossConfig.lastUpdated = new Date().toISOString();
@@ -308,8 +343,8 @@ export const tossPaymentsHandlers = [
   }),
 
   // Process payment (for integration testing)
-  http.post(`${API_BASE}/v1/payments/toss/process`, async ({ request }: any) => {
-    const data = await request.json();
+  http.post(`${API_BASE}/v1/payments/toss/process`, async ({ request }) => {
+    const data = await request.json() as TossPaymentProcessData;
     
     // Simulate payment processing
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -340,8 +375,9 @@ export const tossPaymentsHandlers = [
   }),
 
   // Cancel payment
-  http.post(`${API_BASE}/v1/payments/toss/cancel`, async ({ request }: any) => {
-    const { paymentKey, cancelReason } = await request.json();
+  http.post(`${API_BASE}/v1/payments/toss/cancel`, async ({ request }) => {
+    const data = await request.json();
+    const { paymentKey, cancelReason } = data as TossCancelData;
     
     // Simulate cancellation processing
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -359,7 +395,7 @@ export const tossPaymentsHandlers = [
   }),
 
   // Get webhooks
-  http.get(`${API_BASE}/v1/payments/toss/webhooks`, ({ request }: any) => {
+  http.get(`${API_BASE}/v1/payments/toss/webhooks`, ({ request }) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '20');
@@ -395,7 +431,7 @@ export const tossPaymentsHandlers = [
 
   // Refund Management APIs
   // Get refund requests
-  http.get(`${API_BASE}/v1/payments/refunds`, ({ request }: any) => {
+  http.get(`${API_BASE}/v1/payments/refunds`, ({ request }) => {
     const url = new URL(request.url);
     const search = url.searchParams.get('search');
     const status = url.searchParams.get('status');
@@ -465,9 +501,9 @@ export const tossPaymentsHandlers = [
   }),
 
   // Process refund (approve/reject)
-  http.post(`${API_BASE}/v1/payments/refunds/:id/process`, async ({ params, request }: any) => {
-    const { id } = params;
-    const data = await request.json();
+  http.post(`${API_BASE}/v1/payments/refunds/:id/process`, async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const data = await request.json() as RefundProcessData;
     
     const refundIndex = mockRefunds.findIndex(r => r.id === id);
     if (refundIndex === -1) {
@@ -510,7 +546,7 @@ export const tossPaymentsHandlers = [
           status: 'failed',
           processedAt: now,
           adminNote: data.adminNote,
-        } as any;
+        };
 
         return HttpResponse.json({
           success: false,
@@ -524,7 +560,7 @@ export const tossPaymentsHandlers = [
         status: 'rejected',
         processedAt: now,
         adminNote: data.adminNote
-      } as any;
+      };
 
       return HttpResponse.json({
         success: true,
@@ -540,8 +576,8 @@ export const tossPaymentsHandlers = [
   }),
 
   // Retry failed refund
-  http.post(`${API_BASE}/v1/payments/refunds/:id/retry`, async ({ params }: any) => {
-    const { id } = params;
+  http.post(`${API_BASE}/v1/payments/refunds/:id/retry`, async ({ params }) => {
+    const { id } = params as { id: string };
     
     const refundIndex = mockRefunds.findIndex(r => r.id === id);
     if (refundIndex === -1) {
@@ -578,12 +614,12 @@ export const tossPaymentsHandlers = [
             completedAt: new Date().toISOString(),
             tossRefundKey: `refund_retry_${Date.now()}`,
             receiptUrl: `https://dashboard.tosspayments.com/receipt/refund_retry_${Date.now()}`
-          } as any;
+          };
         } else {
           mockRefunds[updatedRefundIndex] = {
             ...mockRefunds[updatedRefundIndex],
             status: 'failed'
-          } as any;
+          };
         }
       }
     }, 3000);
@@ -596,8 +632,8 @@ export const tossPaymentsHandlers = [
   }),
 
   // Create refund request (from order detail)
-  http.post(`${API_BASE}/v1/payments/refunds/create`, async ({ request }: any) => {
-    const data = await request.json();
+  http.post(`${API_BASE}/v1/payments/refunds/create`, async ({ request }) => {
+    const data = await request.json() as RefundCreateData;
     
     const newRefund = {
       id: `refund-${Date.now()}`,

@@ -223,17 +223,19 @@ export const customPostTypeHandlers = [
   }),
 
   // Update field groups for custom post type
-  http.put(`${API_BASE}/v1/custom-post-types/:id/field-groups`, async ({ params, request }: any) => {
-    const data = await request.json() as any;
-    const index = customPostTypes.findIndex(c => c.id === params.id);
+  http.put(`${API_BASE}/v1/custom-post-types/:id/field-groups`, async ({ params, request }) => {
+    await request.json() as { fieldGroupIds: string[] };
+    const { id } = params as { id: string };
+    const index = customPostTypes.findIndex(c => c.id === id);
     
     if (index === -1) {
       return HttpResponse.json({ error: 'Custom post type not found' }, { status: 404 });
     }
     
+    // In a real implementation, this would look up field groups by ID
+    // For now, we'll just keep the existing field groups
     customPostTypes[index] = {
       ...customPostTypes[index],
-      fieldGroups: data.fieldGroups,
       updatedAt: new Date(),
     };
     

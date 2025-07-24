@@ -1,6 +1,26 @@
 import { http, HttpResponse } from 'msw';
+import type { SettlementData } from '@o4o/types';
+import type { SettlementProcessData, FeePolicyData, FeeCalculationData } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
+// Extended type for mock data
+interface MockVendorSettlement extends Partial<SettlementData> {
+  vendorName: string;
+  vendorEmail: string;
+  settlementPeriod: {
+    startDate: string;
+    endDate: string;
+  };
+  bankAccount?: {
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
+  };
+  receiptUrl?: string;
+  memo?: string;
+  [key: string]: any;
+}
 
 // Mock settlement overview data
 const mockSettlementOverview = {
@@ -17,7 +37,7 @@ const mockSettlementOverview = {
 };
 
 // Mock vendor settlements
-const mockVendorSettlements = [
+let mockVendorSettlements: MockVendorSettlement[] = [
   {
     id: 'settlement-1',
     vendorId: 'vendor-1',
@@ -78,7 +98,7 @@ const mockVendorSettlements = [
     tossFee: 136800,
     taxAmount: 456000,
     netAmount: 3739200,
-    status: 'approved',
+    status: 'processing' as const,
     requestedAt: '2025-01-24T11:00:00Z',
     approvedAt: '2025-01-24T12:00:00Z'
   }
@@ -222,7 +242,7 @@ export const settlementsHandlers = [
   }),
 
   // Get vendor settlements
-  http.get(`${API_BASE}/v1/settlements/vendors`, ({ request }: any) => {
+  http.get(`${API_BASE}/v1/settlements/vendors`, ({ request }) => {
     const url = new URL(request.url);
     const search = url.searchParams.get('search');
     const status = url.searchParams.get('status');
@@ -248,8 +268,9 @@ export const settlementsHandlers = [
   }),
 
   // Bulk approve settlements
-  http.post(`${API_BASE}/v1/settlements/vendors/approve-bulk`, async ({ request }: any) => {
-    const { settlementIds, memo } = await request.json();
+  http.post(`${API_BASE}/v1/settlements/vendors/approve-bulk`, async ({ request }) => {
+    const data = await request.json();
+    const { settlementIds, memo } = data as SettlementProcessData;
     
     // Update mock data
     settlementIds.forEach((id: string) => {
@@ -257,10 +278,10 @@ export const settlementsHandlers = [
       if (index !== -1) {
         mockVendorSettlements[index] = {
           ...mockVendorSettlements[index],
-          status: 'approved',
+          status: 'processing' as const,
           approvedAt: new Date().toISOString(),
           memo
-        } as any;
+        };
       }
     });
     
@@ -271,9 +292,9 @@ export const settlementsHandlers = [
   }),
 
   // Individual settlement actions
-  http.post(`${API_BASE}/v1/settlements/vendors/:id/:action`, async ({ params, request }: any) => {
-    const { id, action } = params;
-    const data = await request.json();
+  http.post(`${API_BASE}/v1/settlements/vendors/:id/:action`, async ({ params, request }) => {
+    const { id, action } = params as { id: string; action: string };
+    const data = await request.json() as { memo?: string };
     
     const index = mockVendorSettlements.findIndex(s => s.id === id);
     if (index === -1) {
@@ -289,17 +310,17 @@ export const settlementsHandlers = [
       case 'approve':
         mockVendorSettlements[index] = {
           ...mockVendorSettlements[index],
-          status: 'approved',
+          status: 'processing' as const,
           approvedAt: now,
           memo: data.memo
-        } as any;
+        };
         break;
       case 'reject':
         mockVendorSettlements[index] = {
           ...mockVendorSettlements[index],
-          status: 'rejected',
+          status: 'hold' as const,
           memo: data.memo
-        } as any;
+        };
         break;
       case 'complete':
         mockVendorSettlements[index] = {
@@ -308,7 +329,7 @@ export const settlementsHandlers = [
           completedAt: now,
           receiptUrl: `https://example.com/receipt/${id}`,
           memo: data.memo
-        } as any;
+        };
         break;
     }
     
@@ -335,7 +356,7 @@ export const settlementsHandlers = [
   }),
 
   // Get revenue charts
-  http.get(`${API_BASE}/v1/settlements/charts`, ({ request }: any) => {
+  http.get(`${API_BASE}/v1/settlements/charts`, ({ request }) => {
     const url = new URL(request.url);
     const range = url.searchParams.get('range') || '7days';
     
@@ -370,12 +391,19 @@ export const settlementsHandlers = [
     });
   }),
 
-  http.post(`${API_BASE}/v1/settlements/fee-policies`, async ({ request }: any) => {
-    const data = await request.json();
+  http.post(`${API_BASE}/v1/settlements/fee-policies`, async ({ request }) => {
+    const data = await request.json() as FeePolicyData;
     
     const newPolicy = {
       id: `policy-${Date.now()}`,
-      ...data,
+      name: data.name,
+      type: data.type,
+      baseRate: data.baseRate,
+      minFee: data.minFee || 0,
+      maxFee: data.maxFee || 0,
+      isActive: data.isActive ?? true,
+      conditions: data.conditions || [],
+      description: data.description || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -388,9 +416,9 @@ export const settlementsHandlers = [
     });
   }),
 
-  http.put(`${API_BASE}/v1/settlements/fee-policies/:id`, async ({ params, request }: any) => {
-    const { id } = params;
-    const data = await request.json();
+  http.put(`${API_BASE}/v1/settlements/fee-policies/:id`, async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const data = await request.json() as Partial<FeePolicyData>;
     
     const index = mockFeePolicies.findIndex(p => p.id === id);
     if (index === -1) {
@@ -412,8 +440,8 @@ export const settlementsHandlers = [
     });
   }),
 
-  http.delete(`${API_BASE}/v1/settlements/fee-policies/:id`, ({ params }: any) => {
-    const { id } = params;
+  http.delete(`${API_BASE}/v1/settlements/fee-policies/:id`, ({ params }) => {
+    const { id } = params as { id: string };
     
     const index = mockFeePolicies.findIndex(p => p.id === id);
     if (index === -1) {
@@ -431,9 +459,10 @@ export const settlementsHandlers = [
     });
   }),
 
-  http.patch(`${API_BASE}/v1/settlements/fee-policies/:id/toggle`, async ({ params, request }: any) => {
-    const { id } = params;
-    const { isActive } = await request.json();
+  http.patch(`${API_BASE}/v1/settlements/fee-policies/:id/toggle`, async ({ params, request }) => {
+    const { id } = params as { id: string };
+    const data = await request.json();
+    const { isActive } = data as { isActive: boolean };
     
     const index = mockFeePolicies.findIndex(p => p.id === id);
     if (index === -1) {
@@ -456,8 +485,9 @@ export const settlementsHandlers = [
   }),
 
   // Fee calculation
-  http.post(`${API_BASE}/v1/settlements/calculate-fee`, async ({ request }: any) => {
-    const { orderAmount, categoryId, vendorTier, paymentMethod } = await request.json();
+  http.post(`${API_BASE}/v1/settlements/calculate-fee`, async ({ request }) => {
+    const data = await request.json();
+    const { orderAmount, categoryId, vendorTier, paymentMethod } = data as FeeCalculationData;
     
     // Simulate fee calculation
     const platformFeeRate = vendorTier === 'vip' ? 4.0 : categoryId === 'electronics' ? 3.5 : 5.0;
@@ -497,7 +527,7 @@ export const settlementsHandlers = [
   }),
 
   // Settlement reports
-  http.get(`${API_BASE}/v1/settlements/reports`, ({ request }: any) => {
+  http.get(`${API_BASE}/v1/settlements/reports`, ({ request }) => {
     const url = new URL(request.url);
     const startDate = url.searchParams.get('startDate');
     const endDate = url.searchParams.get('endDate');
@@ -520,7 +550,7 @@ export const settlementsHandlers = [
   }),
 
   // Export settlement report
-  http.get(`${API_BASE}/v1/settlements/reports/export`, async ({ request }: any) => {
+  http.get(`${API_BASE}/v1/settlements/reports/export`, async ({ request }) => {
     const url = new URL(request.url);
     const format = url.searchParams.get('format') || 'excel';
     

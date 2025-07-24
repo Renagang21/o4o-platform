@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
-import type { Menu, MenuListResponse } from '@o4o/types';
+import type { Menu, MenuListResponse, MenuLocation } from '@o4o/types';
+import type { MenuCreateData, MenuUpdateData } from '../types';
 
 // Mock data
 const mockMenus: Menu[] = [
@@ -142,8 +143,9 @@ export const menuHandlers = [
   }),
 
   // Get single menu
-  http.get(`${API_BASE}/v1/menus/:id`, ({ params }: any) => {
-    const menu = menus.find(m => m.id === params.id);
+  http.get(`${API_BASE}/v1/menus/:id`, ({ params }) => {
+    const { id } = params as { id: string };
+    const menu = menus.find(m => m.id === id);
     if (!menu) {
       return HttpResponse.json({ error: 'Menu not found' }, { status: 404 });
     }
@@ -151,11 +153,14 @@ export const menuHandlers = [
   }),
 
   // Create menu
-  http.post(`${API_BASE}/v1/menus`, async ({ request }: any) => {
-    const data = await request.json() as any;
+  http.post(`${API_BASE}/v1/menus`, async ({ request }) => {
+    const data = await request.json() as MenuCreateData;
     const newMenu: Menu = {
       id: `menu-${Date.now()}`,
-      ...data,
+      name: data.name,
+      location: (data.location || 'primary') as MenuLocation,
+      items: data.items || [],
+      isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -165,9 +170,10 @@ export const menuHandlers = [
   }),
 
   // Update menu
-  http.put(`${API_BASE}/v1/menus/:id`, async ({ params, request }: any) => {
-    const data = await request.json() as any;
-    const index = menus.findIndex(m => m.id === params.id);
+  http.put(`${API_BASE}/v1/menus/:id`, async ({ params, request }) => {
+    const data = await request.json() as MenuUpdateData;
+    const { id } = params as { id: string };
+    const index = menus.findIndex(m => m.id === id);
     
     if (index === -1) {
       return HttpResponse.json({ error: 'Menu not found' }, { status: 404 });
@@ -175,7 +181,9 @@ export const menuHandlers = [
     
     menus[index] = {
       ...menus[index],
-      ...data,
+      name: data.name || menus[index].name,
+      location: (data.location as MenuLocation) || menus[index].location,
+      items: data.items || menus[index].items,
       updatedAt: new Date(),
     };
     
@@ -183,8 +191,9 @@ export const menuHandlers = [
   }),
 
   // Delete menu
-  http.delete(`${API_BASE}/v1/menus/:id`, ({ params }: any) => {
-    const index = menus.findIndex(m => m.id === params.id);
+  http.delete(`${API_BASE}/v1/menus/:id`, ({ params }) => {
+    const { id } = params as { id: string };
+    const index = menus.findIndex(m => m.id === id);
     
     if (index === -1) {
       return HttpResponse.json({ error: 'Menu not found' }, { status: 404 });

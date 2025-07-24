@@ -298,7 +298,7 @@ export const platformAppsHandlers = [
     // Update app status
     mockPlatformApps[appIndex] = {
       ...app,
-      status: status as any,
+      status: status as 'active' | 'inactive' | 'error' | 'maintenance',
       lastUpdated: new Date().toISOString(),
       metrics: status === 'active' ? {
         ...app.metrics,
