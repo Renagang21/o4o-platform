@@ -241,6 +241,16 @@ jobs:
           apps/admin-dashboard/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/admin.neture.co.kr/
           
+    - name: Ensure deployment directory exists with correct permissions
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          # 디렉토리 생성 및 권한 설정
+          mkdir -p ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
+          chmod 755 ${{ env.DEPLOY_PATH }}/apps
+          chmod 755 ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
+          echo 'Deployment directory prepared'
+        "
+        
     - name: Deploy application files
       run: |
         rsync -avz --delete \
@@ -296,13 +306,18 @@ jobs:
     - name: Set secure file permissions
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
-          
-          # 보안 강화된 권한 설정
-          chmod -R 640 .
-          chmod -R +X .
-          chmod 644 package*.json
-          chmod -R 644 dist/
+          # 디렉토리 존재 확인
+          if [ -d '${{ env.DEPLOY_PATH }}/apps/admin-dashboard' ]; then
+            cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
+            
+            # 보안 강화된 권한 설정
+            chmod -R 644 .
+            find . -type d -exec chmod 755 {} \;
+            if [ -f package.json ]; then chmod 644 package*.json; fi
+            if [ -d dist ]; then chmod -R 644 dist/ && find dist -type d -exec chmod 755 {} \;; fi
+          else
+            echo 'Warning: admin-dashboard directory does not exist'
+          fi
           
           # 로그 디렉토리 권한
           mkdir -p ${{ env.DEPLOY_PATH }}/logs
