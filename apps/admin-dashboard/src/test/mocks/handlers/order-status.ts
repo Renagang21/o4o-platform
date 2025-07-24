@@ -434,7 +434,7 @@ export const orderStatusHandlers = [
       changedAt: now,
       changedBy: 'admin',
       reason: data.reason || '관리자 상태 변경',
-      notes: data.notes
+      notes: data.notes || ''
     };
 
     // Update order
@@ -445,7 +445,7 @@ export const orderStatusHandlers = [
       trackingNumber: data.trackingNumber || order.trackingNumber,
       estimatedDelivery: data.estimatedDelivery || order.estimatedDelivery,
       statusHistory: [...(order.statusHistory || []), newHistoryEntry]
-    };
+    } as any;
 
     return HttpResponse.json({
       success: true,
@@ -494,9 +494,8 @@ export const orderStatusHandlers = [
       ...order,
       status: 'refunded',
       updatedAt: now,
-      refundInfo,
       statusHistory: [...(order.statusHistory || []), newHistoryEntry]
-    };
+    } as any;
 
     return HttpResponse.json({
       success: true,

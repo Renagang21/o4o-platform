@@ -166,7 +166,7 @@ export const crowdfundingHandlers = [
 
   // Get single project
   http.get(`${API_BASE}/v1/crowdfunding-simple/projects/:id`, ({ params }) => {
-    const project = mockProjects.find(p => p.id === params.id);
+    const project = mockProjects.find(p => p.id === (params.id as string));
     
     if (!project) {
       return HttpResponse.json(
@@ -269,7 +269,7 @@ export const crowdfundingHandlers = [
 
   // Join project
   http.post(`${API_BASE}/v1/crowdfunding-simple/projects/:id/join`, ({ params }) => {
-    const { id: projectId } = params;
+    const projectId = params.id as string;
     const vendorId = 'current-vendor-id'; // 실제로는 토큰에서 가져옴
     
     const project = mockProjects.find(p => p.id === projectId);
@@ -316,7 +316,7 @@ export const crowdfundingHandlers = [
 
   // Cancel participation
   http.post(`${API_BASE}/v1/crowdfunding-simple/projects/:id/cancel`, ({ params }) => {
-    const { id: projectId } = params;
+    const projectId = params.id as string;
     const vendorId = 'current-vendor-id'; // 실제로는 토큰에서 가져옴
     
     const participation = mockParticipations.find(

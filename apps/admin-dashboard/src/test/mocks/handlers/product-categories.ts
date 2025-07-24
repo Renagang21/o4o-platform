@@ -330,7 +330,7 @@ export const productCategoryHandlers = [
 
   // Reorder categories
   http.post(`${API_BASE}/v1/ecommerce/categories/reorder`, async ({ request }: any) => {
-    const { orderedIds } = await request.json();
+    await request.json();
     
     // In a real implementation, this would update the order field
     // For now, just return success

@@ -34,7 +34,7 @@ const AffiliatePerformanceDashboard = () => {
       const mockAffiliate: AffiliateUser = {
         id: '1',
         userId: user?.id || '',
-        affiliateCode: 'KIM123ABC',
+        referralCode: 'KIM123ABC',
         status: 'active',
         joinedAt: new Date('2024-01-15'),
         totalClicks: 3456,

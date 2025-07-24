@@ -263,7 +263,7 @@ export const tossPaymentsHandlers = [
       executedAt: new Date().toISOString()
     };
 
-    mockTests.unshift(newTest); // Add to beginning of array
+    mockTests.unshift(newTest as any); // Add to beginning of array
 
     // Keep only latest 50 tests
     if (mockTests.length > 50) {
@@ -510,8 +510,7 @@ export const tossPaymentsHandlers = [
           status: 'failed',
           processedAt: now,
           adminNote: data.adminNote,
-          cancelReason: '토스페이먼츠 API 오류'
-        };
+        } as any;
 
         return HttpResponse.json({
           success: false,
@@ -525,7 +524,7 @@ export const tossPaymentsHandlers = [
         status: 'rejected',
         processedAt: now,
         adminNote: data.adminNote
-      };
+      } as any;
 
       return HttpResponse.json({
         success: true,
@@ -579,13 +578,12 @@ export const tossPaymentsHandlers = [
             completedAt: new Date().toISOString(),
             tossRefundKey: `refund_retry_${Date.now()}`,
             receiptUrl: `https://dashboard.tosspayments.com/receipt/refund_retry_${Date.now()}`
-          };
+          } as any;
         } else {
           mockRefunds[updatedRefundIndex] = {
             ...mockRefunds[updatedRefundIndex],
-            status: 'failed',
-            cancelReason: '토스페이먼츠 재시도 실패'
-          };
+            status: 'failed'
+          } as any;
         }
       }
     }, 3000);

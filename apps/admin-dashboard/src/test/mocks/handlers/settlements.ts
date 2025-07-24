@@ -260,7 +260,7 @@ export const settlementsHandlers = [
           status: 'approved',
           approvedAt: new Date().toISOString(),
           memo
-        };
+        } as any;
       }
     });
     
@@ -292,14 +292,14 @@ export const settlementsHandlers = [
           status: 'approved',
           approvedAt: now,
           memo: data.memo
-        };
+        } as any;
         break;
       case 'reject':
         mockVendorSettlements[index] = {
           ...mockVendorSettlements[index],
           status: 'rejected',
           memo: data.memo
-        };
+        } as any;
         break;
       case 'complete':
         mockVendorSettlements[index] = {
@@ -308,7 +308,7 @@ export const settlementsHandlers = [
           completedAt: now,
           receiptUrl: `https://example.com/receipt/${id}`,
           memo: data.memo
-        };
+        } as any;
         break;
     }
     
@@ -501,7 +501,7 @@ export const settlementsHandlers = [
     const url = new URL(request.url);
     const startDate = url.searchParams.get('startDate');
     const endDate = url.searchParams.get('endDate');
-    const type = url.searchParams.get('type') || 'summary';
+    url.searchParams.get('type');
     
     // Customize report based on parameters
     let reportData = { ...mockSettlementReport };

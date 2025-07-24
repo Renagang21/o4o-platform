@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index, ForeignKey } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
 
 export class CreateCrowdfundingTables1737724800000 implements MigrationInterface {
     name = 'CreateCrowdfundingTables1737724800000';
@@ -160,7 +160,7 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
         // Create foreign keys
         await queryRunner.createForeignKey(
             'crowdfunding_projects',
-            new ForeignKey({
+            new TableForeignKey({
                 columnNames: ['creator_id'],
                 referencedColumnNames: ['id'],
                 referencedTableName: 'users',
@@ -170,7 +170,7 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
 
         await queryRunner.createForeignKey(
             'crowdfunding_participations',
-            new ForeignKey({
+            new TableForeignKey({
                 columnNames: ['project_id'],
                 referencedColumnNames: ['id'],
                 referencedTableName: 'crowdfunding_projects',
@@ -180,7 +180,7 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
 
         await queryRunner.createForeignKey(
             'crowdfunding_participations',
-            new ForeignKey({
+            new TableForeignKey({
                 columnNames: ['vendor_id'],
                 referencedColumnNames: ['id'],
                 referencedTableName: 'users',
