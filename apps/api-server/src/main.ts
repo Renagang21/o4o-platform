@@ -34,6 +34,7 @@ import settingsRoutes from './routes/settingsRoutes';
 import crowdfundingRoutes from './routes/crowdfunding';
 import linkedAccountsRoutes from './routes/linked-accounts';
 import vendorRoutes from './routes/vendor';
+import formsRoutes from './routes/forms';
 
 // 환경변수 로드
 dotenv.config();
@@ -172,6 +173,7 @@ app.use('/api/crowdfunding', crowdfundingRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/settings', settingsRoutes);
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
+app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api', contentRoutes);
 
 // 헬스체크 엔드포인트
@@ -205,7 +207,8 @@ app.get('/', (req, res) => {
         media: '/api/admin/media',
         templates: '/api/admin/templates',
         customFields: '/api/admin/custom-field-groups'
-      }
+      },
+      forms: '/api/forms'
     },
     frontend: process.env.FRONTEND_URL || 'http://localhost:3011'
   });

@@ -15,6 +15,7 @@ export * from './advanced-custom-fields';
 export * from './media';
 export * from './template';
 export * from './widget';
+export * from './form-builder';
 
 // Export ecommerce types
 export * from './ecommerce';

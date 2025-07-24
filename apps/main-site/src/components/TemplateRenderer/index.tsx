@@ -10,8 +10,10 @@ import SpacerBlock from './blocks/SpacerBlock';
 import ShortcodeBlock from './blocks/ShortcodeBlock';
 import ErrorBlock from './blocks/ErrorBlock';
 import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
+import { SpectraFormBlock, SpectraViewBlock } from './blocks/SpectraFormBlocks';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
+import { formShortcodes } from '@/components/shortcodes/formShortcodes';
 
 // Block component mapping
 const blockComponents: Record<string, React.ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
@@ -30,10 +32,13 @@ const blockComponents: Record<string, React.ComponentType<{ block: TemplateBlock
   'uagb/pricing-table': PricingTableBlock,
   'uagb/testimonial': TestimonialBlock,
   'uagb/info-box': InfoBoxBlock,
+  'uagb/form': SpectraFormBlock,
+  'uagb/view': SpectraViewBlock,
 };
 
-// Register product shortcodes on initialization
+// Register shortcodes on initialization
 shortcodeParser.registerMany(productShortcodes);
+shortcodeParser.registerMany(formShortcodes);
 
 interface TemplateRendererProps {
   blocks: TemplateBlock[];
