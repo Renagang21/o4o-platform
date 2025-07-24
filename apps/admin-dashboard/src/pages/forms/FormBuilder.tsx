@@ -9,7 +9,6 @@ import {
   Settings,
   Eye,
   Copy,
-  Trash2,
   Code,
   Mail,
   FileText,

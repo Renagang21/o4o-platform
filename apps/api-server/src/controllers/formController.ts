@@ -346,8 +346,8 @@ export const formController = {
             html: message,
             from: notification.fromEmail ? `${notification.fromName || ''} <${notification.fromEmail}>` : undefined,
             replyTo: notification.replyTo,
-            cc: notification.cc,
-            bcc: notification.bcc
+            cc: notification.cc ? notification.cc.split(',').map(e => e.trim()).filter(Boolean) : undefined,
+            bcc: notification.bcc ? notification.bcc.split(',').map(e => e.trim()).filter(Boolean) : undefined
           });
         } catch (emailError) {
           console.error('Failed to send notification email:', emailError);
