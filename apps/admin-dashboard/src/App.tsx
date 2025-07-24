@@ -3,14 +3,17 @@ import { AuthProvider, AdminProtectedRoute, SessionManager } from '@o4o/auth-con
 import { AuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { DevAuthProvider } from '@/lib/DevAuthProvider';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useAuthStore } from '@/stores/authStore';
+import { ssoService } from '@/api/sso';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
 
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
-const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
 const UsersList = lazy(() => import('@/pages/Users/UsersList'));
 const UserCreate = lazy(() => import('@/pages/Users/UserCreate'));
@@ -30,7 +33,33 @@ const HomepageEditor = lazy(() => import('@/pages/templates/HomepageEditor'));
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
+const TestPage = lazy(() => import('@/pages/test/TestPage'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
+
+// Vendor Management Pages
+const VendorsList = lazy(() => import('@/pages/vendors/VendorsList'));
+const VendorsPending = lazy(() => import('@/pages/vendors/VendorsPending'));
+const VendorsCommission = lazy(() => import('@/pages/vendors/VendorsCommission'));
+const VendorsReports = lazy(() => import('@/pages/vendors/VendorsReports'));
+
+// Affiliate Management Pages
+const AffiliatePartners = lazy(() => import('@/pages/affiliate/AffiliatePartners'));
+const AffiliateLinks = lazy(() => import('@/pages/affiliate/AffiliateLinks'));
+const AffiliateCommission = lazy(() => import('@/pages/affiliate/AffiliateCommission'));
+const AffiliateAnalytics = lazy(() => import('@/pages/affiliate/AffiliateAnalytics'));
+
+// App Pages
+const ForumApp = lazy(() => import('@/pages/apps/ForumApp'));
+const SignageApp = lazy(() => import('@/pages/apps/SignageApp'));
+const CrowdfundingApp = lazy(() => import('@/pages/apps/CrowdfundingApp'));
+const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
+
+// User Management Pages
+const RolePermissions = lazy(() => import('@/pages/users/RolePermissions'));
+
+// UI Showcase
+const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
+const GutenbergPage = lazy(() => import('@/pages/test/GutenbergPage'));
 
 // Loading component
 const PageLoader = () => (
@@ -49,6 +78,27 @@ const ssoClient = new AuthClient(
  * SSO 인증 시스템 통합
  */
 function App() {
+  const checkSSOSession = useAuthStore(state => state.checkSSOSession);
+  
+  // Initialize SSO on app start
+  useEffect(() => {
+    // Check SSO session if not using mock
+    if (import.meta.env.VITE_USE_MOCK !== 'true') {
+      checkSSOSession();
+      
+      // Start SSO session monitoring
+      ssoService.startSessionCheck((isAuthenticated) => {
+        if (!isAuthenticated) {
+          toast.error('Session expired. Please log in again.');
+        }
+      });
+      
+      return () => {
+        ssoService.stopSessionCheck();
+      };
+    }
+  }, [checkSSOSession]);
+  
   // 인증 오류 처리
   const handleAuthError = (error: string) => {
     console.error('Auth error:', error);
@@ -81,19 +131,21 @@ function App() {
   const AuthProviderComponent = import.meta.env.DEV ? DevAuthProvider : AuthProvider;
   
   return (
-    <AuthProviderComponent 
-      {...(!import.meta.env.DEV ? {
-        ssoClient,
-        autoRefresh: true,
-        onAuthError: handleAuthError,
-        onSessionExpiring: handleSessionExpiring
-      } : {})}
-    >
-      <SessionManager
-        warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
-        onSessionExpiring={handleSessionExpiring}
-      >
-        <Routes>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProviderComponent 
+          {...(!import.meta.env.DEV ? {
+            ssoClient,
+            autoRefresh: true,
+            onAuthError: handleAuthError,
+            onSessionExpiring: handleSessionExpiring
+          } : {})}
+        >
+          <SessionManager
+            warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
+            onSessionExpiring={handleSessionExpiring}
+          >
+            <Routes>
             {/* 공개 라우트 - 로그인 페이지 */}
             <Route path="/login" element={
               <Suspense fallback={<PageLoader />}>
@@ -109,11 +161,7 @@ function App() {
               >
                 <AdminLayout>
                   <Routes>
-                    <Route path="/" element={
-                      <Suspense fallback={<PageLoader />}>
-                        <AdminHome />
-                      </Suspense>
-                    } />
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={
                       <Suspense fallback={<PageLoader />}>
                         <Dashboard />
@@ -128,10 +176,26 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    <Route path="/users/create" element={
+                    <Route path="/users/new" element={
                       <AdminProtectedRoute requiredPermissions={['users:create']}>
                         <Suspense fallback={<PageLoader />}>
                           <UserCreate />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/users/profile" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserDetail />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/users/roles" element={
+                      <AdminProtectedRoute requiredPermissions={['users:update']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <RolePermissions />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -150,11 +214,27 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 콘텐츠 관리 */}
-                    <Route path="/content/*" element={
+                    {/* 글 관리 */}
+                    <Route path="/posts/*" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Content />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 카테고리 & 태그 */}
+                    <Route path="/posts/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Categories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/posts/tags" element={
+                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Categories />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -168,11 +248,27 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 홈페이지 편집기 */}
-                    <Route path="/homepage-editor" element={
+                    {/* 테마 관리 */}
+                    <Route path="/themes/*" element={
                       <AdminProtectedRoute requiredPermissions={['templates:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <HomepageEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/themes/customize" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <HomepageEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/themes/menus" element={
+                      <AdminProtectedRoute requiredPermissions={['menus:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Menus />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -186,8 +282,8 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 이커머스 관리 */}
-                    <Route path="/products" element={
+                    {/* E-commerce 관리 */}
+                    <Route path="/ecommerce/products" element={
                       <AdminProtectedRoute requiredPermissions={['products:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Products />
@@ -195,7 +291,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/products/new" element={
+                    <Route path="/ecommerce/products/new" element={
                       <AdminProtectedRoute requiredPermissions={['products:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <ProductForm />
@@ -203,7 +299,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/products/:id/edit" element={
+                    <Route path="/ecommerce/products/:id/edit" element={
                       <AdminProtectedRoute requiredPermissions={['products:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <ProductForm />
@@ -211,17 +307,25 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/orders" element={
+                    <Route path="/ecommerce/orders" element={
                       <AdminProtectedRoute requiredPermissions={['orders:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Orders />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    <Route path="/orders/:id" element={
+                    <Route path="/ecommerce/orders/:id" element={
                       <AdminProtectedRoute requiredPermissions={['orders:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <OrderDetail />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/reports" element={
+                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Analytics />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -235,29 +339,130 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 카테고리 & 태그 */}
-                    <Route path="/categories" element={
-                      <AdminProtectedRoute requiredPermissions={['categories:read']}>
+                    {/* 판매자/공급자 관리 */}
+                    <Route path="/vendors" element={
+                      <AdminProtectedRoute requiredPermissions={['vendors:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Categories />
+                          <VendorsList />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/vendors/pending" element={
+                      <AdminProtectedRoute requiredPermissions={['vendors:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <VendorsPending />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/vendors/commission" element={
+                      <AdminProtectedRoute requiredPermissions={['vendors:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <VendorsCommission />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/vendors/reports" element={
+                      <AdminProtectedRoute requiredPermissions={['vendors:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <VendorsReports />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 메뉴 관리 */}
-                    <Route path="/menus/*" element={
-                      <AdminProtectedRoute requiredPermissions={['menus:read']}>
+                    {/* 제휴 마케팅 */}
+                    <Route path="/affiliate/partners" element={
+                      <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Menus />
+                          <AffiliatePartners />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/affiliate/links" element={
+                      <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliateLinks />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/affiliate/commission" element={
+                      <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliateCommission />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/affiliate/analytics" element={
+                      <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AffiliateAnalytics />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 커스텀 필드 */}
-                    <Route path="/custom-fields/*" element={
+                    {/* CPT & ACF */}
+                    <Route path="/cpt" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Content />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/acf" element={
                       <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <CustomFields />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/acf/groups" element={
+                      <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CustomFields />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 메일 관리 */}
+                    <Route path="/mail/*" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Settings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Forum, Signage, Crowdfunding */}
+                    <Route path="/forum" element={
+                      <AdminProtectedRoute requiredPermissions={['forum:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ForumApp />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/signage" element={
+                      <AdminProtectedRoute requiredPermissions={['signage:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SignageApp />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/crowdfunding" element={
+                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CrowdfundingApp />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 도구 */}
+                    <Route path="/tools" element={
+                      <AdminProtectedRoute requiredPermissions={['tools:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ToolsPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -280,6 +485,33 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
+                    {/* 테스트 페이지 */}
+                    <Route path="/test" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TestPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Gutenberg Editor */}
+                    <Route path="/gutenberg" element={
+                      <AdminProtectedRoute requiredPermissions={['content:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <GutenbergPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* UI Showcase */}
+                    <Route path="/ui-showcase" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UIShowcase />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
                     {/* 404 핸들링 */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
@@ -289,6 +521,8 @@ function App() {
         </Routes>
       </SessionManager>
     </AuthProviderComponent>
+    </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

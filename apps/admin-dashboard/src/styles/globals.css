@@ -7,49 +7,192 @@
 
 @layer base {
   :root {
-    /* WordPress Color Scheme */
-    --wp-color-primary: #0073aa;
-    --wp-color-primary-dark: #005177;
-    --wp-color-primary-light: #00a0d2;
-    --wp-color-success: #46b450;
-    --wp-color-warning: #ffb900;
-    --wp-color-error: #d63638;
-    --wp-color-info: #00a0d2;
+    /* Primary Colors - Modern Blue/Purple Gradient */
+    --primary-50: #e8f2ff;
+    --primary-100: #c4deff;
+    --primary-200: #9cc9ff;
+    --primary-300: #72b4ff;
+    --primary-400: #4ea3ff;
+    --primary-500: #2693ff; /* Main Primary */
+    --primary-600: #1a85f0;
+    --primary-700: #0073df;
+    --primary-800: #0062c7;
+    --primary-900: #0045a1;
+
+    /* Secondary - Modern Purple */
+    --secondary-50: #f3e8ff;
+    --secondary-100: #e2c6ff;
+    --secondary-200: #d1a3ff;
+    --secondary-300: #c180ff;
+    --secondary-400: #b264ff;
+    --secondary-500: #a548ff; /* Main Secondary */
+    --secondary-600: #9836f2;
+    --secondary-700: #8620e0;
+    --secondary-800: #7400cd;
+    --secondary-900: #5500aa;
+
+    /* Neutral Colors - For Light Mode */
+    --neutral-0: #ffffff;
+    --neutral-50: #f8fafc;
+    --neutral-100: #f1f5f9;
+    --neutral-200: #e2e8f0;
+    --neutral-300: #cbd5e1;
+    --neutral-400: #94a3b8;
+    --neutral-500: #64748b;
+    --neutral-600: #475569;
+    --neutral-700: #334155;
+    --neutral-800: #1e293b;
+    --neutral-900: #0f172a;
+    --neutral-950: #020617;
+
+    /* Success Colors */
+    --success-50: #e6fbf3;
+    --success-100: #c1f5df;
+    --success-200: #97eec9;
+    --success-300: #66e5af;
+    --success-400: #2dda8f;
+    --success-500: #00cc6a; /* Main Success */
+    --success-600: #00b85f;
+    --success-700: #00a352;
+    --success-800: #008e45;
+    --success-900: #007336;
+
+    /* Warning Colors */
+    --warning-50: #fffbea;
+    --warning-100: #fff5c4;
+    --warning-200: #ffec99;
+    --warning-300: #ffe066;
+    --warning-400: #ffd133;
+    --warning-500: #ffc107; /* Main Warning */
+    --warning-600: #f5b800;
+    --warning-700: #e0a800;
+    --warning-800: #cc9900;
+    --warning-900: #a67c00;
+
+    /* Error Colors */
+    --error-50: #ffebe9;
+    --error-100: #ffccc7;
+    --error-200: #ffa8a0;
+    --error-300: #ff8176;
+    --error-400: #ff5449;
+    --error-500: #ff1e1e; /* Main Error */
+    --error-600: #f50014;
+    --error-700: #e00013;
+    --error-800: #cc0012;
+    --error-900: #a60010;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
+    --gradient-dark: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-950) 100%);
+    --gradient-light: linear-gradient(135deg, var(--neutral-0) 0%, var(--neutral-100) 100%);
+
+    /* Semantic Colors - Light Mode */
+    --bg-primary: var(--neutral-0);
+    --bg-secondary: var(--neutral-50);
+    --bg-tertiary: var(--neutral-100);
+    --bg-inverse: var(--neutral-900);
     
-    /* WordPress Admin Colors */
-    --wp-admin-blue: #0073aa;
-    --wp-admin-blue-dark: #005177;
-    --wp-admin-blue-light: #00a0d2;
-    --wp-admin-red: #d63638;
-    --wp-admin-green: #46b450;
-    --wp-admin-orange: #ffb900;
-    --wp-admin-purple: #826eb4;
-    --wp-admin-gray: #646970;
-    --wp-admin-gray-light: #dcdcde;
-    --wp-admin-gray-dark: #3c434a;
+    --text-primary: var(--neutral-900);
+    --text-secondary: var(--neutral-600);
+    --text-tertiary: var(--neutral-500);
+    --text-inverse: var(--neutral-0);
     
-    /* WordPress Sidebar Colors */
-    --wp-sidebar-bg: #23282d;
-    --wp-sidebar-text: #a7aaad;
-    --wp-sidebar-hover: #32373c;
-    --wp-sidebar-active: #0073aa;
-    --wp-sidebar-border: #3c434a;
+    --border-primary: var(--neutral-200);
+    --border-secondary: var(--neutral-300);
+    --border-focus: var(--primary-500);
     
-    /* WordPress Background Colors */
-    --wp-bg-primary: #f6f7f7;
-    --wp-bg-secondary: #ffffff;
-    --wp-bg-tertiary: #f0f0f1;
+    /* Admin Bar - Modern Dark */
+    --admin-bar-bg: var(--neutral-950);
+    --admin-bar-text: var(--neutral-100);
+    --admin-bar-hover: rgba(255, 255, 255, 0.1);
+    --admin-bar-active: rgba(255, 255, 255, 0.2);
     
-    /* WordPress Text Colors */
-    --wp-text-primary: #1d2327;
-    --wp-text-secondary: #646970;
-    --wp-text-tertiary: #a7aaad;
-    --wp-text-white: #ffffff;
+    /* Sidebar */
+    --sidebar-bg: var(--neutral-50);
+    --sidebar-text: var(--neutral-700);
+    --sidebar-hover: var(--neutral-100);
+    --sidebar-active-bg: var(--primary-500);
+    --sidebar-active-text: var(--neutral-0);
     
-    /* WordPress Border Colors */
-    --wp-border-primary: #c3c4c7;
-    --wp-border-secondary: #dcdcde;
-    --wp-border-tertiary: #f0f0f1;
+    /* Components */
+    --card-bg: var(--neutral-0);
+    --card-border: var(--neutral-200);
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Buttons */
+    --btn-primary-bg: var(--primary-500);
+    --btn-primary-text: var(--neutral-0);
+    --btn-primary-hover: var(--primary-600);
+    --btn-primary-active: var(--primary-700);
+    
+    --btn-secondary-bg: var(--neutral-0);
+    --btn-secondary-text: var(--neutral-700);
+    --btn-secondary-border: var(--neutral-300);
+    --btn-secondary-hover: var(--neutral-50);
+    --btn-secondary-active: var(--neutral-100);
+    
+    /* Forms */
+    --input-bg: var(--neutral-0);
+    --input-border: var(--neutral-300);
+    --input-focus-border: var(--primary-500);
+    --input-text: var(--neutral-900);
+    --input-placeholder: var(--neutral-500);
+    
+    /* Tables */
+    --table-bg: var(--neutral-0);
+    --table-hover: var(--neutral-50);
+    --table-stripe: var(--neutral-50);
+    --table-border: var(--neutral-200);
+    
+    /* Transitions */
+    --transition-fast: 150ms ease-in-out;
+    --transition-normal: 200ms ease-in-out;
+    --transition-slow: 300ms ease-in-out;
+    
+    /* WordPress Legacy Support (mapped to modern colors) */
+    --wp-color-primary: var(--primary-500);
+    --wp-color-primary-dark: var(--primary-700);
+    --wp-color-primary-light: var(--primary-300);
+    --wp-color-success: var(--success-500);
+    --wp-color-warning: var(--warning-500);
+    --wp-color-error: var(--error-500);
+    --wp-color-info: var(--primary-400);
+    
+    /* WordPress Admin Colors (mapped) */
+    --wp-admin-blue: var(--primary-500);
+    --wp-admin-blue-dark: var(--primary-700);
+    --wp-admin-blue-light: var(--primary-300);
+    --wp-admin-red: var(--error-500);
+    --wp-admin-green: var(--success-500);
+    --wp-admin-orange: var(--warning-500);
+    --wp-admin-purple: var(--secondary-500);
+    --wp-admin-gray: var(--neutral-500);
+    --wp-admin-gray-light: var(--neutral-300);
+    --wp-admin-gray-dark: var(--neutral-700);
+    
+    /* WordPress Sidebar Colors (mapped) */
+    --wp-sidebar-bg: var(--sidebar-bg);
+    --wp-sidebar-text: var(--sidebar-text);
+    --wp-sidebar-hover: var(--sidebar-hover);
+    --wp-sidebar-active: var(--sidebar-active-bg);
+    --wp-sidebar-border: var(--border-primary);
+    
+    /* WordPress Background Colors (mapped) */
+    --wp-bg-primary: var(--bg-secondary);
+    --wp-bg-secondary: var(--bg-primary);
+    --wp-bg-tertiary: var(--bg-tertiary);
+    
+    /* WordPress Text Colors (mapped) */
+    --wp-text-primary: var(--text-primary);
+    --wp-text-secondary: var(--text-secondary);
+    --wp-text-tertiary: var(--text-tertiary);
+    --wp-text-white: var(--text-inverse);
+    
+    /* WordPress Border Colors (mapped) */
+    --wp-border-primary: var(--border-primary);
+    --wp-border-secondary: var(--border-secondary);
+    --wp-border-tertiary: var(--border-primary);
     
     /* Legacy Shadcn/ui variables for compatibility */
     --background: 0 0% 100%;
@@ -74,7 +217,78 @@
     --radius: 0.5rem;
   }
 
-  .dark {
+  /* Dark Mode */
+  [data-theme="dark"] {
+    /* Semantic Colors - Dark Mode */
+    --bg-primary: var(--neutral-950);
+    --bg-secondary: var(--neutral-900);
+    --bg-tertiary: var(--neutral-800);
+    --bg-inverse: var(--neutral-0);
+    
+    --text-primary: var(--neutral-100);
+    --text-secondary: var(--neutral-400);
+    --text-tertiary: var(--neutral-500);
+    --text-inverse: var(--neutral-900);
+    
+    --border-primary: var(--neutral-800);
+    --border-secondary: var(--neutral-700);
+    --border-focus: var(--primary-400);
+    
+    /* Admin Bar - Dark Mode */
+    --admin-bar-bg: var(--neutral-900);
+    --admin-bar-text: var(--neutral-100);
+    --admin-bar-hover: rgba(255, 255, 255, 0.1);
+    --admin-bar-active: rgba(255, 255, 255, 0.2);
+    
+    /* Sidebar - Dark Mode */
+    --sidebar-bg: var(--neutral-900);
+    --sidebar-text: var(--neutral-300);
+    --sidebar-hover: var(--neutral-800);
+    --sidebar-active-bg: var(--primary-600);
+    --sidebar-active-text: var(--neutral-0);
+    
+    /* Components - Dark Mode */
+    --card-bg: var(--neutral-900);
+    --card-border: var(--neutral-800);
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    
+    /* Buttons - Dark Mode */
+    --btn-primary-bg: var(--primary-600);
+    --btn-primary-text: var(--neutral-0);
+    --btn-primary-hover: var(--primary-700);
+    --btn-primary-active: var(--primary-800);
+    
+    --btn-secondary-bg: var(--neutral-800);
+    --btn-secondary-text: var(--neutral-200);
+    --btn-secondary-border: var(--neutral-700);
+    --btn-secondary-hover: var(--neutral-700);
+    --btn-secondary-active: var(--neutral-600);
+    
+    /* Forms - Dark Mode */
+    --input-bg: var(--neutral-900);
+    --input-border: var(--neutral-700);
+    --input-focus-border: var(--primary-400);
+    --input-text: var(--neutral-100);
+    --input-placeholder: var(--neutral-500);
+    
+    /* Tables - Dark Mode */
+    --table-bg: var(--neutral-900);
+    --table-hover: var(--neutral-800);
+    --table-stripe: var(--neutral-850);
+    --table-border: var(--neutral-800);
+    
+    /* WordPress Dark Mode Mappings */
+    --wp-bg-primary: var(--bg-secondary);
+    --wp-bg-secondary: var(--bg-primary);
+    --wp-bg-tertiary: var(--bg-tertiary);
+    --wp-text-primary: var(--text-primary);
+    --wp-text-secondary: var(--text-secondary);
+    --wp-text-tertiary: var(--text-tertiary);
+    --wp-border-primary: var(--border-primary);
+    --wp-border-secondary: var(--border-secondary);
+    
+    /* Legacy Shadcn/ui variables for compatibility */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -101,15 +315,22 @@
 @layer base {
   * {
     @apply border-wp-border-secondary;
+    transition: background-color var(--transition-normal),
+                color var(--transition-normal),
+                border-color var(--transition-normal),
+                box-shadow var(--transition-normal);
   }
   
   body {
-    @apply bg-wp-bg-primary font-sans;
+    @apply font-sans;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-wp-text-primary;
+    @apply font-semibold;
+    color: var(--text-primary);
   }
 }
 
@@ -175,15 +396,24 @@
   
   /* WordPress-style cards */
   .wp-card {
-    @apply bg-white border border-wp-border-secondary rounded-lg shadow-sm;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    @apply rounded-lg;
+  }
+  
+  .wp-card:hover {
+    box-shadow: var(--card-shadow-hover);
   }
   
   .wp-card-header {
-    @apply px-6 py-4 border-b border-wp-border-secondary;
+    @apply px-6 py-4;
+    border-bottom: 1px solid var(--border-primary);
   }
   
   .wp-card-title {
-    @apply text-lg font-semibold text-wp-text-primary;
+    @apply text-lg font-semibold;
+    color: var(--text-primary);
   }
   
   .wp-card-body {
@@ -211,23 +441,65 @@
     @apply wp-notice bg-blue-50 border-blue-400 text-blue-800;
   }
   
+  /* WordPress Admin Bar */
+  .admin-bar {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    background: var(--admin-bar-bg);
+    color: var(--admin-bar-text);
+  }
+
   /* Sidebar styles */
   .admin-sidebar {
-    @apply bg-sidebar-bg text-sidebar-text;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    top: 32px; /* Height of admin bar */
+    height: calc(100vh - 32px);
   }
   
   .admin-sidebar-item {
-    @apply flex items-center px-4 py-3 text-sm hover:bg-sidebar-hover;
-    @apply transition-colors duration-200;
+    @apply flex items-center px-2 py-1 text-[13px] transition-colors duration-200 relative justify-between;
+    color: var(--sidebar-text);
+  }
+  
+  .admin-sidebar-item:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--modern-primary);
   }
   
   .admin-sidebar-item.active {
-    @apply bg-sidebar-active text-white;
+    background: var(--sidebar-active-bg);
+    color: white;
+  }
+  
+  .admin-sidebar-item.active:hover {
+    background: var(--sidebar-active-bg);
+    color: white;
   }
   
   .admin-sidebar-item.active::before {
     content: '';
-    @apply absolute left-0 w-1 h-full bg-white;
+    @apply absolute right-0 top-0 w-0 h-0 border-t-[13px] border-t-transparent border-b-[13px] border-b-transparent border-r-[8px];
+    border-right-color: var(--modern-bg-primary);
+  }
+
+  /* Main content area positioning */
+  .wordpress-admin-content {
+    margin-left: 160px;
+    margin-top: 32px; /* Height of admin bar */
+    min-height: calc(100vh - 32px);
+    transition: margin-left 0.3s ease-in-out;
+  }
+
+  /* When sidebar is collapsed */
+  body[data-sidebar-collapsed="true"] .wordpress-admin-content {
+    margin-left: 36px;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .wordpress-admin-content {
+      margin-left: 0;
+    }
   }
   
   /* Loading states */
@@ -241,14 +513,82 @@
   }
   
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-wp-bg-tertiary;
+    background-color: var(--bg-tertiary);
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-wp-border-primary rounded-full;
+    background-color: var(--border-primary);
+    @apply rounded-full;
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-admin-gray;
+    background-color: var(--border-secondary);
+  }
+
+  /* Modern utility classes */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-dark {
+    background: var(--gradient-dark);
+  }
+
+  .gradient-light {
+    background: var(--gradient-light);
+  }
+
+  .shadow-sm {
+    box-shadow: var(--card-shadow);
+  }
+
+  .shadow-lg {
+    box-shadow: var(--card-shadow-hover);
+  }
+  
+  /* Modern buttons */
+  .btn-modern {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .btn-modern:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .btn-modern:active {
+    transform: translateY(0);
+  }
+  
+  .btn-modern-primary {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+  }
+  
+  .btn-modern-primary:hover {
+    background-color: var(--btn-primary-hover);
+  }
+  
+  .btn-modern-secondary {
+    background-color: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border: 1px solid var(--btn-secondary-border);
+  }
+  
+  .btn-modern-secondary:hover {
+    background-color: var(--btn-secondary-hover);
+  }
+  
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  [data-theme="dark"] .glass {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }

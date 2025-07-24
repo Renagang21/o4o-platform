@@ -3,7 +3,7 @@
  * 대시보드 데이터 관리 훅 - 수동 새로고침 방식
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../../../api/dashboard';
 
@@ -130,7 +130,7 @@ export const useDashboardData = () => {
   } = useQuery<DashboardStats>({
     queryKey: ['dashboard', 'stats', manualRefreshTrigger],
     queryFn: () => dashboardApi.getStats(),
-    enabled: false, // 수동 새로고침만 허용
+    enabled: true, // 자동 로딩 활성화
     staleTime: 5 * 60 * 1000, // 5분간 fresh
     gcTime: 10 * 60 * 1000, // 10분간 캐시 유지
     retry: 2
@@ -152,7 +152,7 @@ export const useDashboardData = () => {
         users: data.users
       };
     },
-    enabled: false,
+    enabled: true,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2
@@ -171,7 +171,7 @@ export const useDashboardData = () => {
   }>({
     queryKey: ['dashboard', 'notifications', manualRefreshTrigger],
     queryFn: () => dashboardApi.getNotifications(),
-    enabled: false,
+    enabled: true,
     staleTime: 2 * 60 * 1000, // 알림은 2분간만 fresh
     retry: 2
   });
@@ -184,7 +184,7 @@ export const useDashboardData = () => {
   } = useQuery<ActivityItem[]>({
     queryKey: ['dashboard', 'activities', manualRefreshTrigger],
     queryFn: () => dashboardApi.getRecentActivities(),
-    enabled: false,
+    enabled: true,
     staleTime: 3 * 60 * 1000, // 3분간 fresh
     retry: 2
   });
@@ -197,7 +197,7 @@ export const useDashboardData = () => {
   } = useQuery<SystemHealth>({
     queryKey: ['dashboard', 'health', manualRefreshTrigger],
     queryFn: () => dashboardApi.getSystemHealth(),
-    enabled: false,
+    enabled: true,
     staleTime: 30 * 1000, // 30초간만 fresh (시스템 상태는 자주 확인)
     retry: 1
   });
@@ -231,10 +231,10 @@ export const useDashboardData = () => {
     }
   }, [refetchStats, refetchCharts, refetchNotifications, refetchActivities, refetchHealth]);
 
-  // 초기 데이터 로드
-  useEffect(() => {
-    refreshAllData();
-  }, []);
+  // 초기 데이터 로드 제거 - enabled: true로 자동 로드됨
+  // useEffect(() => {
+  //   refreshAllData();
+  // }, []);
 
   // 개별 섹션 새로고침 함수들
   const refreshStats = useCallback(() => refetchStats(), [refetchStats]);

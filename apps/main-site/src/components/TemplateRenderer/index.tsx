@@ -8,11 +8,14 @@ import HeroBlock from './blocks/HeroBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 import SpacerBlock from './blocks/SpacerBlock';
 import ShortcodeBlock from './blocks/ShortcodeBlock';
+import ErrorBlock from './blocks/ErrorBlock';
+import { CTABlock, PricingTableBlock, TestimonialBlock, InfoBoxBlock } from './blocks/SpectraBlocks';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 
 // Block component mapping
 const blockComponents: Record<string, React.ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
+  // Core blocks
   paragraph: ParagraphBlock,
   heading: HeadingBlock,
   image: ImageBlock,
@@ -21,6 +24,12 @@ const blockComponents: Record<string, React.ComponentType<{ block: TemplateBlock
   columns: ColumnsBlock,
   spacer: SpacerBlock,
   shortcode: ShortcodeBlock,
+  
+  // Spectra blocks
+  'uagb/call-to-action': CTABlock,
+  'uagb/pricing-table': PricingTableBlock,
+  'uagb/testimonial': TestimonialBlock,
+  'uagb/info-box': InfoBoxBlock,
 };
 
 // Register product shortcodes on initialization
@@ -48,14 +57,26 @@ const TemplateRenderer: React.FC<TemplateRendererProps> = ({ blocks, className =
         const BlockComponent = blockComponents[block.type];
         
         if (!BlockComponent) {
-          console.warn(`Unknown block type: ${block.type}`);
-          return null;
+          console.warn(`Unknown block type: ${block.type}. Available types:`, Object.keys(blockComponents));
+          
+          // Use ErrorBlock for better debugging
+          return (
+            <ErrorBlock
+              key={block.id || `block-${index}`}
+              blockType={block.type}
+              blockData={block.content || block.data}
+              availableTypes={Object.keys(blockComponents)}
+            />
+          );
         }
 
+        // Handle both block.content and block.data for compatibility
+        const blockData = block.content || block.data || {};
+        
         return (
           <BlockComponent
             key={block.id || `block-${index}`}
-            {...block.content}
+            {...blockData}
             settings={block.settings}
           />
         );

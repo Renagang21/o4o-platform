@@ -502,6 +502,251 @@ export const handlers = [
   }),
 
   // =============================================================================
+  // DASHBOARD MAIN API HANDLERS
+  // =============================================================================
+
+  // Dashboard Stats API (main dashboard)
+  http.get(`${API_BASE}/dashboard/stats`, () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        stats: {
+          users: {
+            total: 1234,
+            pending: 23,
+            today: 45,
+            activeRate: 85.4,
+            change: 12.5,
+            trend: 'up' as const
+          },
+          sales: {
+            today: 2450000,
+            changePercent: 15.3,
+            monthlyTotal: 35000000,
+            monthlyTarget: 50000000,
+            trend: 'up' as const
+          },
+          products: {
+            active: 156,
+            lowStock: 8,
+            newThisWeek: 5,
+            bestsellers: [
+              { id: '1', name: 'Premium Omega-3', sales: 234 },
+              { id: '2', name: 'Vitamin C 1000mg', sales: 189 },
+              { id: '3', name: 'Multi-Vitamin Complex', sales: 156 }
+            ],
+            change: 8.2,
+            trend: 'up' as const
+          },
+          content: {
+            publishedPages: 45,
+            draftContent: 12,
+            totalMedia: 234,
+            todayViews: 1567,
+            change: 23.4,
+            trend: 'up' as const
+          },
+          partners: {
+            active: 34,
+            pending: 5,
+            totalCommission: 4500000,
+            topPartners: [
+              { id: '1', name: 'Health Store Plus', commission: 850000 },
+              { id: '2', name: 'Wellness Shop', commission: 620000 },
+              { id: '3', name: 'Natural Life', commission: 450000 }
+            ],
+            change: 5.8,
+            trend: 'down' as const
+          }
+        }
+      },
+      message: "Dashboard stats retrieved successfully"
+    });
+  }),
+
+  // Dashboard Chart Data API
+  http.get(`${API_BASE}/dashboard/charts`, () => {
+    const salesData = [];
+    const today = new Date();
+    
+    // Generate 30 days of sales data
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      salesData.push({
+        date: date.toISOString().split('T')[0],
+        amount: Math.floor(Math.random() * 3000000) + 1000000,
+        orders: Math.floor(Math.random() * 50) + 20
+      });
+    }
+
+    // Generate user data for last 7 days
+    const userData = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      userData.push({
+        date: date.toISOString().split('T')[0],
+        newUsers: Math.floor(Math.random() * 30) + 10,
+        activeUsers: Math.floor(Math.random() * 150) + 100
+      });
+    }
+
+    return HttpResponse.json({
+      success: true,
+      data: {
+        sales: salesData,
+        orders: [
+          { status: '대기중', count: 23, color: '#f59e0b' },
+          { status: '처리중', count: 45, color: '#3b82f6' },
+          { status: '배송중', count: 67, color: '#8b5cf6' },
+          { status: '완료', count: 234, color: '#10b981' },
+          { status: '취소', count: 12, color: '#ef4444' },
+          { status: '환불', count: 5, color: '#f97316' }
+        ],
+        users: userData
+      },
+      message: "Chart data retrieved successfully"
+    });
+  }),
+
+  // Dashboard Notifications API
+  http.get(`${API_BASE}/admin/notifications`, () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        notifications: [
+          {
+            id: 'notif_1',
+            type: 'urgent',
+            title: '재고 부족 경고',
+            message: '프리미엄 오메가3 제품의 재고가 5개 미만입니다.',
+            time: '2분 전',
+            read: false,
+            actionUrl: '/products?filter=low-stock'
+          },
+          {
+            id: 'notif_2',
+            type: 'approval',
+            title: '사업자 승인 대기',
+            message: '새로운 사업자 회원 3명의 승인이 대기 중입니다.',
+            time: '15분 전',
+            read: false,
+            actionUrl: '/users?filter=pending'
+          },
+          {
+            id: 'notif_3',
+            type: 'success',
+            title: '일일 매출 목표 달성',
+            message: '오늘 매출이 목표액을 초과 달성했습니다!',
+            time: '1시간 전',
+            read: true
+          },
+          {
+            id: 'notif_4',
+            type: 'info',
+            title: '시스템 업데이트 완료',
+            message: '시스템이 최신 버전으로 업데이트되었습니다.',
+            time: '3시간 전',
+            read: true
+          }
+        ]
+      },
+      message: "Notifications retrieved successfully"
+    });
+  }),
+
+  // Dashboard Activities API
+  http.get(`${API_BASE}/admin/activities`, () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        activities: [
+          {
+            id: 'act_1',
+            type: 'user',
+            message: '새로운 사업자 회원이 가입했습니다',
+            time: '방금 전',
+            user: '김사업 (businesskim@example.com)',
+            icon: '👤'
+          },
+          {
+            id: 'act_2',
+            type: 'order',
+            message: '새 주문이 접수되었습니다 (#ORD-2025-0123)',
+            time: '5분 전',
+            user: '이고객',
+            icon: '🛒'
+          },
+          {
+            id: 'act_3',
+            type: 'product',
+            message: '비타민C 1000mg 상품이 품절되었습니다',
+            time: '10분 전',
+            icon: '📦'
+          },
+          {
+            id: 'act_4',
+            type: 'content',
+            message: '건강 관리 가이드 페이지가 수정되었습니다',
+            time: '30분 전',
+            user: '관리자',
+            icon: '📄'
+          },
+          {
+            id: 'act_5',
+            type: 'order',
+            message: '주문 #ORD-2025-0119이 배송 완료되었습니다',
+            time: '1시간 전',
+            icon: '✅'
+          },
+          {
+            id: 'act_6',
+            type: 'user',
+            message: '제휴사 "헬스케어 프로"가 승인되었습니다',
+            time: '2시간 전',
+            user: '관리자',
+            icon: '🤝'
+          }
+        ]
+      },
+      message: "Activities retrieved successfully"
+    });
+  }),
+
+  // System Health API
+  http.get(`${API_BASE}/system/health`, () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        api: {
+          status: 'healthy',
+          responseTime: 125,
+          lastCheck: new Date().toISOString()
+        },
+        database: {
+          status: 'healthy',
+          connections: 12,
+          lastCheck: new Date().toISOString()
+        },
+        storage: {
+          status: 'healthy',
+          usage: 3.2,
+          total: 10
+        },
+        memory: {
+          status: 'warning',
+          usage: 1.8,
+          total: 2
+        }
+      },
+      message: "System health retrieved successfully"
+    });
+  }),
+
+  // =============================================================================
   // USER MANAGEMENT API HANDLERS
   // =============================================================================
 

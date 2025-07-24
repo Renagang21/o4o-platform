@@ -28,6 +28,9 @@ import HomeWithSettings from './pages/HomeWithSettings';
 import { TestDashboard } from './features/test-dashboard';
 import SessionSyncTest from './pages/test/SessionSyncTest';
 
+// Demo Pages
+import SpectraBlocksDemo from './pages/SpectraBlocksDemo';
+
 // Components
 import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -119,6 +122,9 @@ const App: React.FC = () => {
           {/* Test Dashboard */}
           <Route path="/test-dashboard" element={<TestDashboard />} />
           <Route path="/test/session-sync" element={<SessionSyncTest />} />
+          
+          {/* Demo Pages */}
+          <Route path="/spectra-blocks-demo" element={<SpectraBlocksDemo />} />
           
           {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
           <Route path="/editor" element={<DisabledFeaturePage />} />

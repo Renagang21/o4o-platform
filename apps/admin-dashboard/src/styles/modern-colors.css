@@ -1,0 +1,222 @@
+/* Modern Color System for WordPress Admin */
+@layer base {
+  :root {
+    /* Modern Primary Colors */
+    --modern-primary: #3b82f6; /* Bright blue */
+    --modern-primary-hover: #2563eb;
+    --modern-primary-dark: #1d4ed8;
+    --modern-primary-light: #60a5fa;
+    --modern-primary-alpha: rgba(59, 130, 246, 0.1);
+    
+    /* Modern Secondary Colors */
+    --modern-secondary: #8b5cf6; /* Purple */
+    --modern-secondary-hover: #7c3aed;
+    --modern-secondary-dark: #6d28d9;
+    --modern-secondary-light: #a78bfa;
+    
+    /* Modern Accent Colors */
+    --modern-accent: #06b6d4; /* Cyan */
+    --modern-accent-hover: #0891b2;
+    --modern-accent-dark: #0e7490;
+    --modern-accent-light: #22d3ee;
+    
+    /* Modern Status Colors */
+    --modern-success: #10b981; /* Green */
+    --modern-success-hover: #059669;
+    --modern-success-light: #34d399;
+    --modern-success-alpha: rgba(16, 185, 129, 0.1);
+    
+    --modern-warning: #f59e0b; /* Amber */
+    --modern-warning-hover: #d97706;
+    --modern-warning-light: #fbbf24;
+    --modern-warning-alpha: rgba(245, 158, 11, 0.1);
+    
+    --modern-error: #ef4444; /* Red */
+    --modern-error-hover: #dc2626;
+    --modern-error-light: #f87171;
+    --modern-error-alpha: rgba(239, 68, 68, 0.1);
+    
+    --modern-info: #3b82f6; /* Blue */
+    --modern-info-hover: #2563eb;
+    --modern-info-light: #60a5fa;
+    --modern-info-alpha: rgba(59, 130, 246, 0.1);
+    
+    /* Modern Gradient Colors */
+    --modern-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --modern-gradient-success: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    --modern-gradient-warning: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    --modern-gradient-error: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    --modern-gradient-dark: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    
+    /* Modern Neutral Colors */
+    --modern-gray-50: #f9fafb;
+    --modern-gray-100: #f3f4f6;
+    --modern-gray-200: #e5e7eb;
+    --modern-gray-300: #d1d5db;
+    --modern-gray-400: #9ca3af;
+    --modern-gray-500: #6b7280;
+    --modern-gray-600: #4b5563;
+    --modern-gray-700: #374151;
+    --modern-gray-800: #1f2937;
+    --modern-gray-900: #111827;
+    
+    /* Modern Background Colors */
+    --modern-bg-primary: #ffffff;
+    --modern-bg-secondary: #f9fafb;
+    --modern-bg-tertiary: #f3f4f6;
+    --modern-bg-card: #ffffff;
+    --modern-bg-hover: #f9fafb;
+    --modern-bg-active: #e5e7eb;
+    
+    /* Modern Text Colors */
+    --modern-text-primary: #111827;
+    --modern-text-secondary: #4b5563;
+    --modern-text-tertiary: #6b7280;
+    --modern-text-muted: #9ca3af;
+    --modern-text-white: #ffffff;
+    
+    /* Modern Border Colors */
+    --modern-border-primary: #e5e7eb;
+    --modern-border-secondary: #d1d5db;
+    --modern-border-focus: #3b82f6;
+    
+    /* Modern Shadow Styles */
+    --modern-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --modern-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --modern-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --modern-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --modern-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Modern Sidebar Colors */
+    --modern-sidebar-bg: #1f2937;
+    --modern-sidebar-text: #d1d5db;
+    --modern-sidebar-hover: #374151;
+    --modern-sidebar-active: #3b82f6;
+    --modern-sidebar-border: #374151;
+    
+    /* Modern Admin Bar Colors */
+    --modern-adminbar-bg: #111827;
+    --modern-adminbar-text: #d1d5db;
+    --modern-adminbar-hover: #60a5fa;
+  }
+  
+  /* Dark Mode Theme */
+  [data-theme="dark"] {
+    /* Dark Mode Primary Colors */
+    --modern-primary: #60a5fa;
+    --modern-primary-hover: #3b82f6;
+    --modern-primary-dark: #2563eb;
+    --modern-primary-light: #93bbfc;
+    --modern-primary-alpha: rgba(96, 165, 250, 0.1);
+    
+    /* Dark Mode Secondary Colors */
+    --modern-secondary: #a78bfa;
+    --modern-secondary-hover: #8b5cf6;
+    --modern-secondary-dark: #7c3aed;
+    --modern-secondary-light: #c4b5fd;
+    
+    /* Dark Mode Background Colors */
+    --modern-bg-primary: #0f172a;
+    --modern-bg-secondary: #1e293b;
+    --modern-bg-tertiary: #334155;
+    --modern-bg-card: #1e293b;
+    --modern-bg-hover: #334155;
+    --modern-bg-active: #475569;
+    
+    /* Dark Mode Text Colors */
+    --modern-text-primary: #f1f5f9;
+    --modern-text-secondary: #cbd5e1;
+    --modern-text-tertiary: #94a3b8;
+    --modern-text-muted: #64748b;
+    
+    /* Dark Mode Border Colors */
+    --modern-border-primary: #334155;
+    --modern-border-secondary: #475569;
+    --modern-border-focus: #60a5fa;
+    
+    /* Dark Mode Shadow Styles */
+    --modern-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --modern-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --modern-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --modern-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --modern-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    
+    /* Dark Mode Sidebar Colors */
+    --modern-sidebar-bg: #0f172a;
+    --modern-sidebar-text: #cbd5e1;
+    --modern-sidebar-hover: #1e293b;
+    --modern-sidebar-active: #3b82f6;
+    --modern-sidebar-border: #1e293b;
+    
+    /* Dark Mode Admin Bar Colors */
+    --modern-adminbar-bg: #020617;
+    --modern-adminbar-text: #cbd5e1;
+    --modern-adminbar-hover: #60a5fa;
+  }
+  
+  /* Gradient Overlays for both themes */
+  .modern-gradient-overlay {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(139, 92, 246, 0.8) 100%);
+  }
+  
+  .modern-gradient-overlay-dark {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  }
+  
+  /* Modern Button Styles */
+  .modern-btn-primary {
+    background: var(--modern-gradient-primary);
+    @apply text-white font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200;
+  }
+  
+  .modern-btn-secondary {
+    @apply bg-modern-secondary text-white font-medium px-4 py-2 rounded-lg shadow-md hover:bg-modern-secondary-hover transition-all duration-200;
+  }
+  
+  .modern-btn-outline {
+    @apply border-2 border-modern-primary text-modern-primary font-medium px-4 py-2 rounded-lg hover:bg-modern-primary hover:text-white transition-all duration-200;
+  }
+  
+  /* Modern Card Styles */
+  .modern-card {
+    @apply bg-modern-bg-card rounded-xl shadow-md border border-modern-border-primary transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .modern-card-gradient {
+    background: var(--modern-gradient-primary);
+    @apply text-white rounded-xl shadow-lg;
+  }
+  
+  /* Glass Effect */
+  .modern-glass {
+    @apply backdrop-blur-lg bg-white/80 dark:bg-modern-gray-900/80 border border-modern-border-primary rounded-xl shadow-lg;
+  }
+  
+  /* Modern Input Styles */
+  .modern-input {
+    @apply px-4 py-2 bg-modern-bg-secondary border border-modern-border-primary rounded-lg
+           focus:outline-none focus:ring-2 focus:ring-modern-primary focus:border-transparent
+           transition-all duration-200;
+  }
+  
+  /* Modern Badge Styles */
+  .modern-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .modern-badge-primary {
+    @apply modern-badge bg-modern-primary-alpha text-modern-primary;
+  }
+  
+  .modern-badge-success {
+    @apply modern-badge bg-modern-success-alpha text-modern-success;
+  }
+  
+  .modern-badge-warning {
+    @apply modern-badge bg-modern-warning-alpha text-modern-warning;
+  }
+  
+  .modern-badge-error {
+    @apply modern-badge bg-modern-error-alpha text-modern-error;
+  }
+}

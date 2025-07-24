@@ -7,21 +7,30 @@ import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
 import App from './App'
 import './styles/globals.css'
 
-// MSW 개발 환경 설정 - 임시로 비활성화
+// MSW 개발 환경 설정
 async function enableMocking() {
-  // MSW 임시 비활성화 - 백지 화면 문제 해결을 위해
-  return Promise.resolve();
+  // Check if mocking is enabled via environment variable
+  const useMock = import.meta.env.VITE_USE_MOCK === 'true'
   
-  // if (!import.meta.env.DEV) {
-  //   return
-  // }
+  if (!import.meta.env.DEV || !useMock) {
+    console.log('[MSW] Mocking disabled, using real API')
+    return
+  }
 
-  // const { worker } = await import('./test-utils/mocks/browser')
-  
-  // // MSW 서비스 워커 시작
-  // return worker.start({
-  //   onUnhandledRequest: 'bypass', // 처리되지 않은 요청은 실제 네트워크로 전달
-  // })
+  try {
+    const { worker } = await import('./test-utils/mocks/browser')
+    
+    console.log('[MSW] Starting mock service worker...')
+    // MSW 서비스 워커 시작
+    return worker.start({
+      onUnhandledRequest: 'bypass', // 처리되지 않은 요청은 실제 네트워크로 전달
+      quiet: false, // Show MSW logs for debugging
+    })
+  } catch (error) {
+    console.error('Failed to start MSW:', error)
+    // MSW 실패해도 앱은 계속 실행
+    return Promise.resolve()
+  }
 }
 
 const queryClient = new QueryClient({

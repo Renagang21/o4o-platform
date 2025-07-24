@@ -6,6 +6,7 @@
 import { api } from './base';
 import { EcommerceApi } from './ecommerceApi';
 import { SalesDataItem, Notification, Activity, OrderStatusData, UserChartData, SystemHealthStatus } from '../types/dashboard';
+import { forumService, signageService, crowdfundingService } from './apps';
 
 // Dashboard Stats type
 interface DashboardStats {
@@ -56,18 +57,52 @@ interface DashboardStats {
     change: number;
     trend: 'up' | 'down';
   };
+  apps: {
+    forum: {
+      posts: number;
+      activeUsers: number;
+      pendingModeration: number;
+    };
+    signage: {
+      displays: number;
+      activeDisplays: number;
+      content: number;
+    };
+    crowdfunding: {
+      campaigns: number;
+      totalRaised: number;
+      backers: number;
+    };
+  };
 }
 
 // Dashboard API endpoints
 export const dashboardApi = {
   // 통계 데이터 조회
   async getStats(): Promise<DashboardStats> {
+    let forumStats: any = null;
+    let signageStats: any = null;
+    let crowdfundingStats: any = null;
+    
     try {
-      // Use EcommerceApi for dashboard stats
-      const [dashboardStatsResponse, usersResponse] = await Promise.all([
+      // 개발 환경에서는 Mock 데이터 사용
+      if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
+        const response = await api.get('/dashboard/stats');
+        return response.data.data.stats;
+      }
+      
+      // Production: Use EcommerceApi and App services for dashboard stats
+      const [dashboardStatsResponse, usersResponse, forumStatsRes, signageStatsRes, crowdfundingStatsRes] = await Promise.all([
         EcommerceApi.getDashboardStats(),
-        api.get('/api/users/stats').catch(() => ({ data: {} }))
+        api.get('/api/users/stats').catch(() => ({ data: {} })),
+        forumService.getStats().catch(() => null),
+        signageService.getStats().catch(() => null),
+        crowdfundingService.getStats().catch(() => null)
       ]);
+      
+      forumStats = forumStatsRes;
+      signageStats = signageStatsRes;
+      crowdfundingStats = crowdfundingStatsRes;
 
       const ecommerceStats = dashboardStatsResponse.data;
 
@@ -111,6 +146,23 @@ export const dashboardApi = {
           topPartners: [],
           change: 0,
           trend: 'up' as const
+        },
+        apps: {
+          forum: forumStats ? {
+            posts: forumStats.totalPosts,
+            activeUsers: forumStats.activeUsers,
+            pendingModeration: forumStats.pendingModeration
+          } : { posts: 0, activeUsers: 0, pendingModeration: 0 },
+          signage: signageStats ? {
+            displays: signageStats.totalDisplays,
+            activeDisplays: signageStats.activeDisplays,
+            content: signageStats.totalContent
+          } : { displays: 0, activeDisplays: 0, content: 0 },
+          crowdfunding: crowdfundingStats ? {
+            campaigns: crowdfundingStats.totalCampaigns,
+            totalRaised: crowdfundingStats.totalRaised,
+            backers: crowdfundingStats.totalBackers
+          } : { campaigns: 0, totalRaised: 0, backers: 0 }
         }
       };
     } catch (error: any) {
@@ -155,6 +207,23 @@ export const dashboardApi = {
           topPartners: [],
           change: 0,
           trend: 'up' as const
+        },
+        apps: {
+          forum: forumStats ? {
+            posts: forumStats.totalPosts,
+            activeUsers: forumStats.activeUsers,
+            pendingModeration: forumStats.pendingModeration
+          } : { posts: 0, activeUsers: 0, pendingModeration: 0 },
+          signage: signageStats ? {
+            displays: signageStats.totalDisplays,
+            activeDisplays: signageStats.activeDisplays,
+            content: signageStats.totalContent
+          } : { displays: 0, activeDisplays: 0, content: 0 },
+          crowdfunding: crowdfundingStats ? {
+            campaigns: crowdfundingStats.totalCampaigns,
+            totalRaised: crowdfundingStats.totalRaised,
+            backers: crowdfundingStats.totalBackers
+          } : { campaigns: 0, totalRaised: 0, backers: 0 }
         }
       };
     }
@@ -163,7 +232,13 @@ export const dashboardApi = {
   // 차트 데이터 조회
   async getChartData() {
     try {
-      // Use EcommerceApi for sales report
+      // 개발 환경에서는 Mock 데이터 사용
+      if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
+        const response = await api.get('/dashboard/charts');
+        return response.data.data;
+      }
+      
+      // Production: Use EcommerceApi for sales report
       const [salesReportResponse, ordersResponse] = await Promise.all([
         EcommerceApi.getSalesReport('month'),
         EcommerceApi.getOrders(1, 100) // Get recent orders for status distribution

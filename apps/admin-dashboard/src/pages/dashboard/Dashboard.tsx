@@ -14,40 +14,84 @@ import RecentActivity from './components/RecentActivity';
 import QuickActions from './components/QuickActions';
 import SystemStatus from './components/SystemHealth';
 import Charts from './components/Charts';
+import AtAGlanceWidget from '@/components/dashboard/AtAGlanceWidget';
+import ScreenOptions, { type ScreenOption } from '@/components/common/ScreenOptions';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useState } from 'react';
 
 const Dashboard = memo(() => {
-  const { chartData, isLoading: chartsLoading } = useDashboardData();
+  const { chartData, isLoading: chartsLoading, stats } = useDashboardData();
   const { isLoading: statsLoading } = useDashboardStats();
+  
+  // Screen Options state
+  const [screenOptions, setScreenOptions] = useState<ScreenOption[]>([
+    { id: 'stats', label: 'Statistics Overview', checked: true, type: 'checkbox' },
+    { id: 'ecommerce', label: 'E-commerce Stats', checked: true, type: 'checkbox' },
+    { id: 'realtime', label: 'Realtime Stats', checked: true, type: 'checkbox' },
+    { id: 'activity', label: 'Recent Activity', checked: true, type: 'checkbox' },
+    { id: 'charts', label: 'Charts', checked: true, type: 'checkbox' },
+    { id: 'system', label: 'System Health', checked: true, type: 'checkbox' }
+  ]);
+  
+  const [columnsPerPage, setColumnsPerPage] = useState(2);
 
   return (
     <div className="space-y-8">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-wp-text-primary flex items-center">
-            <BarChart3 className="w-8 h-8 mr-3 text-blue-600" />
-            대시보드
-          </h1>
-          <p className="text-wp-text-secondary mt-2">
-            O4O 플랫폼의 모든 현황을 한눈에 확인하고 관리하세요
-          </p>
-        </div>
-        <div className="text-sm text-wp-text-secondary">
-          마지막 업데이트: 방금 전
+      {/* Page Header with Screen Options */}
+      <div className="relative">
+        <ScreenOptions
+          options={screenOptions}
+          onOptionsChange={setScreenOptions}
+          columnsPerPage={columnsPerPage}
+          onColumnsChange={setColumnsPerPage}
+        />
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-modern-text-primary flex items-center">
+              <BarChart3 className="w-8 h-8 mr-3 text-modern-primary" />
+              대시보드
+            </h1>
+            <p className="text-modern-text-secondary mt-2">
+              O4O 플랫폼의 모든 현황을 한눈에 확인하고 관리하세요
+            </p>
+          </div>
+          <div className="text-sm text-modern-text-secondary">
+            마지막 업데이트: 방금 전
+          </div>
         </div>
       </div>
+      
+      {/* At a Glance Widget */}
+      <section>
+        <AtAGlanceWidget 
+          stats={{
+            posts: stats?.content?.publishedPages || 45,
+            pages: stats?.content?.publishedPages || 12,
+            comments: {
+              total: 156,
+              pending: 3
+            },
+            users: stats?.users?.total || 1234,
+            products: stats?.products?.active || 156,
+            views: stats?.content?.todayViews || 1567
+          }}
+        />
+      </section>
 
       {/* E-commerce 통계 위젯 */}
-      <section>
-        <EcommerceStats />
-      </section>
+      {screenOptions.find(opt => opt.id === 'ecommerce')?.checked && (
+        <section>
+          <EcommerceStats />
+        </section>
+      )}
 
       {/* 통합 개요 위젯 */}
-      <section>
-        <StatsOverview />
-      </section>
+      {screenOptions.find(opt => opt.id === 'stats')?.checked && (
+        <section>
+          <StatsOverview />
+        </section>
+      )}
 
       {/* 실시간 데이터 및 활동 그리드 */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
