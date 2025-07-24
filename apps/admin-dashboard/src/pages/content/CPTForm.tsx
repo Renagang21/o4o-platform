@@ -85,7 +85,7 @@ const CPTForm: React.FC = () => {
   const { data: cpt, isLoading: isLoadingCPT } = useQuery({
     queryKey: ['custom-post-type', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/custom-post-types/${id}`)
+      const response = await authClient.api.get(`/v1/custom-post-types/${id}`)
       return response.data
     },
     enabled: isEditMode
@@ -106,13 +106,13 @@ const CPTForm: React.FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: CreateCustomPostTypeDto) => {
-      const response = await authClient.api.post('/custom-post-types', data)
+      const response = await authClient.api.post('/v1/custom-post-types', data)
       return response.data
     },
     onSuccess: () => {
       toast.success('사용자 정의 게시물 유형이 생성되었습니다')
       queryClient.invalidateQueries({ queryKey: ['custom-post-types'] })
-      navigate('/content/cpt')
+      navigate('/cpt')
     },
     onError: () => {
       toast.error('생성에 실패했습니다')
@@ -122,7 +122,7 @@ const CPTForm: React.FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateCustomPostTypeDto) => {
-      const response = await authClient.api.put(`/custom-post-types/${id}`, data)
+      const response = await authClient.api.put(`/v1/custom-post-types/${id}`, data)
       return response.data
     },
     onSuccess: () => {

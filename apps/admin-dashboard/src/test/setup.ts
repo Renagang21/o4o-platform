@@ -65,3 +65,23 @@ vi.mock('../api/base', () => ({
     delete: vi.fn().mockResolvedValue({ data: {} }),
   }
 }));
+
+// Setup MSW handlers if using mock mode
+if (import.meta.env.VITE_USE_MOCK === 'true') {
+  // Import all handlers
+  import('./mocks/handlers/posts');
+  import('./mocks/handlers/media');
+  import('./mocks/handlers/templates');
+  import('./mocks/handlers/widgets');
+  import('./mocks/handlers/menus');
+  import('./mocks/handlers/custom-post-types');
+  import('./mocks/handlers/acf');
+  import('./mocks/handlers/affiliate');
+  import('./mocks/handlers/forum');
+  import('./mocks/handlers/product-categories');
+  import('./mocks/handlers/order-status');
+  import('./mocks/handlers/inventory');
+  import('./mocks/handlers/toss-payments');
+  import('./mocks/handlers/settlements');
+  import('./mocks/handlers/platform-apps');
+}

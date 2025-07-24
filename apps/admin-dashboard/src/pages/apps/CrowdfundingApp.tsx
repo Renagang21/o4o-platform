@@ -1,322 +1,342 @@
-import { DollarSign, Target, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Gift } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  TrendingUp, 
+  Plus, 
+  Eye, 
+  Users, 
+  Target, 
+  Clock,
+  MessageSquare,
+  CheckCircle,
+  ArrowRight
+} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { authClient } from '@o4o/auth-client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-const CrowdfundingApp = () => {
+const CrowdfundingApp: React.FC = () => {
+  const navigate = useNavigate();
+
+  // 크라우드펀딩 통계 조회
+  const { data: statsData } = useQuery({
+    queryKey: ['crowdfunding-stats'],
+    queryFn: async () => {
+      const response = await authClient.api.get('/v1/crowdfunding-simple/dashboard/stats');
+      return response.data;
+    }
+  });
+
+  const stats = statsData?.data;
+
+  // 최근 프로젝트 조회
+  const { data: recentProjectsData } = useQuery({
+    queryKey: ['crowdfunding-recent'],
+    queryFn: async () => {
+      const response = await authClient.api.get('/v1/crowdfunding-simple/projects?limit=4&status=recruiting');
+      return response.data;
+    }
+  });
+
+  const recentProjects = recentProjectsData?.data || [];
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      recruiting: { label: '모집중', variant: 'default' as const, icon: Clock },
+      in_progress: { label: '진행중', variant: 'secondary' as const, icon: TrendingUp },
+      completed: { label: '완료', variant: 'outline' as const, icon: CheckCircle }
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.recruiting;
+    const Icon = config.icon;
+    
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <Icon className="w-3 h-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
+  const calculateProgress = (current: number, target: number) => {
+    return target > 0 ? Math.min((current / target) * 100, 100) : 0;
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-modern-text-primary flex items-center gap-2">
-            <DollarSign className="w-8 h-8 text-modern-primary" />
-            크라우드펀딩 관리
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center gap-3">
+          <TrendingUp className="w-12 h-12 text-modern-primary" />
+          <h1 className="text-4xl font-bold text-modern-text-primary">
+            O4O 크라우드펀딩
           </h1>
-          <p className="text-modern-text-secondary mt-1">
-            크라우드펀딩 프로젝트를 관리하고 후원자를 관리하세요.
-          </p>
         </div>
-        <button className="px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors">
-          새 프로젝트 생성
-        </button>
+        <p className="text-lg text-modern-text-secondary max-w-3xl mx-auto">
+          제품 개발사와 판매 매장을 연결하여 대량 구매로 비용을 절감하는 B2B 크라우드펀딩 플랫폼입니다.
+          복잡한 결제 시스템 없이 간단한 참여 방식으로 운영됩니다.
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">진행 중 프로젝트</p>
-                <p className="text-2xl font-bold text-modern-text-primary">5</p>
-                <p className="text-xs text-modern-text-secondary mt-1">2개 곧 종료</p>
+      {/* 통계 카드 */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-modern-text-secondary">전체 프로젝트</p>
+                  <p className="text-3xl font-bold text-modern-text-primary">{stats.totalProjects}</p>
+                </div>
+                <TrendingUp className="w-10 h-10 text-modern-primary opacity-20" />
               </div>
-              <Target className="w-8 h-8 text-modern-primary opacity-20" />
-            </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">총 모금액</p>
-                <p className="text-2xl font-bold text-modern-success">₩127.5M</p>
-                <p className="text-xs text-modern-success mt-1">목표 대비 85%</p>
+            </CardContent>
+          </Card>
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-modern-text-secondary">활성 프로젝트</p>
+                  <p className="text-3xl font-bold text-modern-text-primary">{stats.activeProjects}</p>
+                </div>
+                <Clock className="w-10 h-10 text-modern-warning opacity-20" />
               </div>
-              <DollarSign className="w-8 h-8 text-modern-success opacity-20" />
-            </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">후원자 수</p>
-                <p className="text-2xl font-bold text-modern-warning">1,234</p>
-                <p className="text-xs text-modern-text-secondary mt-1">평균 ₩103,400</p>
+            </CardContent>
+          </Card>
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-modern-text-secondary">완료 프로젝트</p>
+                  <p className="text-3xl font-bold text-modern-text-primary">{stats.completedProjects}</p>
+                </div>
+                <CheckCircle className="w-10 h-10 text-modern-success opacity-20" />
               </div>
-              <Users className="w-8 h-8 text-modern-warning opacity-20" />
-            </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">성공률</p>
-                <p className="text-2xl font-bold text-modern-accent">78%</p>
-                <p className="text-xs text-modern-success mt-1">업계 평균 대비 +18%</p>
+            </CardContent>
+          </Card>
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-modern-text-secondary">성공률</p>
+                  <p className="text-3xl font-bold text-modern-text-primary">{stats.successRate}%</p>
+                </div>
+                <Target className="w-10 h-10 text-modern-primary opacity-20" />
               </div>
-              <TrendingUp className="w-8 h-8 text-modern-accent opacity-20" />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
+      )}
 
-      {/* Active Projects */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <h2 className="text-lg font-semibold">진행 중인 프로젝트</h2>
-        </div>
-        <div className="wp-card-body">
-          <div className="space-y-4">
-            {/* Project 1 */}
-            <div className="border border-modern-border-primary rounded-lg p-4">
-              <div className="flex items-start justify-between mb-3">
+      {/* 주요 기능 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* 빠른 액션 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="w-5 h-5 text-modern-primary" />
+              빠른 액션
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              className="w-full justify-start text-left h-auto p-4"
+              onClick={() => navigate('/crowdfunding/projects/new')}
+            >
+              <div className="flex items-center gap-3 w-full">
+                <Plus className="w-5 h-5" />
                 <div>
-                  <h3 className="font-semibold text-modern-text-primary">스마트 건강 모니터링 기기</h3>
-                  <p className="text-sm text-modern-text-secondary">헬스케어 | D-15</p>
+                  <p className="font-medium">새 프로젝트 만들기</p>
+                  <p className="text-sm opacity-80">대량 구매 프로젝트를 시작하세요</p>
                 </div>
-                <span className="px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                  진행 중
-                </span>
+                <ArrowRight className="w-4 h-4 ml-auto" />
               </div>
-              <div className="mb-3">
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-modern-text-secondary">목표 금액: ₩50,000,000</span>
-                  <span className="font-medium text-modern-text-primary">92% 달성</span>
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="w-full justify-start text-left h-auto p-4"
+              onClick={() => navigate('/crowdfunding/projects')}
+            >
+              <div className="flex items-center gap-3 w-full">
+                <Eye className="w-5 h-5" />
+                <div>
+                  <p className="font-medium">프로젝트 목록 보기</p>
+                  <p className="text-sm text-modern-text-secondary">모든 진행 중인 프로젝트를 확인하세요</p>
                 </div>
-                <div className="w-full bg-modern-bg-tertiary rounded-full h-2">
-                  <div className="bg-modern-success h-2 rounded-full" style={{ width: '92%' }}></div>
-                </div>
+                <ArrowRight className="w-4 h-4 ml-auto" />
               </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">₩46M</p>
-                  <p className="text-xs text-modern-text-secondary">모금액</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">523</p>
-                  <p className="text-xs text-modern-text-secondary">후원자</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">15일</p>
-                  <p className="text-xs text-modern-text-secondary">남은 기간</p>
-                </div>
-              </div>
-            </div>
+            </Button>
+          </CardContent>
+        </Card>
 
-            {/* Project 2 */}
-            <div className="border border-modern-border-primary rounded-lg p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-modern-text-primary">친환경 요가 매트</h3>
-                  <p className="text-sm text-modern-text-secondary">라이프스타일 | D-5</p>
-                </div>
-                <span className="px-2.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                  곧 종료
-                </span>
-              </div>
-              <div className="mb-3">
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-modern-text-secondary">목표 금액: ₩20,000,000</span>
-                  <span className="font-medium text-modern-text-primary">156% 달성</span>
-                </div>
-                <div className="w-full bg-modern-bg-tertiary rounded-full h-2">
-                  <div className="bg-modern-primary h-2 rounded-full" style={{ width: '100%' }}></div>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">₩31.2M</p>
-                  <p className="text-xs text-modern-text-secondary">모금액</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">412</p>
-                  <p className="text-xs text-modern-text-secondary">후원자</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">5일</p>
-                  <p className="text-xs text-modern-text-secondary">남은 기간</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Project 3 */}
-            <div className="border border-modern-border-primary rounded-lg p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-modern-text-primary">슈퍼푸드 에너지바</h3>
-                  <p className="text-sm text-modern-text-secondary">식품 | D-30</p>
-                </div>
-                <span className="px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                  진행 중
-                </span>
-              </div>
-              <div className="mb-3">
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-modern-text-secondary">목표 금액: ₩30,000,000</span>
-                  <span className="font-medium text-modern-text-primary">67% 달성</span>
-                </div>
-                <div className="w-full bg-modern-bg-tertiary rounded-full h-2">
-                  <div className="bg-modern-warning h-2 rounded-full" style={{ width: '67%' }}></div>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">₩20.1M</p>
-                  <p className="text-xs text-modern-text-secondary">모금액</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">299</p>
-                  <p className="text-xs text-modern-text-secondary">후원자</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-modern-text-primary">30일</p>
-                  <p className="text-xs text-modern-text-secondary">남은 기간</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Backers */}
-        <div className="wp-card">
-          <div className="wp-card-header">
-            <h2 className="text-lg font-semibold">최근 후원자</h2>
-          </div>
-          <div className="wp-card-body">
+        {/* 시스템 특징 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>시스템 특징</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-3">
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-modern-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                    김철수
-                  </div>
-                  <div>
-                    <p className="font-medium text-modern-text-primary">김철수</p>
-                    <p className="text-sm text-modern-text-secondary">스마트 건강 모니터링</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-modern-text-primary">₩150,000</p>
-                  <p className="text-xs text-modern-text-secondary">5분 전</p>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-modern-success mt-0.5" />
+                <div>
+                  <p className="font-medium text-modern-text-primary">간단한 B2B 모델</p>
+                  <p className="text-sm text-modern-text-secondary">복잡한 결제 없이 참여 의사만 표시</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-modern-success text-white rounded-full flex items-center justify-center text-sm font-medium">
-                    이영희
-                  </div>
-                  <div>
-                    <p className="font-medium text-modern-text-primary">이영희</p>
-                    <p className="text-sm text-modern-text-secondary">친환경 요가 매트</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-modern-text-primary">₩89,000</p>
-                  <p className="text-xs text-modern-text-secondary">15분 전</p>
+              <div className="flex items-start gap-3">
+                <MessageSquare className="w-5 h-5 text-modern-primary mt-0.5" />
+                <div>
+                  <p className="font-medium text-modern-text-primary">포럼 연동</p>
+                  <p className="text-sm text-modern-text-secondary">기존 포럼 시스템으로 소통</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-modern-warning text-white rounded-full flex items-center justify-center text-sm font-medium">
-                    박민수
-                  </div>
-                  <div>
-                    <p className="font-medium text-modern-text-primary">박민수</p>
-                    <p className="text-sm text-modern-text-secondary">슈퍼푸드 에너지바</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-modern-text-primary">₩45,000</p>
-                  <p className="text-xs text-modern-text-secondary">1시간 전</p>
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-modern-warning mt-0.5" />
+                <div>
+                  <p className="font-medium text-modern-text-primary">참여 추적</p>
+                  <p className="text-sm text-modern-text-secondary">실시간 참여 현황 모니터링</p>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Reward Status */}
-        <div className="wp-card">
-          <div className="wp-card-header">
-            <h2 className="text-lg font-semibold">리워드 현황</h2>
-          </div>
-          <div className="wp-card-body">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Gift className="w-5 h-5 text-modern-primary" />
-                  <span className="text-sm text-modern-text-primary">발송 대기</span>
-                </div>
-                <span className="text-lg font-bold text-modern-text-primary">234</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-modern-warning" />
-                  <span className="text-sm text-modern-text-primary">제작 중</span>
-                </div>
-                <span className="text-lg font-bold text-modern-text-primary">156</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-modern-success" />
-                  <span className="text-sm text-modern-text-primary">발송 완료</span>
-                </div>
-                <span className="text-lg font-bold text-modern-text-primary">892</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-modern-danger" />
-                  <span className="text-sm text-modern-text-primary">문의 사항</span>
-                </div>
-                <span className="text-lg font-bold text-modern-text-primary">12</span>
-              </div>
-            </div>
-            <button className="mt-4 w-full py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors">
-              리워드 관리
-            </button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Campaign Performance */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <h2 className="text-lg font-semibold">캠페인 성과 분석</h2>
-        </div>
-        <div className="wp-card-body">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
-              <p className="text-3xl font-bold text-modern-text-primary mb-1">3.2%</p>
-              <p className="text-sm text-modern-text-secondary">평균 전환율</p>
-              <p className="text-xs text-modern-success mt-2">+0.5%p 향상</p>
+      {/* 최근 프로젝트 */}
+      {recentProjects.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-modern-primary" />
+              최근 모집 중인 프로젝트
+            </CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/crowdfunding/projects')}
+            >
+              전체 보기
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recentProjects.map((project: any) => {
+                const progress = calculateProgress(project.currentParticipantCount, project.targetParticipantCount);
+                
+                return (
+                  <Card key={project.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <h4 className="font-medium line-clamp-2 flex-1">
+                            {project.title}
+                          </h4>
+                          {getStatusBadge(project.status)}
+                        </div>
+                        
+                        <p className="text-sm text-modern-text-secondary line-clamp-2">
+                          {project.description}
+                        </p>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-modern-text-secondary">진행률</span>
+                            <span className="font-medium text-modern-text-primary">
+                              {project.currentParticipantCount}/{project.targetParticipantCount} ({Math.round(progress)}%)
+                            </span>
+                          </div>
+                          <div className="w-full bg-modern-bg-tertiary rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                progress >= 100 
+                                  ? 'bg-modern-success' 
+                                  : progress >= 50 
+                                  ? 'bg-modern-primary' 
+                                  : 'bg-modern-warning'
+                              }`}
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1 text-sm text-modern-text-secondary">
+                            <Users className="w-4 h-4" />
+                            <span>{project.currentParticipantCount}명 참여</span>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => navigate(`/crowdfunding/projects/${project.id}`)}
+                          >
+                            상세보기
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-            <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
-              <p className="text-3xl font-bold text-modern-text-primary mb-1">₩87,400</p>
-              <p className="text-sm text-modern-text-secondary">평균 후원 금액</p>
-              <p className="text-xs text-modern-success mt-2">+12% 증가</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 성공 사례 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-modern-success" />
+            성공 사례
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-modern-success/10 rounded-full flex items-center justify-center mx-auto">
+                <Target className="w-8 h-8 text-modern-success" />
+              </div>
+              <h4 className="font-medium text-modern-text-primary">친환경 포장재 프로젝트</h4>
+              <p className="text-sm text-modern-text-secondary">125개 매장 참여 · 35% 비용 절감</p>
             </div>
-            <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
-              <p className="text-3xl font-bold text-modern-text-primary mb-1">42%</p>
-              <p className="text-sm text-modern-text-secondary">재후원율</p>
-              <p className="text-xs text-modern-text-secondary mt-2">전월 동일</p>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-modern-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <Users className="w-8 h-8 text-modern-primary" />
+              </div>
+              <h4 className="font-medium text-modern-text-primary">프리미엄 건강식품</h4>
+              <p className="text-sm text-modern-text-secondary">89개 매장 참여 · 28% 비용 절감</p>
             </div>
-            <div className="text-center p-4 bg-modern-bg-tertiary rounded-lg">
-              <p className="text-3xl font-bold text-modern-text-primary mb-1">4.8</p>
-              <p className="text-sm text-modern-text-secondary">만족도 점수</p>
-              <p className="text-xs text-modern-success mt-2">매우 우수</p>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-modern-warning/10 rounded-full flex items-center justify-center mx-auto">
+                <TrendingUp className="w-8 h-8 text-modern-warning" />
+              </div>
+              <h4 className="font-medium text-modern-text-primary">계절 상품 대량구매</h4>
+              <p className="text-sm text-modern-text-secondary">67개 매장 참여 · 42% 비용 절감</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* CTA */}
+      <div className="text-center space-y-4 py-8">
+        <h2 className="text-2xl font-bold text-modern-text-primary">
+          지금 시작하세요
+        </h2>
+        <p className="text-modern-text-secondary">
+          여러 매장이 함께 참여하여 더 좋은 조건으로 상품을 구매할 수 있습니다.
+        </p>
+        <div className="flex items-center justify-center gap-4">
+          <Button size="lg" onClick={() => navigate('/crowdfunding/projects/new')}>
+            <Plus className="w-5 h-5 mr-2" />
+            새 프로젝트 만들기
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => navigate('/crowdfunding/projects')}>
+            <Eye className="w-5 h-5 mr-2" />
+            프로젝트 둘러보기
+          </Button>
         </div>
       </div>
     </div>

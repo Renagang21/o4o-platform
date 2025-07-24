@@ -156,9 +156,11 @@ const mockCustomPostTypes: CustomPostType[] = [
 // Store CPTs in memory for CRUD operations
 let customPostTypes = [...mockCustomPostTypes];
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
 export const customPostTypeHandlers = [
   // Get all custom post types
-  http.get('/api/v1/custom-post-types', () => {
+  http.get(`${API_BASE}/v1/custom-post-types`, () => {
     const response: CustomPostTypeListResponse = {
       postTypes: customPostTypes,
       total: customPostTypes.length,
@@ -167,7 +169,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Get single custom post type
-  http.get('/api/v1/custom-post-types/:id', ({ params }: any) => {
+  http.get(`${API_BASE}/v1/custom-post-types/:id`, ({ params }: any) => {
     const cpt = customPostTypes.find(c => c.id === params.id);
     if (!cpt) {
       return HttpResponse.json({ error: 'Custom post type not found' }, { status: 404 });
@@ -176,7 +178,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Create custom post type
-  http.post('/api/v1/custom-post-types', async ({ request }: any) => {
+  http.post(`${API_BASE}/v1/custom-post-types`, async ({ request }: any) => {
     const data = await request.json() as any;
     const newCPT: CustomPostType = {
       id: `cpt-${Date.now()}`,
@@ -191,7 +193,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Update custom post type
-  http.put('/api/v1/custom-post-types/:id', async ({ params, request }: any) => {
+  http.put(`${API_BASE}/v1/custom-post-types/:id`, async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = customPostTypes.findIndex(c => c.id === params.id);
     
@@ -209,7 +211,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Delete custom post type
-  http.delete('/api/v1/custom-post-types/:id', ({ params }: any) => {
+  http.delete(`${API_BASE}/v1/custom-post-types/:id`, ({ params }: any) => {
     const index = customPostTypes.findIndex(c => c.id === params.id);
     
     if (index === -1) {
@@ -221,7 +223,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Update field groups for custom post type
-  http.put('/api/v1/custom-post-types/:id/field-groups', async ({ params, request }: any) => {
+  http.put(`${API_BASE}/v1/custom-post-types/:id/field-groups`, async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = customPostTypes.findIndex(c => c.id === params.id);
     
@@ -239,7 +241,7 @@ export const customPostTypeHandlers = [
   }),
 
   // Get custom post type posts (dynamic endpoint)
-  http.get('/api/v1/posts', ({ request }: any) => {
+  http.get(`${API_BASE}/v1/posts`, ({ request }: any) => {
     const url = new URL(request.url);
     const postType = url.searchParams.get('post_type');
     

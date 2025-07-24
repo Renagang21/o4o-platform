@@ -6,9 +6,10 @@ import {
   ChevronLeft
 } from 'lucide-react'
 import { clsx } from 'clsx'
-import { wordpressMenuItems, MenuItem } from '@/config/wordpressMenuFinal'
+import { MenuItem } from '@/config/wordpressMenuFinal'
 import { filterMenuByRole, UserRole } from '@/config/rolePermissions'
 import { useAuth } from '@o4o/auth-context'
+import { useDynamicMenu } from '@/hooks/useDynamicMenu'
 
 interface AdminSidebarProps {
   isOpen: boolean
@@ -21,10 +22,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const [expandedItems, setExpandedItems] = React.useState<string[]>([])
   const [isCollapsed, setIsCollapsed] = useState(false)
   
-  // Get filtered menu items based on user role
+  // 동적 메뉴 가져오기 (활성화된 앱 기반)
+  const { menuItems: dynamicMenuItems, isLoading: menuLoading } = useDynamicMenu()
+  
+  // 역할 기반 메뉴 필터링
   const userRole = (user?.role || 'customer') as UserRole
   const userPermissions: string[] = [] // User type doesn't have permissions field yet
-  const menuItems = filterMenuByRole(wordpressMenuItems, userRole, userPermissions)
+  const menuItems = filterMenuByRole(dynamicMenuItems, userRole, userPermissions)
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -164,7 +168,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
 
         {/* Navigation */}
         <nav className="flex-1 py-2 custom-scrollbar overflow-y-auto">
-          {menuItems.map(renderMenuItem)}
+          {menuLoading ? (
+            <div className="flex justify-center items-center h-20">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            </div>
+          ) : (
+            menuItems.map(renderMenuItem)
+          )}
         </nav>
 
         {/* Footer */}

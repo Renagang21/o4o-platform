@@ -21,3 +21,32 @@ export * from './ecommerce';
 
 // Export pricing types
 export * from './pricing';
+
+// Export crowdfunding types
+export * from './crowdfunding';
+
+// Export affiliate types
+export * from './affiliate';
+
+// Export vendor management types (excluding duplicates)
+export type {
+  // Types
+  ProductApprovalStatus,
+  VendorProduct,
+  SupplierOrderSplit,
+  VendorOrderItem,
+  VendorOrder,
+  ProfitCalculationParams,
+  VendorStats,
+  ProductApprovalRequest,
+  ProductApprovalResponse,
+  StockUpdateRequest,
+  PricingPolicy,
+  SettlementData,
+  SupplierInfo,
+  VendorInfo
+} from './vendor-management';
+
+// Re-export with different names to avoid conflicts
+export type { PriceCalculation as VendorPriceCalculation } from './vendor-management';
+export type { SupplierStats as VendorSupplierStats } from './vendor-management';

@@ -28,7 +28,8 @@ import {
   Store,
   CreditCard,
   FileCheck,
-  Layout
+  Layout,
+  FolderTree
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -97,10 +98,19 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <ShoppingCart className="w-5 h-5" />,
     children: [
       { id: 'products', label: '제품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
+      { id: 'categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/ecommerce/categories' },
+      { id: 'inventory', label: '재고 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/inventory' },
       { id: 'orders', label: '주문 관리', icon: <ClipboardList className="w-4 h-4" />, path: '/ecommerce/orders' },
+      { id: 'order-status', label: '주문 상태', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/order-status' },
       { id: 'customers', label: '고객 관리', icon: <Users className="w-4 h-4" />, path: '/ecommerce/customers' },
       { id: 'coupons', label: '쿠폰', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/coupons' },
-      { id: 'reports', label: '보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
+      { id: 'refunds', label: '환불 관리', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/refunds' },
+      { id: 'toss-payments', label: '토스페이먼츠', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/payments/toss' },
+      { id: 'settlement-dashboard', label: '정산 대시보드', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/settlements' },
+      { id: 'vendor-settlements', label: '판매자 정산', icon: <Store className="w-4 h-4" />, path: '/ecommerce/vendor-settlements' },
+      { id: 'fee-management', label: '수수료 관리', icon: <DollarSign className="w-4 h-4" />, path: '/ecommerce/fee-management' },
+      { id: 'settlement-reports', label: '정산 보고서', icon: <FileCheck className="w-4 h-4" />, path: '/ecommerce/settlement-reports' },
+      { id: 'reports', label: '매출 보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
       { id: 'ecommerce-settings', label: '설정', icon: <Cog className="w-4 h-4" />, path: '/ecommerce/settings' }
     ]
   },
@@ -208,6 +218,12 @@ export const wordpressMenuItems: MenuItem[] = [
     label: '도구',
     icon: <Wrench className="w-5 h-5" />,
     path: '/tools'
+  },
+  {
+    id: 'apps',
+    label: 'Apps',
+    icon: <Package className="w-5 h-5" />,
+    path: '/apps'
   },
   {
     id: 'settings',

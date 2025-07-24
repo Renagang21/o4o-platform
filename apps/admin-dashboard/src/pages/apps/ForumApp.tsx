@@ -1,6 +1,57 @@
-import { MessageSquare, Users, FileText, Settings, Shield } from 'lucide-react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { MessageSquare, Users, FileText, Settings, Shield, Folder } from 'lucide-react';
+import { lazy, Suspense } from 'react';
+import { Button } from '@/components/ui/button';
+
+// Lazy load forum components
+const ForumBoardList = lazy(() => import('./forum/ForumBoardList'));
+const ForumPostDetail = lazy(() => import('./forum/ForumPostDetail'));
+const ForumPostForm = lazy(() => import('./forum/ForumPostForm'));
+const ForumCategories = lazy(() => import('./forum/ForumCategories'));
+
+const PageLoader = () => (
+  <div className="flex items-center justify-center h-96">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-modern-primary"></div>
+  </div>
+);
 
 const ForumApp = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isMainPage = location.pathname === '/forum';
+
+  if (!isMainPage) {
+    return (
+      <Routes>
+        <Route path="/" element={
+          <Suspense fallback={<PageLoader />}>
+            <ForumBoardList />
+          </Suspense>
+        } />
+        <Route path="/posts/new" element={
+          <Suspense fallback={<PageLoader />}>
+            <ForumPostForm />
+          </Suspense>
+        } />
+        <Route path="/posts/:id" element={
+          <Suspense fallback={<PageLoader />}>
+            <ForumPostDetail />
+          </Suspense>
+        } />
+        <Route path="/posts/:id/edit" element={
+          <Suspense fallback={<PageLoader />}>
+            <ForumPostForm />
+          </Suspense>
+        } />
+        <Route path="/categories" element={
+          <Suspense fallback={<PageLoader />}>
+            <ForumCategories />
+          </Suspense>
+        } />
+      </Routes>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -14,9 +65,10 @@ const ForumApp = () => {
             커뮤니티 포럼을 관리하고 모더레이션하세요.
           </p>
         </div>
-        <button className="px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors">
+        <Button onClick={() => navigate('/forum/categories')}>
+          <Settings className="w-4 h-4 mr-2" />
           포럼 설정
-        </button>
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -124,12 +176,27 @@ const ForumApp = () => {
           </div>
           <div className="wp-card-body">
             <div className="space-y-3">
-              <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
+              <button 
+                onClick={() => navigate('/forum/posts/new')}
+                className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-modern-primary" />
                   <div>
                     <p className="font-medium text-modern-text-primary">공지사항 작성</p>
                     <p className="text-sm text-modern-text-secondary">새 공지사항 등록</p>
+                  </div>
+                </div>
+              </button>
+              <button 
+                onClick={() => navigate('/forum', { replace: true })}
+                className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-5 h-5 text-modern-primary" />
+                  <div>
+                    <p className="font-medium text-modern-text-primary">게시판 관리</p>
+                    <p className="text-sm text-modern-text-secondary">전체 게시글 보기</p>
                   </div>
                 </div>
               </button>
@@ -151,12 +218,15 @@ const ForumApp = () => {
                   </div>
                 </div>
               </button>
-              <button className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
+              <button 
+                onClick={() => navigate('/forum/categories')}
+                className="w-full p-3 text-left border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors"
+              >
                 <div className="flex items-center gap-3">
-                  <Settings className="w-5 h-5 text-modern-text-secondary" />
+                  <Folder className="w-5 h-5 text-modern-text-secondary" />
                   <div>
-                    <p className="font-medium text-modern-text-primary">포럼 설정</p>
-                    <p className="text-sm text-modern-text-secondary">규칙 및 권한 설정</p>
+                    <p className="font-medium text-modern-text-primary">카테고리 설정</p>
+                    <p className="text-sm text-modern-text-secondary">포럼 카테고리 관리</p>
                   </div>
                 </div>
               </button>

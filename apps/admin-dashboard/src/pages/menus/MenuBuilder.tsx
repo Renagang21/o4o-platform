@@ -94,7 +94,7 @@ const MenuBuilder: React.FC = () => {
   const { data: menu, isLoading: isLoadingMenu } = useQuery({
     queryKey: ['menu', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/menus/${id}`)
+      const response = await authClient.api.get(`/v1/menus/${id}`)
       return response.data
     },
     enabled: isEditMode
@@ -104,7 +104,7 @@ const MenuBuilder: React.FC = () => {
   const { data: pages = [] } = useQuery({
     queryKey: ['pages-for-menu'],
     queryFn: async () => {
-      const response = await authClient.api.get('/posts?type=page&status=published')
+      const response = await authClient.api.get('/v1/posts?type=page&status=published')
       return response.data.posts || []
     }
   })
@@ -113,7 +113,7 @@ const MenuBuilder: React.FC = () => {
   const { data: posts = [] } = useQuery({
     queryKey: ['posts-for-menu'],
     queryFn: async () => {
-      const response = await authClient.api.get('/posts?type=post&status=published&limit=50')
+      const response = await authClient.api.get('/v1/posts?type=post&status=published&limit=50')
       return response.data.posts || []
     }
   })
@@ -122,7 +122,7 @@ const MenuBuilder: React.FC = () => {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories-for-menu'],
     queryFn: async () => {
-      const response = await authClient.api.get('/categories')
+      const response = await authClient.api.get('/v1/categories')
       return response.data
     }
   })
@@ -130,13 +130,13 @@ const MenuBuilder: React.FC = () => {
   // Create menu mutation
   const createMutation = useMutation({
     mutationFn: async (data: CreateMenuDto) => {
-      const response = await authClient.api.post('/menus', data)
+      const response = await authClient.api.post('/v1/menus', data)
       return response.data
     },
     onSuccess: () => {
       toast.success('메뉴가 생성되었습니다')
       queryClient.invalidateQueries({ queryKey: ['menus'] })
-      navigate('/menus')
+      navigate('/themes/menus')
     },
     onError: () => {
       toast.error('메뉴 생성에 실패했습니다')
@@ -146,7 +146,7 @@ const MenuBuilder: React.FC = () => {
   // Update menu mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateMenuDto) => {
-      const response = await authClient.api.put(`/menus/${id}`, data)
+      const response = await authClient.api.put(`/v1/menus/${id}`, data)
       return response.data
     },
     onSuccess: () => {
@@ -171,11 +171,19 @@ const MenuBuilder: React.FC = () => {
 
   // Handle save
   const handleSave = () => {
+    // Function to clean items (remove isExpanded property)
+    const cleanItems = (items: DraggableMenuItem[]): MenuItem[] => {
+      return items.map(({ isExpanded, ...item }) => ({
+        ...item,
+        children: item.children ? cleanItems(item.children) : undefined
+      })) as MenuItem[]
+    }
+    
     const menuData = {
       name: menuName,
       location: menuLocation,
       description: menuDescription,
-      items: menuItems.map(({ isExpanded, ...item }) => item),
+      items: cleanItems(menuItems),
       isActive: true
     }
 
@@ -226,9 +234,23 @@ const MenuBuilder: React.FC = () => {
     }
 
     if (editingItem) {
-      setMenuItems(menuItems.map((item: any) => 
-        item.id === editingItem.id ? newItem : item
-      ))
+      // Function to update item in tree
+      const updateInTree = (items: DraggableMenuItem[]): DraggableMenuItem[] => {
+        return items.map((item) => {
+          if (item.id === editingItem.id) {
+            return { ...newItem, isExpanded: item.isExpanded }
+          }
+          if (item.children && item.children.length > 0) {
+            return {
+              ...item,
+              children: updateInTree(item.children)
+            }
+          }
+          return item
+        })
+      }
+      
+      setMenuItems(updateInTree(menuItems))
     } else {
       setMenuItems([...menuItems, newItem])
     }
@@ -237,7 +259,20 @@ const MenuBuilder: React.FC = () => {
   }
 
   const handleDeleteItem = (itemId: string) => {
-    setMenuItems(menuItems.filter(item => item.id !== itemId))
+    // Function to remove item from tree
+    const removeFromTree = (items: DraggableMenuItem[]): DraggableMenuItem[] => {
+      return items.filter(item => {
+        if (item.id === itemId) {
+          return false
+        }
+        if (item.children && item.children.length > 0) {
+          item.children = removeFromTree(item.children)
+        }
+        return true
+      })
+    }
+    
+    setMenuItems(removeFromTree(menuItems))
   }
 
   // Drag and drop handlers
@@ -256,25 +291,73 @@ const MenuBuilder: React.FC = () => {
     setDragOverItem(null)
   }
 
-  const handleDrop = (e: React.DragEvent, targetItem: DraggableMenuItem) => {
+  const handleDrop = (e: React.DragEvent, targetItem: DraggableMenuItem, dropPosition: 'before' | 'after' | 'inside' = 'after') => {
     e.preventDefault()
+    e.stopPropagation()
     
     if (!draggedItem || draggedItem.id === targetItem.id) return
 
-    const newItems = [...menuItems]
-    const draggedIndex = newItems.findIndex(item => item.id === draggedItem.id)
-    const targetIndex = newItems.findIndex(item => item.id === targetItem.id)
-
-    // Remove dragged item
-    newItems.splice(draggedIndex, 1)
+    // Create a deep copy of menu items
+    const newItems = JSON.parse(JSON.stringify(menuItems))
     
-    // Insert at new position
-    newItems.splice(targetIndex, 0, draggedItem)
-
+    // Function to find and remove item from tree
+    const removeFromTree = (items: DraggableMenuItem[], itemId: string): DraggableMenuItem | null => {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].id === itemId) {
+          return items.splice(i, 1)[0]
+        }
+        if (items[i].children && items[i].children!.length > 0) {
+          const found = removeFromTree(items[i].children!, itemId)
+          if (found) return found
+        }
+      }
+      return null
+    }
+    
+    // Function to insert item into tree
+    const insertIntoTree = (items: DraggableMenuItem[], targetId: string, item: DraggableMenuItem, position: 'before' | 'after' | 'inside'): boolean => {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].id === targetId) {
+          if (position === 'inside') {
+            // Add as child
+            items[i].children = items[i].children || []
+            item.parentId = targetId
+            items[i].children!.push(item)
+            items[i].isExpanded = true
+          } else {
+            // Add as sibling
+            item.parentId = items[i].parentId
+            const insertIndex = position === 'before' ? i : i + 1
+            items.splice(insertIndex, 0, item)
+          }
+          return true
+        }
+        if (items[i].children && items[i].children!.length > 0) {
+          if (insertIntoTree(items[i].children!, targetId, item, position)) {
+            return true
+          }
+        }
+      }
+      return false
+    }
+    
+    // Remove dragged item from tree
+    const removedItem = removeFromTree(newItems, draggedItem.id)
+    if (!removedItem) return
+    
+    // Insert item at new position
+    insertIntoTree(newItems, targetItem.id, removedItem, dropPosition)
+    
     // Update order values
-    newItems.forEach((item, index: any) => {
-      item.order = index
-    })
+    const updateOrder = (items: DraggableMenuItem[], startOrder = 0) => {
+      items.forEach((item, index) => {
+        item.order = startOrder + index
+        if (item.children && item.children.length > 0) {
+          updateOrder(item.children, 0)
+        }
+      })
+    }
+    updateOrder(newItems)
 
     setMenuItems(newItems)
     setDraggedItem(null)
@@ -310,22 +393,26 @@ const MenuBuilder: React.FC = () => {
       <div key={item.id} className={level > 0 ? 'ml-8' : ''}>
         <div
           className={`
-            flex items-center gap-2 p-3 bg-white border rounded-lg mb-2
+            relative flex items-center gap-2 p-3 bg-white border rounded-lg mb-2 transition-all
             ${dragOverItem === item.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}
             ${draggedItem?.id === item.id ? 'opacity-50' : ''}
+            hover:shadow-sm
           `}
           draggable
           onDragStart={(e) => handleDragStart(e, item)}
-          onDragOver={(e) => handleDragOver(e, item.id)}
+          onDragOver={(e) => {
+            e.preventDefault()
+            handleDragOver(e, item.id)
+          }}
           onDragLeave={handleDragLeave}
-          onDrop={(e) => handleDrop(e, item)}
+          onDrop={(e) => handleDrop(e, item, 'after')}
         >
-          <GripVertical className="w-5 h-5 text-gray-400 cursor-move" />
+          <GripVertical className="w-5 h-5 text-gray-400 cursor-move flex-shrink-0" />
           
           {hasChildren && (
             <button
               onClick={() => toggleItemExpanded(item.id)}
-              className="p-1"
+              className="p-1 hover:bg-gray-100 rounded"
             >
               {item.isExpanded ? (
                 <ChevronDown className="w-4 h-4" />
@@ -335,25 +422,26 @@ const MenuBuilder: React.FC = () => {
             </button>
           )}
 
-          <div className="flex-1 flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 min-w-0">
             {getItemIcon(item.type)}
-            <span className="font-medium">{item.label}</span>
-            <Badge variant="outline" className="text-xs">
+            <span className="font-medium truncate">{item.label}</span>
+            <Badge variant="outline" className="text-xs flex-shrink-0">
               {item.type}
             </Badge>
             {item.url && (
-              <span className="text-sm text-gray-500">({item.url})</span>
+              <span className="text-sm text-gray-500 truncate hidden sm:block">({item.url})</span>
             )}
             {item.target === '_blank' && (
-              <ExternalLink className="w-3 h-3 text-gray-400" />
+              <ExternalLink className="w-3 h-3 text-gray-400 flex-shrink-0" />
             )}
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleEditItem(item)}
+              className="h-8 w-8 p-0"
             >
               <Edit2 className="w-4 h-4" />
             </Button>
@@ -361,14 +449,33 @@ const MenuBuilder: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => handleDeleteItem(item.id)}
+              className="h-8 w-8 p-0 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4 text-red-500" />
             </Button>
           </div>
+          
+          {/* Drop zone indicator for nesting */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-8 flex items-end justify-center opacity-0 hover:opacity-100"
+            onDragOver={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            onDrop={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleDrop(e, item, 'inside')
+            }}
+          >
+            <div className="w-full mx-8 h-1 bg-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded">Drop here to nest</span>
+            </div>
+          </div>
         </div>
 
         {hasChildren && item.isExpanded && (
-          <div className="ml-4">
+          <div className="ml-4 pl-4 border-l-2 border-gray-200">
             {item.children!.map(child => renderMenuItem(child, level + 1))}
           </div>
         )}
@@ -390,7 +497,7 @@ const MenuBuilder: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/menus')}
+          onClick={() => navigate('/themes/menus')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           메뉴 목록

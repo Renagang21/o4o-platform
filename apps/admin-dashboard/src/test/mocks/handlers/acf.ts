@@ -158,14 +158,16 @@ const mockFieldGroups: ACFFieldGroup[] = [
 // Store field groups in memory for CRUD operations
 let fieldGroups = [...mockFieldGroups];
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
 export const acfHandlers = [
   // Get all field groups
-  http.get('/api/v1/acf/field-groups', () => {
+  http.get(`${API_BASE}/v1/acf/field-groups`, () => {
     return HttpResponse.json(fieldGroups);
   }),
 
   // Get single field group
-  http.get('/api/v1/acf/field-groups/:id', ({ params }: any) => {
+  http.get(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }: any) => {
     const fieldGroup = fieldGroups.find(fg => fg.id === params.id);
     if (!fieldGroup) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });
@@ -174,7 +176,7 @@ export const acfHandlers = [
   }),
 
   // Create field group
-  http.post('/api/v1/acf/field-groups', async ({ request }: any) => {
+  http.post(`${API_BASE}/v1/acf/field-groups`, async ({ request }: any) => {
     const data = await request.json() as any;
     const newFieldGroup: ACFFieldGroup = {
       id: `fg-${Date.now()}`,
@@ -188,7 +190,7 @@ export const acfHandlers = [
   }),
 
   // Update field group
-  http.put('/api/v1/acf/field-groups/:id', async ({ params, request }: any) => {
+  http.put(`${API_BASE}/v1/acf/field-groups/:id`, async ({ params, request }: any) => {
     const data = await request.json() as any;
     const index = fieldGroups.findIndex(fg => fg.id === params.id);
     
@@ -206,7 +208,7 @@ export const acfHandlers = [
   }),
 
   // Delete field group
-  http.delete('/api/v1/acf/field-groups/:id', ({ params }: any) => {
+  http.delete(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }: any) => {
     const index = fieldGroups.findIndex(fg => fg.id === params.id);
     
     if (index === -1) {
@@ -218,7 +220,7 @@ export const acfHandlers = [
   }),
 
   // Duplicate field group
-  http.post('/api/v1/acf/field-groups/:id/duplicate', ({ params }: any) => {
+  http.post(`${API_BASE}/v1/acf/field-groups/:id/duplicate`, ({ params }: any) => {
     const fieldGroup = fieldGroups.find(fg => fg.id === params.id);
     
     if (!fieldGroup) {

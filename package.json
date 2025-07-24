@@ -6,7 +6,9 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "!apps/*.backup",
+    "!packages/*.backup"
   ],
   "engines": {
     "node": ">=20.0.0 <21.0.0",

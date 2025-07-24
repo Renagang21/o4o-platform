@@ -35,7 +35,7 @@ const CPTList: React.FC = () => {
   const { data: postTypes = [], isLoading } = useQuery({
     queryKey: ['custom-post-types'],
     queryFn: async () => {
-      const response = await authClient.api.get('/custom-post-types')
+      const response = await authClient.api.get('/v1/custom-post-types')
       return response.data
     }
   })
@@ -43,7 +43,7 @@ const CPTList: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/custom-post-types/${id}`)
+      return authClient.api.delete(`/v1/custom-post-types/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom-post-types'] })

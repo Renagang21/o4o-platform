@@ -35,18 +35,20 @@ const MenuList: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Fetch menus
-  const { data: menus = [], isLoading } = useQuery({
+  const { data: menuData, isLoading } = useQuery({
     queryKey: ['menus'],
     queryFn: async () => {
-      const response = await authClient.api.get('/menus')
+      const response = await authClient.api.get('/v1/menus')
       return response.data
     }
   })
 
+  const menus = menuData?.menus || []
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/menus/${id}`)
+      return authClient.api.delete(`/v1/menus/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menus'] })
@@ -60,7 +62,7 @@ const MenuList: React.FC = () => {
   // Toggle active mutation
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return authClient.api.patch(`/menus/${id}/active`, { isActive })
+      return authClient.api.patch(`/v1/menus/${id}/active`, { isActive })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menus'] })
@@ -97,7 +99,7 @@ const MenuList: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">메뉴 관리</h1>
           <p className="text-gray-600 mt-1">사이트의 내비게이션 메뉴를 관리합니다</p>
         </div>
-        <Button onClick={() => navigate('/menus/new')}>
+        <Button onClick={() => navigate('/themes/menus/new')}>
           <Plus className="w-4 h-4 mr-2" />
           새 메뉴
         </Button>
@@ -144,7 +146,7 @@ const MenuList: React.FC = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => navigate(`/menus/${menu.id}/edit`)}>
+                              <DropdownMenuItem onClick={() => navigate(`/themes/menus/${menu.id}/edit`)}>
                                 <Edit2 className="w-4 h-4 mr-2" />
                                 편집
                               </DropdownMenuItem>
@@ -182,7 +184,7 @@ const MenuList: React.FC = () => {
                           </div>
                           <div className="pt-3 border-t">
                             <Link
-                              to={`/menus/${menu.id}/edit`}
+                              to={`/themes/menus/${menu.id}/edit`}
                               className="text-sm text-blue-600 hover:text-blue-800"
                             >
                               메뉴 편집 →
@@ -202,7 +204,7 @@ const MenuList: React.FC = () => {
           <CardContent className="text-center py-12">
             <MenuIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 mb-4">메뉴가 없습니다</p>
-            <Button onClick={() => navigate('/menus/new')}>
+            <Button onClick={() => navigate('/themes/menus/new')}>
               <Plus className="w-4 h-4 mr-2" />
               첫 메뉴 만들기
             </Button>

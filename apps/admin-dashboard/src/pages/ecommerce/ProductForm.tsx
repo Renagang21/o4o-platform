@@ -6,10 +6,15 @@ import {
   Package,
   DollarSign,
   Image as ImageIcon,
-  X
+  X,
+  FolderTree,
+  Settings2
 } from 'lucide-react';
 import { useProduct, useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
 import { Product } from '@/types/ecommerce';
+import ProductVariantManager, { ProductOption, ProductVariant } from '@/components/ecommerce/ProductVariantManager';
+import { useQuery } from '@tanstack/react-query';
+import { authClient } from '@o4o/auth-client';
 // import TipTapEditor from '@/components/ui/TipTapEditor';
 
 const ProductForm: React.FC = () => {
@@ -44,10 +49,24 @@ const ProductForm: React.FC = () => {
     images: [],
     metaTitle: '',
     metaDescription: '',
+    categoryIds: [],
   });
 
+  const [productOptions, setProductOptions] = useState<ProductOption[]>([]);
+  const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   // const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ['product-categories'],
+    queryFn: async () => {
+      const response = await authClient.api.get('/v1/ecommerce/categories/tree');
+      return response.data;
+    }
+  });
+  const categories = categoriesData?.data || [];
 
   // Load product data in edit mode
   useEffect(() => {
@@ -92,6 +111,38 @@ const ProductForm: React.FC = () => {
       .replace(/-+/g, '-')
       .trim();
     handleInputChange('slug', slug || '');
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    const newCategories = selectedCategories.includes(categoryId)
+      ? selectedCategories.filter(id => id !== categoryId)
+      : [...selectedCategories, categoryId];
+    
+    setSelectedCategories(newCategories);
+    handleInputChange('categoryIds', newCategories);
+  };
+
+  const renderCategoryTree = (cats: any[], level = 0) => {
+    return cats.map(category => (
+      <div key={category.id}>
+        <div
+          className={`flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer`}
+          style={{ paddingLeft: `${level * 1.5}rem` }}
+        >
+          <input
+            type="checkbox"
+            checked={selectedCategories.includes(category.id)}
+            onChange={() => toggleCategory(category.id)}
+            className="mr-2"
+          />
+          <span className="text-sm">{category.name}</span>
+          <span className="text-xs text-gray-500 ml-2">({category.productCount})</span>
+        </div>
+        {category.children && category.children.length > 0 && (
+          <div>{renderCategoryTree(category.children, level + 1)}</div>
+        )}
+      </div>
+    ));
   };
 
   if (isLoading && isEditMode) {
@@ -288,6 +339,37 @@ const ProductForm: React.FC = () => {
             </div>
           </div>
 
+          {/* Categories */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center">
+              <FolderTree className="w-5 h-5 mr-2" />
+              카테고리
+            </h2>
+            
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {renderCategoryTree(categories)}
+            </div>
+          </div>
+
+          {/* Product Options & Variants */}
+          {formData.type === 'variable' && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center">
+                <Settings2 className="w-5 h-5 mr-2" />
+                상품 옵션 및 변형
+              </h2>
+              
+              <ProductVariantManager
+                options={productOptions}
+                variants={productVariants}
+                basePrice={formData.retailPrice || 0}
+                baseSku={formData.sku || ''}
+                onOptionsChange={setProductOptions}
+                onVariantsChange={setProductVariants}
+              />
+            </div>
+          )}
+
           {/* Inventory */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center">
@@ -416,7 +498,8 @@ const ProductForm: React.FC = () => {
               onChange={(e: any) => handleInputChange('type', e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="physical">실물 상품</option>
+              <option value="simple">단순 상품</option>
+              <option value="variable">옵션 상품</option>
               <option value="digital">디지털 상품</option>
               <option value="service">서비스</option>
             </select>

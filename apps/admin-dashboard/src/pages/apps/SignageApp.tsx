@@ -1,6 +1,37 @@
-import { Monitor, Play, Calendar, MapPin, Settings, Power, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Monitor, Play, Plus, Link, Copy, Youtube, Video, Search, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { VideoCopyButton } from '@/components/apps/VideoCopyButton';
+import { parseVideoUrl, isValidVideoUrl } from '@/utils/videoUtils';
+import toast from 'react-hot-toast';
 
 const SignageApp = () => {
+  const [videoUrl, setVideoUrl] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
+
+  const handleAddVideo = () => {
+    if (!videoUrl) {
+      toast.error('비디오 URL을 입력해주세요.');
+      return;
+    }
+
+    setIsValidating(true);
+
+    if (isValidVideoUrl(videoUrl)) {
+      const videoInfo = parseVideoUrl(videoUrl);
+      toast.success(`${videoInfo.type === 'youtube' ? 'YouTube' : 'Vimeo'} 비디오가 확인되었습니다!`);
+      // TODO: 실제로 비디오를 추가하는 로직
+      setVideoUrl('');
+    } else {
+      toast.error('유효한 YouTube 또는 Vimeo URL을 입력해주세요.');
+    }
+
+    setIsValidating(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -8,250 +39,298 @@ const SignageApp = () => {
         <div>
           <h1 className="text-2xl font-bold text-modern-text-primary flex items-center gap-2">
             <Monitor className="w-8 h-8 text-modern-primary" />
-            디지털 사이니지 관리
+            디지털 사이니지 비디오 관리
           </h1>
           <p className="text-modern-text-secondary mt-1">
-            디지털 디스플레이를 관리하고 콘텐츠를 배포하세요.
+            YouTube/Vimeo 비디오를 추가하고 디스플레이에 표시할 콘텐츠를 관리하세요.
           </p>
         </div>
-        <button className="px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors">
-          새 디스플레이 추가
-        </button>
       </div>
+
+      {/* Quick Add Video */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="w-5 h-5 text-modern-primary" />
+            빠른 비디오 추가
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input
+              type="url"
+              placeholder="YouTube 또는 Vimeo URL을 입력하세요..."
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="flex-1"
+            />
+            <Button onClick={handleAddVideo} disabled={isValidating}>
+              <Plus className="w-4 h-4 mr-2" />
+              추가
+            </Button>
+          </div>
+          <p className="text-sm text-modern-text-secondary mt-2">
+            예: https://www.youtube.com/watch?v=dQw4w9WgXcQ 또는 https://vimeo.com/123456789
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-modern-text-secondary">전체 디스플레이</p>
+                <p className="text-sm text-modern-text-secondary">내 비디오</p>
                 <p className="text-2xl font-bold text-modern-text-primary">24</p>
-                <p className="text-xs text-modern-text-secondary mt-1">12개 지점</p>
+                <p className="text-xs text-modern-text-secondary mt-1">총 재생시간 2시간 30분</p>
               </div>
-              <Monitor className="w-8 h-8 text-modern-primary opacity-20" />
+              <Video className="w-8 h-8 text-modern-primary opacity-20" />
             </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-modern-text-secondary">활성 디스플레이</p>
-                <p className="text-2xl font-bold text-modern-success">22</p>
-                <p className="text-xs text-modern-success mt-1">91.7% 가동률</p>
+                <p className="text-sm text-modern-text-secondary">공유된 비디오</p>
+                <p className="text-2xl font-bold text-modern-success">156</p>
+                <p className="text-xs text-modern-text-secondary mt-1">다른 사용자가 공유</p>
               </div>
-              <Power className="w-8 h-8 text-modern-success opacity-20" />
+              <Copy className="w-8 h-8 text-modern-success opacity-20" />
             </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-modern-text-secondary">재생 중 콘텐츠</p>
+                <p className="text-sm text-modern-text-secondary">YouTube</p>
                 <p className="text-2xl font-bold text-modern-warning">45</p>
-                <p className="text-xs text-modern-text-secondary mt-1">15개 플레이리스트</p>
+                <p className="text-xs text-modern-text-secondary mt-1">플레이리스트 3개</p>
               </div>
-              <Play className="w-8 h-8 text-modern-warning opacity-20" />
+              <Youtube className="w-8 h-8 text-modern-warning opacity-20" />
             </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-modern-text-secondary">오류 상태</p>
-                <p className="text-2xl font-bold text-modern-danger">2</p>
-                <p className="text-xs text-modern-danger mt-1">즉시 확인 필요</p>
+                <p className="text-sm text-modern-text-secondary">Vimeo</p>
+                <p className="text-2xl font-bold text-modern-accent">12</p>
+                <p className="text-xs text-modern-text-secondary mt-1">프리미엄 콘텐츠</p>
               </div>
-              <AlertCircle className="w-8 h-8 text-modern-danger opacity-20" />
+              <Play className="w-8 h-8 text-modern-accent opacity-20" />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Display Grid */}
+      {/* Video Lists */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Display List */}
-        <div className="wp-card">
-          <div className="wp-card-header">
-            <h2 className="text-lg font-semibold">디스플레이 현황</h2>
-          </div>
-          <div className="wp-card-body">
+        {/* My Videos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>내 비디오</span>
+              <Button size="sm" variant="outline">
+                <Search className="w-4 h-4 mr-2" />
+                검색
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-3">
-              <div className="p-4 border border-modern-border-primary rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-modern-success rounded-full mt-2"></div>
-                    <div>
-                      <h3 className="font-medium text-modern-text-primary">강남점 1층 메인</h3>
-                      <p className="text-sm text-modern-text-secondary">55" LG OLED</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs text-modern-text-secondary flex items-center gap-1">
-                          <MapPin className="w-3 h-3" /> 강남점
-                        </span>
-                        <span className="text-xs text-modern-text-secondary flex items-center gap-1">
-                          <Play className="w-3 h-3" /> 프로모션 A
-                        </span>
-                      </div>
+              {/* Sample Video Item */}
+              <div className="p-4 border border-modern-border-primary rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-32 h-20 bg-modern-bg-tertiary rounded flex items-center justify-center flex-shrink-0">
+                    <Youtube className="w-8 h-8 text-modern-text-tertiary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-modern-text-primary line-clamp-1">
+                      2024 봄 신제품 프로모션
+                    </h4>
+                    <p className="text-sm text-modern-text-secondary mt-1">
+                      재생시간: 2:30 | YouTube
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">프로모션</Badge>
+                      <span className="text-xs text-modern-text-secondary">
+                        2024.03.15 추가
+                      </span>
                     </div>
                   </div>
-                  <button className="p-1.5 hover:bg-modern-bg-hover rounded">
-                    <Settings className="w-4 h-4 text-modern-text-secondary" />
-                  </button>
+                  <Button size="sm" variant="ghost">
+                    <Play className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
-              
-              <div className="p-4 border border-modern-border-primary rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-modern-success rounded-full mt-2"></div>
-                    <div>
-                      <h3 className="font-medium text-modern-text-primary">강남점 2층 대기실</h3>
-                      <p className="text-sm text-modern-text-secondary">43" Samsung</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs text-modern-text-secondary flex items-center gap-1">
-                          <MapPin className="w-3 h-3" /> 강남점
-                        </span>
-                        <span className="text-xs text-modern-text-secondary flex items-center gap-1">
-                          <Play className="w-3 h-3" /> 일반 콘텐츠
-                        </span>
-                      </div>
+
+              <div className="p-4 border border-modern-border-primary rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-32 h-20 bg-modern-bg-tertiary rounded flex items-center justify-center flex-shrink-0">
+                    <Video className="w-8 h-8 text-modern-text-tertiary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-modern-text-primary line-clamp-1">
+                      브랜드 소개 영상
+                    </h4>
+                    <p className="text-sm text-modern-text-secondary mt-1">
+                      재생시간: 5:15 | Vimeo
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">브랜딩</Badge>
+                      <span className="text-xs text-modern-text-secondary">
+                        2024.02.28 추가
+                      </span>
                     </div>
                   </div>
-                  <button className="p-1.5 hover:bg-modern-bg-hover rounded">
-                    <Settings className="w-4 h-4 text-modern-text-secondary" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-modern-danger rounded-full mt-2"></div>
-                    <div>
-                      <h3 className="font-medium text-modern-text-primary">판교점 입구</h3>
-                      <p className="text-sm text-modern-danger">연결 끊김</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs text-modern-text-secondary flex items-center gap-1">
-                          <MapPin className="w-3 h-3" /> 판교점
-                        </span>
-                        <span className="text-xs text-modern-danger flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" /> 오프라인 2시간
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="p-1.5 hover:bg-red-100 rounded">
-                    <Settings className="w-4 h-4 text-modern-danger" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <button className="mt-4 w-full py-2 border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
-              모든 디스플레이 보기
-            </button>
-          </div>
-        </div>
-
-        {/* Content Management */}
-        <div className="wp-card">
-          <div className="wp-card-header">
-            <h2 className="text-lg font-semibold">콘텐츠 관리</h2>
-          </div>
-          <div className="wp-card-body">
-            <div className="space-y-4 mb-4">
-              <div className="p-3 bg-modern-bg-tertiary rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-modern-text-primary">프로모션 A</span>
-                  <span className="text-xs px-2 py-1 bg-modern-success text-white rounded">재생 중</span>
-                </div>
-                <p className="text-sm text-modern-text-secondary mb-2">봄맞이 특별 할인 이벤트</p>
-                <div className="flex items-center gap-4 text-xs text-modern-text-secondary">
-                  <span>12개 디스플레이</span>
-                  <span>30초 x 5개 슬라이드</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-modern-bg-tertiary rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-modern-text-primary">일반 콘텐츠</span>
-                  <span className="text-xs px-2 py-1 bg-modern-success text-white rounded">재생 중</span>
-                </div>
-                <p className="text-sm text-modern-text-secondary mb-2">브랜드 소개 및 제품 안내</p>
-                <div className="flex items-center gap-4 text-xs text-modern-text-secondary">
-                  <span>8개 디스플레이</span>
-                  <span>60초 x 10개 슬라이드</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-modern-bg-tertiary rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-modern-text-primary">시간대별 콘텐츠</span>
-                  <span className="text-xs px-2 py-1 bg-gray-500 text-white rounded">예약됨</span>
-                </div>
-                <p className="text-sm text-modern-text-secondary mb-2">점심 시간 특별 메뉴</p>
-                <div className="flex items-center gap-4 text-xs text-modern-text-secondary">
-                  <span>4개 디스플레이</span>
-                  <span>11:30 - 13:30</span>
+                  <Button size="sm" variant="ghost">
+                    <Play className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button className="py-2 border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
-                콘텐츠 업로드
-              </button>
-              <button className="py-2 border border-modern-border-primary rounded-lg hover:bg-modern-bg-hover transition-colors">
-                플레이리스트 관리
-              </button>
+            <Button variant="outline" className="w-full mt-4">
+              전체 보기
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Shared Videos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>공유된 비디오</span>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline">
+                  <Filter className="w-4 h-4 mr-2" />
+                  필터
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {/* Shared Video with Copy Button */}
+              <div className="p-4 border border-modern-border-primary rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-32 h-20 bg-modern-bg-tertiary rounded flex items-center justify-center flex-shrink-0">
+                    <Youtube className="w-8 h-8 text-modern-text-tertiary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-modern-text-primary line-clamp-1">
+                      건강 관리 팁 시리즈
+                    </h4>
+                    <p className="text-sm text-modern-text-secondary mt-1">
+                      재생시간: 3:45 | YouTube 플레이리스트
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">교육</Badge>
+                      <span className="text-xs text-modern-text-secondary">
+                        by 마케팅팀
+                      </span>
+                    </div>
+                  </div>
+                  <VideoCopyButton postId="video_123" size="sm" />
+                </div>
+              </div>
+
+              <div className="p-4 border border-modern-border-primary rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-32 h-20 bg-modern-bg-tertiary rounded flex items-center justify-center flex-shrink-0">
+                    <Video className="w-8 h-8 text-modern-text-tertiary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-modern-text-primary line-clamp-1">
+                      매장 인테리어 소개
+                    </h4>
+                    <p className="text-sm text-modern-text-secondary mt-1">
+                      재생시간: 1:30 | Vimeo
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">매장소개</Badge>
+                      <span className="text-xs text-modern-text-secondary">
+                        by 디자인팀
+                      </span>
+                    </div>
+                  </div>
+                  <VideoCopyButton postId="video_124" size="sm" />
+                </div>
+              </div>
+
+              <div className="p-4 border border-modern-border-primary rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-32 h-20 bg-modern-bg-tertiary rounded flex items-center justify-center flex-shrink-0">
+                    <Youtube className="w-8 h-8 text-modern-text-tertiary" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-modern-text-primary line-clamp-1">
+                      고객 후기 모음
+                    </h4>
+                    <p className="text-sm text-modern-text-secondary mt-1">
+                      재생시간: 4:20 | YouTube
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">후기</Badge>
+                      <span className="text-xs text-modern-text-secondary">
+                        by CS팀
+                      </span>
+                    </div>
+                  </div>
+                  <VideoCopyButton postId="video_125" size="sm" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+
+            <Button variant="outline" className="w-full mt-4">
+              더 많은 비디오 보기
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Schedule Calendar */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">콘텐츠 스케줄</h2>
-            <div className="flex items-center gap-2">
-              <button className="p-1.5 hover:bg-modern-bg-hover rounded">
-                <Calendar className="w-5 h-5 text-modern-text-secondary" />
-              </button>
+      {/* Info Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>사용 가이드</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-modern-primary">
+                <Link className="w-5 h-5" />
+                <h4 className="font-medium">비디오 추가하기</h4>
+              </div>
+              <p className="text-sm text-modern-text-secondary">
+                YouTube나 Vimeo URL을 붙여넣어 비디오를 빠르게 추가하세요. 
+                플레이리스트 URL도 지원됩니다.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-modern-primary">
+                <Copy className="w-5 h-5" />
+                <h4 className="font-medium">비디오 복사하기</h4>
+              </div>
+              <p className="text-sm text-modern-text-secondary">
+                다른 사용자가 공유한 비디오를 내 목록에 복사하여 사용할 수 있습니다.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-modern-primary">
+                <Monitor className="w-5 h-5" />
+                <h4 className="font-medium">디스플레이 설정</h4>
+              </div>
+              <p className="text-sm text-modern-text-secondary">
+                CPT와 ACF를 활용하여 디스플레이별 재생 스케줄과 설정을 관리하세요.
+              </p>
             </div>
           </div>
-        </div>
-        <div className="wp-card-body">
-          <div className="grid grid-cols-7 gap-2 mb-4">
-            {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
-              <div key={day} className="text-center text-xs font-medium text-modern-text-secondary py-2">
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-2">
-            {Array.from({ length: 30 }, (_, i) => i + 1).map((date) => (
-              <div
-                key={date}
-                className={`aspect-square flex items-center justify-center rounded-lg text-sm 
-                  ${date === 15 ? 'bg-modern-primary text-white' : 'hover:bg-modern-bg-hover'}
-                  ${[8, 12, 15, 22, 28].includes(date) ? 'border border-modern-primary' : ''}
-                `}
-              >
-                {date}
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 pt-4 border-t border-modern-border-primary">
-            <p className="text-sm text-modern-text-secondary">
-              <span className="inline-block w-3 h-3 bg-modern-primary rounded mr-2"></span>
-              오늘: 3개 캠페인 진행 중
-            </p>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

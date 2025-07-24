@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { DevAuthProvider } from '@/lib/DevAuthProvider';
 import { lazy, Suspense, useEffect } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import AppGuard from '@/components/AppGuard';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/stores/authStore';
 import { ssoService } from '@/api/sso';
@@ -22,6 +23,14 @@ const Content = lazy(() => import('@/pages/content/Content'));
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
 const OrderDetail = lazy(() => import('@/pages/ecommerce/OrderDetail'));
+const OrderStatusManagement = lazy(() => import('@/pages/ecommerce/OrderStatusManagement'));
+const InventoryManagement = lazy(() => import('@/pages/ecommerce/InventoryManagement'));
+const TossPaymentsSettings = lazy(() => import('@/pages/ecommerce/TossPaymentsSettings'));
+const RefundManagement = lazy(() => import('@/pages/ecommerce/RefundManagement'));
+const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
+const VendorSettlements = lazy(() => import('@/pages/ecommerce/VendorSettlements'));
+const FeeManagement = lazy(() => import('@/pages/ecommerce/FeeManagement'));
+const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 const Pages = lazy(() => import('@/pages/pages/Pages'));
@@ -31,6 +40,7 @@ const Categories = lazy(() => import('@/pages/categories/Categories'));
 const HomepageEditor = lazy(() => import('@/pages/templates/HomepageEditor'));
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
+const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
 const TestPage = lazy(() => import('@/pages/test/TestPage'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
@@ -43,6 +53,7 @@ const VendorsReports = lazy(() => import('@/pages/vendors/VendorsReports'));
 
 // Affiliate Management Pages
 const AffiliatePartners = lazy(() => import('@/pages/affiliate/AffiliatePartners'));
+const AffiliatePartnerForm = lazy(() => import('@/pages/affiliate/AffiliatePartnerForm'));
 const AffiliateLinks = lazy(() => import('@/pages/affiliate/AffiliateLinks'));
 const AffiliateCommission = lazy(() => import('@/pages/affiliate/AffiliateCommission'));
 const AffiliateAnalytics = lazy(() => import('@/pages/affiliate/AffiliateAnalytics'));
@@ -51,6 +62,9 @@ const AffiliateAnalytics = lazy(() => import('@/pages/affiliate/AffiliateAnalyti
 const ForumApp = lazy(() => import('@/pages/apps/ForumApp'));
 const SignageApp = lazy(() => import('@/pages/apps/SignageApp'));
 const CrowdfundingApp = lazy(() => import('@/pages/apps/CrowdfundingApp'));
+const CrowdfundingProjects = lazy(() => import('@/pages/apps/CrowdfundingProjects'));
+const CrowdfundingProjectDetail = lazy(() => import('@/pages/apps/CrowdfundingProjectDetail'));
+const CrowdfundingProjectForm = lazy(() => import('@/pages/apps/CrowdfundingProjectForm'));
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 
 // User Management Pages
@@ -59,6 +73,9 @@ const RolePermissions = lazy(() => import('@/pages/users/RolePermissions'));
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 const GutenbergPage = lazy(() => import('@/pages/test/GutenbergPage'));
+
+// Apps Manager
+const AppsManager = lazy(() => import('@/pages/apps/AppsManager'));
 
 // Loading component
 const PageLoader = () => (
@@ -290,6 +307,14 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
+                    <Route path="/ecommerce/categories" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ProductCategories />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
                     <Route path="/ecommerce/products/new" element={
                       <AdminProtectedRoute requiredPermissions={['products:write']}>
                         <Suspense fallback={<PageLoader />}>
@@ -317,6 +342,70 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['orders:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <OrderDetail />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/order-status" element={
+                      <AdminProtectedRoute requiredPermissions={['orders:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <OrderStatusManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/inventory" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <InventoryManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/payments/toss" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TossPaymentsSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/refunds" element={
+                      <AdminProtectedRoute requiredPermissions={['orders:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <RefundManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/settlements" element={
+                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SettlementDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/vendor-settlements" element={
+                      <AdminProtectedRoute requiredPermissions={['vendors:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <VendorSettlements />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/fee-management" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <FeeManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/settlement-reports" element={
+                      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SettlementReports />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -368,33 +457,59 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 제휴 마케팅 */}
+                    {/* 제휴 마케팅 - App Guard 적용 */}
                     <Route path="/affiliate/partners" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliatePartners />
-                        </Suspense>
+                        <AppGuard appName="affiliate">
+                          <Suspense fallback={<PageLoader />}>
+                            <AffiliatePartners />
+                          </Suspense>
+                        </AppGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/affiliate/partners/new" element={
+                      <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
+                        <AppGuard appName="affiliate">
+                          <Suspense fallback={<PageLoader />}>
+                            <AffiliatePartnerForm />
+                          </Suspense>
+                        </AppGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/affiliate/partners/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
+                        <AppGuard appName="affiliate">
+                          <Suspense fallback={<PageLoader />}>
+                            <AffiliatePartnerForm />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/links" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliateLinks />
-                        </Suspense>
+                        <AppGuard appName="affiliate">
+                          <Suspense fallback={<PageLoader />}>
+                            <AffiliateLinks />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/commission" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliateCommission />
-                        </Suspense>
+                        <AppGuard appName="affiliate">
+                          <Suspense fallback={<PageLoader />}>
+                            <AffiliateCommission />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     <Route path="/affiliate/analytics" element={
                       <AdminProtectedRoute requiredPermissions={['affiliate:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <AffiliateAnalytics />
-                        </Suspense>
+                        <AppGuard appName="affiliate">
+                          <Suspense fallback={<PageLoader />}>
+                            <AffiliateAnalytics />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     
@@ -432,28 +547,70 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* Forum, Signage, Crowdfunding */}
-                    <Route path="/forum" element={
+                    {/* Forum, Signage, Crowdfunding - App Guard 적용 */}
+                    <Route path="/forum/*" element={
                       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ForumApp />
-                        </Suspense>
+                        <AppGuard appName="forum">
+                          <Suspense fallback={<PageLoader />}>
+                            <ForumApp />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     
                     <Route path="/signage" element={
                       <AdminProtectedRoute requiredPermissions={['signage:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <SignageApp />
-                        </Suspense>
+                        <AppGuard appName="signage">
+                          <Suspense fallback={<PageLoader />}>
+                            <SignageApp />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     
                     <Route path="/crowdfunding" element={
                       <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <CrowdfundingApp />
-                        </Suspense>
+                        <AppGuard appName="crowdfunding">
+                          <Suspense fallback={<PageLoader />}>
+                            <CrowdfundingApp />
+                          </Suspense>
+                        </AppGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/crowdfunding/projects" element={
+                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
+                        <AppGuard appName="crowdfunding">
+                          <Suspense fallback={<PageLoader />}>
+                            <CrowdfundingProjects />
+                          </Suspense>
+                        </AppGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/crowdfunding/projects/new" element={
+                      <AdminProtectedRoute requiredPermissions={['crowdfunding:write']}>
+                        <AppGuard appName="crowdfunding">
+                          <Suspense fallback={<PageLoader />}>
+                            <CrowdfundingProjectForm />
+                          </Suspense>
+                        </AppGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/crowdfunding/projects/:id" element={
+                      <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
+                        <AppGuard appName="crowdfunding">
+                          <Suspense fallback={<PageLoader />}>
+                            <CrowdfundingProjectDetail />
+                          </Suspense>
+                        </AppGuard>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/crowdfunding/projects/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['crowdfunding:write']}>
+                        <AppGuard appName="crowdfunding">
+                          <Suspense fallback={<PageLoader />}>
+                            <CrowdfundingProjectForm />
+                          </Suspense>
+                        </AppGuard>
                       </AdminProtectedRoute>
                     } />
                     
@@ -462,6 +619,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <ToolsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Apps Manager */}
+                    <Route path="/apps" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AppsManager />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

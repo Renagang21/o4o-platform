@@ -24,6 +24,14 @@ import { acfHandlers } from '../../test/mocks/handlers/acf';
 import { mediaHandlers } from '../../test/mocks/handlers/media';
 import { templateHandlers } from '../../test/mocks/handlers/templates';
 import { widgetHandlers } from '../../test/mocks/handlers/widgets';
+import { userManagementHandlers } from './userHandlers';
+import { affiliateHandlers } from '../../test/mocks/handlers/affiliate';
+import { forumHandlers } from '../../test/mocks/handlers/forum';
+import { productCategoryHandlers } from '../../test/mocks/handlers/product-categories';
+import { orderStatusHandlers } from '../../test/mocks/handlers/order-status';
+import { inventoryHandlers } from '../../test/mocks/handlers/inventory';
+import { tossPaymentsHandlers } from '../../test/mocks/handlers/toss-payments';
+import { crowdfundingHandlers } from '../../test/mocks/handlers/crowdfunding';
 
 // API Base URL (환경에 따라 변경)
 const API_BASE = 'http://localhost:4000/api';
@@ -62,6 +70,30 @@ export const handlers = [
   
   // Widget handlers
   ...widgetHandlers,
+  
+  // User Management handlers
+  ...userManagementHandlers,
+  
+  // Affiliate handlers
+  ...affiliateHandlers,
+  
+  // Forum handlers
+  ...forumHandlers,
+  
+  // Product Category handlers
+  ...productCategoryHandlers,
+  
+  // Order Status handlers
+  ...orderStatusHandlers,
+  
+  // Inventory handlers
+  ...inventoryHandlers,
+  
+  // Toss Payments handlers
+  ...tossPaymentsHandlers,
+  
+  // Crowdfunding handlers
+  ...crowdfundingHandlers,
   
   // =============================================================================
   // AUTHENTICATION HANDLERS - 최우선 순위
