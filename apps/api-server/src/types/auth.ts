@@ -3,9 +3,15 @@
 import { Request } from 'express';
 
 export enum UserRole {
-  CUSTOMER = 'customer',
-  ADMIN = 'admin', 
+  SUPER_ADMIN = 'super_admin',
+  ADMIN = 'admin',
+  VENDOR = 'vendor',
   SELLER = 'seller',
+  CUSTOMER = 'customer',
+  BUSINESS = 'business',
+  MODERATOR = 'moderator',
+  PARTNER = 'partner',
+  // Legacy roles kept for backward compatibility
   SUPPLIER = 'supplier',
   MANAGER = 'manager'
 }

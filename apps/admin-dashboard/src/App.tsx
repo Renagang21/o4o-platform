@@ -15,10 +15,9 @@ import AdminLayout from '@/components/layout/AdminLayout';
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
-const UsersList = lazy(() => import('@/pages/Users/UsersList'));
-const UserCreate = lazy(() => import('@/pages/Users/UserCreate'));
-const UserEdit = lazy(() => import('@/pages/Users/UserEdit'));
-const UserDetail = lazy(() => import('@/pages/Users/UserDetail'));
+const UsersPage = lazy(() => import('@/pages/users'));
+const UserForm = lazy(() => import('@/pages/users/UserForm'));
+const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const Content = lazy(() => import('@/pages/content/Content'));
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
@@ -172,14 +171,14 @@ function App() {
                     <Route path="/users" element={
                       <AdminProtectedRoute requiredPermissions={['users:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <UsersList />
+                          <UsersPage />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    <Route path="/users/new" element={
+                    <Route path="/users/add" element={
                       <AdminProtectedRoute requiredPermissions={['users:create']}>
                         <Suspense fallback={<PageLoader />}>
-                          <UserCreate />
+                          <UserForm />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -209,7 +208,7 @@ function App() {
                     <Route path="/users/:id/edit" element={
                       <AdminProtectedRoute requiredPermissions={['users:update']}>
                         <Suspense fallback={<PageLoader />}>
-                          <UserEdit />
+                          <UserForm />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

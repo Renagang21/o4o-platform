@@ -1,7 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth';
 import { BusinessInfo } from '../types/user';
 import { RefreshToken } from './RefreshToken';
+import { ApprovalLog } from './ApprovalLog';
+import * as bcrypt from 'bcryptjs';
 // import { IsEmail, IsEnum, IsArray, IsOptional } from 'class-validator';
 
 // Re-export types for external use
@@ -46,6 +48,7 @@ export class User {
   @Column({ type: 'json', nullable: true })
   businessInfo?: BusinessInfo;
 
+  // Single role for backward compatibility
   @Column({ 
     type: 'enum', 
     enum: UserRole,
@@ -53,6 +56,13 @@ export class User {
   })
   // @IsEnum(UserRole)
   role!: UserRole;
+
+  // Multiple roles support
+  @Column({
+    type: 'simple-array',
+    default: () => `'${UserRole.CUSTOMER}'`
+  })
+  roles!: string[];
 
   @Column({ type: 'json', default: () => "'[]'" })
   // @IsArray()
@@ -121,6 +131,49 @@ export class User {
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
   refreshTokens: RefreshToken[];
 
+  // Approval logs relationship
+  @OneToMany(() => ApprovalLog, log => log.user)
+  approvalLogs: ApprovalLog[];
+
+  // Admin actions relationship
+  @OneToMany(() => ApprovalLog, log => log.admin)
+  adminActions: ApprovalLog[];
+
+  // Password hashing
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password && !this.password.startsWith('$2')) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+  }
+
+  // Password validation
+  async validatePassword(password: string): Promise<boolean> {
+    return await bcrypt.compare(password, this.password);
+  }
+
+  // Role helper methods
+  hasRole(role: UserRole | string): boolean {
+    return this.roles.includes(role) || this.role === role;
+  }
+
+  hasAnyRole(roles: (UserRole | string)[]): boolean {
+    return roles.some(role => this.hasRole(role));
+  }
+
+  isAdmin(): boolean {
+    return this.hasAnyRole([UserRole.SUPER_ADMIN, UserRole.ADMIN]);
+  }
+
+  isPending(): boolean {
+    return this.status === UserStatus.PENDING;
+  }
+
+  isActiveUser(): boolean {
+    return this.status === UserStatus.ACTIVE || this.status === UserStatus.APPROVED;
+  }
+
   // 민감 정보 제거한 공개 데이터
   toPublicData() {
     return {
@@ -130,6 +183,7 @@ export class User {
       lastName: this.lastName,
       fullName: this.fullName,
       role: this.role,
+      roles: this.roles,
       status: this.status,
       permissions: this.permissions,
       isActive: this.isActive,

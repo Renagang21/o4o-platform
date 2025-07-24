@@ -3,6 +3,7 @@ import { User } from '../entities/User';
 import { RefreshToken } from '../entities/RefreshToken';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
+import { ApprovalLog } from '../entities/ApprovalLog';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
 import { Product } from '../entities/Product';
@@ -79,6 +80,7 @@ export const AppDataSource = new DataSource({
     RefreshToken,
     PasswordResetToken,
     EmailVerificationToken,
+    ApprovalLog,
     MediaFile,
     MediaFolder,
     Product,

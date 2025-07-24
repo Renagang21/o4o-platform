@@ -618,7 +618,7 @@ chmod 600 ~/.ssh/github_actions_key
 **Pre-commit Checklist**:
 - [ ] Run `npm run type-check` for your workspace
 - [ ] Run `npm run lint` and fix ALL warnings
-- [ ] Run `npm audit` and resolve security issues
+- [ ] Run `npm audit --audit-level=moderate` and resolve security issues
 - [ ] Remove all unused imports
 - [ ] Add type annotations for all parameters
 - [ ] Ensure no unused variables (prefix with _ if needed)
@@ -863,6 +863,20 @@ When CI/CD fails, check in this order:
 8. **NO workspace conflicts** - No duplicate workspace names
 
 Remember: **CI/CD has ZERO tolerance for warnings!**
+
+### Most Common Import Errors to Avoid
+```typescript
+// ❌ WRONG - These will always fail in admin-dashboard
+import React from 'react'; // Don't import React in React 17+
+import { cn } from '@o4o/ui/lib/utils'; // Use @/lib/utils instead
+import { Link } from 'lucide-react'; // Check if actually used
+import { Home, Plus, Eye } from 'lucide-react'; // Remove unused icons
+
+// ✅ CORRECT
+import { useState, useEffect } from 'react'; // Import only what you need
+import { cn } from '@/lib/utils'; // Use local import
+import { Settings } from 'lucide-react'; // Import only used icons
+```
 
 ### Type Checking Best Practices
 
@@ -1256,6 +1270,88 @@ DB_PASSWORD: "12345678"
 - Never commit .env files
 - Use different secrets for development/production
 - Rotate keys regularly
+
+### npm Security Audit
+- Run `npm audit --audit-level=moderate` before every commit
+- Fix all high and critical vulnerabilities immediately
+- Update axios regularly to avoid CVE vulnerabilities
+- Keep dependencies up to date with `npm update`
+
+## 🚨 Common Admin Dashboard Issues & Solutions
+
+### 1. Import Path Issues
+```typescript
+// ❌ WRONG - Package import that doesn't exist
+import { cn } from '@o4o/ui/lib/utils';
+
+// ✅ CORRECT - Use local import
+import { cn } from '@/lib/utils';
+```
+
+### 2. Undefined Variable References
+```typescript
+// ❌ WRONG - Variables defined in try block but used in catch
+try {
+  const [forumStats, signageStats] = await Promise.all([...]);
+  // use variables
+} catch (error) {
+  // forumStats is undefined here!
+}
+
+// ✅ CORRECT - Define variables outside try block
+let forumStats: any = null;
+let signageStats: any = null;
+try {
+  [forumStats, signageStats] = await Promise.all([...]);
+} catch (error) {
+  // Now accessible
+}
+```
+
+### 3. Auth Context Type Issues
+```typescript
+// ❌ WRONG - Accessing non-existent properties
+const { user, token } = useAuth(); // token doesn't exist!
+
+// ✅ CORRECT - Use only available properties
+const { user, login, logout, getSessionStatus } = useAuth();
+```
+
+### 4. React Query Parameter Types
+```typescript
+// ❌ WRONG - Assuming req.query values are numbers
+const { limit = 20 } = req.query as { limit?: number };
+
+// ✅ CORRECT - Query params are always strings
+const { limit = '20' } = req.query as { limit?: string };
+const limitNum = parseInt(limit) || 20;
+```
+
+### 5. TypeScript Strict Mode Patterns
+```typescript
+// ❌ WRONG - Missing type in useState
+const [options, setOptions] = useState([...]);
+
+// ✅ CORRECT - Explicit type declaration
+const [options, setOptions] = useState<ScreenOption[]>([...]);
+```
+
+### 6. User Permissions Handling
+```typescript
+// ❌ WRONG - Accessing non-existent permissions field
+const userPermissions = user?.permissions || [];
+
+// ✅ CORRECT - Handle missing field gracefully
+const userPermissions: string[] = []; // TODO: Add permissions to User type
+```
+
+### Admin Dashboard Pre-Push Checklist
+1. **Type Check**: `npm run type-check --workspace=@o4o/admin-dashboard`
+2. **Lint Check**: `npm run lint --workspace=@o4o/admin-dashboard`
+3. **Security Audit**: `npm audit --audit-level=moderate --workspace=@o4o/admin-dashboard`
+4. **Remove ALL unused imports** - CI/CD has zero tolerance
+5. **Fix ALL type errors** - No implicit any, no type assertions without reason
+6. **Check for undefined references** - Especially in try/catch blocks
 
 ## TypeScript Migration Strategy
 

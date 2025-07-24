@@ -21,6 +21,7 @@ import authRoutes from './routes/auth';
 import authV2Routes from './routes/auth-v2';
 import socialAuthRoutes from './routes/social-auth';
 import userRoutes from './routes/user';
+import userManagementRoutes from './routes/users.routes';
 import adminRoutes from './routes/admin';
 import ecommerceRoutes from './routes/ecommerce';
 import cptRoutes from './routes/cpt';
@@ -160,6 +161,7 @@ app.use('/api/v1/auth/v2', authV2Routes); // Cookie-based auth routes
 app.use('/api/v1/auth', socialAuthRoutes); // Social auth routes
 app.use('/api/v1/auth', linkedAccountsRoutes); // Linked accounts routes
 app.use('/api/users', userRoutes);
+app.use('/api/v1/users', userManagementRoutes); // New user management routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
 app.use('/api/cpt', cptRoutes);
