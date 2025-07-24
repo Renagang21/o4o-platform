@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, UserCheck, UserX, Clock, Shield, Mail, Calendar, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 import { api } from '@/api/base';
 import { formatDistanceToNow, format } from 'date-fns';
 
@@ -28,7 +28,6 @@ interface ApprovalLog {
 export default function UserDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [approvalHistory, setApprovalHistory] = useState<ApprovalLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,11 +55,7 @@ export default function UserDetail() {
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load user details',
-        variant: 'destructive',
-      });
+      toast.error('Failed to load user details');
       navigate('/users');
     } finally {
       setLoading(false);
@@ -73,19 +68,12 @@ export default function UserDetail() {
         notes: 'Approved via admin dashboard',
       });
       
-      toast({
-        title: 'Success',
-        description: 'User approved successfully',
-      });
+      toast.success('User approved successfully');
 
       fetchUserData();
     } catch (error) {
       console.error('Error approving user:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to approve user',
-        variant: 'destructive',
-      });
+      toast.error('Failed to approve user');
     }
   };
 
@@ -95,19 +83,12 @@ export default function UserDetail() {
         notes: 'Rejected via admin dashboard',
       });
       
-      toast({
-        title: 'Success',
-        description: 'User rejected successfully',
-      });
+      toast.success('User rejected successfully');
 
       fetchUserData();
     } catch (error) {
       console.error('Error rejecting user:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to reject user',
-        variant: 'destructive',
-      });
+      toast.error('Failed to reject user');
     }
   };
 

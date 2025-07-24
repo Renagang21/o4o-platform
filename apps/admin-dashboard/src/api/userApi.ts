@@ -16,7 +16,7 @@ export class UserApi {
       )
     })
 
-    const response = await apiClient.get(`/admin/users?${params}`)
+    const response = await apiClient.get(`/v1/users?${params}`)
     return response.data
   }
 
@@ -35,57 +35,62 @@ export class UserApi {
       params.append('businessType', businessType)
     }
 
-    const response = await apiClient.get(`/admin/users?${params}`)
+    const response = await apiClient.get(`/v1/users?${params}`)
     return response.data
   }
 
   static async getUser(userId: string): Promise<ApiResponse<User>> {
-    const response = await apiClient.get(`/admin/users/${userId}`)
+    const response = await apiClient.get(`/v1/users/${userId}`)
     return response.data
   }
 
   static async createUser(userData: UserFormData): Promise<ApiResponse<User>> {
-    const response = await apiClient.post('/admin/users', userData)
+    const response = await apiClient.post('/v1/users', userData)
     return response.data
   }
 
   static async updateUser(userId: string, userData: Partial<UserFormData>): Promise<ApiResponse<User>> {
-    const response = await apiClient.put(`/admin/users/${userId}`, userData)
+    const response = await apiClient.put(`/v1/users/${userId}`, userData)
     return response.data
   }
 
   static async approveUser(userId: string, notes?: string): Promise<ApiResponse<User>> {
-    const response = await apiClient.post(`/admin/users/${userId}/approve`, { notes })
+    const response = await apiClient.post(`/v1/users/${userId}/approve`, { notes })
     return response.data
   }
 
   static async rejectUser(userId: string, reason: string): Promise<ApiResponse<User>> {
-    const response = await apiClient.post(`/admin/users/${userId}/reject`, { reason })
+    const response = await apiClient.post(`/v1/users/${userId}/reject`, { notes: reason })
     return response.data
   }
 
-  static async suspendUser(userId: string, reason: string): Promise<ApiResponse<User>> {
-    const response = await apiClient.post(`/admin/users/${userId}/suspend`, { reason })
-    return response.data
-  }
+  // TODO: Implement suspend/reactivate endpoints in backend
+  // static async suspendUser(userId: string, reason: string): Promise<ApiResponse<User>> {
+  //   const response = await apiClient.post(`/v1/users/${userId}/suspend`, { reason })
+  //   return response.data
+  // }
 
-  static async reactivateUser(userId: string): Promise<ApiResponse<User>> {
-    const response = await apiClient.post(`/admin/users/${userId}/reactivate`)
-    return response.data
-  }
+  // static async reactivateUser(userId: string): Promise<ApiResponse<User>> {
+  //   const response = await apiClient.post(`/v1/users/${userId}/reactivate`)
+  //   return response.data
+  // }
 
   static async deleteUser(userId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`/admin/users/${userId}`)
+    const response = await apiClient.delete(`/v1/users/${userId}`)
     return response.data
   }
 
   static async bulkAction(action: UserBulkAction): Promise<ApiResponse<void>> {
-    const response = await apiClient.post('/admin/users/bulk', action)
+    const endpoint = action.action === 'approve' ? '/v1/users/bulk-approve' : '/v1/users/bulk-reject'
+    const response = await apiClient.post(endpoint, {
+      userIds: action.userIds,
+      notes: action.reason || 'Bulk action via admin dashboard'
+    })
     return response.data
   }
 
   static async getUserStats(): Promise<ApiResponse<UserStats>> {
-    const response = await apiClient.get('/admin/users/stats')
+    const response = await apiClient.get('/v1/users/statistics')
     return response.data
   }
 
@@ -96,14 +101,14 @@ export class UserApi {
       )
     )
 
-    const response = await apiClient.get(`/admin/users/export?${params}`, {
+    const response = await apiClient.get(`/v1/users/export/csv?${params}`, {
       responseType: 'blob'
     })
     return response.data
   }
 
   static async getUserActivity(userId: string): Promise<ApiResponse<UserActivityLog[]>> {
-    const response = await apiClient.get(`/admin/users/${userId}/activity`)
+    const response = await apiClient.get(`/v1/users/${userId}/approval-history`)
     return response.data
   }
 

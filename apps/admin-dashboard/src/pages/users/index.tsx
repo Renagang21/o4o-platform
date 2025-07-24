@@ -1,4 +1,3 @@
-import React from 'react';
 import UserStatistics from './components/UserStatistics';
 import UserList from './UserList';
 

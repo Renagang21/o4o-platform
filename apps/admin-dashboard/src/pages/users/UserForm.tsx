@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Save, User } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 import { api } from '@/api/base';
-import { UserRole } from '@o4o/types';
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -28,9 +27,7 @@ type UserFormData = z.infer<typeof userSchema>;
 export default function UserForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
 
   const isEdit = !!id;
 
@@ -67,7 +64,6 @@ export default function UserForm() {
       
       if (response.data.success) {
         const userData = response.data.data;
-        setUser(userData);
         
         // Set form values
         setValue('email', userData.email);
@@ -78,11 +74,7 @@ export default function UserForm() {
       }
     } catch (error) {
       console.error('Error fetching user:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load user',
-        variant: 'destructive',
-      });
+      toast.error('Failed to load user');
       navigate('/users');
     } finally {
       setLoading(false);
@@ -106,27 +98,17 @@ export default function UserForm() {
         
         await api.put(`/v1/users/${id}`, payload);
         
-        toast({
-          title: 'Success',
-          description: 'User updated successfully',
-        });
+        toast.success('User updated successfully');
       } else {
         await api.post('/v1/users', payload);
         
-        toast({
-          title: 'Success',
-          description: 'User created successfully',
-        });
+        toast.success('User created successfully');
       }
       
       navigate('/users');
     } catch (error: any) {
       console.error('Error saving user:', error);
-      toast({
-        title: 'Error',
-        description: error.response?.data?.error || 'Failed to save user',
-        variant: 'destructive',
-      });
+      toast.error(error.response?.data?.error || 'Failed to save user');
     } finally {
       setLoading(false);
     }

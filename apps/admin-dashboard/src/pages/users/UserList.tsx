@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Download, Plus, UserPlus, UserCheck, UserX, Trash2 } from 'lucide-react';
+import { Search, Download, UserPlus, UserCheck, UserX, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/api/base';
 import { UserRole } from '@o4o/types';
@@ -41,7 +41,6 @@ interface UserListResponse {
 
 export default function UserList() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -49,7 +48,7 @@ export default function UserList() {
   const [roleFilter, setRoleFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
+  const [limit] = useState(20);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -75,11 +74,7 @@ export default function UserList() {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load users',
-        variant: 'destructive',
-      });
+      toast.error('Failed to load users');
     } finally {
       setLoading(false);
     }
@@ -117,20 +112,13 @@ export default function UserList() {
         notes: 'Bulk approved via admin dashboard',
       });
 
-      toast({
-        title: 'Success',
-        description: `${selectedUsers.length} users approved successfully`,
-      });
+      toast.success(`${selectedUsers.length} users approved successfully`);
 
       setSelectedUsers([]);
       fetchUsers();
     } catch (error) {
       console.error('Error approving users:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to approve users',
-        variant: 'destructive',
-      });
+      toast.error('Failed to approve users');
     }
   };
 
@@ -144,20 +132,13 @@ export default function UserList() {
         notes: 'Bulk rejected via admin dashboard',
       });
 
-      toast({
-        title: 'Success',
-        description: `${selectedUsers.length} users rejected successfully`,
-      });
+      toast.success(`${selectedUsers.length} users rejected successfully`);
 
       setSelectedUsers([]);
       fetchUsers();
     } catch (error) {
       console.error('Error rejecting users:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to reject users',
-        variant: 'destructive',
-      });
+      toast.error('Failed to reject users');
     }
   };
 
@@ -166,19 +147,12 @@ export default function UserList() {
     try {
       await api.post(`/v1/users/${userId}/approve`);
       
-      toast({
-        title: 'Success',
-        description: 'User approved successfully',
-      });
+      toast.success('User approved successfully');
 
       fetchUsers();
     } catch (error) {
       console.error('Error approving user:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to approve user',
-        variant: 'destructive',
-      });
+      toast.error('Failed to approve user');
     }
   };
 
@@ -187,19 +161,12 @@ export default function UserList() {
     try {
       await api.post(`/v1/users/${userId}/reject`);
       
-      toast({
-        title: 'Success',
-        description: 'User rejected successfully',
-      });
+      toast.success('User rejected successfully');
 
       fetchUsers();
     } catch (error) {
       console.error('Error rejecting user:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to reject user',
-        variant: 'destructive',
-      });
+      toast.error('Failed to reject user');
     }
   };
 
@@ -224,11 +191,7 @@ export default function UserList() {
       link.remove();
     } catch (error) {
       console.error('Error exporting users:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to export users',
-        variant: 'destructive',
-      });
+      toast.error('Failed to export users');
     }
   };
 

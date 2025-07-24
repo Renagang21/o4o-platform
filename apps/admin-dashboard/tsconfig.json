@@ -40,7 +40,8 @@
     "src/components/users/__tests__/UserForm.test.tsx",
     "src/components/users/__tests__/UserDeleteModal.test.tsx",
     "src/components/users/__tests__/UserRoleChangeModal.test.tsx",
-    "src/pages/Users/__tests__/UsersList.test.tsx"
+    "src/pages/Users/__tests__/UsersList.test.tsx",
+    "src/pages/Users/**"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

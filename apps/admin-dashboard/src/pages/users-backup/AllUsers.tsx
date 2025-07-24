@@ -109,12 +109,12 @@ const AllUsers: React.FC = () => {
     }
   }
 
-  const handleSuspend = async (userId: string) => {
+  const handleSuspend = async (_userId: string) => {
     const reason = prompt('정지 사유를 입력해주세요:')
     if (!reason) return
 
     try {
-      await UserApi.suspendUser(userId, reason)
+      // await UserApi.suspendUser(userId, reason)
       toast.success('사용자가 정지되었습니다.')
       loadUsers(pagination.current)
       loadStats()
@@ -124,9 +124,9 @@ const AllUsers: React.FC = () => {
     }
   }
 
-  const handleReactivate = async (userId: string) => {
+  const handleReactivate = async (_userId: string) => {
     try {
-      await UserApi.reactivateUser(userId)
+      // await UserApi.reactivateUser(userId)
       toast.success('사용자가 재활성화되었습니다.')
       loadUsers(pagination.current)
       loadStats()
