@@ -183,14 +183,30 @@ jobs:
         fi
         chmod 644 ~/.ssh/known_hosts
         
+    - name: Clean up old backup folders
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}
+          # 프로젝트 내부의 백업 폴더 제거 (workspace 충돌 방지)
+          if [ -d 'apps/admin-dashboard.backup' ]; then
+            echo 'Removing old backup folder from project directory...'
+            rm -rf apps/admin-dashboard.backup
+          fi
+        "
+        
     - name: Create backup of current deployment
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           if [ -d 'apps/admin-dashboard' ]; then
             echo 'Creating backup of current admin-dashboard...'
-            rm -rf apps/admin-dashboard.backup
-            cp -r apps/admin-dashboard apps/admin-dashboard.backup
+            # 백업을 프로젝트 외부 디렉토리에 생성하여 workspace 충돌 방지
+            BACKUP_DIR=\"/home/${{ secrets.WEB_USER }}/backups/admin-dashboard-\$(date +%Y%m%d-%H%M%S)\"
+            mkdir -p /home/${{ secrets.WEB_USER }}/backups
+            rm -rf /home/${{ secrets.WEB_USER }}/backups/admin-dashboard-latest
+            cp -r apps/admin-dashboard \$BACKUP_DIR
+            ln -sfn \$BACKUP_DIR /home/${{ secrets.WEB_USER }}/backups/admin-dashboard-latest
+            echo \"Backup created at: \$BACKUP_DIR\"
           fi
         "
         
