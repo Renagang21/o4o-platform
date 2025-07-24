@@ -17,7 +17,7 @@ import {
 import { createVendorProduct, updateVendorProduct } from '@/api/vendor/products';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
-import type { VendorProduct, PriceCalculation } from '@o4o/types';
+import type { VendorProduct, VendorPriceCalculation as PriceCalculation } from '@o4o/types';
 
 interface SupplierProductFormProps {
   product?: VendorProduct;
@@ -38,7 +38,7 @@ export const SupplierProductForm: React.FC<SupplierProductFormProps> = ({
     name: product?.name || '',
     sku: product?.sku || '',
     description: product?.description || '',
-    categoryId: product?.categories?.[0]?.id || '',
+    categoryId: product?.categories?.[0] || '',
     supplyPrice: product?.supplyPrice || 0,
     sellPrice: product?.sellPrice || 0,
     marginRate: product?.marginRate || 30,
@@ -110,7 +110,7 @@ export const SupplierProductForm: React.FC<SupplierProductFormProps> = ({
       name: formData.name,
       sku: formData.sku,
       description: formData.description,
-      categoryId: formData.categoryId,
+      categories: formData.categoryId ? [formData.categoryId] : [],
       supplyPrice: formData.supplyPrice,
       sellPrice: formData.sellPrice,
       marginRate: formData.marginRate,

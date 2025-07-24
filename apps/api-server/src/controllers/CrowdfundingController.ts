@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { CrowdfundingRepository } from '../repositories/CrowdfundingRepository';
-import { AppDataSource } from '../database/data-source';
+import AppDataSource from '../database/data-source';
 import { CrowdfundingProject } from '../entities/CrowdfundingProject';
 
 export class CrowdfundingController {

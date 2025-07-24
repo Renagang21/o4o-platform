@@ -26,7 +26,7 @@ const CrowdfundingProjectForm: React.FC = () => {
     forumLink: ''
   });
 
-  const [errors, setErrors] = useState<Partial<CrowdfundingProjectFormData>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof CrowdfundingProjectFormData, string>>>({});
 
   // 수정 모드일 때 기존 데이터 조회
   const { data: projectData, isLoading } = useQuery({
@@ -88,7 +88,7 @@ const CrowdfundingProjectForm: React.FC = () => {
 
   // 폼 유효성 검사
   const validateForm = (): boolean => {
-    const newErrors: Partial<CrowdfundingProjectFormData> = {};
+    const newErrors: Partial<Record<keyof CrowdfundingProjectFormData, string>> = {};
 
     if (!formData.title.trim()) {
       newErrors.title = '프로젝트 제목을 입력하세요.';

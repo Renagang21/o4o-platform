@@ -12,7 +12,7 @@ import { approveProducts, getPendingProducts } from '@/api/vendor/products';
 import { formatPrice, calculateProfitDistribution } from '@/utils/vendorUtils';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
-import type { VendorProduct, ProductApprovalRequest, PriceCalculation as VendorPriceCalculation } from '@o4o/types';
+import type { VendorProduct, ProductApprovalRequest } from '@o4o/types';
 
 export const ProductApprovalManager: React.FC = () => {
   const { user } = useAuth();

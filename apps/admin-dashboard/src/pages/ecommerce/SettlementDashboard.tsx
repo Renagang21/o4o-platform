@@ -73,7 +73,7 @@ const SettlementDashboard: React.FC = () => {
   const vendors: VendorSettlement[] = vendorData?.data || [];
 
   // Fetch revenue chart data
-  const { data: chartData, isLoading: chartLoading } = useQuery({
+  const { data: chartData } = useQuery({
     queryKey: ['settlement-charts', dateRange],
     queryFn: async () => {
       const response = await authClient.api.get(`/v1/settlements/charts?range=${dateRange}`);

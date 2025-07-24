@@ -474,11 +474,11 @@ const AppsManager: React.FC = () => {
               />
             </div>
 
-            {selectedApp?.dependencies.length > 0 && (
+            {selectedApp?.dependencies && selectedApp.dependencies.length > 0 && (
               <div className="p-3 bg-modern-bg-secondary rounded-lg">
                 <div className="text-sm font-medium text-modern-text-secondary mb-2">의존성 앱</div>
                 <div className="space-y-1">
-                  {selectedApp.dependencies.map(depId => {
+                  {selectedApp?.dependencies?.map(depId => {
                     const depApp = apps.find(a => a.id === depId);
                     return depApp ? (
                       <div key={depId} className="flex items-center justify-between text-sm">

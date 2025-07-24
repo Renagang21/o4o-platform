@@ -74,7 +74,7 @@ const TossPaymentsSettings: React.FC = () => {
   });
 
   // Fetch Toss Payments configuration
-  const { data: configData, isLoading } = useQuery({
+  const { data: configData } = useQuery({
     queryKey: ['toss-payments-config'],
     queryFn: async () => {
       const response = await authClient.api.get('/v1/payments/toss/config');

@@ -168,7 +168,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
   return (
     <div className="flex items-center gap-2">
       {/* 네이티브 공유 (모바일) */}
-      {typeof navigator !== 'undefined' && navigator.share && (
+      {typeof navigator !== 'undefined' && 'share' in navigator && (
         <Button
           size={size}
           variant={variant}

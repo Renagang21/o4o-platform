@@ -555,7 +555,7 @@ const InventoryManagement: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-4 py-2 text-sm">
-                        {movement.type === 'out' || movement.type === 'decrease' ? '-' : '+'}
+                        {movement.type === 'out' || movement.type === 'adjustment' ? '-' : '+'}
                         {movement.quantity}
                       </td>
                       <td className="px-4 py-2 text-sm">

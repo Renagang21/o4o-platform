@@ -209,9 +209,9 @@ export function initializeReferralTracking(): void {
  * 추천 성과 실시간 업데이트를 위한 WebSocket 연결 (선택사항)
  */
 export class ReferralRealtimeTracker {
-  private ws: WebSocket | null = null;
+  private ws: any = null;
   
-  connect(affiliateUserId: string): void {
+  connect(_affiliateUserId: string): void {
     // 실시간 기능은 복잡성을 피하기 위해 제외
     // 필요시 간단한 폴링으로 대체
   }

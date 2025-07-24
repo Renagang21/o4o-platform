@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatPrice, getStockStatus, getProductStatusBadge } from '@/utils/vendorUtils';
-import type { SupplierStats, VendorProduct } from '@o4o/types';
+import type { VendorSupplierStats as SupplierStats, VendorProduct } from '@o4o/types';
 
 interface SupplierDashboardProps {
   stats: SupplierStats;

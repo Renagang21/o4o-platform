@@ -13,7 +13,6 @@ import { CommissionHistory } from '@/components/affiliate/CommissionHistory';
 import { ReferralToolkit } from '@/components/affiliate/ReferralToolkit';
 import { PerformanceChart } from '@/components/affiliate/PerformanceChart';
 import { useAuth } from '@o4o/auth-context';
-import { getAffiliateStats, getAffiliateUser } from '@/api/affiliate';
 import { formatPrice } from '@/utils/vendorUtils';
 import type { AffiliateUser, UserAffiliateDashboard } from '@o4o/types';
 
@@ -352,7 +351,7 @@ const AffiliatePerformanceDashboard = () => {
         {/* 추천 링크 탭 */}
         <TabsContent value="links" className="space-y-6">
           <ReferralLinkGenerator
-            referralCode={affiliateData?.affiliateCode || ''}
+            referralCode={affiliateData?.referralCode || ''}
             userName={user?.name}
           />
         </TabsContent>
@@ -365,7 +364,7 @@ const AffiliatePerformanceDashboard = () => {
         {/* 도구 탭 */}
         <TabsContent value="toolkit" className="space-y-6">
           <ReferralToolkit
-            referralCode={affiliateData?.affiliateCode || ''}
+            referralCode={affiliateData?.referralCode || ''}
             userName={user?.name}
           />
         </TabsContent>

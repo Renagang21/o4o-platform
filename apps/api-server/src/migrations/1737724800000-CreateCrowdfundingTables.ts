@@ -70,6 +70,20 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
                         onUpdate: 'CURRENT_TIMESTAMP',
                     },
                 ],
+                indices: [
+                    {
+                        name: 'IDX_crowdfunding_projects_creator_id',
+                        columnNames: ['creator_id']
+                    },
+                    {
+                        name: 'IDX_crowdfunding_projects_status',
+                        columnNames: ['status']
+                    },
+                    {
+                        name: 'IDX_crowdfunding_projects_dates',
+                        columnNames: ['start_date', 'end_date']
+                    }
+                ]
             }),
             true,
         );
@@ -122,41 +136,26 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
                         onUpdate: 'CURRENT_TIMESTAMP',
                     },
                 ],
+                indices: [
+                    {
+                        name: 'IDX_crowdfunding_participations_project_id',
+                        columnNames: ['project_id']
+                    },
+                    {
+                        name: 'IDX_crowdfunding_participations_vendor_id',
+                        columnNames: ['vendor_id']
+                    },
+                    {
+                        name: 'UQ_crowdfunding_participations_project_vendor',
+                        columnNames: ['project_id', 'vendor_id'],
+                        isUnique: true
+                    }
+                ]
             }),
             true,
         );
 
-        // Create indexes
-        await queryRunner.createIndex(
-            'crowdfunding_projects',
-            new Index('IDX_crowdfunding_projects_creator_id', ['creator_id']),
-        );
-
-        await queryRunner.createIndex(
-            'crowdfunding_projects',
-            new Index('IDX_crowdfunding_projects_status', ['status']),
-        );
-
-        await queryRunner.createIndex(
-            'crowdfunding_projects',
-            new Index('IDX_crowdfunding_projects_dates', ['start_date', 'end_date']),
-        );
-
-        await queryRunner.createIndex(
-            'crowdfunding_participations',
-            new Index('IDX_crowdfunding_participations_project_id', ['project_id']),
-        );
-
-        await queryRunner.createIndex(
-            'crowdfunding_participations',
-            new Index('IDX_crowdfunding_participations_vendor_id', ['vendor_id']),
-        );
-
-        // Create unique constraint for project_id + vendor_id
-        await queryRunner.createIndex(
-            'crowdfunding_participations',
-            new Index('UQ_crowdfunding_participations_project_vendor', ['project_id', 'vendor_id'], { isUnique: true }),
-        );
+        // Indexes are defined in table creation above
 
         // Create foreign keys
         await queryRunner.createForeignKey(
@@ -209,13 +208,7 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
             await queryRunner.dropForeignKey('crowdfunding_participations', participationsVendorFk);
         }
 
-        // Drop indexes
-        await queryRunner.dropIndex('crowdfunding_projects', 'IDX_crowdfunding_projects_creator_id');
-        await queryRunner.dropIndex('crowdfunding_projects', 'IDX_crowdfunding_projects_status');
-        await queryRunner.dropIndex('crowdfunding_projects', 'IDX_crowdfunding_projects_dates');
-        await queryRunner.dropIndex('crowdfunding_participations', 'IDX_crowdfunding_participations_project_id');
-        await queryRunner.dropIndex('crowdfunding_participations', 'IDX_crowdfunding_participations_vendor_id');
-        await queryRunner.dropIndex('crowdfunding_participations', 'UQ_crowdfunding_participations_project_vendor');
+        // Indexes are dropped with tables
 
         // Drop tables
         await queryRunner.dropTable('crowdfunding_participations');

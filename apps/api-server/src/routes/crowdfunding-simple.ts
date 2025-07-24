@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { CrowdfundingController } from '../controllers/CrowdfundingController';
-import { authenticateToken } from '../middleware/auth';
-import { roleRequired } from '../middleware/roleRequired';
+import { authenticateToken, requireRole } from '../middleware/auth';
 
 const router = Router();
 const crowdfundingController = new CrowdfundingController();
@@ -15,16 +14,16 @@ router.get('/projects/:id', crowdfundingController.getProjectById.bind(crowdfund
 router.get('/dashboard/stats', crowdfundingController.getDashboardStats.bind(crowdfundingController));
 
 // 참여 관련 (Business/Affiliate 사용자만)
-router.post('/projects/:id/join', roleRequired(['business', 'affiliate']), crowdfundingController.joinProject.bind(crowdfundingController));
-router.post('/projects/:id/cancel', roleRequired(['business', 'affiliate']), crowdfundingController.cancelParticipation.bind(crowdfundingController));
+router.post('/projects/:id/join', requireRole(['business', 'affiliate']), crowdfundingController.joinProject.bind(crowdfundingController));
+router.post('/projects/:id/cancel', requireRole(['business', 'affiliate']), crowdfundingController.cancelParticipation.bind(crowdfundingController));
 router.get('/projects/:id/participation-status', crowdfundingController.getParticipationStatus.bind(crowdfundingController));
 
 // 프로젝트 생성/수정/삭제 (Business 사용자만 - 제품 개발사)
-router.post('/projects', roleRequired(['business']), crowdfundingController.createProject.bind(crowdfundingController));
-router.put('/projects/:id', roleRequired(['business']), crowdfundingController.updateProject.bind(crowdfundingController));
-router.delete('/projects/:id', roleRequired(['business']), crowdfundingController.deleteProject.bind(crowdfundingController));
+router.post('/projects', requireRole(['business']), crowdfundingController.createProject.bind(crowdfundingController));
+router.put('/projects/:id', requireRole(['business']), crowdfundingController.updateProject.bind(crowdfundingController));
+router.delete('/projects/:id', requireRole(['business']), crowdfundingController.deleteProject.bind(crowdfundingController));
 
 // 관리자 전용 라우트
-router.patch('/projects/:id/status', roleRequired(['admin']), crowdfundingController.updateProjectStatus.bind(crowdfundingController));
+router.patch('/projects/:id/status', requireRole(['admin']), crowdfundingController.updateProjectStatus.bind(crowdfundingController));
 
 export { router as crowdfundingSimpleRoutes };

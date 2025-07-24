@@ -166,9 +166,9 @@ const ProductCategories: React.FC = () => {
         parentId: category.parentId,
         active: category.active,
         attributes: category.attributes || [],
-        shippingPolicy: category.shippingPolicy || {
-          freeShippingThreshold: 50000,
-          baseShippingFee: 3000
+        shippingPolicy: {
+          freeShippingThreshold: category.shippingPolicy?.freeShippingThreshold || 50000,
+          baseShippingFee: category.shippingPolicy?.baseShippingFee || 3000
         },
         seo: {
           title: category.seo?.title || '',
@@ -237,11 +237,11 @@ const ProductCategories: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const submitData = {
+    const submitData: any = {
       ...formData,
       seo: {
         ...formData.seo,
-        keywords: formData.seo.keywords.split(',').map(k => k.trim()).filter(k => k)
+        keywords: formData.seo.keywords.split(',').map((k: string) => k.trim()).filter(k => k)
       }
     };
 

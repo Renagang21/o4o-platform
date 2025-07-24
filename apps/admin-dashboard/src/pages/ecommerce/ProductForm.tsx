@@ -49,7 +49,7 @@ const ProductForm: React.FC = () => {
     images: [],
     metaTitle: '',
     metaDescription: '',
-    categoryIds: [],
+    categories: [],
   });
 
   const [productOptions, setProductOptions] = useState<ProductOption[]>([]);
@@ -119,7 +119,7 @@ const ProductForm: React.FC = () => {
       : [...selectedCategories, categoryId];
     
     setSelectedCategories(newCategories);
-    handleInputChange('categoryIds', newCategories);
+    handleInputChange('categories', newCategories);
   };
 
   const renderCategoryTree = (cats: any[], level = 0) => {

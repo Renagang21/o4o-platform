@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -15,14 +14,14 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
-import type { CrowdfundingProjectDetail, CrowdfundingParticipation } from '@o4o/types';
+import type { CrowdfundingProjectDetail as ProjectDetail, CrowdfundingParticipation } from '@o4o/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import toast from 'react-hot-toast';
 
-const CrowdfundingProjectDetail: React.FC = () => {
+const CrowdfundingProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -37,7 +36,7 @@ const CrowdfundingProjectDetail: React.FC = () => {
     enabled: !!id
   });
 
-  const project: CrowdfundingProjectDetail = projectData?.data;
+  const project: ProjectDetail = projectData?.data;
 
   // 참여 상태 조회
   const { data: participationData } = useQuery({

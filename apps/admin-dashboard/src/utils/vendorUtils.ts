@@ -4,7 +4,7 @@
  */
 
 import type { 
-  PriceCalculation as VendorPriceCalculation, 
+  VendorPriceCalculation as PriceCalculation, 
   ProfitCalculationParams,
   SupplierOrderSplit,
   VendorOrderItem
