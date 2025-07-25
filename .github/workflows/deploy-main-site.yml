@@ -247,8 +247,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           # serve가 설치되어 있는지 확인하고 없으면 설치
           if ! command -v serve &> /dev/null; then
-            echo 'Installing serve globally...'
-            npm install -g serve
+            echo 'Installing serve globally with sudo...'
+            sudo npm install -g serve
           else
             echo 'serve is already installed'
           fi
