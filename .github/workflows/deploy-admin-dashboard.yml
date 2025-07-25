@@ -228,7 +228,7 @@ jobs:
     - name: Deploy static files to secured directory
       run: |
         # 관리자 대시보드 정적 파일 배포
-        rsync -avz --delete \
+        rsync -avz --delete --no-owner --no-group --no-perms \
           -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/admin.neture.co.kr/
@@ -245,25 +245,26 @@ jobs:
         
     - name: Deploy application files
       run: |
-        rsync -avz --delete \
+        rsync -avz --delete --no-owner --no-group --no-perms \
           -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:${{ env.DEPLOY_PATH }}/apps/admin-dashboard/
           
-    - name: Fix file permissions
+    - name: Fix file permissions and ownership
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
+          # 모든 파일과 디렉토리의 소유권을 현재 사용자로 변경
+          sudo chown -R \$(whoami):\$(whoami) .
           # 파일 권한 수정
-          find . -type f -name '*.json' -exec chmod 644 {} \;
-          find . -type f -name '*.js' -exec chmod 644 {} \;
-          find . -type f -name '*.ts' -exec chmod 644 {} \;
+          find . -type f -exec chmod 644 {} \;
           find . -type d -exec chmod 755 {} \;
-          # 소유자 확인 및 수정
+          # package.json 권한 확인
           if [ -f package.json ]; then
             chmod 644 package.json
             ls -la package.json
           fi
+          echo 'File permissions and ownership fixed'
         "
           
     - name: Install production dependencies
