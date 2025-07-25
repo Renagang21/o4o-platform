@@ -33,7 +33,17 @@ export default defineConfig({
   server: {
     port: 3001,
     host: '0.0.0.0',
-    strictPort: true
+    strictPort: true,
+    allowedHosts: [
+      'admin.neture.co.kr',
+      'www.neture.co.kr',
+      'shop.neture.co.kr',
+      'forum.neture.co.kr',
+      'signage.neture.co.kr',
+      'funding.neture.co.kr',
+      'neture.co.kr',
+      'localhost'
+    ]
   },
   optimizeDeps: {
     include: ['@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']

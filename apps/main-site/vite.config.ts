@@ -22,6 +22,12 @@ export default defineConfig({
     strictPort: false,
     allowedHosts: [
       'neture.co.kr',
+      'www.neture.co.kr',
+      'shop.neture.co.kr',
+      'forum.neture.co.kr',
+      'signage.neture.co.kr',
+      'funding.neture.co.kr',
+      'admin.neture.co.kr',
       'localhost',
       '127.0.0.1'
     ]
