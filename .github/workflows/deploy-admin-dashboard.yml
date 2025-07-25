@@ -243,37 +243,16 @@ jobs:
           echo 'Deployment directory prepared'
         "
         
-    - name: Deploy application files
-      run: |
-        rsync -avz --delete --no-owner --no-group --no-perms \
-          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
-          apps/admin-dashboard/ \
-          ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:${{ env.DEPLOY_PATH }}/apps/admin-dashboard/
-          
-    - name: Fix file permissions and ownership
+    - name: Install serve globally if needed
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
-          # 모든 파일과 디렉토리의 소유권을 현재 사용자로 변경
-          sudo chown -R \$(whoami):\$(whoami) .
-          # 파일 권한 수정
-          find . -type f -exec chmod 644 {} \;
-          find . -type d -exec chmod 755 {} \;
-          # package.json 권한 확인
-          if [ -f package.json ]; then
-            chmod 644 package.json
-            ls -la package.json
+          # serve가 설치되어 있는지 확인하고 없으면 설치
+          if ! command -v serve &> /dev/null; then
+            echo 'Installing serve globally...'
+            npm install -g serve
+          else
+            echo 'serve is already installed'
           fi
-          echo 'File permissions and ownership fixed'
-        "
-          
-    - name: Install production dependencies
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
-          # npm 캐시 정리 및 설치
-          npm cache clean --force
-          npm install --production --no-audit --no-fund
         "
         
     - name: Setup PM2 ecosystem file (Admin Security)
@@ -285,13 +264,13 @@ jobs:
               name: '${{ env.PM2_APP_NAME }}',
               script: 'serve',
               args: [
-                'dist',
                 '-s',
+                '/var/www/admin.neture.co.kr',
                 '-l', '${{ env.SERVICE_PORT }}',
                 '--cors',
                 '--single'
               ],
-              cwd: '${{ env.DEPLOY_PATH }}/apps/admin-dashboard',
+              cwd: '${{ env.DEPLOY_PATH }}',
               instances: 2,
               exec_mode: 'cluster',
               max_memory_restart: '256M',
