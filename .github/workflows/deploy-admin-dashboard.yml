@@ -243,15 +243,16 @@ jobs:
           echo 'Deployment directory prepared'
         "
         
-    - name: Install serve globally if needed
+    - name: Ensure npx is available
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          # serve가 설치되어 있는지 확인하고 없으면 설치
-          if ! command -v serve &> /dev/null; then
-            echo 'Installing serve globally with sudo...'
-            sudo npm install -g serve
+          # npx 사용 가능 확인
+          if command -v npx &> /dev/null; then
+            echo '✅ npx is available'
+            npx --version
           else
-            echo 'serve is already installed'
+            echo '❌ npx is not available'
+            exit 1
           fi
         "
         
@@ -262,8 +263,9 @@ jobs:
           module.exports = {
             apps: [{
               name: '${{ env.PM2_APP_NAME }}',
-              script: 'serve',
+              script: 'npx',
               args: [
+                'serve',
                 '-s',
                 '/var/www/admin.neture.co.kr',
                 '-l', '${{ env.SERVICE_PORT }}',
@@ -296,20 +298,21 @@ jobs:
     - name: Set secure file permissions
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          # 디렉토리 존재 확인
-          if [ -d '${{ env.DEPLOY_PATH }}/apps/admin-dashboard' ]; then
-            cd ${{ env.DEPLOY_PATH }}/apps/admin-dashboard
+          # 정적 파일 디렉토리 권한 설정
+          if [ -d '/var/www/admin.neture.co.kr' ]; then
+            echo 'Setting permissions for static files...'
+            cd /var/www/admin.neture.co.kr
             
             # 보안 강화된 권한 설정
-            chmod -R 644 .
+            find . -type f -exec chmod 644 {} \;
             find . -type d -exec chmod 755 {} \;
-            if [ -f package.json ]; then chmod 644 package*.json; fi
-            if [ -d dist ]; then chmod -R 644 dist/ && find dist -type d -exec chmod 755 {} \;; fi
+            echo '✅ Permissions set for static files'
           else
-            echo 'Warning: admin-dashboard directory does not exist'
+            echo '❌ ERROR: /var/www/admin.neture.co.kr directory does not exist!'
+            exit 1
           fi
           
-          # 로그 디렉토리 권한
+          # 로그 디렉토리 생성 및 권한 설정
           mkdir -p ${{ env.DEPLOY_PATH }}/logs
           chmod 750 ${{ env.DEPLOY_PATH }}/logs
         "
@@ -319,7 +322,22 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
+          # npx serve 실행 가능 확인
+          echo '🔍 Checking npx serve availability...'
+          npx serve --version || echo 'npx serve test failed'
+          
+          # ecosystem 파일 확인
+          echo '📄 Checking ecosystem file...'
+          if [ -f admin-dashboard.ecosystem.config.js ]; then
+            echo '✅ Ecosystem file exists'
+            cat admin-dashboard.ecosystem.config.js
+          else
+            echo '❌ ERROR: Ecosystem file not found!'
+            exit 1
+          fi
+          
           # PM2 프로세스 존재 여부 확인
+          echo '🔄 Managing PM2 process...'
           if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
             echo 'Reloading existing PM2 process...'
             pm2 reload admin-dashboard.ecosystem.config.js --update-env
@@ -336,6 +354,9 @@ jobs:
           echo '📊 PM2 프로세스 상태:'
           pm2 status
           echo ''
+          echo '📋 PM2 로그 (최근 20줄):'
+          pm2 logs ${{ env.PM2_APP_NAME }} --nostream --lines 20 || true
+          echo ''
           echo '📁 배포된 파일 확인:'
           ls -la /var/www/admin.neture.co.kr/ | head -10
           echo ''
@@ -345,6 +366,7 @@ jobs:
             head -5 /var/www/admin.neture.co.kr/index.html
           else
             echo '❌ index.html 파일이 없습니다'
+            exit 1
           fi
         "
 

@@ -242,15 +242,16 @@ jobs:
           apps/main-site/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/neture.co.kr/
           
-    - name: Install serve globally if needed
+    - name: Ensure npx is available
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          # serve가 설치되어 있는지 확인하고 없으면 설치
-          if ! command -v serve &> /dev/null; then
-            echo 'Installing serve globally with sudo...'
-            sudo npm install -g serve
+          # npx 사용 가능 확인
+          if command -v npx &> /dev/null; then
+            echo '✅ npx is available'
+            npx --version
           else
-            echo 'serve is already installed'
+            echo '❌ npx is not available'
+            exit 1
           fi
         "
         
@@ -261,8 +262,9 @@ jobs:
           module.exports = {
             apps: [{
               name: '${{ env.PM2_APP_NAME }}',
-              script: 'serve',
+              script: 'npx',
               args: [
+                'serve',
                 '-s',
                 '/var/www/neture.co.kr',
                 '-l', '${{ env.SERVICE_PORT }}',
@@ -289,10 +291,25 @@ jobs:
           EOF
         "
         
-    - name: Install serve globally
+    - name: Verify static files deployment
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          npm install -g serve@14
+          # 정적 파일 확인
+          if [ -d '/var/www/neture.co.kr' ]; then
+            echo '✅ Static files directory exists'
+            echo '📁 Files in /var/www/neture.co.kr:'
+            ls -la /var/www/neture.co.kr/ | head -10
+            
+            if [ -f '/var/www/neture.co.kr/index.html' ]; then
+              echo '✅ index.html exists'
+            else
+              echo '❌ ERROR: index.html not found!'
+              exit 1
+            fi
+          else
+            echo '❌ ERROR: /var/www/neture.co.kr directory does not exist!'
+            exit 1
+          fi
         "
         
     - name: Deploy with PM2 (Zero-downtime)
@@ -300,7 +317,22 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
+          # npx serve 실행 가능 확인
+          echo '🔍 Checking npx serve availability...'
+          npx serve --version || echo 'npx serve test failed'
+          
+          # ecosystem 파일 확인
+          echo '📄 Checking ecosystem file...'
+          if [ -f main-site.ecosystem.config.js ]; then
+            echo '✅ Ecosystem file exists'
+            cat main-site.ecosystem.config.js
+          else
+            echo '❌ ERROR: Ecosystem file not found!'
+            exit 1
+          fi
+          
           # PM2 프로세스 존재 여부 확인
+          echo '🔄 Managing PM2 process...'
           if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
             echo 'Reloading existing PM2 process...'
             pm2 reload main-site.ecosystem.config.js --update-env
@@ -311,6 +343,14 @@ jobs:
           
           # PM2 상태 저장
           pm2 save
+          
+          # 배포 확인
+          echo ''
+          echo '📊 PM2 프로세스 상태:'
+          pm2 status
+          echo ''
+          echo '📋 PM2 로그 (최근 20줄):'
+          pm2 logs ${{ env.PM2_APP_NAME }} --nostream --lines 20 || true
         "
 
   # 단계 4: 배포 후 헬스체크 및 성능 테스트
