@@ -249,11 +249,29 @@ jobs:
           apps/main-site/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:${{ env.DEPLOY_PATH }}/apps/main-site/
           
+    - name: Fix file permissions
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          cd ${{ env.DEPLOY_PATH }}/apps/main-site
+          # 파일 권한 수정
+          find . -type f -name '*.json' -exec chmod 644 {} \;
+          find . -type f -name '*.js' -exec chmod 644 {} \;
+          find . -type f -name '*.ts' -exec chmod 644 {} \;
+          find . -type d -exec chmod 755 {} \;
+          # 소유자 확인 및 수정
+          if [ -f package.json ]; then
+            chmod 644 package.json
+            ls -la package.json
+          fi
+        "
+          
     - name: Install production dependencies
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/main-site
-          npm install --production
+          # npm 캐시 정리 및 설치
+          npm cache clean --force
+          npm install --production --no-audit --no-fund
         "
         
     - name: Setup PM2 ecosystem file
