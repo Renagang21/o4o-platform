@@ -352,6 +352,26 @@ parameters: {
 } as DegradationParameters
 ```
 
+### 8. **API 서버 헬스체크 실패 (000 응답 코드)**
+
+#### 🚨 발생 상황
+- **에러**: Health check returns 000 (connection failed)
+- **원인**: PM2 미실행, Nginx 미설정, SSL 문제 등
+
+#### ✅ 해결 방법
+1. **CI/CD 수정**: `continue-on-error: true` 추가
+2. **디버깅 단계 추가**:
+   - PM2 프로세스 상태 확인
+   - 포트 리스닝 확인
+   - 직접 연결 테스트
+   - DNS 해석 확인
+
+3. **서버 확인 항목**:
+   - PM2 실행 상태: `pm2 list`
+   - Nginx 설정: api.neture.co.kr → localhost:4000
+   - SSL 인증서 설치
+   - 방화벽 포트 개방
+
 ## 🚨 Common Deployment Issues & Solutions
 
 ### 1. **NPM CI Errors (EUSAGE)**
