@@ -3,7 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { Form } from '../entities/Form';
 import { FormSubmission } from '../entities/FormSubmission';
 import { User } from '../entities/User';
-import type { FormField, FormNotification } from '@o4o/types';
+import type { FormField, FormNotification } from '../types';
 import { AuthRequest } from '../types/auth';
 import { sendEmail } from '../utils/email';
 import { evaluateConditionalLogic } from '../utils/conditionalLogic';

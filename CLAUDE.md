@@ -289,6 +289,8 @@ npm update
 6. **Never hardcode secrets**
 7. **Never create backup dirs inside project**
 8. **Never use req.query values as numbers** - They're strings!
+9. **Never assume packages exist on deployed server** - o4o-apiserver may not have packages/
+10. **Never skip environment variable setup** - OAuth, DB settings are required
 
 ## 📚 Additional Resources
 
@@ -304,6 +306,8 @@ npm update
 - Fixed database password string type issues
 - Added crowdfunding-types package
 - Updated to React 19 and ESLint 9 flat config
+- Fixed API server TypeScript module errors for server deployment
+- Added local type definitions for o4o-apiserver deployment
 
 ## 🚨 Common Deployment Issues & Solutions
 
@@ -351,6 +355,31 @@ server: {
 - **ALWAYS** run `npm run build:packages` before any other build
 - Package build order: types → utils → ui → auth-client → auth-context
 - Never skip the package build step
+
+### 6. **API Server TypeScript Module Errors (o4o-apiserver)**
+**Problem**: `Cannot find module '@o4o/crowdfunding-types'` or `@o4o/types` in deployed server
+**Context**: o4o-apiserver는 배포 시 packages 디렉토리가 없는 환경일 수 있음
+**Solutions**:
+- **로컬 개발**: `npm run build:packages` 실행 필수
+- **서버 배포 시 모듈 에러 발생하면**:
+  1. `apps/api-server/src/types/` 디렉토리 생성
+  2. 필요한 타입 파일들 생성:
+     - `crowdfunding-types.ts` (FundingStatus, FundingCategory, PaymentMethod 등)
+     - `form-builder.ts` (FormField, FormSettings 등)
+     - `database-types.ts` (QueryPlan, ConnectionPoolStats 등)
+     - `graceful-degradation-types.ts` (DegradationParameters 등)
+     - `performance-types.ts` (PerformanceReport, SlowQueryInfo 등)
+     - `index.ts` (모든 타입 re-export)
+  3. Import 경로 수정: `@o4o/types` → `../types` 또는 `../../types`
+- **환경 변수 설정 필수**:
+  ```bash
+  cp env.example .env
+  # OAuth 클라이언트 ID/Secret 설정 필요
+  ```
+- **타입 호환성 문제**:
+  - PostgreSQL EXPLAIN 형식과 MySQL 형식 타입이 혼재
+  - 타입에 optional 속성 추가로 호환성 확보
+  - 개발 모드(`npm run dev`)는 ts-node로 실행되어 더 관대함
 
 ## 🎯 Deployment Best Practices
 

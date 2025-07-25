@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { FormSubmission } from './FormSubmission';
 import { User } from './User';
-import type { FormField, FormSettings, FormNotification, FormConfirmation, FormStyling } from '@o4o/types';
+import type { FormField, FormSettings, FormNotification, FormConfirmation, FormStyling } from '../types';
 
 @Entity('forms')
 @Index(['name'])

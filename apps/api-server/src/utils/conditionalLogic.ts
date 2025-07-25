@@ -1,4 +1,4 @@
-import { ConditionalLogic, ConditionalRule } from '@o4o/types';
+import { ConditionalLogic, ConditionalRule } from '../types';
 
 export function evaluateConditionalLogic(logic: ConditionalLogic, data: Record<string, any>): boolean {
   const results = logic.rules.map(rule => evaluateRule(rule, data));

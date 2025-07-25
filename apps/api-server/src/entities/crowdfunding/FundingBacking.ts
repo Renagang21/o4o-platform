@@ -12,7 +12,7 @@ import {
 import { User } from '../User';
 import { FundingProject } from './FundingProject';
 import { BackerReward } from './BackerReward';
-import type { PaymentMethod, PaymentStatus, BackingStatus } from '@o4o/crowdfunding-types';
+import type { PaymentMethod, PaymentStatus, BackingStatus } from '../../types/crowdfunding-types';
 
 @Entity('funding_backings')
 @Index(['projectId', 'backerId'])

@@ -18,7 +18,7 @@ import {
   RedirectTrafficParams,
   FeatureState,
   IsolationParameters
-} from '@o4o/types';
+} from '../types';
 
 export enum DegradationLevel {
   NONE = 'none',

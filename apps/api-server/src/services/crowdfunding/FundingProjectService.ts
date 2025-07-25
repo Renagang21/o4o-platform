@@ -7,7 +7,7 @@ import type {
   FundingProjectFormData, 
   ProjectFilters,
   FundingStatus 
-} from '@o4o/crowdfunding-types';
+} from '../../types/crowdfunding-types';
 import { generateSlug } from '../../utils/string';
 
 export class FundingProjectService {

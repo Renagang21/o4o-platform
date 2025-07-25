@@ -20,7 +20,7 @@ import {
   QueryCacheEntry as ImportedQueryCacheEntry,
   DatabaseMetrics,
   QueryPattern as ImportedQueryPattern
-} from '@o4o/types';
+} from '../types';
 
 /**
  * 데이터베이스 최적화 서비스

@@ -13,7 +13,7 @@ import { User } from '../User';
 import { FundingReward } from './FundingReward';
 import { FundingBacking } from './FundingBacking';
 import { FundingUpdate } from './FundingUpdate';
-import type { FundingStatus, FundingCategory } from '@o4o/crowdfunding-types';
+import type { FundingStatus, FundingCategory } from '../../types/crowdfunding-types';
 
 @Entity('funding_projects')
 @Index(['status', 'endDate'])

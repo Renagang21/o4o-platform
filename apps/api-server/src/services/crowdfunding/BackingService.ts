@@ -6,7 +6,7 @@ import { FundingReward } from '../../entities/crowdfunding/FundingReward';
 import { BackerReward } from '../../entities/crowdfunding/BackerReward';
 import { User } from '../../entities/User';
 import { FundingProjectService } from './FundingProjectService';
-import type { PaymentMethod, BackingStatus } from '@o4o/crowdfunding-types';
+import type { PaymentMethod, BackingStatus } from '../../types/crowdfunding-types';
 
 interface CreateBackingData {
   projectId: string;

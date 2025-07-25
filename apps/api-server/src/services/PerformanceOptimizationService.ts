@@ -20,7 +20,7 @@ import {
   QueryPerformanceMetrics,
   CacheMetrics,
   SystemMetrics
-} from '@o4o/types';
+} from '../types';
 
 /**
  * 성능 최적화 서비스
