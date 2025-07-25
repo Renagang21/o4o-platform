@@ -354,7 +354,14 @@ parameters: {
 
 ## 🚨 Common Deployment Issues & Solutions
 
-### 1. **NPM Permission Errors (EACCES)**
+### 1. **NPM CI Errors (EUSAGE)**
+**Problem**: `npm ci` fails with "can only install with an existing package-lock.json"
+**Solution**: 
+- Change `npm ci` to `npm install` in GitHub Actions
+- package-lock.json may not be properly synchronized in sparse-checkout environments
+- `npm install` is more forgiving and will generate package-lock.json if missing
+
+### 2. **NPM Permission Errors (EACCES)**
 **Problem**: `EACCES: permission denied` when installing global packages
 **Solutions**:
 - **NEVER** try to install global packages with npm in CI/CD
