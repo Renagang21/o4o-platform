@@ -396,7 +396,17 @@ parameters: {
     ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
 ```
 
-### 3. **NPM Permission Errors (EACCES)**
+### 3. **SSL Certificate Errors (Exit Code 60)**
+**Problem**: curl fails with exit code 60 (SSL certificate problem)
+**Solution**:
+- Add `-k` flag to curl commands to ignore SSL verification
+- Make SSL-dependent steps non-blocking with `continue-on-error: true`
+- Add SSL certificate check for debugging
+```yaml
+curl -k -s -o /dev/null -w "%{http_code}" https://api.example.com
+```
+
+### 4. **NPM Permission Errors (EACCES)**
 **Problem**: `EACCES: permission denied` when installing global packages
 **Solutions**:
 - **NEVER** try to install global packages with npm in CI/CD
