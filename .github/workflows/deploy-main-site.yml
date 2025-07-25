@@ -233,7 +233,8 @@ jobs:
       run: |
         # 정적 파일을 별도 디렉토리에 배포 (CDN 역할)
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          mkdir -p /var/www/neture.co.kr
+          sudo mkdir -p /var/www/neture.co.kr
+          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/neture.co.kr
         "
         
         rsync -avz --delete \

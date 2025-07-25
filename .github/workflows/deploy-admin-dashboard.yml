@@ -218,19 +218,11 @@ jobs:
         
     - name: Ensure deployment directories exist
       run: |
-        # 서버 관리자가 미리 생성해야 하는 디렉토리
-        # 만약 디렉토리가 없다면 서버 관리자에게 다음 명령어 실행 요청:
-        # sudo mkdir -p /var/www/admin.neture.co.kr
-        # sudo chown -R ubuntu:ubuntu /var/www/admin.neture.co.kr
+        # 정적 파일 배포 디렉토리 생성
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          if [ ! -d /var/www/admin.neture.co.kr ]; then
-            echo 'ERROR: /var/www/admin.neture.co.kr does not exist.'
-            echo 'Please ask server admin to run:'
-            echo 'sudo mkdir -p /var/www/admin.neture.co.kr'
-            echo 'sudo chown -R ubuntu:ubuntu /var/www/admin.neture.co.kr'
-            exit 1
-          fi
-          echo 'Directory exists, proceeding with deployment...'
+          sudo mkdir -p /var/www/admin.neture.co.kr
+          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/admin.neture.co.kr
+          echo 'Directory created/verified, proceeding with deployment...'
         "
     
     - name: Deploy static files to secured directory
