@@ -65,7 +65,7 @@
     "js-cookie": "^3.0.5",
     "lowlight": "^3.3.0",
     "lucide-react": "^0.523.0",
-    "postcss-nested": "^6.2.0",
+    "postcss-nested": "^7.0.2",
     "react": "^19.1.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
