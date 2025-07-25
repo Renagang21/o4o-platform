@@ -253,60 +253,45 @@ jobs:
         
     - name: Setup Nginx site configuration
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          # Create Nginx configuration for static site
-          sudo tee /etc/nginx/sites-available/neture.co.kr > /dev/null << 'EOF'
-          server {
-              listen 80;
-              listen [::]:80;
-              server_name neture.co.kr www.neture.co.kr;
-              
-              # Redirect to HTTPS
-              return 301 https://\$server_name\$request_uri;
-          }
-          
-          server {
-              listen 443 ssl http2;
-              listen [::]:443 ssl http2;
-              server_name neture.co.kr www.neture.co.kr;
-              
-              root /var/www/neture.co.kr;
-              index index.html;
-              
-              # SSL configuration (managed by Certbot)
-              ssl_certificate /etc/letsencrypt/live/neture.co.kr/fullchain.pem;
-              ssl_certificate_key /etc/letsencrypt/live/neture.co.kr/privkey.pem;
-              
-              # Security headers
-              add_header X-Frame-Options "SAMEORIGIN" always;
-              add_header X-Content-Type-Options "nosniff" always;
-              add_header X-XSS-Protection "1; mode=block" always;
-              
-              # Gzip compression
-              gzip on;
-              gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
-              
-              # SPA routing
-              location / {
-                  try_files \$uri \$uri/ /index.html;
-              }
-              
-              # Cache static assets
-              location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-                  expires 1y;
-                  add_header Cache-Control "public, immutable";
-              }
-          }
-          EOF
-          
-          # Enable site if not already enabled
-          if [ ! -L /etc/nginx/sites-enabled/neture.co.kr ]; then
-            sudo ln -s /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-enabled/
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} '
+          # Nginx 설정이 이미 존재하는지 확인
+          echo "🔍 Checking existing Nginx configuration..."
+          if [ -f /etc/nginx/sites-available/neture.co.kr ]; then
+            echo "✅ Nginx configuration already exists"
+            echo "📄 Current configuration:"
+            sudo cat /etc/nginx/sites-available/neture.co.kr
+          else
+            echo "⚠️  Nginx configuration not found"
+            echo "Creating basic static site configuration..."
+            
+            # 기본 설정 생성
+            sudo tee /etc/nginx/sites-available/neture.co.kr > /dev/null <<EOF
+server {
+    listen 80;
+    listen [::]:80;
+    server_name neture.co.kr www.neture.co.kr;
+    root /var/www/neture.co.kr;
+    index index.html;
+    
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+EOF
+            
+            # 사이트 활성화
+            if [ ! -L /etc/nginx/sites-enabled/neture.co.kr ]; then
+              sudo ln -s /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-enabled/
+            fi
           fi
           
-          # Test and reload Nginx
+          # Nginx 설정 테스트 및 리로드
+          echo ""
+          echo "🔧 Testing and reloading Nginx..."
           sudo nginx -t && sudo systemctl reload nginx
-        "
+          
+          echo "✅ Nginx configuration completed"
+        '
         
     - name: Verify static files deployment
       run: |
