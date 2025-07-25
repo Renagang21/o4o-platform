@@ -359,6 +359,25 @@ jobs:
       
     - name: Basic health check
       run: |
+        echo "🔍 Starting health check for neture.co.kr..."
+        
+        # 먼저 HTTP로 테스트
+        echo "Testing HTTP access..."
+        curl -I http://neture.co.kr/ || echo "HTTP test failed"
+        
+        # HTTPS로 테스트
+        echo ""
+        echo "Testing HTTPS access..."
+        curl -I https://neture.co.kr/ || echo "HTTPS test failed"
+        
+        # 정적 파일 직접 접근 테스트
+        echo ""
+        echo "Testing direct static file access..."
+        curl -I https://neture.co.kr/index.html || echo "Direct file test failed"
+        
+        # 실제 헬스체크
+        echo ""
+        echo "Running health check loop..."
         for i in {1..10}; do
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             https://neture.co.kr/ || echo "000")
@@ -368,8 +387,22 @@ jobs:
             break
           else
             echo "⏳ 메인 사이트 헬스체크 대기 중... (시도 $i/10, 응답 코드: $response)"
+            
+            # 502 에러인 경우 추가 진단
+            if [ "$response" = "502" ]; then
+              echo "🔍 502 Bad Gateway detected - Nginx is trying to proxy to a backend"
+              echo "⚠️  This suggests Nginx is not configured for static file serving"
+              echo "📝 Please check Nginx configuration at /etc/nginx/sites-available/neture.co.kr"
+            fi
+            
             if [ $i -eq 10 ]; then
               echo "❌ 메인 사이트 헬스체크 실패"
+              echo ""
+              echo "📋 Troubleshooting steps:"
+              echo "1. Check if files exist in /var/www/neture.co.kr/"
+              echo "2. Verify Nginx configuration is for static files, not proxy"
+              echo "3. Ensure no PM2/Node.js process is expected"
+              echo "4. Check Nginx error logs: sudo tail -f /var/log/nginx/error.log"
               exit 1
             fi
             sleep 10
