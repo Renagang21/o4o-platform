@@ -242,56 +242,39 @@ jobs:
           apps/main-site/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/neture.co.kr/
           
-    - name: Configure Nginx for static files
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          echo '🔧 Ensuring Nginx is configured for static files...'
-          # Nginx configuration should already exist, just reload
-          sudo systemctl reload nginx
-          echo '✅ Nginx reloaded'
-        "
         
-    - name: Setup Nginx site configuration
+    - name: Configure and verify Nginx
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} '
-          # Nginx 설정이 이미 존재하는지 확인
-          echo "🔍 Checking existing Nginx configuration..."
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
+          echo "🔍 Verifying Nginx configuration..."
+          
+          # Nginx 설정 파일 확인
           if [ -f /etc/nginx/sites-available/neture.co.kr ]; then
-            echo "✅ Nginx configuration already exists"
-            echo "📄 Current configuration:"
-            sudo cat /etc/nginx/sites-available/neture.co.kr
+            echo "✅ Nginx site configuration exists"
           else
-            echo "⚠️  Nginx configuration not found"
-            echo "Creating basic static site configuration..."
-            
-            # 기본 설정 생성
-            sudo tee /etc/nginx/sites-available/neture.co.kr > /dev/null <<EOF
-server {
-    listen 80;
-    listen [::]:80;
-    server_name neture.co.kr www.neture.co.kr;
-    root /var/www/neture.co.kr;
-    index index.html;
-    
-    location / {
-        try_files \$uri \$uri/ /index.html;
-    }
-}
-EOF
-            
-            # 사이트 활성화
-            if [ ! -L /etc/nginx/sites-enabled/neture.co.kr ]; then
-              sudo ln -s /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-enabled/
-            fi
+            echo "❌ ERROR: Nginx configuration not found at /etc/nginx/sites-available/neture.co.kr"
+            echo "Please create the Nginx configuration manually"
+            exit 1
           fi
           
-          # Nginx 설정 테스트 및 리로드
-          echo ""
-          echo "🔧 Testing and reloading Nginx..."
-          sudo nginx -t && sudo systemctl reload nginx
+          # 사이트가 활성화되어 있는지 확인
+          if [ -L /etc/nginx/sites-enabled/neture.co.kr ]; then
+            echo "✅ Site is enabled"
+          else
+            echo "⚠️  Site is not enabled, enabling now..."
+            sudo ln -s /etc/nginx/sites-available/neture.co.kr /etc/nginx/sites-enabled/
+          fi
           
-          echo "✅ Nginx configuration completed"
-        '
+          # Nginx 설정 테스트
+          echo "🔧 Testing Nginx configuration..."
+          sudo nginx -t
+          
+          # Nginx 리로드
+          echo "🔄 Reloading Nginx..."
+          sudo systemctl reload nginx
+          
+          echo "✅ Nginx setup completed"
+        ENDSSH
         
     - name: Verify static files deployment
       run: |

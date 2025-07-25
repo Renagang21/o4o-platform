@@ -305,6 +305,85 @@ npm update
 - Added crowdfunding-types package
 - Updated to React 19 and ESLint 9 flat config
 
+## 🚨 Common Deployment Issues & Solutions
+
+### 1. **NPM Permission Errors (EACCES)**
+**Problem**: `EACCES: permission denied` when installing global packages
+**Solutions**:
+- **NEVER** try to install global packages with npm in CI/CD
+- **NEVER** use `npm install -g serve` or similar commands
+- Use `npx` instead of global installs
+- If PM2 is needed, ensure it's pre-installed on server
+
+### 2. **502 Bad Gateway Errors**
+**Problem**: Nginx returns 502 when trying to proxy to backend service
+**Solution**: 
+- **DO NOT** use PM2 + serve for static sites
+- Let Nginx serve static files directly from `/var/www/[domain]/`
+- Ensure Nginx config points to correct root directory
+- No additional Node.js process needed for static files
+
+### 3. **GitHub Actions YAML Syntax Errors**
+**Problem**: heredoc syntax causes YAML parsing errors
+**Solutions**:
+- **AVOID** complex heredoc in GitHub Actions YAML
+- Use `<< 'ENDSSH'` instead of `<< 'EOF'` 
+- Keep scripts simple and flat
+- Test YAML syntax before committing
+
+### 4. **Vite Host Blocking**
+**Problem**: "This host is not allowed" error
+**Solution**: Add all domains to `allowedHosts` in vite.config.ts:
+```javascript
+server: {
+  allowedHosts: [
+    'localhost',
+    'neture.co.kr',
+    'admin.neture.co.kr',
+    // Add all your domains
+  ]
+}
+```
+
+### 5. **Build Order Issues**
+**Problem**: "Cannot find module '@o4o/types'" errors
+**Solution**: 
+- **ALWAYS** run `npm run build:packages` before any other build
+- Package build order: types → utils → ui → auth-client → auth-context
+- Never skip the package build step
+
+## 🎯 Deployment Best Practices
+
+### Static Site Deployment (Recommended)
+1. Build in GitHub Actions
+2. rsync dist folder to `/var/www/[domain]/`
+3. Let Nginx serve files directly
+4. No PM2, no serve, no Node.js process
+
+### Nginx Configuration
+- Pre-configure Nginx on server
+- Don't try to create Nginx configs in CI/CD
+- Use simple static file serving:
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+    root /var/www/example.com;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### Permission Management
+- Use sudo only when absolutely necessary
+- Ensure deployment user owns `/var/www/` directories
+- Set proper file permissions after deployment:
+  - Directories: 755
+  - Files: 644
+
 ---
 
 **Remember: Claude Code must ALWAYS check this file before starting any task and follow ALL guidelines strictly.**
