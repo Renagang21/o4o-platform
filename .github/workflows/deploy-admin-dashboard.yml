@@ -243,58 +243,75 @@ jobs:
           echo 'Deployment directory prepared'
         "
         
-    - name: Ensure npx is available
+    - name: Configure Nginx for admin static files
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          # npx 사용 가능 확인
-          if command -v npx &> /dev/null; then
-            echo '✅ npx is available'
-            npx --version
-          else
-            echo '❌ npx is not available'
-            exit 1
-          fi
+          echo '🔧 Ensuring Nginx is configured for admin static files...'
+          # Nginx configuration should already exist, just reload
+          sudo systemctl reload nginx
+          echo '✅ Nginx reloaded'
         "
         
-    - name: Setup PM2 ecosystem file (Admin Security)
+    - name: Setup Nginx site configuration for admin
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          cat > ${{ env.DEPLOY_PATH }}/admin-dashboard.ecosystem.config.js << 'EOF'
-          module.exports = {
-            apps: [{
-              name: '${{ env.PM2_APP_NAME }}',
-              script: 'npx',
-              args: [
-                'serve',
-                '-s',
-                '/var/www/admin.neture.co.kr',
-                '-l', '${{ env.SERVICE_PORT }}',
-                '--cors',
-                '--single'
-              ],
-              cwd: '${{ env.DEPLOY_PATH }}',
-              instances: 2,
-              exec_mode: 'cluster',
-              max_memory_restart: '256M',
-              error_file: '${{ env.DEPLOY_PATH }}/logs/admin-dashboard-error.log',
-              out_file: '${{ env.DEPLOY_PATH }}/logs/admin-dashboard-out.log',
-              log_file: '${{ env.DEPLOY_PATH }}/logs/admin-dashboard-combined.log',
-              time: true,
-              autorestart: true,
-              max_restarts: 5,
-              min_uptime: '10s',
-              kill_timeout: 30000,
-              restart_delay: 5000,
-              env: {
-                NODE_ENV: 'production',
-                PORT: '${{ env.SERVICE_PORT }}',
-                ADMIN_MODE: 'true',
-                NODE_NO_WARNINGS: '1'
-              },
-              autorestart_delay: 1000
-            }]
-          };
+          # Create Nginx configuration for admin static site
+          sudo tee /etc/nginx/sites-available/admin.neture.co.kr > /dev/null << 'EOF'
+          server {
+              listen 80;
+              listen [::]:80;
+              server_name admin.neture.co.kr;
+              
+              # Redirect to HTTPS
+              return 301 https://\$server_name\$request_uri;
+          }
+          
+          server {
+              listen 443 ssl http2;
+              listen [::]:443 ssl http2;
+              server_name admin.neture.co.kr;
+              
+              root /var/www/admin.neture.co.kr;
+              index index.html;
+              
+              # SSL configuration (managed by Certbot)
+              ssl_certificate /etc/letsencrypt/live/admin.neture.co.kr/fullchain.pem;
+              ssl_certificate_key /etc/letsencrypt/live/admin.neture.co.kr/privkey.pem;
+              
+              # Security headers for admin panel
+              add_header X-Frame-Options "DENY" always;
+              add_header X-Content-Type-Options "nosniff" always;
+              add_header X-XSS-Protection "1; mode=block" always;
+              add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+              
+              # Basic authentication (optional)
+              # auth_basic "Admin Access";
+              # auth_basic_user_file /etc/nginx/.htpasswd;
+              
+              # Gzip compression
+              gzip on;
+              gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
+              
+              # SPA routing
+              location / {
+                  try_files \$uri \$uri/ /index.html;
+              }
+              
+              # Cache static assets
+              location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                  expires 1y;
+                  add_header Cache-Control "public, immutable";
+              }
+          }
           EOF
+          
+          # Enable site if not already enabled
+          if [ ! -L /etc/nginx/sites-enabled/admin.neture.co.kr ]; then
+            sudo ln -s /etc/nginx/sites-available/admin.neture.co.kr /etc/nginx/sites-enabled/
+          fi
+          
+          # Test and reload Nginx
+          sudo nginx -t && sudo systemctl reload nginx
         "
         
     - name: Set secure file permissions
@@ -319,57 +336,27 @@ jobs:
           chmod 750 ${{ env.DEPLOY_PATH }}/logs
         "
         
-    - name: Deploy with PM2 (Zero-downtime)
+    - name: Verify admin deployment
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          cd ${{ env.DEPLOY_PATH }}
-          
-          # npx serve 실행 가능 확인
-          echo '🔍 Checking npx serve availability...'
-          npx serve --version || echo 'npx serve test failed'
-          
-          # ecosystem 파일 확인
-          echo '📄 Checking ecosystem file...'
-          if [ -f admin-dashboard.ecosystem.config.js ]; then
-            echo '✅ Ecosystem file exists'
-            cat admin-dashboard.ecosystem.config.js
-          else
-            echo '❌ ERROR: Ecosystem file not found!'
-            exit 1
-          fi
-          
-          # PM2 프로세스 존재 여부 확인
-          echo '🔄 Managing PM2 process...'
-          if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
-            echo 'Reloading existing PM2 process...'
-            pm2 reload admin-dashboard.ecosystem.config.js --update-env
-          else
-            echo 'Starting new PM2 process...'
-            pm2 start admin-dashboard.ecosystem.config.js
-          fi
-          
-          # PM2 상태 저장
-          pm2 save
-          
-          # 배포 확인
+          echo '🔍 Verifying admin deployment...'
           echo ''
-          echo '📊 PM2 프로세스 상태:'
-          pm2 status
+          echo '📁 Static files in /var/www/admin.neture.co.kr:'
+          ls -la /var/www/admin.neture.co.kr/ | head -20
           echo ''
-          echo '📋 PM2 로그 (최근 20줄):'
-          pm2 logs ${{ env.PM2_APP_NAME }} --nostream --lines 20 || true
-          echo ''
-          echo '📁 배포된 파일 확인:'
-          ls -la /var/www/admin.neture.co.kr/ | head -10
-          echo ''
-          echo '🔍 index.html 파일 확인:'
+          echo '🔍 Checking index.html:'
           if [ -f /var/www/admin.neture.co.kr/index.html ]; then
-            echo '✅ index.html 파일이 존재합니다'
-            head -5 /var/www/admin.neture.co.kr/index.html
+            echo '✅ index.html exists'
+            head -n 10 /var/www/admin.neture.co.kr/index.html
           else
-            echo '❌ index.html 파일이 없습니다'
+            echo '❌ ERROR: index.html not found!'
             exit 1
           fi
+          echo ''
+          echo '🌐 Testing local access:'
+          curl -I http://localhost/ -H 'Host: admin.neture.co.kr' || echo 'Local test failed'
+          echo ''
+          echo '✅ Admin deployment completed successfully'
         "
 
   # 단계 4: 보안 및 접근 테스트
@@ -385,20 +372,25 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts
         
-    - name: Check PM2 process status
+    - name: Check Nginx configuration
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          echo '🔍 Checking PM2 process status...'
-          pm2 list
+          echo '🔍 Checking Nginx configuration...'
           echo ''
-          echo '📋 PM2 process details for o4o-admin-dashboard:'
-          pm2 describe o4o-admin-dashboard || echo 'Process not found'
+          echo '📄 Nginx site configuration for admin.neture.co.kr:'
+          sudo cat /etc/nginx/sites-available/admin.neture.co.kr || echo 'Configuration not found'
           echo ''
-          echo '🔍 Checking if service is listening on port 3001:'
-          sudo netstat -tlnp | grep :3001 || echo 'Port 3001 not listening'
+          echo '🔍 Testing Nginx configuration:'
+          sudo nginx -t
           echo ''
-          echo '🔍 Testing localhost connection:'
-          curl -I http://localhost:3001 || echo 'Local connection failed'
+          echo '🔍 Reloading Nginx to ensure latest configuration:'
+          sudo systemctl reload nginx
+          echo ''
+          echo '📁 Checking static files:'
+          ls -la /var/www/admin.neture.co.kr/ | head -10
+          echo ''
+          echo '🔍 Testing direct file access:'
+          curl -I https://admin.neture.co.kr/index.html || echo 'Direct file access failed'
         "
     
     - name: Wait for service startup
