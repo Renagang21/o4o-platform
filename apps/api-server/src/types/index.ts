@@ -145,6 +145,16 @@ export interface ApiResponse<T = any> {
 // Re-export all types
 export * from './crowdfunding-types';
 export * from './form-builder';
-export * from './database-types';
+export { 
+  SlowQuery, IndexInfo, DuplicateIndex, TableStats, TableSize,
+  ConnectionInfo, LockInfo, QueryPlan, PlanNode, QueryResult,
+  DatabasePerformanceThresholds, PerformanceThresholds, ConnectionPoolStats,
+  IndexRecommendation, QueryCacheEntry, QueryPattern, DatabaseMetrics,
+  normalizeConnectionPoolStats, normalizePerformanceThresholds
+} from './database-types';
 export * from './graceful-degradation-types';
-export * from './performance-types';
+export { 
+  QueryBuilderWithExecute, QueryType, OptimizedResponse, CacheHeaders,
+  PerformanceReport, SlowQueryInfo, PerformanceAlert, PerformanceAlertData,
+  CompressionLevel, RedisInfo, CacheMetrics, SystemMetrics, QueryPerformanceMetrics
+} from './performance-types';

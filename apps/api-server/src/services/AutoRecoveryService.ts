@@ -12,6 +12,7 @@ import { WebhookService } from './webhookService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';
+import { convertToIsolationParameters } from '../types';
 
 const execAsync = promisify(exec);
 
@@ -360,7 +361,7 @@ export class AutoRecoveryService {
         return await this.deploymentMonitoring.rollbackDeployment(step.target, step.parameters as Record<string, string | number | boolean>);
       
       case 'isolate_component':
-        return await this.gracefulDegradation.isolateComponent(step.target, step.parameters as Record<string, string | number | boolean>);
+        return await this.gracefulDegradation.isolateComponent(step.target, convertToIsolationParameters(step.parameters as Record<string, string | number | boolean>));
       
       case 'execute_script':
         return await this.executeCustomScript(step.target, step.parameters as Record<string, string | number | boolean>);

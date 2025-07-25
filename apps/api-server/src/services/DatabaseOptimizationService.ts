@@ -16,10 +16,12 @@ import {
   QueryResult,
   DatabasePerformanceThresholds as ImportedPerformanceThresholds,
   ConnectionPoolStats as ImportedConnectionPoolStats,
+  normalizeConnectionPoolStats,
+  normalizePerformanceThresholds,
   IndexRecommendation as ImportedIndexRecommendation,
   QueryCacheEntry as ImportedQueryCacheEntry,
-  DatabaseMetrics,
-  QueryPattern as ImportedQueryPattern
+  QueryPattern as ImportedQueryPattern,
+  QueryPerformanceMetrics
 } from '../types';
 
 /**
@@ -38,7 +40,7 @@ export class DatabaseOptimizationService {
   private queryCache: Map<string, QueryCacheEntry> = new Map();
   private performanceThresholds!: PerformanceThresholds;
   private indexRecommendations: Map<string, IndexRecommendation[]> = new Map();
-  private connectionPoolStats: ConnectionPoolStats = {
+  private connectionPoolStats: ConnectionPoolStats = normalizeConnectionPoolStats({
     activeConnections: 0,
     idleConnections: 0,
     totalConnections: 0,
@@ -46,7 +48,7 @@ export class DatabaseOptimizationService {
     maxConnections: 20,
     acquiredConnections: 0,
     releasedConnections: 0
-  };
+  });
 
   constructor() {
     this.redis = new Redis({
@@ -66,7 +68,7 @@ export class DatabaseOptimizationService {
    * 성능 임계값 초기화
    */
   private initializeThresholds(): void {
-    this.performanceThresholds = {
+    this.performanceThresholds = normalizePerformanceThresholds({
       slowQueryThreshold: 1000, // 1초
       verySlowQueryThreshold: 5000, // 5초
       highConnectionUsage: 15, // 최대 연결의 75%
@@ -74,7 +76,7 @@ export class DatabaseOptimizationService {
       longRunningTransactionThreshold: 30000, // 30초
       tableAnalyzeThreshold: 100000, // 10만 행 변경 시
       deadlockThreshold: 5 // 시간당 5개 이상
-    };
+    });
   }
 
   /**
@@ -624,7 +626,7 @@ export class DatabaseOptimizationService {
       } }).pool;
       
       if (pool) {
-        this.connectionPoolStats = {
+        this.connectionPoolStats = normalizeConnectionPoolStats({
           activeConnections: pool.totalCount - pool.idleCount,
           idleConnections: pool.idleCount,
           totalConnections: pool.totalCount,
@@ -632,7 +634,7 @@ export class DatabaseOptimizationService {
           maxConnections: pool.max || 20,
           acquiredConnections: pool.acquiredCount || 0,
           releasedConnections: pool.releasedCount || 0
-        };
+        });
 
         // 연결 풀 통계 저장
         await this.redis.hset(
@@ -1011,21 +1013,23 @@ export class DatabaseOptimizationService {
   /**
    * 쿼리 성능 통계 조회
    */
-  private async getQueryPerformanceStats(): Promise<DatabaseMetrics['queryPerformance']> {
+  private async getQueryPerformanceStats(): Promise<QueryPerformanceMetrics> {
     try {
       const cached = await this.redis.hget('query_performance_stats', 'current');
       return cached ? JSON.parse(cached) : {
         totalQueries: 0,
         slowQueries: 0,
-        averageQueryTime: 0,
-        cacheHitRate: 0
+        averageExecutionTime: 0,
+        cacheHitRate: 0,
+        indexUsageRate: 0
       };
     } catch (error) {
       return {
         totalQueries: 0,
         slowQueries: 0,
-        averageQueryTime: 0,
-        cacheHitRate: 0
+        averageExecutionTime: 0,
+        cacheHitRate: 0,
+        indexUsageRate: 0
       };
     }
   }
@@ -1236,25 +1240,11 @@ export class DatabaseOptimizationService {
 }
 
 // 타입 정의
-interface PerformanceThresholds extends ImportedPerformanceThresholds {
-  slowQueryThreshold: number;
-  verySlowQueryThreshold: number;
-  highConnectionUsage: number;
-  lowCacheHitRate: number;
-  longRunningTransactionThreshold: number;
-  tableAnalyzeThreshold: number;
-  deadlockThreshold: number;
-}
+// PerformanceThresholds는 ImportedPerformanceThresholds를 그대로 사용
+type PerformanceThresholds = ImportedPerformanceThresholds;
 
-interface ConnectionPoolStats extends ImportedConnectionPoolStats {
-  activeConnections: number;
-  idleConnections: number;
-  totalConnections: number;
-  waitingConnections: number;
-  maxConnections: number;
-  acquiredConnections: number;
-  releasedConnections: number;
-}
+// ConnectionPoolStats는 ImportedConnectionPoolStats를 그대로 사용
+type ConnectionPoolStats = ImportedConnectionPoolStats;
 
 interface SlowQuery extends Partial<ImportedSlowQuery> {
   query: string;
@@ -1373,7 +1363,7 @@ interface LockStats {
 
 interface DatabaseDashboard {
   connectionPool: ConnectionPoolStats;
-  queryPerformance: DatabaseMetrics['queryPerformance'];
+  queryPerformance?: QueryPerformanceMetrics;
   indexAnalysis: {
     unusedIndexes: UnusedIndex[];
     duplicateIndexes: DuplicateIndex[];
@@ -1401,7 +1391,7 @@ interface DatabaseDashboard {
 
 interface QueryCacheEntry extends Partial<ImportedQueryCacheEntry> {
   query: string;
-  result: QueryResult<unknown>;
+  result: QueryResult;
   cachedAt: Date;
   hits: number;
 }

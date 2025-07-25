@@ -3,6 +3,10 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+
+// dotenv 설정 로드
+dotenv.config();
+
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';

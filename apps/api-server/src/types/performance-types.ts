@@ -51,6 +51,7 @@ export interface SlowQueryInfo {
   frequency: number;
   impact: 'low' | 'medium' | 'high';
   timestamp?: Date;
+  optimized?: boolean;
 }
 
 export interface PerformanceAlert {
@@ -59,6 +60,7 @@ export interface PerformanceAlert {
   message: string;
   timestamp: Date;
   data: PerformanceAlertData;
+  id?: string;
 }
 
 export interface PerformanceAlertData {
@@ -66,6 +68,9 @@ export interface PerformanceAlertData {
   currentValue: number;
   threshold: number;
   duration?: number;
+  details?: any;
+  current?: number;
+  error?: any;
 }
 
 export type CompressionLevel = 'none' | 'fast' | 'default' | 'best' | 'low' | 'medium' | 'high';
@@ -78,6 +83,10 @@ export interface RedisInfo {
   evictedKeys: number;
   hitRate: number;
   commandsProcessed: number;
+  server?: any;
+  stats?: any;
+  memory?: any;
+  keyspace?: any;
 }
 
 export interface QueryPerformanceMetrics {
@@ -94,6 +103,7 @@ export interface CacheMetrics {
   evictions: number;
   memoryUsage: number;
   hitRate: number;
+  sets?: number;
 }
 
 export interface SystemMetrics {
@@ -105,4 +115,5 @@ export interface SystemMetrics {
     outgoing: number;
   };
   timestamp: Date;
+  cpuUsage?: number;
 }
