@@ -381,7 +381,22 @@ parameters: {
 - package-lock.json may not be properly synchronized in sparse-checkout environments
 - `npm install` is more forgiving and will generate package-lock.json if missing
 
-### 2. **NPM Permission Errors (EACCES)**
+### 2. **SSH Host Key Verification Failed**
+**Problem**: "Host key verification failed" in GitHub Actions
+**Solution**:
+- Add SSH key setup step in each job that uses SSH
+- Use `ssh-keyscan` to add host to known_hosts
+- Use `-o StrictHostKeyChecking=no` for SSH commands
+```yaml
+- name: Setup SSH key
+  run: |
+    mkdir -p ~/.ssh
+    echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+    chmod 600 ~/.ssh/id_rsa
+    ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+```
+
+### 3. **NPM Permission Errors (EACCES)**
 **Problem**: `EACCES: permission denied` when installing global packages
 **Solutions**:
 - **NEVER** try to install global packages with npm in CI/CD

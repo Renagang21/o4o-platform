@@ -322,13 +322,20 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.API_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        
     - name: Wait for service startup
       run: sleep 30
       
     - name: Check PM2 process status
       run: |
         echo "🔍 Checking PM2 process on server..."
-        ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           pm2 list
           pm2 describe ${{ env.PM2_APP_NAME }} || echo 'PM2 process not found'
           
