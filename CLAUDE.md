@@ -22,6 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Run full validation suite: `npm run type-check && npm run lint && npm audit --audit-level=moderate`
    - Fix ALL issues before proceeding
    - Use `npm run lint:fix` for automatic fixes
+   - **CRITICAL**: Always commit `package-lock.json` files when modifying dependencies
 
 ### 🔥 필수 작업 규칙
 **모든 코드 변경 후 다음 검증 필수 실행:**
@@ -38,6 +39,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 2. **During development**: Follow existing patterns, no new dependencies without justification
 3. **Before completion**: Run all quality checks
 4. **Use checklist approach** for complex tasks - create TODO lists with TodoWrite tool
+
+### CI/CD Pre-Push Checklist
+Before pushing any code that will trigger CI/CD:
+- [ ] All dependencies installed with `npm install` (not `npm ci`)
+- [ ] `package-lock.json` files are committed if dependencies changed
+- [ ] Build tested locally: `npm run build`
+- [ ] TypeScript check passed: `npm run type-check`
+- [ ] Lint check passed: `npm run lint`
+- [ ] OAuth and other optional features have conditional initialization
+- [ ] Environment variables are properly handled with defaults
 
 ### Structured Logging
 - **ALWAYS use structured logging** - No console.log/console.error
@@ -380,6 +391,8 @@ parameters: {
 - Change `npm ci` to `npm install` in GitHub Actions
 - package-lock.json may not be properly synchronized in sparse-checkout environments
 - `npm install` is more forgiving and will generate package-lock.json if missing
+- **IMPORTANT**: Always commit package-lock.json when changing dependencies
+- **CI/CD Fix**: Replace all `npm ci` with `npm install` in deployment scripts
 
 ### 2. **SSH Host Key Verification Failed**
 **Problem**: "Host key verification failed" in GitHub Actions

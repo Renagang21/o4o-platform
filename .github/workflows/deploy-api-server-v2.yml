@@ -41,7 +41,7 @@ jobs:
       
     - name: Install dependencies
       run: |
-        npm ci
+        npm install
         bash scripts/setup-ci-env.sh
     
     - name: Build shared packages
@@ -52,7 +52,7 @@ jobs:
     - name: Install API server dependencies
       run: |
         cd apps/api-server
-        npm ci
+        npm install
         
     - name: TypeScript type check
       run: |
@@ -232,7 +232,7 @@ jobs:
       run: |
         ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}/apps/api-server
-          npm ci --omit=dev
+          npm install --omit=dev
         "
         
     - name: Run database migrations
