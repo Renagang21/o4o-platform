@@ -101,7 +101,7 @@ jobs:
         
     # 방법 1: webfactory/ssh-agent 사용 (가장 안정적)
     - name: Setup SSH Agent
-      uses: webfactory/ssh-agent@v0.9.0
+      uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.API_SSH_KEY }}
         
