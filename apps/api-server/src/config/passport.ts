@@ -21,13 +21,14 @@ passport.deserializeUser(async (id: string, done) => {
   }
 });
 
-// Google OAuth Strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID || '',
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-  callbackURL: '/api/v1/auth/google/callback',
-  scope: ['profile', 'email']
-}, async (accessToken, refreshToken, profile, done) => {
+// Google OAuth Strategy - Only initialize if credentials are provided
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: '/api/v1/auth/google/callback',
+    scope: ['profile', 'email']
+  }, async (accessToken, refreshToken, profile, done) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
     
@@ -69,14 +70,18 @@ passport.use(new GoogleStrategy({
   } catch (error) {
     done(error as Error, undefined);
   }
-}));
+  }));
+} else {
+  console.log('⚠️  Google OAuth not configured - skipping strategy initialization');
+}
 
-// Kakao OAuth Strategy
-passport.use(new KakaoStrategy({
-  clientID: process.env.KAKAO_CLIENT_ID || '',
-  clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
-  callbackURL: '/api/v1/auth/kakao/callback'
-}, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+// Kakao OAuth Strategy - Only initialize if credentials are provided
+if (process.env.KAKAO_CLIENT_ID) {
+  passport.use(new KakaoStrategy({
+    clientID: process.env.KAKAO_CLIENT_ID,
+    clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
+    callbackURL: '/api/v1/auth/kakao/callback'
+  }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
     
@@ -122,14 +127,18 @@ passport.use(new KakaoStrategy({
   } catch (error) {
     done(error as Error, undefined);
   }
-}));
+  }));
+} else {
+  console.log('⚠️  Kakao OAuth not configured - skipping strategy initialization');
+}
 
-// Naver OAuth Strategy
-passport.use(new NaverStrategy({
-  clientID: process.env.NAVER_CLIENT_ID || '',
-  clientSecret: process.env.NAVER_CLIENT_SECRET || '',
-  callbackURL: '/api/v1/auth/naver/callback'
-}, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+// Naver OAuth Strategy - Only initialize if credentials are provided
+if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
+  passport.use(new NaverStrategy({
+    clientID: process.env.NAVER_CLIENT_ID,
+    clientSecret: process.env.NAVER_CLIENT_SECRET,
+    callbackURL: '/api/v1/auth/naver/callback'
+  }, async (accessToken: string, refreshToken: string, profile: any, done: any) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
     
@@ -175,6 +184,9 @@ passport.use(new NaverStrategy({
   } catch (error) {
     done(error as Error, undefined);
   }
-}));
+  }));
+} else {
+  console.log('⚠️  Naver OAuth not configured - skipping strategy initialization');
+}
 
 export default passport;
