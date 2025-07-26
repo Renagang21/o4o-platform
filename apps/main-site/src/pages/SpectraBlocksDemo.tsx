@@ -1,7 +1,7 @@
 import React from 'react';
 import TemplateRenderer from '../components/TemplateRenderer';
 
-const SpectraBlocksDemo: React.FC = () => {
+const SpectraBlocksDemo: FC = () => {
   // Mock data simulating content from the admin dashboard
   const mockBlocks = [
     {

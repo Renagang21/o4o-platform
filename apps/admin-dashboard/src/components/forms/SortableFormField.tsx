@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, ReactNode } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
@@ -6,10 +6,10 @@ import type { FormField } from '@o4o/types';
 
 interface SortableFormFieldProps {
   field: FormField;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const SortableFormField: React.FC<SortableFormFieldProps> = ({ field, children }) => {
+export const SortableFormField: FC<SortableFormFieldProps> = ({ field, children }) => {
   const {
     attributes,
     listeners,

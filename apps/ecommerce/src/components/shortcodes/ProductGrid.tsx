@@ -13,7 +13,7 @@ interface ProductGridProps {
   showRating?: boolean;
 }
 
-const ProductGridComponent: React.FC<ProductGridProps> = ({
+const ProductGridComponent: FC<ProductGridProps> = ({
   category,
   limit = 12,
   sort = 'newest',
@@ -89,7 +89,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 };
 
 // Wrapper component that accepts ShortcodeProps
-export const ProductGrid: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const ProductGrid: FC<ShortcodeProps> = ({ attributes }) => {
   const props: ProductGridProps = {
     category: attributes.category as string,
     limit: attributes.limit ? Number(attributes.limit) : undefined,

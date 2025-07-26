@@ -8,11 +8,11 @@ interface DividerProps {
   variant?: DividerVariant;
   orientation?: DividerOrientation;
   className?: string;
-  text?: React.ReactNode;
+  text?: ReactNode;
   color?: string;
 }
 
-const Divider: React.FC<DividerProps> = ({
+const Divider: FC<DividerProps> = ({
   variant = 'solid',
   orientation = 'horizontal',
   className,

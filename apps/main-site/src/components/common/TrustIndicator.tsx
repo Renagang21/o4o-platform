@@ -19,7 +19,7 @@ interface TrustIndicatorProps {
   showDetails?: boolean;
 }
 
-const TrustIndicator: React.FC<TrustIndicatorProps> = ({
+const TrustIndicator: FC<TrustIndicatorProps> = ({
   score,
   type,
   details,

@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 // import GutenbergEditor from '../../components/gutenberg/GutenbergEditor'; // 일시적 비활성화
 
-const GutenbergEditorPage: React.FC = () => {
+const GutenbergEditorPage: FC = () => {
   const { pageId } = useParams<{ pageId: string }>();
   const navigate = useNavigate();
 

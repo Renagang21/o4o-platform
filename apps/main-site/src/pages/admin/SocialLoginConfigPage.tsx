@@ -2,7 +2,7 @@ import React from 'react';
 import { useSocialLoginConfig } from './SocialLoginConfigContext';
 import useToast from '../../hooks/useToast';
 
-const SocialLoginConfigPage: React.FC = () => {
+const SocialLoginConfigPage: FC = () => {
   const { config, setConfig, saveConfig, loadConfig } = useSocialLoginConfig();
   const { showToast } = useToast();
 

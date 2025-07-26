@@ -16,7 +16,7 @@ interface SignageContent {
   };
 }
 
-const SignageDetail: React.FC = () => {
+const SignageDetail: FC = () => {
   const { id: _id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 

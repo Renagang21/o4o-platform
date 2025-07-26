@@ -1,6 +1,6 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 
-const Analytics: React.FC = () => {
+const Analytics: FC = () => {
   return (
     <div className="space-y-6">
       <div>

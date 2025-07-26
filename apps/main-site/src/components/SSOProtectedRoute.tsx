@@ -3,13 +3,13 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth, UserRole } from '../context/AuthContext';
 
 interface SSOProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
   requiredRoles?: UserRole[]; // 허용된 역할들
   requireAdmin?: boolean; // 하위 호환성
   fallbackPath?: string; // 권한 없을 때 리다이렉트할 경로
 }
 
-const SSOProtectedRoute: React.FC<SSOProtectedRouteProps> = ({ 
+const SSOProtectedRoute: FC<SSOProtectedRouteProps> = ({ 
   children, 
   requiredRoles = [], 
   requireAdmin = false,

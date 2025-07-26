@@ -4,7 +4,7 @@ import TestBannerGrid from '../components/home/TestBannerGrid';
 import TestAccountList from '../components/home/TestAccountList';
 import { testPageData } from '../config/testPageData';
 
-const TheDANGStyleHome: React.FC = () => {
+const TheDANGStyleHome: FC = () => {
   const services = [
     {
       id: 'ecommerce',

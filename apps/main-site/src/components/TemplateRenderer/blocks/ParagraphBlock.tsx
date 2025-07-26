@@ -13,7 +13,7 @@ interface ParagraphBlockProps {
   };
 }
 
-const ParagraphBlock: React.FC<ParagraphBlockProps> = ({ 
+const ParagraphBlock: FC<ParagraphBlockProps> = ({ 
   text, 
   alignment = 'left',
   settings = {}

@@ -8,7 +8,7 @@ export interface ShortcodeAttributes {
 
 export interface ShortcodeHandler {
   name: string;
-  render: (attrs: ShortcodeAttributes, content?: string) => React.ReactElement | null;
+  render: (attrs: ShortcodeAttributes, content?: string) => ReactElement | null;
 }
 
 // Parse attributes from shortcode string
@@ -53,8 +53,8 @@ export class ShortcodeParser {
   }
 
   // Parse content and replace shortcodes with React components
-  parse(content: string): React.ReactNode[] {
-    const elements: React.ReactNode[] = [];
+  parse(content: string): ReactNode[] {
+    const elements: ReactNode[] = [];
     
     // Regex to match shortcodes: [name attr="value"] or [name attr="value"]content[/name]
     const shortcodeRegex = /\[(\w+)([^\]]*)\](?:([^[]*)\[\/\1\])?/g;
@@ -88,7 +88,7 @@ export class ShortcodeParser {
         const attrs = parseShortcodeAttributes(attributes || '');
         const element = handler.render(attrs, innerContent);
         if (element) {
-          elements.push(React.cloneElement(element, { key: `shortcode-${keyIndex++}` }));
+          elements.push(cloneElement(element, { key: `shortcode-${keyIndex++}` }));
         }
       } else {
         // If no handler found, just show the shortcode as text
@@ -121,7 +121,7 @@ export class ShortcodeParser {
   }
 
   // Parse content and return as a single React element
-  parseAsElement(content: string): React.ReactElement {
+  parseAsElement(content: string): ReactElement {
     const nodes = this.parse(content);
     return <>{nodes}</>;
   }
@@ -141,7 +141,7 @@ export class ShortcodeParser {
 export const shortcodeParser = new ShortcodeParser();
 
 // Helper component to render parsed content
-export const ShortcodeContent: React.FC<{ content: string }> = ({ content }) => {
+export const ShortcodeContent: FC<{ content: string }> = ({ content }) => {
   const parsed = shortcodeParser.parseAsElement(content);
   return <div className="shortcode-content">{parsed}</div>;
 };

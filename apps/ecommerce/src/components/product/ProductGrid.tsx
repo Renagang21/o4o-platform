@@ -14,7 +14,7 @@ interface ProductGridProps {
   className?: string;
 }
 
-export const ProductGrid: React.FC<ProductGridProps> = ({
+export const ProductGrid: FC<ProductGridProps> = ({
   products,
   columns = 4,
   mode = 'customer',

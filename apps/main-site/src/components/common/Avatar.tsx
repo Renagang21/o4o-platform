@@ -8,7 +8,7 @@ interface AvatarProps {
   src?: string;
   alt?: string;
   initials?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   size?: AvatarSize;
   variant?: AvatarVariant;
   className?: string;
@@ -16,7 +16,7 @@ interface AvatarProps {
   onClick?: () => void;
 }
 
-const Avatar: React.FC<AvatarProps> = ({
+const Avatar: FC<AvatarProps> = ({
   src,
   alt,
   initials,

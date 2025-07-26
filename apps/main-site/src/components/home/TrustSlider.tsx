@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import Card from '../common/Card';
 import Badge from '../common/Badge';
 
-const TrustSlider: React.FC = () => {
+const TrustSlider: FC = () => {
   const testimonials = [
     {
       name: '김지원',

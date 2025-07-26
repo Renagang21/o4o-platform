@@ -8,13 +8,13 @@ interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
   fullWidth?: boolean;
   as?: React.ElementType;
   className?: string;
   disabled?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   onClick?: () => void;
 }
 
@@ -32,7 +32,7 @@ const Button = (
     as: Component = 'button',
     onClick,
     ...props
-  }: ButtonProps & React.ComponentPropsWithoutRef<'button'>
+  }: ButtonProps & ComponentPropsWithoutRef<'button'>
 ) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors';
     

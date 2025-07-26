@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { 
   Star, 
   DollarSign, 
@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 // CTA Block Component
-export const CTABlock: React.FC<{
+export const CTABlock: FC<{
   content: {
     title?: string;
     description?: string;
@@ -110,7 +110,7 @@ export const CTABlock: React.FC<{
 };
 
 // Pricing Table Block Component
-export const PricingTableBlock: React.FC<{
+export const PricingTableBlock: FC<{
   content: {
     plans?: Array<{
       name: string;
@@ -255,7 +255,7 @@ export const PricingTableBlock: React.FC<{
 };
 
 // Testimonial Block Component
-export const TestimonialBlock: React.FC<{
+export const TestimonialBlock: FC<{
   content: {
     quote?: string;
     author?: string;
@@ -370,7 +370,7 @@ export const TestimonialBlock: React.FC<{
 };
 
 // Star Rating Block Component
-export const StarRatingBlock: React.FC<{
+export const StarRatingBlock: FC<{
   content: {
     title?: string;
     rating?: number;
@@ -445,7 +445,7 @@ export const StarRatingBlock: React.FC<{
 };
 
 // Info Box Block Component
-export const InfoBoxBlock: React.FC<{
+export const InfoBoxBlock: FC<{
   content: {
     icon?: string;
     title?: string;

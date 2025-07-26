@@ -19,9 +19,9 @@ try {
   console.log('✅ React root 생성 완료');
   
   root.render(
-    <React.StrictMode>
+    <StrictMode>
       <TestApp />
-    </React.StrictMode>
+    </StrictMode>
   );
   
   console.log('✅ React 앱 렌더링 완료!');

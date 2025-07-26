@@ -21,7 +21,7 @@ interface PageRendererProps {
   page: Page;
 }
 
-const PageRenderer: React.FC<PageRendererProps> = ({ page }) => {
+const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   // If page has template blocks, use TemplateRenderer
   if (typeof page.content === 'object' && page.content.blocks && Array.isArray(page.content.blocks)) {
     return (

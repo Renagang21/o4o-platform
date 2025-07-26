@@ -6,9 +6,9 @@ export type ListSize = 'sm' | 'md' | 'lg';
 
 interface ListItem {
   id: string;
-  content: React.ReactNode;
-  icon?: React.ReactNode;
-  action?: React.ReactNode;
+  content: ReactNode;
+  icon?: ReactNode;
+  action?: ReactNode;
   disabled?: boolean;
   onClick?: () => void;
 }
@@ -21,7 +21,7 @@ interface ListProps {
   emptyText?: string;
 }
 
-const List: React.FC<ListProps> = ({
+const List: FC<ListProps> = ({
   items,
   variant = 'default',
   size = 'md',

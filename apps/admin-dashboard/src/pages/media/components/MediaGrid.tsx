@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { MediaFile } from '@/types/content'
 import MediaItem from './MediaItem'
 
@@ -9,7 +9,7 @@ interface MediaGridProps {
   onSelectAll: () => void
 }
 
-const MediaGrid: React.FC<MediaGridProps> = ({
+const MediaGrid: FC<MediaGridProps> = ({
   files,
   selectedFiles,
   onFileSelect,

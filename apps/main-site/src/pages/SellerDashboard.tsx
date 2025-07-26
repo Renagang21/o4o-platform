@@ -5,7 +5,7 @@ import RecentOrders from '../components/dashboard/RecentOrders';
 import RecentProducts from '../components/dashboard/RecentProducts';
 import ApprovalNotice from '../components/dashboard/ApprovalNotice';
 
-const SellerDashboard: React.FC = () => {
+const SellerDashboard: FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">

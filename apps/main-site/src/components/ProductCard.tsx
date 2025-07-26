@@ -19,7 +19,7 @@ interface ProductCardProps {
   onToggleActive: (id: string) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, onToggleActive }) => {
+const ProductCard: FC<ProductCardProps> = ({ product, onEdit, onDelete, onToggleActive }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col gap-3 relative">
       <div className="flex items-center gap-4">

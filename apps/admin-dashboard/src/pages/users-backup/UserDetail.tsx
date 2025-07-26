@@ -1,7 +1,7 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { useParams } from 'react-router-dom'
 
-const UserDetail: React.FC = () => {
+const UserDetail: FC = () => {
   const { userId } = useParams()
 
   return (

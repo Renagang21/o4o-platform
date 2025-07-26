@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Edit2, Trash2, Menu as MenuIcon, MoreVertical, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,7 @@ const locationColors: Record<MenuLocation, string> = {
   mobile: 'bg-purple-100 text-purple-800',
 }
 
-const MenuList: React.FC = () => {
+const MenuList: FC = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 

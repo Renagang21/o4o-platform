@@ -14,7 +14,7 @@ interface CartSummaryProps {
   className?: string;
 }
 
-export const CartSummary: React.FC<CartSummaryProps> = ({
+export const CartSummary: FC<CartSummaryProps> = ({
   summary,
   userRole,
   userGrade,

@@ -8,7 +8,7 @@ interface Column<T> {
   key: string;
   title: string;
   dataIndex: keyof T;
-  render?: (value: T[keyof T], record: T) => React.ReactNode;
+  render?: (value: T[keyof T], record: T) => ReactNode;
   width?: number | string;
   align?: 'left' | 'center' | 'right';
 }

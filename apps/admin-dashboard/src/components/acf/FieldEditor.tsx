@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -12,7 +12,7 @@ interface FieldEditorProps {
   onChange: (field: CustomField) => void
 }
 
-const FieldEditor: React.FC<FieldEditorProps> = ({ field, onChange }) => {
+const FieldEditor: FC<FieldEditorProps> = ({ field, onChange }) => {
   const generateKey = (name: string) => {
     return name
       .toLowerCase()

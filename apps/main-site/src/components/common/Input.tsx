@@ -10,12 +10,12 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   label?: string;
   error?: string;
   helperText?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
   fullWidth?: boolean;
 }
 
-const Input: React.FC<InputProps> = ({
+const Input: FC<InputProps> = ({
   variant = 'default',
   size = 'md',
   label,

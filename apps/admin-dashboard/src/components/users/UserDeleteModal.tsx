@@ -3,7 +3,7 @@
  * 단일 및 일괄 사용자 삭제 시 확인 메시지 제공 컴포넌트
  */
 
-import React from 'react';
+import { FC } from 'react';
 import { AlertTriangle, X, Trash2, Users } from 'lucide-react';
 import { User } from '../../types/user';
 
@@ -15,7 +15,7 @@ interface UserDeleteModalProps {
   isLoading?: boolean;
 }
 
-const UserDeleteModal: React.FC<UserDeleteModalProps> = ({
+const UserDeleteModal: FC<UserDeleteModalProps> = ({
   isOpen,
   onClose,
   onConfirm,

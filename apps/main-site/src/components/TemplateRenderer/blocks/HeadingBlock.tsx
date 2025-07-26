@@ -11,7 +11,7 @@ interface HeadingBlockProps {
   };
 }
 
-const HeadingBlock: React.FC<HeadingBlockProps> = ({ 
+const HeadingBlock: FC<HeadingBlockProps> = ({ 
   text, 
   level = 2,
   alignment = 'left',

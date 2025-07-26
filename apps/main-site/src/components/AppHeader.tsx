@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { useAuth, UserRole } from '../context/AuthContext';
 
-const AppHeader: React.FC = () => {
+const AppHeader: FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 

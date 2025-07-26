@@ -1,6 +1,6 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 
-const PendingUsers: React.FC = () => {
+const PendingUsers: FC = () => {
   return (
     <div className="space-y-6">
       <div>

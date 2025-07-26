@@ -16,14 +16,14 @@ export type BadgeVariant =
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
 interface BadgeProps {
-  children: React.ReactNode;
+  children: ReactNode;
   variant?: BadgeVariant;
   size?: BadgeSize;
   className?: string;
   dot?: boolean;
 }
 
-const Badge: React.FC<BadgeProps> = ({
+const Badge: FC<BadgeProps> = ({
   children,
   variant = 'primary',
   size = 'md',

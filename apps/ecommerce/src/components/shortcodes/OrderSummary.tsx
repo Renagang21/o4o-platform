@@ -12,7 +12,7 @@ import { ShoppingCart, Tag, Truck, Receipt } from 'lucide-react';
  * [order-summary]
  * [order-summary show-details="true" show-icons="true"]
  */
-export const OrderSummary: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const OrderSummary: FC<ShortcodeProps> = ({ attributes }) => {
   const { cart } = useCartStore();
   
   // 기본 속성값

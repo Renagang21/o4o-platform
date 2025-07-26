@@ -4,14 +4,14 @@ import AdminHeader from './AdminHeader';
 import AdminBreadcrumb from './AdminBreadcrumb';
 
 interface AdminLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   title?: string;
   subtitle?: string;
   showBreadcrumb?: boolean;
   fullWidth?: boolean;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ 
+const AdminLayout: FC<AdminLayoutProps> = ({ 
   children, 
   title, 
   subtitle, 

@@ -14,7 +14,7 @@ interface RelatedProductsProps {
   showRating?: boolean;
 }
 
-const RelatedProductsComponent: React.FC<RelatedProductsProps> = ({
+const RelatedProductsComponent: FC<RelatedProductsProps> = ({
   productId,
   category: _category,  // In real app, this would be used to filter products
   limit = 4,
@@ -347,7 +347,7 @@ const RelatedProductsComponent: React.FC<RelatedProductsProps> = ({
 };
 
 // Wrapper component that accepts ShortcodeProps
-export const RelatedProducts: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const RelatedProducts: FC<ShortcodeProps> = ({ attributes }) => {
   const props: RelatedProductsProps = {
     productId: attributes.productId as string,
     category: attributes.category as string,

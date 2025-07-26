@@ -16,7 +16,7 @@ interface ButtonBlockProps {
   };
 }
 
-const ButtonBlock: React.FC<ButtonBlockProps> = ({ 
+const ButtonBlock: FC<ButtonBlockProps> = ({ 
   text, 
   url,
   style = 'primary',

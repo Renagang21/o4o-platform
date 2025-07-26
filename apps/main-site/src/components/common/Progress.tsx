@@ -15,7 +15,7 @@ interface ProgressProps {
   isIndeterminate?: boolean;
 }
 
-const Progress: React.FC<ProgressProps> = ({
+const Progress: FC<ProgressProps> = ({
   value,
   max = 100,
   size = 'md',

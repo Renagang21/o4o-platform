@@ -1,6 +1,6 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 
-const Pages: React.FC = () => {
+const Pages: FC = () => {
   console.warn('TODO: Implement Pages component')
   
   return (

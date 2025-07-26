@@ -3,7 +3,7 @@ import { MultiThemeProvider } from '@o4o/ui/theme/MultiThemeContext';
 import { ThemeSelector, ThemeSelectorCompact } from '@o4o/ui/theme/ThemeSelector';
 
 // Example of how to integrate the new theme system into the existing app
-export const ThemeIntegrationExample: React.FC = () => {
+export const ThemeIntegrationExample: FC = () => {
   return (
     <MultiThemeProvider defaultTheme="light">
       <div className="min-h-screen">
@@ -56,7 +56,7 @@ export const ThemeIntegrationExample: React.FC = () => {
 };
 
 // Example of updating existing components to use theme variables
-export const ThemedButton: React.FC<{ variant?: 'primary' | 'secondary' }> = ({ 
+export const ThemedButton: FC<{ variant?: 'primary' | 'secondary' }> = ({ 
   variant = 'primary', 
   children 
 }) => {

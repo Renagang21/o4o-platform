@@ -3,7 +3,7 @@ import { UserPlus, ShoppingBag, TrendingUp } from 'lucide-react';
 // import Card from '../common/Card';
 // import Badge from '../common/Badge';
 
-const StepGuide: React.FC = () => {
+const StepGuide: FC = () => {
   const steps = [
     {
       icon: UserPlus,

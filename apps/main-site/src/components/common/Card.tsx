@@ -4,14 +4,14 @@ import { twMerge } from 'tailwind-merge';
 export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
 
 interface CardProps {
-  children: React.ReactNode;
+  children: ReactNode;
   variant?: CardVariant;
   className?: string;
   onClick?: () => void;
   hoverable?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({
+const Card: FC<CardProps> = ({
   children,
   variant = 'default',
   className,

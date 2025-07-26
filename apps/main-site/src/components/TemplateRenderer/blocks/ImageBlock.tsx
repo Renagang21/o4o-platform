@@ -13,7 +13,7 @@ interface ImageBlockProps {
   };
 }
 
-const ImageBlock: React.FC<ImageBlockProps> = ({ 
+const ImageBlock: FC<ImageBlockProps> = ({ 
   src, 
   alt,
   caption,

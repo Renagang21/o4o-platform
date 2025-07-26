@@ -7,7 +7,7 @@ interface PriceInputProps {
   onChange: (price: number) => void;
 }
 
-const PriceInput: React.FC<PriceInputProps> = ({
+const PriceInput: FC<PriceInputProps> = ({
   basePrice,
   currentPrice,
   onChange

@@ -11,7 +11,7 @@ interface StockStatusProps {
   className?: string;
 }
 
-export const StockStatus: React.FC<StockStatusProps> = ({
+export const StockStatus: FC<StockStatusProps> = ({
   stockQuantity,
   lowStockThreshold = 5,
   manageStock = true,

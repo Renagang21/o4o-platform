@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { MediaFile } from '@/types/content'
 import ResponsiveImage from './ResponsiveImage'
 import { Image, Video, Music, FileText, File, Check } from 'lucide-react'
@@ -10,7 +10,7 @@ interface MediaItemProps {
   onSelect: () => void
 }
 
-const MediaItem: React.FC<MediaItemProps> = ({
+const MediaItem: FC<MediaItemProps> = ({
   item,
   view,
   isSelected,

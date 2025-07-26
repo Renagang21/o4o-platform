@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { 
   LayoutDashboard, 
   ShoppingBag, 
@@ -33,7 +33,7 @@ interface AtAGlance {
   icon?: React.ElementType;
 }
 
-const AdminHome: React.FC = () => {
+const AdminHome: FC = () => {
   const quickStats: QuickStatCard[] = [
     {
       title: '총 매출',

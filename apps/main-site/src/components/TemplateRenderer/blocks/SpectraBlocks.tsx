@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 // CTA Block Component
-export const CTABlock: React.FC<{
+export const CTABlock: FC<{
   title?: string;
   description?: string;
   buttonText?: string;
@@ -68,7 +68,7 @@ export const CTABlock: React.FC<{
 };
 
 // Pricing Table Block Component
-export const PricingTableBlock: React.FC<{
+export const PricingTableBlock: FC<{
   plans?: Array<{
     name: string;
     price: string;
@@ -154,7 +154,7 @@ export const PricingTableBlock: React.FC<{
 };
 
 // Testimonial Block Component
-export const TestimonialBlock: React.FC<{
+export const TestimonialBlock: FC<{
   quote?: string;
   author?: string;
   position?: string;
@@ -216,7 +216,7 @@ export const TestimonialBlock: React.FC<{
 };
 
 // Info Box Block Component  
-export const InfoBoxBlock: React.FC<{
+export const InfoBoxBlock: FC<{
   icon?: string;
   title?: string;
   description?: string;

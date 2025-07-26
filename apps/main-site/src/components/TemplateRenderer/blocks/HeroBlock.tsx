@@ -20,7 +20,7 @@ interface HeroBlockProps {
   };
 }
 
-const HeroBlock: React.FC<HeroBlockProps> = ({ 
+const HeroBlock: FC<HeroBlockProps> = ({ 
   title, 
   subtitle,
   backgroundImage,

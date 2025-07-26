@@ -28,7 +28,7 @@ const socialLinks = [
   { icon: <FaLinkedin />, href: 'https://linkedin.com' }
 ];
 
-const Footer: React.FC = () => {
+const Footer: FC = () => {
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 py-12">

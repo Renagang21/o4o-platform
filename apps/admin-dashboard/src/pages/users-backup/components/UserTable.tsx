@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { Link } from 'react-router-dom'
 import { User, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '@/types/user'
 import { Eye, Edit, UserCheck, UserX, UserMinus, Trash2 } from 'lucide-react'
@@ -18,7 +18,7 @@ interface UserTableProps {
   showBulkSelect?: boolean
 }
 
-const UserTable: React.FC<UserTableProps> = ({
+const UserTable: FC<UserTableProps> = ({
   users,
   selectedUsers,
   onSelectUser,

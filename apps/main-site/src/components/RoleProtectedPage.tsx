@@ -11,7 +11,7 @@ export default function RoleProtectedPage({
   show403 = true,
 }: {
   allowedRoles?: UserRole[];
-  children: React.ReactNode;
+  children: ReactNode;
   message?: string;
   show403?: boolean;
 }) {
@@ -38,7 +38,7 @@ export default function RoleProtectedPage({
   }
 
   // 접근 기록 로그
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) logAccess(user.id, location.pathname);
      
   }, [user, location.pathname]);

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, FC, ReactNode } from 'react'
 import { 
   Type, 
   Image, 
@@ -29,7 +29,7 @@ interface BlockPaletteProps {
 interface BlockDefinition {
   type: TemplateBlockType
   name: string
-  icon: React.ReactNode
+  icon: ReactNode
   category: string
   description: string
 }
@@ -218,8 +218,8 @@ const blockDefinitions: BlockDefinition[] = [
 
 const categories = ['Basic', 'Media', 'Layout', 'Content', 'Interactive', 'Advanced']
 
-const BlockPalette: React.FC<BlockPaletteProps> = ({ onAddBlock }) => {
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('Basic')
+const BlockPalette: FC<BlockPaletteProps> = ({ onAddBlock }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('Basic')
 
   const filteredBlocks = blockDefinitions.filter(
     block => block.category === selectedCategory

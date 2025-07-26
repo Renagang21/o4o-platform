@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ interface FieldPropertiesPanelProps {
   onClose: () => void;
 }
 
-export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
+export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
   field,
   onUpdate,
   onClose,

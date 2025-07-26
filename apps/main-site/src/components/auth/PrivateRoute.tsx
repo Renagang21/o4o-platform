@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { UserType } from '../../types/user';
 
 interface PrivateRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
   allowedUserTypes?: UserType[];
 }
 

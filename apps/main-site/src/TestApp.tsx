@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TestApp: React.FC = () => {
+const TestApp: FC = () => {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <h1>O4O Platform Test</h1>

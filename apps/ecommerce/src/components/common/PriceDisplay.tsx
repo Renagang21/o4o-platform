@@ -14,7 +14,7 @@ interface PriceDisplayProps {
   className?: string;
 }
 
-export const PriceDisplay: React.FC<PriceDisplayProps> = ({
+export const PriceDisplay: FC<PriceDisplayProps> = ({
   price,
   compareAtPrice,
   priceByRole,

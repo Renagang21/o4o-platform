@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-const ApprovalNotice: React.FC = () => {
+const ApprovalNotice: FC = () => {
   const notices = [
     {
       id: '1',

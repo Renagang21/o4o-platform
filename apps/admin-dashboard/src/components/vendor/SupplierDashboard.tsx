@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Package, TrendingUp, AlertCircle, DollarSign, ShoppingBag, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ interface SupplierDashboardProps {
   recentOrders: any[];
 }
 
-export const SupplierDashboard: React.FC<SupplierDashboardProps> = ({
+export const SupplierDashboard: FC<SupplierDashboardProps> = ({
   stats,
   lowStockProducts,
   pendingProducts,

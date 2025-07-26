@@ -39,7 +39,7 @@ export function ReviewItem({
   className
 }: ReviewItemProps) {
   const { user } = useAuth();
-  const [helpfulClicked, setHelpfulClicked] = React.useState<boolean | null>(null);
+  const [helpfulClicked, setHelpfulClicked] = useState<boolean | null>(null);
   const isOwner = user?.id === review.userId;
 
   const handleHelpful = (helpful: boolean) => {

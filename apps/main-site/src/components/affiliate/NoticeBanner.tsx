@@ -5,7 +5,7 @@ interface NoticeBannerProps {
   onClose: () => void;
 }
 
-const NoticeBanner: React.FC<NoticeBannerProps> = ({ onClose }) => {
+const NoticeBanner: FC<NoticeBannerProps> = ({ onClose }) => {
   return (
     <div 
       className="bg-secondary rounded-xl p-4 mb-6"

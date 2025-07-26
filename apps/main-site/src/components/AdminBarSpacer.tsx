@@ -2,10 +2,10 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AdminBarSpacerProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const AdminBarSpacer: React.FC<AdminBarSpacerProps> = ({ children }) => {
+const AdminBarSpacer: FC<AdminBarSpacerProps> = ({ children }) => {
   const { user } = useAuth();
   
   // 관리자 권한이 있는 사용자에게만 상단 여백 적용

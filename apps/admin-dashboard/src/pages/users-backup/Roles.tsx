@@ -1,8 +1,8 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { Shield, Users, Building, Star, Settings } from 'lucide-react'
 import { ROLE_LABELS } from '@/types/user'
 
-const Roles: React.FC = () => {
+const Roles: FC = () => {
   const roleDescriptions = {
     admin: {
       description: '시스템의 모든 기능에 접근할 수 있는 최고 권한자',

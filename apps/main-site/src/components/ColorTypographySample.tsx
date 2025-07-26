@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ColorTypographySample: React.FC = () => {
+const ColorTypographySample: FC = () => {
   return (
     <div className="p-8 space-y-8">
       {/* 타이포그래피 섹션 */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, 
@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-const CrowdfundingApp: React.FC = () => {
+const CrowdfundingApp: FC = () => {
   const navigate = useNavigate();
 
   // 크라우드펀딩 통계 조회

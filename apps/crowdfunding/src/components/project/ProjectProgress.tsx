@@ -8,7 +8,7 @@ interface ProjectProgressProps {
   className?: string;
 }
 
-export const ProjectProgress: React.FC<ProjectProgressProps> = ({
+export const ProjectProgress: FC<ProjectProgressProps> = ({
   currentAmount,
   targetAmount,
   backerCount,

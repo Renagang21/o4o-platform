@@ -5,7 +5,7 @@ interface StatusBadgeProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' }) => {
+export const StatusBadge: FC<StatusBadgeProps> = ({ status, size = 'md' }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'online':

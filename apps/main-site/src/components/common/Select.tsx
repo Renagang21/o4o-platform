@@ -17,12 +17,12 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
   error?: string;
   helperText?: string;
   options: SelectOption[];
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
   fullWidth?: boolean;
 }
 
-const Select: React.FC<SelectProps> = ({
+const Select: FC<SelectProps> = ({
   variant = 'default',
   size = 'md',
   label,

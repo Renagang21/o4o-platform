@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { VideoCopyButtonShortcode } from '@/components/apps/VideoCopyButton';
 
 /**
@@ -6,7 +6,7 @@ import { VideoCopyButtonShortcode } from '@/components/apps/VideoCopyButton';
  */
 
 // [video_copy_button] shortcode 구현
-export const VideoCopyButtonShortcodeWrapper: React.FC<{
+export const VideoCopyButtonShortcodeWrapper: FC<{
   attributes: {
     post_id?: string;
     size?: string;

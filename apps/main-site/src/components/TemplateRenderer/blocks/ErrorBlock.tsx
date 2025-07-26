@@ -7,7 +7,7 @@ interface ErrorBlockProps {
   availableTypes: string[];
 }
 
-const ErrorBlock: React.FC<ErrorBlockProps> = ({ blockType, blockData, availableTypes }) => {
+const ErrorBlock: FC<ErrorBlockProps> = ({ blockType, blockData, availableTypes }) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   return (

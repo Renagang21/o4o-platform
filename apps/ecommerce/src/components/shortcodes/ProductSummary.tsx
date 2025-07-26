@@ -11,7 +11,7 @@ import { formatPrice } from '@o4o/utils';
  * [product-summary]
  * [product-summary show-image="true" show-price="true"]
  */
-export const ProductSummary: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const ProductSummary: FC<ShortcodeProps> = ({ attributes }) => {
   const { cart } = useCartStore();
   
   // 기본 속성값

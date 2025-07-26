@@ -15,7 +15,7 @@ interface CartItemProps {
   className?: string;
 }
 
-export const CartItem: React.FC<CartItemProps> = ({
+export const CartItem: FC<CartItemProps> = ({
   item,
   isSelected,
   onSelect,

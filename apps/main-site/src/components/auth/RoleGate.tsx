@@ -4,12 +4,12 @@ import { AlertCircle } from 'lucide-react';
 
 interface RoleGateProps {
   allowedRoles: string[];
-  children: React.ReactNode;
+  children: ReactNode;
   userRole?: string;
   isApproved?: boolean;
 }
 
-const RoleGate: React.FC<RoleGateProps> = ({
+const RoleGate: FC<RoleGateProps> = ({
   allowedRoles,
   children,
   userRole = 'user',

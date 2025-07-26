@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, Trash2 } from 'lucide-react';
@@ -14,7 +14,7 @@ interface SortableFieldCardProps {
   onDuplicate: () => void;
 }
 
-export const SortableFieldCard: React.FC<SortableFieldCardProps> = ({
+export const SortableFieldCard: FC<SortableFieldCardProps> = ({
   field,
   isSelected,
   onSelect,

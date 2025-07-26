@@ -7,7 +7,7 @@ interface SpacerBlockProps {
   };
 }
 
-const SpacerBlock: React.FC<SpacerBlockProps> = ({ 
+const SpacerBlock: FC<SpacerBlockProps> = ({ 
   height = '2rem',
   settings = {}
 }) => {

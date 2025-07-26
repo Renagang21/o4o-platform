@@ -3,7 +3,7 @@
  * 읽기 전용 사용자 정보 표시
  */
 
-import React from 'react';
+import { FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -37,7 +37,7 @@ interface GetUserResponse {
   data: User;
 }
 
-const UserDetail: React.FC = () => {
+const UserDetail: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 

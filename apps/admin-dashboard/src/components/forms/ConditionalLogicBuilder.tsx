@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,7 +11,7 @@ interface ConditionalLogicBuilderProps {
   onChange: (logic: ConditionalLogic) => void;
 }
 
-export const ConditionalLogicBuilder: React.FC<ConditionalLogicBuilderProps> = ({
+export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
   logic = { enabled: false, action: 'show', logicType: 'all', rules: [] },
   fields,
   onChange,

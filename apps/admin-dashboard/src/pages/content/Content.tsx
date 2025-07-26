@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PostList from './PostList'
 import PostForm from './PostForm'
@@ -14,7 +14,7 @@ import MediaLibrary from './MediaLibrary'
 import TemplateManager from './TemplateManager'
 import WidgetManager from './WidgetManager'
 
-const Content: React.FC = () => {
+const Content: FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="posts" replace />} />

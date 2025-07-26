@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, Home, Settings } from 'lucide-react';
 
-const Navbar: React.FC = () => {
+const Navbar: FC = () => {
   const navigate = useNavigate();
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;

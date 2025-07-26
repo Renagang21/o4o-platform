@@ -3,15 +3,15 @@ import { twMerge } from 'tailwind-merge';
 import { Link } from 'react-router-dom';
 
 interface BreadcrumbItem {
-  label: React.ReactNode;
+  label: ReactNode;
   href?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   isCurrent?: boolean;
 }
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
-  separator?: React.ReactNode;
+  separator?: ReactNode;
   className?: string;
 }
 
@@ -29,7 +29,7 @@ const defaultSeparator = (
   </svg>
 );
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({
+const Breadcrumb: FC<BreadcrumbProps> = ({
   items,
   separator = defaultSeparator,
   className,

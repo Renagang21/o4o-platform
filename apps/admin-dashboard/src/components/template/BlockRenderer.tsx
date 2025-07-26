@@ -1,4 +1,4 @@
-import React from 'react'
+import { createElement, FC } from 'react'
 import { 
   Plus, 
   Copy, 
@@ -21,7 +21,7 @@ interface BlockRendererProps {
   onMove: (direction: 'up' | 'down') => void
 }
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({
+const BlockRenderer: FC<BlockRendererProps> = ({
   block,
   isSelected,
   isPreview,
@@ -140,7 +140,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
           level === 5 ? 'text-lg' : 'text-base'
         }`
         
-        return React.createElement(
+        return createElement(
           `h${level}`,
           { className: headingClass },
           block.content.text || 'Heading Text'

@@ -10,10 +10,10 @@ const useUser = () => {
 };
 
 interface YaksaProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const YaksaProtectedRoute: React.FC<YaksaProtectedRouteProps> = ({ children }) => {
+const YaksaProtectedRoute: FC<YaksaProtectedRouteProps> = ({ children }) => {
   const { user } = useAuth();
   const location = useLocation();
 

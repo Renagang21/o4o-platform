@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   Plus, 
@@ -27,7 +27,7 @@ import { authClient } from '@o4o/auth-client'
 import type { ACFFieldGroup } from '@o4o/types'
 import toast from 'react-hot-toast'
 
-const ACFManager: React.FC = () => {
+const ACFManager: FC = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 

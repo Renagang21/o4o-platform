@@ -26,7 +26,7 @@ const orderStatusConfig = {
   refunded: { label: '환불 완료', color: 'bg-gray-100 text-gray-800', icon: RefreshCw }
 };
 
-export const OrderItem: React.FC<OrderItemProps> = ({
+export const OrderItem: FC<OrderItemProps> = ({
   order,
   onCancel,
   onTrack,

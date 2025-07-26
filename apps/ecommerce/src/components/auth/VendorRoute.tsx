@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
 interface VendorRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function VendorRoute({ children }: VendorRouteProps) {

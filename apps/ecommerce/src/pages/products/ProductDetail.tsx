@@ -30,8 +30,8 @@ export function ProductDetail() {
   const addToCart = useAddToCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlistStore();
   
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
-  const [quantity, setQuantity] = React.useState(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   if (isLoading) {
     return <ProductDetailSkeleton />;

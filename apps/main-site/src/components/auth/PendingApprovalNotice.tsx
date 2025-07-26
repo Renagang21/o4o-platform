@@ -7,7 +7,7 @@ interface PendingApprovalNoticeProps {
   message?: string;
 }
 
-const PendingApprovalNotice: React.FC<PendingApprovalNoticeProps> = ({
+const PendingApprovalNotice: FC<PendingApprovalNoticeProps> = ({
   role,
   message
 }) => {

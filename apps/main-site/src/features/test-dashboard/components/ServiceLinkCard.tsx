@@ -7,7 +7,7 @@ interface ServiceLinkCardProps {
   onClick?: (service: ServiceLink) => void;
 }
 
-export const ServiceLinkCard: React.FC<ServiceLinkCardProps> = ({ 
+export const ServiceLinkCard: FC<ServiceLinkCardProps> = ({ 
   service, 
   onClick 
 }) => {

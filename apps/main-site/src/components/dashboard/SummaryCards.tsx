@@ -6,7 +6,7 @@ import {
   Users
 } from 'lucide-react';
 
-const SummaryCards: React.FC = () => {
+const SummaryCards: FC = () => {
   const cards = [
     {
       title: '총 주문 수',

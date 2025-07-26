@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 interface ServiceCardProps {
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   link: string;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, icon, link }) => {
+const ServiceCard: FC<ServiceCardProps> = ({ title, description, icon, link }) => {
   const navigate = useNavigate();
 
   return (

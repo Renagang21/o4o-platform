@@ -15,7 +15,7 @@ interface ProductCardProps {
   className?: string;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+export const ProductCard: FC<ProductCardProps> = ({
   product,
   mode = 'customer',
   onEdit,

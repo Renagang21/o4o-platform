@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   Plus, 
@@ -27,7 +27,7 @@ import { authClient } from '@o4o/auth-client'
 import type { CustomPostType } from '@o4o/types'
 import toast from 'react-hot-toast'
 
-const CPTList: React.FC = () => {
+const CPTList: FC = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 

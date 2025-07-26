@@ -15,7 +15,7 @@ interface PaginationProps {
   siblingCount?: number;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination: FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,

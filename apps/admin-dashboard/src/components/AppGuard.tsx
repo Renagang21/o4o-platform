@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, ReactNode } from 'react';
 import { useAppStatus } from '@/hooks/useDynamicMenu';
 import { AlertCircle, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 interface AppGuardProps {
   appName: string;
-  children: React.ReactNode;
+  children: ReactNode;
   fallbackPath?: string;
 }
 
@@ -14,7 +14,7 @@ interface AppGuardProps {
  * 앱 활성화 상태를 확인하여 접근을 제어하는 가드 컴포넌트
  * 비활성화된 앱에 접근하려고 하면 차단하고 안내 메시지 표시
  */
-const AppGuard: React.FC<AppGuardProps> = ({ 
+const AppGuard: FC<AppGuardProps> = ({ 
   appName, 
   children, 
   fallbackPath = '/dashboard' 

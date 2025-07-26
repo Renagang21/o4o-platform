@@ -58,10 +58,10 @@ export function SupplierStoreSettings() {
   const uploadBanner = useUploadSupplierBanner();
   const generateSlug = useGenerateSlug();
   
-  const [logoFile, setLogoFile] = React.useState<File | null>(null);
-  const [bannerFile, setBannerFile] = React.useState<File | null>(null);
-  const [slugInput, setSlugInput] = React.useState('');
-  const [isCheckingSlug, setIsCheckingSlug] = React.useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [slugInput, setSlugInput] = useState('');
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   
   const slugCheckResult = useCheckSlugAvailability(slugInput);
 
@@ -93,7 +93,7 @@ export function SupplierStoreSettings() {
   const watchedSlug = watch('storeSlug');
 
   // Load profile data
-  React.useEffect(() => {
+  useEffect(() => {
     if (profile) {
       setValue('storeName', profile.storeName || '');
       setValue('storeSlug', profile.storeSlug || '');
@@ -113,7 +113,7 @@ export function SupplierStoreSettings() {
   }, [profile, setValue]);
 
   // Check slug when it changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (watchedSlug && watchedSlug !== profile?.storeSlug) {
       setSlugInput(watchedSlug);
       setIsCheckingSlug(true);

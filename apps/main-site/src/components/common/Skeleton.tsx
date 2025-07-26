@@ -13,7 +13,7 @@ interface SkeletonProps {
   animation?: 'pulse' | 'wave' | 'none';
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({
+const Skeleton: FC<SkeletonProps> = ({
   variant = 'text',
   size = 'md',
   width,

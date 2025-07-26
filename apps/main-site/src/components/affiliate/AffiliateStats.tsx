@@ -1,7 +1,7 @@
 import React from 'react';
 import { MousePointer, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
 
-const AffiliateStats: React.FC = () => {
+const AffiliateStats: FC = () => {
   const stats = [
     {
       id: 'clicks',

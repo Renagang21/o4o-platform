@@ -25,7 +25,7 @@ export function ReviewRating({
   showText = false,
   className
 }: ReviewRatingProps) {
-  const [hoverRating, setHoverRating] = React.useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
 
   const handleMouseEnter = (value: number) => {
     if (!readonly) {

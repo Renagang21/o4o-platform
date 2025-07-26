@@ -7,15 +7,15 @@ export type AlertVariant = 'filled' | 'outlined' | 'soft';
 interface AlertProps {
   type?: AlertType;
   variant?: AlertVariant;
-  title?: React.ReactNode;
-  children: React.ReactNode;
+  title?: ReactNode;
+  children: ReactNode;
   className?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   onClose?: () => void;
-  action?: React.ReactNode;
+  action?: ReactNode;
 }
 
-const Alert: React.FC<AlertProps> = ({
+const Alert: FC<AlertProps> = ({
   type = 'info',
   variant = 'soft',
   title,

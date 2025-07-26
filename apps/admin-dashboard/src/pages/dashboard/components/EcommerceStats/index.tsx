@@ -3,7 +3,7 @@
  * WordPress Admin style statistics cards
  */
 
-import React from 'react';
+import { FC } from 'react';
 import { 
   ShoppingCart, 
   TrendingUp, 
@@ -18,7 +18,7 @@ import {
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { formatCurrency } from '@/lib/utils';
 
-const EcommerceStats: React.FC = () => {
+const EcommerceStats: FC = () => {
   const { data, isLoading, error } = useDashboardStats();
 
   if (error) {

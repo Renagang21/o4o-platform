@@ -4,8 +4,8 @@ import AffiliateStats from '../components/affiliate/AffiliateStats';
 import ActivityHistoryTable from '../components/affiliate/ActivityHistoryTable';
 import NoticeBanner from '../components/affiliate/NoticeBanner';
 
-const AffiliateDashboard: React.FC = () => {
-  const [showNotice, setShowNotice] = React.useState(true);
+const AffiliateDashboard: FC = () => {
+  const [showNotice, setShowNotice] = useState(true);
 
   return (
     <div className="min-h-screen bg-gray-50">

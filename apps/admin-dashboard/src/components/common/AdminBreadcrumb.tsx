@@ -1,4 +1,4 @@
-import React from 'react'
+import { Fragment, FC } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronRight, Home } from 'lucide-react'
 
@@ -12,7 +12,7 @@ interface AdminBreadcrumbProps {
   className?: string
 }
 
-const AdminBreadcrumb: React.FC<AdminBreadcrumbProps> = ({ items, className = '' }) => {
+const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) => {
   const location = useLocation()
   
   // 경로 기반 자동 브레드크럼 생성
@@ -74,7 +74,7 @@ const AdminBreadcrumb: React.FC<AdminBreadcrumbProps> = ({ items, className = ''
       <Home className="w-4 h-4" />
       
       {breadcrumbItems.map((item, index) => (
-        <React.Fragment key={index}>
+        <Fragment key={index}>
           {index > 0 && <ChevronRight className="w-4 h-4 text-wp-text-secondary" />}
           
           {item.path ? (
@@ -89,7 +89,7 @@ const AdminBreadcrumb: React.FC<AdminBreadcrumbProps> = ({ items, className = ''
               {item.label}
             </span>
           )}
-        </React.Fragment>
+        </Fragment>
       ))}
     </nav>
   )

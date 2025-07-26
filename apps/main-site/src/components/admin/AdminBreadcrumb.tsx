@@ -7,7 +7,7 @@ interface BreadcrumbItem {
   path?: string;
 }
 
-const AdminBreadcrumb: React.FC = () => {
+const AdminBreadcrumb: FC = () => {
   const location = useLocation();
 
   // 경로를 기반으로 breadcrumb 생성
@@ -130,7 +130,7 @@ const AdminBreadcrumb: React.FC = () => {
       <Home className="h-4 w-4" />
       
       {breadcrumbs.map((item, index) => (
-        <React.Fragment key={index}>
+        <Fragment key={index}>
           {index > 0 && <ChevronRight className="h-4 w-4 text-gray-400" />}
           
           {item.path ? (
@@ -143,7 +143,7 @@ const AdminBreadcrumb: React.FC = () => {
           ) : (
             <span className="text-gray-900 font-medium">{item.label}</span>
           )}
-        </React.Fragment>
+        </Fragment>
       ))}
     </nav>
   );

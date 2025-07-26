@@ -8,7 +8,7 @@ interface ShortcodeBlockProps {
   };
 }
 
-const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({ content, settings }) => {
+const ShortcodeBlock: FC<ShortcodeBlockProps> = ({ content, settings }) => {
   if (!content) {
     return null;
   }

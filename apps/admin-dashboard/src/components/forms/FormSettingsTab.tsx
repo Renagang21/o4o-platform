@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ interface FormSettingsTabProps {
   onChange: (settings: FormSettings) => void;
 }
 
-export const FormSettingsTab: React.FC<FormSettingsTabProps> = ({ settings, onChange }) => {
+export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }) => {
   const updateSettings = (updates: Partial<FormSettings>) => {
     onChange({ ...settings, ...updates });
   };

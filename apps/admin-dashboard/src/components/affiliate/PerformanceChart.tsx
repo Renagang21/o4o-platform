@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, Legend
@@ -9,7 +9,7 @@ interface PerformanceChartProps {
   period: 'today' | 'week' | 'month' | 'year';
 }
 
-export const PerformanceChart: React.FC<PerformanceChartProps> = ({ period }) => {
+export const PerformanceChart: FC<PerformanceChartProps> = ({ period }) => {
   // 기간별 더미 데이터 생성
   const generateChartData = () => {
     switch (period) {

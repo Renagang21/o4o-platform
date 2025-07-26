@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, ReactNode } from 'react';
 import { AuthProvider } from '@o4o/auth-context';
 import axios from 'axios';
 
@@ -19,7 +19,7 @@ const mockUser = {
 
 const mockToken = 'mock-jwt-token-dev-' + Date.now();
 
-export const DevAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DevAuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   // 컴포넌트 마운트 전에 로컬 스토리지 설정
   if (import.meta.env.DEV) {
     // 로컬 스토리지에 인증 정보 저장

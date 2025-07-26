@@ -17,7 +17,7 @@ interface ProductFiltersProps {
   className?: string;
 }
 
-export const ProductFilters: React.FC<ProductFiltersProps> = ({
+export const ProductFilters: FC<ProductFiltersProps> = ({
   categories,
   brands,
   priceRange,

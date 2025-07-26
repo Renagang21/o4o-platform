@@ -10,7 +10,7 @@ interface TestBannerGridProps {
   description?: string;
 }
 
-const TestBannerGrid: React.FC<TestBannerGridProps> = ({ 
+const TestBannerGrid: FC<TestBannerGridProps> = ({ 
   banners, 
   title = '테스트 기능 바로가기',
   description = '각 기능을 클릭하여 테스트를 시작하세요'

@@ -7,7 +7,7 @@ interface ServiceStatusCardProps {
   onRefresh?: (serviceName: string) => void;
 }
 
-export const ServiceStatusCard: React.FC<ServiceStatusCardProps> = ({ 
+export const ServiceStatusCard: FC<ServiceStatusCardProps> = ({ 
   service, 
   onRefresh 
 }) => {

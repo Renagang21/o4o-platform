@@ -1,9 +1,9 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { useAuthStore } from '@/api/authStore'
 import ThemeSettings from './ThemeSettings'
 import { Shield } from 'lucide-react'
 
-const ThemeSettingsWithAuth: React.FC = () => {
+const ThemeSettingsWithAuth: FC = () => {
   const { user } = useAuthStore()
   
   // Only admins can manage themes

@@ -1,11 +1,11 @@
-import React from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon, BookOpen } from 'lucide-react'
 import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 
-const UserSettings: React.FC = () => (
+const UserSettings: FC = () => (
   <div className="wp-card">
     <div className="wp-card-body">
       <div className="text-center py-12 text-wp-text-secondary">
@@ -15,7 +15,7 @@ const UserSettings: React.FC = () => (
   </div>
 )
 
-const EmailSettings: React.FC = () => (
+const EmailSettings: FC = () => (
   <div className="wp-card">
     <div className="wp-card-body">
       <div className="text-center py-12 text-wp-text-secondary">
@@ -25,7 +25,7 @@ const EmailSettings: React.FC = () => (
   </div>
 )
 
-const IntegrationSettings: React.FC = () => (
+const IntegrationSettings: FC = () => (
   <div className="wp-card">
     <div className="wp-card-body">
       <div className="text-center py-12 text-wp-text-secondary">
@@ -44,7 +44,7 @@ const settingsTabs = [
   { id: 'integrations', label: '연동 설정', icon: <LinkIcon className="w-4 h-4" />, path: 'integrations' }
 ]
 
-const Settings: React.FC = () => {
+const Settings: FC = () => {
   const location = useLocation()
   const currentPath = location.pathname.split('/').pop() || ''
 

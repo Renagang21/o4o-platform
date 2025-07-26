@@ -1,30 +1,31 @@
-import React from 'react';
+import { FC, ReactNode, isValidElement, cloneElement, ReactElement } from 'react';
+import type { ButtonHTMLAttributes, InputHTMLAttributes, HTMLAttributes, LabelHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes } from 'react';
 
 // Basic component interfaces for type safety
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'default';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   asChild?: boolean;
 }
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
 }
 
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-  children: React.ReactNode;
+export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
+  children: ReactNode;
 }
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
 // Simple component implementations
-export const Button: React.FC<ButtonProps> = ({ 
+export const Button: FC<ButtonProps> = ({ 
   variant = 'primary', 
   size = 'md', 
   className = '', 
@@ -49,7 +50,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${baseClasses} ${variantClasses[variant as keyof typeof variantClasses]} ${sizeClasses[size as keyof typeof sizeClasses]} ${className}`}
       {...props}
     >
       {children}
@@ -57,7 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-export const Input: React.FC<InputProps> = ({ 
+export const Input: FC<InputProps> = ({ 
   className = '', 
   error,
   ...props 
@@ -73,7 +74,7 @@ export const Input: React.FC<InputProps> = ({
   );
 };
 
-export const Card: React.FC<CardProps> = ({ className = '', children, ...props }) => {
+export const Card: FC<CardProps> = ({ className = '', children, ...props }) => {
   return (
     <div
       className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
@@ -84,7 +85,7 @@ export const Card: React.FC<CardProps> = ({ className = '', children, ...props }
   );
 };
 
-export const CardHeader: React.FC<CardProps> = ({ className = '', children, ...props }) => {
+export const CardHeader: FC<CardProps> = ({ className = '', children, ...props }) => {
   return (
     <div className={`flex flex-col space-y-1.5 p-6 ${className}`} {...props}>
       {children}
@@ -92,7 +93,7 @@ export const CardHeader: React.FC<CardProps> = ({ className = '', children, ...p
   );
 };
 
-export const CardContent: React.FC<CardProps> = ({ className = '', children, ...props }) => {
+export const CardContent: FC<CardProps> = ({ className = '', children, ...props }) => {
   return (
     <div className={`p-6 pt-0 ${className}`} {...props}>
       {children}
@@ -100,7 +101,7 @@ export const CardContent: React.FC<CardProps> = ({ className = '', children, ...
   );
 };
 
-export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ className = '', children, ...props }) => {
+export const CardTitle: FC<HTMLAttributes<HTMLHeadingElement>> = ({ className = '', children, ...props }) => {
   return (
     <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className}`} {...props}>
       {children}
@@ -108,7 +109,7 @@ export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ 
   );
 };
 
-export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({ className = '', children, ...props }) => {
+export const CardDescription: FC<HTMLAttributes<HTMLParagraphElement>> = ({ className = '', children, ...props }) => {
   return (
     <p className={`text-sm text-muted-foreground ${className}`} {...props}>
       {children}
@@ -116,7 +117,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
   );
 };
 
-export const CardFooter: React.FC<CardProps> = ({ className = '', children, ...props }) => {
+export const CardFooter: FC<CardProps> = ({ className = '', children, ...props }) => {
   return (
     <div className={`flex items-center p-6 pt-0 ${className}`} {...props}>
       {children}
@@ -124,7 +125,7 @@ export const CardFooter: React.FC<CardProps> = ({ className = '', children, ...p
   );
 };
 
-export const Label: React.FC<LabelProps> = ({ className = '', children, ...props }) => {
+export const Label: FC<LabelProps> = ({ className = '', children, ...props }) => {
   return (
     <label
       className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
@@ -135,7 +136,7 @@ export const Label: React.FC<LabelProps> = ({ className = '', children, ...props
   );
 };
 
-export const Badge: React.FC<BadgeProps> = ({ 
+export const Badge: FC<BadgeProps> = ({ 
   variant = 'default', 
   className = '', 
   children, 
@@ -150,7 +151,7 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variantClasses[variant]} ${className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variantClasses[variant as keyof typeof variantClasses]} ${className}`}
       {...props}
     >
       {children}
@@ -158,11 +159,11 @@ export const Badge: React.FC<BadgeProps> = ({
   );
 };
 
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   onCheckedChange?: (checked: boolean) => void;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({ 
+export const Checkbox: FC<CheckboxProps> = ({ 
   className = '', 
   onCheckedChange,
   ...props 
@@ -177,7 +178,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   );
 };
 
-export const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ 
+export const Textarea: FC<TextareaHTMLAttributes<HTMLTextAreaElement>> = ({ 
   className = '', 
   ...props 
 }) => {
@@ -189,7 +190,7 @@ export const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement
   );
 };
 
-export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = ({ 
+export const Select: FC<SelectHTMLAttributes<HTMLSelectElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -205,13 +206,13 @@ export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (
 };
 
 // Radio Group components (simplified)
-export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface RadioGroupProps extends HTMLAttributes<HTMLDivElement> {
   value?: string;
   onValueChange?: (value: string) => void;
   name?: string;
 }
 
-export const RadioGroup: React.FC<RadioGroupProps> = ({ 
+export const RadioGroup: FC<RadioGroupProps> = ({ 
   className = '', 
   value,
   onValueChange,
@@ -227,7 +228,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   );
 };
 
-export const RadioGroupItem: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { id: string }> = ({ 
+export const RadioGroupItem: FC<InputHTMLAttributes<HTMLInputElement> & { id: string }> = ({ 
   className = '', 
   ...props 
 }) => {
@@ -241,7 +242,7 @@ export const RadioGroupItem: React.FC<React.InputHTMLAttributes<HTMLInputElement
 };
 
 // Tabs components (simplified)
-export const Tabs: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const Tabs: FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children, 
   ...props 
@@ -253,7 +254,7 @@ export const Tabs: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   );
 };
 
-export const TabsList: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const TabsList: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children, 
   ...props 
@@ -265,7 +266,7 @@ export const TabsList: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   );
 };
 
-export const TabsTrigger: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ 
+export const TabsTrigger: FC<ButtonHTMLAttributes<HTMLButtonElement>> = ({ 
   className = '', 
   children, 
   ...props 
@@ -280,7 +281,7 @@ export const TabsTrigger: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>
   );
 };
 
-export const TabsContent: React.FC<React.HTMLAttributes<HTMLDivElement> & { value?: string }> = ({ 
+export const TabsContent: FC<HTMLAttributes<HTMLDivElement> & { value?: string }> = ({ 
   className = '', 
   children, 
   value,
@@ -298,7 +299,7 @@ export const TabsContent: React.FC<React.HTMLAttributes<HTMLDivElement> & { valu
 };
 
 // Slider component (simplified)
-export const Slider: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({ 
+export const Slider: FC<InputHTMLAttributes<HTMLInputElement>> = ({ 
   className = '', 
   ...props 
 }) => {
@@ -312,12 +313,12 @@ export const Slider: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({
 };
 
 // Progress component
-export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ProgressProps extends HTMLAttributes<HTMLDivElement> {
   value?: number;
   max?: number;
 }
 
-export const Progress: React.FC<ProgressProps> = ({ 
+export const Progress: FC<ProgressProps> = ({ 
   className = '', 
   value = 0,
   max = 100,
@@ -339,7 +340,7 @@ export const Progress: React.FC<ProgressProps> = ({
 };
 
 // Skeleton component
-export const Skeleton: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const Skeleton: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   ...props 
 }) => {
@@ -352,7 +353,7 @@ export const Skeleton: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 };
 
 // Alert components
-export const Alert: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const Alert: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -368,7 +369,7 @@ export const Alert: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   );
 };
 
-export const AlertDescription: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const AlertDescription: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -384,22 +385,22 @@ export const AlertDescription: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
 };
 
 // Dropdown Menu components (simplified)
-export const DropdownMenu: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => {
+export const DropdownMenu: FC<HTMLAttributes<HTMLDivElement>> = ({ children, ...props }) => {
   return <div className="relative inline-block text-left" {...props}>{children}</div>;
 };
 
-export const DropdownMenuTrigger: React.FC<React.HTMLAttributes<HTMLButtonElement> & { asChild?: boolean }> = ({ 
+export const DropdownMenuTrigger: FC<HTMLAttributes<HTMLButtonElement> & { asChild?: boolean }> = ({ 
   children, 
   asChild, 
   ...props 
 }) => {
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, props);
+  if (asChild && isValidElement(children)) {
+    return cloneElement(children as ReactElement<HTMLAttributes<HTMLElement>>, props);
   }
   return <button {...props}>{children}</button>;
 };
 
-export const DropdownMenuContent: React.FC<React.HTMLAttributes<HTMLDivElement> & { align?: 'start' | 'center' | 'end' }> = ({ 
+export const DropdownMenuContent: FC<HTMLAttributes<HTMLDivElement> & { align?: 'start' | 'center' | 'end' }> = ({ 
   className = '', 
   align = 'center',
   children, 
@@ -415,7 +416,7 @@ export const DropdownMenuContent: React.FC<React.HTMLAttributes<HTMLDivElement> 
   );
 };
 
-export const DropdownMenuItem: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const DropdownMenuItem: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children, 
   ...props 
@@ -431,11 +432,11 @@ export const DropdownMenuItem: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
 };
 
 // Select components (enhanced)
-export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   onValueChange?: (value: string) => void;
 }
 
-export const SelectTrigger: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({ 
+export const SelectTrigger: FC<HTMLAttributes<HTMLButtonElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -450,11 +451,11 @@ export const SelectTrigger: React.FC<React.HTMLAttributes<HTMLButtonElement>> = 
   );
 };
 
-export const SelectValue: React.FC<{ placeholder?: string }> = ({ placeholder }) => {
+export const SelectValue: FC<{ placeholder?: string }> = ({ placeholder }) => {
   return <span>{placeholder || 'Select...'}</span>;
 };
 
-export const SelectContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const SelectContent: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -469,7 +470,7 @@ export const SelectContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   );
 };
 
-export const SelectItem: React.FC<React.HTMLAttributes<HTMLDivElement> & { value: string }> = ({ 
+export const SelectItem: FC<HTMLAttributes<HTMLDivElement> & { value: string }> = ({ 
   className = '', 
   children,
   value,
@@ -487,13 +488,13 @@ export const SelectItem: React.FC<React.HTMLAttributes<HTMLDivElement> & { value
 };
 
 // Toggle Group components
-export interface ToggleGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ToggleGroupProps extends HTMLAttributes<HTMLDivElement> {
   type?: 'single' | 'multiple';
   value?: string | string[];
   onValueChange?: (value: string | string[]) => void;
 }
 
-export const ToggleGroup: React.FC<ToggleGroupProps> = ({ 
+export const ToggleGroup: FC<ToggleGroupProps> = ({ 
   className = '', 
   type = 'single',
   children,
@@ -510,7 +511,7 @@ export const ToggleGroup: React.FC<ToggleGroupProps> = ({
   );
 };
 
-export const ToggleGroupItem: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { value: string }> = ({ 
+export const ToggleGroupItem: FC<ButtonHTMLAttributes<HTMLButtonElement> & { value: string }> = ({ 
   className = '', 
   value,
   children,
@@ -529,12 +530,12 @@ export const ToggleGroupItem: React.FC<React.ButtonHTMLAttributes<HTMLButtonElem
 };
 
 // Dialog components
-export interface DialogProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DialogProps extends HTMLAttributes<HTMLDivElement> {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-export const Dialog: React.FC<DialogProps> = ({ 
+export const Dialog: FC<DialogProps> = ({ 
   open = false,
   children,
   ...props 
@@ -549,7 +550,7 @@ export const Dialog: React.FC<DialogProps> = ({
   );
 };
 
-export const DialogContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const DialogContent: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -566,7 +567,7 @@ export const DialogContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   );
 };
 
-export const DialogHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const DialogHeader: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -581,7 +582,7 @@ export const DialogHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   );
 };
 
-export const DialogTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ 
+export const DialogTitle: FC<HTMLAttributes<HTMLHeadingElement>> = ({ 
   className = '', 
   children,
   ...props 
@@ -597,13 +598,13 @@ export const DialogTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = (
 };
 
 // Add Dialog Trigger
-export const DialogTrigger: React.FC<React.HTMLAttributes<HTMLButtonElement> & { asChild?: boolean }> = ({ 
+export const DialogTrigger: FC<HTMLAttributes<HTMLButtonElement> & { asChild?: boolean }> = ({ 
   children, 
   asChild, 
   ...props 
 }) => {
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, props);
+  if (asChild && isValidElement(children)) {
+    return cloneElement(children as ReactElement<HTMLAttributes<HTMLElement>>, props);
   }
   return <button {...props}>{children}</button>;
 };

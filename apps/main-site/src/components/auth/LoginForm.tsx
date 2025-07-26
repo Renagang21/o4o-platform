@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const COMMON_CORE_AUTH_URL = import.meta.env.VITE_COMMON_CORE_AUTH_URL || 'http://localhost:5000';
 
-const LoginForm: React.FC = () => {
+const LoginForm: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 

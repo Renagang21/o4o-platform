@@ -1,11 +1,11 @@
-import React from 'react';
+import { FC, ReactElement, useState, ChangeEvent } from 'react';
 import { Plus, Search, Filter, MoreVertical } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface PageHeaderAction {
   id: string;
   label: string;
-  icon?: React.ReactElement;
+  icon?: ReactElement;
   onClick: () => void;
   variant?: 'primary' | 'secondary' | 'danger';
   disabled?: boolean;
@@ -27,7 +27,7 @@ interface PageHeaderProps {
  * WordPress-style page header component
  * 모든 관리자 페이지에 공통적으로 사용되는 페이지 헤더
  */
-const PageHeader: React.FC<PageHeaderProps> = ({
+const PageHeader: FC<PageHeaderProps> = ({
   title,
   subtitle,
   actions = [],
@@ -38,9 +38,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   onFilter,
   className
 }) => {
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
     onSearch?.(value);

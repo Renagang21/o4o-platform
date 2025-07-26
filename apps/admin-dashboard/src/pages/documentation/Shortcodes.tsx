@@ -1,8 +1,8 @@
-import React from 'react';
+import { FC } from 'react';
 import { Code } from 'lucide-react';
 import ShortcodeReference from '@/components/ShortcodeReference';
 
-const Shortcodes: React.FC = () => {
+const Shortcodes: FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">

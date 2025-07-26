@@ -18,11 +18,11 @@ const queryClient = new QueryClient({
 // Auth client is already configured as singleton
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  <StrictMode>
     <QueryClientProvider client={queryClient}>
       <CookieAuthProvider>
         <RouterProvider router={router} />
       </CookieAuthProvider>
     </QueryClientProvider>
-  </React.StrictMode>
+  </StrictMode>
 );

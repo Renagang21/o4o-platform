@@ -13,7 +13,7 @@ interface ColumnsBlockProps {
   };
 }
 
-const ColumnsBlock: React.FC<ColumnsBlockProps> = ({ 
+const ColumnsBlock: FC<ColumnsBlockProps> = ({ 
   columns = [],
   settings = {}
 }) => {

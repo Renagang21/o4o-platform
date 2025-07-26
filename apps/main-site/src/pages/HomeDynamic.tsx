@@ -50,7 +50,7 @@ const StaticHomepage = () => (
   </>
 );
 
-const HomeDynamic: React.FC = () => {
+const HomeDynamic: FC = () => {
   const { data, isLoading, isError, error } = useHomepageTemplate();
 
   // Show loading state

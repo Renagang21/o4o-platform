@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
   requireAdmin?: boolean;
 }
 
@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
  * 하위 호환성을 위한 ProtectedRoute
  * 새로운 SSO 시스템과 기존 시스템 모두 지원
  */
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
+const ProtectedRoute: FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
   const { state, user, isSSO } = useAuth();
   const location = useLocation();
 

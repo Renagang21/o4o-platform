@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC, ComponentType } from 'react'
 import {
   Type,
   Hash,
@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button'
 interface FieldType {
   value: string
   label: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   category: 'basic' | 'content' | 'choice' | 'relational' | 'layout' | 'advanced'
   description: string
 }
@@ -76,7 +76,7 @@ interface FieldTypeSelectorProps {
   selectedType?: string
 }
 
-const FieldTypeSelector: React.FC<FieldTypeSelectorProps> = ({ onSelect, selectedType }) => {
+const FieldTypeSelector: FC<FieldTypeSelectorProps> = ({ onSelect, selectedType }) => {
   const categories = [
     { key: 'basic', label: '기본 필드' },
     { key: 'content', label: '콘텐츠 필드' },

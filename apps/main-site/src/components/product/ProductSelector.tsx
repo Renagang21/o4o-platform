@@ -13,7 +13,7 @@ interface ProductSelectorProps {
   onSelect: (product: ProductData) => void;
 }
 
-const ProductSelector: React.FC<ProductSelectorProps> = ({
+const ProductSelector: FC<ProductSelectorProps> = ({
   selectedProduct,
   onSelect
 }) => {

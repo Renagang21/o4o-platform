@@ -14,7 +14,7 @@ const roleLabel: Record<string, string> = {
   admin: '관리자',
 };
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ user, onLogout, onPasswordChange }) => {
+const ProfileCard: FC<ProfileCardProps> = ({ user, onLogout, onPasswordChange }) => {
   const joinDate = user._id.length === 24 ? new Date(parseInt(user._id.substring(0, 8), 16) * 1000) : new Date();
   const formattedDate = joinDate.toISOString().slice(0, 10);
 

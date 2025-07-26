@@ -49,8 +49,8 @@ const fetchPosts = async (page: number, limit: number): Promise<{ posts: Post[];
   };
 };
 
-const BlogList: React.FC<BlogListProps> = ({ postsPerPage = 10 }) => {
-  const [currentPage, setCurrentPage] = React.useState(1);
+const BlogList: FC<BlogListProps> = ({ postsPerPage = 10 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', currentPage, postsPerPage],

@@ -8,7 +8,7 @@ import {
   LogOut
 } from 'lucide-react';
 
-const SidebarMenu: React.FC = () => {
+const SidebarMenu: FC = () => {
   const location = useLocation();
 
   const menuItems = [

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
-const RecentOrders: React.FC = () => {
+const RecentOrders: FC = () => {
   const orders = [
     {
       id: 'ORD-2024-001',

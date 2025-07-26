@@ -38,9 +38,9 @@ export function ReviewForm({
   isSubmitting,
   className
 }: ReviewFormProps) {
-  const [images, setImages] = React.useState<File[]>([]);
-  const [imageUrls, setImageUrls] = React.useState<string[]>(review?.images || []);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>(review?.images || []);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,

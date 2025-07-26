@@ -1,11 +1,11 @@
-import React from 'react';
+import { ReactNode, ReactElement, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export interface DataTableColumn<T> {
   id: string;
   label: string;
-  accessor: keyof T | ((item: T) => React.ReactNode);
+  accessor: keyof T | ((item: T) => ReactNode);
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
@@ -15,7 +15,7 @@ export interface DataTableColumn<T> {
 export interface DataTableAction<T> {
   id: string;
   label: string;
-  icon?: React.ReactElement;
+  icon?: ReactElement;
   onClick: (item: T) => void;
   variant?: 'primary' | 'secondary' | 'danger';
   disabled?: (item: T) => boolean;
@@ -65,7 +65,7 @@ const DataTable = <T extends object>({
   pagination,
   className
 }: DataTableProps<T>) => {
-  const [selectAll, setSelectAll] = React.useState(false);
+  const [selectAll, setSelectAll] = useState(false);
 
   // Selection logic
   const handleSelectAll = (checked: boolean) => {

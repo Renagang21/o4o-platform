@@ -6,7 +6,7 @@ import TrustSlider from '../components/home/TrustSlider';
 import BrandPreview from '../components/home/BrandPreview';
 import Footer from '../components/home/Footer';
 
-const Home: React.FC = () => {
+const Home: FC = () => {
   const services = [
     {
       id: 'dropshipping',

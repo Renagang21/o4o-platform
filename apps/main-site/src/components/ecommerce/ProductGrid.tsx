@@ -9,7 +9,7 @@ interface ProductGridProps {
   columns?: number;
 }
 
-const ProductGrid: React.FC<ProductGridProps> = ({ products, columns = 4 }) => {
+const ProductGrid: FC<ProductGridProps> = ({ products, columns = 4 }) => {
   const gridCols = {
     1: 'grid-cols-1',
     2: 'grid-cols-1 md:grid-cols-2',
@@ -28,7 +28,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, columns = 4 }) => {
   );
 };
 
-const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+const ProductCard: FC<{ product: Product }> = ({ product }) => {
   const discount = product.compareAtPrice && product.compareAtPrice > product.price
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;

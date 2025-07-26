@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth, UserRole } from '../context/AuthContext';
 
 
-const Profile: React.FC = () => {
+const Profile: FC = () => {
 
   const { user } = useAuth();
 

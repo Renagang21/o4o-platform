@@ -6,7 +6,7 @@ interface DevToolCardProps {
   onClick?: (tool: DevTool) => void;
 }
 
-export const DevToolCard: React.FC<DevToolCardProps> = ({ 
+export const DevToolCard: FC<DevToolCardProps> = ({ 
   tool, 
   onClick 
 }) => {

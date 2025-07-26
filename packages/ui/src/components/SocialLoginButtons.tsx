@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 
 interface SocialLoginButtonsProps {
   onSocialLogin?: (provider: 'google' | 'kakao' | 'naver') => void;
@@ -7,7 +7,7 @@ interface SocialLoginButtonsProps {
   size?: 'small' | 'medium' | 'large';
 }
 
-export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
+export const SocialLoginButtons: FC<SocialLoginButtonsProps> = ({
   onSocialLogin,
   disabled = false,
   showLabels = true,
@@ -41,9 +41,9 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
       <button
         onClick={() => handleSocialLogin('google')}
         disabled={disabled}
-        className={`w-full flex items-center justify-center gap-3 ${sizeClasses[size]} bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
+        className={`w-full flex items-center justify-center gap-3 ${sizeClasses[size as keyof typeof sizeClasses]} bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
       >
-        <svg className={iconSizes[size]} viewBox="0 0 24 24">
+        <svg className={iconSizes[size as keyof typeof iconSizes]} viewBox="0 0 24 24">
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -70,7 +70,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         disabled={disabled}
         className={`w-full flex items-center justify-center gap-3 ${sizeClasses[size]} bg-[#FEE500] rounded-lg shadow-sm hover:bg-[#FDD835] disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
       >
-        <svg className={iconSizes[size]} viewBox="0 0 24 24">
+        <svg className={iconSizes[size as keyof typeof iconSizes]} viewBox="0 0 24 24">
           <path
             fill="#000000"
             d="M12 3c-5.52 0-10 3.432-10 7.66 0 2.742 1.882 5.146 4.71 6.507l-.968 3.534c-.062.227.102.463.34.494.067.008.134 0 .197-.023l4.299-2.853c.472.05.945.075 1.422.075 5.52 0 10-3.432 10-7.66S17.52 3 12 3z"
@@ -85,7 +85,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         disabled={disabled}
         className={`w-full flex items-center justify-center gap-3 ${sizeClasses[size]} bg-[#03C75A] rounded-lg shadow-sm hover:bg-[#02B350] disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
       >
-        <svg className={iconSizes[size]} viewBox="0 0 24 24">
+        <svg className={iconSizes[size as keyof typeof iconSizes]} viewBox="0 0 24 24">
           <path
             fill="#FFFFFF"
             d="M16.273 12.845L7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727v12.845z"

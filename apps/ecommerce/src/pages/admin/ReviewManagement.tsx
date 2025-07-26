@@ -18,11 +18,11 @@ import {
 import { toast } from 'sonner';
 
 export function ReviewManagement() {
-  const [filters, setFilters] = React.useState<ReviewFilters>({
+  const [filters, setFilters] = useState<ReviewFilters>({
     status: ReviewStatus.PENDING,
     limit: 20
   });
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Queries
   const { data: reviewsData, isLoading } = useAdminReviews(filters);

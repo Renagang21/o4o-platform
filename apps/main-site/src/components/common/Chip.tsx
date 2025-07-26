@@ -6,18 +6,18 @@ export type ChipColor = 'primary' | 'secondary' | 'success' | 'danger' | 'warnin
 export type ChipSize = 'sm' | 'md' | 'lg';
 
 interface ChipProps {
-  label: React.ReactNode;
+  label: ReactNode;
   variant?: ChipVariant;
   color?: ChipColor;
   size?: ChipSize;
   className?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   onDelete?: () => void;
   onClick?: () => void;
   disabled?: boolean;
 }
 
-const Chip: React.FC<ChipProps> = ({
+const Chip: FC<ChipProps> = ({
   label,
   variant = 'filled',
   color = 'primary',

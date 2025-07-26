@@ -30,14 +30,14 @@ interface ProductReviewSectionProps {
 
 export function ProductReviewSection({ product, className }: ProductReviewSectionProps) {
   const { user } = useAuth();
-  const [filters, setFilters] = React.useState<ReviewFilters>({
+  const [filters, setFilters] = useState<ReviewFilters>({
     sort: 'recent',
     limit: 10
   });
-  const [showReviewForm, setShowReviewForm] = React.useState(false);
-  const [editingReview, setEditingReview] = React.useState<string | null>(null);
-  const [reportingReview, setReportingReview] = React.useState<string | null>(null);
-  const [reportReason, setReportReason] = React.useState('');
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [editingReview, setEditingReview] = useState<string | null>(null);
+  const [reportingReview, setReportingReview] = useState<string | null>(null);
+  const [reportReason, setReportReason] = useState('');
 
   // Queries
   const { data: reviewsData, isLoading: reviewsLoading } = useProductReviews(product.id, filters);

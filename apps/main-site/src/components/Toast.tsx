@@ -17,7 +17,7 @@ const toastIcons = {
   warning: <AlertTriangle className="w-5 h-5 mr-2 text-yellow-500" />,
 };
 
-const Toast: React.FC = () => {
+const Toast: FC = () => {
   const { toasts, removeToast } = useToast();
 
   return (
