@@ -145,15 +145,21 @@ When you see "CI/CD Pipeline completed", notify the team:
 # 1. SSH 접속
 ssh ubuntu@43.202.242.215
 
-# 2. 최신 코드 동기화 (필요시)
+# 2. 최신 코드 동기화 (필요시 - 선택적 동기화 권장)
 cd /home/ubuntu/o4o-platform
-git pull origin main
+git fetch origin main
+# API 서버 관련 파일만 선택적 업데이트
+git checkout origin/main -- apps/api-server/
+git checkout origin/main -- scripts/
 
 # 3. PM2 프로세스 확인
 pm2 list
 pm2 logs o4o-api-server --lines 50
 
 # 4. API 서버 재시작 (필요시)
+cd apps/api-server
+npm install  # package.json 변경 시
+npm run build
 pm2 restart o4o-api-server
 
 # 5. 헬스체크 확인
