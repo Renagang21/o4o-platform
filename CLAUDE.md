@@ -133,11 +133,63 @@ GOOGLE_CLIENT_SECRET=optional
 7. Never deploy API code to web server or frontend code to API server
 8. Never run database migrations on web server
 
+## 🔧 Post-CI/CD Server Work
+
+### After CI/CD Completes
+When you see "CI/CD Pipeline completed", notify the team:
+
+**"CI/CD 완료! 서버에서 다음 작업이 필요합니다:"**
+
+#### o4o-apiserver (43.202.242.215)
+```bash
+# 1. SSH 접속
+ssh ubuntu@43.202.242.215
+
+# 2. 최신 코드 동기화 (필요시)
+cd /home/ubuntu/o4o-platform
+git pull origin main
+
+# 3. PM2 프로세스 확인
+pm2 list
+pm2 logs o4o-api-server --lines 50
+
+# 4. API 서버 재시작 (필요시)
+pm2 restart o4o-api-server
+
+# 5. 헬스체크 확인
+curl http://localhost:4000/api/health
+
+# 6. Nginx 설정 확인 (필요시)
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+#### o4o-webserver (13.125.144.8)
+```bash
+# 1. SSH 접속
+ssh ubuntu@13.125.144.8
+
+# 2. 배포된 파일 확인
+ls -la /var/www/neture.co.kr/
+ls -la /var/www/admin.neture.co.kr/
+
+# 3. 권한 설정 (필요시)
+sudo chown -R www-data:www-data /var/www/
+sudo chmod -R 755 /var/www/
+```
+
+### Common Server Tasks
+- **환경변수 설정**: `.env.production` 파일 수동 생성
+- **DB 마이그레이션**: `npm run migration:run` (API 서버에서만)
+- **SSL 인증서**: Let's Encrypt 설정 확인
+- **로그 모니터링**: PM2 logs, Nginx access/error logs
+
 ## 📝 Recent Updates (2025-07)
 - Fixed OAuth conditional initialization
 - Changed all `npm ci` to `npm install` in CI/CD
 - Added local type definitions for API server deployment
 - Resolved 83 TypeScript errors → 0
+- Added post-CI/CD server work documentation
 
 ---
 
