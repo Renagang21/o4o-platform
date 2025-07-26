@@ -103,16 +103,25 @@ GOOGLE_CLIENT_SECRET=optional
 
 ## 📊 Deployment Notes
 
-### API Server Specifics
-- Server path: `/home/ubuntu/o4o-platform`
+### Two-Server Architecture
+**o4o-apiserver** (43.202.242.215)
+- Hosts: API backend, PostgreSQL, Medusa
+- Domain: api.neture.co.kr
+- Apps: `apps/api-server`
 - PM2 app name: `o4o-api-server`
-- No `packages/` directory on server - use local type definitions
-- OAuth strategies initialize conditionally
+- Path: `/home/ubuntu/o4o-platform`
 
-### Static Site Deployment
-1. Build in GitHub Actions
-2. rsync to `/var/www/[domain]/`
-3. Let Nginx serve directly (no PM2/serve needed)
+**o4o-webserver** (13.125.144.8)
+- Hosts: Frontend web/mobile interfaces
+- Domains: www.neture.co.kr, admin.neture.co.kr
+- Apps: `apps/main-site`, `apps/admin-dashboard`, `apps/ecommerce`
+- Static files served by Nginx from `/var/www/[domain]/`
+
+### Deployment Considerations
+- API server: No `packages/` directory - use local type definitions
+- Web server: Only needs built static files (dist/)
+- Never deploy API code to web server or vice versa
+- OAuth strategies initialize conditionally on API server
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
@@ -121,6 +130,8 @@ GOOGLE_CLIENT_SECRET=optional
 4. Never ignore ESLint warnings
 5. Never hardcode secrets
 6. Never assume packages exist on deployed server
+7. Never deploy API code to web server or frontend code to API server
+8. Never run database migrations on web server
 
 ## 📝 Recent Updates (2025-07)
 - Fixed OAuth conditional initialization
