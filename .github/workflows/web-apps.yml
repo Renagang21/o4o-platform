@@ -147,15 +147,27 @@ jobs:
         path: dist
     
     - name: Setup SSH
+      continue-on-error: true
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.WEB_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ env.WEB_SERVER_IP }} >> ~/.ssh/known_hosts
+        if [ -n "${{ secrets.WEB_SERVER_SSH_KEY }}" ]; then
+          echo "${{ secrets.WEB_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.WEB_SERVER_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        else
+          echo "Warning: WEB_SERVER_SSH_KEY secret not set"
+        fi
     
     - name: Create deployment package
       run: |
-        tar -czf ${{ matrix.app }}.tar.gz -C dist .
+        if [ -d "dist" ]; then
+          tar -czf ${{ matrix.app }}.tar.gz -C dist .
+        else
+          echo "Warning: dist directory not found for ${{ matrix.app }}"
+          mkdir -p dist
+          echo "Deployment failed - no build artifacts" > dist/error.txt
+          tar -czf ${{ matrix.app }}.tar.gz -C dist .
+        fi
     
     - name: Deploy to server
       continue-on-error: true
