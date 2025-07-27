@@ -1,0 +1,215 @@
+name: Health Check Monitor
+
+on:
+  schedule:
+    # 매 30분마다 실행 (UTC 기준)
+    - cron: '*/30 * * * *'
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  check-services:
+    name: Check All Services
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        service:
+          - name: API Server
+            url: https://api.neture.co.kr/api/health
+            timeout: 10
+          - name: Main Site
+            url: https://www.neture.co.kr
+            timeout: 30
+          - name: Admin Dashboard
+            url: https://admin.neture.co.kr
+            timeout: 30
+          - name: Shop
+            url: https://shop.neture.co.kr
+            timeout: 30
+          - name: Forum
+            url: https://forum.neture.co.kr
+            timeout: 30
+          - name: Digital Signage
+            url: https://signage.neture.co.kr
+            timeout: 30
+          - name: Crowdfunding
+            url: https://funding.neture.co.kr
+            timeout: 30
+    
+    steps:
+    - name: Check ${{ matrix.service.name }}
+      id: health
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" --max-time ${{ matrix.service.timeout }} ${{ matrix.service.url }} || echo "000")
+        echo "status=$response" >> $GITHUB_OUTPUT
+        
+        if [ "$response" = "200" ]; then
+          echo "✅ ${{ matrix.service.name }} is healthy (Status: $response)"
+        else
+          echo "❌ ${{ matrix.service.name }} is unhealthy (Status: $response)"
+          exit 1
+        fi
+    
+    - name: Send alert on failure
+      if: failure()
+      run: |
+        echo "🚨 ALERT: ${{ matrix.service.name }} is down!"
+        echo "URL: ${{ matrix.service.url }}"
+        echo "Status: ${{ steps.health.outputs.status }}"
+        echo "Time: $(date)"
+        
+        # Slack 알림 (SLACK_WEBHOOK_URL이 설정된 경우)
+        if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            -d '{
+              "text": "🚨 *Service Down Alert*",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Service:* ${{ matrix.service.name }}\n*URL:* ${{ matrix.service.url }}\n*Status:* ${{ steps.health.outputs.status }}\n*Time:* '"$(date)"'"
+                  }
+                }
+              ]
+            }'
+        fi
+
+  check-api-endpoints:
+    name: Check API Endpoints
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check critical API endpoints
+      run: |
+        # Health check
+        curl -f -s https://api.neture.co.kr/api/health || exit 1
+        
+        # Auth endpoint
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://api.neture.co.kr/api/auth/status)
+        if [ "$response" != "200" ] && [ "$response" != "401" ]; then
+          echo "Auth endpoint failed with status: $response"
+          exit 1
+        fi
+        
+        # Products endpoint (public)
+        curl -f -s https://api.neture.co.kr/api/products?limit=1 || exit 1
+        
+        echo "✅ All API endpoints are healthy"
+
+  check-database:
+    name: Check Database Connection
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'  # 수동 실행시에만
+    
+    steps:
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.API_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 43.202.242.215 >> ~/.ssh/known_hosts
+    
+    - name: Check PostgreSQL
+      run: |
+        ssh ubuntu@43.202.242.215 "
+          # PostgreSQL 상태 확인
+          sudo systemctl is-active postgresql || exit 1
+          
+          # 연결 테스트
+          PGPASSWORD=\$DB_PASSWORD psql -h localhost -U \$DB_USERNAME -d \$DB_NAME -c 'SELECT 1' || exit 1
+          
+          echo '✅ PostgreSQL is healthy'
+        "
+    
+    - name: Check Redis
+      run: |
+        ssh ubuntu@43.202.242.215 "
+          # Redis 상태 확인
+          sudo systemctl is-active redis || exit 1
+          
+          # 연결 테스트
+          redis-cli ping || exit 1
+          
+          echo '✅ Redis is healthy'
+        "
+
+  check-server-resources:
+    name: Check Server Resources
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'  # 수동 실행시에만
+    
+    strategy:
+      matrix:
+        server:
+          - name: API Server
+            ip: 43.202.242.215
+          - name: Web Server
+            ip: 13.125.144.8
+    
+    steps:
+    - name: Setup SSH for ${{ matrix.server.name }}
+      run: |
+        mkdir -p ~/.ssh
+        if [ "${{ matrix.server.name }}" = "API Server" ]; then
+          echo "${{ secrets.API_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+        else
+          echo "${{ secrets.WEB_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+        fi
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ matrix.server.ip }} >> ~/.ssh/known_hosts
+    
+    - name: Check resources on ${{ matrix.server.name }}
+      run: |
+        ssh ubuntu@${{ matrix.server.ip }} "
+          echo '=== ${{ matrix.server.name }} Resource Check ==='
+          
+          # CPU 사용률
+          echo -n 'CPU Usage: '
+          top -bn1 | grep 'Cpu(s)' | awk '{print \$2}' | cut -d'%' -f1
+          
+          # 메모리 사용률
+          echo -n 'Memory Usage: '
+          free | grep Mem | awk '{print (\$3/\$2) * 100.0"%"}'
+          
+          # 디스크 사용률
+          echo 'Disk Usage:'
+          df -h | grep -E '^/dev/' | awk '{print \$6 ": " \$5}'
+          
+          # Load Average
+          echo -n 'Load Average: '
+          uptime | awk -F'load average:' '{print \$2}'
+          
+          # PM2 프로세스 (API 서버만)
+          if [ '${{ matrix.server.name }}' = 'API Server' ]; then
+            echo '=== PM2 Status ==='
+            pm2 list
+          fi
+          
+          # Nginx 상태
+          echo -n 'Nginx: '
+          sudo systemctl is-active nginx
+        "
+
+  summary:
+    name: Health Check Summary
+    runs-on: ubuntu-latest
+    needs: [check-services, check-api-endpoints]
+    if: always()
+    
+    steps:
+    - name: Generate summary
+      run: |
+        echo "# 🏥 Health Check Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.check-services.result }}" = "success" ] && [ "${{ needs.check-api-endpoints.result }}" = "success" ]; then
+          echo "## ✅ All services are healthy!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## ❌ Some services are experiencing issues" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the individual job results for details." >> $GITHUB_STEP_SUMMARY
+        fi
