@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 interface StatusBadgeProps {
   status: 'online' | 'offline' | 'warning' | 'unknown' | 'active' | 'development' | 'maintenance' | 'passing' | 'failing' | 'not-tested';

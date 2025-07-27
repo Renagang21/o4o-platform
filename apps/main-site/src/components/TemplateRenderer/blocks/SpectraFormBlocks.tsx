@@ -131,7 +131,7 @@ export const SpectraFormBlock: React.FC<{
         }
         break;
       case 'tel':
-        if (value && !/^[\d\s\-\+\(\)]+$/.test(value)) {
+        if (value && !/^[\d\s\-+()]+$/.test(value)) {
           return 'Invalid phone number';
         }
         break;

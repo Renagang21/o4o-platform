@@ -1,5 +1,5 @@
 // React 19 새로운 기능들 활용 예시
-import { useState, useMemo, forwardRef } from 'react';
+import React, { useState, useMemo, forwardRef, useOptimistic, useActionState, startTransition } from 'react';
 
 // 1. useOptimistic 활용 예시 - 즉시 UI 업데이트
 interface Todo {
