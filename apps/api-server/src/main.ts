@@ -129,7 +129,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(cookieParser());
+app.use(cookieParser() as any);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -145,10 +145,10 @@ app.use(session({
     domain: process.env.COOKIE_DOMAIN || undefined, // Enable cross-subdomain cookies
     sameSite: 'lax'
   }
-}));
+}) as any);
 
 // Initialize passport
-app.use(passport.initialize());
+app.use(passport.initialize() as any);
 
 // Static file serving for uploads
 const uploadsPath = process.env.UPLOAD_DIR || './uploads';

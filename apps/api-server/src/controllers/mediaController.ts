@@ -172,7 +172,7 @@ export class MediaController {
   async uploadFiles(req: Request, res: Response) {
     const uploadMiddleware = this.upload.array('files', 10); // Max 10 files
 
-    uploadMiddleware(req, res, async (err) => {
+    uploadMiddleware(req as any, res as any, async (err) => {
       if (err) {
         return res.status(400).json({
           success: false,

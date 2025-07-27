@@ -48,7 +48,7 @@ router.delete('/:id', authenticateToken, checkRole(['admin']), formController.de
 router.get('/:id', formController.getForm);
 
 // Form submission - public but may require auth depending on form settings
-router.post('/:formId/submit', upload.array('files', 10), formController.submitForm);
+router.post('/:formId/submit', upload.array('files', 10) as any, formController.submitForm);
 
 // Submission management - require authentication
 router.get('/:formId/submissions', authenticateToken, checkRole(['admin', 'business']), formController.getSubmissions);

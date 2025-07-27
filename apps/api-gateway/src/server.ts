@@ -24,7 +24,7 @@ try {
 }
 
 // Create Express app
-const app: express.Application = express();
+const app: any = express();
 
 // Initialize Redis client
 let redis: Redis | undefined;
@@ -122,7 +122,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((req: any, res: any) => {
   res.status(404).json({
     error: 'Route not found',
     code: 'NOT_FOUND',

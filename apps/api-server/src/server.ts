@@ -63,10 +63,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 쿠키 파싱
-app.use(cookieParser());
+app.use(cookieParser() as any);
 
 // 압축
-app.use(compression());
+app.use(compression() as any);
 
 // 요청 로깅 (개발 환경)
 if (NODE_ENV === 'development') {
