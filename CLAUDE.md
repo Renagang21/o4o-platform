@@ -1,5 +1,10 @@
 # CLAUDE.md
 
+⚠️ **CRITICAL: YOU ARE WORKING DIRECTLY IN GITHUB VIA FIREBASE STUDIO** ⚠️
+- There is NO separate "local" environment - all changes are directly in the GitHub repository
+- When you see file paths like `/home/user/o4o-platform/`, this IS the GitHub repository
+- DO NOT confuse "local" vs "GitHub" - they are the SAME in Firebase Studio
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 🎯 Critical Development Rules
@@ -195,6 +200,15 @@ GOOGLE_CLIENT_SECRET=optional
 - Web server: Only needs built static files (dist/)
 - Never deploy API code to web server or vice versa
 - OAuth strategies initialize conditionally on API server
+
+## 🔧 Development Environment Notes
+
+### Firebase Studio
+- **Firebase Studio는 GitHub 직접 연결 환경**
+- 모든 작업은 GitHub 저장소에서 직접 이루어짐
+- 별도의 로컬 환경이 아님
+- git 명령어 사용 시 GitHub 저장소와 직접 상호작용
+- 파일 시스템은 GitHub 저장소의 내용을 반영
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
