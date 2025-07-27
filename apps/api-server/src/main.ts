@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import express from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -46,7 +46,7 @@ console.log('✅ Environment variables loaded');
 console.log('📍 Current directory:', process.cwd());
 console.log('🌐 PORT from env:', process.env.PORT);
 
-const app = express();
+const app: Application = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {

@@ -24,7 +24,7 @@ try {
 }
 
 // Create Express app
-const app = express();
+const app: express.Application = express();
 
 // Initialize Redis client
 let redis: Redis | undefined;
