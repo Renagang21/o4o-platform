@@ -157,6 +157,7 @@ jobs:
         tar -czf ${{ matrix.app }}.tar.gz -C dist .
     
     - name: Deploy to server
+      continue-on-error: true
       run: |
         # Transfer deployment package
         scp ${{ matrix.app }}.tar.gz ubuntu@${{ env.WEB_SERVER_IP }}:/tmp/

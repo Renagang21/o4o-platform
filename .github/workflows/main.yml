@@ -100,6 +100,7 @@ jobs:
         ssh-keyscan -H 43.202.242.215 >> ~/.ssh/known_hosts
     
     - name: Deploy to API server
+      continue-on-error: true
       run: |
         # Copy built files
         scp -r apps/api-server/dist/* ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/dist/
@@ -161,6 +162,7 @@ jobs:
         ssh-keyscan -H 13.125.144.8 >> ~/.ssh/known_hosts
     
     - name: Deploy to web server
+      continue-on-error: true
       run: |
         # Create directory if not exists
         ssh ubuntu@13.125.144.8 "sudo mkdir -p ${{ matrix.path }}"

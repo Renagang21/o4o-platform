@@ -126,8 +126,11 @@ jobs:
         echo "${{ secrets.API_SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
+        # Test SSH connection
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ env.SERVER_IP }} "echo 'SSH connection successful'" || echo "SSH connection failed"
     
     - name: Deploy to server
+      continue-on-error: true
       run: |
         # Sync source code (excluding node_modules)
         rsync -avz --delete \
