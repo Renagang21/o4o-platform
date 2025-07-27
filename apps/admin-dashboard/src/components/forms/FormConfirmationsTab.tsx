@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -74,8 +74,8 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 </div>
                 {confirmations.length > 1 && (
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant={"ghost" as const}
+                    size={"icon" as const}
                     onClick={(e) => {
                       e.stopPropagation();
                       deleteConfirmation(confirmation.id);
@@ -87,7 +87,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
               </div>
             </Card>
           ))}
-          <Button variant="outline" className="w-full" onClick={addConfirmation}>
+          <Button variant={"outline" as const} className="w-full" onClick={addConfirmation}>
             <Plus className="h-4 w-4 mr-2" />
             확인 추가
           </Button>

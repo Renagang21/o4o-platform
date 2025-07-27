@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Target, FileText, Link } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -165,8 +165,8 @@ const CrowdfundingProjectForm: FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate(isEditMode ? `/crowdfunding/projects/${id}` : '/crowdfunding/projects')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -316,7 +316,7 @@ const CrowdfundingProjectForm: FC = () => {
         <div className="flex justify-end gap-3">
           <Button
             type="button"
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => navigate(isEditMode ? `/crowdfunding/projects/${id}` : '/crowdfunding/projects')}
           >
             취소

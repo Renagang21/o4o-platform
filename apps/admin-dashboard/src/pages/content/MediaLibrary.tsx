@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, FC } from 'react';
 import {
   Upload,
   FolderOpen,
@@ -177,7 +177,7 @@ const MediaLibrary: FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => setIsFolderManagerOpen(true)}
           >
             <FolderPlus className="w-4 h-4 mr-2" />
@@ -260,15 +260,15 @@ const MediaLibrary: FC = () => {
                 {selectedItems.length}개 선택됨
               </span>
               <Button
-                variant="ghost"
-                size="sm"
+                variant={"ghost" as const}
+                size={"sm" as const}
                 onClick={clearSelection}
               >
                 <X className="w-4 h-4" />
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant={"outline" as const} size={"sm" as const}>
                     일괄 작업
                   </Button>
                 </DropdownMenuTrigger>
@@ -301,14 +301,14 @@ const MediaLibrary: FC = () => {
           <div className="flex items-center gap-1 border rounded-lg p-1">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
-              size="sm"
+              size={"sm" as const}
               onClick={() => setViewMode('grid')}
             >
               <Grid className="w-4 h-4" />
             </Button>
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
-              size="sm"
+              size={"sm" as const}
               onClick={() => setViewMode('list')}
             >
               <List className="w-4 h-4" />
@@ -387,7 +387,7 @@ const MediaLibrary: FC = () => {
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                   <div className="flex items-center gap-2">
                     <Button
-                      size="sm"
+                      size={"sm" as const}
                       variant="secondary"
                       onClick={(e: any) => {
                         e.stopPropagation()
@@ -398,7 +398,7 @@ const MediaLibrary: FC = () => {
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e: any) => e.stopPropagation()}>
-                        <Button size="sm" variant="secondary">
+                        <Button size={"sm" as const} variant="secondary">
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -489,7 +489,7 @@ const MediaLibrary: FC = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant="outline">{item.mediaType}</Badge>
+                    <Badge variant={"outline" as const}>{item.mediaType}</Badge>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {formatFileSize(item.size)}
@@ -503,7 +503,7 @@ const MediaLibrary: FC = () => {
                   <td className="px-4 py-3">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button variant={"ghost" as const} size={"sm" as const}>
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -554,16 +554,16 @@ const MediaLibrary: FC = () => {
           </span>
           <div className="flex gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
             >
               이전
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               onClick={() => setPage(page + 1)}
               disabled={page === data.totalPages}
             >

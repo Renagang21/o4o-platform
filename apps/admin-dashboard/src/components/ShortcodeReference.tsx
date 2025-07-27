@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Copy, Check, ChevronDown, ChevronRight, ShoppingBag, Grid, Package, Zap, List, Tag } from 'lucide-react';
 
 interface ShortcodeExample {

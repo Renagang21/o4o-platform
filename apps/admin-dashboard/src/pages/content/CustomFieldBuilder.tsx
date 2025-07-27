@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { 
   ArrowLeft, 
@@ -291,8 +291,8 @@ const CustomFieldBuilder: FC = () => {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/content/cpt')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -338,17 +338,17 @@ const CustomFieldBuilder: FC = () => {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline">{group.position}</Badge>
+                      <Badge variant={"outline" as const}>{group.position}</Badge>
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant={"ghost" as const}
+                        size={"sm" as const}
                         onClick={() => handleEditGroup(group)}
                       >
                         <Settings className="w-4 h-4" />
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant={"ghost" as const}
+                        size={"sm" as const}
                         onClick={() => handleDeleteGroup(group.id)}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
@@ -376,15 +376,15 @@ const CustomFieldBuilder: FC = () => {
                             </div>
                           </div>
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleEditField(field, group.id)}
                           >
                             <Settings className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleDeleteField(field.id, group.id)}
                           >
                             <Trash2 className="w-4 h-4 text-red-500" />
@@ -392,8 +392,8 @@ const CustomFieldBuilder: FC = () => {
                         </div>
                       ))}
                       <Button
-                        variant="outline"
-                        size="sm"
+                        variant={"outline" as const}
+                        size={"sm" as const}
                         className="w-full mt-2"
                         onClick={() => handleAddField()}
                       >
@@ -424,7 +424,7 @@ const CustomFieldBuilder: FC = () => {
                 변경사항 저장
               </Button>
               <Button
-                variant="outline"
+                variant={"outline" as const}
                 className="w-full"
                 onClick={handleAddGroup}
               >
@@ -520,7 +520,7 @@ const CustomFieldBuilder: FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsGroupDialogOpen(false)}>
+            <Button variant={"outline" as const} onClick={() => setIsGroupDialogOpen(false)}>
               취소
             </Button>
             <Button onClick={handleSaveGroup}>
@@ -694,8 +694,8 @@ const CustomFieldBuilder: FC = () => {
                         }}
                       />
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant={"ghost" as const}
+                        size={"sm" as const}
                         onClick={() => {
                           const newOptions = fieldFormData.options?.filter((_, i: any) => i !== index)
                           setFieldFormData({ ...fieldFormData, options: newOptions })
@@ -706,8 +706,8 @@ const CustomFieldBuilder: FC = () => {
                     </div>
                   ))}
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant={"outline" as const}
+                    size={"sm" as const}
                     onClick={() => {
                       const newOptions = [...(fieldFormData.options || []), { label: '', value: '' }]
                       setFieldFormData({ ...fieldFormData, options: newOptions })
@@ -721,7 +721,7 @@ const CustomFieldBuilder: FC = () => {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsFieldDialogOpen(false)}>
+            <Button variant={"outline" as const} onClick={() => setIsFieldDialogOpen(false)}>
               취소
             </Button>
             <Button onClick={handleSaveField}>

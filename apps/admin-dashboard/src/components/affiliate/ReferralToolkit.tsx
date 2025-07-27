@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import { 
   Link2, QrCode, MessageSquare, Image, 
   Download, Copy, Check, Smartphone, Monitor 
@@ -132,8 +132,8 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
                 <div className="flex gap-2">
                   <Input value={referralLink} readOnly className="font-mono text-sm" />
                   <Button
-                    variant="outline"
-                    size="icon"
+                    variant={"outline" as const}
+                    size={"icon" as const}
                     onClick={() => {
                       navigator.clipboard.writeText(referralLink);
                       toast.success('링크가 복사되었습니다!');
@@ -292,7 +292,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
                       1200 x 675px • 블로그, 웹사이트용
                     </p>
                     <Button 
-                      variant="outline" 
+                      variant={"outline" as const} 
                       className="w-full"
                       onClick={() => downloadBanner('desktop')}
                     >
@@ -312,7 +312,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
                       1080 x 1920px • 인스타그램 스토리용
                     </p>
                     <Button 
-                      variant="outline" 
+                      variant={"outline" as const} 
                       className="w-full"
                       onClick={() => downloadBanner('mobile')}
                     >

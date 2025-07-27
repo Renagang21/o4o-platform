@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC } from 'react';
 import { Link } from 'react-router-dom'
 import { User, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '@/types/user'
 import { Eye, Edit, UserCheck, UserX, UserMinus, Trash2 } from 'lucide-react'

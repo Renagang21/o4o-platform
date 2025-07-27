@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'
 import { 
   Plus, 
@@ -211,8 +211,8 @@ const DynamicContentList: FC = () => {
               {selectedPosts.length}개 선택됨
             </span>
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               className="ml-4"
               onClick={() => {/* Bulk actions */}}
             >
@@ -290,7 +290,7 @@ const DynamicContentList: FC = () => {
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button variant={"ghost" as const} size={"sm" as const}>
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -328,7 +328,7 @@ const DynamicContentList: FC = () => {
           <div className="p-8 text-center text-gray-500">
             <p>아직 {currentCPT?.pluralName || '콘텐츠'}가 없습니다.</p>
             <Button
-              variant="outline"
+              variant={"outline" as const}
               className="mt-4"
               onClick={() => navigate(`/content/${slug}/new`)}
             >
@@ -346,16 +346,16 @@ const DynamicContentList: FC = () => {
             </span>
             <div className="flex gap-2">
               <Button
-                variant="outline"
-                size="sm"
+                variant={"outline" as const}
+                size={"sm" as const}
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
               >
                 이전
               </Button>
               <Button
-                variant="outline"
-                size="sm"
+                variant={"outline" as const}
+                size={"sm" as const}
                 onClick={() => setPage(page + 1)}
                 disabled={page === data.totalPages}
               >

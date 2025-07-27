@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import {
   Download,
   Star,
@@ -133,14 +133,14 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
         <div className="flex items-center gap-2">
           <Button
             variant={viewMode === 'grid' ? 'default' : 'outline'}
-            size="sm"
+            size={"sm" as const}
             onClick={() => setViewMode('grid')}
           >
             <Grid className="w-4 h-4" />
           </Button>
           <Button
             variant={viewMode === 'list' ? 'default' : 'outline'}
-            size="sm"
+            size={"sm" as const}
             onClick={() => setViewMode('list')}
           >
             <List className="w-4 h-4" />
@@ -215,7 +215,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-lg">{template.name}</CardTitle>
-                    <Badge variant="outline" className="mt-1">
+                    <Badge variant={"outline" as const} className="mt-1">
                       {getCategoryDisplayName(template.category)}
                     </Badge>
                   </div>
@@ -287,7 +287,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
                             Premium
                           </Badge>
                         )}
-                        <Badge variant="outline">
+                        <Badge variant={"outline" as const}>
                           {getCategoryDisplayName(template.category)}
                         </Badge>
                       </div>
@@ -308,14 +308,14 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
                   
                   <div className="flex items-center gap-2">
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant={"outline" as const}
+                      size={"sm" as const}
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       미리보기
                     </Button>
                     <Button
-                      size="sm"
+                      size={"sm" as const}
                       onClick={() => handleApplyTemplate(template)}
                       disabled={applyMutation.isPending}
                     >
@@ -345,7 +345,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">템플릿을 찾을 수 없습니다</h3>
           <p className="text-gray-600 mb-4">다른 검색어나 필터를 시도해보세요</p>
           <Button
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => {
               setSearchTerm('')
               setSelectedCategory('all')
@@ -364,7 +364,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
             <h3 className="text-lg font-semibold">추천 템플릿</h3>
             <p className="text-gray-600">인기 있는 위젯 템플릿들을 확인해보세요</p>
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant={"outline" as const} size={"sm" as const}>
             전체 보기
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -403,7 +403,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
                   </span>
                 </div>
                 <Button
-                  size="sm"
+                  size={"sm" as const}
                   className="w-full"
                   onClick={() => handleApplyTemplate(template)}
                 >

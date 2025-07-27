@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC } from 'react';
 import { Search, Filter, Download, RefreshCw } from 'lucide-react'
 import { UserFilters as IUserFilters, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS, BUSINESS_TYPES } from '@/types/user'
 

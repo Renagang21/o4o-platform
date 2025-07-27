@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { 
   ArrowLeft, 
@@ -425,7 +425,7 @@ const MenuBuilder: FC = () => {
           <div className="flex-1 flex items-center gap-2 min-w-0">
             {getItemIcon(item.type)}
             <span className="font-medium truncate">{item.label}</span>
-            <Badge variant="outline" className="text-xs flex-shrink-0">
+            <Badge variant={"outline" as const} className="text-xs flex-shrink-0">
               {item.type}
             </Badge>
             {item.url && (
@@ -438,16 +438,16 @@ const MenuBuilder: FC = () => {
 
           <div className="flex items-center gap-1 flex-shrink-0">
             <Button
-              variant="ghost"
-              size="sm"
+              variant={"ghost" as const}
+              size={"sm" as const}
               onClick={() => handleEditItem(item)}
               className="h-8 w-8 p-0"
             >
               <Edit2 className="w-4 h-4" />
             </Button>
             <Button
-              variant="ghost"
-              size="sm"
+              variant={"ghost" as const}
+              size={"sm" as const}
               onClick={() => handleDeleteItem(item.id)}
               className="h-8 w-8 p-0 hover:bg-red-50"
             >
@@ -495,8 +495,8 @@ const MenuBuilder: FC = () => {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/themes/menus')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -749,7 +749,7 @@ const MenuBuilder: FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsItemDialogOpen(false)}>
+            <Button variant={"outline" as const} onClick={() => setIsItemDialogOpen(false)}>
               취소
             </Button>
             <Button onClick={handleSaveItem}>

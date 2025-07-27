@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC, ReactNode } from 'react';
 import { X, Download, Copy, Trash2, Save, ExternalLink, Calendar, User, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -105,22 +105,22 @@ const MediaDetails: FC<MediaDetailsProps> = ({
             <DialogTitle>미디어 상세</DialogTitle>
             <div className="flex items-center gap-2">
               <Button
-                variant="ghost"
-                size="sm"
+                variant={"ghost" as const}
+                size={"sm" as const}
                 onClick={copyUrl}
               >
                 <Copy className="w-4 h-4" />
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant={"ghost" as const}
+                size={"sm" as const}
                 onClick={() => window.open(media.url, '_blank')}
               >
                 <ExternalLink className="w-4 h-4" />
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant={"ghost" as const}
+                size={"sm" as const}
                 onClick={() => {
                   const a = document.createElement('a')
                   a.href = media.url
@@ -131,8 +131,8 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                 <Download className="w-4 h-4" />
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
+                variant={"ghost" as const}
+                size={"sm" as const}
                 onClick={onClose}
               >
                 <X className="w-4 h-4" />
@@ -169,8 +169,8 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                     <ImageIcon className="w-16 h-16 mb-4" />
                     <p className="text-sm">미리보기를 사용할 수 없습니다</p>
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant={"outline" as const}
+                      size={"sm" as const}
                       className="mt-4"
                       onClick={() => window.open(media.url, '_blank')}
                     >
@@ -188,7 +188,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
                   <span className="text-sm text-gray-500">유형</span>
-                  <Badge variant="outline">{media.mimeType}</Badge>
+                  <Badge variant={"outline" as const}>{media.mimeType}</Badge>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
                   <span className="text-sm text-gray-500">크기</span>
@@ -340,15 +340,15 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                 <TabsContent value="usage" className="space-y-4">
                   {media.attachedTo && media.attachedTo.length > 0 ? (
                     <div className="space-y-2">
-                      {media.attachedTo.map((attachment, index) => (
+                      {media.attachedTo.map((attachment: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                           <div>
                             <p className="font-medium text-sm">{attachment.postTitle}</p>
                             <p className="text-xs text-gray-500">{attachment.postType}</p>
                           </div>
                           <Button
-                            variant="outline"
-                            size="sm"
+                            variant={"outline" as const}
+                            size={"sm" as const}
                             onClick={() => window.open(`/content/${attachment.postType}/${attachment.postId}/edit`, '_blank')}
                           >
                             편집
@@ -374,7 +374,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                     className="bg-white"
                   />
                   <Button
-                    variant="outline"
+                    variant={"outline" as const}
                     onClick={copyUrl}
                   >
                     <Copy className="w-4 h-4" />
@@ -393,11 +393,11 @@ const MediaDetails: FC<MediaDetailsProps> = ({
                         {media.width} × {media.height}px
                       </span>
                     </div>
-                    {Object.entries(media.variations).map(([size, variation]) => variation && (
+                    {Object.entries(media.variations || {}).map(([size, variation]: [string, any]) => variation && (
                       <div key={size} className="flex justify-between items-center">
                         <span className="text-sm capitalize">{size}</span>
                         <span className="text-sm text-gray-500">
-                          {variation.width} × {variation.height}px
+                          {(variation as any).width} × {(variation as any).height}px
                         </span>
                       </div>
                     ))}

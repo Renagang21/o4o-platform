@@ -122,8 +122,8 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
             )}
 
             <Button
-              variant="ghost"
-              size="icon"
+              variant={"ghost" as const}
+              size={"icon" as const}
               onClick={() => removeRule(index)}
             >
               <Trash2 className="h-4 w-4" />
@@ -133,8 +133,8 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
       </div>
 
       <Button
-        variant="outline"
-        size="sm"
+        variant={"outline" as const}
+        size={"sm" as const}
         onClick={addRule}
         className="w-full"
       >

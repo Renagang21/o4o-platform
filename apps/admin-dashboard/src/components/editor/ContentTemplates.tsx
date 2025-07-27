@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import {
   Layout,
   FileText,
@@ -342,8 +342,8 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                           </div>
                         </div>
                         <Button
-                          variant="ghost"
-                          size="icon"
+                          variant={"ghost" as const}
+                          size={"icon" as const}
                           className="h-8 w-8"
                           onClick={() => toggleFavorite(template.id)}
                         >
@@ -362,7 +362,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                       
                       <div className="flex flex-wrap gap-2 mt-4">
                         {template.tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
+                          <Badge key={tag} variant={"outline" as const} className="text-xs">
                             {tag}
                           </Badge>
                         ))}
@@ -382,8 +382,8 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                         Use Template
                       </Button>
                       <Button
-                        variant="outline"
-                        size="icon"
+                        variant={"outline" as const}
+                        size={"icon" as const}
                         onClick={() => {
                           // Preview
                         }}
@@ -391,8 +391,8 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
-                        variant="outline"
-                        size="icon"
+                        variant={"outline" as const}
+                        size={"icon" as const}
                         onClick={() => copyTemplateId(template.id)}
                       >
                         {copiedId === template.id ? (
@@ -474,7 +474,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                 <p className="text-gray-600 mb-4">
                   Save your own block combinations as reusable patterns
                 </p>
-                <Button variant="outline">
+                <Button variant={"outline" as const}>
                   Create Pattern
                 </Button>
               </CardContent>

@@ -51,7 +51,7 @@ const AppGuard: FC<AppGuardProps> = ({
 
           <div className="flex gap-2 justify-center">
             <Button 
-              variant="outline" 
+              variant={"outline" as const} 
               onClick={() => window.history.back()}
             >
               이전 페이지
@@ -66,8 +66,8 @@ const AppGuard: FC<AppGuardProps> = ({
           {/* 관리자용 앱 설정 링크 */}
           <div className="pt-4 border-t">
             <Button
-              variant="ghost"
-              size="sm"
+              variant={"ghost" as const}
+              size={"sm" as const}
               asChild
               className="text-modern-text-tertiary hover:text-modern-text-secondary"
             >

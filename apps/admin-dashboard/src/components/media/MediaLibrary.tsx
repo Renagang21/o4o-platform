@@ -1,5 +1,5 @@
-import { type FC } from 'react';
-import { useState, useCallback } from 'react';
+import { FC, Fragment } from 'react';
+import { useState, useCallback, Fragment } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,
@@ -247,8 +247,8 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
         <h2 className="text-xl font-semibold">Media Library</h2>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setShowUploadDialog(true)}
           >
             <Upload className="h-4 w-4 mr-2" />
@@ -256,7 +256,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
           </Button>
           {mode === 'picker' && (
             <Button
-              size="sm"
+              size={"sm" as const}
               onClick={handleSelectConfirm}
               disabled={selectedItems.length === 0}
             >
@@ -265,8 +265,8 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
           )}
           {onClose && (
             <Button
-              variant="ghost"
-              size="icon"
+              variant={"ghost" as const}
+              size={"icon" as const}
               onClick={onClose}
             >
               <X className="h-4 w-4" />
@@ -307,14 +307,14 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
         <div className="flex items-center gap-2">
           <Button
             variant={view === 'grid' ? 'default' : 'ghost'}
-            size="icon"
+            size={"icon" as const}
             onClick={() => setView('grid')}
           >
             <Grid className="h-4 w-4" />
           </Button>
           <Button
             variant={view === 'list' ? 'default' : 'ghost'}
-            size="icon"
+            size={"icon" as const}
             onClick={() => setView('list')}
           >
             <List className="h-4 w-4" />
@@ -328,7 +328,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
         <div className="w-64 border-r p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-medium text-sm">Folders</h3>
-            <Button size="icon" variant="ghost" className="h-6 w-6">
+            <Button size={"icon" as const} variant={"ghost" as const} className="h-6 w-6">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -436,7 +436,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                         {/* Hover actions */}
                         <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                           <Button
-                            size="icon"
+                            size={"icon" as const}
                             variant="secondary"
                             className="h-8 w-8"
                             onClick={(e) => {
@@ -447,7 +447,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button
-                            size="icon"
+                            size={"icon" as const}
                             variant="secondary"
                             className="h-8 w-8"
                             onClick={(e) => {
@@ -516,8 +516,8 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                       
                       <div className="flex items-center gap-2">
                         <Button
-                          size="icon"
-                          variant="ghost"
+                          size={"icon" as const}
+                          variant={"ghost" as const}
                           className="h-8 w-8"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -528,8 +528,8 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                           <Edit2 className="h-4 w-4" />
                         </Button>
                         <Button
-                          size="icon"
-                          variant="ghost"
+                          size={"icon" as const}
+                          variant={"ghost" as const}
                           className="h-8 w-8"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -571,11 +571,11 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
               {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
             </p>
             <p className="text-sm text-gray-500 mb-4">or click to browse</p>
-            <Button variant="outline">Select Files</Button>
+            <Button variant={"outline" as const}>Select Files</Button>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
+            <Button variant={"outline" as const} onClick={() => setShowUploadDialog(false)}>
               Cancel
             </Button>
           </DialogFooter>
@@ -600,7 +600,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                   />
                 ) : (
                   <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                    {React.createElement(getFileIcon(editingItem.type), { className: 'h-24 w-24 text-gray-400' })}
+                    {createElement(getFileIcon(editingItem.type), { className: 'h-24 w-24 text-gray-400' })}
                   </div>
                 )}
               </div>
@@ -656,7 +656,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
           )}
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+            <Button variant={"outline" as const} onClick={() => setShowEditDialog(false)}>
               Cancel
             </Button>
             <Button onClick={() => setShowEditDialog(false)}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC } from 'react';
 import { Package, DollarSign, Calculator, Save, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -390,7 +390,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
       {/* 액션 버튼 */}
       <div className="flex justify-end gap-3">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant={"outline" as const} onClick={onCancel}>
             취소
           </Button>
         )}

@@ -156,7 +156,7 @@ export default function UserDetail() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate('/users')}>
+          <Button variant={"ghost" as const} onClick={() => navigate('/users')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Users
           </Button>
@@ -175,7 +175,7 @@ export default function UserDetail() {
               </Button>
             </>
           )}
-          <Button variant="outline" onClick={() => navigate(`/users/${id}/edit`)}>
+          <Button variant={"outline" as const} onClick={() => navigate(`/users/${id}/edit`)}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
@@ -262,7 +262,7 @@ export default function UserDetail() {
                     <p className="text-sm text-gray-600 mb-2">Special Permissions</p>
                     <div className="flex gap-2 flex-wrap">
                       {user.permissions.map((permission: string) => (
-                        <Badge key={permission} variant="outline">
+                        <Badge key={permission} variant={"outline" as const}>
                           {permission}
                         </Badge>
                       ))}

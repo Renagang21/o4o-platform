@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FC } from 'react';
 import { MediaFile } from '@/types/content'
 import { ContentApi } from '@/api/contentApi'
 

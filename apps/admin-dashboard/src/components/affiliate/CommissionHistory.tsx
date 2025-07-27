@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC } from 'react';
 import { DollarSign, Calendar, Download, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -117,7 +117,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
       case 'cancelled':
         return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />취소됨</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -196,7 +196,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
               <Calendar className="w-5 h-5 text-modern-primary" />
               커미션 내역
             </span>
-            <Button size="sm" variant="outline" onClick={exportToExcel}>
+            <Button size={"sm" as const} variant={"outline" as const} onClick={exportToExcel}>
               <Download className="w-4 h-4 mr-2" />
               내보내기
             </Button>

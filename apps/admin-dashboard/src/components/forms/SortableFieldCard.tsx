@@ -36,8 +36,8 @@ export const SortableFieldCard: FC<SortableFieldCardProps> = ({
             </div>
             <div className="flex gap-2">
               <Button
-                variant="ghost"
-                size="icon"
+                variant={"ghost" as const}
+                size={"icon" as const}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDuplicate();
@@ -46,8 +46,8 @@ export const SortableFieldCard: FC<SortableFieldCardProps> = ({
                 <Copy className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
-                size="icon"
+                variant={"ghost" as const}
+                size={"icon" as const}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete();

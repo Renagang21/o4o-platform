@@ -103,7 +103,7 @@ const FieldTypeSelector: FC<FieldTypeSelectorProps> = ({ onSelect, selectedType 
                   <Button
                     key={field.value}
                     variant={isSelected ? 'default' : 'outline'}
-                    size="sm"
+                    size={"sm" as const}
                     className="justify-start h-auto py-3 px-3"
                     onClick={() => onSelect(field.value)}
                   >

@@ -1,5 +1,5 @@
-import React from "react"
-import { useState, useEffect } from 'react';
+import React, { FC } from 'react'
+import { useState, useEffect, FC } from 'react';
 import { 
   Upload,
   Search,

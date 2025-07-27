@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC } from 'react';
 import { Link2, QrCode, Copy, Check, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -122,8 +122,8 @@ export const ReferralLinkGenerator: FC<ReferralLinkGeneratorProps> = ({
                 className="font-mono text-sm"
               />
               <Button
-                variant="outline"
-                size="icon"
+                variant={"outline" as const}
+                size={"icon" as const}
                 onClick={copyLink}
               >
                 {copied ? (
@@ -133,8 +133,8 @@ export const ReferralLinkGenerator: FC<ReferralLinkGeneratorProps> = ({
                 )}
               </Button>
               <Button
-                variant="outline"
-                size="icon"
+                variant={"outline" as const}
+                size={"icon" as const}
                 onClick={() => setShowQR(!showQR)}
               >
                 <QrCode className="w-4 h-4" />

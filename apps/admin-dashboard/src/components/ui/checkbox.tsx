@@ -1,4 +1,4 @@
-import { forwardRef, type LabelHTMLAttributes, type ElementRef, type ComponentPropsWithoutRef } from "react"
+import { forwardRef } from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"

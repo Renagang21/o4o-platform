@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { UserCheck, UserX, UserMinus, Trash2, Mail, Download } from 'lucide-react'
 import { UserBulkAction } from '@/types/user'
 

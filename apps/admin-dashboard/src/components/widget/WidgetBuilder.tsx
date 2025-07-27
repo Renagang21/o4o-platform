@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC } from 'react';
 import {
   X,
   Save,
@@ -509,8 +509,8 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                       className="flex-1"
                     />
                     <Button
-                      size="sm"
-                      variant="outline"
+                      size={"sm" as const}
+                      variant={"outline" as const}
                       onClick={() => {
                         const newLinks = (formData.content.links || []).filter((_: unknown, i: number) => i !== index)
                         updateContent('links', newLinks)
@@ -521,8 +521,8 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                   </div>
                 ))}
                 <Button
-                  size="sm"
-                  variant="outline"
+                  size={"sm" as const}
+                  variant={"outline" as const}
                   onClick={() => {
                     const newLinks = [...(formData.content.links || []), { platform: 'facebook', url: '' }]
                     updateContent('links', newLinks)
@@ -767,7 +767,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                       <Button
                         key={type.type}
                         variant={selectedType === type.type ? 'default' : 'outline'}
-                        size="sm"
+                        size={"sm" as const}
                         onClick={() => setSelectedType(type.type)}
                         className="flex flex-col h-auto p-3"
                       >
@@ -863,7 +863,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
 
         {/* Footer */}
         <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant={"outline" as const} onClick={onCancel}>
             취소
           </Button>
           <Button 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { Copy, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { copyVideoToMyList, checkVideoInMyList } from '@/api/apps/video-copy';
@@ -8,8 +8,8 @@ import toast from 'react-hot-toast';
 interface VideoCopyButtonProps {
   postId: string;
   postType?: string;
-  size?: 'sm' | 'default' | 'lg';
-  variant?: 'default' | 'outline' | 'ghost';
+  size?: 'sm' | 'default' | 'lg' | 'icon';
+  variant?: 'default' | 'outline' | 'ghost' | 'secondary' | 'destructive' | 'link';
   className?: string;
   onCopySuccess?: (newPostId: string) => void;
 }

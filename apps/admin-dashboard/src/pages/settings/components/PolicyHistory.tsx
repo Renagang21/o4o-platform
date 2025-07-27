@@ -3,7 +3,7 @@
  * 정책 변경 히스토리 및 감사 로그 시스템
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import {
   History,
   Clock,

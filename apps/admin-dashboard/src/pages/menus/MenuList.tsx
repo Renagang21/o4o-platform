@@ -141,7 +141,7 @@ const MenuList: FC = () => {
                           </div>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
+                              <Button variant={"ghost" as const} size={"sm" as const}>
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -165,7 +165,7 @@ const MenuList: FC = () => {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">항목 수</span>
-                            <Badge variant="outline">{menu.items.length}개</Badge>
+                            <Badge variant={"outline" as const}>{menu.items.length}개</Badge>
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">활성화</span>

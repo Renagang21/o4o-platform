@@ -156,7 +156,7 @@ const CrowdfundingApp: FC = () => {
             </Button>
             
             <Button 
-              variant="outline"
+              variant={"outline" as const}
               className="w-full justify-start text-left h-auto p-4"
               onClick={() => navigate('/crowdfunding/projects')}
             >
@@ -214,8 +214,8 @@ const CrowdfundingApp: FC = () => {
               최근 모집 중인 프로젝트
             </CardTitle>
             <Button 
-              variant="outline" 
-              size="sm"
+              variant={"outline" as const} 
+              size={"sm" as const}
               onClick={() => navigate('/crowdfunding/projects')}
             >
               전체 보기
@@ -268,8 +268,8 @@ const CrowdfundingApp: FC = () => {
                             <span>{project.currentParticipantCount}명 참여</span>
                           </div>
                           <Button 
-                            size="sm" 
-                            variant="outline"
+                            size={"sm" as const} 
+                            variant={"outline" as const}
                             onClick={() => navigate(`/crowdfunding/projects/${project.id}`)}
                           >
                             상세보기
@@ -333,7 +333,7 @@ const CrowdfundingApp: FC = () => {
             <Plus className="w-5 h-5 mr-2" />
             새 프로젝트 만들기
           </Button>
-          <Button size="lg" variant="outline" onClick={() => navigate('/crowdfunding/projects')}>
+          <Button size="lg" variant={"outline" as const} onClick={() => navigate('/crowdfunding/projects')}>
             <Eye className="w-5 h-5 mr-2" />
             프로젝트 둘러보기
           </Button>

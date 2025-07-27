@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { AlertTriangle, Search, Filter, Edit, Eye } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -147,7 +147,7 @@ const InventoryManagement: FC = () => {
       return <Badge variant="destructive">품절</Badge>;
     }
     if (status === 'low_stock' || currentStock <= reorderPoint) {
-      return <Badge variant="outline" className="text-orange-600 border-orange-600">부족</Badge>;
+      return <Badge variant={"outline" as const} className="text-orange-600 border-orange-600">부족</Badge>;
     }
     if (status === 'discontinued') {
       return <Badge variant="secondary">단종</Badge>;
@@ -207,7 +207,7 @@ const InventoryManagement: FC = () => {
         <div className="flex gap-2">
           {lowStockItems.length > 0 && (
             <Button
-              variant="outline"
+              variant={"outline" as const}
               onClick={() => bulkReorderMutation.mutate(lowStockItems.map((item: any) => item.id))}
               disabled={bulkReorderMutation.isPending}
             >
@@ -409,15 +409,15 @@ const InventoryManagement: FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleOpenAdjustment(item)}
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleOpenMovementHistory(item)}
                           >
                             <Eye className="w-4 h-4" />
@@ -508,7 +508,7 @@ const InventoryManagement: FC = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsAdjustmentDialogOpen(false)}>
+              <Button type="button" variant={"outline" as const} onClick={() => setIsAdjustmentDialogOpen(false)}>
                 취소
               </Button>
               <Button type="submit" disabled={adjustStockMutation.isPending}>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import {
   Layout,
   Plus,
@@ -188,7 +188,7 @@ const TemplateManager: FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => setIsLibraryOpen(true)}
           >
             <Download className="w-4 h-4 mr-2" />
@@ -263,14 +263,14 @@ const TemplateManager: FC = () => {
             <div className="flex items-center gap-1 border rounded-lg p-1">
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
+                size={"sm" as const}
                 onClick={() => setViewMode('grid')}
               >
                 <Grid className="w-4 h-4" />
               </Button>
               <Button
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="sm"
+                size={"sm" as const}
                 onClick={() => setViewMode('list')}
               >
                 <List className="w-4 h-4" />
@@ -319,7 +319,7 @@ const TemplateManager: FC = () => {
                 <div className="absolute top-2 right-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="bg-white/80 hover:bg-white">
+                      <Button variant={"ghost" as const} size={"sm" as const} className="bg-white/80 hover:bg-white">
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -441,7 +441,7 @@ const TemplateManager: FC = () => {
                       <td className="px-6 py-4">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant={"ghost" as const} size={"sm" as const}>
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -478,8 +478,8 @@ const TemplateManager: FC = () => {
       {data && data.totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
@@ -489,8 +489,8 @@ const TemplateManager: FC = () => {
             {page} / {data.totalPages}
           </span>
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setPage(page + 1)}
             disabled={page === data.totalPages}
           >

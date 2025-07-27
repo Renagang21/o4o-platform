@@ -245,8 +245,8 @@ export default function MediaUploader({
                       </p>
                     </div>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant={"ghost" as const}
+                      size={"sm" as const}
                       onClick={() => removeFile(file.id)}
                       disabled={file.status === 'uploading'}
                     >

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Calculator, Settings, Percent, Plus, Edit, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -250,7 +250,7 @@ const FeeManagement: FC = () => {
                           <Badge variant={policy.isActive ? 'default' : 'secondary'}>
                             {policy.isActive ? '활성' : '비활성'}
                           </Badge>
-                          <Badge variant="outline">
+                          <Badge variant={"outline" as const}>
                             {getPolicyTypeName(policy.type)}
                           </Badge>
                         </div>
@@ -278,8 +278,8 @@ const FeeManagement: FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
-                          variant="ghost"
-                          size="sm"
+                          variant={"ghost" as const}
+                          size={"sm" as const}
                           onClick={() => togglePolicyMutation.mutate({ 
                             id: policy.id, 
                             isActive: !policy.isActive 
@@ -288,15 +288,15 @@ const FeeManagement: FC = () => {
                           <Settings className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="sm"
+                          variant={"ghost" as const}
+                          size={"sm" as const}
                           onClick={() => handleOpenEdit(policy)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="sm"
+                          variant={"ghost" as const}
+                          size={"sm" as const}
                           onClick={() => deletePolicyMutation.mutate(policy.id)}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -506,7 +506,7 @@ const FeeManagement: FC = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button type="button" variant={"outline" as const} onClick={() => setIsCreateDialogOpen(false)}>
                 취소
               </Button>
               <Button type="submit" disabled={createPolicyMutation.isPending}>
@@ -600,7 +600,7 @@ const FeeManagement: FC = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              <Button type="button" variant={"outline" as const} onClick={() => setIsEditDialogOpen(false)}>
                 취소
               </Button>
               <Button type="submit" disabled={updatePolicyMutation.isPending}>

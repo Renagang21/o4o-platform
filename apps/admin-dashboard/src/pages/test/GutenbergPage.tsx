@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -177,8 +177,8 @@ const GutenbergPage: FC = () => {
       <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
-            size="icon"
+            variant={"ghost" as const}
+            size={"icon" as const}
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -207,8 +207,8 @@ const GutenbergPage: FC = () => {
         
         <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
-            size="sm"
+            variant={"ghost" as const}
+            size={"sm" as const}
             onClick={() => setShowTemplates(true)}
           >
             <LayoutIcon className="h-4 w-4 mr-2" />
@@ -216,8 +216,8 @@ const GutenbergPage: FC = () => {
           </Button>
           
           <Button
-            variant="ghost"
-            size="sm"
+            variant={"ghost" as const}
+            size={"sm" as const}
             onClick={() => setShowMediaLibrary(true)}
           >
             <ImageIcon className="h-4 w-4 mr-2" />
@@ -225,24 +225,24 @@ const GutenbergPage: FC = () => {
           </Button>
           
           <div className="flex items-center gap-1 px-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant={"ghost" as const} size={"icon" as const} className="h-8 w-8">
               <Undo className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant={"ghost" as const} size={"icon" as const} className="h-8 w-8">
               <Redo className="h-4 w-4" />
             </Button>
           </div>
           
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
           >
             <Eye className="h-4 w-4 mr-2" />
             Preview
           </Button>
           
           <Button
-            size="sm"
+            size={"sm" as const}
             onClick={() => handleSave(false)}
             disabled={isSaving}
           >
@@ -260,7 +260,7 @@ const GutenbergPage: FC = () => {
           </Button>
           
           <Button
-            size="sm"
+            size={"sm" as const}
             variant="default"
             onClick={() => handleSave(true)}
             disabled={isSaving}
@@ -270,7 +270,7 @@ const GutenbergPage: FC = () => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant={"ghost" as const} size={"icon" as const}>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -284,8 +284,8 @@ const GutenbergPage: FC = () => {
           </DropdownMenu>
           
           <Button
-            variant="ghost"
-            size="icon"
+            variant={"ghost" as const}
+            size={"icon" as const}
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             {sidebarOpen ? <X className="h-4 w-4" /> : <Settings className="h-4 w-4" />}

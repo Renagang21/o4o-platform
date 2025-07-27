@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { 
   ArrowLeft, 
@@ -207,8 +207,8 @@ const CPTForm: FC = () => {
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/content/cpt')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -452,15 +452,15 @@ const CPTForm: FC = () => {
                       }}
                     />
                     <span>{taxonomy.name}</span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant={"outline" as const} className="text-xs">
                       {taxonomy.slug}
                     </Badge>
                   </label>
                 ))}
               </div>
               <Button
-                variant="outline"
-                size="sm"
+                variant={"outline" as const}
+                size={"sm" as const}
                 className="mt-4"
                 onClick={() => navigate('/content/taxonomies/new')}
               >
@@ -552,7 +552,7 @@ const CPTForm: FC = () => {
 
               {isEditMode && (
                 <Button
-                  variant="outline"
+                  variant={"outline" as const}
                   className="w-full"
                   onClick={() => navigate(`/content/cpt/${id}/fields`)}
                 >

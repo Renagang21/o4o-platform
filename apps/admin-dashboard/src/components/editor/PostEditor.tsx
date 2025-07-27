@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { FC } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -110,8 +110,8 @@ const PostEditor: FC<PostEditorProps> = ({
       {/* Toolbar */}
       <div className="border-b bg-gray-50 p-2 flex flex-wrap gap-1">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={cn(
             'p-2 h-auto',
@@ -121,8 +121,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <Bold className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={cn(
             'p-2 h-auto',
@@ -132,8 +132,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <Italic className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleCode().run()}
           className={cn(
             'p-2 h-auto',
@@ -146,8 +146,8 @@ const PostEditor: FC<PostEditorProps> = ({
         <Separator orientation="vertical" className="mx-1 h-8" />
 
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={cn(
             'p-2 h-auto',
@@ -157,8 +157,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <Heading1 className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={cn(
             'p-2 h-auto',
@@ -168,8 +168,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <Heading2 className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={cn(
             'p-2 h-auto',
@@ -182,8 +182,8 @@ const PostEditor: FC<PostEditorProps> = ({
         <Separator orientation="vertical" className="mx-1 h-8" />
 
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={cn(
             'p-2 h-auto',
@@ -193,8 +193,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <List className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={cn(
             'p-2 h-auto',
@@ -204,8 +204,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <ListOrdered className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={cn(
             'p-2 h-auto',
@@ -218,8 +218,8 @@ const PostEditor: FC<PostEditorProps> = ({
         <Separator orientation="vertical" className="mx-1 h-8" />
 
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={setLink}
           className={cn(
             'p-2 h-auto',
@@ -229,8 +229,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <LinkIcon className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={addImage}
           className="p-2 h-auto"
         >
@@ -240,8 +240,8 @@ const PostEditor: FC<PostEditorProps> = ({
         <Separator orientation="vertical" className="mx-1 h-8" />
 
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
           className="p-2 h-auto"
@@ -249,8 +249,8 @@ const PostEditor: FC<PostEditorProps> = ({
           <Undo className="w-4 h-4" />
         </Button>
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
           className="p-2 h-auto"

@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Notification Badge Component
  * 알림 배지 컴포넌트

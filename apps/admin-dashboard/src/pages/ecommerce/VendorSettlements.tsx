@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Users, DollarSign, Clock, CheckCircle, Download, Search } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -130,17 +130,17 @@ const VendorSettlements: FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="text-orange-600 border-orange-600">승인 대기</Badge>;
+        return <Badge variant={"outline" as const} className="text-orange-600 border-orange-600">승인 대기</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">승인됨</Badge>;
+        return <Badge variant={"outline" as const} className="text-blue-600 border-blue-600">승인됨</Badge>;
       case 'processing':
-        return <Badge variant="outline" className="text-purple-600 border-purple-600">처리중</Badge>;
+        return <Badge variant={"outline" as const} className="text-purple-600 border-purple-600">처리중</Badge>;
       case 'completed':
         return <Badge>완료</Badge>;
       case 'failed':
         return <Badge variant="secondary">실패</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -188,7 +188,7 @@ const VendorSettlements: FC = () => {
           <p className="text-modern-text-secondary mt-1">판매자별 정산 승인 및 처리</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport} disabled={exportMutation.isPending}>
+          <Button variant={"outline" as const} onClick={handleExport} disabled={exportMutation.isPending}>
             <Download className="w-4 h-4 mr-2" />
             엑셀 다운로드
           </Button>
@@ -429,7 +429,7 @@ const VendorSettlements: FC = () => {
                           {settlement.status === 'pending' && (
                             <>
                               <Button
-                                size="sm"
+                                size={"sm" as const}
                                 onClick={() => settlementActionMutation.mutate({ 
                                   id: settlement.id, 
                                   action: 'approve' 
@@ -439,8 +439,8 @@ const VendorSettlements: FC = () => {
                                 승인
                               </Button>
                               <Button
-                                size="sm"
-                                variant="outline"
+                                size={"sm" as const}
+                                variant={"outline" as const}
                                 onClick={() => settlementActionMutation.mutate({ 
                                   id: settlement.id, 
                                   action: 'reject' 
@@ -453,8 +453,8 @@ const VendorSettlements: FC = () => {
                           )}
                           {settlement.receiptUrl && (
                             <Button
-                              size="sm"
-                              variant="ghost"
+                              size={"sm" as const}
+                              variant={"ghost" as const}
                               onClick={() => window.open(settlement.receiptUrl, '_blank')}
                             >
                               영수증
@@ -513,7 +513,7 @@ const VendorSettlements: FC = () => {
 
           <DialogFooter>
             <Button 
-              variant="outline" 
+              variant={"outline" as const} 
               onClick={() => setIsApprovalDialogOpen(false)}
             >
               취소

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -150,8 +150,8 @@ const ForumPostForm: FC = () => {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/forum')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -271,7 +271,7 @@ const ForumPostForm: FC = () => {
         <div className="flex justify-end gap-3 mt-6">
           <Button
             type="button"
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => navigate('/forum')}
           >
             취소

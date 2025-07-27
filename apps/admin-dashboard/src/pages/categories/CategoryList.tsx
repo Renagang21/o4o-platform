@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Plus, Edit2, Trash2, FolderOpen, MoreVertical, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -177,7 +177,7 @@ const CategoryList: FC = () => {
                 </Badge>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
+                    <Button variant={"ghost" as const} size={"sm" as const}>
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -316,7 +316,7 @@ const CategoryList: FC = () => {
               )}
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button type="button" variant={"outline" as const} onClick={handleCloseDialog}>
                 취소
               </Button>
               <Button type="submit" disabled={saveMutation.isPending}>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Plus, Edit2, Trash2, Tag as TagIcon, MoreVertical, Hash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -245,7 +245,7 @@ const TagList: FC = () => {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button variant={"ghost" as const} size={"sm" as const}>
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -270,7 +270,7 @@ const TagList: FC = () => {
                     <p className="text-sm text-gray-600 mb-3">{tag.description}</p>
                   )}
                   <div className="flex items-center justify-between text-sm">
-                    <Badge variant="outline">
+                    <Badge variant={"outline" as const}>
                       {tag.postCount || 0}개 게시글
                     </Badge>
                     <span className="text-gray-500">
@@ -346,7 +346,7 @@ const TagList: FC = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button type="button" variant={"outline" as const} onClick={handleCloseDialog}>
                 취소
               </Button>
               <Button type="submit" disabled={saveMutation.isPending}>

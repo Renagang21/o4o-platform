@@ -1,4 +1,4 @@
-import { FC, createElement } from 'react';
+import { FC } from 'react';
 import { 
   Plus, 
   Copy, 
@@ -337,18 +337,18 @@ const BlockRenderer: FC<BlockRendererProps> = ({
       }`}>
         <div className="flex items-center gap-1 bg-white border rounded-lg shadow-sm p-1">
           <span className="text-xs text-gray-600 px-2">{block.type}</span>
-          <Button size="sm" variant="ghost" onClick={(e: any) => { e.stopPropagation(); onMove('up') }}>
+          <Button size={"sm" as const} variant={"ghost" as const} onClick={(e: any) => { e.stopPropagation(); onMove('up') }}>
             <ArrowUp className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={(e: any) => { e.stopPropagation(); onMove('down') }}>
+          <Button size={"sm" as const} variant={"ghost" as const} onClick={(e: any) => { e.stopPropagation(); onMove('down') }}>
             <ArrowDown className="w-3 h-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={(e: any) => { e.stopPropagation(); onDuplicate() }}>
+          <Button size={"sm" as const} variant={"ghost" as const} onClick={(e: any) => { e.stopPropagation(); onDuplicate() }}>
             <Copy className="w-3 h-3" />
           </Button>
           <Button 
-            size="sm" 
-            variant="ghost" 
+            size={"sm" as const} 
+            variant={"ghost" as const} 
             onClick={(e: any) => { e.stopPropagation(); onDelete() }}
             className="text-red-600 hover:text-red-700"
           >
@@ -386,8 +386,8 @@ const BlockRenderer: FC<BlockRendererProps> = ({
         isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
       }`}>
         <Button
-          size="sm"
-          variant="outline"
+          size={"sm" as const}
+          variant={"outline" as const}
           className="bg-white shadow-sm"
           onClick={(e: any) => {
             e.stopPropagation()

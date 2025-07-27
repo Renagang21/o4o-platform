@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { 
   Folder, 
   FolderOpen, 
@@ -100,7 +100,7 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" onClick={(e: any) => e.stopPropagation()}>
+            <Button variant={"ghost" as const} size={"sm" as const} onClick={(e: any) => e.stopPropagation()}>
               <MoreVertical className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -256,8 +256,8 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-medium">폴더 구조</h3>
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               onClick={() => {
                 setFormData({ name: '', parentId: undefined, description: '' })
                 setEditingFolder(null)
@@ -278,7 +278,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
               <Folder className="w-12 h-12 mx-auto text-gray-400 mb-4" />
               <p className="text-gray-500 mb-4">폴더가 없습니다</p>
               <Button
-                variant="outline"
+                variant={"outline" as const}
                 onClick={() => {
                   setFormData({ name: '', parentId: undefined, description: '' })
                   setEditingFolder(null)
@@ -316,7 +316,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant={"outline" as const} onClick={onClose}>
               닫기
             </Button>
           </DialogFooter>
@@ -377,7 +377,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
 
           <DialogFooter>
             <Button
-              variant="outline"
+              variant={"outline" as const}
               onClick={() => {
                 setIsCreateDialogOpen(false)
                 setEditingFolder(null)

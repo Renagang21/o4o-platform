@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Partner Statistics Card (Placeholder)
  * 파트너스 현황 통계 카드 (플레이스홀더)

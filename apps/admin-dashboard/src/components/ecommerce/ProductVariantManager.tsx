@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -216,8 +216,8 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                     </div>
                     <Button
                       type="button"
-                      variant="ghost"
-                      size="sm"
+                      variant={"ghost" as const}
+                      size={"sm" as const}
                       onClick={() => handleRemoveOption(option.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -265,8 +265,8 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
               <div className="flex gap-2">
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={() => {
                     const price = prompt('모든 변형의 가격을 입력하세요:', String(basePrice));
                     if (price) {
@@ -278,8 +278,8 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={() => {
                     const stock = prompt('모든 변형의 재고를 입력하세요:', '0');
                     if (stock) {

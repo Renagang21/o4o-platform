@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Action Button Component
  * 개별 빠른 액션 버튼

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Package, Clock, CheckCircle, Truck, AlertCircle, RefreshCw, Eye, Edit, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -157,15 +157,15 @@ const OrderStatusManagement: FC = () => {
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">대기중</Badge>;
+        return <Badge variant={"outline" as const} className="text-yellow-600 border-yellow-600">대기중</Badge>;
       case 'confirmed':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">확인됨</Badge>;
+        return <Badge variant={"outline" as const} className="text-blue-600 border-blue-600">확인됨</Badge>;
       case 'processing':
-        return <Badge variant="outline" className="text-purple-600 border-purple-600">처리중</Badge>;
+        return <Badge variant={"outline" as const} className="text-purple-600 border-purple-600">처리중</Badge>;
       case 'shipped':
-        return <Badge variant="outline" className="text-indigo-600 border-indigo-600">배송중</Badge>;
+        return <Badge variant={"outline" as const} className="text-indigo-600 border-indigo-600">배송중</Badge>;
       case 'delivered':
-        return <Badge variant="outline" className="text-green-600 border-green-600">배송완료</Badge>;
+        return <Badge variant={"outline" as const} className="text-green-600 border-green-600">배송완료</Badge>;
       case 'completed':
         return <Badge>완료</Badge>;
       case 'cancelled':
@@ -173,7 +173,7 @@ const OrderStatusManagement: FC = () => {
       case 'refunded':
         return <Badge variant="destructive">환불</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -415,15 +415,15 @@ const OrderStatusManagement: FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleOpenOrderDetail(order)}
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleOpenStatusChange(order)}
                           >
                             <Edit className="w-4 h-4" />
@@ -519,7 +519,7 @@ const OrderStatusManagement: FC = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsStatusDialogOpen(false)}>
+              <Button type="button" variant={"outline" as const} onClick={() => setIsStatusDialogOpen(false)}>
                 취소
               </Button>
               <Button type="submit" disabled={changeStatusMutation.isPending}>

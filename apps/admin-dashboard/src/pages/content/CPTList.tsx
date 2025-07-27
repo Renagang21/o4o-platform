@@ -113,15 +113,15 @@ const CPTList: FC = () => {
               </p>
               <div className="flex flex-wrap gap-1 mb-4">
                 {['제목', '에디터', '카테고리', '태그', '대표 이미지'].map(feature => (
-                  <Badge key={feature} variant="outline" className="text-xs">
+                  <Badge key={feature} variant={"outline" as const} className="text-xs">
                     {feature}
                   </Badge>
                 ))}
               </div>
               <div className="flex items-center justify-between pt-4 border-t">
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={() => navigate('/content/posts')}
                 >
                   <Eye className="w-4 h-4 mr-2" />
@@ -152,15 +152,15 @@ const CPTList: FC = () => {
               </p>
               <div className="flex flex-wrap gap-1 mb-4">
                 {['제목', '에디터', '페이지 속성', '대표 이미지'].map(feature => (
-                  <Badge key={feature} variant="outline" className="text-xs">
+                  <Badge key={feature} variant={"outline" as const} className="text-xs">
                     {feature}
                   </Badge>
                 ))}
               </div>
               <div className="flex items-center justify-between pt-4 border-t">
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={() => navigate('/content/pages')}
                 >
                   <Eye className="w-4 h-4 mr-2" />
@@ -190,7 +190,7 @@ const CPTList: FC = () => {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant={"ghost" as const} size={"sm" as const}>
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -242,7 +242,7 @@ const CPTList: FC = () => {
                   {/* Supported Features */}
                   <div className="flex flex-wrap gap-1">
                     {getSupportBadges(postType.supports).map(feature => (
-                      <Badge key={feature} variant="outline" className="text-xs">
+                      <Badge key={feature} variant={"outline" as const} className="text-xs">
                         {feature}
                       </Badge>
                     ))}
@@ -275,8 +275,8 @@ const CPTList: FC = () => {
                     {new Date(postType.createdAt).toLocaleDateString()}
                   </span>
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant={"outline" as const}
+                    size={"sm" as const}
                     onClick={() => navigate(`/content/${postType.slug}`)}
                   >
                     콘텐츠 관리

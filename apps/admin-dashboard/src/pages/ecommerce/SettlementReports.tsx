@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Download, Calendar, FileText, BarChart3, PieChart, TrendingUp, Filter } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -162,11 +162,11 @@ const SettlementReports: FC = () => {
           <p className="text-modern-text-secondary mt-1">매출 및 정산 현황 분석</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => handleExportReport('excel')}>
+          <Button variant={"outline" as const} onClick={() => handleExportReport('excel')}>
             <Download className="w-4 h-4 mr-2" />
             엑셀 다운로드
           </Button>
-          <Button variant="outline" onClick={() => handleExportReport('pdf')}>
+          <Button variant={"outline" as const} onClick={() => handleExportReport('pdf')}>
             <FileText className="w-4 h-4 mr-2" />
             PDF 다운로드
           </Button>

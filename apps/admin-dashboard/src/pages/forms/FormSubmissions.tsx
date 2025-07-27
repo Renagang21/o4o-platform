@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft,
@@ -213,8 +213,8 @@ const FormSubmissions: FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
-            size="sm"
+            variant={"ghost" as const}
+            size={"sm" as const}
             onClick={() => navigate('/forms')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -233,8 +233,8 @@ const FormSubmissions: FC = () => {
                 {selectedSubmissions.length}개 선택됨
               </span>
               <Button
-                variant="outline"
-                size="sm"
+                variant={"outline" as const}
+                size={"sm" as const}
                 onClick={handleDeleteSelected}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -243,7 +243,7 @@ const FormSubmissions: FC = () => {
             </>
           )}
           <Button
-            variant="outline"
+            variant={"outline" as const}
             onClick={handleExport}
           >
             <Download className="w-4 h-4 mr-2" />
@@ -379,7 +379,7 @@ const FormSubmissions: FC = () => {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant={"ghost" as const} size={"sm" as const}>
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -420,8 +420,8 @@ const FormSubmissions: FC = () => {
       {data && data.totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-6">
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
@@ -431,8 +431,8 @@ const FormSubmissions: FC = () => {
             {page} / {data.totalPages}
           </span>
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setPage(page + 1)}
             disabled={page === data.totalPages}
           >

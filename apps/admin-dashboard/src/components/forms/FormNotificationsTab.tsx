@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import { Plus, Trash2, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -82,8 +82,8 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                   <span className="font-medium">{notification.name}</span>
                 </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
+                  variant={"ghost" as const}
+                  size={"icon" as const}
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteNotification(notification.id);
@@ -94,7 +94,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
               </div>
             </Card>
           ))}
-          <Button variant="outline" className="w-full" onClick={addNotification}>
+          <Button variant={"outline" as const} className="w-full" onClick={addNotification}>
             <Plus className="h-4 w-4 mr-2" />
             알림 추가
           </Button>

@@ -135,7 +135,7 @@ const ACFManager: FC = () => {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant={"ghost" as const} size={"sm" as const}>
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -201,11 +201,11 @@ const ACFManager: FC = () => {
 
                   {/* Position */}
                   <div className="flex flex-wrap gap-1">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant={"outline" as const} className="text-xs">
                       {fieldGroup.position || 'normal'}
                     </Badge>
                     {fieldGroup.labelPlacement && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant={"outline" as const} className="text-xs">
                         레이블 {fieldGroup.labelPlacement === 'top' ? '상단' : '왼쪽'}
                       </Badge>
                     )}
@@ -217,8 +217,8 @@ const ACFManager: FC = () => {
                     {fieldGroup.updatedAt ? new Date(fieldGroup.updatedAt).toLocaleDateString() : ''}
                   </span>
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant={"outline" as const}
+                    size={"sm" as const}
                     onClick={() => navigate(`/content/acf/${fieldGroup.id}/edit`)}
                   >
                     <Settings2 className="w-4 h-4 mr-2" />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Eye, Calendar, Users, TrendingUp, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -290,8 +290,8 @@ const CrowdfundingProjects: FC = () => {
                       {/* 액션 버튼 */}
                       <div className="flex gap-2">
                         <Button
-                          variant="outline"
-                          size="sm"
+                          variant={"outline" as const}
+                          size={"sm" as const}
                           className="flex-1"
                           onClick={() => navigate(`/crowdfunding/projects/${project.id}`)}
                         >
@@ -300,8 +300,8 @@ const CrowdfundingProjects: FC = () => {
                         </Button>
                         {project.forumLink && (
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => navigate(project.forumLink!)}
                           >
                             포럼
@@ -320,8 +320,8 @@ const CrowdfundingProjects: FC = () => {
         {pagination && pagination.totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-8">
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               disabled={page <= 1}
               onClick={() => setPage(p => Math.max(1, p - 1))}
             >
@@ -338,7 +338,7 @@ const CrowdfundingProjects: FC = () => {
                   <Button
                     key={pageNum}
                     variant={pageNum === page ? "default" : "ghost"}
-                    size="sm"
+                    size={"sm" as const}
                     onClick={() => setPage(pageNum)}
                     className="w-8 h-8 p-0"
                   >
@@ -348,8 +348,8 @@ const CrowdfundingProjects: FC = () => {
               })}
             </div>
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               disabled={page >= pagination.totalPages}
               onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
             >

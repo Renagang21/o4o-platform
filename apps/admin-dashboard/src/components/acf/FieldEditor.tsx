@@ -163,8 +163,8 @@ const FieldEditor: FC<FieldEditorProps> = ({ field, onChange }) => {
                   }}
                 />
                 <Button
-                  variant="ghost"
-                  size="sm"
+                  variant={"ghost" as const}
+                  size={"sm" as const}
                   onClick={() => {
                     const newOptions = field.options?.filter((_, i: any) => i !== index)
                     onChange({ ...field, options: newOptions })
@@ -175,8 +175,8 @@ const FieldEditor: FC<FieldEditorProps> = ({ field, onChange }) => {
               </div>
             ))}
             <Button
-              variant="outline"
-              size="sm"
+              variant={"outline" as const}
+              size={"sm" as const}
               onClick={() => {
                 const newOptions = [...(field.options || []), { label: '', value: '' }]
                 onChange({ ...field, options: newOptions })

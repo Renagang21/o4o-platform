@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Check, Palette, Moon, Sun } from 'lucide-react'
 import { useTheme } from '../../shared/components/theme/MultiThemeContext'
 

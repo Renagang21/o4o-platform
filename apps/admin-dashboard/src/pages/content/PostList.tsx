@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Edit, Trash2, Eye, MoreVertical, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -248,7 +248,7 @@ const PostList: FC = () => {
                     </TableCell>
                     <TableCell>
                       {post.categories?.map((category) => (
-                        <Badge key={category.id} variant="outline" className="mr-1">
+                        <Badge key={category.id} variant={"outline" as const} className="mr-1">
                           {category.name}
                         </Badge>
                       )) || '-'}
@@ -265,7 +265,7 @@ const PostList: FC = () => {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant={"ghost" as const} size={"sm" as const}>
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>

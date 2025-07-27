@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Search, Edit, Trash2, Eye, MoreVertical, Copy, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -253,7 +253,7 @@ const PageList: FC = () => {
                           )}
                         </div>
                         {page.isHomepage && (
-                          <Badge variant="outline" className="flex items-center gap-1">
+                          <Badge variant={"outline" as const} className="flex items-center gap-1">
                             <Home className="w-3 h-3" />
                             홈
                           </Badge>
@@ -268,7 +268,7 @@ const PageList: FC = () => {
                     </TableCell>
                     <TableCell>
                       {page.template ? (
-                        <Badge variant="outline">{page.template}</Badge>
+                        <Badge variant={"outline" as const}>{page.template}</Badge>
                       ) : (
                         <span className="text-gray-500">기본</span>
                       )}
@@ -285,7 +285,7 @@ const PageList: FC = () => {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant={"ghost" as const} size={"sm" as const}>
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>

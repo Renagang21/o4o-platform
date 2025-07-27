@@ -221,8 +221,8 @@ const ACFFieldGroupForm: FC = () => {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/content/acf')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -318,7 +318,7 @@ const ACFFieldGroupForm: FC = () => {
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="font-medium">{field.label}</span>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant={"outline" as const} className="text-xs">
                                   {field.type}
                                 </Badge>
                                 {field.required && (
@@ -334,15 +334,15 @@ const ACFFieldGroupForm: FC = () => {
                           </button>
                           <div className="flex items-center gap-2">
                             <Button
-                              variant="ghost"
-                              size="sm"
+                              variant={"ghost" as const}
+                              size={"sm" as const}
                               onClick={() => handleEditField(field)}
                             >
                               <Settings className="w-4 h-4" />
                             </Button>
                             <Button
-                              variant="ghost"
-                              size="sm"
+                              variant={"ghost" as const}
+                              size={"sm" as const}
                               onClick={() => handleDeleteField(field.id)}
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -368,7 +368,7 @@ const ACFFieldGroupForm: FC = () => {
                     </Card>
                   ))}
                   <Button
-                    variant="outline"
+                    variant={"outline" as const}
                     className="w-full"
                     onClick={handleAddField}
                   >
@@ -446,8 +446,8 @@ const ACFFieldGroupForm: FC = () => {
                   </div>
                 ))}
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={handleAddLocationRule}
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -616,7 +616,7 @@ const ACFFieldGroupForm: FC = () => {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsFieldDialogOpen(false)}>
+            <Button variant={"outline" as const} onClick={() => setIsFieldDialogOpen(false)}>
               취소
             </Button>
             <Button onClick={() => {

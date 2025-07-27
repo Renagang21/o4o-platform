@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import { 
   Settings, 
   Monitor,
@@ -197,8 +197,8 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
                     placeholder="URL"
                   />
                   <Button
-                    size="sm"
-                    variant="ghost"
+                    size={"sm" as const}
+                    variant={"ghost" as const}
                     onClick={() => {
                       const newButtons = (block.content.buttons || []).filter((_: unknown, i: number) => i !== index)
                       updateContent('buttons', newButtons)
@@ -209,8 +209,8 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
                 </div>
               ))}
               <Button
-                size="sm"
-                variant="outline"
+                size={"sm" as const}
+                variant={"outline" as const}
                 onClick={() => {
                   const newButtons = [...(block.content.buttons || []), { text: '버튼', url: '#', style: 'primary' }]
                   updateContent('buttons', newButtons)
@@ -404,21 +404,21 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
       {/* Device Selector */}
       <div className="flex items-center gap-1 border rounded-lg p-1">
         <Button
-          size="sm"
+          size={"sm" as const}
           variant={activeDevice === 'desktop' ? 'default' : 'ghost'}
           onClick={() => setActiveDevice('desktop')}
         >
           <Monitor className="w-4 h-4" />
         </Button>
         <Button
-          size="sm"
+          size={"sm" as const}
           variant={activeDevice === 'tablet' ? 'default' : 'ghost'}
           onClick={() => setActiveDevice('tablet')}
         >
           <Tablet className="w-4 h-4" />
         </Button>
         <Button
-          size="sm"
+          size={"sm" as const}
           variant={activeDevice === 'mobile' ? 'default' : 'ghost'}
           onClick={() => setActiveDevice('mobile')}
         >
@@ -630,3 +630,22 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
 }
 
 export default BlockEditor
+interface SpacingValue {
+  top?: string;
+  right?: string;
+  bottom?: string;
+  left?: string;
+}
+
+interface SpacingValue {
+  top?: string;
+  right?: string;
+  bottom?: string;
+  left?: string;
+}
+
+interface SpacingControlProps {
+  label: string;
+  value: SpacingValue;
+  onChange: (value: SpacingValue) => void;
+}

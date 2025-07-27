@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -294,8 +294,8 @@ const FormBuilder: FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
-            size="sm"
+            variant={"ghost" as const}
+            size={"sm" as const}
             onClick={() => navigate('/forms')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -308,7 +308,7 @@ const FormBuilder: FC = () => {
         
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => setShowPreview(true)}
           >
             <Eye className="w-4 h-4 mr-2" />
@@ -382,7 +382,7 @@ const FormBuilder: FC = () => {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold">양식 필드</h3>
                     <Button
-                      size="sm"
+                      size={"sm" as const}
                       onClick={() => setShowFieldDialog(true)}
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -394,7 +394,7 @@ const FormBuilder: FC = () => {
                     <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
                       <p className="text-gray-500 mb-4">아직 필드가 없습니다</p>
                       <Button
-                        variant="outline"
+                        variant={"outline" as const}
                         onClick={() => setShowFieldDialog(true)}
                       >
                         <Plus className="w-4 h-4 mr-2" />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Plus, Edit, Trash2, GripVertical } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -256,15 +256,15 @@ const ForumCategories: FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
                         <Button
-                          variant="ghost"
-                          size="sm"
+                          variant={"ghost" as const}
+                          size={"sm" as const}
                           onClick={() => handleOpenDialog(category)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="sm"
+                          variant={"ghost" as const}
+                          size={"sm" as const}
                           onClick={() => handleDelete(category)}
                           disabled={category.postCount > 0}
                         >
@@ -343,7 +343,7 @@ const ForumCategories: FC = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button type="button" variant={"outline" as const} onClick={handleCloseDialog}>
                 취소
               </Button>
               <Button 

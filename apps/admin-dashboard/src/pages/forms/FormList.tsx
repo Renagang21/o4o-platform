@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
@@ -203,7 +203,7 @@ const FormList: FC = () => {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant={"ghost" as const} size={"sm" as const}>
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -283,22 +283,22 @@ const FormList: FC = () => {
                   
                   <div className="flex items-center gap-1">
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant={"ghost" as const}
+                      size={"sm" as const}
                       onClick={() => navigate(`/forms/${form.id}/submissions`)}
                     >
                       <Users className="w-4 h-4" />
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant={"ghost" as const}
+                      size={"sm" as const}
                       onClick={() => navigate(`/forms/${form.id}/report`)}
                     >
                       <BarChart className="w-4 h-4" />
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant={"ghost" as const}
+                      size={"sm" as const}
                       onClick={() => {
                         navigator.clipboard.writeText(form.shortcode || `[form name="${form.name}"]`);
                         toast.success('숏코드가 복사되었습니다');
@@ -318,8 +318,8 @@ const FormList: FC = () => {
       {data && data.totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-8">
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
@@ -329,8 +329,8 @@ const FormList: FC = () => {
             {page} / {data.totalPages}
           </span>
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => setPage(page + 1)}
             disabled={page === data.totalPages}
           >

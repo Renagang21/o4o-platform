@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { CreditCard, Shield, AlertTriangle, CheckCircle, Settings, Eye, EyeOff } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -158,9 +158,9 @@ const TossPaymentsSettings: FC = () => {
       case 'failed':
         return <Badge variant="destructive">실패</Badge>;
       case 'pending':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">진행중</Badge>;
+        return <Badge variant={"outline" as const} className="text-yellow-600 border-yellow-600">진행중</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -206,7 +206,7 @@ const TossPaymentsSettings: FC = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="outline"
+            variant={"outline" as const}
             onClick={() => setIsTestDialogOpen(true)}
           >
             <Shield className="w-4 h-4 mr-2" />
@@ -539,7 +539,7 @@ const TossPaymentsSettings: FC = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsTestDialogOpen(false)}>
+            <Button variant={"outline" as const} onClick={() => setIsTestDialogOpen(false)}>
               취소
             </Button>
             <Button onClick={handleTestConnection} disabled={testConnectionMutation.isPending}>

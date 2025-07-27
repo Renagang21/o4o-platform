@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Activity Item Component
  * 개별 활동 아이템

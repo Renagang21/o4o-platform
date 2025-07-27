@@ -140,7 +140,7 @@ export default function UserForm() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <Button variant="ghost" onClick={() => navigate('/users')}>
+        <Button variant={"ghost" as const} onClick={() => navigate('/users')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Users
         </Button>
@@ -283,7 +283,7 @@ export default function UserForm() {
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant={"outline" as const}
                 onClick={() => navigate('/users')}
                 disabled={loading}
               >

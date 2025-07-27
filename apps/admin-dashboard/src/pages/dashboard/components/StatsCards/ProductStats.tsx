@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Product Statistics Card
  * 상품 현황 통계 카드

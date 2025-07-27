@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { RefreshCw, AlertTriangle, CheckCircle, Clock, Search, Filter, Eye, CreditCard } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -136,11 +136,11 @@ const RefundManagement: FC = () => {
   const getStatusBadge = (status: RefundStatus) => {
     switch (status) {
       case 'requested':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">요청됨</Badge>;
+        return <Badge variant={"outline" as const} className="text-yellow-600 border-yellow-600">요청됨</Badge>;
       case 'processing':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">처리중</Badge>;
+        return <Badge variant={"outline" as const} className="text-blue-600 border-blue-600">처리중</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="text-purple-600 border-purple-600">승인됨</Badge>;
+        return <Badge variant={"outline" as const} className="text-purple-600 border-purple-600">승인됨</Badge>;
       case 'completed':
         return <Badge>완료</Badge>;
       case 'rejected':
@@ -148,7 +148,7 @@ const RefundManagement: FC = () => {
       case 'failed':
         return <Badge variant="destructive">실패</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -412,16 +412,16 @@ const RefundManagement: FC = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="ghost"
-                            size="sm"
+                            variant={"ghost" as const}
+                            size={"sm" as const}
                             onClick={() => handleOpenDetail(refund)}
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
                           {canProcess(refund.status) && (
                             <Button
-                              variant="ghost"
-                              size="sm"
+                              variant={"ghost" as const}
+                              size={"sm" as const}
                               onClick={() => handleOpenProcess(refund)}
                             >
                               <CreditCard className="w-4 h-4" />
@@ -429,8 +429,8 @@ const RefundManagement: FC = () => {
                           )}
                           {canRetry(refund.status) && (
                             <Button
-                              variant="ghost"
-                              size="sm"
+                              variant={"ghost" as const}
+                              size={"sm" as const}
                               onClick={() => retryRefundMutation.mutate(refund.id)}
                               disabled={retryRefundMutation.isPending}
                             >
@@ -521,7 +521,7 @@ const RefundManagement: FC = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsProcessDialogOpen(false)}>
+              <Button type="button" variant={"outline" as const} onClick={() => setIsProcessDialogOpen(false)}>
                 취소
               </Button>
               <Button type="submit" disabled={processRefundMutation.isPending}>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Package, ToggleLeft, ToggleRight, Settings, Users, TrendingUp, AlertCircle, Activity } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -134,11 +134,11 @@ const AppsManager: FC = () => {
       case 'inactive':
         return <Badge variant="secondary">비활성</Badge>;
       case 'maintenance':
-        return <Badge variant="outline" className="text-orange-600 border-orange-600">점검중</Badge>;
+        return <Badge variant={"outline" as const} className="text-orange-600 border-orange-600">점검중</Badge>;
       case 'development':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">개발중</Badge>;
+        return <Badge variant={"outline" as const} className="text-blue-600 border-blue-600">개발중</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -147,11 +147,11 @@ const AppsManager: FC = () => {
       case 'complete':
         return <Badge className="bg-blue-100 text-blue-800">완전 구현</Badge>;  
       case 'partial':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">부분 구현</Badge>;
+        return <Badge variant={"outline" as const} className="text-yellow-600 border-yellow-600">부분 구현</Badge>;
       case 'planned':
         return <Badge variant="secondary">계획됨</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -333,8 +333,8 @@ const AppsManager: FC = () => {
                     </div>
                   </div>
                   <Button
-                    variant="ghost"
-                    size="sm"
+                    variant={"ghost" as const}
+                    size={"sm" as const}
                     onClick={() => handleToggleApp(app)}
                     disabled={toggleAppMutation.isPending}
                   >
@@ -384,7 +384,7 @@ const AppsManager: FC = () => {
                       {app.dependencies.map(depId => {
                         const depApp = apps.find(a => a.id === depId);
                         return depApp ? (
-                          <Badge key={depId} variant="outline" className="text-xs">
+                          <Badge key={depId} variant={"outline" as const} className="text-xs">
                             {depApp.displayName}
                           </Badge>
                         ) : null;
@@ -396,8 +396,8 @@ const AppsManager: FC = () => {
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant={"outline" as const}
+                    size={"sm" as const}
                     onClick={() => handleOpenSettings(app)}
                     className="flex-1"
                   >
@@ -405,7 +405,7 @@ const AppsManager: FC = () => {
                     설정
                   </Button>
                   {app.status === 'active' && app.metrics.errorRate > 5 && (
-                    <Button variant="outline" size="sm" className="text-orange-600">
+                    <Button variant={"outline" as const} size={"sm" as const} className="text-orange-600">
                       <AlertCircle className="w-4 h-4" />
                     </Button>
                   )}
@@ -494,7 +494,7 @@ const AppsManager: FC = () => {
 
           <DialogFooter>
             <Button 
-              variant="outline" 
+              variant={"outline" as const} 
               onClick={() => setIsSettingsDialogOpen(false)}
             >
               취소

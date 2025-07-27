@@ -1,4 +1,4 @@
-// 임시 비활성화: socket.io-client 타입 에러 해결 후 다시 활성화 예정
+import { FC } from 'react';
 // TODO: socket.io-client import 문제 해결 후 복원
 
 /*

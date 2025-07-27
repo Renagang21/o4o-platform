@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Plus, Edit, Trash2, ChevronRight, ChevronDown } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -349,23 +349,23 @@ const ProductCategories: FC = () => {
 
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
-              size="sm"
+              variant={"ghost" as const}
+              size={"sm" as const}
               onClick={() => handleOpenDialog(undefined, category.id)}
             >
               <Plus className="w-4 h-4" />
               하위 추가
             </Button>
             <Button
-              variant="ghost"
-              size="sm"
+              variant={"ghost" as const}
+              size={"sm" as const}
               onClick={() => handleOpenDialog(category)}
             >
               <Edit className="w-4 h-4" />
             </Button>
             <Button
-              variant="ghost"
-              size="sm"
+              variant={"ghost" as const}
+              size={"sm" as const}
               onClick={() => handleDelete(category)}
               disabled={category.productCount > 0 || (category.children && category.children.length > 0)}
             >
@@ -512,8 +512,8 @@ const ProductCategories: FC = () => {
                       )}
                       <Button
                         type="button"
-                        variant="ghost"
-                        size="sm"
+                        variant={"ghost" as const}
+                        size={"sm" as const}
                         onClick={() => handleRemoveAttribute(index)}
                         className="ml-auto"
                       >
@@ -656,7 +656,7 @@ const ProductCategories: FC = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button type="button" variant={"outline" as const} onClick={handleCloseDialog}>
                 취소
               </Button>
               <Button 

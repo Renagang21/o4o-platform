@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import {
   Layout,
   Plus,
@@ -202,21 +202,21 @@ const WidgetManager: FC = () => {
           {/* Preview Device Selector */}
           <div className="flex items-center border rounded-lg p-1">
             <Button
-              size="sm"
+              size={"sm" as const}
               variant={previewDevice === 'desktop' ? 'default' : 'ghost'}
               onClick={() => setPreviewDevice('desktop')}
             >
               <Monitor className="w-4 h-4" />
             </Button>
             <Button
-              size="sm"
+              size={"sm" as const}
               variant={previewDevice === 'tablet' ? 'default' : 'ghost'}
               onClick={() => setPreviewDevice('tablet')}
             >
               <Tablet className="w-4 h-4" />
             </Button>
             <Button
-              size="sm"
+              size={"sm" as const}
               variant={previewDevice === 'mobile' ? 'default' : 'ghost'}
               onClick={() => setPreviewDevice('mobile')}
             >
@@ -283,7 +283,7 @@ const WidgetManager: FC = () => {
                             >
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-xs">
+                                  <Badge variant={"outline" as const} className="text-xs">
                                     {getWidgetTypeDisplayName(widget.type)}
                                   </Badge>
                                   {!widget.isActive && (
@@ -294,7 +294,7 @@ const WidgetManager: FC = () => {
                                 </div>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                                    <Button size={"sm" as const} variant={"ghost" as const} className="h-6 w-6 p-0">
                                       <MoreVertical className="w-3 h-3" />
                                     </Button>
                                   </DropdownMenuTrigger>
@@ -389,8 +389,8 @@ const WidgetManager: FC = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <Button 
-                      variant="outline" 
-                      size="sm" 
+                      variant={"outline" as const} 
+                      size={"sm" as const} 
                       className="w-full justify-start"
                       onClick={() => {
                         setEditingWidget(null)
@@ -401,8 +401,8 @@ const WidgetManager: FC = () => {
                       새 위젯 추가
                     </Button>
                     <Button 
-                      variant="outline" 
-                      size="sm" 
+                      variant={"outline" as const} 
+                      size={"sm" as const} 
                       className="w-full justify-start"
                       onClick={() => setViewMode('library')}
                     >
@@ -410,8 +410,8 @@ const WidgetManager: FC = () => {
                       위젯 라이브러리
                     </Button>
                     <Button 
-                      variant="outline" 
-                      size="sm" 
+                      variant={"outline" as const} 
+                      size={"sm" as const} 
                       className="w-full justify-start"
                     >
                       <Settings className="w-4 h-4 mr-2" />
@@ -464,7 +464,7 @@ const WidgetManager: FC = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-medium">{widget.title}</h3>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant={"outline" as const} className="text-xs">
                             {getWidgetTypeDisplayName(widget.type)}
                           </Badge>
                           {!widget.isActive && (
@@ -480,15 +480,15 @@ const WidgetManager: FC = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
-                        size="sm"
-                        variant="outline"
+                        size={"sm" as const}
+                        variant={"outline" as const}
                         onClick={() => handleEdit(widget)}
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button
-                        size="sm"
-                        variant="outline"
+                        size={"sm" as const}
+                        variant={"outline" as const}
                         onClick={() => handleToggleActive(widget)}
                       >
                         {widget.isActive ? (
@@ -498,8 +498,8 @@ const WidgetManager: FC = () => {
                         )}
                       </Button>
                       <Button
-                        size="sm"
-                        variant="outline"
+                        size={"sm" as const}
+                        variant={"outline" as const}
                         onClick={() => handleDelete(widget)}
                         className="text-red-600 hover:text-red-700"
                       >

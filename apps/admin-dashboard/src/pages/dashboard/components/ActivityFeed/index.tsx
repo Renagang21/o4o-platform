@@ -3,7 +3,7 @@
  * 통합 활동 피드 (최신 15개 활동)
  */
 
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import ActivityItem from './ActivityItem';
 import { Activity, Filter, RefreshCw } from 'lucide-react';
 
@@ -31,12 +31,12 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
 
   // 필터링된 활동
   const filteredActivities = activities.filter(activity => 
-    filter === 'all' || activity.type === filter
+    filter === 'all' || activity?.type || "" === filter
   );
 
   // 타입별 카운트
   const counts = activities.reduce((acc: any, activity: any) => {
-    acc[activity.type] = (acc[activity.type] || 0) + 1;
+    acc[activity?.type || ""] = (acc[activity?.type || ""] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -137,9 +137,9 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
           {filteredActivities.length > 0 ? (
             filteredActivities.map(activity => (
               <ActivityItem
-                key={activity.id}
+                key={activity?.id || ""}
                 activity={activity}
-                typeColor={getTypeColor(activity.type)}
+                typeColor={getTypeColor(activity?.type || "")}
               />
             ))
           ) : (

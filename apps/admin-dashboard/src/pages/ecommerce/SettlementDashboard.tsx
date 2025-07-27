@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, Users, Calculator, FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -86,15 +86,15 @@ const SettlementDashboard: FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-600">대기중</Badge>;
+        return <Badge variant={"outline" as const} className="text-yellow-600 border-yellow-600">대기중</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">승인됨</Badge>;
+        return <Badge variant={"outline" as const} className="text-blue-600 border-blue-600">승인됨</Badge>;
       case 'completed':
         return <Badge>완료</Badge>;
       case 'held':
         return <Badge variant="secondary">보류</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant={"outline" as const}>{status}</Badge>;
     }
   };
 
@@ -145,7 +145,7 @@ const SettlementDashboard: FC = () => {
             <option value="90days">최근 90일</option>
             <option value="1year">최근 1년</option>
           </select>
-          <Button variant="outline">
+          <Button variant={"outline" as const}>
             <FileText className="w-4 h-4 mr-2" />
             보고서 생성
           </Button>

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState, FC, ReactNode, Children } from 'react';
 import { GripVertical, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DraggableWidgetProps {
   id: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   isCollapsible?: boolean;
   isClosable?: boolean;
   onClose?: (id: string) => void;
@@ -107,7 +107,7 @@ const DraggableWidget: FC<DraggableWidgetProps> = ({
 };
 
 interface WidgetContainerProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onReorder: (fromIndex: number, toIndex: number) => void;
   columns?: number;
 }
@@ -129,7 +129,7 @@ export const WidgetContainer: FC<WidgetContainerProps> = ({
     const draggedId = e.dataTransfer.getData('widgetId');
     
     // Find the index of the dragged widget
-    const childrenArray = React.Children.toArray(children);
+    const childrenArray = Children.toArray(children);
     const draggedIndex = childrenArray.findIndex(
       (child: any) => child.props.id === draggedId
     );
@@ -154,7 +154,7 @@ export const WidgetContainer: FC<WidgetContainerProps> = ({
 
   return (
     <div className={cn("grid grid-cols-1 gap-6", gridColumns)}>
-      {React.Children.map(children, (child, index) => (
+      {Children.map(children, (child, index) => (
         <div
           key={index}
           onDragOver={(e) => handleDragOver(e, index)}

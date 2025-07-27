@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import {
   FileText,
   Settings,
@@ -161,8 +161,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
         </Tabs>
         {onClose && (
           <Button
-            variant="ghost"
-            size="icon"
+            variant={"ghost" as const}
+            size={"icon" as const}
             className="ml-2"
             onClick={onClose}
           >
@@ -271,8 +271,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
               <div className="space-y-3">
                 <div className="relative">
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant={"outline" as const}
+                    size={"sm" as const}
                     className="w-full justify-start"
                     onClick={() => setShowCategorySearch(!showCategorySearch)}
                   >
@@ -316,7 +316,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
 
                 <Button
                   variant="link"
-                  size="sm"
+                  size={"sm" as const}
                   className="p-0 h-auto"
                 >
                   <Plus className="h-4 w-4 mr-1" />
@@ -341,7 +341,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                     }}
                   />
                   <Button
-                    size="sm"
+                    size={"sm" as const}
                     onClick={handleAddTag}
                   >
                     Add
@@ -378,11 +378,11 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       className="w-full rounded-md"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
-                      <Button size="sm" variant="secondary">
+                      <Button size={"sm" as const} variant="secondary">
                         Replace
                       </Button>
                       <Button
-                        size="sm"
+                        size={"sm" as const}
                         variant="secondary"
                         onClick={() => 
                           onPostSettingsChange({ featuredImage: undefined })
@@ -394,7 +394,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   </div>
                 ) : (
                   <Button
-                    variant="outline"
+                    variant={"outline" as const}
                     className="w-full"
                   >
                     <ImageIcon className="h-4 w-4 mr-2" />
@@ -500,7 +500,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                             <Button
                               key={align}
                               variant={blockSettings.attributes?.align === align ? 'default' : 'outline'}
-                              size="sm"
+                              size={"sm" as const}
                               onClick={() => 
                                 onBlockSettingsChange?.({
                                   attributes: { ...blockSettings.attributes, align }

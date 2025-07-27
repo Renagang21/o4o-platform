@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FC } from 'react';
 import { Upload, X, Check, AlertCircle, File, Image, Film, Music, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -58,10 +58,10 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   // Initialize files when opened
   useEffect(() => {
     if (isOpen && files && files.length > 0) {
-      const newFiles: UploadFile[] = Array.from(files).map(file => ({
+      const newFiles: UploadFile[] = Array.from(files).map((file: File) => ({
         file,
         id: `${Date.now()}-${Math.random()}`,
-        status: 'pending',
+        status: 'pending' as const,
         progress: 0,
         preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
         metadata: {
@@ -332,15 +332,15 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
                           {uploadFile.status === 'pending' && (
                             <>
                               <Button
-                                variant="ghost"
-                                size="sm"
+                                variant={"ghost" as const}
+                                size={"sm" as const}
                                 onClick={() => setCurrentEditingFile(uploadFile.id)}
                               >
                                 편집
                               </Button>
                               <Button
-                                variant="ghost"
-                                size="sm"
+                                variant={"ghost" as const}
+                                size={"sm" as const}
                                 onClick={() => removeFile(uploadFile.id)}
                               >
                                 <X className="w-4 h-4" />
@@ -409,8 +409,8 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
                             />
                           </div>
                           <Button
-                            variant="outline"
-                            size="sm"
+                            variant={"outline" as const}
+                            size={"sm" as const}
                             onClick={() => setCurrentEditingFile(null)}
                           >
                             완료
@@ -434,7 +434,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
               {errorCount > 0 && <span className="ml-3 text-red-600">{errorCount}개 실패</span>}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant={"outline" as const} onClick={onClose}>
                 취소
               </Button>
               <Button

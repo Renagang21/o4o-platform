@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FC } from 'react';
 import {
   X,
   Download,
@@ -165,7 +165,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>템플릿 라이브러리</DialogTitle>
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant={"ghost" as const} onClick={onClose}>
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -277,7 +277,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                           <div className="flex items-center gap-2">
                             <Button
-                              size="sm"
+                              size={"sm" as const}
                               variant="secondary"
                               onClick={() => setSelectedTemplate(template)}
                             >
@@ -285,7 +285,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                               미리보기
                             </Button>
                             <Button
-                              size="sm"
+                              size={"sm" as const}
                               onClick={() => handleImport(template)}
                               disabled={importMutation.isPending}
                             >
@@ -325,7 +325,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="font-semibold text-lg truncate">{template.name}</h3>
-                          <Button variant="ghost" size="sm">
+                          <Button variant={"ghost" as const} size={"sm" as const}>
                             <Heart className="w-4 h-4" />
                           </Button>
                         </div>
@@ -359,12 +359,12 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                         {/* Tags */}
                         <div className="flex flex-wrap gap-1 mb-3">
                           {template.metadata.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
+                            <Badge key={tag} variant={"outline" as const} className="text-xs">
                               {tag}
                             </Badge>
                           ))}
                           {template.metadata.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant={"outline" as const} className="text-xs">
                               +{template.metadata.tags.length - 3}
                             </Badge>
                           )}
@@ -373,8 +373,8 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                         {/* Actions */}
                         <div className="flex gap-2">
                           <Button
-                            variant="outline"
-                            size="sm"
+                            variant={"outline" as const}
+                            size={"sm" as const}
                             className="flex-1"
                             onClick={() => setSelectedTemplate(template)}
                           >
@@ -382,7 +382,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                             미리보기
                           </Button>
                           <Button
-                            size="sm"
+                            size={"sm" as const}
                             className="flex-1"
                             onClick={() => handleImport(template)}
                             disabled={importMutation.isPending}
@@ -453,7 +453,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
 
                   <div className="flex gap-2">
                     <Button
-                      variant="outline"
+                      variant={"outline" as const}
                       onClick={() => setSelectedTemplate(null)}
                     >
                       닫기

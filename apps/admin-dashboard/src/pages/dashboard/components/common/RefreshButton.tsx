@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Refresh Button Component
  * 수동 새로고침 버튼 컴포넌트

@@ -1,186 +1,143 @@
-import { useState, useEffect, useRef } from 'react';
-import { Settings, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { FC } from 'react';
+import { useState } from 'react';
+import { ChevronDown, Settings } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-export interface ScreenOption {
+interface Option {
   id: string;
   label: string;
   checked: boolean;
 }
 
 interface ScreenOptionsProps {
-  options: ScreenOption[];
+  options: Option[];
   onOptionChange: (id: string, checked: boolean) => void;
-  columnsPerPage?: number;
+  columns?: number;
   onColumnsChange?: (columns: number) => void;
   itemsPerPage?: number;
   onItemsPerPageChange?: (items: number) => void;
+  className?: string;
 }
 
-const ScreenOptions: FC<ScreenOptionsProps> = ({
+export const ScreenOptions: FC<ScreenOptionsProps> = ({
   options,
   onOptionChange,
-  columnsPerPage = 2,
+  columns,
   onColumnsChange,
-  itemsPerPage = 20,
+  itemsPerPage,
   onItemsPerPageChange,
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={cn('relative', className)}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-all duration-200",
-          "border border-gray-300 dark:border-gray-700",
-          "bg-white dark:bg-gray-900",
-          "text-gray-700 dark:text-gray-300",
-          "hover:bg-gray-50 dark:hover:bg-gray-800",
-          isOpen && "bg-gray-50 dark:bg-gray-800"
+          'inline-flex items-center gap-2 px-3 py-2',
+          'bg-white dark:bg-gray-800',
+          'border border-gray-300 dark:border-gray-600',
+          'rounded-md shadow-sm',
+          'hover:bg-gray-50 dark:hover:bg-gray-700',
+          'focus:outline-none focus:ring-2 focus:ring-primary-500'
         )}
       >
         <Settings className="w-4 h-4" />
         <span>Screen Options</span>
-        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        <ChevronDown className={cn(
+          'w-4 h-4 transition-transform',
+          isOpen && 'rotate-180'
+        )} />
       </button>
 
       {isOpen && (
         <div className={cn(
-          "absolute top-full right-0 mt-2 w-80 z-50",
-          "bg-white dark:bg-gray-900",
-          "rounded-lg shadow-xl",
-          "border border-gray-200 dark:border-gray-800"
+          'absolute right-0 mt-2 w-80',
+          'bg-white dark:bg-gray-800',
+          'border border-gray-300 dark:border-gray-600',
+          'rounded-md shadow-lg',
+          'z-50'
         )}>
-          {/* Show/Hide Boxes */}
-          {options.length > 0 && (
-            <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm font-semibold mb-3 text-gray-900 dark:text-gray-100">
-                Show on screen
-              </h3>
-              <div className="space-y-2">
-                {options.map((option) => (
-                  <label
-                    key={option.id}
-                    className="flex items-center gap-2 cursor-pointer group"
-                  >
-                    <div className="relative">
-                      <input
-                        type="checkbox"
+          <div className="p-4">
+            {options.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium mb-2">Show on screen</h3>
+                <div className="space-y-2">
+                  {options.map((option: Option) => (
+                    <div key={option.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={option.id}
                         checked={option.checked}
-                        onChange={(e) => onOptionChange(option.id, e.target.checked)}
-                        className="sr-only"
+                        onCheckedChange={(checked) => 
+                          onOptionChange(option.id, checked as boolean)
+                        }
                       />
-                      <div className={cn(
-                        "w-4 h-4 rounded border-2 transition-all duration-200",
-                        option.checked 
-                          ? "bg-primary-500 border-primary-500" 
-                          : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 group-hover:border-primary-400"
-                      )}>
-                        {option.checked && (
-                          <Check className="w-3 h-3 text-white absolute top-0.5 left-0.5" />
-                        )}
-                      </div>
+                      <Label 
+                        htmlFor={option.id}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {option.label}
+                      </Label>
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                      {option.label}
-                    </span>
-                  </label>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Layout Options */}
-          {onColumnsChange && (
-            <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm font-semibold mb-3 text-gray-900 dark:text-gray-100">
-                Screen Layout
-              </h3>
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600 dark:text-gray-400">
-                  Number of Columns:
-                </label>
-                <select
-                  value={columnsPerPage}
-                  onChange={(e) => onColumnsChange(Number(e.target.value))}
-                  className={cn(
-                    "px-3 py-1 text-sm rounded border transition-colors",
-                    "bg-white dark:bg-gray-800",
-                    "border-gray-300 dark:border-gray-600",
-                    "text-gray-700 dark:text-gray-300",
-                    "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  )}
-                >
-                  <option value={1}>1</option>
-                  <option value={2}>2</option>
-                  <option value={3}>3</option>
-                  <option value={4}>4</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {/* Pagination Options */}
-          {onItemsPerPageChange && (
-            <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm font-semibold mb-3 text-gray-900 dark:text-gray-100">
-                Pagination
-              </h3>
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600 dark:text-gray-400">
-                  Items per page:
-                </label>
-                <input
+            {columns !== undefined && onColumnsChange && (
+              <div className="mb-4">
+                <Label htmlFor="columns" className="text-sm font-medium">
+                  Number of Columns
+                </Label>
+                <Input
+                  id="columns"
                   type="number"
-                  value={itemsPerPage}
-                  onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-                  min={1}
-                  max={999}
-                  className={cn(
-                    "w-20 px-3 py-1 text-sm rounded border transition-colors",
-                    "bg-white dark:bg-gray-800",
-                    "border-gray-300 dark:border-gray-600",
-                    "text-gray-700 dark:text-gray-300",
-                    "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  )}
+                  min="1"
+                  max="6"
+                  value={columns}
+                  onChange={(e) => onColumnsChange(parseInt(e.target.value) || 1)}
+                  className="mt-1 w-full"
                 />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Apply Button & Help Text */}
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
+            {itemsPerPage !== undefined && onItemsPerPageChange && (
+              <div>
+                <Label htmlFor="itemsPerPage" className="text-sm font-medium">
+                  Items per page
+                </Label>
+                <Input
+                  id="itemsPerPage"
+                  type="number"
+                  min="1"
+                  max="999"
+                  value={itemsPerPage}
+                  onChange={(e) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
+                  className="mt-1 w-full"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => setIsOpen(false)}
               className={cn(
-                "px-4 py-2 text-sm font-medium rounded transition-all duration-200",
-                "bg-primary-500 hover:bg-primary-600",
-                "text-white shadow-sm hover:shadow"
+                'px-3 py-1.5 text-sm',
+                'bg-primary-600 text-white',
+                'rounded hover:bg-primary-700',
+                'focus:outline-none focus:ring-2 focus:ring-primary-500'
               )}
             >
               Apply
             </button>
-            <p className="mt-3 text-xs text-gray-500 dark:text-gray-400 italic">
-              This screen layout setting only applies to you and will be saved for later visits.
-            </p>
           </div>
         </div>
       )}
     </div>
   );
 };
-
-export default ScreenOptions;

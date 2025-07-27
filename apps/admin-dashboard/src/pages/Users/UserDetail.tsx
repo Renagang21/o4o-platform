@@ -1,4 +1,4 @@
-/**
+import { FC } from 'react';
  * UserDetail - 사용자 상세 정보 조회 페이지
  * 읽기 전용 사용자 정보 표시
  */

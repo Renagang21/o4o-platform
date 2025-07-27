@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * Notification Item Component
  * 개별 알림 아이템

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, MoreVertical, Eye, MessageCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -80,7 +80,7 @@ const ForumBoardList: FC = () => {
       case 'draft':
         return <Badge variant="secondary">초안</Badge>;
       case 'pending':
-        return <Badge variant="outline">검토 중</Badge>;
+        return <Badge variant={"outline" as const}>검토 중</Badge>;
       case 'reported':
         return <Badge variant="destructive">신고됨</Badge>;
       default:
@@ -214,7 +214,7 @@ const ForumBoardList: FC = () => {
                           <Badge variant="secondary" className="text-xs">고정</Badge>
                         )}
                         {post.isLocked && (
-                          <Badge variant="outline" className="text-xs">잠김</Badge>
+                          <Badge variant={"outline" as const} className="text-xs">잠김</Badge>
                         )}
                         <a
                           href="#"
@@ -229,7 +229,7 @@ const ForumBoardList: FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant="outline">{post.category.name}</Badge>
+                      <Badge variant={"outline" as const}>{post.category.name}</Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -260,7 +260,7 @@ const ForumBoardList: FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant={"ghost" as const} size={"sm" as const}>
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>

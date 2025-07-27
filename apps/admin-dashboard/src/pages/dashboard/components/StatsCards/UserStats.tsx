@@ -1,3 +1,4 @@
+import { FC } from 'react';
 /**
  * User Statistics Card
  * 사용자 현황 통계 카드

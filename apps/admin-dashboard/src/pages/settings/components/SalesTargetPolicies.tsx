@@ -3,7 +3,7 @@
  * 매출 목표 및 알림 임계값 설정 컴포넌트
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, FC } from 'react';
 import {
   Target,
   TrendingUp,

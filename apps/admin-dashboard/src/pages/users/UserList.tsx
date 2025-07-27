@@ -274,7 +274,7 @@ export default function UserList() {
                   <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" onClick={handleExport}>
+              <Button variant={"outline" as const} onClick={handleExport}>
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
@@ -289,11 +289,11 @@ export default function UserList() {
                   {selectedUsers.length} user(s) selected
                 </span>
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={handleBulkApprove}>
+                  <Button size={"sm" as const} onClick={handleBulkApprove}>
                     <UserCheck className="mr-2 h-4 w-4" />
                     Approve Selected
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={handleBulkReject}>
+                  <Button size={"sm" as const} variant="destructive" onClick={handleBulkReject}>
                     <UserX className="mr-2 h-4 w-4" />
                     Reject Selected
                   </Button>
@@ -385,7 +385,7 @@ export default function UserList() {
                       <td className="p-4">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button variant={"ghost" as const} size={"sm" as const}>
                               Actions
                             </Button>
                           </DropdownMenuTrigger>
@@ -430,8 +430,8 @@ export default function UserList() {
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
                 >
@@ -444,7 +444,7 @@ export default function UserList() {
                       <Button
                         key={pageNum}
                         variant={pageNum === page ? 'default' : 'outline'}
-                        size="sm"
+                        size={"sm" as const}
                         onClick={() => setPage(pageNum)}
                       >
                         {pageNum}
@@ -454,8 +454,8 @@ export default function UserList() {
                   {totalPages > 5 && <span className="px-2">...</span>}
                 </div>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant={"outline" as const}
+                  size={"sm" as const}
                   onClick={() => setPage(page + 1)}
                   disabled={page === totalPages}
                 >

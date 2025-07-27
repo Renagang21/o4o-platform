@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { Plus, Trash2, GripVertical, ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,7 +42,7 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
   }
 
   const handleDeleteSubField = (index: number) => {
-    const newSubFields = field.subFields?.filter((_, i: any) => i !== index) || []
+    const newSubFields = field.subFields?.filter((_, i) => i !== index) || []
     onChange({
       ...field,
       subFields: newSubFields,
@@ -109,8 +109,8 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-medium">하위 필드</h4>
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={handleAddSubField}
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -125,8 +125,8 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
                 아직 하위 필드가 없습니다
               </p>
               <Button
-                variant="outline"
-                size="sm"
+                variant={"outline" as const}
+                size={"sm" as const}
                 onClick={handleAddSubField}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -136,7 +136,7 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
           </Card>
         ) : (
           <div className="space-y-2">
-            {field.subFields?.map((subField, index) => (
+            {field.subFields?.map((subField: CustomField, index: number) => (
               <Card key={subField.id}>
                 <CardHeader className="py-3">
                   <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
                           <span className="font-medium">
                             {subField.label || '(제목 없음)'}
                           </span>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant={"outline" as const} className="text-xs">
                             {subField.type}
                           </Badge>
                           {subField.required && (
@@ -172,8 +172,8 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
                       </div>
                     </button>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant={"ghost" as const}
+                      size={"sm" as const}
                       onClick={() => handleDeleteSubField(index)}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />

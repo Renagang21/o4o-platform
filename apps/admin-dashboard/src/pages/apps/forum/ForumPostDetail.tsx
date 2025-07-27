@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MoreVertical, Eye, MessageCircle, Lock, Pin, Trash2, Edit, Reply } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -157,7 +157,7 @@ const ForumPostDetail: FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-modern-text-primary">{comment.author.name}</span>
-                  <Badge variant="outline" className="text-xs">{comment.author.role}</Badge>
+                  <Badge variant={"outline" as const} className="text-xs">{comment.author.role}</Badge>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-modern-text-secondary">
                   <span>{formatDate(comment.createdAt)}</span>
@@ -167,7 +167,7 @@ const ForumPostDetail: FC = () => {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant={"ghost" as const} size={"sm" as const}>
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -204,15 +204,15 @@ const ForumPostDetail: FC = () => {
               />
               <div className="flex gap-2">
                 <Button 
-                  size="sm"
+                  size={"sm" as const}
                   onClick={() => handleEditComment(comment.id)}
                   disabled={updateCommentMutation.isPending}
                 >
                   수정 완료
                 </Button>
                 <Button
-                  size="sm"
-                  variant="outline"
+                  size={"sm" as const}
+                  variant={"outline" as const}
                   onClick={() => {
                     setEditingComment(null);
                     setEditContent('');
@@ -227,8 +227,8 @@ const ForumPostDetail: FC = () => {
               <p className="text-modern-text-primary mb-3 whitespace-pre-wrap">{comment.content}</p>
               {!post?.isLocked && (
                 <Button
-                  size="sm"
-                  variant="ghost"
+                  size={"sm" as const}
+                  variant={"ghost" as const}
                   onClick={() => {
                     setReplyingTo(comment.id);
                     setReplyContent('');
@@ -253,15 +253,15 @@ const ForumPostDetail: FC = () => {
             />
             <div className="flex gap-2">
               <Button
-                size="sm"
+                size={"sm" as const}
                 onClick={() => handleReply(comment.id)}
                 disabled={createCommentMutation.isPending}
               >
                 답글 작성
               </Button>
               <Button
-                size="sm"
-                variant="outline"
+                size={"sm" as const}
+                variant={"outline" as const}
                 onClick={() => {
                   setReplyingTo(null);
                   setReplyContent('');
@@ -299,8 +299,8 @@ const ForumPostDetail: FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/forum')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -308,24 +308,24 @@ const ForumPostDetail: FC = () => {
         </Button>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => togglePinMutation.mutate()}
           >
             <Pin className="w-4 h-4 mr-2" />
             {post.isPinned ? '고정 해제' : '고정'}
           </Button>
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => toggleLockMutation.mutate()}
           >
             <Lock className="w-4 h-4 mr-2" />
             {post.isLocked ? '잠금 해제' : '잠금'}
           </Button>
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => navigate(`/forum/posts/${id}/edit`)}
           >
             <Edit className="w-4 h-4 mr-2" />
@@ -340,8 +340,8 @@ const ForumPostDetail: FC = () => {
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
               {post.isPinned && <Badge variant="secondary">고정</Badge>}
-              {post.isLocked && <Badge variant="outline">잠김</Badge>}
-              <Badge variant="outline">{post.category.name}</Badge>
+              {post.isLocked && <Badge variant={"outline" as const}>잠김</Badge>}
+              <Badge variant={"outline" as const}>{post.category.name}</Badge>
               {post.status === 'reported' && <Badge variant="destructive">신고됨</Badge>}
             </div>
             <h1 className="text-2xl font-bold text-modern-text-primary mb-4">{post.title}</h1>

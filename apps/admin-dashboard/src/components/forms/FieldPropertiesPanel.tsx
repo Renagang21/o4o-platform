@@ -35,7 +35,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
     <div className="w-96 bg-white border-l h-full overflow-y-auto">
       <div className="p-4 border-b flex items-center justify-between">
         <h3 className="font-medium">Field Properties</h3>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+        <Button variant={"ghost" as const} size={"icon" as const} onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </div>

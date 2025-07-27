@@ -182,8 +182,8 @@ const PostForm = () => {
       {/* 헤더 */}
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/content/posts')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -392,7 +392,7 @@ const PostForm = () => {
 
               <div className="flex gap-2 pt-4 border-t">
                 <Button
-                  variant="outline"
+                  variant={"outline" as const}
                   className="flex-1"
                   onClick={() => handleSubmit('draft')}
                   disabled={createMutation.isPending || updateMutation.isPending}
@@ -498,7 +498,7 @@ const PostForm = () => {
                   />
                   <Button
                     variant="destructive"
-                    size="sm"
+                    size={"sm" as const}
                     className="absolute top-2 right-2"
                     onClick={() => setFormData({ ...formData, featuredImageId: undefined, featuredImage: undefined })}
                   >
@@ -506,7 +506,7 @@ const PostForm = () => {
                   </Button>
                 </div>
               ) : (
-                <Button variant="outline" className="w-full">
+                <Button variant={"outline" as const} className="w-full">
                   <ImageIcon className="w-4 h-4 mr-2" />
                   이미지 선택
                 </Button>

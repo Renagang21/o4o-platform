@@ -152,7 +152,7 @@ const AffiliatePerformanceDashboard = () => {
               <SelectItem value="year">올해</SelectItem>
             </SelectContent>
           </Select>
-          <Badge variant="outline" className="text-modern-success">
+          <Badge variant={"outline" as const} className="text-modern-success">
             <div className="w-2 h-2 rounded-full bg-modern-success mr-2" />
             활성
           </Badge>
@@ -320,7 +320,7 @@ const AffiliatePerformanceDashboard = () => {
                   <p className="text-xs text-modern-text-secondary mb-2">
                     다음 정산일: 2024년 3월 25일
                   </p>
-                  <Button size="sm" variant="outline" className="w-full">
+                  <Button size={"sm" as const} variant={"outline" as const} className="w-full">
                     정산 내역 보기
                   </Button>
                 </div>

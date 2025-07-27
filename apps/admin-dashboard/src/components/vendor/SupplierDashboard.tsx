@@ -102,7 +102,7 @@ export const SupplierDashboard: FC<SupplierDashboardProps> = ({
                 <AlertCircle className="w-5 h-5 text-modern-warning" />
                 재고 부족 제품
               </span>
-              <Button size="sm" variant="outline">
+              <Button size={"sm" as const} variant={"outline" as const}>
                 전체 보기
               </Button>
             </CardTitle>
@@ -128,7 +128,7 @@ export const SupplierDashboard: FC<SupplierDashboardProps> = ({
                         <p className={`text-sm font-medium ${stockStatus.color}`}>
                           {stockStatus.message}
                         </p>
-                        <Button size="sm" variant="outline" className="mt-1">
+                        <Button size={"sm" as const} variant={"outline" as const} className="mt-1">
                           재고 추가
                         </Button>
                       </div>
@@ -217,7 +217,7 @@ export const SupplierDashboard: FC<SupplierDashboardProps> = ({
                         {formatPrice(order.profit)}
                       </td>
                       <td className="py-3 px-2">
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant={"outline" as const} className="text-xs">
                           {order.status}
                         </Badge>
                       </td>

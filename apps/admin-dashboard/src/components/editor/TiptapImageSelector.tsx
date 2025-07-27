@@ -232,7 +232,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
         </Tabs>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant={"outline" as const} onClick={handleClose}>
             취소
           </Button>
           <Button 

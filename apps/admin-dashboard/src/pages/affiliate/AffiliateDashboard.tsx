@@ -34,7 +34,7 @@ const AffiliateDashboard = () => {
             추천 실적과 수수료를 확인하세요
           </p>
         </div>
-        <Badge variant="outline" className="text-modern-success">
+        <Badge variant={"outline" as const} className="text-modern-success">
           <div className="w-2 h-2 rounded-full bg-modern-success mr-2" />
           활성
         </Badge>
@@ -160,7 +160,7 @@ const AffiliateDashboard = () => {
                 <p className="text-xs text-modern-text-secondary mb-3">
                   매월 25일 지급 예정
                 </p>
-                <Button size="sm" className="w-full">
+                <Button size={"sm" as const} className="w-full">
                   지급 내역 보기
                 </Button>
               </div>
@@ -212,7 +212,7 @@ const AffiliateDashboard = () => {
                 </div>
               </div>
 
-              <Button variant="outline" size="sm" className="w-full mt-4">
+              <Button variant={"outline" as const} size={"sm" as const} className="w-full mt-4">
                 전체 활동 보기
               </Button>
             </CardContent>

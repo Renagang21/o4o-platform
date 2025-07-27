@@ -210,8 +210,8 @@ export default function CategoryTagSelector({
           />
           <Button
             type="button"
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={handleCreateTag}
             disabled={!tagInput.trim() || createTagMutation.isPending}
           >

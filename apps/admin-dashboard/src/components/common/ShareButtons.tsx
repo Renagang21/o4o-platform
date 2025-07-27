@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { Share2, Link2, MessageSquare, Users, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
@@ -16,8 +16,8 @@ interface ShareButtonsProps {
   description?: string;
   imageUrl?: string;
   referralCode?: string;
-  size?: 'sm' | 'default' | 'lg';
-  variant?: 'default' | 'outline' | 'ghost';
+  size?: 'sm' | 'default' | 'lg' | 'icon';
+  variant?: 'default' | 'outline' | 'ghost' | 'secondary' | 'destructive' | 'link';
   showLabels?: boolean;
   className?: string;
 }

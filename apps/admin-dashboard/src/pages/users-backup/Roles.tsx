@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC } from 'react';
 import { Shield, Users, Building, Star, Settings } from 'lucide-react'
 import { ROLE_LABELS } from '@/types/user'
 

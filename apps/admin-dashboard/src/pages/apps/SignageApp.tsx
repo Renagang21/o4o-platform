@@ -134,7 +134,7 @@ const SignageApp = () => {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>내 비디오</span>
-              <Button size="sm" variant="outline">
+              <Button size={"sm" as const} variant={"outline" as const}>
                 <Search className="w-4 h-4 mr-2" />
                 검색
               </Button>
@@ -156,13 +156,13 @@ const SignageApp = () => {
                       재생시간: 2:30 | YouTube
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">프로모션</Badge>
+                      <Badge variant={"outline" as const} className="text-xs">프로모션</Badge>
                       <span className="text-xs text-modern-text-secondary">
                         2024.03.15 추가
                       </span>
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost">
+                  <Button size={"sm" as const} variant={"ghost" as const}>
                     <Play className="w-4 h-4" />
                   </Button>
                 </div>
@@ -181,20 +181,20 @@ const SignageApp = () => {
                       재생시간: 5:15 | Vimeo
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">브랜딩</Badge>
+                      <Badge variant={"outline" as const} className="text-xs">브랜딩</Badge>
                       <span className="text-xs text-modern-text-secondary">
                         2024.02.28 추가
                       </span>
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost">
+                  <Button size={"sm" as const} variant={"ghost" as const}>
                     <Play className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             </div>
 
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant={"outline" as const} className="w-full mt-4">
               전체 보기
             </Button>
           </CardContent>
@@ -206,7 +206,7 @@ const SignageApp = () => {
             <CardTitle className="flex items-center justify-between">
               <span>공유된 비디오</span>
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline">
+                <Button size={"sm" as const} variant={"outline" as const}>
                   <Filter className="w-4 h-4 mr-2" />
                   필터
                 </Button>
@@ -229,13 +229,13 @@ const SignageApp = () => {
                       재생시간: 3:45 | YouTube 플레이리스트
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">교육</Badge>
+                      <Badge variant={"outline" as const} className="text-xs">교육</Badge>
                       <span className="text-xs text-modern-text-secondary">
                         by 마케팅팀
                       </span>
                     </div>
                   </div>
-                  <VideoCopyButton postId="video_123" size="sm" />
+                  <VideoCopyButton postId="video_123" size={"sm" as const} />
                 </div>
               </div>
 
@@ -252,13 +252,13 @@ const SignageApp = () => {
                       재생시간: 1:30 | Vimeo
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">매장소개</Badge>
+                      <Badge variant={"outline" as const} className="text-xs">매장소개</Badge>
                       <span className="text-xs text-modern-text-secondary">
                         by 디자인팀
                       </span>
                     </div>
                   </div>
-                  <VideoCopyButton postId="video_124" size="sm" />
+                  <VideoCopyButton postId="video_124" size={"sm" as const} />
                 </div>
               </div>
 
@@ -275,18 +275,18 @@ const SignageApp = () => {
                       재생시간: 4:20 | YouTube
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">후기</Badge>
+                      <Badge variant={"outline" as const} className="text-xs">후기</Badge>
                       <span className="text-xs text-modern-text-secondary">
                         by CS팀
                       </span>
                     </div>
                   </div>
-                  <VideoCopyButton postId="video_125" size="sm" />
+                  <VideoCopyButton postId="video_125" size={"sm" as const} />
                 </div>
               </div>
             </div>
 
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant={"outline" as const} className="w-full mt-4">
               더 많은 비디오 보기
             </Button>
           </CardContent>

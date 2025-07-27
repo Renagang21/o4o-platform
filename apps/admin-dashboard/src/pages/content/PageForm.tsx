@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save, Eye, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -158,8 +158,8 @@ const PageForm: FC = () => {
       {/* 헤더 */}
       <div className="flex items-center gap-4 mb-6">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/content/pages')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -408,7 +408,7 @@ const PageForm: FC = () => {
 
               <div className="flex gap-2 pt-4 border-t">
                 <Button
-                  variant="outline"
+                  variant={"outline" as const}
                   className="flex-1"
                   onClick={() => handleSubmit('draft')}
                   disabled={createMutation.isPending || updateMutation.isPending}

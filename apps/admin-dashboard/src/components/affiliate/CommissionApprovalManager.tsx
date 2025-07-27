@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC } from 'react';
 import { 
   DollarSign, CheckCircle, XCircle, Clock, Search, 
   Download, AlertCircle 
@@ -258,14 +258,14 @@ export const CommissionApprovalManager: FC = () => {
                   <SelectItem value="approved">승인됨</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" onClick={exportToExcel}>
+              <Button variant={"outline" as const} onClick={exportToExcel}>
                 <Download className="w-4 h-4 mr-2" />
                 내보내기
               </Button>
             </div>
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
+                variant={"outline" as const}
                 onClick={() => setShowRejectDialog(true)}
                 disabled={selectedCommissions.size === 0}
               >
@@ -273,7 +273,7 @@ export const CommissionApprovalManager: FC = () => {
                 거절
               </Button>
               <Button
-                variant="outline"
+                variant={"outline" as const}
                 onClick={() => setShowPaymentDialog(true)}
                 disabled={selectedCommissions.size === 0 || 
                   !Array.from(selectedCommissions).every(id => 
@@ -420,7 +420,7 @@ export const CommissionApprovalManager: FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+            <Button variant={"outline" as const} onClick={() => setShowRejectDialog(false)}>
               취소
             </Button>
             <Button variant="destructive" onClick={handleReject}>
@@ -457,7 +457,7 @@ export const CommissionApprovalManager: FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>
+            <Button variant={"outline" as const} onClick={() => setShowPaymentDialog(false)}>
               취소
             </Button>
             <Button onClick={handlePayment}>

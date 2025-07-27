@@ -157,8 +157,8 @@ const CrowdfundingProjectDetail = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button
-          variant="ghost"
-          size="sm"
+          variant={"ghost" as const}
+          size={"sm" as const}
           onClick={() => navigate('/crowdfunding/projects')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -166,8 +166,8 @@ const CrowdfundingProjectDetail = () => {
         </Button>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant={"outline" as const}
+            size={"sm" as const}
             onClick={() => navigate(`/crowdfunding/projects/${id}/edit`)}
           >
             <Edit className="w-4 h-4 mr-2" />
@@ -309,7 +309,7 @@ const CrowdfundingProjectDetail = () => {
                         <span className="font-medium">참여 중</span>
                       </div>
                       <Button
-                        variant="outline"
+                        variant={"outline" as const}
                         className="w-full"
                         onClick={() => cancelMutation.mutate()}
                         disabled={cancelMutation.isPending}
@@ -345,7 +345,7 @@ const CrowdfundingProjectDetail = () => {
                 <Card>
                   <CardContent className="p-4">
                     <Button
-                      variant="outline"
+                      variant={"outline" as const}
                       className="w-full"
                       onClick={() => navigate(project.forumLink!)}
                     >

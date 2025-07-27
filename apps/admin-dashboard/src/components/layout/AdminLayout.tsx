@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
 import AdminBreadcrumb from '../common/AdminBreadcrumb'

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC } from 'react';
 import { Check, X, Eye, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -188,7 +188,7 @@ export const ProductApprovalManager: FC = () => {
             </div>
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
+                variant={"outline" as const}
                 onClick={() => openRejectDialog()}
                 disabled={selectedProducts.size === 0}
               >
@@ -299,12 +299,12 @@ export const ProductApprovalManager: FC = () => {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <Button size="sm" variant="ghost">
+                            <Button size={"sm" as const} variant={"ghost" as const}>
                               <Eye className="w-4 h-4" />
                             </Button>
                             <Button
-                              size="sm"
-                              variant="ghost"
+                              size={"sm" as const}
+                              variant={"ghost" as const}
                               className="text-modern-success"
                               onClick={() => {
                                 setSelectedProducts(new Set([product.id]));
@@ -314,8 +314,8 @@ export const ProductApprovalManager: FC = () => {
                               <Check className="w-4 h-4" />
                             </Button>
                             <Button
-                              size="sm"
-                              variant="ghost"
+                              size={"sm" as const}
+                              variant={"ghost" as const}
                               className="text-modern-error"
                               onClick={() => openRejectDialog(product)}
                             >
@@ -353,7 +353,7 @@ export const ProductApprovalManager: FC = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+            <Button variant={"outline" as const} onClick={() => setShowRejectDialog(false)}>
               취소
             </Button>
             <Button variant="destructive" onClick={handleReject}>

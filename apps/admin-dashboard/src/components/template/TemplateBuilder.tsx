@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { FC } from 'react';
 import { useState, useCallback, useRef } from 'react';
 import {
   X,
@@ -389,8 +389,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                       <span className="flex-1 text-sm">{block.type}</span>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
                         <Button
-                          size="sm"
-                          variant="ghost"
+                          size={"sm" as const}
+                          variant={"ghost" as const}
                           onClick={(e: any) => {
                             e.stopPropagation()
                             moveBlock(block.id, 'up')
@@ -400,8 +400,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                           <ArrowUp className="w-3 h-3" />
                         </Button>
                         <Button
-                          size="sm"
-                          variant="ghost"
+                          size={"sm" as const}
+                          variant={"ghost" as const}
                           onClick={(e: any) => {
                             e.stopPropagation()
                             moveBlock(block.id, 'down')
@@ -411,8 +411,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                           <ArrowDown className="w-3 h-3" />
                         </Button>
                         <Button
-                          size="sm"
-                          variant="ghost"
+                          size={"sm" as const}
+                          variant={"ghost" as const}
                           onClick={(e: any) => {
                             e.stopPropagation()
                             duplicateBlock(block.id)
@@ -421,8 +421,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                           <Copy className="w-3 h-3" />
                         </Button>
                         <Button
-                          size="sm"
-                          variant="ghost"
+                          size={"sm" as const}
+                          variant={"ghost" as const}
                           onClick={(e: any) => {
                             e.stopPropagation()
                             deleteBlock(block.id)
@@ -505,7 +505,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                 {/* Device Preview */}
                 <div className="flex items-center gap-1 border rounded-lg p-1">
                   <Button
-                    size="sm"
+                    size={"sm" as const}
                     variant={builderState.devicePreview === 'desktop' ? 'default' : 'ghost'}
                     onClick={() => setBuilderState(prev => ({ 
                       ...prev, 
@@ -515,7 +515,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                     <Monitor className="w-4 h-4" />
                   </Button>
                   <Button
-                    size="sm"
+                    size={"sm" as const}
                     variant={builderState.devicePreview === 'tablet' ? 'default' : 'ghost'}
                     onClick={() => setBuilderState(prev => ({ 
                       ...prev, 
@@ -525,7 +525,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                     <Tablet className="w-4 h-4" />
                   </Button>
                   <Button
-                    size="sm"
+                    size={"sm" as const}
                     variant={builderState.devicePreview === 'mobile' ? 'default' : 'ghost'}
                     onClick={() => setBuilderState(prev => ({ 
                       ...prev, 
@@ -539,16 +539,16 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                 {/* History Controls */}
                 <div className="flex items-center gap-1">
                   <Button
-                    size="sm"
-                    variant="ghost"
+                    size={"sm" as const}
+                    variant={"ghost" as const}
                     onClick={undo}
                     disabled={builderState.historyIndex <= 0}
                   >
                     <Undo className="w-4 h-4" />
                   </Button>
                   <Button
-                    size="sm"
-                    variant="ghost"
+                    size={"sm" as const}
+                    variant={"ghost" as const}
                     onClick={redo}
                     disabled={builderState.historyIndex >= builderState.history.length - 1}
                   >
@@ -558,13 +558,13 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
 
                 {/* Zoom Controls */}
                 <div className="flex items-center gap-1">
-                  <Button size="sm" variant="ghost" onClick={zoomOut}>
+                  <Button size={"sm" as const} variant={"ghost" as const} onClick={zoomOut}>
                     <ZoomOut className="w-4 h-4" />
                   </Button>
                   <span className="text-sm text-gray-600 min-w-[3rem] text-center">
                     {Math.round(builderState.zoom * 100)}%
                   </span>
-                  <Button size="sm" variant="ghost" onClick={zoomIn}>
+                  <Button size={"sm" as const} variant={"ghost" as const} onClick={zoomIn}>
                     <ZoomIn className="w-4 h-4" />
                   </Button>
                 </div>
@@ -572,7 +572,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
 
               <div className="flex items-center gap-3">
                 <Button
-                  variant="outline"
+                  variant={"outline" as const}
                   onClick={() => setBuilderState(prev => ({ 
                     ...prev, 
                     previewMode: !prev.previewMode 
@@ -585,7 +585,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                   <Save className="w-4 h-4 mr-2" />
                   저장
                 </Button>
-                <Button variant="ghost" onClick={onClose}>
+                <Button variant={"ghost" as const} onClick={onClose}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>

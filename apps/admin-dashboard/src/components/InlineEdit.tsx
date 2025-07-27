@@ -1,200 +1,221 @@
-import { useState, useEffect, useRef } from 'react';
+import { FC, ReactNode, useState, useEffect, useRef } from 'react';
 import { Check, X, Edit2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+interface ValidationRule {
+  test: (value: string) => boolean;
+  message: string;
+}
 
 interface InlineEditProps {
   value: string;
   onSave: (value: string) => void | Promise<void>;
   onCancel?: () => void;
-  type?: 'text' | 'number' | 'email' | 'select';
-  options?: { value: string; label: string }[]; // For select type
+  type?: 'text' | 'textarea' | 'email' | 'number' | 'url';
   placeholder?: string;
   className?: string;
-  editIconClassName?: string;
-  inputClassName?: string;
-  validation?: (value: string) => boolean;
-  emptyText?: string;
-  showEditIcon?: boolean;
+  editClassName?: string;
+  displayClassName?: string;
+  disabled?: boolean;
+  validation?: ValidationRule[];
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  showEditButton?: boolean;
+  autoTrim?: boolean;
+  allowEmpty?: boolean;
+  renderDisplay?: (value: string) => ReactNode;
 }
 
-const InlineEdit: FC<InlineEditProps> = ({
+export const InlineEdit: FC<InlineEditProps> = ({
   value,
   onSave,
   onCancel,
   type = 'text',
-  options = [],
   placeholder = 'Click to edit',
   className = '',
-  editIconClassName = '',
-  inputClassName = '',
-  validation,
-  emptyText = 'Click to add',
-  showEditIcon = true,
+  editClassName = '',
+  displayClassName = '',
+  disabled = false,
+  validation = [],
+  required = false,
+  minLength,
+  maxLength,
+  showEditButton = true,
+  autoTrim = true,
+  allowEmpty = false,
+  renderDisplay,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
-  const [isLoading, setIsLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        handleCancel();
+      if (type !== 'textarea') {
+        inputRef.current.select();
       }
-    };
-
-    if (isEditing) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isEditing]);
+  }, [isEditing, type]);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-    setEditValue(value);
+  const validate = (val: string): string | null => {
+    const trimmedValue = autoTrim ? val.trim() : val;
+
+    if (required && !trimmedValue) {
+      return 'This field is required';
+    }
+
+    if (!allowEmpty && !trimmedValue) {
+      return 'This field cannot be empty';
+    }
+
+    if (minLength && trimmedValue.length < minLength) {
+      return `Minimum length is ${minLength} characters`;
+    }
+
+    if (maxLength && trimmedValue.length > maxLength) {
+      return `Maximum length is ${maxLength} characters`;
+    }
+
+    if (type === 'email' && trimmedValue) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedValue)) {
+        return 'Please enter a valid email address';
+      }
+    }
+
+    if (type === 'url' && trimmedValue) {
+      try {
+        new URL(trimmedValue);
+      } catch {
+        return 'Please enter a valid URL';
+      }
+    }
+
+    if (type === 'number' && trimmedValue) {
+      if (isNaN(Number(trimmedValue))) {
+        return 'Please enter a valid number';
+      }
+    }
+
+    for (const rule of validation) {
+      if (!rule.test(trimmedValue)) {
+        return rule.message;
+      }
+    }
+
+    return null;
   };
 
   const handleSave = async () => {
-    if (validation && !validation(editValue)) {
+    const finalValue = autoTrim ? editValue.trim() : editValue;
+    const validationError = validate(finalValue);
+
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
-    if (editValue === value) {
-      setIsEditing(false);
-      return;
-    }
+    setIsSaving(true);
+    setError(null);
 
-    setIsLoading(true);
     try {
-      await onSave(editValue);
+      await onSave(finalValue);
       setIsEditing(false);
     } catch (error) {
-      console.error('Save failed:', error);
+      setError('Failed to save. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
     setEditValue(value);
+    setError(null);
     setIsEditing(false);
     onCancel?.();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && type !== 'textarea') {
+      e.preventDefault();
       handleSave();
     } else if (e.key === 'Escape') {
       handleCancel();
     }
   };
 
-  if (!isEditing) {
+  if (isEditing) {
+    const InputComponent = type === 'textarea' ? 'textarea' : 'input';
+    
     return (
-      <div
-        ref={containerRef}
-        className={cn(
-          "inline-flex items-center gap-2 group cursor-pointer",
-          "hover:bg-gray-100 dark:hover:bg-gray-800 px-2 py-1 -mx-2 -my-1 rounded transition-colors",
-          className
-        )}
-        onClick={handleEdit}
-      >
-        <span className={cn(
-          value ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400 italic"
-        )}>
-          {value || emptyText}
-        </span>
-        {showEditIcon && (
-          <Edit2 
+      <div className={cn('inline-flex flex-col gap-1 w-full', className)}>
+        <div className="inline-flex items-center gap-2">
+          <InputComponent
+            ref={inputRef as any}
+            type={type === 'textarea' ? undefined : type}
+            value={editValue}
+            onChange={(e) => {
+              setEditValue(e.target.value);
+              setError(null);
+            }}
+            onKeyDown={handleKeyDown}
+            disabled={isSaving}
+            placeholder={placeholder}
             className={cn(
-              "w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity",
-              "text-gray-400 dark:text-gray-500",
-              editIconClassName
+              'px-2 py-1 border rounded',
+              'focus:outline-none focus:ring-2 focus:ring-primary-500',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              error && 'border-red-500 focus:ring-red-500',
+              editClassName
             )}
           />
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="p-1 text-green-600 hover:text-green-700 disabled:opacity-50"
+            title="Save"
+          >
+            <Check className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleCancel}
+            disabled={isSaving}
+            className="p-1 text-red-600 hover:text-red-700 disabled:opacity-50"
+            title="Cancel"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        {error && (
+          <span className="text-xs text-red-500">{error}</span>
         )}
       </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="inline-flex items-center gap-2">
-      {type === 'select' ? (
-        <select
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={isLoading}
-          className={cn(
-            "px-2 py-1 text-sm rounded border transition-colors",
-            "bg-white dark:bg-gray-800",
-            "border-gray-300 dark:border-gray-600",
-            "text-gray-700 dark:text-gray-300",
-            "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-            inputClassName
-          )}
-          autoFocus
-        >
-          {options.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <input
-          ref={inputRef}
-          type={type}
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={isLoading}
-          className={cn(
-            "px-2 py-1 text-sm rounded border transition-colors",
-            "bg-white dark:bg-gray-800",
-            "border-gray-300 dark:border-gray-600",
-            "text-gray-700 dark:text-gray-300",
-            "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-            inputClassName
-          )}
-        />
+    <div
+      className={cn(
+        'inline-flex items-center gap-2 group',
+        !disabled && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 -my-1',
+        className
       )}
-      <button
-        onClick={handleSave}
-        disabled={isLoading}
-        className={cn(
-          "p-1 rounded transition-colors",
-          "text-success-600 hover:bg-success-100 dark:text-success-400 dark:hover:bg-success-900/20",
-          isLoading && "opacity-50 cursor-not-allowed"
-        )}
-        title="Save"
-      >
-        <Check className="w-4 h-4" />
-      </button>
-      <button
-        onClick={handleCancel}
-        disabled={isLoading}
-        className={cn(
-          "p-1 rounded transition-colors",
-          "text-error-600 hover:bg-error-100 dark:text-error-400 dark:hover:bg-error-900/20",
-          isLoading && "opacity-50 cursor-not-allowed"
-        )}
-        title="Cancel"
-      >
-        <X className="w-4 h-4" />
-      </button>
+      onClick={() => !disabled && setIsEditing(true)}
+    >
+      <span className={cn('break-all', displayClassName)}>
+        {renderDisplay ? renderDisplay(value) : (value || placeholder)}
+      </span>
+      {showEditButton && !disabled && (
+        <Edit2 className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+      )}
     </div>
   );
 };
-
-export default InlineEdit;
