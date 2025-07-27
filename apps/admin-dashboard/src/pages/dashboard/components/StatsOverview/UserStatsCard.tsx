@@ -155,7 +155,7 @@ const UserStatsCard = memo<UserStatsCardProps>(({
         </div>
 
         {/* Quick Stats Bar */}
-        <div className="mt-4 pt-4 border-t border-wp-border-secondary">
+        <div className="mt-4 pt-4 border-t border-neutral-300">
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div className="text-center">
               <div className="text-wp-text-secondary">승인 대기</div>

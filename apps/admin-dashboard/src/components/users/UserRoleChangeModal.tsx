@@ -66,7 +66,7 @@ const UserRoleChangeModal: React.FC<UserRoleChangeModalProps> = ({
         aria-labelledby="role-change-modal-title"
       >
         {/* 모달 헤더 */}
-        <div className="flex items-center justify-between p-6 border-b border-wp-border-secondary">
+        <div className="flex items-center justify-between p-6 border-b border-neutral-300">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
               <Shield className="w-6 h-6 text-blue-600" />
@@ -131,7 +131,7 @@ const UserRoleChangeModal: React.FC<UserRoleChangeModalProps> = ({
                   className={`p-3 border rounded-lg text-left transition-colors ${
                     selectedRole === role
                       ? 'border-blue-500 bg-blue-50 text-blue-900'
-                      : 'border-wp-border-primary hover:border-wp-border-secondary text-wp-text-primary'
+                      : 'border border-neutral-200 hover:border-neutral-300 text-wp-text-primary'
                   } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className="flex items-center justify-between">

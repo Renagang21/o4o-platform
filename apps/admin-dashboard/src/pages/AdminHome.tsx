@@ -122,7 +122,7 @@ const AdminHome: FC = () => {
               );
             })}
           </div>
-          <div className="mt-4 pt-4 border-t border-wp-border-primary">
+          <div className="mt-4 pt-4 border-t border border-neutral-200">
             <p className="text-sm text-wp-text-secondary">
               WordPress 5.8 테마 사용중
             </p>
@@ -142,7 +142,7 @@ const AdminHome: FC = () => {
                 <p className="text-xs text-wp-text-secondary">2시간 전</p>
               </div>
             </div>
-            <div className="pt-3 border-t border-wp-border-primary">
+            <div className="pt-3 border-t border border-neutral-200">
               <h4 className="text-sm font-medium text-wp-text-primary mb-2">최근 댓글</h4>
               <div className="space-y-2">
                 <div className="text-sm">
@@ -178,7 +178,7 @@ const AdminHome: FC = () => {
               새 벤더 추가
             </Link>
           </div>
-          <div className="mt-4 pt-4 border-t border-wp-border-primary">
+          <div className="mt-4 pt-4 border-t border border-neutral-200">
             <Link to="/activity-log" className="text-sm text-admin-blue hover:text-admin-blue-dark">
               모든 활동 로그 보기 →
             </Link>
@@ -223,7 +223,7 @@ const AdminHome: FC = () => {
                   <Link
                     key={action.title}
                     to={action.link}
-                    className="flex flex-col items-center p-4 rounded-lg border border-wp-border-primary hover:border-admin-blue hover:bg-admin-blue hover:bg-opacity-5 transition-all duration-200"
+                    className="flex flex-col items-center p-4 rounded-lg border border-neutral-200 hover:border-admin-blue hover:bg-admin-blue hover:bg-opacity-5 transition-all duration-200"
                   >
                     <Icon className={`h-8 w-8 ${action.color} mb-2`} />
                     <span className="text-sm text-center text-wp-text-primary">{action.title}</span>
@@ -259,7 +259,7 @@ const AdminHome: FC = () => {
                 <span className="text-sm text-yellow-600 font-medium">사용률 85%</span>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-wp-border-primary">
+            <div className="mt-4 pt-4 border-t border border-neutral-200">
               <Link 
                 to="/system/monitoring" 
                 className="text-sm text-admin-blue hover:text-admin-blue-dark"
@@ -275,7 +275,7 @@ const AdminHome: FC = () => {
           <h2 className="text-lg font-semibold text-wp-text-primary mb-4">최근 활동</h2>
           <div className="space-y-3">
             {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border-wp-border-primary last:border-0 last:pb-0">
+              <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border border-neutral-200 last:border-0 last:pb-0">
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-2 h-2 bg-admin-blue rounded-full"></div>
                 </div>
@@ -286,7 +286,7 @@ const AdminHome: FC = () => {
               </div>
             ))}
           </div>
-          <div className="mt-4 pt-4 border-t border-wp-border-primary">
+          <div className="mt-4 pt-4 border-t border border-neutral-200">
             <Link 
               to="/activity-log" 
               className="text-sm text-admin-blue hover:text-admin-blue-dark"

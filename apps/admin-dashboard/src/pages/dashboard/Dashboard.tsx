@@ -127,7 +127,7 @@ const Dashboard = memo(() => {
       </section>
 
       {/* Footer 정보 */}
-      <div className="mt-12 pt-8 border-t border-wp-border-primary">
+      <div className="mt-12 pt-8 border-t border border-neutral-200">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
           <div className="wp-card">
             <div className="wp-card-body text-center">

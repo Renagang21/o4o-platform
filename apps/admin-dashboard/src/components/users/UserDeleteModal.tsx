@@ -63,7 +63,7 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
         aria-labelledby="delete-modal-title"
       >
         {/* 모달 헤더 */}
-        <div className="flex items-center justify-between p-6 border-b border-wp-border-secondary">
+        <div className="flex items-center justify-between p-6 border-b border-neutral-300">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
               <AlertTriangle className="w-6 h-6 text-red-600" />

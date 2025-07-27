@@ -146,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {onDuplicate && (
             <button
               onClick={() => onDuplicate(product.id)}
-              className="px-3 py-2 text-sm border border-wp-border-primary rounded hover:bg-wp-bg-tertiary"
+              className="px-3 py-2 text-sm border border-neutral-200 rounded hover:bg-wp-bg-tertiary"
               data-testid="duplicate-button"
             >
               복제

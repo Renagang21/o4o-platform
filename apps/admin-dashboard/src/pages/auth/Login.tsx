@@ -216,7 +216,7 @@ const Login: React.FC = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e: any) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-admin-blue focus:ring-admin-blue border-wp-border-primary rounded"
+                className="h-4 w-4 text-admin-blue focus:ring-admin-blue border border-neutral-200 rounded"
                 disabled={isLoading}
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-wp-text-primary">

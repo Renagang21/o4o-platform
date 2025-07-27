@@ -67,7 +67,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
 
   return (
-    <header className="bg-white border-b border-wp-border-secondary">
+    <header className="bg-white border-b border-neutral-300">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Left side */}

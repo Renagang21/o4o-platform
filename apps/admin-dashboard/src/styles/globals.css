@@ -314,7 +314,7 @@
 /* WordPress Admin-inspired styles */
 @layer base {
   * {
-    @apply border-wp-border-secondary;
+    @apply border-neutral-300;
     transition: background-color var(--transition-normal),
                 color var(--transition-normal),
                 border-color var(--transition-normal),
@@ -347,8 +347,8 @@
   }
   
   .wp-button-secondary {
-    @apply wp-button bg-wp-bg-tertiary text-wp-text-primary border-wp-border-primary;
-    @apply hover:bg-wp-bg-secondary hover:border-wp-border-secondary;
+    @apply wp-button bg-wp-bg-tertiary text-wp-text-primary border border-neutral-200;
+    @apply hover:bg-wp-bg-secondary hover:border-neutral-300;
   }
   
   .wp-button-danger {
@@ -358,7 +358,7 @@
   
   /* WordPress-style form elements */
   .wp-input {
-    @apply block w-full px-3 py-2 text-sm border border-wp-border-primary rounded;
+    @apply block w-full px-3 py-2 text-sm border border-neutral-200 rounded;
     @apply focus:outline-none focus:ring-2 focus:ring-admin-blue focus:border-transparent;
     @apply transition-colors duration-200;
   }
@@ -377,7 +377,7 @@
   
   /* WordPress-style tables */
   .wp-table {
-    @apply w-full border border-wp-border-secondary rounded-lg overflow-hidden;
+    @apply w-full border-wp-border-secondary rounded-lg overflow-hidden;
   }
   
   .wp-table th {
