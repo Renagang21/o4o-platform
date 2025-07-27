@@ -4,9 +4,23 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+      babel: {
+        plugins: [
+          ['@babel/plugin-transform-react-jsx', {
+            runtime: 'automatic'
+          }]
+        ]
+      }
+    })
+  ],
   resolve: {
     alias: {
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
       '@': path.resolve(__dirname, './src'),
       '@o4o/types': path.resolve(__dirname, '../../packages/types/src'),
       '@o4o/utils': path.resolve(__dirname, '../../packages/utils/src'),
@@ -34,16 +48,34 @@ export default defineConfig({
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    'global': 'globalThis',
   },
   build: {
     sourcemap: false,
     minify: 'esbuild',
     target: 'es2020',
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
   },
   optimizeDeps: {
-    include: ['@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context'],
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      '@o4o/types', 
+      '@o4o/utils', 
+      '@o4o/ui', 
+      '@o4o/auth-client', 
+      '@o4o/auth-context'
+    ],
     exclude: ['@vite/client', '@vite/env'],
     force: true, // 강제 의존성 재생성
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
   },
 })
 

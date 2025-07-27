@@ -2,10 +2,23 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+      babel: {
+        plugins: [
+          ['@babel/plugin-transform-react-jsx', {
+            runtime: 'automatic'
+          }]
+        ]
+      }
+    }),
     visualizer({
       open: false,
       filename: 'dist/bundle-analysis.html',
@@ -15,6 +28,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
       '@': path.resolve(__dirname, './src'),
       '@/components': path.resolve(__dirname, './src/components'),
       '@/pages': path.resolve(__dirname, './src/pages'),
@@ -46,7 +61,21 @@ export default defineConfig({
     ]
   },
   optimizeDeps: {
-    include: ['@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      '@o4o/types', 
+      '@o4o/utils', 
+      '@o4o/ui', 
+      '@o4o/auth-client', 
+      '@o4o/auth-context'
+    ],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
   },
   build: {
     outDir: 'dist',
