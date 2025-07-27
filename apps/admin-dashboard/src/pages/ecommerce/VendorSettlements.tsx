@@ -308,7 +308,7 @@ const VendorSettlements: FC = () => {
                   <th className="px-4 py-3 text-left">
                     <input
                       type="checkbox"
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (e.target.checked) {
                           setSelectedSettlements(settlements.map(s => s.id));
                         } else {
@@ -366,7 +366,7 @@ const VendorSettlements: FC = () => {
                         <input
                           type="checkbox"
                           checked={selectedSettlements.includes(settlement.id)}
-                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             if (e.target.checked) {
                               setSelectedSettlements([...selectedSettlements, settlement.id]);
                             } else {

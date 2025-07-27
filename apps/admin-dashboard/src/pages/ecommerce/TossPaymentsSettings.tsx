@@ -329,7 +329,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="clientKey"
                   value={configForm.clientKey}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, clientKey: e.target.value }))}
+                  onChange={(e) => setConfigForm(prev => ({ ...prev, clientKey: e.target.value }))}
                   placeholder="test_ck_... 또는 live_ck_..."
                   required
                 />
@@ -343,7 +343,7 @@ const TossPaymentsSettings: FC = () => {
                     id="secretKey"
                     type={showSecretKey ? 'text' : 'password'}
                     value={configForm.secretKey}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, secretKey: e.target.value }))}
+                    onChange={(e) => setConfigForm(prev => ({ ...prev, secretKey: e.target.value }))}
                     placeholder="test_sk_... 또는 live_sk_..."
                     required
                   />
@@ -365,7 +365,7 @@ const TossPaymentsSettings: FC = () => {
                     id="webhookSecretKey"
                     type={showWebhookKey ? 'text' : 'password'}
                     value={configForm.webhookSecretKey}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, webhookSecretKey: e.target.value }))}
+                    onChange={(e) => setConfigForm(prev => ({ ...prev, webhookSecretKey: e.target.value }))}
                     placeholder="웹훅 검증용 시크릿 키"
                   />
                   <button
@@ -384,7 +384,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="webhookUrl"
                   value={configForm.webhookUrl}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, webhookUrl: e.target.value }))}
+                  onChange={(e) => setConfigForm(prev => ({ ...prev, webhookUrl: e.target.value }))}
                   placeholder="https://yourdomain.com/api/webhooks/toss"
                   required
                 />
@@ -395,7 +395,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="returnUrl"
                   value={configForm.returnUrl}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, returnUrl: e.target.value }))}
+                  onChange={(e) => setConfigForm(prev => ({ ...prev, returnUrl: e.target.value }))}
                   placeholder="https://yourdomain.com/payment/success"
                   required
                 />
@@ -406,7 +406,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="failUrl"
                   value={configForm.failUrl}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, failUrl: e.target.value }))}
+                  onChange={(e) => setConfigForm(prev => ({ ...prev, failUrl: e.target.value }))}
                   placeholder="https://yourdomain.com/payment/fail"
                   required
                 />
@@ -418,7 +418,7 @@ const TossPaymentsSettings: FC = () => {
                   type="checkbox"
                   id="isEnabled"
                   checked={configForm.isEnabled}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfigForm(prev => ({ ...prev, isEnabled: e.target.checked }))}
+                  onChange={(e) => setConfigForm(prev => ({ ...prev, isEnabled: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="isEnabled">토스페이먼츠 활성화</Label>
@@ -520,7 +520,7 @@ const TossPaymentsSettings: FC = () => {
               <Label>테스트 유형</Label>
               <select
                 value={selectedTestType}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedTestType(e.target.value as any)}
+                onChange={(e) => setSelectedTestType(e.target.value as any)}
                 className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
               >
                 <option value="connection">API 연결 테스트</option>

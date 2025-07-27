@@ -186,7 +186,7 @@ const VendorsList = () => {
               type="text"
               placeholder="이름, 사업자명, 이메일로 검색..."
               value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
             />
           </div>

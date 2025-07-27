@@ -12,8 +12,6 @@ import {
   Music,
   FileText,
   Trash2,
-  RefreshCw,
-  X,
   ChevronDown,
   HardDrive
 } from 'lucide-react'

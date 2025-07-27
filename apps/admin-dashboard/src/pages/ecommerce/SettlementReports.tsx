@@ -183,7 +183,7 @@ const SettlementReports: FC = () => {
                 id="startDate"
                 type="date"
                 value={dateRange.startDate}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+                onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
               />
             </div>
             <div>
@@ -192,7 +192,7 @@ const SettlementReports: FC = () => {
                 id="endDate"
                 type="date"
                 value={dateRange.endDate}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+                onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
               />
             </div>
             <div>
@@ -200,7 +200,7 @@ const SettlementReports: FC = () => {
               <select
                 id="reportType"
                 value={reportType}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReportType(e.target.value)}
+                onChange={(e) => setReportType(e.target.value)}
                 className="w-full px-3 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
               >
                 <option value="summary">요약 보고서</option>

@@ -70,7 +70,7 @@ const UIShowcase = () => {
         <ScreenOptions
           options={screenOptions}
           onOptionChange={handleOptionChange}
-          columnsPerPage={columns}
+          columns={columns}
           onColumnsChange={setColumns}
         />
       </div>
@@ -202,7 +202,6 @@ const UIShowcase = () => {
                         <div className="text-2xl font-bold text-modern-primary">
                           $<InlineEdit
                             value={inlineValues.price}
-                            type="number"
                             onSave={(value) => setInlineValues(prev => ({ ...prev, price: value }))}
                             inputClassName="w-24"
                           />

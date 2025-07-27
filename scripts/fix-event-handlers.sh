@@ -1,3 +1,10 @@
+#!/bin/bash
+
+echo "🔧 Fixing event handler types..."
+
+# Fix InlineEdit.tsx - This component has a complex union type issue
+echo "Fixing InlineEdit.tsx..."
+cat > src/components/InlineEdit.tsx << 'EOF'
 import { FC, useState, useRef, useEffect } from 'react';
 import { Check, X, Edit2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -169,3 +176,14 @@ export const InlineEdit: FC<InlineEditProps> = ({
 };
 
 export default InlineEdit;
+EOF
+
+# Fix ReferralToolkit.tsx - Textarea with wrong Select handler
+echo "Fixing ReferralToolkit.tsx..."
+sed -i '247s/onChange={(e: React.ChangeEvent<HTMLSelectElement>)/onChange={(e: React.ChangeEvent<HTMLTextAreaElement>)/' src/components/affiliate/ReferralToolkit.tsx 2>/dev/null || true
+
+# Fix VendorsList.tsx - Input handler is HTMLTextAreaElement but should be HTMLInputElement
+echo "Fixing VendorsList.tsx..."
+sed -i '189s/onChange={(e: React.ChangeEvent<HTMLTextAreaElement>)/onChange={(e: React.ChangeEvent<HTMLInputElement>)/' src/pages/vendors/VendorsList.tsx 2>/dev/null || true
+
+echo "✅ Event handler types fixed!"

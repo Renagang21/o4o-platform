@@ -326,7 +326,7 @@ const FeeManagement: FC = () => {
                   id="testAmount"
                   type="number"
                   value={testAmount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTestAmount(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setTestAmount(parseInt(e.target.value) || 0)}
                   placeholder="주문 금액 입력"
                 />
               </div>
@@ -424,7 +424,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="name"
                   value={policyForm.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="정책명을 입력하세요"
                   required
                 />
@@ -435,7 +435,7 @@ const FeeManagement: FC = () => {
                 <select
                   id="type"
                   value={policyForm.type}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, type: e.target.value as any }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, type: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
@@ -455,7 +455,7 @@ const FeeManagement: FC = () => {
                   min="0"
                   max="100"
                   value={policyForm.baseRate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
                   required
                 />
               </div>
@@ -468,7 +468,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.minFee}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) => setPolicyForm(prev => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
                 <div>
@@ -478,7 +478,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.maxFee}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) => setPolicyForm(prev => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="description"
                   value={policyForm.description}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="정책 설명을 입력하세요"
                 />
               </div>
@@ -498,7 +498,7 @@ const FeeManagement: FC = () => {
                   type="checkbox"
                   id="isActive"
                   checked={policyForm.isActive}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, isActive: e.target.checked }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, isActive: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="isActive">정책 활성화</Label>
@@ -534,7 +534,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="editName"
                   value={policyForm.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="정책명을 입력하세요"
                   required
                 />
@@ -549,7 +549,7 @@ const FeeManagement: FC = () => {
                   min="0"
                   max="100"
                   value={policyForm.baseRate}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
                   required
                 />
               </div>
@@ -562,7 +562,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.minFee}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) => setPolicyForm(prev => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
                 <div>
@@ -572,7 +572,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.maxFee}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) => setPolicyForm(prev => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
               </div>
@@ -582,7 +582,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="editDescription"
                   value={policyForm.description}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="정책 설명을 입력하세요"
                 />
               </div>
@@ -592,7 +592,7 @@ const FeeManagement: FC = () => {
                   type="checkbox"
                   id="editIsActive"
                   checked={policyForm.isActive}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPolicyForm(prev => ({ ...prev, isActive: e.target.checked }))}
+                  onChange={(e) => setPolicyForm(prev => ({ ...prev, isActive: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="editIsActive">정책 활성화</Label>

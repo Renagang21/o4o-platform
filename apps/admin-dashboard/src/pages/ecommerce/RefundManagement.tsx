@@ -295,7 +295,7 @@ const RefundManagement: FC = () => {
               type="text"
               placeholder="주문번호, 고객명으로 검색..."
               value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -304,7 +304,7 @@ const RefundManagement: FC = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={statusFilter}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>
@@ -469,7 +469,7 @@ const RefundManagement: FC = () => {
                 <select
                   id="action"
                   value={processForm.action}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProcessForm(prev => ({ ...prev, action: e.target.value as any }))}
+                  onChange={(e) => setProcessForm(prev => ({ ...prev, action: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
@@ -487,7 +487,7 @@ const RefundManagement: FC = () => {
                     min="0"
                     max={selectedRefund?.requestedAmount}
                     value={processForm.approvedAmount}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProcessForm(prev => ({ ...prev, approvedAmount: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) => setProcessForm(prev => ({ ...prev, approvedAmount: parseFloat(e.target.value) || 0 }))}
                     required
                   />
                   <div className="text-xs text-modern-text-tertiary mt-1">
@@ -501,7 +501,7 @@ const RefundManagement: FC = () => {
                 <Textarea
                   id="adminNote"
                   value={processForm.adminNote}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProcessForm(prev => ({ ...prev, adminNote: e.target.value }))}
+                  onChange={(e) => setProcessForm(prev => ({ ...prev, adminNote: e.target.value }))}
                   placeholder="환불 처리 사유나 메모를 입력하세요..."
                   rows={3}
                   required
@@ -513,7 +513,7 @@ const RefundManagement: FC = () => {
                   type="checkbox"
                   id="notifyCustomer"
                   checked={processForm.notifyCustomer}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProcessForm(prev => ({ ...prev, notifyCustomer: e.target.checked }))}
+                  onChange={(e) => setProcessForm(prev => ({ ...prev, notifyCustomer: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="notifyCustomer">고객에게 알림 발송</Label>

@@ -1,3 +1,4 @@
+import type { AffiliateCommission as AffiliateCommissionType } from "@o4o/types"
 import { useState } from 'react';
 import { DollarSign, Calendar, Download, TrendingUp, Users, CreditCard, FileText } from 'lucide-react';
 
@@ -86,15 +87,15 @@ const AffiliateCommission = () => {
     return matchesPeriod && matchesStatus;
   });
 
-  const totalCommission = filteredCommissions.reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
+  const totalCommission = filteredCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
   const paidCommission = filteredCommissions
     .filter(c => c.status === 'paid')
-    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
+    .reduce((sum, c) => sum + c.commissionAmount, 0);
   const pendingCommission = filteredCommissions
     .filter(c => c.status === 'pending' || c.status === 'processing')
-    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
+    .reduce((sum, c) => sum + c.commissionAmount, 0);
   const averageCommissionRate = filteredCommissions.length > 0
-    ? filteredCommissions.reduce((sum: number, c: AffiliateCommission) => sum + c.commissionRate, 0) / filteredCommissions.length
+    ? filteredCommissions.reduce((sum, c) => sum + c.commissionRate, 0) / filteredCommissions.length
     : 0;
 
   const getStatusBadge = (status: string) => {
@@ -239,7 +240,7 @@ const AffiliateCommission = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <select
           value={selectedPeriod}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedPeriod(e.target.value)}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">전체 기간</option>
@@ -249,7 +250,7 @@ const AffiliateCommission = () => {
         </select>
         <select
           value={selectedStatus}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedStatus(e.target.value)}
+          onChange={(e) => setSelectedStatus(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">모든 상태</option>
@@ -382,7 +383,7 @@ const AffiliateCommission = () => {
                 <p className="text-xl font-bold text-modern-accent">
                   ₩{filteredCommissions
                     .filter(c => c.status === 'pending' && c.period === selectedPeriod)
-                    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0)
+                    .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </p>
               </div>
@@ -401,7 +402,7 @@ const AffiliateCommission = () => {
                 <span className="text-sm font-medium text-modern-text-primary">
                   ₩{commissions
                     .filter(c => c.paymentMethod === '계좌이체')
-                    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0)
+                    .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </span>
               </div>
@@ -410,7 +411,7 @@ const AffiliateCommission = () => {
                 <span className="text-sm font-medium text-modern-text-primary">
                   ₩{commissions
                     .filter(c => c.paymentMethod === '페이팔')
-                    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0)
+                    .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </span>
               </div>
@@ -419,7 +420,7 @@ const AffiliateCommission = () => {
                 <span className="text-sm font-medium text-modern-text-primary">
                   ₩{commissions
                     .filter(c => c.paymentMethod === '세금계산서')
-                    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0)
+                    .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </span>
               </div>

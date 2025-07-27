@@ -31,7 +31,7 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
 
   // 필터링된 활동
   const filteredActivities = activities.filter(activity => 
-    filter === 'all' || activity?.type || "" === filter
+    filter === 'all' || activity?.type === filter
   );
 
   // 타입별 카운트

@@ -445,13 +445,13 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
           <SpacingControls
             label="여백 (Margin)"
             value={block.settings.margin as Record<string, string> || {}}
-            onChange={(value: string) => updateNestedSettings('margin', '', value)}
+            onChange={(value) => onChange({ settings: { ...block.settings, margin: value } })}
           />
 
           <SpacingControls
             label="패딩 (Padding)"
             value={block.settings.padding as Record<string, string> || {}}
-            onChange={(value: string) => updateNestedSettings('padding', '', value)}
+            onChange={(value) => onChange({ settings: { ...block.settings, padding: value } })}
           />
 
           {/* Background */}
@@ -630,22 +630,5 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
 }
 
 export default BlockEditor
-interface SpacingValue {
-  top?: string;
-  right?: string;
-  bottom?: string;
-  left?: string;
-}
 
-interface SpacingValue {
-  top?: string;
-  right?: string;
-  bottom?: string;
-  left?: string;
-}
 
-interface SpacingControlProps {
-  label: string;
-  value: SpacingValue;
-  onChange: (value: SpacingValue) => void;
-}
