@@ -260,8 +260,14 @@ sudo chmod -R 755 /var/www/
 ### Common Server Tasks
 - **환경변수 설정**: `.env.production` 파일 수동 생성
 - **DB 마이그레이션**: `npm run migration:run` (API 서버에서만)
+  - 주의: 테이블이 없는 경우 마이그레이션이 실패할 수 있음
+  - 해결: 마이그레이션 파일에 테이블 존재 여부 확인 코드 추가
 - **SSL 인증서**: Let's Encrypt 설정 확인
 - **로그 모니터링**: PM2 logs, Nginx access/error logs
+- **헬스체크 실패 시**: 
+  - Nginx 설정 확인: `sudo nginx -t`
+  - 도메인 설정 확인: `/etc/nginx/sites-available/*`
+  - SSL 인증서 확인: `sudo certbot certificates`
 
 ## 📝 Recent Updates (2025-07)
 - Fixed OAuth conditional initialization
@@ -269,6 +275,9 @@ sudo chmod -R 755 /var/www/
 - Added local type definitions for API server deployment
 - Resolved 83 TypeScript errors → 0
 - Added post-CI/CD server work documentation
+- Fixed double --passWithNoTests flag in CI/CD workflows
+- Added conditional table checks in database migrations
+- Added missing test scripts for all web apps (vitest)
 - Fixed React 19 breaking changes (200+ files updated)
 - Added comprehensive error classification system
 

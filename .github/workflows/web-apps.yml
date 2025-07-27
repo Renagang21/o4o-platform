@@ -92,7 +92,7 @@ jobs:
       run: npm run lint --workspace=@o4o/${{ matrix.app }}
     
     - name: Test
-      run: npm test --workspace=@o4o/${{ matrix.app }} -- --passWithNoTests
+      run: npm test --workspace=@o4o/${{ matrix.app }}
     
     - name: Build
       run: npm run build --workspace=@o4o/${{ matrix.app }}
