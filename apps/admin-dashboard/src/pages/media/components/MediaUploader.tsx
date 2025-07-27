@@ -1,4 +1,4 @@
-import { useState, useCallback, FC } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone'
 import { 
   Upload, 

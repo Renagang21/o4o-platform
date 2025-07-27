@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState } from 'react';
 import { Calculator, Settings, Percent, Plus, Edit, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';

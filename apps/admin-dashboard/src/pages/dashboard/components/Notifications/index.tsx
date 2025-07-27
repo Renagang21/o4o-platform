@@ -3,7 +3,7 @@
  * 4가지 타입의 실시간 알림 시스템
  */
 
-import { useState, FC, Component } from 'react';
+import { useState } from 'react';
 import NotificationItem from './NotificationItem';
 import NotificationBadge from './NotificationBadge';
 import { Bell, Filter, X, CheckCheck, AlertTriangle } from 'lucide-react';

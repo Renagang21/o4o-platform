@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, FC } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Settings, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

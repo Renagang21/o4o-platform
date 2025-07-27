@@ -1,3 +1,4 @@
+import { ErrorInfo } from "react"
 /**
  * Error Boundary Component
  * 대시보드 에러 처리

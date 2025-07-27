@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, createElement } from 'react';
+import { useState, useEffect } from 'react';
 import { Share2, Link2, MessageSquare, Users, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';

@@ -3,7 +3,7 @@
  * 파트너스 정책 관리 - 승인/커미션/등급 시스템
  */
 
-import { useState, FC, Component } from 'react';
+import { useState } from 'react';
 import {
   Users,
   UserCheck,

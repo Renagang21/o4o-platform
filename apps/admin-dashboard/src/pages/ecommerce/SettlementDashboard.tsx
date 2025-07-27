@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle, Users, Calculator, FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';

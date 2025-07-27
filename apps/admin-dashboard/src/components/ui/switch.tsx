@@ -1,4 +1,4 @@
-import { forwardRef, ComponentPropsWithoutRef } from 'react';
+import React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 import { cn } from "@/lib/utils"
 

@@ -18,7 +18,7 @@ class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { ErrorInfo, hasError: true, error };
+    return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -37,7 +37,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   private handleReset = () => {
-    this.setState({ ErrorInfo, hasError: false, error: undefined, errorInfo: undefined });
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
     window.location.reload();
   };
 

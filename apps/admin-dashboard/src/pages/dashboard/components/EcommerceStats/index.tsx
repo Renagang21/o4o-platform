@@ -3,7 +3,7 @@
  * WordPress Admin style statistics cards
  */
 
-import { FC, Component } from 'react';
+import { FC } from 'react';
 import { 
   ShoppingCart, 
   TrendingUp, 

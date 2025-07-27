@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { copyVideoToMyList, checkVideoInMyList } from '@/api/apps/video-copy';

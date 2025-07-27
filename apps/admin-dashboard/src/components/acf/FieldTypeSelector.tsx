@@ -1,4 +1,4 @@
-import { ComponentType, FC, ComponentType } from 'react';
+import { ComponentType, FC } from 'react';
 import {
   Type,
   Hash,
@@ -21,54 +21,54 @@ import {
   Images,
   GitBranch
 } from 'lucide-react'
-import { ComponentType, Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 interface FieldType {
   value: string
   label: string
-  icon: ComponentType<{ ComponentType, className?: string }>
+  icon: ComponentType<{ className?: string }>
   category: 'basic' | 'content' | 'choice' | 'relational' | 'layout' | 'advanced'
   description: string
 }
 
 const fieldTypes: FieldType[] = [
   // Basic Fields
-  { ComponentType, value: 'text', label: '텍스트', icon: Type, category: 'basic', description: '단일 행 텍스트 입력' },
-  { ComponentType, value: 'textarea', label: '텍스트 영역', icon: FileText, category: 'basic', description: '여러 행 텍스트 입력' },
-  { ComponentType, value: 'number', label: '숫자', icon: Hash, category: 'basic', description: '숫자 입력' },
-  { ComponentType, value: 'email', label: '이메일', icon: Mail, category: 'basic', description: '이메일 주소 입력' },
-  { ComponentType, value: 'url', label: 'URL', icon: Link, category: 'basic', description: '웹사이트 주소 입력' },
+  { value: 'text', label: '텍스트', icon: Type, category: 'basic', description: '단일 행 텍스트 입력' },
+  { value: 'textarea', label: '텍스트 영역', icon: FileText, category: 'basic', description: '여러 행 텍스트 입력' },
+  { value: 'number', label: '숫자', icon: Hash, category: 'basic', description: '숫자 입력' },
+  { value: 'email', label: '이메일', icon: Mail, category: 'basic', description: '이메일 주소 입력' },
+  { value: 'url', label: 'URL', icon: Link, category: 'basic', description: '웹사이트 주소 입력' },
   
   // Content Fields
-  { ComponentType, value: 'wysiwyg', label: '에디터', icon: FileText, category: 'content', description: 'WYSIWYG 리치 텍스트 에디터' },
-  { ComponentType, value: 'image', label: '이미지', icon: Image, category: 'content', description: '단일 이미지 업로드' },
-  { ComponentType, value: 'gallery', label: '갤러리', icon: Images, category: 'content', description: '여러 이미지 갤러리' },
-  { ComponentType, value: 'file', label: '파일', icon: FileText, category: 'content', description: '파일 업로드' },
+  { value: 'wysiwyg', label: '에디터', icon: FileText, category: 'content', description: 'WYSIWYG 리치 텍스트 에디터' },
+  { value: 'image', label: '이미지', icon: Image, category: 'content', description: '단일 이미지 업로드' },
+  { value: 'gallery', label: '갤러리', icon: Images, category: 'content', description: '여러 이미지 갤러리' },
+  { value: 'file', label: '파일', icon: FileText, category: 'content', description: '파일 업로드' },
   
   // Choice Fields
-  { ComponentType, value: 'select', label: '선택', icon: List, category: 'choice', description: '드롭다운 선택' },
-  { ComponentType, value: 'checkbox', label: '체크박스', icon: ToggleLeft, category: 'choice', description: '다중 선택 체크박스' },
-  { ComponentType, value: 'radio', label: '라디오', icon: Radio, category: 'choice', description: '단일 선택 라디오 버튼' },
-  { ComponentType, value: 'button_group', label: '버튼 그룹', icon: Group, category: 'choice', description: '버튼 형태의 선택' },
-  { ComponentType, value: 'true_false', label: '참/거짓', icon: ToggleLeft, category: 'choice', description: '토글 스위치' },
+  { value: 'select', label: '선택', icon: List, category: 'choice', description: '드롭다운 선택' },
+  { value: 'checkbox', label: '체크박스', icon: ToggleLeft, category: 'choice', description: '다중 선택 체크박스' },
+  { value: 'radio', label: '라디오', icon: Radio, category: 'choice', description: '단일 선택 라디오 버튼' },
+  { value: 'button_group', label: '버튼 그룹', icon: Group, category: 'choice', description: '버튼 형태의 선택' },
+  { value: 'true_false', label: '참/거짓', icon: ToggleLeft, category: 'choice', description: '토글 스위치' },
   
   // Relational Fields
-  { ComponentType, value: 'relationship', label: '관계', icon: GitBranch, category: 'relational', description: '게시물 간 관계 설정' },
-  { ComponentType, value: 'post_object', label: '게시물 선택', icon: Database, category: 'relational', description: '게시물 선택기' },
-  { ComponentType, value: 'taxonomy', label: '분류', icon: Database, category: 'relational', description: '카테고리/태그 선택' },
-  { ComponentType, value: 'user', label: '사용자', icon: Users, category: 'relational', description: '사용자 선택' },
+  { value: 'relationship', label: '관계', icon: GitBranch, category: 'relational', description: '게시물 간 관계 설정' },
+  { value: 'post_object', label: '게시물 선택', icon: Database, category: 'relational', description: '게시물 선택기' },
+  { value: 'taxonomy', label: '분류', icon: Database, category: 'relational', description: '카테고리/태그 선택' },
+  { value: 'user', label: '사용자', icon: Users, category: 'relational', description: '사용자 선택' },
   
   // Layout Fields
-  { ComponentType, value: 'repeater', label: '반복 필드', icon: Copy, category: 'layout', description: '반복 가능한 필드 그룹' },
-  { ComponentType, value: 'flexible_content', label: '유연한 콘텐츠', icon: Layers, category: 'layout', description: '유연한 레이아웃 블록' },
-  { ComponentType, value: 'group', label: '그룹', icon: Package, category: 'layout', description: '필드 그룹화' },
-  { ComponentType, value: 'clone', label: '복제', icon: Copy, category: 'layout', description: '다른 필드 복제' },
+  { value: 'repeater', label: '반복 필드', icon: Copy, category: 'layout', description: '반복 가능한 필드 그룹' },
+  { value: 'flexible_content', label: '유연한 콘텐츠', icon: Layers, category: 'layout', description: '유연한 레이아웃 블록' },
+  { value: 'group', label: '그룹', icon: Package, category: 'layout', description: '필드 그룹화' },
+  { value: 'clone', label: '복제', icon: Copy, category: 'layout', description: '다른 필드 복제' },
   
   // Advanced Fields
-  { ComponentType, value: 'date_picker', label: '날짜 선택', icon: Calendar, category: 'advanced', description: '날짜 선택기' },
-  { ComponentType, value: 'date_time_picker', label: '날짜/시간', icon: Calendar, category: 'advanced', description: '날짜와 시간 선택' },
-  { ComponentType, value: 'color_picker', label: '색상', icon: Palette, category: 'advanced', description: '색상 선택기' },
-  { ComponentType, value: 'google_map', label: '구글 지도', icon: MapPin, category: 'advanced', description: '위치 선택' },
+  { value: 'date_picker', label: '날짜 선택', icon: Calendar, category: 'advanced', description: '날짜 선택기' },
+  { value: 'date_time_picker', label: '날짜/시간', icon: Calendar, category: 'advanced', description: '날짜와 시간 선택' },
+  { value: 'color_picker', label: '색상', icon: Palette, category: 'advanced', description: '색상 선택기' },
+  { value: 'google_map', label: '구글 지도', icon: MapPin, category: 'advanced', description: '위치 선택' },
 ]
 
 interface FieldTypeSelectorProps {
@@ -76,14 +76,14 @@ interface FieldTypeSelectorProps {
   selectedType?: string
 }
 
-const FieldTypeSelector: FC<FieldTypeSelectorProps> = ({ ComponentType, onSelect, selectedType }) => {
+const FieldTypeSelector: FC<FieldTypeSelectorProps> = ({ onSelect, selectedType }) => {
   const categories = [
-    { ComponentType, key: 'basic', label: '기본 필드' },
-    { ComponentType, key: 'content', label: '콘텐츠 필드' },
-    { ComponentType, key: 'choice', label: '선택 필드' },
-    { ComponentType, key: 'relational', label: '관계 필드' },
-    { ComponentType, key: 'layout', label: '레이아웃 필드' },
-    { ComponentType, key: 'advanced', label: '고급 필드' },
+    { key: 'basic', label: '기본 필드' },
+    { key: 'content', label: '콘텐츠 필드' },
+    { key: 'choice', label: '선택 필드' },
+    { key: 'relational', label: '관계 필드' },
+    { key: 'layout', label: '레이아웃 필드' },
+    { key: 'advanced', label: '고급 필드' },
   ]
 
   return (
@@ -128,4 +128,4 @@ const FieldTypeSelector: FC<FieldTypeSelectorProps> = ({ ComponentType, onSelect
 }
 
 export default FieldTypeSelector
-export { ComponentType, fieldTypes }
+export { fieldTypes }

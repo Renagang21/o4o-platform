@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect } from 'react';
 import { UserCheck, UserX, Clock, AlertTriangle, Filter } from 'lucide-react'
 import { User, UserBulkAction } from '@/types/user'
 import { UserApi } from '@/api/userApi'

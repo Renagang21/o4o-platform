@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, createElement } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   DollarSign, CheckCircle, XCircle, Clock, Search, 
   Download, AlertCircle 

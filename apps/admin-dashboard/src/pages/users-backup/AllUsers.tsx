@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, createElement } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { Plus, Users, TrendingUp, AlertTriangle, UserX } from 'lucide-react'
 import { User, UserFilters as IUserFilters, UserBulkAction, UserStats } from '@/types/user'

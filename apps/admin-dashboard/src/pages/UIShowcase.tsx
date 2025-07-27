@@ -1,4 +1,4 @@
-import { useState, Component } from 'react';
+import { useState } from 'react';
 import { Palette, Moon, Sun, Layout, Type, Zap } from 'lucide-react';
 import DraggableWidget, { WidgetContainer } from '@/components/DraggableWidget';
 import InlineEdit from '@/components/InlineEdit';

@@ -18,7 +18,6 @@ import AtAGlanceWidget from '@/components/dashboard/AtAGlanceWidget';
 import ScreenOptions, { type ScreenOption } from '@/components/common/ScreenOptions';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
-import { useState, memo } from 'react';
 
 const Dashboard = memo(() => {
   const { chartData, isLoading: chartsLoading, stats } = useDashboardData();

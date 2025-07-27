@@ -3,7 +3,7 @@
  * 강화된 WordPress 스타일 관리자 대시보드
  */
 
-import { useState, useCallback, FC } from 'react';
+import { useState, useCallback } from 'react';
 import { 
   RefreshCw,
   Clock,

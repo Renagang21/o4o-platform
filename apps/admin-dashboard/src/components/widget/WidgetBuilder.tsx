@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Save,

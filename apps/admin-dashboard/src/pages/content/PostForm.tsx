@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save, Eye, Calendar, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'

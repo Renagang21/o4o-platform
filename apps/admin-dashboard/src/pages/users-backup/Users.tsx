@@ -1,3 +1,4 @@
+import { FC } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import AllUsers from './AllUsers'
 import PendingApproval from './PendingApproval'

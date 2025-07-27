@@ -3,7 +3,7 @@
  * 빠른 작업 위젯 - 관리자 주요 작업 버튼 모음
  */
 
-import { useState, memo, ReactNode } from 'react';
+import { useState, memo } from 'react';
 import { 
   Users,
   Package,

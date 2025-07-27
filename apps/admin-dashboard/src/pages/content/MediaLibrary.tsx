@@ -1,4 +1,4 @@
-import { useState, useRef, FC, ChangeEvent } from 'react';
+import { useState, useRef } from 'react';
 import {
   Upload,
   FolderOpen,

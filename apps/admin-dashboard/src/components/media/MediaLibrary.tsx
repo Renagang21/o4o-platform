@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useCallback, FC, createElement } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   Upload,

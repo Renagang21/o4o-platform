@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useCallback, useRef, FC } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   X,
   Save,
