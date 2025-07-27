@@ -56,7 +56,7 @@ const PageHeader: FC<PageHeaderProps> = ({
         return clsx(baseClass, 'bg-admin-red text-white border-admin-red hover:bg-red-700 hover:border-red-700');
       case 'secondary':
       default:
-        return clsx(baseClass, 'bg-white text-wp-text-secondary border border-neutral-200 hover:bg-wp-bg-tertiary hover:border-neutral-300');
+        return clsx(baseClass, 'bg-white text-wp-text-secondary border border-gray-200 hover:bg-wp-bg-tertiary hover:border-gray-300');
     }
   };
 

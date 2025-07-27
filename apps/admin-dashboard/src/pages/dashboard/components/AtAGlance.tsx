@@ -48,7 +48,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ stats = {} }) => {
           <Eye className="w-5 h-5 text-primary-500" />
           At a Glance
         </h2>
-        <button className="text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors">
+        <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
           {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
         </button>
       </div>
@@ -85,7 +85,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ stats = {} }) => {
           </div>
 
           {/* Quick Actions */}
-          <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
             <div className="flex flex-wrap gap-2 text-sm">
               <Link
                 to="/posts/new"
@@ -93,21 +93,21 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ stats = {} }) => {
               >
                 Write a Post
               </Link>
-              <span className="text-neutral-400">•</span>
+              <span className="text-gray-400">•</span>
               <Link
                 to="/pages/new"
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
               >
                 Create a Page
               </Link>
-              <span className="text-neutral-400">•</span>
+              <span className="text-gray-400">•</span>
               <Link
                 to="/ecommerce/products/new"
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
               >
                 Add Product
               </Link>
-              <span className="text-neutral-400">•</span>
+              <span className="text-gray-400">•</span>
               <Link
                 to="/media"
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
@@ -118,7 +118,7 @@ const AtAGlance: React.FC<AtAGlanceProps> = ({ stats = {} }) => {
           </div>
 
           {/* WordPress Version Info */}
-          <div className="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
+          <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-1">
                 <Shield className="w-3 h-3" />

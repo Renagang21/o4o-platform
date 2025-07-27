@@ -125,7 +125,7 @@ const DataTable = <T extends object>({
               {
                 'bg-admin-blue text-white border-admin-blue hover:bg-admin-blue-dark': action.variant === 'primary',
                 'bg-admin-red text-white border-admin-red hover:bg-red-700': action.variant === 'danger',
-                'bg-white text-wp-text-secondary border border-neutral-200 hover:bg-wp-bg-tertiary': action.variant === 'secondary' || !action.variant
+                'bg-white text-wp-text-secondary border border-gray-200 hover:bg-wp-bg-tertiary': action.variant === 'secondary' || !action.variant
               }
             )}
             title={action.label}
@@ -168,7 +168,7 @@ const DataTable = <T extends object>({
                       type="checkbox"
                       checked={selectAll}
                       onChange={(e: any) => handleSelectAll(e.target.checked)}
-                      className="rounded border border-neutral-200 text-admin-blue focus:ring-admin-blue"
+                      className="rounded border border-gray-200 text-admin-blue focus:ring-admin-blue"
                     />
                   </th>
                 )}
@@ -245,7 +245,7 @@ const DataTable = <T extends object>({
                           type="checkbox"
                           checked={isItemSelected(item)}
                           onChange={(e: any) => handleSelectItem(item, e.target.checked)}
-                          className="rounded border border-neutral-200 text-admin-blue focus:ring-admin-blue"
+                          className="rounded border border-gray-200 text-admin-blue focus:ring-admin-blue"
                         />
                       </td>
                     )}
@@ -282,7 +282,7 @@ const DataTable = <T extends object>({
 
         {/* Pagination */}
         {pagination && data.length > 0 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-300">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-300">
             <div className="flex items-center gap-2 text-sm text-wp-text-secondary">
               <span>페이지 당</span>
               <select

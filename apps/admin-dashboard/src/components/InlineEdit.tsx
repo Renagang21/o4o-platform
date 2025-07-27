@@ -103,13 +103,13 @@ const InlineEdit: React.FC<InlineEditProps> = ({
         ref={containerRef}
         className={cn(
           "inline-flex items-center gap-2 group cursor-pointer",
-          "hover:bg-neutral-100 dark:hover:bg-neutral-800 px-2 py-1 -mx-2 -my-1 rounded transition-colors",
+          "hover:bg-gray-100 dark:hover:bg-gray-800 px-2 py-1 -mx-2 -my-1 rounded transition-colors",
           className
         )}
         onClick={handleEdit}
       >
         <span className={cn(
-          value ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400 italic"
+          value ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400 italic"
         )}>
           {value || emptyText}
         </span>
@@ -117,7 +117,7 @@ const InlineEdit: React.FC<InlineEditProps> = ({
           <Edit2 
             className={cn(
               "w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity",
-              "text-neutral-400 dark:text-neutral-500",
+              "text-gray-400 dark:text-gray-500",
               editIconClassName
             )}
           />
@@ -136,9 +136,9 @@ const InlineEdit: React.FC<InlineEditProps> = ({
           disabled={isLoading}
           className={cn(
             "px-2 py-1 text-sm rounded border transition-colors",
-            "bg-white dark:bg-neutral-800",
-            "border-neutral-300 dark:border-neutral-600",
-            "text-neutral-700 dark:text-neutral-300",
+            "bg-white dark:bg-gray-800",
+            "border-gray-300 dark:border-gray-600",
+            "text-gray-700 dark:text-gray-300",
             "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
             inputClassName
           )}
@@ -161,9 +161,9 @@ const InlineEdit: React.FC<InlineEditProps> = ({
           disabled={isLoading}
           className={cn(
             "px-2 py-1 text-sm rounded border transition-colors",
-            "bg-white dark:bg-neutral-800",
-            "border-neutral-300 dark:border-neutral-600",
-            "text-neutral-700 dark:text-neutral-300",
+            "bg-white dark:bg-gray-800",
+            "border-gray-300 dark:border-gray-600",
+            "text-gray-700 dark:text-gray-300",
             "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
             inputClassName
           )}

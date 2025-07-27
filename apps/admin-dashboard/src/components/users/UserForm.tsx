@@ -516,7 +516,7 @@ const UserForm: React.FC<UserFormProps> = ({
                   type="checkbox"
                   {...register('sendWelcomeEmail')}
                   id="sendWelcomeEmail"
-                  className="rounded border border-neutral-200 text-blue-600 focus:ring-blue-500"
+                  className="rounded border border-gray-200 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="sendWelcomeEmail" className="ml-2 text-sm text-wp-text-primary">
                   환영 메시지 이메일 발송

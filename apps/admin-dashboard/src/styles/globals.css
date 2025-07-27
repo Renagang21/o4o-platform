@@ -32,18 +32,18 @@
     --secondary-900: #5500aa;
 
     /* Neutral Colors - For Light Mode */
-    --neutral-0: #ffffff;
-    --neutral-50: #f8fafc;
-    --neutral-100: #f1f5f9;
-    --neutral-200: #e2e8f0;
-    --neutral-300: #cbd5e1;
-    --neutral-400: #94a3b8;
-    --neutral-500: #64748b;
-    --neutral-600: #475569;
-    --neutral-700: #334155;
-    --neutral-800: #1e293b;
-    --neutral-900: #0f172a;
-    --neutral-950: #020617;
+    --gray-0: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+    --gray-950: #020617;
 
     /* Success Colors */
     --success-50: #e6fbf3;
@@ -83,67 +83,67 @@
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
-    --gradient-dark: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-950) 100%);
-    --gradient-light: linear-gradient(135deg, var(--neutral-0) 0%, var(--neutral-100) 100%);
+    --gradient-dark: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-950) 100%);
+    --gradient-light: linear-gradient(135deg, var(--gray-0) 0%, var(--gray-100) 100%);
 
     /* Semantic Colors - Light Mode */
-    --bg-primary: var(--neutral-0);
-    --bg-secondary: var(--neutral-50);
-    --bg-tertiary: var(--neutral-100);
-    --bg-inverse: var(--neutral-900);
+    --bg-primary: var(--gray-0);
+    --bg-secondary: var(--gray-50);
+    --bg-tertiary: var(--gray-100);
+    --bg-inverse: var(--gray-900);
     
-    --text-primary: var(--neutral-900);
-    --text-secondary: var(--neutral-600);
-    --text-tertiary: var(--neutral-500);
-    --text-inverse: var(--neutral-0);
+    --text-primary: var(--gray-900);
+    --text-secondary: var(--gray-600);
+    --text-tertiary: var(--gray-500);
+    --text-inverse: var(--gray-0);
     
-    --border-primary: var(--neutral-200);
-    --border-secondary: var(--neutral-300);
+    --border-primary: var(--gray-200);
+    --border-secondary: var(--gray-300);
     --border-focus: var(--primary-500);
     
     /* Admin Bar - Modern Dark */
-    --admin-bar-bg: var(--neutral-950);
-    --admin-bar-text: var(--neutral-100);
+    --admin-bar-bg: var(--gray-950);
+    --admin-bar-text: var(--gray-100);
     --admin-bar-hover: rgba(255, 255, 255, 0.1);
     --admin-bar-active: rgba(255, 255, 255, 0.2);
     
     /* Sidebar */
-    --sidebar-bg: var(--neutral-50);
-    --sidebar-text: var(--neutral-700);
-    --sidebar-hover: var(--neutral-100);
+    --sidebar-bg: var(--gray-50);
+    --sidebar-text: var(--gray-700);
+    --sidebar-hover: var(--gray-100);
     --sidebar-active-bg: var(--primary-500);
-    --sidebar-active-text: var(--neutral-0);
+    --sidebar-active-text: var(--gray-0);
     
     /* Components */
-    --card-bg: var(--neutral-0);
-    --card-border: var(--neutral-200);
+    --card-bg: var(--gray-0);
+    --card-border: var(--gray-200);
     --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     
     /* Buttons */
     --btn-primary-bg: var(--primary-500);
-    --btn-primary-text: var(--neutral-0);
+    --btn-primary-text: var(--gray-0);
     --btn-primary-hover: var(--primary-600);
     --btn-primary-active: var(--primary-700);
     
-    --btn-secondary-bg: var(--neutral-0);
-    --btn-secondary-text: var(--neutral-700);
-    --btn-secondary-border: var(--neutral-300);
-    --btn-secondary-hover: var(--neutral-50);
-    --btn-secondary-active: var(--neutral-100);
+    --btn-secondary-bg: var(--gray-0);
+    --btn-secondary-text: var(--gray-700);
+    --btn-secondary-border: var(--gray-300);
+    --btn-secondary-hover: var(--gray-50);
+    --btn-secondary-active: var(--gray-100);
     
     /* Forms */
-    --input-bg: var(--neutral-0);
-    --input-border: var(--neutral-300);
+    --input-bg: var(--gray-0);
+    --input-border: var(--gray-300);
     --input-focus-border: var(--primary-500);
-    --input-text: var(--neutral-900);
-    --input-placeholder: var(--neutral-500);
+    --input-text: var(--gray-900);
+    --input-placeholder: var(--gray-500);
     
     /* Tables */
-    --table-bg: var(--neutral-0);
-    --table-hover: var(--neutral-50);
-    --table-stripe: var(--neutral-50);
-    --table-border: var(--neutral-200);
+    --table-bg: var(--gray-0);
+    --table-hover: var(--gray-50);
+    --table-stripe: var(--gray-50);
+    --table-border: var(--gray-200);
     
     /* Transitions */
     --transition-fast: 150ms ease-in-out;
@@ -167,9 +167,9 @@
     --wp-admin-green: var(--success-500);
     --wp-admin-orange: var(--warning-500);
     --wp-admin-purple: var(--secondary-500);
-    --wp-admin-gray: var(--neutral-500);
-    --wp-admin-gray-light: var(--neutral-300);
-    --wp-admin-gray-dark: var(--neutral-700);
+    --wp-admin-gray: var(--gray-500);
+    --wp-admin-gray-light: var(--gray-300);
+    --wp-admin-gray-dark: var(--gray-700);
     
     /* WordPress Sidebar Colors (mapped) */
     --wp-sidebar-bg: var(--sidebar-bg);
@@ -220,63 +220,63 @@
   /* Dark Mode */
   [data-theme="dark"] {
     /* Semantic Colors - Dark Mode */
-    --bg-primary: var(--neutral-950);
-    --bg-secondary: var(--neutral-900);
-    --bg-tertiary: var(--neutral-800);
-    --bg-inverse: var(--neutral-0);
+    --bg-primary: var(--gray-950);
+    --bg-secondary: var(--gray-900);
+    --bg-tertiary: var(--gray-800);
+    --bg-inverse: var(--gray-0);
     
-    --text-primary: var(--neutral-100);
-    --text-secondary: var(--neutral-400);
-    --text-tertiary: var(--neutral-500);
-    --text-inverse: var(--neutral-900);
+    --text-primary: var(--gray-100);
+    --text-secondary: var(--gray-400);
+    --text-tertiary: var(--gray-500);
+    --text-inverse: var(--gray-900);
     
-    --border-primary: var(--neutral-800);
-    --border-secondary: var(--neutral-700);
+    --border-primary: var(--gray-800);
+    --border-secondary: var(--gray-700);
     --border-focus: var(--primary-400);
     
     /* Admin Bar - Dark Mode */
-    --admin-bar-bg: var(--neutral-900);
-    --admin-bar-text: var(--neutral-100);
+    --admin-bar-bg: var(--gray-900);
+    --admin-bar-text: var(--gray-100);
     --admin-bar-hover: rgba(255, 255, 255, 0.1);
     --admin-bar-active: rgba(255, 255, 255, 0.2);
     
     /* Sidebar - Dark Mode */
-    --sidebar-bg: var(--neutral-900);
-    --sidebar-text: var(--neutral-300);
-    --sidebar-hover: var(--neutral-800);
+    --sidebar-bg: var(--gray-900);
+    --sidebar-text: var(--gray-300);
+    --sidebar-hover: var(--gray-800);
     --sidebar-active-bg: var(--primary-600);
-    --sidebar-active-text: var(--neutral-0);
+    --sidebar-active-text: var(--gray-0);
     
     /* Components - Dark Mode */
-    --card-bg: var(--neutral-900);
-    --card-border: var(--neutral-800);
+    --card-bg: var(--gray-900);
+    --card-border: var(--gray-800);
     --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
     
     /* Buttons - Dark Mode */
     --btn-primary-bg: var(--primary-600);
-    --btn-primary-text: var(--neutral-0);
+    --btn-primary-text: var(--gray-0);
     --btn-primary-hover: var(--primary-700);
     --btn-primary-active: var(--primary-800);
     
-    --btn-secondary-bg: var(--neutral-800);
-    --btn-secondary-text: var(--neutral-200);
-    --btn-secondary-border: var(--neutral-700);
-    --btn-secondary-hover: var(--neutral-700);
-    --btn-secondary-active: var(--neutral-600);
+    --btn-secondary-bg: var(--gray-800);
+    --btn-secondary-text: var(--gray-200);
+    --btn-secondary-border: var(--gray-700);
+    --btn-secondary-hover: var(--gray-700);
+    --btn-secondary-active: var(--gray-600);
     
     /* Forms - Dark Mode */
-    --input-bg: var(--neutral-900);
-    --input-border: var(--neutral-700);
+    --input-bg: var(--gray-900);
+    --input-border: var(--gray-700);
     --input-focus-border: var(--primary-400);
-    --input-text: var(--neutral-100);
-    --input-placeholder: var(--neutral-500);
+    --input-text: var(--gray-100);
+    --input-placeholder: var(--gray-500);
     
     /* Tables - Dark Mode */
-    --table-bg: var(--neutral-900);
-    --table-hover: var(--neutral-800);
-    --table-stripe: var(--neutral-850);
-    --table-border: var(--neutral-800);
+    --table-bg: var(--gray-900);
+    --table-hover: var(--gray-800);
+    --table-stripe: var(--gray-850);
+    --table-border: var(--gray-800);
     
     /* WordPress Dark Mode Mappings */
     --wp-bg-primary: var(--bg-secondary);
@@ -314,7 +314,7 @@
 /* WordPress Admin-inspired styles */
 @layer base {
   * {
-    @apply border-neutral-300;
+    border-color: rgb(209 213 219);
     transition: background-color var(--transition-normal),
                 color var(--transition-normal),
                 border-color var(--transition-normal),
@@ -322,14 +322,13 @@
   }
   
   body {
-    @apply font-sans;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold;
+    font-weight: 600;
     color: var(--text-primary);
   }
 }
@@ -337,28 +336,76 @@
 @layer components {
   /* WordPress-style buttons */
   .wp-button {
-    @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded border;
-    @apply transition-colors duration-200;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    transition: color 200ms, background-color 200ms, border-color 200ms;
   }
   
   .wp-button-primary {
-    @apply wp-button bg-admin-blue text-white border-admin-blue;
-    @apply hover:bg-admin-blue-dark hover:border-admin-blue-dark;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    transition: color 200ms, background-color 200ms, border-color 200ms;
+    background-color: var(--wp-admin-blue);
+    color: white;
+    border-color: var(--wp-admin-blue);
+  }
+  
+  .wp-button-primary:hover {
+    background-color: var(--wp-admin-blue-dark);
+    border-color: var(--wp-admin-blue-dark);
   }
   
   .wp-button-secondary {
-    @apply wp-button bg-wp-bg-tertiary text-wp-text-primary border border-neutral-200;
-    @apply hover:bg-wp-bg-secondary hover:border-neutral-300;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    transition: color 200ms, background-color 200ms, border-color 200ms;
+    background-color: var(--wp-bg-tertiary);
+    color: var(--wp-text-primary);
+    border: 1px solid rgb(229 231 235);
+  }
+  
+  .wp-button-secondary:hover {
+    background-color: var(--wp-bg-secondary);
+    border-color: rgb(209 213 219);
   }
   
   .wp-button-danger {
-    @apply wp-button bg-admin-red text-white border-admin-red;
-    @apply hover:bg-red-700 hover:border-red-700;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    transition: color 200ms, background-color 200ms, border-color 200ms;
+    background-color: var(--wp-admin-red);
+    color: white;
+    border-color: var(--wp-admin-red);
+  }
+  
+  .wp-button-danger:hover {
+    background-color: rgb(185 28 28);
+    border-color: rgb(185 28 28);
   }
   
   /* WordPress-style form elements */
   .wp-input {
-    @apply block w-full px-3 py-2 text-sm border border-neutral-200 rounded;
+    @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded;
     @apply focus:outline-none focus:ring-2 focus:ring-admin-blue focus:border-transparent;
     @apply transition-colors duration-200;
   }

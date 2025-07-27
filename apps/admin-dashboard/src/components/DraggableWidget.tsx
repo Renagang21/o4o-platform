@@ -53,7 +53,7 @@ const DraggableWidget: React.FC<DraggableWidgetProps> = ({
     >
       <div className="wp-card-header flex items-center justify-between cursor-move select-none">
         <div className="flex items-center gap-2">
-          <GripVertical className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+          <GripVertical className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           <h3 className="text-base font-semibold">{title}</h3>
         </div>
         <div className="flex items-center gap-1">
@@ -65,9 +65,9 @@ const DraggableWidget: React.FC<DraggableWidgetProps> = ({
               }}
               className={cn(
                 "p-1 rounded transition-colors",
-                "hover:bg-neutral-100 dark:hover:bg-neutral-800",
-                "text-neutral-500 hover:text-neutral-700",
-                "dark:text-neutral-400 dark:hover:text-neutral-200"
+                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                "text-gray-500 hover:text-gray-700",
+                "dark:text-gray-400 dark:hover:text-gray-200"
               )}
               aria-label={isCollapsed ? 'Expand' : 'Collapse'}
             >
@@ -86,9 +86,9 @@ const DraggableWidget: React.FC<DraggableWidgetProps> = ({
               }}
               className={cn(
                 "p-1 rounded transition-colors",
-                "hover:bg-neutral-100 dark:hover:bg-neutral-800",
-                "text-neutral-500 hover:text-error-600",
-                "dark:text-neutral-400 dark:hover:text-error-400"
+                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                "text-gray-500 hover:text-error-600",
+                "dark:text-gray-400 dark:hover:text-error-400"
               )}
               aria-label="Close"
             >
@@ -162,7 +162,7 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
           onDragLeave={handleDragLeave}
           className={cn(
             "relative transition-all duration-200",
-            dragOverIndex === index && "ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-neutral-900"
+            dragOverIndex === index && "ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-gray-900"
           )}
         >
           {child}

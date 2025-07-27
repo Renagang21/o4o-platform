@@ -66,7 +66,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="bg-white border-b border border-neutral-200 px-6 py-4">
+    <header className="bg-white border-b border border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center gap-4">
