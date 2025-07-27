@@ -43,7 +43,7 @@
     "type-check": "npm run build:packages && npm run type-check --workspaces --if-present",
     "lint": "eslint --config ./eslint.config.js apps/*/src/**/*.{ts,tsx} packages/*/src/**/*.{ts,tsx}",
     "lint:fix": "npm run lint -- --fix",
-    "test": "npm run build:packages && npm run test --workspaces --if-present",
+    "test": "npm run build:packages && npm run test --workspaces --if-present -- --passWithNoTests",
     "test:e2e": "npm run test:e2e --workspaces --if-present",
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/*/dist packages/*/dist",
     "install:all": "npm install && npm run build"

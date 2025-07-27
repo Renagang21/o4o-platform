@@ -21,8 +21,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [ ] Build tested: `npm run build`
 - [ ] TypeScript passed: `npm run type-check`
 - [ ] Lint passed: `npm run lint` (0 warnings)
+- [ ] Tests passed: `npm test`
 - [ ] Optional features have conditional initialization
 - [ ] Environment variables have proper defaults
+
+### 4. CI/CD 문제 해결 원칙
+- **반복 검증**: 하나의 문제를 해결한 후 반드시 유사한 문제가 다른 곳에 있는지 확인
+- **근본 해결**: 우회하지 말고 문제의 근본 원인을 해결
+- **전체 테스트**: 부분 수정 후 전체 테스트 실행으로 사이드 이펙트 확인
 
 ## 📁 Project Structure
 
@@ -62,6 +68,15 @@ npm run lint:fix       # Auto-fix issues
 ### Build Issues
 - **"Cannot find module '@o4o/types'"**: Run `npm run build:packages` first
 - **Package build order**: types → utils → ui → auth-client → auth-context
+
+### Test Issues
+- **"--passWithNoTests received [true, true]"**: Root package.json이 이미 전달하므로 workspace에서 제거
+- **"activeApps.some is not a function"**: Mock에서 queryKey별로 다른 응답 반환 필요
+- **테스트 환경 Context 누락**: ThemeProvider, AuthProvider 등 필수 Provider 확인
+
+### Database Issues
+- **"CREATE INDEX CONCURRENTLY cannot run inside transaction"**: TypeORM 마이그레이션에서 CONCURRENTLY 제거
+- **"Data type 'datetime' not supported"**: PostgreSQL은 `timestamp` 사용
 
 ### TypeScript Issues
 ```typescript

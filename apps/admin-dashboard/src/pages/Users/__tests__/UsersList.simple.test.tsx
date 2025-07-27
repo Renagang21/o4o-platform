@@ -33,40 +33,56 @@ vi.mock('@o4o/auth-context', () => ({
 
 // Mock react-query
 vi.mock('@tanstack/react-query', () => ({
-  useQuery: vi.fn(() => ({
-    data: {
-      success: true,
+  useQuery: vi.fn((options) => {
+    // active-apps 쿼리에 대한 응답
+    if (options.queryKey[0] === 'active-apps') {
+      return {
+        data: {
+          data: [
+            { id: 'forum', name: 'forum', displayName: '포럼', permissions: [], category: 'community' },
+            { id: 'ecommerce', name: 'ecommerce', displayName: '이커머스', permissions: [], category: 'business' }
+          ]
+        },
+        isLoading: false,
+        error: null
+      };
+    }
+    // users 쿼리에 대한 응답
+    return {
       data: {
-        users: [
-          {
-            id: '1',
-            name: '홍길동',
-            email: 'hong@example.com',
-            role: 'customer',
-            status: 'approved',
-            createdAt: '2023-01-01T00:00:00Z'
-          },
-          {
-            id: '2',
-            name: '김철수',
-            email: 'kim@example.com',
-            role: 'business',
-            status: 'pending',
-            createdAt: '2023-01-02T00:00:00Z'
+        success: true,
+        data: {
+          users: [
+            {
+              id: '1',
+              name: '홍길동',
+              email: 'hong@example.com',
+              role: 'customer',
+              status: 'approved',
+              createdAt: '2023-01-01T00:00:00Z'
+            },
+            {
+              id: '2',
+              name: '김철수',
+              email: 'kim@example.com',
+              role: 'business',
+              status: 'pending',
+              createdAt: '2023-01-02T00:00:00Z'
+            }
+          ],
+          pagination: {
+            total: 2,
+            page: 1,
+            limit: 10,
+            totalPages: 1
           }
-        ],
-        pagination: {
-          total: 2,
-          page: 1,
-          limit: 10,
-          totalPages: 1
         }
-      }
-    },
-    isLoading: false,
-    error: null,
-    refetch: vi.fn()
-  })),
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn()
+    };
+  }),
   useMutation: vi.fn(() => ({
     mutate: vi.fn(),
     isLoading: false
