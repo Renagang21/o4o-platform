@@ -81,7 +81,7 @@ export class MediaFile {
   @Column({ default: 0 })
   downloads!: number
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastAccessed!: Date
 
   @CreateDateColumn()

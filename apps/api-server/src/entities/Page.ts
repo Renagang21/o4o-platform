@@ -88,10 +88,10 @@ export class Page {
   @Column({ type: 'json', nullable: true })
   customFields!: Record<string, unknown>
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   publishedAt!: Date
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   scheduledAt!: Date
 
   @Column({ type: 'uuid' })

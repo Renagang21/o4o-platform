@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import UsersList from '../UsersList';
+import { ThemeProvider } from '../../../contexts/ThemeContext';
 // Mock auth-context
 vi.mock('@o4o/auth-context', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -85,9 +86,11 @@ describe('UsersList 간단 테스트', () => {
 
   const renderWithRouter = (component: React.ReactElement) => {
     return render(
-      <BrowserRouter>
-        {component}
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          {component}
+        </BrowserRouter>
+      </ThemeProvider>
     );
   };
 
