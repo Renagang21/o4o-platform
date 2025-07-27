@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useState, useMemo, FC } from 'react';
 import { useUserRoleManager, UserRole } from './UserRoleManagerContext';
 import useToast from '../../hooks/useToast';
 import { logRoleChange } from '../../utils/logRoleChange';

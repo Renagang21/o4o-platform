@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { useHomepageTemplate } from '../api/content/contentApi';
 import TemplateRenderer from '../components/TemplateRenderer';
 import HeroSection from '../components/home/HeroSection';

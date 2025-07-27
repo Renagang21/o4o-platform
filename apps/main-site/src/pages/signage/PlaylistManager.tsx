@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Play, Edit, Trash2, GripVertical, Clock, Video, Image } from 'lucide-react';
 
 interface PlaylistItem {

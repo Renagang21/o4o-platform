@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 interface SignageContent {

@@ -1,6 +1,6 @@
 // 🎯 구텐베르크 에디터 페이지 래퍼
 
-import React from 'react';
+import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 // import GutenbergEditor from '../../components/gutenberg/GutenbergEditor'; // 일시적 비활성화
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import TemplateRenderer from './TemplateRenderer';
 import Footer from './home/Footer';
 

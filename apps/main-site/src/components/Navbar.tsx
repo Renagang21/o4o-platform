@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, Home, Settings } from 'lucide-react';
 

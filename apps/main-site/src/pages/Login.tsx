@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC, ChangeEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Zap } from 'lucide-react';

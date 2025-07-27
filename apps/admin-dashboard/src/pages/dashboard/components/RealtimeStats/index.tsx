@@ -3,7 +3,7 @@
  * 실시간 통계 위젯 - 실시간 데이터와 Socket.io 연동
  */
 
-import { memo, useEffect, useState } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Activity,

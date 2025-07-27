@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, FC, Component } from 'react';
 import { BetaFeedbackModal } from './BetaFeedbackModal';
 import { BetaRegistrationModal } from './BetaRegistrationModal';
 import { useToast } from '../../hooks/useToast';

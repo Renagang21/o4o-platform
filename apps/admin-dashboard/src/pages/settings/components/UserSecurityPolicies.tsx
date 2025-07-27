@@ -3,7 +3,7 @@
  * 사용자 관리 및 보안 정책 컴포넌트
  */
 
-import React, { useState } from 'react';
+import { useState, FC, Component } from 'react';
 import {
   Shield,
   Lock,

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface ProductData {

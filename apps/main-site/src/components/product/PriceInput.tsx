@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, ChangeEvent } from 'react';
 import { DollarSign } from 'lucide-react';
 
 interface PriceInputProps {

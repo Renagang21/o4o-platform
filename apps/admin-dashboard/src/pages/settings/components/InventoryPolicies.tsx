@@ -3,7 +3,7 @@
  * 재고 관리 및 품질 관리 정책 컴포넌트
  */
 
-import React, { useState } from 'react';
+import { useState, FC, Component } from 'react';
 import {
   Package,
   AlertTriangle,

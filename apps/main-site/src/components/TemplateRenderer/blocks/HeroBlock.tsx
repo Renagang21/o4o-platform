@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import ButtonBlock from './ButtonBlock';
 
 interface HeroBlockProps {

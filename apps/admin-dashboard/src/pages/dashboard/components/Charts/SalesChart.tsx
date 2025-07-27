@@ -3,7 +3,7 @@
  * 매출 분석 차트 (Recharts)
  */
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, FC } from 'react';
 import { 
   LineChart, 
   Line, 

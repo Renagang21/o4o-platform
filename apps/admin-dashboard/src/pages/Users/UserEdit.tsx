@@ -3,7 +3,7 @@
  * 기존 사용자 정보를 불러와 UserForm으로 수정
  */
 
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';

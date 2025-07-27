@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, Play, Edit, Trash2, AlertCircle } from 'lucide-react';
 
 interface Schedule {

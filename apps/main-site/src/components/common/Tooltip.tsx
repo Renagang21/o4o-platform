@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef, FC, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type TooltipPosition = 'top' | 'right' | 'bottom' | 'left';

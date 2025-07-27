@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { ShortcodeProps } from '@o4o/shortcodes';
 import { useCartStore } from '@/stores/useCartStore';
 import { formatPrice } from '@o4o/utils';

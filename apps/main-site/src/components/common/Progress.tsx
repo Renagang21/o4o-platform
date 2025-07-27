@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type ProgressSize = 'sm' | 'md' | 'lg';

@@ -3,7 +3,7 @@
  * 일괄 사용자 역할 변경 및 변경 사항 확인 UX 제공 컴포넌트
  */
 
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { Shield, X, Check, Users, AlertTriangle } from 'lucide-react';
 import { User, UserRole, ROLE_LABELS } from '../../types/user';
 

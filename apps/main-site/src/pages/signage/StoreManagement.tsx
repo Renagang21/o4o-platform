@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Settings, Monitor, Calendar, BarChart3, Play, Pause, SkipForward } from 'lucide-react';
 
 interface Store {

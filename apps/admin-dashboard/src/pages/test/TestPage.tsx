@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { useState, FC } from 'react';
 import { Wrench, Palette, Layout } from 'lucide-react';
 import GutenbergEditor from '@/components/editor/GutenbergEditor';
 import ApiConnectionTest from '@/components/test/ApiConnectionTest';

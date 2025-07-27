@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
+import { FC } from 'react';
 
 const Analytics: FC = () => {
   return (

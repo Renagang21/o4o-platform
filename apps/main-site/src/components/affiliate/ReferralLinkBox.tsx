@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { Copy, Share2, Mail, MessageCircle, Facebook, Twitter, Check } from 'lucide-react';
 
 const ReferralLinkBox: React.FC = () => {

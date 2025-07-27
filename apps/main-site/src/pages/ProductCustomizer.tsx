@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import ProductSelector from '../components/product/ProductSelector';
 import LabelUploader from '../components/product/LabelUploader';
 import PriceInput from '../components/product/PriceInput';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Monitor, Video, Calendar, BarChart3, Play, Users, Clock, TrendingUp } from 'lucide-react';
 import SignageContent from './SignageContent';
 import StoreManagement from './StoreManagement';

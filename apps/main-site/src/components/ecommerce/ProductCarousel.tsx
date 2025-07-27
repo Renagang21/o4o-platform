@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FC, lazy } from 'react';
 import { Product } from '@/types/ecommerce';
 import { formatCurrency } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react';

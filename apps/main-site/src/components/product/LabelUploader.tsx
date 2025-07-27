@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback, FC } from 'react';
 import { Upload, X } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 

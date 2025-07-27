@@ -3,7 +3,7 @@
  * 대시보드 메인 페이지 - 모든 위젯을 통합하여 표시
  */
 
-import { memo } from 'react';
+import { useState, memo } from 'react';
 import { BarChart3 } from 'lucide-react';
 
 // MVP 위젯 컴포넌트 import
@@ -18,7 +18,7 @@ import AtAGlanceWidget from '@/components/dashboard/AtAGlanceWidget';
 import ScreenOptions, { type ScreenOption } from '@/components/common/ScreenOptions';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 const Dashboard = memo(() => {
   const { chartData, isLoading: chartsLoading, stats } = useDashboardData();

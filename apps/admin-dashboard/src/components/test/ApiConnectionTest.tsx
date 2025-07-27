@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { useState, FC } from 'react';
 import { CheckCircle2, XCircle, Loader2, RefreshCw, AlertCircle, ExternalLink } from 'lucide-react';
 import { api } from '@/api/base';
 import { useAuthStore } from '@/stores/authStore';

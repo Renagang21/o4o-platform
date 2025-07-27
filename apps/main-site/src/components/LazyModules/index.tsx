@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import { FC, Suspense, lazy } from 'react';
 import { 
   DropshippingErrorBoundary, 
   HealthcareErrorBoundary, 

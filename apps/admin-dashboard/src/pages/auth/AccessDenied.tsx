@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 import { useAuthStore } from '@/api/authStore'
 
 const AccessDenied = () => {

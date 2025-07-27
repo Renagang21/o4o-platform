@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MoreVertical, Eye, MessageCircle, Lock, Pin, Trash2, Edit, Reply } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

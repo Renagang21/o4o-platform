@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import SidebarMenu from '../components/dashboard/SidebarMenu';
 import SummaryCards from '../components/dashboard/SummaryCards';
 import RecentOrders from '../components/dashboard/RecentOrders';

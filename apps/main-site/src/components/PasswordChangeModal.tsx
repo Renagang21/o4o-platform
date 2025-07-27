@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef, FC } from 'react';
 import useToast from '../hooks/useToast';
 
 interface PasswordChangeModalProps {

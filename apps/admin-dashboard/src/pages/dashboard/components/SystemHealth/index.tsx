@@ -3,7 +3,7 @@
  * 시스템 상태 위젯 - 시스템 전반적인 상태 모니터링
  */
 
-import { memo, useState } from 'react';
+import { useState, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Server, 

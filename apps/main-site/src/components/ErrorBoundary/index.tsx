@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, ReactNode } from 'react';
 import { ModuleErrorBoundary } from './ModuleErrorBoundary';
 
 export { ErrorBoundary } from '../ErrorBoundary';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { motion } from 'motion/react';
 import { 
   Bot, 

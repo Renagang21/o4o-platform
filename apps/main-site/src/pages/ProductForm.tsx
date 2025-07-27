@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useState, useRef, FC, ChangeEvent } from 'react';
 import useToast from '../hooks/useToast';
 
 interface ProductFormData {

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { MultiThemeProvider } from '@o4o/ui/theme/MultiThemeContext';
 import { ThemeSelector, ThemeSelectorCompact } from '@o4o/ui/theme/ThemeSelector';
 

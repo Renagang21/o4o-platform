@@ -1,6 +1,6 @@
 // 🎯 TipTap 에디터 페이지 래퍼
 
-import React from 'react';
+import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TipTapPageEditor from '@o4o/ui/editor/TipTapPageEditor';
 

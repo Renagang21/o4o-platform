@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
+import { FC } from 'react';
 import { MediaFile } from '@/types/content'
 import ResponsiveImage from './ResponsiveImage'
 import { Image, Video, Music, FileText, File, Check } from 'lucide-react'

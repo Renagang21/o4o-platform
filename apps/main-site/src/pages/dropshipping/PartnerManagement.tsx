@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import PartnerDashboard from '../../components/dropshipping/PartnerDashboard';
 import CommissionManagementSystem from '../../components/dropshipping/CommissionManagementSystem';
 

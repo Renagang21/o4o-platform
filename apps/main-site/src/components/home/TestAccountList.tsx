@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { TestAccount } from '../../types/testData';
 import Card from '../common/Card';
 import List from '../common/List';

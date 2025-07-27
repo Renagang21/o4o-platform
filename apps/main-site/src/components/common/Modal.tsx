@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, FC, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { createPortal } from 'react-dom';
 

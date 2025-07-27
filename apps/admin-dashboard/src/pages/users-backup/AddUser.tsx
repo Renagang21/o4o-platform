@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'
 import { Save, ArrowLeft, User, Mail, Building } from 'lucide-react'
 import { UserFormData, UserRole, ROLE_LABELS, BUSINESS_TYPES } from '@/types/user'

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Calendar, Clock } from 'lucide-react';
 

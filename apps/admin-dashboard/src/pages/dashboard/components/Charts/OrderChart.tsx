@@ -3,7 +3,7 @@
  * 주문 현황 분석 차트 (Recharts 도넛 차트)
  */
 
-import React, { useMemo } from 'react';
+import { useMemo, FC } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Package, TrendingUp } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Store, Truck, Stethoscope, Users } from 'lucide-react';
 

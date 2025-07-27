@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type AlertType = 'success' | 'error' | 'warning' | 'info';

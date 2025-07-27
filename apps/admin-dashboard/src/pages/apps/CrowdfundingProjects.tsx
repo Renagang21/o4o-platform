@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Eye, Calendar, Users, TrendingUp, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';

@@ -1,4 +1,4 @@
-import { useState, FC, ReactNode } from 'react'
+import { useState, FC, ReactNode } from 'react';
 import { 
   Type, 
   Image, 

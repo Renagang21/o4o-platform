@@ -3,7 +3,7 @@
  * React Hook Form + Zod를 사용한 유효성 검증
  */
 
-import React, { useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

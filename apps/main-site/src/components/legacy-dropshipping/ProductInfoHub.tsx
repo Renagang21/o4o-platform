@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import TrustIndicator from '../common/TrustIndicator';
 import InformationCard from '../common/InformationCard';
 import ExternalResourceWidget, { ExternalResourceList } from '../common/ExternalResourceWidget';

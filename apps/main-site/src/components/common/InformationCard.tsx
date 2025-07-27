@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC, ReactNode } from 'react';
 
 interface InfoSource {
   type: 'supplier' | 'expert' | 'user' | 'external';

@@ -3,7 +3,7 @@
  * 통합 활동 피드 (최신 15개 활동)
  */
 
-import React, { useState } from 'react';
+import { useState, FC, Component } from 'react';
 import ActivityItem from './ActivityItem';
 import { Activity, Filter, RefreshCw } from 'lucide-react';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { FullScreenEditor } from '@o4o/ui/editor/fullscreen';
 
 export function FullScreenEditorSimpleTest() {

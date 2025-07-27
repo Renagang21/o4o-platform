@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 
 type ResourceType = 'youtube' | 'blog' | 'article' | 'social' | 'document' | 'external';
 

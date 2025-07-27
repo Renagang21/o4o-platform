@@ -1,5 +1,5 @@
 import { TiptapEditor } from '@o4o/ui/editor/TiptapEditor'
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import { JSONContent } from '@tiptap/react'
 import toast from 'react-hot-toast'

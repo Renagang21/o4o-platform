@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
+import { FC } from 'react';
 import { MediaFile } from '@/types/content'
 import MediaItem from './MediaItem'
 import { formatFileSize } from '@/utils/format'

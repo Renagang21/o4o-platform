@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Card, Button } from '@o4o/ui';
 import { formatCurrency } from '@o4o/utils';
 import { OrderSummary } from '@o4o/types';

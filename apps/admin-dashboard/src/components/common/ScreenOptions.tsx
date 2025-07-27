@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { useState, FC } from 'react';
 import { ChevronDown, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 

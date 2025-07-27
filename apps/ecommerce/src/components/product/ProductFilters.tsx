@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Card, Checkbox, RadioGroup, RadioGroupItem, Label, Slider, Button } from '@o4o/ui';
 import { formatCurrency } from '@o4o/utils';
 import { cn } from '@o4o/utils';

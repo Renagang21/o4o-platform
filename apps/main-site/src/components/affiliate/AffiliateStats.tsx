@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { MousePointer, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
 
 const AffiliateStats: FC = () => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Product } from '@/types/ecommerce';
 import { formatCurrency } from '@/lib/utils';
 import { ShoppingCart, Package, Star } from 'lucide-react';

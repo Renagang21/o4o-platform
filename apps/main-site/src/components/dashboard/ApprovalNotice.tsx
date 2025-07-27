@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 
 const ApprovalNotice: FC = () => {

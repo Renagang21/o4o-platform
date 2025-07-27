@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 
 type CustomerType = 'b2c' | 'b2b';
 type B2CTier = 'member' | 'premium' | 'vip';

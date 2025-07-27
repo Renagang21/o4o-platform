@@ -3,7 +3,7 @@
  * 사용자 활동 트렌드 차트 (Recharts 막대 차트)
  */
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, FC } from 'react';
 import { 
   BarChart, 
   Bar, 

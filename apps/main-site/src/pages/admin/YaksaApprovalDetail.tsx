@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useToast from '../../hooks/useToast';
 import { useApproval } from './ApprovalContext';

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import HeroSection from '../components/home/HeroSection';
 import StepGuide from '../components/home/StepGuide';

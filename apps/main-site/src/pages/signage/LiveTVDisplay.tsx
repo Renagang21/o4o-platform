@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FC, Component } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   Wifi, WifiOff, Clock, Calendar, Volume2, VolumeX,

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { FC, Component, Suspense, lazy } from 'react';
 import { ShortcodeHandler, ShortcodeAttributes } from '@/utils/shortcodeParser';
 import { useProducts, useProduct } from '@/hooks/useProducts';
 import { formatCurrency } from '@/lib/utils';

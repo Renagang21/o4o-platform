@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const COMMON_CORE_AUTH_URL = import.meta.env.VITE_COMMON_CORE_AUTH_URL || 'http://localhost:5000';

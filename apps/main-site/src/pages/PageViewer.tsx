@@ -1,6 +1,6 @@
 // 📄 페이지 뷰어 컴포넌트 (사용자용)
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit3, ArrowLeft } from 'lucide-react';
 import { loadPageContent, PageContent } from '../utils/pageSystem';

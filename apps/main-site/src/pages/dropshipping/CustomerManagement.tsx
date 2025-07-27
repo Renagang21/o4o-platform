@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import CustomerTierManager from '../../components/dropshipping/CustomerTierManager';
 
 type CustomerType = 'b2c' | 'b2b';

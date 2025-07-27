@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component, ReactNode, ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'disabled' | 'ghost';

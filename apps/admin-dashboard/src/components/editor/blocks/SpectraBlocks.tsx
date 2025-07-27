@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, Component } from 'react';
 import { 
   Star, 
   DollarSign, 

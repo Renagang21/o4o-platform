@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 
 type UserRole = 'supplier' | 'reseller' | 'partner' | 'customer' | 'expert';
 

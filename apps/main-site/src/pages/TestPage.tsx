@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { NotionEditor } from '@o4o/ui/editor/NotionEditor';
 import { GutenbergEditor } from '@o4o/ui/editor/GutenbergEditor';
 

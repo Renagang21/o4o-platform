@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, cloneElement, ReactNode, ReactElement } from 'react';
 import DOMPurify from 'dompurify';
 
 // Shortcode type definitions

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSupplierPublicProfile, useSupplierPublicProducts } from '@/hooks';
 import { ProductGrid } from '@/components/product';

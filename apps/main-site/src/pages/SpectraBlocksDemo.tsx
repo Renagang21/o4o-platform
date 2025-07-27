@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import TemplateRenderer from '../components/TemplateRenderer';
 
 const SpectraBlocksDemo: FC = () => {

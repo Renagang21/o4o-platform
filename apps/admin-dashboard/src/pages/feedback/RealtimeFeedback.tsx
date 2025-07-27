@@ -2,7 +2,7 @@
 // TODO: socket.io-client import 문제 해결 후 복원
 
 /*
-import { useState, useEffect, useCallback } from 'react';
+import { FC } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '../../api/authStore';
 ... 전체 컴포넌트 로직

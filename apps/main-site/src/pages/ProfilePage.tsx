@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ProfileCard from '../components/ProfileCard';

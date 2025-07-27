@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, FC } from 'react';
 import { Plus, Edit2, Trash2, Tag as TagIcon, MoreVertical, Hash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

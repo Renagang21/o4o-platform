@@ -1,6 +1,6 @@
 // 🛠️ Custom Post Type 관리자 페이지
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { 
   Plus, 
   Edit3, 

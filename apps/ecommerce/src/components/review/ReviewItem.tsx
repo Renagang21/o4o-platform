@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Review } from '@o4o/types';
 import { ReviewRating } from './ReviewRating';
 import { Button } from '@o4o/ui';

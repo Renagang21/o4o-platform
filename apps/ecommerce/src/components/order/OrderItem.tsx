@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Truck, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
 import { Button, Badge } from '@o4o/ui';

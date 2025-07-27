@@ -1,5 +1,5 @@
 import { TiptapEditor } from '@o4o/ui/editor/TiptapEditor'
-import { useState } from 'react'
+import { useState } from 'react';
 import { JSONContent } from '@tiptap/react'
 
 const initialContent: JSONContent = {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Star, Heart, Share2, ShoppingCart, Truck, Shield, 

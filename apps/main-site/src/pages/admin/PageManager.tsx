@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Eye, Settings, Layout, Home, DollarSign, Info, Mail, ArrowLeft, Plus, Edit3, Globe, Smartphone, Monitor } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { PageContent, PageSection, PageInfo, DefaultPageContents, BannerSection, FeaturesSection, ContentSection, ProgressSection } from '../../types/page-manager';

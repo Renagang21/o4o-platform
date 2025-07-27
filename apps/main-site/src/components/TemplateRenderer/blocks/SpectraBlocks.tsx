@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, Component } from 'react';
 import { 
   Star, 
   ArrowRight,

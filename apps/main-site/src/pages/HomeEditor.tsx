@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 
 const HomeEditorPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);

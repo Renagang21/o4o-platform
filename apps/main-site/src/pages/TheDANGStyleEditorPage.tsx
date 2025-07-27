@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC, createElement } from 'react';
 import TheDANGHomeEditor from '@shared/components/editor/TheDANGHomeEditor';
 import DOMPurify from 'dompurify';
 

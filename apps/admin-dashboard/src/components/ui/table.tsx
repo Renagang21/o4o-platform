@@ -1,4 +1,4 @@
-import * as React from "react"
+import { forwardRef, ComponentPropsWithoutRef } from 'react';
 import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<

@@ -3,7 +3,7 @@
  * UserForm을 사용한 사용자 정보 생성
  */
 
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';

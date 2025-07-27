@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { X } from 'lucide-react';
 import { useAuth, UserRole } from '../context/AuthContext';
 

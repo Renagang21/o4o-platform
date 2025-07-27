@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback, useMemo, useRef, Fragment, FC } from 'react'
 import { useParams } from 'react-router-dom'
 
 const UserDetail: FC = () => {

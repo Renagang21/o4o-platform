@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { DropshippingRouter, realtimeSync } from '@o4o/ui/dropshipping';
 
 // 데모용 역할 선택 컴포넌트 (실제로는 로그인된 사용자의 역할을 사용)

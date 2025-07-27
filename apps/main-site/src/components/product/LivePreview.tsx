@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { ZoomIn, ZoomOut } from 'lucide-react';
 
 interface ProductData {

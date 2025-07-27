@@ -1,6 +1,6 @@
 // ✏️ 페이지 에디터 (관리자용)
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import NotionEditor from '@o4o/ui/editor/NotionEditor';
 import { loadPageContent, savePageContent, PageContent, getPageViewUrl } from '../utils/pageSystem';

@@ -1,4 +1,4 @@
-import { createElement, FC } from 'react'
+import { FC, createElement } from 'react';
 import { 
   Plus, 
   Copy, 

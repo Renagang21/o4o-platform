@@ -3,7 +3,7 @@ import { AuthProvider, AdminProtectedRoute, SessionManager } from '@o4o/auth-con
 import { AuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { DevAuthProvider } from '@/lib/DevAuthProvider';
-import { lazy, Suspense, useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import AppGuard from '@/components/AppGuard';
 import { ThemeProvider } from '@/contexts/ThemeContext';

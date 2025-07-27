@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Image, FileText, Video, Bell } from 'lucide-react';
 import SignageScheduler from '../../components/signage/SignageScheduler';

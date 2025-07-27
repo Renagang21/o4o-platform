@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import ProductCard, { Product } from '../components/ProductCard';
 import useToast from '../hooks/useToast';
 

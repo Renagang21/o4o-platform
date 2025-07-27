@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 
 export interface Product {

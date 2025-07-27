@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface AccordionItem {

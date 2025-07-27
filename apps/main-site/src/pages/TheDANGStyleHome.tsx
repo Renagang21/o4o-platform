@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import TestBannerGrid from '../components/home/TestBannerGrid';
 import TestAccountList from '../components/home/TestAccountList';

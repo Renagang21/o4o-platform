@@ -1,4 +1,3 @@
-import React from 'react';
 import { SpectraFormBlock, SpectraViewBlock } from '../TemplateRenderer/blocks/SpectraFormBlocks';
 
 // Form shortcode handler

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, FC } from 'react';
 import ReferralLinkBox from '../components/affiliate/ReferralLinkBox';
 import AffiliateStats from '../components/affiliate/AffiliateStats';
 import ActivityHistoryTable from '../components/affiliate/ActivityHistoryTable';

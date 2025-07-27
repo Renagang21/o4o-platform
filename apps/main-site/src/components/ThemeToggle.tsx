@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
 const ThemeToggle: React.FC = () => {

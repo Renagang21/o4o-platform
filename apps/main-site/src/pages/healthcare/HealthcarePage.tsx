@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { HealthcareMainPage } from '@o4o/ui/healthcare';
 import { Button } from '@o4o/ui';
 import { Edit3, Save, RefreshCw } from 'lucide-react';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FC, ChangeEvent } from 'react';
 import { motion } from 'motion/react';
 import {
   Upload,

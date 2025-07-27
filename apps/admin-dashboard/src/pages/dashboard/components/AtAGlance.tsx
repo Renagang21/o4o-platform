@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { FileText, MessageSquare, Users, Package, Eye, Shield, Zap, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

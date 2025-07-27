@@ -1,4 +1,4 @@
-import { FC, ReactElement, useState, ChangeEvent } from 'react';
+import { useState, FC, ReactElement, ChangeEvent } from 'react';
 import { Plus, Search, Filter, MoreVertical } from 'lucide-react';
 import { clsx } from 'clsx';
 

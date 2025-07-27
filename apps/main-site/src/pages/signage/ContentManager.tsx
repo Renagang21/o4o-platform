@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef, FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, File, Image, Video, Trash2, Edit3, Save } from 'lucide-react';
 import Navbar from '../../components/Navbar';

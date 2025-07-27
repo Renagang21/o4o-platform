@@ -3,7 +3,7 @@
  * WordPress 수준의 완전 커스터마이징 정책 관리
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FC, ReactNode } from 'react';
 import {
   Settings,
   Users,

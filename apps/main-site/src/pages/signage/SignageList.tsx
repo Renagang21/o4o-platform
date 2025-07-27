@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Image, FileText, Video, Bell } from 'lucide-react';
 

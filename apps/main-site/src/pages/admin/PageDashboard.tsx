@@ -1,6 +1,6 @@
 // 📚 페이지 관리 대시보드 (관리자용)
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 

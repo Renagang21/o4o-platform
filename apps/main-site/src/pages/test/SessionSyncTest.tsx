@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useCookieAuth } from '@o4o/auth-context';
 import { Card, CardHeader, CardTitle, CardContent, Button, Badge } from '@o4o/ui';
 

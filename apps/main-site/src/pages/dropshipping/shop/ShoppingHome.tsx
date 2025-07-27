@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User, Star, Truck, Heart, Filter } from 'lucide-react';
 import Navbar from '../../../components/Navbar';

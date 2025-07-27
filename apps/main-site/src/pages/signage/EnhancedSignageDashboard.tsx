@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FC, Component } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, Monitor, Play, Pause, Upload, Settings, Eye, Tv, 

@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 
 const Forbidden: FC = () => (
   <div style={{ padding: 40, textAlign: 'center' }}>

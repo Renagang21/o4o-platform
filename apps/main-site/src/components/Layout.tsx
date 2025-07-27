@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Outlet } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import Footer from './Footer';

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, FC } from 'react';
 import { TemplateBlock } from '../../api/content/contentApi';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import HeadingBlock from './blocks/HeadingBlock';

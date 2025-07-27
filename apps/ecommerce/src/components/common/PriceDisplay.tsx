@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { formatCurrency, formatPercentage } from '@o4o/utils';
 import { cn } from '@o4o/utils';
 import { PriceByRole } from '@o4o/types';

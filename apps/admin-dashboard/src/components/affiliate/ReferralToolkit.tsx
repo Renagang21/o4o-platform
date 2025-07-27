@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC, createElement } from 'react';
 import { 
   Link2, QrCode, MessageSquare, Image, 
   Download, Copy, Check, Smartphone, Monitor 

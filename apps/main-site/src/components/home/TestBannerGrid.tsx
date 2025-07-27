@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { TestBanner } from '../../types/testData';
 import Card from '../common/Card';

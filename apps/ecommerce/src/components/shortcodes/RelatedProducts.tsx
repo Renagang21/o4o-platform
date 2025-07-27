@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import type { Product } from '@o4o/types';
 import { formatCurrency } from '@o4o/utils';

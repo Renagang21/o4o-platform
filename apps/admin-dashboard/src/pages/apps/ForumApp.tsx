@@ -1,6 +1,6 @@
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare, Users, FileText, Settings, Shield, Folder } from 'lucide-react';
-import { lazy, Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { Button } from '@/components/ui/button';
 
 // Lazy load forum components

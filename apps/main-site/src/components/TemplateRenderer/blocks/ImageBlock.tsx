@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, lazy } from 'react';
 
 interface ImageBlockProps {
   src: string;

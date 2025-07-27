@@ -3,7 +3,7 @@
  * 대시보드 데이터 관리 훅 - 수동 새로고침 방식
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../../../api/dashboard';
 

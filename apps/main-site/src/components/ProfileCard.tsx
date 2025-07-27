@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { User, UserRole } from '../contexts/AuthContext';
 import { UserCircle, Mail, Shield, Calendar, LogOut, KeyRound } from 'lucide-react';
 

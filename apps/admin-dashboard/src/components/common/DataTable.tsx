@@ -1,4 +1,4 @@
-import { ReactNode, ReactElement, useState } from 'react';
+import { useState, ReactNode, ReactElement } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from 'lucide-react';
 import { clsx } from 'clsx';
 

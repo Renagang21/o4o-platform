@@ -1,4 +1,4 @@
-import React, { useActionState, useOptimistic, use } from 'react';
+import { useEffect, FC } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 

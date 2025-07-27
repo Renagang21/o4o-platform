@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import ProductInfoHub from '../../components/dropshipping/ProductInfoHub';
 import TrustIndicator from '../../components/common/TrustIndicator';
 

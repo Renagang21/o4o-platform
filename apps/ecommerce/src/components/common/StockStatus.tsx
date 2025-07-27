@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC } from 'react';
 import { cn } from '@o4o/utils';
 import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 

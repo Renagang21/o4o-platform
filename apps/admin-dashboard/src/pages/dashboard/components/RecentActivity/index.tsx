@@ -3,7 +3,7 @@
  * 최근 활동 위젯 - 시스템 전체 활동 모니터링
  */
 
-import { memo, useState } from 'react';
+import { useState, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Clock,

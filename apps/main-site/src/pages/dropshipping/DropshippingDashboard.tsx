@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import UserRoleSwitch from '../../components/common/UserRoleSwitch';
 import TrustIndicator from '../../components/common/TrustIndicator';
 
