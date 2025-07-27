@@ -28,7 +28,7 @@ interface SalesTargetPoliciesProps {
   onUpdate: (updates: Partial<SalesTargetSettings>) => void;
 }
 
-const SalesTargetPolicies: React.FC<SalesTargetPoliciesProps> = ({ settings, onUpdate }) => {
+const SalesTargetPolicies: FC<SalesTargetPoliciesProps> = ({ settings, onUpdate }) => {
   const [_previewMode, _setPreviewMode] = useState(false);
 
   // Mock current sales data for demonstration

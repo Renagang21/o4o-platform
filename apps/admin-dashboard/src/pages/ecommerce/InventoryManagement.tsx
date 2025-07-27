@@ -59,7 +59,7 @@ interface StockAdjustmentFormData {
   notes?: string;
 }
 
-const InventoryManagement: React.FC = () => {
+const InventoryManagement: FC = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

@@ -18,7 +18,7 @@ interface ContentStatsProps {
   isLoading?: boolean;
 }
 
-const ContentStats: React.FC<ContentStatsProps> = ({ data, isLoading = false }) => {
+const ContentStats: FC<ContentStatsProps> = ({ data, isLoading = false }) => {
   if (isLoading) {
     return (
       <div className="wp-card animate-pulse">

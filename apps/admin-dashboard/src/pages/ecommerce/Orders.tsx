@@ -20,7 +20,7 @@ import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-const Orders: React.FC = () => {
+const Orders: FC = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<OrderFilters>({});

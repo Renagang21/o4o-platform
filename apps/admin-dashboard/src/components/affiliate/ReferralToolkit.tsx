@@ -19,7 +19,7 @@ interface ReferralToolkitProps {
   userName?: string;
 }
 
-export const ReferralToolkit: React.FC<ReferralToolkitProps> = ({
+export const ReferralToolkit: FC<ReferralToolkitProps> = ({
   referralCode,
   userName = '회원'
 }) => {

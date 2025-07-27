@@ -22,7 +22,7 @@ interface PartnerStatsProps {
   isLoading?: boolean;
 }
 
-const PartnerStats: React.FC<PartnerStatsProps> = ({ data, isLoading = false }) => {
+const PartnerStats: FC<PartnerStatsProps> = ({ data, isLoading = false }) => {
   if (isLoading) {
     return (
       <div className="wp-card animate-pulse">

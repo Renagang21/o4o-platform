@@ -48,7 +48,7 @@ interface TossPaymentsTest {
   executedAt: string;
 }
 
-const TossPaymentsSettings: React.FC = () => {
+const TossPaymentsSettings: FC = () => {
   const queryClient = useQueryClient();
   const [isTestDialogOpen, setIsTestDialogOpen] = useState(false);
   const [selectedTestType, setSelectedTestType] = useState<'connection' | 'payment' | 'webhook'>('connection');

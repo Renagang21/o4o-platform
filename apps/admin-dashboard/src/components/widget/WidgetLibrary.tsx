@@ -29,7 +29,7 @@ interface WidgetLibraryProps {
   onApplyTemplate: () => void
 }
 
-const WidgetLibrary: React.FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
+const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<WidgetCategory | 'all'>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')

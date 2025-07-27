@@ -33,7 +33,7 @@ interface GetUserResponse {
   data: User;
 }
 
-const UserEdit: React.FC = () => {
+const UserEdit: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();

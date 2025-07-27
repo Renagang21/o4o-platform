@@ -13,7 +13,7 @@ interface AtAGlanceProps {
   };
 }
 
-const AtAGlance: React.FC<AtAGlanceProps> = ({ stats = {} }) => {
+const AtAGlance: FC<AtAGlanceProps> = ({ stats = {} }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   
   const {

@@ -9,7 +9,7 @@ interface BulkActionsProps {
   availableActions?: ('approve' | 'reject' | 'suspend' | 'reactivate' | 'delete' | 'email')[]
 }
 
-const BulkActions: React.FC<BulkActionsProps> = ({
+const BulkActions: FC<BulkActionsProps> = ({
   selectedCount,
   onBulkAction,
   onClearSelection,

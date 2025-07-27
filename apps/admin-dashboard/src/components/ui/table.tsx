@@ -1,9 +1,9 @@
-import React from "react"
+import { forwardRef, type LabelHTMLAttributes, type ElementRef, type ComponentPropsWithoutRef } from "react"
 import { cn } from "@/lib/utils"
 
-const Table = React.forwardRef<
-  React.ElementRef<"table">,
-  React.ComponentPropsWithoutRef<"table">
+const Table = forwardRef<
+  ElementRef<"table">,
+  ComponentPropsWithoutRef<"table">
 >(({ className, ...props }, ref) => (
   <div className="relative w-full overflow-auto">
     <table
@@ -15,17 +15,17 @@ const Table = React.forwardRef<
 ))
 Table.displayName = "Table"
 
-const TableHeader = React.forwardRef<
-  React.ElementRef<"thead">,
-  React.ComponentPropsWithoutRef<"thead">
+const TableHeader = forwardRef<
+  ElementRef<"thead">,
+  ComponentPropsWithoutRef<"thead">
 >(({ className, ...props }, ref) => (
   <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
 ))
 TableHeader.displayName = "TableHeader"
 
-const TableBody = React.forwardRef<
-  React.ElementRef<"tbody">,
-  React.ComponentPropsWithoutRef<"tbody">
+const TableBody = forwardRef<
+  ElementRef<"tbody">,
+  ComponentPropsWithoutRef<"tbody">
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
@@ -35,9 +35,9 @@ const TableBody = React.forwardRef<
 ))
 TableBody.displayName = "TableBody"
 
-const TableFooter = React.forwardRef<
-  React.ElementRef<"tfoot">,
-  React.ComponentPropsWithoutRef<"tfoot">
+const TableFooter = forwardRef<
+  ElementRef<"tfoot">,
+  ComponentPropsWithoutRef<"tfoot">
 >(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
@@ -50,9 +50,9 @@ const TableFooter = React.forwardRef<
 ))
 TableFooter.displayName = "TableFooter"
 
-const TableRow = React.forwardRef<
-  React.ElementRef<"tr">,
-  React.ComponentPropsWithoutRef<"tr">
+const TableRow = forwardRef<
+  ElementRef<"tr">,
+  ComponentPropsWithoutRef<"tr">
 >(({ className, ...props }, ref) => (
   <tr
     ref={ref}
@@ -65,9 +65,9 @@ const TableRow = React.forwardRef<
 ))
 TableRow.displayName = "TableRow"
 
-const TableHead = React.forwardRef<
-  React.ElementRef<"th">,
-  React.ComponentPropsWithoutRef<"th">
+const TableHead = forwardRef<
+  ElementRef<"th">,
+  ComponentPropsWithoutRef<"th">
 >(({ className, ...props }, ref) => (
   <th
     ref={ref}
@@ -80,9 +80,9 @@ const TableHead = React.forwardRef<
 ))
 TableHead.displayName = "TableHead"
 
-const TableCell = React.forwardRef<
-  React.ElementRef<"td">,
-  React.ComponentPropsWithoutRef<"td">
+const TableCell = forwardRef<
+  ElementRef<"td">,
+  ComponentPropsWithoutRef<"td">
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
@@ -92,9 +92,9 @@ const TableCell = React.forwardRef<
 ))
 TableCell.displayName = "TableCell"
 
-const TableCaption = React.forwardRef<
-  React.ElementRef<"caption">,
-  React.ComponentPropsWithoutRef<"caption">
+const TableCaption = forwardRef<
+  ElementRef<"caption">,
+  ComponentPropsWithoutRef<"caption">
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}

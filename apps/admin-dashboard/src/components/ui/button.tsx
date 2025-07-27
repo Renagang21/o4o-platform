@@ -1,4 +1,4 @@
-import React from "react"
+import { forwardRef, type LabelHTMLAttributes, type ElementRef, type ComponentPropsWithoutRef } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
@@ -34,7 +34,7 @@ export interface ButtonProps
   asChild?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? "span" : "button"
     return (

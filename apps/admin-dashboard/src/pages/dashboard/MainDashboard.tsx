@@ -28,7 +28,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useRefresh } from './hooks/useRefresh';
 
-const MainDashboard: React.FC = () => {
+const MainDashboard: FC = () => {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   
   // Dashboard data management

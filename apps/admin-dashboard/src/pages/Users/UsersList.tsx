@@ -50,7 +50,7 @@ interface UsersResponse {
   message: string;
 }
 
-const UsersList: React.FC = () => {
+const UsersList: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   

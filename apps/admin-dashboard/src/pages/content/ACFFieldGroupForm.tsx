@@ -1,4 +1,4 @@
-import React from 'react';
+import { type FC } from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { 
@@ -41,7 +41,7 @@ import FieldTypeSelector from '@/components/acf/FieldTypeSelector'
 import FieldEditor from '@/components/acf/FieldEditor'
 import RepeaterFieldEditor from '@/components/acf/RepeaterFieldEditor'
 
-const ACFFieldGroupForm: React.FC = () => {
+const ACFFieldGroupForm: FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const queryClient = useQueryClient()

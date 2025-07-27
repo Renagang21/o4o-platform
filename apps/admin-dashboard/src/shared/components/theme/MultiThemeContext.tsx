@@ -20,7 +20,7 @@ interface MultiThemeProviderProps {
   defaultTheme?: string
 }
 
-export const MultiThemeProvider: React.FC<MultiThemeProviderProps> = ({ 
+export const MultiThemeProvider: FC<MultiThemeProviderProps> = ({ 
   children, 
   defaultTheme = 'light' 
 }) => {

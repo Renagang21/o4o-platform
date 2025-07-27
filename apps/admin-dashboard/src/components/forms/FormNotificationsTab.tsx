@@ -14,7 +14,7 @@ interface FormNotificationsTabProps {
   onChange: (notifications: FormNotification[]) => void;
 }
 
-export const FormNotificationsTab: React.FC<FormNotificationsTabProps> = ({
+export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
   notifications,
   fields: _fields,
   onChange,

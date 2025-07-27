@@ -50,7 +50,7 @@ interface ImageFormats {
   jpg: ImageSizes
 }
 
-const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
+const ResponsiveImage: FC<ResponsiveImageProps> = ({
   mediaId,
   alt = '',
   className = '',
@@ -453,7 +453,7 @@ export const useResponsiveImage = (mediaId: string) => {
 }
 
 // Simple version for when you just need a basic responsive image
-export const SimpleResponsiveImage: React.FC<{
+export const SimpleResponsiveImage: FC<{
   mediaId: string
   alt?: string
   className?: string

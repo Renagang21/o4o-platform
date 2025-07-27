@@ -17,7 +17,7 @@ import { formatPrice, formatRate } from '@/utils/vendorUtils';
 import toast from 'react-hot-toast';
 import type { AffiliateCommission, ProcessCommissionRequest } from '@o4o/types';
 
-export const CommissionApprovalManager: React.FC = () => {
+export const CommissionApprovalManager: FC = () => {
   const [commissions, setCommissions] = useState<AffiliateCommission[]>([]);
   const [selectedCommissions, setSelectedCommissions] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);

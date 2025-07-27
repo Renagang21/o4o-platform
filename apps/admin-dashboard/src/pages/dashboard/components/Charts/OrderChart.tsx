@@ -18,7 +18,7 @@ interface OrderChartProps {
   isLoading?: boolean;
 }
 
-const OrderChart: React.FC<OrderChartProps> = ({ data, isLoading = false }) => {
+const OrderChart: FC<OrderChartProps> = ({ data, isLoading = false }) => {
   // 데이터 가공
   const processedData = useMemo(() => {
     if (!data.length) {

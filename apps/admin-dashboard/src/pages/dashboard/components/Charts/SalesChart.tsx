@@ -29,7 +29,7 @@ interface SalesChartProps {
   isLoading?: boolean;
 }
 
-const SalesChart: React.FC<SalesChartProps> = ({ data, isLoading = false }) => {
+const SalesChart: FC<SalesChartProps> = ({ data, isLoading = false }) => {
   const [chartType, setChartType] = useState<'line' | 'area'>('line');
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 

@@ -31,7 +31,7 @@ interface ForumComment {
   replies?: ForumComment[];
 }
 
-const ForumPostDetail: React.FC = () => {
+const ForumPostDetail: FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

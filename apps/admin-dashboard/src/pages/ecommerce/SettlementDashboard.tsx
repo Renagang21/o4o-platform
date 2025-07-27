@@ -49,7 +49,7 @@ interface FeeBreakdown {
   color: string;
 }
 
-const SettlementDashboard: React.FC = () => {
+const SettlementDashboard: FC = () => {
   const [dateRange, setDateRange] = useState('7days');
 
   // Fetch settlement overview

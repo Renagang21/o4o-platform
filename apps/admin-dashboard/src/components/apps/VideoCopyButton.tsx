@@ -14,7 +14,7 @@ interface VideoCopyButtonProps {
   onCopySuccess?: (newPostId: string) => void;
 }
 
-export const VideoCopyButton: React.FC<VideoCopyButtonProps> = ({
+export const VideoCopyButton: FC<VideoCopyButtonProps> = ({
   postId,
   postType = 'signage_video',
   size = 'default',
@@ -122,7 +122,7 @@ export const VideoCopyButton: React.FC<VideoCopyButtonProps> = ({
 };
 
 // Shortcode용 래퍼 컴포넌트
-export const VideoCopyButtonShortcode: React.FC<{ 
+export const VideoCopyButtonShortcode: FC<{ 
   postId: string;
   size?: string;
 }> = ({ postId, size = 'default' }) => {

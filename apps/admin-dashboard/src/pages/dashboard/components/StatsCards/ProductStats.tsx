@@ -22,7 +22,7 @@ interface ProductStatsProps {
   isLoading?: boolean;
 }
 
-const ProductStats: React.FC<ProductStatsProps> = ({ data, isLoading = false }) => {
+const ProductStats: FC<ProductStatsProps> = ({ data, isLoading = false }) => {
   if (isLoading) {
     return (
       <div className="wp-card animate-pulse">

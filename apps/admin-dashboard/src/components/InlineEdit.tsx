@@ -17,7 +17,7 @@ interface InlineEditProps {
   showEditIcon?: boolean;
 }
 
-const InlineEdit: React.FC<InlineEditProps> = ({
+const InlineEdit: FC<InlineEditProps> = ({
   value,
   onSave,
   onCancel,

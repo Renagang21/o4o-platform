@@ -13,7 +13,7 @@ interface NotificationBadgeProps {
   color?: 'red' | 'orange' | 'blue' | 'green';
 }
 
-const NotificationBadge: React.FC<NotificationBadgeProps> = ({
+const NotificationBadge: FC<NotificationBadgeProps> = ({
   count,
   max = 99,
   className = '',

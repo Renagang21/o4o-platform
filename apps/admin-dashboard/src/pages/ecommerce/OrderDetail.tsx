@@ -21,7 +21,7 @@ import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-const OrderDetail: React.FC = () => {
+const OrderDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [showRefundModal, setShowRefundModal] = useState(false);

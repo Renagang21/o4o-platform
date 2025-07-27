@@ -29,7 +29,7 @@ interface BlockEditorProps {
   onChange: (updates: Partial<TemplateBlock>) => void
 }
 
-const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
+const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
   const [activeDevice, setActiveDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
   // Update content
@@ -67,7 +67,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
   }
 
   // Color picker component
-  const ColorPicker: React.FC<{ 
+  const ColorPicker: FC<{ 
     label: string
     value: string
     onChange: (value: string) => void 
@@ -92,7 +92,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => {
   )
 
   // Spacing controls
-  const SpacingControls: React.FC<{
+  const SpacingControls: FC<{
     label: string
     value: Record<string, string>
     onChange: (value: Record<string, string>) => void

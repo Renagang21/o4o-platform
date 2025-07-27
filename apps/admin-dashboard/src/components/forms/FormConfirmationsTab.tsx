@@ -14,7 +14,7 @@ interface FormConfirmationsTabProps {
   onChange: (confirmations: FormConfirmation[]) => void;
 }
 
-export const FormConfirmationsTab: React.FC<FormConfirmationsTabProps> = ({
+export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
   confirmations,
   fields: _fields,
   onChange,

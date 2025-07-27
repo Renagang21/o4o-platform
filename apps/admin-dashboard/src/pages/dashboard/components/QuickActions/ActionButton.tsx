@@ -19,7 +19,7 @@ interface ActionButtonProps {
   tooltip?: string;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({
+const ActionButton: FC<ActionButtonProps> = ({
   id: _id,
   title,
   description,

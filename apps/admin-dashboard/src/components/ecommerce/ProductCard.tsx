@@ -8,7 +8,7 @@ interface ProductCardProps {
   onDuplicate?: (productId: string) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+export const ProductCard: FC<ProductCardProps> = ({
   product,
   onEdit,
   onDelete,

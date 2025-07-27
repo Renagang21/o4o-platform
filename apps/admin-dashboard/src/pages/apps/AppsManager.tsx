@@ -55,7 +55,7 @@ interface AppSettings {
   customSettings: Record<string, any>;
 }
 
-const AppsManager: React.FC = () => {
+const AppsManager: FC = () => {
   const queryClient = useQueryClient();
   const [selectedApp, setSelectedApp] = useState<PlatformApp | null>(null);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);

@@ -92,7 +92,7 @@ interface StatusChangeData {
   estimatedDelivery?: string;
 }
 
-const OrderStatusManagement: React.FC = () => {
+const OrderStatusManagement: FC = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

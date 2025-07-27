@@ -22,7 +22,7 @@ interface ShareButtonsProps {
   className?: string;
 }
 
-export const ShareButtons: React.FC<ShareButtonsProps> = ({
+export const ShareButtons: FC<ShareButtonsProps> = ({
   url,
   title = 'O4O Platform',
   description = '함께 성장하는 B2B 플랫폼',
@@ -244,7 +244,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
 };
 
 // 추천 링크 공유를 위한 특화 컴포넌트
-export const ReferralShareButtons: React.FC<{
+export const ReferralShareButtons: FC<{
   productId?: string;
   referralCode: string;
   productName?: string;

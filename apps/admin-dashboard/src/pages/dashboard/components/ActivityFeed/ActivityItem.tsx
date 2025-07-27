@@ -20,7 +20,7 @@ interface ActivityItemProps {
   typeColor: string;
 }
 
-const ActivityItem: React.FC<ActivityItemProps> = ({ activity, typeColor }) => {
+const ActivityItem: FC<ActivityItemProps> = ({ activity, typeColor }) => {
   const { type, message, time, user, icon } = activity;
 
   // 타입별 배경색

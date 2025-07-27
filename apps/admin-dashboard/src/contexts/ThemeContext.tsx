@@ -26,7 +26,7 @@ interface ThemeProviderProps {
   storageKey?: string;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+export const ThemeProvider: FC<ThemeProviderProps> = ({
   children,
   defaultTheme = 'system',
   storageKey = 'o4o-admin-theme',

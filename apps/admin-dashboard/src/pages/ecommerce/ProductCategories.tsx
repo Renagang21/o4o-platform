@@ -69,7 +69,7 @@ interface CategoryFormData {
   };
 }
 
-const ProductCategories: React.FC = () => {
+const ProductCategories: FC = () => {
   const queryClient = useQueryClient();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [isDialogOpen, setIsDialogOpen] = useState(false);

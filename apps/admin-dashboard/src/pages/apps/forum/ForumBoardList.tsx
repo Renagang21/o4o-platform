@@ -42,7 +42,7 @@ interface ForumPost {
   updatedAt: string;
 }
 
-const ForumBoardList: React.FC = () => {
+const ForumBoardList: FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');

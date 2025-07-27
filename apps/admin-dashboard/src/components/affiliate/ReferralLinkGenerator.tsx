@@ -14,7 +14,7 @@ interface ReferralLinkGeneratorProps {
   userName?: string;
 }
 
-export const ReferralLinkGenerator: React.FC<ReferralLinkGeneratorProps> = ({
+export const ReferralLinkGenerator: FC<ReferralLinkGeneratorProps> = ({
   referralCode,
   userName = '회원',
 }) => {

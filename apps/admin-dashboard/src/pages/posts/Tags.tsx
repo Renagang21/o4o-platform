@@ -17,7 +17,7 @@ import { Tag } from '@/types/content'
 import { ContentApi } from '@/api/contentApi'
 import toast from 'react-hot-toast'
 
-const Tags: React.FC = () => {
+const Tags: FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [tags, setTags] = useState<Tag[]>([])

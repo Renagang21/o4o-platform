@@ -51,7 +51,7 @@ import FolderManager from '@/components/media/FolderManager'
 
 type ViewMode = 'grid' | 'list'
 
-const MediaLibrary: React.FC = () => {
+const MediaLibrary: FC = () => {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 

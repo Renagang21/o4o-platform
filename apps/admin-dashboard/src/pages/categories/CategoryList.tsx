@@ -26,7 +26,7 @@ interface CategoryFormData {
   parentId?: string
 }
 
-const CategoryList: React.FC = () => {
+const CategoryList: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null)
   const [formData, setFormData] = useState<CategoryFormData>({

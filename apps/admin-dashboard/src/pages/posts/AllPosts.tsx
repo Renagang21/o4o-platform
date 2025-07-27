@@ -23,7 +23,7 @@ import { ContentApi } from '@/api/contentApi'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
-const AllPosts: React.FC = () => {
+const AllPosts: FC = () => {
   const [loading, setLoading] = useState(true)
   const [posts, setPosts] = useState<Post[]>([])
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([])

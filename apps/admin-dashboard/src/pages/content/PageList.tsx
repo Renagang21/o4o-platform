@@ -32,7 +32,7 @@ import { authClient } from '@o4o/auth-client'
 import type { Post, PostStatus } from '@o4o/types'
 import toast from 'react-hot-toast'
 
-const PageList: React.FC = () => {
+const PageList: FC = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')

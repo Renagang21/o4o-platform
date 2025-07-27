@@ -23,7 +23,7 @@ interface NotificationsProps {
   isLoading?: boolean;
 }
 
-const Notifications: React.FC<NotificationsProps> = ({ 
+const Notifications: FC<NotificationsProps> = ({ 
   notifications = [], 
   isLoading = false 
 }) => {

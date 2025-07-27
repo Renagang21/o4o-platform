@@ -14,7 +14,7 @@ import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
 import type { VendorProduct, ProductApprovalRequest } from '@o4o/types';
 
-export const ProductApprovalManager: React.FC = () => {
+export const ProductApprovalManager: FC = () => {
   const { user } = useAuth();
   const [products, setProducts] = useState<VendorProduct[]>([]);
   const [loading, setLoading] = useState(true);

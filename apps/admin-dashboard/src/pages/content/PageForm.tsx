@@ -36,7 +36,7 @@ const pageTemplates = [
   { value: 'about', label: '회사 소개' },
 ]
 
-const PageForm: React.FC = () => {
+const PageForm: FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const queryClient = useQueryClient()

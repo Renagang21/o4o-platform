@@ -25,7 +25,7 @@ interface MediaSelectorProps {
   initialSelection?: string[]
 }
 
-const MediaSelector: React.FC<MediaSelectorProps> = ({
+const MediaSelector: FC<MediaSelectorProps> = ({
   multiple = true,
   allowedTypes = ['image'],
   onSelect,

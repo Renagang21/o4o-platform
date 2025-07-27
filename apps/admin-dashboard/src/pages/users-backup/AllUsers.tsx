@@ -8,7 +8,7 @@ import UserFilters from './components/UserFilters'
 import BulkActions from './components/BulkActions'
 import toast from 'react-hot-toast'
 
-const AllUsers: React.FC = () => {
+const AllUsers: FC = () => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<UserStats | null>(null)

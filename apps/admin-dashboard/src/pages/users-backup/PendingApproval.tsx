@@ -6,7 +6,7 @@ import UserTable from './components/UserTable'
 import BulkActions from './components/BulkActions'
 import toast from 'react-hot-toast'
 
-const PendingApproval: React.FC = () => {
+const PendingApproval: FC = () => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])

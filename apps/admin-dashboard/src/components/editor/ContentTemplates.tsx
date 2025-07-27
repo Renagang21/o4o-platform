@@ -193,7 +193,7 @@ interface ContentTemplatesProps {
   mode?: 'templates' | 'patterns' | 'both';
 }
 
-const ContentTemplates: React.FC<ContentTemplatesProps> = ({
+const ContentTemplates: FC<ContentTemplatesProps> = ({
   onSelectTemplate,
   onSelectPattern,
   mode = 'both'

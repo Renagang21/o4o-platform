@@ -1,4 +1,4 @@
-import React from 'react';
+import { type FC } from 'react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom'
 import { 
@@ -17,10 +17,10 @@ interface AdminSidebarProps {
   onClose: () => void
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
+const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation()
   const { user } = useAuth()
-  const [expandedItems, setExpandedItems] = React.useState<string[]>([])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [isCollapsed, setIsCollapsed] = useState(false)
   
   // 동적 메뉴 가져오기 (활성화된 앱 기반)

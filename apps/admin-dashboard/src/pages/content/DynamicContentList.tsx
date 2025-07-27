@@ -44,7 +44,7 @@ import { authClient } from '@o4o/auth-client'
 import type { Post, PostStatus, CustomPostType } from '@o4o/types'
 import toast from 'react-hot-toast'
 
-const DynamicContentList: React.FC = () => {
+const DynamicContentList: FC = () => {
   const navigate = useNavigate()
   const { slug } = useParams()
   const queryClient = useQueryClient()

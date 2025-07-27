@@ -30,7 +30,7 @@ interface UserChartProps {
   isLoading?: boolean;
 }
 
-const UserChart: React.FC<UserChartProps> = ({ data, isLoading = false }) => {
+const UserChart: FC<UserChartProps> = ({ data, isLoading = false }) => {
   const [chartType, setChartType] = useState<'bar' | 'line' | 'combined'>('bar');
 
   // 데이터 가공

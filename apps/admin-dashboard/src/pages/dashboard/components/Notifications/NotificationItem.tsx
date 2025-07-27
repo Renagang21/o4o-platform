@@ -31,7 +31,7 @@ interface NotificationItemProps {
   onAction?: (url: string) => void;
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({
+const NotificationItem: FC<NotificationItemProps> = ({
   notification,
   onMarkRead,
   onDismiss,

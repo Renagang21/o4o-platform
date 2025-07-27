@@ -27,7 +27,7 @@ interface ForumPostFormData {
   isLocked: boolean;
 }
 
-const ForumPostForm: React.FC = () => {
+const ForumPostForm: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();

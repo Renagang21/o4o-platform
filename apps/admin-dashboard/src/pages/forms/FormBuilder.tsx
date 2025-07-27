@@ -102,7 +102,7 @@ const fieldTypeConfig: Record<FormFieldType, { label: string; icon: any; categor
   'payment': { label: '결제', icon: CreditCard, category: 'special' },
 };
 
-const FormBuilder: React.FC = () => {
+const FormBuilder: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();

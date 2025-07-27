@@ -30,7 +30,7 @@ interface UploadingFile {
   error?: string
 }
 
-const MediaUploader: React.FC<MediaUploaderProps> = ({
+const MediaUploader: FC<MediaUploaderProps> = ({
   onUpload,
   onClose,
   currentFolder,

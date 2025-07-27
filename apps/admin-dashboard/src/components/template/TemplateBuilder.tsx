@@ -1,4 +1,4 @@
-import React from 'react';
+import { type FC } from 'react';
 import { useState, useCallback, useRef } from 'react';
 import {
   X,
@@ -57,7 +57,7 @@ interface TemplateBuilderProps {
   onSave: () => void
 }
 
-const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
+const TemplateBuilder: FC<TemplateBuilderProps> = ({
   template,
   onClose,
   onSave

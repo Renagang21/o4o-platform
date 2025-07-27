@@ -51,7 +51,7 @@ interface SettlementApproval {
   memo?: string;
 }
 
-const VendorSettlements: React.FC = () => {
+const VendorSettlements: FC = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

@@ -17,7 +17,7 @@ interface ScreenOptionsProps {
   onItemsPerPageChange?: (items: number) => void;
 }
 
-const ScreenOptions: React.FC<ScreenOptionsProps> = ({
+const ScreenOptions: FC<ScreenOptionsProps> = ({
   options,
   onOptionChange,
   columnsPerPage = 2,

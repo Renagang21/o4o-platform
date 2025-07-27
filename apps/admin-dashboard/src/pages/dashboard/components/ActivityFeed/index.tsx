@@ -22,7 +22,7 @@ interface ActivityFeedProps {
   onRefresh?: () => void;
 }
 
-const ActivityFeed: React.FC<ActivityFeedProps> = ({ 
+const ActivityFeed: FC<ActivityFeedProps> = ({ 
   activities = [], 
   isLoading = false,
   onRefresh

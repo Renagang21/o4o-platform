@@ -46,7 +46,7 @@ import WidgetLibrary from '@/components/widget/WidgetLibrary'
 
 type ViewMode = 'builder' | 'list' | 'library'
 
-const WidgetManager: React.FC = () => {
+const WidgetManager: FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('builder')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPosition, setSelectedPosition] = useState<WidgetPosition | 'all'>('all')

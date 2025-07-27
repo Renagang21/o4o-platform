@@ -13,7 +13,7 @@ interface RepeaterFieldEditorProps {
   onChange: (field: ACFRepeaterField) => void
 }
 
-const RepeaterFieldEditor: React.FC<RepeaterFieldEditorProps> = ({ field, onChange }) => {
+const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) => {
   const [expandedFields, setExpandedFields] = useState<string[]>([])
 
   const handleAddSubField = () => {

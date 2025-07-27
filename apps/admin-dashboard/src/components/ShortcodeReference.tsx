@@ -119,7 +119,7 @@ const shortcodes: ShortcodeInfo[] = [
   }
 ];
 
-const ShortcodeReference: React.FC = () => {
+const ShortcodeReference: FC = () => {
   const [expandedShortcode, setExpandedShortcode] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 

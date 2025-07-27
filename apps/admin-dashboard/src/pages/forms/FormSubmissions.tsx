@@ -55,7 +55,7 @@ import type { Form, FormSubmission } from '@o4o/types';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 
-const FormSubmissions: React.FC = () => {
+const FormSubmissions: FC = () => {
   const navigate = useNavigate();
   const { formId } = useParams();
   

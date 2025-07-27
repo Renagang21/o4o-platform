@@ -61,7 +61,7 @@ interface RefundProcessData {
   notifyCustomer: boolean;
 }
 
-const RefundManagement: React.FC = () => {
+const RefundManagement: FC = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

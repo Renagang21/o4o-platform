@@ -14,7 +14,7 @@ interface RefreshButtonProps {
   showText?: boolean;
 }
 
-const RefreshButton: React.FC<RefreshButtonProps> = ({ 
+const RefreshButton: FC<RefreshButtonProps> = ({ 
   onRefresh, 
   isRefreshing, 
   className = '',

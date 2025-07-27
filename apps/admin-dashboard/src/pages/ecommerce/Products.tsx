@@ -18,7 +18,7 @@ import { useProducts, useDeleteProduct, useDuplicateProduct } from '@/hooks/useP
 import { Product, ProductFilters } from '@/types/ecommerce';
 import { formatCurrency } from '@/lib/utils';
 
-const Products: React.FC = () => {
+const Products: FC = () => {
   const navigate = useNavigate();
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [page, setPage] = useState(1);

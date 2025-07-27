@@ -63,7 +63,7 @@ const mockTemplates: LayoutTemplate[] = [
   }
 ];
 
-const TemplateLayoutManager: React.FC = () => {
+const TemplateLayoutManager: FC = () => {
   const [templates, _setTemplates] = useState<LayoutTemplate[]>(mockTemplates);
   const [selectedLayoutType, setSelectedLayoutType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');

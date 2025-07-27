@@ -41,7 +41,7 @@ import {
 } from '@/components/ui/dialog';
 
 // Enhanced block component with Spectra blocks
-const EnhancedBlockItem: React.FC<{
+const EnhancedBlockItem: FC<{
   block: any;
   isEditing: boolean;
   onUpdate: (content: any) => void;
@@ -63,7 +63,7 @@ const EnhancedBlockItem: React.FC<{
   }
 };
 
-const GutenbergPage: React.FC = () => {
+const GutenbergPage: FC = () => {
   const navigate = useNavigate();
   const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);

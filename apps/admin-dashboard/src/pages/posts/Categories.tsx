@@ -18,7 +18,7 @@ import { Category } from '@/types/content'
 import { ContentApi } from '@/api/contentApi'
 import toast from 'react-hot-toast'
 
-const Categories: React.FC = () => {
+const Categories: FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])

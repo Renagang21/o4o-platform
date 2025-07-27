@@ -12,7 +12,7 @@ interface DraggableWidgetProps {
   defaultCollapsed?: boolean;
 }
 
-const DraggableWidget: React.FC<DraggableWidgetProps> = ({
+const DraggableWidget: FC<DraggableWidgetProps> = ({
   id,
   title,
   children,
@@ -112,7 +112,7 @@ interface WidgetContainerProps {
   columns?: number;
 }
 
-export const WidgetContainer: React.FC<WidgetContainerProps> = ({
+export const WidgetContainer: FC<WidgetContainerProps> = ({
   children,
   onReorder,
   columns = 2,

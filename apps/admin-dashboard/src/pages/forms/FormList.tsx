@@ -42,7 +42,7 @@ import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-const FormList: React.FC = () => {
+const FormList: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   

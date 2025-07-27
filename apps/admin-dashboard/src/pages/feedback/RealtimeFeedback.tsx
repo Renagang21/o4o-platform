@@ -9,7 +9,7 @@ import { useAuthStore } from '../../api/authStore';
 */
 
 // 임시 대체 컴포넌트
-const RealtimeFeedback: React.FC = () => {
+const RealtimeFeedback: FC = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">실시간 피드백</h1>

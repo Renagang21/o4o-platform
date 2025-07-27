@@ -44,7 +44,7 @@ import TemplateLibrary from '@/components/template/TemplateLibrary'
 
 type ViewMode = 'grid' | 'list'
 
-const TemplateManager: React.FC = () => {
+const TemplateManager: FC = () => {
   const queryClient = useQueryClient()
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [searchQuery, setSearchQuery] = useState('')

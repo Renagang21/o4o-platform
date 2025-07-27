@@ -27,7 +27,7 @@ interface InventoryPoliciesProps {
   onUpdate: (updates: Partial<InventorySettings>) => void;
 }
 
-const InventoryPolicies: React.FC<InventoryPoliciesProps> = ({ settings, onUpdate }) => {
+const InventoryPolicies: FC<InventoryPoliciesProps> = ({ settings, onUpdate }) => {
   const [_selectedCategory, _setSelectedCategory] = useState<string>('all');
 
   // Mock inventory data for demonstration

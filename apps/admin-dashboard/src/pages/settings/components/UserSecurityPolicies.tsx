@@ -37,7 +37,7 @@ interface UserSecurityPoliciesProps {
   onUpdate: (updates: Partial<UserSecuritySettings>) => void;
 }
 
-const UserSecurityPolicies: React.FC<UserSecurityPoliciesProps> = ({ settings, onUpdate }) => {
+const UserSecurityPolicies: FC<UserSecurityPoliciesProps> = ({ settings, onUpdate }) => {
   const [showPasswordPolicy, setShowPasswordPolicy] = useState(false);
 
   // Mock security stats

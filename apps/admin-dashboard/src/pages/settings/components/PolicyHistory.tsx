@@ -35,7 +35,7 @@ interface PolicyHistoryProps {
   maxItems?: number;
 }
 
-const PolicyHistory: React.FC<PolicyHistoryProps> = ({ 
+const PolicyHistory: FC<PolicyHistoryProps> = ({ 
   category, 
   maxItems = 50 
 }) => {

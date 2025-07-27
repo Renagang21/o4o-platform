@@ -45,7 +45,7 @@ interface TemplateLibraryProps {
   onImport: () => void
 }
 
-const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
+const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
   const queryClient = useQueryClient()
   const [filter, setFilter] = useState<TemplateLibraryFilter>({
     category: undefined,

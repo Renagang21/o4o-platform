@@ -15,7 +15,7 @@ interface UserRoleChangeModalProps {
   isLoading?: boolean;
 }
 
-const UserRoleChangeModal: React.FC<UserRoleChangeModalProps> = ({
+const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
   isOpen,
   onClose,
   onConfirm,

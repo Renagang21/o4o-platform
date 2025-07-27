@@ -1,4 +1,4 @@
-import React from 'react';
+import { type FC } from 'react';
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -80,7 +80,7 @@ interface MediaLibraryProps {
   onClose?: () => void;
 }
 
-const MediaLibrary: React.FC<MediaLibraryProps> = ({
+const MediaLibrary: FC<MediaLibraryProps> = ({
   mode = 'library',
   onSelect,
   multiple = false,

@@ -35,7 +35,7 @@ interface ProductVariantManagerProps {
   onVariantsChange: (variants: ProductVariant[]) => void;
 }
 
-const ProductVariantManager: React.FC<ProductVariantManagerProps> = ({
+const ProductVariantManager: FC<ProductVariantManagerProps> = ({
   options,
   variants,
   basePrice,

@@ -64,7 +64,7 @@ interface DraggableMenuItem extends MenuItem {
   isExpanded?: boolean
 }
 
-const MenuBuilder: React.FC = () => {
+const MenuBuilder: FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const queryClient = useQueryClient()

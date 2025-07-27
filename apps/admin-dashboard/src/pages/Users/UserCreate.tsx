@@ -26,7 +26,7 @@ interface CreateUserResponse {
   message: string;
 }
 
-const UserCreate: React.FC = () => {
+const UserCreate: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);

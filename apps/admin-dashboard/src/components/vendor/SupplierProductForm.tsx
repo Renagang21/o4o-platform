@@ -25,7 +25,7 @@ interface SupplierProductFormProps {
   onCancel?: () => void;
 }
 
-export const SupplierProductForm: React.FC<SupplierProductFormProps> = ({
+export const SupplierProductForm: FC<SupplierProductFormProps> = ({
   product,
   onSuccess,
   onCancel

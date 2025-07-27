@@ -73,7 +73,7 @@ interface FieldFormData extends Omit<CustomField, 'id'> {
   tempId?: string
 }
 
-const CustomFieldBuilder: React.FC = () => {
+const CustomFieldBuilder: FC = () => {
   const navigate = useNavigate()
   const { cptId } = useParams()
   const queryClient = useQueryClient()

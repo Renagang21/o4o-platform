@@ -71,7 +71,7 @@ interface GutenbergSidebarProps {
 }
 
 // Panel component for collapsible sections
-const Panel: React.FC<{
+const Panel: FC<{
   title: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
@@ -95,7 +95,7 @@ const Panel: React.FC<{
   );
 };
 
-const GutenbergSidebar: React.FC<GutenbergSidebarProps> = ({
+const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   activeTab = 'document',
   postSettings,
   blockSettings,

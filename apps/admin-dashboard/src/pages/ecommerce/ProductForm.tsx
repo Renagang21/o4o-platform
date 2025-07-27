@@ -1,4 +1,4 @@
-import React from 'react';
+import { type FC } from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -18,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 // import TipTapEditor from '@/components/ui/TipTapEditor';
 
-const ProductForm: React.FC = () => {
+const ProductForm: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;

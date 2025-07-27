@@ -10,7 +10,7 @@ interface AdminLayoutProps {
   children: React.ReactNode
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { logout } = useAuth()
 

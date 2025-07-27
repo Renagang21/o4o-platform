@@ -163,7 +163,7 @@ const widgetTypes: WidgetTypeDefinition[] = [
   }
 ]
 
-const WidgetBuilder: React.FC<WidgetBuilderProps> = ({
+const WidgetBuilder: FC<WidgetBuilderProps> = ({
   widget,
   onSave,
   onCancel

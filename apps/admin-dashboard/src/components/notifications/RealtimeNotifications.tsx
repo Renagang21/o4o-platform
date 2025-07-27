@@ -24,7 +24,7 @@ interface RealtimeNotificationsProps {
   className?: string;
 }
 
-export const RealtimeNotifications: React.FC<RealtimeNotificationsProps> = ({ className }) => {
+export const RealtimeNotifications: FC<RealtimeNotificationsProps> = ({ className }) => {
   // 컴포넌트 로직...
 };
 */
@@ -34,7 +34,7 @@ interface RealtimeNotificationsProps {
   className?: string;
 }
 
-export const RealtimeNotifications: React.FC<RealtimeNotificationsProps> = ({ className = '' }) => {
+export const RealtimeNotifications: FC<RealtimeNotificationsProps> = ({ className = '' }) => {
   return (
     <div className={`relative ${className}`}>
       <div className="text-sm text-gray-500">

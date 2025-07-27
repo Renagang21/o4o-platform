@@ -33,7 +33,7 @@ interface PartnerPoliciesProps {
   onUpdate: (updates: Partial<PartnerPoliciesSettings>) => void;
 }
 
-const PartnerPolicies: React.FC<PartnerPoliciesProps> = ({ settings, onUpdate }) => {
+const PartnerPolicies: FC<PartnerPoliciesProps> = ({ settings, onUpdate }) => {
   const [editingTier, setEditingTier] = useState<number | null>(null);
   const [newTier, setNewTier] = useState<PartnerTier>({
     name: '',

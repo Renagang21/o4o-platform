@@ -25,7 +25,7 @@ import MediaList from './components/MediaList'
 import MediaUploader from '@/components/media/MediaUploader'
 import toast from 'react-hot-toast'
 
-const Library: React.FC = () => {
+const Library: FC = () => {
   const [loading, setLoading] = useState(true)
   const [files, setFiles] = useState<MediaFile[]>([])
   const [folders, setFolders] = useState<MediaFolder[]>([])

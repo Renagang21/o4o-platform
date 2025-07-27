@@ -32,7 +32,7 @@ interface AffiliatePartnerFormData {
   notes?: string;
 }
 
-const AffiliatePartnerForm: React.FC = () => {
+const AffiliatePartnerForm: FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();

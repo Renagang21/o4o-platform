@@ -12,7 +12,7 @@ interface CommissionHistoryProps {
   affiliateUserId: string;
 }
 
-export const CommissionHistory: React.FC<CommissionHistoryProps> = ({ affiliateUserId }) => {
+export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId }) => {
   const [commissions, setCommissions] = useState<AffiliateCommission[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'paid' | 'cancelled'>('all');
   const [period, setPeriod] = useState<'all' | 'month' | 'quarter' | 'year'>('month');

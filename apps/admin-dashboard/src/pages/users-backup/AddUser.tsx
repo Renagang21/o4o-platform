@@ -6,7 +6,7 @@ import { UserApi } from '@/api/userApi'
 import toast from 'react-hot-toast'
 import { AxiosError } from 'axios'
 
-const AddUser: React.FC = () => {
+const AddUser: FC = () => {
   const { userId } = useParams()
   const navigate = useNavigate()
   const isEditMode = Boolean(userId)

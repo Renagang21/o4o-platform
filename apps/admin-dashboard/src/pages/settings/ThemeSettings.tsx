@@ -14,7 +14,7 @@ const themes = {
   twilight: { name: 'twilight' as ThemeName, displayName: 'Twilight', description: '어스름한 테마' }
 }
 
-const ThemeSettings: React.FC = () => {
+const ThemeSettings: FC = () => {
   const { theme: currentThemeName, setTheme } = useTheme()
   const currentTheme = themes[currentThemeName as ThemeName] || themes.light
   const [selectedTheme, setSelectedTheme] = useState<ThemeName>(currentTheme.name)

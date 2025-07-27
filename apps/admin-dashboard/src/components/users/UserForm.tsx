@@ -116,7 +116,7 @@ interface UserFormProps {
   className?: string;
 }
 
-const UserForm: React.FC<UserFormProps> = ({
+const UserForm: FC<UserFormProps> = ({
   mode,
   initialData,
   onSubmit,
@@ -124,8 +124,8 @@ const UserForm: React.FC<UserFormProps> = ({
   isLoading = false,
   className = ''
 }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showBusinessFields, setShowBusinessFields] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showBusinessFields, setShowBusinessFields] = useState(false);
 
   const {
     register,

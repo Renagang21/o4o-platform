@@ -50,7 +50,7 @@ interface FolderTreeItemProps {
   folders: MediaFolder[]
 }
 
-const FolderTreeItem: React.FC<FolderTreeItemProps> = ({
+const FolderTreeItem: FC<FolderTreeItemProps> = ({
   folder,
   level,
   expandedFolders,
@@ -142,7 +142,7 @@ const FolderTreeItem: React.FC<FolderTreeItemProps> = ({
   )
 }
 
-const FolderManager: React.FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect }) => {
+const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect }) => {
   const queryClient = useQueryClient()
   const [expandedFolders, setExpandedFolders] = useState<string[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)

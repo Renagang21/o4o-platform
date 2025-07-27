@@ -42,7 +42,7 @@ interface MediaUploadDialogProps {
   maxFileSize?: number // bytes
 }
 
-const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
+const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   isOpen,
   onClose,
   onUploadComplete,

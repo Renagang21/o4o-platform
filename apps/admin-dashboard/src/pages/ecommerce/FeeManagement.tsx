@@ -54,7 +54,7 @@ interface FeeBreakdownItem {
   description: string;
 }
 
-const FeeManagement: React.FC = () => {
+const FeeManagement: FC = () => {
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

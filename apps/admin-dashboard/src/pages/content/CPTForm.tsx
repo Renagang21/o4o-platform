@@ -45,7 +45,7 @@ const iconOptions = [
   { value: '🔧', label: '도구' },
 ]
 
-const CPTForm: React.FC = () => {
+const CPTForm: FC = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const queryClient = useQueryClient()

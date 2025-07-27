@@ -66,7 +66,7 @@ const blockTypes = [
   { type: 'spacer', label: 'Spacer', icon: '↕️' },
 ];
 
-const HomepageEditor: React.FC = () => {
+const HomepageEditor: FC = () => {
   const navigate = useNavigate();
   const [template, setTemplate] = useState<Template | null>(null);
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -339,7 +339,7 @@ const HomepageEditor: React.FC = () => {
 };
 
 // Block Preview Component
-const BlockPreview: React.FC<{
+const BlockPreview: FC<{
   block: Block;
   isSelected: boolean;
   onSelect: () => void;
@@ -396,7 +396,7 @@ const BlockPreview: React.FC<{
 };
 
 // Block Content Preview
-const BlockContent: React.FC<{ block: Block }> = ({ block }) => {
+const BlockContent: FC<{ block: Block }> = ({ block }) => {
   switch (block.type) {
     case 'hero':
       return (
@@ -427,7 +427,7 @@ const BlockContent: React.FC<{ block: Block }> = ({ block }) => {
 };
 
 // Block Editor Component
-const BlockEditor: React.FC<{
+const BlockEditor: FC<{
   block: Block;
   onUpdate: (updates: Partial<Block>) => void;
 }> = ({ block, onUpdate }) => {

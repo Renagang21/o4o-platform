@@ -24,7 +24,7 @@ interface MediaDetailsProps {
   onDelete: () => void
 }
 
-const MediaDetails: React.FC<MediaDetailsProps> = ({
+const MediaDetails: FC<MediaDetailsProps> = ({
   media,
   onClose,
   onUpdate,

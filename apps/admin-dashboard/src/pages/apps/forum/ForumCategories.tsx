@@ -34,7 +34,7 @@ interface CategoryFormData {
   active: boolean;
 }
 
-const ForumCategories: React.FC = () => {
+const ForumCategories: FC = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ForumCategory | null>(null);

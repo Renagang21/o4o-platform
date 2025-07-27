@@ -71,7 +71,7 @@ interface PolicySettings {
   };
 }
 
-const PolicySettings: React.FC = () => {
+const PolicySettings: FC = () => {
   const [activeTab, setActiveTab] = useState<string>('partners');
   const [settings, setSettings] = useState<PolicySettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
