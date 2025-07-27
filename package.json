@@ -52,10 +52,10 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/user-event": "^14.6.1",
     "@types/socket.io-client": "^1.4.36",
-    "@typescript-eslint/eslint-plugin": "^8.18.2",
-    "@typescript-eslint/parser": "^8.18.2",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
     "concurrently": "^7.6.0",
-    "eslint": "^9.25.0",
+    "eslint": "^9.32.0",
     "prettier": "^3.4.2",
     "typescript": "^5.8.3"
   },
