@@ -1,9 +1,11 @@
 # CLAUDE.md
 
-⚠️ **CRITICAL: YOU ARE WORKING DIRECTLY IN GITHUB VIA FIREBASE STUDIO** ⚠️
-- There is NO separate "local" environment - all changes are directly in the GitHub repository
-- When you see file paths like `/home/user/o4o-platform/`, this IS the GitHub repository
-- DO NOT confuse "local" vs "GitHub" - they are the SAME in Firebase Studio
+⚠️ **CRITICAL: FIREBASE STUDIO DEVELOPMENT ENVIRONMENT** ⚠️
+- Firebase Studio is a cloud-based IDE that clones GitHub repositories
+- Working directory `/home/user/o4o-platform/` is a Firebase Studio workspace (NOT GitHub directly)
+- Changes are made in Firebase Studio environment, then pushed to GitHub via `git push`
+- Workflow: Edit in Firebase Studio → Commit locally → Push to GitHub repository
+- This is similar to local development, but in the cloud
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -203,12 +205,14 @@ GOOGLE_CLIENT_SECRET=optional
 
 ## 🔧 Development Environment Notes
 
-### Firebase Studio
-- **Firebase Studio는 GitHub 직접 연결 환경**
-- 모든 작업은 GitHub 저장소에서 직접 이루어짐
-- 별도의 로컬 환경이 아님
-- git 명령어 사용 시 GitHub 저장소와 직접 상호작용
-- 파일 시스템은 GitHub 저장소의 내용을 반영
+### Firebase Studio (Cloud IDE)
+- **Firebase Studio는 클라우드 기반 개발 환경**
+- GitHub 저장소를 클론하여 작업
+- `/home/user/o4o-platform/`는 Firebase Studio의 작업 공간
+- 일반적인 로컬 개발과 유사하지만 클라우드에서 실행
+- git 명령어 사용:
+  - `git commit`: Firebase Studio 환경에 커밋
+  - `git push origin main`: GitHub 저장소로 푸시
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
