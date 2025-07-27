@@ -115,7 +115,7 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
             {rule.operator !== 'is_empty' && rule.operator !== 'is_not_empty' && (
               <Input
                 value={rule.value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateRule(index, { value: e.target.value })}
+                onChange={(e) => updateRule(index, { value: e.target.value })}
                 placeholder="Value"
                 className="flex-1"
               />

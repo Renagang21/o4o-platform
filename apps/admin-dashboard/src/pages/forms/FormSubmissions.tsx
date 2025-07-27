@@ -261,7 +261,7 @@ const FormSubmissions: FC = () => {
               <Input
                 placeholder="제출 검0색..."
                 value={search}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10"
               />
             </div>

@@ -98,7 +98,7 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
                   min="1"
                   max="6"
                   value={columns}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onColumnsChange(parseInt(e.target.value) || 1)}
+                  onChange={(e) => onColumnsChange(parseInt(e.target.value) || 1)}
                   className="mt-1 w-full"
                 />
               </div>
@@ -115,7 +115,7 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
                   min="1"
                   max="999"
                   value={itemsPerPage}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
+                  onChange={(e) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
                   className="mt-1 w-full"
                 />
               </div>

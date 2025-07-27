@@ -207,7 +207,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
             <Input
               placeholder="주문번호로 검색..."
               value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
             <Select value={filter} onValueChange={(value: any) => setFilter(value)}>

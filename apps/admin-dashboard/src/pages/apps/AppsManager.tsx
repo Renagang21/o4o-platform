@@ -222,7 +222,7 @@ const AppsManager: FC = () => {
         <div className="flex gap-2">
           <select
             value={statusFilter}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>
@@ -439,7 +439,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="autoStart"
                 checked={settingsForm.autoStart || false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettingsForm(prev => ({ ...prev, autoStart: e.target.checked }))}
+                onChange={(e) => setSettingsForm(prev => ({ ...prev, autoStart: e.target.checked }))}
               />
             </div>
 
@@ -449,7 +449,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="requiresApproval"
                 checked={settingsForm.requiresApproval || false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettingsForm(prev => ({ ...prev, requiresApproval: e.target.checked }))}
+                onChange={(e) => setSettingsForm(prev => ({ ...prev, requiresApproval: e.target.checked }))}
               />
             </div>
 
@@ -459,7 +459,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="maintenanceMode"
                 checked={settingsForm.maintenanceMode || false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettingsForm(prev => ({ ...prev, maintenanceMode: e.target.checked }))}
+                onChange={(e) => setSettingsForm(prev => ({ ...prev, maintenanceMode: e.target.checked }))}
               />
             </div>
 
@@ -469,7 +469,7 @@ const AppsManager: FC = () => {
                 id="maxUsers"
                 type="number"
                 value={settingsForm.maxUsers || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettingsForm(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || undefined }))}
+                onChange={(e) => setSettingsForm(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || undefined }))}
                 placeholder="제한 없음"
               />
             </div>

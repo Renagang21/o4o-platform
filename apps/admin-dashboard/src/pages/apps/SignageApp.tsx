@@ -61,7 +61,7 @@ const SignageApp = () => {
               type="url"
               placeholder="YouTube 또는 Vimeo URL을 입력하세요..."
               value={videoUrl}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVideoUrl(e.target.value)}
+              onChange={(e) => setVideoUrl(e.target.value)}
               className="flex-1"
             />
             <Button onClick={handleAddVideo} disabled={isValidating}>

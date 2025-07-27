@@ -107,7 +107,7 @@ export const ReferralLinkGenerator: FC<ReferralLinkGeneratorProps> = ({
               <Input
                 placeholder="상품 ID를 입력하세요"
                 value={productId}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProductId(e.target.value)}
+                onChange={(e) => setProductId(e.target.value)}
               />
             </div>
           )}

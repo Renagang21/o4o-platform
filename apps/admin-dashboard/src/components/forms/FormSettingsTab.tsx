@@ -24,14 +24,14 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
             <Label>제출 버튼 텍스트</Label>
             <Input
               value={settings.submitButtonText}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ submitButtonText: e.target.value })}
+              onChange={(e) => updateSettings({ submitButtonText: e.target.value })}
             />
           </div>
           <div>
             <Label>처리중 텍스트</Label>
             <Input
               value={settings.submitButtonProcessingText}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ submitButtonProcessingText: e.target.value })}
+              onChange={(e) => updateSettings({ submitButtonProcessingText: e.target.value })}
             />
           </div>
           <div className="flex items-center justify-between">
@@ -67,7 +67,7 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
               <Input
                 type="number"
                 value={settings.maxSubmissions || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ maxSubmissions: parseInt(e.target.value) || undefined })}
+                onChange={(e) => updateSettings({ maxSubmissions: parseInt(e.target.value) || undefined })}
               />
             </div>
           )}
@@ -117,7 +117,7 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
               <Input
                 type="number"
                 value={settings.autoSaveInterval || 30}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ autoSaveInterval: parseInt(e.target.value) || 30 })}
+                onChange={(e) => updateSettings({ autoSaveInterval: parseInt(e.target.value) || 30 })}
               />
             </div>
           )}

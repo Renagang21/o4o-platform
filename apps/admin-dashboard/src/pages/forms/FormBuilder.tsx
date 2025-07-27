@@ -349,7 +349,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formName"
                       value={formData.name}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="contact_form"
                       className="font-mono"
                     />
@@ -360,7 +360,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formTitle"
                       value={formData.title}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="문의하기"
                     />
                   </div>

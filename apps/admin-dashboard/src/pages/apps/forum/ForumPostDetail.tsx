@@ -198,7 +198,7 @@ const ForumPostDetail: FC = () => {
             <div className="space-y-3">
               <Textarea
                 value={editContent}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditContent(e.target.value)}
+                onChange={(e) => setEditContent(e.target.value)}
                 rows={3}
                 className="w-full"
               />
@@ -246,7 +246,7 @@ const ForumPostDetail: FC = () => {
           <div className="ml-12 mb-4">
             <Textarea
               value={replyContent}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReplyContent(e.target.value)}
+              onChange={(e) => setReplyContent(e.target.value)}
               placeholder="답글을 작성하세요..."
               rows={3}
               className="w-full mb-2"
@@ -384,7 +384,7 @@ const ForumPostDetail: FC = () => {
             <div className="mb-6">
               <Textarea
                 value={replyContent}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReplyContent(e.target.value)}
+                onChange={(e) => setReplyContent(e.target.value)}
                 placeholder="댓글을 작성하세요..."
                 rows={4}
                 className="w-full mb-2"

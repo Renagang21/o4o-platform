@@ -283,7 +283,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
             <Input
               placeholder="Search media..."
               value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-64"
             />
           </div>

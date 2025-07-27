@@ -109,7 +109,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>알림 이름</Label>
                 <Input
                   value={currentNotification.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateNotification(currentNotification.id, { name: e.target.value })
                   }
                 />
@@ -119,7 +119,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>받는 사람</Label>
                 <Input
                   value={currentNotification.to}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateNotification(currentNotification.id, { to: e.target.value })
                   }
                   placeholder="admin@example.com 또는 {field:email}"
@@ -130,7 +130,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>제목</Label>
                 <Input
                   value={currentNotification.subject}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateNotification(currentNotification.id, { subject: e.target.value })
                   }
                   placeholder="새 양식 제출: {field:name}"
@@ -154,7 +154,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                   <Label>보내는 사람 이름</Label>
                   <Input
                     value={currentNotification.fromName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       updateNotification(currentNotification.id, { fromName: e.target.value })
                     }
                   />
@@ -164,7 +164,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                   <Input
                     type="email"
                     value={currentNotification.fromEmail}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       updateNotification(currentNotification.id, { fromEmail: e.target.value })
                     }
                   />
@@ -176,7 +176,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Input
                   type="email"
                   value={currentNotification.replyTo || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateNotification(currentNotification.id, { replyTo: e.target.value })
                   }
                 />
@@ -186,7 +186,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>숨은 참조 (BCC)</Label>
                 <Input
                   value={currentNotification.bcc || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateNotification(currentNotification.id, { bcc: e.target.value })
                   }
                   placeholder="쉼표로 구분된 이메일 주소"

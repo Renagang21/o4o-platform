@@ -102,7 +102,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>확인 이름</Label>
                 <Input
                   value={currentConfirmation.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateConfirmation(currentConfirmation.id, { name: e.target.value })
                   }
                 />
@@ -146,7 +146,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>페이지 ID</Label>
                   <Input
                     value={currentConfirmation.pageId || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       updateConfirmation(currentConfirmation.id, { pageId: e.target.value })
                     }
                     placeholder="감사 페이지의 ID를 입력하세요"
@@ -159,7 +159,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>리디렉션 URL</Label>
                   <Input
                     value={currentConfirmation.redirectUrl || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e) =>
                       updateConfirmation(currentConfirmation.id, { redirectUrl: e.target.value })
                     }
                     placeholder="https://example.com/thank-you"
@@ -171,7 +171,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>쿼리 문자열 추가</Label>
                 <Input
                   value={currentConfirmation.queryString || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e) =>
                     updateConfirmation(currentConfirmation.id, { queryString: e.target.value })
                   }
                   placeholder="utm_source=form&entry_id={entry_id}"

@@ -189,7 +189,7 @@ const GutenbergPage: FC = () => {
             <Input
               placeholder="Add title"
               value={postTitle}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPostTitle(e.target.value)}
+              onChange={(e) => setPostTitle(e.target.value)}
               className="text-2xl font-bold border-0 focus-visible:ring-0 p-0"
             />
           </div>

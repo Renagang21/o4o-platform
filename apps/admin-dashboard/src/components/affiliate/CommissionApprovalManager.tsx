@@ -244,7 +244,7 @@ export const CommissionApprovalManager: FC = () => {
                 <Input
                   placeholder="주문번호 또는 추천인ID로 검색..."
                   value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>

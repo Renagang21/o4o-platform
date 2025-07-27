@@ -242,7 +242,7 @@ export default function UserList() {
                 <Input
                   placeholder="Search users..."
                   value={search}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>

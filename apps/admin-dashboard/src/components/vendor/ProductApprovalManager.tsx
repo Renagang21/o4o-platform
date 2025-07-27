@@ -172,7 +172,7 @@ export const ProductApprovalManager: FC = () => {
                 <Input
                   placeholder="제품명 또는 SKU로 검색..."
                   value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>

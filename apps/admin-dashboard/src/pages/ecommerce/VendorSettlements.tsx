@@ -274,7 +274,7 @@ const VendorSettlements: FC = () => {
                 <Input
                   placeholder="판매자명, 이메일로 검색..."
                   value={searchTerm}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -308,7 +308,7 @@ const VendorSettlements: FC = () => {
                   <th className="px-4 py-3 text-left">
                     <input
                       type="checkbox"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      onChange={(e) => {
                         if (e.target.checked) {
                           setSelectedSettlements(settlements.map(s => s.id));
                         } else {
@@ -366,7 +366,7 @@ const VendorSettlements: FC = () => {
                         <input
                           type="checkbox"
                           checked={selectedSettlements.includes(settlement.id)}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          onChange={(e) => {
                             if (e.target.checked) {
                               setSelectedSettlements([...selectedSettlements, settlement.id]);
                             } else {
@@ -505,7 +505,7 @@ const VendorSettlements: FC = () => {
               <Input
                 id="approvalMemo"
                 value={approvalMemo}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApprovalMemo(e.target.value)}
+                onChange={(e) => setApprovalMemo(e.target.value)}
                 placeholder="승인 관련 메모를 입력하세요"
               />
             </div>

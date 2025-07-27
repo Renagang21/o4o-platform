@@ -1,4 +1,3 @@
-import type { AffiliateCommission as AffiliateCommissionType } from "@o4o/types"
 import { useState } from 'react';
 import { DollarSign, Calendar, Download, TrendingUp, Users, CreditCard, FileText } from 'lucide-react';
 

@@ -128,7 +128,7 @@ const ForumBoardList: FC = () => {
               type="text"
               placeholder="제목, 내용, 작성자로 검색..."
               value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -137,7 +137,7 @@ const ForumBoardList: FC = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={categoryFilter}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCategoryFilter(e.target.value)}
+            onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 카테고리</option>
@@ -149,7 +149,7 @@ const ForumBoardList: FC = () => {
           </select>
           <select
             value={statusFilter}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>

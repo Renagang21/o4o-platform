@@ -52,7 +52,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>Field Label</Label>
             <Input
               value={field.label}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({ label: e.target.value })}
+              onChange={(e) => updateField({ label: e.target.value })}
             />
           </div>
 
@@ -60,7 +60,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>Field Name</Label>
             <Input
               value={field.name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({ name: e.target.value })}
+              onChange={(e) => updateField({ name: e.target.value })}
             />
           </div>
 
@@ -77,7 +77,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>Placeholder</Label>
             <Input
               value={field.placeholder || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({ placeholder: e.target.value })}
+              onChange={(e) => updateField({ placeholder: e.target.value })}
             />
           </div>
 
@@ -114,7 +114,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Input
                   type="number"
                   value={field.validation?.minLength || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ minLength: parseInt(e.target.value) || undefined })}
+                  onChange={(e) => updateValidation({ minLength: parseInt(e.target.value) || undefined })}
                 />
               </div>
               <div>
@@ -122,14 +122,14 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Input
                   type="number"
                   value={field.validation?.maxLength || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ maxLength: parseInt(e.target.value) || undefined })}
+                  onChange={(e) => updateValidation({ maxLength: parseInt(e.target.value) || undefined })}
                 />
               </div>
               <div>
                 <Label>Pattern (RegEx)</Label>
                 <Input
                   value={field.validation?.pattern || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ pattern: e.target.value || undefined })}
+                  onChange={(e) => updateValidation({ pattern: e.target.value || undefined })}
                 />
               </div>
             </>
@@ -140,7 +140,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Input
                   type="number"
                   value={field.validation?.min || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ min: parseFloat(e.target.value) || undefined })}
+                  onChange={(e) => updateValidation({ min: parseFloat(e.target.value) || undefined })}
                 />
               </div>
               <div>
@@ -148,7 +148,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Input
                   type="number"
                   value={field.validation?.max || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ max: parseFloat(e.target.value) || undefined })}
+                  onChange={(e) => updateValidation({ max: parseFloat(e.target.value) || undefined })}
                 />
               </div>
               <div>
@@ -156,7 +156,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Input
                   type="number"
                   value={field.validation?.step || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ step: parseFloat(e.target.value) || undefined })}
+                  onChange={(e) => updateValidation({ step: parseFloat(e.target.value) || undefined })}
                 />
               </div>
             </>
@@ -166,7 +166,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>Custom Error Message</Label>
             <Input
               value={field.validation?.customMessage || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateValidation({ customMessage: e.target.value || undefined })}
+              onChange={(e) => updateValidation({ customMessage: e.target.value || undefined })}
             />
           </div>
         </TabsContent>
@@ -196,7 +196,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Label>Allowed File Types</Label>
                 <Input
                   value={field.fileConfig?.allowedTypes?.join(', ') || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({
+                  onChange={(e) => updateField({
                     fileConfig: {
                       ...field.fileConfig,
                       allowedTypes: e.target.value.split(',').map(t => t.trim()).filter(Boolean),
@@ -210,7 +210,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                 <Input
                   type="number"
                   value={field.fileConfig?.maxSize || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({
+                  onChange={(e) => updateField({
                     fileConfig: {
                       ...field.fileConfig,
                       maxSize: parseInt(e.target.value) || undefined,
@@ -225,7 +225,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>CSS Classes</Label>
             <Input
               value={field.cssClass || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({ cssClass: e.target.value })}
+              onChange={(e) => updateField({ cssClass: e.target.value })}
             />
           </div>
         </TabsContent>

@@ -232,7 +232,7 @@ const AffiliateLinks = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <select
           value={selectedPartner}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedPartner(e.target.value)}
+          onChange={(e) => setSelectedPartner(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">모든 제휴사</option>
@@ -242,7 +242,7 @@ const AffiliateLinks = () => {
         </select>
         <select
           value={selectedStatus}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedStatus(e.target.value)}
+          onChange={(e) => setSelectedStatus(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">모든 상태</option>
