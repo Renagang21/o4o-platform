@@ -58,14 +58,11 @@ export default defineConfig({
       'react',
       'react-dom',
       'react/jsx-runtime',
-      '@o4o/types', 
-      '@o4o/utils', 
-      '@o4o/ui', 
-      '@o4o/auth-client', 
-      '@o4o/auth-context'
+      'react-router-dom',
+      '@tanstack/react-query',
+      'react-hot-toast'
     ],
     exclude: ['@vite/client', '@vite/env'],
-    force: true, // 강제 의존성 재생성
     esbuildOptions: {
       define: {
         global: 'globalThis',
