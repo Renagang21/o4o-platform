@@ -352,7 +352,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                       <td className="px-4 py-3">
                         <select
                           value={variant.active ? 'active' : 'inactive'}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleVariantChange(variant.id, 'active', e.target.value === 'active')}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleVariantChange(variant.id, 'active', e.target.value === 'active')}
                           className="px-2 py-1 border border-modern-border-primary rounded text-sm"
                         >
                           <option value="active">활성</option>

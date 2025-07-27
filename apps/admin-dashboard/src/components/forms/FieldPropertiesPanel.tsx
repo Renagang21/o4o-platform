@@ -68,7 +68,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>Description</Label>
             <Textarea
               value={field.description || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField({ description: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateField({ description: e.target.value })}
               rows={3}
             />
           </div>
@@ -177,7 +177,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
               <Label>Options (one per line)</Label>
               <Textarea
                 value={field.options?.map(opt => `${opt.value}|${opt.label}`).join('\n') || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                   const options = e.target.value.split('\n').map(line => {
                     const [value, label] = line.split('|');
                     return { value: value || '', label: label || value || '' };

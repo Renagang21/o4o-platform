@@ -1,4 +1,5 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
+import {
   Upload,
   Search,
   Filter,
@@ -115,7 +116,7 @@ const Library: FC = () => {
     }
   ])
 
-  const [folders, setFolders] = useState<MediaFolder[]>([
+  const [folders, ] = useState<MediaFolder[]>([ // setFolders not used
     {
       id: 'folder-1',
       name: '제품 이미지',
@@ -150,9 +151,9 @@ const Library: FC = () => {
     setSelectedItems(newSelection)
   }
 
-  const selectAll = () => {
-    setSelectedItems(new Set(mediaItems.map(item => item.id)))
-  }
+  // const selectAll = () => {
+  //   setSelectedItems(new Set(mediaItems.map(item => item.id)))
+  // }
 
   const clearSelection = () => {
     setSelectedItems(new Set())
@@ -343,8 +344,8 @@ const Library: FC = () => {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="text-gray-400">
-                            {getFileIcon(item.type, 'h-12 w-12')}
+                          <div className="text-gray-400 text-5xl">
+                            {getFileIcon(item.type)}
                           </div>
                         )}
                       </div>
@@ -397,8 +398,8 @@ const Library: FC = () => {
                             className="w-full h-full object-cover rounded"
                           />
                         ) : (
-                          <div className="text-gray-400">
-                            {getFileIcon(item.type, 'h-6 w-6')}
+                          <div className="text-gray-400 text-2xl">
+                            {getFileIcon(item.type)}
                           </div>
                         )}
                       </div>
@@ -447,7 +448,7 @@ const Library: FC = () => {
                   />
                 ) : (
                   <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                    {getFileIcon(selectedItem.type, 'h-24 w-24 text-gray-400')}
+                    <span className="text-6xl">{getFileIcon(selectedItem.type)}</span>
                   </div>
                 )}
               </div>

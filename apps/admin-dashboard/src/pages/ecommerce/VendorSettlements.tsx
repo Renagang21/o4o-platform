@@ -281,7 +281,7 @@ const VendorSettlements: FC = () => {
             </div>
             <select
               value={statusFilter}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
               className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
             >
               <option value="all">모든 상태</option>
@@ -308,7 +308,7 @@ const VendorSettlements: FC = () => {
                   <th className="px-4 py-3 text-left">
                     <input
                       type="checkbox"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                         if (e.target.checked) {
                           setSelectedSettlements(settlements.map(s => s.id));
                         } else {
@@ -366,7 +366,7 @@ const VendorSettlements: FC = () => {
                         <input
                           type="checkbox"
                           checked={selectedSettlements.includes(settlement.id)}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                             if (e.target.checked) {
                               setSelectedSettlements([...selectedSettlements, settlement.id]);
                             } else {

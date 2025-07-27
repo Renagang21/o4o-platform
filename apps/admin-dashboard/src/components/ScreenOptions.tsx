@@ -1,5 +1,4 @@
-import { FC } from 'react';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { ChevronDown, Settings } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';

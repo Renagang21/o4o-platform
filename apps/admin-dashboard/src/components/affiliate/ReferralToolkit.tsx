@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState } from 'react';
 import { 
   Link2, QrCode, MessageSquare, Image, 
   Download, Copy, Check, Smartphone, Monitor 
@@ -244,7 +244,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
                 <Label>메시지 내용</Label>
                 <Textarea
                   value={messageTemplate === 'custom' ? customMessage : getMessageTemplate()}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomMessage(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCustomMessage(e.target.value)}
                   rows={8}
                   readOnly={messageTemplate !== 'custom'}
                   className={messageTemplate !== 'custom' ? 'bg-modern-bg-tertiary' : ''}

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState } from 'react';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -132,7 +132,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>메시지</Label>
                   <Textarea
                     value={currentConfirmation.message || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                       updateConfirmation(currentConfirmation.id, { message: e.target.value })
                     }
                     rows={10}

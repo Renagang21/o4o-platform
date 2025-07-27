@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState } from 'react';
 import {
   FileText,
   Settings,
@@ -410,7 +410,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Textarea
                   placeholder="Write an excerpt (optional)"
                   value={postSettings.excerpt}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => 
                     onPostSettingsChange({ excerpt: e.target.value })
                   }
                   rows={4}

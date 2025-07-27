@@ -370,7 +370,7 @@ const FormBuilder: FC = () => {
                     <Textarea
                       id="formDescription"
                       value={formData.description}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="양식에 대한 설명을 입력하세요"
                       rows={2}
                     />

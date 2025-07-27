@@ -1,4 +1,4 @@
-import { useState, FC, ReactNode } from 'react';
+import { useState, FC } from 'react';
 import { X, Download, Copy, Trash2, Save, ExternalLink, Calendar, User, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
