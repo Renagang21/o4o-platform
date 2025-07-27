@@ -530,7 +530,7 @@ const MenuBuilder: FC = () => {
                 <Label htmlFor="location">메뉴 위치</Label>
                 <Select
                   value={menuLocation}
-                  onValueChange={(value) => setMenuLocation(value as MenuLocation)}
+                  onValueChange={(value: string) => setMenuLocation(value as MenuLocation)}
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue />
@@ -727,7 +727,7 @@ const MenuBuilder: FC = () => {
               <Label htmlFor="itemTarget">링크 열기</Label>
               <Select
                 value={itemFormData.target}
-                onValueChange={(value) => setItemFormData({ ...itemFormData, target: value as '_self' | '_blank' })}
+                onValueChange={(value: string) => setItemFormData({ ...itemFormData, target: value as '_self' | '_blank' })}
               >
                 <SelectTrigger>
                   <SelectValue />

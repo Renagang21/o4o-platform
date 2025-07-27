@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { Check, X, Eye, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -172,7 +172,7 @@ export const ProductApprovalManager: FC = () => {
                 <Input
                   placeholder="제품명 또는 SKU로 검색..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -347,7 +347,7 @@ export const ProductApprovalManager: FC = () => {
               <Textarea
                 placeholder="거절 사유를 입력해주세요..."
                 value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRejectReason(e.target.value)}
                 rows={4}
               />
             </div>

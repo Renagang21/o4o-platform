@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { Package, DollarSign, Calculator, Save, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,7 +158,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
                 placeholder="제품명을 입력하세요"
                 required
               />
@@ -168,7 +168,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
               <Input
                 id="sku"
                 value={formData.sku}
-                onChange={(e) => handleInputChange('sku', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('sku', e.target.value)}
                 placeholder="재고 관리 코드"
                 required
               />
@@ -180,7 +180,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('description', e.target.value)}
               placeholder="제품에 대한 상세 설명을 입력하세요"
               rows={4}
             />
@@ -190,7 +190,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
             <Label htmlFor="category">카테고리*</Label>
             <Select
               value={formData.categoryId}
-              onValueChange={(value) => handleInputChange('categoryId', value)}
+              onValueChange={(value: string) => handleInputChange('categoryId', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="카테고리를 선택하세요" />
@@ -225,7 +225,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="supplyPrice"
                 type="number"
                 value={formData.supplyPrice}
-                onChange={(e) => handleInputChange('supplyPrice', Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('supplyPrice', Number(e.target.value))}
                 placeholder="0"
                 min="0"
                 required
@@ -237,7 +237,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="marginRate"
                 type="number"
                 value={formData.marginRate}
-                onChange={(e) => handleInputChange('marginRate', Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('marginRate', Number(e.target.value))}
                 placeholder="30"
                 min="0"
                 max="100"
@@ -250,7 +250,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
             <Switch
               id="autoCalculate"
               checked={formData.autoCalculatePrice}
-              onCheckedChange={(checked) => handleInputChange('autoCalculatePrice', checked)}
+              onCheckedChange={(checked: boolean) => handleInputChange('autoCalculatePrice', checked)}
             />
             <Label htmlFor="autoCalculate" className="cursor-pointer">
               판매가격 자동 계산
@@ -263,7 +263,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
               id="sellPrice"
               type="number"
               value={formData.sellPrice}
-              onChange={(e) => handleInputChange('sellPrice', Number(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('sellPrice', Number(e.target.value))}
               placeholder="0"
               min="0"
               required
@@ -279,7 +279,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="affiliateRate"
                 type="number"
                 value={formData.affiliateRate}
-                onChange={(e) => handleInputChange('affiliateRate', Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('affiliateRate', Number(e.target.value))}
                 placeholder="5"
                 min="0"
                 max="50"
@@ -292,7 +292,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="adminFeeRate"
                 type="number"
                 value={formData.adminFeeRate}
-                onChange={(e) => handleInputChange('adminFeeRate', Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('adminFeeRate', Number(e.target.value))}
                 placeholder="3"
                 min="0"
                 max="50"
@@ -366,7 +366,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="supplierStock"
                 type="number"
                 value={formData.supplierStock}
-                onChange={(e) => handleInputChange('supplierStock', Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('supplierStock', Number(e.target.value))}
                 placeholder="0"
                 min="0"
                 required
@@ -378,7 +378,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="lowStockThreshold"
                 type="number"
                 value={formData.lowStockThreshold}
-                onChange={(e) => handleInputChange('lowStockThreshold', Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('lowStockThreshold', Number(e.target.value))}
                 placeholder="10"
                 min="1"
               />

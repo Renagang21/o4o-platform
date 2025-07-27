@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import {
   X,
   Download,
@@ -189,7 +189,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
               {/* Category Filter */}
               <Select
                 value={filter.category || 'all'}
-                onValueChange={(value) => setFilter({ 
+                onValueChange={(value: string) => setFilter({ 
                   ...filter, 
                   category: value === 'all' ? undefined : value as TemplateCategory 
                 })}
@@ -211,7 +211,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
               {/* Price Filter */}
               <Select
                 value={filter.isPremium === undefined ? 'all' : filter.isPremium ? 'premium' : 'free'}
-                onValueChange={(value) => setFilter({ 
+                onValueChange={(value: string) => setFilter({ 
                   ...filter, 
                   isPremium: value === 'all' ? undefined : value === 'premium'
                 })}

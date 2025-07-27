@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Palette, Moon, Sun, Layout, Type, Zap } from 'lucide-react';
 import DraggableWidget, { WidgetContainer } from '@/components/DraggableWidget';
-import InlineEdit from '@/components/InlineEdit';
-import ScreenOptions, { ScreenOption } from '@/components/ScreenOptions';
+import { InlineEdit } from '@/components/InlineEdit';
+import { ScreenOptions, ScreenOption } from '@/components/ScreenOptions';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const UIShowcase = () => {

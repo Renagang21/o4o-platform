@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { Plus, Trash2, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -109,7 +109,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>알림 이름</Label>
                 <Input
                   value={currentNotification.name}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateNotification(currentNotification.id, { name: e.target.value })
                   }
                 />
@@ -119,7 +119,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>받는 사람</Label>
                 <Input
                   value={currentNotification.to}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateNotification(currentNotification.id, { to: e.target.value })
                   }
                   placeholder="admin@example.com 또는 {field:email}"
@@ -130,7 +130,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>제목</Label>
                 <Input
                   value={currentNotification.subject}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateNotification(currentNotification.id, { subject: e.target.value })
                   }
                   placeholder="새 양식 제출: {field:name}"
@@ -141,7 +141,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>메시지</Label>
                 <Textarea
                   value={currentNotification.message}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateNotification(currentNotification.id, { message: e.target.value })
                   }
                   rows={10}
@@ -154,7 +154,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                   <Label>보내는 사람 이름</Label>
                   <Input
                     value={currentNotification.fromName}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       updateNotification(currentNotification.id, { fromName: e.target.value })
                     }
                   />
@@ -164,7 +164,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                   <Input
                     type="email"
                     value={currentNotification.fromEmail}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       updateNotification(currentNotification.id, { fromEmail: e.target.value })
                     }
                   />
@@ -176,7 +176,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Input
                   type="email"
                   value={currentNotification.replyTo || ''}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateNotification(currentNotification.id, { replyTo: e.target.value })
                   }
                 />
@@ -186,7 +186,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>숨은 참조 (BCC)</Label>
                 <Input
                   value={currentNotification.bcc || ''}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateNotification(currentNotification.id, { bcc: e.target.value })
                   }
                   placeholder="쉼표로 구분된 이메일 주소"
@@ -197,7 +197,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>업로드된 파일 첨부</Label>
                 <Switch
                   checked={currentNotification.attachFiles}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={(checked: boolean) =>
                     updateNotification(currentNotification.id, { attachFiles: checked })
                   }
                 />
@@ -207,7 +207,7 @@ export const FormNotificationsTab: FC<FormNotificationsTabProps> = ({
                 <Label>조건부 전송</Label>
                 <Switch
                   checked={currentNotification.conditional?.enabled || false}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={(checked: boolean) =>
                     updateNotification(currentNotification.id, {
                       conditional: {
                         ...currentNotification.conditional!,

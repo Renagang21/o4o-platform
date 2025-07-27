@@ -1,10 +1,9 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 /**
  * UserForm - 공통 사용자 폼 컴포넌트
  * React Hook Form + Zod를 사용한 유효성 검증
  */
 
-import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

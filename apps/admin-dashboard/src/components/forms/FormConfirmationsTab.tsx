@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { Plus, Trash2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -102,7 +102,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>확인 이름</Label>
                 <Input
                   value={currentConfirmation.name}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateConfirmation(currentConfirmation.id, { name: e.target.value })
                   }
                 />
@@ -132,7 +132,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>메시지</Label>
                   <Textarea
                     value={currentConfirmation.message || ''}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       updateConfirmation(currentConfirmation.id, { message: e.target.value })
                     }
                     rows={10}
@@ -146,7 +146,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>페이지 ID</Label>
                   <Input
                     value={currentConfirmation.pageId || ''}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       updateConfirmation(currentConfirmation.id, { pageId: e.target.value })
                     }
                     placeholder="감사 페이지의 ID를 입력하세요"
@@ -159,7 +159,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>리디렉션 URL</Label>
                   <Input
                     value={currentConfirmation.redirectUrl || ''}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       updateConfirmation(currentConfirmation.id, { redirectUrl: e.target.value })
                     }
                     placeholder="https://example.com/thank-you"
@@ -171,7 +171,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>쿼리 문자열 추가</Label>
                 <Input
                   value={currentConfirmation.queryString || ''}
-                  onChange={(e) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateConfirmation(currentConfirmation.id, { queryString: e.target.value })
                   }
                   placeholder="utm_source=form&entry_id={entry_id}"

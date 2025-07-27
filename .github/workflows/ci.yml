@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm ci
+          npm install
           bash scripts/setup-ci-env.sh
 
   # 타입 체크
@@ -75,7 +75,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm ci
+            npm install
           fi
       
       - name: Build packages if not cached
@@ -118,7 +118,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm ci
+            npm install
           fi
       
       - name: Build packages if not cached
@@ -164,7 +164,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm ci
+            npm install
           fi
       
       - name: Build packages if not cached
@@ -210,7 +210,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm ci
+            npm install
           fi
       
       - name: Build shared packages
@@ -257,7 +257,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm ci
+            npm install
           fi
       
       - name: Build packages if not cached

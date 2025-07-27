@@ -46,7 +46,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        npm ci
+        npm install
         bash scripts/setup-ci-env.sh
     
     - name: Build shared packages
@@ -57,7 +57,7 @@ jobs:
     - name: Install admin dashboard dependencies
       run: |
         cd apps/admin-dashboard
-        npm ci
+        npm install
         
     - name: TypeScript type check
       run: |

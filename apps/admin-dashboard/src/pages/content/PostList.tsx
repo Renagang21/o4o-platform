@@ -136,7 +136,7 @@ const PostList: FC = () => {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as PostStatus | 'all')}>
+            <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as PostStatus | 'all')}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="상태 필터" />
               </SelectTrigger>

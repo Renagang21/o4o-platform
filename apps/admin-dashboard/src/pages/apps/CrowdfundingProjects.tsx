@@ -162,7 +162,7 @@ const CrowdfundingProjects: FC = () => {
               type="text"
               placeholder="프로젝트명, 설명, 개발사명으로 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -171,7 +171,7 @@ const CrowdfundingProjects: FC = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={statusFilter}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}

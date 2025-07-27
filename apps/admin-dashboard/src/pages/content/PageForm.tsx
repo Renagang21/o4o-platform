@@ -215,7 +215,7 @@ const PageForm: FC = () => {
                     <Label htmlFor="template">템플릿</Label>
                     <Select
                       value={formData.template}
-                      onValueChange={(value) => setFormData({ ...formData, template: value })}
+                      onValueChange={(value: string) => setFormData({ ...formData, template: value })}
                     >
                       <SelectTrigger className="mt-2">
                         <SelectValue />
@@ -237,7 +237,7 @@ const PageForm: FC = () => {
                     <Label htmlFor="parent">부모 페이지</Label>
                     <Select
                       value={formData.parentId || 'none'}
-                      onValueChange={(value) => setFormData({ 
+                      onValueChange={(value: string) => setFormData({ 
                         ...formData, 
                         parentId: value === 'none' ? undefined : value 
                       })}
@@ -380,7 +380,7 @@ const PageForm: FC = () => {
                 <span className="text-sm">공개 설정:</span>
                 <Select
                   value={formData.visibility}
-                  onValueChange={(value) => setFormData({ ...formData, visibility: value as PostVisibility })}
+                  onValueChange={(value: string) => setFormData({ ...formData, visibility: value as PostVisibility })}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />

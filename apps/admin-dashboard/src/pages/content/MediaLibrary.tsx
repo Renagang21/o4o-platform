@@ -215,7 +215,7 @@ const MediaLibrary: FC = () => {
           
           <Select 
             value={filter.mediaType || 'all'} 
-            onValueChange={(value) => setFilter({ ...filter, mediaType: value as MediaType | 'all' })}
+            onValueChange={(value: string) => setFilter({ ...filter, mediaType: value as MediaType | 'all' })}
           >
             <SelectTrigger className="w-[180px]">
               <Filter className="w-4 h-4 mr-2" />
@@ -234,7 +234,7 @@ const MediaLibrary: FC = () => {
           {data?.folders && data.folders.length > 0 && (
             <Select 
               value={filter.folderId || 'all'} 
-              onValueChange={(value) => setFilter({ ...filter, folderId: value === 'all' ? undefined : value })}
+              onValueChange={(value: string) => setFilter({ ...filter, folderId: value === 'all' ? undefined : value })}
             >
               <SelectTrigger className="w-[180px]">
                 <FolderOpen className="w-4 h-4 mr-2" />
@@ -450,7 +450,7 @@ const MediaLibrary: FC = () => {
                 <th className="px-4 py-3 text-left">
                   <Checkbox
                     checked={selectedItems.length === data?.items?.length && data?.items?.length > 0}
-                    onCheckedChange={(checked) => checked ? selectAll() : clearSelection()}
+                    onCheckedChange={(checked: boolean) => checked ? selectAll() : clearSelection()}
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">미디어</th>

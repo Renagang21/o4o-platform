@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import {
   Download,
   Star,
@@ -161,7 +161,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
             />
           </div>
         </div>
-        <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value as WidgetCategory | 'all')}>
+        <Select value={selectedCategory} onValueChange={(value: string) => setSelectedCategory(value as WidgetCategory | 'all')}>
           <SelectTrigger className="w-48">
             <SelectValue placeholder="카테고리 선택" />
           </SelectTrigger>

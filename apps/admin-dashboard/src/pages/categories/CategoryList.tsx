@@ -296,7 +296,7 @@ const CategoryList: FC = () => {
                   <Label htmlFor="parent">상위 카테고리 (선택)</Label>
                   <Select
                     value={formData.parentId}
-                    onValueChange={(value) => setFormData({ ...formData, parentId: value })}
+                    onValueChange={(value: string) => setFormData({ ...formData, parentId: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="상위 카테고리 선택" />

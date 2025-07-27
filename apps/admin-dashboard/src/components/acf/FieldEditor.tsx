@@ -88,7 +88,7 @@ const FieldEditor: FC<FieldEditorProps> = ({ field, onChange }) => {
         <Switch
           id={`${field.id}-required`}
           checked={field.required || false}
-          onCheckedChange={(checked) => onChange({ ...field, required: checked })}
+          onCheckedChange={(checked: boolean) => onChange({ ...field, required: checked })}
         />
         <Label htmlFor={`${field.id}-required`}>필수 필드</Label>
       </div>
@@ -254,7 +254,7 @@ const FieldEditor: FC<FieldEditorProps> = ({ field, onChange }) => {
             <Switch
               id={`${field.id}-defaultValue`}
               checked={field.defaultValue === true}
-              onCheckedChange={(checked) => onChange({ ...field, defaultValue: checked })}
+              onCheckedChange={(checked: boolean) => onChange({ ...field, defaultValue: checked })}
             />
             <Label htmlFor={`${field.id}-defaultValue`}>
               기본적으로 체크됨

@@ -349,7 +349,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formName"
                       value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="contact_form"
                       className="font-mono"
                     />
@@ -360,7 +360,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formTitle"
                       value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="문의하기"
                     />
                   </div>
@@ -370,7 +370,7 @@ const FormBuilder: FC = () => {
                     <Textarea
                       id="formDescription"
                       value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="양식에 대한 설명을 입력하세요"
                       rows={2}
                     />

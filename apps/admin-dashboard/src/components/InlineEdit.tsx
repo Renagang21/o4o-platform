@@ -162,7 +162,7 @@ export const InlineEdit: FC<InlineEditProps> = ({
             ref={inputRef as any}
             type={type === 'textarea' ? undefined : type}
             value={editValue}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setEditValue(e.target.value);
               setError(null);
             }}

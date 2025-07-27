@@ -235,7 +235,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                   <Input
                     placeholder="예: 색상, 사이즈"
                     value={newOptionName}
-                    onChange={(e) => setNewOptionName(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewOptionName(e.target.value)}
                   />
                 </div>
                 <div>
@@ -243,7 +243,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                   <Input
                     placeholder="예: S, M, L, XL"
                     value={newOptionValues}
-                    onChange={(e) => setNewOptionValues(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewOptionValues(e.target.value)}
                   />
                 </div>
               </div>
@@ -320,7 +320,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                         <Input
                           type="text"
                           value={variant.sku}
-                          onChange={(e) => handleVariantChange(variant.id, 'sku', e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleVariantChange(variant.id, 'sku', e.target.value)}
                           className="w-32"
                         />
                       </td>
@@ -328,7 +328,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                         <Input
                           type="number"
                           value={variant.price}
-                          onChange={(e) => handleVariantChange(variant.id, 'price', parseInt(e.target.value) || 0)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleVariantChange(variant.id, 'price', parseInt(e.target.value) || 0)}
                           className="w-24"
                         />
                       </td>
@@ -336,7 +336,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                         <Input
                           type="number"
                           value={variant.stock}
-                          onChange={(e) => handleVariantChange(variant.id, 'stock', parseInt(e.target.value) || 0)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleVariantChange(variant.id, 'stock', parseInt(e.target.value) || 0)}
                           className="w-20"
                         />
                       </td>
@@ -344,7 +344,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                         <Input
                           type="text"
                           value={variant.barcode || ''}
-                          onChange={(e) => handleVariantChange(variant.id, 'barcode', e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleVariantChange(variant.id, 'barcode', e.target.value)}
                           placeholder="바코드"
                           className="w-32"
                         />
@@ -352,7 +352,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                       <td className="px-4 py-3">
                         <select
                           value={variant.active ? 'active' : 'inactive'}
-                          onChange={(e) => handleVariantChange(variant.id, 'active', e.target.value === 'active')}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleVariantChange(variant.id, 'active', e.target.value === 'active')}
                           className="px-2 py-1 border border-modern-border-primary rounded text-sm"
                         >
                           <option value="active">활성</option>

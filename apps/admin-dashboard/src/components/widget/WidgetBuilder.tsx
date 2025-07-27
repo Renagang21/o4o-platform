@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import {
   X,
   Save,
@@ -291,7 +291,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.content.autoP || false}
-                onCheckedChange={(checked) => updateContent('autoP', checked)}
+                onCheckedChange={(checked: boolean) => updateContent('autoP', checked)}
               />
               <Label>자동 단락 나누기</Label>
             </div>
@@ -343,7 +343,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
               <Label>이미지 크기</Label>
               <Select
                 value={formData.content.size || 'medium'}
-                onValueChange={(value) => updateContent('size', value)}
+                onValueChange={(value: string) => updateContent('size', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -375,14 +375,14 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.content.showDate || false}
-                onCheckedChange={(checked) => updateContent('showDate', checked)}
+                onCheckedChange={(checked: boolean) => updateContent('showDate', checked)}
               />
               <Label>날짜 표시</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.content.showExcerpt || false}
-                onCheckedChange={(checked) => updateContent('showExcerpt', checked)}
+                onCheckedChange={(checked: boolean) => updateContent('showExcerpt', checked)}
               />
               <Label>요약 표시</Label>
             </div>
@@ -423,7 +423,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.content.searchCategories || false}
-                onCheckedChange={(checked) => updateContent('searchCategories', checked)}
+                onCheckedChange={(checked: boolean) => updateContent('searchCategories', checked)}
               />
               <Label>카테고리 검색 포함</Label>
             </div>
@@ -437,7 +437,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
               <Label>표시 스타일</Label>
               <Select
                 value={formData.content.style || 'icons'}
-                onValueChange={(value) => updateContent('style', value)}
+                onValueChange={(value: string) => updateContent('style', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -453,7 +453,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
               <Label>크기</Label>
               <Select
                 value={formData.content.size || 'medium'}
-                onValueChange={(value) => updateContent('size', value)}
+                onValueChange={(value: string) => updateContent('size', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -468,7 +468,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.content.openInNewTab || true}
-                onCheckedChange={(checked) => updateContent('openInNewTab', checked)}
+                onCheckedChange={(checked: boolean) => updateContent('openInNewTab', checked)}
               />
               <Label>새 탭에서 열기</Label>
             </div>
@@ -481,7 +481,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                   <div key={index} className="flex gap-2">
                     <Select
                       value={String(link.platform || '')}
-                      onValueChange={(value) => {
+                      onValueChange={(value: string) => {
                         const newLinks = [...(formData.content.links || [])]
                         newLinks[index] = { ...link, platform: value }
                         updateContent('links', newLinks)
@@ -574,7 +574,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.content.showMap || false}
-                onCheckedChange={(checked) => updateContent('showMap', checked)}
+                onCheckedChange={(checked: boolean) => updateContent('showMap', checked)}
               />
               <Label>지도 표시</Label>
             </div>
@@ -650,21 +650,21 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <Label className="text-sm">데스크톱에서 표시</Label>
             <Switch
               checked={formData.settings.visibility?.desktop !== false}
-              onCheckedChange={(checked) => updateNestedSettings('visibility', 'desktop', checked)}
+              onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'desktop', checked)}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-sm">태블릿에서 표시</Label>
             <Switch
               checked={formData.settings.visibility?.tablet !== false}
-              onCheckedChange={(checked) => updateNestedSettings('visibility', 'tablet', checked)}
+              onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'tablet', checked)}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-sm">모바일에서 표시</Label>
             <Switch
               checked={formData.settings.visibility?.mobile !== false}
-              onCheckedChange={(checked) => updateNestedSettings('visibility', 'mobile', checked)}
+              onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'mobile', checked)}
             />
           </div>
         </CardContent>
@@ -680,7 +680,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             <Label className="text-sm">타입</Label>
             <Select
               value={formData.settings.animation?.type || 'none'}
-              onValueChange={(value) => updateNestedSettings('animation', 'type', value)}
+              onValueChange={(value: string) => updateNestedSettings('animation', 'type', value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -793,7 +793,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                   <Label>위치</Label>
                   <Select
                     value={formData.position}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, position: value as WidgetPosition }))}
+                    onValueChange={(value: string) => setFormData(prev => ({ ...prev, position: value as WidgetPosition }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -814,7 +814,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={formData.settings.showTitle}
-                    onCheckedChange={(checked) => updateSettings('showTitle', checked)}
+                    onCheckedChange={(checked: boolean) => updateSettings('showTitle', checked)}
                   />
                   <Label>제목 표시</Label>
                 </div>

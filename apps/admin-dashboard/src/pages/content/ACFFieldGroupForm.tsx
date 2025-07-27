@@ -395,7 +395,7 @@ const ACFFieldGroupForm: FC = () => {
                       <div key={ruleIndex} className="flex gap-2 mb-2">
                         <Select
                           value={rule.param}
-                          onValueChange={(value) => {
+                          onValueChange={(value: string) => {
                             const newLocation = [...(formData.location || [])]
                             newLocation[groupIndex].rules[ruleIndex].param = value as any
                             setFormData({ ...formData, location: newLocation })
@@ -416,7 +416,7 @@ const ACFFieldGroupForm: FC = () => {
 
                         <Select
                           value={rule.operator}
-                          onValueChange={(value) => {
+                          onValueChange={(value: string) => {
                             const newLocation = [...(formData.location || [])]
                             newLocation[groupIndex].rules[ruleIndex].operator = value as any
                             setFormData({ ...formData, location: newLocation })
@@ -470,7 +470,7 @@ const ACFFieldGroupForm: FC = () => {
                 <Switch
                   id="active"
                   checked={formData.active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, active: checked })}
                 />
               </div>
 
@@ -479,7 +479,7 @@ const ACFFieldGroupForm: FC = () => {
                 <Switch
                   id="showInRest"
                   checked={formData.showInRest}
-                  onCheckedChange={(checked) => setFormData({ ...formData, showInRest: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, showInRest: checked })}
                 />
               </div>
             </CardContent>
@@ -494,7 +494,7 @@ const ACFFieldGroupForm: FC = () => {
                 <Label htmlFor="position">위치</Label>
                 <Select
                   value={formData.position}
-                  onValueChange={(value) => setFormData({ ...formData, position: value as any })}
+                  onValueChange={(value: string) => setFormData({ ...formData, position: value as any })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -511,7 +511,7 @@ const ACFFieldGroupForm: FC = () => {
                 <Label htmlFor="style">스타일</Label>
                 <Select
                   value={formData.style}
-                  onValueChange={(value) => setFormData({ ...formData, style: value as any })}
+                  onValueChange={(value: string) => setFormData({ ...formData, style: value as any })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -527,7 +527,7 @@ const ACFFieldGroupForm: FC = () => {
                 <Label htmlFor="labelPlacement">레이블 위치</Label>
                 <Select
                   value={formData.labelPlacement}
-                  onValueChange={(value) => setFormData({ ...formData, labelPlacement: value as any })}
+                  onValueChange={(value: string) => setFormData({ ...formData, labelPlacement: value as any })}
                 >
                   <SelectTrigger>
                     <SelectValue />

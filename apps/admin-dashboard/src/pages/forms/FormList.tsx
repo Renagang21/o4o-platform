@@ -155,7 +155,7 @@ const FormList: FC = () => {
               <Input
                 placeholder="양식 검색..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                 className="w-full pl-10"
               />
             </div>

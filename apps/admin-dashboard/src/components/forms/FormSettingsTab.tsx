@@ -24,21 +24,21 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
             <Label>제출 버튼 텍스트</Label>
             <Input
               value={settings.submitButtonText}
-              onChange={(e) => updateSettings({ submitButtonText: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ submitButtonText: e.target.value })}
             />
           </div>
           <div>
             <Label>처리중 텍스트</Label>
             <Input
               value={settings.submitButtonProcessingText}
-              onChange={(e) => updateSettings({ submitButtonProcessingText: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ submitButtonProcessingText: e.target.value })}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label>AJAX 제출</Label>
             <Switch
               checked={settings.ajax}
-              onCheckedChange={(checked) => updateSettings({ ajax: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ ajax: checked })}
             />
           </div>
         </div>
@@ -51,14 +51,14 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
             <Label>로그인 필수</Label>
             <Switch
               checked={settings.requireLogin}
-              onCheckedChange={(checked) => updateSettings({ requireLogin: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ requireLogin: checked })}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label>제출 횟수 제한</Label>
             <Switch
               checked={settings.limitSubmissions}
-              onCheckedChange={(checked) => updateSettings({ limitSubmissions: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ limitSubmissions: checked })}
             />
           </div>
           {settings.limitSubmissions && (
@@ -67,7 +67,7 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
               <Input
                 type="number"
                 value={settings.maxSubmissions || ''}
-                onChange={(e) => updateSettings({ maxSubmissions: parseInt(e.target.value) || undefined })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ maxSubmissions: parseInt(e.target.value) || undefined })}
               />
             </div>
           )}
@@ -81,14 +81,14 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
             <Label>Honeypot 보호</Label>
             <Switch
               checked={settings.honeypot}
-              onCheckedChange={(checked) => updateSettings({ honeypot: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ honeypot: checked })}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label>CAPTCHA 사용</Label>
             <Switch
               checked={settings.recaptcha || false}
-              onCheckedChange={(checked) => updateSettings({ recaptcha: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ recaptcha: checked })}
             />
           </div>
         </div>
@@ -101,14 +101,14 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
             <Label>임시 저장 허용</Label>
             <Switch
               checked={settings.allowSave}
-              onCheckedChange={(checked) => updateSettings({ allowSave: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ allowSave: checked })}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label>자동 저장</Label>
             <Switch
               checked={settings.autoSave}
-              onCheckedChange={(checked) => updateSettings({ autoSave: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ autoSave: checked })}
             />
           </div>
           {settings.autoSave && (
@@ -117,7 +117,7 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
               <Input
                 type="number"
                 value={settings.autoSaveInterval || 30}
-                onChange={(e) => updateSettings({ autoSaveInterval: parseInt(e.target.value) || 30 })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSettings({ autoSaveInterval: parseInt(e.target.value) || 30 })}
               />
             </div>
           )}
@@ -131,7 +131,7 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
             <Label>멀티 페이지 양식</Label>
             <Switch
               checked={settings.multiPage}
-              onCheckedChange={(checked) => updateSettings({ multiPage: checked })}
+              onCheckedChange={(checked: boolean) => updateSettings({ multiPage: checked })}
             />
           </div>
           {settings.multiPage && (
@@ -140,14 +140,14 @@ export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }
                 <Label>진행률 표시</Label>
                 <Switch
                   checked={settings.progressBar}
-                  onCheckedChange={(checked) => updateSettings({ progressBar: checked })}
+                  onCheckedChange={(checked: boolean) => updateSettings({ progressBar: checked })}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label>진행 상태 저장</Label>
                 <Switch
                   checked={settings.saveProgress}
-                  onCheckedChange={(checked) => updateSettings({ saveProgress: checked })}
+                  onCheckedChange={(checked: boolean) => updateSettings({ saveProgress: checked })}
                 />
               </div>
             </>

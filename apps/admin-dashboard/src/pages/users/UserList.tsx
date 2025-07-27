@@ -242,7 +242,7 @@ export default function UserList() {
                 <Input
                   placeholder="Search users..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -341,7 +341,7 @@ export default function UserList() {
                       <td className="p-4">
                         <Checkbox
                           checked={selectedUsers.includes(user.id)}
-                          onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
+                          onCheckedChange={(checked: boolean) => handleSelectUser(user.id, checked as boolean)}
                         />
                       </td>
                       <td className="p-4">

@@ -235,7 +235,7 @@ const CPTForm: FC = () => {
                   <Label htmlFor="icon">아이콘</Label>
                   <Select
                     value={formData.icon}
-                    onValueChange={(value) => setFormData({ ...formData, icon: value })}
+                    onValueChange={(value: string) => setFormData({ ...formData, icon: value })}
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue />
@@ -339,7 +339,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.title}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, title: !!checked }
                     })}
@@ -349,7 +349,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.editor}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, editor: !!checked }
                     })}
@@ -359,7 +359,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.excerpt}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, excerpt: !!checked }
                     })}
@@ -369,7 +369,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.thumbnail}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, thumbnail: !!checked }
                     })}
@@ -379,7 +379,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.customFields}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, customFields: !!checked }
                     })}
@@ -389,7 +389,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.comments}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, comments: !!checked }
                     })}
@@ -399,7 +399,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.revisions}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, revisions: !!checked }
                     })}
@@ -409,7 +409,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.author}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, author: !!checked }
                     })}
@@ -419,7 +419,7 @@ const CPTForm: FC = () => {
                 <label className="flex items-center space-x-2">
                   <Checkbox
                     checked={formData.supports?.pageAttributes}
-                    onCheckedChange={(checked) => setFormData({
+                    onCheckedChange={(checked: boolean) => setFormData({
                       ...formData,
                       supports: { ...formData.supports!, pageAttributes: !!checked }
                     })}
@@ -443,7 +443,7 @@ const CPTForm: FC = () => {
                   <label key={taxonomy.id} className="flex items-center space-x-2">
                     <Checkbox
                       checked={selectedTaxonomies.includes(taxonomy.id)}
-                      onCheckedChange={(checked) => {
+                      onCheckedChange={(checked: boolean) => {
                         if (checked) {
                           setSelectedTaxonomies([...selectedTaxonomies, taxonomy.id])
                         } else {
@@ -488,7 +488,7 @@ const CPTForm: FC = () => {
                 <Switch
                   id="isPublic"
                   checked={formData.isPublic}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isPublic: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, isPublic: checked })}
                 />
               </div>
 
@@ -502,7 +502,7 @@ const CPTForm: FC = () => {
                 <Switch
                   id="showInMenu"
                   checked={formData.showInMenu}
-                  onCheckedChange={(checked) => setFormData({ ...formData, showInMenu: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, showInMenu: checked })}
                 />
               </div>
 
@@ -516,7 +516,7 @@ const CPTForm: FC = () => {
                 <Switch
                   id="showInAdminBar"
                   checked={formData.showInAdminBar}
-                  onCheckedChange={(checked) => setFormData({ ...formData, showInAdminBar: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, showInAdminBar: checked })}
                 />
               </div>
 
@@ -530,7 +530,7 @@ const CPTForm: FC = () => {
                 <Switch
                   id="hasArchive"
                   checked={formData.hasArchive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, hasArchive: checked })}
+                  onCheckedChange={(checked: boolean) => setFormData({ ...formData, hasArchive: checked })}
                 />
               </div>
             </CardContent>

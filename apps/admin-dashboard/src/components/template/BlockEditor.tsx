@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { 
   Settings, 
   Monitor,
@@ -239,7 +239,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>레벨</Label>
               <Select
                 value={block.content.level?.toString() || '2'}
-                onValueChange={(value) => updateContent('level', parseInt(value))}
+                onValueChange={(value: string) => updateContent('level', parseInt(value))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -323,7 +323,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>스타일</Label>
               <Select
                 value={block.content.style || 'primary'}
-                onValueChange={(value) => updateContent('style', value)}
+                onValueChange={(value: string) => updateContent('style', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -346,7 +346,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
               <Label>컬럼 수</Label>
               <Select
                 value={(block.content.columns?.length || 2).toString()}
-                onValueChange={(value) => {
+                onValueChange={(value: string) => {
                   const count = parseInt(value)
                   const newColumns = Array.from({ length: count }, (_, i) => 
                     block.content.columns?.[i] || { content: '' }
@@ -445,13 +445,13 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
           <SpacingControls
             label="여백 (Margin)"
             value={block.settings.margin as Record<string, string> || {}}
-            onChange={(value) => updateNestedSettings('margin', '', value)}
+            onChange={(value: string) => updateNestedSettings('margin', '', value)}
           />
 
           <SpacingControls
             label="패딩 (Padding)"
             value={block.settings.padding as Record<string, string> || {}}
-            onChange={(value) => updateNestedSettings('padding', '', value)}
+            onChange={(value: string) => updateNestedSettings('padding', '', value)}
           />
 
           {/* Background */}
@@ -464,7 +464,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
                 <Label className="text-sm">타입</Label>
                 <Select
                   value={block.settings.background?.type || 'none'}
-                  onValueChange={(value) => updateNestedSettings('background', 'type', value)}
+                  onValueChange={(value: string) => updateNestedSettings('background', 'type', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -482,7 +482,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
                 <ColorPicker
                   label="배경 색상"
                   value={block.settings.background?.color || ''}
-                  onChange={(value) => updateNestedSettings('background', 'color', value)}
+                  onChange={(value: string) => updateNestedSettings('background', 'color', value)}
                 />
               )}
 
@@ -519,7 +519,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
               <ColorPicker
                 label="색상"
                 value={block.settings.border?.color || ''}
-                onChange={(value) => updateNestedSettings('border', 'color', value)}
+                onChange={(value: string) => updateNestedSettings('border', 'color', value)}
               />
               <div>
                 <Label className="text-sm">둥근 모서리</Label>
@@ -545,7 +545,7 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
                 <Label className="text-sm">타입</Label>
                 <Select
                   value={block.settings.animation?.type || 'none'}
-                  onValueChange={(value) => updateNestedSettings('animation', 'type', value)}
+                  onValueChange={(value: string) => updateNestedSettings('animation', 'type', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -604,21 +604,21 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
                 <Label className="text-sm">데스크톱에서 표시</Label>
                 <Switch
                   checked={block.settings.visibility?.desktop !== false}
-                  onCheckedChange={(checked) => updateNestedSettings('visibility', 'desktop', checked)}
+                  onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'desktop', checked)}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label className="text-sm">태블릿에서 표시</Label>
                 <Switch
                   checked={block.settings.visibility?.tablet !== false}
-                  onCheckedChange={(checked) => updateNestedSettings('visibility', 'tablet', checked)}
+                  onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'tablet', checked)}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label className="text-sm">모바일에서 표시</Label>
                 <Switch
                   checked={block.settings.visibility?.mobile !== false}
-                  onCheckedChange={(checked) => updateNestedSettings('visibility', 'mobile', checked)}
+                  onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'mobile', checked)}
                 />
               </div>
             </CardContent>

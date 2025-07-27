@@ -188,7 +188,7 @@ const DynamicContentList: FC = () => {
             className="pl-10"
           />
         </div>
-        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as PostStatus | 'all')}>
+        <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as PostStatus | 'all')}>
           <SelectTrigger className="w-[180px]">
             <Filter className="w-4 h-4 mr-2" />
             <SelectValue placeholder="상태 필터" />

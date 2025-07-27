@@ -461,7 +461,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                     <Label htmlFor="template-type">타입</Label>
                     <Select
                       value={builderState.template.type}
-                      onValueChange={(value) => updateTemplate({ type: value as any })}
+                      onValueChange={(value: string) => updateTemplate({ type: value as any })}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -478,7 +478,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                     <Label htmlFor="template-category">카테고리</Label>
                     <Select
                       value={builderState.template.category}
-                      onValueChange={(value) => updateTemplate({ category: value as any })}
+                      onValueChange={(value: string) => updateTemplate({ category: value as any })}
                     >
                       <SelectTrigger>
                         <SelectValue />

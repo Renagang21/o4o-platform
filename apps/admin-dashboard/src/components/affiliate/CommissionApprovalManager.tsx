@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { 
   DollarSign, CheckCircle, XCircle, Clock, Search, 
   Download, AlertCircle 
@@ -135,7 +135,7 @@ export const CommissionApprovalManager: FC = () => {
     return matchesSearch;
   });
 
-  const totalAmount = filteredCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
+  const totalAmount = filteredCommissions.reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
   const selectedAmount = Array.from(selectedCommissions).reduce((sum, id) => {
     const commission = commissions.find(c => c.id === id);
     return sum + (commission?.commissionAmount || 0);
@@ -225,7 +225,7 @@ export const CommissionApprovalManager: FC = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">선택 금액</p>
                 <p className="text-2xl font-bold text-modern-accent">
-                  {formatPrice(selectedAmount)}
+                  {formatPrice(selectedAmount as number)}
                 </p>
               </div>
               <DollarSign className="w-8 h-8 text-modern-accent opacity-20" />
@@ -244,7 +244,7 @@ export const CommissionApprovalManager: FC = () => {
                 <Input
                   placeholder="주문번호 또는 추천인ID로 검색..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -413,7 +413,7 @@ export const CommissionApprovalManager: FC = () => {
                 id="reason"
                 placeholder="거절 사유를 입력해주세요..."
                 value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
                 rows={4}
                 className="mt-2"
               />
@@ -442,7 +442,7 @@ export const CommissionApprovalManager: FC = () => {
                 선택한 {selectedCommissions.size}개 커미션을 지급 처리합니다.
               </p>
               <p className="text-lg font-medium mb-4">
-                총 지급액: {formatPrice(selectedAmount)}
+                총 지급액: {formatPrice(selectedAmount as number)}
               </p>
               <Label htmlFor="paymentMethod">지급 방법</Label>
               <Select value={paymentMethod} onValueChange={(value: any) => setPaymentMethod(value)}>

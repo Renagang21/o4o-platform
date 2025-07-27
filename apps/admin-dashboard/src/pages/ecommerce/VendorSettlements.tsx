@@ -274,14 +274,14 @@ const VendorSettlements: FC = () => {
                 <Input
                   placeholder="판매자명, 이메일로 검색..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
             </div>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
               className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
             >
               <option value="all">모든 상태</option>
@@ -308,7 +308,7 @@ const VendorSettlements: FC = () => {
                   <th className="px-4 py-3 text-left">
                     <input
                       type="checkbox"
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (e.target.checked) {
                           setSelectedSettlements(settlements.map(s => s.id));
                         } else {
@@ -366,7 +366,7 @@ const VendorSettlements: FC = () => {
                         <input
                           type="checkbox"
                           checked={selectedSettlements.includes(settlement.id)}
-                          onChange={(e) => {
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             if (e.target.checked) {
                               setSelectedSettlements([...selectedSettlements, settlement.id]);
                             } else {
@@ -505,7 +505,7 @@ const VendorSettlements: FC = () => {
               <Input
                 id="approvalMemo"
                 value={approvalMemo}
-                onChange={(e) => setApprovalMemo(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApprovalMemo(e.target.value)}
                 placeholder="승인 관련 메모를 입력하세요"
               />
             </div>

@@ -82,13 +82,13 @@ const VendorsCommission = () => {
     return matchesPeriod && matchesStatus;
   });
 
-  const totalCommission = filteredCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
+  const totalCommission = filteredCommissions.reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
   const paidCommission = filteredCommissions
     .filter(c => c.status === 'paid')
-    .reduce((sum, c) => sum + c.commissionAmount, 0);
+    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
   const pendingCommission = filteredCommissions
     .filter(c => c.status === 'pending' || c.status === 'processing')
-    .reduce((sum, c) => sum + c.commissionAmount, 0);
+    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -218,7 +218,7 @@ const VendorsCommission = () => {
           <Calendar className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedPeriod(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">전체 기간</option>
@@ -231,7 +231,7 @@ const VendorsCommission = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>

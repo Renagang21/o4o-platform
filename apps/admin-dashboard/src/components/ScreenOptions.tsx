@@ -6,14 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-interface Option {
+export interface ScreenOption {
   id: string;
   label: string;
   checked: boolean;
 }
 
 interface ScreenOptionsProps {
-  options: Option[];
+  options: ScreenOption[];
   onOptionChange: (id: string, checked: boolean) => void;
   columns?: number;
   onColumnsChange?: (columns: number) => void;
@@ -67,12 +67,12 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
               <div className="mb-4">
                 <h3 className="text-sm font-medium mb-2">Show on screen</h3>
                 <div className="space-y-2">
-                  {options.map((option: Option) => (
+                  {options.map((option: ScreenOption) => (
                     <div key={option.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={option.id}
                         checked={option.checked}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked: boolean) => 
                           onOptionChange(option.id, checked as boolean)
                         }
                       />
@@ -99,7 +99,7 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
                   min="1"
                   max="6"
                   value={columns}
-                  onChange={(e) => onColumnsChange(parseInt(e.target.value) || 1)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onColumnsChange(parseInt(e.target.value) || 1)}
                   className="mt-1 w-full"
                 />
               </div>
@@ -116,7 +116,7 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
                   min="1"
                   max="999"
                   value={itemsPerPage}
-                  onChange={(e) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
                   className="mt-1 w-full"
                 />
               </div>
@@ -141,3 +141,5 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
     </div>
   );
 };
+
+export default ScreenOptions;

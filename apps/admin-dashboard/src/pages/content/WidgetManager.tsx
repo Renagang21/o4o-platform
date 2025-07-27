@@ -237,7 +237,7 @@ const WidgetManager: FC = () => {
       </div>
 
       {/* View Mode Tabs */}
-      <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)}>
+      <Tabs value={viewMode} onValueChange={(value: string) => setViewMode(value as ViewMode)}>
         <TabsList>
           <TabsTrigger value="builder">위젯 빌더</TabsTrigger>
           <TabsTrigger value="list">목록 보기</TabsTrigger>
@@ -436,7 +436,7 @@ const WidgetManager: FC = () => {
                 className="max-w-md"
               />
             </div>
-            <Select value={selectedPosition} onValueChange={(value) => setSelectedPosition(value as WidgetPosition | 'all')}>
+            <Select value={selectedPosition} onValueChange={(value: string) => setSelectedPosition(value as WidgetPosition | 'all')}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="위치 선택" />
               </SelectTrigger>

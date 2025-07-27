@@ -199,7 +199,7 @@ const AffiliatePartnerForm: FC = () => {
                 <Label htmlFor="type">제휴사 유형 *</Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value) => handleChange('type', value)}
+                  onValueChange={(value: string) => handleChange('type', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -254,7 +254,7 @@ const AffiliatePartnerForm: FC = () => {
                 <Label htmlFor="paymentMethod">결제 방법 *</Label>
                 <Select
                   value={formData.paymentMethod}
-                  onValueChange={(value) => handleChange('paymentMethod', value)}
+                  onValueChange={(value: string) => handleChange('paymentMethod', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />

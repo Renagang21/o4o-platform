@@ -119,7 +119,7 @@ export default function ReadingSettings() {
         <CardContent className="space-y-6">
           <RadioGroup
             value={settings.homepageType}
-            onValueChange={(value) => handleChange('homepageType', value as 'latest_posts' | 'static_page')}
+            onValueChange={(value: string) => handleChange('homepageType', value as 'latest_posts' | 'static_page')}
           >
             <div className="flex items-start space-x-3 mb-4">
               <RadioGroupItem value="latest_posts" id="latest_posts" className="mt-1" />
@@ -148,7 +148,7 @@ export default function ReadingSettings() {
                     <Label htmlFor="homepage-select">홈페이지</Label>
                     <Select
                       value={settings.homepageId}
-                      onValueChange={(value) => handleChange('homepageId', value)}
+                      onValueChange={(value: string) => handleChange('homepageId', value)}
                     >
                       <SelectTrigger id="homepage-select" className="w-full">
                         <SelectValue placeholder="페이지를 선택하세요" />
@@ -191,7 +191,7 @@ export default function ReadingSettings() {
             <Label htmlFor="posts-per-page">페이지당 글 수</Label>
             <Select
               value={settings.postsPerPage.toString()}
-              onValueChange={(value) => handleChange('postsPerPage', parseInt(value))}
+              onValueChange={(value: string) => handleChange('postsPerPage', parseInt(value))}
             >
               <SelectTrigger id="posts-per-page">
                 <SelectValue />
@@ -211,7 +211,7 @@ export default function ReadingSettings() {
             <Label>피드에서 각 글 표시</Label>
             <RadioGroup
               value={settings.showSummary}
-              onValueChange={(value) => handleChange('showSummary', value as 'full' | 'excerpt')}
+              onValueChange={(value: string) => handleChange('showSummary', value as 'full' | 'excerpt')}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="full" id="show-full" />
@@ -233,7 +233,7 @@ export default function ReadingSettings() {
               <Label htmlFor="excerpt-length">요약문 길이 (글자 수)</Label>
               <Select
                 value={settings.excerptLength.toString()}
-                onValueChange={(value) => handleChange('excerptLength', parseInt(value))}
+                onValueChange={(value: string) => handleChange('excerptLength', parseInt(value))}
               >
                 <SelectTrigger id="excerpt-length">
                   <SelectValue />

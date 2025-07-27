@@ -261,7 +261,7 @@ const FormSubmissions: FC = () => {
               <Input
                 placeholder="제출 검0색..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                 className="w-full pl-10"
               />
             </div>
@@ -333,7 +333,7 @@ const FormSubmissions: FC = () => {
                     <TableCell>
                       <Checkbox
                         checked={selectedSubmissions.includes(submission.id)}
-                        onCheckedChange={(checked) => {
+                        onCheckedChange={(checked: boolean) => {
                           if (checked) {
                             setSelectedSubmissions([...selectedSubmissions, submission.id]);
                           } else {

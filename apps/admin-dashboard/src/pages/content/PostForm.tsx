@@ -340,7 +340,7 @@ const PostForm = () => {
                 <span className="text-sm">공개 설정:</span>
                 <Select
                   value={formData.visibility}
-                  onValueChange={(value) => setFormData({ ...formData, visibility: value as PostVisibility })}
+                  onValueChange={(value: string) => setFormData({ ...formData, visibility: value as PostVisibility })}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />

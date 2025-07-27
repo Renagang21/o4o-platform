@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import {
   FileText,
   Settings,
@@ -218,7 +218,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     type="datetime-local"
                     value={postSettings.publishDate}
-                    onChange={(e) => 
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
                       onPostSettingsChange({ publishDate: e.target.value })
                     }
                     className="mt-1"
@@ -232,7 +232,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Switch
                     id="sticky"
                     checked={postSettings.sticky}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked: boolean) => 
                       onPostSettingsChange({ sticky: checked })
                     }
                   />
@@ -255,7 +255,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <Input
                   value={postSettings.slug}
-                  onChange={(e) => 
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
                     onPostSettingsChange({ slug: e.target.value })
                   }
                   placeholder="post-url-slug"
@@ -286,7 +286,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                         autoFocus
                         placeholder="Search..."
                         value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCategorySearch(e.target.value)}
                         className="border-0 focus-visible:ring-0"
                       />
                     </div>
@@ -332,7 +332,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     placeholder="Add new tag"
                     value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTagInput(e.target.value)}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -410,7 +410,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Textarea
                   placeholder="Write an excerpt (optional)"
                   value={postSettings.excerpt}
-                  onChange={(e) => 
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
                     onPostSettingsChange({ excerpt: e.target.value })
                   }
                   rows={4}
@@ -431,7 +431,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Switch
                     id="comments"
                     checked={postSettings.commentStatus}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked: boolean) => 
                       onPostSettingsChange({ commentStatus: checked })
                     }
                   />
@@ -443,7 +443,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Switch
                     id="pingbacks"
                     checked={postSettings.pingStatus}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked: boolean) => 
                       onPostSettingsChange({ pingStatus: checked })
                     }
                   />
@@ -473,7 +473,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                         <Label className="text-xs">Level</Label>
                         <Select
                           value={blockSettings.attributes?.level || 'h2'}
-                          onValueChange={(value) => 
+                          onValueChange={(value: string) => 
                             onBlockSettingsChange?.({
                               attributes: { ...blockSettings.attributes, level: value }
                             })
@@ -523,7 +523,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       <Input
                         placeholder="custom-class"
                         value={blockSettings.attributes?.className || ''}
-                        onChange={(e) => 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
                           onBlockSettingsChange?.({
                             attributes: { ...blockSettings.attributes, className: e.target.value }
                           })
@@ -537,7 +537,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       <Input
                         placeholder="anchor-id"
                         value={blockSettings.attributes?.anchor || ''}
-                        onChange={(e) => 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
                           onBlockSettingsChange?.({
                             attributes: { ...blockSettings.attributes, anchor: e.target.value }
                           })

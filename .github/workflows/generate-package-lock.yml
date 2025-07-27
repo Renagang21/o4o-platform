@@ -54,7 +54,7 @@ jobs:
             git commit -m "feat: generate package-lock.json via GitHub Actions
             
             🔧 Generated with Node.js 20 in clean Ubuntu environment
-            🚀 Resolves CI/CD npm ci compatibility issues
+            🚀 Resolves CI/CD npm install compatibility issues
             
             Generated with [Claude Code](https://claude.ai/code)
             

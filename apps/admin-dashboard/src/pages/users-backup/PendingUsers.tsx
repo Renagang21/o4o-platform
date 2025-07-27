@@ -1,6 +1,4 @@
 import { FC } from 'react';
-import { FC } from 'react'
-
 const PendingUsers: FC = () => {
   return (
     <div className="space-y-6">

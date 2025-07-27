@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { DollarSign, Calendar, Download, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -96,15 +96,15 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
     return matchesFilter && matchesSearch;
   });
 
-  const totalCommission = filteredCommissions.reduce((sum, c) => 
+  const totalCommission = filteredCommissions.reduce((sum: number, c: AffiliateCommission) => 
     c.status !== 'cancelled' ? sum + c.commissionAmount : sum, 0
   );
   const pendingCommission = filteredCommissions
     .filter(c => c.status === 'pending' || c.status === 'approved')
-    .reduce((sum, c) => sum + c.commissionAmount, 0);
+    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
   const paidCommission = filteredCommissions
     .filter(c => c.status === 'paid')
-    .reduce((sum, c) => sum + c.commissionAmount, 0);
+    .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -207,7 +207,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
             <Input
               placeholder="주문번호로 검색..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
             <Select value={filter} onValueChange={(value: any) => setFilter(value)}>

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import {
   Layout,
   FileText,
@@ -274,7 +274,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
           <Input
             placeholder="Search templates and patterns..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>

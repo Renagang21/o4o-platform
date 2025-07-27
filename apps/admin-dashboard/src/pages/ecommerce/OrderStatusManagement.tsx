@@ -307,13 +307,13 @@ const OrderStatusManagement: FC = () => {
             type="text"
             placeholder="주문번호, 고객명으로 검색..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>
@@ -460,7 +460,7 @@ const OrderStatusManagement: FC = () => {
                 <select
                   id="newStatus"
                   value={statusChangeForm.newStatus}
-                  onChange={(e) => setStatusChangeForm(prev => ({ ...prev, newStatus: e.target.value as OrderStatus }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusChangeForm(prev => ({ ...prev, newStatus: e.target.value as OrderStatus }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
@@ -480,7 +480,7 @@ const OrderStatusManagement: FC = () => {
                     <Input
                       id="trackingNumber"
                       value={statusChangeForm.trackingNumber}
-                      onChange={(e) => setStatusChangeForm(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusChangeForm(prev => ({ ...prev, trackingNumber: e.target.value }))}
                       placeholder="운송장 번호를 입력하세요"
                     />
                   </div>
@@ -490,7 +490,7 @@ const OrderStatusManagement: FC = () => {
                       id="estimatedDelivery"
                       type="date"
                       value={statusChangeForm.estimatedDelivery}
-                      onChange={(e) => setStatusChangeForm(prev => ({ ...prev, estimatedDelivery: e.target.value }))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusChangeForm(prev => ({ ...prev, estimatedDelivery: e.target.value }))}
                     />
                   </div>
                 </>
@@ -501,7 +501,7 @@ const OrderStatusManagement: FC = () => {
                 <Input
                   id="reason"
                   value={statusChangeForm.reason}
-                  onChange={(e) => setStatusChangeForm(prev => ({ ...prev, reason: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusChangeForm(prev => ({ ...prev, reason: e.target.value }))}
                   placeholder="상태 변경 이유를 입력하세요"
                 />
               </div>
@@ -511,7 +511,7 @@ const OrderStatusManagement: FC = () => {
                 <Textarea
                   id="notes"
                   value={statusChangeForm.notes}
-                  onChange={(e) => setStatusChangeForm(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStatusChangeForm(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder="추가 메모를 입력하세요"
                   rows={3}
                 />

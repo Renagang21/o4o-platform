@@ -189,7 +189,7 @@ export default function GeneralSettings() {
               <Label htmlFor="timezone">시간대</Label>
               <Select
                 value={settings.timezone}
-                onValueChange={(value) => handleChange('timezone', value)}
+                onValueChange={(value: string) => handleChange('timezone', value)}
               >
                 <SelectTrigger id="timezone">
                   <SelectValue />
@@ -207,7 +207,7 @@ export default function GeneralSettings() {
               <Label htmlFor="language">언어</Label>
               <Select
                 value={settings.language}
-                onValueChange={(value) => handleChange('language', value)}
+                onValueChange={(value: string) => handleChange('language', value)}
               >
                 <SelectTrigger id="language">
                   <SelectValue />
@@ -223,7 +223,7 @@ export default function GeneralSettings() {
               <Label htmlFor="dateFormat">날짜 형식</Label>
               <Select
                 value={settings.dateFormat}
-                onValueChange={(value) => handleChange('dateFormat', value)}
+                onValueChange={(value: string) => handleChange('dateFormat', value)}
               >
                 <SelectTrigger id="dateFormat">
                   <SelectValue />
@@ -241,7 +241,7 @@ export default function GeneralSettings() {
               <Label htmlFor="timeFormat">시간 형식</Label>
               <Select
                 value={settings.timeFormat}
-                onValueChange={(value) => handleChange('timeFormat', value)}
+                onValueChange={(value: string) => handleChange('timeFormat', value)}
               >
                 <SelectTrigger id="timeFormat">
                   <SelectValue />
@@ -281,7 +281,7 @@ export default function GeneralSettings() {
               </div>
               <Switch
                 checked={settings.allowRegistration}
-                onCheckedChange={(checked) => handleChange('allowRegistration', checked)}
+                onCheckedChange={(checked: boolean) => handleChange('allowRegistration', checked)}
               />
             </div>
             <Separator />
@@ -294,7 +294,7 @@ export default function GeneralSettings() {
               </div>
               <Switch
                 checked={settings.requireEmailVerification}
-                onCheckedChange={(checked) => handleChange('requireEmailVerification', checked)}
+                onCheckedChange={(checked: boolean) => handleChange('requireEmailVerification', checked)}
               />
             </div>
             <Separator />
@@ -302,7 +302,7 @@ export default function GeneralSettings() {
               <Label htmlFor="defaultRole">기본 사용자 역할</Label>
               <Select
                 value={settings.defaultUserRole}
-                onValueChange={(value) => handleChange('defaultUserRole', value)}
+                onValueChange={(value: string) => handleChange('defaultUserRole', value)}
               >
                 <SelectTrigger id="defaultRole">
                   <SelectValue />
@@ -339,7 +339,7 @@ export default function GeneralSettings() {
             </div>
             <Switch
               checked={settings.maintenanceMode}
-              onCheckedChange={(checked) => handleChange('maintenanceMode', checked)}
+              onCheckedChange={(checked: boolean) => handleChange('maintenanceMode', checked)}
             />
           </div>
           {settings.maintenanceMode && (

@@ -1,4 +1,28 @@
+#!/bin/bash
+
+# Script to fix TypeScript errors in admin-dashboard
+
+echo "🔧 Fixing TypeScript errors in admin-dashboard..."
+
+# Fix 1: Add missing React hook imports for affiliate components
+echo "📦 Fixing missing React hooks in affiliate components..."
+
+# CommissionApprovalManager.tsx
+sed -i "1s/import { FC } from 'react';/import { FC, useState, useEffect } from 'react';/" apps/admin-dashboard/src/components/affiliate/CommissionApprovalManager.tsx
+
+# CommissionHistory.tsx
+sed -i "1s/import { FC } from 'react';/import { FC, useState } from 'react';/" apps/admin-dashboard/src/components/affiliate/CommissionHistory.tsx
+
+# CommissionSummary.tsx
+sed -i "1s/import { FC } from 'react';/import { FC, useState, useEffect } from 'react';/" apps/admin-dashboard/src/components/affiliate/CommissionSummary.tsx
+
+# Fix 2: Remove duplicate imports
+echo "🔧 Removing duplicate imports..."
+
+# Library.tsx - Remove the duplicate FC import and fix the import
+cat > apps/admin-dashboard/src/pages/media/Library.tsx << 'EOF'
 import { FC, useState, useEffect } from 'react';
+import { 
   Upload,
   Search,
   Filter,
@@ -26,6 +50,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { MediaUploadDialog } from '@/components/MediaUploadDialog'
+import { useState, useCallback } from 'react'
 import { formatBytes, getFileIcon } from '@/utils/fileUtils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -202,7 +227,7 @@ const Library: FC = () => {
                 <Input
                   placeholder="미디어 검색..."
                   value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -541,3 +566,56 @@ const Library: FC = () => {
 }
 
 export default Library
+EOF
+
+# PendingUsers.tsx - Remove duplicate imports
+cat > apps/admin-dashboard/src/pages/users-backup/PendingUsers.tsx << 'EOF'
+import { FC } from 'react';
+
+const PendingUsers: FC = () => {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">승인 대기 사용자</h1>
+        <p className="text-gray-600 mt-1">가입 승인을 기다리는 사용자들을 관리합니다</p>
+      </div>
+
+      <div className="wp-card">
+        <div className="wp-card-body">
+          <div className="text-center py-12 text-gray-500">
+            <p>승인 대기 사용자 페이지는 개발 중입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default PendingUsers
+EOF
+
+# Fix 3: Add type annotations for implicit any parameters
+echo "🔧 Adding type annotations for event handlers..."
+
+# Find and fix onChange handlers with implicit any
+find apps/admin-dashboard/src -type f -name "*.tsx" -exec sed -i \
+  -e 's/onChange={(checked)/onChange={(checked: boolean)/g' \
+  -e 's/onChange={(value)/onChange={(value: string)/g' \
+  -e 's/onChange={(e)/onChange={(e: React.ChangeEvent<HTMLInputElement>)/g' \
+  -e 's/onValueChange={(value)/onValueChange={(value: string)/g' \
+  -e 's/onCheckedChange={(checked)/onCheckedChange={(checked: boolean)/g' \
+  {} \;
+
+# Fix 4: Fix specific error in ActivityFeed
+echo "🔧 Fixing ActivityFeed comparison error..."
+sed -i 's/activity\.type === ""/activity.type === "content"/' apps/admin-dashboard/src/pages/dashboard/components/ActivityFeed/index.tsx
+
+# Fix 5: Fix ScreenOption export issue
+echo "🔧 Fixing ScreenOption export..."
+# Check if ScreenOptions.tsx exports ScreenOption
+if ! grep -q "export.*ScreenOption[^s]" apps/admin-dashboard/src/components/ScreenOptions.tsx; then
+  # Add the export at the end of the file
+  echo -e "\nexport { ScreenOption }" >> apps/admin-dashboard/src/components/ScreenOptions.tsx
+fi
+
+echo "✅ Admin dashboard TypeScript fixes complete!"

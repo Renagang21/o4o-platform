@@ -506,7 +506,7 @@ const CustomFieldBuilder: FC = () => {
               <Label htmlFor="groupPosition">위치</Label>
               <Select
                 value={groupFormData.position}
-                onValueChange={(value) => setGroupFormData({ ...groupFormData, position: value as any })}
+                onValueChange={(value: string) => setGroupFormData({ ...groupFormData, position: value as any })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -572,7 +572,7 @@ const CustomFieldBuilder: FC = () => {
               <Label htmlFor="fieldType">필드 유형</Label>
               <Select
                 value={fieldFormData.type}
-                onValueChange={(value) => setFieldFormData({ ...fieldFormData, type: value as any })}
+                onValueChange={(value: string) => setFieldFormData({ ...fieldFormData, type: value as any })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -628,7 +628,7 @@ const CustomFieldBuilder: FC = () => {
               <Switch
                 id="fieldRequired"
                 checked={fieldFormData.required}
-                onCheckedChange={(checked) => setFieldFormData({ ...fieldFormData, required: checked })}
+                onCheckedChange={(checked: boolean) => setFieldFormData({ ...fieldFormData, required: checked })}
               />
               <Label htmlFor="fieldRequired">필수 필드</Label>
             </div>

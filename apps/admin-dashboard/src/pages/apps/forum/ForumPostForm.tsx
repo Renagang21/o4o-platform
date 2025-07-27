@@ -175,7 +175,7 @@ const ForumPostForm: FC = () => {
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => handleChange('title', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('title', e.target.value)}
                   placeholder="게시글 제목을 입력하세요"
                   required
                 />
@@ -185,7 +185,7 @@ const ForumPostForm: FC = () => {
                 <Label htmlFor="category">카테고리 *</Label>
                 <Select
                   value={formData.categoryId}
-                  onValueChange={(value) => handleChange('categoryId', value)}
+                  onValueChange={(value: string) => handleChange('categoryId', value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="카테고리를 선택하세요" />
@@ -205,7 +205,7 @@ const ForumPostForm: FC = () => {
                 <Textarea
                   id="content"
                   value={formData.content}
-                  onChange={(e) => handleChange('content', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('content', e.target.value)}
                   placeholder="게시글 내용을 입력하세요..."
                   rows={12}
                   required
@@ -224,7 +224,7 @@ const ForumPostForm: FC = () => {
                 <Label htmlFor="status">상태</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value) => handleChange('status', value)}
+                  onValueChange={(value: string) => handleChange('status', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -246,7 +246,7 @@ const ForumPostForm: FC = () => {
                 <Switch
                   id="isPinned"
                   checked={formData.isPinned}
-                  onCheckedChange={(checked) => handleChange('isPinned', checked)}
+                  onCheckedChange={(checked: boolean) => handleChange('isPinned', checked)}
                 />
               </div>
 
@@ -260,7 +260,7 @@ const ForumPostForm: FC = () => {
                 <Switch
                   id="isLocked"
                   checked={formData.isLocked}
-                  onCheckedChange={(checked) => handleChange('isLocked', checked)}
+                  onCheckedChange={(checked: boolean) => handleChange('isLocked', checked)}
                 />
               </div>
             </CardContent>

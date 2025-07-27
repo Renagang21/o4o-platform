@@ -46,7 +46,7 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
       <div className="flex items-center gap-4">
         <Select
           value={logic.action}
-          onValueChange={(value) => onChange({ ...logic, action: value as 'show' | 'hide' })}
+          onValueChange={(value: string) => onChange({ ...logic, action: value as 'show' | 'hide' })}
         >
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -59,7 +59,7 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
         <span>this field if</span>
         <Select
           value={logic.logicType}
-          onValueChange={(value) => onChange({ ...logic, logicType: value as 'all' | 'any' })}
+          onValueChange={(value: string) => onChange({ ...logic, logicType: value as 'all' | 'any' })}
         >
           <SelectTrigger className="w-24">
             <SelectValue />
@@ -77,7 +77,7 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
           <div key={index} className="flex items-center gap-2">
             <Select
               value={rule.field}
-              onValueChange={(value) => updateRule(index, { field: value })}
+              onValueChange={(value: string) => updateRule(index, { field: value })}
             >
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Select field" />
@@ -93,7 +93,7 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
 
             <Select
               value={rule.operator}
-              onValueChange={(value) => updateRule(index, { operator: value as ConditionalRule['operator'] })}
+              onValueChange={(value: string) => updateRule(index, { operator: value as ConditionalRule['operator'] })}
             >
               <SelectTrigger className="w-32">
                 <SelectValue />
@@ -115,7 +115,7 @@ export const ConditionalLogicBuilder: FC<ConditionalLogicBuilderProps> = ({
             {rule.operator !== 'is_empty' && rule.operator !== 'is_not_empty' && (
               <Input
                 value={rule.value}
-                onChange={(e) => updateRule(index, { value: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateRule(index, { value: e.target.value })}
                 placeholder="Value"
                 className="flex-1"
               />

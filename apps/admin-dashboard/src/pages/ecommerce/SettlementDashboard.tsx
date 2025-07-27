@@ -137,7 +137,7 @@ const SettlementDashboard: FC = () => {
         <div className="flex gap-2">
           <select
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateRange(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="7days">최근 7일</option>

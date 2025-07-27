@@ -66,14 +66,14 @@ export const CTABlock: FC<{
               style={{ color: textColor }}
               placeholder="Enter title..."
               value={title}
-              onChange={(e) => onUpdate({ ...content, title: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, title: e.target.value })}
             />
             <Textarea
               className="text-lg mb-8 bg-transparent border-0 text-center resize-none placeholder-white/50"
               style={{ color: textColor }}
               placeholder="Enter description..."
               value={description}
-              onChange={(e) => onUpdate({ ...content, description: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, description: e.target.value })}
               rows={2}
             />
             <Input
@@ -84,7 +84,7 @@ export const CTABlock: FC<{
               }}
               placeholder="Button text..."
               value={buttonText}
-              onChange={(e) => onUpdate({ ...content, buttonText: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, buttonText: e.target.value })}
             />
           </>
         ) : (
@@ -173,7 +173,7 @@ export const PricingTableBlock: FC<{
                 className="text-2xl font-bold mb-2 text-center border-0"
                 placeholder="Plan name"
                 value={plan.name}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const newPlans = [...plans];
                   newPlans[index].name = e.target.value;
                   onUpdate({ ...content, plans: newPlans });
@@ -190,7 +190,7 @@ export const PricingTableBlock: FC<{
                     className="text-4xl font-bold w-24 text-right border-0 p-0"
                     placeholder="$0"
                     value={plan.price}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const newPlans = [...plans];
                       newPlans[index].price = e.target.value;
                       onUpdate({ ...content, plans: newPlans });
@@ -201,7 +201,7 @@ export const PricingTableBlock: FC<{
                     className="text-gray-600 w-20 border-0 p-0"
                     placeholder="month"
                     value={plan.period}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const newPlans = [...plans];
                       newPlans[index].period = e.target.value;
                       onUpdate({ ...content, plans: newPlans });
@@ -226,7 +226,7 @@ export const PricingTableBlock: FC<{
                     className="flex-1 border-0 p-0"
                     placeholder="Feature"
                     value={feature}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const newPlans = [...plans];
                       newPlans[index].features[featureIndex] = e.target.value;
                       onUpdate({ ...content, plans: newPlans });
@@ -306,7 +306,7 @@ export const TestimonialBlock: FC<{
             className="text-2xl leading-relaxed text-gray-700 italic text-center border-0 resize-none"
             placeholder="Enter testimonial quote..."
             value={quote}
-            onChange={(e) => onUpdate({ ...content, quote: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, quote: e.target.value })}
             rows={3}
           />
         ) : (
@@ -337,21 +337,21 @@ export const TestimonialBlock: FC<{
                 className="font-semibold text-lg border-0 p-0 h-auto"
                 placeholder="Author name"
                 value={author}
-                onChange={(e) => onUpdate({ ...content, author: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, author: e.target.value })}
               />
               <div className="flex gap-2 text-gray-600">
                 <Input
                   className="border-0 p-0 h-auto text-sm"
                   placeholder="Position"
                   value={position}
-                  onChange={(e) => onUpdate({ ...content, position: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, position: e.target.value })}
                 />
                 <span>at</span>
                 <Input
                   className="border-0 p-0 h-auto text-sm"
                   placeholder="Company"
                   value={company}
-                  onChange={(e) => onUpdate({ ...content, company: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, company: e.target.value })}
                 />
               </div>
             </>
@@ -405,7 +405,7 @@ export const StarRatingBlock: FC<{
             className="font-medium text-lg border-0 p-0"
             placeholder="Rating title..."
             value={title}
-            onChange={(e) => onUpdate({ ...content, title: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, title: e.target.value })}
           />
         ) : (
           <h4 className="font-medium text-lg">{title}</h4>
@@ -503,7 +503,7 @@ export const InfoBoxBlock: FC<{
             )}
             placeholder="Enter title..."
             value={title}
-            onChange={(e) => onUpdate({ ...content, title: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, title: e.target.value })}
           />
           <Textarea
             className={cn(
@@ -513,7 +513,7 @@ export const InfoBoxBlock: FC<{
             )}
             placeholder="Enter description..."
             value={description}
-            onChange={(e) => onUpdate({ ...content, description: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...content, description: e.target.value })}
             rows={2}
           />
         </>
