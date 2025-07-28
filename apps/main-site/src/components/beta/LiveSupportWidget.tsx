@@ -68,7 +68,7 @@ export const LiveSupportWidget: React.FC<LiveSupportWidgetProps> = ({
 
     setConnectionStatus('connecting');
     
-    const socketInstance = io(process.env.REACT_APP_API_URL || 'http://localhost:4000', {
+    const socketInstance = io(import.meta.env.VITE_API_URL || 'https://api.neture.co.kr', {
       transports: ['websocket'],
       withCredentials: true
     });

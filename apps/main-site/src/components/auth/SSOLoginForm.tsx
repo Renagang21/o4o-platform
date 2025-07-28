@@ -208,7 +208,7 @@ const SSOLoginForm: React.FC = () => {
             <details>
               <summary className="cursor-pointer">디버그 정보</summary>
               <div className="mt-2 space-y-1">
-                <div>SSO API URL: {import.meta.env.VITE_SSO_API_URL || 'http://localhost:4000'}</div>
+                <div>SSO API URL: {import.meta.env.VITE_SSO_API_URL || 'https://api.neture.co.kr'}</div>
                 <div>Use SSO: {import.meta.env.VITE_USE_SSO || 'true'}</div>
                 <div>Loading: {isLoading.toString()}</div>
                 <div>Is Authenticated: {state.isAuthenticated.toString()}</div>

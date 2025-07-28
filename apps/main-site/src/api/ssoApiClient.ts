@@ -2,7 +2,7 @@ import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'ax
 import { API_ENDPOINTS } from './config/endpoints';
 
 // 새로운 SSO/JWT API 클라이언트 설정
-const SSO_API_BASE_URL = import.meta.env.VITE_SSO_API_URL || 'http://localhost:4000';
+const SSO_API_BASE_URL = import.meta.env.VITE_SSO_API_URL || 'https://api.neture.co.kr';
 
 // JWT 토큰 인터페이스 (Phase 1에서 정의한 구조와 동일)
 export interface JWTTokens {
