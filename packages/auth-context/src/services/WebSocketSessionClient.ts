@@ -1,4 +1,4 @@
-const io = require('socket.io-client');
+import io from 'socket.io-client';
 
 interface Socket {
   on(event: string, listener: (...args: any[]) => void): void;
