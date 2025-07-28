@@ -57,6 +57,15 @@ const io = new Server(httpServer, {
         "http://localhost:3001", // admin dashboard
         "http://localhost:3002", // ecommerce
         "http://localhost:3003", // crowdfunding
+        // Production domains
+        "https://neture.co.kr",
+        "https://www.neture.co.kr",
+        "https://admin.neture.co.kr",
+        "https://shop.neture.co.kr",
+        "https://forum.neture.co.kr",
+        "https://signage.neture.co.kr",
+        "https://funding.neture.co.kr",
+        "https://auth.neture.co.kr"
       ];
       
       if (!origin || allowedOrigins.includes(origin)) {
@@ -108,6 +117,15 @@ const corsOptions = {
       "http://localhost:3001", // admin dashboard
       "http://localhost:3002", // ecommerce
       "http://localhost:3003", // crowdfunding
+      // Production domains
+      "https://neture.co.kr",
+      "https://www.neture.co.kr",
+      "https://admin.neture.co.kr",
+      "https://shop.neture.co.kr",
+      "https://forum.neture.co.kr",
+      "https://signage.neture.co.kr",
+      "https://funding.neture.co.kr",
+      "https://auth.neture.co.kr"
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
