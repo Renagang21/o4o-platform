@@ -1,9 +1,8 @@
 import { FC } from 'react';
+/**
  * UserDetail - 사용자 상세 정보 조회 페이지
  * 읽기 전용 사용자 정보 표시
  */
-
-import { FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
