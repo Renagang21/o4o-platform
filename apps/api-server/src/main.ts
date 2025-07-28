@@ -3,9 +3,19 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import path from 'path';
 
-// dotenv 설정 로드
-dotenv.config();
+// 환경변수 로드 (우선순위: .env.production > .env)
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+
+// 환경변수 검증
+console.log('🔧 Environment Configuration:');
+console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`   Config file: ${envFile}`);
+console.log(`   DB_HOST: ${process.env.DB_HOST || 'NOT SET'}`);
+console.log(`   DB_PORT: ${process.env.DB_PORT || 'NOT SET'}`);
+console.log(`   DB_NAME: ${process.env.DB_NAME || 'NOT SET'}`);
 
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
@@ -40,11 +50,7 @@ import linkedAccountsRoutes from './routes/linked-accounts';
 import vendorRoutes from './routes/vendor';
 import formsRoutes from './routes/forms';
 
-// 환경변수 로드
-dotenv.config();
-console.log('✅ Environment variables loaded');
-console.log('📍 Current directory:', process.cwd());
-console.log('🌐 PORT from env:', process.env.PORT);
+// 중복 제거 - 이미 상단에서 로드됨
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -279,12 +285,48 @@ app.use('*', (req, res) => {
 // 서버 시작
 const startServer = async () => {
   try {
-    // 데이터베이스 초기화 시도
-    await AppDataSource.initialize();
-    console.log('✅ Database connection established');
+    // 데이터베이스 초기화 전 상태 확인
+    if (AppDataSource.isInitialized) {
+      console.log('✅ Database already initialized');
+    } else {
+      console.log('🔄 Initializing database connection...');
+      
+      // 환경변수 재확인
+      const dbConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432'),
+        username: process.env.DB_USERNAME || 'postgres',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'o4o_platform'
+      };
+      
+      console.log('📊 Database config:', {
+        ...dbConfig,
+        password: dbConfig.password ? '***' : 'NOT SET'
+      });
+      
+      // 데이터베이스 초기화
+      await AppDataSource.initialize();
+      console.log('✅ Database connection established');
+      
+      // 마이그레이션 실행 (프로덕션 환경)
+      if (process.env.NODE_ENV === 'production') {
+        try {
+          await AppDataSource.runMigrations();
+          console.log('✅ Database migrations completed');
+        } catch (migrationError) {
+          console.log('⚠️  Migration error:', (migrationError as Error).message);
+        }
+      }
+    }
   } catch (dbError) {
-    console.log('⚠️  Database connection failed:', (dbError as Error).message);
-    console.log('📌 Running in development mode without database');
+    console.error('❌ Database connection failed:', dbError);
+    console.log('📌 Check your database configuration and ensure PostgreSQL is running');
+    
+    // 프로덕션에서는 종료, 개발에서는 계속 실행
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
   }
 
   // Redis 초기화

@@ -148,6 +148,9 @@ export const AppDataSource = new DataSource({
 });
 
 // 데이터베이스 연결 상태 모니터링
+// 주의: main.ts에서 초기화하므로 여기서는 자동 초기화하지 않음
+// PM2 클러스터 모드에서 중복 초기화 방지
+/*
 AppDataSource.initialize()
   .then(() => {
     console.log('📊 Database Configuration:');
@@ -162,6 +165,7 @@ AppDataSource.initialize()
   .catch((error) => {
     console.error('❌ Database initialization failed:', error);
   });
+*/
 
 // 데이터베이스 헬스 체크 함수
 export async function checkDatabaseHealth() {
