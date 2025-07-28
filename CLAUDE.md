@@ -188,7 +188,7 @@ GOOGLE_CLIENT_SECRET=optional
 - Hosts: API backend, PostgreSQL, Medusa
 - Domain: api.neture.co.kr
 - Apps: `apps/api-server`
-- PM2 app name: `o4o-api-server`
+- PM2 app name: `api-server`
 - Path: `/home/ubuntu/o4o-platform`
 
 **o4o-webserver** (13.125.144.8)
@@ -245,13 +245,13 @@ git checkout origin/main -- scripts/
 
 # 3. PM2 프로세스 확인
 pm2 list
-pm2 logs o4o-api-server --lines 50
+pm2 logs api-server --lines 50
 
 # 4. API 서버 재시작 (필요시)
 cd apps/api-server
 npm install  # package.json 변경 시
 npm run build
-pm2 restart o4o-api-server
+pm2 restart api-server
 
 # 5. 헬스체크 확인
 curl http://localhost:4000/api/health

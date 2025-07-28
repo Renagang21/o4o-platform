@@ -12,7 +12,7 @@ Based on the deployment workflows analysis, the O4O platform uses a two-server a
 - **GitHub Secret for SSH Key**: `APISERVER_SSH_KEY`
 - **SSH User**: ubuntu
 - **Deploy Path**: /home/ubuntu/o4o-platform
-- **Services**: API server (PM2 process: o4o-api-server)
+- **Services**: API server (PM2 process: api-server)
 
 #### 2. Web Server
 - **Purpose**: Hosts both admin dashboard and main site (static files)

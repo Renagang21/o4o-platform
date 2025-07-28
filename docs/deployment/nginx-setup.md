@@ -37,7 +37,7 @@ pm2 status
 # Expected output:
 # o4o-admin-dashboard - running on port 3001
 # o4o-main-site - running on port 3000
-# o4o-api-server - running on port 4000
+# api-server - running on port 4000
 ```
 
 ## Architecture

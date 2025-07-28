@@ -95,12 +95,12 @@ cd ../..
 ### 1.5 API 서버 시작
 ```bash
 # PM2로 API 서버 시작
-pm2 start ecosystem.config.js --only o4o-api-server
+pm2 start ecosystem.config.js --only api-server
 pm2 save
 pm2 startup  # 재부팅 시 자동 시작 설정
 
 # 로그 확인
-pm2 logs o4o-api-server --lines 50
+pm2 logs api-server --lines 50
 
 # 헬스체크
 curl http://localhost:4000/health
@@ -287,7 +287,7 @@ sudo ufw allow 443/tcp
 ### API 연결 실패
 ```bash
 # API 서버 로그
-pm2 logs o4o-api-server --lines 100
+pm2 logs api-server --lines 100
 
 # 데이터베이스 연결 테스트
 PGPASSWORD='your_secure_password' psql -h localhost -U o4o_user -d o4o_platform -c '\l'

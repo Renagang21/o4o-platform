@@ -17,7 +17,7 @@ concurrency:
 env:
   SERVICE_NAME: api-server
   SERVICE_PORT: 4000
-  PM2_APP_NAME: o4o-api-server
+  PM2_APP_NAME: api-server
   DEPLOY_PATH: /home/ubuntu/o4o-platform
   NODE_VERSION: '20.18.0'
 
@@ -322,7 +322,7 @@ jobs:
               echo "⚠️ API 서버 헬스체크 실패 (CI/CD는 계속 진행됨)"
               echo "📝 서버에서 수동으로 확인 필요:"
               echo "  - PM2 상태: pm2 list"
-              echo "  - 로그 확인: pm2 logs o4o-api-server"
+              echo "  - 로그 확인: pm2 logs api-server"
               echo "  - 직접 테스트: curl http://localhost:4000/api/health"
               exit 0  # 실패해도 0 반환하여 CI/CD 계속 진행
             fi

@@ -130,7 +130,7 @@ The deployment workflows have been updated to handle passwords safely:
 
 3. Check PM2 environment:
    ```bash
-   pm2 env o4o-api-server | grep DB_PASSWORD
+   pm2 env api-server | grep DB_PASSWORD
    ```
 
 ### Error: "password authentication failed"

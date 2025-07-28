@@ -172,10 +172,10 @@ pm2 start ecosystem.config.js --max-memory-restart 1G
 **PM2 not starting:**
 ```bash
 # Check PM2 logs
-pm2 logs o4o-api-server
+pm2 logs api-server
 
 # Check ecosystem.config.js paths
-pm2 show o4o-api-server
+pm2 show api-server
 
 # Restart
 pm2 delete all

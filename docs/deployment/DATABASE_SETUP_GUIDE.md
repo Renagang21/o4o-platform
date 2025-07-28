@@ -96,10 +96,10 @@ npm run migration:show
 #### 5. PM2 재시작
 ```bash
 # 환경 변수 반영을 위한 재시작
-pm2 restart o4o-api-server
+pm2 restart api-server
 
 # 로그 확인
-pm2 logs o4o-api-server --lines 50
+pm2 logs api-server --lines 50
 ```
 
 ## 🔍 문제 해결
@@ -219,7 +219,7 @@ gunzip -c /home/ubuntu/backups/postgres/o4o_platform_YYYYMMDD_HHMMSS.sql.gz | ps
 sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'o4o_platform' AND pid <> pg_backend_pid();"
 
 # PM2 재시작
-pm2 restart o4o-api-server
+pm2 restart api-server
 ```
 
 ## 📝 체크리스트
@@ -238,7 +238,7 @@ pm2 restart o4o-api-server
 
 ## 📞 문제 발생 시
 
-1. PM2 로그 확인: `pm2 logs o4o-api-server`
+1. PM2 로그 확인: `pm2 logs api-server`
 2. PostgreSQL 로그 확인: `sudo tail -f /var/log/postgresql/postgresql-14-main.log`
 3. 시스템 로그 확인: `sudo journalctl -u postgresql -f`
 

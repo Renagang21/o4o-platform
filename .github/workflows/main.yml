@@ -110,7 +110,7 @@ jobs:
         scp apps/api-server/package*.json ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/
         
         # Restart application
-        ssh ubuntu@43.202.242.215 "cd /home/ubuntu/o4o-platform/apps/api-server && npm install --production && pm2 restart o4o-api-server"
+        ssh ubuntu@43.202.242.215 "cd /home/ubuntu/o4o-platform/apps/api-server && npm install --production && pm2 restart api-server"
     
     - name: Health check
       continue-on-error: true

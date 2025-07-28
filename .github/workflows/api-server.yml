@@ -16,7 +16,7 @@ on:
 env:
   NODE_VERSION: '18.x'
   APP_NAME: api-server
-  PM2_NAME: o4o-api-server
+  PM2_NAME: api-server
   SERVER_IP: 43.202.242.215
 
 jobs:

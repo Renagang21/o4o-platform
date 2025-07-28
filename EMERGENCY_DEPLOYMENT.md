@@ -52,11 +52,11 @@ cp .env.example .env.production
 nano .env.production  # 실제 값으로 수정
 
 # API 서버 시작
-pm2 start ecosystem.config.js --only o4o-api-server
+pm2 start ecosystem.config.js --only api-server
 pm2 save
 
 # 로그 확인
-pm2 logs o4o-api-server --lines 50
+pm2 logs api-server --lines 50
 ```
 
 #### 메인 사이트 (www.neture.co.kr)

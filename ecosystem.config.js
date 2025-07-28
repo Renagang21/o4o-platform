@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     // API Server
     {
-      name: 'o4o-api-server',
+      name: 'api-server',
       script: 'dist/main.js',
       cwd: '/home/ubuntu/o4o-platform/apps/api-server',
       instances: 2,

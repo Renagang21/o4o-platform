@@ -55,7 +55,7 @@
 
 2. PM2 재시작
    ```bash
-   pm2 restart o4o-api-server
+   pm2 restart api-server
    ```
 
 ### 생성된 문서

@@ -63,7 +63,7 @@ if ! check_service "API Server" "http://localhost:4000/health"; then
     # Check if API is built
     if [ -f "/home/ubuntu/o4o-platform/apps/api-server/dist/main.js" ]; then
         cd /home/ubuntu/o4o-platform
-        pm2 start ecosystem.config.js --only o4o-api-server
+        pm2 start ecosystem.config.js --only api-server
     else
         echo -e "${RED}API server not built! Build it first.${NC}"
     fi

@@ -18,7 +18,7 @@ cat diagnosis-report.txt
 
 ### 1. PM2 프로세스가 실행되지 않는 경우
 
-**증상**: PM2 list에서 o4o-api-server가 없거나 stopped 상태
+**증상**: PM2 list에서 api-server가 없거나 stopped 상태
 
 **해결 방법**:
 ```bash
@@ -40,7 +40,7 @@ pm2 startup  # 서버 재시작 시 자동 시작 설정
 **해결 방법**:
 ```bash
 # PM2 로그 확인
-pm2 logs o4o-api-server --lines 100
+pm2 logs api-server --lines 100
 
 # 수동으로 실행해보기
 cd /home/ubuntu/o4o-platform/apps/api-server
@@ -171,8 +171,8 @@ ADMIN_URL=https://admin.neture.co.kr
 
 1. **API 서버 재시작**:
 ```bash
-pm2 restart o4o-api-server
-pm2 logs o4o-api-server
+pm2 restart api-server
+pm2 logs api-server
 ```
 
 2. **로컬 테스트**:

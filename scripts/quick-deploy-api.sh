@@ -124,10 +124,10 @@ fi
 chmod 600 .env.production
 
 # Stop existing PM2 process if running
-pm2 stop o4o-api-server 2>/dev/null || true
+pm2 stop api-server 2>/dev/null || true
 
 # Start with PM2
-pm2 start ecosystem.config.js --only o4o-api-server
+pm2 start ecosystem.config.js --only api-server
 pm2 save
 
 echo "✅ API server deployed!"
@@ -167,7 +167,7 @@ if ssh $API_USER@$API_HOST "curl -s http://localhost:4000/health | grep -q 'heal
 else
     echo "❌ API server health check failed"
     echo "Checking logs..."
-    ssh $API_USER@$API_HOST "pm2 logs o4o-api-server --lines 50"
+    ssh $API_USER@$API_HOST "pm2 logs api-server --lines 50"
 fi
 
 # Check public endpoint

@@ -20,7 +20,7 @@ on:
 env:
   SERVICE_NAME: api-server
   SERVICE_PORT: 4000
-  PM2_APP_NAME: o4o-api-server
+  PM2_APP_NAME: api-server
   DEPLOY_PATH: /home/ubuntu/o4o-platform
   NODE_VERSION: '20.18.0'
 

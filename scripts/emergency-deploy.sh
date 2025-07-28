@@ -154,7 +154,7 @@ echo "   - cd /home/ubuntu/o4o-platform"
 echo "   - git pull origin main"
 echo "   - npm install --production"
 echo "   - npm run build:api"
-echo "   - pm2 restart o4o-api-server"
+echo "   - pm2 restart api-server"
 
 echo -e "\n${GREEN}2. Main Site (www.neture.co.kr)${NC}"
 echo "   SSH to server: ssh $SSH_USER@$WEB_SERVER"

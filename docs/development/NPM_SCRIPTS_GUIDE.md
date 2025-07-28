@@ -194,7 +194,7 @@ For running applications with PM2 in development mode:
 pm2 start npm --name "o4o-admin-dashboard" -- run dev -- --port 3001
 
 # API Server Development
-pm2 start npm --name "o4o-api-server" -- run dev
+pm2 start npm --name "api-server" -- run dev
 
 # Main Site Development
 pm2 start npm --name "o4o-main-site" -- run dev -- --port 3000

@@ -15,10 +15,10 @@ echo "PM2 프로세스 목록:"
 pm2 list
 
 echo -e "\nPM2 API 서버 상세 정보:"
-pm2 describe o4o-api-server || echo "❌ PM2에서 o4o-api-server를 찾을 수 없음"
+pm2 describe api-server || echo "❌ PM2에서 api-server를 찾을 수 없음"
 
 echo -e "\n최근 PM2 로그 (20줄):"
-pm2 logs o4o-api-server --lines 20 --nostream || echo "❌ 로그를 가져올 수 없음"
+pm2 logs api-server --lines 20 --nostream || echo "❌ 로그를 가져올 수 없음"
 
 echo -e "\n포트 4000 리스닝 상태:"
 sudo netstat -tlnp | grep :4000 || echo "❌ 포트 4000이 리스닝되지 않음"
