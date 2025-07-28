@@ -1,0 +1,11 @@
+/* Tailwind v4 explicit imports to prevent build warnings */
+@import 'tailwindcss';
+
+/* Explicitly reference commonly used utilities to prevent "unknown utility class" warnings */
+@layer utilities {
+  /* Spacing utilities */
+  @reference {
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .border-border { border-color: hsl(var(--border)); }
+  }
+}
