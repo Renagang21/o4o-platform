@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig(mergeConfig(sharedViteConfig, {
   plugins: [
-    ...(sharedViteConfig.plugins || []),
     visualizer({
       open: false,
       filename: 'dist/bundle-analysis.html',
