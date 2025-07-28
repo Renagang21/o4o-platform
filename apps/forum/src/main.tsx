@@ -1,4 +1,5 @@
 import { StrictMode } from 'react';
+import './utils/react-compat'; // React 19 호환성
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';

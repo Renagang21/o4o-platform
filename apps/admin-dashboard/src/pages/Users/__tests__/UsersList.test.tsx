@@ -116,11 +116,11 @@ describe('UsersList 컴포넌트', () => {
   let mockDelete: ReturnType<typeof vi.fn>;
   let mockPut: ReturnType<typeof vi.fn>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     
     // API 모킹
-    const apiClient = require('../../../api/base').default;
+    const { default: apiClient } = await import('../../../api/base');
     mockGet = apiClient.get;
     mockDelete = apiClient.delete;
     mockPut = apiClient.put;

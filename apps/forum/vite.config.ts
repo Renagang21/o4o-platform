@@ -1,9 +1,12 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig, mergeConfig } from 'vite';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { sharedViteConfig } from '../../vite.config.shared';
 
-export default defineConfig({
-  plugins: [react()],
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = resolve(fileURLToPath(import.meta.url), '..');
+
+export default defineConfig(mergeConfig(sharedViteConfig, {
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -25,18 +28,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@tanstack/react-query', 'zustand', 'react-hook-form'],
-          'utils-vendor': ['axios', 'date-fns', 'clsx'],
-          'editor-vendor': ['marked', 'dompurify'],
-        },
-      },
-    },
-  },
-});
+}));

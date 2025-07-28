@@ -1,9 +1,12 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig, mergeConfig } from 'vite';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { sharedViteConfig } from '../../vite.config.shared';
 
-export default defineConfig({
-  plugins: [react()],
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default defineConfig(mergeConfig(sharedViteConfig, {
   server: {
     port: 3002,
     host: true
@@ -18,7 +21,4 @@ export default defineConfig({
       '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/src')
     }
   },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
-  }
-});
+}));

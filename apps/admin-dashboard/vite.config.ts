@@ -1,18 +1,15 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, mergeConfig } from 'vite'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { fileURLToPath } from 'url'
+import { sharedViteConfig } from '../../vite.config.shared'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export default defineConfig({
+export default defineConfig(mergeConfig(sharedViteConfig, {
   plugins: [
-    react({
-      jsxRuntime: 'automatic',
-      jsxImportSource: 'react'
-    }),
+    ...(sharedViteConfig.plugins || []),
     visualizer({
       open: false,
       filename: 'dist/bundle-analysis.html',
@@ -70,26 +67,18 @@ export default defineConfig({
     },
   },
   build: {
+    ...sharedViteConfig.build,
     outDir: 'dist',
-    sourcemap: true,
     rollupOptions: {
+      ...sharedViteConfig.build?.rollupOptions,
       output: {
+        ...sharedViteConfig.build?.rollupOptions?.output,
         manualChunks: (id) => {
+          // 공통 설정 먼저 적용
+          const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
+          if (sharedChunk) return sharedChunk;
+          
           if (id.includes('node_modules')) {
-            // React 관련
-            if (id.includes('react') && !id.includes('react-')) {
-              return 'vendor-react';
-            }
-            // UI 라이브러리
-            if (id.includes('@radix-ui') || id.includes('lucide-react') || 
-                id.includes('clsx') || id.includes('tailwind-merge')) {
-              return 'vendor-ui';
-            }
-            // 폼 관련
-            if (id.includes('react-hook-form') || id.includes('@hookform') || 
-                id.includes('zod')) {
-              return 'vendor-forms';
-            }
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {
               return 'vendor-editor';
@@ -98,15 +87,6 @@ export default defineConfig({
             if (id.includes('recharts') || id.includes('d3')) {
               return 'vendor-charts';
             }
-            // 유틸리티
-            if (id.includes('date-fns') || id.includes('axios') || 
-                id.includes('js-cookie')) {
-              return 'vendor-utils';
-            }
-            // React Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'vendor-query';
-            }
             // 기타 큰 라이브러리들
             if (id.includes('socket.io')) {
               return 'vendor-socket';
@@ -114,7 +94,6 @@ export default defineConfig({
           }
         }
       }
-    },
-    chunkSizeWarningLimit: 500
+    }
   }
-})
+}))

@@ -1,10 +1,13 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig, mergeConfig } from 'vite';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { sharedViteConfig } from '../../vite.config.shared';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(mergeConfig(sharedViteConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -20,8 +23,4 @@ export default defineConfig({
     port: 3003,
     open: true,
   },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-  },
-});
+}));

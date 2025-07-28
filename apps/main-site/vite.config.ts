@@ -1,19 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, mergeConfig } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { sharedViteConfig } from '../../vite.config.shared'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    react({
-      jsxRuntime: 'automatic',
-      jsxImportSource: 'react'
-    })
-  ],
+export default defineConfig(mergeConfig(sharedViteConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -40,34 +34,5 @@ export default defineConfig({
       'localhost',
       '127.0.0.1'
     ]
-  },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-    'global': 'globalThis',
-  },
-  build: {
-    sourcemap: false,
-    minify: 'esbuild',
-    target: 'es2020',
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
-  },
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-      'react-router-dom',
-      '@tanstack/react-query',
-      'react-hot-toast'
-    ],
-    exclude: ['@vite/client', '@vite/env'],
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
-    },
-  },
-})
-
+  }
+}))
