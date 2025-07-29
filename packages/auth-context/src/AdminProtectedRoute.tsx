@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AdminProtectedRouteProps {
   children: ReactNode;
@@ -37,11 +38,48 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
   requiredPermissions = [],
   showContactAdmin = false
 }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // 인증되지 않은 경우
+  useEffect(() => {
+    // 로딩 중이 아니고 인증되지 않은 경우 로그인 페이지로 리다이렉트
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login', {
+        replace: true,
+        state: { from: location.pathname }
+      });
+    }
+  }, [isAuthenticated, isLoading, navigate, location]);
+
+  // 로딩 중인 경우
+  if (isLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ 
+            width: '48px', 
+            height: '48px', 
+            border: '4px solid #f3f4f6', 
+            borderTop: '4px solid #3b82f6', 
+            borderRadius: '50%', 
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ color: '#6b7280' }}>인증 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 인증되지 않은 경우 (리다이렉트 전 잠시 표시)
   if (!isAuthenticated || !user) {
-    return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
+    return null;
   }
 
   // 역할 기반 접근 제어
@@ -68,3 +106,16 @@ export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
   // 모든 조건을 만족하면 자식 컴포넌트 렌더링
   return <>{children}</>;
 };
+
+// CSS 애니메이션을 위한 스타일 태그 추가
+if (typeof document !== 'undefined' && !document.getElementById('auth-spinner-styles')) {
+  const style = document.createElement('style');
+  style.id = 'auth-spinner-styles';
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+}

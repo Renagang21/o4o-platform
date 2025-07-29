@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 import { AuthContext } from './AuthContext';
 import { AuthClient } from '@o4o/auth-client';
 import type { User, SessionStatus } from '@o4o/types';
@@ -35,12 +35,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   };
 
   const [user, setUser] = useState<User | null>(getInitialState());
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태를 true로 설정
   const [error, setError] = useState<string | null>(null);
   
   const authClient = ssoClient || new AuthClient(
     typeof window !== 'undefined' && (window as typeof globalThis & { import?: { meta?: { env?: { VITE_API_BASE_URL?: string } } } }).import?.meta?.env?.VITE_API_BASE_URL || ''
   );
+
+  // 초기 인증 상태 확인
+  useEffect(() => {
+    const checkInitialAuth = async () => {
+      try {
+        const storedUser = getInitialState();
+        if (storedUser) {
+          // 저장된 사용자 정보가 있으면 유효성 검증
+          setUser(storedUser);
+        }
+      } catch (error) {
+        console.error('Initial auth check failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkInitialAuth();
+  }, []);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {

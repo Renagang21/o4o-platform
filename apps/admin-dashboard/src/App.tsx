@@ -43,6 +43,7 @@ const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
 const TestPage = lazy(() => import('@/pages/test/TestPage'));
+const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
 
 // Vendor Management Pages
@@ -675,6 +676,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <UIShowcase />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* System Monitoring */}
+                    <Route path="/monitoring" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <SystemMonitoring />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
