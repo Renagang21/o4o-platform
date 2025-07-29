@@ -91,6 +91,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       setError(null);
       const response = await authClient.login(credentials);
       setUser(response.user);
+      
+      // 토큰을 localStorage에 저장
+      if (response.token) {
+        localStorage.setItem('authToken', response.token);
+        
+        // admin-auth-storage 구조도 업데이트 (apiClient 호환성을 위해)
+        const authStorage = {
+          state: {
+            user: response.user,
+            token: response.token,
+            isAuthenticated: true
+          }
+        };
+        localStorage.setItem('admin-auth-storage', JSON.stringify(authStorage));
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
@@ -105,6 +120,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     authClient.logout();
     setUser(null);
     setError(null);
+    
+    // 모든 인증 관련 데이터 제거
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('admin-auth-storage');
+    localStorage.removeItem('user');
   };
 
   const clearError = () => {
