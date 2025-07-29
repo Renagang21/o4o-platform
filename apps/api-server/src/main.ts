@@ -168,6 +168,9 @@ const corsOptions = {
       "http://localhost:3001", // admin dashboard
       "http://localhost:3002", // ecommerce
       "http://localhost:3003", // crowdfunding
+      // Web server IPs
+      "http://13.125.144.8:3000", // web server main-site
+      "http://13.125.144.8:3001", // web server admin-dashboard
       // Production domains
       "https://neture.co.kr",
       "https://www.neture.co.kr",
