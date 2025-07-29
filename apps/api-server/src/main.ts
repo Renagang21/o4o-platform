@@ -56,6 +56,14 @@ import formsRoutes from './routes/forms';
 // 중복 제거 - 이미 상단에서 로드됨
 
 const app: Application = express();
+
+// IMPORTANT: Set trust proxy IMMEDIATELY after creating the app
+// This must be done before any middleware that uses req.ip
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', true);
+  console.log('✅ Trust proxy enabled for production environment');
+}
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -101,8 +109,23 @@ const limiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  // Skip successful requests from rate limit count
-  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1'
+  // Use custom key generator for proxy environments
+  keyGenerator: (req) => {
+    // In production with proxy, use X-Forwarded-For
+    if (process.env.NODE_ENV === 'production') {
+      const forwarded = req.headers['x-forwarded-for'];
+      if (forwarded) {
+        // Get the first IP in the chain (original client IP)
+        return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
+      }
+    }
+    return req.ip || 'unknown';
+  },
+  // Skip localhost
+  skip: (req) => {
+    const ip = req.ip || '';
+    return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  }
 });
 
 // More lenient rate limiting for public endpoints
@@ -115,7 +138,19 @@ const publicLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1'
+  keyGenerator: (req) => {
+    if (process.env.NODE_ENV === 'production') {
+      const forwarded = req.headers['x-forwarded-for'];
+      if (forwarded) {
+        return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
+      }
+    }
+    return req.ip || 'unknown';
+  },
+  skip: (req) => {
+    const ip = req.ip || '';
+    return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  }
 });
 
 
@@ -163,11 +198,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Trust proxy for production environment (Nginx)
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
-
 // Add performance monitoring middleware early in the chain
 app.use(performanceMonitor);
 
@@ -206,7 +236,19 @@ const ssoCheckLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1'
+  keyGenerator: (req) => {
+    if (process.env.NODE_ENV === 'production') {
+      const forwarded = req.headers['x-forwarded-for'];
+      if (forwarded) {
+        return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
+      }
+    }
+    return req.ip || 'unknown';
+  },
+  skip: (req) => {
+    const ip = req.ip || '';
+    return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  }
 });
 
 // Apply rate limiting to specific endpoints
