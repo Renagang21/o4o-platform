@@ -6,7 +6,11 @@ export default {
     "../../shared/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        border: '#e5e7eb',
+      },
+    },
   },
   plugins: [],
 }

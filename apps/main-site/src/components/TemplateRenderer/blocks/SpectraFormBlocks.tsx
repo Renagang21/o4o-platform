@@ -228,7 +228,7 @@ export const SpectraFormBlock: React.FC<{
     }
   };
 
-  // Simple formula evaluation
+  // Simple formula evaluation (safe parser without eval)
   const evaluateFormula = (formula: string, data: Record<string, any>): number => {
     try {
       let processedFormula = formula;
@@ -236,8 +236,35 @@ export const SpectraFormBlock: React.FC<{
         const regex = new RegExp(`{${key}}`, 'g');
         processedFormula = processedFormula.replace(regex, String(Number(value) || 0));
       });
-      // Note: In production, use a proper expression parser
-      return eval(processedFormula);
+      
+      // Safe mathematical expression evaluation without eval
+      // This is a basic implementation that handles simple arithmetic
+      const safeEval = (expr: string): number => {
+        // Remove whitespace
+        expr = expr.replace(/\s/g, '');
+        
+        // Basic arithmetic parser for +, -, *, /
+        // For more complex expressions, consider using a library like math.js
+        const numbers = expr.split(/[+\-*/]/).map(n => parseFloat(n));
+        const operators = expr.match(/[+\-*/]/g) || [];
+        
+        if (numbers.length === 0) return 0;
+        
+        let result = numbers[0];
+        for (let i = 0; i < operators.length; i++) {
+          const nextNum = numbers[i + 1];
+          switch (operators[i]) {
+            case '+': result += nextNum; break;
+            case '-': result -= nextNum; break;
+            case '*': result *= nextNum; break;
+            case '/': result = nextNum !== 0 ? result / nextNum : 0; break;
+          }
+        }
+        
+        return result;
+      };
+      
+      return safeEval(processedFormula);
     } catch {
       return 0;
     }

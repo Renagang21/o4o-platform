@@ -54,21 +54,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
           setUser(storedUser);
           
           // SSO 세션 확인 (프로덕션 환경에서만)
-          if (ssoClient && !import.meta.env.DEV) {
-            try {
-              const isValid = await authClient.checkSSOSession();
-              if (!isValid) {
-                // SSO 세션이 유효하지 않으면 로그아웃
-                setUser(null);
-                localStorage.removeItem('admin-auth-storage');
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('user');
-              }
-            } catch (error) {
-              console.error('SSO session check failed:', error);
-              // SSO 체크 실패 시에도 기존 세션 유지
-            }
-          }
+          // TODO: checkSSOSession 메서드가 구현되면 주석 해제
+          // if (ssoClient && !import.meta.env.DEV) {
+          //   try {
+          //     const isValid = await authClient.checkSSOSession();
+          //     if (!isValid) {
+          //       // SSO 세션이 유효하지 않으면 로그아웃
+          //       setUser(null);
+          //       localStorage.removeItem('admin-auth-storage');
+          //       localStorage.removeItem('authToken');
+          //       localStorage.removeItem('user');
+          //     }
+          //   } catch (error) {
+          //     console.error('SSO session check failed:', error);
+          //     // SSO 체크 실패 시에도 기존 세션 유지
+          //   }
+          // }
         } else {
           // 저장된 인증 정보가 없으면 null 설정
           setUser(null);
