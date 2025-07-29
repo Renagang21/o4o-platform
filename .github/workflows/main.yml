@@ -173,8 +173,11 @@ jobs:
     - name: Deploy to web server
       continue-on-error: true
       run: |
-        # Create directory if not exists
-        ssh ubuntu@13.125.144.8 "sudo mkdir -p ${{ matrix.path }}"
+        # Create temp directory locally
+        mkdir -p /tmp/${{ matrix.app }}
+        
+        # Create directory on remote server if not exists
+        ssh ubuntu@13.125.144.8 "sudo mkdir -p ${{ matrix.path }} && sudo mkdir -p /tmp/${{ matrix.app }}"
         
         # Copy files
         scp -r apps/${{ matrix.app }}/dist/* ubuntu@13.125.144.8:/tmp/${{ matrix.app }}/
@@ -185,6 +188,7 @@ jobs:
           sudo mv /tmp/${{ matrix.app }}/* ${{ matrix.path }}/
           sudo chown -R www-data:www-data ${{ matrix.path }}
           sudo chmod -R 755 ${{ matrix.path }}
+          sudo rm -rf /tmp/${{ matrix.app }}
         "
     
     - name: Health check
