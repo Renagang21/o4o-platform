@@ -121,7 +121,56 @@ const Login: FC = () => {
           </div>
         </div>
 
-        {/* 프로덕션 환경에서는 테스트 계정 정보 숨김 */}
+        {/* 테스트 계정 정보 */}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="h-4 w-4 text-amber-600" />
+            <p className="text-amber-800 text-sm font-medium">테스트 계정 정보</p>
+          </div>
+          <div className="text-amber-700 text-sm space-y-2">
+            <div>
+              <strong>관리자 계정:</strong>
+              <div className="mt-1 bg-white rounded px-2 py-1 font-mono text-xs">
+                이메일: admin@neture.co.kr<br />
+                비밀번호: Test@1234
+              </div>
+            </div>
+            <div>
+              <strong>일반 관리자:</strong>
+              <div className="mt-1 bg-white rounded px-2 py-1 font-mono text-xs">
+                이메일: manager@neture.co.kr<br />
+                비밀번호: Test@1234
+              </div>
+            </div>
+            <div className="text-xs text-amber-600 mt-2">
+              ⚠️ 테스트 환경에서만 사용하세요
+            </div>
+          </div>
+          
+          {/* 빠른 로그인 버튼 */}
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin@neture.co.kr');
+                setPassword('Test@1234');
+              }}
+              className="flex-1 text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 transition-colors"
+            >
+              관리자로 로그인
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('manager@neture.co.kr');
+                setPassword('Test@1234');
+              }}
+              className="flex-1 text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 transition-colors"
+            >
+              일반 관리자로 로그인
+            </button>
+          </div>
+        </div>
 
         {/* 에러 메시지 */}
         {error && (
