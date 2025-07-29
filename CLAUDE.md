@@ -84,6 +84,7 @@ npm run lint:fix       # Auto-fix issues
 ### Database Issues
 - **"CREATE INDEX CONCURRENTLY cannot run inside transaction"**: TypeORM 마이그레이션에서 CONCURRENTLY 제거
 - **"Data type 'datetime' not supported"**: PostgreSQL은 `timestamp` 사용
+- **Migration naming error**: TypeORM requires timestamp with milliseconds (e.g., 1738000000000 not 1738000000)
 
 ### TypeScript Issues
 ```typescript
@@ -91,11 +92,15 @@ npm run lint:fix       # Auto-fix issues
 import React from 'react';              // No React namespace in React 17+
 products.map(item => item.name)         // Missing type annotation
 } catch (error) {                       // Implicit any
+export const handler = (fn: Function)   // Too generic function type
+res.end = function(...args) { }        // Missing return type
 
 // ✅ CORRECT
 import { useState } from 'react';       // Import only what you need
 products.map((item: Product) => item.name)
 } catch (error: any) {                  // Explicit annotation
+export const handler = (fn: (req: Request, res: Response) => Promise<any>)
+res.end = function(...args): Response { return originalEnd.apply(res, args); }
 ```
 
 ### CI/CD Issues
@@ -181,6 +186,46 @@ GOOGLE_CLIENT_ID=optional
 GOOGLE_CLIENT_SECRET=optional
 ```
 
+## 🔄 Backup & Recovery System
+
+### Automated Backup
+```bash
+# Setup automated backup (run as root)
+./scripts/setup-backup-automation.sh
+
+# Manual backup
+./scripts/backup.sh
+
+# Restore from backup
+./scripts/restore.sh /backup/o4o-platform/o4o_backup_20250129_120000.tar.gz
+
+# Monitor backup health
+./scripts/backup-monitoring.sh
+```
+
+### Backup Components
+- Database: PostgreSQL full dump with compression
+- Files: Environment configs, uploads, built files
+- Schedule: Daily at 2 AM via systemd timer
+- Retention: 7 days (configurable)
+- Monitoring: Every 6 hours health check
+
+## 📊 Monitoring System
+
+### System Monitoring Dashboard
+- **Location**: `/monitoring` in admin dashboard
+- **Features**: Real-time metrics, performance tracking, error logs
+- **API Endpoints**:
+  - `/api/v1/monitoring/health` - System health status
+  - `/api/v1/monitoring/performance` - Performance metrics
+  - `/api/v1/monitoring/errors` - Error logs
+
+### Auto-Recovery System
+- **Service**: `AutoRecoveryService` with automated actions
+- **Actions**: Service restart, cache clear, connection reset, resource scaling
+- **Escalation**: Automatic team notification on failure
+- **Configuration**: See `/apps/api-server/src/services/AutoRecoveryService.ts`
+
 ## 📊 Deployment Notes
 
 ### Two-Server Architecture
@@ -223,6 +268,9 @@ GOOGLE_CLIENT_SECRET=optional
 6. Never assume packages exist on deployed server
 7. Never deploy API code to web server or frontend code to API server
 8. Never run database migrations on web server
+9. Never use generic `Function` type - specify exact function signature
+10. Never declare variables/imports without using them
+11. Never create migration files without milliseconds in timestamp
 
 ## 🔧 Post-CI/CD Server Work
 
@@ -287,7 +335,7 @@ sudo chmod -R 755 /var/www/
   - 도메인 설정 확인: `/etc/nginx/sites-available/*`
   - SSL 인증서 확인: `sudo certbot certificates`
 
-## 📝 Recent Updates (2025-07)
+## 📝 Recent Updates (2025-01)
 - Fixed OAuth conditional initialization
 - Changed all `npm ci` to `npm install` in CI/CD
 - Added local type definitions for API server deployment
@@ -302,6 +350,11 @@ sudo chmod -R 755 /var/www/
 - Added passWithNoTests to all test configurations (Jest & Vitest)
 - Made deployment steps continue-on-error for missing SSH keys
 - Made health checks non-blocking with continue-on-error
+- Added comprehensive backup and recovery system with automation
+- Implemented system monitoring dashboard and API endpoints
+- Fixed TypeScript strict type errors (Function type, return types)
+- Fixed unused imports and variables in monitoring components
+- Added disaster recovery runbook and procedures
 
 ## 🚨 Current Error Status & Resolution
 
