@@ -95,7 +95,11 @@ const limiter = rateLimit({
   message: {
     error: 'Too many requests from this IP',
     code: 'RATE_LIMIT_EXCEEDED'
-  }
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  // Skip successful requests from rate limit count
+  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1'
 });
 
 // More lenient rate limiting for public endpoints
@@ -105,7 +109,10 @@ const publicLimiter = rateLimit({
   message: {
     error: 'Too many requests from this IP',
     code: 'RATE_LIMIT_EXCEEDED'
-  }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1'
 });
 
 
@@ -152,6 +159,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Trust proxy for production environment (Nginx)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 app.use(cookieParser() as any);
 app.use(express.json({ limit: '10mb' }));
