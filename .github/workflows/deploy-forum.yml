@@ -100,9 +100,11 @@ jobs:
           apps/forum/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/forum.neture.co.kr/
           
-    - name: Configure Nginx for forum.neture.co.kr
+    - name: Configure Nginx
       run: |
-        cat > nginx-forum.conf << 'NGINX_EOF'
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
+          # Create nginx config directly on server
+          sudo tee /etc/nginx/sites-available/forum.neture.co.kr > /dev/null << 'NGINX_EOF'
 server {
     listen 80;
     server_name forum.neture.co.kr;
@@ -142,20 +144,20 @@ server {
 
     # SPA routing
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files \$uri \$uri/ /index.html;
     }
 
     # API proxy
     location /api/ {
         proxy_pass http://43.202.242.215:4000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
@@ -173,13 +175,6 @@ server {
     }
 }
 NGINX_EOF
-        
-        # Copy nginx config to server and apply
-        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa nginx-forum.conf ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/tmp/
-        
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
-          # Move nginx config to proper location
-          sudo mv /tmp/nginx-forum.conf /etc/nginx/sites-available/forum.neture.co.kr
           
           # Enable site if not already enabled
           if [ ! -L /etc/nginx/sites-enabled/forum.neture.co.kr ]; then
