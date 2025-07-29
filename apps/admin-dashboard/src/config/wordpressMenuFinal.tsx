@@ -1,4 +1,5 @@
 import { 
+  Home,
   LayoutDashboard, 
   FileText, 
   Image, 
@@ -43,13 +44,16 @@ export interface MenuItem {
 
 export const wordpressMenuItems: MenuItem[] = [
   {
+    id: 'home',
+    label: '홈',
+    icon: <Home className="w-5 h-5" />,
+    path: '/home'
+  },
+  {
     id: 'dashboard',
     label: '대시보드',
     icon: <LayoutDashboard className="w-5 h-5" />,
-    children: [
-      { id: 'dashboard-home', label: '홈', icon: <LayoutDashboard className="w-4 h-4" />, path: '/dashboard' },
-      { id: 'dashboard-updates', label: '업데이트', icon: <RefreshCw className="w-4 h-4" />, path: '/dashboard/updates' }
-    ]
+    path: '/dashboard'
   },
   {
     id: 'separator-1',

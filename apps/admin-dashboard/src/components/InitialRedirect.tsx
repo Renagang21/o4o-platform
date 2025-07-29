@@ -31,8 +31,8 @@ const InitialRedirect = () => {
     );
   }
 
-  // 인증된 관리자는 대시보드로
-  return <Navigate to="/dashboard" replace />;
+  // 인증된 관리자는 홈으로
+  return <Navigate to="/home" replace />;
 };
 
 export default InitialRedirect;

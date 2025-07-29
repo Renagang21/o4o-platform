@@ -16,6 +16,7 @@ import InitialRedirect from '@/components/InitialRedirect';
 
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
+const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
@@ -186,6 +187,12 @@ function App() {
               >
                 <AdminLayout>
                   <Routes>
+                    <Route path="/home" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <AdminHome />
+                      </Suspense>
+                    } />
+                    
                     <Route path="/dashboard" element={
                       <Suspense fallback={<PageLoader />}>
                         <Dashboard />

@@ -97,7 +97,7 @@ jobs:
           
     - name: Configure Nginx for forum.neture.co.kr
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} 'bash -s' << 'ENDSSH'
           # Create Nginx configuration for forum.neture.co.kr
           sudo tee /etc/nginx/sites-available/forum.neture.co.kr > /dev/null << 'EOF'
 server {
