@@ -29,6 +29,9 @@ import Redis from 'ioredis';
 import { AppDataSource } from './database/connection';
 import { SessionSyncService } from './services/sessionSyncService';
 import { WebSocketSessionSync } from './websocket/sessionSync';
+import { errorHandler } from './middleware/errorHandler';
+import { performanceMonitor } from './middleware/performanceMonitor';
+import logger from './utils/simpleLogger';
 
 // 라우트 imports 
 import authRoutes from './routes/auth';
@@ -165,6 +168,9 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
+// Add performance monitoring middleware early in the chain
+app.use(performanceMonitor);
+
 app.use(cookieParser() as any);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -290,14 +296,8 @@ io.on('connection', (socket) => {
   });
 });
 
-// 에러 핸들러
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    error: 'Internal server error',
-    code: 'INTERNAL_SERVER_ERROR'
-  });
-});
+// 중앙화된 에러 핸들러 (모든 라우트 뒤에 위치해야 함)
+app.use(errorHandler);
 
 // 404 핸들러 (API 전용)
 app.use('*', (req, res) => {

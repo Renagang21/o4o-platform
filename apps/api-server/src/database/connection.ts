@@ -18,12 +18,6 @@ import { FundingReward } from '../entities/crowdfunding/FundingReward';
 import { FundingBacking } from '../entities/crowdfunding/FundingBacking';
 import { BackerReward } from '../entities/crowdfunding/BackerReward';
 import { FundingUpdate } from '../entities/crowdfunding/FundingUpdate';
-// Temporarily disabled problematic entities due to OneDrive sync issues
-// import { BetaUser } from '../entities/BetaUser';
-// import { AnalyticsReport } from '../entities/AnalyticsReport';
-// import { Alert } from '../entities/Alert';
-// import { BetaFeedback } from '../entities/BetaFeedback';
-// import { FeedbackConversation } from '../entities/FeedbackConversation';
 import { ForumCategory } from '../entities/ForumCategory';
 import { ForumComment } from '../entities/ForumComment';
 import { ForumPost } from '../entities/ForumPost';
@@ -36,13 +30,6 @@ import { StorePlaylist } from '../entities/StorePlaylist';
 import { PlaylistItem } from '../entities/PlaylistItem';
 import { ScreenTemplate } from '../entities/ScreenTemplate';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
-// import { OperationsDashboard } from '../entities/OperationsDashboard';
-// import { Payment } from '../entities/Payment';
-// import { PricePolicy } from '../entities/PricePolicy';
-// import { StatusPage } from '../entities/StatusPage';
-// import { SystemMetrics } from '../entities/SystemMetrics';
-// import { UserAction } from '../entities/UserAction';
-// import { UserSession } from '../entities/UserSession';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -108,23 +95,7 @@ export const AppDataSource = new DataSource({
     StorePlaylist,
     PlaylistItem,
     ScreenTemplate,
-    ContentUsageLog,
-    // BetaUser,
-    // AnalyticsReport,
-    // Alert,
-    // BetaFeedback,
-    // FeedbackConversation,
-    // ForumCategory,
-    // ForumComment,
-    // ForumPost,
-    // ForumTag,
-    // OperationsDashboard,
-    // Payment,
-    // PricePolicy,
-    // StatusPage,
-    // SystemMetrics,
-    // UserAction,
-    // UserSession
+    ContentUsageLog
   ],
   
   // 마이그레이션 설정
