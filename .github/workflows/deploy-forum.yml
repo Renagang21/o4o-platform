@@ -67,8 +67,9 @@ jobs:
     - name: Setup SSH key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        echo "${{ secrets.WEB_SSH_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub || echo "SSH key validation failed"
         echo "SSH key setup completed"
         
     - name: Add SSH known hosts
@@ -79,6 +80,10 @@ jobs:
           ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
         fi
         chmod 644 ~/.ssh/known_hosts
+        
+    - name: Test SSH connection
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "echo 'SSH connection successful'"
         
     - name: Create deployment directories
       run: |
@@ -97,9 +102,7 @@ jobs:
           
     - name: Configure Nginx for forum.neture.co.kr
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} 'bash -s' << 'ENDSSH'
-          # Create Nginx configuration for forum.neture.co.kr
-          sudo tee /etc/nginx/sites-available/forum.neture.co.kr > /dev/null << 'EOF'
+        cat > nginx-forum.conf << 'EOF'
 server {
     listen 80;
     server_name forum.neture.co.kr;
@@ -170,7 +173,14 @@ server {
     }
 }
 EOF
-
+        
+        # Copy nginx config to server and apply
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa nginx-forum.conf ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/tmp/
+        
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
+          # Move nginx config to proper location
+          sudo mv /tmp/nginx-forum.conf /etc/nginx/sites-available/forum.neture.co.kr
+          
           # Enable site if not already enabled
           if [ ! -L /etc/nginx/sites-enabled/forum.neture.co.kr ]; then
             sudo ln -s /etc/nginx/sites-available/forum.neture.co.kr /etc/nginx/sites-enabled/
