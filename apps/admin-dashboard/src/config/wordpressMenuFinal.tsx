@@ -91,6 +91,17 @@ export const wordpressMenuItems: MenuItem[] = [
     ]
   },
   {
+    id: 'theme',
+    label: '테마',
+    icon: <Palette className="w-5 h-5" />,
+    children: [
+      { id: 'themes', label: '테마 관리', icon: <Palette className="w-4 h-4" />, path: '/themes' },
+      { id: 'customize', label: '사용자 정의하기', icon: <Palette className="w-4 h-4" />, path: '/themes/customize' },
+      { id: 'homepage', label: '홈페이지 편집', icon: <Layout className="w-4 h-4" />, path: '/themes/homepage' },
+      { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/themes/menus' }
+    ]
+  },
+  {
     id: 'separator-2',
     label: '',
     icon: <></>,
@@ -188,16 +199,6 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'cpt-types', label: 'Custom Post Types', icon: <FileCode className="w-4 h-4" />, path: '/cpt' },
       { id: 'acf-fields', label: 'Custom Fields', icon: <FileCode className="w-4 h-4" />, path: '/acf' },
       { id: 'acf-groups', label: 'Field Groups', icon: <FileCode className="w-4 h-4" />, path: '/acf/groups' }
-    ]
-  },
-  {
-    id: 'theme',
-    label: '테마',
-    icon: <Palette className="w-5 h-5" />,
-    children: [
-      { id: 'themes', label: '테마 관리', icon: <Palette className="w-4 h-4" />, path: '/themes' },
-      { id: 'customize', label: '사용자 정의하기', icon: <Palette className="w-4 h-4" />, path: '/themes/customize' },
-      { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/themes/menus' }
     ]
   },
   {

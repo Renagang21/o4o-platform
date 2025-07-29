@@ -104,9 +104,9 @@ jobs:
           apps/ecommerce/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/shop.neture.co.kr/
           
-    - name: Configure Nginx for shop.neture.co.kr
+    - name: Create Nginx configuration
       run: |
-        cat > nginx-shop.conf << 'EOF'
+        cat > nginx-shop.conf << 'NGINX_EOF'
 server {
     listen 80;
     server_name shop.neture.co.kr;
@@ -177,7 +177,7 @@ server {
         deny all;
     }
 }
-EOF
+NGINX_EOF
         
         # Copy nginx config to server and apply
         scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa nginx-shop.conf ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/tmp/

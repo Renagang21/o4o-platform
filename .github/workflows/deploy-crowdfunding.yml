@@ -1,13 +1,13 @@
-name: Deploy Forum
+name: Deploy Crowdfunding
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - 'apps/forum/**'
+      - 'apps/crowdfunding/**'
       - 'packages/**'
-      - '.github/workflows/deploy-forum.yml'
+      - '.github/workflows/deploy-crowdfunding.yml'
 
 env:
   NODE_VERSION: '20.x'
@@ -36,16 +36,16 @@ jobs:
       run: |
         npm run build:packages
         
-    - name: Build Forum app
-      working-directory: apps/forum
+    - name: Build Crowdfunding app
+      working-directory: apps/crowdfunding
       run: |
         npm run build
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: forum-build
-        path: apps/forum/dist
+        name: crowdfunding-build
+        path: apps/crowdfunding/dist
         retention-days: 1
 
   # 단계 2: 배포
@@ -61,8 +61,8 @@ jobs:
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
-        name: forum-build
-        path: apps/forum/dist
+        name: crowdfunding-build
+        path: apps/crowdfunding/dist
         
     - name: Setup SSH key
       run: |
@@ -75,7 +75,7 @@ jobs:
     - name: Add SSH known hosts
       run: |
         ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-        ssh-keyscan -H forum.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H funding.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
         if [ -n "${{ secrets.WEB_HOST_IP }}" ]; then
           ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
         fi
@@ -88,24 +88,24 @@ jobs:
     - name: Create deployment directories
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
-          sudo mkdir -p /var/www/forum.neture.co.kr
-          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/forum.neture.co.kr
-          echo 'Directory created/verified for forum.neture.co.kr'
+          sudo mkdir -p /var/www/funding.neture.co.kr
+          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/funding.neture.co.kr
+          echo 'Directory created/verified for funding.neture.co.kr'
         "
         
     - name: Deploy static files
       run: |
         rsync -avz --delete --no-owner --no-group --no-perms \
           -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
-          apps/forum/dist/ \
-          ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/forum.neture.co.kr/
+          apps/crowdfunding/dist/ \
+          ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/funding.neture.co.kr/
           
-    - name: Configure Nginx for forum.neture.co.kr
+    - name: Configure Nginx for funding.neture.co.kr
       run: |
-        cat > nginx-forum.conf << 'NGINX_EOF'
+        cat > nginx-funding.conf << 'NGINX_EOF'
 server {
     listen 80;
-    server_name forum.neture.co.kr;
+    server_name funding.neture.co.kr;
 
     # Redirect HTTP to HTTPS
     return 301 https://$server_name$request_uri;
@@ -113,11 +113,11 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name forum.neture.co.kr;
+    server_name funding.neture.co.kr;
 
     # SSL certificates (will be configured by Certbot)
-    ssl_certificate /etc/letsencrypt/live/forum.neture.co.kr/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/forum.neture.co.kr/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/funding.neture.co.kr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/funding.neture.co.kr/privkey.pem;
     
     # Modern SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -131,7 +131,7 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
     # Document root
-    root /var/www/forum.neture.co.kr;
+    root /var/www/funding.neture.co.kr;
     index index.html;
 
     # Gzip compression
@@ -175,20 +175,20 @@ server {
 NGINX_EOF
         
         # Copy nginx config to server and apply
-        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa nginx-forum.conf ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/tmp/
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa nginx-funding.conf ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/tmp/
         
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
           # Move nginx config to proper location
-          sudo mv /tmp/nginx-forum.conf /etc/nginx/sites-available/forum.neture.co.kr
+          sudo mv /tmp/nginx-funding.conf /etc/nginx/sites-available/funding.neture.co.kr
           
           # Enable site if not already enabled
-          if [ ! -L /etc/nginx/sites-enabled/forum.neture.co.kr ]; then
-            sudo ln -s /etc/nginx/sites-available/forum.neture.co.kr /etc/nginx/sites-enabled/
+          if [ ! -L /etc/nginx/sites-enabled/funding.neture.co.kr ]; then
+            sudo ln -s /etc/nginx/sites-available/funding.neture.co.kr /etc/nginx/sites-enabled/
           fi
 
           # Test and reload Nginx
           sudo nginx -t && sudo systemctl reload nginx
-          echo "Nginx configuration for forum.neture.co.kr completed"
+          echo "Nginx configuration for funding.neture.co.kr completed"
 ENDSSH
 
     - name: Setup SSL certificate
@@ -196,11 +196,11 @@ ENDSSH
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
           # Check if certificate already exists
-          if [ ! -d /etc/letsencrypt/live/forum.neture.co.kr ]; then
-            echo 'Setting up SSL certificate for forum.neture.co.kr...'
-            sudo certbot --nginx -d forum.neture.co.kr --non-interactive --agree-tos --email admin@neture.co.kr || echo 'SSL setup will be completed manually'
+          if [ ! -d /etc/letsencrypt/live/funding.neture.co.kr ]; then
+            echo 'Setting up SSL certificate for funding.neture.co.kr...'
+            sudo certbot --nginx -d funding.neture.co.kr --non-interactive --agree-tos --email admin@neture.co.kr || echo 'SSL setup will be completed manually'
           else
-            echo 'SSL certificate already exists for forum.neture.co.kr'
+            echo 'SSL certificate already exists for funding.neture.co.kr'
           fi
         "
 
@@ -212,7 +212,7 @@ ENDSSH
         
         # Check HTTPS
         echo "Checking HTTPS..."
-        curl -I https://forum.neture.co.kr || true
+        curl -I https://funding.neture.co.kr || true
 
   # 단계 3: 배포 후 검증
   post-deploy-verification:
@@ -223,8 +223,8 @@ ENDSSH
     steps:
     - name: Verify deployment
       run: |
-        echo "Forum deployment to forum.neture.co.kr completed"
+        echo "Crowdfunding deployment to funding.neture.co.kr completed"
         echo "Please verify:"
-        echo "- https://forum.neture.co.kr"
+        echo "- https://funding.neture.co.kr"
         echo "- Public access without authentication"
         echo "- API connections working"

@@ -296,6 +296,14 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
+                    <Route path="/themes/homepage" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <HomepageEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
                     <Route path="/themes/menus" element={
                       <AdminProtectedRoute requiredPermissions={['menus:read']}>
                         <Suspense fallback={<PageLoader />}>
