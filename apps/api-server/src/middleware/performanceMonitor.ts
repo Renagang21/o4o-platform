@@ -12,7 +12,7 @@ export const performanceMonitor = (req: RequestWithTiming, res: Response, next: 
 
   // Override res.end to capture response time
   const originalEnd = res.end;
-  res.end = function(...args: any[]) {
+  res.end = function(...args: any[]): Response {
     // Calculate response time
     const responseTime = Date.now() - (req.startTime || Date.now());
     
@@ -38,8 +38,8 @@ export const performanceMonitor = (req: RequestWithTiming, res: Response, next: 
       });
     }
 
-    // Call original end
-    originalEnd.apply(res, args);
+    // Call original end and return the result
+    return originalEnd.apply(res, args);
   };
 
   next();

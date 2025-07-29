@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddOptimizationIndexes1738000000 implements MigrationInterface {
-    name = 'AddOptimizationIndexes1738000000'
+export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
+    name = 'AddOptimizationIndexes1738000000000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // User 테이블 인덱스

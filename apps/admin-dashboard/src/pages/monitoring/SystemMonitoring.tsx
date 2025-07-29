@@ -1,19 +1,14 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Activity,
   AlertTriangle,
   CheckCircle,
-  Clock,
   Database,
   Server,
-  TrendingUp,
-  Users,
   Zap,
-  BarChart3,
   AlertCircle
 } from 'lucide-react';
-import { Line, Bar } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -82,7 +77,7 @@ const SystemMonitoring: FC = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   // 시스템 상태 조회
-  const { data: systemHealth, isLoading: healthLoading } = useQuery<SystemHealth>({
+  const { data: systemHealth } = useQuery<SystemHealth>({
     queryKey: ['system-health'],
     queryFn: async () => {
       const response = await apiClient.get('/api/v1/monitoring/health');
@@ -133,13 +128,6 @@ const SystemMonitoring: FC = () => {
       case 'critical': return 'text-red-600';
       default: return 'text-gray-600';
     }
-  };
-
-  // 메모리 사용률 색상
-  const getMemoryColor = (percentage: number) => {
-    if (percentage < 70) return 'bg-green-500';
-    if (percentage < 85) return 'bg-yellow-500';
-    return 'bg-red-500';
   };
 
   return (
