@@ -80,7 +80,7 @@ jobs:
         cd apps/admin-dashboard
         cat > .env.production << 'EOF'
         NODE_ENV=production
-        VITE_API_BASE_URL=https://api.neture.co.kr
+        VITE_API_BASE_URL=https://api.neture.co.kr/api
         VITE_APP_TITLE=O4O Admin Dashboard
         VITE_MAIN_SITE_URL=https://neture.co.kr
         VITE_ADMIN_URL=https://admin.neture.co.kr

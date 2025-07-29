@@ -89,7 +89,7 @@ const PageLoader = () => (
 
 // SSO 클라이언트 인스턴스 생성
 const ssoClient = new AuthClient(
-  import.meta.env.VITE_API_URL || 'http://localhost:4000'
+  import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000'
 );
 
 /**
@@ -101,9 +101,10 @@ function App() {
   
   // Initialize SSO on app start
   useEffect(() => {
-    // Only start SSO session monitoring if not using mock and not in dev mode
-    if (import.meta.env.VITE_USE_MOCK !== 'true' && !import.meta.env.DEV) {
-      // Remove duplicate checkSSOSession call - ssoService.startSessionCheck handles initial check
+    // Only start SSO session monitoring if not using mock
+    if (import.meta.env.VITE_USE_MOCK !== 'true') {
+      // Initial SSO session check
+      checkSSOSession();
       
       // Start SSO session monitoring
       ssoService.startSessionCheck((isAuthenticated) => {

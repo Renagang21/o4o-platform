@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/authStore'
 
 // Create axios instance
 export const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
@@ -61,9 +61,12 @@ api.interceptors.response.use(
     
     if (error.response?.status === 401) {
       // Clear auth state on 401
-      useAuthStore.getState().logout()
-      // Redirect to login if not already there
-      if (window.location.pathname !== '/login') {
+      const currentPath = window.location.pathname
+      
+      // Only logout and redirect if not already on login page
+      // and not making auth-related requests
+      if (currentPath !== '/login' && !error.config?.url?.includes('/auth')) {
+        useAuthStore.getState().logout()
         window.location.href = '/login'
       }
     }
