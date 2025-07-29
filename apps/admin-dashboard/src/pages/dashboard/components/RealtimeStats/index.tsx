@@ -146,7 +146,7 @@ const RealtimeStats = memo<RealtimeStatsProps>(({ className = '' }) => {
                 <p className="text-sm font-medium text-gray-600">실시간 방문자</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {isLoading ? (
-                    <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <span className="inline-block h-8 w-16 bg-gray-200 rounded animate-pulse" />
                   ) : (
                     DashboardApiUtils.formatNumber(realtimeData?.data.currentUsers.online || 0)
                   )}
@@ -173,7 +173,7 @@ const RealtimeStats = memo<RealtimeStatsProps>(({ className = '' }) => {
                 <p className="text-sm font-medium text-gray-600">실시간 주문</p>
                 <p className="text-2xl font-bold text-green-600">
                   {isLoading ? (
-                    <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <span className="inline-block h-8 w-16 bg-gray-200 rounded animate-pulse" />
                   ) : (
                     DashboardApiUtils.formatNumber(realtimeData?.data.realtimeActivities.newOrders || 0)
                   )}
@@ -199,7 +199,7 @@ const RealtimeStats = memo<RealtimeStatsProps>(({ className = '' }) => {
                 <p className="text-sm font-medium text-gray-600">실시간 활동</p>
                 <p className="text-2xl font-bold text-purple-600">
                   {isLoading ? (
-                    <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <span className="inline-block h-8 w-16 bg-gray-200 rounded animate-pulse" />
                   ) : (
                     DashboardApiUtils.formatNumber(realtimeData?.data.realtimeActivities.newPosts || 0)
                   )}
@@ -225,7 +225,7 @@ const RealtimeStats = memo<RealtimeStatsProps>(({ className = '' }) => {
                 <p className="text-sm font-medium text-gray-600">응답시간</p>
                 <p className="text-2xl font-bold text-orange-600">
                   {isLoading ? (
-                    <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <span className="inline-block h-8 w-16 bg-gray-200 rounded animate-pulse" />
                   ) : (
                     `${realtimeData?.data.liveMetrics.averageResponseTime || 0}ms`
                   )}
@@ -271,7 +271,7 @@ const RealtimeStats = memo<RealtimeStatsProps>(({ className = '' }) => {
       </div>
 
       {/* 실시간 지리적 분포 */}
-      {realtimeData && realtimeData.data.geographicDistribution && realtimeData.data.geographicDistribution.length > 0 && (
+      {!isLoading && realtimeData?.data.geographicDistribution && realtimeData.data.geographicDistribution.length > 0 && (
         <div className="wp-card">
           <div className="wp-card-body">
             <h3 className="text-sm font-medium text-gray-900 mb-3">실시간 지역별 사용자</h3>

@@ -98,14 +98,16 @@ function App() {
   
   // Initialize SSO on app start
   useEffect(() => {
-    // Check SSO session if not using mock
-    if (import.meta.env.VITE_USE_MOCK !== 'true') {
-      checkSSOSession();
+    // Only start SSO session monitoring if not using mock and not in dev mode
+    if (import.meta.env.VITE_USE_MOCK !== 'true' && !import.meta.env.DEV) {
+      // Remove duplicate checkSSOSession call - ssoService.startSessionCheck handles initial check
       
       // Start SSO session monitoring
       ssoService.startSessionCheck((isAuthenticated) => {
         if (!isAuthenticated) {
           toast.error('Session expired. Please log in again.');
+          // Update auth store when session expires
+          checkSSOSession();
         }
       });
       

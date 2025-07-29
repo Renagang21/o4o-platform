@@ -28,7 +28,7 @@ export const ssoConfig = {
   enabled: import.meta.env.VITE_SSO_ENABLED === 'true',
   domain: import.meta.env.VITE_SSO_DOMAIN || '.neture.co.kr',
   cookieName: 'o4o_auth_token',
-  sessionCheckInterval: 60000, // Check session every minute
+  sessionCheckInterval: 300000, // Check session every 5 minutes (reduced to prevent rate limiting)
 };
 
 // API endpoints configuration

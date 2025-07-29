@@ -190,7 +190,21 @@ app.use(passport.initialize() as any);
 const uploadsPath = process.env.UPLOAD_DIR || './uploads';
 app.use('/uploads', express.static(uploadsPath));
 
-// Apply rate limiting to public endpoints first (more lenient)
+// Special rate limit for SSO check endpoint (more lenient to prevent 429 errors)
+const ssoCheckLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 500, // 최대 500 요청 (SSO 체크는 자주 발생)
+  message: {
+    error: 'Too many SSO check requests',
+    code: 'SSO_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1'
+});
+
+// Apply rate limiting to specific endpoints
+app.use('/api/v1/auth/sso/check', ssoCheckLimiter);
 app.use('/api/public', publicLimiter);
 
 // Apply standard rate limiting to other endpoints
