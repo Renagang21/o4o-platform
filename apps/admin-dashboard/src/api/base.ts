@@ -14,7 +14,29 @@ export const api: AxiosInstance = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token
+    // 여러 소스에서 토큰 확인
+    let token = useAuthStore.getState().token
+    
+    // authStore에 토큰이 없으면 localStorage에서 직접 확인
+    if (!token) {
+      token = localStorage.getItem('authToken')
+    }
+    
+    // 그래도 없으면 admin-auth-storage에서 확인
+    if (!token) {
+      const adminStorage = localStorage.getItem('admin-auth-storage')
+      if (adminStorage) {
+        try {
+          const parsed = JSON.parse(adminStorage)
+          if (parsed.state?.token) {
+            token = parsed.state.token
+          }
+        } catch (e) {
+          console.warn('Failed to parse admin-auth-storage')
+        }
+      }
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }

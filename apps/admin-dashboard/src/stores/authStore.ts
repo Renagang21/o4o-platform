@@ -41,6 +41,9 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false
         })
         
+        // localStorage에도 토큰 저장 (호환성을 위해)
+        localStorage.setItem('authToken', token)
+        
         // Set SSO cookie for cross-domain authentication
         ssoService.setCrossDomainCookie(token)
       },

@@ -2,8 +2,8 @@ name: Health Check Monitor
 
 on:
   schedule:
-    # 매 30분마다 실행 (UTC 기준)
-    - cron: '*/30 * * * *'
+    # 매일 오전 10시 (UTC) = 한국시간 오후 7시
+    - cron: '0 10 * * *'
   workflow_dispatch:  # 수동 실행 가능
 
 jobs:
