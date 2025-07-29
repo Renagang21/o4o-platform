@@ -251,6 +251,17 @@ const ssoCheckLimiter = rateLimit({
   }
 });
 
+// 헬스체크 엔드포인트 (rate limit 전에 위치해야 함)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    service: 'api-server'
+  });
+});
+
 // Apply rate limiting to specific endpoints
 app.use('/api/v1/auth/sso/check', ssoCheckLimiter);
 app.use('/api/public', publicLimiter);
@@ -278,16 +289,6 @@ app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api', contentRoutes);
 
-// 헬스체크 엔드포인트
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
-    service: 'api-server'
-  });
-});
 
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {

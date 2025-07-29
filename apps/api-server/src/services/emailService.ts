@@ -54,6 +54,13 @@ export class EmailService {
 
   private async initializeTransporter(): Promise<void> {
     try {
+      // Skip initialization if SMTP credentials are not configured
+      if (!this.config.auth.user || !this.config.auth.pass) {
+        console.log('⚠️  Email service disabled: SMTP credentials not configured');
+        this.transporter = null;
+        return;
+      }
+
       // Create transporter
       this.transporter = nodemailer.createTransport(this.config);
 
@@ -61,7 +68,8 @@ export class EmailService {
       await this.transporter.verify();
       console.log('✅ Email service connected successfully');
     } catch (error) {
-      console.error('❌ Email service connection failed:', error);
+      console.error('⚠️  Email service initialization failed:', error);
+      console.log('📌 Email functionality will be disabled');
       this.transporter = null;
     }
   }
@@ -71,7 +79,7 @@ export class EmailService {
    */
   async sendEmail(options: EmailOptions): Promise<boolean> {
     if (!this.transporter) {
-      console.error('Email transporter not initialized');
+      console.log('⚠️  Email service not available - skipping email send');
       return false;
     }
 
