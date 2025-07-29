@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup Node.js
       uses: actions/setup-node@v3
@@ -40,7 +40,7 @@ jobs:
     needs: test
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Run security audit
       run: npm audit --audit-level=high
@@ -58,7 +58,7 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup SSH
       run: |
@@ -96,7 +96,7 @@ jobs:
     needs: deploy-staging
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Run Lighthouse CI
       uses: treosh/lighthouse-ci-action@v9
