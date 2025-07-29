@@ -12,6 +12,7 @@ import { ssoService } from '@/api/sso';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
+import InitialRedirect from '@/components/InitialRedirect';
 
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
@@ -146,14 +147,16 @@ function App() {
     });
   };
 
-  // 개발 환경에서는 DevAuthProvider 사용
-  const AuthProviderComponent = import.meta.env.DEV ? DevAuthProvider : AuthProvider;
+  // 프로덕션에서는 항상 AuthProvider 사용
+  // DevAuthProvider는 VITE_USE_MOCK=true일 때만 사용
+  const useDevAuth = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
+  const AuthProviderComponent = useDevAuth ? DevAuthProvider : AuthProvider;
   
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProviderComponent 
-          {...(!import.meta.env.DEV ? {
+          {...(!useDevAuth ? {
             ssoClient,
             autoRefresh: true,
             onAuthError: handleAuthError,
@@ -172,6 +175,9 @@ function App() {
               </Suspense>
             } />
             
+            {/* 루트 경로 - 인증 상태에 따라 리다이렉트 */}
+            <Route path="/" element={<InitialRedirect />} />
+            
             {/* 보호된 관리자 라우트들 */}
             <Route path="/*" element={
               <AdminProtectedRoute 
@@ -180,7 +186,6 @@ function App() {
               >
                 <AdminLayout>
                   <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={
                       <Suspense fallback={<PageLoader />}>
                         <Dashboard />

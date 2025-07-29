@@ -47,19 +47,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     const checkInitialAuth = async () => {
       try {
         const storedUser = getInitialState();
-        if (storedUser) {
+        const storedToken = localStorage.getItem('authToken');
+        
+        if (storedUser && storedToken) {
           // 저장된 사용자 정보가 있으면 유효성 검증
           setUser(storedUser);
+          
+          // SSO 세션 확인 (프로덕션 환경에서만)
+          if (ssoClient && !import.meta.env.DEV) {
+            try {
+              const isValid = await authClient.checkSSOSession();
+              if (!isValid) {
+                // SSO 세션이 유효하지 않으면 로그아웃
+                setUser(null);
+                localStorage.removeItem('admin-auth-storage');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+              }
+            } catch (error) {
+              console.error('SSO session check failed:', error);
+              // SSO 체크 실패 시에도 기존 세션 유지
+            }
+          }
+        } else {
+          // 저장된 인증 정보가 없으면 null 설정
+          setUser(null);
         }
       } catch (error) {
         console.error('Initial auth check failed:', error);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     checkInitialAuth();
-  }, []);
+  }, [authClient, ssoClient]);
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
