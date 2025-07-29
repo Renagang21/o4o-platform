@@ -121,21 +121,7 @@ const Login: FC = () => {
           </div>
         </div>
 
-        {/* 개발 환경 테스트 계정 안내 */}
-        {import.meta.env.DEV && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-yellow-800 text-sm font-medium mb-2">🔧 개발 환경 - 관리자 테스트 계정</p>
-            <div className="text-yellow-700 text-xs space-y-1">
-              <div>
-                관리자: <code className="bg-yellow-100 px-1 rounded">admin@neture.co.kr</code> / 
-                <code className="bg-yellow-100 px-1 rounded ml-1">admin123!</code>
-              </div>
-              <div className="text-xs text-yellow-600 mt-1">
-                💡 Phase 1에서 npm run create-admin으로 생성
-              </div>
-            </div>
-          </div>
-        )}
+        {/* 프로덕션 환경에서는 테스트 계정 정보 숨김 */}
 
         {/* 에러 메시지 */}
         {error && (
