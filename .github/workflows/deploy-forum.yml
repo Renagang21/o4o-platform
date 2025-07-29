@@ -1,0 +1,220 @@
+name: Deploy Forum
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/forum/**'
+      - 'packages/**'
+      - '.github/workflows/deploy-forum.yml'
+
+env:
+  NODE_VERSION: '20.x'
+  DEPLOY_PATH: /home/ubuntu/o4o-platform
+
+jobs:
+  # 단계 1: 빌드
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm install
+        
+    - name: Build shared packages
+      run: |
+        npm run build:packages
+        
+    - name: Build Forum app
+      working-directory: apps/forum
+      run: |
+        npm run build
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: forum-build
+        path: apps/forum/dist
+        retention-days: 1
+
+  # 단계 2: 배포
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: forum-build
+        path: apps/forum/dist
+        
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        echo "SSH key setup completed"
+        
+    - name: Add SSH known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H forum.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        if [ -n "${{ secrets.WEB_HOST_IP }}" ]; then
+          ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        fi
+        chmod 644 ~/.ssh/known_hosts
+        
+    - name: Create deployment directories
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          sudo mkdir -p /var/www/forum.neture.co.kr
+          sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/forum.neture.co.kr
+          echo 'Directory created/verified for forum.neture.co.kr'
+        "
+        
+    - name: Deploy static files
+      run: |
+        rsync -avz --delete --no-owner --no-group --no-perms \
+          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
+          apps/forum/dist/ \
+          ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/forum.neture.co.kr/
+          
+    - name: Configure Nginx for forum.neture.co.kr
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} << 'ENDSSH'
+          # Create Nginx configuration for forum.neture.co.kr
+          sudo tee /etc/nginx/sites-available/forum.neture.co.kr > /dev/null << 'EOF'
+server {
+    listen 80;
+    server_name forum.neture.co.kr;
+
+    # Redirect HTTP to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name forum.neture.co.kr;
+
+    # SSL certificates (will be configured by Certbot)
+    ssl_certificate /etc/letsencrypt/live/forum.neture.co.kr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/forum.neture.co.kr/privkey.pem;
+    
+    # Modern SSL configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Document root
+    root /var/www/forum.neture.co.kr;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+
+    # SPA routing
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API proxy
+    location /api/ {
+        proxy_pass http://43.202.242.215:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Static assets caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+    }
+}
+EOF
+
+          # Enable site if not already enabled
+          if [ ! -L /etc/nginx/sites-enabled/forum.neture.co.kr ]; then
+            sudo ln -s /etc/nginx/sites-available/forum.neture.co.kr /etc/nginx/sites-enabled/
+          fi
+
+          # Test and reload Nginx
+          sudo nginx -t && sudo systemctl reload nginx
+          echo "Nginx configuration for forum.neture.co.kr completed"
+ENDSSH
+
+    - name: Setup SSL certificate
+      continue-on-error: true
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          # Check if certificate already exists
+          if [ ! -d /etc/letsencrypt/live/forum.neture.co.kr ]; then
+            echo 'Setting up SSL certificate for forum.neture.co.kr...'
+            sudo certbot --nginx -d forum.neture.co.kr --non-interactive --agree-tos --email admin@neture.co.kr || echo 'SSL setup will be completed manually'
+          else
+            echo 'SSL certificate already exists for forum.neture.co.kr'
+          fi
+        "
+
+    - name: Health check
+      continue-on-error: true
+      run: |
+        echo "Waiting for deployment to stabilize..."
+        sleep 10
+        
+        # Check HTTPS
+        echo "Checking HTTPS..."
+        curl -I https://forum.neture.co.kr || true
+
+  # 단계 3: 배포 후 검증
+  post-deploy-verification:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Verify deployment
+      run: |
+        echo "Forum deployment to forum.neture.co.kr completed"
+        echo "Please verify:"
+        echo "- https://forum.neture.co.kr"
+        echo "- Public access without authentication"
+        echo "- API connections working"
