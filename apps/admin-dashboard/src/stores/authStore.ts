@@ -102,9 +102,22 @@ export const useAuthStore = create<AuthState>()(
               isLoading: false
             })
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('[Auth] SSO session check failed:', error)
-          set({ isLoading: false })
+          // 401 에러 시 자동 로그아웃
+          if (error?.response?.status === 401) {
+            set({
+              user: null,
+              token: null,
+              isAuthenticated: false,
+              isLoading: false
+            })
+            // localStorage 정리
+            localStorage.removeItem('auth-storage')
+            localStorage.removeItem('authToken')
+          } else {
+            set({ isLoading: false })
+          }
         }
       }
     }),

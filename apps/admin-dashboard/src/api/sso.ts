@@ -58,8 +58,12 @@ class SSOService {
     try {
       const response = await api.get<SSOCheckResponse>(apiEndpoints.auth.ssoCheck);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[SSO] Session check error:', error);
+      // 에러를 상위로 전달하여 401 처리 가능하도록 함
+      if (error?.response?.status === 401) {
+        throw error;
+      }
       return { isAuthenticated: false };
     }
   }

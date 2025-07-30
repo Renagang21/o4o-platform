@@ -104,7 +104,12 @@ function App() {
     // Only start SSO session monitoring if not using mock
     if (import.meta.env.VITE_USE_MOCK !== 'true') {
       // Initial SSO session check
-      checkSSOSession();
+      checkSSOSession().catch((error) => {
+        console.error('Initial session check failed:', error);
+        // 초기 체크 실패 시 로컬 스토리지 정리
+        localStorage.removeItem('auth-storage');
+        localStorage.removeItem('authToken');
+      });
       
       // Start SSO session monitoring
       ssoService.startSessionCheck((isAuthenticated) => {

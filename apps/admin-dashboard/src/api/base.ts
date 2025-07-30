@@ -85,6 +85,11 @@ api.interceptors.response.use(
       // Clear auth state on 401
       const currentPath = window.location.pathname
       
+      // Clear all auth-related localStorage items
+      localStorage.removeItem('auth-storage')
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('admin-auth-storage')
+      
       // Only logout and redirect if not already on login page
       // and not making auth-related requests
       if (currentPath !== '/login' && !error.config?.url?.includes('/auth')) {
