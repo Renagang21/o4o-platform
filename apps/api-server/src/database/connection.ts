@@ -50,7 +50,7 @@ export const AppDataSource = new DataSource({
   database: DB_NAME,
   
   // 개발 환경 설정
-  synchronize: NODE_ENV === 'development', // 개발 시에만 자동 스키마 동기화
+  synchronize: false, // 자동 스키마 동기화 비활성화 (마이그레이션 사용)
   logging: NODE_ENV === 'development' ? ['query', 'error'] : ['error'],
   
   // 연결 풀 설정 (CLAUDE.md 정책 기반)
@@ -61,49 +61,51 @@ export const AppDataSource = new DataSource({
     connectionTimeoutMillis: 2000, // 연결 타임아웃
   },
   
-  // 엔티티 등록 (temporarily minimal for OneDrive sync issues)
-  entities: [
-    User,
-    RefreshToken,
-    PasswordResetToken,
-    EmailVerificationToken,
-    ApprovalLog,
-    MediaFile,
-    MediaFolder,
-    Product,
-    Order,
-    OrderItem,
-    Cart,
-    CartItem,
-    Category,
-    Settings,
-    // Crowdfunding entities
-    FundingProject,
-    FundingReward,
-    FundingBacking,
-    BackerReward,
-    FundingUpdate,
-    // Forum entities
-    ForumCategory,
-    ForumPost,
-    ForumComment,
-    ForumTag,
-    // Digital Signage entities
-    SignageContent,
-    SignageSchedule,
-    Store,
-    StorePlaylist,
-    PlaylistItem,
-    ScreenTemplate,
-    ContentUsageLog
-  ],
+  // 엔티티 등록
+  entities: NODE_ENV === 'production'
+    ? ['dist/entities/**/*.js']
+    : [
+        User,
+        RefreshToken,
+        PasswordResetToken,
+        EmailVerificationToken,
+        ApprovalLog,
+        MediaFile,
+        MediaFolder,
+        Product,
+        Order,
+        OrderItem,
+        Cart,
+        CartItem,
+        Category,
+        Settings,
+        // Crowdfunding entities
+        FundingProject,
+        FundingReward,
+        FundingBacking,
+        BackerReward,
+        FundingUpdate,
+        // Forum entities
+        ForumCategory,
+        ForumPost,
+        ForumComment,
+        ForumTag,
+        // Digital Signage entities
+        SignageContent,
+        SignageSchedule,
+        Store,
+        StorePlaylist,
+        PlaylistItem,
+        ScreenTemplate,
+        ContentUsageLog
+      ],
   
   // 마이그레이션 설정
-  migrations: [
-    'src/database/migrations/*.ts'
-  ],
+  migrations: NODE_ENV === 'production' 
+    ? ['dist/database/migrations/*.js'] 
+    : ['src/database/migrations/*.ts'],
   migrationsTableName: 'typeorm_migrations',
-  migrationsRun: NODE_ENV === 'production', // 프로덕션에서 자동 마이그레이션 실행
+  migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
   
   // SSL 설정 (프로덕션 환경)
   ssl: NODE_ENV === 'production' ? {
