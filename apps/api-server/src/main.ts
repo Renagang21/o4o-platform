@@ -7,7 +7,11 @@ import path from 'path';
 
 // 환경변수 로드 (우선순위: .env.production > .env)
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+const envPath = path.resolve(__dirname, '..', envFile);
+dotenv.config({ path: envPath });
+
+// 환경변수 파일 경로 확인
+console.log(`🔍 Loading env from: ${envPath}`);
 
 // 환경변수 검증
 console.log('🔧 Environment Configuration:');
