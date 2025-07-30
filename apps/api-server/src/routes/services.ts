@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // 모든 서비스 라우트는 인증 필요
 router.use(authenticateToken);

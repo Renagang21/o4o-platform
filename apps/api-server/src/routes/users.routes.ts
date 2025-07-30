@@ -5,7 +5,7 @@ import { UserRole } from '../types/auth';
 import { validationResult } from 'express-validator';
 import { body, param, query } from 'express-validator';
 
-const router = Router();
+const router: Router = Router();
 const userController = new UserManagementController();
 
 // Validation rules

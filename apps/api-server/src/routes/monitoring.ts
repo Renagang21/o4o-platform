@@ -6,7 +6,7 @@ import logger from '../utils/simpleLogger';
 import { AppDataSource } from '../database/connection';
 import os from 'os';
 
-const router = Router();
+const router: Router = Router();
 
 // 모든 모니터링 엔드포인트는 관리자 권한 필요
 router.use(authenticateToken);

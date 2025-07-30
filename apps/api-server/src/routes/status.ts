@@ -3,7 +3,7 @@ import { statusPageController } from '../controllers/statusPageController';
 import { authMiddleware } from '../middleware/authMiddleware';
 import { analyticsMiddleware } from '../middleware/analyticsMiddleware';
 
-const router = Router();
+const router: Router = Router();
 
 // Public status page endpoints (no authentication required)
 router.get('/', statusPageController.getPublicStatus.bind(statusPageController));

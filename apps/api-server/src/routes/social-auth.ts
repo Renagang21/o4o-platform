@@ -3,7 +3,7 @@ import passport from '../config/passport';
 import { SocialAuthService } from '../services/socialAuthService';
 import { authenticateCookie, AuthRequest } from '../middleware/auth-v2';
 
-const router = Router();
+const router: Router = Router();
 
 // Success/Failure redirect URLs
 const getRedirectUrls = () => ({

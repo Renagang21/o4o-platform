@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { CPTController } from '../controllers/cptController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // ============= Custom Post Type Routes =============
 

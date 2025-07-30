@@ -3,7 +3,7 @@ import { operationsController } from '../controllers/operationsController';
 import { authMiddleware } from '../middleware/authMiddleware';
 import { analyticsMiddleware } from '../middleware/analyticsMiddleware';
 
-const router = Router();
+const router: Router = Router();
 
 // Public health check endpoint (no auth required)
 router.get('/health', operationsController.getSystemHealth.bind(operationsController));

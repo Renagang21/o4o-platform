@@ -3,7 +3,7 @@ import { autoRecoveryController } from '../controllers/autoRecoveryController';
 import { authMiddleware, roleGuard } from '../middleware/authMiddleware';
 import { UserRole } from '../types/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // Apply authentication middleware to all routes
 router.use(authMiddleware.verifyToken);

@@ -5,7 +5,7 @@ import { TemplatesController } from '../controllers/templatesController';
 import { CustomFieldsController } from '../controllers/customFieldsController';
 import { authenticateToken } from '../middleware/auth';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 // Initialize controllers
 const pagesController = new PagesController();

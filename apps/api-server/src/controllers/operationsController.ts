@@ -3,6 +3,16 @@ import { OperationsMonitoringService, SystemStatus, HealthCheckResult, AlertRule
 import { MetricType, MetricCategory, SystemMetrics } from '../entities/SystemMetrics';
 import { AlertSeverity, AlertStatus } from '../entities/Alert';
 
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
+}
+
 export class OperationsController {
   private operationsService: OperationsMonitoringService;
 
@@ -253,7 +263,7 @@ export class OperationsController {
     }
   }
 
-  async acknowledgeAlert(req: Request, res: Response): Promise<void> {
+  async acknowledgeAlert(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { alertId } = req.params;
       const { note } = req.body;
@@ -275,7 +285,7 @@ export class OperationsController {
     }
   }
 
-  async resolveAlert(req: Request, res: Response): Promise<void> {
+  async resolveAlert(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { alertId } = req.params;
       const { note, action } = req.body;

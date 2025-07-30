@@ -3,7 +3,7 @@ import { SignageController } from '../controllers/signageController';
 import { authenticateToken } from '../middleware/auth';
 import { validateSignageContent, validateStore, validatePlaylist } from '../middleware/validation';
 
-const router = Router();
+const router: Router = Router();
 const signageController = new SignageController();
 
 // Apply authentication to all routes

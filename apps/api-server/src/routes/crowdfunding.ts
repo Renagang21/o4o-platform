@@ -3,7 +3,7 @@ import { FundingProjectController } from '../controllers/crowdfunding/FundingPro
 import { BackingController } from '../controllers/crowdfunding/BackingController';
 import { authenticateToken, requireRole } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const projectController = new FundingProjectController();
 const backingController = new BackingController();
 

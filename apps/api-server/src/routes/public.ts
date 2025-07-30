@@ -6,7 +6,7 @@ import { CustomPost, PostStatus } from '../entities/CustomPost';
 import { Product, ProductStatus } from '../entities/Product';
 import { MockDataService } from '../services/MockDataService';
 
-const router = Router();
+const router: Router = Router();
 const USE_MOCK = process.env.USE_MOCK === 'true' || !AppDataSource.isInitialized;
 
 // Get homepage template

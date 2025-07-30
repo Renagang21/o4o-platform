@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { UserController } from '../controllers/userController';
 import { authenticateToken, requireAdmin, requireManagerOrAdmin } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const userController = new UserController();
 
 // 현재 사용자 프로필 조회

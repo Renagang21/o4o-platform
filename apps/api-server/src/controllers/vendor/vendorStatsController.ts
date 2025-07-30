@@ -2,12 +2,21 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { Order, OrderStatus } from '../../entities/Order';
 import { Product, ProductStatus } from '../../entities/Product';
-import { User } from '../../entities/User';
 import { Between, MoreThan } from 'typeorm';
+
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
+}
 
 export class VendorStatsController {
   // 벤더 대시보드 통계
-  async getDashboardStats(req: Request, res: Response) {
+  async getDashboardStats(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       if (!vendorId) {
@@ -97,7 +106,7 @@ export class VendorStatsController {
   }
 
   // 매출 차트 데이터
-  async getSalesChartData(req: Request, res: Response) {
+  async getSalesChartData(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { period = '7d' } = req.query;
@@ -166,7 +175,7 @@ export class VendorStatsController {
   }
 
   // 최근 주문 목록
-  async getRecentOrders(req: Request, res: Response) {
+  async getRecentOrders(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { limit = '5' } = req.query;
@@ -205,7 +214,7 @@ export class VendorStatsController {
   }
 
   // 인기 상품 통계
-  async getTopProducts(req: Request, res: Response) {
+  async getTopProducts(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       if (!vendorId) {

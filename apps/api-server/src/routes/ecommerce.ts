@@ -4,7 +4,7 @@ import { ProductsController } from '../controllers/productsController';
 import { CartController } from '../controllers/cartController';
 import { OrdersController } from '../controllers/ordersController';
 
-const router = Router();
+const router: Router = Router();
 
 // 컨트롤러 인스턴스 생성
 const productsController = new ProductsController();

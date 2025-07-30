@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { CrowdfundingController } from '../controllers/CrowdfundingController';
 import { authenticateToken, requireRole } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const crowdfundingController = new CrowdfundingController();
 
 // 프로젝트 관련 라우트 (인증 필요)

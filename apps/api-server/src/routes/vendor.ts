@@ -1,8 +1,23 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { authenticateToken as authMiddleware, requireRole } from '../middleware/auth';
 import { VendorStatsController } from '../controllers/vendor/vendorStatsController';
 import { VendorProductController } from '../controllers/vendor/vendorProductController';
 import { VendorOrderController } from '../controllers/vendor/vendorOrderController';
+
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    name?: string;
+    businessInfo?: {
+      companyName?: string;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
+}
 
 const router = Router();
 
@@ -37,7 +52,7 @@ router.put('/orders/:id/status', vendorOrderController.updateOrderStatus);
 router.post('/orders/bulk-update', vendorOrderController.bulkUpdateOrderStatus);
 
 // 프로필 관리 (TODO)
-router.get('/profile', (req, res) => {
+router.get('/profile', (req: AuthRequest, res: Response) => {
   // 현재는 인증된 사용자 정보 반환
   res.json({
     id: req.user?.id,
@@ -48,13 +63,13 @@ router.get('/profile', (req, res) => {
   });
 });
 
-router.put('/profile', (req, res) => {
+router.put('/profile', (req: AuthRequest, res: Response) => {
   // TODO: 프로필 업데이트 구현
   res.json({ message: 'Profile update endpoint - to be implemented' });
 });
 
 // 설정 관리 (TODO)
-router.get('/settings', (req, res) => {
+router.get('/settings', (req: AuthRequest, res: Response) => {
   // TODO: 벤더 설정 조회
   res.json({
     storeName: req.user?.businessInfo?.companyName || req.user?.name || 'My Store',
@@ -65,7 +80,7 @@ router.get('/settings', (req, res) => {
   });
 });
 
-router.put('/settings', (req, res) => {
+router.put('/settings', (req: AuthRequest, res: Response) => {
   // TODO: 벤더 설정 업데이트
   res.json({ message: 'Settings update endpoint - to be implemented' });
 });

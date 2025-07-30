@@ -2,6 +2,16 @@ import { Request, Response } from 'express';
 import { StatusPageService } from '../services/StatusPageService';
 import { IncidentImpact, IncidentStatus, ComponentType, ServiceStatus } from '../entities/StatusPage';
 
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
+}
+
 export class StatusPageController {
   private statusPageService: StatusPageService;
 
@@ -293,7 +303,7 @@ export class StatusPageController {
     }
   }
 
-  async createIncident(req: Request, res: Response): Promise<void> {
+  async createIncident(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { title, description, impact, affectedComponents } = req.body;
       const createdBy = req.user?.id;
@@ -337,7 +347,7 @@ export class StatusPageController {
     }
   }
 
-  async updateIncident(req: Request, res: Response): Promise<void> {
+  async updateIncident(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { incidentId } = req.params;
       const { status, message } = req.body;
@@ -380,7 +390,7 @@ export class StatusPageController {
     }
   }
 
-  async scheduleMaintenance(req: Request, res: Response): Promise<void> {
+  async scheduleMaintenance(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { title, description, affectedComponents, scheduledStart, scheduledEnd } = req.body;
       const createdBy = req.user?.id;

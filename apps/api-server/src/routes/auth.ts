@@ -8,7 +8,7 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { asyncHandler, UnauthorizedError, BadRequestError } from '../middleware/errorHandler';
 import { ok, created, unauthorized } from '../utils/apiResponse';
 
-const router = Router();
+const router: Router = Router();
 
 // 로그인
 router.post('/login',

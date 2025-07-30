@@ -4,9 +4,19 @@ import { Order } from '../../entities/Order';
 import { OrderStatus } from '../../entities/Order';
 import { Between, Like } from 'typeorm';
 
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
+}
+
 export class VendorOrderController {
   // 벤더의 주문 목록 조회
-  async getOrders(req: Request, res: Response) {
+  async getOrders(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { 
@@ -100,7 +110,7 @@ export class VendorOrderController {
   }
 
   // 주문 상세 조회
-  async getOrder(req: Request, res: Response) {
+  async getOrder(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { id } = req.params;
@@ -164,7 +174,7 @@ export class VendorOrderController {
   }
 
   // 주문 상태 업데이트
-  async updateOrderStatus(req: Request, res: Response) {
+  async updateOrderStatus(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { id } = req.params;
@@ -228,7 +238,7 @@ export class VendorOrderController {
   }
 
   // 주문 통계
-  async getOrderStats(req: Request, res: Response) {
+  async getOrderStats(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       if (!vendorId) {
@@ -270,7 +280,7 @@ export class VendorOrderController {
   }
 
   // 대량 주문 상태 업데이트
-  async bulkUpdateOrderStatus(req: Request, res: Response) {
+  async bulkUpdateOrderStatus(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { orderIds, status } = req.body;

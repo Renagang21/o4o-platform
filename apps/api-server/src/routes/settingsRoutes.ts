@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { SettingsController } from '../controllers/settingsController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
-const router = Router();
+const router: Router = Router();
 const settingsController = new SettingsController();
 
 // Public endpoints

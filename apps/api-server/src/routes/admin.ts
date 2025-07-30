@@ -11,7 +11,7 @@ import {
 } from '../controllers/adminController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // 모든 관리자 라우트는 인증 및 관리자 권한 필요
 router.use(authenticateToken);

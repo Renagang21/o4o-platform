@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authenticateToken, optionalAuth } from '../middleware/auth';
 import { ForumController } from '../controllers/forumController';
 
-const router = Router();
+const router: Router = Router();
 const forumController = new ForumController();
 
 // Category routes

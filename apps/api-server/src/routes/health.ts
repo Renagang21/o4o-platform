@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import * as os from 'os';
 
-const router = Router();
+const router: Router = Router();
 
 // Basic health check endpoint
 router.get('/', async (req: Request, res: Response) => {

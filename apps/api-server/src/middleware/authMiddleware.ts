@@ -4,14 +4,14 @@ import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { BetaUser } from '../entities/BetaUser';
 import { authService } from '../services/AuthService';
-import { UserRole, UserStatus, AccessTokenPayload, AuthRequest } from '../types/auth';
+import { UserRole, UserStatus, AccessTokenPayload } from '../types/auth';
 
-// Request 타입 확장 (새 SSO 시스템용)
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: AccessTokenPayload;
-  }
+// Use AccessTokenPayload for req.user since that's what authService returns
+interface AuthRequest extends Request {
+  user?: AccessTokenPayload;
 }
+
+// Request 타입 확장은 types/express.d.ts에서 처리됨
 
 export class AuthMiddleware {
   private userRepository = AppDataSource.getRepository(User);
@@ -233,7 +233,7 @@ export class AuthMiddleware {
 
   // Role-based authorization
   requireRole = (roles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
       if (!req.user) {
         return res.status(401).json({ 
           error: 'Authentication required',
@@ -261,7 +261,7 @@ export class AuthMiddleware {
   requireManagerOrAdmin = this.requireRole(['admin', 'manager']);
 
   // Analytics access (admin, manager, or beta users for their own data)
-  requireAnalyticsAccess = (req: Request, res: Response, next: NextFunction) => {
+  requireAnalyticsAccess = (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ 
         error: 'Authentication required',
@@ -270,7 +270,7 @@ export class AuthMiddleware {
     }
 
     // Admins and managers have full access
-    if (['admin', 'manager'].includes(req.user.role)) {
+    if (['admin', 'manager'].includes(req.user.role as string)) {
       return next();
     }
 
@@ -338,7 +338,7 @@ export class AuthMiddleware {
    * 역할 기반 접근 제어 미들웨어 (새 SSO 시스템)
    */
   requireRoles = (allowedRoles: UserRole[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
       if (!req.user) {
         return res.status(401).json({
           success: false,
@@ -361,7 +361,7 @@ export class AuthMiddleware {
    * 권한 기반 접근 제어 미들웨어 (새 SSO 시스템)
    */
   requirePermission = (permission: string) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
       if (!req.user) {
         return res.status(401).json({
           success: false,
@@ -370,11 +370,11 @@ export class AuthMiddleware {
       }
 
       // 관리자는 모든 권한 보유
-      if (req.user.role === 'admin' || req.user.permissions.includes('*')) {
+      if (req.user.role === 'admin' || req.user.permissions?.includes('*')) {
         return next();
       }
 
-      if (!req.user.permissions.includes(permission)) {
+      if (!req.user.permissions?.includes(permission)) {
         return res.status(403).json({
           success: false,
           message: `Permission required: ${permission}`
@@ -389,7 +389,7 @@ export class AuthMiddleware {
    * 도메인별 접근 제어 미들웨어 (새 SSO 시스템)
    */
   requireDomain = (allowedDomains: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
       if (!req.user) {
         return res.status(401).json({
           success: false,
@@ -397,7 +397,7 @@ export class AuthMiddleware {
         });
       }
 
-      const requestDomain = req.headers.host || req.user.domain;
+      const requestDomain = req.headers.host || req.user.domain || '';
       
       if (!allowedDomains.some(domain => requestDomain.includes(domain))) {
         return res.status(403).json({
@@ -462,7 +462,7 @@ export class AuthMiddleware {
    * API 카테고리별 접근 제어 (새 SSO 시스템)
    */
   requireApiAccess = (category: keyof typeof this.API_PERMISSIONS) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
       if (!req.user) {
         return res.status(401).json({
           success: false,

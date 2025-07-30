@@ -6,7 +6,7 @@ import {
   feedbackSubmissionValidation 
 } from '../controllers/betaUserController';
 
-const router = Router();
+const router: Router = Router();
 
 // Public endpoints (no authentication required)
 

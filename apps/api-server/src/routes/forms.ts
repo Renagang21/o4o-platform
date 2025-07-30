@@ -6,7 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-const router = Router();
+const router: Router = Router();
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({

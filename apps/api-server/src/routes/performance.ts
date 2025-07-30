@@ -15,7 +15,7 @@ import {
   getPerformanceAlerts
 } from '../controllers/performanceController';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * 성능 최적화 및 스케일링 라우트

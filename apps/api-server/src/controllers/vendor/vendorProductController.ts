@@ -5,9 +5,19 @@ import { Category } from '../../entities/Category';
 import { Like, In } from 'typeorm';
 import slugify from 'slugify';
 
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
+}
+
 export class VendorProductController {
   // 벤더의 상품 목록 조회
-  async getProducts(req: Request, res: Response) {
+  async getProducts(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { 
@@ -95,7 +105,7 @@ export class VendorProductController {
   }
 
   // 상품 상세 조회
-  async getProduct(req: Request, res: Response) {
+  async getProduct(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { id } = req.params;
@@ -122,7 +132,7 @@ export class VendorProductController {
   }
 
   // 상품 생성
-  async createProduct(req: Request, res: Response) {
+  async createProduct(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const productData = req.body;
@@ -175,7 +185,7 @@ export class VendorProductController {
   }
 
   // 상품 수정
-  async updateProduct(req: Request, res: Response) {
+  async updateProduct(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { id } = req.params;
@@ -234,7 +244,7 @@ export class VendorProductController {
   }
 
   // 상품 삭제
-  async deleteProduct(req: Request, res: Response) {
+  async deleteProduct(req: AuthRequest, res: Response) {
     try {
       const vendorId = req.user?.id;
       const { id } = req.params;

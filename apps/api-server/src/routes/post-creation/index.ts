@@ -11,7 +11,7 @@ import {
   getUserAvailablePostTypes
 } from '../../controllers/post-creation';
 
-const router = Router();
+const router: Router = Router();
 
 // 🆕 Post Creation (UAGBFormsBlock에서 호출)
 router.post('/create', createPost);

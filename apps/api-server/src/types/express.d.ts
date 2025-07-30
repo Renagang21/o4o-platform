@@ -28,6 +28,7 @@ declare global {
           metadata?: Record<string, string | number | boolean>;
         };
         permissions?: string[];
+        domain?: string;
         betaUserId?: string;
         createdAt?: Date | string;
         updatedAt?: Date | string;

@@ -8,7 +8,7 @@ import { SessionSyncService } from '../services/sessionSyncService';
 import { PasswordResetService } from '../services/passwordResetService';
 import { authenticateCookie, AuthRequest } from '../middleware/auth-v2';
 
-const router = Router();
+const router: Router = Router();
 
 // Login with httpOnly cookies
 router.post('/login',

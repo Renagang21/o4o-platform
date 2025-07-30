@@ -6,6 +6,16 @@ import { MockDataService } from '../services/MockDataService';
 import path from 'path';
 import fs from 'fs/promises';
 
+// Ensure proper typing for req.user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    [key: string]: any;
+  };
+}
+
 export class TemplatesController {
   private templateRepository = AppDataSource.getRepository(Template);
   private userRepository = AppDataSource.getRepository(User);
@@ -143,7 +153,7 @@ export class TemplatesController {
   }
 
   // POST /api/admin/templates
-  async createTemplate(req: Request, res: Response) {
+  async createTemplate(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -230,7 +240,7 @@ export class TemplatesController {
   }
 
   // PUT /api/admin/templates/:id
-  async updateTemplate(req: Request, res: Response) {
+  async updateTemplate(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
       const userId = req.user?.id;
@@ -305,7 +315,7 @@ export class TemplatesController {
   }
 
   // DELETE /api/admin/templates/:id
-  async deleteTemplate(req: Request, res: Response) {
+  async deleteTemplate(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
       const userId = req.user?.id;
@@ -347,7 +357,7 @@ export class TemplatesController {
   }
 
   // POST /api/admin/templates/import
-  async importTemplate(req: Request, res: Response) {
+  async importTemplate(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.id;
       const { templateData } = req.body;
