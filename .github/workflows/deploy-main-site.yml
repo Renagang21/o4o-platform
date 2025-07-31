@@ -351,7 +351,7 @@ jobs:
           ls -la /var/www/neture.co.kr/ | head -10
           echo ''
           echo '🔍 Testing direct file access:'
-          curl -I https://neture.co.kr/index.html || echo 'Direct file access failed'
+          curl -I https://neture.co.kr:8443/index.html || echo 'Direct file access failed'
         "
     
     - name: Wait for service startup
@@ -368,19 +368,19 @@ jobs:
         # HTTPS로 테스트
         echo ""
         echo "Testing HTTPS access..."
-        curl -I https://neture.co.kr/ || echo "HTTPS test failed"
+        curl -I https://neture.co.kr:8443/ || echo "HTTPS test failed"
         
         # 정적 파일 직접 접근 테스트
         echo ""
         echo "Testing direct static file access..."
-        curl -I https://neture.co.kr/index.html || echo "Direct file test failed"
+        curl -I https://neture.co.kr:8443/index.html || echo "Direct file test failed"
         
         # 실제 헬스체크
         echo ""
         echo "Running health check loop..."
         for i in {1..10}; do
           response=$(curl -s -o /dev/null -w "%{http_code}" \
-            https://neture.co.kr/ || echo "000")
+            https://neture.co.kr:8443/ || echo "000")
             
           if [ "$response" = "200" ]; then
             echo "✅ 메인 사이트 헬스체크 성공 (응답 코드: $response)"
@@ -432,7 +432,7 @@ jobs:
     - name: Page load speed test
       run: |
         # 페이지 로드 시간 측정
-        load_time=$(curl -s -o /dev/null -w "%{time_total}" https://neture.co.kr/)
+        load_time=$(curl -s -o /dev/null -w "%{time_total}" https://neture.co.kr:8443/)
         
         echo "📊 페이지 로드 시간: ${load_time}초"
         
@@ -446,7 +446,7 @@ jobs:
     - name: API connectivity test
       run: |
         # 메인 사이트에서 API 서버 연결 테스트
-        response=$(curl -s "https://neture.co.kr/api/health" || echo "failed")
+        response=$(curl -s "https://neture.co.kr:8443/api/health" || echo "failed")
         
         if echo "$response" | grep -q "healthy"; then
           echo "✅ API 서버 연결 확인 성공"
@@ -471,13 +471,13 @@ jobs:
         lhci autorun \
           --config=.lighthouserc.json \
           --collect.url=https://neture.co.kr \
-          --collect.url=https://neture.co.kr/about \
-          --collect.url=https://neture.co.kr/products || true
+          --collect.url=https://neture.co.kr:8443/about \
+          --collect.url=https://neture.co.kr:8443/products || true
           
     - name: Meta tags verification
       run: |
         # 주요 메타 태그 확인
-        content=$(curl -s https://neture.co.kr/)
+        content=$(curl -s https://neture.co.kr:8443/)
         
         if echo "$content" | grep -q "<title>"; then
           echo "✅ Title 태그 확인"

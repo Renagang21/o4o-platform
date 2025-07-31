@@ -80,10 +80,10 @@ jobs:
         cd apps/admin-dashboard
         cat > .env.production << 'EOF'
         NODE_ENV=production
-        VITE_API_BASE_URL=https://api.neture.co.kr/api
+        VITE_API_BASE_URL=https://api.neture.co.kr:8443/api
         VITE_APP_TITLE=O4O Admin Dashboard
-        VITE_MAIN_SITE_URL=https://neture.co.kr
-        VITE_ADMIN_URL=https://admin.neture.co.kr
+        VITE_MAIN_SITE_URL=https://neture.co.kr:8443
+        VITE_ADMIN_URL=https://admin.neture.co.kr:8443
         VITE_ENABLE_ANALYTICS=false
         VITE_ENABLE_DEBUG=false
         VITE_SECURITY_MODE=strict
@@ -353,7 +353,7 @@ jobs:
           ls -la /var/www/admin.neture.co.kr/ | head -10
           echo ''
           echo '🔍 Testing direct file access:'
-          curl -I https://admin.neture.co.kr/index.html || echo 'Direct file access failed'
+          curl -I https://admin.neture.co.kr:8443/index.html || echo 'Direct file access failed'
         "
     
     - name: Wait for service startup
@@ -366,7 +366,7 @@ jobs:
           # 더 자세한 응답 정보 수집
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "User-Agent: GitHub-Actions-HealthCheck" \
-            https://admin.neture.co.kr/ || echo "000")
+            https://admin.neture.co.kr:8443/ || echo "000")
             
           if [ "$response" = "200" ] || [ "$response" = "403" ] || [ "$response" = "401" ]; then
             if [ "$response" = "200" ]; then
@@ -389,7 +389,7 @@ jobs:
     - name: Security headers verification
       run: |
         echo "보안 헤더 확인 중..."
-        headers=$(curl -s -I https://admin.neture.co.kr/)
+        headers=$(curl -s -I https://admin.neture.co.kr:8443/)
         
         if echo "$headers" | grep -i "strict-transport-security"; then
           echo "✅ HSTS 헤더 확인"
@@ -412,7 +412,7 @@ jobs:
     - name: Login page accessibility test
       run: |
         # 로그인 페이지 접근 테스트
-        content=$(curl -s https://admin.neture.co.kr/login || echo "failed")
+        content=$(curl -s https://admin.neture.co.kr:8443/login || echo "failed")
         
         if echo "$content" | grep -q "login\|로그인"; then
           echo "✅ 로그인 페이지 접근 확인"
@@ -424,8 +424,8 @@ jobs:
       run: |
         # 관리자 대시보드에서 API 서버 연결 테스트
         response=$(curl -s -w "%{http_code}" \
-          -H "Origin: https://admin.neture.co.kr" \
-          "https://api.neture.co.kr/health" || echo "000")
+          -H "Origin: https://admin.neture.co.kr:8443" \
+          "https://api.neture.co.kr:8443/api/health" || echo "000")
           
         if [[ "$response" == *"200" ]]; then
           echo "✅ 관리자 → API 서버 연결 확인"
@@ -440,7 +440,7 @@ jobs:
         
         for route in "${routes[@]}"; do
           response=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://admin.neture.co.kr$route" || echo "000")
+            "https://admin.neture.co.kr:8443$route" || echo "000")
             
           # 401 또는 403 또는 200(로그인 페이지로 리디렉션)이면 정상
           if [[ "$response" =~ ^(200|401|403)$ ]]; then
@@ -460,7 +460,7 @@ jobs:
       run: |
         # 관리자 페이지 로드 시간 측정
         load_time=$(curl -s -o /dev/null -w "%{time_total}" \
-          https://admin.neture.co.kr/)
+          https://admin.neture.co.kr:8443/)
         
         echo "📊 관리자 페이지 로드 시간: ${load_time}초"
         
@@ -491,7 +491,7 @@ jobs:
       if: needs.security-health-check.result == 'success'
       run: |
         echo "🚀 관리자 대시보드 배포 성공!"
-        echo "📍 서비스 URL: https://admin.neture.co.kr"
+        echo "📍 서비스 URL: https://admin.neture.co.kr:8443"
         echo "🕐 배포 시간: $(date '+%Y-%m-%d %H:%M:%S')"
         echo "🔒 보안 검사: 통과"
         echo "📊 성능 테스트: 완료"

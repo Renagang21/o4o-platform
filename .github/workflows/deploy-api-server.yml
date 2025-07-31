@@ -367,7 +367,7 @@ jobs:
         for i in {1..10}; do
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "X-Health-Check-Key: ${{ secrets.HEALTH_CHECK_KEY }}" \
-            https://api.neture.co.kr/health || echo "000")
+            https://api.neture.co.kr:8443/api/health || echo "000")
             
           if [ "$response" = "200" ]; then
             echo "✅ API 서버 헬스체크 성공 (응답 코드: $response)"
@@ -381,7 +381,7 @@ jobs:
               # Test DNS resolution
               nslookup api.neture.co.kr || echo "DNS resolution failed"
               # Test basic HTTPS connectivity
-              curl -I https://api.neture.co.kr/ || echo "HTTPS connection failed"
+              curl -I https://api.neture.co.kr:8443/ || echo "HTTPS connection failed"
             fi
             
             if [ $i -eq 10 ]; then
@@ -400,7 +400,7 @@ jobs:
       continue-on-error: true
       run: |
         response=$(curl -s -H "X-Health-Check-Key: ${{ secrets.HEALTH_CHECK_KEY }}" \
-          https://api.neture.co.kr/health/database)
+          https://api.neture.co.kr:8443/api/health/database)
           
         if echo "$response" | grep -q "\"status\":\"healthy\""; then
           echo "✅ 데이터베이스 연결 확인 성공"
@@ -417,7 +417,7 @@ jobs:
         
         # SSL 인증서 확인
         echo "🔐 Checking SSL certificate..."
-        echo | openssl s_client -connect api.neture.co.kr:443 -servername api.neture.co.kr 2>/dev/null | openssl x509 -noout -dates || echo "⚠️  SSL certificate check failed"
+        echo | openssl s_client -connect api.neture.co.kr:8443 -servername api.neture.co.kr 2>/dev/null | openssl x509 -noout -dates || echo "⚠️  SSL certificate check failed"
         
         # 주요 API 엔드포인트 smoke test
         endpoints=(
@@ -429,7 +429,7 @@ jobs:
         for endpoint in "${endpoints[@]}"; do
           # SSL 검증 무시 옵션 추가 (-k)
           response=$(curl -k -s -o /dev/null -w "%{http_code}" \
-            "https://api.neture.co.kr$endpoint" || echo "000")
+            "https://api.neture.co.kr:8443$endpoint" || echo "000")
             
           if [ "$response" = "200" ] || [ "$response" = "401" ]; then
             echo "✅ $endpoint 엔드포인트 정상 (응답 코드: $response)"
@@ -440,7 +440,7 @@ jobs:
             if [ "$response" = "000" ]; then
               echo "🔍 Trying HTTP instead..."
               http_response=$(curl -s -o /dev/null -w "%{http_code}" \
-                "http://api.neture.co.kr$endpoint" || echo "000")
+                "http://api.neture.co.kr:8443$endpoint" || echo "000")
               echo "   HTTP response: $http_response"
             fi
             exit 1
@@ -458,7 +458,7 @@ jobs:
       if: needs.health-check.result == 'success'
       run: |
         echo "🚀 API 서버 배포 성공!"
-        echo "📍 서비스 URL: https://api.neture.co.kr"
+        echo "📍 서비스 URL: https://api.neture.co.kr:8443"
         echo "🕐 배포 시간: $(date '+%Y-%m-%d %H:%M:%S')"
         echo "📊 헬스체크: 통과"
         
