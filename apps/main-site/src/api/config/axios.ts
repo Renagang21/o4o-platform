@@ -29,9 +29,16 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // 토큰 만료 시 로그아웃 처리
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Public API 호출인 경우 로그인 페이지로 리다이렉트하지 않음
+      const isPublicApi = error.config?.url?.includes('/public/') || 
+                          error.config?.url?.includes('/settings/') ||
+                          error.config?.url?.includes('/pages/');
+      
+      if (!isPublicApi) {
+        // 보호된 API에서만 로그아웃 처리
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
