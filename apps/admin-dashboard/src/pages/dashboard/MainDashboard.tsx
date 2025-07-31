@@ -16,7 +16,7 @@ import {
 
 // Components
 import StatsCards from './components/StatsCards';
-import Charts from './components/Charts';
+// import Charts from './components/Charts';
 import QuickActions from './components/QuickActions';
 import Notifications from './components/Notifications';
 import ActivityFeed from './components/ActivityFeed';
@@ -34,7 +34,6 @@ const MainDashboard: FC = () => {
   // Dashboard data management
   const { 
     stats, 
-    chartData, 
     notifications, 
     activities,
     isLoading,
@@ -181,10 +180,13 @@ const MainDashboard: FC = () => {
             </div>
           </div>
           
-          <Charts 
+          {/* <Charts 
             data={chartData}
             isLoading={isLoading}
-          />
+          /> */}
+          <div className="text-center py-8 text-gray-500">
+            차트는 준비 중입니다.
+          </div>
         </section>
 
         {/* Quick Actions and Notifications */}

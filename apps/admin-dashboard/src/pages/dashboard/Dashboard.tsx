@@ -13,15 +13,15 @@ import RealtimeStats from './components/RealtimeStats';
 import RecentActivity from './components/RecentActivity';
 import QuickActions from './components/QuickActions';
 import SystemStatus from './components/SystemHealth';
-import Charts from './components/Charts';
+// import Charts from './components/Charts';
 import AtAGlanceWidget from '@/components/dashboard/AtAGlanceWidget';
 import ScreenOptions, { type ScreenOption } from '@/components/common/ScreenOptions';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 const Dashboard = memo(() => {
-  const { chartData, isLoading: chartsLoading, stats } = useDashboardData();
-  const { isLoading: statsLoading } = useDashboardStats();
+  const { stats } = useDashboardData();
+  const { } = useDashboardStats();
   
   // Screen Options state
   const [screenOptions, setScreenOptions] = useState<ScreenOption[]>([
@@ -118,13 +118,13 @@ const Dashboard = memo(() => {
         </div>
       </div>
 
-      {/* E-commerce Charts Section */}
-      <section>
+      {/* E-commerce Charts Section - 준비 중 */}
+      {/* <section>
         <Charts 
           data={chartData} 
           isLoading={statsLoading || chartsLoading} 
         />
-      </section>
+      </section> */}
 
       {/* Footer 정보 */}
       <div className="mt-12 pt-8 border-t border border-gray-200">

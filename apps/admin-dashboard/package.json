@@ -61,7 +61,6 @@
     "react-hot-toast": "^2.4.1",
     "react-intersection-observer": "^9.16.0",
     "react-router-dom": "^7.6.0",
-    "recharts": "^2.8.0",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.5.5",
     "zod": "^4.0.5",

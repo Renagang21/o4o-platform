@@ -17,10 +17,10 @@ import { VendorRoute } from './components/auth/VendorRoute';
 
 // Vendor Dashboard imports
 import VendorLayout from './pages/vendor/layout/VendorLayout';
-import VendorDashboard from './pages/vendor/Dashboard';
+// import VendorDashboard from './pages/vendor/Dashboard';
 import VendorProducts from './pages/vendor/Products';
 import VendorOrders from './pages/vendor/Orders';
-import VendorAnalytics from './pages/vendor/Analytics';
+// import VendorAnalytics from './pages/vendor/Analytics';
 import VendorSettings from './pages/vendor/Settings';
 
 export const router = createBrowserRouter([
@@ -84,7 +84,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <VendorDashboard />,
+        element: <div>대시보드는 준비 중입니다.</div>,
       },
       {
         path: 'products',
@@ -96,7 +96,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'analytics',
-        element: <VendorAnalytics />,
+        element: <div>분석 페이지는 준비 중입니다.</div>,
       },
       {
         path: 'settings',

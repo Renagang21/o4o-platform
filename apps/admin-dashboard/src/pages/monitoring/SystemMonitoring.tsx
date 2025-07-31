@@ -8,33 +8,7 @@ import {
   Zap,
   AlertCircle
 } from 'lucide-react';
-import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
 import apiClient from '../../api/base';
-
-// Chart.js 설정
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
 
 interface PerformanceMetric {
   endpoint: string;
@@ -106,19 +80,6 @@ const SystemMonitoring: FC = () => {
     refetchInterval: autoRefresh ? 60000 : false // 1분마다 갱신
   });
 
-  // 응답 시간 차트 데이터
-  const responseTimeChartData = {
-    labels: performanceMetrics?.map(m => m.endpoint.replace('/api/v1/', '')) || [],
-    datasets: [
-      {
-        label: '평균 응답 시간 (ms)',
-        data: performanceMetrics?.map(m => m.avgResponseTime) || [],
-        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-        borderColor: 'rgb(59, 130, 246)',
-        borderWidth: 2
-      }
-    ]
-  };
 
   // 시스템 상태 색상 결정
   const getHealthColor = (status?: string) => {
@@ -279,33 +240,28 @@ const SystemMonitoring: FC = () => {
 
       {/* 성능 차트 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* API 응답 시간 차트 */}
+        {/* API 응답 시간 테이블 */}
         <div className="wp-card">
           <div className="wp-card-header">
             <h3 className="text-lg font-medium text-gray-900">API 응답 시간</h3>
           </div>
           <div className="wp-card-body">
             {performanceMetrics && performanceMetrics.length > 0 ? (
-              <Bar 
-                data={responseTimeChartData} 
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: {
-                      display: false
-                    }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      title: {
-                        display: true,
-                        text: '응답 시간 (ms)'
-                      }
-                    }
-                  }
-                }}
-              />
+              <div className="space-y-4">
+                {performanceMetrics?.slice(0, 10).map((metric) => (
+                  <div key={metric.endpoint} className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {metric.endpoint.replace('/api/v1/', '')}
+                      </p>
+                      <p className="text-xs text-gray-500">{metric.count} 요청</p>
+                    </div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {metric.avgResponseTime.toFixed(0)}ms
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
                 데이터가 없습니다

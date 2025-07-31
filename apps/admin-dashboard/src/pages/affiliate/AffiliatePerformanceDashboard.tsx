@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ReferralLinkGenerator } from '@/components/affiliate/ReferralLinkGenerator';
 import { CommissionHistory } from '@/components/affiliate/CommissionHistory';
 import { ReferralToolkit } from '@/components/affiliate/ReferralToolkit';
-import { PerformanceChart } from '@/components/affiliate/PerformanceChart';
+// import { PerformanceChart } from '@/components/affiliate/PerformanceChart';
 import { useAuth } from '@o4o/auth-context';
 import { formatPrice } from '@/utils/vendorUtils';
 import type { AffiliateUser, UserAffiliateDashboard } from '@o4o/types';
@@ -249,7 +249,8 @@ const AffiliatePerformanceDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <PerformanceChart period={period} />
+                {/* <PerformanceChart period={period} /> */}
+                <div className="text-center py-8 text-gray-500">성과 차트는 준비 중입니다.</div>
               </CardContent>
             </Card>
 

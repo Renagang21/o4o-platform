@@ -29,10 +29,10 @@ const OrderStatusManagement = lazy(() => import('@/pages/ecommerce/OrderStatusMa
 const InventoryManagement = lazy(() => import('@/pages/ecommerce/InventoryManagement'));
 const TossPaymentsSettings = lazy(() => import('@/pages/ecommerce/TossPaymentsSettings'));
 const RefundManagement = lazy(() => import('@/pages/ecommerce/RefundManagement'));
-const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
+// const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 const VendorSettlements = lazy(() => import('@/pages/ecommerce/VendorSettlements'));
 const FeeManagement = lazy(() => import('@/pages/ecommerce/FeeManagement'));
-const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
+// const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
 const Pages = lazy(() => import('@/pages/pages/Pages'));
@@ -411,7 +411,8 @@ function App() {
                     <Route path="/ecommerce/settlements" element={
                       <AdminProtectedRoute requiredPermissions={['analytics:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <SettlementDashboard />
+                          {/* <SettlementDashboard /> */}
+                          <div>정산 대시보드는 준비 중입니다.</div>
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -435,7 +436,8 @@ function App() {
                     <Route path="/ecommerce/settlement-reports" element={
                       <AdminProtectedRoute requiredPermissions={['analytics:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <SettlementReports />
+                          {/* <SettlementReports /> */}
+                          <div>정산 리포트는 준비 중입니다.</div>
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
