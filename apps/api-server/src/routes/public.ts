@@ -374,6 +374,57 @@ router.get('/products/:idOrSlug', async (req, res) => {
   }
 });
 
+// Get posts list (public) - Add this endpoint for main site
+router.get('/posts', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const status = req.query.status as string || 'published';
+    const orderBy = req.query.orderBy as string || 'createdAt';
+    const order = req.query.order as string || 'DESC';
+    const offset = (page - 1) * limit;
+
+    // For now, return mock data until we have proper posts entity
+    const mockPosts = [
+      {
+        id: '1',
+        title: 'Neture 플랫폼 출시',
+        slug: 'neture-platform-launch',
+        excerpt: 'O4O 비즈니스를 위한 통합 플랫폼이 출시되었습니다.',
+        content: '<p>Neture 플랫폼이 공식 출시되었습니다...</p>',
+        status: 'published',
+        author: {
+          id: '1',
+          name: 'Admin',
+          avatar: null
+        },
+        featuredImage: null,
+        categories: ['공지사항'],
+        tags: ['플랫폼', '출시'],
+        publishedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    res.json({
+      data: mockPosts,
+      pagination: {
+        current: page,
+        total: 1,
+        count: limit,
+        totalItems: 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch posts'
+    });
+  }
+});
+
 // Get featured products (public)
 router.get('/featured-products', async (req, res) => {
   try {
