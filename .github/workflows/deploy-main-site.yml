@@ -420,12 +420,13 @@ jobs:
         
         for asset in "${assets[@]}"; do
           response=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://neture.co.kr$asset")
+            "https://neture.co.kr:8443$asset")
             
           if [ "$response" = "200" ]; then
             echo "✅ 정적 자원 확인 성공: $asset"
           else
             echo "⚠️  정적 자원 확인 실패: $asset (응답 코드: $response)"
+            # 실패 시 종료하지 않고 경고만 표시
           fi
         done
         
@@ -446,7 +447,7 @@ jobs:
     - name: API connectivity test
       run: |
         # 메인 사이트에서 API 서버 연결 테스트
-        response=$(curl -s "https://neture.co.kr:8443/api/health" || echo "failed")
+        response=$(curl -s "https://api.neture.co.kr:8443/api/health" || echo "failed")
         
         if echo "$response" | grep -q "healthy"; then
           echo "✅ API 서버 연결 확인 성공"
@@ -470,7 +471,7 @@ jobs:
       run: |
         lhci autorun \
           --config=.lighthouserc.json \
-          --collect.url=https://neture.co.kr \
+          --collect.url=https://neture.co.kr:8443 \
           --collect.url=https://neture.co.kr:8443/about \
           --collect.url=https://neture.co.kr:8443/products || true
           
