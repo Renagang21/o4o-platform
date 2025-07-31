@@ -12,6 +12,11 @@ export default function PrivateRoute({ children, allowedUserTypes }: PrivateRout
   const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
 
+  // 개발 모드에서 VITE_USE_MOCK이 true인 경우 인증 체크 우회
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
+    return <>{children}</>;
+  }
+
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트
   if (!isAuthenticated || !user) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />;

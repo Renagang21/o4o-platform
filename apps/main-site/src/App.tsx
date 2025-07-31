@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
+import { DevAuthProvider } from './lib/DevAuthProvider';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -55,8 +56,9 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <Router>
-        <Routes>
+      <DevAuthProvider>
+        <Router>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomeWithSettings />} />
           <Route path="/login" element={<Login />} />
@@ -137,8 +139,9 @@ const App: React.FC = () => {
           
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </DevAuthProvider>
     </ErrorBoundary>
   );
 };

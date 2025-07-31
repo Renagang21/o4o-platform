@@ -392,6 +392,35 @@ sudo chmod -R 755 /var/www/
   - 도메인 설정 확인: `/etc/nginx/sites-available/*`
   - SSL 인증서 확인: `sudo certbot certificates`
 
+## 🔐 Authentication Bypass for Testing (Temporary)
+
+### 개발/테스트 모드 활성화
+로그인 없이 테스트를 진행하기 위한 임시 설정:
+
+#### Admin Dashboard (admin.neture.co.kr)
+```bash
+# apps/admin-dashboard/.env
+VITE_USE_MOCK=true  # 이 설정으로 자동 로그인 활성화
+```
+- Mock 사용자: admin@o4o.com (관리자 권한)
+- 모든 관리자 기능에 접근 가능
+
+#### Main Site (neture.co.kr)  
+```bash
+# apps/main-site/.env
+VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
+```
+- Mock 사용자: admin@neture.co.kr (관리자 권한)
+- PrivateRoute 자동 우회
+
+### 로그인 기능 별도 테스트
+- `/login` 경로로 직접 접근하여 실제 로그인 테스트 가능
+- `VITE_USE_MOCK=false`로 변경 시 정상 인증 프로세스 복원
+
+### 주의사항
+- **프로덕션 배포 전 반드시 `VITE_USE_MOCK` 제거 또는 false 설정**
+- 이는 초기 테스트를 위한 임시 조치임
+
 ## 📝 Recent Updates (2025-01)
 - Fixed OAuth conditional initialization
 - Changed all `npm ci` to `npm install` in CI/CD
@@ -412,6 +441,7 @@ sudo chmod -R 755 /var/www/
 - Fixed TypeScript strict type errors (Function type, return types)
 - Fixed unused imports and variables in monitoring components
 - Added disaster recovery runbook and procedures
+- Added authentication bypass for testing (VITE_USE_MOCK=true)
 
 ## 🚨 Current Error Status & Resolution
 
