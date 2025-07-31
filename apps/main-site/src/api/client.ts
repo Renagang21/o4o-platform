@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // API 클라이언트 설정
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr:8443/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -30,10 +30,17 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // 토큰 만료 또는 인증 실패
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Public API 호출인 경우 로그인 페이지로 리다이렉트하지 않음
+      const isPublicApi = error.config?.url?.includes('/public/') || 
+                          error.config?.url?.includes('/settings/') ||
+                          error.config?.url?.includes('/pages/');
+      
+      if (!isPublicApi) {
+        // 토큰 만료 또는 인증 실패
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
