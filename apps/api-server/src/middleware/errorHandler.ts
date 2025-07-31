@@ -108,6 +108,17 @@ export const errorHandler = (
     stack: err.stack
   });
 
+  // Set CORS headers for error responses
+  const origin = req.headers.origin;
+  const corsOrigins = process.env.CORS_ORIGIN?.split(',') || [];
+  
+  if (origin && corsOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  }
+
   // Send error response
   res.status(statusCode).json(errorResponse);
 };
