@@ -22,7 +22,8 @@ const mockToken = 'mock-jwt-token-dev-' + Date.now();
 export const DevAuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   // 컴포넌트 마운트 전에 로컬 스토리지 설정
   // VITE_USE_MOCK이 명시적으로 true일 때만 mock 데이터 사용
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
+  // 임시: 프로덕션에서도 VITE_USE_MOCK 체크
+  if (import.meta.env.VITE_USE_MOCK === 'true') {
     // 로컬 스토리지에 인증 정보 저장
     const authData = {
       state: {

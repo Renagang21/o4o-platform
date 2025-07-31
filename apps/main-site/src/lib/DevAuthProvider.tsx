@@ -7,7 +7,8 @@ export const DevAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   useEffect(() => {
     // 개발 모드이고 VITE_USE_MOCK이 true일 때만 작동
-    if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
+    // 임시: 프로덕션에서도 VITE_USE_MOCK 체크
+    if (import.meta.env.VITE_USE_MOCK === 'true') {
       const mockUser = {
         id: 'admin_1',
         email: 'admin@neture.co.kr',

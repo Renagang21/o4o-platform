@@ -13,7 +13,8 @@ export default function PrivateRoute({ children, allowedUserTypes }: PrivateRout
   const location = useLocation();
 
   // 개발 모드에서 VITE_USE_MOCK이 true인 경우 인증 체크 우회
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
+  // 임시: 프로덕션에서도 VITE_USE_MOCK 체크
+  if (import.meta.env.VITE_USE_MOCK === 'true') {
     return <>{children}</>;
   }
 

@@ -156,7 +156,8 @@ function App() {
 
   // 프로덕션에서는 항상 AuthProvider 사용
   // DevAuthProvider는 VITE_USE_MOCK=true일 때만 사용
-  const useDevAuth = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
+  // 임시: 프로덕션에서도 VITE_USE_MOCK 체크
+  const useDevAuth = import.meta.env.VITE_USE_MOCK === 'true';
   const AuthProviderComponent = useDevAuth ? DevAuthProvider : AuthProvider;
   
   return (
