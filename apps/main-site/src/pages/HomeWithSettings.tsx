@@ -21,7 +21,7 @@ interface Page {
 
 // API client
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr:8443/api',
 });
 
 // Fetch homepage settings

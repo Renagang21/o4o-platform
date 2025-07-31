@@ -49,7 +49,7 @@ router.post('/login',
       }
 
       // 계정 상태 확인 (active 상태만 로그인 허용)
-      if (user.status !== 'active') {
+      if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
         return res.status(403).json({
           error: 'Account not active',
           code: 'ACCOUNT_NOT_ACTIVE',
@@ -83,6 +83,16 @@ router.post('/login',
       });
     } catch (error) {
       console.error('Login error:', error);
+      
+      // PostgreSQL 권한 에러 체크
+      if (error instanceof Error && error.message.includes('aclcheck_error')) {
+        console.error('Database permission error - check PostgreSQL user permissions');
+        return res.status(500).json({
+          error: 'Database access error',
+          code: 'DATABASE_PERMISSION_ERROR'
+        });
+      }
+      
       res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_SERVER_ERROR'

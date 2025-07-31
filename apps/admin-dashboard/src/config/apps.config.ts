@@ -117,7 +117,7 @@ export const apiEndpoints = {
 
 // Helper function to construct full API URL
 export function getApiUrl(endpoint: string): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr/api';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr:8443/api';
   return `${baseUrl}${endpoint}`;
 }
 

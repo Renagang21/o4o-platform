@@ -89,7 +89,7 @@ const PageLoader = () => (
 
 // SSO 클라이언트 인스턴스 생성
 const ssoClient = new AuthClient(
-  import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000'
+  import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://api.neture.co.kr:8443/api'
 );
 
 /**
