@@ -107,7 +107,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
           {/* User menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <button className="flex items-center gap-3 p-2 rounded-md text-wp-text-primary hover:bg-wp-bg-tertiary">
                 <div className="w-8 h-8 bg-admin-blue text-white rounded-full flex items-center justify-center">
                   <User className="w-4 h-4" />
@@ -122,7 +122,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               </button>
             </DropdownMenuTrigger>
             
-            <DropdownMenuContent className="w-64" align="end" forceMount>
+            <DropdownMenuContent className="w-64" align="end">
               {/* User Info Header */}
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">

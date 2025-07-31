@@ -105,7 +105,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
           {/* User menu with Shadcn DropdownMenu */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <button className="flex items-center gap-3 p-2 rounded-md text-wp-text-primary hover:bg-wp-bg-tertiary focus:outline-none">
                 <div className="w-8 h-8 bg-admin-blue text-white rounded-full flex items-center justify-center">
                   <User className="w-4 h-4" />

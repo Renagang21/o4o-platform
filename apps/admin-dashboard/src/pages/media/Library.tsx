@@ -207,7 +207,7 @@ const Library: FC = () => {
               </div>
               
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger>
                   <Button variant="outline" size="sm">
                     <Filter className="h-4 w-4 mr-2" />
                     {selectedType === 'all' ? '모든 유형' : selectedType}

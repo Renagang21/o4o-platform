@@ -318,7 +318,7 @@ const TemplateManager: FC = () => {
                 </div>
                 <div className="absolute top-2 right-2">
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger>
                       <Button variant={"ghost" as const} size={"sm" as const} className="bg-white/80 hover:bg-white">
                         <MoreVertical className="w-4 h-4" />
                       </Button>
@@ -440,7 +440,7 @@ const TemplateManager: FC = () => {
                       </td>
                       <td className="px-6 py-4">
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger>
                             <Button variant={"ghost" as const} size={"sm" as const}>
                               <MoreVertical className="w-4 h-4" />
                             </Button>

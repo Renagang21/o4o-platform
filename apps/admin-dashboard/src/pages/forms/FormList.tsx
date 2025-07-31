@@ -202,7 +202,7 @@ const FormList: FC = () => {
                     <p className="text-sm text-gray-500">/{form.name}</p>
                   </div>
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger>
                       <Button variant={"ghost" as const} size={"sm" as const}>
                         <MoreVertical className="w-4 h-4" />
                       </Button>

@@ -112,8 +112,8 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>확인 유형</Label>
                 <Select
                   value={currentConfirmation.type}
-                  onValueChange={(value: FormConfirmation['type']) =>
-                    updateConfirmation(currentConfirmation.id, { type: value })
+                  onValueChange={(value) =>
+                    updateConfirmation(currentConfirmation.id, { type: value as FormConfirmation['type'] })
                   }
                 >
                   <SelectTrigger>

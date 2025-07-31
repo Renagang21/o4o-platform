@@ -56,10 +56,8 @@ const AppGuard: FC<AppGuardProps> = ({
             >
               이전 페이지
             </Button>
-            <Button asChild>
-              <a href={fallbackPath}>
-                대시보드로 이동
-              </a>
+            <Button onClick={() => window.location.href = fallbackPath}>
+              대시보드로 이동
             </Button>
           </div>
 
@@ -68,13 +66,13 @@ const AppGuard: FC<AppGuardProps> = ({
             <Button
               variant={"ghost" as const}
               size={"sm" as const}
-              asChild
               className="text-modern-text-tertiary hover:text-modern-text-secondary"
+              onClick={() => window.location.href = '/apps'}
             >
-              <a href="/apps" className="flex items-center gap-1">
+              <span className="flex items-center gap-1">
                 <Settings className="w-4 h-4" />
                 앱 관리 설정
-              </a>
+              </span>
             </Button>
           </div>
         </CardContent>

@@ -99,7 +99,7 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
         </div>
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button variant={"ghost" as const} size={"sm" as const} onClick={(e: any) => e.stopPropagation()}>
               <MoreVertical className="w-4 h-4" />
             </Button>

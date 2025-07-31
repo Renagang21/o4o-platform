@@ -269,7 +269,7 @@ const GutenbergPage: FC = () => {
           </Button>
           
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button variant={"ghost" as const} size={"icon" as const}>
                 <MoreVertical className="h-4 w-4" />
               </Button>

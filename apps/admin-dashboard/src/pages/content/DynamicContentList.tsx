@@ -289,7 +289,7 @@ const DynamicContentList: FC = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger>
                         <Button variant={"ghost" as const} size={"sm" as const}>
                           <MoreVertical className="h-4 w-4" />
                         </Button>

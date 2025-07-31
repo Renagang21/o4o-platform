@@ -267,7 +267,7 @@ const MediaLibrary: FC = () => {
                 <X className="w-4 h-4" />
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger>
                   <Button variant={"outline" as const} size={"sm" as const}>
                     일괄 작업
                   </Button>
@@ -397,7 +397,7 @@ const MediaLibrary: FC = () => {
                       <Eye className="w-4 h-4" />
                     </Button>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e: any) => e.stopPropagation()}>
+                      <DropdownMenuTrigger onClick={(e: any) => e.stopPropagation()}>
                         <Button size={"sm" as const} variant="secondary">
                           <MoreVertical className="w-4 h-4" />
                         </Button>
@@ -502,7 +502,7 @@ const MediaLibrary: FC = () => {
                   </td>
                   <td className="px-4 py-3">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger>
                         <Button variant={"ghost" as const} size={"sm" as const}>
                           <MoreVertical className="w-4 h-4" />
                         </Button>

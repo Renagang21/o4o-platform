@@ -384,7 +384,7 @@ export default function UserList() {
                       </td>
                       <td className="p-4">
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger>
                             <Button variant={"ghost" as const} size={"sm" as const}>
                               Actions
                             </Button>

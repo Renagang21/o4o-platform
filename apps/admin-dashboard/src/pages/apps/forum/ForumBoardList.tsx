@@ -259,7 +259,7 @@ const ForumBoardList: FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant={"ghost" as const} size={"sm" as const}>
                             <MoreVertical className="w-4 h-4" />
                           </Button>

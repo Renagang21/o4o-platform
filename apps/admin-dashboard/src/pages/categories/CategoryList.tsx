@@ -176,7 +176,7 @@ const CategoryList: FC = () => {
                   {category.postCount || 0}개 게시글
                 </Badge>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger>
                     <Button variant={"ghost" as const} size={"sm" as const}>
                       <MoreVertical className="w-4 h-4" />
                     </Button>

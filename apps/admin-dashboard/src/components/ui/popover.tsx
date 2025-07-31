@@ -1,30 +1,139 @@
-import { ElementRef, ComponentPropsWithoutRef } from "react"
-import { forwardRef } from "react"
-import * as PopoverPrimitive from "@radix-ui/react-popover"
+import { forwardRef, HTMLAttributes, ButtonHTMLAttributes, createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
-import { cn } from "@/lib/utils"
+interface PopoverContextValue {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
-const Popover = PopoverPrimitive.Root
+const PopoverContext = createContext<PopoverContextValue | null>(null);
 
-const PopoverTrigger = PopoverPrimitive.Trigger
+export interface PopoverProps {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children: ReactNode;
+}
 
-const PopoverContent = forwardRef<
-  ElementRef<typeof PopoverPrimitive.Content>,
-  ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
-  <PopoverPrimitive.Portal>
-    <PopoverPrimitive.Content
-      ref={ref}
-      align={align}
-      sideOffset={sideOffset}
-      className={cn(
-        "z-50 w-72 rounded-md border bg-white p-4 text-gray-900 shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        className
-      )}
-      {...props}
-    />
-  </PopoverPrimitive.Portal>
-))
-PopoverContent.displayName = PopoverPrimitive.Content.displayName
+const Popover = ({ open: controlledOpen, defaultOpen = false, onOpenChange, children }: PopoverProps) => {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const open = controlledOpen ?? uncontrolledOpen;
+  
+  const handleOpenChange = (newOpen: boolean) => {
+    if (controlledOpen === undefined) {
+      setUncontrolledOpen(newOpen);
+    }
+    onOpenChange?.(newOpen);
+  };
 
-export { Popover, PopoverTrigger, PopoverContent }
+  return (
+    <PopoverContext.Provider value={{ open, onOpenChange: handleOpenChange }}>
+      <div className="relative inline-block">
+        {children}
+      </div>
+    </PopoverContext.Provider>
+  );
+};
+
+const PopoverTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(
+  ({ onClick, ...props }, ref) => {
+    const context = useContext(PopoverContext);
+    if (!context) throw new Error('PopoverTrigger must be used within Popover');
+    
+    return (
+      <button
+        ref={ref}
+        onClick={(e) => {
+          onClick?.(e);
+          context.onOpenChange(!context.open);
+        }}
+        aria-expanded={context.open}
+        aria-haspopup="dialog"
+        {...props}
+      />
+    );
+  }
+);
+
+interface PopoverContentProps extends HTMLAttributes<HTMLDivElement> {
+  align?: 'start' | 'center' | 'end';
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  sideOffset?: number;
+}
+
+const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, align = 'center', side = 'bottom', sideOffset = 4, children, ...props }) => {
+    const context = useContext(PopoverContext);
+    if (!context) throw new Error('PopoverContent must be used within Popover');
+    
+    const contentRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLElement | null>(null);
+    
+    useEffect(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (contentRef.current && !contentRef.current.contains(e.target as Node) &&
+            triggerRef.current && !triggerRef.current.contains(e.target as Node)) {
+          context.onOpenChange(false);
+        }
+      };
+      
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          context.onOpenChange(false);
+        }
+      };
+      
+      if (context.open) {
+        // Find the trigger element
+        const trigger = contentRef.current?.parentElement?.querySelector('[aria-expanded]') as HTMLElement;
+        triggerRef.current = trigger;
+        
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+          document.removeEventListener('keydown', handleEscape);
+        };
+      }
+    }, [context]);
+    
+    if (!context.open) return null;
+    
+    // Calculate position classes based on side and align
+    const positionClasses = {
+      top: 'bottom-full mb-2',
+      bottom: 'top-full mt-2',
+      left: 'right-full mr-2',
+      right: 'left-full ml-2',
+    };
+    
+    const alignClasses = {
+      start: side === 'top' || side === 'bottom' ? 'left-0' : 'top-0',
+      center: side === 'top' || side === 'bottom' ? 'left-1/2 -translate-x-1/2' : 'top-1/2 -translate-y-1/2',
+      end: side === 'top' || side === 'bottom' ? 'right-0' : 'bottom-0',
+    };
+    
+    return (
+      <div
+        ref={contentRef}
+        className={cn(
+          "absolute z-50 w-72 rounded-md border bg-white p-4 text-gray-900 shadow-md outline-none",
+          "animate-in fade-in-0 zoom-in-95",
+          positionClasses[side],
+          alignClasses[align],
+          className
+        )}
+        style={{ marginTop: side === 'bottom' ? `${sideOffset}px` : undefined }}
+        role="dialog"
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+PopoverTrigger.displayName = 'PopoverTrigger';
+PopoverContent.displayName = 'PopoverContent';
+
+export { Popover, PopoverTrigger, PopoverContent };

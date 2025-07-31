@@ -293,7 +293,7 @@ const WidgetManager: FC = () => {
                                   )}
                                 </div>
                                 <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
+                                  <DropdownMenuTrigger>
                                     <Button size={"sm" as const} variant={"ghost" as const} className="h-6 w-6 p-0">
                                       <MoreVertical className="w-3 h-3" />
                                     </Button>
