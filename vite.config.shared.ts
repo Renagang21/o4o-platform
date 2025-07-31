@@ -18,8 +18,7 @@ export const sharedViteConfig: UserConfig = {
   ],
   resolve: {
     alias: {
-      // React 19 호환성을 위한 @radix-ui 패치
-      '@radix-ui/react-use-layout-effect': path.resolve(__dirname, './patches/radix-ui-layout-effect-fix.js')
+      // React 19 호환성을 위한 alias 제거 (번들 분리로 해결)
     }
   },
   define: {
@@ -89,12 +88,10 @@ export const sharedViteConfig: UserConfig = {
       'react/jsx-runtime',
       'react-router-dom',
       '@tanstack/react-query',
-      'react-hot-toast',
-      '@radix-ui/react-use-layout-effect'
+      'react-hot-toast'
     ],
     exclude: ['@vite/client', '@vite/env'],
     esbuildOptions: {
-      target: 'esnext',
       define: {
         global: 'globalThis',
       },
