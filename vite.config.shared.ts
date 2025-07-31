@@ -18,8 +18,7 @@ export const sharedViteConfig: UserConfig = {
   ],
   resolve: {
     alias: {
-      // React 19 호환성을 위한 alias - patches 파일로 리다이렉트
-      '@radix-ui/react-use-layout-effect': path.resolve(__dirname, './patches/radix-ui-react-19-compat.js')
+      // React 19 호환성을 위한 alias 제거 (번들 분리로 해결)
     }
   },
   define: {
@@ -29,7 +28,7 @@ export const sharedViteConfig: UserConfig = {
   build: {
     sourcemap: process.env.NODE_ENV === 'development',
     minify: 'esbuild',
-    target: 'es2020',
+    target: 'esnext', // React 19 호환성을 위해 최신 타겟 사용
     commonjsOptions: {
       transformMixedEsModules: true,
       include: [/node_modules/],
@@ -49,8 +48,12 @@ export const sharedViteConfig: UserConfig = {
             if (id.includes('react') && !id.includes('react-')) {
               return 'vendor-react';
             }
-            // UI 라이브러리
-            if (id.includes('@radix-ui') || id.includes('lucide-react') || 
+            // Radix UI는 별도 청크로 분리 (React 19 호환성 문제)
+            if (id.includes('@radix-ui')) {
+              return 'vendor-radix';
+            }
+            // 기타 UI 라이브러리
+            if (id.includes('lucide-react') || 
                 id.includes('clsx') || id.includes('tailwind-merge')) {
               return 'vendor-ui';
             }
@@ -85,8 +88,7 @@ export const sharedViteConfig: UserConfig = {
       'react/jsx-runtime',
       'react-router-dom',
       '@tanstack/react-query',
-      'react-hot-toast',
-      '@radix-ui/react-use-layout-effect'
+      'react-hot-toast'
     ],
     exclude: ['@vite/client', '@vite/env'],
     esbuildOptions: {
