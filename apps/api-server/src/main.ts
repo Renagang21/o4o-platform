@@ -1,17 +1,38 @@
 import 'reflect-metadata';
 import express, { Application, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
 
 // 환경변수 로드 (우선순위: .env.production > .env)
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
-const envPath = path.resolve(__dirname, '..', envFile);
-dotenv.config({ path: envPath });
 
-// 환경변수 파일 경로 확인
-console.log(`🔍 Loading env from: ${envPath}`);
+// Try multiple paths for .env file
+const possiblePaths = [
+  path.resolve(__dirname, '..', envFile),      // apps/api-server/.env
+  path.resolve(__dirname, '..', '.env'),       // apps/api-server/.env (fallback)
+  path.resolve(process.cwd(), envFile),        // Current working directory
+  path.resolve(process.cwd(), '.env'),         // Current working directory (fallback)
+];
+
+let envLoaded = false;
+for (const envPath of possiblePaths) {
+  try {
+    const result = dotenv.config({ path: envPath });
+    if (!result.error) {
+      console.log(`✅ Successfully loaded env from: ${envPath}`);
+      envLoaded = true;
+      break;
+    }
+  } catch (error) {
+    // Continue to next path
+  }
+}
+
+if (!envLoaded) {
+  console.warn('⚠️ No .env file found, using system environment variables');
+}
 
 // 환경변수 검증
 console.log('🔧 Environment Configuration:');
@@ -164,8 +185,11 @@ app.use(helmet({
 }));
 
 // CORS configuration for multiple origins
-const corsOptions = {
+const corsOptions: CorsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Get allowed origins from environment variable
+    const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [];
+    
     const allowedOrigins = [
       process.env.FRONTEND_URL || "http://localhost:3011",
       "http://localhost:3000", // main-site
@@ -187,7 +211,9 @@ const corsOptions = {
       // Port 8443 URLs
       "https://neture.co.kr:8443",
       "https://www.neture.co.kr:8443",
-      "https://admin.neture.co.kr:8443"
+      "https://admin.neture.co.kr:8443",
+      // Add environment-defined origins
+      ...envOrigins
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)

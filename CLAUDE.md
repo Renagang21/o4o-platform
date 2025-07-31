@@ -259,6 +259,23 @@ GOOGLE_CLIENT_SECRET=optional
   - `git commit`: Firebase Studio 환경에 커밋
   - `git push origin main`: GitHub 저장소로 푸시
 
+## ⚠️ Known Issues & Solutions
+
+### npm workspaces "2" 버그
+**문제**: npm workspaces 명령 실행 시 명령어 끝에 "2"가 추가되는 현상
+```bash
+# 잘못된 실행 예시
+npm run type-check --workspaces --if-present
+# 결과: tsc --noEmit 2
+```
+
+**원인**: npm 10.8.2의 stderr 리다이렉션 처리 버그
+
+**해결책**:
+1. workspace 명령어 끝에 `--` 사용 금지
+2. 대체 스크립트 사용: `./scripts/type-check-all.sh`
+3. 개별 workspace에서 직접 실행
+
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
 2. Never use 'any' without annotation
@@ -271,6 +288,46 @@ GOOGLE_CLIENT_SECRET=optional
 9. Never use generic `Function` type - specify exact function signature
 10. Never declare variables/imports without using them
 11. Never create migration files without milliseconds in timestamp
+
+## 🔄 서버 동기화 가이드
+
+### 중요: 서버 작업 보호 전략
+
+#### 1. 환경변수 백업 (필수!)
+```bash
+# 서버에서 git pull 전에 항상 실행
+cp .env .env.backup.$(date +%Y%m%d_%H%M%S)
+cp apps/api-server/.env apps/api-server/.env.backup.$(date +%Y%m%d_%H%M%S)
+```
+
+#### 2. Git Pull 후 복원
+```bash
+# Pull 수행
+git pull origin main
+
+# 환경변수 복원
+cp .env.backup.* .env
+cp apps/api-server/.env.backup.* apps/api-server/.env
+```
+
+#### 3. 환경변수 샘플
+```bash
+# apps/api-server/.env (API 서버용)
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=o4o_user
+DB_PASSWORD=3lz15772779
+DB_NAME=o4o_platform
+NODE_ENV=production
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=7d
+CORS_ORIGIN=https://neture.co.kr:8443,https://admin.neture.co.kr:8443
+```
+
+#### 4. 디렉토리 구조 정리
+- ❌ `/services/` - 삭제됨 (legacy)
+- ✅ `/apps/api-server/` - 현재 API 서버 위치
+- ✅ `/apps/` - 모든 애플리케이션 위치
 
 ## 🔧 Post-CI/CD Server Work
 
