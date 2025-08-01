@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Upload, Search, Grid, List, Image as ImageIcon, FileText, Film, Music, Archive } from 'lucide-react';
+import { useState } from 'react';
+import { Grid, List, Image as ImageIcon, FileText, Film, Music, Archive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -44,7 +44,7 @@ export default function MediaLibraryEnhanced() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
-  const [page, setPage] = useState(1);
+  const [page] = useState(1); // Reserved for pagination
 
   // Default column configuration for list view
   const defaultColumns: ColumnOption[] = [

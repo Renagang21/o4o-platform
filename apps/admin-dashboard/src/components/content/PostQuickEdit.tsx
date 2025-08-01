@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from 'react';
-import { X, Check } from 'lucide-react';
+// import { X, Check } from 'lucide-react'; // Icons not used directly
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Post, PostStatus } from '@o4o/types';
+import type { Post } from '@o4o/types';
 
 interface PostQuickEditProps {
   post: Post;
@@ -33,8 +33,8 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
   onSave,
   onCancel,
   isLoading,
-  categories = [],
-  tags = []
+  categories = []
+  // tags = [] // Not used
 }) => {
   const titleRef = useRef<HTMLInputElement>(null);
 
@@ -208,7 +208,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                         if (e.target.checked) {
                           onUpdate('categoryIds', [...ids, category.id]);
                         } else {
-                          onUpdate('categoryIds', ids.filter(id => id !== category.id));
+                          onUpdate('categoryIds', ids.filter((id: string) => id !== category.id));
                         }
                       }}
                     />

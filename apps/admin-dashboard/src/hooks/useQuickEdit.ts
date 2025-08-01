@@ -45,7 +45,7 @@ export function useQuickEdit({ onSave, onCancel }: UseQuickEditProps) {
 
   // Update form field
   const updateField = useCallback((field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   }, []);
 
   // Check if a specific item is being edited

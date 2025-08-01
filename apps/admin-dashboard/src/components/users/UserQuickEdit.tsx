@@ -22,7 +22,7 @@ interface UserQuickEditProps {
  * WordPress-style Quick Edit row for users
  */
 export const UserQuickEdit: FC<UserQuickEditProps> = ({
-  user,
+  // user, // Reserved for future use
   formData,
   onUpdate,
   onSave,

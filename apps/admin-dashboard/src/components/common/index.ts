@@ -5,8 +5,8 @@ export type { RowAction } from './RowActions';
 export { WordPressTable } from './WordPressTable';
 export type { WordPressTableColumn, WordPressTableRow } from './WordPressTable';
 
-export { AdminBreadcrumb } from './AdminBreadcrumb';
-export { AdminFooter } from './AdminFooter';
+export { default as AdminBreadcrumb } from './AdminBreadcrumb';
+// export { AdminFooter } from './AdminFooter'; // File doesn't exist yet
 
 // Screen Options
 export { default as ScreenOptions } from './ScreenOptions';

@@ -1,6 +1,6 @@
 import { useState, FC } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom'; // Not used
+// import { Plus } from 'lucide-react'; // Not used
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
-import { RowAction } from '@/components/common/RowActions';
+// import { RowAction } from '@/components/common/RowActions'; // Type is exported from WordPressTable
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { formatDate } from '@/lib/utils';
@@ -25,7 +25,7 @@ import { useAdminNotices } from '@/hooks/useAdminNotices';
  * WordPress-style Post List with Row Actions
  */
 const PostListWordPress: FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Not used
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
   const [searchQuery, setSearchQuery] = useState('');

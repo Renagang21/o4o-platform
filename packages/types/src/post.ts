@@ -15,9 +15,11 @@ export interface PostCategory {
   updatedAt: Date;
 }
 
-export type PostStatus = 'draft' | 'published' | 'scheduled' | 'trash';
+export type PostStatus = 'draft' | 'published' | 'scheduled' | 'trash' | 'private';
 export type PostType = 'post' | 'page';
 export type PostVisibility = 'public' | 'private' | 'password';
+export type CommentStatus = 'open' | 'closed';
+export type PingStatus = 'open' | 'closed';
 
 export interface PostMeta {
   seoTitle?: string;
@@ -63,6 +65,9 @@ export interface Post {
   revisions?: PostRevision[];
   commentCount?: number;
   viewCount?: number;
+  commentStatus?: CommentStatus;
+  pingStatus?: PingStatus;
+  isSticky?: boolean;
 }
 
 export interface PostRevision {

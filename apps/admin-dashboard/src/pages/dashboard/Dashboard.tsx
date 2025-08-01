@@ -49,8 +49,8 @@ const Dashboard = memo(() => {
 
   // Use screen options hook
   const {
-    options,
-    updateColumnVisibility
+    options
+    // updateColumnVisibility // Not used
   } = useScreenOptions('dashboard', {
     customOptions: defaultWidgets
   });
@@ -59,10 +59,10 @@ const Dashboard = memo(() => {
   
   // Convert to checkbox format for backward compatibility
   const screenOptions = options.customOptions || defaultWidgets;
-  const isWidgetVisible = (widgetId: string) => {
-    const widget = screenOptions.find(w => w.id === widgetId);
-    return widget?.checked ?? true;
-  };
+  // const isWidgetVisible = (widgetId: string) => {
+  //   const widget = screenOptions.find((w: any) => w.id === widgetId);
+  //   return widget?.checked ?? true;
+  // }; // Not used - widgets always visible in current implementation
 
   return (
     <div className="space-y-8">
@@ -70,12 +70,12 @@ const Dashboard = memo(() => {
       <div className="relative">
         <ScreenOptionsReact
           title="Screen Options"
-          customOptions={screenOptions}
-          onCustomOptionChange={(optionId, checked) => {
+          customOptions={Array.isArray(screenOptions) ? screenOptions : defaultWidgets}
+          onCustomOptionChange={() => {
             // Update custom options in store
-            const updatedOptions = screenOptions.map(opt =>
-              opt.id === optionId ? { ...opt, checked } : opt
-            );
+            // const updatedOptions = screenOptions.map((opt: any) =>
+            //   opt.id === optionId ? { ...opt, checked } : opt
+            // );
             // TODO: Update store with new options
           }}
           layoutColumns={columnsPerPage}
@@ -108,22 +108,22 @@ const Dashboard = memo(() => {
               total: 156,
               pending: 3
             },
-            users: stats?.users?.total || 1234,
-            products: stats?.products?.active || 156,
+            users: typeof stats?.users === 'number' ? stats.users : stats?.users?.total || 1234,
+            products: typeof stats?.products === 'number' ? stats.products : stats?.products?.active || 156,
             views: stats?.content?.todayViews || 1567
           }}
         />
       </section>
 
       {/* E-commerce 통계 위젯 */}
-      {screenOptions.find(opt => opt.id === 'ecommerce')?.checked && (
+      {screenOptions.find((opt: any) => opt.id === 'ecommerce')?.checked && (
         <section>
           <EcommerceStats />
         </section>
       )}
 
       {/* 통합 개요 위젯 */}
-      {screenOptions.find(opt => opt.id === 'stats')?.checked && (
+      {screenOptions.find((opt: any) => opt.id === 'stats')?.checked && (
         <section>
           <StatsOverview />
         </section>

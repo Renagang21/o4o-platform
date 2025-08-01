@@ -43,7 +43,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
   loading = false,
   emptyMessage = 'No items found'
 }) => {
-  const { hoveredRow, handleMouseEnter, handleMouseLeave, isRowHovered } = useRowActions();
+  const { handleMouseEnter, handleMouseLeave, isRowHovered } = useRowActions();
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 

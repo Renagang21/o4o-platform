@@ -1,9 +1,9 @@
 import { FC, Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge'; // Not used in quick edit view
 import { 
   Select,
   SelectContent,
@@ -19,7 +19,7 @@ import toast from 'react-hot-toast';
 import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuickEdit } from '@/hooks/useQuickEdit';
 import { BulkActionBar } from '@/components/common/BulkActionBar';
-import { SelectableTable } from '@/components/common/SelectableTable';
+// import { SelectableTable } from '@/components/common/SelectableTable'; // Not used
 import { RowActions } from '@/components/common/RowActions';
 import { PostQuickEdit } from '@/components/content/PostQuickEdit';
 import { ScreenMeta } from '@/components/common/ScreenMeta';
@@ -220,10 +220,10 @@ const PostListQuickEdit: FC = () => {
   ];
 
   const {
-    selectedIds,
+    // selectedIds, // Not used directly
     selectedCount,
     isAllSelected,
-    isSomeSelected,
+    // isSomeSelected, // Not used
     isProcessing,
     toggleAll,
     toggleItem,
@@ -328,7 +328,8 @@ const PostListQuickEdit: FC = () => {
     return <RowActions actions={actions} visible={!quickEdit.isEditing(post.id)} />;
   };
 
-  // Status badge
+  // Status badge - Not used in quick edit view
+  /*
   const getStatusBadge = (status: PostStatus) => {
     switch (status) {
       case 'published':
@@ -343,6 +344,7 @@ const PostListQuickEdit: FC = () => {
         return <Badge>{status}</Badge>;
     }
   };
+  */
 
   // Custom table render to handle quick edit rows
   const renderTableBody = () => {
@@ -356,7 +358,7 @@ const PostListQuickEdit: FC = () => {
       );
     }
 
-    return posts.map((post, index) => {
+    return posts.map((post: Post, index: number) => {
       const itemId = String(post.id);
       const selected = isSelected(itemId);
       const isBeingEdited = quickEdit.isEditing(itemId);

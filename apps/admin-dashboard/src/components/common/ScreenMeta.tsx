@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { ScreenOptions } from './ScreenOptions';
+import ScreenOptions from './ScreenOptions';
 import { HelpTab } from './HelpTab';
 
 interface ScreenMetaProps {
@@ -19,12 +19,33 @@ interface ScreenMetaProps {
  * WordPress-style Screen Meta component that combines Screen Options and Help Tab
  */
 export const ScreenMeta: FC<ScreenMetaProps> = (props) => {
+  // Convert props to ScreenOptions format
+  const screenOptions = props.columns?.map(col => ({
+    id: col.id,
+    label: col.label,
+    checked: col.checked,
+    type: 'checkbox' as const
+  })) || [];
+
+  const handleOptionsChange = (newOptions: any[]) => {
+    newOptions.forEach(opt => {
+      if (props.onColumnChange) {
+        props.onColumnChange(opt.id, opt.checked);
+      }
+    });
+  };
+
   return (
     <div id="screen-meta" className="metabox-prefs">
       <div id="screen-meta-links">
         <div className="screen-options-and-help-container">
           <HelpTab />
-          <ScreenOptions {...props} />
+          <ScreenOptions 
+            options={screenOptions}
+            onOptionsChange={handleOptionsChange}
+            itemsPerPage={props.itemsPerPage}
+            onItemsPerPageChange={props.onItemsPerPageChange}
+          />
         </div>
       </div>
     </div>

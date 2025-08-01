@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Key, Mail, Shield } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { formatDate } from '@/lib/utils';
+// import { formatDate } from '@/lib/utils'; // Not used
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -152,7 +152,7 @@ const UsersListBulk: FC = () => {
   ];
 
   const {
-    selectedIds,
+    // selectedIds, // Not used directly
     selectedCount,
     isAllSelected,
     isSomeSelected,
@@ -252,11 +252,11 @@ const UsersListBulk: FC = () => {
   // Role stats
   const roleStats = {
     all: users.length,
-    administrator: users.filter(u => u.role === 'administrator').length,
-    editor: users.filter(u => u.role === 'editor').length,
-    author: users.filter(u => u.role === 'author').length,
-    contributor: users.filter(u => u.role === 'contributor').length,
-    subscriber: users.filter(u => u.role === 'subscriber').length
+    administrator: users.filter((u: any) => u.role === 'administrator').length,
+    editor: users.filter((u: any) => u.role === 'editor').length,
+    author: users.filter((u: any) => u.role === 'author').length,
+    contributor: users.filter((u: any) => u.role === 'contributor').length,
+    subscriber: users.filter((u: any) => u.role === 'subscriber').length
   };
 
   return (

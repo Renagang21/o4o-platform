@@ -36,7 +36,7 @@ const ScreenOptionsEnhanced: FC<ScreenOptionsEnhancedProps> = ({
   onColumnToggle,
   itemsPerPage = 20,
   onItemsPerPageChange,
-  itemsPerPageOptions = [10, 20, 50, 100],
+  // itemsPerPageOptions = [10, 20, 50, 100], // Not used in current implementation
   customOptions = [],
   onCustomOptionChange,
   layoutColumns,

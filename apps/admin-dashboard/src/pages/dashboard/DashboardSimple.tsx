@@ -122,7 +122,7 @@ const DashboardSimple: FC = () => {
             <div className="stat-content">
               <div className="stat-number">{stats?.comments?.total || 0}</div>
               <div className="stat-label">Comments</div>
-              {stats?.comments?.pending > 0 && (
+              {stats?.comments && stats.comments.pending > 0 && (
                 <div className="stat-badge">{stats.comments.pending} pending</div>
               )}
             </div>
@@ -135,7 +135,7 @@ const DashboardSimple: FC = () => {
               <Users className="w-8 h-8" />
             </div>
             <div className="stat-content">
-              <div className="stat-number">{stats?.users || 0}</div>
+              <div className="stat-number">{typeof stats?.users === 'number' ? stats.users : stats?.users?.total || 0}</div>
               <div className="stat-label">Users</div>
             </div>
           </Link>
@@ -148,7 +148,7 @@ const DashboardSimple: FC = () => {
                 <Package className="w-8 h-8" />
               </div>
               <div className="stat-content">
-                <div className="stat-number">{stats.products}</div>
+                <div className="stat-number">{typeof stats.products === 'number' ? stats.products : stats.products?.active || 0}</div>
                 <div className="stat-label">Products</div>
               </div>
             </Link>
@@ -162,7 +162,7 @@ const DashboardSimple: FC = () => {
                 <Eye className="w-8 h-8" />
               </div>
               <div className="stat-content">
-                <div className="stat-number">{stats.views.toLocaleString()}</div>
+                <div className="stat-number">{stats.views?.toLocaleString() || 0}</div>
                 <div className="stat-label">Views Today</div>
                 <TrendingUp className="w-4 h-4 text-green-600 inline ml-1" />
               </div>

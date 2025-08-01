@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { MessageSquare, Search, Check, X, Trash2, Reply } from 'lucide-react';
+import { useState } from 'react';
+import { MessageSquare, Check, X, Trash2, Reply } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -39,8 +39,8 @@ export default function CommentsListEnhanced() {
   const [selectedComments, setSelectedComments] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [postFilter, setPostFilter] = useState<string>('');
-  const [page, setPage] = useState(1);
+  const [postFilter] = useState<string>(''); // Reserved for future use
+  const [page] = useState(1); // Reserved for pagination
 
   // Default column configuration
   const defaultColumns: ColumnOption[] = [

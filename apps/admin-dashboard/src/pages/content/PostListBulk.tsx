@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge'; // Not used in bulk view
 import { 
   Select,
   SelectContent,
@@ -127,7 +127,7 @@ const PostListBulk: FC = () => {
   ];
 
   const {
-    selectedIds,
+    // selectedIds, // Used by BulkActionBar component
     selectedCount,
     isAllSelected,
     isSomeSelected,
@@ -235,7 +235,8 @@ const PostListBulk: FC = () => {
     return <RowActions actions={actions} />;
   };
 
-  // Status badge
+  // Status badge - Not used in bulk view
+  /*
   const getStatusBadge = (status: PostStatus) => {
     switch (status) {
       case 'published':
@@ -250,6 +251,7 @@ const PostListBulk: FC = () => {
         return <Badge>{status}</Badge>;
     }
   };
+  */
 
   return (
     <div className="wrap">

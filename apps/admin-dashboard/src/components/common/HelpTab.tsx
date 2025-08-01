@@ -22,7 +22,7 @@ export const HelpTab: FC = () => {
     return null;
   }
 
-  const currentTab = tabs.find(tab => tab.id === activeTab);
+  // const currentTab = tabs.find(tab => tab.id === activeTab); // Reserved for future use
 
   return (
     <>

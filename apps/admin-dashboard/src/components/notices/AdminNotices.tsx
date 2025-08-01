@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { AdminNotice, AdminNoticeProps } from './AdminNotice';
+import { AdminNotice } from './AdminNotice';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 /**

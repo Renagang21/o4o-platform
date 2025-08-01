@@ -9,7 +9,17 @@ import { dashboardApi } from '../../../api/dashboard';
 
 // Types
 interface DashboardStats {
-  users: {
+  // Basic WordPress stats
+  posts?: number;
+  pages?: number;
+  comments?: {
+    total: number;
+    pending: number;
+  };
+  views?: number;
+  
+  // User stats
+  users: number | {
     total: number;
     pending: number;
     today: number;
@@ -17,14 +27,16 @@ interface DashboardStats {
     change: number;
     trend: 'up' | 'down';
   };
-  sales: {
+  
+  // Ecommerce stats (optional)
+  sales?: {
     today: number;
     changePercent: number;
     monthlyTotal: number;
     monthlyTarget: number;
     trend: 'up' | 'down';
   };
-  products: {
+  products?: number | {
     active: number;
     lowStock: number;
     newThisWeek: number;
@@ -36,7 +48,7 @@ interface DashboardStats {
     change: number;
     trend: 'up' | 'down';
   };
-  content: {
+  content?: {
     publishedPages: number;
     draftContent: number;
     totalMedia: number;
@@ -44,7 +56,7 @@ interface DashboardStats {
     change: number;
     trend: 'up' | 'down';
   };
-  partners: {
+  partners?: {
     active: number;
     pending: number;
     totalCommission: number;
