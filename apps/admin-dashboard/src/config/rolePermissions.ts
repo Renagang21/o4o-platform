@@ -11,6 +11,11 @@ export interface MenuPermission {
 
 // Complete menu permission mapping
 export const menuPermissions: MenuPermission[] = [
+  // Home - All roles can access
+  {
+    menuId: 'home',
+    roles: ['admin', 'business', 'affiliate', 'customer', 'seller', 'supplier', 'manager', 'retailer'],
+  },
   // Dashboard - All roles can access
   {
     menuId: 'dashboard',
@@ -344,7 +349,11 @@ export function hasMenuAccess(menuId: string, userRole: UserRole, userPermission
 // Helper function to filter menu items based on user role and permissions
 export function filterMenuByRole(menuItems: any[], userRole: UserRole, userPermissions?: string[]): any[] {
   return menuItems
-    .filter(item => hasMenuAccess(item.id, userRole, userPermissions))
+    .filter(item => {
+      // Always include separators
+      if (item.separator) return true;
+      return hasMenuAccess(item.id, userRole, userPermissions);
+    })
     .map(item => {
       if (item.children) {
         const filteredChildren = filterMenuByRole(item.children, userRole, userPermissions);

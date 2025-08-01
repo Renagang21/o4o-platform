@@ -28,7 +28,18 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   
   // 역할 기반 메뉴 필터링
   const userRole = (user?.role || 'customer') as UserRole
-  const userPermissions: string[] = [] // User type doesn't have permissions field yet
+  // Admin role should have all permissions
+  const userPermissions: string[] = userRole === 'admin' ? [
+    'updates:read', 'content:read', 'content:write', 'categories:read',
+    'media:read', 'media:write', 'pages:read', 'pages:write',
+    'ecommerce:read', 'products:read', 'orders:read', 'customers:read',
+    'coupons:read', 'analytics:read', 'settings:write', 'vendors:read',
+    'vendors:write', 'affiliate:read', 'affiliate:write', 'forum:read',
+    'signage:read', 'crowdfunding:read', 'mail:read', 'mail:write',
+    'custom_fields:write', 'templates:read', 'templates:write',
+    'menus:write', 'users:read', 'users:create', 'users:update',
+    'tools:read', 'settings:read'
+  ] : [] // Other roles need proper permissions
   const menuItems = filterMenuByRole(dynamicMenuItems, userRole, userPermissions)
   
   // 디버깅용 로그

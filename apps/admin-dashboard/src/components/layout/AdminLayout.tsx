@@ -11,7 +11,7 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true) // Default to open on desktop
   const { logout } = useAuth()
 
   const handleLogout = async () => {

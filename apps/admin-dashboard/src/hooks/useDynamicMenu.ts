@@ -38,7 +38,10 @@ export const useDynamicMenu = () => {
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
-    gcTime: 10 * 60 * 1000 // 10분간 캐시 유지
+    gcTime: 10 * 60 * 1000, // 10분간 캐시 유지
+    enabled: true, // Always enable query
+    refetchOnMount: false, // Don't refetch on mount
+    refetchOnWindowFocus: false // Don't refetch on window focus
   });
   
   const activeApps: ActiveApp[] = activeAppsData?.data || [];
