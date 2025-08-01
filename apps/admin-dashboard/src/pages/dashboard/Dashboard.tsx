@@ -21,7 +21,7 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 const Dashboard = memo(() => {
   const { stats } = useDashboardData();
-  const { } = useDashboardStats();
+  useDashboardStats();
   
   // Screen Options state
   const [screenOptions, setScreenOptions] = useState<ScreenOption[]>([
