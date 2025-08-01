@@ -45,12 +45,8 @@ export const sharedViteConfig: UserConfig = {
           
           if (id.includes('node_modules')) {
             // React 관련
-            if (id.includes('react') && !id.includes('react-') && !id.includes('recharts')) {
+            if (id.includes('react') && !id.includes('react-')) {
               return 'vendor-react';
-            }
-            // recharts는 React 호환성 문제로 별도 청크
-            if (id.includes('recharts')) {
-              return 'vendor-charts';
             }
             // Radix UI는 별도 청크로 분리 (React 19 호환성 문제)
             if (id.includes('@radix-ui')) {

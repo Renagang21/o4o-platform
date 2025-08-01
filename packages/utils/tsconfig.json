@@ -18,7 +18,8 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@o4o/types": ["../types/dist"]
     }
   },
   "include": ["src/**/*"],

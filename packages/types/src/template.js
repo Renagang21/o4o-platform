@@ -1,0 +1,2 @@
+// Template System Types
+export {};
