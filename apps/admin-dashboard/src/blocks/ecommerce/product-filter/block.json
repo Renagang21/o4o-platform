@@ -1,0 +1,100 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "o4o/product-filter",
+  "version": "1.0.0",
+  "title": "Product Filter",
+  "category": "o4o-ecommerce",
+  "description": "Filter products by various criteria",
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"],
+    "anchor": true,
+    "customClassName": true
+  },
+  "attributes": {
+    "layout": {
+      "type": "string",
+      "default": "sidebar"
+    },
+    "showPriceFilter": {
+      "type": "boolean",
+      "default": true
+    },
+    "priceMin": {
+      "type": "number",
+      "default": 0
+    },
+    "priceMax": {
+      "type": "number",
+      "default": 1000000
+    },
+    "priceStep": {
+      "type": "number",
+      "default": 10000
+    },
+    "showCategoryFilter": {
+      "type": "boolean",
+      "default": true
+    },
+    "showTagFilter": {
+      "type": "boolean",
+      "default": false
+    },
+    "showBrandFilter": {
+      "type": "boolean",
+      "default": true
+    },
+    "showStockFilter": {
+      "type": "boolean",
+      "default": true
+    },
+    "showRatingFilter": {
+      "type": "boolean",
+      "default": false
+    },
+    "showSaleFilter": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSortOptions": {
+      "type": "boolean",
+      "default": true
+    },
+    "sortOptions": {
+      "type": "array",
+      "default": [
+        "popularity",
+        "rating",
+        "date",
+        "price",
+        "price-desc"
+      ]
+    },
+    "filterStyle": {
+      "type": "string",
+      "default": "accordion"
+    },
+    "showFilterCount": {
+      "type": "boolean",
+      "default": true
+    },
+    "showClearAll": {
+      "type": "boolean",
+      "default": true
+    },
+    "ajaxFilter": {
+      "type": "boolean",
+      "default": true
+    },
+    "mobileToggle": {
+      "type": "boolean",
+      "default": true
+    },
+    "targetProductBlock": {
+      "type": "string"
+    }
+  },
+  "textdomain": "o4o",
+  "editorScript": "file:./index.tsx"
+}

@@ -1,6 +1,9 @@
 import { useState, useEffect, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save, Eye, FileText } from 'lucide-react'
+import { useAutoSave } from '@/hooks/useAutoSave'
+import AutoSaveIndicator from '@/components/AutoSaveIndicator'
+import RecoveryNotice from '@/components/RecoveryNotice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,7 +22,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import PostEditor from '@/components/editor/PostEditor'
+import GutenbergEditor from '@/components/editor/GutenbergEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
 import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility } from '@o4o/types'
@@ -57,6 +60,9 @@ const PageForm: FC = () => {
       seoKeywords: []
     }
   })
+  
+  const [showRecoveryNotice, setShowRecoveryNotice] = useState(false)
+  const [recoveryData, setRecoveryData] = useState<any>(null)
 
   // 페이지 조회 (수정 모드)
   const { data: page, isLoading: isLoadingPage } = useQuery({
@@ -77,6 +83,48 @@ const PageForm: FC = () => {
     }
   })
 
+  // 자동 저장 훅
+  const {
+    isSaving,
+    lastSaved,
+    hasUnsavedChanges,
+    savedInLocalStorage,
+    recoverFromLocalStorage,
+    clearLocalStorage
+  } = useAutoSave(formData, {
+    postId: id,
+    postType: 'page',
+    interval: 30000, // 30초
+    onSaveSuccess: () => {
+      // 자동 저장 성공 시 처리
+    }
+  });
+
+  // 페이지 로드 시 복구 데이터 확인
+  useEffect(() => {
+    const recovered = recoverFromLocalStorage();
+    if (recovered && !id) { // 새 페이지일 때만 복구 제안
+      setRecoveryData(recovered);
+      setShowRecoveryNotice(true);
+    }
+  }, [id, recoverFromLocalStorage]);
+
+  // 복구 처리
+  const handleRecover = () => {
+    if (recoveryData) {
+      setFormData(recoveryData.data);
+      clearLocalStorage();
+      setShowRecoveryNotice(false);
+      toast.success('임시 저장된 내용이 복구되었습니다');
+    }
+  };
+
+  // 복구 취소
+  const handleDiscardRecovery = () => {
+    clearLocalStorage();
+    setShowRecoveryNotice(false);
+  };
+
   // 페이지 생성
   const createMutation = useMutation({
     mutationFn: async (data: CreatePostDto) => {
@@ -86,6 +134,7 @@ const PageForm: FC = () => {
     onSuccess: (data) => {
       toast.success('페이지가 저장되었습니다')
       queryClient.invalidateQueries({ queryKey: ['pages'] })
+      clearLocalStorage() // 자동 저장 데이터 정리
       navigate(`/content/pages/${data.id}/edit`)
     },
     onError: () => {
@@ -103,6 +152,7 @@ const PageForm: FC = () => {
       toast.success('페이지가 수정되었습니다')
       queryClient.invalidateQueries({ queryKey: ['pages'] })
       queryClient.invalidateQueries({ queryKey: ['page', id] })
+      clearLocalStorage() // 자동 저장 데이터 정리
     },
     onError: () => {
       toast.error('페이지 수정에 실패했습니다')
@@ -168,7 +218,22 @@ const PageForm: FC = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           {isEditMode ? '페이지 수정' : '새 페이지 만들기'}
         </h1>
+        <AutoSaveIndicator
+          isSaving={isSaving}
+          lastSaved={lastSaved}
+          hasUnsavedChanges={hasUnsavedChanges}
+          savedInLocalStorage={savedInLocalStorage}
+        />
       </div>
+
+      {/* 복구 알림 */}
+      {showRecoveryNotice && recoveryData && (
+        <RecoveryNotice
+          timestamp={recoveryData.timestamp}
+          onRecover={handleRecover}
+          onDiscard={handleDiscardRecovery}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 메인 콘텐츠 영역 */}
@@ -192,9 +257,9 @@ const PageForm: FC = () => {
             <div className="wp-card-body">
               <Label>내용</Label>
               <div className="mt-2">
-                <PostEditor
+                <GutenbergEditor
                   content={formData.content}
-                  onChange={(content) => setFormData({ ...formData, content })}
+                  onContentChange={(content) => setFormData({ ...formData, content })}
                 />
               </div>
             </div>

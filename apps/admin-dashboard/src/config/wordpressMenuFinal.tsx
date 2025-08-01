@@ -30,7 +30,9 @@ import {
   CreditCard,
   FileCheck,
   Layout,
-  FolderTree
+  FolderTree,
+  Activity,
+  Shield
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -229,6 +231,16 @@ export const wordpressMenuItems: MenuItem[] = [
     label: 'Apps',
     icon: <Package className="w-5 h-5" />,
     path: '/apps'
+  },
+  {
+    id: 'monitoring',
+    label: '시스템 모니터링',
+    icon: <Activity className="w-5 h-5" />,
+    children: [
+      { id: 'monitoring-dashboard', label: '통합 모니터링', icon: <Activity className="w-4 h-4" />, path: '/monitoring' },
+      { id: 'performance', label: '성능 대시보드', icon: <BarChart3 className="w-4 h-4" />, path: '/monitoring/performance' },
+      { id: 'security-logs', label: '보안 로그', icon: <Shield className="w-4 h-4" />, path: '/monitoring/security' }
+    ]
   },
   {
     id: 'settings',

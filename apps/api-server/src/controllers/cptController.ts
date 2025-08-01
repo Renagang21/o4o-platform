@@ -3,6 +3,7 @@ import { AppDataSource } from '../database/connection';
 import { CustomPostType, FieldGroup, FieldSchema } from '../entities/CustomPostType';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
 import { AuthRequest } from '../types/auth';
+import { WordPressTransformer } from '../utils/wordpress-transformer';
 
 export class CPTController {
   // ============= Custom Post Type Management =============
@@ -201,16 +202,21 @@ export class CPTController {
       const { slug } = req.params;
       const { 
         page = 1, 
-        limit = 10, 
+        per_page = 10, // WordPress-style parameter
         status, 
         search,
-        sortBy = 'createdAt',
-        sortOrder = 'DESC'
+        orderby = 'date', // WordPress-style parameter
+        order = 'desc', // WordPress-style parameter
+        _embed = false // WordPress-style parameter
       } = req.query;
 
       const postRepo = AppDataSource.getRepository(CustomPost);
       const queryBuilder = postRepo.createQueryBuilder('post')
         .leftJoinAndSelect('post.postType', 'postType')
+        .leftJoinAndSelect('post.author', 'author')
+        .leftJoinAndSelect('post.featuredImage', 'featuredImage')
+        .leftJoinAndSelect('post.categories', 'categories')
+        .leftJoinAndSelect('post.tags', 'tags')
         .where('post.postTypeSlug = :slug', { slug });
 
       // Filter by status
@@ -221,37 +227,43 @@ export class CPTController {
       // Search in title and fields
       if (search) {
         queryBuilder.andWhere(
-          '(post.title ILIKE :search OR post.fields::text ILIKE :search)',
+          '(post.title ILIKE :search OR post.content ILIKE :search OR post.fields::text ILIKE :search)',
           { search: `%${search}%` }
         );
       }
 
-      // Sorting
-      queryBuilder.orderBy(`post.${sortBy as string}`, sortOrder as 'ASC' | 'DESC');
+      // WordPress-style sorting
+      const sortField = orderby === 'date' ? 'createdAt' : 
+                       orderby === 'modified' ? 'updatedAt' : 
+                       orderby === 'title' ? 'title' : 'createdAt';
+      const sortOrder = typeof order === 'string' ? order.toUpperCase() : 'DESC';
+      queryBuilder.orderBy(`post.${sortField}`, sortOrder as 'ASC' | 'DESC');
 
       // Pagination
-      const skip = (Number(page) - 1) * Number(limit);
-      queryBuilder.skip(skip).take(Number(limit));
+      const skip = (Number(page) - 1) * Number(per_page);
+      queryBuilder.skip(skip).take(Number(per_page));
 
       const [posts, total] = await queryBuilder.getManyAndCount();
 
-      res.json({
-        success: true,
-        data: {
-          posts,
-          pagination: {
-            current: Number(page),
-            total: Math.ceil(total / Number(limit)),
-            count: total,
-            limit: Number(limit)
-          }
-        }
+      // Transform to WordPress format
+      const wpPosts = WordPressTransformer.transformCustomPosts(posts, {
+        includeContent: true,
+        includeEmbedded: String(_embed) === 'true'
       });
+
+      // WordPress-style headers
+      res.set({
+        'X-WP-Total': total.toString(),
+        'X-WP-TotalPages': Math.ceil(total / Number(per_page)).toString()
+      });
+
+      res.json(wpPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
       res.status(500).json({
-        success: false,
-        message: '포스트 목록을 가져오는데 실패했습니다.'
+        code: 'rest_posts_error',
+        message: '포스트 목록을 가져오는데 실패했습니다.',
+        data: { status: 500 }
       });
     }
   }
@@ -376,29 +388,35 @@ export class CPTController {
   static async getPostById(req: Request, res: Response) {
     try {
       const { slug, postId } = req.params;
+      const { _embed = false } = req.query;
       const postRepo = AppDataSource.getRepository(CustomPost);
 
       const post = await postRepo.findOne({
         where: { id: postId, postTypeSlug: slug },
-        relations: ['postType']
+        relations: ['postType', 'author', 'featuredImage', 'categories', 'tags']
       });
 
       if (!post) {
         return res.status(404).json({
-          success: false,
-          message: '포스트를 찾을 수 없습니다.'
+          code: 'rest_post_invalid_id',
+          message: '포스트를 찾을 수 없습니다.',
+          data: { status: 404 }
         });
       }
 
-      res.json({
-        success: true,
-        data: post
+      // Transform to WordPress format
+      const wpPost = WordPressTransformer.transformCustomPost(post, {
+        includeContent: true,
+        includeEmbedded: String(_embed) === 'true'
       });
+
+      res.json(wpPost);
     } catch (error) {
       console.error('Error fetching post:', error);
       res.status(500).json({
-        success: false,
-        message: '포스트를 가져오는데 실패했습니다.'
+        code: 'rest_post_error',
+        message: '포스트를 가져오는데 실패했습니다.',
+        data: { status: 500 }
       });
     }
   }
@@ -473,37 +491,65 @@ export class CPTController {
   static async getPublicPosts(req: Request, res: Response) {
     try {
       const { slug } = req.params;
-      const { limit = 10, page = 1 } = req.query;
+      const { 
+        per_page = 10, 
+        page = 1,
+        orderby = 'date',
+        order = 'desc',
+        _embed = false,
+        search
+      } = req.query;
 
       const postRepo = AppDataSource.getRepository(CustomPost);
-      const [posts, total] = await postRepo.findAndCount({
-        where: { 
-          postTypeSlug: slug, 
-          status: PostStatus.PUBLISHED 
-        },
-        order: { publishedAt: 'DESC' },
-        skip: (Number(page) - 1) * Number(limit),
-        take: Number(limit),
-        relations: ['postType']
+      const queryBuilder = postRepo.createQueryBuilder('post')
+        .leftJoinAndSelect('post.postType', 'postType')
+        .leftJoinAndSelect('post.author', 'author')
+        .leftJoinAndSelect('post.featuredImage', 'featuredImage')
+        .leftJoinAndSelect('post.categories', 'categories')
+        .leftJoinAndSelect('post.tags', 'tags')
+        .where('post.postTypeSlug = :slug', { slug })
+        .andWhere('post.status = :status', { status: PostStatus.PUBLISHED });
+
+      // Search
+      if (search) {
+        queryBuilder.andWhere(
+          '(post.title ILIKE :search OR post.content ILIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+
+      // WordPress-style sorting
+      const sortField = orderby === 'date' ? 'publishedAt' : 
+                       orderby === 'modified' ? 'updatedAt' : 
+                       orderby === 'title' ? 'title' : 'publishedAt';
+      const sortOrder = typeof order === 'string' ? order.toUpperCase() : 'DESC';
+      queryBuilder.orderBy(`post.${sortField}`, sortOrder as 'ASC' | 'DESC');
+
+      // Pagination
+      const skip = (Number(page) - 1) * Number(per_page);
+      queryBuilder.skip(skip).take(Number(per_page));
+
+      const [posts, total] = await queryBuilder.getManyAndCount();
+
+      // Transform to WordPress format
+      const wpPosts = WordPressTransformer.transformCustomPosts(posts, {
+        includeContent: true,
+        includeEmbedded: String(_embed) === 'true'
       });
 
-      res.json({
-        success: true,
-        data: {
-          posts,
-          pagination: {
-            current: Number(page),
-            total: Math.ceil(total / Number(limit)),
-            count: total,
-            limit: Number(limit)
-          }
-        }
+      // WordPress-style headers
+      res.set({
+        'X-WP-Total': total.toString(),
+        'X-WP-TotalPages': Math.ceil(total / Number(per_page)).toString()
       });
+
+      res.json(wpPosts);
     } catch (error) {
       console.error('Error fetching public posts:', error);
       res.status(500).json({
-        success: false,
-        message: '공개 포스트를 가져오는데 실패했습니다.'
+        code: 'rest_posts_error',
+        message: '공개 포스트를 가져오는데 실패했습니다.',
+        data: { status: 500 }
       });
     }
   }

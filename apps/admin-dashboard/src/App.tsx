@@ -47,7 +47,9 @@ const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
 const TestPage = lazy(() => import('@/pages/test/TestPage'));
-const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
+// const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
+const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
+const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
 
 // Vendor Management Pages
@@ -78,6 +80,7 @@ const RolePermissions = lazy(() => import('@/pages/users/RolePermissions'));
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 const GutenbergPage = lazy(() => import('@/pages/test/GutenbergPage'));
+const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 
 // Apps Manager
 const AppsManager = lazy(() => import('@/pages/apps/AppsManager'));
@@ -703,6 +706,15 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
+                    {/* Loop Block Test */}
+                    <Route path="/loop-block-test" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <LoopBlockTest />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
                     {/* UI Showcase */}
                     <Route path="/ui-showcase" element={
                       <AdminProtectedRoute requiredPermissions={['admin']}>
@@ -716,7 +728,23 @@ function App() {
                     <Route path="/monitoring" element={
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
-                          <SystemMonitoring />
+                          <IntegratedMonitoring />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/monitoring/performance" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <PerformanceDashboard />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/monitoring/security" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <IntegratedMonitoring />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

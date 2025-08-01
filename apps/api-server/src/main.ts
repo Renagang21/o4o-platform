@@ -56,7 +56,13 @@ import { SessionSyncService } from './services/sessionSyncService';
 import { WebSocketSessionSync } from './websocket/sessionSync';
 import { errorHandler } from './middleware/errorHandler';
 import { performanceMonitor } from './middleware/performanceMonitor';
+import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
 import logger from './utils/simpleLogger';
+
+// Monitoring services
+import { backupService } from './services/BackupService';
+import { errorAlertService } from './services/ErrorAlertService';
+import { securityAuditService } from './services/SecurityAuditService';
 
 // 라우트 imports 
 import authRoutes from './routes/auth';
@@ -77,6 +83,7 @@ import crowdfundingRoutes from './routes/crowdfunding';
 import linkedAccountsRoutes from './routes/linked-accounts';
 import vendorRoutes from './routes/vendor';
 import formsRoutes from './routes/forms';
+import monitoringRoutes from './routes/monitoring';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -238,6 +245,10 @@ app.use(cors(corsOptions));
 // Add performance monitoring middleware early in the chain
 app.use(performanceMonitor);
 
+// Security middleware
+app.use(securityMiddleware);
+app.use(sqlInjectionDetection);
+
 app.use(cookieParser() as any);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -376,6 +387,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
 app.use('/api/settings', settingsRoutes);
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
+app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
 app.use('/api', contentRoutes);
 
 
@@ -475,6 +487,15 @@ const startServer = async () => {
         } catch (migrationError) {
           console.log('⚠️  Migration error:', (migrationError as Error).message);
         }
+      }
+
+      // Initialize monitoring services
+      try {
+        await backupService.initialize();
+        await errorAlertService.initialize();
+        console.log('✅ Monitoring services initialized');
+      } catch (serviceError) {
+        console.error('⚠️  Failed to initialize monitoring services:', serviceError);
       }
     }
   } catch (dbError) {

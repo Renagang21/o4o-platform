@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save, Eye, Calendar, Image as ImageIcon } from 'lucide-react'
+import { useAutoSave } from '@/hooks/useAutoSave'
+import AutoSaveIndicator from '@/components/AutoSaveIndicator'
+import RecoveryNotice from '@/components/RecoveryNotice'
+import { eventBus, EVENTS } from '@/lib/eventBus'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +24,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
-import PostEditor from '@/components/editor/PostEditor'
+import GutenbergEditor from '@/components/editor/GutenbergEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
 import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility, Category, Tag } from '@o4o/types'
@@ -56,6 +60,8 @@ const PostForm = () => {
   const [isScheduled, setIsScheduled] = useState(false)
   const [scheduledDate, setScheduledDate] = useState('')
   const [scheduledTime, setScheduledTime] = useState('')
+  const [showRecoveryNotice, setShowRecoveryNotice] = useState(false)
+  const [recoveryData, setRecoveryData] = useState<any>(null)
 
   // 게시글 조회 (수정 모드)
   const { data: post, isLoading: isLoadingPost } = useQuery({
@@ -85,6 +91,54 @@ const PostForm = () => {
     }
   })
 
+  // 자동 저장 훅
+  const {
+    isSaving,
+    lastSaved,
+    hasUnsavedChanges,
+    savedInLocalStorage,
+    recoverFromLocalStorage,
+    clearLocalStorage
+  } = useAutoSave(formData, {
+    postId: id,
+    postType: 'post',
+    interval: 30000, // 30초
+    onSaveSuccess: () => {
+      // 자동 저장 성공 시 처리
+    }
+  });
+
+  // 페이지 로드 시 복구 데이터 확인
+  useEffect(() => {
+    const recovered = recoverFromLocalStorage();
+    if (recovered && !id) { // 새 게시글일 때만 복구 제안
+      setRecoveryData(recovered);
+      setShowRecoveryNotice(true);
+    }
+  }, [id, recoverFromLocalStorage]);
+
+  // 복구 처리
+  const handleRecover = () => {
+    if (recoveryData) {
+      setFormData(recoveryData.data);
+      if (recoveryData.data.categoryIds) {
+        setSelectedCategories(recoveryData.data.categoryIds);
+      }
+      if (recoveryData.data.tagIds) {
+        setSelectedTags(recoveryData.data.tagIds);
+      }
+      clearLocalStorage();
+      setShowRecoveryNotice(false);
+      toast.success('임시 저장된 내용이 복구되었습니다');
+    }
+  };
+
+  // 복구 취소
+  const handleDiscardRecovery = () => {
+    clearLocalStorage();
+    setShowRecoveryNotice(false);
+  };
+
   // 게시글 생성
   const createMutation = useMutation({
     mutationFn: async (data: CreatePostDto) => {
@@ -94,6 +148,9 @@ const PostForm = () => {
     onSuccess: (data) => {
       toast.success('게시글이 저장되었습니다')
       queryClient.invalidateQueries({ queryKey: ['posts'] })
+      clearLocalStorage() // 자동 저장 데이터 정리
+      // Emit event to refresh Loop blocks
+      eventBus.emit(EVENTS.POST_CREATED, { postType: 'post', id: data.id })
       navigate(`/content/posts/${data.id}/edit`)
     },
     onError: () => {
@@ -111,6 +168,9 @@ const PostForm = () => {
       toast.success('게시글이 수정되었습니다')
       queryClient.invalidateQueries({ queryKey: ['posts'] })
       queryClient.invalidateQueries({ queryKey: ['post', id] })
+      clearLocalStorage() // 자동 저장 데이터 정리
+      // Emit event to refresh Loop blocks
+      eventBus.emit(EVENTS.POST_UPDATED, { postType: 'post', id })
     },
     onError: () => {
       toast.error('게시글 수정에 실패했습니다')
@@ -192,7 +252,22 @@ const PostForm = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           {isEditMode ? '게시글 수정' : '새 게시글 작성'}
         </h1>
+        <AutoSaveIndicator
+          isSaving={isSaving}
+          lastSaved={lastSaved}
+          hasUnsavedChanges={hasUnsavedChanges}
+          savedInLocalStorage={savedInLocalStorage}
+        />
       </div>
+
+      {/* 복구 알림 */}
+      {showRecoveryNotice && recoveryData && (
+        <RecoveryNotice
+          timestamp={recoveryData.timestamp}
+          onRecover={handleRecover}
+          onDiscard={handleDiscardRecovery}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 메인 콘텐츠 영역 */}
@@ -216,9 +291,9 @@ const PostForm = () => {
             <div className="wp-card-body">
               <Label>내용</Label>
               <div className="mt-2">
-                <PostEditor
+                <GutenbergEditor
                   content={formData.content}
-                  onChange={(content) => setFormData({ ...formData, content })}
+                  onContentChange={(content) => setFormData({ ...formData, content })}
                 />
               </div>
             </div>
