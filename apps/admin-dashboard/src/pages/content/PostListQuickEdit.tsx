@@ -1,6 +1,5 @@
 import { FC, Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 // import { Badge } from '@/components/ui/badge'; // Not used in quick edit view
@@ -384,7 +383,7 @@ const PostListQuickEdit: FC = () => {
                 key={column.key}
                 className={`column-${column.key}`}
               >
-                {column.render ? column.render(post) : post[column.key]}
+                {column.render ? column.render(post) : (post as any)[column.key]}
                 {column.key === columns[0].key && getRowActions(post)}
               </td>
             ))}

@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 // import { Badge } from '@/components/ui/badge'; // Not used in bulk view

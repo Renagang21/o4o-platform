@@ -28,6 +28,53 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useRefresh } from './hooks/useRefresh';
 
+// Transform stats to match StatsCards expected format
+const transformStats = (stats: any) => {
+  if (!stats) return undefined;
+  
+  return {
+    users: typeof stats.users === 'object' ? stats.users : {
+      total: stats.users || 0,
+      pending: 0,
+      today: 0,
+      activeRate: 0,
+      change: 0,
+      trend: 'up' as const
+    },
+    sales: stats.sales || {
+      today: 0,
+      changePercent: 0,
+      monthlyTotal: 0,
+      monthlyTarget: 0,
+      trend: 'up' as const
+    },
+    products: typeof stats.products === 'object' ? stats.products : {
+      active: stats.products || 0,
+      lowStock: 0,
+      newThisWeek: 0,
+      bestsellers: [],
+      change: 0,
+      trend: 'up' as const
+    },
+    content: stats.content || {
+      publishedPages: 0,
+      draftContent: 0,
+      totalMedia: 0,
+      todayViews: 0,
+      change: 0,
+      trend: 'up' as const
+    },
+    partners: stats.partners || {
+      active: 0,
+      pending: 0,
+      totalCommission: 0,
+      topPartners: [],
+      change: 0,
+      trend: 'up' as const
+    }
+  };
+};
+
 const MainDashboard: FC = () => {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   
@@ -164,7 +211,7 @@ const MainDashboard: FC = () => {
           </div>
           
           <StatsCards 
-            stats={stats}
+            stats={transformStats(stats)}
             isLoading={isLoading}
           />
         </section>
