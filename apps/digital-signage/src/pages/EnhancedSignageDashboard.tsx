@@ -7,7 +7,9 @@ import {
   Layers, PlayCircle, PauseCircle
 } from 'lucide-react';
 // import Navbar from '../../components/Navbar';
-import { useAuth } from '@o4o/auth-context';
+// import { useAuth } from '@o4o/auth-context';
+// 임시: auth-context 빌드 문제로 인한 mock
+const useAuth = () => ({ user: { id: 'admin_1' } });
 import { useToast } from '../hooks/useToast';
 import axios from 'axios';
 

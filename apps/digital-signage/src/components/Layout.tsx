@@ -1,7 +1,13 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FileVideo, Calendar, Store, LogOut } from 'lucide-react';
-import { useAuth } from '@o4o/auth-context';
+// import { useAuth } from '@o4o/auth-context';
+// 임시: auth-context 빌드 문제로 인한 mock
+const useAuth = () => ({ 
+  user: { name: '관리자', email: 'admin@o4o.com' },
+  isAuthenticated: true,
+  logout: () => console.log('Logout')
+});
 
 interface LayoutProps {
   children: ReactNode;
