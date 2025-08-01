@@ -1,7 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 // import { useAuth } from '@o4o/auth-context';
 // 임시: auth-context 빌드 문제로 인한 mock
-const useAuth = () => ({ isAuthenticated: true, isLoading: false });
+const useAuth = () => ({ 
+  isAuthenticated: true, 
+  isLoading: false,
+  user: { id: 'admin_1', role: 'admin' }
+});
 import Layout from './components/Layout';
 import EnhancedSignageDashboard from './pages/EnhancedSignageDashboard';
 import ContentManager from './pages/content/ContentManager';
