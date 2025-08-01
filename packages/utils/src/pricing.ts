@@ -3,17 +3,128 @@
 // =============================================================================
 // 가격 계산, 포맷팅, 검증을 위한 유틸리티 함수들
 
-import type {
-  UserRole,
-  RetailerGrade,
-  PriceByRole,
-  PriceContext,
-  CalculatedPrice,
-  PriceDisplay,
-  PriceDisplayConfig,
-  PriceValidationResult,
-  CurrencyInfo
-} from '@o4o/types';
+// Temporarily define types locally until @o4o/types build issue is resolved
+export type UserRole = 'customer' | 'business' | 'affiliate' | 'retailer' | 'supplier' | 'admin';
+export type RetailerGrade = 'gold' | 'premium' | 'vip';
+
+export interface PriceByRole {
+  customer: number;
+  business: number;
+  affiliate: number;
+  retailer: {
+    gold: number;
+    premium: number;
+    vip: number;
+  };
+}
+
+export interface PriceContext {
+  userRole: UserRole;
+  retailerGrade?: RetailerGrade;
+  quantity: number;
+}
+
+export interface CalculatedPrice {
+  originalPrice: number;
+  basePrice: number;
+  roleDiscount: {
+    type: 'role_based';
+    amount: number;
+    percentage: number;
+    label: string;
+  } | null;
+  volumeDiscount: {
+    type: 'volume';
+    amount: number;
+    percentage: number;
+    label: string;
+    tier: string;
+  } | null;
+  ruleDiscounts: Array<{
+    ruleId: string;
+    ruleName: string;
+    type: 'percentage' | 'fixed_amount';
+    amount: number;
+    percentage: number;
+  }>;
+  subtotal: number;
+  taxAmount: number;
+  finalPrice: number;
+  totalSavings: number;
+  totalSavingsPercentage: number;
+  currency: string;
+  formattedPrice: string;
+  formattedOriginalPrice: string;
+  formattedSavings: string;
+  breakdown: {
+    basePrice: number;
+    discounts: {
+      roleBasedDiscount: number;
+      volumeDiscount: number;
+      couponDiscount: number;
+      membershipDiscount: number;
+      promotionalDiscount: number;
+      other: number;
+    };
+    fees: {
+      tax: number;
+      shipping: number;
+      handling: number;
+      service: number;
+      other: number;
+    };
+    total: number;
+  };
+}
+
+export interface PriceDisplay {
+  price: string;
+  currency: string;
+  currencySymbol: string;
+  className: string;
+  variant: string;
+  size: string;
+}
+
+export interface PriceDisplayConfig {
+  showCurrency: boolean;
+  showCurrencySymbol: boolean;
+  currencyPosition: 'before' | 'after';
+  thousandsSeparator: string;
+  decimalSeparator: string;
+  decimalPlaces: number;
+  showRoleLabel: boolean;
+  showSavingsBadge: boolean;
+  highlightBestPrice: boolean;
+  showCompareAtPrice: boolean;
+  showQuantityBreaks: boolean;
+  showTotalSavings: boolean;
+}
+
+export interface PriceValidationResult {
+  isValid: boolean;
+  warnings: Array<{
+    ruleId: string;
+    ruleName: string;
+    message: string;
+    severity?: string;
+  }>;
+  errors: Array<{
+    ruleId: string;
+    ruleName: string;
+    message: string;
+  }>;
+}
+
+export interface CurrencyInfo {
+  code: string;
+  symbol: string;
+  name: string;
+  symbolPosition: 'before' | 'after';
+  decimalPlaces: number;
+  thousandsSeparator: string;
+  decimalSeparator: string;
+}
 
 // =============================================================================
 // ROLE-BASED PRICE CALCULATION
