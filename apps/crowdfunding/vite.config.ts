@@ -23,4 +23,11 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     port: 3003,
     open: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // 기본 청킹 사용 (vendor 분리 비활성화)
+      },
+    },
+  },
 }));

@@ -47,7 +47,7 @@ jobs:
     - name: Build shared packages
       run: |
         echo "Building shared packages first..."
-        bash scripts/build-packages.sh
+        bash scripts/dev.sh build:packages
         
     - name: Install API server dependencies
       run: |
