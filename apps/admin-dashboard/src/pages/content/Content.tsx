@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'
-import PostList from './PostList'
+import PostListQuickEdit from './PostListQuickEdit'
 import PostForm from './PostForm'
 import PageList from './PageList'
 import PageForm from './PageForm'
@@ -18,7 +18,7 @@ const Content: FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="posts" replace />} />
-      <Route path="posts" element={<PostList />} />
+      <Route path="posts" element={<PostListQuickEdit />} />
       <Route path="posts/new" element={<PostForm />} />
       <Route path="posts/:id/edit" element={<PostForm />} />
       <Route path="pages" element={<PageList />} />

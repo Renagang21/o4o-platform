@@ -1,0 +1,331 @@
+/* WordPress Help Tab Styles */
+
+/* Screen Meta Toggle (Help Button) */
+.screen-meta-toggle {
+  float: right;
+  margin: 0 0 0 6px;
+}
+
+#contextual-help-link {
+  position: relative;
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 0;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 1.4;
+  border: 1px solid #c3c4c7;
+  border-radius: 3px;
+  background: #f6f7f7;
+  color: #50575e;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+#contextual-help-link:hover {
+  background: #f0f0f1;
+  border-color: #8c8f94;
+  color: #1d2327;
+}
+
+#contextual-help-link.screen-meta-active {
+  background: #f0f0f1;
+  border-color: #8c8f94;
+  color: #1d2327;
+  box-shadow: none;
+}
+
+/* Help Content Wrap */
+#contextual-help-wrap {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-top: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: none;
+}
+
+#contextual-help-wrap.contextual-help-open {
+  display: block;
+}
+
+#contextual-help-back {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 150px;
+  right: 170px;
+  border: 1px solid #e1e1e1;
+  border-top: none;
+  border-bottom: none;
+  background: #f6f7f7;
+}
+
+/* Help Columns Layout */
+#contextual-help-columns {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Help Tabs */
+.contextual-help-tabs {
+  float: left;
+  width: 150px;
+  margin: 0;
+}
+
+.contextual-help-tabs ul {
+  margin: 1em 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contextual-help-tabs li {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.contextual-help-tabs a {
+  display: block;
+  padding: 5px 5px 5px 12px;
+  line-height: 18px;
+  text-decoration: none;
+  color: #1d2327;
+  font-size: 14px;
+}
+
+.contextual-help-tabs a:hover {
+  color: #2271b1;
+}
+
+.contextual-help-tabs .active a {
+  color: #2c3338;
+  font-weight: 600;
+  background: #f6f7f7;
+  border-left: 6px solid #2271b1;
+  padding-left: 6px;
+}
+
+/* Help Tab Content */
+.contextual-help-tabs-wrap {
+  padding: 0 20px;
+  overflow: auto;
+}
+
+.help-tab-content {
+  display: none;
+  margin: 0;
+  padding: 20px 0;
+  min-height: 350px;
+  max-height: 650px;
+  overflow: auto;
+}
+
+.help-tab-content.active {
+  display: block;
+}
+
+.help-tab-content h2 {
+  margin: 8px 0;
+  font-size: 23px;
+  font-weight: 400;
+}
+
+.help-tab-content h3 {
+  margin: 1.33em 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.help-tab-content p {
+  margin: 1em 0;
+  line-height: 1.6;
+}
+
+.help-tab-content ul,
+.help-tab-content ol {
+  margin: 1em 0 1em 2em;
+}
+
+.help-tab-content li {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+}
+
+.help-tab-content code {
+  padding: 2px 4px;
+  font-size: 13px;
+  background: #f0f0f1;
+  border-radius: 2px;
+}
+
+/* Help Sidebar */
+.contextual-help-sidebar {
+  width: 150px;
+  float: right;
+  padding: 0 8px 0 12px;
+  margin-top: 20px;
+}
+
+.contextual-help-sidebar h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.contextual-help-sidebar p {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.contextual-help-sidebar a {
+  color: #2271b1;
+  text-decoration: none;
+}
+
+.contextual-help-sidebar a:hover {
+  text-decoration: underline;
+}
+
+/* Close Button */
+.contextual-help-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  background: none;
+  border: none;
+  color: #646970;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.contextual-help-close:hover {
+  color: #1d2327;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 782px) {
+  .screen-meta-toggle {
+    margin: 4px 0 4px 6px;
+  }
+  
+  #contextual-help-wrap {
+    margin: 0 -10px;
+    border-left: none;
+    border-right: none;
+  }
+  
+  #contextual-help-back {
+    display: none;
+  }
+  
+  .contextual-help-tabs {
+    float: none;
+    width: 100%;
+    margin: 0;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  
+  .contextual-help-tabs ul {
+    margin: 0;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .contextual-help-tabs li {
+    flex: 0 0 auto;
+    border-bottom: none;
+    border-right: 1px solid #e1e1e1;
+  }
+  
+  .contextual-help-tabs li:last-child {
+    border-right: none;
+  }
+  
+  .contextual-help-tabs a {
+    padding: 10px 15px;
+    white-space: nowrap;
+  }
+  
+  .contextual-help-tabs .active a {
+    border-left: none;
+    border-bottom: 3px solid #2271b1;
+    padding-left: 15px;
+  }
+  
+  .contextual-help-tabs-wrap {
+    padding: 0 15px;
+  }
+  
+  .help-tab-content {
+    min-height: 200px;
+    max-height: none;
+  }
+  
+  .contextual-help-sidebar {
+    float: none;
+    width: 100%;
+    margin: 0;
+    padding: 20px 15px;
+    border-top: 1px solid #e1e1e1;
+  }
+}
+
+/* Integration with Screen Options */
+.screen-options-and-help-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  float: right;
+}
+
+/* Hidden class for no-js */
+.hide-if-no-js {
+  display: none;
+}
+
+html.js .hide-if-no-js {
+  display: block;
+}
+
+/* Screen Meta Container */
+#screen-meta {
+  position: relative;
+  clear: both;
+  margin: 0 -20px;
+}
+
+#screen-meta-links {
+  position: relative;
+  margin: 0 20px;
+  height: 28px;
+}
+
+.screen-options-and-help-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  float: right;
+  margin-top: -30px;
+}
+
+/* WordPress Page Title Spacing */
+.wp-heading-inline {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.page-title-action {
+  margin-bottom: 15px;
+}
+
+hr.wp-header-end {
+  clear: both;
+}

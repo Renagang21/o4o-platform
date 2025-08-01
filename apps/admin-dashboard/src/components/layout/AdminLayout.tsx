@@ -3,6 +3,7 @@ import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
 import AdminBreadcrumb from '../common/AdminBreadcrumb'
 import AdminBar from './AdminBar'
+import { AdminNotices } from '../notices/AdminNotices'
 import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
 
@@ -40,6 +41,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         {/* Page content */}
         <main className="p-6">
           <AdminBreadcrumb />
+          <AdminNotices />
           {children}
         </main>
       </div>

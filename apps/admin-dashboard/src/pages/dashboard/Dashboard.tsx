@@ -3,7 +3,7 @@
  * 대시보드 메인 페이지 - 모든 위젯을 통합하여 표시
  */
 
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { BarChart3 } from 'lucide-react';
 
 // MVP 위젯 컴포넌트 import
@@ -15,35 +15,72 @@ import QuickActions from './components/QuickActions';
 import SystemStatus from './components/SystemHealth';
 // import Charts from './components/Charts';
 import AtAGlanceWidget from '@/components/dashboard/AtAGlanceWidget';
-import ScreenOptions, { type ScreenOption } from '@/components/common/ScreenOptions';
+import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
+import { useScreenOptions } from '@/hooks/useScreenOptions';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 const Dashboard = memo(() => {
   const { stats } = useDashboardData();
   useDashboardStats();
+  const { success } = useAdminNotices();
   
-  // Screen Options state
-  const [screenOptions, setScreenOptions] = useState<ScreenOption[]>([
-    { id: 'stats', label: 'Statistics Overview', checked: true, type: 'checkbox' },
-    { id: 'ecommerce', label: 'E-commerce Stats', checked: true, type: 'checkbox' },
-    { id: 'realtime', label: 'Realtime Stats', checked: true, type: 'checkbox' },
-    { id: 'activity', label: 'Recent Activity', checked: true, type: 'checkbox' },
-    { id: 'charts', label: 'Charts', checked: true, type: 'checkbox' },
-    { id: 'system', label: 'System Health', checked: true, type: 'checkbox' }
-  ]);
+  // Show welcome message on first load
+  useEffect(() => {
+    const hasShownWelcome = localStorage.getItem('dashboard_welcome_shown');
+    if (!hasShownWelcome) {
+      success('Welcome to your WordPress-style admin dashboard! All systems are operational.', {
+        duration: 5000
+      });
+      localStorage.setItem('dashboard_welcome_shown', 'true');
+    }
+  }, [success]);
   
+  // Default widget configuration
+  const defaultWidgets = [
+    { id: 'stats', label: 'Statistics Overview', checked: true },
+    { id: 'ecommerce', label: 'E-commerce Stats', checked: true },
+    { id: 'realtime', label: 'Realtime Stats', checked: true },
+    { id: 'activity', label: 'Recent Activity', checked: true },
+    { id: 'charts', label: 'Charts', checked: true },
+    { id: 'system', label: 'System Health', checked: true }
+  ];
+
+  // Use screen options hook
+  const {
+    options,
+    updateColumnVisibility
+  } = useScreenOptions('dashboard', {
+    customOptions: defaultWidgets
+  });
+
   const [columnsPerPage, setColumnsPerPage] = useState(2);
+  
+  // Convert to checkbox format for backward compatibility
+  const screenOptions = options.customOptions || defaultWidgets;
+  const isWidgetVisible = (widgetId: string) => {
+    const widget = screenOptions.find(w => w.id === widgetId);
+    return widget?.checked ?? true;
+  };
 
   return (
     <div className="space-y-8">
       {/* Page Header with Screen Options */}
       <div className="relative">
-        <ScreenOptions
-          options={screenOptions}
-          onOptionsChange={setScreenOptions}
-          columnsPerPage={columnsPerPage}
-          onColumnsChange={setColumnsPerPage}
+        <ScreenOptionsReact
+          title="Screen Options"
+          customOptions={screenOptions}
+          onCustomOptionChange={(optionId, checked) => {
+            // Update custom options in store
+            const updatedOptions = screenOptions.map(opt =>
+              opt.id === optionId ? { ...opt, checked } : opt
+            );
+            // TODO: Update store with new options
+          }}
+          layoutColumns={columnsPerPage}
+          onLayoutColumnsChange={setColumnsPerPage}
+          showLayoutOptions={true}
         />
         <div className="flex items-center justify-between">
           <div>

@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
-import toast from 'react-hot-toast';
+import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 interface GeneralSettingsData {
   siteName: string;
@@ -53,6 +53,7 @@ const timeFormats = [
 
 export default function GeneralSettings() {
   const queryClient = useQueryClient();
+  const { success, error } = useAdminNotices();
   const [settings, setSettings] = useState<GeneralSettingsData>({
     siteName: '',
     siteDescription: '',
@@ -91,11 +92,11 @@ export default function GeneralSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'general'] });
-      toast.success('설정이 저장되었습니다');
+      success('설정이 저장되었습니다.');
     },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : '설정 저장에 실패했습니다';
-      toast.error(message);
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : '설정 저장에 실패했습니다';
+      error(message);
     }
   });
 

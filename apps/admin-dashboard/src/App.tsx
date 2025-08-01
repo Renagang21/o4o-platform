@@ -9,6 +9,7 @@ import AppGuard from '@/components/AppGuard';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/stores/authStore';
 import { ssoService } from '@/api/sso';
+import { WordPressRouter } from '@/components/routing/WordPressRouter';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
@@ -18,6 +19,7 @@ import InitialRedirect from '@/components/InitialRedirect';
 const Login = lazy(() => import('@/pages/auth/Login'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
+const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
@@ -175,6 +177,7 @@ function App() {
             warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
             onSessionExpiring={handleSessionExpiring}
           >
+            <WordPressRouter />
             <Routes>
             {/* 공개 라우트 - 로그인 페이지 */}
             <Route path="/login" element={
@@ -202,7 +205,7 @@ function App() {
                     
                     <Route path="/dashboard" element={
                       <Suspense fallback={<PageLoader />}>
-                        <Dashboard />
+                        <DashboardSimple />
                       </Suspense>
                     } />
                     

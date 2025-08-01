@@ -1,0 +1,245 @@
+/* WordPress Quick Edit Styles */
+
+/* Quick Edit Row */
+.inline-edit-row {
+  background-color: #fff;
+  border-top: 1px solid #dcdcde;
+  border-bottom: 1px solid #dcdcde;
+}
+
+.inline-edit-row td {
+  padding: 0.5em 0.5em 1em;
+  vertical-align: top;
+}
+
+.inline-edit-row fieldset {
+  clear: both;
+  display: block;
+  float: left;
+  width: 100%;
+}
+
+.inline-edit-row .inline-edit-legend {
+  margin: 0;
+  padding: 0.2em 0.2em 0.1em;
+  line-height: 2.5;
+  font-weight: 600;
+}
+
+.inline-edit-row fieldset label {
+  display: block;
+  margin: 0.2em 0;
+  line-height: 2.5;
+}
+
+.inline-edit-row .inline-edit-col {
+  padding: 0 0.5em;
+}
+
+/* Column Layout */
+.inline-edit-col-left {
+  float: left;
+  width: 30%;
+}
+
+.inline-edit-col-center {
+  float: left;
+  width: 30%;
+}
+
+.inline-edit-col-right {
+  float: right;
+  width: 40%;
+}
+
+/* Form Elements */
+.inline-edit-row span.title {
+  display: block;
+  float: left;
+  width: 5em;
+  font-weight: 600;
+  line-height: 2.5;
+}
+
+.inline-edit-row .input-text-wrap {
+  display: block;
+  margin-left: 5em;
+}
+
+.inline-edit-row input[type="text"],
+.inline-edit-row input[type="password"],
+.inline-edit-row input[type="email"],
+.inline-edit-row input[type="number"],
+.inline-edit-row textarea,
+.inline-edit-row select {
+  width: 100%;
+  padding: 2px 8px;
+  margin: 1px;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+/* Title field - larger */
+.inline-edit-row .ptitle {
+  font-size: 16px;
+  padding: 4px 8px;
+  line-height: 1.5;
+  width: 100%;
+}
+
+/* Date fields */
+.inline-edit-date {
+  float: left;
+}
+
+.inline-edit-date .timestamp-wrap {
+  line-height: 2;
+}
+
+.inline-edit-date .timestamp-wrap label {
+  display: inline;
+  vertical-align: baseline;
+}
+
+.inline-edit-date .timestamp-wrap input {
+  width: auto;
+  vertical-align: baseline;
+}
+
+.inline-edit-month {
+  width: 100px !important;
+  display: inline !important;
+}
+
+.inline-edit-day,
+.inline-edit-year {
+  width: 50px !important;
+  display: inline !important;
+}
+
+/* Categories */
+.inline-edit-categories {
+  margin: 0 5px;
+}
+
+.inline-edit-categories ul.cat-checklist {
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #dcdcde;
+  background-color: #fff;
+}
+
+.inline-edit-categories ul.cat-checklist li {
+  margin: 0;
+  padding: 3px 8px;
+  line-height: 20px;
+}
+
+.inline-edit-categories ul.cat-checklist li:hover {
+  background-color: #f0f0f1;
+}
+
+.inline-edit-categories ul.cat-checklist input {
+  margin-right: 3px;
+  margin-top: -1px;
+  vertical-align: middle;
+}
+
+/* Tags */
+.inline-edit-tags textarea {
+  height: 60px;
+  width: 100%;
+}
+
+/* Groups */
+.inline-edit-group {
+  clear: both;
+  line-height: 2.5;
+}
+
+.inline-edit-group .alignleft {
+  float: left;
+  margin-right: 15px;
+}
+
+/* Submit section */
+.inline-edit-save {
+  clear: both;
+  float: left;
+  padding: 0.5em 0.5em 0;
+  margin: 0.5em 0 0;
+  width: 100%;
+}
+
+.inline-edit-save .save,
+.inline-edit-save .cancel {
+  margin-right: 10px;
+}
+
+.inline-edit-save .spinner {
+  padding: 4px 10px 0;
+  vertical-align: top;
+  float: none;
+}
+
+/* Inline checkboxes */
+.inline-edit-row input[type="checkbox"] {
+  vertical-align: middle;
+  margin: 0 5px 0 0;
+}
+
+.inline-edit-row .checkbox-title {
+  line-height: 2.5;
+  display: inline;
+  vertical-align: middle;
+}
+
+/* Error messages */
+.inline-edit-row .notice {
+  margin: 5px 0;
+  background: #fff;
+  border-left: 4px solid #d63638;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  padding: 12px;
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 782px) {
+  .inline-edit-row fieldset {
+    width: 100%;
+    float: none;
+  }
+  
+  .inline-edit-col-left,
+  .inline-edit-col-center,
+  .inline-edit-col-right {
+    float: none;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 15px;
+  }
+  
+  .inline-edit-row span.title {
+    width: auto;
+    min-width: 5em;
+  }
+  
+  .inline-edit-row .input-text-wrap {
+    margin-left: 0;
+  }
+}
+
+/* Clear floats */
+.wp-clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Quick Edit specific select styling */
+.inline-edit-row select {
+  height: 28px;
+  vertical-align: middle;
+}

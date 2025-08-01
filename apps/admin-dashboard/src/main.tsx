@@ -7,6 +7,11 @@ import { Toaster } from 'react-hot-toast'
 import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
 import App from './App'
 import './styles/globals.css'
+import './styles/wordpress-dashboard.css'
+import './styles/dashboard-simple.css'
+import './styles/bulk-actions.css'
+import './styles/quick-edit.css'
+import './styles/help-tab.css'
 
 // MSW 개발 환경 설정
 async function enableMocking() {
