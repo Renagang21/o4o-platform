@@ -20,6 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 1. Use `./scripts/dev.sh` for all development commands
 2. CI/CD will validate code - local npm commands may fail due to environment
 3. Follow existing patterns - no new dependencies without justification
+4. **IMPORTANT**: Never create commits - user will handle all git commits manually
 
 ### 3. Quick Commands
 ```bash
@@ -434,6 +435,51 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - Fixed unused imports and variables in monitoring components
 - Added disaster recovery runbook and procedures
 - Added authentication bypass for testing (VITE_USE_MOCK=true)
+
+## 🏗️ 구텐베르그 블록 개발 원칙
+
+### 1. 워드프레스 정확한 모방 원칙
+- 워드프레스의 기본 블록 UI/UX를 정확히 재현
+- 커스텀 스타일링 최소화 - 워드프레스 기본 동작 준수
+- 블록 에디터의 표준 인터페이스 사용
+
+### 2. 기술 스택 제한
+- **허용**: React + Tailwind CSS만 사용
+- **금지**: 외부 UI 라이브러리 (Material-UI, Ant Design 등)
+- **필수**: WordPress 컴포넌트 (@wordpress/components) 활용
+
+### 3. 블록 독립성 원칙
+- 각 블록은 완전히 독립적으로 작동
+- 블록 간 직접적인 데이터 공유 금지
+- 필요시 WordPress 데이터 저장소 활용
+
+### 4. 개발 우선순위
+1. **기능 완성도** > 디자인
+2. **WordPress 표준 준수** > 커스텀 기능
+3. **안정성** > 신규 기능
+
+### 5. 호환성 요구사항
+- WordPress 5.8+ 지원
+- 모든 주요 브라우저 호환
+- 모바일 반응형 필수
+
+### 6. 금지사항
+- ❌ 인라인 스타일 사용
+- ❌ !important 선언
+- ❌ 전역 CSS 수정
+- ❌ WordPress 코어 함수 오버라이드
+
+### 7. 권장사항
+- ✅ WordPress 블록 패턴 활용
+- ✅ 접근성(ARIA) 속성 준수
+- ✅ 다국어 지원 고려
+- ✅ 성능 최적화 (lazy loading 등)
+
+### 8. 테스트 기준
+- 블록 생성/편집/삭제 정상 작동
+- 저장 후 프론트엔드 렌더링 확인
+- 다른 블록과의 충돌 없음
+- WordPress 코어 업데이트 호환성
 
 ## 🚀 Current Status
 - **React 19**: ✅ Migration completed

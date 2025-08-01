@@ -32,6 +32,7 @@ import { orderStatusHandlers } from '../../test/mocks/handlers/order-status';
 import { inventoryHandlers } from '../../test/mocks/handlers/inventory';
 import { tossPaymentsHandlers } from '../../test/mocks/handlers/toss-payments';
 import { crowdfundingHandlers } from '../../test/mocks/handlers/crowdfunding';
+import { platformAppsHandlers } from '../../test/mocks/handlers/platform-apps';
 
 // API Base URL (환경에 따라 변경)
 const API_BASE = 'http://localhost:4000/api';
@@ -94,6 +95,9 @@ export const handlers = [
   
   // Crowdfunding handlers
   ...crowdfundingHandlers,
+  
+  // Platform Apps handlers
+  ...platformAppsHandlers,
   
   // =============================================================================
   // AUTHENTICATION HANDLERS - 최우선 순위

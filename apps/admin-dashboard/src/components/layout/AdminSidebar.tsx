@@ -30,6 +30,14 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const userRole = (user?.role || 'customer') as UserRole
   const userPermissions: string[] = [] // User type doesn't have permissions field yet
   const menuItems = filterMenuByRole(dynamicMenuItems, userRole, userPermissions)
+  
+  // 디버깅용 로그
+  console.log('[AdminSidebar] User:', user);
+  console.log('[AdminSidebar] User Role:', userRole);
+  console.log('[AdminSidebar] Dynamic Menu Items:', dynamicMenuItems);
+  console.log('[AdminSidebar] Filtered Menu Items:', menuItems);
+  console.log('[AdminSidebar] Is Open:', isOpen);
+  console.log('[AdminSidebar] Menu Loading:', menuLoading);
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -144,8 +152,8 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
       className={clsx(
         'admin-sidebar fixed left-0 z-40 transform transition-all duration-300 ease-in-out',
         isCollapsed ? 'w-[36px] collapsed' : 'w-[160px]',
-        'lg:translate-x-0',
-        isOpen ? 'translate-x-0' : '-translate-x-full'
+        // 임시로 항상 보이도록 설정
+        'translate-x-0'
       )}
     >
       <div className="flex h-full flex-col">
@@ -172,6 +180,10 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
           {menuLoading ? (
             <div className="flex justify-center items-center h-20">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            </div>
+          ) : menuItems.length === 0 ? (
+            <div className="text-center p-4 text-sidebar-text text-xs">
+              메뉴를 불러오는 중...
             </div>
           ) : (
             menuItems.map(renderMenuItem)

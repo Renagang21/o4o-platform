@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+// Remove /api suffix if already included in VITE_API_URL
+const BASE_URL = API_BASE.endsWith('/api') ? API_BASE.slice(0, -4) : API_BASE;
 
 // Mock platform apps data - 실제 O4O 플랫폼 앱 현황
 let mockPlatformApps = [
