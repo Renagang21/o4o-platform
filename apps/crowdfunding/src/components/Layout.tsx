@@ -1,7 +1,12 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, Search, PlusCircle, User, Menu } from 'lucide-react';
 import { useState } from 'react';
-import { useAuth } from '@o4o/auth-context';
+// import { useAuth } from '@o4o/auth-context';
+// 임시: auth-context 빌드 문제로 인한 mock
+const useAuth = () => ({
+  user: null as { name?: string; email?: string } | null,
+  isAuthenticated: false
+});
 
 export function Layout() {
   const location = useLocation();

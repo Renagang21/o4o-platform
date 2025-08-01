@@ -82,10 +82,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             if (id.includes('@tiptap')) {
               return 'vendor-editor';
             }
-            // 차트
-            if (id.includes('recharts') || id.includes('d3')) {
-              return 'vendor-charts';
-            }
             // 기타 큰 라이브러리들
             if (id.includes('socket.io')) {
               return 'vendor-socket';
