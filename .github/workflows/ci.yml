@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package.json'
       
       - name: Cache dependencies
         uses: actions/cache@v4
@@ -70,6 +71,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package.json'
       
       - name: Restore dependencies
         uses: actions/cache@v4
@@ -113,6 +115,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package.json'
       
       - name: Restore dependencies
         uses: actions/cache@v4
@@ -159,6 +162,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package.json'
       
       - name: Restore dependencies
         uses: actions/cache@v4
@@ -205,6 +209,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package.json'
       
       - name: Restore dependencies
         uses: actions/cache@v4
@@ -252,6 +257,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: '**/package.json'
       
       - name: Restore dependencies
         uses: actions/cache@v4
@@ -314,4 +320,3 @@ jobs:
           echo "CI Pipeline completed"
           echo "Lint: ${{ needs.lint.result }}"
           echo "Unit Tests: ${{ needs.test-unit.result }}"
-          echo "Build: ${{ needs.build.result }}"

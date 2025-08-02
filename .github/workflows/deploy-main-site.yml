@@ -43,6 +43,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
       run: |
@@ -78,6 +79,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
       run: |
@@ -571,4 +573,3 @@ jobs:
     - name: Rollback notification
       run: |
         echo "🔄 메인 사이트 롤백 완료"
-        echo "⚠️  수동 확인이 필요합니다."

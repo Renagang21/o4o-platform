@@ -1,0 +1,32 @@
+name: 'Setup Node.js with Safe Cache'
+description: 'Setup Node.js with cache that handles missing package-lock.json'
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: true
+    default: '22.18.0'
+runs:
+  using: 'composite'
+  steps:
+    - name: Check for lock file
+      id: check-lock
+      shell: bash
+      run: |
+        if [ -f "package-lock.json" ]; then
+          echo "lock-exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "lock-exists=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Setup Node.js with cache
+      if: steps.check-lock.outputs.lock-exists == 'true'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+    
+    - name: Setup Node.js without cache
+      if: steps.check-lock.outputs.lock-exists == 'false'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}

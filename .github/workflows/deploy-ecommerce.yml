@@ -27,6 +27,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: '**/package.json'
         
     - name: Install dependencies
       run: |
@@ -166,4 +167,3 @@ jobs:
         echo "Please verify:"
         echo "- https://shop.neture.co.kr"
         echo "- Check browser console for errors"
-        echo "- Verify API connections"

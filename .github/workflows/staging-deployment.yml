@@ -20,6 +20,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
       run: npm install
@@ -105,4 +106,3 @@ jobs:
           https://staging.neture.co.kr
           https://staging.neture.co.kr/vendor
         uploadArtifacts: true
-        temporaryPublicStorage: true

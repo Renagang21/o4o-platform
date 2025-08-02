@@ -27,6 +27,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: '**/package.json'
         
     - name: Install dependencies
       run: |
@@ -158,4 +159,3 @@ jobs:
         echo "Please verify:"
         echo "- https://forum.neture.co.kr"
         echo "- Public access without authentication"
-        echo "- API connections working"

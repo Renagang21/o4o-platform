@@ -43,6 +43,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
       run: |
@@ -560,4 +561,3 @@ jobs:
       run: |
         echo "🔄 관리자 대시보드 롤백 완료"
         echo "⚠️  수동 확인이 필요합니다."
-        echo "🔒 보안상 중요하므로 즉시 상태를 확인하세요."

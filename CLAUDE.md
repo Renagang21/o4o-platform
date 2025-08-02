@@ -443,6 +443,44 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - Fixed npm version mismatch issues (now using npm 10.9.x)
 - Added Git pre-commit hook to prevent invalid dependencies
 - Added validate-dependencies.sh script for dependency validation
+- **Fixed GitHub Actions Cache Error**: Added `cache-dependency-path: '**/package.json'` to all workflows
+- **Created Safe Setup Action**: `.github/actions/setup-node-safe` for conditional cache handling
+- **Resolved package-lock.json Missing**: Workflows now handle missing lock file gracefully
+
+## 🛠️ GitHub Actions Cache 문제 해결 가이드
+
+### 문제 상황
+```
+Error: Dependencies lock file is not found in /home/runner/work/o4o-platform/o4o-platform.
+Supported file patterns: package-lock.json,npm-shrinkwrap.json,yarn.lock
+```
+
+### 원인
+- GitHub Actions의 `cache: 'npm'` 설정은 package-lock.json을 필수로 요구
+- monorepo에서 package-lock.json이 없을 때 워크플로우 실패
+
+### 해결 방법
+1. **즉시 수정**: 모든 워크플로우에 `cache-dependency-path` 추가
+   ```yaml
+   - uses: actions/setup-node@v4
+     with:
+       node-version: '22.18.0'
+       cache: 'npm'
+       cache-dependency-path: '**/package.json'
+   ```
+
+2. **안전한 대안**: 조건부 캐시 사용
+   ```yaml
+   - uses: ./.github/actions/setup-node-safe
+     with:
+       node-version: '22.18.0'
+   ```
+
+### 적용 스크립트
+```bash
+# 모든 워크플로우 자동 수정
+./scripts/fix-workflows-cache.sh
+```
 
 ## 🏗️ 구텐베르그 블록 개발 원칙
 
@@ -493,7 +531,7 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - **Node.js 22 LTS**: ✅ Migrated from 20.18.0 to 22.18.0
 - **React 19**: ✅ Migration completed
 - **TypeScript**: ✅ All errors resolved
-- **CI/CD**: ✅ Passing
+- **CI/CD**: ✅ Passing (cache issues fixed)
 - **Auth Bypass**: ✅ VITE_USE_MOCK=true enabled for testing
 
 ---
