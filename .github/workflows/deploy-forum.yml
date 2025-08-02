@@ -10,7 +10,7 @@ on:
       - '.github/workflows/deploy-forum.yml'
 
 env:
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '20.19.4'
   DEPLOY_PATH: /home/ubuntu/o4o-platform
 
 jobs:

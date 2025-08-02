@@ -27,7 +27,7 @@ env:
   SERVICE_PORT: 3001
   PM2_APP_NAME: o4o-admin-dashboard
   DEPLOY_PATH: /home/ubuntu/o4o-platform
-  NODE_VERSION: '20.18.0'
+  NODE_VERSION: '20.19.4'
 
 jobs:
   # 단계 1: 빌드 및 보안 검사

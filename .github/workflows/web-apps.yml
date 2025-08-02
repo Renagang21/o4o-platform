@@ -24,7 +24,7 @@ on:
       - 'packages/**'
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20.19.4'
   WEB_SERVER_IP: 13.125.144.8
 
 jobs:

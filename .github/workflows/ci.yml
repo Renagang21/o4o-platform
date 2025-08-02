@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '20.18.0'
+  NODE_VERSION: '20.19.4'
 
 jobs:
   # 의존성 캐싱 및 설치
