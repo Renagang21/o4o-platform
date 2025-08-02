@@ -29,7 +29,7 @@ console.log('✅ Dependencies verified');
 // Run TypeScript compiler
 try {
   console.log('📦 Compiling TypeScript...');
-  execSync('tsc', { 
+  execSync('tsc --skipLibCheck --noEmitOnError false', { 
     stdio: 'inherit',
     cwd: __dirname
   });

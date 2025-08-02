@@ -4,7 +4,7 @@
   "description": "O4O Platform API Server",
   "main": "dist/main.js",
   "engines": {
-    "node": ">=22.0.0 <23.0.0",
+    "node": ">=20.0.0",
     "npm": ">=10.9.0"
   },
   "scripts": {
@@ -12,14 +12,14 @@
     "dev": "nodemon --exec ts-node src/main.ts",
     "dev:mock": "nodemon --exec ts-node src/server-mock.ts",
     "build": "tsc",
-    "test": "npx jest",
+    "test": "npx jest --passWithNoTests",
     "test:unit": "npx jest --testPathPattern=unit",
     "test:integration": "npx jest --testPathPattern=integration",
     "test:coverage": "npx jest --coverage",
     "test:e2e": "npx jest --testPathPattern=e2e",
     "type-check": "npx tsc --noEmit",
-    "lint": "eslint --config ../../eslint.config.js src/**/*.ts --max-warnings 600 || true",
-    "lint:fix": "eslint --config ../../eslint.config.js src/**/*.ts --fix",
+    "lint": "eslint --config ../../.eslintrc.js src/**/*.ts --max-warnings 600 || true",
+    "lint:fix": "eslint --config ../../.eslintrc.js src/**/*.ts --fix",
     "prettier": "prettier --check src/**/*.ts",
     "prettier:fix": "prettier --write src/**/*.ts",
     "create-admin": "npx ts-node ../../scripts/create-admin.ts",

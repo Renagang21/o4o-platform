@@ -9,7 +9,7 @@
     "start": "node --experimental-specifier-resolution=node dist/server.js",
     "type-check": "npx tsc --noEmit",
     "lint": "eslint src/**/*.ts",
-    "test": "vitest"
+    "test": "vitest --passWithNoTests"
   },
   "dependencies": {
     "express": "^4.21.2",

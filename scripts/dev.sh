@@ -84,7 +84,7 @@ run_build() {
     echo -e "${GREEN}🔨 Building project...${NC}"
     
     # Build packages first
-    ./scripts/dev.sh build:packages
+    build_packages
     
     # Build apps
     echo "Building apps..."

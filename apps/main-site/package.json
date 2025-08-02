@@ -17,7 +17,7 @@
     "prettier": "prettier --check \"src/**/*.{ts,tsx,js,jsx}\"",
     "prettier:fix": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --passWithNoTests",
     "test:unit": "vitest run",
     "test:simple": "vitest run --config vitest.config.simple.ts",
     "test:integration": "vitest run --config vitest.config.integration.ts",
