@@ -16,7 +16,7 @@ const mockRoleHistory = [
   { adminId: '2', targetUserId: '4', newRoles: ['user', 'contributor'], timestamp: 1710000002000 },
 ];
 
-const AdminStats: React.FC = () => {
+const AdminStats: FC = () => {
   // 페이지별 접근 수 집계
   const pageCounts = mockAccessLogs.reduce((acc, log) => {
     acc[log.page] = (acc[log.page] || 0) + 1;

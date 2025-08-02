@@ -447,6 +447,25 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - **Created Safe Setup Action**: `.github/actions/setup-node-safe` for conditional cache handling
 - **Resolved package-lock.json Missing**: Workflows now handle missing lock file gracefully
 
+## 📝 Recent Updates (2025-02)
+- **Node.js 22 Migration Completed** (2025-02-02)
+  - Root cause analysis: package-lock.json deleted multiple times (commit d34ff3b3)
+  - Fixed GitHub Actions cache issues with missing lock file
+  - Created ci-install.sh for stable npm installations
+  - Added performance measurement and monitoring scripts
+  - Updated all workflows with cache-dependency-path
+- **TypeScript/ESLint Error Resolution** (2025-02-02)
+  - Fixed React namespace imports → named imports (React 19 compatibility)
+  - Replaced all React.FC usage with FC (130+ files)
+  - Fixed catch block error types (added explicit `: any`) (100+ files)
+  - Removed/commented all console.log statements (90+ files)
+  - Fixed Function type usage → specific function signatures
+  - Created automated fix scripts:
+    - `fix-common-type-lint-errors.sh`
+    - `fix-react-fc.sh`
+    - `fix-catch-errors.sh`
+  - Updated dev.sh script with absolute paths for Firebase Studio environment
+
 ## 🛠️ GitHub Actions Cache 문제 해결 가이드
 
 ### 문제 상황

@@ -14,7 +14,7 @@ interface SignageContent {
   };
 }
 
-const SignageEditor: React.FC = () => {
+const SignageEditor: FC = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState<SignageContent>({
     title: '',

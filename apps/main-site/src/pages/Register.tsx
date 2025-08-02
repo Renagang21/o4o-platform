@@ -13,7 +13,7 @@ interface SimpleRegisterData {
   name: string;
 }
 
-const Register: React.FC = () => {
+const Register: FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<SimpleRegisterData>({
     email: '',

@@ -106,7 +106,7 @@ const getStatusInfo = (status: string) => {
   }
 };
 
-const Dashboard: React.FC = () => {
+const Dashboard: FC = () => {
   const [servicesData, setServicesData] = useState<ServicesData | null>(null);
   const [loading, setLoading] = useState(true);
   const userStr = localStorage.getItem('user');

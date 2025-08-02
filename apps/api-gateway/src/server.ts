@@ -18,7 +18,7 @@ import { ProxyMiddleware } from './middleware/proxy.middleware.js';
 // Validate configuration on startup
 try {
   validateConfig();
-} catch (error: any) {
+} catch (error) {
   logger.error('Invalid configuration', { error: error.message });
   process.exit(1);
 }

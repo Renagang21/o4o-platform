@@ -133,7 +133,7 @@ const mockContents: Content[] = [
   }
 ];
 
-const ContentManagement: React.FC = () => {
+const ContentManagement: FC = () => {
   const [contents, setContents] = useState<Content[]>(mockContents);
   const [selectedContent, setSelectedContent] = useState<Content | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -361,7 +361,7 @@ const ContentManagement: React.FC = () => {
         c.id === selectedContent.id ? updatedContent : c
       ));
       
-      console.log('저장 완료:', selectedContent.id);
+      // console.log('저장 완료:', selectedContent.id);
     } catch (error) {
       console.error('저장 실패:', error);
     } finally {
@@ -537,7 +537,7 @@ const ContentManagement: React.FC = () => {
                             localStorage.setItem(`content_${selectedContent.id}`, JSON.stringify(updatedContent));
                             
                             // 실제 구현에서는 API 호출
-                            console.log('자동 저장됨:', selectedContent.id);
+                            // console.log('자동 저장됨:', selectedContent.id);
                             return true;
                           } catch (error) {
                             console.error('자동 저장 실패:', error);

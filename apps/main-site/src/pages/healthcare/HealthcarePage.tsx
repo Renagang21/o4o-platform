@@ -3,7 +3,7 @@ import { HealthcareMainPage } from '@o4o/ui/healthcare';
 import { Button } from '@o4o/ui';
 import { Edit3, Save, RefreshCw } from 'lucide-react';
 
-const HealthcarePage: React.FC = () => {
+const HealthcarePage: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -24,14 +24,14 @@ const HealthcarePage: React.FC = () => {
     setIsEditing(!isEditing);
     if (isEditing && hasChanges) {
       // Simulate saving changes
-      console.log('Saving changes...');
+      // console.log('Saving changes...');
       setHasChanges(false);
     }
   };
 
   const handleSaveChanges = () => {
     // Simulate API call to save changes
-    console.log('Saving changes...');
+    // console.log('Saving changes...');
     setHasChanges(false);
     
     // Show success message (you can implement toast notifications)

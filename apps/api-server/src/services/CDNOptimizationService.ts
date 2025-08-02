@@ -127,7 +127,7 @@ export class CDNOptimizationService {
    */
   async optimizeAssets(): Promise<void> {
     try {
-      console.log('🔄 Starting asset optimization...');
+      // console.log('🔄 Starting asset optimization...');
       
       // 최적화 대상 자산 스캔
       const assetsToOptimize = await this.scanAssetsForOptimization();
@@ -146,7 +146,7 @@ export class CDNOptimizationService {
       const successful = results.filter(r => r.status === 'fulfilled').length;
       const failed = results.filter(r => r.status === 'rejected').length;
 
-      console.log(`✅ Asset optimization completed: ${successful} successful, ${failed} failed`);
+      // console.log(`✅ Asset optimization completed: ${successful} successful, ${failed} failed`);
 
       // 최적화 결과 저장
       await this.saveOptimizationResults(results);
@@ -578,7 +578,7 @@ export class CDNOptimizationService {
     // 현재 상태 업데이트
     await this.redis.hset('optimization_status', 'latest', JSON.stringify(summary));
 
-    console.log('📊 Optimization summary:', summary);
+    // console.log('📊 Optimization summary:', summary);
   }
 
   /**
@@ -685,7 +685,7 @@ export class CDNOptimizationService {
 
     try {
       // 실제로는 CDN 제공업체의 API 사용
-      console.log(`📡 Deploying asset to CDN: ${asset.path}`);
+      // console.log(`📡 Deploying asset to CDN: ${asset.path}`);
       
       // 배포 상태 저장
       await this.redis.hset('cdn_deployed_assets', asset.path, JSON.stringify({
@@ -800,7 +800,7 @@ export class CDNOptimizationService {
 
     try {
       // 실제로는 CDN 제공업체의 캐시 무효화 API 호출
-      console.log('🗑️ Invalidating CDN cache for paths:', paths);
+      // console.log('🗑️ Invalidating CDN cache for paths:', paths);
       
       const invalidationResult = {
         paths,
@@ -896,7 +896,7 @@ export class CDNOptimizationService {
   async shutdown(): Promise<void> {
     try {
       await this.redis.disconnect();
-      console.log('✅ CDN optimization service shutdown completed');
+      // console.log('✅ CDN optimization service shutdown completed');
     } catch (error) {
       console.error('❌ CDN optimization service shutdown failed:', error);
     }

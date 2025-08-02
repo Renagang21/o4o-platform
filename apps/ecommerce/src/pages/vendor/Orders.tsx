@@ -161,7 +161,7 @@ export default function VendorOrders() {
 
   const handleUpdateStatus = (orderId: string, newStatus: Order['status']) => {
     // API 호출하여 상태 업데이트
-    console.log(`Updating order ${orderId} to ${newStatus}`);
+    // console.log(`Updating order ${orderId} to ${newStatus}`);
   };
 
   return (

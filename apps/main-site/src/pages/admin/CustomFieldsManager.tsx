@@ -79,7 +79,7 @@ interface FieldGroup {
   updatedAt: string;
 }
 
-const CustomFieldsManager: React.FC = () => {
+const CustomFieldsManager: FC = () => {
   const [fieldGroups, setFieldGroups] = useState<FieldGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
@@ -233,7 +233,7 @@ const CustomFieldsManager: React.FC = () => {
       };
 
       // API 호출 (Mock)
-      console.log('Creating field group:', groupData);
+      // console.log('Creating field group:', groupData);
       
       await loadFieldGroups();
       resetForm();
@@ -250,7 +250,7 @@ const CustomFieldsManager: React.FC = () => {
 
     try {
       // API 호출 (Mock)
-      console.log('Deleting field group:', id);
+      // console.log('Deleting field group:', id);
       
       setFieldGroups(prev => prev.filter(group => group.id !== id));
       alert('✅ 필드 그룹이 삭제되었습니다.');

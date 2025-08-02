@@ -46,7 +46,7 @@ export async function checkVideoInMyList(postId: string): Promise<boolean> {
   try {
     const response = await authClient.api.get(`/v1/signage/check-video/${postId}`);
     return response.data.exists || false;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Check video error:', error);
     return false;
   }
@@ -71,7 +71,7 @@ export async function getMyVideoList(params?: {
 
     const response = await authClient.api.get(`/v1/signage/my-videos?${queryParams.toString()}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get my videos error:', error);
     return {
       success: false,

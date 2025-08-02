@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { FC, useState, useEffect  } from 'react';
 import { 
   ServiceStatusCard, 
   ServiceLinkCard, 
@@ -14,7 +14,7 @@ import {
 } from '../data/sampleData';
 import { ServiceStatus, ServiceLink, DevTool } from '../types';
 
-export const TestDashboard: React.FC = () => {
+export const TestDashboard: FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [services, setServices] = useState(sampleServiceStatus);
 

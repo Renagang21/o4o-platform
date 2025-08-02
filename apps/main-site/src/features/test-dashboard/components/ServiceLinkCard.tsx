@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { ServiceLink } from '../types';
 import { StatusBadge } from './StatusBadge';
 

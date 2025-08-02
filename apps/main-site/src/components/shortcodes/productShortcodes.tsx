@@ -42,7 +42,7 @@ export const productShortcode: ShortcodeHandler = {
 };
 
 // Single Product Component
-const SingleProduct: React.FC<{
+const SingleProduct: FC<{
   productId: string;
   showPrice?: boolean;
   showCart?: boolean;
@@ -137,7 +137,7 @@ export const productGridShortcode: ShortcodeHandler = {
 };
 
 // Grid Loading Component
-const GridLoading: React.FC<{ columns: number }> = ({ columns }) => (
+const GridLoading: FC<{ columns: number }> = ({ columns }) => (
   <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${columns} gap-6`}>
     {[...Array(columns * 2)].map((_, i) => (
       <ProductLoading key={i} />
@@ -146,7 +146,7 @@ const GridLoading: React.FC<{ columns: number }> = ({ columns }) => (
 );
 
 // Product Grid Wrapper
-const ProductGridWrapper: React.FC<{
+const ProductGridWrapper: FC<{
   category?: string;
   limit: number;
   columns: number;
@@ -219,7 +219,7 @@ export const addToCartShortcode: ShortcodeHandler = {
 };
 
 // Add to Cart Button Component
-const AddToCartButton: React.FC<{
+const AddToCartButton: FC<{
   productId: string;
   text: string;
   className?: string;
@@ -283,7 +283,7 @@ export const productCarouselShortcode: ShortcodeHandler = {
 };
 
 // Product Carousel Wrapper
-const ProductCarouselWrapper: React.FC<{
+const ProductCarouselWrapper: FC<{
   category?: string;
   limit: number;
   autoplay: boolean;

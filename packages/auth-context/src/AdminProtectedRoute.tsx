@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import { FC, ReactNode, useEffect  } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ interface AdminProtectedRouteProps {
   showContactAdmin?: boolean;
 }
 
-const AccessDeniedComponent: React.FC<{ showContactAdmin?: boolean }> = ({ 
+const AccessDeniedComponent: FC<{ showContactAdmin?: boolean }> = ({ 
   showContactAdmin = false 
 }) => (
   <div style={{ 
@@ -32,7 +32,7 @@ const AccessDeniedComponent: React.FC<{ showContactAdmin?: boolean }> = ({
   </div>
 );
 
-export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
+export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   children,
   requiredRoles = [],
   requiredPermissions = [],

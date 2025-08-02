@@ -2,13 +2,13 @@ import { useState, FC } from 'react';
 import { NotionEditor } from '@o4o/ui/editor/NotionEditor';
 import { GutenbergEditor } from '@o4o/ui/editor/GutenbergEditor';
 
-const TestPage: React.FC = () => {
+const TestPage: FC = () => {
   const [showNotionEditor, setShowNotionEditor] = useState(false);
   const [showGutenbergEditor, setShowGutenbergEditor] = useState(false);
 
   const handleSave = (content: string, json: Record<string, unknown>) => {
-    console.log('💾 저장된 콘텐츠:', content);
-    console.log('💾 저장된 JSON:', json);
+    // console.log('💾 저장된 콘텐츠:', content);
+    // console.log('💾 저장된 JSON:', json);
   };
 
   const handleBack = () => {

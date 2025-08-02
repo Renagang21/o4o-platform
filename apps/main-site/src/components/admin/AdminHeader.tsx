@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
-const AdminHeader: React.FC = () => {
+const AdminHeader: FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -37,7 +37,7 @@ const AdminHeader: React.FC = () => {
     try {
       await logout();
       navigate('/login');
-    } catch (error: any) {
+    } catch (error) {
       console.error('로그아웃 중 오류:', error);
     }
   };

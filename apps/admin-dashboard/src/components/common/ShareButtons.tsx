@@ -92,7 +92,7 @@ export const ShareButtons: FC<ShareButtonsProps> = ({
           },
         ],
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Kakao share error:', error);
       toast.error('카카오톡 공유 중 오류가 발생했습니다.');
     }
@@ -121,7 +121,7 @@ export const ShareButtons: FC<ShareButtonsProps> = ({
       
       // 3초 후 복사 상태 초기화
       setTimeout(() => setCopied(false), 3000);
-    } catch (error) {
+    } catch (error: any) {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = shareUrl;

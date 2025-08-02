@@ -25,7 +25,7 @@ interface MenuProps {
   onSelect?: (key: string) => void;
 }
 
-const Menu: React.FC<MenuProps> = ({
+const Menu: FC<MenuProps> = ({
   items,
   variant = 'default',
   size = 'md',

@@ -3,7 +3,7 @@ import { HealthcareMainPage } from '@o4o/ui/healthcare';
 import { Button, Card, CardContent } from '@o4o/ui';
 import { Play, Pause, RotateCcw, Monitor, Smartphone, Tablet } from 'lucide-react';
 
-const HealthcareDemo: React.FC = () => {
+const HealthcareDemo: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [autoPlay, setAutoPlay] = useState(false);

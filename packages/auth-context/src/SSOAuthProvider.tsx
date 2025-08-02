@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { FC, useEffect  } from 'react';
 import { CookieAuthProvider, CookieAuthProviderProps } from './CookieAuthProvider';
 import { ssoClient, User } from '@o4o/auth-client';
 
@@ -7,7 +7,7 @@ export interface SSOAuthProviderProps extends CookieAuthProviderProps {
   ssoCheckInterval?: number;
 }
 
-export const SSOAuthProvider: React.FC<SSOAuthProviderProps> = ({ 
+export const SSOAuthProvider: FC<SSOAuthProviderProps> = ({ 
   children, 
   onAuthChange,
   enableSSO = true

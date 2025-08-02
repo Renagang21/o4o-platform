@@ -37,7 +37,7 @@ interface PaymentMethod {
   isRecommended?: boolean;
 }
 
-const CheckoutPage: React.FC = () => {
+const CheckoutPage: FC = () => {
   const [checkoutItems, setCheckoutItems] = useState<CheckoutItem[]>([]);
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string>('');

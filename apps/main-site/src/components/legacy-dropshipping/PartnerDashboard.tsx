@@ -54,7 +54,7 @@ interface PartnerDashboardProps {
   partnerId: string;
 }
 
-const PartnerDashboard: React.FC<PartnerDashboardProps> = ({ partnerId }) => {
+const PartnerDashboard: FC<PartnerDashboardProps> = ({ partnerId }) => {
   const [partnerInfo, setPartnerInfo] = useState<PartnerInfo | null>(null);
   const [earnings, setEarnings] = useState<EarningsData | null>(null);
   const [performance, setPerformance] = useState<PerformanceMetrics | null>(null);

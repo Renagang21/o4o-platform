@@ -20,7 +20,7 @@ interface Partner {
   performanceScore: number;
 }
 
-const PartnerManagement: React.FC = () => {
+const PartnerManagement: FC = () => {
   const [currentRole, setCurrentRole] = useState<UserRole>('supplier');
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>('partner_001');
@@ -140,12 +140,12 @@ const PartnerManagement: React.FC = () => {
   };
 
   const handleCommissionApprove = (requestId: string, rate: number, conditions?: string) => {
-    console.log('수수료 승인:', { requestId, rate, conditions });
+    // console.log('수수료 승인:', { requestId, rate, conditions });
     // 실제로는 API 호출
   };
 
   const handleCommissionReject = (requestId: string, reason: string) => {
-    console.log('수수료 거절:', { requestId, reason });
+    // console.log('수수료 거절:', { requestId, reason });
     // 실제로는 API 호출
   };
 

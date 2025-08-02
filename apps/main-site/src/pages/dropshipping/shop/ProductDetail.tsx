@@ -37,7 +37,7 @@ interface Review {
   helpful: number;
 }
 
-const ProductDetail: React.FC = () => {
+const ProductDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);

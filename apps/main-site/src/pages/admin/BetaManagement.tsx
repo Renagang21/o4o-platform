@@ -93,7 +93,7 @@ const FEEDBACK_STATUS_COLORS = {
   archived: 'gray'
 } as const;
 
-export const BetaManagement: React.FC = () => {
+export const BetaManagement: FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
   

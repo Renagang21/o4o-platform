@@ -21,7 +21,7 @@ for (const envPath of possiblePaths) {
   try {
     const result = dotenv.config({ path: envPath });
     if (!result.error) {
-      console.log(`✅ Successfully loaded env from: ${envPath}`);
+      // console.log(`✅ Successfully loaded env from: ${envPath}`);
       envLoaded = true;
       break;
     }
@@ -35,12 +35,12 @@ if (!envLoaded) {
 }
 
 // 환경변수 검증
-console.log('🔧 Environment Configuration:');
-console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`   Config file: ${envFile}`);
-console.log(`   DB_HOST: ${process.env.DB_HOST || 'NOT SET'}`);
-console.log(`   DB_PORT: ${process.env.DB_PORT || 'NOT SET'}`);
-console.log(`   DB_NAME: ${process.env.DB_NAME || 'NOT SET'}`);
+// console.log('🔧 Environment Configuration:');
+// console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+// console.log(`   Config file: ${envFile}`);
+// console.log(`   DB_HOST: ${process.env.DB_HOST || 'NOT SET'}`);
+// console.log(`   DB_PORT: ${process.env.DB_PORT || 'NOT SET'}`);
+// console.log(`   DB_NAME: ${process.env.DB_NAME || 'NOT SET'}`);
 
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
@@ -93,7 +93,7 @@ const app: Application = express();
 // This must be done before any middleware that uses req.ip
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', true);
-  console.log('✅ Trust proxy enabled for production environment');
+  // console.log('✅ Trust proxy enabled for production environment');
 }
 
 const httpServer = createServer(app);
@@ -129,7 +129,7 @@ const io = new Server(httpServer, {
 });
 
 const port = process.env.PORT || 4000;
-console.log('🚀 Starting server on port:', port);
+// console.log('🚀 Starting server on port:', port);
 
 // Rate limiting for authenticated endpoints
 const limiter = rateLimit({
@@ -420,11 +420,11 @@ app.get('/', (req, res) => {
 
 // Socket.IO 연결 처리 (기존 기능 유지)
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+  // console.log('Client connected:', socket.id);
 
   socket.on('join_admin', () => {
     socket.join('admin_notifications');
-    console.log('Admin joined notifications room');
+    // console.log('Admin joined notifications room');
   });
 
   socket.on('new_user_registered', (data) => {
@@ -436,7 +436,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+    // console.log('Client disconnected:', socket.id);
   });
 });
 
@@ -457,9 +457,9 @@ const startServer = async () => {
   try {
     // 데이터베이스 초기화 전 상태 확인
     if (AppDataSource.isInitialized) {
-      console.log('✅ Database already initialized');
+      // console.log('✅ Database already initialized');
     } else {
-      console.log('🔄 Initializing database connection...');
+      // console.log('🔄 Initializing database connection...');
       
       // 환경변수 재확인
       const dbConfig = {
@@ -470,22 +470,22 @@ const startServer = async () => {
         database: process.env.DB_NAME || 'o4o_platform'
       };
       
-      console.log('📊 Database config:', {
+      // console.log('📊 Database config:', {
         ...dbConfig,
         password: dbConfig.password ? '***' : 'NOT SET'
       });
       
       // 데이터베이스 초기화
       await AppDataSource.initialize();
-      console.log('✅ Database connection established');
+      // console.log('✅ Database connection established');
       
       // 마이그레이션 실행 (프로덕션 환경)
       if (process.env.NODE_ENV === 'production') {
         try {
           await AppDataSource.runMigrations();
-          console.log('✅ Database migrations completed');
+          // console.log('✅ Database migrations completed');
         } catch (migrationError) {
-          console.log('⚠️  Migration error:', (migrationError as Error).message);
+          // console.log('⚠️  Migration error:', (migrationError as Error).message);
         }
       }
 
@@ -493,14 +493,14 @@ const startServer = async () => {
       try {
         await backupService.initialize();
         await errorAlertService.initialize();
-        console.log('✅ Monitoring services initialized');
+        // console.log('✅ Monitoring services initialized');
       } catch (serviceError) {
         console.error('⚠️  Failed to initialize monitoring services:', serviceError);
       }
     }
   } catch (dbError) {
     console.error('❌ Database connection failed:', dbError);
-    console.log('📌 Check your database configuration and ensure PostgreSQL is running');
+    // console.log('📌 Check your database configuration and ensure PostgreSQL is running');
     
     // 프로덕션에서는 종료, 개발에서는 계속 실행
     if (process.env.NODE_ENV === 'production') {
@@ -518,11 +518,11 @@ const startServer = async () => {
     });
 
     redisClient.on('connect', () => {
-      console.log('✅ Redis connected');
+      // console.log('✅ Redis connected');
     });
 
     redisClient.on('error', (err) => {
-      console.log('⚠️  Redis connection error:', err.message);
+      // console.log('⚠️  Redis connection error:', err.message);
     });
 
     // Initialize SessionSyncService
@@ -531,21 +531,21 @@ const startServer = async () => {
     // Initialize WebSocket session sync if enabled
     if (process.env.SESSION_SYNC_ENABLED === 'true') {
       webSocketSessionSync = new WebSocketSessionSync(io);
-      console.log('✅ WebSocket session sync initialized');
+      // console.log('✅ WebSocket session sync initialized');
     }
   } catch (redisError) {
-    console.log('⚠️  Redis initialization failed:', (redisError as Error).message);
-    console.log('📌 Running without session synchronization');
+    // console.log('⚠️  Redis initialization failed:', (redisError as Error).message);
+    // console.log('📌 Running without session synchronization');
   }
   
   httpServer.listen(port, () => {
-    console.log(`🚀 Neture API Server running on port ${port}`);
-    console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 API Base URL: http://localhost:${port}/api`);
-    console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3011'}`);
-    console.log(`📡 Health check: http://localhost:${port}/api/health`);
-    console.log(`🍪 Cookie Domain: ${process.env.COOKIE_DOMAIN || 'none (default)'}`);
-    console.log(`🔄 Session Sync: ${process.env.SESSION_SYNC_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
+    // console.log(`🚀 Neture API Server running on port ${port}`);
+    // console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
+    // console.log(`🌐 API Base URL: http://localhost:${port}/api`);
+    // console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3011'}`);
+    // console.log(`📡 Health check: http://localhost:${port}/api/health`);
+    // console.log(`🍪 Cookie Domain: ${process.env.COOKIE_DOMAIN || 'none (default)'}`);
+    // console.log(`🔄 Session Sync: ${process.env.SESSION_SYNC_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
   });
 };
 

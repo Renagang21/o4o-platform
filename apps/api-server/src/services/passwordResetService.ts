@@ -23,7 +23,7 @@ export class PasswordResetService {
     
     // Always return true to prevent email enumeration
     if (!user) {
-      console.log(`Password reset requested for non-existent email: ${email}`);
+      // console.log(`Password reset requested for non-existent email: ${email}`);
       return true;
     }
 

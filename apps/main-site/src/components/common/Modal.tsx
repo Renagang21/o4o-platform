@@ -16,7 +16,7 @@ interface ModalProps {
   closeOnEsc?: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({
+const Modal: FC<ModalProps> = ({
   isOpen,
   onClose,
   title,

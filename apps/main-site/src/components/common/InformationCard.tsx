@@ -25,7 +25,7 @@ interface InformationCardProps {
   children?: React.ReactNode;
 }
 
-const InformationCard: React.FC<InformationCardProps> = ({
+const InformationCard: FC<InformationCardProps> = ({
   title,
   level,
   sources,
@@ -178,7 +178,7 @@ interface TechnicalData {
   features?: string[];
 }
 
-export const TechnicalInfoSection: React.FC<{ data: TechnicalData }> = ({ data }) => (
+export const TechnicalInfoSection: FC<{ data: TechnicalData }> = ({ data }) => (
   <div className="space-y-3">
     <div className="grid grid-cols-2 gap-4">
       <div>
@@ -217,7 +217,7 @@ interface SafetyData {
   warnings?: string[];
 }
 
-export const SafetyInfoSection: React.FC<{ data: SafetyData }> = ({ data }) => (
+export const SafetyInfoSection: FC<{ data: SafetyData }> = ({ data }) => (
   <div className="space-y-3">
     <div className="bg-info-safety bg-opacity-10 border border-info-safety border-opacity-20 rounded-lg p-3">
       <h5 className="font-medium text-info-safety mb-2">🛡️ 안전성 데이터</h5>
@@ -257,7 +257,7 @@ interface UsageData {
   tips?: string[];
 }
 
-export const UsageInfoSection: React.FC<{ data: UsageData }> = ({ data }) => (
+export const UsageInfoSection: FC<{ data: UsageData }> = ({ data }) => (
   <div className="space-y-3">
     <div>
       <h5 className="font-medium text-info-usage mb-2">📋 사용법 안내</h5>

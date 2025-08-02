@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { FC, useState, useEffect, useCallback  } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   Wifi, WifiOff, Calendar, Volume2, VolumeX,
@@ -45,7 +45,7 @@ interface PlaybackStatus {
   };
 }
 
-const LiveTVDisplay: React.FC = () => {
+const LiveTVDisplay: FC = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());

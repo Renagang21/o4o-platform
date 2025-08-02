@@ -10,7 +10,7 @@ interface TestAccountListProps {
   description?: string;
 }
 
-const TestAccountList: React.FC<TestAccountListProps> = ({ 
+const TestAccountList: FC<TestAccountListProps> = ({ 
   accounts,
   title = '테스트 계정 정보',
   description = '각 역할에 맞는 계정으로 로그인하여 기능을 테스트하세요' 

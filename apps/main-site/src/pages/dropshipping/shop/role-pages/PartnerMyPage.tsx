@@ -43,7 +43,7 @@ interface ReferralLink {
   createdDate: string;
 }
 
-const PartnerMyPage: React.FC<RolePageProps> = ({ user }) => {
+const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [partnerStats, setPartnerStats] = useState<PartnerStats>({
     totalEarnings: 1850000,

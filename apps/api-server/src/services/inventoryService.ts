@@ -138,7 +138,7 @@ export class InventoryService {
       // 이 방법은 Redis SCAN을 사용하여 구현할 수 있지만,
       // 현재는 간단히 개별 상품별로 해제하는 방식을 사용
       // 실제 구현에서는 예약 정보를 별도로 저장하여 관리하는 것이 좋습니다.
-      console.log(`Releasing reservation: ${reservationId}`);
+      // console.log(`Releasing reservation: ${reservationId}`);
     } catch (error) {
       console.error('Error releasing reservation:', error);
     }
@@ -297,7 +297,7 @@ export class InventoryService {
     notes?: string
   ): Promise<void> {
     // 실제 구현에서는 별도의 InventoryMovement 엔티티를 생성하여 이력을 관리합니다.
-    console.log('Inventory movement recorded:', {
+    // console.log('Inventory movement recorded:', {
       productId,
       quantityChange,
       type,
@@ -382,7 +382,7 @@ export class InventoryService {
   async cleanupExpiredReservations(): Promise<void> {
     // 이 메서드는 크론 잡으로 주기적으로 실행되어야 합니다.
     // Redis TTL이 자동으로 처리하지만, 수동 정리도 필요할 수 있습니다.
-    console.log('Cleaning up expired reservations...');
+    // console.log('Cleaning up expired reservations...');
   }
 }
 

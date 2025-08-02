@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Review, ReviewSummary } from '../types/review';
 import { useReviewStore } from '../stores/reviewStore';
 import { useAuthStore } from '../stores/authStore';

@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { mockAuthService } from '../services/mockAuth';
 
-const ForgotPassword: React.FC = () => {
+const ForgotPassword: FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ const ForgotPassword: React.FC = () => {
           throw new Error(errorData.message || '비밀번호 재설정 요청에 실패했습니다.');
         }
       } catch (apiError) {
-        console.log('API 서버 연결 실패, 모의 서비스 사용');
+        // console.log('API 서버 연결 실패, 모의 서비스 사용');
         await mockAuthService.forgotPassword(email);
       }
 

@@ -13,7 +13,7 @@ interface DashboardStats {
   avgOrderValue: number;
 }
 
-const DropshippingDashboard: React.FC = () => {
+const DropshippingDashboard: FC = () => {
   const [currentRole, setCurrentRole] = useState<UserRole>('supplier');
   const [stats] = useState<DashboardStats>({
     totalProducts: 147,

@@ -33,7 +33,7 @@ interface LiveSupportWidgetProps {
   className?: string;
 }
 
-export const LiveSupportWidget: React.FC<LiveSupportWidgetProps> = ({
+export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
   betaUserEmail,
   betaUserId,
   feedbackId,
@@ -81,13 +81,13 @@ export const LiveSupportWidget: React.FC<LiveSupportWidgetProps> = ({
 
     // Connection handlers
     socketInstance.on('connect', () => {
-      console.log('Connected to live support');
+      // console.log('Connected to live support');
       setIsConnected(true);
       setConnectionStatus('connected');
     });
 
     socketInstance.on('disconnect', () => {
-      console.log('Disconnected from live support');
+      // console.log('Disconnected from live support');
       setIsConnected(false);
       setConnectionStatus('disconnected');
     });
@@ -170,7 +170,7 @@ export const LiveSupportWidget: React.FC<LiveSupportWidgetProps> = ({
       } else {
         showToast(data.error?.message || '실시간 지원 요청에 실패했습니다.', 'error');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Start live support error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
@@ -353,7 +353,7 @@ interface EnhancedBetaFeedbackWidgetProps {
   className?: string;
 }
 
-export const EnhancedBetaFeedbackWidget: React.FC<EnhancedBetaFeedbackWidgetProps> = ({
+export const EnhancedBetaFeedbackWidget: FC<EnhancedBetaFeedbackWidgetProps> = ({
   page = 'signage',
   feature,
   className

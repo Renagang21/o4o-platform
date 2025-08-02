@@ -46,21 +46,21 @@ declare module '@wordpress/url' {
 }
 
 declare module '@wordpress/api-fetch' {
-  // RequestInit type from lib.dom.d.ts or a compatible interface
+  // Simplified API fetch options that work in both browser and Node environments
   interface APIFetchOptions {
-    // RequestInit properties
-    method?: string;
-    headers?: HeadersInit;
-    body?: BodyInit | null;
-    mode?: RequestMode;
-    credentials?: RequestCredentials;
-    cache?: RequestCache;
-    redirect?: RequestRedirect;
+    // Basic fetch options
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+    headers?: Record<string, string> | [string, string][];
+    body?: string | FormData | URLSearchParams | ReadableStream<Uint8Array> | null;
+    mode?: 'cors' | 'no-cors' | 'same-origin';
+    credentials?: 'omit' | 'same-origin' | 'include';
+    cache?: 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';
+    redirect?: 'follow' | 'error' | 'manual';
     referrer?: string;
-    referrerPolicy?: ReferrerPolicy;
+    referrerPolicy?: 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
     integrity?: string;
     keepalive?: boolean;
-    signal?: AbortSignal | null;
+    signal?: any; // AbortSignal
     
     // WordPress specific properties
     path?: string;

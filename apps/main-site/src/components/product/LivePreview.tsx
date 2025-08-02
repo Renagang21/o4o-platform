@@ -14,7 +14,7 @@ interface LivePreviewProps {
   price: number;
 }
 
-const LivePreview: React.FC<LivePreviewProps> = ({
+const LivePreview: FC<LivePreviewProps> = ({
   product,
   label,
   price

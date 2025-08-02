@@ -71,7 +71,7 @@ app.use(compression() as any);
 // 요청 로깅 (개발 환경)
 if (NODE_ENV === 'development') {
   app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+    // console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
     next();
   });
 }
@@ -149,27 +149,27 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
 async function startServer() {
   try {
     // 데이터베이스 연결
-    console.log('🔗 Initializing database connection...');
+    // console.log('🔗 Initializing database connection...');
     await AppDataSource.initialize();
-    console.log('✅ Database connected successfully');
+    // console.log('✅ Database connected successfully');
 
     // 서버 시작
     app.listen(PORT, () => {
-      console.log('🚀 API Server Information:');
-      console.log(`   Environment: ${NODE_ENV}`);
-      console.log(`   Port: ${PORT}`);
-      console.log(`   Database: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
-      console.log(`   URL: http://localhost:${PORT}`);
-      console.log(`   API: http://localhost:${PORT}/api/v1`);
-      console.log(`   Health: http://localhost:${PORT}/health`);
-      console.log('');
-      console.log('📋 Available API Endpoints:');
-      console.log('   🏢 Business API: /api/v1/business/*');
-      console.log('   🔧 Admin API: /api/v1/admin/*');
-      console.log('   🤝 Partner API: /api/v1/partner/*');
-      console.log('   🔒 Internal API: /api/v1/internal/*');
-      console.log('');
-      console.log('✨ Server is ready to accept connections');
+      // console.log('🚀 API Server Information:');
+      // console.log(`   Environment: ${NODE_ENV}`);
+      // console.log(`   Port: ${PORT}`);
+      // console.log(`   Database: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
+      // console.log(`   URL: http://localhost:${PORT}`);
+      // console.log(`   API: http://localhost:${PORT}/api/v1`);
+      // console.log(`   Health: http://localhost:${PORT}/health`);
+      // console.log('');
+      // console.log('📋 Available API Endpoints:');
+      // console.log('   🏢 Business API: /api/v1/business/*');
+      // console.log('   🔧 Admin API: /api/v1/admin/*');
+      // console.log('   🤝 Partner API: /api/v1/partner/*');
+      // console.log('   🔒 Internal API: /api/v1/internal/*');
+      // console.log('');
+      // console.log('✨ Server is ready to accept connections');
     });
 
   } catch (error) {
@@ -183,22 +183,22 @@ startServer();
 
 // 종료 시 정리
 process.on('SIGTERM', async () => {
-  console.log('🛑 SIGTERM received, shutting down gracefully...');
+  // console.log('🛑 SIGTERM received, shutting down gracefully...');
   
   if (AppDataSource.isInitialized) {
     await AppDataSource.destroy();
-    console.log('✅ Database connection closed');
+    // console.log('✅ Database connection closed');
   }
   
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('🛑 SIGINT received, shutting down gracefully...');
+  // console.log('🛑 SIGINT received, shutting down gracefully...');
   
   if (AppDataSource.isInitialized) {
     await AppDataSource.destroy();
-    console.log('✅ Database connection closed');
+    // console.log('✅ Database connection closed');
   }
   
   process.exit(0);

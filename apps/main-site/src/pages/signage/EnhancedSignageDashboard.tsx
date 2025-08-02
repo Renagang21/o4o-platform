@@ -71,7 +71,7 @@ interface LiveDashboard {
   }>;
 }
 
-const EnhancedSignageDashboard: React.FC = () => {
+const EnhancedSignageDashboard: FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
   

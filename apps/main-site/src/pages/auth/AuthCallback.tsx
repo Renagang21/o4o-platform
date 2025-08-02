@@ -2,7 +2,7 @@ import { useState, useEffect, FC } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-const AuthCallback: React.FC = () => {
+const AuthCallback: FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login } = useAuth();

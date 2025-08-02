@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { FC, useEffect  } from 'react';
 import { useAuthStore } from '../stores/authStore';
 
 // 개발 모드에서 자동 로그인을 위한 컴포넌트
-export const DevAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DevAuthProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { setUser } = useAuthStore();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const DevAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
       }));
 
-      console.log('개발 모드: 자동 로그인 활성화', mockUser);
+      // console.log('개발 모드: 자동 로그인 활성화', mockUser);
     }
   }, [setUser]);
 

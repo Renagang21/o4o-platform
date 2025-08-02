@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { FC, useState, useEffect, useCallback  } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, Filter, Upload, Tag, Clock, 
@@ -61,7 +61,7 @@ interface SearchResult {
   };
 }
 
-const ContentSearchManager: React.FC = () => {
+const ContentSearchManager: FC = () => {
   const { user } = useAuth();
   const toast = useToast();
 

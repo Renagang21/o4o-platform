@@ -17,7 +17,7 @@ interface CustomizationData {
   price: number;
 }
 
-const ProductCustomizer: React.FC = () => {
+const ProductCustomizer: FC = () => {
   const [customization, setCustomization] = useState<CustomizationData>({
     product: null,
     label: null,

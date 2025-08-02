@@ -285,7 +285,7 @@ export class OperationsMonitoringService {
 
   // Start all monitoring processes
   async startMonitoring(): Promise<void> {
-    console.log('🔍 Starting 24/7 Operations Monitoring System...');
+    // console.log('🔍 Starting 24/7 Operations Monitoring System...');
 
     // Start health checks
     await this.startHealthChecks();
@@ -302,20 +302,20 @@ export class OperationsMonitoringService {
     // Start cleanup processes
     await this.startCleanupProcesses();
 
-    console.log('✅ 24/7 Operations Monitoring System started successfully');
+    // console.log('✅ 24/7 Operations Monitoring System started successfully');
   }
 
   // Stop all monitoring processes
   async stopMonitoring(): Promise<void> {
-    console.log('🛑 Stopping 24/7 Operations Monitoring System...');
+    // console.log('🛑 Stopping 24/7 Operations Monitoring System...');
 
     this.monitoringIntervals.forEach((interval, name) => {
       clearInterval(interval);
-      console.log(`Stopped ${name} monitoring`);
+      // console.log(`Stopped ${name} monitoring`);
     });
 
     this.monitoringIntervals.clear();
-    console.log('✅ 24/7 Operations Monitoring System stopped');
+    // console.log('✅ 24/7 Operations Monitoring System stopped');
   }
 
   // Health Check System
@@ -330,7 +330,7 @@ export class OperationsMonitoringService {
     }, this.config.healthCheckInterval * 1000);
 
     this.monitoringIntervals.set('health-check', interval);
-    console.log(`Health checks started (interval: ${this.config.healthCheckInterval}s)`);
+    // console.log(`Health checks started (interval: ${this.config.healthCheckInterval}s)`);
   }
 
   async performSystemHealthCheck(): Promise<SystemStatus> {
@@ -605,7 +605,7 @@ export class OperationsMonitoringService {
     }, this.config.metricCollectionInterval * 1000);
 
     this.monitoringIntervals.set('metric-collection', interval);
-    console.log(`Metric collection started (interval: ${this.config.metricCollectionInterval}s)`);
+    // console.log(`Metric collection started (interval: ${this.config.metricCollectionInterval}s)`);
   }
 
   private async collectSystemMetrics(): Promise<void> {
@@ -712,7 +712,7 @@ export class OperationsMonitoringService {
     }, this.config.alertCheckInterval * 1000);
 
     this.monitoringIntervals.set('alert-monitoring', interval);
-    console.log(`Alert monitoring started (interval: ${this.config.alertCheckInterval}s)`);
+    // console.log(`Alert monitoring started (interval: ${this.config.alertCheckInterval}s)`);
   }
 
   private async checkAlertConditions(): Promise<void> {
@@ -859,7 +859,7 @@ export class OperationsMonitoringService {
     `;
 
     // Implementation would use nodemailer or similar
-    console.log(`📧 Email notification sent: ${subject}`);
+    // console.log(`📧 Email notification sent: ${subject}`);
   }
 
   private async sendSlackNotification(alert: Alert): Promise<void> {
@@ -904,7 +904,7 @@ export class OperationsMonitoringService {
     };
 
     // Implementation would use Slack webhook
-    console.log(`📱 Slack notification sent: ${alert.title}`);
+    // console.log(`📱 Slack notification sent: ${alert.title}`);
   }
 
   private async sendWebhookNotification(alert: Alert): Promise<void> {
@@ -936,7 +936,7 @@ export class OperationsMonitoringService {
   }
 
   private async sendEscalationNotifications(alert: Alert): Promise<void> {
-    console.log(`🔺 Escalating alert: ${alert.title}`);
+    // console.log(`🔺 Escalating alert: ${alert.title}`);
     await this.sendAlertNotifications(alert);
   }
 
@@ -1030,7 +1030,7 @@ export class OperationsMonitoringService {
     }, 24 * 60 * 60 * 1000); // 24 hours
 
     this.monitoringIntervals.set('cleanup', cleanup);
-    console.log('Cleanup processes started');
+    // console.log('Cleanup processes started');
   }
 
   private async cleanupOldData(): Promise<void> {
@@ -1051,7 +1051,7 @@ export class OperationsMonitoringService {
       resolvedAt: LessThan(alertsRetentionDate)
     });
 
-    console.log('🧹 Old data cleanup completed');
+    // console.log('🧹 Old data cleanup completed');
   }
 
   private async startUptimeMonitoring(): Promise<void> {
@@ -1064,7 +1064,7 @@ export class OperationsMonitoringService {
     }, this.config.uptimeCheckInterval * 1000);
 
     this.monitoringIntervals.set('uptime-monitoring', interval);
-    console.log(`Uptime monitoring started (interval: ${this.config.uptimeCheckInterval}s)`);
+    // console.log(`Uptime monitoring started (interval: ${this.config.uptimeCheckInterval}s)`);
   }
 
   private async recordUptimeMetrics(): Promise<void> {

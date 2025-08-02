@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { FC, useEffect  } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { DevAuthProvider } from './lib/DevAuthProvider';
@@ -37,7 +37,7 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Temporary placeholder for disabled features
-const DisabledFeaturePage: React.FC = () => (
+const DisabledFeaturePage: FC = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
     <div className="text-center">
       <h1 className="text-2xl font-bold text-gray-900 mb-4">Feature Temporarily Disabled</h1>
@@ -46,7 +46,7 @@ const DisabledFeaturePage: React.FC = () => (
   </div>
 );
 
-const App: React.FC = () => {
+const App: FC = () => {
   const { checkAuth } = useAuthStore();
 
   useEffect(() => {

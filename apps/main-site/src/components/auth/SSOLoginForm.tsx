@@ -2,7 +2,7 @@ import { useState, FC, ChangeEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const SSOLoginForm: React.FC = () => {
+const SSOLoginForm: FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''

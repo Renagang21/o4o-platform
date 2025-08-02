@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { Plus, X } from 'lucide-react';
 
 interface TimeRange {
@@ -16,7 +16,7 @@ interface SignageSchedulerProps {
 
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
-const SignageScheduler: React.FC<SignageSchedulerProps> = ({
+const SignageScheduler: FC<SignageSchedulerProps> = ({
   schedule,
   onChange
 }) => {

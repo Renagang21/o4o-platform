@@ -66,7 +66,7 @@ const REFERRAL_SOURCES = [
   { value: 'other', label: '기타' }
 ];
 
-export const BetaRegistrationModal: React.FC<BetaRegistrationModalProps> = ({
+export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
   isOpen,
   onClose,
   onSuccess
@@ -169,7 +169,7 @@ export const BetaRegistrationModal: React.FC<BetaRegistrationModalProps> = ({
       } else {
         showToast(data.error?.message || '등록 중 오류가 발생했습니다.', 'error');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Registration error:', error);
       showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     } finally {

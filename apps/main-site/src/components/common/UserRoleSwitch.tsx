@@ -18,7 +18,7 @@ interface UserRoleSwitchProps {
   showDescription?: boolean;
 }
 
-const UserRoleSwitch: React.FC<UserRoleSwitchProps> = ({
+const UserRoleSwitch: FC<UserRoleSwitchProps> = ({
   currentRole,
   availableRoles,
   onRoleChange,

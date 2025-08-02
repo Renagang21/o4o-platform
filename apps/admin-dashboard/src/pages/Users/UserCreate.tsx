@@ -76,7 +76,7 @@ const UserCreate: FC = () => {
     
     try {
       await createUserMutation.mutateAsync(data);
-    } catch (error) {
+    } catch (error: any) {
       // 에러는 mutation의 onError에서 처리됨
       console.error('Create user error:', error);
     } finally {

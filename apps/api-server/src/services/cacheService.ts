@@ -26,7 +26,7 @@ export class CacheService {
       });
 
       this.redis.on('connect', () => {
-        console.log('✅ Redis connected successfully');
+        // console.log('✅ Redis connected successfully');
         this.isEnabled = true;
       });
     }

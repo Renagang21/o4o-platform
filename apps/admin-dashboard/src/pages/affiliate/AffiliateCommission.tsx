@@ -129,12 +129,12 @@ const AffiliateCommission = () => {
   };
 
   const handlePayCommission = (commissionId: string) => {
-    console.log('Processing payment for:', commissionId);
+    // console.log('Processing payment for:', commissionId);
     // TODO: Implement payment processing
   };
 
   const handleDownloadInvoice = (invoice: string) => {
-    console.log('Downloading invoice:', invoice);
+    // console.log('Downloading invoice:', invoice);
     // TODO: Implement invoice download
   };
 

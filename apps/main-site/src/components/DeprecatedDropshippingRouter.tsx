@@ -1,7 +1,7 @@
 import { useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const DropshippingRouter: React.FC = () => {
+const DropshippingRouter: FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {

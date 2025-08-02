@@ -9,7 +9,7 @@ const GutenbergEditorPage: FC = () => {
   const navigate = useNavigate();
 
   const handleSave = (content: any) => {
-    console.log('페이지 저장:', content);
+    // console.log('페이지 저장:', content);
     // 여기에 실제 저장 로직 추가
   };
 

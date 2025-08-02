@@ -56,7 +56,7 @@ async function loginAction(prevState: LoginState, formData: FormData): Promise<L
   }
 }
 
-const ModernLoginForm: React.FC = () => {
+const ModernLoginForm: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 

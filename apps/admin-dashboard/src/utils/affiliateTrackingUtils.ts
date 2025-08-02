@@ -89,7 +89,7 @@ export async function trackReferralClick(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(clickData)
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to track referral click:', error);
   }
 }
@@ -120,7 +120,7 @@ export async function trackReferralConversion(
     }
     
     return result.success;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to track referral conversion:', error);
     return false;
   }
@@ -148,7 +148,7 @@ export async function validateSingleTierReferral(
     
     const result = await response.json();
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to validate referral:', error);
     return { valid: false, reason: '추천 관계 검증에 실패했습니다.' };
   }
@@ -176,7 +176,7 @@ export async function establishReferralRelationship(
     
     const result = await response.json();
     return result;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to establish referral relationship:', error);
     return { success: false, message: '추천 관계 설정에 실패했습니다.' };
   }

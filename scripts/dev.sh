@@ -33,13 +33,25 @@ usage() {
 # Lint 실행
 run_lint() {
     echo -e "${GREEN}🔍 Running ESLint...${NC}"
-    ./node_modules/.bin/eslint \
-        --config ./eslint.config.js \
-        apps/*/src/**/*.{ts,tsx} \
-        packages/*/src/**/*.{ts,tsx} \
-        --report-unused-disable-directives \
-        --max-warnings 0 \
-        "$@"
+    if [ -x "/home/user/o4o-platform/node_modules/.bin/eslint" ]; then
+        /home/user/o4o-platform/node_modules/.bin/eslint \
+            --config ./eslint.config.js \
+            apps/*/src/**/*.{ts,tsx} \
+            packages/*/src/**/*.{ts,tsx} \
+            --report-unused-disable-directives \
+            --max-warnings 0 \
+            "$@"
+    else
+        echo -e "${RED}ESLint not found. Running npm install...${NC}"
+        npm install
+        /home/user/o4o-platform/node_modules/.bin/eslint \
+            --config ./eslint.config.js \
+            apps/*/src/**/*.{ts,tsx} \
+            packages/*/src/**/*.{ts,tsx} \
+            --report-unused-disable-directives \
+            --max-warnings 0 \
+            "$@"
+    fi
 }
 
 # TypeScript 체크
@@ -51,7 +63,7 @@ run_type_check() {
     for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
-            (cd "packages/$pkg" && ../../node_modules/.bin/tsc) || true
+            (cd "packages/$pkg" && /home/user/o4o-platform/node_modules/.bin/tsc 2>/dev/null) || true
         fi
     done
     
@@ -60,7 +72,7 @@ run_type_check() {
     for app in api-server main-site admin-dashboard ecommerce crowdfunding digital-signage; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
-            (cd "apps/$app" && ../../node_modules/.bin/tsc --noEmit) || true
+            (cd "apps/$app" && /home/user/o4o-platform/node_modules/.bin/tsc --noEmit 2>/dev/null) || true
         fi
     done
 }

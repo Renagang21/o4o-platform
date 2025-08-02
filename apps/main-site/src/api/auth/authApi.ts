@@ -39,7 +39,7 @@ export const authApi = {
         } else {
           throw new Error(ssoResponse.message || 'Login failed');
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('SSO 로그인 실패, 레거시 시스템으로 폴백:', error);
         // SSO 실패 시 레거시 시스템으로 폴백
         return this.legacyLogin(data);
@@ -70,7 +70,7 @@ export const authApi = {
       try {
         const ssoUser = await ssoAuthAPI.getCurrentUser();
         return ssoUserToLegacyUser(ssoUser);
-      } catch (error: any) {
+      } catch (error) {
         console.error('SSO 사용자 정보 조회 실패, 레거시로 폴백:', error);
         // SSO 실패 시 레거시로 폴백
       }

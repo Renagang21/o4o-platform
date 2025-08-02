@@ -11,7 +11,7 @@ interface SignageContent {
   createdAt: string;
 }
 
-const SignageList: React.FC = () => {
+const SignageList: FC = () => {
   const [filter, setFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
 

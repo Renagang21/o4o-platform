@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { FC, useEffect, useState  } from 'react';
 import type { ShortcodeProps, ShortcodeDefinition } from '@o4o/shortcodes';
 
 interface FlashSaleTimerProps {
@@ -9,7 +9,7 @@ interface FlashSaleTimerProps {
   showSeconds?: boolean;
 }
 
-const FlashSaleTimerComponent: React.FC<FlashSaleTimerProps> = ({
+const FlashSaleTimerComponent: FC<FlashSaleTimerProps> = ({
   endTime,
   title = 'Flash Sale Ends In:',
   productId: _productId,  // In real app, this would be used for product-specific sales
@@ -99,7 +99,7 @@ const FlashSaleTimerComponent: React.FC<FlashSaleTimerProps> = ({
 };
 
 // Wrapper component that accepts ShortcodeProps
-export const FlashSaleTimer: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const FlashSaleTimer: FC<ShortcodeProps> = ({ attributes }) => {
   if (!attributes.endTime) {
     return <div className="text-red-500">Error: endTime attribute is required for flash-sale-timer</div>;
   }

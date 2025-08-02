@@ -9,7 +9,7 @@ interface ProductFormData {
   image: File | null;
 }
 
-const ProductForm: React.FC = () => {
+const ProductForm: FC = () => {
   const { showToast } = useToast();
   const [form, setForm] = useState<ProductFormData>({
     name: '',

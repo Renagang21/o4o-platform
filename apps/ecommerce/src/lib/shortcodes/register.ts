@@ -9,7 +9,7 @@ export function registerAllShortcodes() {
     registerShortcode(shortcodeDef);
   });
   
-  console.log('✅ All shortcodes registered:', allShortcodes.map(s => s.name));
+  // console.log('✅ All shortcodes registered:', allShortcodes.map(s => s.name));
 }
 
 /**
@@ -20,7 +20,7 @@ export function registerShortcodeByName(name: string) {
   
   if (shortcode) {
     registerShortcode(shortcode);
-    console.log(`✅ Shortcode "${name}" registered`);
+    // console.log(`✅ Shortcode "${name}" registered`);
   } else {
     console.warn(`⚠️ Shortcode "${name}" not found`);
   }

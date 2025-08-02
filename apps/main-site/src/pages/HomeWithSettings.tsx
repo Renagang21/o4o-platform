@@ -36,7 +36,7 @@ const fetchPage = async (pageId: string): Promise<Page> => {
   return data.data;
 };
 
-const HomeWithSettings: React.FC = () => {
+const HomeWithSettings: FC = () => {
   const [pageData, setPageData] = useState<Page | null>(null);
 
   // Fetch homepage settings

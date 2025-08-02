@@ -40,7 +40,7 @@ export const CommissionApprovalManager: FC = () => {
         limit: 100
       });
       setCommissions(response.data || []);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('커미션 목록을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -81,7 +81,7 @@ export const CommissionApprovalManager: FC = () => {
       toast.success(`${selectedCommissions.size}개 커미션이 승인되었습니다`);
       setSelectedCommissions(new Set());
       loadCommissions();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('커미션 승인 처리 중 오류가 발생했습니다');
     }
   };
@@ -105,7 +105,7 @@ export const CommissionApprovalManager: FC = () => {
       setRejectReason('');
       setShowRejectDialog(false);
       loadCommissions();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('커미션 거절 처리 중 오류가 발생했습니다');
     }
   };
@@ -123,7 +123,7 @@ export const CommissionApprovalManager: FC = () => {
       setSelectedCommissions(new Set());
       setShowPaymentDialog(false);
       loadCommissions();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('커미션 지급 처리 중 오류가 발생했습니다');
     }
   };

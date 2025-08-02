@@ -181,12 +181,12 @@ export class DeploymentMonitoringService {
   }
 
   async initialize(): Promise<void> {
-    console.log('🚀 Initializing Deployment Monitoring Service...');
+    // console.log('🚀 Initializing Deployment Monitoring Service...');
 
     await this.detectCurrentDeployment();
     await this.startDeploymentMonitoring();
 
-    console.log('✅ Deployment Monitoring Service initialized');
+    // console.log('✅ Deployment Monitoring Service initialized');
   }
 
   async shutdown(): Promise<void> {
@@ -194,7 +194,7 @@ export class DeploymentMonitoringService {
       clearInterval(this.monitoringInterval);
     }
 
-    console.log('🚀 Deployment Monitoring Service shut down');
+    // console.log('🚀 Deployment Monitoring Service shut down');
   }
 
   // Deployment tracking and monitoring
@@ -217,7 +217,7 @@ export class DeploymentMonitoringService {
 
     this.activeDeployments.set(deployment.id, deployment);
 
-    console.log(`📦 Tracking deployment: ${deployment.version} (ID: ${deployment.id})`);
+    // console.log(`📦 Tracking deployment: ${deployment.version} (ID: ${deployment.id})`);
 
     // Start monitoring this deployment
     await this.startDeploymentTracking(deployment);
@@ -226,7 +226,7 @@ export class DeploymentMonitoringService {
   }
 
   private async startDeploymentTracking(deployment: DeploymentInfo): Promise<void> {
-    console.log(`🔍 Starting deployment monitoring for ${deployment.id}`);
+    // console.log(`🔍 Starting deployment monitoring for ${deployment.id}`);
 
     // Collect baseline metrics
     deployment.metrics = await this.collectBaselineMetrics();
@@ -255,7 +255,7 @@ export class DeploymentMonitoringService {
 
     // Wait for stabilization period before starting validation
     if (timeSinceStart < stabilizationTime) {
-      console.log(`⏳ Deployment ${deployment.id} still in stabilization period`);
+      // console.log(`⏳ Deployment ${deployment.id} still in stabilization period`);
       return;
     }
 
@@ -269,7 +269,7 @@ export class DeploymentMonitoringService {
     const validationResult = await this.validateDeployment(deployment);
 
     if (!validationResult.isHealthy) {
-      console.log(`❌ Deployment ${deployment.id} failed validation: ${validationResult.reason}`);
+      // console.log(`❌ Deployment ${deployment.id} failed validation: ${validationResult.reason}`);
 
       if (this.autoRollbackEnabled && validationResult.shouldRollback) {
         await this.initiateAutomaticRollback(deployment, validationResult.reason);
@@ -334,7 +334,7 @@ export class DeploymentMonitoringService {
   }
 
   private async runHealthChecks(deployment: DeploymentInfo): Promise<void> {
-    console.log(`🏥 Running health checks for deployment ${deployment.id}`);
+    // console.log(`🏥 Running health checks for deployment ${deployment.id}`);
 
     const healthCheckPromises = deployment.healthChecks.map(async (check) => {
       check.status = 'running';
@@ -362,7 +362,7 @@ export class DeploymentMonitoringService {
     await Promise.all(healthCheckPromises);
 
     const failedChecks = deployment.healthChecks.filter(check => check.status === 'failed');
-    console.log(`🏥 Health checks completed: ${deployment.healthChecks.length - failedChecks.length}/${deployment.healthChecks.length} passed`);
+    // console.log(`🏥 Health checks completed: ${deployment.healthChecks.length - failedChecks.length}/${deployment.healthChecks.length} passed`);
   }
 
   private async executeHealthCheck(check: HealthCheck): Promise<{
@@ -536,7 +536,7 @@ export class DeploymentMonitoringService {
   }
 
   private async collectBaselineMetrics(): Promise<DeploymentMetrics> {
-    console.log('📊 Collecting baseline metrics...');
+    // console.log('📊 Collecting baseline metrics...');
 
     const metrics = this.initializeMetrics();
 
@@ -554,7 +554,7 @@ export class DeploymentMonitoringService {
   }
 
   private async collectDeploymentMetrics(deployment: DeploymentInfo): Promise<void> {
-    console.log(`📊 Collecting deployment metrics for ${deployment.id}`);
+    // console.log(`📊 Collecting deployment metrics for ${deployment.id}`);
 
     // Collect current metrics
     const endTime = new Date();
@@ -803,7 +803,7 @@ export class DeploymentMonitoringService {
 
   // Rollback functionality
   async rollbackDeployment(target: string, parameters?: Record<string, string | number | boolean>): Promise<{ output: string }> {
-    console.log(`🔄 Rolling back deployment: ${target}`);
+    // console.log(`🔄 Rolling back deployment: ${target}`);
 
     let deployment: DeploymentInfo | undefined;
 
@@ -826,7 +826,7 @@ export class DeploymentMonitoringService {
   }
 
   private async initiateAutomaticRollback(deployment: DeploymentInfo, reason: string): Promise<void> {
-    console.log(`🚨 Initiating automatic rollback for deployment ${deployment.id}: ${reason}`);
+    // console.log(`🚨 Initiating automatic rollback for deployment ${deployment.id}: ${reason}`);
 
     await this.executeRollback(deployment, 'automatic', reason);
   }
@@ -862,7 +862,7 @@ export class DeploymentMonitoringService {
       rollbackInfo.status = 'success';
       rollbackInfo.endTime = new Date();
 
-      console.log(`✅ Rollback completed successfully: ${rollbackInfo.id}`);
+      // console.log(`✅ Rollback completed successfully: ${rollbackInfo.id}`);
 
       // Create success alert
       await this.createRollbackAlert(deployment, rollbackInfo, true);
@@ -937,7 +937,7 @@ export class DeploymentMonitoringService {
   }
 
   private async executeRollbackStep(step: RollbackStep, deployment: DeploymentInfo): Promise<void> {
-    console.log(`🔧 Executing rollback step: ${step.name}`);
+    // console.log(`🔧 Executing rollback step: ${step.name}`);
 
     step.status = 'in_progress';
     step.startTime = new Date();
@@ -975,7 +975,7 @@ export class DeploymentMonitoringService {
       step.status = 'completed';
       step.endTime = new Date();
 
-      console.log(`✅ Rollback step completed: ${step.name}`);
+      // console.log(`✅ Rollback step completed: ${step.name}`);
 
     } catch (error) {
       step.status = 'failed';
@@ -998,7 +998,7 @@ export class DeploymentMonitoringService {
 
   private async executeServiceRestart(target: string): Promise<string> {
     // In a real implementation, this would restart the actual service
-    console.log(`Restarting service: ${target}`);
+    // console.log(`Restarting service: ${target}`);
     
     // Simulate service restart delay
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -1008,7 +1008,7 @@ export class DeploymentMonitoringService {
 
   private async executeCacheClear(target: string): Promise<string> {
     // Clear application caches
-    console.log(`Clearing cache: ${target}`);
+    // console.log(`Clearing cache: ${target}`);
     return `Cache ${target} cleared successfully`;
   }
 
@@ -1023,7 +1023,7 @@ export class DeploymentMonitoringService {
 
   private async executeConfigRestore(target: string): Promise<string> {
     // Restore configuration from backup
-    console.log(`Restoring configuration: ${target}`);
+    // console.log(`Restoring configuration: ${target}`);
     return `Configuration ${target} restored successfully`;
   }
 
@@ -1037,7 +1037,7 @@ export class DeploymentMonitoringService {
   }
 
   private async verifyRollback(rollbackInfo: RollbackInfo): Promise<void> {
-    console.log(`🔍 Verifying rollback: ${rollbackInfo.id}`);
+    // console.log(`🔍 Verifying rollback: ${rollbackInfo.id}`);
 
     // Run verification health checks
     for (const check of rollbackInfo.verificationChecks) {
@@ -1062,7 +1062,7 @@ export class DeploymentMonitoringService {
       throw new Error(`Rollback verification failed: ${failedChecks.map(c => c.name).join(', ')}`);
     }
 
-    console.log(`✅ Rollback verification successful: ${rollbackInfo.id}`);
+    // console.log(`✅ Rollback verification successful: ${rollbackInfo.id}`);
   }
 
   // Deployment status management
@@ -1070,7 +1070,7 @@ export class DeploymentMonitoringService {
     deployment.status = DeploymentStatus.SUCCESS;
     deployment.endTime = new Date();
 
-    console.log(`✅ Deployment marked as successful: ${deployment.id}`);
+    // console.log(`✅ Deployment marked as successful: ${deployment.id}`);
 
     // Update current version
     this.currentVersion = deployment.version;
@@ -1087,7 +1087,7 @@ export class DeploymentMonitoringService {
     deployment.status = DeploymentStatus.FAILED;
     deployment.endTime = new Date();
 
-    console.log(`❌ Deployment marked as failed: ${deployment.id} - ${reason}`);
+    // console.log(`❌ Deployment marked as failed: ${deployment.id} - ${reason}`);
 
     // Create failure alert
     await this.createDeploymentAlert(deployment, false, reason);
@@ -1108,7 +1108,7 @@ export class DeploymentMonitoringService {
       }
     }, 60000); // Every minute
 
-    console.log('📊 Deployment monitoring started');
+    // console.log('📊 Deployment monitoring started');
   }
 
   private async detectCurrentDeployment(): Promise<void> {
@@ -1119,7 +1119,7 @@ export class DeploymentMonitoringService {
       const packageJson = JSON.parse(packageContent);
       this.currentVersion = packageJson.version || '1.0.0';
 
-      console.log(`📦 Current version detected: ${this.currentVersion}`);
+      // console.log(`📦 Current version detected: ${this.currentVersion}`);
     } catch (error) {
       console.warn('Failed to detect current version:', error);
       this.currentVersion = '1.0.0';
@@ -1269,17 +1269,17 @@ export class DeploymentMonitoringService {
 
   async enableAutoRollback(): Promise<void> {
     this.autoRollbackEnabled = true;
-    console.log('✅ Auto-rollback enabled');
+    // console.log('✅ Auto-rollback enabled');
   }
 
   async disableAutoRollback(): Promise<void> {
     this.autoRollbackEnabled = false;
-    console.log('⏸️ Auto-rollback disabled');
+    // console.log('⏸️ Auto-rollback disabled');
   }
 
   async updateValidationRules(rules: Partial<DeploymentValidationRules>): Promise<void> {
     this.validationRules = { ...this.validationRules, ...rules };
-    console.log('✅ Deployment validation rules updated');
+    // console.log('✅ Deployment validation rules updated');
   }
 }
 

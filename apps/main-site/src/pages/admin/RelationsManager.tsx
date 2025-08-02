@@ -44,7 +44,7 @@ interface Relation {
   updatedAt: string;
 }
 
-const RelationsManager: React.FC = () => {
+const RelationsManager: FC = () => {
   const [relations, setRelations] = useState<Relation[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
@@ -208,7 +208,7 @@ const RelationsManager: React.FC = () => {
       };
 
       // API 호출 (Mock)
-      console.log('Creating relation:', relationData);
+      // console.log('Creating relation:', relationData);
       
       await loadRelations();
       resetForm();
@@ -225,7 +225,7 @@ const RelationsManager: React.FC = () => {
 
     try {
       // API 호출 (Mock)
-      console.log('Deleting relation:', id);
+      // console.log('Deleting relation:', id);
       
       setRelations(prev => prev.filter(rel => rel.id !== id));
       alert('✅ 관계가 삭제되었습니다.');

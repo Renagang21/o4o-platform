@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Image, FileText, Video, Bell } from 'lucide-react';
 import SignageScheduler from '../components/signage/SignageScheduler';
@@ -14,7 +14,7 @@ interface SignageContent {
   };
 }
 
-const SignageEditor: React.FC = () => {
+const SignageEditor: FC = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState<SignageContent>({
     title: '',

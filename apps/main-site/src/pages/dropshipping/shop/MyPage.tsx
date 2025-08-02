@@ -17,7 +17,7 @@ import SupplierMyPage from './role-pages/SupplierMyPage';
 import PartnerMyPage from './role-pages/PartnerMyPage';
 import UserMyPage from './role-pages/UserMyPage';
 
-const MyPage: React.FC = () => {
+const MyPage: FC = () => {
   const { user } = useAuth();
 
   if (!user) {

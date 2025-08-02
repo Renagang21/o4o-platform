@@ -200,7 +200,7 @@ interface EnhancedView {
   createdBy: string;
 }
 
-const EnhancedViewsManager: React.FC = () => {
+const EnhancedViewsManager: FC = () => {
   const [views, setViews] = useState<EnhancedView[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
@@ -613,7 +613,7 @@ const EnhancedViewsManager: React.FC = () => {
 
   const createView = async () => {
     try {
-      console.log('Creating view:', newView);
+      // console.log('Creating view:', newView);
       // API call would go here
       
       await loadViews();
@@ -630,7 +630,7 @@ const EnhancedViewsManager: React.FC = () => {
     if (!confirm('Are you sure you want to delete this view?')) return;
     
     try {
-      console.log('Deleting view:', id);
+      // console.log('Deleting view:', id);
       setViews(prev => prev.filter(view => view.id !== id));
       alert('✅ View deleted successfully');
     } catch (error) {

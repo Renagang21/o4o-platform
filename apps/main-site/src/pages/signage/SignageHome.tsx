@@ -1,7 +1,7 @@
 import { useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SignageHome: React.FC = () => {
+const SignageHome: FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {

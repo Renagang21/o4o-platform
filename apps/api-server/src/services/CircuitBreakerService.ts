@@ -68,7 +68,7 @@ class CircuitBreaker {
         this.state = CircuitState.HALF_OPEN;
         this.stateChangeTime = new Date();
         this.halfOpenTests = 0;
-        console.log(`🔄 Circuit ${this.id} transitioning to HALF_OPEN`);
+        // console.log(`🔄 Circuit ${this.id} transitioning to HALF_OPEN`);
       } else {
         throw new Error(`Circuit breaker ${this.id} is OPEN - rejecting request`);
       }
@@ -130,7 +130,7 @@ class CircuitBreaker {
       this.halfOpenTests++;
       if (this.halfOpenTests >= this.config.successThreshold) {
         this.reset();
-        console.log(`✅ Circuit ${this.id} recovered and reset to CLOSED`);
+        // console.log(`✅ Circuit ${this.id} recovered and reset to CLOSED`);
       }
     }
   }
@@ -142,10 +142,10 @@ class CircuitBreaker {
 
     if (this.state === CircuitState.HALF_OPEN) {
       this.trip();
-      console.log(`❌ Circuit ${this.id} failed in HALF_OPEN, returning to OPEN`);
+      // console.log(`❌ Circuit ${this.id} failed in HALF_OPEN, returning to OPEN`);
     } else if (this.shouldTrip()) {
       this.trip();
-      console.log(`⚡ Circuit ${this.id} tripped due to failures`);
+      // console.log(`⚡ Circuit ${this.id} tripped due to failures`);
     }
   }
 
@@ -230,12 +230,12 @@ class CircuitBreaker {
   }
 
   reset_manual(): void {
-    console.log(`🔧 Manually resetting circuit ${this.id}`);
+    // console.log(`🔧 Manually resetting circuit ${this.id}`);
     this.reset();
   }
 
   force_open(): void {
-    console.log(`🚫 Manually opening circuit ${this.id}`);
+    // console.log(`🚫 Manually opening circuit ${this.id}`);
     this.trip();
   }
 }
@@ -264,7 +264,7 @@ export class CircuitBreakerService {
   }
 
   async initialize(): Promise<void> {
-    console.log('🔌 Initializing Circuit Breaker Service...');
+    // console.log('🔌 Initializing Circuit Breaker Service...');
     
     // Initialize default circuits for critical services
     await this.createDefaultCircuits();
@@ -272,7 +272,7 @@ export class CircuitBreakerService {
     // Start monitoring
     await this.startMonitoring();
     
-    console.log('✅ Circuit Breaker Service initialized');
+    // console.log('✅ Circuit Breaker Service initialized');
   }
 
   async shutdown(): Promise<void> {
@@ -281,7 +281,7 @@ export class CircuitBreakerService {
     }
     
     this.circuits.clear();
-    console.log('🔌 Circuit Breaker Service shut down');
+    // console.log('🔌 Circuit Breaker Service shut down');
   }
 
   // Circuit management
@@ -294,7 +294,7 @@ export class CircuitBreakerService {
     const circuit = new CircuitBreaker(id, serviceName, finalConfig);
     
     this.circuits.set(id, circuit);
-    console.log(`🔌 Created circuit breaker: ${id} for service: ${serviceName}`);
+    // console.log(`🔌 Created circuit breaker: ${id} for service: ${serviceName}`);
     
     return circuit;
   }
@@ -318,7 +318,7 @@ export class CircuitBreakerService {
   removeCircuit(id: string): boolean {
     const removed = this.circuits.delete(id);
     if (removed) {
-      console.log(`🗑️ Removed circuit breaker: ${id}`);
+      // console.log(`🗑️ Removed circuit breaker: ${id}`);
     }
     return removed;
   }
@@ -394,7 +394,7 @@ export class CircuitBreakerService {
       }
     }, 30000); // Every 30 seconds
 
-    console.log('📊 Circuit breaker monitoring started');
+    // console.log('📊 Circuit breaker monitoring started');
   }
 
   private async collectCircuitMetrics(): Promise<void> {
@@ -569,7 +569,7 @@ export class CircuitBreakerService {
       errorThreshold: 40
     });
 
-    console.log(`🔌 Created ${this.circuits.size} default circuit breakers`);
+    // console.log(`🔌 Created ${this.circuits.size} default circuit breakers`);
   }
 
   // Management API
@@ -631,7 +631,7 @@ export class CircuitBreakerService {
       );
     }
     
-    console.log(`🔄 Reset ${resetCount} circuit breakers`);
+    // console.log(`🔄 Reset ${resetCount} circuit breakers`);
     return resetCount;
   }
 
@@ -707,7 +707,7 @@ export class CircuitBreakerService {
     try {
       return await this.executeWithCircuitBreaker(circuitId, serviceName, primaryOperation);
     } catch (error) {
-      console.log(`🔄 Primary operation failed, using fallback for ${serviceName}`);
+      // console.log(`🔄 Primary operation failed, using fallback for ${serviceName}`);
       return await fallbackOperation();
     }
   }
@@ -728,7 +728,7 @@ export class CircuitBreakerService {
         lastError = error instanceof Error ? error : new Error('Unknown error');
         
         if (attempt < maxRetries) {
-          console.log(`🔄 Attempt ${attempt} failed for ${serviceName}, retrying in ${backoffMs}ms`);
+          // console.log(`🔄 Attempt ${attempt} failed for ${serviceName}, retrying in ${backoffMs}ms`);
           await new Promise(resolve => setTimeout(resolve, backoffMs * attempt));
         }
       }

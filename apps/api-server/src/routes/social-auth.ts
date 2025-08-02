@@ -112,7 +112,7 @@ router.post('/link/:provider', authenticateCookie, async (req: AuthRequest, res)
         hasPassword: !!user.password
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Social account linking error:', error);
     res.status(400).json({
       error: error.message || 'Failed to link social account',
@@ -136,7 +136,7 @@ router.delete('/unlink', authenticateCookie, async (req: AuthRequest, res) => {
         hasPassword: !!user.password
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Social account unlinking error:', error);
     res.status(400).json({
       error: error.message || 'Failed to unlink social account',
@@ -154,7 +154,7 @@ router.get('/linked-accounts', authenticateCookie, async (req: AuthRequest, res)
       success: true,
       accounts
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get linked accounts error:', error);
     res.status(400).json({
       error: error.message || 'Failed to get linked accounts',

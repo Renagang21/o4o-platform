@@ -34,7 +34,7 @@ export const ProductApprovalManager: FC = () => {
       setLoading(true);
       const response = await getPendingProducts({ limit: 50 });
       setProducts(response.data || []);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('승인 대기 제품을 불러오는데 실패했습니다');
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ export const ProductApprovalManager: FC = () => {
       } else {
         toast.error(response.message || '승인 처리 중 오류가 발생했습니다');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error('승인 처리 중 오류가 발생했습니다');
     }
   };
@@ -124,7 +124,7 @@ export const ProductApprovalManager: FC = () => {
       } else {
         toast.error(response.message || '거절 처리 중 오류가 발생했습니다');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error('거절 처리 중 오류가 발생했습니다');
     }
   };

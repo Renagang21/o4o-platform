@@ -38,7 +38,7 @@ export const VideoCopyButton: FC<VideoCopyButtonProps> = ({
       try {
         const exists = await checkVideoInMyList(postId);
         setIsCopied(exists);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to check video status:', error);
       } finally {
         setIsChecking(false);
@@ -76,7 +76,7 @@ export const VideoCopyButton: FC<VideoCopyButtonProps> = ({
       } else {
         toast.error(result.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error('비디오 복사 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);

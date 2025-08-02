@@ -731,36 +731,36 @@ export class StatusPageService {
 
   private async recordStatusChange(component: StatusPageComponent, oldStatus: ServiceStatus, newStatus: ServiceStatus): Promise<void> {
     // Could record status change events in a separate table for audit trail
-    console.log(`Component ${component.name} status changed from ${oldStatus} to ${newStatus}`);
+    // console.log(`Component ${component.name} status changed from ${oldStatus} to ${newStatus}`);
   }
 
   // Notification methods (stubs - implement based on your notification preferences)
   private async notifyStatusChange(component: StatusPageComponent, oldStatus: ServiceStatus, newStatus: ServiceStatus): Promise<void> {
     // Implementation depends on notification system
-    console.log(`Status change notification: ${component.name} ${oldStatus} -> ${newStatus}`);
+    // console.log(`Status change notification: ${component.name} ${oldStatus} -> ${newStatus}`);
   }
 
   private async notifyIncidentCreated(incident: StatusPageIncident): Promise<void> {
-    console.log(`Incident created notification: ${incident.title}`);
+    // console.log(`Incident created notification: ${incident.title}`);
   }
 
   private async notifyIncidentUpdated(incident: StatusPageIncident): Promise<void> {
-    console.log(`Incident updated notification: ${incident.title} - ${incident.status}`);
+    // console.log(`Incident updated notification: ${incident.title} - ${incident.status}`);
   }
 
   private async notifyMaintenanceScheduled(maintenance: StatusPageMaintenance): Promise<void> {
-    console.log(`Maintenance scheduled notification: ${maintenance.title}`);
+    // console.log(`Maintenance scheduled notification: ${maintenance.title}`);
   }
 
   private async notifyMaintenanceStarted(maintenance: StatusPageMaintenance): Promise<void> {
-    console.log(`Maintenance started notification: ${maintenance.title}`);
+    // console.log(`Maintenance started notification: ${maintenance.title}`);
   }
 
   private async notifyMaintenanceCompleted(maintenance: StatusPageMaintenance): Promise<void> {
-    console.log(`Maintenance completed notification: ${maintenance.title}`);
+    // console.log(`Maintenance completed notification: ${maintenance.title}`);
   }
 
   private async sendConfirmationEmail(subscriber: StatusPageSubscriber): Promise<void> {
-    console.log(`Confirmation email sent to: ${subscriber.email}`);
+    // console.log(`Confirmation email sent to: ${subscriber.email}`);
   }
 }

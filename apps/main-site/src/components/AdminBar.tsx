@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-const AdminBar: React.FC = () => {
+const AdminBar: FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dropdowns, setDropdowns] = useState<{[key: string]: boolean}>({});

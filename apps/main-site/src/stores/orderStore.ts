@@ -151,7 +151,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             },
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -176,7 +176,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             },
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '사용자 주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -201,7 +201,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             },
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '공급자 주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -224,7 +224,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             currentOrder: order,
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -244,7 +244,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: userCartItems,
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '장바구니를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -307,7 +307,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: updatedCartItems,
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '장바구니 추가 중 오류가 발생했습니다.',
             isLoading: false,
@@ -332,7 +332,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: updatedCartItems,
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '장바구니 수정 중 오류가 발생했습니다.',
             isLoading: false,
@@ -353,7 +353,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: updatedCartItems,
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '장바구니 삭제 중 오류가 발생했습니다.',
             isLoading: false,
@@ -371,7 +371,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: [],
             isLoading: false,
           });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '장바구니 비우기 중 오류가 발생했습니다.',
             isLoading: false,
@@ -438,7 +438,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           });
           
           return newOrder;
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '주문 생성 중 오류가 발생했습니다.',
             isLoading: false,
@@ -473,7 +473,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           mockOrders[orderIndex] = updatedOrder;
           
           set({ isLoading: false });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '주문 상태 변경 중 오류가 발생했습니다.',
             isLoading: false,
@@ -505,7 +505,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           mockOrders[orderIndex] = updatedOrder;
           
           set({ isLoading: false });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '결제 상태 변경 중 오류가 발생했습니다.',
             isLoading: false,
@@ -531,7 +531,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           };
           
           set({ isLoading: false });
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '주문 취소 중 오류가 발생했습니다.',
             isLoading: false,

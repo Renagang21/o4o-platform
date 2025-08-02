@@ -11,7 +11,7 @@ interface ReviewForm {
   images: FileList;
 }
 
-const WriteReview: React.FC = () => {
+const WriteReview: FC = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<ReviewForm>();
   const [rating, setRating] = useState(0);
@@ -21,7 +21,7 @@ const WriteReview: React.FC = () => {
   const onSubmit = async (data: ReviewForm) => {
     setIsSubmitting(true);
     try {
-      console.log('Review submitted:', { ...data, rating });
+      // console.log('Review submitted:', { ...data, rating });
       // TODO: API call to submit review
       navigate('/customer/reviews');
     } catch (error) {

@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, Users } from 'lucide-react';
 import { FundingProject } from '@o4o/crowdfunding-types';
@@ -8,7 +9,7 @@ interface ProjectCardProps {
   className?: string;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, className = '' }) => {
+export const ProjectCard: FC<ProjectCardProps> = ({ project, className = '' }) => {
   const progress = Math.min((project.currentAmount / project.targetAmount) * 100, 100);
   const daysLeft = Math.max(
     0,

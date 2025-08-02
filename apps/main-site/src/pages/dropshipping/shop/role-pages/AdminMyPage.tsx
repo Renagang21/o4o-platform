@@ -44,7 +44,7 @@ interface PendingApproval {
   priority: 'high' | 'medium' | 'low';
 }
 
-const AdminMyPage: React.FC<RolePageProps> = ({ user }) => {
+const AdminMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [systemStats, setSystemStats] = useState<SystemStats>({
     totalUsers: 12547,

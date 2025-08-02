@@ -102,9 +102,9 @@ export const useDynamicMenu = () => {
   
   // 디버깅용 로그
   if (isMockMode) {
-    console.log('[useDynamicMenu] Mock mode active');
-    console.log('[useDynamicMenu] Active apps:', activeApps);
-    console.log('[useDynamicMenu] Menu items:', dynamicMenu);
+    // console.log('[useDynamicMenu] Mock mode active');
+    // console.log('[useDynamicMenu] Active apps:', activeApps);
+    // console.log('[useDynamicMenu] Menu items:', dynamicMenu);
   }
 
   // 앱 상태 변경 시 메뉴 다시 로드

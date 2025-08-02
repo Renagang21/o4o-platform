@@ -21,7 +21,7 @@ interface TabsProps {
   onChange?: (tabId: string) => void;
 }
 
-const Tabs: React.FC<TabsProps> = ({
+const Tabs: FC<TabsProps> = ({
   items,
   defaultTab,
   variant = 'line',

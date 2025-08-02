@@ -1,6 +1,6 @@
 import { useState, FC } from 'react';
 
-const HomeEditorPage: React.FC = () => {
+const HomeEditorPage: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [homeContent, setHomeContent] = useState({
     title: '매장 경쟁력 강화를 지원하는 플랫폼',
@@ -11,7 +11,7 @@ const HomeEditorPage: React.FC = () => {
   const handleSave = () => {
     // TODO: API call to save home content
     setIsEditing(false);
-    console.log('Saving home content:', homeContent);
+    // console.log('Saving home content:', homeContent);
   };
 
   return (

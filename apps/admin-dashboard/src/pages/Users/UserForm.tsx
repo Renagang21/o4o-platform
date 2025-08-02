@@ -72,7 +72,7 @@ export default function UserForm() {
         setValue('roles', userData.roles);
         setValue('status', userData.status);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user:', error);
       toast.error('Failed to load user');
       navigate('/users');

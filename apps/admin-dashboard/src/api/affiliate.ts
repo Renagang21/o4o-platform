@@ -32,7 +32,7 @@ export async function getAffiliateUser(userId?: string): Promise<AffiliateUser |
   try {
     const response = await authClient.api.get(`/v1/affiliate/user${userId ? `/${userId}` : ''}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get affiliate user error:', error);
     return null;
   }
@@ -52,7 +52,7 @@ export async function getAffiliateStats(params: GetAffiliateStatsRequest) {
 
     const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString()}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get affiliate stats error:', error);
     throw error;
   }
@@ -81,7 +81,7 @@ export async function getCommissionHistory(params: {
 
     const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString()}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get commission history error:', error);
     throw error;
   }
@@ -129,7 +129,7 @@ export async function trackReferralClick(data: {
   try {
     const response = await authClient.api.post('/v1/affiliate/track-click', data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Track referral click error:', error);
     throw error;
   }
@@ -146,7 +146,7 @@ export async function trackReferralConversion(data: {
   try {
     const response = await authClient.api.post('/v1/affiliate/track-conversion', data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Track referral conversion error:', error);
     throw error;
   }
@@ -193,7 +193,7 @@ export async function getAffiliateList(params?: {
 
     const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString()}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get affiliate list error:', error);
     throw error;
   }
@@ -213,7 +213,7 @@ export async function updateAffiliateStatus(
       reason
     });
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update affiliate status error:', error);
     throw error;
   }
@@ -226,7 +226,7 @@ export async function getAffiliatePolicy() {
   try {
     const response = await authClient.api.get('/v1/affiliate/policy');
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get affiliate policy error:', error);
     throw error;
   }

@@ -32,7 +32,7 @@ export default function UserStatistics() {
         }
         setStats(response.data.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user statistics:', error);
     } finally {
       setLoading(false);

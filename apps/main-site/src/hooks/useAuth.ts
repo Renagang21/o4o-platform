@@ -9,7 +9,7 @@ export const useAuth = () => {
     try {
       await context.login(data);
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         message: error instanceof AxiosError && error.response?.data?.message 
@@ -23,7 +23,7 @@ export const useAuth = () => {
     try {
       await context.register(data);
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         message: error instanceof AxiosError && error.response?.data?.message 
@@ -37,7 +37,7 @@ export const useAuth = () => {
     try {
       await context.logout();
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         message: '로그아웃에 실패했습니다.',

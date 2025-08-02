@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { ShortcodeProps } from '@o4o/shortcodes';
 import { CreditCard, Smartphone, Banknote, Building } from 'lucide-react';
 
@@ -10,7 +10,7 @@ import { CreditCard, Smartphone, Banknote, Building } from 'lucide-react';
  * [payment-methods]
  * [payment-methods show-icons="true" default="card"]
  */
-export const PaymentMethods: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const PaymentMethods: FC<ShortcodeProps> = ({ attributes }) => {
   const [selectedMethod, setSelectedMethod] = useState<string>(
     String(attributes.default || 'card')
   );

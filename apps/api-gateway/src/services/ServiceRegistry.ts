@@ -13,6 +13,19 @@ export interface ServiceHealth {
   error?: string;
 }
 
+export interface ServiceInstanceMetrics {
+  status: string;
+  lastCheck: Date;
+  responseTime?: number;
+  error?: string;
+}
+
+export interface ServiceMetrics {
+  totalServices: number;
+  healthyServices: number;
+  services: Record<string, ServiceInstanceMetrics>;
+}
+
 export class ServiceRegistry {
   private services: Map<string, ServiceConfig> = new Map();
   private healthStatus: Map<string, ServiceHealth> = new Map();
@@ -193,17 +206,17 @@ export class ServiceRegistry {
       });
       
       logger.debug(`Health check passed: ${config.name}`, { responseTime });
-    } catch (error: any) {
+    } catch (error) {
       this.healthStatus.set(key, {
         name: config.name,
         status: 'unhealthy',
         lastCheck: new Date(),
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       
       logger.error(`Health check failed: ${config.name}`, {
-        error: error.message,
-        code: error.code
+        error: error instanceof Error ? error.message : String(error),
+        code: (error as any).code
       });
     }
   }
@@ -272,11 +285,11 @@ export class ServiceRegistry {
   /**
    * Get service metrics
    */
-  getMetrics(): any {
+  getMetrics(): ServiceMetrics {
     const metrics = {
       totalServices: this.services.size,
       healthyServices: this.getHealthyServices().length,
-      services: {} as any
+      services: {} as Record<string, ServiceInstanceMetrics>
     };
     
     this.healthStatus.forEach((health, key) => {

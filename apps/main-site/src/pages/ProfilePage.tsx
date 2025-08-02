@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import ProfileCard from '../components/ProfileCard';
 import PasswordChangeModal from '../components/PasswordChangeModal';
 
-const ProfilePage: React.FC = () => {
+const ProfilePage: FC = () => {
   const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);

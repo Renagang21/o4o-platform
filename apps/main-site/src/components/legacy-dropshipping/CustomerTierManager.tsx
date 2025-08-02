@@ -65,7 +65,7 @@ interface CustomerTierManagerProps {
   onCustomerAction?: (customerId: string, action: string) => void;
 }
 
-const CustomerTierManager: React.FC<CustomerTierManagerProps> = ({
+const CustomerTierManager: FC<CustomerTierManagerProps> = ({
   customerType,
   onTierUpdate,
   onCustomerAction

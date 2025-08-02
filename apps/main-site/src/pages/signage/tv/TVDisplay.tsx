@@ -12,7 +12,7 @@ interface SignageContent {
   isActive: boolean;
 }
 
-const TVDisplay: React.FC = () => {
+const TVDisplay: FC = () => {
   const [currentContent, setCurrentContent] = useState<SignageContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string>('');

@@ -9,7 +9,7 @@ interface BetaFeedbackWidgetProps {
   className?: string;
 }
 
-export const BetaFeedbackWidget: React.FC<BetaFeedbackWidgetProps> = ({
+export const BetaFeedbackWidget: FC<BetaFeedbackWidgetProps> = ({
   page = 'signage',
   feature,
   className
@@ -230,7 +230,7 @@ interface BetaStatusProps {
   onStatusChange?: (status: { approved: boolean; betaLevel: string; accessGranted: boolean }) => void;
 }
 
-export const BetaStatusChecker: React.FC<BetaStatusProps> = ({
+export const BetaStatusChecker: FC<BetaStatusProps> = ({
   email,
   onStatusChange
 }) => {
@@ -252,7 +252,7 @@ export const BetaStatusChecker: React.FC<BetaStatusProps> = ({
         setStatus(null);
         onStatusChange?.(null);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Status check error:', error);
       setStatus(null);
       onStatusChange?.(null);

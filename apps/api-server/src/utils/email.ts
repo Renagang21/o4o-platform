@@ -39,7 +39,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully to:', options.to);
+    // console.log('Email sent successfully to:', options.to);
   } catch (error) {
     console.error('Failed to send email:', error);
     throw error;
@@ -50,7 +50,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
 export async function verifyEmailConnection(): Promise<boolean> {
   try {
     await transporter.verify();
-    console.log('SMTP connection verified');
+    // console.log('SMTP connection verified');
     return true;
   } catch (error) {
     console.error('SMTP connection failed:', error);

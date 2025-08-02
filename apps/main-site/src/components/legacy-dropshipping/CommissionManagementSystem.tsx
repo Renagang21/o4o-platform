@@ -34,7 +34,7 @@ interface CommissionManagementSystemProps {
   onReject?: (requestId: string, reason: string) => void;
 }
 
-const CommissionManagementSystem: React.FC<CommissionManagementSystemProps> = ({
+const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
   userRole,
   onApprove,
   onReject

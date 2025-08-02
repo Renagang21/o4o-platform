@@ -56,7 +56,7 @@ export class EmailService {
     try {
       // Skip initialization if SMTP credentials are not configured
       if (!this.config.auth.user || !this.config.auth.pass) {
-        console.log('⚠️  Email service disabled: SMTP credentials not configured');
+        // console.log('⚠️  Email service disabled: SMTP credentials not configured');
         this.transporter = null;
         return;
       }
@@ -66,10 +66,10 @@ export class EmailService {
 
       // Verify connection
       await this.transporter.verify();
-      console.log('✅ Email service connected successfully');
+      // console.log('✅ Email service connected successfully');
     } catch (error) {
       console.error('⚠️  Email service initialization failed:', error);
-      console.log('📌 Email functionality will be disabled');
+      // console.log('📌 Email functionality will be disabled');
       this.transporter = null;
     }
   }
@@ -79,7 +79,7 @@ export class EmailService {
    */
   async sendEmail(options: EmailOptions): Promise<boolean> {
     if (!this.transporter) {
-      console.log('⚠️  Email service not available - skipping email send');
+      // console.log('⚠️  Email service not available - skipping email send');
       return false;
     }
 
@@ -104,7 +104,7 @@ export class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', info.messageId);
+      // console.log('Email sent successfully:', info.messageId);
       return true;
     } catch (error) {
       console.error('Failed to send email:', error);

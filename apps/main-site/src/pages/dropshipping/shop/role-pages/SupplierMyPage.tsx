@@ -51,7 +51,7 @@ interface PartnerOrder {
   requestedDelivery: string;
 }
 
-const SupplierMyPage: React.FC<RolePageProps> = ({ user }) => {
+const SupplierMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [supplierStats, setSupplierStats] = useState<SupplierStats>({
     totalProducts: 147,

@@ -35,7 +35,7 @@ export function useQuickEdit({ onSave, onCancel }: UseQuickEditProps) {
       await onSave(editingId, formData);
       setEditingId(null);
       setFormData({});
-    } catch (error) {
+    } catch (error: any) {
       console.error('Quick edit save failed:', error);
       throw error;
     } finally {

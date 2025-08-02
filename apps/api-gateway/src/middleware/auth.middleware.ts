@@ -99,7 +99,7 @@ export class AuthMiddleware {
         });
         
         next();
-      } catch (error: any) {
+      } catch (error) {
         if (error.name === 'TokenExpiredError') {
           res.status(401).json({
             error: 'Token has expired',

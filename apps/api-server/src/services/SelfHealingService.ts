@@ -158,13 +158,13 @@ export class SelfHealingService {
   }
 
   async initialize(): Promise<void> {
-    console.log('🔧 Initializing Self-Healing Service...');
+    // console.log('🔧 Initializing Self-Healing Service...');
     
     await this.initializeHealingActions();
     await this.startHealthMonitoring();
     await this.initializeServiceTracking();
     
-    console.log('✅ Self-Healing Service initialized');
+    // console.log('✅ Self-Healing Service initialized');
   }
 
   async shutdown(): Promise<void> {
@@ -172,12 +172,12 @@ export class SelfHealingService {
       clearInterval(this.monitoringInterval);
     }
     
-    console.log('🔧 Self-Healing Service shut down');
+    // console.log('🔧 Self-Healing Service shut down');
   }
 
   // Service restart functionality
   async restartService(serviceName: string, parameters?: ServiceRestartParameters): Promise<{ output: string }> {
-    console.log(`🔄 Restarting service: ${serviceName}`);
+    // console.log(`🔄 Restarting service: ${serviceName}`);
     
     const action = this.healingActions.get('restart-service') || await this.createServiceRestartAction(serviceName, parameters);
     return await this.executeHealingAction(action, { serviceName, ...parameters });
@@ -219,7 +219,7 @@ export class SelfHealingService {
 
   // Cache clearing functionality
   async clearCache(target: string, parameters?: CacheClearParameters): Promise<{ output: string }> {
-    console.log(`🗑️ Clearing cache: ${target}`);
+    // console.log(`🗑️ Clearing cache: ${target}`);
     
     let output = '';
     const cacheTypes = parameters?.cacheTypes || ['memory', 'redis', 'temp'];
@@ -266,7 +266,7 @@ export class SelfHealingService {
     try {
       // Implementation would use actual Redis client
       const pattern = parameters?.pattern || '*';
-      console.log(`Clearing Redis cache with pattern: ${pattern}`);
+      // console.log(`Clearing Redis cache with pattern: ${pattern}`);
       
       // Simulate Redis cache clear
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -296,7 +296,7 @@ export class SelfHealingService {
 
   // Connection reset functionality
   async resetConnections(target: string, parameters?: ConnectionResetParameters): Promise<{ output: string }> {
-    console.log(`🔌 Resetting connections: ${target}`);
+    // console.log(`🔌 Resetting connections: ${target}`);
     
     let output = '';
     
@@ -351,13 +351,13 @@ export class SelfHealingService {
 
   private async resetRedisConnections(parameters?: Record<string, unknown>): Promise<string> {
     // Implementation would reset Redis connections
-    console.log('Resetting Redis connections');
+    // console.log('Resetting Redis connections');
     return 'Redis connections reset';
   }
 
   // Resource scaling functionality
   async scaleResources(target: string, parameters?: ScaleResourceParameters): Promise<{ output: string }> {
-    console.log(`📈 Scaling resources: ${target}`);
+    // console.log(`📈 Scaling resources: ${target}`);
     
     const action = parameters?.action || 'scale_up';
     const factor = parameters?.factor || 1.5;
@@ -387,7 +387,7 @@ export class SelfHealingService {
 
   private async scaleApiServer(action: string, factor: number): Promise<string> {
     // In a real implementation, this would scale the API server instances
-    console.log(`Scaling API server: ${action} by factor ${factor}`);
+    // console.log(`Scaling API server: ${action} by factor ${factor}`);
     
     if (action === 'scale_up') {
       // Increase worker processes, connection limits, etc.
@@ -413,7 +413,7 @@ export class SelfHealingService {
 
   private async scaleConnectionPools(action: string, factor: number): Promise<string> {
     // In a real implementation, this would adjust connection pool sizes
-    console.log(`Scaling connection pools: ${action} by factor ${factor}`);
+    // console.log(`Scaling connection pools: ${action} by factor ${factor}`);
     return `Connection pools scaled ${action} by factor ${factor}`;
   }
 
@@ -458,7 +458,7 @@ export class SelfHealingService {
       }
     }, 60000); // Every minute
 
-    console.log('❤️ Self-healing health monitoring started');
+    // console.log('❤️ Self-healing health monitoring started');
   }
 
   private async performHealthCheck(): Promise<SystemHealth> {
@@ -654,7 +654,7 @@ export class SelfHealingService {
     
     for (const issue of autoHealableIssues) {
       if (this.activeAttempts.size >= this.maxConcurrentHealing) {
-        console.log(`⚠️ Max concurrent healing attempts reached, skipping ${issue.type}`);
+        // console.log(`⚠️ Max concurrent healing attempts reached, skipping ${issue.type}`);
         continue;
       }
       
@@ -663,7 +663,7 @@ export class SelfHealingService {
   }
 
   private async healIssue(issue: SystemIssue): Promise<void> {
-    console.log(`🩹 Auto-healing issue: ${issue.type} - ${issue.description}`);
+    // console.log(`🩹 Auto-healing issue: ${issue.type} - ${issue.description}`);
     
     const suggestedAction = issue.suggestedActions[0];
     
@@ -701,7 +701,7 @@ export class SelfHealingService {
           console.warn(`Unknown healing action: ${suggestedAction}`);
       }
       
-      console.log(`✅ Auto-healing successful for ${issue.type}`);
+      // console.log(`✅ Auto-healing successful for ${issue.type}`);
       
     } catch (error) {
       console.error(`❌ Auto-healing failed for ${issue.type}:`, error);
@@ -970,7 +970,7 @@ export class SelfHealingService {
       this.healingActions.set(action.id, action);
     });
     
-    console.log(`🔧 Initialized ${actions.length} healing actions`);
+    // console.log(`🔧 Initialized ${actions.length} healing actions`);
   }
 
   private async initializeServiceTracking(): Promise<void> {
@@ -1102,12 +1102,12 @@ export class SelfHealingService {
 
   async enable(): Promise<void> {
     this.isEnabled = true;
-    console.log('✅ Self-healing enabled');
+    // console.log('✅ Self-healing enabled');
   }
 
   async disable(): Promise<void> {
     this.isEnabled = false;
-    console.log('⏸️ Self-healing disabled');
+    // console.log('⏸️ Self-healing disabled');
   }
 
   async forceHealing(issueType: string, component: string): Promise<{ output: string }> {

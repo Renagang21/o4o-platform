@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { FC, createContext, useContext, useState, useEffect, useCallback, useRef  } from 'react';
 import { cookieAuthClient, LoginCredentials, RegisterData, User } from '@o4o/auth-client';
 import { WebSocketSessionClient } from './services/WebSocketSessionClient';
 
@@ -25,7 +25,7 @@ export interface CookieAuthProviderProps {
   sessionCheckInterval?: number;
 }
 
-export const CookieAuthProvider: React.FC<CookieAuthProviderProps> = ({ 
+export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({ 
   children, 
   onAuthChange,
   enableSessionSync = true,
@@ -75,7 +75,7 @@ export const CookieAuthProvider: React.FC<CookieAuthProviderProps> = ({
     // Connect with callbacks
     wsClientRef.current.connect(token, {
       onSessionEvent: (event) => {
-        console.log('[Auth] Session event:', event);
+        // console.log('[Auth] Session event:', event);
         
         // Handle different session events
         switch (event.event) {
@@ -91,7 +91,7 @@ export const CookieAuthProvider: React.FC<CookieAuthProviderProps> = ({
         }
       },
       onForceLogout: (reason) => {
-        console.log('[Auth] Force logout:', reason);
+        // console.log('[Auth] Force logout:', reason);
         // Clear local auth state
         setUser(null);
         setError(reason);

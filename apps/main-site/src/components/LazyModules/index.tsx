@@ -7,7 +7,7 @@ import {
 } from '../ErrorBoundary';
 
 // 로딩 컴포넌트
-const LoadingSpinner: React.FC<{ module: string }> = ({ module }) => (
+const LoadingSpinner: FC<{ module: string }> = ({ module }) => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="text-center">
       <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -25,7 +25,7 @@ const LazyFullScreenEditorSimpleTest = lazy(() => import('../../pages/FullScreen
 const LazyAdminDashboardTest = lazy(() => import('../../pages/AdminDashboardTest').then(module => ({ default: module.AdminDashboardTest })));
 
 // 안전한 Lazy 래퍼 컴포넌트들
-export const SafeDropshippingPage: React.FC = () => (
+export const SafeDropshippingPage: FC = () => (
   <DropshippingErrorBoundary>
     <Suspense fallback={<LoadingSpinner module="드랍쉬핑" />}>
       <LazyDropshippingPage />
@@ -33,7 +33,7 @@ export const SafeDropshippingPage: React.FC = () => (
   </DropshippingErrorBoundary>
 );
 
-export const SafeHealthcarePage: React.FC = () => (
+export const SafeHealthcarePage: FC = () => (
   <HealthcareErrorBoundary>
     <Suspense fallback={<LoadingSpinner module="헬스케어" />}>
       <LazyHealthcarePage />
@@ -41,7 +41,7 @@ export const SafeHealthcarePage: React.FC = () => (
   </HealthcareErrorBoundary>
 );
 
-export const SafeHealthcareDemo: React.FC = () => (
+export const SafeHealthcareDemo: FC = () => (
   <HealthcareErrorBoundary>
     <Suspense fallback={<LoadingSpinner module="헬스케어 데모" />}>
       <LazyHealthcareDemo />
@@ -49,7 +49,7 @@ export const SafeHealthcareDemo: React.FC = () => (
   </HealthcareErrorBoundary>
 );
 
-export const SafeTheDANGStyleEditorPage: React.FC = () => (
+export const SafeTheDANGStyleEditorPage: FC = () => (
   <EditorErrorBoundary>
     <Suspense fallback={<LoadingSpinner module="에디터" />}>
       <LazyTheDANGStyleEditorPage />
@@ -57,7 +57,7 @@ export const SafeTheDANGStyleEditorPage: React.FC = () => (
   </EditorErrorBoundary>
 );
 
-export const SafeFullScreenEditorSimpleTest: React.FC = () => (
+export const SafeFullScreenEditorSimpleTest: FC = () => (
   <EditorErrorBoundary>
     <Suspense fallback={<LoadingSpinner module="전체화면 에디터" />}>
       <LazyFullScreenEditorSimpleTest />
@@ -65,7 +65,7 @@ export const SafeFullScreenEditorSimpleTest: React.FC = () => (
   </EditorErrorBoundary>
 );
 
-export const SafeAdminDashboardTest: React.FC = () => (
+export const SafeAdminDashboardTest: FC = () => (
   <AdminErrorBoundary>
     <Suspense fallback={<LoadingSpinner module="관리자 대시보드" />}>
       <LazyAdminDashboardTest />

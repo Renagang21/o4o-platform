@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Image, FileText, Video, Bell } from 'lucide-react';
 
@@ -11,7 +11,7 @@ interface SignageContent {
   createdAt: string;
 }
 
-const SignageList: React.FC = () => {
+const SignageList: FC = () => {
   const [filter, setFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
 

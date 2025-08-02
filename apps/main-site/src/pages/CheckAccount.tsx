@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Search, ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
-const CheckAccount: React.FC = () => {
+const CheckAccount: FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);

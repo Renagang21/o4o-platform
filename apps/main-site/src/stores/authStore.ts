@@ -72,9 +72,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             error: null,
           });
           
-          console.log('로그인 성공:', user);
+          // Login successful
           
-        } catch (error: any) {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : '로그인 중 오류가 발생했습니다.',
             isLoading: false,
@@ -110,7 +110,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         localStorage.removeItem('auth-storage');
         localStorage.removeItem('auth_token');
         
-        console.log('로그아웃 완료');
+        // Logout completed
       },
 
       setUser: (user) => {
@@ -151,12 +151,12 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             };
             
             set({ user, isAuthenticated: true });
-            console.log('인증 상태 유지:', user);
+            // Auth state maintained
           } else {
             // Token invalid, logout
             get().logout();
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error('Auth check failed:', error);
           get().logout();
         }

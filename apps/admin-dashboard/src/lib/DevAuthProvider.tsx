@@ -42,7 +42,7 @@ export const DevAuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`;
     
     // 콘솔에 로그
-    console.log('DevAuthProvider: Mock 인증 사용 (VITE_USE_MOCK=true)', mockUser);
+    // console.log('DevAuthProvider: Mock 인증 사용 (VITE_USE_MOCK=true)', mockUser);
   } else {
     // Mock 사용하지 않을 경우 인증 정보 제거
     localStorage.removeItem('admin-auth-storage');

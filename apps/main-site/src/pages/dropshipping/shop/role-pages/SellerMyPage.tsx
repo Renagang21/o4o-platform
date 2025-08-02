@@ -45,7 +45,7 @@ interface Order {
   orderDate: string;
 }
 
-const SellerMyPage: React.FC<RolePageProps> = ({ user }) => {
+const SellerMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sellerStats, setSellerStats] = useState<SellerStats>({
     totalProducts: 24,

@@ -27,7 +27,7 @@ const mockUser: ApprovalUser = {
   address: '서울시 강남구',
 };
 
-const YaksaApprovalDetail: React.FC = () => {
+const YaksaApprovalDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();

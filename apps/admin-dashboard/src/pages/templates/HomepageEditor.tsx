@@ -105,7 +105,7 @@ const HomepageEditor: FC = () => {
         setTemplate(createResponse.data);
         setBlocks([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load homepage template:', error);
     } finally {
       setLoading(false);
@@ -196,7 +196,7 @@ const HomepageEditor: FC = () => {
       });
       setTemplate(updateResponse.data);
       alert('Homepage template saved successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save template:', error);
       alert('Failed to save template');
     } finally {
@@ -215,7 +215,7 @@ const HomepageEditor: FC = () => {
       // In a real implementation, this would trigger a deployment
       // or cache invalidation to update the live site
       alert('Homepage published successfully! The changes are now live.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to publish template:', error);
       alert('Failed to publish template');
     } finally {

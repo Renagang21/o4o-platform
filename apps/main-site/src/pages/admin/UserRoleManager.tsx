@@ -18,7 +18,7 @@ const ALL_ROLES: UserRole[] = [
   'user', 'member', 'contributor', 'seller', 'vendor', 'partner', 'operator', 'administrator',
 ];
 
-const UserRoleManager: React.FC = () => {
+const UserRoleManager: FC = () => {
   const { users, changeRoles, filter, setFilter, search, setSearch, adminId } = useUserRoleManager();
   const { showToast } = useToast();
   const [pendingRoles, setPendingRoles] = useState<{ [id: string]: UserRole[] }>({});

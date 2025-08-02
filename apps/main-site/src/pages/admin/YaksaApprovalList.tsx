@@ -31,7 +31,7 @@ const mockUsers: ApprovalUser[] = [
   },
 ];
 
-const YaksaApprovalList: React.FC = () => {
+const YaksaApprovalList: FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [users, setUsers] = useState<ApprovalUser[]>(mockUsers);

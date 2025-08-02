@@ -45,7 +45,7 @@ interface PlaybackStatus {
   };
 }
 
-const LiveTVDisplay: React.FC = () => {
+const LiveTVDisplay: FC = () => {
   const { storeId } = useParams<{ storeId: string }>();
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());

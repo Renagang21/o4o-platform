@@ -54,7 +54,7 @@ interface Template {
   updatedAt: string;
 }
 
-const TemplatesManager: React.FC = () => {
+const TemplatesManager: FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
@@ -323,7 +323,7 @@ const TemplatesManager: React.FC = () => {
       };
 
       // API 호출 (Mock)
-      console.log('Creating template:', templateData);
+      // console.log('Creating template:', templateData);
       
       await loadTemplates();
       resetForm();
@@ -340,7 +340,7 @@ const TemplatesManager: React.FC = () => {
 
     try {
       // API 호출 (Mock)
-      console.log('Deleting template:', id);
+      // console.log('Deleting template:', id);
       
       setTemplates(prev => prev.filter(template => template.id !== id));
       alert('✅ Template이 삭제되었습니다.');

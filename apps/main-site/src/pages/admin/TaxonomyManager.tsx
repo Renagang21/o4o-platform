@@ -45,7 +45,7 @@ interface Taxonomy {
   updatedAt: string;
 }
 
-const TaxonomyManager: React.FC = () => {
+const TaxonomyManager: FC = () => {
   const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
@@ -158,7 +158,7 @@ const TaxonomyManager: React.FC = () => {
       };
 
       // API 호출 (Mock)
-      console.log('Creating taxonomy:', taxonomyData);
+      // console.log('Creating taxonomy:', taxonomyData);
       
       await loadTaxonomies();
       resetForm();
@@ -175,7 +175,7 @@ const TaxonomyManager: React.FC = () => {
 
     try {
       // API 호출 (Mock)
-      console.log('Deleting taxonomy:', slug);
+      // console.log('Deleting taxonomy:', slug);
       
       setTaxonomies(prev => prev.filter(tax => tax.slug !== slug));
       alert('✅ Taxonomy가 삭제되었습니다.');
@@ -212,7 +212,7 @@ const TaxonomyManager: React.FC = () => {
 
   const addTerm = (taxonomySlug: string) => {
     // Term 추가 로직 (나중에 구현)
-    console.log('Adding term to:', taxonomySlug, newTerm);
+    // console.log('Adding term to:', taxonomySlug, newTerm);
   };
 
   const renderTermHierarchy = (terms: TaxonomyTerm[], parentId?: string, level = 0) => {

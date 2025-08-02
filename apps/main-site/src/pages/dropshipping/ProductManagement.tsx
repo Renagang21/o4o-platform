@@ -17,7 +17,7 @@ interface Product {
   lastUpdated: string;
 }
 
-const ProductManagement: React.FC = () => {
+const ProductManagement: FC = () => {
   const [currentRole, setCurrentRole] = useState<UserRole>('supplier');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductInfoHub, setShowProductInfoHub] = useState(false);
@@ -145,7 +145,7 @@ const ProductManagement: React.FC = () => {
   };
 
   const handleProductSave = (data: any) => {
-    console.log('제품 데이터 저장:', data);
+    // console.log('제품 데이터 저장:', data);
     setShowProductInfoHub(false);
     setSelectedProduct(null);
     // 실제로는 API 호출하여 저장

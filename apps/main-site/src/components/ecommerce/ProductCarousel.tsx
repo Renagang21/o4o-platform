@@ -10,7 +10,7 @@ interface ProductCarouselProps {
   interval?: number;
 }
 
-const ProductCarousel: React.FC<ProductCarouselProps> = ({ 
+const ProductCarousel: FC<ProductCarouselProps> = ({ 
   products, 
   autoplay = false,
   interval = 5000 
@@ -120,7 +120,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({
   );
 };
 
-const CarouselCard: React.FC<{ product: Product }> = ({ product }) => {
+const CarouselCard: FC<{ product: Product }> = ({ product }) => {
   const discount = product.compareAtPrice && product.compareAtPrice > product.price
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;

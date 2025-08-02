@@ -32,7 +32,7 @@ interface CouponInfo {
   isApplicable: boolean;
 }
 
-const CartPage: React.FC = () => {
+const CartPage: FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [coupons, setCoupons] = useState<CouponInfo[]>([]);

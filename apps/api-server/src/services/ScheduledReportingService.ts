@@ -75,28 +75,28 @@ export class ScheduledReportingService {
 
   start(): void {
     if (this.isRunning) {
-      console.log('Scheduled reporting service is already running');
+      // console.log('Scheduled reporting service is already running');
       return;
     }
 
-    console.log('Starting scheduled reporting service...');
+    // console.log('Starting scheduled reporting service...');
     this.isRunning = true;
 
     // Daily reports at 6:00 AM
     cron.schedule('0 6 * * *', async () => {
-      console.log('Generating daily reports...');
+      // console.log('Generating daily reports...');
       await this.generateDailyReports();
     });
 
     // Weekly reports on Mondays at 7:00 AM
     cron.schedule('0 7 * * 1', async () => {
-      console.log('Generating weekly reports...');
+      // console.log('Generating weekly reports...');
       await this.generateWeeklyReports();
     });
 
     // Monthly reports on the 1st at 8:00 AM
     cron.schedule('0 8 1 * *', async () => {
-      console.log('Generating monthly reports...');
+      // console.log('Generating monthly reports...');
       await this.generateMonthlyReports();
     });
 
@@ -120,21 +120,21 @@ export class ScheduledReportingService {
       await this.generateBetaProgramInsights();
     });
 
-    console.log('Scheduled reporting service started successfully');
+    // console.log('Scheduled reporting service started successfully');
   }
 
   stop(): void {
     if (!this.isRunning) {
-      console.log('Scheduled reporting service is not running');
+      // console.log('Scheduled reporting service is not running');
       return;
     }
 
-    console.log('Stopping scheduled reporting service...');
+    // console.log('Stopping scheduled reporting service...');
     this.isRunning = false;
     
     // Note: node-cron doesn't provide a clean way to stop all tasks
     // In a production environment, you might want to keep references to tasks
-    console.log('Scheduled reporting service stopped');
+    // console.log('Scheduled reporting service stopped');
   }
 
   // Report Generation Methods
@@ -164,7 +164,7 @@ export class ScheduledReportingService {
         )
       ]);
 
-      console.log(`Generated ${reports.length} daily reports for ${yesterday.toDateString()}`);
+      // console.log(`Generated ${reports.length} daily reports for ${yesterday.toDateString()}`);
 
       // Send notifications for daily reports
       await this.sendDailyReportNotification(reports);
@@ -202,7 +202,7 @@ export class ScheduledReportingService {
         )
       ]);
 
-      console.log(`Generated ${reports.length} weekly reports for week ${weekStart.toDateString()} - ${weekEnd.toDateString()}`);
+      // console.log(`Generated ${reports.length} weekly reports for week ${weekStart.toDateString()} - ${weekEnd.toDateString()}`);
 
       // Send notifications for weekly reports
       await this.sendWeeklyReportNotification(reports);
@@ -226,7 +226,7 @@ export class ScheduledReportingService {
         monthEnd
       );
 
-      console.log(`Generated monthly report for ${monthStart.toDateString()} - ${monthEnd.toDateString()}`);
+      // console.log(`Generated monthly report for ${monthStart.toDateString()} - ${monthEnd.toDateString()}`);
 
       // Send notifications for monthly report
       await this.sendMonthlyReportNotification(report);
@@ -365,7 +365,7 @@ export class ScheduledReportingService {
         );
       }
 
-      console.log(`System health check completed. Status: ${overview.systemHealth}`);
+      // console.log(`System health check completed. Status: ${overview.systemHealth}`);
     } catch (error) {
       console.error('Error in system health check:', error);
     }
@@ -413,7 +413,7 @@ export class ScheduledReportingService {
         );
       }
 
-      console.log('Beta program insights generated and analyzed');
+      // console.log('Beta program insights generated and analyzed');
     } catch (error) {
       console.error('Error generating beta program insights:', error);
     }
@@ -468,7 +468,7 @@ export class ScheduledReportingService {
 
   private async sendEmailNotification(title: string, message: string, urgent: boolean): Promise<void> {
     // Implementation depends on email service (nodemailer, SendGrid, etc.)
-    console.log(`EMAIL NOTIFICATION: ${title}\n${message}`);
+    // console.log(`EMAIL NOTIFICATION: ${title}\n${message}`);
   }
 
   private async sendSlackNotification(title: string, message: string, urgent: boolean): Promise<void> {

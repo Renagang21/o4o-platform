@@ -14,7 +14,7 @@ interface ToastProps {
   className?: string;
 }
 
-const Toast: React.FC<ToastProps> = ({
+const Toast: FC<ToastProps> = ({
   message,
   type = 'info',
   position = 'top-right',

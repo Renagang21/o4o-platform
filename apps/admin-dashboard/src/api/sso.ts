@@ -35,7 +35,7 @@ class SSOService {
         if (onSessionChange) {
           onSessionChange(response.isAuthenticated);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('[SSO] Session check failed:', error);
       }
     }, ssoConfig.sessionCheckInterval);

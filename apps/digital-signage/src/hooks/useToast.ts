@@ -1,6 +1,6 @@
 export const useToast = () => {
   const success = (message: string) => {
-    console.log('Success:', message);
+    // console.log('Success:', message);
     // TODO: Implement actual toast notification
   };
 

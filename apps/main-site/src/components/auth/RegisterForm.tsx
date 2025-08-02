@@ -18,7 +18,7 @@ const roles = [
   { id: 'affiliate', name: '제휴자', icon: Users }
 ];
 
-const RegisterForm: React.FC = () => {
+const RegisterForm: FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
@@ -77,7 +77,7 @@ const RegisterForm: React.FC = () => {
           }
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('회원가입 실패:', error);
     }
   };

@@ -16,7 +16,7 @@ const isAdmin = () => {
   }
 };
 
-const PageViewer: React.FC = () => {
+const PageViewer: FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [pageContent, setPageContent] = useState<PageContent | null>(null);

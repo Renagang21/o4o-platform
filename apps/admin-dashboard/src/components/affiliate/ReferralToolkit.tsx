@@ -68,7 +68,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
       setCopiedMessage(true);
       toast.success('메시지가 복사되었습니다!');
       setTimeout(() => setCopiedMessage(false), 3000);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('메시지 복사에 실패했습니다.');
     }
   };

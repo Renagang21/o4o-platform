@@ -58,7 +58,7 @@ router.post('/login',
           businessInfo: result.user.businessInfo
         }
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       
       if (error.message.includes('Account is')) {
@@ -339,7 +339,7 @@ router.post('/reset-password',
         success: true,
         message: 'Password has been reset successfully'
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Password reset error:', error);
       res.status(400).json({
         error: error.message || 'Failed to reset password',
@@ -365,7 +365,7 @@ router.post('/resend-verification', authenticateCookie, async (req: AuthRequest,
       success: true,
       message: 'Verification email has been sent'
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Email verification request error:', error);
     res.status(400).json({
       error: error.message || 'Failed to send verification email',
@@ -392,7 +392,7 @@ router.post('/verify-email',
         success: true,
         message: 'Email has been verified successfully'
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Email verification error:', error);
       res.status(400).json({
         error: error.message || 'Failed to verify email',

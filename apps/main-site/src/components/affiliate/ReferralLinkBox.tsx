@@ -1,7 +1,7 @@
 import { useState, FC } from 'react';
 import { Copy, Share2, Mail, MessageCircle, Facebook, Twitter, Check } from 'lucide-react';
 
-const ReferralLinkBox: React.FC = () => {
+const ReferralLinkBox: FC = () => {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
   const referralLink = `${import.meta.env.VITE_PUBLIC_URL || 'https://o4o.com'}/ref/partner123`;

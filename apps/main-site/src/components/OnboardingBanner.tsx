@@ -30,7 +30,7 @@ const getBannerContent = (role: string | undefined) => {
   }
 };
 
-const OnboardingBanner: React.FC = () => {
+const OnboardingBanner: FC = () => {
   const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
 

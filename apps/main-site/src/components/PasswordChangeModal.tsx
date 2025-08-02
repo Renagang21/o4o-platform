@@ -6,7 +6,7 @@ interface PasswordChangeModalProps {
   onClose: () => void;
 }
 
-const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ open, onClose }) => {
+const PasswordChangeModal: FC<PasswordChangeModalProps> = ({ open, onClose }) => {
   const { showToast } = useToast();
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');

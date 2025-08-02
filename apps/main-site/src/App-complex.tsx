@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { FC, useEffect  } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 
@@ -49,7 +49,7 @@ import {
   SignageErrorBoundary
 } from './components/ErrorBoundary';
 
-const App: React.FC = () => {
+const App: FC = () => {
   const { checkAuth } = useAuthStore();
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 // React 19 새로운 기능들 활용 예시
-import React, { useState, useMemo, forwardRef, useOptimistic, useActionState, startTransition } from 'react';
+import { useState, useMemo, forwardRef, useOptimistic, useActionState, startTransition } from 'react';
 
 // 1. useOptimistic 활용 예시 - 즉시 UI 업데이트
 interface Todo {
@@ -37,7 +37,7 @@ function OptimisticTodoList() {
     try {
       const newTodo = await addTodoAction(text);
       setTodos(prev => [...prev, newTodo]);
-    } catch (error: any) {
+    } catch (error) {
       // 에러 시 자동으로 이전 상태로 롤백
       console.error('Failed to add todo:', error);
     }

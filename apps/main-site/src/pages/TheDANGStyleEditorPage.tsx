@@ -2,7 +2,7 @@ import { useState, FC, createElement } from 'react';
 import TheDANGHomeEditor from '@shared/components/editor/TheDANGHomeEditor';
 import DOMPurify from 'dompurify';
 
-const TheDANGStyleEditorPage: React.FC = () => {
+const TheDANGStyleEditorPage: FC = () => {
   const [savedContent, setSavedContent] = useState<string>('');
 
   // Initial content structure for the homepage
@@ -66,7 +66,7 @@ const TheDANGStyleEditorPage: React.FC = () => {
   const handleSave = async () => {
     try {
       // Here you would typically save to your API
-      console.log('Saving content:', savedContent);
+      // console.log('Saving content:', savedContent);
       
       // For now, just show a success message
       alert('Content saved successfully!');

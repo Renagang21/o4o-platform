@@ -30,7 +30,7 @@ interface WishlistItem {
   isRocket: boolean;
 }
 
-const UserMyPage: React.FC<RolePageProps> = ({ user }) => {
+const UserMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);

@@ -30,7 +30,7 @@ interface Pagination {
   totalUsers: number;
 }
 
-const AdminDashboard: React.FC = () => {
+const AdminDashboard: FC = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ const AdminDashboard: React.FC = () => {
 
   const loadUsers = (page: number = 1) => {
     // Mock function for pagination
-    console.log(`Loading users for page ${page}`);
+    // console.log(`Loading users for page ${page}`);
   };
 
   const getActionButtons = (user: User) => {

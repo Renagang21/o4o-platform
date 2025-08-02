@@ -7,7 +7,7 @@ interface LabelUploaderProps {
   currentLabel: File | null;
 }
 
-const LabelUploader: React.FC<LabelUploaderProps> = ({
+const LabelUploader: FC<LabelUploaderProps> = ({
   onUpload,
   currentLabel
 }) => {

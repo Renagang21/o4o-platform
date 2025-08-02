@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import { FC, useState, useRef  } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Upload, File, Image, Video, Trash2, Edit3, Save } from 'lucide-react';
 // import Navbar from '../../components/Navbar';
 // import { BetaFeedbackWidget } from '../../components/beta/BetaFeedbackWidget';
 
-const ContentManager: React.FC = () => {
+const ContentManager: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -65,7 +65,7 @@ const ContentManager: React.FC = () => {
       // 실제로는 파일 업로드 API 호출
       await new Promise(resolve => setTimeout(resolve, 2000)); // 모의 업로드 지연
       
-      console.log('업로드 완료:', {
+      // console.log('업로드 완료:', {
         title: newContent.title,
         type: newContent.type,
         file: newContent.file.name

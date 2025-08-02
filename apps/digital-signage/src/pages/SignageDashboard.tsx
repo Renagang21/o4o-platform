@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { FC, useState, useEffect  } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, Monitor, Play, Pause, Upload, 
@@ -19,7 +19,7 @@ interface SignageContent {
   isActive: boolean;
 }
 
-const SignageDashboard: React.FC = () => {
+const SignageDashboard: FC = () => {
   const [contents, setContents] = useState<SignageContent[]>([]);
   const [currentDisplay, setCurrentDisplay] = useState<SignageContent | null>(null);
   const [displayStatus, setDisplayStatus] = useState<'playing' | 'paused' | 'stopped'>('stopped');
@@ -76,7 +76,7 @@ const SignageDashboard: React.FC = () => {
     setDisplayStatus('playing');
     
     // 실제로는 여기서 TV 디스플레이 업데이트 API 호출
-    console.log('🖥️ TV 디스플레이 업데이트:', content.title);
+    // console.log('🖥️ TV 디스플레이 업데이트:', content.title);
   };
 
   return (

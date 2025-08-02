@@ -120,7 +120,7 @@ class TokenManager {
       } else {
         throw new Error('Token refresh failed');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('토큰 갱신 실패:', error);
       this.clearTokens();
       
@@ -244,7 +244,7 @@ export const ssoAuthAPI = {
         return tokens;
       }
       return null;
-    } catch (error: any) {
+    } catch (error) {
       console.error('토큰 갱신 실패:', error);
       return null;
     }

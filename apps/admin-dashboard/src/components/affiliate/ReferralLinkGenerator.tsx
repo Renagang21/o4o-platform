@@ -42,7 +42,7 @@ export const ReferralLinkGenerator: FC<ReferralLinkGeneratorProps> = ({
       setCopied(true);
       toast.success('추천 링크가 복사되었습니다!');
       setTimeout(() => setCopied(false), 3000);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('링크 복사에 실패했습니다.');
     }
   };

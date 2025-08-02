@@ -108,7 +108,7 @@ const menuItems: MenuItem[] = [
   }
 ];
 
-const AdminSidebar: React.FC = () => {
+const AdminSidebar: FC = () => {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>(['content', 'data-structure']);
 

@@ -2,7 +2,7 @@ import { useState, useEffect, FC } from 'react';
 import { DropshippingRouter, realtimeSync } from '@o4o/ui/dropshipping';
 
 // 데모용 역할 선택 컴포넌트 (실제로는 로그인된 사용자의 역할을 사용)
-const RoleSelector: React.FC<{ onRoleSelect: (role: string) => void }> = ({ onRoleSelect }) => {
+const RoleSelector: FC<{ onRoleSelect: (role: string) => void }> = ({ onRoleSelect }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
@@ -63,7 +63,7 @@ const RoleSelector: React.FC<{ onRoleSelect: (role: string) => void }> = ({ onRo
   );
 };
 
-export const DropshippingPage: React.FC = () => {
+export const DropshippingPage: FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
   React.useEffect(() => {

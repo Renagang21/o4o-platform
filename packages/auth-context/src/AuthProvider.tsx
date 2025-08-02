@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect } from 'react';
+import { FC, useState, ReactNode, useEffect  } from 'react';
 import { AuthContext } from './AuthContext';
 import { AuthClient } from '@o4o/auth-client';
 import type { User, SessionStatus } from '@o4o/types';
@@ -11,7 +11,7 @@ interface AuthProviderProps {
   onSessionExpiring?: (remainingSeconds: number) => void;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ 
+export const AuthProvider: FC<AuthProviderProps> = ({ 
   children, 
   ssoClient,
   onAuthError

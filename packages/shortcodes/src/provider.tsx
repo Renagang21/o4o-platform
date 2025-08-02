@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import { FC, createContext, useContext, ReactNode  } from 'react';
 import { ShortcodeParser, ShortcodeRegistry } from './types';
 import { defaultParser } from './parser';
 import { globalRegistry } from './registry';
@@ -27,7 +27,7 @@ interface ShortcodeProviderProps {
 /**
  * Shortcode Provider Component
  */
-export const ShortcodeProvider: React.FC<ShortcodeProviderProps> = ({
+export const ShortcodeProvider: FC<ShortcodeProviderProps> = ({
   children,
   parser = defaultParser,
   registry = globalRegistry
@@ -70,7 +70,7 @@ interface ShortcodeContentProps {
   className?: string;
 }
 
-export const ShortcodeContent: React.FC<ShortcodeContentProps> = ({
+export const ShortcodeContent: FC<ShortcodeContentProps> = ({
   content,
   context,
   className

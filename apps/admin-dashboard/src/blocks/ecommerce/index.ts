@@ -19,4 +19,4 @@ import './product-filter';
 // import './mini-cart';
 // import './checkout-form';
 
-console.log('O4O E-commerce blocks registered');
+// console.log('O4O E-commerce blocks registered');

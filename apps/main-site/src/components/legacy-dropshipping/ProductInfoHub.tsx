@@ -68,7 +68,7 @@ interface ProductInfoHubProps {
   readonly?: boolean;
 }
 
-const ProductInfoHub: React.FC<ProductInfoHubProps> = ({
+const ProductInfoHub: FC<ProductInfoHubProps> = ({
   productId,
   userRole,
   onSave,

@@ -19,7 +19,7 @@ interface Product {
   tags: string[];
 }
 
-const ShoppingHome: React.FC = () => {
+const ShoppingHome: FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');

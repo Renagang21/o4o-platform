@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import NotionEditor from '@o4o/ui/editor/NotionEditor';
 import { loadPageContent, savePageContent, PageContent, getPageViewUrl } from '../utils/pageSystem';
 
-const PageEditor: React.FC = () => {
+const PageEditor: FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
@@ -47,7 +47,7 @@ const PageEditor: React.FC = () => {
       savePageContent(updatedContent);
       setPageContent(updatedContent);
       
-      console.log('페이지 저장 완료:', updatedContent);
+      // console.log('페이지 저장 완료:', updatedContent);
     } catch (error) {
       console.error('페이지 저장 실패:', error);
       throw error;

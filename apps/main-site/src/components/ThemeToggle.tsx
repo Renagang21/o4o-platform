@@ -1,7 +1,7 @@
 import { useState, useEffect, FC } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
-const ThemeToggle: React.FC = () => {
+const ThemeToggle: FC = () => {
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');

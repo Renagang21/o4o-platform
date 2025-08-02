@@ -45,11 +45,11 @@ interface TemplateRendererProps {
   className?: string;
 }
 
-const TemplateRenderer: React.FC<TemplateRendererProps> = ({ blocks, className = '' }) => {
+const TemplateRenderer: FC<TemplateRendererProps> = ({ blocks, className = '' }) => {
   // Register shortcodes once on mount
   useEffect(() => {
     // Additional shortcode registration if needed
-    console.log('Available shortcodes:', shortcodeParser.getRegisteredShortcodes());
+    // console.log('Available shortcodes:', shortcodeParser.getRegisteredShortcodes());
   }, []);
 
   if (!blocks || blocks.length === 0) {

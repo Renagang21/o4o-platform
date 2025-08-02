@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { ShortcodeProps } from '@o4o/shortcodes';
 import { useCartStore } from '@/stores/useCartStore';
 import { formatPrice } from '@o4o/utils';
@@ -12,7 +12,7 @@ import { Truck, Package } from 'lucide-react';
  * [shipping-calculator]
  * [shipping-calculator free-threshold="50000"]
  */
-export const ShippingCalculator: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const ShippingCalculator: FC<ShortcodeProps> = ({ attributes }) => {
   const { cart } = useCartStore();
   const [selectedMethod, setSelectedMethod] = useState<string>('standard');
   

@@ -28,7 +28,7 @@ interface ExternalResourceWidgetProps {
   onAction?: (action: 'view' | 'bookmark' | 'report' | 'share') => void;
 }
 
-const ExternalResourceWidget: React.FC<ExternalResourceWidgetProps> = ({
+const ExternalResourceWidget: FC<ExternalResourceWidgetProps> = ({
   resource,
   size = 'medium',
   showMetadata = true,
@@ -322,7 +322,7 @@ interface ExternalResourceListProps {
   onLoadMore?: () => void;
 }
 
-export const ExternalResourceList: React.FC<ExternalResourceListProps> = ({
+export const ExternalResourceList: FC<ExternalResourceListProps> = ({
   resources,
   title = "연관 리소스",
   maxItems,

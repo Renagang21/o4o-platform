@@ -126,7 +126,7 @@ const mockFiles: MediaFile[] = [
   }
 ];
 
-const MediaLibrary: React.FC = () => {
+const MediaLibrary: FC = () => {
   const [files, setFiles] = useState<MediaFile[]>(mockFiles);
   const [folders, setFolders] = useState<MediaFolder[]>(mockFolders);
   const [selectedFolder, setSelectedFolder] = useState<string>('all');

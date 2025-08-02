@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import { FC, ReactNode, useEffect, useRef  } from 'react';
 
 interface SessionManagerProps {
   children: ReactNode;
@@ -6,7 +6,7 @@ interface SessionManagerProps {
   onSessionExpiring?: (remainingSeconds: number) => void;
 }
 
-export const SessionManager: React.FC<SessionManagerProps> = ({
+export const SessionManager: FC<SessionManagerProps> = ({
   children,
   warningBeforeExpiry = 5 * 60 * 1000, // 기본값: 5분
   onSessionExpiring

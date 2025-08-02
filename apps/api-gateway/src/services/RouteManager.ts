@@ -1,4 +1,4 @@
-import { Express, Router } from 'express';
+import { Express, Router, RequestHandler } from 'express';
 import { RouteConfig, gatewayConfig } from '../config/gateway.config.js';
 import { AuthMiddleware } from '../middleware/auth.middleware.js';
 import { RateLimitMiddleware } from '../middleware/rateLimit.middleware.js';
@@ -87,8 +87,8 @@ export class RouteManager {
       const methods = route.methods || ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
       
       methods.forEach(method => {
-        const methodLower = method.toLowerCase() as any;
-        const middlewares: any[] = [];
+        const methodLower = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete' | 'patch';
+        const middlewares: RequestHandler[] = [];
         
         // 1. Rate limiting
         if (route.rateLimit) {
@@ -121,7 +121,7 @@ export class RouteManager {
         middlewares.push(this.proxyMiddleware.routeToService(route));
         
         // Register route
-        (router as any)[methodLower](path, ...middlewares);
+        router[methodLower](path, ...middlewares);
         
         logger.debug('Route registered', {
           method,

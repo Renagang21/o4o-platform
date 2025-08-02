@@ -53,7 +53,7 @@ export class RealtimeFeedbackService {
 
   private setupSocketHandlers() {
     this.io.on('connection', (socket: Socket) => {
-      console.log('Client connected:', socket.id);
+      // console.log('Client connected:', socket.id);
 
       // Admin join handler
       socket.on('admin:join', async (data: { userId: string, userRole: string }) => {
@@ -133,7 +133,7 @@ export class RealtimeFeedbackService {
 
       // Disconnect handler
       socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
+        // console.log('Client disconnected:', socket.id);
         this.handleDisconnect(socket);
       });
     });
@@ -159,7 +159,7 @@ export class RealtimeFeedbackService {
     const pendingNotifications = await this.getPendingNotifications(userId);
     socket.emit('admin:pending_notifications', pendingNotifications);
 
-    console.log(`Admin ${userId} joined with socket ${socket.id}`);
+    // console.log(`Admin ${userId} joined with socket ${socket.id}`);
   }
 
   private async handleUserJoin(socket: Socket, betaUserId: string, email: string) {
@@ -188,7 +188,7 @@ export class RealtimeFeedbackService {
     const conversations = await this.getUserConversations(betaUserId);
     socket.emit('user:conversations', conversations);
 
-    console.log(`Beta user ${betaUserId} joined with socket ${socket.id}`);
+    // console.log(`Beta user ${betaUserId} joined with socket ${socket.id}`);
   }
 
   private async handleConversationJoin(socket: Socket, conversationId: string) {
@@ -214,7 +214,7 @@ export class RealtimeFeedbackService {
     const messages = await this.getConversationMessages(conversationId);
     socket.emit('conversation:history', messages);
 
-    console.log(`Socket ${socket.id} joined conversation ${conversationId}`);
+    // console.log(`Socket ${socket.id} joined conversation ${conversationId}`);
   }
 
   private async handleSendMessage(socket: Socket, data: {
@@ -282,7 +282,7 @@ export class RealtimeFeedbackService {
       });
     }
 
-    console.log(`Message sent in conversation ${data.conversationId}`);
+    // console.log(`Message sent in conversation ${data.conversationId}`);
   }
 
   private async handleMarkMessageRead(messageId: string) {

@@ -36,7 +36,7 @@ export default function OrderDetail() {
       await cancelOrder(currentOrder.id, reason);
       toast.success('주문이 취소되었습니다.');
       fetchOrder(currentOrder.id); // 주문 정보 새로고침
-    } catch (error: any) {
+    } catch (error) {
       toast.error('주문 취소에 실패했습니다.');
     }
   };

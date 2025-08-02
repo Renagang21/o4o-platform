@@ -22,21 +22,21 @@ export const useSignageWebSocket = (storeId?: string) => {
 
     // Listen for content updates
     socket.on('content-updated', (data: unknown) => {
-      console.log('Content updated:', data);
+      // console.log('Content updated:', data);
       queryClient.invalidateQueries({ queryKey: ['signage', 'content'] });
       queryClient.invalidateQueries({ queryKey: ['signage', 'display', storeId] });
     });
 
     // Listen for schedule changes
     socket.on('schedule-changed', (data: unknown) => {
-      console.log('Schedule changed:', data);
+      // console.log('Schedule changed:', data);
       queryClient.invalidateQueries({ queryKey: ['signage', 'schedules'] });
       queryClient.invalidateQueries({ queryKey: ['signage', 'display', storeId] });
     });
 
     // Listen for display control commands
     socket.on('display-control', (command: unknown) => {
-      console.log('Display control command:', command);
+      // console.log('Display control command:', command);
       // Handle display control commands (play, pause, next, etc.)
       window.dispatchEvent(new CustomEvent('display-control', { detail: command }));
     });

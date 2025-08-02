@@ -457,7 +457,7 @@ export class PerformanceOptimizationService {
       // 성능 통계 업데이트
       await this.updatePerformanceStats();
 
-      console.log('✅ Auto-optimization completed successfully');
+      // console.log('✅ Auto-optimization completed successfully');
     } catch (error) {
       console.error('❌ Auto-optimization failed:', error);
       await this.createPerformanceAlert('auto_optimization_failed', {
@@ -529,7 +529,7 @@ export class PerformanceOptimizationService {
           // 일부 유휴 연결 해제
           // Note: pool.release() is not a standard method for TypeORM connection pools
           // Connection pool management is typically handled automatically by TypeORM
-          console.log(`Pool has ${poolStats.idleCount} idle connections`);
+          // console.log(`Pool has ${poolStats.idleCount} idle connections`);
           // Consider using TypeORM's built-in connection pool configuration instead
         }
       }
@@ -537,7 +537,7 @@ export class PerformanceOptimizationService {
       // 통계 업데이트 (PostgreSQL)
       await AppDataSource.query('ANALYZE');
       
-      console.log('✅ Database optimization completed');
+      // console.log('✅ Database optimization completed');
     } catch (error) {
       console.warn('Database optimization failed:', error);
     }
@@ -812,7 +812,7 @@ export class PerformanceOptimizationService {
   async shutdown(): Promise<void> {
     try {
       await this.redis.disconnect();
-      console.log('✅ Performance optimization service shutdown completed');
+      // console.log('✅ Performance optimization service shutdown completed');
     } catch (error) {
       console.error('❌ Performance optimization service shutdown failed:', error);
     }

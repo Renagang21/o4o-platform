@@ -85,7 +85,7 @@ export const loadHomePageData = (): HomePageData => {
     if (saved) {
       return JSON.parse(saved);
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('홈페이지 데이터 로드 실패:', error);
   }
   return getDefaultHomeData();
@@ -99,7 +99,7 @@ export const saveHomePageData = (data: HomePageData): void => {
       lastUpdated: new Date().toISOString()
     };
     localStorage.setItem('homepage_data', JSON.stringify(updatedData));
-  } catch (error: any) {
+  } catch (error) {
     console.error('홈페이지 데이터 저장 실패:', error);
   }
 };

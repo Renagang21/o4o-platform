@@ -106,7 +106,7 @@ export default function UserForm() {
       }
       
       navigate('/users');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving user:', error);
       toast.error(error.response?.data?.error || 'Failed to save user');
     } finally {

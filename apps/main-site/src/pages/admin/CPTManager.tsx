@@ -57,7 +57,7 @@ interface CustomPostType {
   updatedAt: string;
 }
 
-const CPTManager: React.FC = () => {
+const CPTManager: FC = () => {
   const [cpts, setCPTs] = useState<CustomPostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);

@@ -52,7 +52,7 @@ interface SearchResult {
   };
 }
 
-const ContentSearchManager: React.FC = () => {
+const ContentSearchManager: FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();

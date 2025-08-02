@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { formatDateFromNow } from '@o4o/utils';
 import type { ShortcodeProps, ShortcodeDefinition } from '@o4o/shortcodes';
 
@@ -22,7 +22,7 @@ interface CustomerReviewsProps {
   minRating?: number;
 }
 
-const CustomerReviewsComponent: React.FC<CustomerReviewsProps> = ({
+const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
   productId: _productId,  // In real app, this would be used to fetch reviews
   limit = 10,
   sort = 'newest',
@@ -265,7 +265,7 @@ const CustomerReviewsComponent: React.FC<CustomerReviewsProps> = ({
 };
 
 // Wrapper component that accepts ShortcodeProps
-export const CustomerReviews: React.FC<ShortcodeProps> = ({ attributes }) => {
+export const CustomerReviews: FC<ShortcodeProps> = ({ attributes }) => {
   const props: CustomerReviewsProps = {
     productId: attributes.productId as string,
     limit: attributes.limit ? Number(attributes.limit) : undefined,

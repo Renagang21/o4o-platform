@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { FC, createContext, useContext, useReducer, useEffect  } from 'react';
 import { authApi } from '../api/auth/authApi';
 import { AuthState, LoginRequest, RegisterRequest, User, UserRole } from '../api/auth/types';
 
@@ -99,7 +99,7 @@ const AuthContext = createContext<{
   isSSO: boolean; // SSO 사용 여부
 } | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // 초기 인증 상태 복원
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               payload: { user, token, isSSO },
             });
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error('인증 상태 복원 실패:', error);
           dispatch({ type: 'LOGOUT' });
         }
@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else {
               dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
             }
-          } catch (error: any) {
+          } catch (error) {
             console.error('토큰 갱신 실패:', error);
             dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
           }
@@ -173,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isSSO 
         },
       });
-    } catch (error: any) {
+    } catch (error) {
       dispatch({
         type: 'LOGIN_FAILURE',
         payload: {
@@ -195,7 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         type: 'REGISTER_SUCCESS',
         payload: { user: response.user },
       });
-    } catch (error: any) {
+    } catch (error) {
       dispatch({
         type: 'REGISTER_FAILURE',
         payload: {
@@ -210,7 +210,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await authApi.logout();
-    } catch (error: any) {
+    } catch (error) {
       console.error('로그아웃 오류:', error);
     } finally {
       dispatch({ type: 'LOGOUT' });
@@ -230,7 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       return success;
-    } catch (error: any) {
+    } catch (error) {
       console.error('토큰 갱신 실패:', error);
       dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
       return false;

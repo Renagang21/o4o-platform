@@ -134,7 +134,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
         toast.success('제품이 등록되었습니다. 관리자 승인을 기다려주세요.');
       }
       onSuccess?.();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('제품 저장에 실패했습니다');
     } finally {
       setLoading(false);

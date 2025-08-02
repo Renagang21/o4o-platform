@@ -38,7 +38,7 @@ class SimpleLogger {
         }
         break;
       default:
-        console.log(formattedMessage);
+        // console.log(formattedMessage);
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect, useRef  } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { Product } from '@o4o/types';
@@ -17,7 +17,7 @@ interface ProductCarouselProps {
   className?: string;
 }
 
-export const ProductCarousel: React.FC<ProductCarouselProps> = ({
+export const ProductCarousel: FC<ProductCarouselProps> = ({
   products,
   autoplay = false,
   interval = 5000,
@@ -142,7 +142,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
   );
 };
 
-const CarouselCard: React.FC<{ product: Product }> = ({ product }) => {
+const CarouselCard: FC<{ product: Product }> = ({ product }) => {
   const customerPrice = product.pricing?.customer || 0;
   const compareAtPrice = (product as any).compareAtPrice || 0;
   const discount = compareAtPrice > customerPrice

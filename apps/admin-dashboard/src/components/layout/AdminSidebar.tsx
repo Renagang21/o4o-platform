@@ -43,12 +43,12 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const menuItems = filterMenuByRole(dynamicMenuItems, userRole, userPermissions)
   
   // 디버깅용 로그
-  console.log('[AdminSidebar] User:', user);
-  console.log('[AdminSidebar] User Role:', userRole);
-  console.log('[AdminSidebar] Dynamic Menu Items:', dynamicMenuItems);
-  console.log('[AdminSidebar] Filtered Menu Items:', menuItems);
-  console.log('[AdminSidebar] Is Open:', isOpen);
-  console.log('[AdminSidebar] Menu Loading:', menuLoading);
+  // console.log('[AdminSidebar] User:', user);
+  // console.log('[AdminSidebar] User Role:', userRole);
+  // console.log('[AdminSidebar] Dynamic Menu Items:', dynamicMenuItems);
+  // console.log('[AdminSidebar] Filtered Menu Items:', menuItems);
+  // console.log('[AdminSidebar] Is Open:', isOpen);
+  // console.log('[AdminSidebar] Menu Loading:', menuLoading);
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 

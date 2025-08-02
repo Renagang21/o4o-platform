@@ -17,7 +17,7 @@ interface AccordionProps {
   onChange?: (openItems: string[]) => void;
 }
 
-const Accordion: React.FC<AccordionProps> = ({
+const Accordion: FC<AccordionProps> = ({
   items,
   defaultOpen = [],
   allowMultiple = false,

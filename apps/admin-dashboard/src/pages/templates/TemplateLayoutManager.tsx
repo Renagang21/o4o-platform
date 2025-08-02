@@ -105,7 +105,7 @@ const TemplateLayoutManager: FC = () => {
   const handleApplyTemplate = (templateId: string) => {
     setSelectedTemplate(templateId);
     // Here you would typically call an API to apply the template
-    console.log('Applying template:', templateId);
+    // console.log('Applying template:', templateId);
   };
 
   return (

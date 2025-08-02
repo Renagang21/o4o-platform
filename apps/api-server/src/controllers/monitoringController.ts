@@ -161,7 +161,7 @@ export class MonitoringController {
         message: 'Backup started successfully',
         backup: history
       });
-    } catch (error: any) {
+    } catch (error) {
       logger.error('Error triggering backup:', error);
       res.status(500).json({ 
         success: false,

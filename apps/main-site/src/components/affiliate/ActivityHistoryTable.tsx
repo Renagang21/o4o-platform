@@ -1,7 +1,7 @@
 import { useState, FC } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const ActivityHistoryTable: React.FC = () => {
+const ActivityHistoryTable: FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 

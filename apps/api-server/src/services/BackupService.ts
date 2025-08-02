@@ -219,7 +219,7 @@ class BackupService {
 
       logger.info(`✅ Backup completed: ${history.size} in ${history.duration}s`);
 
-    } catch (error: any) {
+    } catch (error) {
       history.status = 'failed';
       history.error = error.message;
       this.status.failedBackups++;
@@ -479,7 +479,7 @@ class BackupService {
       }
       
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       return { success: false, error: error.message };
     }
   }

@@ -19,14 +19,14 @@ async function enableMocking() {
   const useMock = import.meta.env.VITE_USE_MOCK === 'true'
   
   if (!import.meta.env.DEV || !useMock) {
-    console.log('[MSW] Mocking disabled, using real API')
+    // console.log('[MSW] Mocking disabled, using real API')
     return
   }
 
   try {
     const { worker } = await import('./test-utils/mocks/browser')
     
-    console.log('[MSW] Starting mock service worker...')
+    // console.log('[MSW] Starting mock service worker...')
     // MSW 서비스 워커 시작
     return worker.start({
       onUnhandledRequest: 'bypass', // 처리되지 않은 요청은 실제 네트워크로 전달

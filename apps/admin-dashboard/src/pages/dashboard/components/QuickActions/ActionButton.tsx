@@ -97,7 +97,7 @@ const ActionButton: FC<ActionButtonProps> = ({
     if (disabled) return;
     
     // 실제 구현에서는 React Router 또는 Next.js 라우터 사용
-    console.log(`Navigating to: ${href}`);
+    // console.log(`Navigating to: ${href}`);
     // window.location.href = href; // 임시 구현
   };
 

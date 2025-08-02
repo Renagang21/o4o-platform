@@ -93,12 +93,12 @@ export class WebSocketSessionClient {
 
     // Connection events
     this.socket.on('connect', () => {
-      console.log('[Session Sync] Connected to WebSocket');
+      // console.log('[Session Sync] Connected to WebSocket');
       this.checkSession(); // Check session immediately on connect
     });
 
     this.socket.on('disconnect', (reason: string) => {
-      console.log('[Session Sync] Disconnected:', reason);
+      // console.log('[Session Sync] Disconnected:', reason);
     });
 
     this.socket.on('connect_error', (error: Error) => {
@@ -107,18 +107,18 @@ export class WebSocketSessionClient {
 
     // Session events
     this.socket.on('session:status', (data: SessionStatus) => {
-      console.log('[Session Sync] Session status:', data);
+      // console.log('[Session Sync] Session status:', data);
     });
 
     this.socket.on('session:event', (event: SessionEvent) => {
-      console.log('[Session Sync] Session event:', event);
+      // console.log('[Session Sync] Session event:', event);
       if (this.onSessionEvent) {
         this.onSessionEvent(event);
       }
     });
 
     this.socket.on('session:created', (data: { sessionId: string }) => {
-      console.log('[Session Sync] New session created:', data.sessionId);
+      // console.log('[Session Sync] New session created:', data.sessionId);
       if (this.onSessionEvent) {
         this.onSessionEvent({
           event: 'created',
@@ -129,7 +129,7 @@ export class WebSocketSessionClient {
     });
 
     this.socket.on('session:removed', (data: { sessionId: string }) => {
-      console.log('[Session Sync] Session removed:', data.sessionId);
+      // console.log('[Session Sync] Session removed:', data.sessionId);
       if (this.onSessionEvent) {
         this.onSessionEvent({
           event: 'removed',
@@ -140,7 +140,7 @@ export class WebSocketSessionClient {
     });
 
     this.socket.on('session:refreshed', (data: { sessionId: string }) => {
-      console.log('[Session Sync] Session refreshed:', data.sessionId);
+      // console.log('[Session Sync] Session refreshed:', data.sessionId);
       if (this.onSessionEvent) {
         this.onSessionEvent({
           event: 'refreshed',
@@ -151,7 +151,7 @@ export class WebSocketSessionClient {
     });
 
     this.socket.on('session:force_logout', (data: { reason: string }) => {
-      console.log('[Session Sync] Force logout:', data.reason);
+      // console.log('[Session Sync] Force logout:', data.reason);
       if (this.onForceLogout) {
         this.onForceLogout(data.reason);
       }

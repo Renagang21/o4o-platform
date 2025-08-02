@@ -22,7 +22,7 @@ import {
   getPageEditUrl
 } from '../../utils/pageSystem';
 
-const PageDashboard: React.FC = () => {
+const PageDashboard: FC = () => {
   const navigate = useNavigate();
   const [pages, setPages] = useState<PageListItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState  } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { RewardTier } from '@o4o/crowdfunding-types';
 import { formatPrice } from '@o4o/utils';
@@ -9,7 +9,7 @@ interface RewardSelectorProps {
   className?: string;
 }
 
-export const RewardSelector: React.FC<RewardSelectorProps> = ({
+export const RewardSelector: FC<RewardSelectorProps> = ({
   rewards,
   onSelect,
   className = ''

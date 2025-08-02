@@ -76,7 +76,7 @@ interface View {
   updatedAt: string;
 }
 
-const ViewsManager: React.FC = () => {
+const ViewsManager: FC = () => {
   const [views, setViews] = useState<View[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
@@ -287,7 +287,7 @@ const ViewsManager: React.FC = () => {
       };
 
       // API 호출 (Mock)
-      console.log('Creating view:', viewData);
+      // console.log('Creating view:', viewData);
       
       await loadViews();
       resetForm();
@@ -304,7 +304,7 @@ const ViewsManager: React.FC = () => {
 
     try {
       // API 호출 (Mock)
-      console.log('Deleting view:', id);
+      // console.log('Deleting view:', id);
       
       setViews(prev => prev.filter(view => view.id !== id));
       alert('✅ View가 삭제되었습니다.');

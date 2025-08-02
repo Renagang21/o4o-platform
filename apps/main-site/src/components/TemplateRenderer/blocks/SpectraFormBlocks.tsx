@@ -28,7 +28,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
 // Spectra Form Block - Renders dynamic forms created with form builder
-export const SpectraFormBlock: React.FC<{
+export const SpectraFormBlock: FC<{
   formId?: string;
   formName?: string;
   showTitle?: boolean;
@@ -778,7 +778,7 @@ export const SpectraFormBlock: React.FC<{
 };
 
 // Spectra View Block - Renders dynamic views created with view builder
-export const SpectraViewBlock: React.FC<{
+export const SpectraViewBlock: FC<{
   viewId?: string;
   viewName?: string;
   showTitle?: boolean;
