@@ -42,6 +42,15 @@ jobs:
             deps-node-${{ hashFiles('**/package-lock.json') }}-
             deps-node-
       
+      - name: Validate dependencies
+        run: |
+          echo "Checking for invalid numeric dependencies..."
+          if grep -rE '"[0-9]+":\s*"' package.json apps/*/package.json packages/*/package.json 2>/dev/null; then
+            echo "Error: Invalid numeric dependencies found!"
+            exit 1
+          fi
+          echo "Dependencies validation passed"
+      
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
