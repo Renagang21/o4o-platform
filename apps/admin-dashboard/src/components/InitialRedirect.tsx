@@ -1,14 +1,10 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@o4o/auth-context';
+import LandingPage from '@/pages/LandingPage';
 
 const InitialRedirect = () => {
   const { isAuthenticated, isLoading, isAdmin } = useAuth();
   const location = useLocation();
-
-  // VITE_USE_MOCK이 true인 경우 바로 홈으로 이동
-  if (import.meta.env.VITE_USE_MOCK === 'true') {
-    return <Navigate to="/home" replace />;
-  }
 
   // 로딩 중인 경우 로딩 화면 표시
   if (isLoading) {
@@ -36,8 +32,8 @@ const InitialRedirect = () => {
     );
   }
 
-  // 인증된 관리자는 홈으로
-  return <Navigate to="/home" replace />;
+  // 인증된 관리자는 랜딩 페이지 표시
+  return <LandingPage />;
 };
 
 export default InitialRedirect;
