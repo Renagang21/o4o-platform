@@ -4,7 +4,7 @@
   "description": "O4O Platform API Server",
   "main": "dist/main.js",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0 <23.0.0",
     "npm": ">=10.9.0"
   },
   "scripts": {

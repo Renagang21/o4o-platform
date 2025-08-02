@@ -2,6 +2,7 @@
  * React 19 SSR 호환성을 위한 유틸리티
  */
 
+import * as React from 'react';
 import { useEffect, useLayoutEffect as useLayoutEffectReact } from 'react';
 
 // SSR 환경에서는 useLayoutEffect 대신 useEffect를 사용

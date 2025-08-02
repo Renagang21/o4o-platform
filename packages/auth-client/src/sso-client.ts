@@ -8,7 +8,7 @@ interface SSOConfig {
 
 export class SSOClient {
   private config: SSOConfig;
-  private checkInterval: number | null = null;
+  private checkInterval: ReturnType<typeof setInterval> | null = null;
   private onSessionChange?: (user: User | null) => void;
 
   constructor(config: SSOConfig) {

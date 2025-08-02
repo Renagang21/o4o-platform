@@ -1,11 +1,11 @@
 export const useToast = () => {
-  const success = (message: string) => {
+  const success = (_message: string) => {
     // console.log('Success:', message);
     // TODO: Implement actual toast notification
   };
 
-  const error = (message: string) => {
-    console.error('Error:', message);
+  const error = (_message: string) => {
+    // console.error('Error:', message);
     // TODO: Implement actual toast notification
   };
 

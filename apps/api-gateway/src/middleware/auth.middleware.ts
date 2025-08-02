@@ -99,7 +99,7 @@ export class AuthMiddleware {
         });
         
         next();
-      } catch (error) {
+      } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
           res.status(401).json({
             error: 'Token has expired',
@@ -118,7 +118,7 @@ export class AuthMiddleware {
         
         throw error;
       }
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Authentication error', error);
       res.status(500).json({
         error: 'Authentication failed',

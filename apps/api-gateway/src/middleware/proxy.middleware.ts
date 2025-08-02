@@ -153,7 +153,7 @@ export class ProxyMiddleware {
         
         // Execute proxy
         proxy(req, res, next);
-      } catch (error) {
+      } catch (error: any) {
         logger.error('Failed to route request', {
           error: error.message,
           service: route.service,

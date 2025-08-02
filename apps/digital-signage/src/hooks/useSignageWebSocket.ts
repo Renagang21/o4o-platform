@@ -21,14 +21,14 @@ export const useSignageWebSocket = (storeId?: string) => {
     socket.emit('join-store', storeId);
 
     // Listen for content updates
-    socket.on('content-updated', (data: unknown) => {
+    socket.on('content-updated', (_data: unknown) => {
       // console.log('Content updated:', data);
       queryClient.invalidateQueries({ queryKey: ['signage', 'content'] });
       queryClient.invalidateQueries({ queryKey: ['signage', 'display', storeId] });
     });
 
     // Listen for schedule changes
-    socket.on('schedule-changed', (data: unknown) => {
+    socket.on('schedule-changed', (_data: unknown) => {
       // console.log('Schedule changed:', data);
       queryClient.invalidateQueries({ queryKey: ['signage', 'schedules'] });
       queryClient.invalidateQueries({ queryKey: ['signage', 'display', storeId] });

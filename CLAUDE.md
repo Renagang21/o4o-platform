@@ -259,15 +259,11 @@ GOOGLE_CLIENT_SECRET=optional
 
 ## ⚠️ Known Issues & Solutions
 
-### Firebase Studio npm "2" 버그
-**문제**: npm 명령 실행 시 모든 명령어 끝에 "2"가 추가됨 (Firebase Studio 환경)
-
-**해결**: 통합 개발 도구 사용
-```bash
-./scripts/dev.sh <command>
-```
-
-**참고**: CI/CD는 정상 작동. 로컬 검증 실패해도 코드가 정확하면 push 가능
+### ~~Firebase Studio npm "2" 버그~~ (잘못된 정보 - 삭제 예정)
+**⚠️ 정정**: 이는 Firebase Studio 버그가 아님. Node.js 버전 불일치 문제임.
+- npm 명령어 끝에 "2"가 붙는 문제는 특정 환경의 npm wrapper 문제
+- Firebase Studio와 무관함
+- 실제 원인: Node.js 20 환경에서 Node.js 22 프로젝트 실행 시 발생
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
@@ -436,9 +432,47 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - Added disaster recovery runbook and procedures
 - Added authentication bypass for testing (VITE_USE_MOCK=true)
 
+## 🚨 CRITICAL: Node.js 22 LTS Migration (2025-08)
+
+### ⚠️ MUST READ: Node.js Version Requirements ⚠️
+**현재 프로젝트는 Node.js 22 LTS (22.18.0)를 사용합니다!**
+- 모든 package.json은 `"node": ">=22.0.0 <23.0.0"` 요구
+- GitHub Actions CI/CD는 Node.js 22.18.0 사용
+- **로컬 개발 환경도 반드시 Node.js 22 사용 필요**
+
+### 🔴 주요 오류 및 해결 방법
+
+#### 1. npm install "Invalid Version" 에러
+**증상**: `npm error Invalid Version:`
+**원인**: 
+- Node.js 버전 불일치 (시스템이 Node.js 20 사용 중일 때 발생)
+- package.json의 engines 필드가 Node.js 22를 요구하는데 시스템이 20을 사용
+
+**해결방법**:
+```bash
+# Node.js 버전 확인
+node --version  # v22.18.0이어야 함
+
+# Node.js 22가 아닌 경우, nvm으로 설치
+nvm install 22.18.0
+nvm use 22.18.0
+```
+
+#### 2. npm 명령어 끝에 "2" 추가 문제
+**증상**: `npm install 2`, `npm run build 2` 등
+**원인**: 특정 환경의 npm wrapper 버그 (Firebase Studio와 무관)
+**해결방법**: 
+- 직접 npm 명령 실행 대신 스크립트 사용
+- 또는 npm 재설치
+
+#### 3. Firebase Studio 관련 오해 정정
+- **Firebase Studio npm 버그는 존재하지 않음**
+- 대부분의 npm 오류는 Node.js 버전 불일치가 원인
+- ci-install.sh는 CI/CD용이며, 로컬 개발과 무관
+
 ## 📝 Recent Updates (2025-08)
-- **Migrated to Node.js 22 LTS (22.18.0)** from Node.js 20.18.0
-- Updated all package.json engine constraints to support Node.js 22
+- **🔥 Migrated to Node.js 22 LTS (22.18.0)** from Node.js 20.18.0 - 모든 환경에서 필수!
+- Updated all package.json engine constraints to require Node.js 22
 - Updated all GitHub Actions workflows to use Node.js 22.18.0
 - Fixed npm version mismatch issues (now using npm 10.9.x)
 - Added Git pre-commit hook to prevent invalid dependencies
@@ -480,7 +514,7 @@ Supported file patterns: package-lock.json,npm-shrinkwrap.json,yarn.lock
 
 ### 근본 원인
 1. **package-lock.json 삭제 이력**: Git 히스토리 확인 결과 여러 번 삭제됨 (commit d34ff3b3 등)
-2. **Firebase Studio npm 버그**: npm 명령어가 비정상 동작하여 로컬에서 재생성 불가
+2. **환경별 npm 차이**: 특정 환경에서 npm 명령어가 예상과 다르게 동작
 3. **Node.js 버전 변경**: 이전 lock 파일은 Node.js 20용이어서 22로 재생성 필요
 
 ### 해결 방법
@@ -609,11 +643,17 @@ interface APIFetchOptions extends globalThis.RequestInit
 - WordPress 코어 업데이트 호환성
 
 ## 🚀 Current Status
-- **Node.js 22 LTS**: ✅ Migrated from 20.18.0 to 22.18.0
+- **Node.js 22 LTS**: ✅ Migrated from 20.18.0 to 22.18.0 (**필수: 모든 개발 환경에서 Node.js 22 사용**)
 - **React 19**: ✅ Migration completed
 - **TypeScript**: ✅ All errors resolved
 - **CI/CD**: ✅ Passing (cache issues fixed)
 - **Auth Bypass**: ✅ VITE_USE_MOCK=true enabled for testing
+
+## ⚠️ 중요 주의사항 (2025-08-02 추가)
+1. **Node.js 22 필수**: 모든 개발자는 반드시 Node.js 22.18.0 사용
+2. **npm install 오류 시**: Node.js 버전부터 확인 (`node --version`)
+3. **Firebase Studio 관련**: Firebase Studio npm 버그는 존재하지 않음. 대부분 Node.js 버전 문제
+4. **"2" 문제**: npm 명령어 끝에 "2"가 붙는 것은 환경 문제, Firebase Studio와 무관
 
 ---
 

@@ -27,7 +27,7 @@ export interface SessionStatus {
 
 export class WebSocketSessionClient {
   private socket: Socket | null = null;
-  private sessionCheckInterval: number | null = null;
+  private sessionCheckInterval: ReturnType<typeof setInterval> | null = null;
   private onSessionEvent?: (event: SessionEvent) => void;
   private onForceLogout?: (reason: string) => void;
 
@@ -97,7 +97,7 @@ export class WebSocketSessionClient {
       this.checkSession(); // Check session immediately on connect
     });
 
-    this.socket.on('disconnect', (reason: string) => {
+    this.socket.on('disconnect', (_reason: string) => {
       // console.log('[Session Sync] Disconnected:', reason);
     });
 
@@ -106,7 +106,7 @@ export class WebSocketSessionClient {
     });
 
     // Session events
-    this.socket.on('session:status', (data: SessionStatus) => {
+    this.socket.on('session:status', (_data: SessionStatus) => {
       // console.log('[Session Sync] Session status:', data);
     });
 
