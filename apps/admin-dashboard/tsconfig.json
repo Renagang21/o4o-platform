@@ -30,7 +30,8 @@
       "@o4o/types": ["../../packages/types/src"],
       "@o4o/utils": ["../../packages/utils/src"],
       "@o4o/ui": ["../../packages/ui/src"]
-    }
+    },
+    "types": []
   },
   "include": ["src", "vite-env.d.ts"],
   "exclude": [

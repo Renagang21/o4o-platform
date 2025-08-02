@@ -22,7 +22,8 @@
       "@/*": ["./src/*"],
       "@o4o/auth-client": ["../auth-client/src"],
       "@o4o/types": ["../types/src"]
-    }
+    },
+    "types": []
   },
   "include": ["src/**/*", "src/types/**/*.d.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"],
