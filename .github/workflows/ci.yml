@@ -55,8 +55,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install
-          bash scripts/setup-ci-env.sh
+          bash scripts/ci-install.sh
 
   # 타입 체크
   type-check:

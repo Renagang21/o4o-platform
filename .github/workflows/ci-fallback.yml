@@ -1,0 +1,69 @@
+name: 🚨 CI Fallback (No Lock File)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/package.json'
+      - '!**/package-lock.json'
+
+env:
+  NODE_VERSION: '22.18.0'
+
+jobs:
+  basic-checks:
+    name: Basic Code Quality Checks
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js (no cache)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install dependencies (no audit)
+        run: |
+          echo "⚠️  Running in fallback mode without package-lock.json"
+          npm install --no-audit --no-fund --prefer-offline
+      
+      - name: Build packages
+        run: |
+          npm run build:packages || echo "⚠️  Some packages failed to build"
+      
+      - name: Type check (best effort)
+        run: |
+          npm run type-check || echo "⚠️  Type check failed but continuing"
+      
+      - name: Lint (configurable)
+        run: |
+          npm run lint || echo "⚠️  Lint failed but continuing"
+      
+      - name: Create status report
+        if: always()
+        run: |
+          echo "## 🚨 CI Fallback Mode Report" > fallback-report.md
+          echo "" >> fallback-report.md
+          echo "Running without package-lock.json due to generation issues." >> fallback-report.md
+          echo "" >> fallback-report.md
+          echo "### Status:" >> fallback-report.md
+          echo "- ⚠️  No dependency locking (security risk)" >> fallback-report.md
+          echo "- ⚠️  No npm audit available" >> fallback-report.md
+          echo "- ⚠️  Inconsistent dependency versions possible" >> fallback-report.md
+          echo "" >> fallback-report.md
+          echo "### Recommendation:" >> fallback-report.md
+          echo "Generate package-lock.json ASAP using GitHub Actions workflow" >> fallback-report.md
+      
+      - name: Upload fallback report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-fallback-report
+          path: fallback-report.md

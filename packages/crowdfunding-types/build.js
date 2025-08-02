@@ -32,17 +32,6 @@ async function build() {
     );
   }
   
-  // Create package.json for dist
-  const pkgJson = {
-    name: '@o4o/crowdfunding-types',
-    version: '1.0.0',
-    types: './index.d.ts',
-    main: './index.js',
-    dependencies: {
-      '@o4o/types': 'file:../../types'
-    }
-  };
-  
   // Create a simple index.js that exports the types
   const indexJs = `// This is a types-only package
 export {};
@@ -53,10 +42,8 @@ export {};
     indexJs
   );
   
-  await writeFile(
-    join(__dirname, 'dist', 'package.json'),
-    JSON.stringify(pkgJson, null, 2)
-  );
+  // Note: Do NOT create package.json in dist folder
+  // It causes npm workspace resolution issues
   
   console.log('Build complete!');
 }

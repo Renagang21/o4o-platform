@@ -46,7 +46,23 @@ declare module '@wordpress/url' {
 }
 
 declare module '@wordpress/api-fetch' {
-  interface APIFetchOptions extends RequestInit {
+  // RequestInit type from lib.dom.d.ts or a compatible interface
+  interface APIFetchOptions {
+    // RequestInit properties
+    method?: string;
+    headers?: HeadersInit;
+    body?: BodyInit | null;
+    mode?: RequestMode;
+    credentials?: RequestCredentials;
+    cache?: RequestCache;
+    redirect?: RequestRedirect;
+    referrer?: string;
+    referrerPolicy?: ReferrerPolicy;
+    integrity?: string;
+    keepalive?: boolean;
+    signal?: AbortSignal | null;
+    
+    // WordPress specific properties
     path?: string;
     url?: string;
     parse?: boolean;

@@ -7,16 +7,15 @@ echo "🔧 Setting up CI environment..."
 
 # Ensure npm workspaces are properly installed
 echo "📦 Installing all dependencies with workspaces..."
-npm ci
+if [ -f "package-lock.json" ]; then
+  npm ci
+else
+  echo "⚠️  No package-lock.json found, using npm install instead"
+  npm install --no-save
+fi
 
-# Install dependencies in each package to ensure proper linking
-echo "📦 Installing package dependencies..."
-for pkg in types utils ui auth-client auth-context; do
-  if [ -d "packages/$pkg" ]; then
-    echo "  Installing dependencies for @o4o/$pkg..."
-    (cd "packages/$pkg" && npm install)
-  fi
-done
+# Skip individual package installs - workspaces handle this
+echo "✅ Workspace dependencies installed"
 
 # Force workspace linking
 echo "🔗 Ensuring workspace links..."

@@ -503,6 +503,47 @@ Supported file patterns: package-lock.json,npm-shrinkwrap.json,yarn.lock
 2. Firebase Studio 외부에서 개발 환경 구축 고려
 3. 정기적인 lock 파일 업데이트 자동화
 
+## 🚨 CI/CD 일반적인 문제 해결
+
+### ESLint RequestInit 에러
+```typescript
+// ❌ 문제
+interface APIFetchOptions extends RequestInit
+
+// ✅ 해결
+interface APIFetchOptions extends globalThis.RequestInit
+```
+
+### npm install 에러 (Cannot read properties of null)
+- 원인: dist 폴더의 package.json 파일이 workspace 해석을 방해
+- 근본 원인: build.js가 dist에 package.json 생성 (crowdfunding-types)
+- 해결: 
+  1. `find . -name "package.json" -path "*/dist/*" -delete`
+  2. build.js에서 package.json 생성 코드 제거
+
+### npm audit 실패
+- 원인: package-lock.json 없이 audit 실행 불가
+- 임시 해결: CI에서 audit 단계 스킵 또는 `--no-audit` 플래그 사용
+- 대안: `./scripts/security-audit-fallback.sh` 실행
+
+## 🔍 CI/CD 검증 도구
+
+### 문제 해결 후 검증
+```bash
+# 종합 검증
+./scripts/verify-ci-fixes.sh
+
+# 성능 측정
+./scripts/measure-performance.sh
+
+# 보안 검사 (package-lock.json 없을 때)
+./scripts/security-audit-fallback.sh
+```
+
+### CI 실패 시 대안
+- **Fallback 워크플로우**: `.github/workflows/ci-fallback.yml`
+- **수동 롤백**: `./scripts/rollback-cache-changes.sh`
+
 ## 🏗️ 구텐베르그 블록 개발 원칙
 
 ### 1. 워드프레스 정확한 모방 원칙
