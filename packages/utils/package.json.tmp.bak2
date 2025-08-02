@@ -1,7 +1,7 @@
 {
-  "name": "@o4o/types",
+  "name": "@o4o/utils",
   "version": "1.0.0",
-  "description": "Shared TypeScript types for O4O Platform",
+  "description": "Shared utility functions for O4O Platform",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,8 +15,14 @@
     "build": "tsc",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.0"
+  },
   "devDependencies": {
+    "@types/node": "^20.19.7",
     "typescript": "^5.8.3"
+  }
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0",

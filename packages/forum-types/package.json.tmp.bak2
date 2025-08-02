@@ -1,32 +1,32 @@
 {
-  "name": "@o4o/crowdfunding-types",
+  "name": "@o4o/forum-types",
   "version": "1.0.0",
-  "description": "Crowdfunding type definitions for O4O Platform",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "Forum type definitions for O4O Platform",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "node build.js",
+    "build": "tsc",
     "dev": "echo 'Types package - no dev mode'",
     "type-check": "tsc --noEmit"
   },
   "keywords": [
-    "crowdfunding",
+    "forum",
+    "community",
     "types",
     "typescript"
   ],
   "author": "O4O Platform Team",
   "license": "MIT",
   "devDependencies": {
-    "tsup": "^8.0.1",
     "typescript": "~5.8.3"
   },
   "dependencies": {
     "@o4o/types": "file:../types"
+  }
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0",

@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@o4o/types": "file:../types"
+  }
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0",

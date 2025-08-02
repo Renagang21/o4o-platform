@@ -1,7 +1,7 @@
 {
-  "name": "@o4o/types",
+  "name": "@o4o/ui",
   "version": "1.0.0",
-  "description": "Shared TypeScript types for O4O Platform",
+  "description": "Shared UI components for O4O Platform",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,8 +15,15 @@
     "build": "tsc",
     "type-check": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
   "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
+  }
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0",

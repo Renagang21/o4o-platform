@@ -27,7 +27,7 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.18.0'
           cache: 'npm'
           
       - name: 📥 Install dependencies and generate lock file
@@ -53,7 +53,7 @@ jobs:
             git add package-lock.json
             git commit -m "feat: generate package-lock.json via GitHub Actions
             
-            🔧 Generated with Node.js 20 in clean Ubuntu environment
+            🔧 Generated with Node.js 22.18.0 in clean Ubuntu environment
             🚀 Resolves CI/CD npm install compatibility issues
             
             Generated with [Claude Code](https://claude.ai/code)
