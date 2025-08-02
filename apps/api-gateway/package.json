@@ -7,7 +7,7 @@
     "dev": "nodemon --experimental-specifier-resolution=node src/server.ts",
     "build": "tsc",
     "start": "node --experimental-specifier-resolution=node dist/server.js",
-    "type-check": "tsc --noEmit",
+    "type-check": "npx tsc --noEmit",
     "lint": "eslint src/**/*.ts",
     "test": "vitest"
   },

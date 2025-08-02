@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, ComponentType } from 'react';
 // Template System Types
 
 export interface TemplateBlock {

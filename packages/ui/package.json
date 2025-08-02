@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "type-check": "tsc --noEmit"
   },
   "peerDependencies": {

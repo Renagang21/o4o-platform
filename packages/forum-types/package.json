@@ -9,7 +9,7 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "dev": "echo 'Types package - no dev mode'",
     "type-check": "tsc --noEmit"
   },

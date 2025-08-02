@@ -17,7 +17,7 @@
     "test:integration": "npx jest --testPathPattern=integration",
     "test:coverage": "npx jest --coverage",
     "test:e2e": "npx jest --testPathPattern=e2e",
-    "type-check": "tsc --noEmit",
+    "type-check": "npx tsc --noEmit",
     "lint": "eslint --config ../../eslint.config.js src/**/*.ts --max-warnings 600 || true",
     "lint:fix": "eslint --config ../../eslint.config.js src/**/*.ts --fix",
     "prettier": "prettier --check src/**/*.ts",
