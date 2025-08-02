@@ -44,10 +44,10 @@ api.interceptors.request.use(
     // 개발 환경에서 API 요청 로깅
     if (import.meta.env.DEV) {
       // console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-        params: config.params
-      })
+      //   headers: config.headers,
+      //   data: config.data,
+      //   params: config.params
+      // })
     }
     
     return config
@@ -64,9 +64,9 @@ api.interceptors.response.use(
     // 개발 환경에서 API 응답 로깅
     if (import.meta.env.DEV) {
       // console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-        status: response.status,
-        data: response.data
-      })
+      //   status: response.status,
+      //   data: response.data
+      // })
     }
     
     return response

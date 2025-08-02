@@ -8,7 +8,7 @@ interface SSOConfig {
 
 export class SSOClient {
   private config: SSOConfig;
-  private checkInterval: NodeJS.Timeout | null = null;
+  private checkInterval: number | null = null;
   private onSessionChange?: (user: User | null) => void;
 
   constructor(config: SSOConfig) {

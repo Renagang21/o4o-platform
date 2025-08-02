@@ -27,7 +27,7 @@ export interface SessionStatus {
 
 export class WebSocketSessionClient {
   private socket: Socket | null = null;
-  private sessionCheckInterval: NodeJS.Timeout | null = null;
+  private sessionCheckInterval: number | null = null;
   private onSessionEvent?: (event: SessionEvent) => void;
   private onForceLogout?: (reason: string) => void;
 

@@ -51,7 +51,7 @@ declare module '@wordpress/api-fetch' {
     // Basic fetch options
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
     headers?: Record<string, string> | [string, string][];
-    body?: string | FormData | URLSearchParams | ReadableStream<Uint8Array> | null;
+    body?: string | FormData | URLSearchParams | globalThis.ReadableStream<Uint8Array> | null;
     mode?: 'cors' | 'no-cors' | 'same-origin';
     credentials?: 'omit' | 'same-origin' | 'include';
     cache?: 'default' | 'no-store' | 'reload' | 'no-cache' | 'force-cache' | 'only-if-cached';

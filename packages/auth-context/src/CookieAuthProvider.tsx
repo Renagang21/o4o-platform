@@ -1,4 +1,4 @@
-import { Component, createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Component, ComponentType, createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { cookieAuthClient, LoginCredentials, RegisterData, User } from '@o4o/auth-client';
 import { WebSocketSessionClient } from './services/WebSocketSessionClient';
 

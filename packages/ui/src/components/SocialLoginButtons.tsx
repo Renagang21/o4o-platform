@@ -13,7 +13,7 @@ export const SocialLoginButtons: FC<SocialLoginButtonsProps> = ({
   showLabels = true,
   size = 'medium'
 }) => {
-  const baseUrl = process.env.REACT_APP_API_URL || '/api/v1';
+  const baseUrl = '/api/v1';
 
   const handleSocialLogin = (provider: 'google' | 'kakao' | 'naver') => {
     if (onSocialLogin) {

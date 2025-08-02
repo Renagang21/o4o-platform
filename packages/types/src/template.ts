@@ -1,5 +1,7 @@
-import { Component, ComponentType } from 'react';
 // Template System Types
+
+// Generic component type to avoid React dependency
+type ComponentType<P = {}> = (props: P) => any;
 
 export interface TemplateBlock {
   id: string

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { MonitoringController } from '../controllers/monitoringController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // All monitoring routes require authentication and admin role
 router.use(authenticateToken);

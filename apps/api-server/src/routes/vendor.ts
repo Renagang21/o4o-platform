@@ -19,7 +19,7 @@ interface AuthRequest extends Request {
   };
 }
 
-const router = Router();
+const router: Router = Router();
 
 // Controllers
 const vendorStatsController = new VendorStatsController();

@@ -16,7 +16,11 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/react": "^18.3.18",
     "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0",

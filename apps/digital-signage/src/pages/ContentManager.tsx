@@ -66,10 +66,10 @@ const ContentManager: FC = () => {
       await new Promise(resolve => setTimeout(resolve, 2000)); // 모의 업로드 지연
       
       // console.log('업로드 완료:', {
-        title: newContent.title,
-        type: newContent.type,
-        file: newContent.file.name
-      });
+      //   title: newContent.title,
+      //   type: newContent.type,
+      //   file: newContent.file.name
+      // });
 
       alert('콘텐츠가 성공적으로 업로드되었습니다!');
       

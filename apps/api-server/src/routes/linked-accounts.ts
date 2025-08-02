@@ -12,7 +12,7 @@ interface AuthRequest extends Request {
   };
 }
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * Get user's linked accounts
