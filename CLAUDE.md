@@ -259,10 +259,10 @@ GOOGLE_CLIENT_SECRET=optional
 
 ## ⚠️ Known Issues & Solutions
 
-### Node.js 버전 불일치 문제
-**⚠️ 중요**: Node.js 22로 마이그레이션했지만 시스템에 Node.js 20이 남아있을 때 발생하는 문제
+### Node.js 버전 관련 참고사항
+**⚠️ 중요**: 프로젝트는 Node.js 22.18.0 LTS를 사용합니다
 - npm 명령어 끝에 "2"가 붙는 문제는 특정 환경의 npm wrapper 문제
-- 실제 원인: Node.js 22를 요구하는 프로젝트를 Node.js 20 환경에서 실행 시 발생
+- 모든 개발 환경은 Node.js 22.18.0 LTS를 사용해야 합니다
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
@@ -436,6 +436,8 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 ### ⚠️ MUST READ: Node.js Version Requirements ⚠️
 **현재 프로젝트는 Node.js 22 LTS (22.18.0)를 사용합니다!**
 - 모든 package.json은 `"node": ">=22.0.0 <23.0.0"` 요구
+- npm 버전: 10.9.3 (Node.js 22에 포함)
+- TypeScript 버전: ~5.9.2
 - GitHub Actions CI/CD는 Node.js 22.18.0 사용
 - **로컬 개발 환경도 반드시 Node.js 22 사용 필요**
 
@@ -444,8 +446,8 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 #### 1. npm install "Invalid Version" 에러
 **증상**: `npm error Invalid Version:`
 **원인**: 
-- Node.js 버전 불일치 (시스템이 Node.js 20 사용 중일 때 발생)
-- package.json의 engines 필드가 Node.js 22를 요구하는데 시스템이 20을 사용
+- Node.js 버전 불일치 (잘못된 Node.js 버전 사용 시 발생)
+- package.json의 engines 필드가 Node.js 22.18.0을 요구
 
 **해결방법**:
 ```bash
@@ -466,14 +468,14 @@ nvm use 22.18.0
 
 #### 3. Node.js 버전 관련 문제
 - npm 오류의 대부분은 Node.js 버전 불일치가 원인
-- 프로젝트는 Node.js 22를 요구하는데 시스템에 Node.js 20이 있을 때 발생
+- 프로젝트는 Node.js 22.18.0 LTS를 요구
 - ci-install.sh는 CI/CD용이며, 로컬 개발과 무관
 
 ## 📝 Recent Updates (2025-08)
 - **🔥 Migrated to Node.js 22 LTS (22.18.0)** from Node.js 20.18.0 - 모든 환경에서 필수!
 - Updated all package.json engine constraints to require Node.js 22
 - Updated all GitHub Actions workflows to use Node.js 22.18.0
-- Fixed npm version mismatch issues (now using npm 10.9.x)
+- Fixed npm version mismatch issues (now using npm 10.9.3)
 - Added Git pre-commit hook to prevent invalid dependencies
 - Added validate-dependencies.sh script for dependency validation
 - **Fixed GitHub Actions Cache Error**: Added `cache-dependency-path: '**/package.json'` to all workflows
@@ -514,7 +516,7 @@ Supported file patterns: package-lock.json,npm-shrinkwrap.json,yarn.lock
 ### 근본 원인
 1. **package-lock.json 삭제 이력**: Git 히스토리 확인 결과 여러 번 삭제됨 (commit d34ff3b3 등)
 2. **환경별 npm 차이**: 특정 환경에서 npm 명령어가 예상과 다르게 동작
-3. **Node.js 버전 변경**: 이전 lock 파일은 Node.js 20용이어서 22로 재생성 필요
+3. **Node.js 버전 변경**: Node.js 22 LTS로 마이그레이션 완료
 
 ### 해결 방법
 1. **즉시 수정**: 모든 워크플로우에 `cache-dependency-path` 추가
@@ -641,17 +643,27 @@ interface APIFetchOptions extends globalThis.RequestInit
 - 다른 블록과의 충돌 없음
 - WordPress 코어 업데이트 호환성
 
-## 🚀 Current Status
-- **Node.js 22 LTS**: ✅ Migrated from 20.18.0 to 22.18.0 (**필수: 모든 개발 환경에서 Node.js 22 사용**)
-- **React 19**: ✅ Migration completed
-- **TypeScript**: ✅ All errors resolved
+## 🚀 Current Status & Core Versions
+- **Node.js 22 LTS**: ✅ 22.18.0 (LTS) - 2027년 4월까지 지원
+- **npm**: ✅ 10.9.3 (Node.js 22에 포함)
+- **TypeScript**: ✅ 5.9.2 (최신 안정 버전)
+- **React**: ✅ 19.1.0 (최신 버전)
+- **Vite**: ✅ 7.0.6 (Node.js 22 최적화)
 - **CI/CD**: ✅ Passing (cache issues fixed)
 - **Auth Bypass**: ✅ VITE_USE_MOCK=true enabled for testing
+
+### 주요 패키지 버전 표준
+- React 생태계: react/react-dom `^19.1.0`, react-router-dom `^7.6.0`
+- 타입 정의: @types/react `^19.1.2`, @types/react-dom `^19.1.2`, @types/node `^22.10.2`
+- 빌드 도구: vite `^7.0.6`, @vitejs/plugin-react `^4.4.1`
+- 스타일링: tailwindcss `^4.1.0`, @tailwindcss/vite `^4.1.0`
+- 린팅: eslint `^9.31.0`, prettier `^3.0.0`
+- 테스팅: vitest `^2.1.8`, @playwright/test `^1.43.0`
 
 ## ⚠️ 중요 주의사항 (2025-08-02 추가)
 1. **Node.js 22 필수**: 모든 개발자는 반드시 Node.js 22.18.0 사용
 2. **npm install 오류 시**: Node.js 버전부터 확인 (`node --version`)
-3. **Node.js 버전**: Node.js 22로 마이그레이션했지만 시스템에 Node.js 20이 남아있으면 문제 발생
+3. **Node.js 버전**: 프로젝트는 Node.js 22.18.0 LTS 사용 필수
 4. **"2" 문제**: npm 명령어 끝에 "2"가 붙는 것은 환경의 npm wrapper 문제
 
 ---

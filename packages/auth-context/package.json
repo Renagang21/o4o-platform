@@ -12,8 +12,7 @@
     }
   },
   "scripts": {
-    "build": "echo 'Skipping build due to missing dependencies'",
-    "build:tsc": "tsc",
+    "build": "npx tsc",
     "type-check": "npx tsc --noEmit"
   },
   "dependencies": {

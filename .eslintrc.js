@@ -10,7 +10,8 @@ module.exports = {
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true
-    }
+    },
+    warnOnUnsupportedTypeScriptVersion: false
   },
   env: {
     browser: true,

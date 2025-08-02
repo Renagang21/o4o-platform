@@ -12,10 +12,19 @@
   ],
   "engines": {
     "node": ">=22.0.0 <23.0.0",
-    "npm": ">=10.0.0"
+    "npm": ">=10.9.0"
   },
   "overrides": {
-    "node": ">=22.0.0 <23.0.0"
+    "node": ">=22.0.0 <23.0.0",
+    "@typescript-eslint/typescript-estree": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/parser": {
+      "typescript": "*"
+    }
   },
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:admin\"",
