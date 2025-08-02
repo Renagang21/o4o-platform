@@ -10,7 +10,7 @@ on:
       - '.github/workflows/deploy-ecommerce.yml'
 
 env:
-  NODE_VERSION: '20.19.4'
+  NODE_VERSION: '22.18.0'
   DEPLOY_PATH: /home/ubuntu/o4o-platform
 
 jobs:

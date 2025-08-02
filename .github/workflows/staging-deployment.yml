@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '20.19.4'
+  NODE_VERSION: '22.18.0'
 
 jobs:
   test:

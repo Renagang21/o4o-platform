@@ -4,8 +4,8 @@
   "description": "O4O Platform API Server",
   "main": "dist/main.js",
   "engines": {
-    "node": ">=20.0.0 <21.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=22.0.0 <23.0.0",
+    "npm": ">=10.9.0"
   },
   "scripts": {
     "start": "node dist/main.js",
@@ -72,7 +72,7 @@
     "passport-naver-v2": "^2.0.8",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
-    "sharp": "^0.34.2",
+    "sharp": "^0.34.3",
     "slugify": "^1.6.6",
     "socket.io": "^4.6.1",
     "typeorm": "^0.3.20",

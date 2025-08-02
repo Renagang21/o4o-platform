@@ -14,7 +14,7 @@ on:
       - 'packages/**'
 
 env:
-  NODE_VERSION: '20.19.4'
+  NODE_VERSION: '22.18.0'
   APP_NAME: api-server
   PM2_NAME: api-server
   SERVER_IP: 43.202.242.215

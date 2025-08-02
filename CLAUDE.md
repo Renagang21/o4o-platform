@@ -436,6 +436,14 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - Added disaster recovery runbook and procedures
 - Added authentication bypass for testing (VITE_USE_MOCK=true)
 
+## 📝 Recent Updates (2025-08)
+- **Migrated to Node.js 22 LTS (22.18.0)** from Node.js 20.18.0
+- Updated all package.json engine constraints to support Node.js 22
+- Updated all GitHub Actions workflows to use Node.js 22.18.0
+- Fixed npm version mismatch issues (now using npm 10.9.x)
+- Added Git pre-commit hook to prevent invalid dependencies
+- Added validate-dependencies.sh script for dependency validation
+
 ## 🏗️ 구텐베르그 블록 개발 원칙
 
 ### 1. 워드프레스 정확한 모방 원칙
@@ -482,6 +490,7 @@ VITE_USE_MOCK=true  # 이 설정으로 인증 우회 활성화
 - WordPress 코어 업데이트 호환성
 
 ## 🚀 Current Status
+- **Node.js 22 LTS**: ✅ Migrated from 20.18.0 to 22.18.0
 - **React 19**: ✅ Migration completed
 - **TypeScript**: ✅ All errors resolved
 - **CI/CD**: ✅ Passing

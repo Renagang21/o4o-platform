@@ -19,7 +19,7 @@ env:
   SERVICE_PORT: 4000
   PM2_APP_NAME: api-server
   DEPLOY_PATH: /home/ubuntu/o4o-platform
-  NODE_VERSION: '20.19.4'
+  NODE_VERSION: '22.18.0'
 
 jobs:
   # 단계 1: 빌드 및 테스트
