@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@o4o/auth-context';
 import { 
-  DashboardOutlined,
-  UsergroupAddOutlined,
-  FileTextOutlined,
-  ShoppingOutlined,
-  BarChartOutlined,
-  SettingOutlined
-} from '@ant-design/icons';
+  Squares2X2Icon,
+  UserGroupIcon,
+  DocumentTextIcon,
+  ShoppingBagIcon,
+  ChartBarIcon,
+  CogIcon
+} from '@heroicons/react/24/outline';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -15,42 +15,42 @@ const LandingPage = () => {
 
   const mainFeatures = [
     {
-      icon: <DashboardOutlined className="text-4xl" />,
+      icon: <Squares2X2Icon className="w-10 h-10" />,
       title: '대시보드',
       description: '사이트 전체 현황을 한눈에 확인하세요',
       path: '/dashboard',
       color: 'bg-blue-500'
     },
     {
-      icon: <UsergroupAddOutlined className="text-4xl" />,
+      icon: <UserGroupIcon className="w-10 h-10" />,
       title: '사용자 관리',
       description: '회원 정보와 권한을 관리합니다',
       path: '/users',
       color: 'bg-green-500'
     },
     {
-      icon: <FileTextOutlined className="text-4xl" />,
+      icon: <DocumentTextIcon className="w-10 h-10" />,
       title: '콘텐츠 관리',
       description: '게시물과 페이지를 작성하고 관리합니다',
       path: '/posts',
       color: 'bg-purple-500'
     },
     {
-      icon: <ShoppingOutlined className="text-4xl" />,
+      icon: <ShoppingBagIcon className="w-10 h-10" />,
       title: '전자상거래',
       description: '상품과 주문을 관리합니다',
       path: '/ecommerce/products',
       color: 'bg-orange-500'
     },
     {
-      icon: <BarChartOutlined className="text-4xl" />,
+      icon: <ChartBarIcon className="w-10 h-10" />,
       title: '분석',
       description: '매출과 트래픽을 분석합니다',
       path: '/analytics',
       color: 'bg-pink-500'
     },
     {
-      icon: <SettingOutlined className="text-4xl" />,
+      icon: <CogIcon className="w-10 h-10" />,
       title: '설정',
       description: '시스템 설정을 관리합니다',
       path: '/settings',
