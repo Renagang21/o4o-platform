@@ -459,6 +459,11 @@ Supported file patterns: package-lock.json,npm-shrinkwrap.json,yarn.lock
 - GitHub Actions의 `cache: 'npm'` 설정은 package-lock.json을 필수로 요구
 - monorepo에서 package-lock.json이 없을 때 워크플로우 실패
 
+### 근본 원인
+1. **package-lock.json 삭제 이력**: Git 히스토리 확인 결과 여러 번 삭제됨 (commit d34ff3b3 등)
+2. **Firebase Studio npm 버그**: npm 명령어가 비정상 동작하여 로컬에서 재생성 불가
+3. **Node.js 버전 변경**: 이전 lock 파일은 Node.js 20용이어서 22로 재생성 필요
+
 ### 해결 방법
 1. **즉시 수정**: 모든 워크플로우에 `cache-dependency-path` 추가
    ```yaml
@@ -480,7 +485,23 @@ Supported file patterns: package-lock.json,npm-shrinkwrap.json,yarn.lock
 ```bash
 # 모든 워크플로우 자동 수정
 ./scripts/fix-workflows-cache.sh
+
+# package-lock.json 생성 가이드
+./scripts/generate-lock-file-workaround.sh
+
+# 필요시 롤백
+./scripts/rollback-cache-changes.sh
 ```
+
+### 성능 영향
+- `cache-dependency-path`는 package.json 기반으로 캐시 (덜 효율적)
+- package-lock.json 기반 캐시가 더 정확하고 빠름
+- 성능 테스트: `.github/workflows/cache-performance-test.yml`
+
+### 장기 해결책
+1. GitHub Actions로 package-lock.json 생성
+2. Firebase Studio 외부에서 개발 환경 구축 고려
+3. 정기적인 lock 파일 업데이트 자동화
 
 ## 🏗️ 구텐베르그 블록 개발 원칙
 
