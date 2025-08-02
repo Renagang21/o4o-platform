@@ -71,5 +71,9 @@
   "dependencies": {
     "rate-limit-redis": "^4.2.1",
     "slugify": "^1.6.6"
+  },
+  "main": "ecosystem.config.js",
+  "directories": {
+    "doc": "docs"
   }
 }
