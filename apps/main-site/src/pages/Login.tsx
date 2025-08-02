@@ -1,4 +1,4 @@
-import { useState, FC, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, Shield, Zap } from 'lucide-react';
@@ -21,7 +21,7 @@ const Login: FC = () => {
   // 로그인 후 리다이렉트할 경로
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/dashboard';
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -30,7 +30,7 @@ const Login: FC = () => {
     if (error) setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');

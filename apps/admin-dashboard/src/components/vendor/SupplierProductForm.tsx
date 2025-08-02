@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { Package, DollarSign, Calculator, Save, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -98,7 +98,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
   };
 
   // 폼 제출
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (marginWarning) {
@@ -180,7 +180,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
               placeholder="제품에 대한 상세 설명을 입력하세요"
               rows={4}
             />

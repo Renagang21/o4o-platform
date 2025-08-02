@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useState } from 'react';
 import {
   FileText,
   Settings,
@@ -74,7 +74,7 @@ interface GutenbergSidebarProps {
 const Panel: FC<{
   title: string;
   defaultOpen?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }> = ({ title, defaultOpen = true, children }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -410,7 +410,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Textarea
                   placeholder="Write an excerpt (optional)"
                   value={postSettings.excerpt}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => 
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => 
                     onPostSettingsChange({ excerpt: e.target.value })
                   }
                   rows={4}

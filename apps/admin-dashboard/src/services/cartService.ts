@@ -54,7 +54,7 @@ class CartService {
     try {
       const cartData = localStorage.getItem(this.cartKey);
       return cartData ? JSON.parse(cartData) : null;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error reading cart from storage:', error);
       return null;
     }
@@ -64,7 +64,7 @@ class CartService {
     try {
       localStorage.setItem(this.cartKey, JSON.stringify(cart));
       this.notifyListeners(cart);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving cart to storage:', error);
     }
   }
@@ -152,7 +152,7 @@ class CartService {
       }
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding to cart:', error);
       return false;
     }
@@ -180,7 +180,7 @@ class CartService {
       
       this.saveCartToStorage(updatedCart);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating quantity:', error);
       return false;
     }
@@ -198,7 +198,7 @@ class CartService {
       
       this.saveCartToStorage(updatedCart);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error removing item:', error);
       return false;
     }
@@ -240,7 +240,7 @@ class CartService {
       if (!response.ok) {
         console.error('Cart sync failed:', await response.text());
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error syncing cart with server:', error);
     }
   }
@@ -267,7 +267,7 @@ class CartService {
       }
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error applying coupon:', error);
       return {
         success: false,
@@ -295,7 +295,7 @@ class CartService {
         valid: errors.length === 0,
         errors
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error validating cart:', error);
       return {
         valid: false,

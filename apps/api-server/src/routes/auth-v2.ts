@@ -58,7 +58,7 @@ router.post('/login',
           businessInfo: result.user.businessInfo
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       
       if (error.message.includes('Account is')) {
@@ -118,7 +118,7 @@ router.post('/register',
       // Send email verification
       try {
         await PasswordResetService.requestEmailVerification(user.id);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to send verification email:', error);
         // Don't fail registration if email fails
       }
@@ -134,7 +134,7 @@ router.post('/register',
           status: user.status
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
       res.status(500).json({
         error: 'Internal server error',
@@ -174,7 +174,7 @@ router.post('/refresh', async (req, res) => {
       success: true,
       message: 'Token refreshed successfully'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Token refresh error:', error);
     authService.clearAuthCookies(res);
     res.status(500).json({
@@ -213,7 +213,7 @@ router.post('/logout', async (req, res) => {
       success: true,
       message: 'Logout successful'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Logout error:', error);
     // Still clear cookies even if error occurs
     authService.clearAuthCookies(res);
@@ -247,7 +247,7 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
       success: true,
       user
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get user error:', error);
     res.status(500).json({
       error: 'Internal server error',
@@ -282,7 +282,7 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
       success: true,
       message: 'Logged out from all devices'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Logout all error:', error);
     res.status(500).json({
       error: 'Internal server error',
@@ -310,7 +310,7 @@ router.post('/forgot-password',
         success: true,
         message: 'If an account exists with this email, a password reset link has been sent.'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Password reset request error:', error);
       res.status(500).json({
         error: 'Failed to process password reset request',
@@ -339,7 +339,7 @@ router.post('/reset-password',
         success: true,
         message: 'Password has been reset successfully'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Password reset error:', error);
       res.status(400).json({
         error: error.message || 'Failed to reset password',
@@ -365,7 +365,7 @@ router.post('/resend-verification', authenticateCookie, async (req: AuthRequest,
       success: true,
       message: 'Verification email has been sent'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Email verification request error:', error);
     res.status(400).json({
       error: error.message || 'Failed to send verification email',
@@ -392,7 +392,7 @@ router.post('/verify-email',
         success: true,
         message: 'Email has been verified successfully'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Email verification error:', error);
       res.status(400).json({
         error: error.message || 'Failed to verify email',

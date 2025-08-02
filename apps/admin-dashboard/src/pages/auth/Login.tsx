@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail, Shield, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
@@ -58,7 +58,7 @@ const Login: FC = () => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
 
@@ -71,7 +71,7 @@ const Login: FC = () => {
       await login({ email, password });
       
       toast.success('관리자 로그인 성공!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Admin login failed:', error);
       
       // 구체적인 에러 메시지 표시

@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 /**
  * Page Manager type definitions
  */
@@ -73,7 +74,7 @@ export interface PageContent {
 export interface PageInfo {
   id: string;
   name: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   url: string;
 }
 

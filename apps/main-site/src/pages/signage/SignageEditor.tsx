@@ -1,4 +1,4 @@
-import { useState, FC, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Image, FileText, Video, Bell } from 'lucide-react';
 import SignageScheduler from '../../components/signage/SignageScheduler';
@@ -30,7 +30,7 @@ const SignageEditor: FC = () => {
     setContent({ ...content, type, content: '' });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -41,7 +41,7 @@ const SignageEditor: FC = () => {
     }
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setContent({ ...content, content: e.target.value });
   };
 
@@ -49,7 +49,7 @@ const SignageEditor: FC = () => {
     setContent({ ...content, schedule });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     // 저장 로직 구현
     navigate('/signage');

@@ -72,7 +72,7 @@ export const authenticateCookie = async (
       role: String(payload.role || UserRole.CUSTOMER)
     };
     next();
-  } catch (error) {
+  } catch (error: any) {
     console.error('Auth middleware error:', error);
     authService.clearAuthCookies(res);
     res.status(401).json({
@@ -133,7 +133,7 @@ export const optionalAuth = async (
     }
     
     next();
-  } catch (error) {
+  } catch (error: any) {
     // Ignore errors in optional auth
     next();
   }

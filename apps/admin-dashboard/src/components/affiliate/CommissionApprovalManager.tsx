@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { 
   DollarSign, CheckCircle, XCircle, Clock, Search, 
   Download, AlertCircle 
@@ -413,7 +413,7 @@ export const CommissionApprovalManager: FC = () => {
                 id="reason"
                 placeholder="거절 사유를 입력해주세요..."
                 value={rejectReason}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
                 rows={4}
                 className="mt-2"
               />

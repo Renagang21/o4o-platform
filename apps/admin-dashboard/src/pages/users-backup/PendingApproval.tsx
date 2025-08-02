@@ -31,7 +31,7 @@ const PendingApproval: FC = () => {
       )
       setUsers(response.data)
       setPagination(response.pagination)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load pending users:', error)
       toast.error('승인 대기 사용자 목록을 불러오는데 실패했습니다.')
     } finally {
@@ -74,7 +74,7 @@ const PendingApproval: FC = () => {
       toast.success('사용자가 승인되었습니다.')
       loadPendingUsers(pagination.current)
       setSelectedUsers(prev => prev.filter(id => id !== userId))
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to approve user:', error)
       toast.error('승인에 실패했습니다.')
     }
@@ -89,7 +89,7 @@ const PendingApproval: FC = () => {
       toast.success('사용자가 거부되었습니다.')
       loadPendingUsers(pagination.current)
       setSelectedUsers(prev => prev.filter(id => id !== userId))
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reject user:', error)
       toast.error('거부에 실패했습니다.')
     }
@@ -104,7 +104,7 @@ const PendingApproval: FC = () => {
       toast.success('일괄 작업이 완료되었습니다.')
       setSelectedUsers([])
       loadPendingUsers(pagination.current)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk action failed:', error)
       toast.error('일괄 작업에 실패했습니다.')
     }

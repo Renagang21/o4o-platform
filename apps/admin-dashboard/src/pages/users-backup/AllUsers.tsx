@@ -29,7 +29,7 @@ const AllUsers: FC = () => {
       const response = await UserApi.getUsers(page, pageSize, filters)
       setUsers(response.data)
       setPagination(response.pagination)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load users:', error)
       toast.error('사용자 목록을 불러오는데 실패했습니다.')
     } finally {
@@ -41,7 +41,7 @@ const AllUsers: FC = () => {
     try {
       const response = await UserApi.getUserStats()
       setStats(response.data)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load user stats:', error)
     }
   }
@@ -76,7 +76,7 @@ const AllUsers: FC = () => {
       setSelectedUsers([])
       loadUsers(pagination.current)
       loadStats()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk action failed:', error)
       toast.error('작업에 실패했습니다.')
     }
@@ -88,7 +88,7 @@ const AllUsers: FC = () => {
       toast.success('사용자가 승인되었습니다.')
       loadUsers(pagination.current)
       loadStats()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to approve user:', error)
       toast.error('승인에 실패했습니다.')
     }
@@ -103,7 +103,7 @@ const AllUsers: FC = () => {
       toast.success('사용자가 거부되었습니다.')
       loadUsers(pagination.current)
       loadStats()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reject user:', error)
       toast.error('거부에 실패했습니다.')
     }
@@ -118,7 +118,7 @@ const AllUsers: FC = () => {
       toast.success('사용자가 정지되었습니다.')
       loadUsers(pagination.current)
       loadStats()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to suspend user:', error)
       toast.error('정지에 실패했습니다.')
     }
@@ -130,7 +130,7 @@ const AllUsers: FC = () => {
       toast.success('사용자가 재활성화되었습니다.')
       loadUsers(pagination.current)
       loadStats()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reactivate user:', error)
       toast.error('재활성화에 실패했습니다.')
     }
@@ -148,7 +148,7 @@ const AllUsers: FC = () => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       toast.success('사용자 목록이 내보내졌습니다.')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to export users:', error)
       toast.error('내보내기에 실패했습니다.')
     }

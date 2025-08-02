@@ -53,7 +53,7 @@ export default function UserDetail() {
       if (historyResponse.data.success) {
         setApprovalHistory(historyResponse.data.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user data:', error);
       toast.error('Failed to load user details');
       navigate('/users');
@@ -71,7 +71,7 @@ export default function UserDetail() {
       toast.success('User approved successfully');
 
       fetchUserData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error approving user:', error);
       toast.error('Failed to approve user');
     }
@@ -86,7 +86,7 @@ export default function UserDetail() {
       toast.success('User rejected successfully');
 
       fetchUserData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error rejecting user:', error);
       toast.error('Failed to reject user');
     }

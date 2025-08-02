@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, MouseEvent } from 'react';
 import { ServiceStatus } from '../types';
 import { StatusBadge } from './StatusBadge';
 
@@ -17,7 +17,7 @@ export const ServiceStatusCard: FC<ServiceStatusCardProps> = ({
     }
   };
 
-  const handleRefresh = (e: React.MouseEvent) => {
+  const handleRefresh = (e: MouseEvent) => {
     e.stopPropagation();
     if (onRefresh) {
       onRefresh(service.name);

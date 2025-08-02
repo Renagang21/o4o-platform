@@ -1,4 +1,4 @@
-import { FC, createContext, useContext, useState, useEffect, useCallback, useRef  } from 'react';
+import { Component, createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { cookieAuthClient, LoginCredentials, RegisterData, User } from '@o4o/auth-client';
 import { WebSocketSessionClient } from './services/WebSocketSessionClient';
 
@@ -19,7 +19,7 @@ interface CookieAuthContextType {
 const CookieAuthContext = createContext<CookieAuthContextType | undefined>(undefined);
 
 export interface CookieAuthProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onAuthChange?: (user: User | null) => void;
   enableSessionSync?: boolean;
   sessionCheckInterval?: number;
@@ -236,7 +236,7 @@ export const useCookieAuth = () => {
 
 // Higher-order component for role-based access
 export const withRole = <P extends object>(
-  Component: React.ComponentType<P>,
+  Component: ComponentType<P>,
   allowedRoles: string | string[]
 ) => {
   return (props: P) => {

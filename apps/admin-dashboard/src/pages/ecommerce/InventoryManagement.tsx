@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { AlertTriangle, Search, Filter, Edit, Eye } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -172,7 +172,7 @@ const InventoryManagement: FC = () => {
     setIsMovementHistoryOpen(true);
   };
 
-  const handleAdjustmentSubmit = (e: React.FormEvent) => {
+  const handleAdjustmentSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!adjustmentForm.quantity || !adjustmentForm.reason) {
       toast.error('수량과 사유를 입력하세요');

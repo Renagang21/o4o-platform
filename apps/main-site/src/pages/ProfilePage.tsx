@@ -9,7 +9,7 @@ const ProfilePage: FC = () => {
   const navigate = useNavigate();
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!user) {
       navigate('/login', { replace: true });
     }

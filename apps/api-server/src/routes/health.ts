@@ -14,7 +14,7 @@ router.get('/', async (req: Request, res: Response) => {
     } else {
       res.status(503).json(health);
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(503).json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
@@ -31,7 +31,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
     const overallHealthy = health.checks.every((check: { status: string }) => check.status === 'healthy');
     
     res.status(overallHealthy ? 200 : 503).json(health);
-  } catch (error) {
+  } catch (error: any) {
     res.status(503).json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
@@ -57,7 +57,7 @@ router.get('/ready', async (req: Request, res: Response) => {
         timestamp: new Date().toISOString()
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(503).json({
       status: 'not ready',
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -75,7 +75,7 @@ router.get('/live', async (req: Request, res: Response) => {
       uptime: process.uptime(),
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       status: 'dead',
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -89,7 +89,7 @@ router.get('/database', async (req: Request, res: Response) => {
   try {
     const dbHealth = await checkDatabaseHealth();
     res.status(dbHealth.status === 'healthy' ? 200 : 503).json(dbHealth);
-  } catch (error) {
+  } catch (error: any) {
     res.status(503).json({
       component: 'database',
       status: 'unhealthy',
@@ -103,7 +103,7 @@ router.get('/system', async (req: Request, res: Response) => {
   try {
     const systemHealth = await checkSystemHealth();
     res.json(systemHealth);
-  } catch (error) {
+  } catch (error: any) {
     res.status(503).json({
       component: 'system',
       status: 'unhealthy',
@@ -141,7 +141,7 @@ async function performHealthCheck(): Promise<HealthCheckResponse> {
   
   try {
     await AppDataSource.query('SELECT 1');
-  } catch (error) {
+  } catch (error: any) {
     dbStatus = 'unhealthy';
     dbError = error instanceof Error ? error.message : 'Database connection failed';
   }
@@ -207,7 +207,7 @@ async function checkReadiness(): Promise<boolean> {
     }
     
     return true;
-  } catch (error) {
+  } catch (error: any) {
     return false;
   }
 }
@@ -255,7 +255,7 @@ async function checkDatabaseHealth(): Promise<HealthComponent> {
       },
       timestamp: new Date().toISOString()
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       component: 'database',
       status: 'unhealthy',
@@ -349,8 +349,8 @@ async function checkMemoryHealth(): Promise<HealthComponent> {
 
 async function checkDiskHealth(): Promise<HealthComponent> {
   try {
-    const { exec } = require('child_process');
-    const { promisify } = require('util');
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
     const execAsync = promisify(exec);
     
     // Get disk usage information
@@ -375,7 +375,7 @@ async function checkDiskHealth(): Promise<HealthComponent> {
       details: diskInfo,
       timestamp: new Date().toISOString()
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       component: 'disk',
       status: 'unknown',

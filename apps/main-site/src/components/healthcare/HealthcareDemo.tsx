@@ -41,7 +41,7 @@ const HealthcareDemo: FC = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (autoPlay) {
       const interval = setInterval(() => {
         setIsEditing(prev => !prev);

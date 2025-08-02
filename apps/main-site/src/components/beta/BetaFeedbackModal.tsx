@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
@@ -89,13 +89,13 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
     ...initialData
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialData) {
       setFormData(prev => ({ ...prev, ...initialData }));
     }
   }, [initialData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Auto-detect device information
     setFormData(prev => ({
       ...prev,
@@ -131,7 +131,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {

@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
 import AdminBreadcrumb from '../common/AdminBreadcrumb'
@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
 
 interface AdminLayoutProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {

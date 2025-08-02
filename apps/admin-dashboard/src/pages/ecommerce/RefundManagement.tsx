@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { RefreshCw, AlertTriangle, CheckCircle, Clock, Search, Filter, Eye, CreditCard } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -188,7 +188,7 @@ const RefundManagement: FC = () => {
     setIsDetailDialogOpen(true);
   };
 
-  const handleProcessSubmit = (e: React.FormEvent) => {
+  const handleProcessSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (processForm.action === 'approve' && (!processForm.approvedAmount || processForm.approvedAmount <= 0)) {
       toast.error('승인 금액을 입력하세요');

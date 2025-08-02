@@ -1,4 +1,4 @@
-import { FC, createContext, useContext, ReactNode  } from 'react';
+import { createContext, FC, ReactElement, ReactNode, useContext } from 'react';
 import { ShortcodeParser, ShortcodeRegistry } from './types';
 import { defaultParser } from './parser';
 import { globalRegistry } from './registry';
@@ -10,7 +10,7 @@ import { useShortcodes } from './renderer';
 interface ShortcodeContextValue {
   parser: ShortcodeParser;
   registry: ShortcodeRegistry;
-  render: (content: string, context?: any) => React.ReactElement | null;
+  render: (content: string, context?: any) => ReactElement | null;
 }
 
 const ShortcodeContext = createContext<ShortcodeContextValue | null>(null);

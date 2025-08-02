@@ -49,7 +49,7 @@ const Categories: FC = () => {
       setLoading(true)
       const response = await ContentApi.getCategories(true)
       setCategories(response.data)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load categories:', error)
       toast.error('카테고리를 불러오는데 실패했습니다.')
     } finally {
@@ -109,7 +109,7 @@ const Categories: FC = () => {
       
       closeModal()
       loadCategories()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save category:', error)
       toast.error('저장에 실패했습니다.')
     } finally {
@@ -132,7 +132,7 @@ const Categories: FC = () => {
       await ContentApi.deleteCategory(categoryId)
       toast.success('카테고리가 삭제되었습니다.')
       loadCategories()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete category:', error)
       toast.error('삭제에 실패했습니다.')
     }
@@ -216,7 +216,7 @@ const Categories: FC = () => {
         toast.success('카테고리가 이동되었습니다.')
         loadCategories()
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to move category:', error)
       toast.error('이동에 실패했습니다.')
     }

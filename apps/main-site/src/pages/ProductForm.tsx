@@ -1,4 +1,4 @@
-import { useState, useRef, FC, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useRef, useState } from 'react';
 import useToast from '../hooks/useToast';
 
 interface ProductFormData {
@@ -39,7 +39,7 @@ const ProductForm: FC = () => {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
     // TODO: 실제 상품 등록 API 연동
@@ -49,13 +49,13 @@ const ProductForm: FC = () => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setError('');
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {

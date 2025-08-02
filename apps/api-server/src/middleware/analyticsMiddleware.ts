@@ -60,7 +60,7 @@ export class AnalyticsMiddleware {
               ipAddress
             }
           });
-        } catch (error) {
+        } catch (error: any) {
           console.error('Analytics tracking error:', error);
         }
       }
@@ -102,7 +102,7 @@ export class AnalyticsMiddleware {
                 }
               );
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error('Performance tracking error:', error);
           }
         });
@@ -135,7 +135,7 @@ export class AnalyticsMiddleware {
                 }
               );
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error('Performance tracking error:', error);
           }
         });
@@ -173,7 +173,7 @@ export class AnalyticsMiddleware {
             }
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Action tracking error:', error);
       }
 
@@ -246,7 +246,7 @@ export class AnalyticsMiddleware {
             utmCampaign: req.query.utm_campaign as string
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Session management error:', error);
       }
 
@@ -274,7 +274,7 @@ export class AnalyticsMiddleware {
                 ipAddress: req.analytics.ipAddress
               }
             });
-          } catch (error) {
+          } catch (error: any) {
             console.error('Login tracking error:', error);
           }
         }
@@ -321,7 +321,7 @@ export class AnalyticsMiddleware {
             await this.analyticsService.updateSession(req.analytics.sessionId, {
               feedbackSubmitted: 1
             });
-          } catch (error) {
+          } catch (error: any) {
             console.error('Feedback tracking error:', error);
           }
         }
@@ -371,7 +371,7 @@ export class AnalyticsMiddleware {
                 contentViewed: 1
               });
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error('Content usage tracking error:', error);
           }
         }

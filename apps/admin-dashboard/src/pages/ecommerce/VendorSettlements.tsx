@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 import { Users, DollarSign, Clock, CheckCircle, Download, Search } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -281,7 +281,7 @@ const VendorSettlements: FC = () => {
             </div>
             <select
               value={statusFilter}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
               className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
             >
               <option value="all">모든 상태</option>

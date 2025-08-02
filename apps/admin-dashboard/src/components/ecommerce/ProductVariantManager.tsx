@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -352,7 +352,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                       <td className="px-4 py-3">
                         <select
                           value={variant.active ? 'active' : 'inactive'}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleVariantChange(variant.id, 'active', e.target.value === 'active')}
+                          onChange={(e: ChangeEvent<HTMLSelectElement>) => handleVariantChange(variant.id, 'active', e.target.value === 'active')}
                           className="px-2 py-1 border border-modern-border-primary rounded text-sm"
                         >
                           <option value="active">활성</option>

@@ -191,7 +191,7 @@ const MediaLibrary: FC = () => {
   };
 
   // 파일 업로드
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const uploadedFiles = event.target.files;
     if (!uploadedFiles) return;
 

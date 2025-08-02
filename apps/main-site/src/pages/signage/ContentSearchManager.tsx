@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, FC } from 'react';
+import { FC, FormEvent, useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, Filter, Upload, Calendar, Tag, Clock, 
@@ -102,7 +102,7 @@ const ContentSearchManager: FC = () => {
   }, [searchContent]);
 
   // Handle search input
-  const handleSearchInput = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearchInput = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSearchOptions(prev => ({ ...prev, page: 1 }));
     searchContent();

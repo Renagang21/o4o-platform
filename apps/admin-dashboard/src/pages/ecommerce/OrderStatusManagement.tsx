@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { Package, Clock, CheckCircle, Truck, AlertCircle, RefreshCw, Eye, Edit, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -241,7 +241,7 @@ const OrderStatusManagement: FC = () => {
     setIsOrderDetailOpen(true);
   };
 
-  const handleStatusSubmit = (e: React.FormEvent) => {
+  const handleStatusSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!statusChangeForm.newStatus) {
       toast.error('새로운 상태를 선택하세요');

@@ -49,7 +49,7 @@ router.get('/templates/homepage', async (req, res) => {
         }
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching homepage template:', error);
     res.status(500).json({
       success: false,
@@ -110,7 +110,7 @@ router.get('/pages/:slug', async (req, res) => {
         }
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching page:', error);
     res.status(500).json({
       success: false,
@@ -154,7 +154,7 @@ router.get('/templates/:type', async (req, res) => {
         }
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching template:', error);
     res.status(500).json({
       success: false,
@@ -204,7 +204,7 @@ router.get('/posts/:type/:slug', async (req, res) => {
         }
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching post:', error);
     res.status(500).json({
       success: false,
@@ -298,7 +298,7 @@ router.get('/products', async (req, res) => {
         totalItems: total
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching products:', error);
     res.status(500).json({
       success: false,
@@ -365,7 +365,7 @@ router.get('/products/:idOrSlug', async (req, res) => {
       success: true,
       data: transformedProduct
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching product:', error);
     res.status(500).json({
       success: false,
@@ -416,7 +416,7 @@ router.get('/posts', async (req, res) => {
         totalItems: 1
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching posts:', error);
     res.status(500).json({
       success: false,
@@ -472,7 +472,7 @@ router.get('/featured-products', async (req, res) => {
       success: true,
       data: transformedProducts
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching featured products:', error);
     res.status(500).json({
       success: false,

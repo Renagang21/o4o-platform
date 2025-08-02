@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, Component } from 'react';
+import { Component, FC, FormEvent, useEffect, useState } from 'react';
 import { BetaFeedbackModal } from './BetaFeedbackModal';
 import { BetaRegistrationModal } from './BetaRegistrationModal';
 import { useToast } from '../../hooks/useToast';
@@ -35,7 +35,7 @@ export const BetaFeedbackWidget: FC<BetaFeedbackWidgetProps> = ({
     setIsExpanded(false);
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!betaUserEmail) {
       showToast('이메일을 입력해주세요.', 'error');
@@ -261,7 +261,7 @@ export const BetaStatusChecker: FC<BetaStatusProps> = ({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     checkStatus();
   }, [email]);
 

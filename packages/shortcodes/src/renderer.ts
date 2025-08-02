@@ -1,4 +1,4 @@
-import { ReactElement, Fragment } from 'react';
+import { cloneElement, createElement, Fragment, ReactElement, useCallback, useMemo } from 'react';
 import { 
   ShortcodeRenderer, 
   ParsedShortcode, 
@@ -30,7 +30,7 @@ export class DefaultShortcodeRenderer implements ShortcodeRenderer {
 
     if (shortcodes.length === 0) {
       // 숏코드가 없으면 원본 텍스트 반환
-      return React.createElement(Fragment, null, content);
+      return createElement(Fragment, null, content);
     }
 
     // 콘텐츠를 숏코드와 일반 텍스트로 분리하여 렌더링
@@ -48,7 +48,7 @@ export class DefaultShortcodeRenderer implements ShortcodeRenderer {
       // 숏코드 렌더링
       const rendered = this.renderShortcode(shortcode, context);
       if (rendered) {
-        elements.push(React.cloneElement(rendered, { key: `shortcode-${index}` }));
+        elements.push(cloneElement(rendered, { key: `shortcode-${index}` }));
       } else {
         // 렌더링 실패 시 원본 텍스트 유지
         elements.push(shortcode.fullMatch);
@@ -62,7 +62,7 @@ export class DefaultShortcodeRenderer implements ShortcodeRenderer {
       elements.push(content.substring(lastIndex));
     }
 
-    return React.createElement(Fragment, null, ...elements);
+    return createElement(Fragment, null, ...elements);
   }
 
   /**
@@ -98,7 +98,7 @@ export class DefaultShortcodeRenderer implements ShortcodeRenderer {
     };
 
     try {
-      return React.createElement(Component, props);
+      return createElement(Component, props);
     } catch (error) {
       console.error(`Error rendering shortcode "${shortcode.name}":`, error);
       return null;
@@ -114,17 +114,17 @@ export function useShortcodes(
   parser: ShortcodeParser,
   registry: ShortcodeRegistry
 ) {
-  const renderer = React.useMemo(
+  const renderer = useMemo(
     () => new DefaultShortcodeRenderer(parser, registry),
     [parser, registry]
   );
 
-  const render = React.useCallback(
+  const render = useCallback(
     (content: string, context?: any) => renderer.render(content, context),
     [renderer]
   );
 
-  const renderShortcode = React.useCallback(
+  const renderShortcode = useCallback(
     (shortcode: ParsedShortcode, context?: any) => renderer.renderShortcode(shortcode, context),
     [renderer]
   );

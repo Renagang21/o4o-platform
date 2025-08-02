@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import { AppDataSource } from '../database/connection';
 import { Repository, SelectQueryBuilder, EntityMetadata } from 'typeorm';
 import { performance } from 'perf_hooks';
@@ -1133,7 +1134,7 @@ export class DatabaseOptimizationService {
 
   // 유틸리티 메서드들
   private generateQueryHash(query: string): string {
-    return require('crypto').createHash('md5').update(query).digest('hex');
+    return crypto.createHash('md5').update(query).digest('hex');
   }
 
   private containsSeqScan(plan: PlanNode): boolean {

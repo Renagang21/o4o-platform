@@ -6,10 +6,10 @@ export type TabSize = 'sm' | 'md' | 'lg';
 
 interface TabItem {
   id: string;
-  label: React.ReactNode;
-  content: React.ReactNode;
+  label: ReactNode;
+  content: ReactNode;
   disabled?: boolean;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }
 
 interface TabsProps {

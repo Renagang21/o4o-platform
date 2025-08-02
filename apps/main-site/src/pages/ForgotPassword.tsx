@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
@@ -11,7 +11,7 @@ const ForgotPassword: FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!email) {

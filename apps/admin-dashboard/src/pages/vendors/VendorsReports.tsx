@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { FileCheck, TrendingUp, Calendar, Download, Package, ShoppingCart, DollarSign, BarChart3 } from 'lucide-react';
 
 interface VendorReport {
@@ -104,7 +104,7 @@ const VendorsReports = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <select
           value={selectedVendor}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedVendor(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedVendor(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">전체 판매자</option>
@@ -113,7 +113,7 @@ const VendorsReports = () => {
         </select>
         <select
           value={selectedPeriod}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedPeriod(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedPeriod(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="2024-03">2024년 3월</option>

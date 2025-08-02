@@ -32,7 +32,7 @@ async function enableMocking() {
       onUnhandledRequest: 'bypass', // 처리되지 않은 요청은 실제 네트워크로 전달
       quiet: false, // Show MSW logs for debugging
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to start MSW:', error)
     // MSW 실패해도 앱은 계속 실행
     return Promise.resolve()

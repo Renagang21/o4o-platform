@@ -6,8 +6,8 @@ export type MenuSize = 'sm' | 'md' | 'lg';
 
 interface MenuItem {
   key: string;
-  label: React.ReactNode;
-  icon?: React.ReactNode;
+  label: ReactNode;
+  icon?: ReactNode;
   disabled?: boolean;
   danger?: boolean;
   onClick?: () => void;

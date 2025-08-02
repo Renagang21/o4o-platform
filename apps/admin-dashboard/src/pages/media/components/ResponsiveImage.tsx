@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, FC } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { MediaFile } from '@/types/content'
 import { ContentApi } from '@/api/contentApi'
 
@@ -121,7 +121,7 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
         setPlaceholderSrc(generatePlaceholder(file))
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load media file:', error)
       setLoadingState('error')
       onError?.(error as Error)
@@ -316,7 +316,7 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
     }
   }, [isIntersecting, imageFormats])
 
-  const imageStyle: React.CSSProperties = {
+  const imageStyle: CSSProperties = {
     width,
     height,
     maxWidth,
@@ -328,7 +328,7 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
     opacity: loadingState === 'loaded' ? 1 : 0
   }
 
-  const placeholderStyle: React.CSSProperties = {
+  const placeholderStyle: CSSProperties = {
     ...imageStyle,
     opacity: loadingState === 'loaded' ? 0 : 1,
     position: 'absolute',

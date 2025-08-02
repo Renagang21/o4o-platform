@@ -1,3 +1,4 @@
+import { Component } from 'react';
 // Template System Types
 
 export interface TemplateBlock {
@@ -351,8 +352,8 @@ export interface BlockDefinition {
   defaultSettings: TemplateBlockSettings
   contentSchema: ContentSchema
   settingsSchema: SettingsSchema
-  preview: React.ComponentType<{ block: TemplateBlock }>
-  editor: React.ComponentType<{ 
+  preview: ComponentType<{ block: TemplateBlock }>
+  editor: ComponentType<{ 
     block: TemplateBlock
     onChange: (updates: Partial<TemplateBlock>) => void 
   }>

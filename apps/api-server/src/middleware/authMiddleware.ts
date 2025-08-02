@@ -78,7 +78,7 @@ export class AuthMiddleware {
       };
 
       next();
-    } catch (error) {
+    } catch (error: any) {
       return res.status(401).json({ 
         error: 'Invalid token',
         code: 'TOKEN_INVALID'
@@ -151,7 +151,7 @@ export class AuthMiddleware {
         // Fall back to regular user authentication
         await this.verifyToken(req, res, next);
       }
-    } catch (error) {
+    } catch (error: any) {
       return res.status(401).json({ 
         error: 'Invalid token',
         code: 'TOKEN_INVALID'
@@ -225,7 +225,7 @@ export class AuthMiddleware {
       }
 
       next();
-    } catch (error) {
+    } catch (error: any) {
       // Continue without authentication
       next();
     }
@@ -326,7 +326,7 @@ export class AuthMiddleware {
       req.user = payload;
 
       next();
-    } catch (error) {
+    } catch (error: any) {
       res.status(401).json({
         success: false,
         message: 'Invalid or expired access token'
@@ -422,13 +422,13 @@ export class AuthMiddleware {
         try {
           const payload = await authService.verifyAccessToken(token);
           req.user = payload;
-        } catch (error) {
+        } catch (error: any) {
           // 토큰이 유효하지 않아도 계속 진행
         }
       }
 
       next();
-    } catch (error) {
+    } catch (error: any) {
       next();
     }
   };

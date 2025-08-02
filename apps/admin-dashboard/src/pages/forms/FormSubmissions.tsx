@@ -137,7 +137,7 @@ const FormSubmissions: FC = () => {
       link.remove();
       
       toast.success('제출 데이터를 내보냈습니다');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('내보내기에 실패했습니다');
     }
   };

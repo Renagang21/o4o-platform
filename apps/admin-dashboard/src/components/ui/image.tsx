@@ -1,4 +1,4 @@
-import { ImgHTMLAttributes, forwardRef } from 'react';
+import { forwardRef, ImgHTMLAttributes, SyntheticEvent } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
@@ -7,7 +7,7 @@ export interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 
 const Image = forwardRef<HTMLImageElement, ImageProps>(
   ({ className, src, alt, fallback = '/placeholder.svg', onError, ...props }, ref) => {
-    const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const handleError = (e: SyntheticEvent<HTMLImageElement>) => {
       if (fallback && e.currentTarget.src !== fallback) {
         e.currentTarget.src = fallback;
       }

@@ -29,11 +29,11 @@ export function calculateFormula(formula: string, data: Record<string, any>): nu
       const func = new Function('return ' + processedFormula);
       const result = func();
       return isNaN(result) ? 0 : Number(result);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Formula evaluation error:', error);
       return 0;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Formula calculation error:', error);
     return 0;
   }

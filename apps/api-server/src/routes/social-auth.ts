@@ -27,7 +27,7 @@ router.get('/google/callback',
 
       await SocialAuthService.completeSocialLogin(user, res);
       res.redirect(getRedirectUrls().success);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google auth callback error:', error);
       res.redirect(getRedirectUrls().failure);
     }
@@ -48,7 +48,7 @@ router.get('/kakao/callback',
 
       await SocialAuthService.completeSocialLogin(user, res);
       res.redirect(getRedirectUrls().success);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Kakao auth callback error:', error);
       res.redirect(getRedirectUrls().failure);
     }
@@ -69,7 +69,7 @@ router.get('/naver/callback',
 
       await SocialAuthService.completeSocialLogin(user, res);
       res.redirect(getRedirectUrls().success);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Naver auth callback error:', error);
       res.redirect(getRedirectUrls().failure);
     }
@@ -112,7 +112,7 @@ router.post('/link/:provider', authenticateCookie, async (req: AuthRequest, res)
         hasPassword: !!user.password
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Social account linking error:', error);
     res.status(400).json({
       error: error.message || 'Failed to link social account',
@@ -136,7 +136,7 @@ router.delete('/unlink', authenticateCookie, async (req: AuthRequest, res) => {
         hasPassword: !!user.password
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Social account unlinking error:', error);
     res.status(400).json({
       error: error.message || 'Failed to unlink social account',
@@ -154,7 +154,7 @@ router.get('/linked-accounts', authenticateCookie, async (req: AuthRequest, res)
       success: true,
       accounts
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Get linked accounts error:', error);
     res.status(400).json({
       error: error.message || 'Failed to get linked accounts',

@@ -81,7 +81,7 @@ router.post('/login',
           businessInfo: user.businessInfo
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       
       // PostgreSQL 권한 에러 체크
@@ -145,7 +145,7 @@ router.post('/register',
           status: user.status
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
       res.status(500).json({
         error: 'Internal server error',

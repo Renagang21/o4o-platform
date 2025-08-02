@@ -3,7 +3,7 @@
  * 단일 및 일괄 사용자 삭제 시 확인 메시지 제공 컴포넌트
  */
 
-import { FC } from 'react';
+import { FC, MouseEvent } from 'react';
 import { AlertTriangle, X, Trash2, Users } from 'lucide-react';
 import { User } from '../../types/user';
 
@@ -39,7 +39,7 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
     ? (users as User[]).some(user => user.status === 'approved')
     : (users as User).status === 'approved';
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget && !isLoading) {
       onClose();
     }

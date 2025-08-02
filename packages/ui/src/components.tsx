@@ -242,7 +242,7 @@ export const RadioGroupItem: FC<InputHTMLAttributes<HTMLInputElement> & { id: st
 };
 
 // Tabs components (simplified)
-export const Tabs: FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+export const Tabs: FC<HTMLAttributes<HTMLDivElement>> = ({ 
   className = '', 
   children, 
   ...props 

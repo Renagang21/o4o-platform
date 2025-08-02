@@ -3,7 +3,7 @@
  * 빠른 작업 위젯 - 관리자 주요 작업 버튼 모음
  */
 
-import { useState, memo } from 'react';
+import { memo, ReactNode, useState } from 'react';
 import { 
   Users,
   Package,
@@ -25,7 +25,7 @@ interface QuickActionItem {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   href?: string;
   onClick?: () => void;

@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { 
   Plus,
   Search,
@@ -63,7 +63,7 @@ const Tags: FC = () => {
       setLoading(true)
       const response = await ContentApi.getTags()
       setTags(response.data)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load tags:', error)
       toast.error('태그를 불러오는데 실패했습니다.')
     } finally {
@@ -154,7 +154,7 @@ const Tags: FC = () => {
       
       closeModal()
       loadTags()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save tag:', error)
       toast.error('저장에 실패했습니다.')
     } finally {
@@ -177,13 +177,13 @@ const Tags: FC = () => {
       await ContentApi.deleteTag(tagId)
       toast.success('태그가 삭제되었습니다.')
       loadTags()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete tag:', error)
       toast.error('삭제에 실패했습니다.')
     }
   }
 
-  const handleQuickAdd = async (e: React.FormEvent) => {
+  const handleQuickAdd = async (e: FormEvent) => {
     e.preventDefault()
     
     if (!quickTagName.trim()) return
@@ -201,7 +201,7 @@ const Tags: FC = () => {
       setQuickTagName('')
       setQuickAddMode(false)
       loadTags()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create tag:', error)
       toast.error('태그 생성에 실패했습니다.')
     }
@@ -245,7 +245,7 @@ const Tags: FC = () => {
       toast.success(`${selectedTags.length}개 태그가 삭제되었습니다.`)
       setSelectedTags([])
       loadTags()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to bulk delete tags:', error)
       toast.error('일괄 삭제에 실패했습니다.')
     }
@@ -275,7 +275,7 @@ const Tags: FC = () => {
       setMergeFromTag(null)
       setMergeToTag(null)
       loadTags()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to merge tags:', error)
       toast.error('태그 병합에 실패했습니다.')
     }

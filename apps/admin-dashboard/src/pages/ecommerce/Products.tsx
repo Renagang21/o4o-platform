@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
@@ -38,7 +38,7 @@ const Products: FC = () => {
   const products = productsData?.data || [];
   const totalPages = Math.ceil((productsData?.total || 0) / 20);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     setPage(1);
   };

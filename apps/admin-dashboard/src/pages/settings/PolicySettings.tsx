@@ -3,7 +3,7 @@
  * WordPress 수준의 완전 커스터마이징 정책 관리
  */
 
-import { useState, useEffect, useCallback, FC } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   Settings,
   Users,
@@ -34,7 +34,7 @@ interface PolicyCategory {
   id: string;
   name: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   status: 'active' | 'warning' | 'error';
   lastModified: string;
@@ -166,7 +166,7 @@ const PolicySettings: FC = () => {
       };
       
       setSettings(mockSettings);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load policy settings:', error);
     } finally {
       setIsLoading(false);
@@ -185,7 +185,7 @@ const PolicySettings: FC = () => {
       setLastSaved(new Date());
       
       // Success notification could be added here
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save policy settings:', error);
     } finally {
       setIsSaving(false);

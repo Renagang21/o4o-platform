@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { X } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -11,7 +11,7 @@ export interface AdminNoticeProps {
   dismissible?: boolean;
   persistent?: boolean;
   onDismiss?: (id?: string) => void;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 /**

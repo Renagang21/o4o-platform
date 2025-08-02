@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, KeyboardEvent, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -38,7 +38,7 @@ export const UserQuickEdit: FC<UserQuickEditProps> = ({
   }, []);
 
   // Handle keyboard shortcuts
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       onCancel();
     } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {

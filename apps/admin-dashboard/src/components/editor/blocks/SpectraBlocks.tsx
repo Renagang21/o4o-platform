@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { ChangeEvent, FC } from 'react';
 import { 
   Star, 
   DollarSign, 
@@ -73,7 +73,7 @@ export const CTABlock: FC<{
               style={{ color: textColor }}
               placeholder="Enter description..."
               value={description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onUpdate({ ...content, description: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onUpdate({ ...content, description: e.target.value })}
               rows={2}
             />
             <Input
@@ -306,7 +306,7 @@ export const TestimonialBlock: FC<{
             className="text-2xl leading-relaxed text-gray-700 italic text-center border-0 resize-none"
             placeholder="Enter testimonial quote..."
             value={quote}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onUpdate({ ...content, quote: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onUpdate({ ...content, quote: e.target.value })}
             rows={3}
           />
         ) : (
@@ -513,7 +513,7 @@ export const InfoBoxBlock: FC<{
             )}
             placeholder="Enter description..."
             value={description}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onUpdate({ ...content, description: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onUpdate({ ...content, description: e.target.value })}
             rows={2}
           />
         </>

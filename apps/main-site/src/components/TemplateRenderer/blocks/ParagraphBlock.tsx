@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { CSSProperties, FC } from 'react';
 import DOMPurify from 'dompurify';
 import { shortcodeParser } from '@/utils/shortcodeParser';
 
@@ -18,7 +18,7 @@ const ParagraphBlock: FC<ParagraphBlockProps> = ({
   alignment = 'left',
   settings = {}
 }) => {
-  const style: React.CSSProperties = {
+  const style: CSSProperties = {
     textAlign: alignment,
     fontSize: settings.fontSize || '1rem',
     color: settings.color || 'inherit',

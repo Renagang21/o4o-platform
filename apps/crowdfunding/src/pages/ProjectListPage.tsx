@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Filter } from 'lucide-react';
 import { ProjectCard } from '@/components/project/ProjectCard';
@@ -49,7 +49,7 @@ export function ProjectListPage() {
     setSearchParams(newParams);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     updateFilter('search', searchQuery || null);
   };

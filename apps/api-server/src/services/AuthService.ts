@@ -400,10 +400,10 @@ export { AuthService };
 // Create singleton instance
 let authServiceInstance: AuthService | null = null;
 
-export const getAuthService = (): AuthService => {
+export const getAuthService = async (): Promise<AuthService> => {
   if (!authServiceInstance) {
-    const { AppDataSource } = require('../database/connection');
-    const { User } = require('../entities/User');
+    const { AppDataSource } = await import('../database/connection');
+    const { User } = await import('../entities/User');
     const userRepository = AppDataSource.getRepository(User);
     authServiceInstance = new AuthService(userRepository);
   }

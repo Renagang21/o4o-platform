@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { Calculator, Settings, Percent, Plus, Edit, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -163,7 +163,7 @@ const FeeManagement: FC = () => {
     setSelectedPolicy(null);
   };
 
-  const handleCreatePolicy = (e: React.FormEvent) => {
+  const handleCreatePolicy = (e: FormEvent) => {
     e.preventDefault();
     if (!policyForm.name || !policyForm.baseRate) {
       toast.error('필수 정보를 입력하세요');
@@ -172,7 +172,7 @@ const FeeManagement: FC = () => {
     createPolicyMutation.mutate(policyForm);
   };
 
-  const handleEditPolicy = (e: React.FormEvent) => {
+  const handleEditPolicy = (e: FormEvent) => {
     e.preventDefault();
     if (!selectedPolicy || !policyForm.name || !policyForm.baseRate) {
       toast.error('필수 정보를 입력하세요');

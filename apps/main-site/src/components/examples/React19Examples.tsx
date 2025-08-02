@@ -19,7 +19,7 @@ async function addTodoAction(text: string): Promise<Todo> {
 }
 
 function OptimisticTodoList() {
-  const [todos, setTodos] = React.useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [optimisticTodos, addOptimisticTodo] = useOptimistic(
     todos,
     (state, newTodo: string) => [
@@ -168,13 +168,13 @@ function ContactForm() {
 
 // 3. startTransition 활용 예시 - 우선순위 기반 업데이트
 function SearchableList() {
-  const [query, setQuery] = React.useState('');
-  const [deferredQuery, setDeferredQuery] = React.useState('');
-  const [items] = React.useState(
+  const [query, setQuery] = useState('');
+  const [deferredQuery, setDeferredQuery] = useState('');
+  const [items] = useState(
     Array.from({ length: 1000 }, (_, i) => `아이템 ${i + 1}`)
   );
 
-  const filteredItems = React.useMemo(() => {
+  const filteredItems = useMemo(() => {
     return items.filter(item =>
       item.toLowerCase().includes(deferredQuery.toLowerCase())
     );

@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 export interface HelpTab {
   id: string;
   title: string;
-  content: string | React.ReactNode;
+  content: string | ReactNode;
 }
 
 export interface HelpSidebar {
   title: string;
-  content: string | React.ReactNode;
+  content: string | ReactNode;
 }
 
 interface HelpTabsStore {

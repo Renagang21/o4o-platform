@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { ReviewFilters, ReviewStatus } from '@o4o/types';
 import { ReviewList } from '@/components/review';
 import { Card, CardContent, CardHeader, CardTitle } from '@o4o/ui';
@@ -40,7 +40,7 @@ export function ReviewManagement() {
     });
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     setFilters({
       ...filters,

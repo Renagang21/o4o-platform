@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { Component, FC, useState } from 'react';
 import {
   Layout,
   FileText,
@@ -45,7 +45,7 @@ export interface Template {
   name: string;
   description: string;
   category: 'landing' | 'product' | 'blog' | 'page' | 'section';
-  icon: React.ComponentType<any>;
+  icon: ComponentType<any>;
   thumbnail?: string;
   blocks: any[];
   tags: string[];

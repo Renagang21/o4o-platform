@@ -5,8 +5,8 @@ export type TooltipPosition = 'top' | 'right' | 'bottom' | 'left';
 export type TooltipVariant = 'light' | 'dark';
 
 interface TooltipProps {
-  content: React.ReactNode;
-  children: React.ReactNode;
+  content: ReactNode;
+  children: ReactNode;
   position?: TooltipPosition;
   variant?: TooltipVariant;
   className?: string;

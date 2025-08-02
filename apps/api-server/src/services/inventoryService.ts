@@ -298,13 +298,13 @@ export class InventoryService {
   ): Promise<void> {
     // 실제 구현에서는 별도의 InventoryMovement 엔티티를 생성하여 이력을 관리합니다.
     // console.log('Inventory movement recorded:', {
-      productId,
-      quantityChange,
-      type,
-      referenceId,
-      notes,
-      timestamp: new Date()
-    });
+    //   productId,
+    //   quantityChange,
+    //   type,
+    //   referenceId,
+    //   notes,
+    //   timestamp: new Date()
+    // });
   }
 
   /**

@@ -8,7 +8,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   size?: ModalSize;
   className?: string;
   showCloseButton?: boolean;

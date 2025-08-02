@@ -1,4 +1,4 @@
-import { FC, useState, useRef, useEffect } from 'react';
+import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Check, X, Edit2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -75,7 +75,7 @@ export const InlineEdit: FC<InlineEditProps> = ({
     onCancel?.();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !multiline) {
       e.preventDefault();
       handleSave();

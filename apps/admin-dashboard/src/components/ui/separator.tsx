@@ -1,7 +1,7 @@
-import { forwardRef } from 'react';
+import { forwardRef, HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SeparatorProps extends HTMLAttributes<HTMLDivElement> {
   orientation?: 'horizontal' | 'vertical';
   decorative?: boolean;
 }

@@ -1,4 +1,4 @@
-import { useEffect, FC } from 'react';
+import { Component, FC, useEffect } from 'react';
 import { TemplateBlock } from '../../api/content/contentApi';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import HeadingBlock from './blocks/HeadingBlock';
@@ -16,7 +16,7 @@ import { productShortcodes } from '@/components/shortcodes/productShortcodes';
 import { formShortcodes } from '@/components/shortcodes/formShortcodes';
 
 // Block component mapping
-const blockComponents: Record<string, React.ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
+const blockComponents: Record<string, ComponentType<{ block: TemplateBlock; [key: string]: unknown }>> = {
   // Core blocks
   paragraph: ParagraphBlock,
   heading: HeadingBlock,

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import {
   X,
   Save,
@@ -58,7 +58,7 @@ interface WidgetTypeDefinition {
   type: WidgetType
   name: string
   description: string
-  icon: React.ReactNode
+  icon: ReactNode
   category: string
   defaultContent: Record<string, unknown>
 }

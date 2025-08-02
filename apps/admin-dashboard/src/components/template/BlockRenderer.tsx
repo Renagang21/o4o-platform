@@ -1,4 +1,4 @@
-import { FC, createElement } from 'react';
+import { createElement, CSSProperties, FC } from 'react';
 import { 
   Plus, 
   Copy, 
@@ -35,7 +35,7 @@ const BlockRenderer: FC<BlockRendererProps> = ({
   // Get block styles from settings
   const getBlockStyles = () => {
     const { settings } = block
-    const styles: React.CSSProperties = {}
+    const styles: CSSProperties = {}
 
     // Margin
     if (settings.margin) {

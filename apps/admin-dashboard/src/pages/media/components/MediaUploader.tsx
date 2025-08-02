@@ -131,7 +131,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
       setTimeout(() => {
         onClose()
       }, 1000)
-    } catch (error) {
+    } catch (error: any) {
       // Mark failed uploads
       setUploadingFiles(prev => prev.map(f => 
         f.status === 'uploading' 

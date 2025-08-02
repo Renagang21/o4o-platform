@@ -210,7 +210,7 @@ export default function CustomerOrderDetail() {
                 
                 <div className="flex items-center">
                   {getOrderProgress().map((step, index) => (
-                    <React.Fragment key={step.step}>
+                    <Fragment key={step.step}>
                       <div className="flex flex-col items-center">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                           step.cancelled 
@@ -240,7 +240,7 @@ export default function CustomerOrderDetail() {
                           getOrderProgress()[index + 1]?.completed ? 'bg-blue-500' : 'bg-gray-300'
                         }`} />
                       )}
-                    </React.Fragment>
+                    </Fragment>
                   ))}
                 </div>
 

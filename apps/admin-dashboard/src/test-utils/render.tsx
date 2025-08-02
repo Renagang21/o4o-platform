@@ -1,4 +1,4 @@
-import { ReactElement, FC } from 'react';
+import { FC, ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -21,7 +21,7 @@ const createTestQueryClient = () =>
 
 // 모든 Provider를 포함한 Wrapper
 interface AllProvidersProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const AllProviders: FC<AllProvidersProps> = ({ children }) => {

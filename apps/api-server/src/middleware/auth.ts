@@ -144,7 +144,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       lastLoginAt: user.lastLoginAt
     };
     next();
-  } catch (error) {
+  } catch (error: any) {
     return res.status(401).json({ 
       error: 'Invalid token',
       code: 'TOKEN_INVALID'
@@ -246,7 +246,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     }
 
     next();
-  } catch (error) {
+  } catch (error: any) {
     // Continue without authentication
     next();
   }

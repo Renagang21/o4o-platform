@@ -45,7 +45,7 @@ router.get('/linked-accounts', authenticateToken, async (req: AuthRequest, res: 
       success: true,
       accounts
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to get linked accounts:', error);
     res.status(500).json({
       success: false,
@@ -67,7 +67,7 @@ router.get('/sessions', authenticateToken, async (req: AuthRequest, res: Respons
       sessions,
       activeSessions: sessions.length
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to get sessions:', error);
     res.status(500).json({
       success: false,
@@ -90,7 +90,7 @@ router.delete('/sessions/:sessionId', authenticateToken, async (req: AuthRequest
       success: true,
       message: 'Session removed successfully'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to remove session:', error);
     res.status(500).json({
       success: false,
@@ -112,7 +112,7 @@ router.post('/logout-all-devices', authenticateToken, async (req: AuthRequest, r
       success: true,
       message: 'Logged out from all devices'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to logout all devices:', error);
     res.status(500).json({
       success: false,

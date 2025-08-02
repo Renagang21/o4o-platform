@@ -11,7 +11,7 @@ interface InfoSection {
   type: 'technical' | 'safety' | 'usage' | 'reviews';
   title: string;
   icon: string;
-  content: React.ReactNode;
+  content: ReactNode;
   isExpanded?: boolean;
 }
 
@@ -22,7 +22,7 @@ interface InformationCardProps {
   lastUpdated: string;
   trustScore: number;
   sections: InfoSection[];
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 const InformationCard: FC<InformationCardProps> = ({

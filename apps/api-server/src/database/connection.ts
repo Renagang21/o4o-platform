@@ -159,7 +159,7 @@ export async function checkDatabaseHealth() {
       maxConnections: 20,
       timestamp: new Date().toISOString()
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       status: 'error',
       error: (error as Error).message,
@@ -175,7 +175,7 @@ export async function closeDatabaseConnection() {
       await AppDataSource.destroy();
       // console.log('✅ Database connection closed gracefully');
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error closing database connection:', error);
   }
 }

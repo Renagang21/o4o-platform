@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { CSSProperties, FC } from 'react';
 import ButtonBlock from './ButtonBlock';
 
 interface HeroBlockProps {
@@ -36,7 +36,7 @@ const HeroBlock: FC<HeroBlockProps> = ({
     alignment = 'center'
   } = settings;
 
-  const heroStyle: React.CSSProperties = {
+  const heroStyle: CSSProperties = {
     minHeight: height,
     backgroundColor,
     backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
@@ -49,7 +49,7 @@ const HeroBlock: FC<HeroBlockProps> = ({
     color: textColor,
   };
 
-  const overlayStyle: React.CSSProperties = {
+  const overlayStyle: CSSProperties = {
     position: 'absolute',
     top: 0,
     left: 0,

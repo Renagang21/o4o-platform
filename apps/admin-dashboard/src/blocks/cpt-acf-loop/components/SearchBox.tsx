@@ -1,3 +1,4 @@
+import { FormEvent } from 'react';
 /**
  * Search Box Component
  * 
@@ -49,7 +50,7 @@ export const SearchBox = ({
   };
 
   // Handle search submission
-  const handleSearchSubmit = (e?: React.FormEvent) => {
+  const handleSearchSubmit = (e?: FormEvent) => {
     e?.preventDefault();
     debouncedSearch.cancel();
     onSearch(searchQuery, searchIn);

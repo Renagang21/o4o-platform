@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Store, UserCheck, Clock, Ban, Search, Filter, MoreVertical, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -195,7 +195,7 @@ const VendorsList = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={statusFilter}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>

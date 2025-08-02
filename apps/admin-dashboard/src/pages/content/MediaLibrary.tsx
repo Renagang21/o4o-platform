@@ -1,4 +1,4 @@
-import { useState, useRef, FC } from 'react';
+import { ChangeEvent, FC, useRef, useState } from 'react';
 import {
   Upload,
   FolderOpen,
@@ -107,7 +107,7 @@ const MediaLibrary: FC = () => {
   })
 
   // Handle file upload
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
       setIsUploaderOpen(true)

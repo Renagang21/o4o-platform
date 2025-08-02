@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { TrendingUp, BarChart3, Calendar, Download, Users, Link, DollarSign, Target } from 'lucide-react';
 
 interface PerformanceMetric {
@@ -113,7 +113,7 @@ const AffiliateAnalytics = () => {
         <div className="flex gap-2">
           <select
             value={selectedPeriod}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedPeriod(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedPeriod(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="week">주간</option>

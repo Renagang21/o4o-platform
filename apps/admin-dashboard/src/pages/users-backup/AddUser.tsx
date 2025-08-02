@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'
 import { Save, ArrowLeft, User, Mail, Building } from 'lucide-react'
 import { UserFormData, UserRole, ROLE_LABELS, BUSINESS_TYPES } from '@/types/user'
@@ -38,7 +38,7 @@ const AddUser: FC = () => {
         businessInfo: user.businessInfo,
         sendWelcomeEmail: false
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load user:', error)
       toast.error('사용자 정보를 불러오는데 실패했습니다.')
       navigate('/users')
@@ -47,7 +47,7 @@ const AddUser: FC = () => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     
     if (!formData.name.trim() || !formData.email.trim()) {
@@ -72,7 +72,7 @@ const AddUser: FC = () => {
       }
       
       navigate('/users')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save user:', error)
       const axiosError = error as AxiosError<{ message?: string }>
       toast.error(axiosError.response?.data?.message || '저장에 실패했습니다.')

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { CSSProperties, FC } from 'react';
 import { Link } from 'react-router-dom';
 
 interface ButtonBlockProps {
@@ -35,12 +35,12 @@ const ButtonBlock: FC<ButtonBlockProps> = ({
     hover:opacity-90
   `;
 
-  const containerStyle: React.CSSProperties = {
+  const containerStyle: CSSProperties = {
     textAlign: alignment,
     marginBottom: '1rem',
   };
 
-  const buttonStyle: React.CSSProperties = {
+  const buttonStyle: CSSProperties = {
     backgroundColor: settings.backgroundColor || (style === 'primary' ? '#3B82F6' : 'transparent'),
     color: settings.textColor || (style === 'primary' ? 'white' : '#3B82F6'),
     borderRadius: settings.borderRadius || '0.375rem',

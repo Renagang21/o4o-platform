@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Input, Button, Select, Card } from '@o4o/ui';
@@ -269,7 +269,7 @@ export function ProductsPage() {
     // TODO: Implement add to cart
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     // Search is already handled by useEffect
   };

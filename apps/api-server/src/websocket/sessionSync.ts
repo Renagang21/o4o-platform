@@ -32,7 +32,7 @@ export class WebSocketSessionSync {
       try {
         const data: SessionEventData = JSON.parse(message);
         this.handleSessionEvent(data);
-      } catch (error) {
+      } catch (error: any) {
         logger.error('Failed to parse session event:', error);
       }
     });
@@ -90,7 +90,7 @@ export class WebSocketSessionSync {
           this.removeUserSocket(userId, socket.id);
         });
 
-      } catch (error) {
+      } catch (error: any) {
         logger.error('Socket authentication failed:', error);
         socket.disconnect();
       }

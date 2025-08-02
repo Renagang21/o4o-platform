@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, FC } from 'react';
+import { FC, FormEvent, MouseEvent, useEffect, useRef, useState } from 'react';
 import useToast from '../hooks/useToast';
 
 interface PasswordChangeModalProps {
@@ -29,7 +29,7 @@ const PasswordChangeModal: FC<PasswordChangeModalProps> = ({ open, onClose }) =>
     }
   }, [open]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!current || !next || !confirm) {
       setError('모든 항목을 입력하세요.');
@@ -49,7 +49,7 @@ const PasswordChangeModal: FC<PasswordChangeModalProps> = ({ open, onClose }) =>
     onClose();
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  const handleOverlayClick = (e: MouseEvent) => {
     if (e.target === modalRef.current) onClose();
   };
 

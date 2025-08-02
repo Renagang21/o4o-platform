@@ -5,6 +5,7 @@ import { AnalyticsService } from './AnalyticsService';
 import Redis from 'ioredis';
 import { performance } from 'perf_hooks';
 import { TypeOrmDriver } from '../types/database';
+import * as crypto from 'crypto';
 import {
   QueryBuilderWithExecute,
   QueryType,
@@ -330,7 +331,7 @@ export class PerformanceOptimizationService {
    * ETag 생성
    */
   private generateETag<T>(data: T): string {
-    const hash = require('crypto').createHash('md5');
+    const hash = crypto.createHash('md5');
     hash.update(JSON.stringify(data));
     return hash.digest('hex');
   }

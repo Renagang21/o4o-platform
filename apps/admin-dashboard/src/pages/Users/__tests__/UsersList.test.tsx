@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 /**
  * UsersList 페이지 컴포넌트 단위 테스트
  * 사용자 목록, 검색, 필터링, 선택, 일괄 작업 로직 테스트
@@ -93,7 +93,7 @@ const mockUsersResponse = {
 };
 
 // Test wrapper component
-const TestWrapper: FC<{ children: React.ReactNode }> = ({ children }) => {
+const TestWrapper: FC<{ children: ReactNode }> = ({ children }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

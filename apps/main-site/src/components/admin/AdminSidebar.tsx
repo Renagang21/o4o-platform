@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { Component, FC, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -24,7 +24,7 @@ import {
 interface MenuItem {
   id: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   path?: string;
   children?: MenuItem[];
 }

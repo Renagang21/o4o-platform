@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 /**
  * Action Button Component
  * 개별 빠른 액션 버튼
@@ -11,7 +11,7 @@ interface ActionButtonProps {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: 'blue' | 'green' | 'orange' | 'purple' | 'pink' | 'indigo' | 'gray' | 'yellow';
   href: string;
   badge?: number | null;

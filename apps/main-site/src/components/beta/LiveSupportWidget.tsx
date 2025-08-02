@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, FC } from 'react';
+import { FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useToast } from '../../hooks/useToast';
 
@@ -191,7 +191,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
     inputRef.current?.focus();
   }, [socket, conversation, newMessage, betaUserId]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();

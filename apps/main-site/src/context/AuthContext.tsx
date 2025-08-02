@@ -1,4 +1,4 @@
-import { FC, createContext, useContext, useReducer, useEffect  } from 'react';
+import { createContext, FC, ReactNode, useContext, useEffect, useReducer } from 'react';
 import { authApi } from '../api/auth/authApi';
 import { AuthState, LoginRequest, RegisterRequest, User, UserRole } from '../api/auth/types';
 
@@ -99,7 +99,7 @@ const AuthContext = createContext<{
   isSSO: boolean; // SSO 사용 여부
 } | null>(null);
 
-export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // 초기 인증 상태 복원

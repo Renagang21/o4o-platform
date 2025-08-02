@@ -66,7 +66,7 @@ const RoleSelector: FC<{ onRoleSelect: (role: string) => void }> = ({ onRoleSele
 export const DropshippingPage: FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // 실시간 동기화 서비스 초기화
     realtimeSync.initializeMockData();
   }, []);

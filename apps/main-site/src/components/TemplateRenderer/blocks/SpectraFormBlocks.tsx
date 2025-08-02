@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { 
   FileText,
   Send,
@@ -271,7 +271,7 @@ export const SpectraFormBlock: FC<{
   };
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!form) return;

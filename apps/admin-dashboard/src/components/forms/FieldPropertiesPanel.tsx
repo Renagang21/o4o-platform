@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { ChangeEvent, FC } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,7 +68,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <Label>Description</Label>
             <Textarea
               value={field.description || ''}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateField({ description: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateField({ description: e.target.value })}
               rows={3}
             />
           </div>
@@ -177,7 +177,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
               <Label>Options (one per line)</Label>
               <Textarea
                 value={field.options?.map(opt => `${opt.value}|${opt.label}`).join('\n') || ''}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                   const options = e.target.value.split('\n').map(line => {
                     const [value, label] = line.split('|');
                     return { value: value || '', label: label || value || '' };

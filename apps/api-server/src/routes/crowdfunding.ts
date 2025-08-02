@@ -36,7 +36,7 @@ router.patch(
       const projectService = new (await import('../services/crowdfunding/FundingProjectService')).FundingProjectService();
       await projectService.updateProjectStatus(req.params.id, req.body.status);
       res.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: 'Failed to update project status' });
     }
   }

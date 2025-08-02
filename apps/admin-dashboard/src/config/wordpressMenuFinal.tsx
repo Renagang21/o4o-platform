@@ -1,3 +1,4 @@
+import { ReactElement } from 'react';
 import { 
   Home,
   LayoutDashboard, 
@@ -38,7 +39,7 @@ import {
 export interface MenuItem {
   id: string;
   label: string;
-  icon: React.ReactElement;
+  icon: ReactElement;
   path?: string;
   separator?: boolean;
   children?: MenuItem[];

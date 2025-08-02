@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -40,7 +40,7 @@ const Orders: FC = () => {
   const orders = ordersData?.data || [];
   const totalPages = Math.ceil((ordersData?.total || 0) / 20);
 
-  const statusColors: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+  const statusColors: Record<string, { bg: string; text: string; icon: ReactNode }> = {
     pending: { 
       bg: 'bg-yellow-100', 
       text: 'text-yellow-800',
@@ -73,7 +73,7 @@ const Orders: FC = () => {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     setPage(1);
   };

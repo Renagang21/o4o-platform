@@ -1,4 +1,4 @@
-import { useState, FC, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -18,7 +18,7 @@ const SSOLoginForm: FC = () => {
   // 로그인 후 리다이렉트할 경로
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
       setError('이메일과 비밀번호를 입력해주세요.');
@@ -40,7 +40,7 @@ const SSOLoginForm: FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value

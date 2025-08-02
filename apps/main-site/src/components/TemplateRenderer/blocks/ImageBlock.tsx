@@ -1,4 +1,4 @@
-import { FC, lazy } from 'react';
+import { CSSProperties, FC, lazy } from 'react';
 
 interface ImageBlockProps {
   src: string;
@@ -22,7 +22,7 @@ const ImageBlock: FC<ImageBlockProps> = ({
 }) => {
   const containerClasses = `image-block image-align-${alignment}`;
   
-  const imageStyle: React.CSSProperties = {
+  const imageStyle: CSSProperties = {
     width: settings.width || '100%',
     height: settings.height || 'auto',
     borderRadius: settings.borderRadius || '0',

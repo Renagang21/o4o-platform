@@ -388,7 +388,7 @@ export const platformAppsHandlers = [
         
         mockPlatformApps[appIndex].lastUpdated = new Date().toISOString();
         successCount++;
-      } catch (error) {
+      } catch (error: any) {
         errors.push(`${app.displayName}: Operation failed`);
       }
     }

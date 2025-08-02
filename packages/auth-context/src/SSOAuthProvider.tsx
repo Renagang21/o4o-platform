@@ -1,4 +1,4 @@
-import { FC, useEffect  } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { CookieAuthProvider, CookieAuthProviderProps } from './CookieAuthProvider';
 import { ssoClient, User } from '@o4o/auth-client';
 
@@ -51,7 +51,7 @@ export const SSOAuthProvider: FC<SSOAuthProviderProps> = ({
 
 // Hook to check SSO status
 export const useSSO = () => {
-  const [hasSession, setHasSession] = React.useState(false);
+  const [hasSession, setHasSession] = useState(false);
   
   useEffect(() => {
     const checkSession = () => {

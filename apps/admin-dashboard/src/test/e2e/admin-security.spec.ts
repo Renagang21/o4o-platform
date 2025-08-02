@@ -257,7 +257,7 @@ test.describe('Admin Dashboard 보안 기능', () => {
           const finalUrl = response.url();
           expect(finalUrl).toMatch(/^https:/);
         }
-      } catch (error) {
+      } catch (error: any) {
         // HTTP 접근이 차단되는 경우도 정상
         console.log('HTTP access blocked (expected in production)');
       }
@@ -315,7 +315,7 @@ test.describe('Admin Dashboard 보안 기능', () => {
         if (response.ok) {
           return await response.json();
         }
-      } catch (error) {
+      } catch (error: any) {
         console.log('Audit logs endpoint not available');
       }
       return null;

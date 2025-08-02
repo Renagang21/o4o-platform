@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { CSSProperties, FC } from 'react';
 
 interface HeadingBlockProps {
   text: string;
@@ -19,7 +19,7 @@ const HeadingBlock: FC<HeadingBlockProps> = ({
 }) => {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
   
-  const style: React.CSSProperties = {
+  const style: CSSProperties = {
     textAlign: alignment,
     color: settings.color || 'inherit',
     marginTop: settings.marginTop || '0',

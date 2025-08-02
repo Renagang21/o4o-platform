@@ -72,7 +72,7 @@ export default function UserList() {
         setTotal(response.data.data.pagination.total);
         setTotalPages(response.data.data.pagination.totalPages);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
     } finally {
@@ -116,7 +116,7 @@ export default function UserList() {
 
       setSelectedUsers([]);
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error approving users:', error);
       toast.error('Failed to approve users');
     }
@@ -136,7 +136,7 @@ export default function UserList() {
 
       setSelectedUsers([]);
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error rejecting users:', error);
       toast.error('Failed to reject users');
     }
@@ -150,7 +150,7 @@ export default function UserList() {
       toast.success('User approved successfully');
 
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error approving user:', error);
       toast.error('Failed to approve user');
     }
@@ -164,7 +164,7 @@ export default function UserList() {
       toast.success('User rejected successfully');
 
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error rejecting user:', error);
       toast.error('Failed to reject user');
     }
@@ -189,7 +189,7 @@ export default function UserList() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error exporting users:', error);
       toast.error('Failed to export users');
     }

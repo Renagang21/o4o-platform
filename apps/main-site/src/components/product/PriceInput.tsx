@@ -12,7 +12,7 @@ const PriceInput: FC<PriceInputProps> = ({
   currentPrice,
   onChange
 }) => {
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value.replace(/[^0-9]/g, ''), 10);
     if (!isNaN(value)) {
       onChange(value);

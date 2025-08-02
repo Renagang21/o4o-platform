@@ -1,3 +1,4 @@
+import { ReactNode, ReactElement } from 'react';
 /**
  * UsersList 컴포넌트 간단 테스트
  * 핵심 기능 검증을 위한 단순화된 테스트
@@ -11,7 +12,7 @@ import UsersList from '../UsersList';
 import { ThemeProvider } from '../../../contexts/ThemeContext';
 // Mock auth-context
 vi.mock('@o4o/auth-context', () => ({
-  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+  AuthProvider: ({ children }: { children: ReactNode }) => children,
   useAuth: vi.fn(() => ({
     user: {
       id: 'admin-user',
@@ -100,7 +101,7 @@ describe('UsersList 간단 테스트', () => {
     vi.clearAllMocks();
   });
 
-  const renderWithRouter = (component: React.ReactElement) => {
+  const renderWithRouter = (component: ReactElement) => {
     return render(
       <ThemeProvider>
         <BrowserRouter>

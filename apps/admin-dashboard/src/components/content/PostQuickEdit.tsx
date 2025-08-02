@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, KeyboardEvent, useEffect, useRef } from 'react';
 // import { X, Check } from 'lucide-react'; // Icons not used directly
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,7 +45,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
   }, []);
 
   // Handle keyboard shortcuts
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       onCancel();
     } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {

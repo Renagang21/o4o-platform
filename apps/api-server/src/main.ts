@@ -25,7 +25,7 @@ for (const envPath of possiblePaths) {
       envLoaded = true;
       break;
     }
-  } catch (error) {
+  } catch (error: any) {
     // Continue to next path
   }
 }
@@ -375,7 +375,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
         totalItems: 1
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching posts:', error);
     res.status(500).json({
       success: false,
@@ -471,9 +471,9 @@ const startServer = async () => {
       };
       
       // console.log('📊 Database config:', {
-        ...dbConfig,
-        password: dbConfig.password ? '***' : 'NOT SET'
-      });
+      //   ...dbConfig,
+      //   password: dbConfig.password ? '***' : 'NOT SET'
+      // });
       
       // 데이터베이스 초기화
       await AppDataSource.initialize();

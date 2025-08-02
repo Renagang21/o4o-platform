@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -370,7 +370,7 @@ const FormBuilder: FC = () => {
                     <Textarea
                       id="formDescription"
                       value={formData.description}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="양식에 대한 설명을 입력하세요"
                       rows={2}
                     />

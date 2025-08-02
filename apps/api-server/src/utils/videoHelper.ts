@@ -57,7 +57,7 @@ export class VideoHelper {
       } else if (type === 'vimeo') {
         return await this.getVimeoInfo(videoId);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error fetching ${type} video info:`, error);
     }
     
@@ -92,7 +92,7 @@ export class VideoHelper {
                      `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
         publishedAt: video.snippet?.publishedAt
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('YouTube API error:', error);
       return null;
     }
@@ -114,7 +114,7 @@ export class VideoHelper {
         thumbnailUrl: video.thumbnail_large,
         publishedAt: video.upload_date
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Vimeo API error:', error);
       return null;
     }

@@ -14,7 +14,7 @@ export function AdminDashboardTest() {
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
 
   // URL 파라미터에서 페이지 정보 추출 (실제 환경에서는 React Router 사용)
-  React.useEffect(() => {
+  useEffect(() => {
     const path = window.location.pathname;
     const searchParams = new URLSearchParams(window.location.search);
     

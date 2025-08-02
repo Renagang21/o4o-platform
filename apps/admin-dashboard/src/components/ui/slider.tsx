@@ -1,4 +1,4 @@
-import { forwardRef, useState, useRef, useEffect } from 'react';
+import { forwardRef, MouseEvent, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface SliderProps {
@@ -42,7 +42,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
       return rawValue;
     };
     
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
       if (disabled) return;
       
       isDragging.current = true;

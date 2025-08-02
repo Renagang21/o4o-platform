@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { Check, X, Eye, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -347,7 +347,7 @@ export const ProductApprovalManager: FC = () => {
               <Textarea
                 placeholder="거절 사유를 입력해주세요..."
                 value={rejectReason}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
                 rows={4}
               />
             </div>

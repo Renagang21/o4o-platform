@@ -3,10 +3,10 @@ import { twMerge } from 'tailwind-merge';
 
 interface AccordionItem {
   id: string;
-  title: React.ReactNode;
-  content: React.ReactNode;
+  title: ReactNode;
+  content: ReactNode;
   disabled?: boolean;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }
 
 interface AccordionProps {

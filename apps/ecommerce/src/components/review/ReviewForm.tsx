@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -60,7 +60,7 @@ export function ReviewForm({
   const rating = watch('rating');
   const contentLength = watch('content')?.length || 0;
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validFiles = files.filter(file => {
       const isImage = file.type.startsWith('image/');

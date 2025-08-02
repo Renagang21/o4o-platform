@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { CreditCard, Shield, AlertTriangle, CheckCircle, Settings, Eye, EyeOff } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -164,7 +164,7 @@ const TossPaymentsSettings: FC = () => {
     }
   };
 
-  const handleConfigSubmit = (e: React.FormEvent) => {
+  const handleConfigSubmit = (e: FormEvent) => {
     e.preventDefault();
     
     // Validation

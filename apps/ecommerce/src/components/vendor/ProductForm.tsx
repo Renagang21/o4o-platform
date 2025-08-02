@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { 
   X, 
   Upload, 
@@ -184,7 +184,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
       // 실제 구현에서는 파일을 서버에 업로드하고 URL을 받아와야 함

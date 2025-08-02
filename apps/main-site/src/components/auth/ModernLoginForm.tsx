@@ -71,7 +71,7 @@ const ModernLoginForm: FC = () => {
   const [optimisticMessage, setOptimisticMessage] = useOptimistic('');
 
   // 로그인 성공 시 리다이렉트 처리
-  React.useEffect(() => {
+  useEffect(() => {
     if (state.success && state.data) {
       const { userRole, isApproved } = state.data;
       

@@ -166,7 +166,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       setHistoryItems(mockHistoryItems.slice(0, maxItems));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load history data:', error);
     } finally {
       setIsLoading(false);

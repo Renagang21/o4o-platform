@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import ScreenOptions from './ScreenOptions';
 import { HelpTab } from './HelpTab';
 
@@ -12,7 +12,7 @@ interface ScreenMetaProps {
   itemsPerPage?: number;
   onColumnChange?: (columnId: string, checked: boolean) => void;
   onItemsPerPageChange?: (value: number) => void;
-  additionalOptions?: React.ReactNode;
+  additionalOptions?: ReactNode;
 }
 
 /**

@@ -113,7 +113,7 @@ const AffiliatePerformanceDashboard = () => {
 
       setAffiliateData(mockAffiliate);
       setDashboard(mockDashboard);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load dashboard data:', error);
     } finally {
       setLoading(false);

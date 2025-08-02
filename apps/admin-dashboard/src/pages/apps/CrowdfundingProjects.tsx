@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Eye, Calendar, Users, TrendingUp, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -79,7 +79,7 @@ const CrowdfundingProjects: FC = () => {
     return Math.max(0, diffDays);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     setPage(1); // Reset to first page when searching
   };

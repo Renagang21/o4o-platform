@@ -42,7 +42,7 @@ async function globalSetup(config: FullConfig) {
         }
       });
       console.log('✅ 관리자 테스트 계정 생성됨');
-    } catch (error) {
+    } catch (error: any) {
       console.log('ℹ️ 관리자 테스트 계정이 이미 존재합니다');
     }
     
@@ -57,7 +57,7 @@ async function globalSetup(config: FullConfig) {
         }
       });
       console.log('✅ 일반 사용자 테스트 계정 생성됨');
-    } catch (error) {
+    } catch (error: any) {
       console.log('ℹ️ 일반 사용자 테스트 계정이 이미 존재합니다');
     }
     
@@ -65,7 +65,7 @@ async function globalSetup(config: FullConfig) {
     
     console.log('🎉 Admin Dashboard E2E 테스트 환경 셋업 완료!');
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Admin Dashboard E2E 테스트 환경 셋업 실패:', error);
     throw error;
   }

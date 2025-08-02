@@ -3,7 +3,7 @@
  * 일괄 사용자 역할 변경 및 변경 사항 확인 UX 제공 컴포넌트
  */
 
-import { useState, FC } from 'react';
+import { FC, MouseEvent, useState } from 'react';
 import { Shield, X, Check, Users, AlertTriangle } from 'lucide-react';
 import { User, UserRole, ROLE_LABELS } from '../../types/user';
 
@@ -42,7 +42,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
 
   const hasChanges = Object.keys(roleChanges).length > 0;
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget && !isLoading) {
       onClose();
     }

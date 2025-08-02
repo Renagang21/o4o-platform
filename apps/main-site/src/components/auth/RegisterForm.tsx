@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Store, Truck, Stethoscope, Users } from 'lucide-react';
 
@@ -52,7 +52,7 @@ const RegisterForm: FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { CSSProperties, FC } from 'react';
 import TemplateRenderer from '../index';
 import { TemplateBlock } from '../../../api/content/contentApi';
 
@@ -22,7 +22,7 @@ const ColumnsBlock: FC<ColumnsBlockProps> = ({
     stackOnMobile = true
   } = settings;
 
-  const containerStyle: React.CSSProperties = {
+  const containerStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: stackOnMobile 
       ? `repeat(auto-fit, minmax(300px, 1fr))`

@@ -172,7 +172,7 @@ async function startServer() {
       // console.log('✨ Server is ready to accept connections');
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   }

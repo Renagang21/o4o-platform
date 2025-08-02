@@ -121,7 +121,7 @@ const MediaSelector: FC<MediaSelectorProps> = ({
       await ContentApi.uploadFiles(files)
       toast.success(`${files.length}개 파일이 업로드되었습니다.`)
       refetch()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload failed:', error)
       toast.error('업로드에 실패했습니다.')
     }

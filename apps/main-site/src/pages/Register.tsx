@@ -1,4 +1,4 @@
-import { useState, FC, ChangeEvent } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
@@ -27,7 +27,7 @@ const Register: FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
     setFormData(prev => ({
@@ -58,7 +58,7 @@ const Register: FC = () => {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { , FormEvent } from 'react';
 import { Review, ReviewSummary } from '../types/review';
 import { useReviewStore } from '../stores/reviewStore';
 import { useAuthStore } from '../stores/authStore';
@@ -60,7 +60,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
     setShowReportModal(true);
   };
 
-  const handleReportSubmit = async (e: React.FormEvent) => {
+  const handleReportSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (user && reportingReviewId && reportReason) {
       await reportReview(reportingReviewId, user.id, reportReason, reportDescription);

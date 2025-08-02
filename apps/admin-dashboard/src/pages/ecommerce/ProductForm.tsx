@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { FormEvent, type FC } from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
@@ -83,7 +83,7 @@ const ProductForm: FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
@@ -97,7 +97,7 @@ const ProductForm: FC = () => {
         await createProduct.mutateAsync(formData);
       }
       navigate('/products');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save product:', error);
     } finally {
       setIsSaving(false);

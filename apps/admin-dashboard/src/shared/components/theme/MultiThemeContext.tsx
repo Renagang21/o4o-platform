@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, createContext, FC } from 'react';
+import { createContext, FC, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface ThemeContextType {
   theme: string
@@ -16,7 +16,7 @@ export const useTheme = () => {
 }
 
 interface MultiThemeProviderProps {
-  children: React.ReactNode
+  children: ReactNode
   defaultTheme?: string
 }
 
