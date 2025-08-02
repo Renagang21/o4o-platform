@@ -259,11 +259,10 @@ GOOGLE_CLIENT_SECRET=optional
 
 ## ⚠️ Known Issues & Solutions
 
-### ~~Firebase Studio npm "2" 버그~~ (잘못된 정보 - 삭제 예정)
-**⚠️ 정정**: 이는 Firebase Studio 버그가 아님. Node.js 버전 불일치 문제임.
+### Node.js 버전 불일치 문제
+**⚠️ 중요**: Node.js 22로 마이그레이션했지만 시스템에 Node.js 20이 남아있을 때 발생하는 문제
 - npm 명령어 끝에 "2"가 붙는 문제는 특정 환경의 npm wrapper 문제
-- Firebase Studio와 무관함
-- 실제 원인: Node.js 20 환경에서 Node.js 22 프로젝트 실행 시 발생
+- 실제 원인: Node.js 22를 요구하는 프로젝트를 Node.js 20 환경에서 실행 시 발생
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+
@@ -465,9 +464,9 @@ nvm use 22.18.0
 - 직접 npm 명령 실행 대신 스크립트 사용
 - 또는 npm 재설치
 
-#### 3. Firebase Studio 관련 오해 정정
-- **Firebase Studio npm 버그는 존재하지 않음**
-- 대부분의 npm 오류는 Node.js 버전 불일치가 원인
+#### 3. Node.js 버전 관련 문제
+- npm 오류의 대부분은 Node.js 버전 불일치가 원인
+- 프로젝트는 Node.js 22를 요구하는데 시스템에 Node.js 20이 있을 때 발생
 - ci-install.sh는 CI/CD용이며, 로컬 개발과 무관
 
 ## 📝 Recent Updates (2025-08)
@@ -652,8 +651,8 @@ interface APIFetchOptions extends globalThis.RequestInit
 ## ⚠️ 중요 주의사항 (2025-08-02 추가)
 1. **Node.js 22 필수**: 모든 개발자는 반드시 Node.js 22.18.0 사용
 2. **npm install 오류 시**: Node.js 버전부터 확인 (`node --version`)
-3. **Firebase Studio 관련**: Firebase Studio npm 버그는 존재하지 않음. 대부분 Node.js 버전 문제
-4. **"2" 문제**: npm 명령어 끝에 "2"가 붙는 것은 환경 문제, Firebase Studio와 무관
+3. **Node.js 버전**: Node.js 22로 마이그레이션했지만 시스템에 Node.js 20이 남아있으면 문제 발생
+4. **"2" 문제**: npm 명령어 끝에 "2"가 붙는 것은 환경의 npm wrapper 문제
 
 ---
 

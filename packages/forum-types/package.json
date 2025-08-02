@@ -23,7 +23,7 @@
   "author": "O4O Platform Team",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "~5.8.3"
+    "typescript": "~5.9.2"
   },
   "dependencies": {
     "@o4o/types": "file:../types"
