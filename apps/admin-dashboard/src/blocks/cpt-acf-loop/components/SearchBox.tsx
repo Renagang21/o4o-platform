@@ -60,7 +60,7 @@ export const SearchBox = ({
   const handleSearchFieldToggle = (field: string, checked: boolean) => {
     const newSearchIn = checked
       ? [...searchIn, field]
-      : searchIn.filter(f => f !== field);
+      : searchIn.filter((f: any) => f !== field);
     
     setSearchIn(newSearchIn);
     
@@ -186,7 +186,7 @@ export const SearchSettings = ({
     if (checked) {
       onSearchInChange([...searchIn, field]);
     } else {
-      onSearchInChange(searchIn.filter(f => f !== field));
+      onSearchInChange(searchIn.filter((f: any) => f !== field));
     }
   };
 

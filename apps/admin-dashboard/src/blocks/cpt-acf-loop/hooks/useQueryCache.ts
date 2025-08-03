@@ -105,7 +105,7 @@ export const useQueryCache = ({
       }
     });
 
-    expiredKeys.forEach(key => cache.current.delete(key));
+    expiredKeys.forEach((key: any) => cache.current.delete(key));
     
     if (expiredKeys.length > 0) {
       setCacheSize(cache.current.size);

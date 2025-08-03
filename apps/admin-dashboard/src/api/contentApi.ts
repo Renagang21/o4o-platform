@@ -272,7 +272,7 @@ export class ContentApi {
   ): Promise<ApiResponse<MediaFile[]>> {
     const formData = new FormData()
     
-    files.forEach(file => {
+    files.forEach((file: any) => {
       formData.append('files', file)
     })
     
@@ -442,7 +442,7 @@ export class ContentApi {
   static async searchContent(query: string, types?: PostType[]): Promise<ApiResponse<Post[]>> {
     const params = new URLSearchParams({ query })
     if (types) {
-      types.forEach(type => params.append('types', type))
+      types.forEach((type: any) => params.append('types', type))
     }
     
     const response = await api.get(`/admin/search?${params}`)

@@ -18,7 +18,7 @@ export async function fetchPostTypes(): Promise<PostType[]> {
 
     if (cptResponse?.success && cptResponse.data) {
       // Transform CPT data to WordPress post type format
-      return cptResponse.data.map(cpt => ({
+      return cptResponse.data.map((cpt: any) => ({
         slug: cpt.slug,
         name: cpt.name,
         description: cpt.description || '',

@@ -266,7 +266,7 @@ export const dashboardApi = {
         { status: '완료', count: statusCounts['completed'] || 0, color: '#10b981' },
         { status: '취소', count: statusCounts['cancelled'] || 0, color: '#ef4444' },
         { status: '환불', count: statusCounts['refunded'] || 0, color: '#f97316' }
-      ].filter(item => item.count > 0);
+      ].filter((item: any) => item.count > 0);
 
       return {
         sales: chartSalesData.length > 0 ? chartSalesData : this.getDefaultSalesData(),

@@ -5,14 +5,7 @@
  */
 
 import { useState } from '@wordpress/element';
-import {
-  PanelBody,
-  Button,
-  SelectControl,
-  TextControl,
-  // ToggleControl,
-  Notice,
-} from '@wordpress/components';
+import { PanelBody, Button, SelectControl, TextControl, Notice,  } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { plus, trash, settings } from '@wordpress/icons';
 
@@ -41,7 +34,7 @@ export default function ACFConditionFilter({
   conditionGroups,
   onConditionsChange,
 }: ACFConditionFilterProps) {
-  const [expandedGroups, setExpandedGroups] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
 
   // Compare operators
   const compareOperators = [
@@ -96,14 +89,14 @@ export default function ACFConditionFilter({
 
   // Remove condition group
   const removeConditionGroup = (groupId: string) => {
-    onConditionsChange(conditionGroups.filter(group => group.id !== groupId));
-    setExpandedGroups(expandedGroups.filter(id => id !== groupId));
+    onConditionsChange(conditionGroups.filter((group: any) => group.id !== groupId));
+    setExpandedGroups(expandedGroups.filter((id: string) => id !== groupId));
   };
 
   // Update condition group
   const updateConditionGroup = (groupId: string, updates: Partial<ACFConditionGroup>) => {
     onConditionsChange(
-      conditionGroups.map(group =>
+      conditionGroups.map((group: any) =>
         group.id === groupId ? { ...group, ...updates } : group
       )
     );
@@ -111,7 +104,7 @@ export default function ACFConditionFilter({
 
   // Add condition to group
   const addCondition = (groupId: string) => {
-    const group = conditionGroups.find(g => g.id === groupId);
+    const group = conditionGroups.find((g: any) => g.id === groupId);
     if (!group) return;
 
     const newCondition: ACFCondition = {
@@ -129,11 +122,11 @@ export default function ACFConditionFilter({
 
   // Remove condition from group
   const removeCondition = (groupId: string, conditionId: string) => {
-    const group = conditionGroups.find(g => g.id === groupId);
+    const group = conditionGroups.find((g: any) => g.id === groupId);
     if (!group) return;
 
     updateConditionGroup(groupId, {
-      conditions: group.conditions.filter(c => c.id !== conditionId),
+      conditions: group.conditions.filter((c: any) => c.id !== conditionId),
     });
   };
 
@@ -143,11 +136,11 @@ export default function ACFConditionFilter({
     conditionId: string,
     updates: Partial<ACFCondition>
   ) => {
-    const group = conditionGroups.find(g => g.id === groupId);
+    const group = conditionGroups.find((g: any) => g.id === groupId);
     if (!group) return;
 
     updateConditionGroup(groupId, {
-      conditions: group.conditions.map(condition =>
+      conditions: group.conditions.map((condition: any) =>
         condition.id === conditionId ? { ...condition, ...updates } : condition
       ),
     });
@@ -155,9 +148,9 @@ export default function ACFConditionFilter({
 
   // Toggle group expansion
   const toggleGroupExpansion = (groupId: string) => {
-    setExpandedGroups(prev =>
+    setExpandedGroups((prev: string[]) =>
       prev.includes(groupId)
-        ? prev.filter(id => id !== groupId)
+        ? prev.filter((id: string) => id !== groupId)
         : [...prev, groupId]
     );
   };
@@ -165,7 +158,7 @@ export default function ACFConditionFilter({
   // Get field options
   const fieldOptions = [
     { label: __('Select a field', 'o4o'), value: '' },
-    ...availableFields.map(field => ({
+    ...availableFields.map((field: any) => ({
       label: field.label,
       value: field.name,
     })),

@@ -22,9 +22,9 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
   });
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev =>
+    setExpandedSections((prev: any) =>
       prev.includes(section)
-        ? prev.filter(s => s !== section)
+        ? prev.filter((s: any) => s !== section)
         : [...prev, section]
     );
   };
@@ -41,14 +41,14 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
 
   const handleCategoryToggle = (categoryId: number) => {
     const newCategories = selectedFilters.categories.includes(categoryId)
-      ? selectedFilters.categories.filter(id => id !== categoryId)
+      ? selectedFilters.categories.filter((id: any) => id !== categoryId)
       : [...selectedFilters.categories, categoryId];
     setSelectedFilters({ ...selectedFilters, categories: newCategories });
   };
 
   const handleBrandToggle = (brandId: number) => {
     const newBrands = selectedFilters.brands.includes(brandId)
-      ? selectedFilters.brands.filter(id => id !== brandId)
+      ? selectedFilters.brands.filter((id: any) => id !== brandId)
       : [...selectedFilters.brands, brandId];
     setSelectedFilters({ ...selectedFilters, brands: newBrands });
   };
@@ -158,7 +158,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
           </button>
           {isExpanded('category') && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {categories.map(category => (
+              {categories.map((category: any) => (
                 <label key={category.id} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -191,7 +191,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
           </button>
           {isExpanded('brand') && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {brands.map(brand => (
+              {brands.map((brand: any) => (
                 <label key={brand.id} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -254,7 +254,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
           </button>
           {isExpanded('rating') && (
             <div className="space-y-2">
-              {[4, 3, 2, 1].map(rating => (
+              {[4, 3, 2, 1].map((rating: any) => (
                 <label key={rating} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"

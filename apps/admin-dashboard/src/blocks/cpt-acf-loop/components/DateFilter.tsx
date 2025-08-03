@@ -165,7 +165,7 @@ export default function DateFilter({
     }
 
     if (dateFilter.type === 'relative' && dateFilter.relative) {
-      const option = relativeOptions.find(opt => opt.value === dateFilter.relative);
+      const option = relativeOptions.find((opt: any) => opt.value === dateFilter.relative);
       if (option) {
         const range = getDateRangeFromRelative(dateFilter.relative);
         return `${option.label} (${formatDateDisplay(range.start)} - ${formatDateDisplay(range.end)})`;

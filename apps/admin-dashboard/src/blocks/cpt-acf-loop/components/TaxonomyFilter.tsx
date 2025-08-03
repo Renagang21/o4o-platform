@@ -48,10 +48,10 @@ export default function TaxonomyFilter({
   selectedTaxonomies,
   onTaxonomiesChange,
 }: TaxonomyFilterProps) {
-  const [availableTaxonomies, setAvailableTaxonomies] = useState([]);
+  const [availableTaxonomies, setAvailableTaxonomies] = useState<string[]>([]);
   const [taxonomyTerms, setTaxonomyTerms] = useState<Record<string, Term[]>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedTaxonomies, setExpandedTaxonomies] = useState([]);
+  const [expandedTaxonomies, setExpandedTaxonomies] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<Record<string, string>>({});
 
   // Fetch taxonomies for the post type
@@ -91,14 +91,14 @@ export default function TaxonomyFilter({
       });
       
       // Build hierarchical structure if needed
-      const taxonomy = availableTaxonomies.find(t => t.slug === taxonomySlug);
+      const taxonomy = availableTaxonomies.find((t: any) => t.slug === taxonomySlug);
       if (taxonomy?.hierarchical) {
-        setTaxonomyTerms(prev => ({
+        setTaxonomyTerms((prev: any) => ({
           ...prev,
           [taxonomySlug]: buildHierarchicalTerms(terms),
         }));
       } else {
-        setTaxonomyTerms(prev => ({
+        setTaxonomyTerms((prev: any) => ({
           ...prev,
           [taxonomySlug]: terms,
         }));
@@ -114,12 +114,12 @@ export default function TaxonomyFilter({
     const rootTerms: Term[] = [];
 
     // Create a map of all terms
-    terms.forEach(term => {
+    terms.forEach((term: any) => {
       termMap[term.id] = { ...term, children: [] };
     });
 
     // Build the hierarchy
-    terms.forEach(term => {
+    terms.forEach((term: any) => {
       if (term.parent === 0) {
         rootTerms.push(termMap[term.id]);
       } else if (termMap[term.parent]) {
@@ -146,7 +146,7 @@ export default function TaxonomyFilter({
     if (checked) {
       newTerms = [...currentTaxonomy.terms, termId];
     } else {
-      newTerms = currentTaxonomy.terms.filter(id => id !== termId);
+      newTerms = currentTaxonomy.terms.filter((id: any) => id !== termId);
     }
 
     if (newTerms.length === 0) {
@@ -179,9 +179,9 @@ export default function TaxonomyFilter({
 
   // Toggle taxonomy expansion
   const toggleTaxonomyExpansion = (taxonomySlug: string) => {
-    setExpandedTaxonomies(prev =>
+    setExpandedTaxonomies((prev: any) =>
       prev.includes(taxonomySlug)
-        ? prev.filter(slug => slug !== taxonomySlug)
+        ? prev.filter((slug: any) => slug !== taxonomySlug)
         : [...prev, taxonomySlug]
     );
   };
@@ -191,9 +191,9 @@ export default function TaxonomyFilter({
     if (!query) return terms;
     
     const lowerQuery = query.toLowerCase();
-    return terms.filter(term => {
+    return terms.filter((term: any) => {
       const matchesTerm = term.name.toLowerCase().includes(lowerQuery);
-      const hasMatchingChildren = term.children?.some(child => 
+      const hasMatchingChildren = term.children?.some((child: any) => 
         child.name.toLowerCase().includes(lowerQuery)
       );
       return matchesTerm || hasMatchingChildren;
@@ -211,7 +211,7 @@ export default function TaxonomyFilter({
       searchQuery[taxonomySlug] || ''
     );
 
-    return searchFiltered.map(term => {
+    return searchFiltered.map((term: any) => {
       const isChecked = selectedTaxonomies[taxonomySlug]?.terms.includes(term.id);
       
       return (
@@ -243,7 +243,7 @@ export default function TaxonomyFilter({
       searchQuery[taxonomySlug] || ''
     );
 
-    return searchFiltered.map(term => {
+    return searchFiltered.map((term: any) => {
       const isChecked = selectedTaxonomies[taxonomySlug]?.terms.includes(term.id);
       
       return (
@@ -291,7 +291,7 @@ export default function TaxonomyFilter({
       initialOpen={false}
       icon={filter}
     >
-      {availableTaxonomies.map(taxonomy => {
+      {availableTaxonomies.map((taxonomy: any) => {
         const terms = taxonomyTerms[taxonomy.slug] || [];
         const hasSelectedTerms = selectedTaxonomies[taxonomy.slug]?.terms.length > 0;
         const isExpanded = expandedTaxonomies.includes(taxonomy.slug);
@@ -340,7 +340,7 @@ export default function TaxonomyFilter({
                       type="search"
                       placeholder={__('Search terms...', 'o4o')}
                       value={searchQuery[taxonomy.slug] || ''}
-                      onChange={(e: any) => setSearchQuery(prev => ({
+                      onChange={(e: any) => setSearchQuery((prev: any) => ({
                         ...prev,
                         [taxonomy.slug]: e.target.value,
                       }))}

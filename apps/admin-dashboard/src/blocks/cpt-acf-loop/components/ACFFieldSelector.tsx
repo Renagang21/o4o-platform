@@ -178,8 +178,8 @@ export default function ACFFieldSelector({
   selectedFields,
   onFieldsChange,
 }: ACFFieldSelectorProps) {
-  // const [fieldGroups, setFieldGroups] = useState([]);
-  const [availableFields, setAvailableFields] = useState([]);
+  // const [fieldGroups, setFieldGroups] = useState<string[]>([]);
+  const [availableFields, setAvailableFields] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // const [expandedField, setExpandedField] = useState<string | null>(null);

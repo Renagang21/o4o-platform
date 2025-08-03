@@ -29,14 +29,14 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
 
   const handleCategoryToggle = (categoryId: number) => {
     const newCategories = selectedFilters.categories.includes(categoryId)
-      ? selectedFilters.categories.filter(id => id !== categoryId)
+      ? selectedFilters.categories.filter((id: any) => id !== categoryId)
       : [...selectedFilters.categories, categoryId];
     setSelectedFilters({ ...selectedFilters, categories: newCategories });
   };
 
   const handleBrandToggle = (brandId: number) => {
     const newBrands = selectedFilters.brands.includes(brandId)
-      ? selectedFilters.brands.filter(id => id !== brandId)
+      ? selectedFilters.brands.filter((id: any) => id !== brandId)
       : [...selectedFilters.brands, brandId];
     setSelectedFilters({ ...selectedFilters, brands: newBrands as number[] });
   };
@@ -52,13 +52,13 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
       case 'category':
         setSelectedFilters({
           ...selectedFilters,
-          categories: selectedFilters.categories.filter(id => id !== value)
+          categories: selectedFilters.categories.filter((id: any) => id !== value)
         });
         break;
       case 'brand':
         setSelectedFilters({
           ...selectedFilters,
-          brands: selectedFilters.brands.filter(id => id !== value)
+          brands: selectedFilters.brands.filter((id: any) => id !== value)
         });
         break;
       case 'inStock':
@@ -92,8 +92,8 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
     });
   }
   
-  selectedFilters.categories.forEach(catId => {
-    const category = categories.find(c => c.id === catId);
+  selectedFilters.categories.forEach((catId: any) => {
+    const category = categories.find((c: any) => c.id === catId);
     if (category) {
       activeFilters.push({
         type: 'category',
@@ -103,8 +103,8 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
     }
   });
   
-  selectedFilters.brands.forEach(brandId => {
-    const brand = brands.find(b => b.id === brandId);
+  selectedFilters.brands.forEach((brandId: any) => {
+    const brand = brands.find((b: any) => b.id === brandId);
     if (brand) {
       activeFilters.push({
         type: 'brand',
@@ -139,14 +139,14 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onClick={() => toggleDropdown('sort')}
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
-              <span>{__('Sort by:', 'o4o')} {sortOptions.find(o => o.value === selectedFilters.sortBy)?.label}</span>
+              <span>{__('Sort by:', 'o4o')} {sortOptions.find((o: any) => o.value === selectedFilters.sortBy)?.label}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             {activeDropdown === 'sort' && (
               <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10">
                 {sortOptions
-                  .filter(option => attributes.sortOptions.includes(option.value))
-                  .map(option => (
+                  .filter((option: any) => attributes.sortOptions.includes(option.value))
+                  .map((option: any) => (
                     <button
                       key={option.value}
                       onClick={() => {
@@ -224,7 +224,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
             </button>
             {activeDropdown === 'category' && (
               <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10 p-2 max-h-80 overflow-y-auto">
-                {categories.map(category => (
+                {categories.map((category: any) => (
                   <label key={category.id} className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 cursor-pointer">
                     <input
                       type="checkbox"
@@ -254,7 +254,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
             </button>
             {activeDropdown === 'brand' && (
               <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10 p-2 max-h-80 overflow-y-auto">
-                {brands.map(brand => (
+                {brands.map((brand: any) => (
                   <label key={brand.id} className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 cursor-pointer">
                     <input
                       type="checkbox"

@@ -5,15 +5,7 @@ import {
   BlockControls,
   useBlockProps
 } from '@wordpress/block-editor';
-import {
-  PanelBody,
-  SelectControl,
-  RangeControl,
-  ToggleControl,
-  ToolbarGroup,
-  ToolbarButton,
-  // ColorPicker
-} from '@wordpress/components';
+import { PanelBody, SelectControl, RangeControl, ToggleControl, ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
   Grid,
   List,

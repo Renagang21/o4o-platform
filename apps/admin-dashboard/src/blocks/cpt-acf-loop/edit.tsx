@@ -3,21 +3,11 @@
  */
 
 import { useBlockProps, InspectorControls, BlockControls } from '@wordpress/block-editor';
-import {
-  PanelBody,
-  SelectControl,
-  RangeControl,
-  // ToggleControl,
-  Spinner,
-  Notice,
-  Placeholder,
-  ToolbarGroup,
-  ToolbarButton,
-} from '@wordpress/components';
+import { PanelBody, SelectControl, RangeControl, Spinner, Notice, Placeholder, ToolbarGroup, ToolbarButton,  } from '@wordpress/components';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { list as icon, grid, listView, update } from '@wordpress/icons';
+import { grid, listView, update } from '@wordpress/icons';
 
 // Import all components
 import ACFFieldSelector from './components/ACFFieldSelector';
@@ -133,8 +123,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   });
 
   // State
-  const [postTypes, setPostTypes] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [postTypes, setPostTypes] = useState<string[]>([]);
+  const [posts, setPosts] = useState<string[]>([]);
   const [totalPosts, setTotalPosts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -288,7 +278,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       const posts = await response.json();
 
       if (append) {
-        setPosts(prev => [...prev, ...posts]);
+        setPosts((prev: any) => [...prev, ...posts]);
       } else {
         setPosts(posts);
         // Cache the results
