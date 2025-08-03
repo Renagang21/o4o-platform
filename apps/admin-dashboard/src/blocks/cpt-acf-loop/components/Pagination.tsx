@@ -330,7 +330,7 @@ export const PaginationSettings = ({
         <RangeControl
           label={__('Posts Per Page', 'o4o')}
           value={postsPerPage}
-          onChange={onPostsPerPageChange}
+          onChange={(value) => value !== undefined && onPostsPerPageChange(value)}
           min={1}
           max={50}
           step={1}

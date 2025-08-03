@@ -394,23 +394,7 @@ export default function ACFFieldSelector({
             {availableFields.map((field: any) => (
               <CheckboxControl
                 key={field.key}
-                label={
-                  <span>
-                    <span style={{ marginRight: '8px' }}>
-                      {getFieldTypeIcon(field.type)}
-                    </span>
-                    {field.label}
-                    <span
-                      style={{
-                        marginLeft: '8px',
-                        fontSize: '11px',
-                        opacity: 0.7,
-                      }}
-                    >
-                      ({field.name})
-                    </span>
-                  </span>
-                }
+                label={field.label + ` (${field.name})`}
                 checked={selectedFields.some((f) => f.key === field.key)}
                 onChange={(checked: any) => handleFieldToggle(field, checked)}
               />

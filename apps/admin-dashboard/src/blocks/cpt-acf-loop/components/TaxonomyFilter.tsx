@@ -217,14 +217,7 @@ export default function TaxonomyFilter({
       return (
         <div key={term.id} style={{ marginLeft: `${level * 20}px` }}>
           <CheckboxControl
-            label={
-              <span>
-                {term.name}
-                <span style={{ marginLeft: '8px', opacity: 0.6, fontSize: '12px' }}>
-                  ({term.count})
-                </span>
-              </span>
-            }
+            label={`${term.name} (${term.count})`}
             checked={isChecked}
             onChange={(checked: any) => handleTermToggle(taxonomySlug, term.id, checked)}
           />
@@ -249,14 +242,7 @@ export default function TaxonomyFilter({
       return (
         <CheckboxControl
           key={term.id}
-          label={
-            <span>
-              {term.name}
-              <span style={{ marginLeft: '8px', opacity: 0.6, fontSize: '12px' }}>
-                ({term.count})
-              </span>
-            </span>
-          }
+          label={`${term.name} (${term.count})`}
           checked={isChecked}
           onChange={(checked: any) => handleTermToggle(taxonomySlug, term.id, checked)}
         />
