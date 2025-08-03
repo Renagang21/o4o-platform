@@ -49,7 +49,7 @@ export class ShortcodeParser {
 
   // Register multiple handlers
   registerMany(handlers: ShortcodeHandler[]) {
-    handlers.forEach(handler => this.register(handler));
+    handlers.forEach((handler: any) => this.register(handler));
   }
 
   // Parse content and replace shortcodes with React components

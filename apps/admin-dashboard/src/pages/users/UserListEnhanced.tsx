@@ -43,9 +43,9 @@ interface UserListResponse {
 export default function UserListEnhanced() {
   // const navigate = useNavigate(); // Not used
   const { success, error } = useAdminNotices();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -96,7 +96,7 @@ export default function UserListEnhanced() {
         setTotal(response.data.data.pagination.total);
         setTotalPages(response.data.data.pagination.totalPages);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching users:', err);
       error('Failed to load users');
     } finally {
@@ -131,7 +131,7 @@ export default function UserListEnhanced() {
       }
       setSelectedUsers([]);
       fetchUsers();
-    } catch (err) {
+    } catch (err: any) {
       error('Failed to perform bulk action.');
     }
   };
@@ -142,7 +142,7 @@ export default function UserListEnhanced() {
       await api.post(`/v1/users/${userId}/approve`);
       success('User approved successfully.');
       fetchUsers();
-    } catch (err) {
+    } catch (err: any) {
       error('Failed to approve user.');
     }
   };
@@ -153,7 +153,7 @@ export default function UserListEnhanced() {
         await api.delete(`/v1/users/${userId}`);
         success('User deleted.');
         fetchUsers();
-      } catch (err) {
+      } catch (err: any) {
         error('Failed to delete user.');
       }
     }
@@ -196,7 +196,7 @@ export default function UserListEnhanced() {
     { id: 'registered', label: 'Registered', sortable: true }
   ];
   
-  const columns = allColumns.filter(col => isColumnVisible(col.id));
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform users to table rows
   const rows: WordPressTableRow[] = users.map((user: any) => ({
@@ -361,12 +361,12 @@ export default function UserListEnhanced() {
           if (selected) {
             setSelectedUsers([...selectedUsers, id]);
           } else {
-            setSelectedUsers(selectedUsers.filter(userId => userId !== id));
+            setSelectedUsers(selectedUsers.filter((userId: any) => userId !== id));
           }
         }}
         onSelectAll={(selected) => {
           if (selected) {
-            setSelectedUsers(users.map(u => u.id));
+            setSelectedUsers(users.map((u: any) => u.id));
           } else {
             setSelectedUsers([]);
           }

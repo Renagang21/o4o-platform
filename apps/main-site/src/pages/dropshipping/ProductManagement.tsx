@@ -133,7 +133,7 @@ const ProductManagement: FC = () => {
     return new Intl.NumberFormat('ko-KR').format(num);
   };
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
     return matchesCategory && matchesStatus;

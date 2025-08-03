@@ -157,8 +157,8 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
     // Generate URLs for each size and format
     const sizeNames = ['thumbnail', 'small', 'medium', 'large', 'original']
     
-    sizeNames.forEach(sizeName => {
-      const sizeData = sizes.find(s => s.name === sizeName)
+    sizeNames.forEach((sizeName: any) => {
+      const sizeData = sizes.find((s: any) => s.name === sizeName)
       if (sizeData) {
         const filename = file.filename.replace(/\.[^/.]+$/, '') // Remove extension
         
@@ -246,7 +246,7 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
       `${selectedFormat?.medium} 768w`,
       `${selectedFormat?.large} 1200w`,
       `${selectedFormat?.original} 2400w`
-    ].filter(entry => !entry.includes('undefined'))
+    ].filter((entry: any) => !entry.includes('undefined'))
 
     return srcSetEntries.join(', ')
   }
@@ -437,7 +437,7 @@ export const useResponsiveImage = (mediaId: string) => {
         setLoading(true)
         const response = await ContentApi.getMediaFile(mediaId)
         setMediaFile(response.data)
-      } catch (err) {
+      } catch (err: any) {
         setError(err as Error)
       } finally {
         setLoading(false)

@@ -134,7 +134,7 @@ const PageManager = () => {
     }
   };
 
-  const currentPageInfo = pages.find(p => p.id === currentPage);
+  const currentPageInfo = pages.find((p: any) => p.id === currentPage);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -222,7 +222,7 @@ const PageManager = () => {
               </button>
               
               <div className="space-y-2">
-                {pages.map(page => (
+                {pages.map((page: any) => (
                   <div
                     key={page.id}
                     onClick={() => setCurrentPage(page.id)}

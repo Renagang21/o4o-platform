@@ -38,7 +38,7 @@ export class UserManagementController {
       res.json({
         success: true,
         data: {
-          users: users.map(user => user.toPublicData()),
+          users: users.map((user: any) => user.toPublicData()),
           pagination: {
             total,
             page: pagination.page,
@@ -89,7 +89,7 @@ export class UserManagementController {
       res.json({
         success: true,
         data: {
-          users: users.map(user => user.toPublicData()),
+          users: users.map((user: any) => user.toPublicData()),
           pagination: {
             total,
             page: pagination.page,
@@ -430,7 +430,7 @@ export class UserManagementController {
       const { users } = await this.userRepository.findWithFilters(filters);
 
       // Prepare data for CSV
-      const csvData = users.map(user => ({
+      const csvData = users.map((user: any) => ({
         ID: user.id,
         Email: user.email,
         'First Name': user.firstName || '',

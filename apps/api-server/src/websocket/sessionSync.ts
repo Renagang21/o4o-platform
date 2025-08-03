@@ -113,7 +113,7 @@ export class WebSocketSessionSync {
         // Force disconnect all sockets for this user
         const userSocketIds = this.userSockets.get(userId);
         if (userSocketIds) {
-          userSocketIds.forEach(socketId => {
+          userSocketIds.forEach((socketId: any) => {
             const socket = this.io.sockets.sockets.get(socketId);
             if (socket) {
               socket.emit('session:force_logout', { reason: 'All devices logged out' });

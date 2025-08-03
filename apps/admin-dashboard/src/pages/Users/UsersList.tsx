@@ -64,7 +64,7 @@ const UsersList: FC = () => {
   });
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   
   // 모달 상태
   const [deleteModal, setDeleteModal] = useState<{
@@ -121,7 +121,7 @@ const UsersList: FC = () => {
 
   // 필터 핸들러
   const handleFilterChange = (newFilters: Partial<UserFilters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    setFilters((prev: any) => ({ ...prev, ...newFilters }));
     setPage(1); // 첫 페이지로 리셋
   };
 
@@ -386,7 +386,7 @@ const UsersList: FC = () => {
   };
 
   const handleBulkDelete = () => {
-    const usersToDelete = usersData?.data.users.filter(user => 
+    const usersToDelete = usersData?.data.users.filter((user: any) => 
       selectedUsers.includes(user.id)
     ) || [];
     
@@ -399,7 +399,7 @@ const UsersList: FC = () => {
   };
 
   const handleBulkRoleChange = () => {
-    const usersToChange = usersData?.data.users.filter(user => 
+    const usersToChange = usersData?.data.users.filter((user: any) => 
       selectedUsers.includes(user.id)
     ) || [];
     
@@ -413,7 +413,7 @@ const UsersList: FC = () => {
 
   const handleDeleteConfirm = () => {
     const users = Array.isArray(deleteModal.users) ? deleteModal.users : [deleteModal.users];
-    const userIds = users.map(user => user.id);
+    const userIds = users.map((user: any) => user.id);
     deleteUsersMutation.mutate(userIds);
   };
 
@@ -426,15 +426,15 @@ const UsersList: FC = () => {
 
   const handleSelectUser = (userId: string, isSelected: boolean) => {
     if (isSelected) {
-      setSelectedUsers(prev => [...prev, userId]);
+      setSelectedUsers((prev: any) => [...prev, userId]);
     } else {
-      setSelectedUsers(prev => prev.filter(id => id !== userId));
+      setSelectedUsers((prev: any) => prev.filter((id: any) => id !== userId));
     }
   };
 
   const handleSelectAll = (isSelected: boolean) => {
     if (isSelected && usersData?.data.users) {
-      setSelectedUsers(usersData.data.users.map(user => user.id));
+      setSelectedUsers(usersData.data.users.map((user: any) => user.id));
     } else {
       setSelectedUsers([]);
     }
@@ -594,7 +594,7 @@ const UsersList: FC = () => {
             <div className="wp-card">
               <div className="wp-card-body text-center">
                 <div className="text-2xl font-bold text-yellow-600">
-                  {usersData.data.users.filter(u => u.status === 'pending').length}
+                  {usersData.data.users.filter((u: any) => u.status === 'pending').length}
                 </div>
                 <div className="text-sm text-gray-600">승인 대기</div>
               </div>
@@ -602,7 +602,7 @@ const UsersList: FC = () => {
             <div className="wp-card">
               <div className="wp-card-body text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {usersData.data.users.filter(u => u.status === 'approved').length}
+                  {usersData.data.users.filter((u: any) => u.status === 'approved').length}
                 </div>
                 <div className="text-sm text-gray-600">승인됨</div>
               </div>
@@ -610,7 +610,7 @@ const UsersList: FC = () => {
             <div className="wp-card">
               <div className="wp-card-body text-center">
                 <div className="text-2xl font-bold text-purple-600">
-                  {usersData.data.users.filter(u => u.role === 'business').length}
+                  {usersData.data.users.filter((u: any) => u.role === 'business').length}
                 </div>
                 <div className="text-sm text-gray-600">사업자</div>
               </div>

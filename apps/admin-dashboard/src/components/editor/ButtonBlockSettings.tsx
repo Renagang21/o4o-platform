@@ -108,7 +108,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
           색상
         </Label>
         <div className="grid grid-cols-3 gap-2 mb-2">
-          {colorPresets.map(preset => (
+          {colorPresets.map((preset: any) => (
             <button
               key={preset.bg}
               onClick={() => onChange({ 

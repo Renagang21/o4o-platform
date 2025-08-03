@@ -182,9 +182,9 @@ const TossPaymentsSettings: FC = () => {
   };
 
   const handleMethodToggle = (methodType: string) => {
-    setConfigForm(prev => ({
+    setConfigForm((prev: any) => ({
       ...prev,
-      supportedMethods: prev.supportedMethods?.map(method =>
+      supportedMethods: prev.supportedMethods?.map((method: any) =>
         method.type === methodType
           ? { ...method, enabled: !method.enabled }
           : method
@@ -306,7 +306,7 @@ const TossPaymentsSettings: FC = () => {
                     <input
                       type="radio"
                       checked={!configForm.isLive}
-                      onChange={() => setConfigForm(prev => ({ ...prev, isLive: false }))}
+                      onChange={() => setConfigForm((prev: any) => ({ ...prev, isLive: false }))}
                       className="mr-2"
                     />
                     <span className="text-sm">테스트 (Sandbox)</span>
@@ -315,7 +315,7 @@ const TossPaymentsSettings: FC = () => {
                     <input
                       type="radio"
                       checked={configForm.isLive}
-                      onChange={() => setConfigForm(prev => ({ ...prev, isLive: true }))}
+                      onChange={() => setConfigForm((prev: any) => ({ ...prev, isLive: true }))}
                       className="mr-2"
                     />
                     <span className="text-sm">운영 (Live)</span>
@@ -329,7 +329,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="clientKey"
                   value={configForm.clientKey}
-                  onChange={(e: any) => setConfigForm(prev => ({ ...prev, clientKey: e.target.value }))}
+                  onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, clientKey: e.target.value }))}
                   placeholder="test_ck_... 또는 live_ck_..."
                   required
                 />
@@ -343,7 +343,7 @@ const TossPaymentsSettings: FC = () => {
                     id="secretKey"
                     type={showSecretKey ? 'text' : 'password'}
                     value={configForm.secretKey}
-                    onChange={(e: any) => setConfigForm(prev => ({ ...prev, secretKey: e.target.value }))}
+                    onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, secretKey: e.target.value }))}
                     placeholder="test_sk_... 또는 live_sk_..."
                     required
                   />
@@ -365,7 +365,7 @@ const TossPaymentsSettings: FC = () => {
                     id="webhookSecretKey"
                     type={showWebhookKey ? 'text' : 'password'}
                     value={configForm.webhookSecretKey}
-                    onChange={(e: any) => setConfigForm(prev => ({ ...prev, webhookSecretKey: e.target.value }))}
+                    onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, webhookSecretKey: e.target.value }))}
                     placeholder="웹훅 검증용 시크릿 키"
                   />
                   <button
@@ -384,7 +384,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="webhookUrl"
                   value={configForm.webhookUrl}
-                  onChange={(e: any) => setConfigForm(prev => ({ ...prev, webhookUrl: e.target.value }))}
+                  onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, webhookUrl: e.target.value }))}
                   placeholder="https://yourdomain.com/api/webhooks/toss"
                   required
                 />
@@ -395,7 +395,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="returnUrl"
                   value={configForm.returnUrl}
-                  onChange={(e: any) => setConfigForm(prev => ({ ...prev, returnUrl: e.target.value }))}
+                  onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, returnUrl: e.target.value }))}
                   placeholder="https://yourdomain.com/payment/success"
                   required
                 />
@@ -406,7 +406,7 @@ const TossPaymentsSettings: FC = () => {
                 <Input
                   id="failUrl"
                   value={configForm.failUrl}
-                  onChange={(e: any) => setConfigForm(prev => ({ ...prev, failUrl: e.target.value }))}
+                  onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, failUrl: e.target.value }))}
                   placeholder="https://yourdomain.com/payment/fail"
                   required
                 />
@@ -418,7 +418,7 @@ const TossPaymentsSettings: FC = () => {
                   type="checkbox"
                   id="isEnabled"
                   checked={configForm.isEnabled}
-                  onChange={(e: any) => setConfigForm(prev => ({ ...prev, isEnabled: e.target.checked }))}
+                  onChange={(e: any) => setConfigForm((prev: any) => ({ ...prev, isEnabled: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="isEnabled">토스페이먼츠 활성화</Label>

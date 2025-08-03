@@ -20,7 +20,7 @@ interface AdminSidebarProps {
 const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation()
   const { user } = useAuth()
-  const [expandedItems, setExpandedItems] = useState([])
+  const [expandedItems, setExpandedItems] = useState<any[]>([])
   const [isCollapsed, setIsCollapsed] = useState(false)
   
   // 동적 메뉴 가져오기 (활성화된 앱 기반)
@@ -51,9 +51,9 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   // console.log('[AdminSidebar] Menu Loading:', menuLoading);
 
   const toggleExpanded = (itemId: string) => {
-    setExpandedItems(prev => 
+    setExpandedItems((prev: any) => 
       prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id: any) => id !== itemId)
         : [...prev, itemId]
     )
   }
@@ -61,7 +61,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const isActive = (path: string) => location.pathname === path
 
   const isParentActive = (children: MenuItem[] | undefined) => 
-    children?.some(child => child.path && isActive(child.path)) || false
+    children?.some((child: any) => child.path && isActive(child.path)) || false
 
   const handleMenuItemClick = (item: MenuItem) => {
     if (item.id === 'collapse') {
@@ -118,7 +118,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
           
           {isExpanded && item.children && !isCollapsed && (
             <div className="ml-6 mt-1 space-y-1">
-              {item.children.map(child => (
+              {item.children.map((child: any) => (
                 <Link
                   key={child.id}
                   to={child.path!}

@@ -38,7 +38,7 @@ export function ReviewForm({
   isSubmitting,
   className
 }: ReviewFormProps) {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<any[]>([]);
   const [imageUrls, setImageUrls] = useState(review?.images || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,7 +62,7 @@ export function ReviewForm({
 
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file: any) => {
       const isImage = file.type.startsWith('image/');
       const isUnder5MB = file.size <= 5 * 1024 * 1024;
       return isImage && isUnder5MB;
@@ -76,10 +76,10 @@ export function ReviewForm({
     setImages([...images, ...validFiles]);
 
     // Create preview URLs
-    validFiles.forEach(file => {
+    validFiles.forEach((file: any) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageUrls(prev => [...prev, reader.result as string]);
+        setImageUrls((prev: any) => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     });

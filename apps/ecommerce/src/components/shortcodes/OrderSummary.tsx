@@ -24,8 +24,8 @@ export const OrderSummary: FC<ShortcodeProps> = ({ attributes }) => {
     return null;
   }
 
-  const { summary } = cart;
-  const itemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+  const { summary } = cart as any;
+  const itemCount = cart.items.reduce((total: any, item: any) => total + item.quantity, 0);
   
   // 주문 요약 항목들
   const summaryItems = [

@@ -548,7 +548,7 @@ export class ForumService {
       take: limit
     });
 
-    return tags.map(tag => ({
+    return tags.map((tag: any) => ({
       name: tag.name,
       count: tag.usageCount
     }));
@@ -561,7 +561,7 @@ export class ForumService {
       take: limit
     });
 
-    return categories.map(cat => ({
+    return categories.map((cat: any) => ({
       name: cat.name,
       postCount: cat.postCount
     }));

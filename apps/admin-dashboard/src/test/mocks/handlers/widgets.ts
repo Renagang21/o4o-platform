@@ -484,7 +484,7 @@ export const widgetHandlers = [
 
   // Get single widget
   http.get('/api/v1/widgets/:id', ({ params }: any) => {
-    const widget = widgets.find(w => w.id === params.id)
+    const widget = widgets.find((w: any) => w.id === params.id)
     if (!widget) {
       return HttpResponse.json({ error: 'Widget not found' }, { status: 404 })
     }
@@ -512,7 +512,7 @@ export const widgetHandlers = [
         ...data.settings
       },
       position: data.position,
-      order: widgets.filter(w => w.position === data.position).length + 1,
+      order: widgets.filter((w: any) => w.position === data.position).length + 1,
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -565,7 +565,7 @@ export const widgetHandlers = [
     const data = await request.json() as { widgetId: string; newOrder: number; newPosition?: WidgetPosition }
     const { widgetId, newOrder, newPosition } = data
     
-    const widget = widgets.find(w => w.id === widgetId)
+    const widget = widgets.find((w: any) => w.id === widgetId)
     if (!widget) {
       return HttpResponse.json({ error: 'Widget not found' }, { status: 404 })
     }
@@ -578,7 +578,7 @@ export const widgetHandlers = [
     widget.updatedAt = new Date()
 
     // Reorder other widgets in the same position
-    const samePositionWidgets = widgets.filter(w => 
+    const samePositionWidgets = widgets.filter((w: any) => 
       w.position === widget.position && w.id !== widgetId
     )
     samePositionWidgets.forEach((w, index) => {
@@ -598,19 +598,19 @@ export const widgetHandlers = [
     let filteredTemplates = [...mockWidgetTemplates]
 
     if (category && category !== 'all') {
-      filteredTemplates = filteredTemplates.filter(t => t.category === category)
+      filteredTemplates = filteredTemplates.filter((t: any) => t.category === category)
     }
 
     if (search) {
       const searchLower = search.toLowerCase()
-      filteredTemplates = filteredTemplates.filter(t =>
+      filteredTemplates = filteredTemplates.filter((t: any) =>
         t.name.toLowerCase().includes(searchLower) ||
         t.description.toLowerCase().includes(searchLower)
       )
     }
 
     if (premium) {
-      filteredTemplates = filteredTemplates.filter(t => t.isPremium)
+      filteredTemplates = filteredTemplates.filter((t: any) => t.isPremium)
     }
 
     return HttpResponse.json({
@@ -623,7 +623,7 @@ export const widgetHandlers = [
   http.post('/api/v1/widget-templates/:id/apply', async ({ params, request }: any) => {
     const data = await request.json() as { targetArea: WidgetPosition; replaceExisting: boolean }
     const { targetArea, replaceExisting } = data
-    const template = mockWidgetTemplates.find(t => t.id === params.id)
+    const template = mockWidgetTemplates.find((t: any) => t.id === params.id)
 
     if (!template) {
       return HttpResponse.json({ error: 'Template not found' }, { status: 404 })
@@ -635,7 +635,7 @@ export const widgetHandlers = [
 
     // Remove existing widgets in target area if replaceExisting is true
     if (replaceExisting) {
-      widgets = widgets.filter(w => w.position !== targetArea)
+      widgets = widgets.filter((w: any) => w.position !== targetArea)
     }
 
     // Create new widgets from template
@@ -643,7 +643,7 @@ export const widgetHandlers = [
       const baseWidget: Omit<Widget, 'id' | 'createdAt' | 'updatedAt'> = {
         ...templateWidget,
         position: targetArea,
-        order: widgets.filter(w => w.position === targetArea).length + index + 1
+        order: widgets.filter((w: any) => w.position === targetArea).length + index + 1
       }
       
       return {

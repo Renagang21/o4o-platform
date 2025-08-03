@@ -443,7 +443,7 @@ export const tossPaymentsHandlers = [
     // Search filter
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredRefunds = filteredRefunds.filter(refund =>
+      filteredRefunds = filteredRefunds.filter((refund: any) =>
         refund.orderNumber.toLowerCase().includes(searchLower) ||
         refund.customerName.toLowerCase().includes(searchLower) ||
         refund.customerEmail.toLowerCase().includes(searchLower)
@@ -452,7 +452,7 @@ export const tossPaymentsHandlers = [
 
     // Status filter
     if (status && status !== 'all') {
-      filteredRefunds = filteredRefunds.filter(refund => refund.status === status);
+      filteredRefunds = filteredRefunds.filter((refund: any) => refund.status === status);
     }
 
     // Sort by request date (newest first)
@@ -477,7 +477,7 @@ export const tossPaymentsHandlers = [
 
   // Get refund statistics
   http.get(`${API_BASE}/v1/payments/refunds/stats`, () => {
-    const stats = mockRefunds.reduce((acc, refund) => {
+    const stats = mockRefunds.reduce((acc: any, refund: any) => {
       acc[refund.status] = (acc[refund.status] || 0) + 1;
       if (refund.status === 'completed') {
         acc.totalAmount = (acc.totalAmount || 0) + (refund.approvedAmount || refund.requestedAmount);

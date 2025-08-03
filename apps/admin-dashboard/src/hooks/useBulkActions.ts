@@ -26,13 +26,13 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
   // Check if all items are selected
   const isAllSelected = useMemo(() => {
     if (items.length === 0) return false;
-    return items.every(item => selectedIds.has(String(item[idField])));
+    return items.every((item: any) => selectedIds.has(String(item[idField])));
   }, [items, selectedIds, idField]);
 
   // Check if some items are selected (for indeterminate state)
   const isSomeSelected = useMemo(() => {
     if (items.length === 0) return false;
-    return items.some(item => selectedIds.has(String(item[idField]))) && !isAllSelected;
+    return items.some((item: any) => selectedIds.has(String(item[idField]))) && !isAllSelected;
   }, [items, selectedIds, idField, isAllSelected]);
 
   // Toggle all items selection
@@ -40,14 +40,14 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
     if (isAllSelected) {
       setSelectedIds(new Set());
     } else {
-      const allIds = new Set(items.map(item => String(item[idField])));
+      const allIds = new Set(items.map((item: any) => String(item[idField])));
       setSelectedIds(allIds);
     }
   }, [items, idField, isAllSelected]);
 
   // Toggle single item selection
   const toggleItem = useCallback((itemId: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev: any) => {
       const newSet = new Set(prev);
       if (newSet.has(itemId)) {
         newSet.delete(itemId);
@@ -65,7 +65,7 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
 
   // Execute bulk action
   const executeBulkAction = useCallback(async (actionValue: string) => {
-    const action = actions.find(a => a.value === actionValue);
+    const action = actions.find((a: any) => a.value === actionValue);
     if (!action) {
       error('Invalid action selected');
       return;
@@ -89,7 +89,7 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
       await action.action(Array.from(selectedIds));
       success(`${action.label} applied to ${selectedIds.size} item(s)`);
       clearSelection();
-    } catch (err) {
+    } catch (err: any) {
       error(`Failed to apply ${action.label}: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);

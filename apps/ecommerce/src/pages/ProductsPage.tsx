@@ -221,7 +221,7 @@ export function ProductsPage() {
       let filtered = [...mockProducts];
       
       if (search) {
-        filtered = filtered.filter(p => 
+        filtered = filtered.filter((p: any) => 
           p.name.toLowerCase().includes(search.toLowerCase()) ||
           p.description?.toLowerCase().includes(search.toLowerCase())
         );
@@ -235,16 +235,16 @@ export function ProductsPage() {
         };
         const categoryId = categoryMap[category];
         if (categoryId) {
-          filtered = filtered.filter(p => p.categories.includes(categoryId));
+          filtered = filtered.filter((p: any) => p.categories.includes(categoryId));
         }
       }
       
       if (minPrice) {
-        filtered = filtered.filter(p => p.pricing.customer >= Number(minPrice));
+        filtered = filtered.filter((p: any) => p.pricing.customer >= Number(minPrice));
       }
       
       if (maxPrice) {
-        filtered = filtered.filter(p => p.pricing.customer <= Number(maxPrice));
+        filtered = filtered.filter((p: any) => p.pricing.customer <= Number(maxPrice));
       }
       
       // Sort
@@ -327,7 +327,7 @@ export function ProductsPage() {
                   value={category}
                   onChange={(e: any) => setCategory(e.target.value)}
                 >
-                  {categories.map(cat => (
+                  {categories.map((cat: any) => (
                     <option key={cat.value} value={cat.value}>
                       {cat.label}
                     </option>
@@ -373,7 +373,7 @@ export function ProductsPage() {
               onChange={(e: any) => setSortBy(e.target.value)}
               className="w-40"
             >
-              {sortOptions.map(option => (
+              {sortOptions.map((option: any) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

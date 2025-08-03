@@ -388,7 +388,7 @@ const FeeManagement: FC = () => {
                 <div className="flex justify-between">
                   <span className="text-sm text-modern-text-secondary">활성 정책</span>
                   <span className="font-medium">
-                    {policies.filter(p => p.isActive).length}개
+                    {policies.filter((p: any) => p.isActive).length}개
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -398,7 +398,7 @@ const FeeManagement: FC = () => {
                 <div className="flex justify-between">
                   <span className="text-sm text-modern-text-secondary">기본 수수료율</span>
                   <span className="font-medium">
-                    {policies.find(p => p.type === 'platform' && p.isActive)?.baseRate || 0}%
+                    {policies.find((p: any) => p.type === 'platform' && p.isActive)?.baseRate || 0}%
                   </span>
                 </div>
               </div>
@@ -424,7 +424,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="name"
                   value={policyForm.name}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, name: e.target.value }))}
                   placeholder="정책명을 입력하세요"
                   required
                 />
@@ -435,7 +435,7 @@ const FeeManagement: FC = () => {
                 <select
                   id="type"
                   value={policyForm.type}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, type: e.target.value as any }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, type: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
@@ -455,7 +455,7 @@ const FeeManagement: FC = () => {
                   min="0"
                   max="100"
                   value={policyForm.baseRate}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
                   required
                 />
               </div>
@@ -468,7 +468,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.minFee}
-                    onChange={(e: any) => setPolicyForm(prev => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
                 <div>
@@ -478,7 +478,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.maxFee}
-                    onChange={(e: any) => setPolicyForm(prev => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="description"
                   value={policyForm.description}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, description: e.target.value }))}
                   placeholder="정책 설명을 입력하세요"
                 />
               </div>
@@ -498,7 +498,7 @@ const FeeManagement: FC = () => {
                   type="checkbox"
                   id="isActive"
                   checked={policyForm.isActive}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, isActive: e.target.checked }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, isActive: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="isActive">정책 활성화</Label>
@@ -534,7 +534,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="editName"
                   value={policyForm.name}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, name: e.target.value }))}
                   placeholder="정책명을 입력하세요"
                   required
                 />
@@ -549,7 +549,7 @@ const FeeManagement: FC = () => {
                   min="0"
                   max="100"
                   value={policyForm.baseRate}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, baseRate: parseFloat(e.target.value) || 0 }))}
                   required
                 />
               </div>
@@ -562,7 +562,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.minFee}
-                    onChange={(e: any) => setPolicyForm(prev => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, minFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
                 <div>
@@ -572,7 +572,7 @@ const FeeManagement: FC = () => {
                     type="number"
                     min="0"
                     value={policyForm.maxFee}
-                    onChange={(e: any) => setPolicyForm(prev => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
+                    onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, maxFee: parseInt(e.target.value) || 0 }))}
                   />
                 </div>
               </div>
@@ -582,7 +582,7 @@ const FeeManagement: FC = () => {
                 <Input
                   id="editDescription"
                   value={policyForm.description}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, description: e.target.value }))}
                   placeholder="정책 설명을 입력하세요"
                 />
               </div>
@@ -592,7 +592,7 @@ const FeeManagement: FC = () => {
                   type="checkbox"
                   id="editIsActive"
                   checked={policyForm.isActive}
-                  onChange={(e: any) => setPolicyForm(prev => ({ ...prev, isActive: e.target.checked }))}
+                  onChange={(e: any) => setPolicyForm((prev: any) => ({ ...prev, isActive: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="editIsActive">정책 활성화</Label>

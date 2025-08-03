@@ -79,7 +79,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
       error: null,
 
       // Actions
-      fetchOrders: async (newFilters) => {
+      fetchOrders: async (newFilters: any) => {
         set({ isLoading: true, error: null });
         
         try {
@@ -96,7 +96,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           }
           
           if (mergedFilters.paymentStatus) {
-            filteredOrders = filteredOrders.filter(order => 
+            filteredOrders = filteredOrders.filter((order: any) => 
               order.paymentStatus === mergedFilters.paymentStatus
             );
           }
@@ -106,25 +106,25 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           }
           
           if (mergedFilters.dateFrom) {
-            filteredOrders = filteredOrders.filter(order =>
+            filteredOrders = filteredOrders.filter((order: any) =>
               order.orderDate >= mergedFilters.dateFrom
             );
           }
           
           if (mergedFilters.dateTo) {
-            filteredOrders = filteredOrders.filter(order =>
+            filteredOrders = filteredOrders.filter((order: any) =>
               order.orderDate <= mergedFilters.dateTo
             );
           }
           
           if (mergedFilters.minAmount > 0) {
-            filteredOrders = filteredOrders.filter(order =>
+            filteredOrders = filteredOrders.filter((order: any) =>
               order.totalAmount >= mergedFilters.minAmount
             );
           }
           
           if (mergedFilters.maxAmount > 0) {
-            filteredOrders = filteredOrders.filter(order =>
+            filteredOrders = filteredOrders.filter((order: any) =>
               order.totalAmount <= mergedFilters.maxAmount
             );
           }
@@ -151,7 +151,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -176,7 +176,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '사용자 주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -201,7 +201,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             },
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '공급자 주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -215,7 +215,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
         try {
           await new Promise(resolve => setTimeout(resolve, 300));
           
-          const order = mockOrders.find(o => o.id === id);
+          const order = mockOrders.find((o: any) => o.id === id);
           if (!order) {
             throw new Error('주문을 찾을 수 없습니다.');
           }
@@ -224,7 +224,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             currentOrder: order,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '주문을 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -244,7 +244,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: userCartItems,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '장바구니를 불러오는 중 오류가 발생했습니다.',
             isLoading: false,
@@ -263,19 +263,19 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           
           await new Promise(resolve => setTimeout(resolve, 300));
           
-          const product = mockProducts.find(p => p.id === productId);
+          const product = mockProducts.find((p: any) => p.id === productId);
           if (!product) {
             throw new Error('상품을 찾을 수 없습니다.');
           }
           
           const { cartItems } = get();
-          const existingItem = cartItems.find(item => item.productId === productId);
+          const existingItem = cartItems.find((item: any) => item.productId === productId);
           
           let updatedCartItems: CartItem[];
           
           if (existingItem) {
             // 기존 아이템 수량 업데이트
-            updatedCartItems = cartItems.map(item =>
+            updatedCartItems = cartItems.map((item: any) =>
               item.productId === productId
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
@@ -307,7 +307,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: updatedCartItems,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '장바구니 추가 중 오류가 발생했습니다.',
             isLoading: false,
@@ -322,7 +322,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           await new Promise(resolve => setTimeout(resolve, 200));
           
           const { cartItems } = get();
-          const updatedCartItems = cartItems.map(item =>
+          const updatedCartItems = cartItems.map((item: any) =>
             item.id === cartItemId
               ? { ...item, quantity }
               : item
@@ -332,7 +332,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: updatedCartItems,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '장바구니 수정 중 오류가 발생했습니다.',
             isLoading: false,
@@ -347,13 +347,13 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           await new Promise(resolve => setTimeout(resolve, 200));
           
           const { cartItems } = get();
-          const updatedCartItems = cartItems.filter(item => item.id !== cartItemId);
+          const updatedCartItems = cartItems.filter((item: any) => item.id !== cartItemId);
           
           set({
             cartItems: updatedCartItems,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '장바구니 삭제 중 오류가 발생했습니다.',
             isLoading: false,
@@ -371,7 +371,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
             cartItems: [],
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '장바구니 비우기 중 오류가 발생했습니다.',
             isLoading: false,
@@ -393,7 +393,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           const { cartItems } = get();
           const summary = get().calculateOrderSummary(cartItems);
           
-          const orderItems = cartItems.map(item => ({
+          const orderItems = cartItems.map((item: any) => ({
             id: `item_${Date.now()}_${Math.random()}`,
             productId: item.productId,
             productName: item.productName,
@@ -438,7 +438,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           });
           
           return newOrder;
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '주문 생성 중 오류가 발생했습니다.',
             isLoading: false,
@@ -473,7 +473,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           mockOrders[orderIndex] = updatedOrder;
           
           set({ isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '주문 상태 변경 중 오류가 발생했습니다.',
             isLoading: false,
@@ -505,7 +505,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           mockOrders[orderIndex] = updatedOrder;
           
           set({ isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '결제 상태 변경 중 오류가 발생했습니다.',
             isLoading: false,
@@ -531,7 +531,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
           };
           
           set({ isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
           set({
             error: error instanceof Error ? error.message : '주문 취소 중 오류가 발생했습니다.',
             isLoading: false,
@@ -546,7 +546,7 @@ export const useOrderStore = create<OrderState & OrderActions>()(
 
       calculateOrderSummary: (items: CartItem[]) => {
         const user = useAuthStore.getState().user;
-        const subtotal = items.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+        const subtotal = items.reduce((sum: any, item: any) => sum + (item.unitPrice * item.quantity), 0);
         
         // 등급별 할인 계산
         let discountRate = 0;

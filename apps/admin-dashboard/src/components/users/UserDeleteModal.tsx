@@ -31,12 +31,12 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
 
   // 관리자 사용자 체크
   const hasAdminUsers = isMultiple 
-    ? (users as User[]).some(user => user.role === 'admin')
+    ? (users as User[]).some((user: any) => user.role === 'admin')
     : (users as User).role === 'admin';
 
   // 활성 사용자 체크  
   const hasActiveUsers = isMultiple
-    ? (users as User[]).some(user => user.status === 'approved')
+    ? (users as User[]).some((user: any) => user.status === 'approved')
     : (users as User).status === 'approved';
 
   const handleBackdropClick = (e: MouseEvent) => {

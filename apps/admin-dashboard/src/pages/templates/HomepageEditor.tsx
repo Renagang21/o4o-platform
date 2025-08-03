@@ -29,7 +29,7 @@ interface Block {
 const blocksToTipTap = (blocks: Block[]): TipTapJSONContent => {
   return {
     type: 'doc',
-    content: blocks.map(block => ({
+    content: blocks.map((block: any) => ({
       type: 'custom-block',
       attrs: {
         id: block.id,
@@ -47,8 +47,8 @@ const tipTapToBlocks = (content: TipTapJSONContent): Block[] => {
   }
   
   return content.content
-    .filter(node => node.type === 'custom-block' && node.attrs)
-    .map(node => ({
+    .filter((node: any) => node.type === 'custom-block' && node.attrs)
+    .map((node: any) => ({
       id: node.attrs?.id as string || `block-${Date.now()}-${Math.random()}`,
       type: node.attrs?.blockType as string || 'paragraph',
       content: node.attrs?.content || {},
@@ -69,7 +69,7 @@ const blockTypes = [
 const HomepageEditor: FC = () => {
   const navigate = useNavigate();
   const [template, setTemplate] = useState<Template | null>(null);
-  const [blocks, setBlocks] = useState([]);
+  const [blocks, setBlocks] = useState<any[]>([]);
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -161,13 +161,13 @@ const HomepageEditor: FC = () => {
   };
 
   const updateBlock = (blockId: string, updates: Partial<Block>) => {
-    setBlocks(blocks.map(block => 
+    setBlocks(blocks.map((block: any) => 
       block.id === blockId ? { ...block, ...updates } : block
     ));
   };
 
   const deleteBlock = (blockId: string) => {
-    setBlocks(blocks.filter(block => block.id !== blockId));
+    setBlocks(blocks.filter((block: any) => block.id !== blockId));
     setSelectedBlock(null);
   };
 
@@ -263,7 +263,7 @@ const HomepageEditor: FC = () => {
           <div className="p-4 border-t">
             <h3 className="font-semibold mb-4">Block Settings</h3>
             <BlockEditor
-              block={blocks.find(b => b.id === selectedBlock)!}
+              block={blocks.find((b: any) => b.id === selectedBlock)!}
               onUpdate={(updates) => updateBlock(selectedBlock, updates)}
             />
           </div>
@@ -483,7 +483,7 @@ const BlockEditor: FC<{
               onChange={(e: any) => updateContent('level', parseInt(e.target.value))}
               className="w-full px-3 py-2 border rounded-lg"
             >
-              {[1, 2, 3, 4, 5, 6].map(level => (
+              {[1, 2, 3, 4, 5, 6].map((level: any) => (
                 <option key={level} value={level}>H{level}</option>
               ))}
             </select>

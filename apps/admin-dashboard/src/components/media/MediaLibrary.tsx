@@ -87,7 +87,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
   onClose
 }) => {
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
@@ -104,7 +104,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
       name: 'product-image-1.jpg',
       url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
       thumbnailUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200',
-      type: 'image',
+      type: 'image' as const,
       mimeType: 'image/jpeg',
       size: 1024000,
       dimensions: { width: 1920, height: 1080 },
@@ -152,7 +152,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
     
     // Simulate upload progress
     const interval = setInterval(() => {
-      setUploadProgress(prev => {
+      setUploadProgress((prev: any) => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsUploading(false);
@@ -172,7 +172,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
             folderId: currentFolder || undefined
           }));
           
-          setMediaItems(prev => [...newItems, ...prev]);
+          setMediaItems((prev: any) => [...newItems, ...prev]);
           return 100;
         }
         return prev + 10;
@@ -187,10 +187,10 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
   });
 
   // Filter items based on search and filters
-  const filteredItems = mediaItems.filter(item => {
+  const filteredItems = mediaItems.filter((item: any) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          item.alt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                         item.tags?.some((tag: any) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesType = filterType === 'all' || item.type === filterType;
     const matchesFolder = !currentFolder || item.folderId === currentFolder;
     
@@ -201,9 +201,9 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
   const handleItemClick = (itemId: string) => {
     if (mode === 'picker') {
       if (multiple) {
-        setSelectedItems(prev => 
+        setSelectedItems((prev: any) => 
           prev.includes(itemId) 
-            ? prev.filter(id => id !== itemId)
+            ? prev.filter((id: any) => id !== itemId)
             : [...prev, itemId]
         );
       } else {
@@ -214,7 +214,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
 
   // Handle selection confirmation
   const handleSelectConfirm = () => {
-    const selected = mediaItems.filter(item => selectedItems.includes(item.id));
+    const selected = mediaItems.filter((item: any) => selectedItems.includes(item.id));
     onSelect?.(selected);
     onClose?.();
   };
@@ -345,7 +345,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
               <span className="ml-auto text-xs text-gray-500">{mediaItems.length}</span>
             </button>
             
-            {folders.map(folder => (
+            {folders.map((folder: any) => (
               <button
                 key={folder.id}
                 onClick={() => setCurrentFolder(folder.id)}
@@ -393,7 +393,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
           <ScrollArea className="h-full">
             {view === 'grid' ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                {filteredItems.map(item => {
+                {filteredItems.map((item: any) => {
                   const Icon = getFileIcon(item.type);
                   const isSelected = selectedItems.includes(item.id);
                   
@@ -471,7 +471,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredItems.map(item => {
+                {filteredItems.map((item: any) => {
                   const Icon = getFileIcon(item.type);
                   const isSelected = selectedItems.includes(item.id);
                   

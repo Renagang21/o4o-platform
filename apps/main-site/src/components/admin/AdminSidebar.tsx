@@ -113,9 +113,9 @@ const AdminSidebar: FC = () => {
   const [expandedItems, setExpandedItems] = useState(['content', 'data-structure']);
 
   const toggleExpanded = (itemId: string) => {
-    setExpandedItems(prev => 
+    setExpandedItems((prev: any) => 
       prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id: any) => id !== itemId)
         : [...prev, itemId]
     );
   };
@@ -125,7 +125,7 @@ const AdminSidebar: FC = () => {
   };
 
   const isParentActive = (children: MenuItem[]) => {
-    return children.some(child => child.path && isActive(child.path));
+    return children.some((child: any) => child.path && isActive(child.path));
   };
 
   const renderMenuItem = (item: MenuItem, level = 0) => {
@@ -178,7 +178,7 @@ const AdminSidebar: FC = () => {
 
         {hasChildren && isExpanded && (
           <div className="mt-1 space-y-1">
-            {item.children!.map(child => renderMenuItem(child, level + 1))}
+            {item.children!.map((child: any) => renderMenuItem(child, level + 1))}
           </div>
         )}
       </div>
@@ -200,7 +200,7 @@ const AdminSidebar: FC = () => {
       {/* 메뉴 영역 */}
       <nav className="mt-4 px-3">
         <div className="space-y-1">
-          {menuItems.map(item => renderMenuItem(item))}
+          {menuItems.map((item: any) => renderMenuItem(item))}
         </div>
       </nav>
 

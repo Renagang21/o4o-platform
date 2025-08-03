@@ -71,12 +71,12 @@ export const wordpressRoutes: WordPressRoute[] = [
 
 // Helper functions
 export function getReactPath(wpPath: string): string | null {
-  const route = wordpressRoutes.find(r => r.wpPath === wpPath);
+  const route = wordpressRoutes.find((r: any) => r.wpPath === wpPath);
   return route ? route.reactPath : null;
 }
 
 export function getWordPressPath(reactPath: string): string | null {
-  const route = wordpressRoutes.find(r => r.reactPath === reactPath);
+  const route = wordpressRoutes.find((r: any) => r.reactPath === reactPath);
   return route ? route.wpPath : null;
 }
 

@@ -262,7 +262,7 @@ router.get('/products', async (req, res) => {
       .getManyAndCount();
 
     // Transform products to match frontend expectations
-    const transformedProducts = products.map(product => ({
+    const transformedProducts = products.map((product: any) => ({
       id: product.id,
       name: product.name,
       slug: product.slug,
@@ -443,7 +443,7 @@ router.get('/featured-products', async (req, res) => {
     });
 
     // Transform products to match frontend expectations
-    const transformedProducts = products.map(product => ({
+    const transformedProducts = products.map((product: any) => ({
       id: product.id,
       name: product.name,
       slug: product.slug,

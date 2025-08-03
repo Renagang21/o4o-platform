@@ -20,9 +20,9 @@ import toast from 'react-hot-toast'
 const Tags: FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [tags, setTags] = useState([])
-  const [filteredTags, setFilteredTags] = useState([])
-  const [selectedTags, setSelectedTags] = useState([])
+  const [tags, setTags] = useState<any[]>([])
+  const [filteredTags, setFilteredTags] = useState<any[]>([])
+  const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [showMergeModal, setShowMergeModal] = useState(false)
@@ -77,7 +77,7 @@ const Tags: FC = () => {
     // Search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(tag => 
+      filtered = filtered.filter((tag: any) => 
         tag.name.toLowerCase().includes(term) ||
         tag.description?.toLowerCase().includes(term) ||
         tag.slug.toLowerCase().includes(term)
@@ -163,7 +163,7 @@ const Tags: FC = () => {
   }
 
   const handleDelete = async (tagId: string) => {
-    const tag = tags.find(t => t.id === tagId)
+    const tag = tags.find((t: any) => t.id === tagId)
     
     if (tag?.postCount && tag.postCount > 0) {
       if (!confirm(`이 태그는 ${tag.postCount}개의 게시물에서 사용 중입니다. 정말 삭제하시겠습니까?`)) {
@@ -208,9 +208,9 @@ const Tags: FC = () => {
   }
 
   const handleSelectTag = (tagId: string) => {
-    setSelectedTags(prev => 
+    setSelectedTags((prev: any) => 
       prev.includes(tagId) 
-        ? prev.filter(id => id !== tagId)
+        ? prev.filter((id: any) => id !== tagId)
         : [...prev, tagId]
     )
   }
@@ -219,7 +219,7 @@ const Tags: FC = () => {
     if (selectedTags.length === filteredTags.length) {
       setSelectedTags([])
     } else {
-      setSelectedTags(filteredTags.map(tag => tag.id))
+      setSelectedTags(filteredTags.map((tag: any) => tag.id))
     }
   }
 
@@ -230,8 +230,8 @@ const Tags: FC = () => {
     }
 
     const tagsWithPosts = selectedTags
-      .map(id => tags.find(t => t.id === id))
-      .filter(tag => tag && tag.postCount > 0)
+      .map((id: any) => tags.find((t: any) => t.id === id))
+      .filter((tag: any) => tag && tag.postCount > 0)
 
     if (tagsWithPosts.length > 0) {
       const totalPosts = tagsWithPosts.reduce((sum: any, tag: any) => sum + (tag?.postCount || 0), 0)
@@ -241,7 +241,7 @@ const Tags: FC = () => {
     }
 
     try {
-      await Promise.all(selectedTags.map(id => ContentApi.deleteTag(id)))
+      await Promise.all(selectedTags.map((id: any) => ContentApi.deleteTag(id)))
       toast.success(`${selectedTags.length}개 태그가 삭제되었습니다.`)
       setSelectedTags([])
       loadTags()
@@ -282,7 +282,7 @@ const Tags: FC = () => {
   }
 
   const updateFormData = (key: keyof Tag, value: string | number | boolean) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [key]: value
     }))
@@ -411,7 +411,7 @@ const Tags: FC = () => {
               </select>
 
               <button
-                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                onClick={() => setSortOrder((prev: any) => prev === 'asc' ? 'desc' : 'asc')}
                 className="wp-button-secondary"
                 title={sortOrder === 'asc' ? '오름차순' : '내림차순'}
               >
@@ -773,15 +773,15 @@ const Tags: FC = () => {
                   <select
                     value={mergeToTag?.id || ''}
                     onChange={(e: any) => {
-                      const selectedTag = tags.find(t => t.id === e.target.value)
+                      const selectedTag = tags.find((t: any) => t.id === e.target.value)
                       setMergeToTag(selectedTag || null)
                     }}
                     className="wp-select"
                   >
                     <option value="">태그를 선택하세요</option>
                     {tags
-                      .filter(tag => tag.id !== mergeFromTag?.id)
-                      .map(tag => (
+                      .filter((tag: any) => tag.id !== mergeFromTag?.id)
+                      .map((tag: any) => (
                         <option key={tag.id} value={tag.id}>
                           {tag.name} ({tag.postCount}개 게시물)
                         </option>

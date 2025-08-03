@@ -70,7 +70,7 @@ const TheDANGStyleEditorPage: FC = () => {
       
       // For now, just show a success message
       alert('Content saved successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving content:', error);
       alert('Error saving content. Please try again.');
     }

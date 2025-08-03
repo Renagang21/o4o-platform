@@ -41,7 +41,7 @@ const SSOLoginForm: FC = () => {
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [e.target.name]: e.target.value
     }));

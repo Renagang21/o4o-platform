@@ -133,7 +133,7 @@ const UserFilters: FC<UserFiltersProps> = ({
         </div>
 
         {/* 활성 필터 표시 */}
-        {Object.values(filters).some(v => v && v !== 'all') && (
+        {Object.values(filters).some((v: any) => v && v !== 'all') && (
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="text-sm text-gray-600">활성 필터:</span>
             

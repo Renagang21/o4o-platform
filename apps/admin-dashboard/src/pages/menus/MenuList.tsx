@@ -111,7 +111,7 @@ const MenuList: FC = () => {
         </div>
       ) : menus.length > 0 ? (
         <div className="space-y-8">
-          {(['primary', 'footer', 'sidebar', 'mobile'] as MenuLocation[]).map(location => {
+          {(['primary', 'footer', 'sidebar', 'mobile'] as MenuLocation[]).map((location: any) => {
             const locationMenus = menusByLocation[location] || []
             if (locationMenus.length === 0) return null
 

@@ -9,11 +9,11 @@ import BulkActions from './components/BulkActions'
 import toast from 'react-hot-toast'
 
 const AllUsers: FC = () => {
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<UserStats | null>(null)
-  const [selectedUsers, setSelectedUsers] = useState([])
-  const [filters, setFilters] = useState({})
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([])
+  const [filters, setFilters] = useState<Record<string, any>>({})
   const [pagination, setPagination] = useState({
     current: 1,
     total: 1,
@@ -55,15 +55,15 @@ const AllUsers: FC = () => {
   }, [])
 
   const handleSelectUser = (userId: string) => {
-    setSelectedUsers(prev => 
+    setSelectedUsers((prev: any) => 
       prev.includes(userId)
-        ? prev.filter(id => id !== userId)
+        ? prev.filter((id: any) => id !== userId)
         : [...prev, userId]
     )
   }
 
   const handleSelectAll = (selected: boolean) => {
-    setSelectedUsers(selected ? users.map(u => u.id) : [])
+    setSelectedUsers(selected ? users.map((u: any) => u.id) : [])
   }
 
   const handleBulkAction = async (action: UserBulkAction) => {

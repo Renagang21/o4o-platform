@@ -15,8 +15,8 @@ const TestBannerGrid: FC<TestBannerGridProps> = ({
   title = '테스트 기능 바로가기',
   description = '각 기능을 클릭하여 테스트를 시작하세요'
 }) => {
-  const featureBanners = banners.filter(b => b.category === 'feature');
-  const utilityBanners = banners.filter(b => b.category === 'utility');
+  const featureBanners = banners.filter((b: any) => b.category === 'feature');
+  const utilityBanners = banners.filter((b: any) => b.category === 'utility');
 
   return (
     <section className="py-16 bg-[#ecf0f3]">

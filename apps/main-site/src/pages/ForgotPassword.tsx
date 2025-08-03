@@ -37,14 +37,14 @@ const ForgotPassword: FC = () => {
           const errorData = await response.json();
           throw new Error(errorData.message || '비밀번호 재설정 요청에 실패했습니다.');
         }
-      } catch (apiError) {
+      } catch (apiError: any) {
         // console.log('API 서버 연결 실패, 모의 서비스 사용');
         await mockAuthService.forgotPassword(email);
       }
 
       setSuccess(true);
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Password reset error:', error);
       setError(error instanceof Error ? error.message : '비밀번호 재설정 요청에 실패했습니다. 다시 시도해주세요.');
       setLoading(false);

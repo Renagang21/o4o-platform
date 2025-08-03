@@ -44,7 +44,7 @@ const PageViewer: FC = () => {
           metaDesc.setAttribute('content', content.seo.metaDescription);
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('페이지 로드 오류:', err);
       setError('페이지를 불러오는 중 오류가 발생했습니다.');
     } finally {

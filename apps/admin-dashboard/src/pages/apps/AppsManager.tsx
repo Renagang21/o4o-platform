@@ -170,12 +170,12 @@ const AppsManager: FC = () => {
   const handleToggleApp = (app: PlatformApp) => {
     // Check dependencies before deactivating
     if (app.status === 'active' && app.dependents.length > 0) {
-      const activeDependents = apps.filter(a => 
+      const activeDependents = apps.filter((a: any) => 
         app.dependents.includes(a.id) && a.status === 'active'
       );
       
       if (activeDependents.length > 0) {
-        toast.error(`다음 앱들이 이 앱에 의존하고 있습니다: ${activeDependents.map(a => a.displayName).join(', ')}`);
+        toast.error(`다음 앱들이 이 앱에 의존하고 있습니다: ${activeDependents.map((a: any) => a.displayName).join(', ')}`);
         return;
       }
     }
@@ -202,14 +202,14 @@ const AppsManager: FC = () => {
     updateSettingsMutation.mutate(settingsForm as AppSettings);
   };
 
-  const filteredApps = apps.filter(app => {
+  const filteredApps = apps.filter((app: any) => {
     if (statusFilter === 'all') return true;
     return app.status === statusFilter;
   });
 
-  const activeApps = apps.filter(app => app.status === 'active').length;
+  const activeApps = apps.filter((app: any) => app.status === 'active').length;
   const totalApps = apps.length;
-  const uptimeAvg = apps.reduce((acc, app) => acc + app.metrics.uptime, 0) / apps.length;
+  const uptimeAvg = apps.reduce((acc: any, app: any) => acc + app.metrics.uptime, 0) / apps.length;
 
   return (
     <div className="space-y-6">
@@ -381,8 +381,8 @@ const AppsManager: FC = () => {
                   <div className="pt-2 border-t">
                     <div className="text-xs text-modern-text-secondary mb-1">의존성:</div>
                     <div className="flex flex-wrap gap-1">
-                      {app.dependencies.map(depId => {
-                        const depApp = apps.find(a => a.id === depId);
+                      {app.dependencies.map((depId: any) => {
+                        const depApp = apps.find((a: any) => a.id === depId);
                         return depApp ? (
                           <Badge key={depId} variant={"outline" as const} className="text-xs">
                             {depApp.displayName}
@@ -439,7 +439,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="autoStart"
                 checked={settingsForm.autoStart || false}
-                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, autoStart: e.target.checked }))}
+                onChange={(e: any) => setSettingsForm((prev: any) => ({ ...prev, autoStart: e.target.checked }))}
               />
             </div>
 
@@ -449,7 +449,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="requiresApproval"
                 checked={settingsForm.requiresApproval || false}
-                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, requiresApproval: e.target.checked }))}
+                onChange={(e: any) => setSettingsForm((prev: any) => ({ ...prev, requiresApproval: e.target.checked }))}
               />
             </div>
 
@@ -459,7 +459,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="maintenanceMode"
                 checked={settingsForm.maintenanceMode || false}
-                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, maintenanceMode: e.target.checked }))}
+                onChange={(e: any) => setSettingsForm((prev: any) => ({ ...prev, maintenanceMode: e.target.checked }))}
               />
             </div>
 
@@ -469,7 +469,7 @@ const AppsManager: FC = () => {
                 id="maxUsers"
                 type="number"
                 value={settingsForm.maxUsers || ''}
-                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || undefined }))}
+                onChange={(e: any) => setSettingsForm((prev: any) => ({ ...prev, maxUsers: parseInt(e.target.value) || undefined }))}
                 placeholder="제한 없음"
               />
             </div>
@@ -478,8 +478,8 @@ const AppsManager: FC = () => {
               <div className="p-3 bg-modern-bg-secondary rounded-lg">
                 <div className="text-sm font-medium text-modern-text-secondary mb-2">의존성 앱</div>
                 <div className="space-y-1">
-                  {selectedApp?.dependencies?.map(depId => {
-                    const depApp = apps.find(a => a.id === depId);
+                  {selectedApp?.dependencies?.map((depId: any) => {
+                    const depApp = apps.find((a: any) => a.id === depId);
                     return depApp ? (
                       <div key={depId} className="flex items-center justify-between text-sm">
                         <span>{depApp.displayName}</span>

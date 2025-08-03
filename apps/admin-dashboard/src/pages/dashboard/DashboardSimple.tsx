@@ -175,7 +175,7 @@ const DashboardSimple: FC = () => {
       <div className="dashboard-activity-section">
         <h2 className="section-title">Recent Activity</h2>
         <div className="activity-list">
-          {recentActivity.map(item => {
+          {recentActivity.map((item: any) => {
             const Icon = item.icon;
             return (
               <div key={item.id} className="activity-item">

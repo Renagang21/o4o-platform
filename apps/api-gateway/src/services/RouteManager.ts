@@ -67,7 +67,7 @@ export class RouteManager {
   private groupRoutesByPath(routes: RouteConfig[]): Map<string, RouteConfig[]> {
     const groups = new Map<string, RouteConfig[]>();
     
-    routes.forEach(route => {
+    routes.forEach((route: any) => {
       const existing = groups.get(route.path) || [];
       existing.push(route);
       groups.set(route.path, existing);
@@ -83,10 +83,10 @@ export class RouteManager {
     const router = Router();
     
     // Apply middlewares and handlers for each method
-    routes.forEach(route => {
+    routes.forEach((route: any) => {
       const methods = route.methods || ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
       
-      methods.forEach(method => {
+      methods.forEach((method: any) => {
         const methodLower = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete' | 'patch';
         const middlewares: RequestHandler[] = [];
         
@@ -167,7 +167,7 @@ export class RouteManager {
   private getRoutesByService(): Record<string, number> {
     const counts: Record<string, number> = {};
     
-    this.routes.forEach(route => {
+    this.routes.forEach((route: any) => {
       counts[route.service] = (counts[route.service] || 0) + 1;
     });
     
@@ -215,6 +215,6 @@ export class RouteManager {
    * Get routes for a specific service
    */
   getServiceRoutes(service: string): RouteConfig[] {
-    return this.routes.filter(r => r.service === service);
+    return this.routes.filter((r: any) => r.service === service);
   }
 }

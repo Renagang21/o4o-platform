@@ -24,7 +24,7 @@ export default function CustomerCheckout() {
   const { user } = useAuthStore();
   const { createOrder, calculateOrderSummary, isLoading } = useOrderStore();
 
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const {
@@ -57,7 +57,7 @@ export default function CustomerCheckout() {
 
   // 고객용 가격 계산 (할인 없음)
   const getCustomerSummary = () => {
-    const subtotal = selectedItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+    const subtotal = selectedItems.reduce((sum: any, item: any) => sum + (item.unitPrice * item.quantity), 0);
     const shipping = subtotal >= 50000 ? 0 : 3000;
     const tax = Math.floor((subtotal + shipping) * 0.1);
     const total = subtotal + shipping + tax;
@@ -72,7 +72,7 @@ export default function CustomerCheckout() {
     
     try {
       const orderRequest: CreateOrderRequest = {
-        items: selectedItems.map(item => ({
+        items: selectedItems.map((item: any) => ({
           productId: item.productId,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -95,7 +95,7 @@ export default function CustomerCheckout() {
       navigate(`/customer/orders/${order.id}`, {
         state: { newOrder: true }
       });
-    } catch (error) {
+    } catch (error: any) {
       toast.error('주문 처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);

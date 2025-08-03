@@ -49,7 +49,7 @@ const PostListBulk: FC = () => {
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => authClient.api.delete(`/posts/${id}`)));
+      await Promise.all(ids.map((id: any) => authClient.api.delete(`/posts/${id}`)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -63,7 +63,7 @@ const PostListBulk: FC = () => {
   // Bulk status update mutation
   const bulkStatusMutation = useMutation({
     mutationFn: async ({ ids, status }: { ids: string[], status: PostStatus }) => {
-      await Promise.all(ids.map(id => 
+      await Promise.all(ids.map((id: any) => 
         authClient.api.patch(`/posts/${id}`, { status })
       ));
     },
@@ -166,7 +166,7 @@ const PostListBulk: FC = () => {
       label: 'Categories',
       render: (post: Post) => (
         <div className="text-sm text-gray-600">
-          {post.categories?.map(cat => cat.name).join(', ') || '—'}
+          {post.categories?.map((cat: any) => cat.name).join(', ') || '—'}
         </div>
       )
     },
@@ -175,7 +175,7 @@ const PostListBulk: FC = () => {
       label: 'Tags',
       render: (post: Post) => (
         <div className="text-sm text-gray-600">
-          {post.tags?.map(tag => tag.name).join(', ') || '—'}
+          {post.tags?.map((tag: any) => tag.name).join(', ') || '—'}
         </div>
       )
     },

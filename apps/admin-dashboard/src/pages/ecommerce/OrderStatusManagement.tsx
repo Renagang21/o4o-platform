@@ -460,12 +460,12 @@ const OrderStatusManagement: FC = () => {
                 <select
                   id="newStatus"
                   value={statusChangeForm.newStatus}
-                  onChange={(e: any) => setStatusChangeForm(prev => ({ ...prev, newStatus: e.target.value as OrderStatus }))}
+                  onChange={(e: any) => setStatusChangeForm((prev: any) => ({ ...prev, newStatus: e.target.value as OrderStatus }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
                   <option value="">상태를 선택하세요</option>
-                  {getNextStatuses(selectedOrder?.status || 'pending').map(status => (
+                  {getNextStatuses(selectedOrder?.status || 'pending').map((status: any) => (
                     <option key={status} value={status}>
                       {getStatusName(status)}
                     </option>
@@ -480,7 +480,7 @@ const OrderStatusManagement: FC = () => {
                     <Input
                       id="trackingNumber"
                       value={statusChangeForm.trackingNumber}
-                      onChange={(e: any) => setStatusChangeForm(prev => ({ ...prev, trackingNumber: e.target.value }))}
+                      onChange={(e: any) => setStatusChangeForm((prev: any) => ({ ...prev, trackingNumber: e.target.value }))}
                       placeholder="운송장 번호를 입력하세요"
                     />
                   </div>
@@ -490,7 +490,7 @@ const OrderStatusManagement: FC = () => {
                       id="estimatedDelivery"
                       type="date"
                       value={statusChangeForm.estimatedDelivery}
-                      onChange={(e: any) => setStatusChangeForm(prev => ({ ...prev, estimatedDelivery: e.target.value }))}
+                      onChange={(e: any) => setStatusChangeForm((prev: any) => ({ ...prev, estimatedDelivery: e.target.value }))}
                     />
                   </div>
                 </>
@@ -501,7 +501,7 @@ const OrderStatusManagement: FC = () => {
                 <Input
                   id="reason"
                   value={statusChangeForm.reason}
-                  onChange={(e: any) => setStatusChangeForm(prev => ({ ...prev, reason: e.target.value }))}
+                  onChange={(e: any) => setStatusChangeForm((prev: any) => ({ ...prev, reason: e.target.value }))}
                   placeholder="상태 변경 이유를 입력하세요"
                 />
               </div>
@@ -511,7 +511,7 @@ const OrderStatusManagement: FC = () => {
                 <Textarea
                   id="notes"
                   value={statusChangeForm.notes}
-                  onChange={(e: any) => setStatusChangeForm(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e: any) => setStatusChangeForm((prev: any) => ({ ...prev, notes: e.target.value }))}
                   placeholder="추가 메모를 입력하세요"
                   rows={3}
                 />

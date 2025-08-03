@@ -119,7 +119,7 @@ export default function UserForm() {
     if (currentRoles.includes(role)) {
       // Don't allow removing the last role
       if (currentRoles.length > 1) {
-        setValue('roles', currentRoles.filter(r => r !== role));
+        setValue('roles', currentRoles.filter((r: any) => r !== role));
       }
     } else {
       setValue('roles', [...currentRoles, role]);

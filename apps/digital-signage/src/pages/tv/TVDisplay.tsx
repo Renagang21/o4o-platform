@@ -46,7 +46,7 @@ const TVDisplay: FC = () => {
       }
     ];
 
-    const activeContent = mockContents.find(c => c.isActive);
+    const activeContent = mockContents.find((c: any) => c.isActive);
     setCurrentContent(activeContent || null);
     setLastUpdate(new Date().toLocaleTimeString());
     setLoading(false);

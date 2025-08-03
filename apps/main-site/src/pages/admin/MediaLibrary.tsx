@@ -132,7 +132,7 @@ const MediaLibrary: FC = () => {
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -142,11 +142,11 @@ const MediaLibrary: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 필터링된 파일 목록
-  const filteredFiles = files.filter(file => {
+  const filteredFiles = files.filter((file: any) => {
     const matchesFolder = selectedFolder === 'all' || file.folder === selectedFolder;
     const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          file.originalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         file.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+                         file.tags.some((tag: any) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesFolder && matchesSearch;
   });
 
@@ -184,7 +184,7 @@ const MediaLibrary: FC = () => {
         createdAt: new Date().toISOString().split('T')[0],
         fileCount: 0
       };
-      setFolders(prev => [...prev, newFolder]);
+      setFolders((prev: any) => [...prev, newFolder]);
       setNewFolderName('');
       setShowNewFolderModal(false);
     }
@@ -218,7 +218,7 @@ const MediaLibrary: FC = () => {
           uploadedBy: '현재 사용자'
         };
 
-        setFiles(prev => [...prev, newFile]);
+        setFiles((prev: any) => [...prev, newFile]);
 
         if (index === uploadedFiles.length - 1) {
           setIsUploading(false);
@@ -236,9 +236,9 @@ const MediaLibrary: FC = () => {
 
   // 파일 선택
   const handleFileSelect = (fileId: string) => {
-    setSelectedFiles(prev => 
+    setSelectedFiles((prev: any) => 
       prev.includes(fileId) 
-        ? prev.filter(id => id !== fileId)
+        ? prev.filter((id: any) => id !== fileId)
         : [...prev, fileId]
     );
   };
@@ -246,7 +246,7 @@ const MediaLibrary: FC = () => {
   // 선택된 파일 삭제
   const handleDeleteSelected = () => {
     if (confirm(`선택된 ${selectedFiles.length}개 파일을 삭제하시겠습니까?`)) {
-      setFiles(prev => prev.filter(file => !selectedFiles.includes(file.id)));
+      setFiles((prev: any) => prev.filter((file: any) => !selectedFiles.includes(file.id)));
       setSelectedFiles([]);
     }
   };
@@ -319,7 +319,7 @@ const MediaLibrary: FC = () => {
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 폴더</option>
-                {folders.map(folder => (
+                {folders.map((folder: any) => (
                   <option key={folder.id} value={folder.id}>
                     {folder.name} ({folder.fileCount})
                   </option>
@@ -451,7 +451,7 @@ const MediaLibrary: FC = () => {
                         checked={selectedFiles.length === filteredFiles.length && filteredFiles.length > 0}
                         onChange={(e: any) => {
                           if (e.target.checked) {
-                            setSelectedFiles(filteredFiles.map(f => f.id));
+                            setSelectedFiles(filteredFiles.map((f: any) => f.id));
                           } else {
                             setSelectedFiles([]);
                           }

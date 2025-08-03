@@ -59,7 +59,7 @@ const ApiConnectionTest: FC = () => {
       for (const endpoint of API_ENDPOINTS) {
         const startTime = Date.now();
         
-        setTestResults(prev => ({
+        setTestResults((prev: any) => ({
           ...prev,
           [endpoint.endpoint]: { endpoint: endpoint.endpoint, status: 'pending' }
         }));
@@ -74,7 +74,7 @@ const ApiConnectionTest: FC = () => {
           
           const responseTime = Date.now() - startTime;
           
-          setTestResults(prev => ({
+          setTestResults((prev: any) => ({
             ...prev,
             [endpoint.endpoint]: {
               endpoint: endpoint.endpoint,
@@ -86,7 +86,7 @@ const ApiConnectionTest: FC = () => {
         } catch (error: any) {
           const responseTime = Date.now() - startTime;
           
-          setTestResults(prev => ({
+          setTestResults((prev: any) => ({
             ...prev,
             [endpoint.endpoint]: {
               endpoint: endpoint.endpoint,
@@ -163,7 +163,7 @@ const ApiConnectionTest: FC = () => {
 
         {/* Test Results */}
         <div className="space-y-2">
-          {API_ENDPOINTS.map(endpoint => {
+          {API_ENDPOINTS.map((endpoint: any) => {
             const result = testResults[endpoint.endpoint];
             
             return (

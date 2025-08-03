@@ -36,13 +36,13 @@ const UIShowcase = () => {
   };
 
   const handleOptionChange = (id: string, checked: boolean) => {
-    setScreenOptions(prev =>
-      prev.map(opt => (opt.id === id ? { ...opt, checked } : opt))
+    setScreenOptions((prev: any) =>
+      prev.map((opt: any) => (opt.id === id ? { ...opt, checked } : opt))
     );
   };
 
   const visibleWidgets = widgets
-    .filter(w => screenOptions.find(opt => opt.id === w.id)?.checked)
+    .filter((w: any) => screenOptions.find((opt: any) => opt.id === w.id)?.checked)
     .sort((a, b) => a.order - b.order);
 
   const colorPalette = [
@@ -182,7 +182,7 @@ const UIShowcase = () => {
                         <div className="text-lg font-semibold">
                           <InlineEdit
                             value={inlineValues.title}
-                            onSave={(value) => setInlineValues(prev => ({ ...prev, title: value }))}
+                            onSave={(value) => setInlineValues((prev: any) => ({ ...prev, title: value }))}
                           />
                         </div>
                       </div>
@@ -192,7 +192,7 @@ const UIShowcase = () => {
                         <div>
                           <InlineEdit
                             value={inlineValues.subtitle}
-                            onSave={(value) => setInlineValues(prev => ({ ...prev, subtitle: value }))}
+                            onSave={(value) => setInlineValues((prev: any) => ({ ...prev, subtitle: value }))}
                           />
                         </div>
                       </div>
@@ -202,7 +202,7 @@ const UIShowcase = () => {
                         <div className="text-2xl font-bold text-modern-primary">
                           $<InlineEdit
                             value={inlineValues.price}
-                            onSave={(value) => setInlineValues(prev => ({ ...prev, price: value }))}
+                            onSave={(value) => setInlineValues((prev: any) => ({ ...prev, price: value }))}
                             inputClassName="w-24"
                           />
                         </div>

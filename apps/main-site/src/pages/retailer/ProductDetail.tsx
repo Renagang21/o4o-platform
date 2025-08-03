@@ -71,13 +71,13 @@ export default function ProductDetail() {
     try {
       await addToCart(currentProduct.id, quantity);
       toast.success(`${quantity}개가 장바구니에 추가되었습니다!`);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('장바구니 추가에 실패했습니다.');
     }
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = flatCategories.find(cat => cat.id === categoryId);
+    const category = flatCategories.find((cat: any) => cat.id === categoryId);
     return category?.name || '미분류';
   };
 
@@ -195,7 +195,7 @@ export default function ProductDetail() {
             {/* 카테고리 */}
             <div className="mb-4">
               <span className="text-sm text-gray-500">
-                {currentProduct.categories.map(catId => getCategoryName(catId)).join(' > ')}
+                {currentProduct.categories.map((catId: any) => getCategoryName(catId)).join(' > ')}
               </span>
             </div>
 

@@ -48,7 +48,7 @@ export const useWishlistStore = create<WishlistStore>()(
         const { items } = get();
         
         // Check if already in wishlist
-        if (items.some(item => item.productId === product.id)) {
+        if (items.some((item: any) => item.productId === product.id)) {
           return;
         }
         
@@ -73,19 +73,19 @@ export const useWishlistStore = create<WishlistStore>()(
           set({ items: updatedItems });
         } catch (error: any) {
           // Revert on error
-          set({ items: items.filter(item => item.id !== newItem.id) });
+          set({ items: items.filter((item: any) => item.id !== newItem.id) });
           throw error;
         }
       },
 
       removeFromWishlist: async (productId: string) => {
         const { items } = get();
-        const itemToRemove = items.find(item => item.productId === productId);
+        const itemToRemove = items.find((item: any) => item.productId === productId);
         
         if (!itemToRemove) return;
         
         // Optimistic update
-        set({ items: items.filter(item => item.productId !== productId) });
+        set({ items: items.filter((item: any) => item.productId !== productId) });
         
         try {
           await authClient.api.delete(`/wishlist/items/${productId}`);
@@ -112,7 +112,7 @@ export const useWishlistStore = create<WishlistStore>()(
       },
 
       isInWishlist: (productId: string) => {
-        return get().items.some(item => item.productId === productId);
+        return get().items.some((item: any) => item.productId === productId);
       },
 
       setItems: (items) => set({ items })

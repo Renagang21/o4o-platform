@@ -56,7 +56,7 @@ export default function Login() {
       }
       
       toast.success('로그인되었습니다.');
-    } catch (err) {
+    } catch (err: any) {
       toast.error('로그인에 실패했습니다.');
     }
   };

@@ -79,7 +79,7 @@ const CPTForm: FC = () => {
     taxonomies: [],
   })
 
-  const [selectedTaxonomies, setSelectedTaxonomies] = useState([])
+  const [selectedTaxonomies, setSelectedTaxonomies] = useState<any[]>([])
 
   // Fetch CPT data (edit mode)
   const { data: cpt, isLoading: isLoadingCPT } = useQuery({
@@ -241,7 +241,7 @@ const CPTForm: FC = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {iconOptions.map(option => (
+                      {iconOptions.map((option: any) => (
                         <SelectItem key={option.value} value={option.value}>
                           <span className="flex items-center gap-2">
                             <span className="text-xl">{option.value}</span>
@@ -447,7 +447,7 @@ const CPTForm: FC = () => {
                         if (checked) {
                           setSelectedTaxonomies([...selectedTaxonomies, taxonomy.id])
                         } else {
-                          setSelectedTaxonomies(selectedTaxonomies.filter(id => id !== taxonomy.id))
+                          setSelectedTaxonomies(selectedTaxonomies.filter((id: any) => id !== taxonomy.id))
                         }
                       }}
                     />

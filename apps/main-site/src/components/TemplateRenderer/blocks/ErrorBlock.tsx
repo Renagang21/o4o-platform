@@ -39,7 +39,7 @@ const ErrorBlock: FC<ErrorBlockProps> = ({ blockType, blockData, availableTypes 
                   Available Block Types ({availableTypes.length})
                 </summary>
                 <ul className="mt-2 text-sm text-red-600 list-disc list-inside">
-                  {availableTypes.sort().map(type => (
+                  {availableTypes.sort().map((type: any) => (
                     <li key={type}>{type}</li>
                   ))}
                 </ul>

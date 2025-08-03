@@ -194,7 +194,7 @@ export class CrowdfundingRepository {
 
     // 성공률 계산 (목표 달성한 프로젝트 비율)
     const allProjects = await this.projectRepository.find();
-    const successfulProjects = allProjects.filter(p => p.isSuccessful).length;
+    const successfulProjects = allProjects.filter((p: any) => p.isSuccessful).length;
     const successRate = totalProjects > 0 ? Math.round((successfulProjects / totalProjects) * 100) : 0;
 
     return {

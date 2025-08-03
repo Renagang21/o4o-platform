@@ -71,7 +71,7 @@ export class PricingService {
     for (const policy of applicablePolicies) {
       // 독점 정책이 이미 적용된 경우 다른 정책 적용 불가
       if (exclusivePolicyApplied && policy.isExclusive) continue;
-      if (appliedPolicies.some(p => p.isExclusive) && !policy.isExclusive) continue;
+      if (appliedPolicies.some((p: any) => p.isExclusive) && !policy.isExclusive) continue;
 
       // 정책 적용 가능성 재검증
       if (!this.canApplyPolicy(policy, product, context, date)) continue;

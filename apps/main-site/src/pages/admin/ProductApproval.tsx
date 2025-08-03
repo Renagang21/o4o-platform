@@ -18,7 +18,7 @@ export default function ProductApproval() {
     clearError,
   } = useProductStore();
 
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState<'pending' | 'approved' | 'rejected' | ''>('pending');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
@@ -35,7 +35,7 @@ export default function ProductApproval() {
     });
   }, [user, statusFilter]);
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.brand?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -47,8 +47,8 @@ export default function ProductApproval() {
     try {
       await updateApprovalStatus(productId, 'approved');
       toast.success('상품이 승인되었습니다.');
-      setSelectedProducts(prev => prev.filter(id => id !== productId));
-    } catch (error) {
+      setSelectedProducts((prev: any) => prev.filter((id: any) => id !== productId));
+    } catch (error: any) {
       toast.error('승인 처리에 실패했습니다.');
     }
   };
@@ -60,8 +60,8 @@ export default function ProductApproval() {
     try {
       await updateApprovalStatus(productId, 'rejected');
       toast.success('상품이 반려되었습니다.');
-      setSelectedProducts(prev => prev.filter(id => id !== productId));
-    } catch (error) {
+      setSelectedProducts((prev: any) => prev.filter((id: any) => id !== productId));
+    } catch (error: any) {
       toast.error('반려 처리에 실패했습니다.');
     }
   };
@@ -74,18 +74,18 @@ export default function ProductApproval() {
 
     try {
       await Promise.all(
-        selectedProducts.map(id => updateApprovalStatus(id, 'approved'))
+        selectedProducts.map((id: any) => updateApprovalStatus(id, 'approved'))
       );
       toast.success(`${selectedProducts.length}개 상품이 승인되었습니다.`);
       setSelectedProducts([]);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('일괄 승인에 실패했습니다.');
     }
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedProducts(filteredProducts.map(p => p.id));
+      setSelectedProducts(filteredProducts.map((p: any) => p.id));
     } else {
       setSelectedProducts([]);
     }
@@ -93,9 +93,9 @@ export default function ProductApproval() {
 
   const handleProductSelect = (productId: string, checked: boolean) => {
     if (checked) {
-      setSelectedProducts(prev => [...prev, productId]);
+      setSelectedProducts((prev: any) => [...prev, productId]);
     } else {
-      setSelectedProducts(prev => prev.filter(id => id !== productId));
+      setSelectedProducts((prev: any) => prev.filter((id: any) => id !== productId));
     }
   };
 
@@ -120,7 +120,7 @@ export default function ProductApproval() {
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = flatCategories.find(cat => cat.id === categoryId);
+    const category = flatCategories.find((cat: any) => cat.id === categoryId);
     return category?.name || '미분류';
   };
 
@@ -305,7 +305,7 @@ export default function ProductApproval() {
                               {product.brand} {product.model}
                             </p>
                             <div className="flex items-center space-x-4 text-sm text-gray-600">
-                              <span>카테고리: {product.categories.map(catId => getCategoryName(catId)).join(', ')}</span>
+                              <span>카테고리: {product.categories.map((catId: any) => getCategoryName(catId)).join(', ')}</span>
                               <span>•</span>
                               <span>공급업체 ID: {product.supplierId}</span>
                               <span>•</span>
@@ -449,7 +449,7 @@ export default function ProductApproval() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">카테고리</label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {viewingProduct.categories.map(catId => getCategoryName(catId)).join(', ')}
+                      {viewingProduct.categories.map((catId: any) => getCategoryName(catId)).join(', ')}
                     </p>
                   </div>
                   <div>

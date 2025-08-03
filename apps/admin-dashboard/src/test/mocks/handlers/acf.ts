@@ -170,7 +170,7 @@ export const acfHandlers = [
   // Get single field group
   http.get(`${API_BASE}/v1/acf/field-groups/:id`, ({ params }) => {
     const { id } = params as { id: string };
-    const fieldGroup = fieldGroups.find(fg => fg.id === id);
+    const fieldGroup = fieldGroups.find((fg: any) => fg.id === id);
     if (!fieldGroup) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });
     }
@@ -180,7 +180,7 @@ export const acfHandlers = [
   // Create field group
   http.post(`${API_BASE}/v1/acf/field-groups`, async ({ request }) => {
     const data = await request.json() as ACFGroupData;
-    const { title, fields, location, ...restData } = data;
+    const { title, fields, location, ...restData } = data as any;
     const newFieldGroup = {
       id: `fg-${Date.now()}`,
       name: title || 'New Field Group',
@@ -234,7 +234,7 @@ export const acfHandlers = [
 
   // Duplicate field group
   http.post(`${API_BASE}/v1/acf/field-groups/:id/duplicate`, ({ params }: any) => {
-    const fieldGroup = fieldGroups.find(fg => fg.id === params.id);
+    const fieldGroup = fieldGroups.find((fg: any) => fg.id === params.id);
     
     if (!fieldGroup) {
       return HttpResponse.json({ error: 'Field group not found' }, { status: 404 });

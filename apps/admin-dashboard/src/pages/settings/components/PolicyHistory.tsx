@@ -39,8 +39,8 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
   category, 
   maxItems = 50 
 }) => {
-  const [historyItems, setHistoryItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [filteredItems, setFilteredItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(category || 'all');
@@ -178,7 +178,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(item =>
+      filtered = filtered.filter((item: any) =>
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.userName.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -186,17 +186,17 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
 
     // Category filter
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(item => item.category === selectedCategory);
+      filtered = filtered.filter((item: any) => item.category === selectedCategory);
     }
 
     // Action filter
     if (selectedAction !== 'all') {
-      filtered = filtered.filter(item => item.action === selectedAction);
+      filtered = filtered.filter((item: any) => item.action === selectedAction);
     }
 
     // User filter
     if (selectedUser !== 'all') {
-      filtered = filtered.filter(item => item.userId === selectedUser);
+      filtered = filtered.filter((item: any) => item.userId === selectedUser);
     }
 
     // Date range filter
@@ -221,7 +221,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
           cutoff.setFullYear(1970);
       }
       
-      filtered = filtered.filter(item => new Date(item.timestamp) >= cutoff);
+      filtered = filtered.filter((item: any) => new Date(item.timestamp) >= cutoff);
     }
 
     setFilteredItems(filtered);
@@ -462,7 +462,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
                 className="wp-input"
               >
                 <option value="all">모든 사용자</option>
-                {uniqueUsers.map(user => (
+                {uniqueUsers.map((user: any) => (
                   <option key={user} value={user}>{user}</option>
                 ))}
               </select>
@@ -570,7 +570,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
         <div className="wp-card">
           <div className="wp-card-body text-center">
             <div className="text-2xl font-bold text-blue-600">
-              {filteredItems.filter(item => item.action === 'update').length}
+              {filteredItems.filter((item: any) => item.action === 'update').length}
             </div>
             <div className="text-sm text-blue-800">수정</div>
           </div>
@@ -579,7 +579,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
         <div className="wp-card">
           <div className="wp-card-body text-center">
             <div className="text-2xl font-bold text-green-600">
-              {filteredItems.filter(item => item.action === 'create').length}
+              {filteredItems.filter((item: any) => item.action === 'create').length}
             </div>
             <div className="text-sm text-green-800">생성</div>
           </div>
@@ -588,7 +588,7 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
         <div className="wp-card">
           <div className="wp-card-body text-center">
             <div className="text-2xl font-bold text-red-600">
-              {filteredItems.filter(item => item.action === 'delete').length}
+              {filteredItems.filter((item: any) => item.action === 'delete').length}
             </div>
             <div className="text-sm text-red-800">삭제</div>
           </div>

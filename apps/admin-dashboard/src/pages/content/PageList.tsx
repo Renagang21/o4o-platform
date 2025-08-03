@@ -37,7 +37,7 @@ const PageList: FC = () => {
   const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
-  const [selectedPages, setSelectedPages] = useState([])
+  const [selectedPages, setSelectedPages] = useState<any[]>([])
 
   // 페이지 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -234,7 +234,7 @@ const PageList: FC = () => {
                           if (e.target.checked) {
                             setSelectedPages([...selectedPages, page.id])
                           } else {
-                            setSelectedPages(selectedPages.filter(id => id !== page.id))
+                            setSelectedPages(selectedPages.filter((id: any) => id !== page.id))
                           }
                         }}
                       />

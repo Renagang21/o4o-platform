@@ -105,7 +105,7 @@ export default function GeneralSettings() {
   };
 
   const handleChange = (field: keyof GeneralSettingsData, value: any) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+    setSettings((prev: any) => ({ ...prev, [field]: value }));
   };
 
   if (isLoading) {

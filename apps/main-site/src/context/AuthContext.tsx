@@ -117,7 +117,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
               payload: { user, token, isSSO },
             });
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('인증 상태 복원 실패:', error);
           dispatch({ type: 'LOGOUT' });
         }
@@ -147,7 +147,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
             } else {
               dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error('토큰 갱신 실패:', error);
             dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
           }
@@ -173,7 +173,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           isSSO 
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       dispatch({
         type: 'LOGIN_FAILURE',
         payload: {
@@ -195,7 +195,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         type: 'REGISTER_SUCCESS',
         payload: { user: response.user },
       });
-    } catch (error) {
+    } catch (error: any) {
       dispatch({
         type: 'REGISTER_FAILURE',
         payload: {
@@ -210,7 +210,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const logout = async () => {
     try {
       await authApi.logout();
-    } catch (error) {
+    } catch (error: any) {
       console.error('로그아웃 오류:', error);
     } finally {
       dispatch({ type: 'LOGOUT' });
@@ -230,7 +230,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         }
       }
       return success;
-    } catch (error) {
+    } catch (error: any) {
       console.error('토큰 갱신 실패:', error);
       dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
       return false;

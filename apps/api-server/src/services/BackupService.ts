@@ -339,7 +339,7 @@ class BackupService {
 
   private async cleanupOldBackups(): Promise<void> {
     const files = await fs.readdir(this.config.backupPath);
-    const backupFiles = files.filter(f => f.startsWith('backup_') && f.endsWith('.tar.gz'));
+    const backupFiles = files.filter((f: any) => f.startsWith('backup_') && f.endsWith('.tar.gz'));
     
     const now = Date.now();
     const maxAge = this.config.retentionDays * 24 * 60 * 60 * 1000;

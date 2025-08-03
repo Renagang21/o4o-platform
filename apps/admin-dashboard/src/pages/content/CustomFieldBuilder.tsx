@@ -78,12 +78,12 @@ const CustomFieldBuilder: FC = () => {
   const { cptId } = useParams()
   const queryClient = useQueryClient()
 
-  const [fieldGroups, setFieldGroups] = useState([])
+  const [fieldGroups, setFieldGroups] = useState<any[]>([])
   const [editingGroup, setEditingGroup] = useState<CustomFieldGroup | null>(null)
   const [editingField, setEditingField] = useState<FieldFormData | null>(null)
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false)
   const [isFieldDialogOpen, setIsFieldDialogOpen] = useState(false)
-  const [expandedGroups, setExpandedGroups] = useState([])
+  const [expandedGroups, setExpandedGroups] = useState<any[]>([])
 
   // Field group form
   const [groupFormData, setGroupFormData] = useState({
@@ -147,9 +147,9 @@ const CustomFieldBuilder: FC = () => {
 
   // Toggle group expansion
   const toggleGroupExpanded = (groupId: string) => {
-    setExpandedGroups(prev =>
+    setExpandedGroups((prev: any) =>
       prev.includes(groupId)
-        ? prev.filter(id => id !== groupId)
+        ? prev.filter((id: any) => id !== groupId)
         : [...prev, groupId]
     )
   }
@@ -188,7 +188,7 @@ const CustomFieldBuilder: FC = () => {
     }
 
     if (editingGroup) {
-      setFieldGroups(fieldGroups.map(g => g.id === editingGroup.id ? newGroup : g))
+      setFieldGroups(fieldGroups.map((g: any) => g.id === editingGroup.id ? newGroup : g))
     } else {
       setFieldGroups([...fieldGroups, newGroup])
     }
@@ -198,7 +198,7 @@ const CustomFieldBuilder: FC = () => {
 
   const handleDeleteGroup = (groupId: string) => {
     if (confirm('정말 이 필드 그룹을 삭제하시겠습니까?')) {
-      setFieldGroups(fieldGroups.filter(g => g.id !== groupId))
+      setFieldGroups(fieldGroups.filter((g: any) => g.id !== groupId))
     }
   }
 
@@ -233,13 +233,13 @@ const CustomFieldBuilder: FC = () => {
       ...fieldFormData,
     }
 
-    setFieldGroups(fieldGroups.map(group => {
+    setFieldGroups(fieldGroups.map((group: any) => {
       if (group.id === groupId) {
         if ((editingField as CustomField)?.id) {
           // Edit existing field
           return {
             ...group,
-            fields: group.fields.map(f => f.id === (editingField as CustomField).id ? newField : f)
+            fields: group.fields.map((f: any) => f.id === (editingField as CustomField).id ? newField : f)
           }
         } else {
           // Add new field
@@ -256,11 +256,11 @@ const CustomFieldBuilder: FC = () => {
   }
 
   const handleDeleteField = (fieldId: string, groupId: string) => {
-    setFieldGroups(fieldGroups.map(group => {
+    setFieldGroups(fieldGroups.map((group: any) => {
       if (group.id === groupId) {
         return {
           ...group,
-          fields: group.fields.filter(f => f.id !== fieldId)
+          fields: group.fields.filter((f: any) => f.id !== fieldId)
         }
       }
       return group
@@ -274,7 +274,7 @@ const CustomFieldBuilder: FC = () => {
 
   // Get field type icon
   const getFieldIcon = (type: string) => {
-    const fieldType = fieldTypes.find(ft => ft.value === type)
+    const fieldType = fieldTypes.find((ft: any) => ft.value === type)
     const Icon = fieldType?.icon || Type
     return <Icon className="w-4 h-4" />
   }
@@ -317,7 +317,7 @@ const CustomFieldBuilder: FC = () => {
               </CardContent>
             </Card>
           ) : (
-            fieldGroups.map(group => (
+            fieldGroups.map((group: any) => (
               <Card key={group.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -370,7 +370,7 @@ const CustomFieldBuilder: FC = () => {
                             <div className="flex-1">
                               <div className="font-medium">{field.label}</div>
                               <div className="text-sm text-gray-500">
-                                {field.key} · {fieldTypes.find(ft => ft.value === field.type)?.label}
+                                {field.key} · {fieldTypes.find((ft: any) => ft.value === field.type)?.label}
                                 {field.required && ' · 필수'}
                               </div>
                             </div>
@@ -443,7 +443,7 @@ const CustomFieldBuilder: FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {fieldTypes.slice(0, 8).map(type => {
+                {fieldTypes.slice(0, 8).map((type: any) => {
                   const Icon = type.icon
                   return (
                     <div key={type.value} className="flex items-center gap-2 text-sm">
@@ -578,7 +578,7 @@ const CustomFieldBuilder: FC = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {fieldTypes.map(type => {
+                  {fieldTypes.map((type: any) => {
                     const Icon = type.icon
                     return (
                       <SelectItem key={type.value} value={type.value}>

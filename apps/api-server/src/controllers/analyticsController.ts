@@ -131,7 +131,7 @@ export class AnalyticsController {
           },
           sessions: {
             ...sessionAnalysis,
-            recentSessions: userSessions.slice(0, 10).map(session => ({
+            recentSessions: userSessions.slice(0, 10).map((session: any) => ({
               id: session.id,
               userId: session.betaUserId,
               userName: session.betaUser?.name,
@@ -291,7 +291,7 @@ export class AnalyticsController {
       res.json({
         success: true,
         data: {
-          actions: actions.map(action => ({
+          actions: actions.map((action: any) => ({
             id: action.id,
             type: action.actionType,
             category: action.actionCategory,
@@ -352,7 +352,7 @@ export class AnalyticsController {
       res.json({
         success: true,
         data: {
-          reports: reports.map(report => ({
+          reports: reports.map((report: any) => ({
             id: report.id,
             type: report.reportType,
             category: report.reportCategory,
@@ -505,7 +505,7 @@ export class AnalyticsController {
       res.json({
         success: true,
         data: {
-          alerts: alerts.map(alert => ({
+          alerts: alerts.map((alert: any) => ({
             id: alert.id,
             type: alert.alertType,
             severity: alert.severity,
@@ -535,9 +535,9 @@ export class AnalyticsController {
             pages: Math.ceil(total / limit)
           },
           summary: {
-            activeAlerts: alerts.filter(a => a.status === AlertStatus.ACTIVE).length,
-            criticalAlerts: alerts.filter(a => a.severity === AlertSeverity.CRITICAL).length,
-            unacknowledgedAlerts: alerts.filter(a => a.status === AlertStatus.ACTIVE && !a.acknowledgedAt).length
+            activeAlerts: alerts.filter((a: any) => a.status === AlertStatus.ACTIVE).length,
+            criticalAlerts: alerts.filter((a: any) => a.severity === AlertSeverity.CRITICAL).length,
+            unacknowledgedAlerts: alerts.filter((a: any) => a.status === AlertStatus.ACTIVE && !a.acknowledgedAt).length
           }
         }
       });
@@ -699,7 +699,7 @@ export class AnalyticsController {
       .orderBy('date', 'ASC')
       .getRawMany();
 
-    return result.map(item => parseInt(item.activeUsers));
+    return result.map((item: any) => parseInt(item.activeUsers));
   }
 
   private analyzeUserSessions(sessions: UserSession[]): {
@@ -744,11 +744,11 @@ export class AnalyticsController {
       return acc;
     }, {} as Record<string, number>);
 
-    const engagementScores = sessions.map(s => s.getEngagementScore());
+    const engagementScores = sessions.map((s: any) => s.getEngagementScore());
     const engagementDistribution = {
-      low: engagementScores.filter(s => s < 10).length,
-      medium: engagementScores.filter(s => s >= 10 && s < 25).length,
-      high: engagementScores.filter(s => s >= 25).length
+      low: engagementScores.filter((s: any) => s < 10).length,
+      medium: engagementScores.filter((s: any) => s >= 10 && s < 25).length,
+      high: engagementScores.filter((s: any) => s >= 25).length
     };
 
     return {
@@ -777,8 +777,8 @@ export class AnalyticsController {
     }
 
     const responseTimes = metrics
-      .filter(m => m.metricCategory === 'response_time')
-      .map(m => parseFloat(m.value));
+      .filter((m: any) => m.metricCategory === 'response_time')
+      .map((m: any) => parseFloat(m.value));
 
     return {
       avgResponseTime: responseTimes.reduce((sum, rt) => sum + rt, 0) / responseTimes.length,
@@ -802,8 +802,8 @@ export class AnalyticsController {
     }
 
     const errorCounts = metrics
-      .filter(m => m.metricCategory === 'error_count')
-      .map(m => parseFloat(m.value));
+      .filter((m: any) => m.metricCategory === 'error_count')
+      .map((m: any) => parseFloat(m.value));
 
     return {
       totalErrors: errorCounts.reduce((sum, count) => sum + count, 0),
@@ -825,13 +825,13 @@ export class AnalyticsController {
       };
     }
 
-    const activeUserMetrics = metrics.filter(m => m.metricCategory === 'active_users');
-    const pageViewMetrics = metrics.filter(m => m.metricCategory === 'page_views');
+    const activeUserMetrics = metrics.filter((m: any) => m.metricCategory === 'active_users');
+    const pageViewMetrics = metrics.filter((m: any) => m.metricCategory === 'page_views');
 
     return {
       activeUsers: activeUserMetrics.length > 0 ? parseFloat(activeUserMetrics[activeUserMetrics.length - 1].value) : 0,
       pageViews: pageViewMetrics.reduce((sum, pv) => sum + parseFloat(pv.value), 0),
-      usageTrends: activeUserMetrics.map(m => parseFloat(m.value)).slice(-24)
+      usageTrends: activeUserMetrics.map((m: any) => parseFloat(m.value)).slice(-24)
     };
   }
 
@@ -855,7 +855,7 @@ export class AnalyticsController {
       .limit(10)
       .getRawMany();
 
-    return result.map(item => ({
+    return result.map((item: any) => ({
       endpoint: item.endpoint,
       avgResponseTime: Math.round(parseFloat(item.avgResponseTime)),
       maxResponseTime: Math.round(parseFloat(item.maxResponseTime)),

@@ -141,11 +141,11 @@ const CrowdfundingProjectForm: FC = () => {
 
   // 폼 데이터 변경
   const handleChange = (field: keyof CrowdfundingProjectFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
     
     // 에러 상태 초기화
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev: any) => ({ ...prev, [field]: undefined }));
     }
   };
 

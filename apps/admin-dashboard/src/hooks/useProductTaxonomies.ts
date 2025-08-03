@@ -21,7 +21,7 @@ interface UseBrandsResult {
 }
 
 export function useProductCategories(): UseTaxonomiesResult {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ export function useProductCategories(): UseTaxonomiesResult {
         
         const data = await response.json();
         setCategories(data.categories || getMockCategories());
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching categories:', err);
         setError(err instanceof Error ? err.message : 'Failed to load categories');
         
@@ -53,7 +53,7 @@ export function useProductCategories(): UseTaxonomiesResult {
 }
 
 export function useProductBrands(): UseBrandsResult {
-  const [brands, setBrands] = useState([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +65,7 @@ export function useProductBrands(): UseBrandsResult {
         
         const data = await response.json();
         setBrands(data.brands || getMockBrands());
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching brands:', err);
         setError(err instanceof Error ? err.message : 'Failed to load brands');
         
@@ -114,7 +114,7 @@ function getMockBrands(): Taxonomy[] {
 }
 
 export function useProductTags(): UseTaxonomiesResult {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,7 +126,7 @@ export function useProductTags(): UseTaxonomiesResult {
         
         const data = await response.json();
         setCategories(data.tags || getMockTags());
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching tags:', err);
         setError(err instanceof Error ? err.message : 'Failed to load tags');
         

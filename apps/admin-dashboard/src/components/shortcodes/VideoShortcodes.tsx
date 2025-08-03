@@ -12,7 +12,7 @@ export const VideoCopyButtonShortcodeWrapper: FC<{
     size?: string;
   };
 }> = ({ attributes }) => {
-  const { post_id, size = 'default' } = attributes;
+  const { post_id, size = 'default' } = attributes as any;
 
   if (!post_id) {
     return (

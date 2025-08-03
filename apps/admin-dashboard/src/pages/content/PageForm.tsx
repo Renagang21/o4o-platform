@@ -505,7 +505,7 @@ const PageForm: FC = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">템플릿:</span>
                 <span className="font-medium">
-                  {pageTemplates.find(t => t.value === formData.template)?.label || '기본 템플릿'}
+                  {pageTemplates.find((t: any) => t.value === formData.template)?.label || '기본 템플릿'}
                 </span>
               </div>
               {formData.parentId && (

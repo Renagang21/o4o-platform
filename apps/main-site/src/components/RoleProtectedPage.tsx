@@ -18,6 +18,11 @@ export default function RoleProtectedPage({
   const { user } = useAuth();
   const location = useLocation();
 
+  // 접근 기록 로그 - Hook은 조건부 return 전에 호출되어야 함
+  useEffect(() => {
+    if (user) logAccess(user.id, location.pathname);
+  }, [user, location.pathname]);
+
   // 전체 공개: allowedRoles가 없거나 빈 배열
   if (!allowedRoles || allowedRoles.length === 0) {
     return <>{children}</>;
@@ -29,19 +34,13 @@ export default function RoleProtectedPage({
   }
 
   // 권한 체크
-  if (!user || !allowedRoles.some(role => user.roles.includes(role))) {
+  if (!user || !allowedRoles.some((role: any) => user.roles.includes(role))) {
     toast.error(message);
     if (show403) {
       return <Navigate to="/403" state={{ from: location }} replace />;
     }
     return <Navigate to="/" state={{ from: location }} replace />;
   }
-
-  // 접근 기록 로그
-  useEffect(() => {
-    if (user) logAccess(user.id, location.pathname);
-     
-  }, [user, location.pathname]);
 
   return <>{children}</>;
 } 

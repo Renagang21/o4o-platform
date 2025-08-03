@@ -205,14 +205,14 @@ export class PricePolicy {
 
     // 카테고리 확인
     if (this.productCategories && this.productCategories.length > 0) {
-      if (!categories || !categories.some(cat => this.productCategories!.includes(cat))) {
+      if (!categories || !categories.some((cat: any) => this.productCategories!.includes(cat))) {
         return false;
       }
     }
 
     // 태그 확인
     if (this.productTags && this.productTags.length > 0) {
-      if (!tags || !tags.some(tag => this.productTags!.includes(tag))) {
+      if (!tags || !tags.some((tag: any) => this.productTags!.includes(tag))) {
         return false;
       }
     }

@@ -50,7 +50,7 @@ export default function ProductForm() {
   const [specifications, setSpecifications] = useState<{[key: string]: string}>({});
 
   // Handle images as array of strings
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<any[]>([]);
 
   const [specKey, setSpecKey] = useState('');
   const [specValue, setSpecValue] = useState('');
@@ -111,7 +111,7 @@ export default function ProductForm() {
       }
       
       navigate('/supplier/products');
-    } catch (err) {
+    } catch (err: any) {
       toast.error('상품 저장에 실패했습니다.');
     }
   };
@@ -218,7 +218,7 @@ export default function ProductForm() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
                   <option value="">카테고리 선택</option>
-                  {flatCategories.map(category => (
+                  {flatCategories.map((category: any) => (
                     <option key={category.id} value={category.id}>
                       {category.level === 2 ? `${category.name}` : category.name}
                     </option>

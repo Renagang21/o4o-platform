@@ -40,7 +40,7 @@ export const UserRoleManagerProvider = ({ children }: { children: ReactNode }) =
   const adminId = '1'; // 관리자 본인 ID (mock)
 
   const changeRoles = (id: string, newRoles: UserRole[]) => {
-    setUsers(users => users.map(u => u.id === id ? { ...u, roles: newRoles } : u));
+    setUsers(users => users.map((u: any) => u.id === id ? { ...u, roles: newRoles } : u));
   };
 
   return (

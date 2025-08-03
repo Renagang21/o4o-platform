@@ -74,7 +74,7 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
   
   const checkValue = (value: any): boolean => {
     if (typeof value === 'string') {
-      return sqlPatterns.some(pattern => pattern.test(value));
+      return sqlPatterns.some((pattern: any) => pattern.test(value));
     }
     return false;
   };

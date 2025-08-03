@@ -7,9 +7,9 @@ import BulkActions from './components/BulkActions'
 import toast from 'react-hot-toast'
 
 const PendingApproval: FC = () => {
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedUsers, setSelectedUsers] = useState([])
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([])
   const [businessTypeFilter, setBusinessTypeFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [pagination, setPagination] = useState({
@@ -44,7 +44,7 @@ const PendingApproval: FC = () => {
   }, [businessTypeFilter])
 
   // 검색 필터링
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user: any) => {
     if (!searchTerm) return true
     
     const searchLower = searchTerm.toLowerCase()
@@ -57,15 +57,15 @@ const PendingApproval: FC = () => {
   })
 
   const handleSelectUser = (userId: string) => {
-    setSelectedUsers(prev => 
+    setSelectedUsers((prev: any) => 
       prev.includes(userId)
-        ? prev.filter(id => id !== userId)
+        ? prev.filter((id: any) => id !== userId)
         : [...prev, userId]
     )
   }
 
   const handleSelectAll = (selected: boolean) => {
-    setSelectedUsers(selected ? filteredUsers.map(u => u.id) : [])
+    setSelectedUsers(selected ? filteredUsers.map((u: any) => u.id) : [])
   }
 
   const handleApprove = async (userId: string) => {
@@ -73,7 +73,7 @@ const PendingApproval: FC = () => {
       await UserApi.approveUser(userId)
       toast.success('사용자가 승인되었습니다.')
       loadPendingUsers(pagination.current)
-      setSelectedUsers(prev => prev.filter(id => id !== userId))
+      setSelectedUsers((prev: any) => prev.filter((id: any) => id !== userId))
     } catch (error: any) {
       console.error('Failed to approve user:', error)
       toast.error('승인에 실패했습니다.')
@@ -88,7 +88,7 @@ const PendingApproval: FC = () => {
       await UserApi.rejectUser(userId, reason)
       toast.success('사용자가 거부되었습니다.')
       loadPendingUsers(pagination.current)
-      setSelectedUsers(prev => prev.filter(id => id !== userId))
+      setSelectedUsers((prev: any) => prev.filter((id: any) => id !== userId))
     } catch (error: any) {
       console.error('Failed to reject user:', error)
       toast.error('거부에 실패했습니다.')
@@ -114,7 +114,7 @@ const PendingApproval: FC = () => {
     loadPendingUsers(page)
   }
 
-  const businessTypes = [...new Set(users.map(u => u.businessInfo?.businessType).filter(Boolean))]
+  const businessTypes = [...new Set(users.map((u: any) => u.businessInfo?.businessType).filter(Boolean))]
 
   return (
     <div className="space-y-6">
@@ -251,7 +251,7 @@ const PendingApproval: FC = () => {
                     if (confirm('현재 페이지의 모든 사용자를 승인하시겠습니까?')) {
                       handleBulkAction({
                         action: 'approve',
-                        userIds: filteredUsers.map(u => u.id)
+                        userIds: filteredUsers.map((u: any) => u.id)
                       })
                     }
                   }}

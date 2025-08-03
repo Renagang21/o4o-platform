@@ -167,7 +167,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
       action
     }
     
-    setBuilderState(prev => ({
+    setBuilderState((prev: any) => ({
       ...prev,
       history: [...prev.history.slice(0, prev.historyIndex + 1), newState],
       historyIndex: prev.historyIndex + 1
@@ -176,7 +176,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
 
   // Update template data
   const updateTemplate = useCallback((updates: Partial<Template>) => {
-    setBuilderState(prev => ({
+    setBuilderState((prev: any) => ({
       ...prev,
       template: { ...prev.template, ...updates }
     }))
@@ -204,13 +204,13 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     newBlocks = newBlocks.map((block, index) => ({ ...block, order: index }))
 
     updateTemplate({ blocks: newBlocks })
-    setBuilderState(prev => ({ ...prev, selectedBlockId: newBlock.id }))
+    setBuilderState((prev: any) => ({ ...prev, selectedBlockId: newBlock.id }))
     addHistory(`Added ${type} block`)
   }, [builderState.template.blocks, updateTemplate, addHistory])
 
   // Update block
   const updateBlock = useCallback((blockId: string, updates: Partial<TemplateBlock>) => {
-    const newBlocks = builderState.template.blocks.map(block =>
+    const newBlocks = builderState.template.blocks.map((block: any) =>
       block.id === blockId ? { ...block, ...updates } : block
     )
     updateTemplate({ blocks: newBlocks })
@@ -219,11 +219,11 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
   // Delete block
   const deleteBlock = useCallback((blockId: string) => {
     const newBlocks = builderState.template.blocks
-      .filter(block => block.id !== blockId)
+      .filter((block: any) => block.id !== blockId)
       .map((block, index) => ({ ...block, order: index }))
     
     updateTemplate({ blocks: newBlocks })
-    setBuilderState(prev => ({ 
+    setBuilderState((prev: any) => ({ 
       ...prev, 
       selectedBlockId: prev.selectedBlockId === blockId ? null : prev.selectedBlockId 
     }))
@@ -252,7 +252,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
 
   // Duplicate block
   const duplicateBlock = useCallback((blockId: string) => {
-    const originalBlock = builderState.template.blocks.find(b => b.id === blockId)
+    const originalBlock = builderState.template.blocks.find((b: any) => b.id === blockId)
     if (!originalBlock) return
 
     const newBlock: TemplateBlock = {
@@ -268,7 +268,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     const orderedBlocks = newBlocks.map((block, i) => ({ ...block, order: i }))
     
     updateTemplate({ blocks: orderedBlocks })
-    setBuilderState(prev => ({ ...prev, selectedBlockId: newBlock.id }))
+    setBuilderState((prev: any) => ({ ...prev, selectedBlockId: newBlock.id }))
     addHistory('Duplicated block')
   }, [builderState.template.blocks, updateTemplate, addHistory])
 
@@ -311,7 +311,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
         blocks: prevState.blocks,
         settings: prevState.settings
       })
-      setBuilderState(prev => ({ ...prev, historyIndex: prev.historyIndex - 1 }))
+      setBuilderState((prev: any) => ({ ...prev, historyIndex: prev.historyIndex - 1 }))
     }
   }, [builderState.history, builderState.historyIndex, updateTemplate])
 
@@ -322,17 +322,17 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
         blocks: nextState.blocks,
         settings: nextState.settings
       })
-      setBuilderState(prev => ({ ...prev, historyIndex: prev.historyIndex + 1 }))
+      setBuilderState((prev: any) => ({ ...prev, historyIndex: prev.historyIndex + 1 }))
     }
   }, [builderState.history, builderState.historyIndex, updateTemplate])
 
   // Zoom controls
-  const zoomIn = () => setBuilderState(prev => ({ 
+  const zoomIn = () => setBuilderState((prev: any) => ({ 
     ...prev, 
     zoom: Math.min(prev.zoom + 0.1, 2) 
   }))
   
-  const zoomOut = () => setBuilderState(prev => ({ 
+  const zoomOut = () => setBuilderState((prev: any) => ({ 
     ...prev, 
     zoom: Math.max(prev.zoom - 0.1, 0.5) 
   }))
@@ -380,7 +380,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                           ? 'bg-blue-100 border border-blue-300'
                           : 'hover:bg-gray-100'
                       }`}
-                      onClick={() => setBuilderState(prev => ({ 
+                      onClick={() => setBuilderState((prev: any) => ({ 
                         ...prev, 
                         selectedBlockId: block.id 
                       }))}
@@ -507,7 +507,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                   <Button
                     size={"sm" as const}
                     variant={builderState.devicePreview === 'desktop' ? 'default' : 'ghost'}
-                    onClick={() => setBuilderState(prev => ({ 
+                    onClick={() => setBuilderState((prev: any) => ({ 
                       ...prev, 
                       devicePreview: 'desktop' 
                     }))}
@@ -517,7 +517,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                   <Button
                     size={"sm" as const}
                     variant={builderState.devicePreview === 'tablet' ? 'default' : 'ghost'}
-                    onClick={() => setBuilderState(prev => ({ 
+                    onClick={() => setBuilderState((prev: any) => ({ 
                       ...prev, 
                       devicePreview: 'tablet' 
                     }))}
@@ -527,7 +527,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                   <Button
                     size={"sm" as const}
                     variant={builderState.devicePreview === 'mobile' ? 'default' : 'ghost'}
-                    onClick={() => setBuilderState(prev => ({ 
+                    onClick={() => setBuilderState((prev: any) => ({ 
                       ...prev, 
                       devicePreview: 'mobile' 
                     }))}
@@ -573,7 +573,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
               <div className="flex items-center gap-3">
                 <Button
                   variant={"outline" as const}
-                  onClick={() => setBuilderState(prev => ({ 
+                  onClick={() => setBuilderState((prev: any) => ({ 
                     ...prev, 
                     previewMode: !prev.previewMode 
                   }))}
@@ -613,7 +613,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                         block={block}
                         isSelected={builderState.selectedBlockId === block.id}
                         isPreview={builderState.previewMode}
-                        onSelect={() => setBuilderState(prev => ({ 
+                        onSelect={() => setBuilderState((prev: any) => ({ 
                           ...prev, 
                           selectedBlockId: block.id 
                         }))}
@@ -638,7 +638,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
               </div>
               <div className="p-4">
                 <BlockEditor
-                  block={builderState.template.blocks.find(b => b.id === builderState.selectedBlockId)!}
+                  block={builderState.template.blocks.find((b: any) => b.id === builderState.selectedBlockId)!}
                   onChange={(updates: any) => updateBlock(builderState.selectedBlockId!, updates)}
                 />
               </div>

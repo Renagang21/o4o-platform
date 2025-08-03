@@ -138,7 +138,7 @@ export const useCartStore = create<CartStore>()(
           set({ cart: newCart });
         } else {
           // Check if product already in cart
-          const existingItem = cart.items.find(item => item.productId === product.id);
+          const existingItem = cart.items.find((item: any) => item.productId === product.id);
           
           if (existingItem) {
             // Update quantity
@@ -148,7 +148,7 @@ export const useCartStore = create<CartStore>()(
                 : item
             );
             // 새로운 summary 계산
-            const newSubtotal = updatedItems.reduce((sum, item) => {
+            const newSubtotal = updatedItems.reduce((sum: any, item: any) => {
               const price = item.unitPrice || item.product?.pricing.customer || 0;
               return sum + (price * item.quantity);
             }, 0);
@@ -178,7 +178,7 @@ export const useCartStore = create<CartStore>()(
             };
             // 새로운 summary 계산
             const newItems = [...cart.items, newItem];
-            const newSubtotal = newItems.reduce((sum, item) => {
+            const newSubtotal = newItems.reduce((sum: any, item: any) => {
               const price = item.unitPrice || item.product?.pricing.customer || 0;
               return sum + (price * item.quantity);
             }, 0);
@@ -212,7 +212,7 @@ export const useCartStore = create<CartStore>()(
         const { cart } = get();
         if (!cart) return;
         
-        const updatedItems = cart.items.filter(item => item.id !== itemId);
+        const updatedItems = cart.items.filter((item: any) => item.id !== itemId);
         set({ cart: { ...cart, items: updatedItems } });
       }
     }),

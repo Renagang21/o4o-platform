@@ -88,14 +88,14 @@ const FieldTypeSelector: FC<FieldTypeSelectorProps> = ({ onSelect, selectedType 
 
   return (
     <div className="space-y-6">
-      {categories.map(category => {
-        const categoryFields = fieldTypes.filter(field => field.category === category.key)
+      {categories.map((category: any) => {
+        const categoryFields = fieldTypes.filter((field: any) => field.category === category.key)
         
         return (
           <div key={category.key}>
             <h4 className="text-sm font-medium text-gray-700 mb-3">{category.label}</h4>
             <div className="grid grid-cols-2 gap-2">
-              {categoryFields.map(field => {
+              {categoryFields.map((field: any) => {
                 const Icon = field.icon
                 const isSelected = selectedType === field.value
                 

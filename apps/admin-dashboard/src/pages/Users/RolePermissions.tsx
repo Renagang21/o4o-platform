@@ -9,7 +9,7 @@ const RolePermissions = () => {
   const getAllMenuItems = (items: any[], parent?: string): { id: string; label: string; parent?: string }[] => {
     const result: { id: string; label: string; parent?: string }[] = [];
     
-    items.forEach(item => {
+    items.forEach((item: any) => {
       if (!item.separator) {
         result.push({ id: item.id, label: item.label, parent });
         if (item.children) {
@@ -24,7 +24,7 @@ const RolePermissions = () => {
   const allMenuItems = getAllMenuItems(wordpressMenuItems);
 
   const hasAccess = (menuId: string, role: UserRole): boolean => {
-    const permission = menuPermissions.find(p => p.menuId === menuId);
+    const permission = menuPermissions.find((p: any) => p.menuId === menuId);
     return permission ? permission.roles.includes(role) : false;
   };
 
@@ -45,7 +45,7 @@ const RolePermissions = () => {
 
       {/* Role Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {roles.map(role => (
+        {roles.map((role: any) => (
           <div key={role} className="wp-card">
             <div className="wp-card-body">
               <div className="flex items-center gap-3 mb-3">
@@ -80,7 +80,7 @@ const RolePermissions = () => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider sticky left-0 bg-modern-bg-tertiary">
                     메뉴 항목
                   </th>
-                  {roles.map(role => (
+                  {roles.map((role: any) => (
                     <th key={role} className="px-4 py-3 text-center text-xs font-medium text-modern-text-secondary uppercase tracking-wider min-w-[100px]">
                       {roleDisplayNames[role]}
                     </th>
@@ -98,7 +98,7 @@ const RolePermissions = () => {
                         </span>
                       </div>
                     </td>
-                    {roles.map(role => (
+                    {roles.map((role: any) => (
                       <td key={role} className="px-4 py-3 whitespace-nowrap text-center">
                         {hasAccess(menuItem.id, role) ? (
                           <Check className="w-5 h-5 text-modern-success mx-auto" />

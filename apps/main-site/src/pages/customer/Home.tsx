@@ -19,9 +19,9 @@ export default function CustomerHome() {
   
   const { addToCart } = useOrderStore();
 
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [newProducts, setNewProducts] = useState([]);
-  const [popularProducts, setPopularProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [newProducts, setNewProducts] = useState<any[]>([]);
+  const [popularProducts, setPopularProducts] = useState<any[]>([]);
 
   useEffect(() => {
     // 활성화된 상품들만 가져오기
@@ -63,7 +63,7 @@ export default function CustomerHome() {
     try {
       await addToCart(productId, 1);
       toast.success('장바구니에 추가되었습니다!');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('장바구니 추가에 실패했습니다.');
     }
   };

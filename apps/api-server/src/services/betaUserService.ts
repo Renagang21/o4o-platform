@@ -527,12 +527,12 @@ export class BetaUserService {
         satisfactionRating: parseFloat(avgRatingResult?.avg || '0')
       },
       engagementStats: {
-        topContributors: topContributors.map(user => ({
+        topContributors: topContributors.map((user: any) => ({
           betaUser: user,
           feedbackCount: user.feedbackCount,
           lastActiveAt: user.lastActiveAt || user.createdAt
         })),
-        popularFeatures: popularFeatures.map(item => ({
+        popularFeatures: popularFeatures.map((item: any) => ({
           feature: item.feedback_feature,
           feedbackCount: parseInt(item.count)
         })),
@@ -546,13 +546,13 @@ export class BetaUserService {
     const result: Record<string, number> = {};
     
     // Initialize all enum values with 0
-    enumValues.forEach(value => {
+    enumValues.forEach((value: any) => {
       result[value] = 0;
     });
     
     // Fill in actual counts
-    data.forEach(item => {
-      const key = Object.keys(item).find(k => k !== 'count');
+    data.forEach((item: any) => {
+      const key = Object.keys(item).find((k: any) => k !== 'count');
       if (key) {
         result[item[key]] = parseInt(item.count);
       }

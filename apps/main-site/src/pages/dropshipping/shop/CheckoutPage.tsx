@@ -38,8 +38,8 @@ interface PaymentMethod {
 }
 
 const CheckoutPage: FC = () => {
-  const [checkoutItems, setCheckoutItems] = useState([]);
-  const [addresses, setAddresses] = useState([]);
+  const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState('');
   const [selectedPayment, setSelectedPayment] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
@@ -113,11 +113,11 @@ const CheckoutPage: FC = () => {
 
     setCheckoutItems(mockItems);
     setAddresses(mockAddresses);
-    setSelectedAddress(mockAddresses.find(addr => addr.isDefault)?.id || '');
+    setSelectedAddress(mockAddresses.find((addr: any) => addr.isDefault)?.id || '');
     setSelectedPayment('card');
   }, []);
 
-  const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = checkoutItems.reduce((sum: any, item: any) => sum + (item.price * item.quantity), 0);
   const shippingFee = 0; // 로켓배송 무료
   const totalAmount = subtotal - couponDiscount + shippingFee;
 
@@ -136,7 +136,7 @@ const CheckoutPage: FC = () => {
       alert('주문이 완료되었습니다! 주문 내역은 마이페이지에서 확인하실 수 있습니다.');
       // 주문 완료 페이지로 이동
       
-    } catch (error) {
+    } catch (error: any) {
       alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsProcessing(false);

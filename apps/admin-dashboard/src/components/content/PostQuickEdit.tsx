@@ -195,7 +195,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
           <div className="inline-edit-col">
             <span className="title inline-edit-categories-label">Categories</span>
             <ul className="cat-checklist category-checklist">
-              {categories.map(category => (
+              {categories.map((category: any) => (
                 <li key={category.id} className="popular-category">
                   <label className="selectit">
                     <input

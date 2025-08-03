@@ -320,7 +320,7 @@ export const menuPermissions: MenuPermission[] = [
 
 // Helper function to check if a role has access to a menu item
 export function hasMenuAccess(menuId: string, userRole: UserRole, userPermissions?: string[]): boolean {
-  const menuPermission = menuPermissions.find(mp => mp.menuId === menuId);
+  const menuPermission = menuPermissions.find((mp: any) => mp.menuId === menuId);
   
   if (!menuPermission) {
     return false; // Menu item not found
@@ -338,7 +338,7 @@ export function hasMenuAccess(menuId: string, userRole: UserRole, userPermission
     }
     
     // User must have at least one of the required permissions
-    return menuPermission.permissions.some(permission => 
+    return menuPermission.permissions.some((permission: any) => 
       userPermissions.includes(permission)
     );
   }
@@ -349,12 +349,12 @@ export function hasMenuAccess(menuId: string, userRole: UserRole, userPermission
 // Helper function to filter menu items based on user role and permissions
 export function filterMenuByRole(menuItems: any[], userRole: UserRole, userPermissions?: string[]): any[] {
   return menuItems
-    .filter(item => {
+    .filter((item: any) => {
       // Always include separators
       if (item.separator) return true;
       return hasMenuAccess(item.id, userRole, userPermissions);
     })
-    .map(item => {
+    .map((item: any) => {
       if (item.children) {
         const filteredChildren = filterMenuByRole(item.children, userRole, userPermissions);
         

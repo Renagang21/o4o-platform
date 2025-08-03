@@ -48,7 +48,7 @@ const useScreenOptionsStore = create<ScreenOptionsStore>()(
         set((state) => {
           const currentOptions = state.options[pageId] || {};
           const columns = currentOptions.columns || [];
-          const updatedColumns = columns.map(col =>
+          const updatedColumns = columns.map((col: any) =>
             col.id === columnId ? { ...col, visible } : col
           );
           
@@ -107,7 +107,7 @@ export function useScreenOptions(pageId: string, defaultOptions?: ScreenOptionsC
   const options = store.getOptions(pageId);
   
   // Get visible columns
-  const visibleColumns = (options.columns || []).filter(col => col.visible);
+  const visibleColumns = (options.columns || []).filter((col: any) => col.visible);
   
   // Helper functions
   const toggleColumn = (columnId: string) => {
@@ -115,7 +115,7 @@ export function useScreenOptions(pageId: string, defaultOptions?: ScreenOptionsC
   };
   
   const isColumnVisible = (columnId: string): boolean => {
-    const column = (options.columns || []).find(col => col.id === columnId);
+    const column = (options.columns || []).find((col: any) => col.id === columnId);
     return column?.visible ?? true;
   };
   

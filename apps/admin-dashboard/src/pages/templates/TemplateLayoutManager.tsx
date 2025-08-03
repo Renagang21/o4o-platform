@@ -95,7 +95,7 @@ const TemplateLayoutManager: FC = () => {
     }
   };
 
-  const filteredTemplates = templates.filter(template => {
+  const filteredTemplates = templates.filter((template: any) => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = selectedLayoutType === 'all' || template.layoutType === selectedLayoutType;

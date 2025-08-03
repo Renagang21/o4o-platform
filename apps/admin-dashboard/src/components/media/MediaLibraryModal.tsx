@@ -45,7 +45,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library');
   const queryClient = useQueryClient();
 
@@ -66,7 +66,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
   const uploadMutation = useMutation({
     mutationFn: async (files: File[]) => {
       const formData = new FormData();
-      files.forEach(file => {
+      files.forEach((file: any) => {
         formData.append('files', file);
       });
 
@@ -94,16 +94,16 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: acceptedTypes.reduce((acc, type) => ({ ...acc, [type]: [] }), {}),
+    accept: acceptedTypes.reduce((acc: any, type: any) => ({ ...acc, [type]: [] }), {}),
     multiple: true
   });
 
   // 아이템 선택 처리
   const handleItemClick = (item: MediaItem) => {
     if (allowMultiple) {
-      setSelectedItems(prev => 
+      setSelectedItems((prev: any) => 
         prev.includes(item.id) 
-          ? prev.filter(id => id !== item.id)
+          ? prev.filter((id: any) => id !== item.id)
           : [...prev, item.id]
       );
     } else {

@@ -282,8 +282,8 @@ export class MediaController {
         // Clean up any remaining temp files
         await ImageProcessingService.cleanupTempFiles(tempFiles);
 
-        const successCount = results.filter(r => r.success).length;
-        const failureCount = results.filter(r => !r.success).length;
+        const successCount = results.filter((r: any) => r.success).length;
+        const failureCount = results.filter((r: any) => !r.success).length;
 
         res.status(201).json({
           success: true,
@@ -365,7 +365,7 @@ export class MediaController {
 
       // Delete all processed image variants
       if (mediaFile.formats) {
-        Object.values(mediaFile.formats).forEach(formatSizes => {
+        Object.values(mediaFile.formats).forEach((formatSizes: any) => {
           if (formatSizes) {
             Object.values(formatSizes).forEach((size) => {
               const typedSize = size as MediaSize;
@@ -422,13 +422,13 @@ export class MediaController {
       const filesToDelete: string[] = [];
 
       // Collect all files to delete
-      mediaFiles.forEach(mediaFile => {
+      mediaFiles.forEach((mediaFile: any) => {
         if (mediaFile.path) {
           filesToDelete.push(mediaFile.path);
         }
 
         if (mediaFile.formats) {
-          Object.values(mediaFile.formats).forEach(formatSizes => {
+          Object.values(mediaFile.formats).forEach((formatSizes: any) => {
             if (formatSizes) {
               Object.values(formatSizes).forEach((size) => {
                 const typedSize = size as MediaSize;
@@ -486,8 +486,8 @@ export class MediaController {
 
       const buildTree = (parentId: string | null): FolderTree[] => {
         return folders
-          .filter(folder => folder.parentId === parentId)
-          .map(folder => ({
+          .filter((folder: any) => folder.parentId === parentId)
+          .map((folder: any) => ({
             ...folder,
             children: buildTree(folder.id)
           }));

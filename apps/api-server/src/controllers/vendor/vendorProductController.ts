@@ -71,11 +71,11 @@ export class VendorProductController {
       const [products, total] = await queryBuilder.getManyAndCount();
 
       // 판매 통계 추가
-      const productIds = products.map(p => p.id);
+      const productIds = products.map((p: any) => p.id);
       const salesStats = await this.getProductSalesStats(productIds);
 
-      const formattedProducts = products.map(product => {
-        const stats = salesStats.find(s => s.productId === product.id);
+      const formattedProducts = products.map((product: any) => {
+        const stats = salesStats.find((s: any) => s.productId === product.id);
         return {
           id: product.id,
           name: product.name,
@@ -287,7 +287,7 @@ export class VendorProductController {
         .groupBy('item.productId')
         .getRawMany();
 
-      return result.map(r => ({
+      return result.map((r: any) => ({
         productId: r.productId,
         totalSales: parseInt(r.totalSales)
       }));

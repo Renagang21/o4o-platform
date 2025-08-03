@@ -16,7 +16,7 @@ const MediaList: FC<MediaListProps> = ({
   onFileSelect,
   onSelectAll
 }) => {
-  const allSelected = files.length > 0 && files.every(file => selectedFiles.includes(file.id))
+  const allSelected = files.length > 0 && files.every((file: any) => selectedFiles.includes(file.id))
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ko-KR', {

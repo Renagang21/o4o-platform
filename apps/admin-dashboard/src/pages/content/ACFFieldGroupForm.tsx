@@ -68,7 +68,7 @@ const ACFFieldGroupForm: FC = () => {
     }],
   })
 
-  const [expandedFields, setExpandedFields] = useState([])
+  const [expandedFields, setExpandedFields] = useState<any[]>([])
   const [isFieldDialogOpen, setIsFieldDialogOpen] = useState(false)
   const [editingField, setEditingField] = useState<ACFField | null>(null)
   const [selectedFieldType, setSelectedFieldType] = useState('text')
@@ -134,9 +134,9 @@ const ACFFieldGroupForm: FC = () => {
 
   // Toggle field expansion
   const toggleFieldExpanded = (fieldId: string) => {
-    setExpandedFields(prev =>
+    setExpandedFields((prev: any) =>
       prev.includes(fieldId)
-        ? prev.filter(id => id !== fieldId)
+        ? prev.filter((id: any) => id !== fieldId)
         : [...prev, fieldId]
     )
   }
@@ -163,7 +163,7 @@ const ACFFieldGroupForm: FC = () => {
     if (editingField) {
       setFormData({
         ...formData,
-        fields: formData.fields?.map(f => f.id === editingField.id ? newField : f) || []
+        fields: formData.fields?.map((f: any) => f.id === editingField.id ? newField : f) || []
       })
     } else {
       setFormData({
@@ -179,7 +179,7 @@ const ACFFieldGroupForm: FC = () => {
     if (confirm('정말 이 필드를 삭제하시겠습니까?')) {
       setFormData({
         ...formData,
-        fields: formData.fields?.filter(f => f.id !== fieldId) || []
+        fields: formData.fields?.filter((f: any) => f.id !== fieldId) || []
       })
     }
   }

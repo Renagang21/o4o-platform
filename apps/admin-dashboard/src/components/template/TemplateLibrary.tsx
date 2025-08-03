@@ -105,13 +105,13 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
 
     switch (activeTab) {
       case 'free':
-        filtered = filtered.filter(item => !item.isPremium)
+        filtered = filtered.filter((item: any) => !item.isPremium)
         break
       case 'premium':
-        filtered = filtered.filter(item => item.isPremium)
+        filtered = filtered.filter((item: any) => item.isPremium)
         break
       case 'featured':
-        filtered = filtered.filter(item => item.featured)
+        filtered = filtered.filter((item: any) => item.featured)
         break
       case 'popular':
         filtered = filtered.sort((a: any, b: any) => b.popularity - a.popularity)

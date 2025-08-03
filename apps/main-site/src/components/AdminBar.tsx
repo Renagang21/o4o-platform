@@ -18,7 +18,7 @@ const AdminBar: FC = () => {
   if (!hasAdminAccess) return null;
 
   const toggleDropdown = (key: string) => {
-    setDropdowns(prev => ({
+    setDropdowns((prev: any) => ({
       ...prev,
       [key]: !prev[key]
     }));

@@ -176,7 +176,7 @@ export class ProxyMiddleware {
     
     return async (req: Request, res: Response, next: NextFunction) => {
       // Get healthy services
-      const healthyServices = serviceKeys.filter(key => 
+      const healthyServices = serviceKeys.filter((key: any) => 
         this.serviceRegistry.isServiceHealthy(key)
       );
       

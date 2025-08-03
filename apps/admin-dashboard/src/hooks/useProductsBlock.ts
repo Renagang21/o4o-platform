@@ -27,7 +27,7 @@ interface UseProductsResult {
 }
 
 export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(0);
@@ -106,7 +106,7 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
       setProducts(transformedProducts);
       setTotalPages(data.totalPages || 1);
       setTotalProducts(data.totalProducts || transformedProducts.length);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching products:', err);
       setError(err instanceof Error ? err.message : 'Failed to load products');
       
@@ -123,7 +123,8 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
 
   useEffect(() => {
     fetchProducts();
-  }, [JSON.stringify(query)]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   return {
     products,

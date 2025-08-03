@@ -156,7 +156,7 @@ export class VendorStatsController {
       
       while (current <= endDate) {
         const dateStr = current.toISOString().split('T')[0];
-        const dayData = salesData.find(d => d.date === dateStr);
+        const dayData = salesData.find((d: any) => d.date === dateStr);
         
         chartData.push({
           date: dateStr,
@@ -192,14 +192,14 @@ export class VendorStatsController {
         relations: ['user', 'items', 'items.product']
       });
 
-      const formattedOrders = recentOrders.map(order => ({
+      const formattedOrders = recentOrders.map((order: any) => ({
         id: order.id,
         orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
         customer: order.user.name,
         total: order.totalAmount,
         status: order.status,
         createdAt: order.createdAt,
-        items: order.items.map(item => ({
+        items: order.items.map((item: any) => ({
           productName: item.product.name,
           quantity: item.quantity,
           price: item.price
@@ -240,7 +240,7 @@ export class VendorStatsController {
         .limit(5)
         .getRawMany();
 
-      res.json(topProducts.map(p => ({
+      res.json(topProducts.map((p: any) => ({
         id: p.productId,
         name: p.productName,
         quantity: parseInt(p.totalQuantity),

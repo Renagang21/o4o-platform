@@ -23,7 +23,7 @@ interface TagFormData {
 const TagList: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingTag, setEditingTag] = useState<Tag | null>(null)
-  const [selectedTags, setSelectedTags] = useState([])
+  const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -142,9 +142,9 @@ const TagList: FC = () => {
   }
 
   const toggleTagSelection = (tagId: string) => {
-    setSelectedTags(prev => 
+    setSelectedTags((prev: any) => 
       prev.includes(tagId) 
-        ? prev.filter(id => id !== tagId)
+        ? prev.filter((id: any) => id !== tagId)
         : [...prev, tagId]
     )
   }

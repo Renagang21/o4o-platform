@@ -567,7 +567,7 @@ export const getPerformanceAlerts = async (req: Request, res: Response) => {
 
     // 심각도 필터링
     if (severity) {
-      alerts = alerts.filter(alert => alert.severity === severity);
+      alerts = alerts.filter((alert: any) => alert.severity === severity);
     }
 
     // 최신 순으로 정렬
@@ -583,9 +583,9 @@ export const getPerformanceAlerts = async (req: Request, res: Response) => {
         alerts,
         total: alerts.length,
         summary: {
-          critical: alerts.filter(a => a.severity === 'critical').length,
-          warning: alerts.filter(a => a.severity === 'warning').length,
-          info: alerts.filter(a => a.severity === 'info').length
+          critical: alerts.filter((a: any) => a.severity === 'critical').length,
+          warning: alerts.filter((a: any) => a.severity === 'warning').length,
+          info: alerts.filter((a: any) => a.severity === 'info').length
         }
       }
     });
@@ -681,5 +681,5 @@ function convertReportToCSV(report: ComprehensiveReport): string {
     ['Total Recommendations', report.summary.totalRecommendations, 'Recommendations', report.metadata.generatedAt]
   ];
 
-  return rows.map(row => row.join(',')).join('\n');
+  return rows.map((row: any) => row.join(',')).join('\n');
 }

@@ -49,7 +49,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
       <div>
         <Label className="text-sm font-medium mb-2 block">정렬</Label>
         <div className="flex gap-1">
-          {alignmentOptions.map(option => {
+          {alignmentOptions.map((option: any) => {
             const Icon = option.icon;
             return (
               <button
@@ -78,7 +78,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
           onChange={(e: any) => onChange({ ...settings, size: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          {sizeOptions.map(option => (
+          {sizeOptions.map((option: any) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

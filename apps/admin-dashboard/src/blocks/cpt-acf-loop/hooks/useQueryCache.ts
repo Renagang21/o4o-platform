@@ -32,7 +32,7 @@ export const useQueryCache = ({
     // Sort keys for consistent cache keys
     const sortedParams = Object.keys(params)
       .sort()
-      .reduce((acc, key) => {
+      .reduce((acc: any, key: any) => {
         if (params[key] !== undefined && params[key] !== null) {
           acc[key] = params[key];
         }
@@ -189,7 +189,7 @@ export const useCachedQuery = <T = any>(
       setData(result);
       setInCache(cacheKey, result);
       options?.onSuccess?.(result);
-    } catch (err) {
+    } catch (err: any) {
       setError(err);
       options?.onError?.(err);
     } finally {

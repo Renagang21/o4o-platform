@@ -150,7 +150,7 @@ const Library: FC = () => {
   }
 
   // const selectAll = () => {
-  //   setSelectedItems(new Set(mediaItems.map(item => item.id)))
+  //   setSelectedItems(new Set(mediaItems.map((item: any) => item.id)))
   // }
 
   const clearSelection = () => {
@@ -159,12 +159,12 @@ const Library: FC = () => {
 
   const deleteSelectedItems = () => {
     if (confirm(`${selectedItems.size}개의 파일을 삭제하시겠습니까?`)) {
-      setMediaItems(mediaItems.filter(item => !selectedItems.has(item.id)))
+      setMediaItems(mediaItems.filter((item: any) => !selectedItems.has(item.id)))
       clearSelection()
     }
   }
 
-  const filteredItems = mediaItems.filter(item => {
+  const filteredItems = mediaItems.filter((item: any) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          item.description?.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesType = selectedType === 'all' || item.type === selectedType
@@ -306,7 +306,7 @@ const Library: FC = () => {
                   <span className="text-sm text-gray-500">{mediaItems.length}</span>
                 </button>
                 
-                {folders.map(folder => (
+                {folders.map((folder: any) => (
                   <button
                     key={folder.id}
                     className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-100 ${
@@ -326,7 +326,7 @@ const Library: FC = () => {
             <div className="flex-1 p-4">
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {filteredItems.map(item => (
+                  {filteredItems.map((item: any) => (
                     <div
                       key={item.id}
                       className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 ${
@@ -372,7 +372,7 @@ const Library: FC = () => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {filteredItems.map(item => (
+                  {filteredItems.map((item: any) => (
                     <div
                       key={item.id}
                       className={`flex items-center gap-4 p-4 rounded-lg border hover:bg-gray-50 cursor-pointer ${

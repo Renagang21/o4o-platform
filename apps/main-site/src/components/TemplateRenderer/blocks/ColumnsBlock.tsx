@@ -26,7 +26,7 @@ const ColumnsBlock: FC<ColumnsBlockProps> = ({
     display: 'grid',
     gridTemplateColumns: stackOnMobile 
       ? `repeat(auto-fit, minmax(300px, 1fr))`
-      : columns.map(col => col.width || '1fr').join(' '),
+      : columns.map((col: any) => col.width || '1fr').join(' '),
     gap: gap,
     marginBottom: '2rem',
   };

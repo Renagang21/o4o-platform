@@ -13,7 +13,7 @@ interface CommissionHistoryProps {
 }
 
 export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId }) => {
-  const [commissions, setCommissions] = useState([]);
+  const [commissions, setCommissions] = useState<any[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'paid' | 'cancelled'>('all');
   const [period, setPeriod] = useState<'all' | 'month' | 'quarter' | 'year'>('month');
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,7 +89,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
     }
   };
 
-  const filteredCommissions = commissions.filter(commission => {
+  const filteredCommissions = commissions.filter((commission: any) => {
     const matchesFilter = filter === 'all' || commission.status === filter;
     const matchesSearch = searchQuery === '' || 
       commission.orderId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -100,10 +100,10 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
     c.status !== 'cancelled' ? sum + c.commissionAmount : sum, 0
   );
   const pendingCommission = filteredCommissions
-    .filter(c => c.status === 'pending' || c.status === 'approved')
+    .filter((c: any) => c.status === 'pending' || c.status === 'approved')
     .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
   const paidCommission = filteredCommissions
-    .filter(c => c.status === 'paid')
+    .filter((c: any) => c.status === 'paid')
     .reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
 
   const getStatusBadge = (status: string) => {
@@ -125,7 +125,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
     // CSV 내보내기 로직
     const csv = [
       ['주문번호', '주문금액', '커미션율', '커미션금액', '상태', '생성일', '지급일'].join(','),
-      ...filteredCommissions.map(c => [
+      ...filteredCommissions.map((c: any) => [
         c.orderId,
         c.orderAmount,
         c.commissionRate + '%',

@@ -39,7 +39,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
   onApprove,
   onReject
 }) => {
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<CommissionRequest | null>(null);
   const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
@@ -117,7 +117,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
     });
   }, []);
 
-  const filteredRequests = requests.filter(request => {
+  const filteredRequests = requests.filter((request: any) => {
     if (activeFilter === 'all') return true;
     return request.status === activeFilter;
   });
@@ -183,7 +183,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
     }
 
     // 요청 목록 업데이트
-    setRequests(prev => prev.map(req => 
+    setRequests((prev: any) => prev.map((req: any) => 
       req.id === selectedRequest.id 
         ? { 
             ...req, 
@@ -306,7 +306,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
                  filter === 'pending' ? '대기 중' :
                  filter === 'approved' ? '승인됨' : '거절됨'}
                 <span className="ml-1 text-xs">
-                  ({requests.filter(r => filter === 'all' || r.status === filter).length})
+                  ({requests.filter((r: any) => filter === 'all' || r.status === filter).length})
                 </span>
               </button>
             ))}

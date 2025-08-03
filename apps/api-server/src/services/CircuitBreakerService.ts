@@ -191,18 +191,18 @@ class CircuitBreaker {
     
     // Keep only recent requests (last 5 minutes)
     const cutoff = new Date(Date.now() - 5 * 60 * 1000);
-    this.requestWindow = this.requestWindow.filter(req => req.startTime >= cutoff);
+    this.requestWindow = this.requestWindow.filter((req: any) => req.startTime >= cutoff);
   }
 
   private getRecentRequests(): ServiceCall[] {
     const cutoff = new Date(Date.now() - 60 * 1000); // Last minute
-    return this.requestWindow.filter(req => req.startTime >= cutoff);
+    return this.requestWindow.filter((req: any) => req.startTime >= cutoff);
   }
 
   private getSlowCallRate(requests: ServiceCall[]): number {
     if (requests.length === 0) return 0;
     
-    const slowCalls = requests.filter(req => req.responseTime > this.config.slowCallThreshold);
+    const slowCalls = requests.filter((req: any) => req.responseTime > this.config.slowCallThreshold);
     return (slowCalls.length / requests.length) * 100;
   }
 
@@ -574,7 +574,7 @@ export class CircuitBreakerService {
 
   // Management API
   getAllCircuits(): CircuitBreakerStats[] {
-    return Array.from(this.circuits.values()).map(circuit => circuit.getStats());
+    return Array.from(this.circuits.values()).map((circuit: any) => circuit.getStats());
   }
 
   getCircuitStats(circuitId: string): CircuitBreakerStats | null {
@@ -669,8 +669,8 @@ export class CircuitBreakerService {
     issues: string[];
   }> {
     const circuits = this.getAllCircuits();
-    const openCircuits = circuits.filter(c => c.state === CircuitState.OPEN).length;
-    const halfOpenCircuits = circuits.filter(c => c.state === CircuitState.HALF_OPEN).length;
+    const openCircuits = circuits.filter((c: any) => c.state === CircuitState.OPEN).length;
+    const halfOpenCircuits = circuits.filter((c: any) => c.state === CircuitState.HALF_OPEN).length;
     const issues: string[] = [];
 
     // Check for issues
@@ -678,7 +678,7 @@ export class CircuitBreakerService {
       issues.push(`More than 50% of circuits are open (${openCircuits}/${circuits.length})`);
     }
 
-    if (circuits.some(c => c.errorRate > 90)) {
+    if (circuits.some((c: any) => c.errorRate > 90)) {
       issues.push('Some circuits showing very high error rates');
     }
 

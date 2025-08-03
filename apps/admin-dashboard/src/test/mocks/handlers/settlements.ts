@@ -251,14 +251,14 @@ export const settlementsHandlers = [
     
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredSettlements = filteredSettlements.filter(settlement =>
+      filteredSettlements = filteredSettlements.filter((settlement: any) =>
         settlement.vendorName.toLowerCase().includes(searchLower) ||
         settlement.vendorEmail.toLowerCase().includes(searchLower)
       );
     }
     
     if (status && status !== 'all') {
-      filteredSettlements = filteredSettlements.filter(settlement => settlement.status === status);
+      filteredSettlements = filteredSettlements.filter((settlement: any) => settlement.status === status);
     }
     
     return HttpResponse.json({

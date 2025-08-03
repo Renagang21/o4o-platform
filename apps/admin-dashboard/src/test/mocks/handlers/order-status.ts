@@ -392,7 +392,7 @@ export const orderStatusHandlers = [
     // Search filter
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredOrders = filteredOrders.filter(order =>
+      filteredOrders = filteredOrders.filter((order: any) =>
         order.orderNumber?.toLowerCase().includes(searchLower) ||
         order.customerName?.toLowerCase().includes(searchLower) ||
         order.customerEmail?.toLowerCase().includes(searchLower)
@@ -401,7 +401,7 @@ export const orderStatusHandlers = [
 
     // Status filter
     if (status && status !== 'all') {
-      filteredOrders = filteredOrders.filter(order => order.status === status);
+      filteredOrders = filteredOrders.filter((order: any) => order.status === status);
     }
 
     // Sort by creation date (newest first)
@@ -430,7 +430,7 @@ export const orderStatusHandlers = [
 
   // Get order statistics
   http.get(`${API_BASE}/v1/ecommerce/orders/stats`, () => {
-    const stats = mockOrders.reduce((acc, order) => {
+    const stats = mockOrders.reduce((acc: any, order: any) => {
       if (order.status) {
         acc[order.status] = (acc[order.status] || 0) + 1;
       }
@@ -456,7 +456,7 @@ export const orderStatusHandlers = [
   // Get single order
   http.get(`${API_BASE}/v1/ecommerce/orders/:id`, ({ params }) => {
     const { id } = params as { id: string };
-    const order = mockOrders.find(o => o.id === id);
+    const order = mockOrders.find((o: any) => o.id === id);
     
     if (!order) {
       return HttpResponse.json(

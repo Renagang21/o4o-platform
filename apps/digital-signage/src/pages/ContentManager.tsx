@@ -177,7 +177,7 @@ const ContentManager: FC = () => {
                 <input
                   type="text"
                   value={newContent.title}
-                  onChange={(e: any) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e: any) => setNewContent((prev: any) => ({ ...prev, title: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   placeholder="TV에 표시될 콘텐츠 제목을 입력하세요"
                 />
@@ -189,7 +189,7 @@ const ContentManager: FC = () => {
                 </label>
                 <select
                   value={newContent.type}
-                  onChange={(e: any) => setNewContent(prev => ({ 
+                  onChange={(e: any) => setNewContent((prev: any) => ({ 
                     ...prev, 
                     type: e.target.value as 'video' | 'image' | 'slideshow' 
                   }))}

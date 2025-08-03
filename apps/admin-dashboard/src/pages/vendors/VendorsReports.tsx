@@ -77,7 +77,7 @@ const VendorsReports = () => {
 
   const currentReport = selectedVendor === 'all' 
     ? null 
-    : mockReports.find(r => r.vendorId === selectedVendor);
+    : mockReports.find((r: any) => r.vendorId === selectedVendor);
 
   return (
     <div className="space-y-6">

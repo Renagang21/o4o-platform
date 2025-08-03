@@ -42,7 +42,7 @@ export const BulkActionBar: FC<BulkActionBarProps> = ({
           disabled={isProcessing}
         >
           <option value="">Bulk actions</option>
-          {actions.map(action => (
+          {actions.map((action: any) => (
             <option key={action.value} value={action.value}>
               {action.label}
             </option>

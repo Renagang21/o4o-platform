@@ -104,7 +104,7 @@ const VendorsPending = () => {
       
       // Mock implementation
       toast.success('판매자가 승인되었습니다.');
-      setVendors(vendors.filter(v => v.id !== vendorId));
+      setVendors(vendors.filter((v: any) => v.id !== vendorId));
     } catch (error: any) {
       console.error('Error approving vendor:', error);
       toast.error('승인 처리 중 오류가 발생했습니다.');
@@ -124,7 +124,7 @@ const VendorsPending = () => {
       
       // Mock implementation
       toast.success('판매자 신청이 거절되었습니다.');
-      setVendors(vendors.filter(v => v.id !== vendorId));
+      setVendors(vendors.filter((v: any) => v.id !== vendorId));
     } catch (error: any) {
       console.error('Error rejecting vendor:', error);
       toast.error('거절 처리 중 오류가 발생했습니다.');

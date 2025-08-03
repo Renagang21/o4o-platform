@@ -15,7 +15,7 @@ const WriteReview: FC = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<ReviewForm>();
   const [rating, setRating] = useState(0);
-  const [previewImages, setPreviewImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: ReviewForm) => {
@@ -24,7 +24,7 @@ const WriteReview: FC = () => {
       // console.log('Review submitted:', { ...data, rating });
       // TODO: API call to submit review
       navigate('/customer/reviews');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting review:', error);
     }
     setIsSubmitting(false);

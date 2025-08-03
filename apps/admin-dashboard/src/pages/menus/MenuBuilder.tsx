@@ -74,7 +74,7 @@ const MenuBuilder: FC = () => {
   const [menuName, setMenuName] = useState('')
   const [menuLocation, setMenuLocation] = useState('primary')
   const [menuDescription, setMenuDescription] = useState('')
-  const [menuItems, setMenuItems] = useState([])
+  const [menuItems, setMenuItems] = useState<any[]>([])
   
   // UI state
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false)
@@ -261,7 +261,7 @@ const MenuBuilder: FC = () => {
   const handleDeleteItem = (itemId: string) => {
     // Function to remove item from tree
     const removeFromTree = (items: DraggableMenuItem[]): DraggableMenuItem[] => {
-      return items.filter(item => {
+      return items.filter((item: any) => {
         if (item.id === itemId) {
           return false
         }
@@ -476,7 +476,7 @@ const MenuBuilder: FC = () => {
 
         {hasChildren && item.isExpanded && (
           <div className="ml-4 pl-4 border-l-2 border-gray-200">
-            {item.children!.map(child => renderMenuItem(child, level + 1))}
+            {item.children!.map((child: any) => renderMenuItem(child, level + 1))}
           </div>
         )}
       </div>

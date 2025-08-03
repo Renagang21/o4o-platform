@@ -53,7 +53,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
     };
     
     useEffect(() => {
-      const handleMouseMove = (e: MouseEvent) => {
+      const handleMouseMove = (e: globalThis.MouseEvent) => {
         if (!isDragging.current || disabled) return;
         
         const newValue = calculateValue(e.clientX);

@@ -201,11 +201,11 @@ interface EnhancedView {
 }
 
 const EnhancedViewsManager: FC = () => {
-  const [views, setViews] = useState([]);
+  const [views, setViews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingView, setEditingView] = useState<EnhancedView | null>(null);
-  const [previewData, setPreviewData] = useState([]);
+  const [previewData, setPreviewData] = useState<any[]>([]);
   const [queryBuilderMode, setQueryBuilderMode] = useState<'visual' | 'sql'>('visual');
 
   // Available data sources
@@ -490,7 +490,7 @@ const EnhancedViewsManager: FC = () => {
       ];
 
       setViews(mockViews);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load views:', error);
     } finally {
       setLoading(false);
@@ -513,12 +513,12 @@ const EnhancedViewsManager: FC = () => {
       selectParts.push(...select.fields);
     }
     if (select.aggregates?.length) {
-      selectParts.push(...select.aggregates.map(agg => 
+      selectParts.push(...select.aggregates.map((agg: any) => 
         `${agg.function}(${agg.distinct ? 'DISTINCT ' : ''}${agg.field}) AS ${agg.alias}`
       ));
     }
     if (select.expressions?.length) {
-      selectParts.push(...select.expressions.map(exp => 
+      selectParts.push(...select.expressions.map((exp: any) => 
         `${exp.expression} AS ${exp.alias}`
       ));
     }
@@ -529,7 +529,7 @@ const EnhancedViewsManager: FC = () => {
     
     // JOIN clauses
     if (source.joins?.length) {
-      source.joins.forEach(join => {
+      source.joins.forEach((join: any) => {
         sql += `\n${join.type} JOIN ${join.table}`;
         if (join.alias) sql += ` AS ${join.alias}`;
         sql += ` ON ${join.on.leftField} ${join.on.operator} ${join.on.rightField}`;
@@ -544,10 +544,10 @@ const EnhancedViewsManager: FC = () => {
     
     // GROUP BY clause
     if (groupBy?.length) {
-      sql += `\nGROUP BY ${groupBy.map(g => g.field).join(', ')}`;
+      sql += `\nGROUP BY ${groupBy.map((g: any) => g.field).join(', ')}`;
       
       // HAVING clause
-      const havingClauses = groupBy.filter(g => g.having).map(g => 
+      const havingClauses = groupBy.filter((g: any) => g.having).map((g: any) => 
         `${g.having!.aggregate} ${g.having!.operator} ${g.having!.value}`
       );
       if (havingClauses.length) {
@@ -557,7 +557,7 @@ const EnhancedViewsManager: FC = () => {
     
     // ORDER BY clause
     if (orderBy?.length) {
-      sql += `\nORDER BY ${orderBy.map(o => 
+      sql += `\nORDER BY ${orderBy.map((o: any) => 
         `${o.field} ${o.direction}${o.nulls ? ` NULLS ${o.nulls}` : ''}`
       ).join(', ')}`;
     }
@@ -576,7 +576,7 @@ const EnhancedViewsManager: FC = () => {
     
     // Process filters
     if (group.filters?.length) {
-      parts.push(...group.filters.map(filter => {
+      parts.push(...group.filters.map((filter: any) => {
         let value = filter.value;
         if (filter.dataType === 'string' && !['in', 'not_in'].includes(filter.operator)) {
           value = `'${value}'`;
@@ -605,7 +605,7 @@ const EnhancedViewsManager: FC = () => {
     
     // Process nested groups
     if (group.groups?.length) {
-      parts.push(...group.groups.map(g => `(${generateWhereClause(g)})`));
+      parts.push(...group.groups.map((g: any) => `(${generateWhereClause(g)})`));
     }
     
     return parts.join(` ${group.type} `);
@@ -620,7 +620,7 @@ const EnhancedViewsManager: FC = () => {
       resetForm();
       setActiveTab('list');
       alert('✅ View created successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create view:', error);
       alert('❌ Failed to create view');
     }
@@ -631,9 +631,9 @@ const EnhancedViewsManager: FC = () => {
     
     try {
       // console.log('Deleting view:', id);
-      setViews(prev => prev.filter(view => view.id !== id));
+      setViews((prev: any) => prev.filter((view: any) => view.id !== id));
       alert('✅ View deleted successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete view:', error);
       alert('❌ Failed to delete view');
     }

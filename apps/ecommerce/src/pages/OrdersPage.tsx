@@ -161,7 +161,7 @@ export function OrdersPage() {
       let filtered = [...mockOrders];
       
       if (activeTab !== 'all') {
-        filtered = filtered.filter(order => {
+        filtered = filtered.filter((order: any) => {
           if (activeTab === 'cancelled') {
             return ['cancelled', 'refunded'].includes(order.status);
           }
@@ -170,9 +170,9 @@ export function OrdersPage() {
       }
       
       if (searchTerm) {
-        filtered = filtered.filter(order =>
+        filtered = filtered.filter((order: any) =>
           order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.items.some(item => 
+          order.items.some((item: any) => 
             item.productName.toLowerCase().includes(searchTerm.toLowerCase())
           )
         );
@@ -252,10 +252,10 @@ export function OrdersPage() {
       {/* Order Tabs */}
       <Tabs defaultValue={activeTab}>
         <TabsList className="w-full justify-start">
-          {orderTabs.map(tab => {
+          {orderTabs.map((tab: any) => {
             const count = tab.value === 'all' 
               ? orders.length 
-              : orders.filter(o => {
+              : orders.filter((o: any) => {
                   if (tab.value === 'cancelled') {
                     return ['cancelled', 'refunded'].includes(o.status);
                   }
@@ -278,7 +278,7 @@ export function OrdersPage() {
               <p className="text-muted-foreground mb-4">
                 {activeTab === 'all' 
                   ? '아직 주문하신 상품이 없습니다.'
-                  : `${orderTabs.find(t => t.value === activeTab)?.label} 상태의 주문이 없습니다.`
+                  : `${orderTabs.find((t: any) => t.value === activeTab)?.label} 상태의 주문이 없습니다.`
                 }
               </p>
               <Button onClick={() => window.location.href = '/products'}>
@@ -287,7 +287,7 @@ export function OrdersPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {orders.map(order => (
+              {orders.map((order: any) => (
                 <OrderItem
                   key={order.id}
                   order={order}

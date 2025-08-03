@@ -78,8 +78,8 @@ const EnhancedSignageDashboard: FC = () => {
   const toast = useToast();
   
   // State
-  const [contents, setContents] = useState([]);
-  const [stores, setStores] = useState([]);
+  const [contents, setContents] = useState<any[]>([]);
+  const [stores, setStores] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [liveDashboard, setLiveDashboard] = useState<LiveDashboard | null>(null);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
@@ -395,7 +395,7 @@ const EnhancedSignageDashboard: FC = () => {
                 <select
                   value={selectedStore?.id || ''}
                   onChange={(e: any) => {
-                    const store = stores.find(s => s.id === e.target.value);
+                    const store = stores.find((s: any) => s.id === e.target.value);
                     setSelectedStore(store || null);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -50,7 +50,7 @@ interface PlaybackStatus {
 }
 
 export default function StoreManagement() {
-  const [stores, setStores] = useState([]);
+  const [stores, setStores] = useState<any[]>([]);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,7 +94,7 @@ export default function StoreManagement() {
       if (userRole === 'manager' && data.data.stores.length > 0) {
         setSelectedStore(data.data.stores[0]);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -113,7 +113,7 @@ export default function StoreManagement() {
         const data = await response.json();
         setPlaybackStatus(data.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch playback status:', err);
     }
   };
@@ -135,7 +135,7 @@ export default function StoreManagement() {
         // Refresh playback status
         fetchPlaybackStatus(selectedStore.id);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Control action failed');
     }
   };

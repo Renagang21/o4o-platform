@@ -26,7 +26,7 @@ interface ScheduleManagerProps {
 }
 
 export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
-  const [schedules, setSchedules] = useState([]);
+  const [schedules, setSchedules] = useState<any[]>([]);
   const [activeSchedule, setActiveSchedule] = useState<Schedule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
 
       const data = await response.json();
       setSchedules(data.data.schedules);
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -72,7 +72,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
         const data = await response.json();
         setActiveSchedule(data.data.activeSchedule);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch active schedule:', err);
     }
   };
@@ -94,7 +94,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
 
       fetchSchedules();
       fetchActiveSchedule();
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to delete schedule');
     }
   };
@@ -140,7 +140,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
   const formatDaysOfWeek = (days?: number[]) => {
     if (!days || days.length === 0) return 'No days selected';
     if (days.length === 7) return 'Every day';
-    return days.map(day => dayNames[day]).join(', ');
+    return days.map((day: any) => dayNames[day]).join(', ');
   };
 
   const isScheduleActive = (schedule: Schedule) => {
@@ -348,7 +348,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
             <div>
               <p className="text-sm font-medium text-gray-900">Active</p>
               <p className="text-2xl font-bold text-gray-900">
-                {schedules.filter(s => s.status === 'active').length}
+                {schedules.filter((s: any) => s.status === 'active').length}
               </p>
             </div>
           </div>
@@ -360,7 +360,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
             <div>
               <p className="text-sm font-medium text-gray-900">Weekly</p>
               <p className="text-2xl font-bold text-gray-900">
-                {schedules.filter(s => s.type === 'weekly').length}
+                {schedules.filter((s: any) => s.type === 'weekly').length}
               </p>
             </div>
           </div>
@@ -372,7 +372,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
             <div>
               <p className="text-sm font-medium text-gray-900">One Time</p>
               <p className="text-2xl font-bold text-gray-900">
-                {schedules.filter(s => s.type === 'one_time').length}
+                {schedules.filter((s: any) => s.type === 'one_time').length}
               </p>
             </div>
           </div>

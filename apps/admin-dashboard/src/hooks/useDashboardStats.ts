@@ -97,7 +97,7 @@ export const useDashboardStats = () => {
           { status: '완료', count: statusCounts.completed, color: '#10b981' },
           { status: '취소', count: statusCounts.cancelled, color: '#ef4444' },
           { status: '환불', count: statusCounts.refunded, color: '#f97316' }
-        ].filter(item => item.count > 0);
+        ].filter((item: any) => item.count > 0);
 
         // Generate user activity data (mock for now)
         const userChartData = [];

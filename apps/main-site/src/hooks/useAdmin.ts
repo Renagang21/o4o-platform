@@ -20,7 +20,7 @@ export const useAdmin = () => {
       setError(null);
       const stats = await adminApi.getStats();
       return stats;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -34,7 +34,7 @@ export const useAdmin = () => {
       setError(null);
       const response = await adminApi.getUsers(params);
       return response;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -48,7 +48,7 @@ export const useAdmin = () => {
       setError(null);
       const response = await adminApi.approveUser(id);
       return response;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -62,7 +62,7 @@ export const useAdmin = () => {
       setError(null);
       const response = await adminApi.rejectUser(id);
       return response;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -76,7 +76,7 @@ export const useAdmin = () => {
       setError(null);
       const stats = await adminApi.getSalesStats();
       return stats;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -90,7 +90,7 @@ export const useAdmin = () => {
       setError(null);
       const stats = await adminApi.getProductStats();
       return stats;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -104,7 +104,7 @@ export const useAdmin = () => {
       setError(null);
       const stats = await adminApi.getUserStats();
       return stats;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -118,7 +118,7 @@ export const useAdmin = () => {
       setError(null);
       const user = await adminApi.updateUserRole(userId, role);
       return user;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {
@@ -132,7 +132,7 @@ export const useAdmin = () => {
       setError(null);
       const user = await adminApi.deactivateUser(userId);
       return user;
-    } catch (err) {
+    } catch (err: any) {
       setError(err as Error);
       throw err;
     } finally {

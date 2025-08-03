@@ -216,7 +216,7 @@ export default function VendorProducts() {
                 value={selectedCategory}
                 onChange={(e: any) => setSelectedCategory(e.target.value)}
               >
-                {categoryOptions.map(cat => (
+                {categoryOptions.map((cat: any) => (
                   <option key={cat} value={cat}>
                     {cat === 'all' ? '전체 카테고리' : cat}
                   </option>
@@ -366,13 +366,13 @@ export default function VendorProducts() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev: any) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               이전
             </Button>
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-              .filter(page => {
+              .filter((page: any) => {
                 return page === 1 || 
                        page === pagination.totalPages || 
                        Math.abs(page - currentPage) <= 2;
@@ -394,7 +394,7 @@ export default function VendorProducts() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, pagination.totalPages))}
+              onClick={() => setCurrentPage((prev: any) => Math.min(prev + 1, pagination.totalPages))}
               disabled={currentPage === pagination.totalPages}
             >
               다음
@@ -411,7 +411,7 @@ export default function VendorProducts() {
           setIsFormOpen(false);
           setEditingProduct(undefined);
         }}
-        onSubmit={async (data) => {
+        onSubmit={async (data: any) => {
           if (editingProduct) {
             // 수정
             await updateProduct.mutateAsync({ id: editingProduct.id, data });

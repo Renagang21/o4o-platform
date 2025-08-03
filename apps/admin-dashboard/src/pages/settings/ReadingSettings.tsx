@@ -34,7 +34,7 @@ export default function ReadingSettings() {
     showSummary: 'excerpt',
     excerptLength: 200
   });
-  const [pages, setPages] = useState([]);
+  const [pages, setPages] = useState<any[]>([]);
 
   // Fetch available pages
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
@@ -90,7 +90,7 @@ export default function ReadingSettings() {
   };
 
   const handleChange = (field: keyof ReadingSettingsData, value: any) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+    setSettings((prev: any) => ({ ...prev, [field]: value }));
   };
 
   const isLoading = settingsLoading || pagesLoading;

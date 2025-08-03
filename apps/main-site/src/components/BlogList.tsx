@@ -151,7 +151,7 @@ const BlogList: FC<BlogListProps> = ({ postsPerPage = 10 }) => {
               <nav className="mt-12 flex justify-center">
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    onClick={() => setCurrentPage((prev: any) => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
                     className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -188,7 +188,7 @@ const BlogList: FC<BlogListProps> = ({ postsPerPage = 10 }) => {
                   })}
                   
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    onClick={() => setCurrentPage((prev: any) => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >

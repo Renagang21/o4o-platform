@@ -15,7 +15,7 @@ const MediaGrid: FC<MediaGridProps> = ({
   onFileSelect,
   onSelectAll
 }) => {
-  const allSelected = files.length > 0 && files.every(file => selectedFiles.includes(file.id))
+  const allSelected = files.length > 0 && files.every((file: any) => selectedFiles.includes(file.id))
 
   return (
     <div className="p-6">

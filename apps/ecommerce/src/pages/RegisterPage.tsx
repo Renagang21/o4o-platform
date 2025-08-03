@@ -28,7 +28,7 @@ export function RegisterPage() {
         role: 'customer'
       });
       navigate('/login');
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage = err instanceof Error 
         ? err.message 
         : '회원가입에 실패했습니다.';

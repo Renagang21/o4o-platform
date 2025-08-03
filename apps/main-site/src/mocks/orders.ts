@@ -244,19 +244,19 @@ export const mockCartItems: { [userId: string]: CartItem[] } = {
 
 // 사용자별 주문 필터링
 export const getOrdersByBuyer = (buyerId: string): Order[] => {
-  return mockOrders.filter(order => order.buyerId === buyerId);
+  return mockOrders.filter((order: any) => order.buyerId === buyerId);
 };
 
 // 공급자별 주문 필터링
 export const getOrdersBySupplier = (supplierId: string): Order[] => {
-  return mockOrders.filter(order => 
-    order.items.some(item => item.supplierId === supplierId)
+  return mockOrders.filter((order: any) => 
+    order.items.some((item: any) => item.supplierId === supplierId)
   );
 };
 
 // 주문 상태별 필터링
 export const getOrdersByStatus = (status: string): Order[] => {
-  return mockOrders.filter(order => order.status === status);
+  return mockOrders.filter((order: any) => order.status === status);
 };
 
 // 사용자별 장바구니 가져오기

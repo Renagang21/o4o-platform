@@ -20,7 +20,7 @@ export default function Cart() {
     clearError,
   } = useOrderStore();
 
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
 
   useEffect(() => {
     if (user?.id) {
@@ -30,18 +30,18 @@ export default function Cart() {
 
   useEffect(() => {
     // 모든 아이템을 기본 선택
-    setSelectedItems(cartItems.map(item => item.id));
+    setSelectedItems(cartItems.map((item: any) => item.id));
   }, [cartItems]);
 
   const summary = calculateCartSummary();
 
   const getSelectedItems = () => {
-    return cartItems.filter(item => selectedItems.includes(item.id));
+    return cartItems.filter((item: any) => selectedItems.includes(item.id));
   };
 
   const getSelectedSummary = () => {
     const selected = getSelectedItems();
-    const subtotal = selected.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+    const subtotal = selected.reduce((sum: any, item: any) => sum + (item.unitPrice * item.quantity), 0);
     
     // 등급별 할인 계산
     let discountRate = 0;
@@ -73,7 +73,7 @@ export default function Cart() {
   const handleQuantityChange = async (cartItemId: string, newQuantity: number) => {
     try {
       await updateCartItem(cartItemId, newQuantity);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('수량 변경에 실패했습니다.');
     }
   };
@@ -81,9 +81,9 @@ export default function Cart() {
   const handleRemoveItem = async (cartItemId: string) => {
     try {
       await removeFromCart(cartItemId);
-      setSelectedItems(prev => prev.filter(id => id !== cartItemId));
+      setSelectedItems((prev: any) => prev.filter((id: any) => id !== cartItemId));
       toast.success('상품이 장바구니에서 제거되었습니다.');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('상품 제거에 실패했습니다.');
     }
   };
@@ -94,7 +94,7 @@ export default function Cart() {
         await clearCart();
         setSelectedItems([]);
         toast.success('장바구니가 비워졌습니다.');
-      } catch (error) {
+      } catch (error: any) {
         toast.error('장바구니 비우기에 실패했습니다.');
       }
     }
@@ -102,7 +102,7 @@ export default function Cart() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedItems(cartItems.map(item => item.id));
+      setSelectedItems(cartItems.map((item: any) => item.id));
     } else {
       setSelectedItems([]);
     }
@@ -110,9 +110,9 @@ export default function Cart() {
 
   const handleItemSelect = (cartItemId: string, checked: boolean) => {
     if (checked) {
-      setSelectedItems(prev => [...prev, cartItemId]);
+      setSelectedItems((prev: any) => [...prev, cartItemId]);
     } else {
-      setSelectedItems(prev => prev.filter(id => id !== cartItemId));
+      setSelectedItems((prev: any) => prev.filter((id: any) => id !== cartItemId));
     }
   };
 

@@ -25,7 +25,7 @@ const ProductCustomizer: FC = () => {
   });
 
   const handleProductSelect = (product: ProductData) => {
-    setCustomization(prev => ({
+    setCustomization((prev: any) => ({
       ...prev,
       product,
       price: product.basePrice
@@ -33,14 +33,14 @@ const ProductCustomizer: FC = () => {
   };
 
   const handleLabelUpload = (file: File) => {
-    setCustomization(prev => ({
+    setCustomization((prev: any) => ({
       ...prev,
       label: file
     }));
   };
 
   const handlePriceChange = (price: number) => {
-    setCustomization(prev => ({
+    setCustomization((prev: any) => ({
       ...prev,
       price
     }));

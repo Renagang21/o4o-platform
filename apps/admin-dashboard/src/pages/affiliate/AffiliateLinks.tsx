@@ -104,7 +104,7 @@ const AffiliateLinks = () => {
   // TODO: Implement create modal
   // const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const filteredLinks = links.filter(link => {
+  const filteredLinks = links.filter((link: any) => {
     const matchesPartner = selectedPartner === 'all' || link.partnerId === selectedPartner;
     const matchesStatus = selectedStatus === 'all' || link.status === selectedStatus;
     return matchesPartner && matchesStatus;
@@ -141,7 +141,7 @@ const AffiliateLinks = () => {
     }
   };
 
-  const totalStats = filteredLinks.reduce((acc, link) => ({
+  const totalStats = filteredLinks.reduce((acc: any, link: any) => ({
     clicks: acc.clicks + link.stats.clicks,
     conversions: acc.conversions + link.stats.conversions,
     revenue: acc.revenue + link.stats.revenue
@@ -180,7 +180,7 @@ const AffiliateLinks = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">활성 링크</p>
                 <p className="text-2xl font-bold text-modern-text-primary">
-                  {links.filter(l => l.status === 'active').length}
+                  {links.filter((l: any) => l.status === 'active').length}
                 </p>
               </div>
               <Link className="w-8 h-8 text-modern-primary opacity-20" />

@@ -78,7 +78,7 @@ export default function VendorSettings() {
   };
 
   const handleInputChange = (field: keyof StoreSettings, value: any) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+    setSettings((prev: any) => ({ ...prev, [field]: value }));
   };
 
   return (

@@ -123,7 +123,7 @@ const AffiliatePartnerForm: FC = () => {
   };
 
   const handleChange = (field: keyof AffiliatePartnerFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   if (isEditMode && isLoading) {

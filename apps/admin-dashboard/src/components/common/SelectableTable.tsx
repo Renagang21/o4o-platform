@@ -53,7 +53,7 @@ export const SelectableTable: FC<SelectableTableProps> = ({
               onCheckedChange={onToggleAll}
             />
           </td>
-          {columns.map(column => (
+          {columns.map((column: any) => (
             <th
               key={column.key}
               scope="col"
@@ -99,7 +99,7 @@ export const SelectableTable: FC<SelectableTableProps> = ({
                     onClick={(e: any) => e.stopPropagation()}
                   />
                 </th>
-                {columns.map(column => (
+                {columns.map((column: any) => (
                   <td
                     key={column.key}
                     className={`column-${column.key}`}
@@ -132,7 +132,7 @@ export const SelectableTable: FC<SelectableTableProps> = ({
               onCheckedChange={onToggleAll}
             />
           </td>
-          {columns.map(column => (
+          {columns.map((column: any) => (
             <th key={column.key} scope="col" className={`manage-column column-${column.key}`}>
               {column.label}
             </th>

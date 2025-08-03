@@ -18,7 +18,7 @@ import toast from 'react-hot-toast';
 import type { AffiliateCommission, ProcessCommissionRequest } from '@o4o/types';
 
 export const CommissionApprovalManager: FC = () => {
-  const [commissions, setCommissions] = useState([]);
+  const [commissions, setCommissions] = useState<any[]>([]);
   const [selectedCommissions, setSelectedCommissions] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('pending');
@@ -51,7 +51,7 @@ export const CommissionApprovalManager: FC = () => {
     if (selectedCommissions.size === filteredCommissions.length) {
       setSelectedCommissions(new Set());
     } else {
-      setSelectedCommissions(new Set(filteredCommissions.map(c => c.id)));
+      setSelectedCommissions(new Set(filteredCommissions.map((c: any) => c.id)));
     }
   };
 
@@ -128,7 +128,7 @@ export const CommissionApprovalManager: FC = () => {
     }
   };
 
-  const filteredCommissions = commissions.filter(commission => {
+  const filteredCommissions = commissions.filter((commission: any) => {
     const matchesSearch = searchQuery === '' ||
       commission.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       commission.affiliateUserId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -136,15 +136,15 @@ export const CommissionApprovalManager: FC = () => {
   });
 
   const totalAmount = filteredCommissions.reduce((sum: number, c: AffiliateCommission) => sum + c.commissionAmount, 0);
-  const selectedAmount = Array.from(selectedCommissions).reduce((sum, id) => {
-    const commission = commissions.find(c => c.id === id);
+  const selectedAmount = Array.from(selectedCommissions).reduce((sum: any, id: any) => {
+    const commission = commissions.find((c: any) => c.id === id);
     return sum + (commission?.commissionAmount || 0);
   }, 0);
 
   const exportToExcel = () => {
     const csv = [
       ['커미션ID', '추천인ID', '주문번호', '주문금액', '커미션율', '커미션금액', '상태', '생성일'].join(','),
-      ...filteredCommissions.map(c => [
+      ...filteredCommissions.map((c: any) => [
         c.id,
         c.affiliateUserId,
         c.orderId,
@@ -186,7 +186,7 @@ export const CommissionApprovalManager: FC = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">대기 중</p>
                 <p className="text-2xl font-bold text-modern-warning">
-                  {commissions.filter(c => c.status === 'pending').length}
+                  {commissions.filter((c: any) => c.status === 'pending').length}
                 </p>
               </div>
               <Clock className="w-8 h-8 text-modern-warning opacity-20" />
@@ -199,7 +199,7 @@ export const CommissionApprovalManager: FC = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">승인됨</p>
                 <p className="text-2xl font-bold text-modern-success">
-                  {commissions.filter(c => c.status === 'approved').length}
+                  {commissions.filter((c: any) => c.status === 'approved').length}
                 </p>
               </div>
               <CheckCircle className="w-8 h-8 text-modern-success opacity-20" />
@@ -276,8 +276,8 @@ export const CommissionApprovalManager: FC = () => {
                 variant={"outline" as const}
                 onClick={() => setShowPaymentDialog(true)}
                 disabled={selectedCommissions.size === 0 || 
-                  !Array.from(selectedCommissions).every(id => 
-                    commissions.find(c => c.id === id)?.status === 'approved'
+                  !Array.from(selectedCommissions).every((id: any) => 
+                    commissions.find((c: any) => c.id === id)?.status === 'approved'
                   )}
               >
                 <DollarSign className="w-4 h-4 mr-2" />

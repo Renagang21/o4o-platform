@@ -31,7 +31,7 @@ const Notifications: FC<NotificationsProps> = ({
   const [showOnlyUnread, setShowOnlyUnread] = useState(false);
 
   // 필터링된 알림
-  const filteredNotifications = notifications.filter(notification => {
+  const filteredNotifications = notifications.filter((notification: any) => {
     const typeMatch = filter === 'all' || notification.type === filter;
     const readMatch = !showOnlyUnread || !notification.read;
     return typeMatch && readMatch;
@@ -72,7 +72,7 @@ const Notifications: FC<NotificationsProps> = ({
         </div>
         <div className="wp-card-body">
           <div className="space-y-3">
-            {[1, 2, 3, 4].map(i => (
+            {[1, 2, 3, 4].map((i: any) => (
               <div key={i} className="h-16 bg-gray-100 rounded animate-pulse"></div>
             ))}
           </div>
@@ -121,7 +121,7 @@ const Notifications: FC<NotificationsProps> = ({
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex flex-wrap gap-2">
-              {filters.map(filterOption => (
+              {filters.map((filterOption: any) => (
                 <button
                   key={filterOption.key}
                   onClick={() => setFilter(filterOption.key as 'all' | 'urgent' | 'approval' | 'success' | 'info')}
@@ -161,7 +161,7 @@ const Notifications: FC<NotificationsProps> = ({
         {/* Notifications List */}
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {filteredNotifications.length > 0 ? (
-            filteredNotifications.map(notification => (
+            filteredNotifications.map((notification: any) => (
               <NotificationItem
                 key={notification.id}
                 notification={notification}
@@ -181,7 +181,7 @@ const Notifications: FC<NotificationsProps> = ({
                 <div>
                   <Filter className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500 text-sm">
-                    {filter === 'all' ? '읽지 않은' : filters.find(f => f.key === filter)?.label} 
+                    {filter === 'all' ? '읽지 않은' : filters.find((f: any) => f.key === filter)?.label} 
                     알림이 없습니다
                   </p>
                   <button

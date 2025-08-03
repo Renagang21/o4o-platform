@@ -23,7 +23,7 @@ const Login: FC = () => {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value
     }));
@@ -49,7 +49,7 @@ const Login: FC = () => {
         navigate(from, { replace: true });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       
       let errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';

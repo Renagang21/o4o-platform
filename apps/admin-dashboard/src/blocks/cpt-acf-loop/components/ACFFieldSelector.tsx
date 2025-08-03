@@ -179,7 +179,7 @@ export default function ACFFieldSelector({
   onFieldsChange,
 }: ACFFieldSelectorProps) {
   // const [fieldGroups, setFieldGroups] = useState<string[]>([]);
-  const [availableFields, setAvailableFields] = useState<string[]>([]);
+  const [availableFields, setAvailableFields] = useState<ACFField[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // const [expandedField, setExpandedField] = useState<string | null>(null);
@@ -324,7 +324,7 @@ export default function ACFFieldSelector({
 
   // Handle field reordering
   const handleDragEnd = (event: any) => {
-    const { active, over } = event;
+    const { active, over } = event as any;
 
     if (active.id !== over.id) {
       const oldIndex = selectedFields.findIndex((f) => f.key === active.id);

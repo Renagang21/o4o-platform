@@ -543,8 +543,8 @@ export class IncidentEscalationService {
       'payment-processing'
     ];
     
-    return services.some(service => 
-      customerFacingServices.some(cf => service.includes(cf))
+    return services.some((service: any) => 
+      customerFacingServices.some((cf: any) => service.includes(cf))
     );
   }
 
@@ -635,7 +635,7 @@ Please acknowledge and take appropriate action immediately.
     level: EscalationLevel,
     trigger: EscalationTrigger
   ): EscalationRule[] {
-    return Array.from(this.escalationRules.values()).filter(rule =>
+    return Array.from(this.escalationRules.values()).filter((rule: any) =>
       rule.enabled &&
       rule.fromLevel === level &&
       rule.trigger === trigger
@@ -783,7 +783,7 @@ Please acknowledge and take appropriate action immediately.
       }
     ];
 
-    rules.forEach(rule => {
+    rules.forEach((rule: any) => {
       this.escalationRules.set(rule.id, rule);
     });
 
@@ -867,7 +867,7 @@ Please acknowledge and take appropriate action immediately.
       }
     ];
 
-    schedules.forEach(schedule => {
+    schedules.forEach((schedule: any) => {
       this.onCallSchedules.set(schedule.teamId, schedule);
     });
 
@@ -949,7 +949,7 @@ Please acknowledge and take appropriate action immediately.
 
   async resolveEscalation(escalationId: string, resolvedBy: string, notes?: string): Promise<boolean> {
     const escalation = Array.from(this.activeEscalations.values())
-      .find(e => e.id === escalationId);
+      .find((e: any) => e.id === escalationId);
     
     if (escalation) {
       escalation.status = 'resolved';
@@ -976,7 +976,7 @@ Please acknowledge and take appropriate action immediately.
 
   async acknowledgeEscalation(escalationId: string, acknowledgedBy: string, notes?: string): Promise<boolean> {
     const escalation = Array.from(this.activeEscalations.values())
-      .find(e => e.id === escalationId);
+      .find((e: any) => e.id === escalationId);
     
     if (escalation) {
       const lastStep = escalation.escalationPath[escalation.escalationPath.length - 1];

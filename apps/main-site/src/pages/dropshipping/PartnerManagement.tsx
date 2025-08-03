@@ -309,7 +309,7 @@ const PartnerManagement: FC = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">활성 파트너</p>
-                    <p className="text-2xl font-bold text-gray-900">{partners.filter(p => p.status === 'active').length}명</p>
+                    <p className="text-2xl font-bold text-gray-900">{partners.filter((p: any) => p.status === 'active').length}명</p>
                   </div>
                 </div>
               </div>
@@ -321,7 +321,7 @@ const PartnerManagement: FC = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">승인 대기</p>
-                    <p className="text-2xl font-bold text-gray-900">{partners.filter(p => p.status === 'pending').length}명</p>
+                    <p className="text-2xl font-bold text-gray-900">{partners.filter((p: any) => p.status === 'pending').length}명</p>
                   </div>
                 </div>
               </div>
@@ -334,7 +334,7 @@ const PartnerManagement: FC = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">월 총 수수료</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {formatCurrency(partners.reduce((sum, p) => sum + p.monthlyEarnings, 0))}
+                      {formatCurrency(partners.reduce((sum: any, p: any) => sum + p.monthlyEarnings, 0))}
                     </p>
                   </div>
                 </div>
@@ -348,7 +348,7 @@ const PartnerManagement: FC = () => {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">평균 성과</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {Math.round(partners.filter(p => p.performanceScore > 0).reduce((sum, p) => sum + p.performanceScore, 0) / partners.filter(p => p.performanceScore > 0).length)}점
+                      {Math.round(partners.filter((p: any) => p.performanceScore > 0).reduce((sum: any, p: any) => sum + p.performanceScore, 0) / partners.filter((p: any) => p.performanceScore > 0).length)}점
                     </p>
                   </div>
                 </div>
@@ -359,8 +359,8 @@ const PartnerManagement: FC = () => {
             <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">등급별 파트너 분포</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['bronze', 'silver', 'gold', 'platinum'].map(tier => {
-                  const count = partners.filter(p => p.tier === tier).length;
+                {['bronze', 'silver', 'gold', 'platinum'].map((tier: any) => {
+                  const count = partners.filter((p: any) => p.tier === tier).length;
                   return (
                     <div key={tier} className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getTierColor(tier)} mb-2`}>
@@ -378,7 +378,7 @@ const PartnerManagement: FC = () => {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">🏆 최고 성과 파트너</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {partners
-                  .filter(p => p.status === 'active')
+                  .filter((p: any) => p.status === 'active')
                   .sort((a, b) => b.performanceScore - a.performanceScore)
                   .slice(0, 3)
                   .map(renderPartnerCard)}

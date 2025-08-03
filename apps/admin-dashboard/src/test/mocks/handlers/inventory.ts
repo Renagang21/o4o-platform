@@ -174,7 +174,7 @@ export const inventoryHandlers = [
     // Search filter
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredInventory = filteredInventory.filter(item =>
+      filteredInventory = filteredInventory.filter((item: any) =>
         item.productName.toLowerCase().includes(searchLower) ||
         item.sku.toLowerCase().includes(searchLower)
       );
@@ -182,7 +182,7 @@ export const inventoryHandlers = [
 
     // Status filter
     if (status && status !== 'all') {
-      filteredInventory = filteredInventory.filter(item => item.status === status);
+      filteredInventory = filteredInventory.filter((item: any) => item.status === status);
     }
 
     // Sort by last updated (newest first)
@@ -208,9 +208,9 @@ export const inventoryHandlers = [
   // Get inventory statistics
   http.get(`${API_BASE}/v1/inventory/stats`, () => {
     const totalItems = mockInventory.length;
-    const lowStockItems = mockInventory.filter(item => item.currentStock <= item.reorderPoint && item.status !== 'discontinued').length;
-    const outOfStockItems = mockInventory.filter(item => item.currentStock === 0).length;
-    const totalValue = mockInventory.reduce((sum, item) => sum + (item.currentStock * item.cost), 0);
+    const lowStockItems = mockInventory.filter((item: any) => item.currentStock <= item.reorderPoint && item.status !== 'discontinued').length;
+    const outOfStockItems = mockInventory.filter((item: any) => item.currentStock === 0).length;
+    const totalValue = mockInventory.reduce((sum: any, item: any) => sum + (item.currentStock * item.cost), 0);
 
     return HttpResponse.json({
       success: true,
@@ -219,15 +219,15 @@ export const inventoryHandlers = [
         lowStockItems,
         outOfStockItems,
         totalValue,
-        inStockItems: mockInventory.filter(item => item.status === 'in_stock').length,
-        discontinuedItems: mockInventory.filter(item => item.status === 'discontinued').length
+        inStockItems: mockInventory.filter((item: any) => item.status === 'in_stock').length,
+        discontinuedItems: mockInventory.filter((item: any) => item.status === 'discontinued').length
       }
     });
   }),
 
   // Get single inventory item
   http.get(`${API_BASE}/v1/inventory/:id`, ({ params }: any) => {
-    const item = mockInventory.find(i => i.id === params.id);
+    const item = mockInventory.find((i: any) => i.id === params.id);
     
     if (!item) {
       return HttpResponse.json(
@@ -244,13 +244,13 @@ export const inventoryHandlers = [
 
   // Get stock movements for an inventory item
   http.get(`${API_BASE}/v1/inventory/:id/movements`, ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '50');
 
     const itemMovements = mockMovements
-      .filter(movement => movement.inventoryItemId === id)
+      .filter((movement: any) => movement.inventoryItemId === id)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Pagination
@@ -273,7 +273,7 @@ export const inventoryHandlers = [
   // Adjust stock
   http.post(`${API_BASE}/v1/inventory/adjust`, async ({ request }: any) => {
     const data = await request.json();
-    const { inventoryItemId, type, quantity, reason, notes } = data;
+    const { inventoryItemId, type, quantity, reason, notes } = data as any;
 
     const itemIndex = mockInventory.findIndex(item => item.id === inventoryItemId);
     if (itemIndex === -1) {
@@ -352,7 +352,7 @@ export const inventoryHandlers = [
 
     // In a real implementation, this would create purchase orders
     // For now, just simulate the process
-    const reorderedItems = mockInventory.filter(item => itemIds.includes(item.id));
+    const reorderedItems = mockInventory.filter((item: any) => itemIds.includes(item.id));
     
     return HttpResponse.json({
       success: true,
@@ -367,7 +367,7 @@ export const inventoryHandlers = [
 
   // Update inventory item
   http.put(`${API_BASE}/v1/inventory/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
 
     const itemIndex = mockInventory.findIndex(item => item.id === id);

@@ -41,9 +41,9 @@ interface UserListResponse {
 
 export default function UserList() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -87,7 +87,7 @@ export default function UserList() {
   // Handle select all
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedUsers(users.map(user => user.id));
+      setSelectedUsers(users.map((user: any) => user.id));
     } else {
       setSelectedUsers([]);
     }
@@ -98,7 +98,7 @@ export default function UserList() {
     if (checked) {
       setSelectedUsers([...selectedUsers, userId]);
     } else {
-      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+      setSelectedUsers(selectedUsers.filter((id: any) => id !== userId));
     }
   };
 

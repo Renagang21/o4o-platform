@@ -77,7 +77,7 @@ export function useHelpTabs() {
   // Reset help tabs when route changes
   useEffect(() => {
     store.reset();
-  }, [location.pathname]);
+  }, [location.pathname, store]);
   
   return store;
 }

@@ -40,7 +40,7 @@ export default function MediaLibraryEnhanced() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedMedia, setSelectedMedia] = useState([]);
+  const [selectedMedia, setSelectedMedia] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
@@ -90,7 +90,7 @@ export default function MediaLibraryEnhanced() {
   // Delete media
   const deleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => apiClient.delete(`/media/${id}`)));
+      await Promise.all(ids.map((id: any) => apiClient.delete(`/media/${id}`)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });
@@ -135,7 +135,7 @@ export default function MediaLibraryEnhanced() {
     { id: 'mimeType', label: 'MIME type' }
   ];
   
-  const columns = allColumns.filter(col => isColumnVisible(col.id));
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform media to table rows
   const media = data?.media || [];
@@ -306,7 +306,7 @@ export default function MediaLibraryEnhanced() {
                   className={`attachment ${selectedMedia.includes(item.id) ? 'selected' : ''}`}
                   onClick={() => {
                     if (selectedMedia.includes(item.id)) {
-                      setSelectedMedia(selectedMedia.filter(id => id !== item.id));
+                      setSelectedMedia(selectedMedia.filter((id: any) => id !== item.id));
                     } else {
                       setSelectedMedia([...selectedMedia, item.id]);
                     }
@@ -340,7 +340,7 @@ export default function MediaLibraryEnhanced() {
             if (selected) {
               setSelectedMedia([...selectedMedia, id]);
             } else {
-              setSelectedMedia(selectedMedia.filter(mediaId => mediaId !== id));
+              setSelectedMedia(selectedMedia.filter((mediaId: any) => mediaId !== id));
             }
           }}
           onSelectAll={(selected) => {

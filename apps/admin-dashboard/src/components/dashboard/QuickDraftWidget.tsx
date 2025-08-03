@@ -32,7 +32,7 @@ const QuickDraftWidget: FC = () => {
       // Clear form
       setTitle('');
       setContent('');
-    } catch (err) {
+    } catch (err: any) {
       error('Failed to save draft. Please try again.');
     } finally {
       setIsSaving(false);
@@ -92,7 +92,7 @@ const QuickDraftWidget: FC = () => {
       <div className="drafts-list">
         <h3>Your Recent Drafts</h3>
         <ul>
-          {recentDrafts.map(draft => (
+          {recentDrafts.map((draft: any) => (
             <li key={draft.id}>
               <div className="draft-title">
                 <a href={`/posts/${draft.id}/edit`} className="draft-link">

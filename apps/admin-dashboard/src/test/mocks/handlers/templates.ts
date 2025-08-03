@@ -430,23 +430,23 @@ export const templateHandlers = [
     // Apply filters
     if (search) {
       const searchLower = search.toLowerCase()
-      filteredTemplates = filteredTemplates.filter(template =>
+      filteredTemplates = filteredTemplates.filter((template: any) =>
         template.name.toLowerCase().includes(searchLower) ||
         template.description.toLowerCase().includes(searchLower) ||
-        template.metadata.tags.some(tag => tag.toLowerCase().includes(searchLower))
+        template.metadata.tags.some((tag: any) => tag.toLowerCase().includes(searchLower))
       )
     }
 
     if (category && category !== 'all') {
-      filteredTemplates = filteredTemplates.filter(template => template.category === category)
+      filteredTemplates = filteredTemplates.filter((template: any) => template.category === category)
     }
 
     if (type && type !== 'all') {
-      filteredTemplates = filteredTemplates.filter(template => template.type === type)
+      filteredTemplates = filteredTemplates.filter((template: any) => template.type === type)
     }
 
     if (status && status !== 'all') {
-      filteredTemplates = filteredTemplates.filter(template => template.status === status)
+      filteredTemplates = filteredTemplates.filter((template: any) => template.status === status)
     }
 
     // Sort by updated date
@@ -470,7 +470,7 @@ export const templateHandlers = [
 
   // Get single template
   http.get('/api/v1/templates/:id', ({ params }: any) => {
-    const template = templates.find(t => t.id === params.id)
+    const template = templates.find((t: any) => t.id === params.id)
     if (!template) {
       return HttpResponse.json({ error: 'Template not found' }, { status: 404 })
     }
@@ -601,7 +601,7 @@ export const templateHandlers = [
 
   // Duplicate template
   http.post('/api/v1/templates/:id/duplicate', ({ params }: any) => {
-    const original = templates.find(t => t.id === params.id)
+    const original = templates.find((t: any) => t.id === params.id)
 
     if (!original) {
       return HttpResponse.json({ error: 'Template not found' }, { status: 404 })
@@ -637,26 +637,26 @@ export const templateHandlers = [
     // Apply filters
     if (search) {
       const searchLower = search.toLowerCase()
-      filteredItems = filteredItems.filter(item =>
+      filteredItems = filteredItems.filter((item: any) =>
         item.name.toLowerCase().includes(searchLower) ||
         item.description.toLowerCase().includes(searchLower) ||
-        item.metadata.tags.some(tag => tag.toLowerCase().includes(searchLower))
+        item.metadata.tags.some((tag: any) => tag.toLowerCase().includes(searchLower))
       )
     }
 
     if (category) {
-      filteredItems = filteredItems.filter(item => item.category === category)
+      filteredItems = filteredItems.filter((item: any) => item.category === category)
     }
 
     if (isPremium !== null) {
-      filteredItems = filteredItems.filter(item => 
+      filteredItems = filteredItems.filter((item: any) => 
         item.isPremium === (isPremium === 'true')
       )
     }
 
     if (rating) {
       const minRating = parseFloat(rating)
-      filteredItems = filteredItems.filter(item => item.metadata.rating >= minRating)
+      filteredItems = filteredItems.filter((item: any) => item.metadata.rating >= minRating)
     }
 
     // Sort by popularity
@@ -677,7 +677,7 @@ export const templateHandlers = [
 
   // Import template from library
   http.post('/api/v1/template-library/:id/import', ({ params }: any) => {
-    const libraryItem = libraryItems.find(item => item.id === params.id)
+    const libraryItem = libraryItems.find((item: any) => item.id === params.id)
 
     if (!libraryItem) {
       return HttpResponse.json({ error: 'Template not found' }, { status: 404 })

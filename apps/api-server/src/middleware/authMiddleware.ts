@@ -399,7 +399,7 @@ export class AuthMiddleware {
 
       const requestDomain = req.headers.host || req.user.domain || '';
       
-      if (!allowedDomains.some(domain => requestDomain.includes(domain))) {
+      if (!allowedDomains.some((domain: any) => requestDomain.includes(domain))) {
         return res.status(403).json({
           success: false,
           message: 'Domain access not allowed'

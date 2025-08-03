@@ -145,7 +145,7 @@ export const menuHandlers = [
   // Get single menu
   http.get(`${API_BASE}/v1/menus/:id`, ({ params }) => {
     const { id } = params as { id: string };
-    const menu = menus.find(m => m.id === id);
+    const menu = menus.find((m: any) => m.id === id);
     if (!menu) {
       return HttpResponse.json({ error: 'Menu not found' }, { status: 404 });
     }
@@ -215,7 +215,7 @@ export const menuHandlers = [
     // Deactivate other menus in the same location if activating
     if (isActive) {
       const location = menus[index].location;
-      menus = menus.map(menu => 
+      menus = menus.map((menu: any) => 
         menu.location === location && menu.id !== params.id
           ? { ...menu, isActive: false }
           : menu

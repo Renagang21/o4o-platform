@@ -25,7 +25,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
           컬럼 수
         </Label>
         <div className="grid grid-cols-3 gap-2">
-          {columnOptions.map(col => (
+          {columnOptions.map((col: any) => (
             <button
               key={col}
               onClick={() => onChange({ ...settings, columns: col })}

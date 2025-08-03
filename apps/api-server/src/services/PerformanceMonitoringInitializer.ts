@@ -486,7 +486,7 @@ export class PerformanceMonitoringInitializer {
       message: `Performance monitoring services health check failed`,
       data: {
         overallStatus: healthStatus.overallStatus,
-        failedServices: healthStatus.issues.map(i => i.service),
+        failedServices: healthStatus.issues.map((i: any) => i.service),
         issues: healthStatus.issues
       },
       timestamp: new Date().toISOString(),
@@ -625,7 +625,7 @@ export class PerformanceMonitoringInitializer {
   private async getSystemAlerts(): Promise<SystemAlert[]> {
     try {
       const alerts = await this.redis.lrange('system_alerts', 0, 9);
-      return alerts.map(a => JSON.parse(a));
+      return alerts.map((a: any) => JSON.parse(a));
     } catch (error) {
       return [];
     }

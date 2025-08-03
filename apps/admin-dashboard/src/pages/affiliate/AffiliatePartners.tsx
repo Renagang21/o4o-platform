@@ -97,7 +97,7 @@ const AffiliatePartners = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const filteredPartners = partners.filter(partner => {
+  const filteredPartners = partners.filter((partner: any) => {
     const matchesSearch = partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          partner.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'all' || partner.type === typeFilter;
@@ -142,7 +142,7 @@ const AffiliatePartners = () => {
     }
   };
 
-  const totalStats = partners.reduce((acc, partner) => ({
+  const totalStats = partners.reduce((acc: any, partner: any) => ({
     clicks: acc.clicks + partner.stats.clicks,
     conversions: acc.conversions + partner.stats.conversions,
     revenue: acc.revenue + partner.stats.revenue

@@ -76,13 +76,13 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
       return;
     }
 
-    const values = newOptionValues.split(',').map(v => v.trim()).filter(v => v);
+    const values = newOptionValues.split(',').map((v: any) => v.trim()).filter((v: any) => v);
     if (values.length === 0) {
       toast.error('옵션 값을 입력하세요');
       return;
     }
 
-    if (options.some(opt => opt.name === newOptionName)) {
+    if (options.some((opt: any) => opt.name === newOptionName)) {
       toast.error('이미 존재하는 옵션입니다');
       return;
     }
@@ -100,7 +100,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
     const combinations = generateVariantCombinations(updatedOptions);
     const newVariants = combinations.map((combo, index) => {
       // Check if variant already exists
-      const existingVariant = variants.find(v => 
+      const existingVariant = variants.find((v: any) => 
         JSON.stringify(v.options) === JSON.stringify(combo)
       );
 
@@ -129,7 +129,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
 
   // Remove option
   const handleRemoveOption = (optionId: string) => {
-    const updatedOptions = options.filter(opt => opt.id !== optionId);
+    const updatedOptions = options.filter((opt: any) => opt.id !== optionId);
     onOptionsChange(updatedOptions);
 
     if (updatedOptions.length === 0) {
@@ -139,13 +139,13 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
       const combinations = generateVariantCombinations(updatedOptions);
       const newVariants = combinations.map((combo, index) => {
         // Try to preserve existing variant data
-        const existingVariant = variants.find(v => {
-          const matchingKeys = Object.keys(combo).every(key => v.options[key] === combo[key]);
+        const existingVariant = variants.find((v: any) => {
+          const matchingKeys = Object.keys(combo).every((key: any) => v.options[key] === combo[key]);
           return matchingKeys;
         });
 
         if (existingVariant) {
-          const { options: oldOptions, ...variantData } = existingVariant;
+          const { options: oldOptions, ...variantData } = existingVariant as any;
           return {
             ...variantData,
             options: combo
@@ -169,7 +169,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
 
   // Update variant
   const handleVariantChange = (variantId: string, field: keyof ProductVariant, value: any) => {
-    const updatedVariants = variants.map(variant => {
+    const updatedVariants = variants.map((variant: any) => {
       if (variant.id === variantId) {
         return { ...variant, [field]: value };
       }
@@ -180,7 +180,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
 
   // Bulk update variants
   const handleBulkUpdate = (field: 'price' | 'stock', value: number) => {
-    const updatedVariants = variants.map(variant => ({
+    const updatedVariants = variants.map((variant: any) => ({
       ...variant,
       [field]: value
     }));
@@ -204,12 +204,12 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
             {/* Existing Options */}
             {options.length > 0 && (
               <div className="space-y-2">
-                {options.map(option => (
+                {options.map((option: any) => (
                   <div key={option.id} className="flex items-center justify-between p-3 bg-modern-bg-tertiary rounded">
                     <div>
                       <span className="font-medium">{option.name}</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {option.values.map(value => (
+                        {option.values.map((value: any) => (
                           <Badge key={value} variant="secondary">{value}</Badge>
                         ))}
                       </div>
@@ -306,7 +306,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {variants.map(variant => (
+                  {variants.map((variant: any) => (
                     <tr key={variant.id} className="border-b">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
@@ -373,7 +373,7 @@ const ProductVariantManager: FC<ProductVariantManagerProps> = ({
                   <span className="text-sm text-modern-text-secondary">총 재고</span>
                 </div>
                 <span className="font-medium">
-                  {variants.reduce((sum, v) => sum + v.stock, 0).toLocaleString()}개
+                  {variants.reduce((sum: any, v: any) => sum + v.stock, 0).toLocaleString()}개
                 </span>
               </div>
             </div>

@@ -67,7 +67,7 @@ const SignageList: FC = () => {
   };
 
   const filteredContents = contents
-    .filter(content => filter === 'all' || content.type === filter)
+    .filter((content: any) => filter === 'all' || content.type === filter)
     .sort((a, b) => {
       if (sortBy === 'date') {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

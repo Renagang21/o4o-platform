@@ -273,7 +273,7 @@ const ForumPostDetail: FC = () => {
           </div>
         )}
 
-        {comment.replies && comment.replies.map(reply => renderComment(reply, level + 1))}
+        {comment.replies && comment.replies.map((reply: any) => renderComment(reply, level + 1))}
       </div>
     );
   };

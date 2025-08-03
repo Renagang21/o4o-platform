@@ -48,7 +48,12 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
     lowStockThreshold: product?.lowStockThreshold || 10,
     autoCalculatePrice: true,
     images: product?.images || []
-  });
+  ,
+    seoTitle: '',
+    seoDescription: '',
+    compareAtPrice: 0,
+    cost: 0,
+    weight: 0});
 
   const [priceCalculation, setPriceCalculation] = useState<PriceCalculation | null>(null);
   const [marginWarning, setMarginWarning] = useState('');
@@ -60,7 +65,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
       // 자동 계산 모드
       if (formData.autoCalculatePrice) {
         const sellPrice = calculateSellPrice(formData.supplyPrice, formData.marginRate);
-        setFormData(prev => ({ ...prev, sellPrice }));
+        setFormData((prev: any) => ({ ...prev, sellPrice }));
       }
 
       // 수익 분배 계산
@@ -94,7 +99,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
 
   // 입력 핸들러
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   // 폼 제출

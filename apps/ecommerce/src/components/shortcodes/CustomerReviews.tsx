@@ -86,8 +86,8 @@ const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
 
   // Filter and sort reviews
   let filteredReviews = mockReviews
-    .filter(review => review.rating >= minRating)
-    .filter(review => selectedRating === null || review.rating === selectedRating);
+    .filter((review: any) => review.rating >= minRating)
+    .filter((review: any) => selectedRating === null || review.rating === selectedRating);
 
   // Sort reviews
   filteredReviews.sort((a, b) => {
@@ -108,16 +108,16 @@ const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
   const displayReviews = filteredReviews.slice(0, limit);
 
   // Calculate rating summary
-  const ratingCounts = mockReviews.reduce((acc, review) => {
+  const ratingCounts = mockReviews.reduce((acc: any, review: any) => {
     acc[review.rating] = (acc[review.rating] || 0) + 1;
     return acc;
   }, {} as Record<number, number>);
 
   const totalReviews = mockReviews.length;
-  const averageRating = mockReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+  const averageRating = mockReviews.reduce((sum: any, r: any) => sum + r.rating, 0) / totalReviews;
 
   const handleHelpful = (reviewId: string) => {
-    setHelpfulReviews(prev => {
+    setHelpfulReviews((prev: any) => {
       const newSet = new Set(prev);
       if (newSet.has(reviewId)) {
         newSet.delete(reviewId);
@@ -152,7 +152,7 @@ const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
           </div>
           
           <div className="space-y-1">
-            {[5, 4, 3, 2, 1].map(rating => (
+            {[5, 4, 3, 2, 1].map((rating: any) => (
               <button
                 key={rating}
                 onClick={() => setSelectedRating(selectedRating === rating ? null : rating)}

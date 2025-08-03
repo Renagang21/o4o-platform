@@ -195,7 +195,7 @@ app.use(helmet({
 const corsOptions: CorsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Get allowed origins from environment variable
-    const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [];
+    const envOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map((o: any) => o.trim()) : [];
     
     const allowedOrigins = [
       process.env.FRONTEND_URL || "http://localhost:3011",

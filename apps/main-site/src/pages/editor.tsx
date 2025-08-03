@@ -19,6 +19,7 @@ export default function EditorPage() {
     if (page) {
       loadContent()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
 
   const loadContent = async () => {
@@ -48,7 +49,7 @@ export default function EditorPage() {
           ]
         })
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.')
       toast.error('콘텐츠를 불러오는데 실패했습니다.')
     } finally {
@@ -68,7 +69,7 @@ export default function EditorPage() {
       // 저장 성공 시 자동으로 버전 추가
       addVersion(page as string, content)
       toast.success('저장되었습니다.')
-    } catch (err) {
+    } catch (err: any) {
       toast.error('저장에 실패했습니다.')
     } finally {
       setIsLoading(false)

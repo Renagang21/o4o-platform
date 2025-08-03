@@ -52,7 +52,7 @@ const UsersListBulk: FC = () => {
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => authClient.api.delete(`/users/${id}`)));
+      await Promise.all(ids.map((id: any) => authClient.api.delete(`/users/${id}`)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -66,7 +66,7 @@ const UsersListBulk: FC = () => {
   // Bulk role update mutation
   const bulkRoleMutation = useMutation({
     mutationFn: async ({ ids, role }: { ids: string[], role: string }) => {
-      await Promise.all(ids.map(id => 
+      await Promise.all(ids.map((id: any) => 
         authClient.api.patch(`/users/${id}`, { role })
       ));
     },
@@ -82,7 +82,7 @@ const UsersListBulk: FC = () => {
   // Send password reset email
   const sendPasswordResetMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => 
+      await Promise.all(ids.map((id: any) => 
         authClient.api.post(`/users/${id}/send-password-reset`)
       ));
     },

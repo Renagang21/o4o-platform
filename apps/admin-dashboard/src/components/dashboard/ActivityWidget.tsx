@@ -68,7 +68,7 @@ const ActivityWidget: FC<ActivityWidgetProps> = ({
   };
 
   // Filter activities based on settings
-  const filteredActivity = recentActivity.filter(item => {
+  const filteredActivity = recentActivity.filter((item: any) => {
     if (item.type === 'post' && !showPosts) return false;
     if (item.type === 'comment' && !showComments) return false;
     if (item.type === 'user' && !showUsers) return false;
@@ -77,13 +77,13 @@ const ActivityWidget: FC<ActivityWidgetProps> = ({
 
   return (
     <div id="dashboard_activity" className="activity-widget">
-      {showPosts && filteredActivity.some(item => item.type === 'post') && (
+      {showPosts && filteredActivity.some((item: any) => item.type === 'post') && (
         <div className="activity-block">
           <h3>Recently Published</h3>
           <ul id="published-posts" className="activity-list">
             {filteredActivity
-              .filter(item => item.type === 'post')
-              .map(item => (
+              .filter((item: any) => item.type === 'post')
+              .map((item: any) => (
               <li key={item.id}>
                 <span className="activity-icon">{getIcon(item.type)}</span>
                 <span>
@@ -96,13 +96,13 @@ const ActivityWidget: FC<ActivityWidgetProps> = ({
         </div>
       )}
       
-      {showComments && filteredActivity.some(item => item.type === 'comment') && (
+      {showComments && filteredActivity.some((item: any) => item.type === 'comment') && (
         <div className="activity-block">
           <h3>Recent Comments</h3>
           <ul id="recent-comments" className="activity-list">
             {filteredActivity
-              .filter(item => item.type === 'comment')
-              .map(item => (
+              .filter((item: any) => item.type === 'comment')
+              .map((item: any) => (
               <li key={item.id}>
                 <div className="dashboard-comment-wrap">
                   <span className="comment-meta">
@@ -136,13 +136,13 @@ const ActivityWidget: FC<ActivityWidgetProps> = ({
         </div>
       )}
       
-      {showUsers && filteredActivity.some(item => item.type === 'user') && (
+      {showUsers && filteredActivity.some((item: any) => item.type === 'user') && (
         <div className="activity-block">
           <h3>Recent User Activity</h3>
           <ul id="recent-users" className="activity-list">
             {filteredActivity
-              .filter(item => item.type === 'user')
-              .map(item => (
+              .filter((item: any) => item.type === 'user')
+              .map((item: any) => (
               <li key={item.id}>
                 <span className="activity-icon">{getIcon(item.type)}</span>
                 <span>

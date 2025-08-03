@@ -27,7 +27,7 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  async (error: any) => {
     if (error.response?.status === 401) {
       // Public API 호출인 경우 로그인 페이지로 리다이렉트하지 않음
       const isPublicApi = error.config?.url?.includes('/public/') || 

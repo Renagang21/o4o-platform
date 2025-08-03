@@ -31,7 +31,7 @@ api.interceptors.request.use(
           if (parsed.state?.token) {
             token = parsed.state.token
           }
-        } catch (e) {
+        } catch (e: any) {
           console.warn('Failed to parse admin-auth-storage')
         }
       }

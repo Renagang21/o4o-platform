@@ -47,7 +47,7 @@ export class OperationsController {
       // Return simplified health status for external monitoring
       const healthStatus = {
         status: systemStatus.overallStatus,
-        services: systemStatus.services.map(service => ({
+        services: systemStatus.services.map((service: any) => ({
           name: service.serviceName,
           status: service.status,
           responseTime: service.responseTime
@@ -204,11 +204,11 @@ export class OperationsController {
       let filteredAlerts = alerts;
       
       if (status && status !== 'all') {
-        filteredAlerts = filteredAlerts.filter(alert => alert.status === status);
+        filteredAlerts = filteredAlerts.filter((alert: any) => alert.status === status);
       }
       
       if (severity && severity !== 'all') {
-        filteredAlerts = filteredAlerts.filter(alert => alert.severity === severity);
+        filteredAlerts = filteredAlerts.filter((alert: any) => alert.severity === severity);
       }
 
       const startIndex = parseInt(offset as string);
@@ -218,7 +218,7 @@ export class OperationsController {
       res.json({
         success: true,
         data: {
-          alerts: paginatedAlerts.map(alert => ({
+          alerts: paginatedAlerts.map((alert: any) => ({
             id: alert.id,
             type: alert.alertType,
             severity: alert.severity,
@@ -246,10 +246,10 @@ export class OperationsController {
           },
           summary: {
             total: alerts.length,
-            active: alerts.filter(a => a.status === AlertStatus.ACTIVE).length,
-            critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL).length,
-            high: alerts.filter(a => a.severity === AlertSeverity.HIGH).length,
-            escalated: alerts.filter(a => a.isEscalated).length
+            active: alerts.filter((a: any) => a.status === AlertStatus.ACTIVE).length,
+            critical: alerts.filter((a: any) => a.severity === AlertSeverity.CRITICAL).length,
+            high: alerts.filter((a: any) => a.severity === AlertSeverity.HIGH).length,
+            escalated: alerts.filter((a: any) => a.isEscalated).length
           }
         }
       });
@@ -315,7 +315,7 @@ export class OperationsController {
       res.json({
         success: true,
         data: {
-          rules: rules.map(rule => ({
+          rules: rules.map((rule: any) => ({
             ...rule,
             isActive: rule.enabled,
             conditionDescription: this.formatConditionDescription(rule)
@@ -466,12 +466,12 @@ export class OperationsController {
           status: systemStatus.overallStatus,
           uptime: systemStatus.infrastructure.server.uptime,
           services: systemStatus.services.length,
-          healthyServices: systemStatus.services.filter(s => s.status === 'healthy').length,
+          healthyServices: systemStatus.services.filter((s: any) => s.status === 'healthy').length,
           alerts: {
             total: alerts.length,
-            critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL).length,
-            high: alerts.filter(a => a.severity === AlertSeverity.HIGH && a.status === AlertStatus.ACTIVE).length,
-            acknowledged: alerts.filter(a => a.status === AlertStatus.ACKNOWLEDGED).length
+            critical: alerts.filter((a: any) => a.severity === AlertSeverity.CRITICAL).length,
+            high: alerts.filter((a: any) => a.severity === AlertSeverity.HIGH && a.status === AlertStatus.ACTIVE).length,
+            acknowledged: alerts.filter((a: any) => a.status === AlertStatus.ACKNOWLEDGED).length
           }
         },
         systemStatus,
@@ -503,7 +503,7 @@ export class OperationsController {
       // Public status page with limited information
       const statusPage = {
         status: systemStatus.overallStatus,
-        services: systemStatus.services.map(service => ({
+        services: systemStatus.services.map((service: any) => ({
           name: service.serviceName,
           status: service.status,
           responseTime: service.responseTime
@@ -530,7 +530,7 @@ export class OperationsController {
     value: number;
     unit: string;
   }> {
-    return metrics.map(metric => ({
+    return metrics.map((metric: any) => ({
       timestamp: metric.createdAt,
       value: parseFloat(metric.value),
       unit: metric.unit
@@ -660,9 +660,9 @@ export class OperationsController {
   }>> {
     const alerts = await this.operationsService.getActiveAlerts();
     const incidents = alerts
-      .filter(alert => alert.severity === AlertSeverity.CRITICAL)
+      .filter((alert: any) => alert.severity === AlertSeverity.CRITICAL)
       .slice(0, 5)
-      .map(alert => ({
+      .map((alert: any) => ({
         id: alert.id,
         title: alert.title,
         status: alert.status,

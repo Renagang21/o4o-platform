@@ -241,7 +241,7 @@ const ProductCategories: FC = () => {
       ...formData,
       seo: {
         ...formData.seo,
-        keywords: formData.seo.keywords.split(',').map((k: string) => k.trim()).filter(k => k)
+        keywords: formData.seo.keywords.split(',').map((k: string) => k.trim()).filter((k: any) => k)
       }
     };
 
@@ -274,7 +274,7 @@ const ProductCategories: FC = () => {
       return;
     }
 
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       attributes: [...prev.attributes, { ...newAttribute }]
     }));
@@ -288,7 +288,7 @@ const ProductCategories: FC = () => {
   };
 
   const handleRemoveAttribute = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       attributes: prev.attributes.filter((_, i) => i !== index)
     }));
@@ -376,7 +376,7 @@ const ProductCategories: FC = () => {
 
         {hasChildren && isExpanded && (
           <div>
-            {category.children!.map(child => renderCategory(child, level + 1))}
+            {category.children!.map((child: any) => renderCategory(child, level + 1))}
           </div>
         )}
       </div>
@@ -447,7 +447,7 @@ const ProductCategories: FC = () => {
                       id="name"
                       value={formData.name}
                       onChange={(e: any) => {
-                        setFormData(prev => ({
+                        setFormData((prev: any) => ({
                           ...prev,
                           name: e.target.value,
                           slug: editingCategory ? prev.slug : generateSlug(e.target.value)
@@ -462,7 +462,7 @@ const ProductCategories: FC = () => {
                     <Input
                       id="slug"
                       value={formData.slug}
-                      onChange={(e: any) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                      onChange={(e: any) => setFormData((prev: any) => ({ ...prev, slug: e.target.value }))}
                       placeholder="예: electronics"
                     />
                   </div>
@@ -473,7 +473,7 @@ const ProductCategories: FC = () => {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e: any) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e: any) => setFormData((prev: any) => ({ ...prev, description: e.target.value }))}
                     placeholder="카테고리에 대한 설명을 입력하세요..."
                     rows={3}
                   />
@@ -489,7 +489,7 @@ const ProductCategories: FC = () => {
                   <Switch
                     id="active"
                     checked={formData.active}
-                    onCheckedChange={(checked: boolean) => setFormData(prev => ({ ...prev, active: checked }))}
+                    onCheckedChange={(checked: boolean) => setFormData((prev: any) => ({ ...prev, active: checked }))}
                   />
                 </div>
               </div>
@@ -528,7 +528,7 @@ const ProductCategories: FC = () => {
                     <Label>속성 키</Label>
                     <Input
                       value={newAttribute.key}
-                      onChange={(e: any) => setNewAttribute(prev => ({ ...prev, key: e.target.value }))}
+                      onChange={(e: any) => setNewAttribute((prev: any) => ({ ...prev, key: e.target.value }))}
                       placeholder="예: color"
                     />
                   </div>
@@ -536,7 +536,7 @@ const ProductCategories: FC = () => {
                     <Label>라벨</Label>
                     <Input
                       value={newAttribute.label}
-                      onChange={(e: any) => setNewAttribute(prev => ({ ...prev, label: e.target.value }))}
+                      onChange={(e: any) => setNewAttribute((prev: any) => ({ ...prev, label: e.target.value }))}
                       placeholder="예: 색상"
                     />
                   </div>
@@ -544,7 +544,7 @@ const ProductCategories: FC = () => {
                     <Label>타입</Label>
                     <select
                       value={newAttribute.type}
-                      onChange={(e: any) => setNewAttribute(prev => ({ ...prev, type: e.target.value as any }))}
+                      onChange={(e: any) => setNewAttribute((prev: any) => ({ ...prev, type: e.target.value as any }))}
                       className="h-10 px-3 py-2 border border-modern-border-primary rounded-md"
                     >
                       <option value="text">텍스트</option>
@@ -556,7 +556,7 @@ const ProductCategories: FC = () => {
                   <div className="flex items-center gap-2">
                     <Switch
                       checked={newAttribute.required}
-                      onCheckedChange={(checked: boolean) => setNewAttribute(prev => ({ ...prev, required: checked }))}
+                      onCheckedChange={(checked: boolean) => setNewAttribute((prev: any) => ({ ...prev, required: checked }))}
                     />
                     <Label>필수</Label>
                   </div>
@@ -580,7 +580,7 @@ const ProductCategories: FC = () => {
                       id="freeShippingThreshold"
                       type="number"
                       value={formData.shippingPolicy.freeShippingThreshold}
-                      onChange={(e: any) => setFormData(prev => ({
+                      onChange={(e: any) => setFormData((prev: any) => ({
                         ...prev,
                         shippingPolicy: {
                           ...prev.shippingPolicy,
@@ -596,7 +596,7 @@ const ProductCategories: FC = () => {
                       id="baseShippingFee"
                       type="number"
                       value={formData.shippingPolicy.baseShippingFee}
-                      onChange={(e: any) => setFormData(prev => ({
+                      onChange={(e: any) => setFormData((prev: any) => ({
                         ...prev,
                         shippingPolicy: {
                           ...prev.shippingPolicy,
@@ -618,7 +618,7 @@ const ProductCategories: FC = () => {
                   <Input
                     id="seoTitle"
                     value={formData.seo.title}
-                    onChange={(e: any) => setFormData(prev => ({
+                    onChange={(e: any) => setFormData((prev: any) => ({
                       ...prev,
                       seo: { ...prev.seo, title: e.target.value }
                     }))}
@@ -631,7 +631,7 @@ const ProductCategories: FC = () => {
                   <Textarea
                     id="seoDescription"
                     value={formData.seo.description}
-                    onChange={(e: any) => setFormData(prev => ({
+                    onChange={(e: any) => setFormData((prev: any) => ({
                       ...prev,
                       seo: { ...prev.seo, description: e.target.value }
                     }))}
@@ -645,7 +645,7 @@ const ProductCategories: FC = () => {
                   <Input
                     id="seoKeywords"
                     value={formData.seo.keywords}
-                    onChange={(e: any) => setFormData(prev => ({
+                    onChange={(e: any) => setFormData((prev: any) => ({
                       ...prev,
                       seo: { ...prev.seo, keywords: e.target.value }
                     }))}

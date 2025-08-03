@@ -78,18 +78,18 @@ export const affiliateHandlers = [
     let filteredPartners = [...mockPartners];
     
     if (search) {
-      filteredPartners = filteredPartners.filter(partner =>
+      filteredPartners = filteredPartners.filter((partner: any) =>
         partner.name.toLowerCase().includes(search.toLowerCase()) ||
         partner.email.toLowerCase().includes(search.toLowerCase())
       );
     }
     
     if (type && type !== 'all') {
-      filteredPartners = filteredPartners.filter(partner => partner.type === type);
+      filteredPartners = filteredPartners.filter((partner: any) => partner.type === type);
     }
     
     if (status && status !== 'all') {
-      filteredPartners = filteredPartners.filter(partner => partner.status === status);
+      filteredPartners = filteredPartners.filter((partner: any) => partner.status === status);
     }
     
     return HttpResponse.json({
@@ -101,7 +101,7 @@ export const affiliateHandlers = [
 
   // Get single partner
   http.get(`${API_BASE}/v1/affiliate/partners/:id`, ({ params }: any) => {
-    const partner = mockPartners.find(p => p.id === params.id);
+    const partner = mockPartners.find((p: any) => p.id === params.id);
     
     if (!partner) {
       return HttpResponse.json(
@@ -145,7 +145,7 @@ export const affiliateHandlers = [
 
   // Update partner
   http.put(`${API_BASE}/v1/affiliate/partners/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
     
     const index = mockPartners.findIndex(p => p.id === id);
@@ -170,7 +170,7 @@ export const affiliateHandlers = [
 
   // Delete partner
   http.delete(`${API_BASE}/v1/affiliate/partners/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const index = mockPartners.findIndex(p => p.id === id);
     
     if (index === -1) {
@@ -190,8 +190,8 @@ export const affiliateHandlers = [
 
   // Approve partner
   http.post(`${API_BASE}/v1/affiliate/partners/:id/approve`, ({ params }: any) => {
-    const { id } = params;
-    const partner = mockPartners.find(p => p.id === id);
+    const { id } = params as any;
+    const partner = mockPartners.find((p: any) => p.id === id);
     
     if (!partner) {
       return HttpResponse.json(
@@ -211,8 +211,8 @@ export const affiliateHandlers = [
 
   // Suspend partner
   http.post(`${API_BASE}/v1/affiliate/partners/:id/suspend`, ({ params }: any) => {
-    const { id } = params;
-    const partner = mockPartners.find(p => p.id === id);
+    const { id } = params as any;
+    const partner = mockPartners.find((p: any) => p.id === id);
     
     if (!partner) {
       return HttpResponse.json(
@@ -232,7 +232,7 @@ export const affiliateHandlers = [
 
   // Get partner statistics
   http.get(`${API_BASE}/v1/affiliate/statistics`, () => {
-    const totalStats = mockPartners.reduce((acc, partner) => ({
+    const totalStats = mockPartners.reduce((acc: any, partner: any) => ({
       clicks: acc.clicks + partner.stats.clicks,
       conversions: acc.conversions + partner.stats.conversions,
       revenue: acc.revenue + partner.stats.revenue,

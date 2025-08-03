@@ -129,18 +129,18 @@ export const userManagementHandlers = [
 
     // Apply filters
     if (search) {
-      filteredUsers = filteredUsers.filter(user =>
+      filteredUsers = filteredUsers.filter((user: any) =>
         user.email.toLowerCase().includes(search.toLowerCase()) ||
         user.fullName.toLowerCase().includes(search.toLowerCase())
       );
     }
 
     if (role) {
-      filteredUsers = filteredUsers.filter(user => user.roles.includes(role));
+      filteredUsers = filteredUsers.filter((user: any) => user.roles.includes(role));
     }
 
     if (status) {
-      filteredUsers = filteredUsers.filter(user => user.status === status);
+      filteredUsers = filteredUsers.filter((user: any) => user.status === status);
     }
 
     // Pagination
@@ -166,15 +166,15 @@ export const userManagementHandlers = [
   http.get(`${API_BASE}/v1/users/statistics`, () => {
     const statistics = {
       total: mockUsers.length,
-      pending: mockUsers.filter(u => u.status === 'pending').length,
-      active: mockUsers.filter(u => u.status === 'active').length,
-      rejected: mockUsers.filter(u => u.status === 'rejected').length,
+      pending: mockUsers.filter((u: any) => u.status === 'pending').length,
+      active: mockUsers.filter((u: any) => u.status === 'active').length,
+      rejected: mockUsers.filter((u: any) => u.status === 'rejected').length,
       byRole: {
-        admin: mockUsers.filter(u => u.roles.includes('admin')).length,
-        vendor: mockUsers.filter(u => u.roles.includes('vendor')).length,
-        customer: mockUsers.filter(u => u.roles.includes('customer')).length,
-        business: mockUsers.filter(u => u.roles.includes('business')).length,
-        seller: mockUsers.filter(u => u.roles.includes('seller')).length,
+        admin: mockUsers.filter((u: any) => u.roles.includes('admin')).length,
+        vendor: mockUsers.filter((u: any) => u.roles.includes('vendor')).length,
+        customer: mockUsers.filter((u: any) => u.roles.includes('customer')).length,
+        business: mockUsers.filter((u: any) => u.roles.includes('business')).length,
+        seller: mockUsers.filter((u: any) => u.roles.includes('seller')).length,
       }
     };
 
@@ -186,8 +186,8 @@ export const userManagementHandlers = [
 
   // Get single user
   http.get(`${API_BASE}/v1/users/:id`, ({ params }: any) => {
-    const { id } = params;
-    const user = mockUsers.find(u => u.id === id);
+    const { id } = params as any;
+    const user = mockUsers.find((u: any) => u.id === id);
 
     if (!user) {
       return HttpResponse.json({
@@ -227,7 +227,7 @@ export const userManagementHandlers = [
 
   // Update user
   http.put(`${API_BASE}/v1/users/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
     
     const userIndex = mockUsers.findIndex(u => u.id === id);
@@ -253,7 +253,7 @@ export const userManagementHandlers = [
 
   // Delete user
   http.delete(`${API_BASE}/v1/users/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const userIndex = mockUsers.findIndex(u => u.id === id);
     
     if (userIndex === -1) {
@@ -273,10 +273,10 @@ export const userManagementHandlers = [
 
   // Approve user
   http.post(`${API_BASE}/v1/users/:id/approve`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const { notes: _notes } = await request.json();
     
-    const user = mockUsers.find(u => u.id === id);
+    const user = mockUsers.find((u: any) => u.id === id);
     if (!user) {
       return HttpResponse.json({
         success: false,
@@ -295,10 +295,10 @@ export const userManagementHandlers = [
 
   // Reject user
   http.post(`${API_BASE}/v1/users/:id/reject`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const { notes: _notes } = await request.json();
     
-    const user = mockUsers.find(u => u.id === id);
+    const user = mockUsers.find((u: any) => u.id === id);
     if (!user) {
       return HttpResponse.json({
         success: false,
@@ -321,7 +321,7 @@ export const userManagementHandlers = [
     
     let approvedCount = 0;
     userIds.forEach((id: string) => {
-      const user = mockUsers.find(u => u.id === id);
+      const user = mockUsers.find((u: any) => u.id === id);
       if (user && user.status === 'pending') {
         user.status = 'approved';
         user.isActive = true;
@@ -343,7 +343,7 @@ export const userManagementHandlers = [
     
     let rejectedCount = 0;
     userIds.forEach((id: string) => {
-      const user = mockUsers.find(u => u.id === id);
+      const user = mockUsers.find((u: any) => u.id === id);
       if (user && user.status === 'pending') {
         user.status = 'rejected';
         user.isActive = false;
@@ -361,8 +361,8 @@ export const userManagementHandlers = [
 
   // Get approval history
   http.get(`${API_BASE}/v1/users/:id/approval-history`, ({ params }: any) => {
-    const { id } = params;
-    const history = mockApprovalHistory.filter(h => h.user_id === id);
+    const { id } = params as any;
+    const history = mockApprovalHistory.filter((h: any) => h.user_id === id);
 
     return HttpResponse.json({
       success: true,
@@ -373,7 +373,7 @@ export const userManagementHandlers = [
   // Export users
   http.get(`${API_BASE}/v1/users/export/csv`, () => {
     const csv = `ID,Email,First Name,Last Name,Role,Status,Created At
-${mockUsers.map(u => `${u.id},${u.email},${u.firstName},${u.lastName},${u.role},${u.status},${u.createdAt}`).join('\n')}`;
+${mockUsers.map((u: any) => `${u.id},${u.email},${u.firstName},${u.lastName},${u.role},${u.status},${u.createdAt}`).join('\n')}`;
 
     return new HttpResponse(csv, {
       headers: {

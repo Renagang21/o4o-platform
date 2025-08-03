@@ -100,7 +100,7 @@ export class ProductsController {
       // 사용자 역할에 따른 가격 조정
       const userRole = (req as AuthRequest).user?.role || 'customer';
       const roleString = String(userRole);
-      const productsWithUserPrice = products.map(product => ({
+      const productsWithUserPrice = products.map((product: any) => ({
         ...product,
         price: product.getPriceForUser(userRole),
         // 민감한 정보 제거
@@ -332,7 +332,7 @@ export class ProductsController {
       // 사용자 역할에 따른 가격 조정
       const userRole = (req as AuthRequest).user?.role || 'customer';
       const roleString = String(userRole);
-      const productsWithUserPrice = products.map(product => ({
+      const productsWithUserPrice = products.map((product: any) => ({
         ...product,
         price: product.getPriceForUser(userRole),
         cost: undefined as number | undefined,

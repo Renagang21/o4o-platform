@@ -210,7 +210,7 @@ export class EmailService {
       }
 
       // Replace template variables
-      Object.keys(data).forEach(key => {
+      Object.keys(data).forEach((key: any) => {
         const value = data[key];
         const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
         html = html.replace(regex, value);

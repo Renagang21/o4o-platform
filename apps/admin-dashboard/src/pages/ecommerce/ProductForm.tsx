@@ -53,9 +53,9 @@ const ProductForm: FC = () => {
     categories: [],
   });
 
-  const [productOptions, setProductOptions] = useState([]);
-  const [productVariants, setProductVariants] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [productOptions, setProductOptions] = useState<any[]>([]);
+  const [productVariants, setProductVariants] = useState<any[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
   // const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -77,7 +77,7 @@ const ProductForm: FC = () => {
   }, [productData]);
 
   const handleInputChange = (field: keyof Product, value: string | number | boolean | object) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [field]: value
     }));
@@ -116,7 +116,7 @@ const ProductForm: FC = () => {
 
   const toggleCategory = (categoryId: string) => {
     const newCategories = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter(id => id !== categoryId)
+      ? selectedCategories.filter((id: any) => id !== categoryId)
       : [...selectedCategories, categoryId];
     
     setSelectedCategories(newCategories);
@@ -124,7 +124,7 @@ const ProductForm: FC = () => {
   };
 
   const renderCategoryTree = (cats: any[], level = 0) => {
-    return cats.map(category => (
+    return cats.map((category: any) => (
       <div key={category.id}>
         <div
           className={`flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer`}

@@ -45,7 +45,7 @@ export interface Template {
   name: string;
   description: string;
   category: 'landing' | 'product' | 'blog' | 'page' | 'section';
-  icon: ComponentType<any>;
+  icon: React.ComponentType<any>;
   thumbnail?: string;
   blocks: any[];
   tags: string[];
@@ -201,7 +201,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
   const [activeTab, setActiveTab] = useState<'templates' | 'patterns'>('templates');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Template categories
@@ -226,16 +226,16 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
   ];
 
   // Filter templates
-  const filteredTemplates = templates.filter(template => {
+  const filteredTemplates = templates.filter((template: any) => {
     const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                         template.tags.some((tag: any) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   // Filter patterns
-  const filteredPatterns = patterns.filter(pattern => {
+  const filteredPatterns = patterns.filter((pattern: any) => {
     const matchesSearch = pattern.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || pattern.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -243,9 +243,9 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
 
   // Toggle favorite
   const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
+    setFavorites((prev: any) => 
       prev.includes(id) 
-        ? prev.filter(fId => fId !== id)
+        ? prev.filter((fId: any) => fId !== id)
         : [...prev, id]
     );
   };
@@ -299,7 +299,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
           <div className="w-64 border-r p-4">
             <h3 className="font-medium text-sm mb-4">Categories</h3>
             <div className="space-y-1">
-              {templateCategories.map(category => (
+              {templateCategories.map((category: any) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
@@ -320,7 +320,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
           {/* Templates Grid */}
           <ScrollArea className="flex-1 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTemplates.map(template => {
+              {filteredTemplates.map((template: any) => {
                 const Icon = template.icon;
                 const isFavorite = favorites.includes(template.id);
                 
@@ -361,7 +361,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                       <CardDescription>{template.description}</CardDescription>
                       
                       <div className="flex flex-wrap gap-2 mt-4">
-                        {template.tags.map(tag => (
+                        {template.tags.map((tag: any) => (
                           <Badge key={tag} variant={"outline" as const} className="text-xs">
                             {tag}
                           </Badge>
@@ -415,7 +415,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
           <div className="w-64 border-r p-4">
             <h3 className="font-medium text-sm mb-4">Pattern Types</h3>
             <div className="space-y-1">
-              {patternCategories.map(category => (
+              {patternCategories.map((category: any) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
@@ -447,7 +447,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
           {/* Patterns Grid */}
           <ScrollArea className="flex-1 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredPatterns.map(pattern => (
+              {filteredPatterns.map((pattern: any) => (
                 <Card
                   key={pattern.id}
                   className="cursor-pointer hover:shadow-md transition-all hover:scale-105"

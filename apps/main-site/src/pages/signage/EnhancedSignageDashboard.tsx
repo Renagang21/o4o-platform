@@ -76,8 +76,8 @@ const EnhancedSignageDashboard: FC = () => {
   const { showToast } = useToast();
   
   // State
-  const [contents, setContents] = useState([]);
-  const [stores, setStores] = useState([]);
+  const [contents, setContents] = useState<any[]>([]);
+  const [stores, setStores] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [liveDashboard, setLiveDashboard] = useState<LiveDashboard | null>(null);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
@@ -91,7 +91,7 @@ const EnhancedSignageDashboard: FC = () => {
     try {
       const response = await axios.get('/api/signage/analytics');
       setAnalytics(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch analytics:', error);
     }
   }, []);
@@ -102,7 +102,7 @@ const EnhancedSignageDashboard: FC = () => {
       const params = selectedStore ? { storeId: selectedStore.id } : {};
       const response = await axios.get('/api/signage/dashboard/live', { params });
       setLiveDashboard(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch live dashboard:', error);
     }
   }, [selectedStore]);
@@ -122,7 +122,7 @@ const EnhancedSignageDashboard: FC = () => {
       
       const response = await axios.get('/api/signage/contents', { params });
       setContents(response.data.data.contents);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch contents:', error);
       showToast('Failed to load contents', 'error');
     }
@@ -136,7 +136,7 @@ const EnhancedSignageDashboard: FC = () => {
       if (response.data.data.stores.length > 0 && !selectedStore) {
         setSelectedStore(response.data.data.stores[0]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch stores:', error);
     }
   }, [selectedStore]);
@@ -176,7 +176,7 @@ const EnhancedSignageDashboard: FC = () => {
       await axios.post(`/api/signage/stores/${storeId}/playback/control`, { action });
       showToast(`Playback ${action} command sent`, 'success');
       fetchLiveDashboard();
-    } catch (error) {
+    } catch (error: any) {
       showToast('Failed to control playback', 'error');
     }
   };
@@ -187,7 +187,7 @@ const EnhancedSignageDashboard: FC = () => {
       await axios.patch(`/api/signage/contents/${contentId}/approval`, { action, reason });
       showToast(`Content ${action}d successfully`, 'success');
       fetchContents();
-    } catch (error) {
+    } catch (error: any) {
       showToast(`Failed to ${action} content`, 'error');
     }
   };
@@ -394,7 +394,7 @@ const EnhancedSignageDashboard: FC = () => {
                 <select
                   value={selectedStore?.id || ''}
                   onChange={(e: any) => {
-                    const store = stores.find(s => s.id === e.target.value);
+                    const store = stores.find((s: any) => s.id === e.target.value);
                     setSelectedStore(store || null);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

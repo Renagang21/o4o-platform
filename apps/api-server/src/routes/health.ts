@@ -185,7 +185,7 @@ async function performDetailedHealthCheck(): Promise<DetailedHealthCheckResponse
     checkDiskHealth()
   ]);
   
-  const overallStatus = checks.every(check => check.status === 'healthy') ? 'healthy' : 'unhealthy';
+  const overallStatus = checks.every((check: any) => check.status === 'healthy') ? 'healthy' : 'unhealthy';
   
   return {
     status: overallStatus,

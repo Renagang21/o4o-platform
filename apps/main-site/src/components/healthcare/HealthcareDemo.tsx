@@ -44,7 +44,7 @@ const HealthcareDemo: FC = () => {
   useEffect(() => {
     if (autoPlay) {
       const interval = setInterval(() => {
-        setIsEditing(prev => !prev);
+        setIsEditing((prev: any) => !prev);
       }, 5000);
       
       return () => clearInterval(interval);

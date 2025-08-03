@@ -30,7 +30,7 @@ const PostListWordPress: FC = () => {
   const { success, error } = useAdminNotices();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
-  const [selectedPosts, setSelectedPosts] = useState([]);
+  const [selectedPosts, setSelectedPosts] = useState<any[]>([]);
 
   // Default column configuration
   const defaultColumns: ColumnOption[] = [
@@ -143,7 +143,7 @@ const PostListWordPress: FC = () => {
     { id: 'date', label: 'Date', sortable: true }
   ];
   
-  const columns = allColumns.filter(col => isColumnVisible(col.id));
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform posts to table rows
   const posts = data?.posts || [];
@@ -288,7 +288,7 @@ const PostListWordPress: FC = () => {
           if (selected) {
             setSelectedPosts([...selectedPosts, id]);
           } else {
-            setSelectedPosts(selectedPosts.filter(postId => postId !== id));
+            setSelectedPosts(selectedPosts.filter((postId: any) => postId !== id));
           }
         }}
         onSelectAll={(selected) => {

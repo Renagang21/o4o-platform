@@ -93,7 +93,7 @@ const ScreenOptionsEnhanced: FC<ScreenOptionsEnhancedProps> = ({
             <fieldset className="metabox-prefs columns-prefs">
               <legend>Columns</legend>
               <div className="columns-prefs-wrap">
-                {columns.map(column => (
+                {columns.map((column: any) => (
                   <label key={column.id} htmlFor={`${column.id}-hide`}>
                     <input
                       className="hide-column-tog"
@@ -116,7 +116,7 @@ const ScreenOptionsEnhanced: FC<ScreenOptionsEnhancedProps> = ({
             <fieldset className="metabox-prefs">
               <legend>Boxes</legend>
               <div className="metabox-prefs-wrap">
-                {customOptions.map(option => (
+                {customOptions.map((option: any) => (
                   <label key={option.id} htmlFor={`${option.id}-hide`}>
                     <input
                       className="hide-postbox-tog"
@@ -275,7 +275,7 @@ export const ScreenOptionsReact: FC<ScreenOptionsEnhancedProps> = (props) => {
               <div>
                 <h3 className="text-sm font-semibold mb-2">Columns</h3>
                 <div className="space-y-1">
-                  {props.columns?.map(column => (
+                  {props.columns?.map((column: any) => (
                     <label 
                       key={column.id}
                       className="flex items-center gap-2 text-sm cursor-pointer"
@@ -302,7 +302,7 @@ export const ScreenOptionsReact: FC<ScreenOptionsEnhancedProps> = (props) => {
               <div>
                 <h3 className="text-sm font-semibold mb-2">Show on screen</h3>
                 <div className="space-y-1">
-                  {props.customOptions.map(option => (
+                  {props.customOptions.map((option: any) => (
                     <label 
                       key={option.id}
                       className="flex items-start gap-2 text-sm cursor-pointer"
@@ -334,7 +334,7 @@ export const ScreenOptionsReact: FC<ScreenOptionsEnhancedProps> = (props) => {
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Number of Columns:</span>
                   <div className="flex gap-1">
-                    {[1, 2, 3, 4].map(num => (
+                    {[1, 2, 3, 4].map((num: any) => (
                       <button
                         key={num}
                         onClick={() => props.onLayoutColumnsChange?.(num)}

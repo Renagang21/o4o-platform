@@ -22,7 +22,7 @@ interface ActivityItemProps {
 }
 
 const ActivityItem: FC<ActivityItemProps> = ({ activity, typeColor }) => {
-  const { type, message, time, user, icon } = activity;
+  const { type, message, time, user, icon } = activity as any;
 
   // 타입별 배경색
   const getTypeBgColor = (type: string) => {

@@ -29,8 +29,8 @@ const SupplierDashboardPage = () => {
     completedSettlement: 8500000
   });
 
-  const [lowStockProducts, setLowStockProducts] = useState([]);
-  const [pendingProducts, setPendingProducts] = useState([]);
+  const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
+  const [pendingProducts, setPendingProducts] = useState<any[]>([]);
   const [recentOrders] = useState([
     {
       id: '1',

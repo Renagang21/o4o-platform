@@ -124,8 +124,8 @@ export function splitOrderBySupplier(
 ): Map<string, SupplierOrderSplit> {
   const supplierMap = new Map<string, SupplierOrderSplit>();
   
-  items.forEach(item => {
-    const { supplierId } = item;
+  items.forEach((item: any) => {
+    const { supplierId } = item as any;
     
     if (!supplierMap.has(supplierId)) {
       supplierMap.set(supplierId, {
@@ -150,7 +150,7 @@ export function splitOrderBySupplier(
   });
   
   // 배송비는 별도 계산 필요 (공급자별 정책)
-  supplierMap.forEach(split => {
+  supplierMap.forEach((split: any) => {
     split.shippingFee = calculateShippingFee(split.subtotal);
     split.total = split.subtotal + split.shippingFee;
   });
@@ -215,9 +215,9 @@ export function filterByRole<T extends { supplierId?: string; vendorId?: string 
 ): T[] {
   switch (userRole) {
     case 'supplier':
-      return data.filter(item => item.supplierId === userId);
+      return data.filter((item: any) => item.supplierId === userId);
     case 'vendor':
-      return data.filter(item => item.vendorId === userId);
+      return data.filter((item: any) => item.vendorId === userId);
     case 'admin':
       return data; // 관리자는 모든 데이터 조회
     default:
@@ -233,7 +233,7 @@ export function filterByApprovalStatus<T extends { approvalStatus: string }>(
   status?: 'pending' | 'approved' | 'rejected'
 ): T[] {
   if (!status) return products;
-  return products.filter(product => product.approvalStatus === status);
+  return products.filter((product: any) => product.approvalStatus === status);
 }
 
 /**

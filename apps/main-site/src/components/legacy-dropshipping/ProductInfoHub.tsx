@@ -76,8 +76,8 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('basic');
   const [basicInfo, setBasicInfo] = useState<ProductBasicInfo | null>(null);
-  const [mediaAssets, setMediaAssets] = useState([]);
-  const [externalResources, setExternalResources] = useState([]);
+  const [mediaAssets, setMediaAssets] = useState<any[]>([]);
+  const [externalResources, setExternalResources] = useState<any[]>([]);
   const [verificationData, setVerificationData] = useState<VerificationData | null>(null);
   const [commissionSettings, setCommissionSettings] = useState<CommissionSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,7 +92,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
   // 정보 완성도 계산
   const calculateCompletion = () => {
     const basic = basicInfo ? (
-      Object.keys(basicInfo).filter(key => basicInfo[key as keyof ProductBasicInfo]).length / 8
+      Object.keys(basicInfo).filter((key: any) => basicInfo[key as keyof ProductBasicInfo]).length / 8
     ) * 100 : 0;
 
     const media = mediaAssets.length >= 3 ? 100 : (mediaAssets.length / 3) * 100;
@@ -133,7 +133,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
   ];
 
   const overallCompletion = Math.round(
-    Object.values(completionData).reduce((sum, val) => sum + val, 0) / Object.keys(completionData).length
+    Object.values(completionData).reduce((sum: any, val: any) => sum + val, 0) / Object.keys(completionData).length
   );
 
   const renderProgressMeter = () => (
@@ -200,7 +200,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <input
               type="text"
               value={basicInfo?.name || ''}
-              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, name: e.target.value} : null)}
+              onChange={(e: any) => setBasicInfo((prev: any) => prev ? {...prev, name: e.target.value} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             />
@@ -209,7 +209,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
             <select
               value={basicInfo?.category || ''}
-              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, category: e.target.value} : null)}
+              onChange={(e: any) => setBasicInfo((prev: any) => prev ? {...prev, category: e.target.value} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             >
@@ -225,7 +225,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <input
               type="number"
               value={basicInfo?.supplierPrice || ''}
-              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, supplierPrice: Number(e.target.value)} : null)}
+              onChange={(e: any) => setBasicInfo((prev: any) => prev ? {...prev, supplierPrice: Number(e.target.value)} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             />
@@ -235,7 +235,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <input
               type="number"
               value={basicInfo?.price || ''}
-              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, price: Number(e.target.value)} : null)}
+              onChange={(e: any) => setBasicInfo((prev: any) => prev ? {...prev, price: Number(e.target.value)} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             />
@@ -246,7 +246,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">제품 설명</label>
           <textarea
             value={basicInfo?.description || ''}
-            onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, description: e.target.value} : null)}
+            onChange={(e: any) => setBasicInfo((prev: any) => prev ? {...prev, description: e.target.value} : null)}
             disabled={readonly}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
@@ -387,7 +387,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
               type="number"
               max="35"
               value={commissionSettings?.baseCommission || ''}
-              onChange={(e: any) => setCommissionSettings(prev => prev ? {...prev, baseCommission: Number(e.target.value)} : null)}
+              onChange={(e: any) => setCommissionSettings((prev: any) => prev ? {...prev, baseCommission: Number(e.target.value)} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
             />

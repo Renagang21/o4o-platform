@@ -241,7 +241,7 @@ const InfiniteScrollPagination = ({
   hasMore: boolean;
   onLoadMore: () => void;
 }) => {
-  const observerTarget = useRef<HTMLDivElement>(null);
+  const observerTarget = useRef<HTMLDivElement | null>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
   // Intersection Observer callback

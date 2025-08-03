@@ -155,13 +155,13 @@ export class GracefulDegradationService {
 
   private async evaluateRule(rule: DegradationRule): Promise<boolean> {
     const triggerResults = await Promise.all(
-      rule.conditions.triggers.map(trigger => this.evaluateTrigger(trigger))
+      rule.conditions.triggers.map((trigger: any) => this.evaluateTrigger(trigger))
     );
 
     if (rule.conditions.aggregation === 'all') {
-      return triggerResults.every(result => result);
+      return triggerResults.every((result: any) => result);
     } else {
-      return triggerResults.some(result => result);
+      return triggerResults.some((result: any) => result);
     }
   }
 
@@ -475,10 +475,10 @@ export class GracefulDegradationService {
     if (!rule.revertConditions) return;
 
     const revertResults = await Promise.all(
-      rule.revertConditions.triggers.map(trigger => this.evaluateRevertTrigger(trigger))
+      rule.revertConditions.triggers.map((trigger: any) => this.evaluateRevertTrigger(trigger))
     );
 
-    const shouldRevert = revertResults.every(result => result);
+    const shouldRevert = revertResults.every((result: any) => result);
     
     if (shouldRevert) {
       const degradation = this.activeDegradations.get(rule.id);
@@ -632,7 +632,7 @@ export class GracefulDegradationService {
   private async recordDegradationMetrics(): Promise<void> {
     const activeDegradationCount = this.activeDegradations.size;
     const degradedFeatureCount = Array.from(this.featureStates.values())
-      .filter(f => f.isDegraded).length;
+      .filter((f: any) => f.isDegraded).length;
 
     await this.systemMetricsRepo.save(
       SystemMetrics.createSystemMetric(
@@ -659,7 +659,7 @@ export class GracefulDegradationService {
 
   private async checkDegradationHealth(): Promise<void> {
     const longRunningDegradations = Array.from(this.activeDegradations.values())
-      .filter(d => {
+      .filter((d: any) => {
         const runtime = Date.now() - d.startTime.getTime();
         return runtime > 30 * 60 * 1000; // 30 minutes
       });
@@ -837,7 +837,7 @@ export class GracefulDegradationService {
       }
     ];
 
-    rules.forEach(rule => {
+    rules.forEach((rule: any) => {
       this.degradationRules.set(rule.id, rule);
     });
 
@@ -878,7 +878,7 @@ export class GracefulDegradationService {
       }
     ];
 
-    features.forEach(feature => {
+    features.forEach((feature: any) => {
       this.featureStates.set(feature.featureId, feature);
     });
 
@@ -927,10 +927,10 @@ export class GracefulDegradationService {
   }> {
     const activeDegradations = this.activeDegradations.size;
     const degradedFeatures = Array.from(this.featureStates.values())
-      .filter(f => f.isDegraded).length;
+      .filter((f: any) => f.isDegraded).length;
     
     const maxLevel = Math.max(
-      ...Array.from(this.activeDegradations.values()).map(d => 
+      ...Array.from(this.activeDegradations.values()).map((d: any) => 
         Object.values(DegradationLevel).indexOf(d.level)
       ),
       0

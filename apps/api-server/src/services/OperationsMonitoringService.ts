@@ -278,7 +278,7 @@ export class OperationsMonitoringService {
       }
     ];
 
-    defaultRules.forEach(rule => {
+    defaultRules.forEach((rule: any) => {
       this.alertRules.set(rule.id, rule);
     });
   }
@@ -578,8 +578,8 @@ export class OperationsMonitoringService {
     services: HealthCheckResult[],
     infrastructure: SystemStatus['infrastructure']
   ): 'healthy' | 'degraded' | 'down' {
-    const unhealthyServices = services.filter(s => s.status === 'unhealthy');
-    const degradedServices = services.filter(s => s.status === 'degraded');
+    const unhealthyServices = services.filter((s: any) => s.status === 'unhealthy');
+    const degradedServices = services.filter((s: any) => s.status === 'degraded');
 
     if (unhealthyServices.length > 0) {
       return 'down';
@@ -817,7 +817,7 @@ export class OperationsMonitoringService {
   private async sendAlertNotifications(alert: Alert): Promise<void> {
     if (!alert.notificationChannels) return;
 
-    const promises = alert.notificationChannels.map(channel => {
+    const promises = alert.notificationChannels.map((channel: any) => {
       switch (channel) {
         case AlertChannel.EMAIL:
           return this.sendEmailNotification(alert);
@@ -929,7 +929,7 @@ export class OperationsMonitoringService {
     };
 
     await Promise.all(
-      this.config.notifications.webhook.urls.map(url =>
+      this.config.notifications.webhook.urls.map((url: any) =>
         this.webhookService.sendWebhook(url, payload)
       )
     );
@@ -1165,7 +1165,7 @@ export class OperationsMonitoringService {
 
   private async processHealthCheckResults(systemStatus: SystemStatus): Promise<void> {
     // Store health check results in history
-    systemStatus.services.forEach(service => {
+    systemStatus.services.forEach((service: any) => {
       if (!this.healthCheckHistory.has(service.serviceName)) {
         this.healthCheckHistory.set(service.serviceName, []);
       }
@@ -1178,7 +1178,7 @@ export class OperationsMonitoringService {
       cutoff.setHours(cutoff.getHours() - 24);
       this.healthCheckHistory.set(
         service.serviceName,
-        history.filter(h => h.timestamp >= cutoff)
+        history.filter((h: any) => h.timestamp >= cutoff)
       );
     });
 

@@ -185,7 +185,7 @@ export function CheckoutPage() {
                   value={customRequest ? '직접 작성' : selectedDeliveryRequest}
                   onValueChange={handleDeliveryRequestChange}
                 >
-                  {deliveryRequests.map(request => (
+                  {deliveryRequests.map((request: any) => (
                     <div key={request} className="flex items-center space-x-2">
                       <RadioGroupItem value={request} id={request} />
                       <Label htmlFor={request} className="font-normal cursor-pointer">
@@ -215,7 +215,7 @@ export function CheckoutPage() {
               onValueChange={(value) => setValue('paymentMethod', value as CheckoutForm['paymentMethod'])}
             >
               <div className="grid grid-cols-2 gap-4">
-                {paymentMethods.map(method => {
+                {paymentMethods.map((method: any) => {
                   const Icon = method.icon;
                   return (
                     <div key={method.value}>

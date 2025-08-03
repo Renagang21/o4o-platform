@@ -223,7 +223,7 @@ class ErrorAlertService extends EventEmitter {
     }
 
     // Clean old entries
-    Object.keys(this.errorCounts).forEach(k => {
+    Object.keys(this.errorCounts).forEach((k: any) => {
       const timeDiff = now - this.errorCounts[k].firstSeen.getTime();
       if (timeDiff > 3600000) { // 1 hour
         delete this.errorCounts[k];
@@ -395,7 +395,7 @@ class ErrorAlertService extends EventEmitter {
     const now = Date.now();
     const autoResolveMs = this.config.autoResolveMinutes * 60000;
 
-    this.alerts.forEach(alert => {
+    this.alerts.forEach((alert: any) => {
       if (!alert.resolved && alert.level !== 'critical') {
         const age = now - alert.timestamp.getTime();
         if (age > autoResolveMs) {
@@ -418,23 +418,23 @@ class ErrorAlertService extends EventEmitter {
     let filtered = [...this.alerts];
 
     if (options.category) {
-      filtered = filtered.filter(a => a.category === options.category);
+      filtered = filtered.filter((a: any) => a.category === options.category);
     }
 
     if (options.level) {
-      filtered = filtered.filter(a => a.level === options.level);
+      filtered = filtered.filter((a: any) => a.level === options.level);
     }
 
     if (options.resolved !== undefined) {
-      filtered = filtered.filter(a => a.resolved === options.resolved);
+      filtered = filtered.filter((a: any) => a.resolved === options.resolved);
     }
 
     if (options.startDate) {
-      filtered = filtered.filter(a => a.timestamp >= options.startDate!);
+      filtered = filtered.filter((a: any) => a.timestamp >= options.startDate!);
     }
 
     if (options.endDate) {
-      filtered = filtered.filter(a => a.timestamp <= options.endDate!);
+      filtered = filtered.filter((a: any) => a.timestamp <= options.endDate!);
     }
 
     if (options.limit) {
@@ -458,7 +458,7 @@ class ErrorAlertService extends EventEmitter {
 
     const errorCounts: Record<string, number> = {};
 
-    this.alerts.forEach(alert => {
+    this.alerts.forEach((alert: any) => {
       // Count by level
       stats[alert.level]++;
 
@@ -484,7 +484,7 @@ class ErrorAlertService extends EventEmitter {
   }
 
   resolveAlert(alertId: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a: any) => a.id === alertId);
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = new Date();
@@ -498,11 +498,11 @@ class ErrorAlertService extends EventEmitter {
     const before = this.alerts.length;
 
     if (options.category) {
-      this.alerts = this.alerts.filter(a => a.category !== options.category);
+      this.alerts = this.alerts.filter((a: any) => a.category !== options.category);
     }
 
     if (options.olderThan) {
-      this.alerts = this.alerts.filter(a => a.timestamp > options.olderThan!);
+      this.alerts = this.alerts.filter((a: any) => a.timestamp > options.olderThan!);
     }
 
     const removed = before - this.alerts.length;

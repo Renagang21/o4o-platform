@@ -189,28 +189,28 @@ export const mediaHandlers = [
 
     // Apply filters
     if (mediaType && mediaType !== 'all') {
-      filteredItems = filteredItems.filter(item => item.mediaType === mediaType);
+      filteredItems = filteredItems.filter((item: any) => item.mediaType === mediaType);
     }
 
     if (folderId) {
       if (folderId === 'uncategorized') {
-        filteredItems = filteredItems.filter(item => !item.folderId);
+        filteredItems = filteredItems.filter((item: any) => !item.folderId);
       } else {
-        filteredItems = filteredItems.filter(item => item.folderId === folderId);
+        filteredItems = filteredItems.filter((item: any) => item.folderId === folderId);
       }
     }
 
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredItems = filteredItems.filter(item =>
+      filteredItems = filteredItems.filter((item: any) =>
         item.title.toLowerCase().includes(searchLower) ||
         item.filename.toLowerCase().includes(searchLower) ||
-        item.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+        item.tags?.some((tag: any) => tag.toLowerCase().includes(searchLower))
       );
     }
 
     if (status && status !== 'all') {
-      filteredItems = filteredItems.filter(item => item.status === status);
+      filteredItems = filteredItems.filter((item: any) => item.status === status);
     }
 
     // Sort by date
@@ -235,7 +235,7 @@ export const mediaHandlers = [
 
   // Get single media item
   http.get('/api/v1/media/:id', ({ params }: any) => {
-    const item = mediaItems.find(m => m.id === params.id);
+    const item = mediaItems.find((m: any) => m.id === params.id);
     if (!item) {
       return HttpResponse.json({ error: 'Media not found' }, { status: 404 });
     }
@@ -319,10 +319,10 @@ export const mediaHandlers = [
   // Bulk operations
   http.post('/api/v1/media/bulk', async ({ request }: any) => {
     const data = await request.json() as any;
-    const { action, mediaIds } = data;
+    const { action, mediaIds } = data as any;
 
     if (action === 'delete') {
-      mediaItems = mediaItems.filter(item => !mediaIds.includes(item.id));
+      mediaItems = mediaItems.filter((item: any) => !mediaIds.includes(item.id));
       return HttpResponse.json({ success: true, message: `${mediaIds.length}개 삭제됨` });
     }
 
@@ -378,7 +378,7 @@ export const mediaHandlers = [
     }
 
     // Move media to uncategorized
-    mediaItems = mediaItems.map(item =>
+    mediaItems = mediaItems.map((item: any) =>
       item.folderId === params.id
         ? { ...item, folderId: undefined }
         : item

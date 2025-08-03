@@ -77,11 +77,11 @@ interface View {
 }
 
 const ViewsManager: FC = () => {
-  const [views, setViews] = useState([]);
+  const [views, setViews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingView, setEditingView] = useState<View | null>(null);
-  const [previewData, setPreviewData] = useState([]);
+  const [previewData, setPreviewData] = useState<any[]>([]);
 
   // 새 View 생성 폼 상태
   const [newView, setNewView] = useState({
@@ -268,7 +268,7 @@ const ViewsManager: FC = () => {
       ];
 
       setViews(mockViews);
-    } catch (error) {
+    } catch (error: any) {
       console.error('View 로드 실패:', error);
     } finally {
       setLoading(false);
@@ -293,7 +293,7 @@ const ViewsManager: FC = () => {
       resetForm();
       setActiveTab('list');
       alert('✅ View가 성공적으로 생성되었습니다!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('View 생성 실패:', error);
       alert('❌ View 생성 중 오류가 발생했습니다.');
     }
@@ -306,9 +306,9 @@ const ViewsManager: FC = () => {
       // API 호출 (Mock)
       // console.log('Deleting view:', id);
       
-      setViews(prev => prev.filter(view => view.id !== id));
+      setViews((prev: any) => prev.filter((view: any) => view.id !== id));
       alert('✅ View가 삭제되었습니다.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('View 삭제 실패:', error);
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
@@ -358,7 +358,7 @@ const ViewsManager: FC = () => {
       relation: 'AND'
     };
 
-    setNewView(prev => ({
+    setNewView((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
@@ -368,11 +368,11 @@ const ViewsManager: FC = () => {
   };
 
   const updateFilter = (filterId: string, updates: Partial<QueryFilter>) => {
-    setNewView(prev => ({
+    setNewView((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
-        filters: prev.query.filters.map(filter =>
+        filters: prev.query.filters.map((filter: any) =>
           filter.id === filterId ? { ...filter, ...updates } : filter
         )
       }
@@ -380,11 +380,11 @@ const ViewsManager: FC = () => {
   };
 
   const removeFilter = (filterId: string) => {
-    setNewView(prev => ({
+    setNewView((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
-        filters: prev.query.filters.filter(filter => filter.id !== filterId)
+        filters: prev.query.filters.filter((filter: any) => filter.id !== filterId)
       }
     }));
   };
@@ -395,7 +395,7 @@ const ViewsManager: FC = () => {
       direction: 'ASC'
     };
 
-    setNewView(prev => ({
+    setNewView((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
@@ -405,7 +405,7 @@ const ViewsManager: FC = () => {
   };
 
   const updateSort = (index: number, updates: Partial<QuerySort>) => {
-    setNewView(prev => ({
+    setNewView((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
@@ -417,7 +417,7 @@ const ViewsManager: FC = () => {
   };
 
   const removeSort = (index: number) => {
-    setNewView(prev => ({
+    setNewView((prev: any) => ({
       ...prev,
       query: {
         ...prev.query,
@@ -427,7 +427,7 @@ const ViewsManager: FC = () => {
   };
 
   const getSelectedCPT = () => {
-    return availableCPTs.find(cpt => cpt.slug === newView.query.postType);
+    return availableCPTs.find((cpt: any) => cpt.slug === newView.query.postType);
   };
 
   const previewView = async (view: View) => {
@@ -603,7 +603,7 @@ const ViewsManager: FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <span className="text-sm text-gray-500">Post Type:</span>
-                          <div className="font-medium">{availableCPTs.find(cpt => cpt.slug === view.query.postType)?.name || view.query.postType}</div>
+                          <div className="font-medium">{availableCPTs.find((cpt: any) => cpt.slug === view.query.postType)?.name || view.query.postType}</div>
                         </div>
                         <div>
                           <span className="text-sm text-gray-500">필터:</span>
@@ -638,7 +638,7 @@ const ViewsManager: FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500">표시 필드:</span>
                         <div className="flex gap-1">
-                          {view.template.fields.slice(0, 3).map(field => (
+                          {view.template.fields.slice(0, 3).map((field: any) => (
                             <span key={field} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
                               {field}
                             </span>
@@ -684,7 +684,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.name}
-                      onChange={(e: any) => setNewView(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setNewView((prev: any) => ({ ...prev, name: e.target.value }))}
                       placeholder="예: featured_products, recent_posts"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -698,7 +698,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.title}
-                      onChange={(e: any) => setNewView(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setNewView((prev: any) => ({ ...prev, title: e.target.value }))}
                       placeholder="예: 추천 상품 목록"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -710,7 +710,7 @@ const ViewsManager: FC = () => {
                     </label>
                     <textarea
                       value={newView.description}
-                      onChange={(e: any) => setNewView(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewView((prev: any) => ({ ...prev, description: e.target.value }))}
                       placeholder="이 View의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -730,14 +730,14 @@ const ViewsManager: FC = () => {
                   </label>
                   <select
                     value={newView.query.postType}
-                    onChange={(e: any) => setNewView(prev => ({
+                    onChange={(e: any) => setNewView((prev: any) => ({
                       ...prev,
                       query: { ...prev.query, postType: e.target.value }
                     }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">Post Type 선택</option>
-                    {availableCPTs.map(cpt => (
+                    {availableCPTs.map((cpt: any) => (
                       <option key={cpt.slug} value={cpt.slug}>{cpt.name}</option>
                     ))}
                   </select>
@@ -782,7 +782,7 @@ const ViewsManager: FC = () => {
                             className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded"
                           >
                             <option value="">필드 선택</option>
-                            {getSelectedCPT()?.fields.map(field => (
+                            {getSelectedCPT()?.fields.map((field: any) => (
                               <option key={field.name} value={field.name}>{field.label}</option>
                             ))}
                           </select>
@@ -792,7 +792,7 @@ const ViewsManager: FC = () => {
                             onChange={(e: any) => updateFilter(filter.id, { operator: e.target.value as any })}
                             className="px-2 py-1 text-sm border border-gray-200 rounded"
                           >
-                            {operators.map(op => (
+                            {operators.map((op: any) => (
                               <option key={op.value} value={op.value}>{op.label}</option>
                             ))}
                           </select>
@@ -845,7 +845,7 @@ const ViewsManager: FC = () => {
                             className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded"
                           >
                             <option value="">필드 선택</option>
-                            {getSelectedCPT()?.fields.map(field => (
+                            {getSelectedCPT()?.fields.map((field: any) => (
                               <option key={field.name} value={field.name}>{field.label}</option>
                             ))}
                           </select>
@@ -879,7 +879,7 @@ const ViewsManager: FC = () => {
                       <input
                         type="checkbox"
                         checked={newView.query.pagination.enabled}
-                        onChange={(e: any) => setNewView(prev => ({
+                        onChange={(e: any) => setNewView((prev: any) => ({
                           ...prev,
                           query: {
                             ...prev.query,
@@ -900,7 +900,7 @@ const ViewsManager: FC = () => {
                           <input
                             type="number"
                             value={newView.query.pagination.itemsPerPage}
-                            onChange={(e: any) => setNewView(prev => ({
+                            onChange={(e: any) => setNewView((prev: any) => ({
                               ...prev,
                               query: {
                                 ...prev.query,
@@ -934,14 +934,14 @@ const ViewsManager: FC = () => {
                       { value: 'grid', label: '그리드', icon: Grid },
                       { value: 'table', label: '테이블', icon: Hash },
                       { value: 'custom', label: '커스텀', icon: Code }
-                    ].map(type => (
+                    ].map((type: any) => (
                       <label key={type.value} className="relative">
                         <input
                           type="radio"
                           name="templateType"
                           value={type.value}
                           checked={newView.template.type === type.value}
-                          onChange={(e: any) => setNewView(prev => ({
+                          onChange={(e: any) => setNewView((prev: any) => ({
                             ...prev,
                             template: { ...prev.template, type: e.target.value as any }
                           }))}
@@ -967,14 +967,14 @@ const ViewsManager: FC = () => {
                   </label>
                   {getSelectedCPT() ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {getSelectedCPT()!.fields.map(field => (
+                      {getSelectedCPT()!.fields.map((field: any) => (
                         <label key={field.name} className="flex items-center">
                           <input
                             type="checkbox"
                             checked={newView.template.fields.includes(field.name)}
                             onChange={(e: any) => {
                               if (e.target.checked) {
-                                setNewView(prev => ({
+                                setNewView((prev: any) => ({
                                   ...prev,
                                   template: {
                                     ...prev.template,
@@ -982,11 +982,11 @@ const ViewsManager: FC = () => {
                                   }
                                 }));
                               } else {
-                                setNewView(prev => ({
+                                setNewView((prev: any) => ({
                                   ...prev,
                                   template: {
                                     ...prev.template,
-                                    fields: prev.template.fields.filter(f => f !== field.name)
+                                    fields: prev.template.fields.filter((f: any) => f !== field.name)
                                   }
                                 }));
                               }
@@ -1011,7 +1011,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.template.wrapperClass}
-                      onChange={(e: any) => setNewView(prev => ({
+                      onChange={(e: any) => setNewView((prev: any) => ({
                         ...prev,
                         template: { ...prev.template, wrapperClass: e.target.value }
                       }))}
@@ -1027,7 +1027,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.template.itemClass}
-                      onChange={(e: any) => setNewView(prev => ({
+                      onChange={(e: any) => setNewView((prev: any) => ({
                         ...prev,
                         template: { ...prev.template, itemClass: e.target.value }
                       }))}
@@ -1087,7 +1087,7 @@ const ViewsManager: FC = () => {
                 <div className={editingView.template.wrapperClass || 'space-y-4'}>
                   {previewData.map((item, index) => (
                     <div key={index} className={editingView.template.itemClass || 'bg-white p-4 rounded border'}>
-                      {editingView.template.fields.map(field => (
+                      {editingView.template.fields.map((field: any) => (
                         <div key={field} className="mb-2">
                           <span className="font-medium text-sm text-gray-700">{field}:</span>
                           <span className="ml-2 text-sm text-gray-900">

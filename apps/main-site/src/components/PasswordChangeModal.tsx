@@ -71,7 +71,7 @@ const PasswordChangeModal: FC<PasswordChangeModalProps> = ({ open, onClose }) =>
             placeholder="현재 비밀번호"
             className="px-3 py-2 rounded border focus:outline-none focus:ring focus:border-blue-400 dark:bg-gray-700 dark:text-white"
             value={current}
-            onChange={e => { setCurrent(e.target.value); setError(''); }}
+            onChange={(e: any) => { setCurrent(e.target.value); setError(''); }}
             autoFocus
           />
           <input
@@ -79,14 +79,14 @@ const PasswordChangeModal: FC<PasswordChangeModalProps> = ({ open, onClose }) =>
             placeholder="새 비밀번호 (8자 이상)"
             className="px-3 py-2 rounded border focus:outline-none focus:ring focus:border-blue-400 dark:bg-gray-700 dark:text-white"
             value={next}
-            onChange={e => { setNext(e.target.value); setError(''); }}
+            onChange={(e: any) => { setNext(e.target.value); setError(''); }}
           />
           <input
             type="password"
             placeholder="새 비밀번호 확인"
             className="px-3 py-2 rounded border focus:outline-none focus:ring focus:border-blue-400 dark:bg-gray-700 dark:text-white"
             value={confirm}
-            onChange={e => { setConfirm(e.target.value); setError(''); }}
+            onChange={(e: any) => { setConfirm(e.target.value); setError(''); }}
           />
           {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
           <div className="flex gap-2 mt-4">

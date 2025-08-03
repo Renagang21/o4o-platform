@@ -58,7 +58,7 @@ export default function CategoryTagSelector({
   // Handle category selection
   const handleCategoryToggle = (categoryId: string) => {
     if (selectedCategories.includes(categoryId)) {
-      onCategoriesChange(selectedCategories.filter(id => id !== categoryId));
+      onCategoriesChange(selectedCategories.filter((id: any) => id !== categoryId));
     } else {
       onCategoriesChange([...selectedCategories, categoryId]);
     }
@@ -67,7 +67,7 @@ export default function CategoryTagSelector({
   // Handle tag selection
   const handleTagToggle = (tagId: string) => {
     if (selectedTags.includes(tagId)) {
-      onTagsChange(selectedTags.filter(id => id !== tagId));
+      onTagsChange(selectedTags.filter((id: any) => id !== tagId));
     } else {
       onTagsChange([...selectedTags, tagId]);
     }

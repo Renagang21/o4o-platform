@@ -12,7 +12,7 @@ const ReferralLinkBox: FC = () => {
       setCopied(true);
       setCopyError(null);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch (err: any) {
       setCopyError('클립보드 복사에 실패했습니다. 다시 시도해주세요.');
       console.error('클립보드 복사 실패:', err);
     }

@@ -71,12 +71,6 @@ interface EditProps {
   setAttributes: (attributes: Partial<EditProps['attributes']>) => void;
 }
 
-interface PostType {
-  slug: string;
-  name: string;
-  rest_base: string;
-}
-
 interface Post {
   id: number;
   title: {
@@ -287,7 +281,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
       setTotalPosts(total);
       setTotalPages(totalPages);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching posts:', err);
       setError(__('Failed to load posts', 'o4o'));
     } finally {

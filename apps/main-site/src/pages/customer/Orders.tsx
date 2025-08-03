@@ -35,7 +35,7 @@ export default function CustomerOrders() {
     }
   }, [user]);
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order: any) => {
     const matchesStatus = !statusFilter || order.status === statusFilter;
     const matchesDateFrom = !dateRange.from || order.orderDate >= dateRange.from;
     const matchesDateTo = !dateRange.to || order.orderDate <= dateRange.to + 'T23:59:59.999Z';
@@ -53,7 +53,7 @@ export default function CustomerOrders() {
       if (user?.id) {
         fetchOrdersByUser(user.id);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error('주문 취소에 실패했습니다.');
     }
   };
@@ -189,7 +189,7 @@ export default function CustomerOrders() {
               <input
                 type="date"
                 value={dateRange.from}
-                onChange={(e: any) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
+                onChange={(e: any) => setDateRange((prev: any) => ({ ...prev, from: e.target.value }))}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
@@ -201,7 +201,7 @@ export default function CustomerOrders() {
               <input
                 type="date"
                 value={dateRange.to}
-                onChange={(e: any) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
+                onChange={(e: any) => setDateRange((prev: any) => ({ ...prev, to: e.target.value }))}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>

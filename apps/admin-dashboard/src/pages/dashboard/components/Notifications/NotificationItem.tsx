@@ -38,7 +38,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
   onDismiss,
   onAction
 }) => {
-  const { id, type, title, message, time, read, actionUrl } = notification;
+  const { id, type, title, message, time, read, actionUrl } = notification as any;
 
   // 타입별 스타일 설정
   const typeConfig = {

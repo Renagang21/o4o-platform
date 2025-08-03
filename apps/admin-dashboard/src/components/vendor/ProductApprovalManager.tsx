@@ -16,7 +16,7 @@ import type { VendorProduct, ProductApprovalRequest } from '@o4o/types';
 
 export const ProductApprovalManager: FC = () => {
   const { user } = useAuth();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState('all');
@@ -46,7 +46,7 @@ export const ProductApprovalManager: FC = () => {
     if (selectedProducts.size === filteredProducts.length) {
       setSelectedProducts(new Set());
     } else {
-      setSelectedProducts(new Set(filteredProducts.map(p => p.id)));
+      setSelectedProducts(new Set(filteredProducts.map((p: any) => p.id)));
     }
   };
 
@@ -130,7 +130,7 @@ export const ProductApprovalManager: FC = () => {
   };
 
   // 필터링된 제품 목록
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.sku.toLowerCase().includes(searchQuery.toLowerCase());
     

@@ -650,7 +650,7 @@ export class SelfHealingService {
     if (!this.isEnabled) return;
     
     const health = await this.performHealthCheck();
-    const autoHealableIssues = health.issues.filter(issue => issue.autoHealable);
+    const autoHealableIssues = health.issues.filter((issue: any) => issue.autoHealable);
     
     for (const issue of autoHealableIssues) {
       if (this.activeAttempts.size >= this.maxConcurrentHealing) {
@@ -743,7 +743,7 @@ export class SelfHealingService {
     
     try {
       // Pre-execution safety checks
-      const preChecks = action.safetyChecks.filter(check => check.type === 'pre_execution');
+      const preChecks = action.safetyChecks.filter((check: any) => check.type === 'pre_execution');
       for (const check of preChecks) {
         const result = await this.performSafetyCheck(check, context);
         attempt.safetyCheckResults.push(result);
@@ -758,7 +758,7 @@ export class SelfHealingService {
       const output = await this.performHealingAction(action, context, attempt);
       
       // Post-execution safety checks
-      const postChecks = action.safetyChecks.filter(check => check.type === 'post_execution');
+      const postChecks = action.safetyChecks.filter((check: any) => check.type === 'post_execution');
       for (const check of postChecks) {
         const result = await this.performSafetyCheck(check, context);
         attempt.safetyCheckResults.push(result);
@@ -966,7 +966,7 @@ export class SelfHealingService {
       }
     ];
     
-    actions.forEach(action => {
+    actions.forEach((action: any) => {
       this.healingActions.set(action.id, action);
     });
     
@@ -1031,7 +1031,7 @@ export class SelfHealingService {
         'count',
         'self-healing',
         { 
-          issueTypes: health.issues.map(i => i.type),
+          issueTypes: health.issues.map((i: any) => i.type),
           timestamp: new Date().toISOString() 
         }
       )
@@ -1070,7 +1070,7 @@ export class SelfHealingService {
     
     let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
     
-    if (systemHealth?.issues.some(i => i.severity === 'critical')) {
+    if (systemHealth?.issues.some((i: any) => i.severity === 'critical')) {
       status = 'unhealthy';
     } else if (issues.length > 0) {
       status = 'degraded';
@@ -1176,7 +1176,7 @@ export class SelfHealingService {
           health.issues.length,
           'count',
           'self-healing',
-          { issueTypes: health.issues.map(i => i.type) }
+          { issueTypes: health.issues.map((i: any) => i.type) }
         )
       )
     ]);

@@ -264,7 +264,7 @@ const RelatedProductsComponent: FC<RelatedProductsProps> = ({
 
   // Filter out current product and limit results
   const relatedProducts = mockProducts
-    .filter(p => p.id !== productId)
+    .filter((p: any) => p.id !== productId)
     .slice(0, limit);
 
   if (relatedProducts.length === 0) {

@@ -61,8 +61,8 @@ const AdminMyPage: FC<RolePageProps> = ({ user }) => {
     serverLoad: 67
   });
 
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [pendingApprovals, setPendingApprovals] = useState<any[]>([]);
 
   useEffect(() => {
     // 모의 최근 활동 데이터
@@ -479,7 +479,7 @@ const AdminMyPage: FC<RolePageProps> = ({ user }) => {
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-xl font-bold">
-                  {menuItems.find(item => item.id === activeTab)?.name}
+                  {menuItems.find((item: any) => item.id === activeTab)?.name}
                 </h3>
               </div>
               

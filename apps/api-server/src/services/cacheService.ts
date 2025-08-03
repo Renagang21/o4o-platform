@@ -287,7 +287,7 @@ export class CacheService {
     if (additionalParams) {
       const paramString = Object.keys(additionalParams)
         .sort()
-        .map(key => `${key}:${additionalParams[key]}`)
+        .map((key: any) => `${key}:${additionalParams[key]}`)
         .join(':');
       parts.push(paramString);
     }

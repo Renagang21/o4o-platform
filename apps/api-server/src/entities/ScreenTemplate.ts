@@ -62,14 +62,14 @@ export class ScreenTemplate {
   }
 
   getMainZone() {
-    return this.layout.zones.find(zone => zone.isMain);
+    return this.layout.zones.find((zone: any) => zone.isMain);
   }
 
   getSubZones() {
-    return this.layout.zones.filter(zone => !zone.isMain);
+    return this.layout.zones.filter((zone: any) => !zone.isMain);
   }
 
   getZoneById(zoneId: string) {
-    return this.layout.zones.find(zone => zone.id === zoneId);
+    return this.layout.zones.find((zone: any) => zone.id === zoneId);
   }
 }

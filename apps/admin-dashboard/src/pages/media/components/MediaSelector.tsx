@@ -81,13 +81,13 @@ const MediaSelector: FC<MediaSelectorProps> = ({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const allFiles = data?.pages.flatMap(page => page.data) || []
-  const selectedFileObjects = allFiles.filter(file => selectedFiles.includes(file.id))
+  const selectedFileObjects = allFiles.filter((file: any) => selectedFiles.includes(file.id))
 
   const handleFileSelect = (fileId: string) => {
     if (multiple) {
-      setSelectedFiles(prev => {
+      setSelectedFiles((prev: any) => {
         if (prev.includes(fileId)) {
-          return prev.filter(id => id !== fileId)
+          return prev.filter((id: any) => id !== fileId)
         }
         if (prev.length >= maxFiles) {
           toast.error(`최대 ${maxFiles}개까지 선택할 수 있습니다.`)
@@ -104,7 +104,7 @@ const MediaSelector: FC<MediaSelectorProps> = ({
     if (selectedFiles.length === allFiles.length) {
       setSelectedFiles([])
     } else {
-      const fileIds = allFiles.slice(0, maxFiles).map(file => file.id)
+      const fileIds = allFiles.slice(0, maxFiles).map((file: any) => file.id)
       setSelectedFiles(fileIds)
       if (allFiles.length > maxFiles) {
         toast.error(`최대 ${maxFiles}개까지 선택할 수 있습니다.`)
@@ -128,7 +128,7 @@ const MediaSelector: FC<MediaSelectorProps> = ({
   }
 
   const updateFilter = (key: string, value: string) => {
-    setFilters(prev => ({
+    setFilters((prev: any) => ({
       ...prev,
       [key]: value
     }))
@@ -172,7 +172,7 @@ const MediaSelector: FC<MediaSelectorProps> = ({
                   className="wp-select"
                 >
                   <option value="">모든 파일</option>
-                  {allowedTypes.map(type => (
+                  {allowedTypes.map((type: any) => (
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
@@ -281,7 +281,7 @@ const MediaSelector: FC<MediaSelectorProps> = ({
         <MediaUploader
           onUpload={handleUploadComplete}
           onClose={() => setShowUploader(false)}
-          allowedTypes={allowedTypes.map(type => `${type}/*`)}
+          allowedTypes={allowedTypes.map((type: any) => `${type}/*`)}
         />
       )}
     </div>

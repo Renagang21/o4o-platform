@@ -91,13 +91,13 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
 
   useEffect(() => {
     if (initialData) {
-      setFormData(prev => ({ ...prev, ...initialData }));
+      setFormData((prev: any) => ({ ...prev, ...initialData }));
     }
   }, [initialData]);
 
   useEffect(() => {
     // Auto-detect device information
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       deviceType: /Mobile|Android|iP(ad|hone)/.test(navigator.userAgent) ? 'mobile' : 'desktop',
       screenResolution: `${screen.width}x${screen.height}`,
@@ -106,7 +106,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
   }, []);
 
   const handleInputChange = <K extends keyof BetaFeedbackData>(field: K, value: BetaFeedbackData[K]) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [field]: value
     }));
@@ -176,7 +176,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
       } else {
         showToast(data.error?.message || '피드백 제출 중 오류가 발생했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Feedback submission error:', error);
       showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     } finally {

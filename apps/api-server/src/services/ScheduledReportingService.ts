@@ -421,12 +421,12 @@ export class ScheduledReportingService {
 
   // Notification Methods
   async sendDailyReportNotification(reports: AnalyticsReport[]): Promise<void> {
-    const message = `Daily analytics reports have been generated:\n${reports.map(r => `- ${r.reportName} (${r.status})`).join('\n')}`;
+    const message = `Daily analytics reports have been generated:\n${reports.map((r: any) => `- ${r.reportName} (${r.status})`).join('\n')}`;
     await this.sendNotification('Daily Analytics Reports Generated', message);
   }
 
   async sendWeeklyReportNotification(reports: AnalyticsReport[]): Promise<void> {
-    const message = `Weekly analytics reports have been generated:\n${reports.map(r => `- ${r.reportName} (${r.status})`).join('\n')}`;
+    const message = `Weekly analytics reports have been generated:\n${reports.map((r: any) => `- ${r.reportName} (${r.status})`).join('\n')}`;
     await this.sendNotification('Weekly Analytics Reports Generated', message);
   }
 

@@ -70,7 +70,7 @@ class CartService {
   }
 
   private calculateTotals(items: CartItem[]): Partial<CartState> {
-    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = items.reduce((sum: any, item: any) => sum + (item.price * item.quantity), 0);
     const discount = 0; // Calculate based on coupons/discounts
     const tax = subtotal * 0.1; // 10% tax rate (configurable)
     const shipping = subtotal > 50000 ? 0 : 3000; // Free shipping over 50,000
@@ -89,12 +89,12 @@ class CartService {
   subscribe(listener: (cart: CartState) => void) {
     this.listeners.push(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners = this.listeners.filter((l: any) => l !== listener);
     };
   }
 
   private notifyListeners(cart: CartState) {
-    this.listeners.forEach(listener => listener(cart));
+    this.listeners.forEach((listener: any) => listener(cart));
   }
 
   // Get current cart
@@ -190,7 +190,7 @@ class CartService {
   removeItem(itemId: string): boolean {
     try {
       const cart = this.getCart();
-      cart.items = cart.items.filter(item => item.id !== itemId);
+      cart.items = cart.items.filter((item: any) => item.id !== itemId);
 
       // Recalculate totals
       const totals = this.calculateTotals(cart.items);
@@ -220,7 +220,7 @@ class CartService {
   // Get cart count
   getItemCount(): number {
     const cart = this.getCart();
-    return cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    return cart.items.reduce((sum: any, item: any) => sum + item.quantity, 0);
   }
 
   // Sync with server

@@ -273,27 +273,27 @@ export const mockReviewStats: ReviewStats = {
 
 // 유틸리티 함수들
 export const getReviewsByProduct = (productId: string): Review[] => {
-  return mockReviews.filter(review => 
+  return mockReviews.filter((review: any) => 
     review.productId === productId && review.status === 'published'
   );
 };
 
 export const getReviewsByUser = (userId: string): Review[] => {
-  return mockReviews.filter(review => review.userId === userId);
+  return mockReviews.filter((review: any) => review.userId === userId);
 };
 
 export const getReviewsByStatus = (status: string): Review[] => {
-  return mockReviews.filter(review => review.status === status);
+  return mockReviews.filter((review: any) => review.status === status);
 };
 
 export const getReviewSummary = (productId: string): ReviewSummary | undefined => {
-  return mockReviewSummaries.find(summary => summary.productId === productId);
+  return mockReviewSummaries.find((summary: any) => summary.productId === productId);
 };
 
 export const canUserReviewProduct = (userId: string, productId: string, orderId?: string): boolean => {
   // 해당 상품을 구매한 사용자만 리뷰 작성 가능
   // 이미 리뷰를 작성했다면 false 반환
-  const existingReview = mockReviews.find(review => 
+  const existingReview = mockReviews.find((review: any) => 
     review.userId === userId && 
     review.productId === productId &&
     review.orderId === orderId
@@ -304,13 +304,13 @@ export const canUserReviewProduct = (userId: string, productId: string, orderId?
 
 export const calculateAverageRating = (reviews: Review[]): number => {
   if (reviews.length === 0) return 0;
-  const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+  const totalRating = reviews.reduce((sum: any, review: any) => sum + review.rating, 0);
   return Math.round((totalRating / reviews.length) * 10) / 10;
 };
 
 export const getRatingDistribution = (reviews: Review[]) => {
   const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  reviews.forEach(review => {
+  reviews.forEach((review: any) => {
     distribution[review.rating as keyof typeof distribution]++;
   });
   return distribution;

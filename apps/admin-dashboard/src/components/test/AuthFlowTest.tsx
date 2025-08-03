@@ -59,7 +59,7 @@ const AuthFlowTest: FC = () => {
   });
 
   const updateStepStatus = (stepId: string, update: Partial<AuthTestStep>) => {
-    setTestSteps(prev => prev.map(step => 
+    setTestSteps((prev: any) => prev.map((step: any) => 
       step.id === stepId ? { ...step, ...update } : step
     ));
   };
@@ -68,7 +68,7 @@ const AuthFlowTest: FC = () => {
     setIsRunning(true);
     
     // Reset all steps
-    setTestSteps(prev => prev.map(step => ({ ...step, status: 'pending', result: undefined, error: undefined })));
+    setTestSteps((prev: any) => prev.map((step: any) => ({ ...step, status: 'pending', result: undefined, error: undefined })));
 
     try {
       // Step 1: Check SSO Configuration
@@ -248,14 +248,14 @@ const AuthFlowTest: FC = () => {
                   type="email"
                   placeholder="Email"
                   value={testCredentials.email}
-                  onChange={(e: any) => setTestCredentials(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e: any) => setTestCredentials((prev: any) => ({ ...prev, email: e.target.value }))}
                   className="px-3 py-1.5 text-sm border border-modern-border-primary rounded focus:outline-none focus:ring-2 focus:ring-modern-primary"
                 />
                 <input
                   type="password"
                   placeholder="Password"
                   value={testCredentials.password}
-                  onChange={(e: any) => setTestCredentials(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e: any) => setTestCredentials((prev: any) => ({ ...prev, password: e.target.value }))}
                   className="px-3 py-1.5 text-sm border border-modern-border-primary rounded focus:outline-none focus:ring-2 focus:ring-modern-primary"
                 />
               </div>
@@ -265,7 +265,7 @@ const AuthFlowTest: FC = () => {
 
         {/* Test Steps */}
         <div className="space-y-3">
-          {testSteps.map(step => (
+          {testSteps.map((step: any) => (
             <div
               key={step.id}
               className={`p-3 border rounded-lg transition-colors ${

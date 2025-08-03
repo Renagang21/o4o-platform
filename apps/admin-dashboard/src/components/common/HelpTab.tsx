@@ -22,7 +22,7 @@ export const HelpTab: FC = () => {
     return null;
   }
 
-  // const currentTab = tabs.find(tab => tab.id === activeTab); // Reserved for future use
+  // const currentTab = tabs.find((tab: any) => tab.id === activeTab); // Reserved for future use
 
   return (
     <>
@@ -54,7 +54,7 @@ export const HelpTab: FC = () => {
         <div id="contextual-help-columns">
           <div className="contextual-help-tabs">
             <ul>
-              {tabs.map(tab => (
+              {tabs.map((tab: any) => (
                 <li
                   key={tab.id}
                   id={`tab-link-${tab.id}`}
@@ -87,7 +87,7 @@ export const HelpTab: FC = () => {
           )}
 
           <div className="contextual-help-tabs-wrap">
-            {tabs.map(tab => (
+            {tabs.map((tab: any) => (
               <div
                 key={tab.id}
                 id={`tab-panel-${tab.id}`}

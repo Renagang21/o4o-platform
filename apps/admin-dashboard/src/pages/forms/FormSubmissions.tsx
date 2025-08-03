@@ -59,7 +59,7 @@ const FormSubmissions: FC = () => {
   const navigate = useNavigate();
   const { formId } = useParams();
   
-  const [selectedSubmissions, setSelectedSubmissions] = useState([]);
+  const [selectedSubmissions, setSelectedSubmissions] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [starredFilter, setStarredFilter] = useState<boolean | null>(null);
@@ -109,7 +109,7 @@ const FormSubmissions: FC = () => {
   // Delete submission mutation
   const deleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => authClient.api.delete(`/forms/submissions/${id}`)));
+      await Promise.all(ids.map((id: any) => authClient.api.delete(`/forms/submissions/${id}`)));
     },
     onSuccess: () => {
       toast.success('제출이 삭제되었습니다');
@@ -337,7 +337,7 @@ const FormSubmissions: FC = () => {
                           if (checked) {
                             setSelectedSubmissions([...selectedSubmissions, submission.id]);
                           } else {
-                            setSelectedSubmissions(selectedSubmissions.filter(id => id !== submission.id));
+                            setSelectedSubmissions(selectedSubmissions.filter((id: any) => id !== submission.id));
                           }
                         }}
                       />
@@ -483,7 +483,7 @@ const FormSubmissions: FC = () => {
                 <h3 className="font-semibold mb-3">양식 데이터</h3>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                   {Object.entries(viewingSubmission.data).map(([key, value]) => {
-                    const field = form.fields.find(f => f.name === key);
+                    const field = form.fields.find((f: any) => f.name === key);
                     return (
                       <div key={key}>
                         <div className="font-medium text-sm text-gray-700">

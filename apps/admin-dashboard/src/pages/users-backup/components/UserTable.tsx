@@ -82,7 +82,7 @@ const UserTable: FC<UserTableProps> = ({
                 <input
                   type="checkbox"
                   checked={allSelected}
-                  ref={input => {
+                  ref={(input: any) => {
                     if (input) input.indeterminate = someSelected
                   }}
                   onChange={(e: any) => onSelectAll(e.target.checked)}

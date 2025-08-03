@@ -102,7 +102,7 @@ export class PagesController {
           });
 
           const customFields: Record<string, unknown> = {};
-          customFieldValues.forEach(cfv => {
+          customFieldValues.forEach((cfv: any) => {
             customFields[cfv.field.name] = cfv.value;
           });
 
@@ -161,7 +161,7 @@ export class PagesController {
       });
 
       const customFields: Record<string, unknown> = {};
-      customFieldValues.forEach(cfv => {
+      customFieldValues.forEach((cfv: any) => {
         customFields[cfv.field.name] = cfv.value;
       });
 
@@ -453,7 +453,7 @@ export class PagesController {
       });
 
       const customFields: Record<string, unknown> = {};
-      customFieldValues.forEach(cfv => {
+      customFieldValues.forEach((cfv: any) => {
         customFields[cfv.field.name] = cfv.value;
       });
 
@@ -598,13 +598,13 @@ export class PagesController {
         relations: ['children']
       });
 
-      const blockedPages = pagesWithChildren.filter(page => page.children && page.children.length > 0);
+      const blockedPages = pagesWithChildren.filter((page: any) => page.children && page.children.length > 0);
       
       if (blockedPages.length > 0) {
         return res.status(400).json({
           success: false,
           message: 'Some pages have child pages and cannot be deleted',
-          blockedPages: blockedPages.map(p => ({ id: p.id, title: p.title, childCount: p.children.length }))
+          blockedPages: blockedPages.map((p: any) => ({ id: p.id, title: p.title, childCount: p.children.length }))
         });
       }
 
@@ -783,8 +783,8 @@ export class PagesController {
       // Build hierarchical tree
       const buildTree = (parentId: string | null): PageTreeNode[] => {
         return pages
-          .filter(page => page.parentId === parentId)
-          .map(page => ({
+          .filter((page: any) => page.parentId === parentId)
+          .map((page: any) => ({
             ...page,
             children: buildTree(page.id)
           }));

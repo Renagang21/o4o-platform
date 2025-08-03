@@ -128,7 +128,7 @@ async function createTestUsers() {
 
     console.log('\n📋 Test Users Summary:');
     console.log('=======================');
-    TEST_USERS.forEach(user => {
+    TEST_USERS.forEach((user: any) => {
       console.log(`👤 ${user.role}: ${user.email}`);
     });
     console.log('\n🔑 Common password: password123');

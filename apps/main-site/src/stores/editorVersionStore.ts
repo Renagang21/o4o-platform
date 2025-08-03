@@ -32,11 +32,11 @@ export const useVersionStore = create<VersionStore>()(
         }))
       },
       getVersions: (page) => {
-        return get().versions.filter(v => v.page === page)
+        return get().versions.filter((v: any) => v.page === page)
       },
       clearVersions: (page) => {
         set(state => ({
-          versions: state.versions.filter(v => v.page !== page)
+          versions: state.versions.filter((v: any) => v.page !== page)
         }))
       },
     }),

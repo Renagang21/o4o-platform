@@ -145,7 +145,7 @@ let mockCategories = [
 
 // Helper function to flatten category tree
 const flattenCategories = (categories: any[], result: any[] = []): any[] => {
-  categories.forEach(category => {
+  categories.forEach((category: any) => {
     result.push(category);
     if (category.children && category.children.length > 0) {
       flattenCategories(category.children, result);
@@ -160,12 +160,12 @@ const buildCategoryTree = (categories: any[]): any[] => {
   const roots: any[] = [];
 
   // First, create a map of all categories
-  categories.forEach(cat => {
+  categories.forEach((cat: any) => {
     categoryMap.set(cat.id, { ...cat, children: [] });
   });
 
   // Then build the tree
-  categories.forEach(cat => {
+  categories.forEach((cat: any) => {
     const category = categoryMap.get(cat.id);
     if (cat.parentId) {
       const parent = categoryMap.get(cat.parentId);
@@ -201,7 +201,7 @@ export const productCategoryHandlers = [
   // Get single category
   http.get(`${API_BASE}/v1/ecommerce/categories/:id`, ({ params }: any) => {
     const flatCategories = flattenCategories(mockCategories);
-    const category = flatCategories.find(c => c.id === params.id);
+    const category = flatCategories.find((c: any) => c.id === params.id);
     
     if (!category) {
       return HttpResponse.json(
@@ -226,7 +226,7 @@ export const productCategoryHandlers = [
     let path: string[] = [];
     
     if (data.parentId) {
-      const parent = flatCategories.find(c => c.id === data.parentId);
+      const parent = flatCategories.find((c: any) => c.id === data.parentId);
       if (parent) {
         level = parent.level + 1;
         path = [...parent.path, parent.id];
@@ -258,7 +258,7 @@ export const productCategoryHandlers = [
 
   // Update category
   http.put(`${API_BASE}/v1/ecommerce/categories/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
     const flatCategories = flattenCategories(mockCategories);
     
@@ -288,10 +288,10 @@ export const productCategoryHandlers = [
 
   // Delete category
   http.delete(`${API_BASE}/v1/ecommerce/categories/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const flatCategories = flattenCategories(mockCategories);
     
-    const category = flatCategories.find(c => c.id === id);
+    const category = flatCategories.find((c: any) => c.id === id);
     if (!category) {
       return HttpResponse.json(
         { success: false, error: 'Category not found' },
@@ -308,7 +308,7 @@ export const productCategoryHandlers = [
     }
     
     // Check if has children
-    const hasChildren = flatCategories.some(c => c.parentId === id);
+    const hasChildren = flatCategories.some((c: any) => c.parentId === id);
     if (hasChildren) {
       return HttpResponse.json(
         { success: false, error: 'Cannot delete category with subcategories' },
@@ -317,7 +317,7 @@ export const productCategoryHandlers = [
     }
     
     // Remove category
-    const filteredCategories = flatCategories.filter(c => c.id !== id);
+    const filteredCategories = flatCategories.filter((c: any) => c.id !== id);
     
     // Rebuild tree
     mockCategories = buildCategoryTree(filteredCategories);

@@ -108,7 +108,7 @@ const WidgetManager: FC = () => {
   const areas = widgetData?.areas || []
 
   // Filter widgets
-  const filteredWidgets = widgets.filter(widget => {
+  const filteredWidgets = widgets.filter((widget: any) => {
     const matchesSearch = widget.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          widget.type.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesPosition = selectedPosition === 'all' || widget.position === selectedPosition
@@ -125,7 +125,7 @@ const WidgetManager: FC = () => {
   }, {} as Record<WidgetPosition, Widget[]>)
 
   // Sort widgets by order within each position
-  Object.keys(widgetsByPosition).forEach(position => {
+  Object.keys(widgetsByPosition).forEach((position: any) => {
     widgetsByPosition[position as WidgetPosition].sort((a: any, b: any) => a.order - b.order)
   })
 
@@ -365,13 +365,13 @@ const WidgetManager: FC = () => {
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">활성 위젯</span>
                       <span className="font-medium text-green-600">
-                        {widgets.filter(w => w.isActive).length}개
+                        {widgets.filter((w: any) => w.isActive).length}개
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">비활성 위젯</span>
                       <span className="font-medium text-red-600">
-                        {widgets.filter(w => !w.isActive).length}개
+                        {widgets.filter((w: any) => !w.isActive).length}개
                       </span>
                     </div>
                     <div className="flex justify-between">

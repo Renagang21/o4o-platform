@@ -590,7 +590,7 @@ export class DatabaseOptimizationService {
     }
 
     // 효율성이 낮은 인덱스 최적화 권장
-    const inefficientIndexes = indexStats.filter(stat => 
+    const inefficientIndexes = indexStats.filter((stat: any) => 
       stat.scan > 0 && (stat.tupRead / stat.scan) > 1000
     );
 
@@ -1114,7 +1114,7 @@ export class DatabaseOptimizationService {
   }>> {
     try {
       const alerts = await this.redis.lrange('db_performance_alerts', 0, 9);
-      return alerts.map(a => JSON.parse(a));
+      return alerts.map((a: any) => JSON.parse(a));
     } catch (error) {
       return [];
     }
@@ -1172,7 +1172,7 @@ export class DatabaseOptimizationService {
     if (whereMatch) {
       const whereClause = whereMatch[1];
       const columns = whereClause.match(/\b\w+\s*=/g);
-      return columns ? columns.map(c => c.replace(/\s*=$/, '')) : [];
+      return columns ? columns.map((c: any) => c.replace(/\s*=$/, '')) : [];
     }
     return [];
   }
@@ -1180,7 +1180,7 @@ export class DatabaseOptimizationService {
   private extractColumnsFromOrderBy(query: string): string[] {
     const orderMatch = query.match(/ORDER\s+BY\s+(.+?)(?:\s+LIMIT|$)/i);
     if (orderMatch) {
-      return orderMatch[1].split(',').map(c => c.trim().split(' ')[0]);
+      return orderMatch[1].split(',').map((c: any) => c.trim().split(' ')[0]);
     }
     return [];
   }

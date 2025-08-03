@@ -19,7 +19,7 @@ export default function ProductList() {
     clearError,
   } = useProductStore();
 
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -29,7 +29,7 @@ export default function ProductList() {
     }
   }, [user?.id]);
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: any) => {
     const matchesStatus = !statusFilter || product.status === statusFilter;
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,7 +42,7 @@ export default function ProductList() {
     try {
       await updateProductStatus(productId, newStatus);
       toast.success('상품 상태가 변경되었습니다.');
-    } catch (err) {
+    } catch (err: any) {
       toast.error('상태 변경에 실패했습니다.');
     }
   };
@@ -52,7 +52,7 @@ export default function ProductList() {
       try {
         await deleteProduct(productId);
         toast.success('상품이 삭제되었습니다.');
-      } catch (err) {
+      } catch (err: any) {
         toast.error('삭제에 실패했습니다.');
       }
     }
@@ -66,11 +66,11 @@ export default function ProductList() {
 
     try {
       await Promise.all(
-        selectedProducts.map(id => updateProductStatus(id, newStatus))
+        selectedProducts.map((id: any) => updateProductStatus(id, newStatus))
       );
       setSelectedProducts([]);
       toast.success(`${selectedProducts.length}개 상품의 상태가 변경되었습니다.`);
-    } catch (err) {
+    } catch (err: any) {
       toast.error('일괄 상태 변경에 실패했습니다.');
     }
   };
@@ -102,7 +102,7 @@ export default function ProductList() {
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = flatCategories.find(cat => cat.id === categoryId);
+    const category = flatCategories.find((cat: any) => cat.id === categoryId);
     return category?.name || '미분류';
   };
 
@@ -242,7 +242,7 @@ export default function ProductList() {
                         checked={selectedProducts.length === filteredProducts.length}
                         onChange={(e: any) => {
                           if (e.target.checked) {
-                            setSelectedProducts(filteredProducts.map(p => p.id));
+                            setSelectedProducts(filteredProducts.map((p: any) => p.id));
                           } else {
                             setSelectedProducts([]);
                           }
@@ -281,7 +281,7 @@ export default function ProductList() {
                             if (e.target.checked) {
                               setSelectedProducts([...selectedProducts, product.id]);
                             } else {
-                              setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+                              setSelectedProducts(selectedProducts.filter((id: any) => id !== product.id));
                             }
                           }}
                           className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
@@ -313,7 +313,7 @@ export default function ProductList() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {product.categories.map(catId => getCategoryName(catId)).join(', ')}
+                        {product.categories.map((catId: any) => getCategoryName(catId)).join(', ')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <div>₩{formatPrice(product.basePrice)}</div>

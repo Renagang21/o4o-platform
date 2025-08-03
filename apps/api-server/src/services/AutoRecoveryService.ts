@@ -699,7 +699,7 @@ export class AutoRecoveryService {
       }
     ];
 
-    actions.forEach(action => {
+    actions.forEach((action: any) => {
       this.recoveryActions.set(action.id, action);
     });
 
@@ -764,7 +764,7 @@ export class AutoRecoveryService {
   private async isActionApplicable(alert: Alert, action: RecoveryAction): Promise<boolean> {
     // Check if action is in cooldown
     const lastAttempt = this.recoveryHistory
-      .filter(a => a.actionId === action.id)
+      .filter((a: any) => a.actionId === action.id)
       .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
 
     if (lastAttempt) {
@@ -981,8 +981,8 @@ export class AutoRecoveryService {
   // Public API methods
   async getRecoveryStats(): Promise<AutoRecoveryStats> {
     const attempts = this.recoveryHistory;
-    const successful = attempts.filter(a => a.status === 'success');
-    const failed = attempts.filter(a => a.status === 'failed');
+    const successful = attempts.filter((a: any) => a.status === 'success');
+    const failed = attempts.filter((a: any) => a.status === 'failed');
 
     const averageRecoveryTime = successful.length > 0
       ? successful.reduce((sum, a) => {
@@ -994,7 +994,7 @@ export class AutoRecoveryService {
     // Calculate top issues
     const issueMap = new Map<string, { count: number; successes: number; totalTime: number }>();
     
-    attempts.forEach(attempt => {
+    attempts.forEach((attempt: any) => {
       const key = attempt.actionId;
       const existing = issueMap.get(key) || { count: 0, successes: 0, totalTime: 0 };
       
@@ -1026,7 +1026,7 @@ export class AutoRecoveryService {
 
   async getActiveRecoveries(): Promise<RecoveryAttempt[]> {
     return Array.from(this.activeRecoveries.values())
-      .map(attemptId => this.recoveryAttempts.get(attemptId))
+      .map((attemptId: any) => this.recoveryAttempts.get(attemptId))
       .filter(Boolean) as RecoveryAttempt[];
   }
 

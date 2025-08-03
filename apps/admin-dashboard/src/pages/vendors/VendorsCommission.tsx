@@ -76,7 +76,7 @@ const VendorsCommission = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const filteredCommissions = commissions.filter(commission => {
+  const filteredCommissions = commissions.filter((commission: any) => {
     const matchesPeriod = commission.period === selectedPeriod || selectedPeriod === 'all';
     const matchesStatus = statusFilter === 'all' || commission.status === statusFilter;
     return matchesPeriod && matchesStatus;
@@ -84,10 +84,10 @@ const VendorsCommission = () => {
 
   const totalCommission = filteredCommissions.reduce((sum: number, c) => sum + c.commissionAmount, 0);
   const paidCommission = filteredCommissions
-    .filter(c => c.status === 'paid')
+    .filter((c: any) => c.status === 'paid')
     .reduce((sum: number, c) => sum + c.commissionAmount, 0);
   const pendingCommission = filteredCommissions
-    .filter(c => c.status === 'pending' || c.status === 'processing')
+    .filter((c: any) => c.status === 'pending' || c.status === 'processing')
     .reduce((sum: number, c) => sum + c.commissionAmount, 0);
 
   const getStatusBadge = (status: string) => {

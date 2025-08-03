@@ -32,10 +32,10 @@ interface ContentFilters {
 }
 
 export default function SignageContent() {
-  const [contents, setContents] = useState([]);
+  const [contents, setContents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -73,12 +73,12 @@ export default function SignageContent() {
 
       const data = await response.json();
       setContents(data.data.contents);
-      setPagination(prev => ({
+      setPagination((prev: any) => ({
         ...prev,
         total: data.data.pagination.total,
         totalPages: data.data.pagination.totalPages
       }));
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -127,7 +127,7 @@ export default function SignageContent() {
       }
 
       fetchContents(); // Refresh the list
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
@@ -148,7 +148,7 @@ export default function SignageContent() {
       }
 
       fetchContents(); // Refresh the list
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
@@ -189,7 +189,7 @@ export default function SignageContent() {
                 placeholder="Search content..."
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={filters.search || ''}
-                onChange={(e: any) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                onChange={(e: any) => setFilters((prev: any) => ({ ...prev, search: e.target.value }))}
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function SignageContent() {
           <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={filters.status || ''}
-            onChange={(e: any) => setFilters(prev => ({ ...prev, status: e.target.value || undefined }))}
+            onChange={(e: any) => setFilters((prev: any) => ({ ...prev, status: e.target.value || undefined }))}
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -209,7 +209,7 @@ export default function SignageContent() {
           <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={filters.type || ''}
-            onChange={(e: any) => setFilters(prev => ({ ...prev, type: e.target.value || undefined }))}
+            onChange={(e: any) => setFilters((prev: any) => ({ ...prev, type: e.target.value || undefined }))}
           >
             <option value="">All Types</option>
             <option value="youtube">YouTube</option>
@@ -219,7 +219,7 @@ export default function SignageContent() {
           <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={filters.isPublic?.toString() || ''}
-            onChange={(e: any) => setFilters(prev => ({ 
+            onChange={(e: any) => setFilters((prev: any) => ({ 
               ...prev, 
               isPublic: e.target.value ? e.target.value === 'true' : undefined 
             }))}
@@ -375,7 +375,7 @@ export default function SignageContent() {
           </div>
           <div className="flex space-x-1">
             <button
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+              onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page - 1 }))}
               disabled={pagination.page === 1}
               className="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -385,7 +385,7 @@ export default function SignageContent() {
               Page {pagination.page} of {pagination.totalPages}
             </span>
             <button
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+              onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page + 1 }))}
               disabled={pagination.page === pagination.totalPages}
               className="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >

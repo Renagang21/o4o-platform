@@ -33,9 +33,9 @@ interface CouponInfo {
 }
 
 const CartPage: FC = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [coupons, setCoupons] = useState([]);
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<any[]>([]);
   const [selectedCoupon, setSelectedCoupon] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -120,14 +120,14 @@ const CartPage: FC = () => {
 
     setCartItems(mockCartItems);
     setCoupons(mockCoupons);
-    setSelectedItems(mockCartItems.map(item => item.id));
+    setSelectedItems(mockCartItems.map((item: any) => item.id));
   }, []);
 
   const updateQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     
     setCartItems(items =>
-      items.map(item =>
+      items.map((item: any) =>
         item.id === itemId 
           ? { ...item, quantity: Math.min(newQuantity, item.stock) }
           : item
@@ -136,14 +136,14 @@ const CartPage: FC = () => {
   };
 
   const removeItem = (itemId: string) => {
-    setCartItems(items => items.filter(item => item.id !== itemId));
-    setSelectedItems(selected => selected.filter(id => id !== itemId));
+    setCartItems(items => items.filter((item: any) => item.id !== itemId));
+    setSelectedItems(selected => selected.filter((id: any) => id !== itemId));
   };
 
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems(selected =>
       selected.includes(itemId)
-        ? selected.filter(id => id !== itemId)
+        ? selected.filter((id: any) => id !== itemId)
         : [...selected, itemId]
     );
   };
@@ -152,7 +152,7 @@ const CartPage: FC = () => {
     if (selectedItems.length === cartItems.length) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(cartItems.map(item => item.id));
+      setSelectedItems(cartItems.map((item: any) => item.id));
     }
   };
 
@@ -163,9 +163,9 @@ const CartPage: FC = () => {
   };
 
   // 선택된 상품들의 총 계산
-  const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));
-  const subtotal = selectedCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalDiscount = selectedCartItems.reduce((sum, item) => {
+  const selectedCartItems = cartItems.filter((item: any) => selectedItems.includes(item.id));
+  const subtotal = selectedCartItems.reduce((sum: any, item: any) => sum + (item.price * item.quantity), 0);
+  const totalDiscount = selectedCartItems.reduce((sum: any, item: any) => {
     const discount = item.originalPrice ? (item.originalPrice - item.price) * item.quantity : 0;
     return sum + discount;
   }, 0);
@@ -174,7 +174,7 @@ const CartPage: FC = () => {
   const calculateCouponDiscount = () => {
     if (!selectedCoupon) return 0;
     
-    const coupon = coupons.find(c => c.id === selectedCoupon);
+    const coupon = coupons.find((c: any) => c.id === selectedCoupon);
     if (!coupon || subtotal < coupon.minOrderAmount) return 0;
     
     if (coupon.discountType === 'percentage') {
@@ -186,7 +186,7 @@ const CartPage: FC = () => {
   };
 
   const couponDiscount = calculateCouponDiscount();
-  const shippingFee = selectedCartItems.some(item => !item.isFreeShipping) ? 3000 : 0;
+  const shippingFee = selectedCartItems.some((item: any) => !item.isFreeShipping) ? 3000 : 0;
   const finalTotal = subtotal - couponDiscount + shippingFee;
 
   const handleCheckout = () => {
@@ -435,10 +435,10 @@ const CartPage: FC = () => {
                 
                 <div className="space-y-3">
                   <div className="text-sm text-gray-600">
-                    사용 가능한 쿠폰 {coupons.filter(c => c.isApplicable).length}개
+                    사용 가능한 쿠폰 {coupons.filter((c: any) => c.isApplicable).length}개
                   </div>
                   
-                  {coupons.filter(c => c.isApplicable).map((coupon: any) => (
+                  {coupons.filter((c: any) => c.isApplicable).map((coupon: any) => (
                     <label key={coupon.id} className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                       <input
                         type="radio"

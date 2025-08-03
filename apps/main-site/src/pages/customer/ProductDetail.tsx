@@ -29,7 +29,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (id && products.length > 0) {
-      const foundProduct = products.find(p => p.id === id && p.approvalStatus === 'approved');
+      const foundProduct = products.find((p: any) => p.id === id && p.approvalStatus === 'approved');
       if (foundProduct) {
         setProduct(foundProduct);
       } else {
@@ -44,13 +44,13 @@ export default function ProductDetail() {
     try {
       addToCart(product.id, quantity);
       toast.success('장바구니에 추가되었습니다.');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('장바구니 추가에 실패했습니다.');
     }
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = flatCategories.find(cat => cat.id === categoryId);
+    const category = flatCategories.find((cat: any) => cat.id === categoryId);
     return category?.name || '미분류';
   };
 

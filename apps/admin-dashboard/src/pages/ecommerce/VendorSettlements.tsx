@@ -55,7 +55,7 @@ const VendorSettlements: FC = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedSettlements, setSelectedSettlements] = useState([]);
+  const [selectedSettlements, setSelectedSettlements] = useState<any[]>([]);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [approvalMemo, setApprovalMemo] = useState('');
 
@@ -161,8 +161,8 @@ const VendorSettlements: FC = () => {
   };
 
   const confirmBulkApprove = () => {
-    const selectedSettlementData = settlements.filter(s => selectedSettlements.includes(s.id));
-    const totalAmount = selectedSettlementData.reduce((sum, s) => sum + s.netAmount, 0);
+    const selectedSettlementData = settlements.filter((s: any) => selectedSettlements.includes(s.id));
+    const totalAmount = selectedSettlementData.reduce((sum: any, s: any) => sum + s.netAmount, 0);
 
     approveSettlementsMutation.mutate({
       settlementIds: selectedSettlements,
@@ -172,12 +172,12 @@ const VendorSettlements: FC = () => {
   };
 
   const handleExport = () => {
-    const exportIds = selectedSettlements.length > 0 ? selectedSettlements : settlements.map(s => s.id);
+    const exportIds = selectedSettlements.length > 0 ? selectedSettlements : settlements.map((s: any) => s.id);
     exportMutation.mutate(exportIds);
   };
 
-  const pendingSettlements = settlements.filter(s => s.status === 'pending');
-  const totalPendingAmount = pendingSettlements.reduce((sum, s) => sum + s.netAmount, 0);
+  const pendingSettlements = settlements.filter((s: any) => s.status === 'pending');
+  const totalPendingAmount = pendingSettlements.reduce((sum: any, s: any) => sum + s.netAmount, 0);
 
   return (
     <div className="space-y-6">
@@ -227,7 +227,7 @@ const VendorSettlements: FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {settlements.filter(s => s.status === 'completed').length}건
+              {settlements.filter((s: any) => s.status === 'completed').length}건
             </div>
             <div className="text-xs text-modern-text-tertiary mt-1">
               이번 달
@@ -244,7 +244,7 @@ const VendorSettlements: FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {new Set(settlements.map(s => s.vendorId)).size}명
+              {new Set(settlements.map((s: any) => s.vendorId)).size}명
             </div>
           </CardContent>
         </Card>
@@ -258,7 +258,7 @@ const VendorSettlements: FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-modern-text-primary">
-              {formatCurrency(settlements.reduce((sum, s) => sum + s.netAmount, 0))}
+              {formatCurrency(settlements.reduce((sum: any, s: any) => sum + s.netAmount, 0))}
             </div>
           </CardContent>
         </Card>
@@ -310,7 +310,7 @@ const VendorSettlements: FC = () => {
                       type="checkbox"
                       onChange={(e: any) => {
                         if (e.target.checked) {
-                          setSelectedSettlements(settlements.map(s => s.id));
+                          setSelectedSettlements(settlements.map((s: any) => s.id));
                         } else {
                           setSelectedSettlements([]);
                         }
@@ -370,7 +370,7 @@ const VendorSettlements: FC = () => {
                             if (e.target.checked) {
                               setSelectedSettlements([...selectedSettlements, settlement.id]);
                             } else {
-                              setSelectedSettlements(selectedSettlements.filter(id => id !== settlement.id));
+                              setSelectedSettlements(selectedSettlements.filter((id: any) => id !== settlement.id));
                             }
                           }}
                         />
@@ -493,8 +493,8 @@ const VendorSettlements: FC = () => {
                 <span className="font-medium text-green-600">
                   {formatCurrency(
                     settlements
-                      .filter(s => selectedSettlements.includes(s.id))
-                      .reduce((sum, s) => sum + s.netAmount, 0)
+                      .filter((s: any) => selectedSettlements.includes(s.id))
+                      .reduce((sum: any, s: any) => sum + s.netAmount, 0)
                   )}
                 </span>
               </div>

@@ -89,17 +89,17 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
   });
 
   const handleInputChange = <K extends keyof BetaRegistrationData>(field: K, value: BetaRegistrationData[K]) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [field]: value
     }));
   };
 
   const handleFeatureToggle = (feature: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       interestedFeatures: prev.interestedFeatures?.includes(feature)
-        ? prev.interestedFeatures.filter(f => f !== feature)
+        ? prev.interestedFeatures.filter((f: any) => f !== feature)
         : [...(prev.interestedFeatures || []), feature]
     }));
   };
@@ -119,12 +119,12 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev: any) => prev + 1);
     }
   };
 
   const handlePrev = () => {
-    setCurrentStep(prev => prev - 1);
+    setCurrentStep((prev: any) => prev - 1);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -169,7 +169,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
       } else {
         showToast(data.error?.message || '등록 중 오류가 발생했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
       showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     } finally {

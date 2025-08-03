@@ -45,7 +45,7 @@ export const mockAuthService = {
   async login(email: string, password: string) {
     await new Promise(resolve => setTimeout(resolve, 1000)); // 네트워크 지연 모방
     
-    const user = mockUsers.find(u => u.email === email);
+    const user = mockUsers.find((u: any) => u.email === email);
     
     if (!user) {
       throw new Error('사용자를 찾을 수 없습니다.');
@@ -79,7 +79,7 @@ export const mockAuthService = {
   async forgotPassword(email: string) {
     await new Promise(resolve => setTimeout(resolve, 1500)); // 네트워크 지연 모방
     
-    const user = mockUsers.find(u => u.email === email);
+    const user = mockUsers.find((u: any) => u.email === email);
     
     if (!user) {
       throw new Error('등록되지 않은 이메일입니다.');
@@ -100,7 +100,7 @@ export const mockAuthService = {
   async verifyToken(token: string) {
     if (token.startsWith('mock_token_')) {
       const userId = token.split('_')[2];
-      const user = mockUsers.find(u => u.id === userId);
+      const user = mockUsers.find((u: any) => u.id === userId);
       return { user };
     }
     throw new Error('유효하지 않은 토큰입니다.');
@@ -122,7 +122,7 @@ export const mockAuthService = {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // 이메일 중복 체크
-    if (mockUsers.find(u => u.email === userData.email)) {
+    if (mockUsers.find((u: any) => u.email === userData.email)) {
       throw new Error('이미 등록된 이메일입니다.');
     }
     

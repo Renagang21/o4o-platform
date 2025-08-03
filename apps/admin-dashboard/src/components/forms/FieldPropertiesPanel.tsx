@@ -176,12 +176,12 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
             <div>
               <Label>Options (one per line)</Label>
               <Textarea
-                value={field.options?.map(opt => `${opt.value}|${opt.label}`).join('\n') || ''}
+                value={field.options?.map((opt: any) => `${opt.value}|${opt.label}`).join('\n') || ''}
                 onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
-                  const options = e.target.value.split('\n').map(line => {
+                  const options = e.target.value.split('\n').map((line: any) => {
                     const [value, label] = line.split('|');
                     return { value: value || '', label: label || value || '' };
-                  }).filter(opt => opt.value);
+                  }).filter((opt: any) => opt.value);
                   updateField({ options });
                 }}
                 rows={5}
@@ -199,7 +199,7 @@ export const FieldPropertiesPanel: FC<FieldPropertiesPanelProps> = ({
                   onChange={(e: any) => updateField({
                     fileConfig: {
                       ...field.fileConfig,
-                      allowedTypes: e.target.value.split(',').map(t => t.trim()).filter(Boolean),
+                      allowedTypes: e.target.value.split(',').map((t: any) => t.trim()).filter(Boolean),
                     }
                   })}
                   placeholder="jpg, png, pdf"

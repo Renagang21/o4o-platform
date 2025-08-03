@@ -25,7 +25,7 @@ try {
   );
   
   console.log('✅ React 앱 렌더링 완료!');
-} catch (error) {
+} catch (error: any) {
   console.error('❌ React 앱 시작 실패:', error);
   // 에러 발생 시 간단한 HTML 표시
   document.body.innerHTML = `

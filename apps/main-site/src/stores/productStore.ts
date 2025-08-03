@@ -77,7 +77,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
   error: null,
 
   // Actions
-  fetchProducts: async (newFilters) => {
+  fetchProducts: async (newFilters: any) => {
     set({ isLoading: true, error: null });
     
     try {
@@ -95,37 +95,37 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       }
       
       if (mergedFilters.categoryId) {
-        filteredProducts = filteredProducts.filter(p =>
+        filteredProducts = filteredProducts.filter((p: any) =>
           p.categories.includes(mergedFilters.categoryId)
         );
       }
       
       if (mergedFilters.supplierId) {
-        filteredProducts = filteredProducts.filter(p =>
+        filteredProducts = filteredProducts.filter((p: any) =>
           p.supplierId === mergedFilters.supplierId
         );
       }
       
       if (mergedFilters.status) {
-        filteredProducts = filteredProducts.filter(p =>
+        filteredProducts = filteredProducts.filter((p: any) =>
           p.status === mergedFilters.status
         );
       }
       
       if (mergedFilters.approvalStatus) {
-        filteredProducts = filteredProducts.filter(p =>
+        filteredProducts = filteredProducts.filter((p: any) =>
           p.approvalStatus === mergedFilters.approvalStatus
         );
       }
       
       if (mergedFilters.minPrice > 0) {
-        filteredProducts = filteredProducts.filter(p =>
+        filteredProducts = filteredProducts.filter((p: any) =>
           p.basePrice >= mergedFilters.minPrice
         );
       }
       
       if (mergedFilters.maxPrice > 0) {
-        filteredProducts = filteredProducts.filter(p =>
+        filteredProducts = filteredProducts.filter((p: any) =>
           p.basePrice <= mergedFilters.maxPrice
         );
       }
@@ -193,7 +193,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품을 불러오는 중 오류가 발생했습니다.',
         isLoading: false,
@@ -219,7 +219,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '공급자 상품을 불러오는 중 오류가 발생했습니다.',
         isLoading: false,
@@ -233,7 +233,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const product = mockProducts.find(p => p.id === id);
+      const product = mockProducts.find((p: any) => p.id === id);
       if (!product) {
         throw new Error('상품을 찾을 수 없습니다.');
       }
@@ -242,7 +242,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         currentProduct: product,
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품을 불러오는 중 오류가 발생했습니다.',
         isLoading: false,
@@ -281,7 +281,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 등록 중 오류가 발생했습니다.',
         isLoading: false,
@@ -315,7 +315,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 수정 중 오류가 발생했습니다.',
         isLoading: false,
@@ -343,7 +343,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 삭제 중 오류가 발생했습니다.',
         isLoading: false,
@@ -372,7 +372,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '상품 상태 변경 중 오류가 발생했습니다.',
         isLoading: false,
@@ -408,7 +408,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
       
       // 목록 새로고침
       get().fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '승인 상태 변경 중 오류가 발생했습니다.',
         isLoading: false,
@@ -456,7 +456,7 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
         },
         isLoading: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       set({
         error: error instanceof Error ? error.message : '검색 중 오류가 발생했습니다.',
         isLoading: false,
@@ -474,11 +474,11 @@ export const useProductStore = create<ProductState & ProductActions>((set, get) 
 
   getCategory: (id: string) => {
     const { flatCategories } = get();
-    return flatCategories.find(category => category.id === id);
+    return flatCategories.find((category: any) => category.id === id);
   },
 
   getCategoriesByGroup: (groupId: string) => {
     const { categories } = get();
-    return categories.filter(category => category.groupId === groupId);
+    return categories.filter((category: any) => category.groupId === groupId);
   },
 }));

@@ -32,7 +32,7 @@ interface Pagination {
 
 const AdminDashboard: FC = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<Pagination | null>(null);
 

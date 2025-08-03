@@ -37,7 +37,7 @@ const PostList: FC = () => {
   const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
-  const [selectedPosts, setSelectedPosts] = useState([])
+  const [selectedPosts, setSelectedPosts] = useState<any[]>([])
 
   // 게시글 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -220,7 +220,7 @@ const PostList: FC = () => {
                           if (e.target.checked) {
                             setSelectedPosts([...selectedPosts, post.id])
                           } else {
-                            setSelectedPosts(selectedPosts.filter(id => id !== post.id))
+                            setSelectedPosts(selectedPosts.filter((id: any) => id !== post.id))
                           }
                         }}
                       />

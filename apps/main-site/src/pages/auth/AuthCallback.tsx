@@ -62,7 +62,7 @@ const AuthCallback: FC = () => {
         } else {
           setError('사용자 정보를 가져올 수 없습니다');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Auth callback error:', err);
         setError('인증 처리 중 오류가 발생했습니다');
       } finally {

@@ -14,7 +14,7 @@ interface SessionInfo {
 
 export default function SessionSyncTest() {
   const { user, isAuthenticated, logout, logoutAll } = useCookieAuth();
-  const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [linkedAccounts, setLinkedAccounts] = useState({
     local: false,
     google: false,
@@ -36,7 +36,7 @@ export default function SessionSyncTest() {
       if (data.success) {
         setSessions(data.sessions);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch sessions:', error);
     }
   };
@@ -53,7 +53,7 @@ export default function SessionSyncTest() {
       if (data.success) {
         setLinkedAccounts(data.accounts);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch linked accounts:', error);
     }
   };
@@ -71,7 +71,7 @@ export default function SessionSyncTest() {
         setLastEvent(`Session ${sessionId.substring(0, 8)}... removed`);
         await fetchSessions();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to remove session:', error);
     } finally {
       setLoading(false);

@@ -27,7 +27,7 @@ const tempProducts: Product[] = [
 
 const ProductList: FC = () => {
   const { showToast } = useToast();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -38,7 +38,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
   maxFileSize = 100 * 1024 * 1024, // 100MB
   allowedTypes = ['image/*', 'video/*', 'audio/*', 'application/pdf']
 }) => {
-  const [uploadingFiles, setUploadingFiles] = useState([])
+  const [uploadingFiles, setUploadingFiles] = useState<any[]>([])
   const [isUploading, setIsUploading] = useState(false)
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
@@ -53,7 +53,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
             message = '지원하지 않는 파일 형식입니다.'
           }
           
-          setUploadingFiles(prev => [...prev, {
+          setUploadingFiles((prev: any) => [...prev, {
             file,
             progress: 0,
             status: 'error',
@@ -64,13 +64,13 @@ const MediaUploader: FC<MediaUploaderProps> = ({
     }
 
     // Add accepted files
-    const newFiles = acceptedFiles.map(file => ({
+    const newFiles = acceptedFiles.map((file: any) => ({
       file,
       progress: 0,
       status: 'pending' as const
     }))
     
-    setUploadingFiles(prev => [...prev, ...newFiles])
+    setUploadingFiles((prev: any) => [...prev, ...newFiles])
   }, [maxFileSize])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -95,20 +95,20 @@ const MediaUploader: FC<MediaUploaderProps> = ({
   })
 
   const startUpload = async () => {
-    const pendingFiles = uploadingFiles.filter(f => f.status === 'pending')
+    const pendingFiles = uploadingFiles.filter((f: any) => f.status === 'pending')
     if (pendingFiles.length === 0) return
 
     setIsUploading(true)
 
     // Update status to uploading
-    setUploadingFiles(prev => prev.map(f => 
+    setUploadingFiles((prev: any) => prev.map((f: any) => 
       f.status === 'pending' ? { ...f, status: 'uploading' } : f
     ))
 
     try {
       // Simulate progress updates
       const progressInterval = setInterval(() => {
-        setUploadingFiles(prev => prev.map(f => {
+        setUploadingFiles((prev: any) => prev.map((f: any) => {
           if (f.status === 'uploading' && f.progress < 90) {
             return { ...f, progress: f.progress + 10 }
           }
@@ -117,13 +117,13 @@ const MediaUploader: FC<MediaUploaderProps> = ({
       }, 300)
 
       // Upload files
-      await onUpload(pendingFiles.map(f => f.file))
+      await onUpload(pendingFiles.map((f: any) => f.file))
 
       // Clear progress interval
       clearInterval(progressInterval)
 
       // Mark all as success
-      setUploadingFiles(prev => prev.map(f => 
+      setUploadingFiles((prev: any) => prev.map((f: any) => 
         f.status === 'uploading' ? { ...f, status: 'success', progress: 100 } : f
       ))
 
@@ -133,7 +133,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
       }, 1000)
     } catch (error: any) {
       // Mark failed uploads
-      setUploadingFiles(prev => prev.map(f => 
+      setUploadingFiles((prev: any) => prev.map((f: any) => 
         f.status === 'uploading' 
           ? { ...f, status: 'error', error: '업로드 실패' } 
           : f
@@ -144,7 +144,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
   }
 
   const removeFile = (index: number) => {
-    setUploadingFiles(prev => prev.filter((_, i: any) => i !== index))
+    setUploadingFiles((prev: any) => prev.filter((_, i: any) => i !== index))
   }
 
   const getFileIcon = (file: File) => {
@@ -164,7 +164,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
     }
   }
 
-  const canUpload = uploadingFiles.some(f => f.status === 'pending') && !isUploading
+  const canUpload = uploadingFiles.some((f: any) => f.status === 'pending') && !isUploading
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -293,7 +293,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
         <div className="p-6 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              {uploadingFiles.filter(f => f.status === 'pending').length}개 대기 중
+              {uploadingFiles.filter((f: any) => f.status === 'pending').length}개 대기 중
             </p>
             <div className="flex items-center gap-2">
               <button

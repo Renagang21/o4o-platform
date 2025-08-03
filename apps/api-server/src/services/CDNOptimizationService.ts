@@ -143,8 +143,8 @@ export class CDNOptimizationService {
       });
 
       const results = await Promise.allSettled(optimizationTasks);
-      const successful = results.filter(r => r.status === 'fulfilled').length;
-      const failed = results.filter(r => r.status === 'rejected').length;
+      const successful = results.filter((r: any) => r.status === 'fulfilled').length;
+      const failed = results.filter((r: any) => r.status === 'rejected').length;
 
       // console.log(`✅ Asset optimization completed: ${successful} successful, ${failed} failed`);
 
@@ -166,7 +166,7 @@ export class CDNOptimizationService {
       await this.scanDirectory(this.staticAssetsPath, assets);
       
       // 최적화 필요한 자산 필터링
-      const assetsToOptimize = assets.filter(asset => {
+      const assetsToOptimize = assets.filter((asset: any) => {
         return this.needsOptimization(asset);
       });
 
@@ -621,7 +621,7 @@ export class CDNOptimizationService {
       misses: Math.floor(Math.random() * 1000),
       bandwidth: Math.floor(Math.random() * 1000000000), // bytes
       requests: Math.floor(Math.random() * 10000),
-      regions: this.cdnConfig.regions.map(region => ({
+      regions: this.cdnConfig.regions.map((region: any) => ({
         name: region.name,
         hits: Math.floor(Math.random() * 1000),
         misses: Math.floor(Math.random() * 100),
@@ -638,7 +638,7 @@ export class CDNOptimizationService {
       const usage = await this.getAssetUsageStats();
       
       // 사용량 기반 캐시 우선순위 결정
-      const priorityAssets = usage.filter(asset => asset.requests > 100);
+      const priorityAssets = usage.filter((asset: any) => asset.requests > 100);
       
       // 우선순위 높은 자산 CDN 배포
       for (const asset of priorityAssets) {
@@ -739,7 +739,7 @@ export class CDNOptimizationService {
 
     // 지역별 CDN 선택
     if (region !== 'auto') {
-      const regionConfig = this.cdnConfig.regions.find(r => r.name === region);
+      const regionConfig = this.cdnConfig.regions.find((r: any) => r.name === region);
       if (regionConfig) {
         cdnUrl = regionConfig.url;
       }
@@ -780,7 +780,7 @@ export class CDNOptimizationService {
       quality = 80
     } = options;
 
-    const srcsetEntries = sizes.map(size => {
+    const srcsetEntries = sizes.map((size: any) => {
       const url = this.getOptimizedAssetUrl(originalPath, {
         format,
         quality,

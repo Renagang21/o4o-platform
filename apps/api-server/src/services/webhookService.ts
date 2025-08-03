@@ -346,7 +346,7 @@ export class WebhookService {
 
     // 재고 확정 (예약된 재고를 실제 차감)
     if (payment.order && payment.order.items) {
-      const inventoryItems = payment.order.items.map(item => ({
+      const inventoryItems = payment.order.items.map((item: any) => ({
         productId: item.productId,
         quantity: item.quantity
       }));
@@ -386,7 +386,7 @@ export class WebhookService {
 
     // 예약된 재고 해제
     if (payment.order && payment.order.items) {
-      const inventoryItems = payment.order.items.map(item => ({
+      const inventoryItems = payment.order.items.map((item: any) => ({
         productId: item.productId,
         quantity: item.quantity
       }));

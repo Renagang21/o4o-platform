@@ -66,7 +66,7 @@ const ContentSearchManager: FC = () => {
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<any[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedContent, setSelectedContent] = useState<Set<string>>(new Set());
 
@@ -88,7 +88,7 @@ const ContentSearchManager: FC = () => {
 
       const response = await axios.post('/api/signage/contents/search', searchPayload);
       setSearchResult(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       showToast('Search failed', 'error');
       console.error('Search error:', error);
     } finally {
@@ -104,13 +104,13 @@ const ContentSearchManager: FC = () => {
   // Handle search input
   const handleSearchInput = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSearchOptions(prev => ({ ...prev, page: 1 }));
+    setSearchOptions((prev: any) => ({ ...prev, page: 1 }));
     searchContent();
   };
 
   // Handle pagination
   const handlePageChange = (page: number) => {
-    setSearchOptions(prev => ({ ...prev, page }));
+    setSearchOptions((prev: any) => ({ ...prev, page }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -139,7 +139,7 @@ const ContentSearchManager: FC = () => {
       showToast(`Deleted ${selectedContent.size} items`, 'success');
       setSelectedContent(new Set());
       searchContent();
-    } catch (error) {
+    } catch (error: any) {
       showToast('Failed to delete content', 'error');
     }
   };
@@ -152,7 +152,7 @@ const ContentSearchManager: FC = () => {
       await axios.delete(`/api/signage/contents/${contentId}`);
       showToast('Content deleted', 'success');
       searchContent();
-    } catch (error) {
+    } catch (error: any) {
       showToast('Failed to delete content', 'error');
     }
   };
@@ -241,7 +241,7 @@ const ContentSearchManager: FC = () => {
                 type="text"
                 placeholder="Search by title, description, or tags..."
                 value={searchOptions.query || ''}
-                onChange={(e: any) => setSearchOptions(prev => ({ ...prev, query: e.target.value }))}
+                onChange={(e: any) => setSearchOptions((prev: any) => ({ ...prev, query: e.target.value }))}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -274,7 +274,7 @@ const ContentSearchManager: FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Content Type</label>
                   <select
                     value={searchOptions.contentType || ''}
-                    onChange={(e: any) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions((prev: any) => ({ 
                       ...prev, 
                       contentType: e.target.value as 'youtube' | 'vimeo' | undefined 
                     }))}
@@ -290,7 +290,7 @@ const ContentSearchManager: FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                   <select
                     value={searchOptions.status || ''}
-                    onChange={(e: any) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions((prev: any) => ({ 
                       ...prev, 
                       status: e.target.value as 'pending' | 'approved' | 'rejected' | 'inactive' | undefined 
                     }))}
@@ -308,7 +308,7 @@ const ContentSearchManager: FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
                   <select
                     value={searchOptions.sortBy || 'latest'}
-                    onChange={(e: any) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions((prev: any) => ({ 
                       ...prev, 
                       sortBy: e.target.value as 'latest' | 'popular' | 'duration' | 'name' 
                     }))}
@@ -329,7 +329,7 @@ const ContentSearchManager: FC = () => {
                   <input
                     type="date"
                     value={searchOptions.dateRange?.start || ''}
-                    onChange={(e: any) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions((prev: any) => ({ 
                       ...prev, 
                       dateRange: { ...prev.dateRange, start: e.target.value }
                     }))}
@@ -342,7 +342,7 @@ const ContentSearchManager: FC = () => {
                   <input
                     type="date"
                     value={searchOptions.dateRange?.end || ''}
-                    onChange={(e: any) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions((prev: any) => ({ 
                       ...prev, 
                       dateRange: { ...prev.dateRange, end: e.target.value }
                     }))}
@@ -361,7 +361,7 @@ const ContentSearchManager: FC = () => {
                       type="button"
                       onClick={() => {
                         if (selectedTags.includes(tag)) {
-                          setSelectedTags(selectedTags.filter(t => t !== tag));
+                          setSelectedTags(selectedTags.filter((t: any) => t !== tag));
                         } else {
                           setSelectedTags([...selectedTags, tag]);
                         }
@@ -544,7 +544,7 @@ const ContentSearchManager: FC = () => {
                           checked={selectedContent.size === searchResult.content.length && selectedContent.size > 0}
                           onChange={(e: any) => {
                             if (e.target.checked) {
-                              setSelectedContent(new Set(searchResult.content.map(c => c.id)));
+                              setSelectedContent(new Set(searchResult.content.map((c: any) => c.id)));
                             } else {
                               setSelectedContent(new Set());
                             }

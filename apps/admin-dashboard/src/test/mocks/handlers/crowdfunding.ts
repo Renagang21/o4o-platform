@@ -112,7 +112,7 @@ let mockParticipations: CrowdfundingParticipation[] = [
 
 // Helper functions
 const getProjectParticipants = (projectId: string) => {
-  return mockParticipations.filter(p => p.projectId === projectId && p.status === 'joined');
+  return mockParticipations.filter((p: any) => p.projectId === projectId && p.status === 'joined');
 };
 
 export const crowdfundingHandlers = [
@@ -129,16 +129,16 @@ export const crowdfundingHandlers = [
 
     // Apply filters
     if (status && status !== 'all') {
-      filteredProjects = filteredProjects.filter(p => p.status === status);
+      filteredProjects = filteredProjects.filter((p: any) => p.status === status);
     }
 
     if (creatorId) {
-      filteredProjects = filteredProjects.filter(p => p.creatorId === creatorId);
+      filteredProjects = filteredProjects.filter((p: any) => p.creatorId === creatorId);
     }
 
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredProjects = filteredProjects.filter(p =>
+      filteredProjects = filteredProjects.filter((p: any) =>
         p.title.toLowerCase().includes(searchLower) ||
         p.description.toLowerCase().includes(searchLower) ||
         p.creatorName?.toLowerCase().includes(searchLower)
@@ -166,7 +166,7 @@ export const crowdfundingHandlers = [
 
   // Get single project
   http.get(`${API_BASE}/v1/crowdfunding-simple/projects/:id`, ({ params }) => {
-    const project = mockProjects.find(p => p.id === (params.id as string));
+    const project = mockProjects.find((p: any) => p.id === (params.id as string));
     
     if (!project) {
       return HttpResponse.json(
@@ -220,7 +220,7 @@ export const crowdfundingHandlers = [
 
   // Update project
   http.put(`${API_BASE}/v1/crowdfunding-simple/projects/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const updateData: Partial<CrowdfundingProjectFormData> = await request.json();
     
     const index = mockProjects.findIndex(p => p.id === id);
@@ -246,7 +246,7 @@ export const crowdfundingHandlers = [
 
   // Delete project
   http.delete(`${API_BASE}/v1/crowdfunding-simple/projects/:id`, ({ params }) => {
-    const { id } = params;
+    const { id } = params as any;
     const index = mockProjects.findIndex(p => p.id === id);
     
     if (index === -1) {
@@ -259,7 +259,7 @@ export const crowdfundingHandlers = [
     mockProjects.splice(index, 1);
     
     // Remove related participations
-    mockParticipations = mockParticipations.filter(p => p.projectId !== id);
+    mockParticipations = mockParticipations.filter((p: any) => p.projectId !== id);
 
     return HttpResponse.json({
       success: true,
@@ -272,7 +272,7 @@ export const crowdfundingHandlers = [
     const projectId = params.id as string;
     const vendorId = 'current-vendor-id'; // 실제로는 토큰에서 가져옴
     
-    const project = mockProjects.find(p => p.id === projectId);
+    const project = mockProjects.find((p: any) => p.id === projectId);
     if (!project) {
       return HttpResponse.json(
         { success: false, error: 'Project not found' },
@@ -334,7 +334,7 @@ export const crowdfundingHandlers = [
     participation.cancelledAt = new Date().toISOString();
 
     // Update project participant count
-    const project = mockProjects.find(p => p.id === projectId);
+    const project = mockProjects.find((p: any) => p.id === projectId);
     if (project) {
       project.currentParticipantCount = getProjectParticipants(projectId).length;
       project.updatedAt = new Date().toISOString();
@@ -349,7 +349,7 @@ export const crowdfundingHandlers = [
 
   // Get participation status
   http.get(`${API_BASE}/v1/crowdfunding-simple/projects/:id/participation-status`, ({ params }) => {
-    const { id: projectId } = params;
+    const { id: projectId } = params as any;
     const vendorId = 'current-vendor-id'; // 실제로는 토큰에서 가져옴
     
     const participation = mockParticipations.find(
@@ -364,10 +364,10 @@ export const crowdfundingHandlers = [
 
   // Update project status (admin only)
   http.patch(`${API_BASE}/v1/crowdfunding-simple/projects/:id/status`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const { status } = await request.json();
     
-    const project = mockProjects.find(p => p.id === id);
+    const project = mockProjects.find((p: any) => p.id === id);
     if (!project) {
       return HttpResponse.json(
         { success: false, error: 'Project not found' },
@@ -388,11 +388,11 @@ export const crowdfundingHandlers = [
   // Get dashboard stats
   http.get(`${API_BASE}/v1/crowdfunding-simple/dashboard/stats`, () => {
     const totalProjects = mockProjects.length;
-    const activeProjects = mockProjects.filter(p => p.status === 'recruiting').length;
-    const completedProjects = mockProjects.filter(p => p.status === 'completed').length;
-    const totalParticipants = mockParticipations.filter(p => p.status === 'joined').length;
+    const activeProjects = mockProjects.filter((p: any) => p.status === 'recruiting').length;
+    const completedProjects = mockProjects.filter((p: any) => p.status === 'completed').length;
+    const totalParticipants = mockParticipations.filter((p: any) => p.status === 'joined').length;
     
-    const successfulProjects = mockProjects.filter(p => 
+    const successfulProjects = mockProjects.filter((p: any) => 
       p.currentParticipantCount >= p.targetParticipantCount
     ).length;
     const successRate = totalProjects > 0 ? Math.round((successfulProjects / totalProjects) * 100) : 0;

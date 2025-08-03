@@ -12,7 +12,7 @@ const AdminBreadcrumb: FC = () => {
 
   // 경로를 기반으로 breadcrumb 생성
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
-    const pathSegments = location.pathname.split('/').filter(segment => segment);
+    const pathSegments = location.pathname.split('/').filter((segment: any) => segment);
     const breadcrumbs: BreadcrumbItem[] = [
       { label: '대시보드', path: '/admin/dashboard' }
     ];

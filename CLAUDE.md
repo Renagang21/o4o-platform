@@ -70,6 +70,12 @@ npm install
 
 ## 🛠️ Common Issues & Solutions
 
+### Command Execution Issues
+- **명령어 끝에 "2"가 붙는 문제**: 일부 환경에서 npm 명령어 실행 시 의도하지 않은 "2"가 추가되는 경우가 있음
+  - 증상: `npm install 2`, `tsc --noEmit 2` 등
+  - 해결: 명령어를 직접 실행하거나 스크립트에서 확인
+  - 점검: type-check, lint 등 스크립트 실행 시 항상 확인 필요
+
 ### Build Issues
 - **"Cannot find module '@o4o/types'"**: Run `npm run build:packages` first
 - **Package build order**: types → utils → ui → auth-client → auth-context

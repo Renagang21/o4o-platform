@@ -21,7 +21,7 @@ import toast from 'react-hot-toast'
 const Categories: FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState<any[]>([])
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -139,14 +139,14 @@ const Categories: FC = () => {
   }
 
   const updateFormData = (key: keyof Category, value: string | number | boolean) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [key]: value
     }))
   }
 
   const toggleExpanded = (categoryId: string) => {
-    setExpandedCategories(prev => {
+    setExpandedCategories((prev: any) => {
       const newSet = new Set(prev)
       if (newSet.has(categoryId)) {
         newSet.delete(categoryId)
@@ -171,7 +171,7 @@ const Categories: FC = () => {
   const filterCategories = (categories: Category[], searchTerm: string): Category[] => {
     if (!searchTerm) return categories
 
-    return categories.filter(category => {
+    return categories.filter((category: any) => {
       const matches = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
       
@@ -185,7 +185,7 @@ const Categories: FC = () => {
       }
       
       return false
-    }).map(category => ({
+    }).map((category: any) => ({
       ...category,
       children: category.children ? filterCategories(category.children, searchTerm) : undefined
     }))
@@ -324,7 +324,7 @@ const Categories: FC = () => {
         {/* Children */}
         {hasChildren && isExpanded && category.children && (
           <div>
-            {category.children.map(child => renderCategory(child, level + 1))}
+            {category.children.map((child: any) => renderCategory(child, level + 1))}
           </div>
         )}
       </div>
@@ -419,7 +419,7 @@ const Categories: FC = () => {
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {filteredCategories.map(category => renderCategory(category))}
+              {filteredCategories.map((category: any) => renderCategory(category))}
             </div>
           )}
         </div>
@@ -487,7 +487,7 @@ const Categories: FC = () => {
                     className="wp-select"
                   >
                     <option value="">최상위 카테고리</option>
-                    {categories.map(category => (
+                    {categories.map((category: any) => (
                       <option 
                         key={category.id} 
                         value={category.id}

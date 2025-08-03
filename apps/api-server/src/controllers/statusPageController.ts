@@ -70,11 +70,11 @@ export class StatusPageController {
       
       // Apply filters
       if (status && status !== 'all') {
-        incidents = incidents.filter(incident => incident.status === status);
+        incidents = incidents.filter((incident: any) => incident.status === status);
       }
       
       if (impact && impact !== 'all') {
-        incidents = incidents.filter(incident => incident.impact === impact);
+        incidents = incidents.filter((incident: any) => incident.impact === impact);
       }
 
       res.json({
@@ -104,7 +104,7 @@ export class StatusPageController {
       // This would need to be implemented in the service
       // For now, get all incidents and find the one
       const incidents = await this.statusPageService.getIncidents(1000);
-      const incident = incidents.find(i => i.id === incidentId);
+      const incident = incidents.find((i: any) => i.id === incidentId);
       
       if (!incident) {
         res.status(404).json({
@@ -532,9 +532,9 @@ export class StatusPageController {
       const analytics = {
         overview: {
           totalComponents: components.length,
-          operationalComponents: components.filter(c => c.status === ServiceStatus.OPERATIONAL).length,
+          operationalComponents: components.filter((c: any) => c.status === ServiceStatus.OPERATIONAL).length,
           totalIncidents: incidents.length,
-          activeIncidents: incidents.filter(i => i.status !== IncidentStatus.RESOLVED).length
+          activeIncidents: incidents.filter((i: any) => i.status !== IncidentStatus.RESOLVED).length
         },
         uptime: {
           overall: 0, // Would calculate from metrics
@@ -543,10 +543,10 @@ export class StatusPageController {
         incidentTrends: {
           byDay: [] as Array<{ date: string; count: number }>, // Would calculate from incident data
           byImpact: {
-            critical: incidents.filter(i => i.impact === IncidentImpact.CRITICAL).length,
-            major: incidents.filter(i => i.impact === IncidentImpact.MAJOR).length,
-            minor: incidents.filter(i => i.impact === IncidentImpact.MINOR).length,
-            none: incidents.filter(i => i.impact === IncidentImpact.NONE).length
+            critical: incidents.filter((i: any) => i.impact === IncidentImpact.CRITICAL).length,
+            major: incidents.filter((i: any) => i.impact === IncidentImpact.MAJOR).length,
+            minor: incidents.filter((i: any) => i.impact === IncidentImpact.MINOR).length,
+            none: incidents.filter((i: any) => i.impact === IncidentImpact.NONE).length
           }
         },
         responseMetrics: {

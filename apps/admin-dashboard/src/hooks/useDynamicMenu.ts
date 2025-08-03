@@ -48,12 +48,12 @@ export const useDynamicMenu = () => {
 
   // 앱 활성화 상태 확인 함수
   const isAppActive = (appName: string): boolean => {
-    return activeApps.some(app => app.name === appName || app.id === appName);
+    return activeApps.some((app: any) => app.name === appName || app.id === appName);
   };
 
   // 메뉴 아이템 필터링 함수
   const filterMenuItems = (items: MenuItem[]): MenuItem[] => {
-    return items.filter(item => {
+    return items.filter((item: any) => {
       // 구분선은 항상 표시
       if (item.separator) {
         return true;
@@ -136,11 +136,11 @@ export const useAppStatus = (appName: string) => {
   });
   
   const activeApps: ActiveApp[] = activeAppsData?.data || [];
-  const isActive = activeApps.some(app => app.name === appName || app.id === appName);
+  const isActive = activeApps.some((app: any) => app.name === appName || app.id === appName);
   
   return {
     isActive,
-    app: activeApps.find(app => app.name === appName || app.id === appName)
+    app: activeApps.find((app: any) => app.name === appName || app.id === appName)
   };
 };
 
@@ -159,12 +159,12 @@ export const useAppPermissions = () => {
   const activeApps: ActiveApp[] = activeAppsData?.data || [];
 
   const hasAppPermission = (appName: string, permission: string): boolean => {
-    const app = activeApps.find(a => a.name === appName || a.id === appName);
+    const app = activeApps.find((a: any) => a.name === appName || a.id === appName);
     return app ? app.permissions.includes(permission) : false;
   };
 
   const getAppPermissions = (appName: string): string[] => {
-    const app = activeApps.find(a => a.name === appName || a.id === appName);
+    const app = activeApps.find((a: any) => a.name === appName || a.id === appName);
     return app ? app.permissions : [];
   };
 

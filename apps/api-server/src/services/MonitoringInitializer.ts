@@ -89,7 +89,7 @@ export class MonitoringInitializer {
 
     // Check if components already exist
     const existingComponents = await this.statusPageService.getComponents();
-    const existingNames = existingComponents.map(c => c.name);
+    const existingNames = existingComponents.map((c: any) => c.name);
 
     for (const componentData of defaultComponents) {
       if (!existingNames.includes(componentData.name)) {
@@ -244,7 +244,7 @@ export class MonitoringInitializer {
     const sampleMaintenance = {
       title: 'Scheduled Database Maintenance',
       description: 'Regular database maintenance including index optimization and backup verification.',
-      affectedComponents: [components.find(c => c.name === 'Database')?.id || components[0].id],
+      affectedComponents: [components.find((c: any) => c.name === 'Database')?.id || components[0].id],
       scheduledStart,
       scheduledEnd,
       createdBy: 'system'

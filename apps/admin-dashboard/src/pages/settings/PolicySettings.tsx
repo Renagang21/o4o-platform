@@ -202,7 +202,7 @@ const PolicySettings: FC = () => {
   const updateSettings = useCallback((category: keyof PolicySettings, updates: Partial<PolicySettings[keyof PolicySettings]>) => {
     if (!settings) return;
     
-    setSettings(prev => ({
+    setSettings((prev: any) => ({
       ...prev!,
       [category]: {
         ...prev![category],
@@ -213,7 +213,7 @@ const PolicySettings: FC = () => {
   }, [settings]);
 
   const getTabColor = (categoryId: string) => {
-    const category = policyCategories.find(c => c.id === categoryId);
+    const category = policyCategories.find((c: any) => c.id === categoryId);
     if (!category) return 'gray';
     
     const colors = {
@@ -402,7 +402,7 @@ const PolicySettings: FC = () => {
             </div>
             <div className="wp-card-body">
               {(() => {
-                const currentCategory = policyCategories.find(c => c.id === activeTab);
+                const currentCategory = policyCategories.find((c: any) => c.id === activeTab);
                 if (!currentCategory) return null;
                 
                 return (

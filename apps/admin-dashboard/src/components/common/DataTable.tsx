@@ -80,14 +80,14 @@ const DataTable = <T extends object>({
     
     const newSelection = checked
       ? [...selectedItems, item]
-      : selectedItems.filter(selected => selected !== item);
+      : selectedItems.filter((selected: any) => selected !== item);
     
     onSelectionChange(newSelection);
     setSelectAll(newSelection.length === data.length);
   };
 
   const isItemSelected = (item: T) => {
-    return selectedItems.some(selected => selected === item);
+    return selectedItems.some((selected: any) => selected === item);
   };
 
   // Sorting logic
@@ -108,7 +108,7 @@ const DataTable = <T extends object>({
 
   // Render actions
   const renderActions = (item: T) => {
-    const visibleActions = actions.filter(action => !action.hidden?.(item));
+    const visibleActions = actions.filter((action: any) => !action.hidden?.(item));
     
     if (visibleActions.length === 0) return null;
 

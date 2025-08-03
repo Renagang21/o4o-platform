@@ -159,7 +159,7 @@ export class User {
   }
 
   hasAnyRole(roles: (UserRole | string)[]): boolean {
-    return roles.some(role => this.hasRole(role));
+    return roles.some((role: any) => this.hasRole(role));
   }
 
   isAdmin(): boolean {

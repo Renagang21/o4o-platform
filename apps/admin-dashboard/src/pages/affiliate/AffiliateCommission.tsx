@@ -80,21 +80,21 @@ const AffiliateCommission = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [selectedStatus, setSelectedStatus] = useState('all');
 
-  const filteredCommissions = commissions.filter(commission => {
+  const filteredCommissions = commissions.filter((commission: any) => {
     const matchesPeriod = selectedPeriod === 'all' || commission.period === selectedPeriod;
     const matchesStatus = selectedStatus === 'all' || commission.status === selectedStatus;
     return matchesPeriod && matchesStatus;
   });
 
-  const totalCommission = filteredCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
+  const totalCommission = filteredCommissions.reduce((sum: any, c: any) => sum + c.commissionAmount, 0);
   const paidCommission = filteredCommissions
-    .filter(c => c.status === 'paid')
-    .reduce((sum, c) => sum + c.commissionAmount, 0);
+    .filter((c: any) => c.status === 'paid')
+    .reduce((sum: any, c: any) => sum + c.commissionAmount, 0);
   const pendingCommission = filteredCommissions
-    .filter(c => c.status === 'pending' || c.status === 'processing')
-    .reduce((sum, c) => sum + c.commissionAmount, 0);
+    .filter((c: any) => c.status === 'pending' || c.status === 'processing')
+    .reduce((sum: any, c: any) => sum + c.commissionAmount, 0);
   const averageCommissionRate = filteredCommissions.length > 0
-    ? filteredCommissions.reduce((sum, c) => sum + c.commissionRate, 0) / filteredCommissions.length
+    ? filteredCommissions.reduce((sum: any, c: any) => sum + c.commissionRate, 0) / filteredCommissions.length
     : 0;
 
   const getStatusBadge = (status: string) => {
@@ -363,7 +363,7 @@ const AffiliateCommission = () => {
           <div className="wp-card-body">
             <div className="space-y-3">
               {filteredCommissions
-                .filter(c => c.status === 'pending' && c.period === selectedPeriod)
+                .filter((c: any) => c.status === 'pending' && c.period === selectedPeriod)
                 .map((commission: any) => (
                   <div key={commission.id} className="flex items-center justify-between py-2 border-b border-modern-border-primary last:border-b-0">
                     <div>
@@ -381,7 +381,7 @@ const AffiliateCommission = () => {
                 <p className="font-medium text-modern-text-primary">총 정산 예정액</p>
                 <p className="text-xl font-bold text-modern-accent">
                   ₩{filteredCommissions
-                    .filter(c => c.status === 'pending' && c.period === selectedPeriod)
+                    .filter((c: any) => c.status === 'pending' && c.period === selectedPeriod)
                     .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </p>
@@ -400,7 +400,7 @@ const AffiliateCommission = () => {
                 <span className="text-sm text-modern-text-secondary">계좌이체</span>
                 <span className="text-sm font-medium text-modern-text-primary">
                   ₩{commissions
-                    .filter(c => c.paymentMethod === '계좌이체')
+                    .filter((c: any) => c.paymentMethod === '계좌이체')
                     .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </span>
@@ -409,7 +409,7 @@ const AffiliateCommission = () => {
                 <span className="text-sm text-modern-text-secondary">페이팔</span>
                 <span className="text-sm font-medium text-modern-text-primary">
                   ₩{commissions
-                    .filter(c => c.paymentMethod === '페이팔')
+                    .filter((c: any) => c.paymentMethod === '페이팔')
                     .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </span>
@@ -418,7 +418,7 @@ const AffiliateCommission = () => {
                 <span className="text-sm text-modern-text-secondary">세금계산서</span>
                 <span className="text-sm font-medium text-modern-text-primary">
                   ₩{commissions
-                    .filter(c => c.paymentMethod === '세금계산서')
+                    .filter((c: any) => c.paymentMethod === '세금계산서')
                     .reduce((sum: number, c) => sum + c.commissionAmount, 0)
                     .toLocaleString()}
                 </span>

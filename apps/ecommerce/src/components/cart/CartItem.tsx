@@ -23,7 +23,7 @@ export const CartItem: FC<CartItemProps> = ({
   onRemove,
   className
 }) => {
-  const { product, quantity } = item;
+  const { product, quantity } = item as any;
   
   if (!product) {
     return null; // or a placeholder component

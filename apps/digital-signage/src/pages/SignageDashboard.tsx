@@ -20,7 +20,7 @@ interface SignageContent {
 }
 
 const SignageDashboard: FC = () => {
-  const [contents, setContents] = useState([]);
+  const [contents, setContents] = useState<any[]>([]);
   const [currentDisplay, setCurrentDisplay] = useState<SignageContent | null>(null);
   const [displayStatus, setDisplayStatus] = useState<'playing' | 'paused' | 'stopped'>('stopped');
 
@@ -59,16 +59,16 @@ const SignageDashboard: FC = () => {
     ];
 
     setContents(mockContents);
-    setCurrentDisplay(mockContents.find(c => c.isActive) || null);
-    setDisplayStatus(mockContents.find(c => c.isActive) ? 'playing' : 'stopped');
+    setCurrentDisplay(mockContents.find((c: any) => c.isActive) || null);
+    setDisplayStatus(mockContents.find((c: any) => c.isActive) ? 'playing' : 'stopped');
   }, []);
 
   const handleContentSelect = (content: SignageContent) => {
     // 이전 활성 콘텐츠 비활성화
-    setContents(prev => prev.map(c => ({ ...c, isActive: false })));
+    setContents((prev: any) => prev.map((c: any) => ({ ...c, isActive: false })));
     
     // 새 콘텐츠 활성화
-    setContents(prev => prev.map(c => 
+    setContents((prev: any) => prev.map((c: any) => 
       c.id === content.id ? { ...c, isActive: true } : c
     ));
     

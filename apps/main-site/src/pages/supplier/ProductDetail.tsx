@@ -57,7 +57,7 @@ export default function ProductDetail() {
     try {
       await updateProductStatus(currentProduct.id, newStatus);
       toast.success('상품 상태가 변경되었습니다.');
-    } catch (err) {
+    } catch (err: any) {
       toast.error('상태 변경에 실패했습니다.');
     }
   };
@@ -68,7 +68,7 @@ export default function ProductDetail() {
         await deleteProduct(currentProduct.id);
         toast.success('상품이 삭제되었습니다.');
         navigate('/supplier/products');
-      } catch (err) {
+      } catch (err: any) {
         toast.error('삭제에 실패했습니다.');
       }
     }
@@ -101,7 +101,7 @@ export default function ProductDetail() {
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = flatCategories.find(cat => cat.id === categoryId);
+    const category = flatCategories.find((cat: any) => cat.id === categoryId);
     return category?.name || '미분류';
   };
 
@@ -204,7 +204,7 @@ export default function ProductDetail() {
                 <div>
                   <dt className="text-sm font-medium text-gray-500">카테고리</dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {currentProduct.categories.map(catId => getCategoryName(catId)).join(', ')}
+                    {currentProduct.categories.map((catId: any) => getCategoryName(catId)).join(', ')}
                   </dd>
                 </div>
                 <div>

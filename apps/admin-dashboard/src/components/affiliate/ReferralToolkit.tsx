@@ -43,7 +43,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
   // 메시지 템플릿 생성
   const getMessageTemplate = () => {
     const productName = selectedProduct 
-      ? products.find(p => p.id === selectedProduct)?.name || '상품'
+      ? products.find((p: any) => p.id === selectedProduct)?.name || '상품'
       : 'O4O Platform';
 
     switch (messageTemplate) {
@@ -118,7 +118,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">전체 상품 추천</SelectItem>
-                    {products.map(product => (
+                    {products.map((product: any) => (
                       <SelectItem key={product.id} value={product.id}>
                         {product.name} - {product.price.toLocaleString()}원
                       </SelectItem>
@@ -147,7 +147,7 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
               <div className="pt-4">
                 <ShareButtons
                   url={referralLink}
-                  title={selectedProduct ? products.find(p => p.id === selectedProduct)?.name : 'O4O Platform 특별 혜택!'}
+                  title={selectedProduct ? products.find((p: any) => p.id === selectedProduct)?.name : 'O4O Platform 특별 혜택!'}
                   description={`추천 코드 ${referralCode}로 특별한 혜택을 받으세요!`}
                   referralCode={referralCode}
                   showLabels={true}

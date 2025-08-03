@@ -469,7 +469,7 @@ const RefundManagement: FC = () => {
                 <select
                   id="action"
                   value={processForm.action}
-                  onChange={(e: any) => setProcessForm(prev => ({ ...prev, action: e.target.value as any }))}
+                  onChange={(e: any) => setProcessForm((prev: any) => ({ ...prev, action: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
@@ -487,7 +487,7 @@ const RefundManagement: FC = () => {
                     min="0"
                     max={selectedRefund?.requestedAmount}
                     value={processForm.approvedAmount}
-                    onChange={(e: any) => setProcessForm(prev => ({ ...prev, approvedAmount: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e: any) => setProcessForm((prev: any) => ({ ...prev, approvedAmount: parseFloat(e.target.value) || 0 }))}
                     required
                   />
                   <div className="text-xs text-modern-text-tertiary mt-1">
@@ -501,7 +501,7 @@ const RefundManagement: FC = () => {
                 <Textarea
                   id="adminNote"
                   value={processForm.adminNote}
-                  onChange={(e: any) => setProcessForm(prev => ({ ...prev, adminNote: e.target.value }))}
+                  onChange={(e: any) => setProcessForm((prev: any) => ({ ...prev, adminNote: e.target.value }))}
                   placeholder="환불 처리 사유나 메모를 입력하세요..."
                   rows={3}
                   required
@@ -513,7 +513,7 @@ const RefundManagement: FC = () => {
                   type="checkbox"
                   id="notifyCustomer"
                   checked={processForm.notifyCustomer}
-                  onChange={(e: any) => setProcessForm(prev => ({ ...prev, notifyCustomer: e.target.checked }))}
+                  onChange={(e: any) => setProcessForm((prev: any) => ({ ...prev, notifyCustomer: e.target.checked }))}
                   className="mr-2"
                 />
                 <Label htmlFor="notifyCustomer">고객에게 알림 발송</Label>

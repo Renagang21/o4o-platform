@@ -29,7 +29,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
   const userCount = users.length;
 
   // 현재 관리자 수 체크
-  const currentAdminCount = users.filter(user => user.role === 'admin').length;
+  const currentAdminCount = users.filter((user: any) => user.role === 'admin').length;
   const willRemoveAllAdmins = selectedRole !== 'admin' && currentAdminCount === users.length;
   
   // 역할 변경 대상 분석

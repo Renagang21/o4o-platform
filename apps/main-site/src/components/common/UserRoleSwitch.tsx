@@ -70,7 +70,7 @@ const UserRoleSwitch: FC<UserRoleSwitchProps> = ({
   };
 
   const getCurrentRoleInfo = () => roleInfoMap[currentRole];
-  const getAvailableRoles = () => availableRoles.filter(role => role !== currentRole);
+  const getAvailableRoles = () => availableRoles.filter((role: any) => role !== currentRole);
 
   const handleRoleChange = (newRole: UserRole) => {
     onRoleChange(newRole);

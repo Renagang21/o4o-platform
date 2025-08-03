@@ -30,7 +30,7 @@ const Register: FC = () => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value
     }));
@@ -88,7 +88,7 @@ const Register: FC = () => {
         navigate('/login');
       }, 3000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
       
       let errorMessage = '회원가입에 실패했습니다.';

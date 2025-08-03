@@ -61,8 +61,8 @@ const PageHeader: FC<PageHeaderProps> = ({
   };
 
   // Primary action (first action with primary variant)
-  const primaryAction = actions.find(action => action.variant === 'primary');
-  const secondaryActions = actions.filter(action => action.variant !== 'primary');
+  const primaryAction = actions.find((action: any) => action.variant === 'primary');
+  const secondaryActions = actions.filter((action: any) => action.variant !== 'primary');
 
   return (
     <div className={clsx('wp-card mb-6', className)}>

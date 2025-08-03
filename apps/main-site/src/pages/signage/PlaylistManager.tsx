@@ -41,9 +41,9 @@ interface PlaylistManagerProps {
 }
 
 export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
-  const [playlists, setPlaylists] = useState([]);
+  const [playlists, setPlaylists] = useState<any[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
-  const [playlistItems, setPlaylistItems] = useState([]);
+  const [playlistItems, setPlaylistItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +77,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
       if (data.data.playlists.length > 0 && !selectedPlaylist) {
         setSelectedPlaylist(data.data.playlists[0]);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -98,7 +98,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
 
       const data = await response.json();
       setPlaylistItems(data.data.items.sort((a: PlaylistItem, b: PlaylistItem) => a.order - b.order));
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to fetch playlist items');
     }
   };
@@ -134,7 +134,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
       if (!response.ok) {
         throw new Error('Failed to reorder items');
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to reorder items');
       // Revert on error
       fetchPlaylistItems(selectedPlaylist.id);
@@ -172,7 +172,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
       if (!response.ok) {
         throw new Error('Failed to reorder items');
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to reorder items');
       fetchPlaylistItems(selectedPlaylist.id);
     }
@@ -197,7 +197,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
       if (selectedPlaylist) {
         fetchPlaylistItems(selectedPlaylist.id);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Failed to delete item');
     }
   };

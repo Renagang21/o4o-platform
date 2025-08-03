@@ -36,7 +36,7 @@ export const ProductFilters: FC<ProductFiltersProps> = ({
     if (!onBrandsChange) return;
     
     const newBrands = selectedBrands.includes(brandId)
-      ? selectedBrands.filter(id => id !== brandId)
+      ? selectedBrands.filter((id: any) => id !== brandId)
       : [...selectedBrands, brandId];
     
     onBrandsChange(newBrands);
@@ -74,7 +74,7 @@ export const ProductFilters: FC<ProductFiltersProps> = ({
               전체 카테고리
             </Label>
           </div>
-          {categories.map(category => (
+          {categories.map((category: any) => (
             <div key={category.id} className="flex items-center space-x-2">
               <RadioGroupItem value={category.id} id={`category-${category.id}`} />
               <Label 
@@ -96,7 +96,7 @@ export const ProductFilters: FC<ProductFiltersProps> = ({
         <div className="space-y-3">
           <h4 className="font-medium text-sm">브랜드</h4>
           <div className="space-y-2">
-            {brands.map(brand => (
+            {brands.map((brand: any) => (
               <div key={brand.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={`brand-${brand.id}`}

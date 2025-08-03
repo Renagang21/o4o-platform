@@ -81,15 +81,15 @@ export function calculateReferralStats(data: {
     timestamp: Date;
   }>;
 }): ReferralStats {
-  const uniqueIps = new Set(data.clicks.map(click => click.ip));
+  const uniqueIps = new Set(data.clicks.map((click: any) => click.ip));
   
-  const totalRevenue = data.orders.reduce((sum, order) => sum + order.amount, 0);
+  const totalRevenue = data.orders.reduce((sum: any, order: any) => sum + order.amount, 0);
   const pendingCommission = data.orders
-    .filter(order => order.status === 'pending' || order.status === 'approved')
-    .reduce((sum, order) => sum + order.commission, 0);
+    .filter((order: any) => order.status === 'pending' || order.status === 'approved')
+    .reduce((sum: any, order: any) => sum + order.commission, 0);
   const paidCommission = data.orders
-    .filter(order => order.status === 'paid')
-    .reduce((sum, order) => sum + order.commission, 0);
+    .filter((order: any) => order.status === 'paid')
+    .reduce((sum: any, order: any) => sum + order.commission, 0);
   
   const conversions = data.orders.length;
   const conversionRate = data.signups.length > 0 
@@ -153,7 +153,7 @@ export function filterReferralsByPeriod<T extends { timestamp: Date }>(
       break;
   }
   
-  return items.filter(item => item.timestamp >= startDate);
+  return items.filter((item: any) => item.timestamp >= startDate);
 }
 
 /**

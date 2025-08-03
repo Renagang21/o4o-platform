@@ -229,9 +229,9 @@ export async function fetchYouTubeVideoInfo(
  */
 export function parseMultipleVideoUrls(urls: string[]): VideoInfo[] {
   return urls
-    .filter(url => url.trim())
-    .map(url => parseVideoUrl(url.trim()))
-    .filter(info => info.type !== 'unknown');
+    .filter((url: any) => url.trim())
+    .map((url: any) => parseVideoUrl(url.trim()))
+    .filter((info: any) => info.type !== 'unknown');
 }
 
 /**

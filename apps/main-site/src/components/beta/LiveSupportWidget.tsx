@@ -45,7 +45,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [isLiveSupport, setIsLiveSupport] = useState(false);
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
@@ -99,7 +99,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
 
     // Real-time event handlers
     socketInstance.on('user:conversations', (conversations: Conversation[]) => {
-      const activeConv = conversations.find(c => c.status === 'active');
+      const activeConv = conversations.find((c: any) => c.status === 'active');
       if (activeConv) {
         setConversation(activeConv);
         socketInstance.emit('conversation:join', { conversationId: activeConv.id });
@@ -111,7 +111,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
     });
 
     socketInstance.on('message:new', (message: Message) => {
-      setMessages(prev => [...prev, message]);
+      setMessages((prev: any) => [...prev, message]);
       
       if (message.senderRole === 'admin') {
         setAdminOnline(true);
@@ -170,7 +170,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
       } else {
         showToast(data.error?.message || '실시간 지원 요청에 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Start live support error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
@@ -281,7 +281,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
                   상담원이 곧 연결됩니다.
                 </div>
               ) : (
-                messages.map(message => (
+                messages.map((message: any) => (
                   <div
                     key={message.id}
                     className={`flex ${message.senderRole === 'beta_user' ? 'justify-end' : 'justify-start'}`}
@@ -452,7 +452,7 @@ export const EnhancedBetaFeedbackWidget: FC<EnhancedBetaFeedbackWidgetProps> = (
 
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-200 dark:border-gray-600">
-          {quickActions.map(action => (
+          {quickActions.map((action: any) => (
             <button
               key={action.id}
               onClick={() => setActiveMode(action.id as 'feedback' | 'support')}

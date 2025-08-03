@@ -44,7 +44,7 @@ async function globalSetup(config: FullConfig) {
         }
       });
       console.log('✅ 테스트 관리자 계정 생성됨');
-    } catch (error) {
+    } catch (error: any) {
       console.log('ℹ️ 테스트 관리자 계정이 이미 존재합니다');
     }
     
@@ -58,7 +58,7 @@ async function globalSetup(config: FullConfig) {
         }
       });
       console.log('✅ 테스트 사용자 계정 생성됨');
-    } catch (error) {
+    } catch (error: any) {
       console.log('ℹ️ 테스트 사용자 계정이 이미 존재합니다');
     }
     
@@ -66,7 +66,7 @@ async function globalSetup(config: FullConfig) {
     
     console.log('🎉 E2E 테스트 환경 셋업 완료!');
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ E2E 테스트 환경 셋업 실패:', error);
     throw error;
   }

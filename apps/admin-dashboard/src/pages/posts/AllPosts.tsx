@@ -25,9 +25,9 @@ import toast from 'react-hot-toast'
 
 const AllPosts: FC = () => {
   const [loading, setLoading] = useState(true)
-  const [posts, setPosts] = useState([])
-  const [filteredPosts, setFilteredPosts] = useState([])
-  const [selectedPosts, setSelectedPosts] = useState([])
+  const [posts, setPosts] = useState<any[]>([])
+  const [filteredPosts, setFilteredPosts] = useState<any[]>([])
+  const [selectedPosts, setSelectedPosts] = useState<any[]>([])
   const [_viewMode, _setViewMode] = useState<'list' | 'grid'>('list')
   const [_showBulkActions, _setShowBulkActions] = useState(false)
 
@@ -109,10 +109,10 @@ const AllPosts: FC = () => {
   const calculateStats = (postsData: Post[]) => {
     const stats = {
       total: postsData.length,
-      published: postsData.filter(p => p.status === 'published').length,
-      draft: postsData.filter(p => p.status === 'draft').length,
-      archived: postsData.filter(p => p.status === 'archived').length,
-      scheduled: postsData.filter(p => p.status === 'scheduled').length
+      published: postsData.filter((p: any) => p.status === 'published').length,
+      draft: postsData.filter((p: any) => p.status === 'draft').length,
+      archived: postsData.filter((p: any) => p.status === 'archived').length,
+      scheduled: postsData.filter((p: any) => p.status === 'scheduled').length
     }
     setStats(stats)
   }
@@ -123,7 +123,7 @@ const AllPosts: FC = () => {
     // Search term filter
     if (filters.searchTerm) {
       const term = filters.searchTerm.toLowerCase()
-      filtered = filtered.filter(post => 
+      filtered = filtered.filter((post: any) => 
         post.title.toLowerCase().includes(term) ||
         post.excerpt?.toLowerCase().includes(term) ||
         post.author.toLowerCase().includes(term)
@@ -132,35 +132,35 @@ const AllPosts: FC = () => {
 
     // Status filter
     if (filters.status) {
-      filtered = filtered.filter(post => post.status === filters.status)
+      filtered = filtered.filter((post: any) => post.status === filters.status)
     }
 
     // Category filter
     if (filters.category) {
-      filtered = filtered.filter(post => post.category === filters.category)
+      filtered = filtered.filter((post: any) => post.category === filters.category)
     }
 
     // Author filter
     if (filters.author) {
-      filtered = filtered.filter(post => post.author === filters.author)
+      filtered = filtered.filter((post: any) => post.author === filters.author)
     }
 
     // Date range filter
     if (filters.dateFrom) {
       const fromDate = new Date(filters.dateFrom)
-      filtered = filtered.filter(post => new Date(post.createdAt) >= fromDate)
+      filtered = filtered.filter((post: any) => new Date(post.createdAt) >= fromDate)
     }
     if (filters.dateTo) {
       const toDate = new Date(filters.dateTo)
       toDate.setHours(23, 59, 59, 999)
-      filtered = filtered.filter(post => new Date(post.createdAt) <= toDate)
+      filtered = filtered.filter((post: any) => new Date(post.createdAt) <= toDate)
     }
 
     setFilteredPosts(filtered)
   }
 
   const updateFilter = (key: string, value: string) => {
-    setFilters(prev => ({
+    setFilters((prev: any) => ({
       ...prev,
       [key]: value
     }))
@@ -179,9 +179,9 @@ const AllPosts: FC = () => {
   }
 
   const handleSelectPost = (postId: string) => {
-    setSelectedPosts(prev => 
+    setSelectedPosts((prev: any) => 
       prev.includes(postId) 
-        ? prev.filter(id => id !== postId)
+        ? prev.filter((id: any) => id !== postId)
         : [...prev, postId]
     )
   }
@@ -190,7 +190,7 @@ const AllPosts: FC = () => {
     if (selectedPosts.length === filteredPosts.length) {
       setSelectedPosts([])
     } else {
-      setSelectedPosts(filteredPosts.map(post => post.id))
+      setSelectedPosts(filteredPosts.map((post: any) => post.id))
     }
   }
 
@@ -457,7 +457,7 @@ const AllPosts: FC = () => {
                   className="wp-select min-w-[120px]"
                 >
                   <option value="">전체 카테고리</option>
-                  {categories.map(category => (
+                  {categories.map((category: any) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
@@ -486,7 +486,7 @@ const AllPosts: FC = () => {
                     className="wp-select"
                   >
                     <option value="">전체 작성자</option>
-                    {authors.map(author => (
+                    {authors.map((author: any) => (
                       <option key={author.id} value={author.id}>
                         {author.name}
                       </option>
@@ -624,7 +624,7 @@ const AllPosts: FC = () => {
                       <td>
                         {post.category && (
                           <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                            {categories.find(c => c.id === post.category)?.name || post.category}
+                            {categories.find((c: any) => c.id === post.category)?.name || post.category}
                           </span>
                         )}
                       </td>

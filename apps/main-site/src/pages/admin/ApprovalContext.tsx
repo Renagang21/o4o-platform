@@ -54,12 +54,12 @@ export const ApprovalProvider = ({ children }: { children: ReactNode }) => {
   const [search, setSearch] = useState('');
 
   const approveUser = (id: string) => {
-    setUsers(users => users.map(u => u.id === id ? { ...u, status: 'approved' } : u));
+    setUsers(users => users.map((u: any) => u.id === id ? { ...u, status: 'approved' } : u));
   };
   const rejectUser = (id: string, reason: string) => {
-    setUsers(users => users.map(u => u.id === id ? { ...u, status: 'rejected', rejectionReason: reason } : u));
+    setUsers(users => users.map((u: any) => u.id === id ? { ...u, status: 'rejected', rejectionReason: reason } : u));
   };
-  const getUserById = (id: string) => users.find(u => u.id === id);
+  const getUserById = (id: string) => users.find((u: any) => u.id === id);
 
   return (
     <ApprovalContext.Provider value={{ users, approveUser, rejectUser, getUserById, filter, setFilter, search, setSearch }}>

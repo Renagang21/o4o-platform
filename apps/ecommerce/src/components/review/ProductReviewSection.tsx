@@ -194,7 +194,7 @@ export function ProductReviewSection({ product, className }: ProductReviewSectio
             </DialogHeader>
             <ReviewForm
               productId={product.id}
-              review={reviewsData?.reviews.find(r => r.id === editingReview)}
+              review={reviewsData?.reviews.find((r: any) => r.id === editingReview)}
               onSubmit={handleUpdateReview}
               onCancel={() => setEditingReview(null)}
               isSubmitting={updateReview.isPending}

@@ -336,7 +336,7 @@ export const ExternalResourceList: FC<ExternalResourceListProps> = ({
     : resources.slice(0, maxItems);
 
   const groupedResources = groupByType 
-    ? resources.reduce((acc, resource) => {
+    ? resources.reduce((acc: any, resource: any) => {
         if (!acc[resource.type]) acc[resource.type] = [];
         acc[resource.type].push(resource);
         return acc;

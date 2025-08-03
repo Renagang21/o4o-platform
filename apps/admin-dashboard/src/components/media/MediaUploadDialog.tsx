@@ -51,7 +51,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   acceptedTypes,
   maxFileSize = 100 * 1024 * 1024 // 100MB default
 }) => {
-  const [uploadFiles, setUploadFiles] = useState([])
+  const [uploadFiles, setUploadFiles] = useState<any[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [currentEditingFile, setCurrentEditingFile] = useState<string | null>(null)
 
@@ -75,7 +75,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   // Clean up preview URLs
   useEffect(() => {
     return () => {
-      uploadFiles.forEach(file => {
+      uploadFiles.forEach((file: any) => {
         if (file.preview) {
           URL.revokeObjectURL(file.preview)
         }
@@ -124,7 +124,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
     e.preventDefault()
     const droppedFiles = e.dataTransfer.files
     if (droppedFiles.length > 0) {
-      const newFiles: UploadFile[] = Array.from(droppedFiles).map(file => ({
+      const newFiles: UploadFile[] = Array.from(droppedFiles).map((file: any) => ({
         file,
         id: `${Date.now()}-${Math.random()}`,
         status: 'pending',
@@ -134,24 +134,24 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
           title: file.name.replace(/\.[^/.]+$/, ''),
         }
       }))
-      setUploadFiles(prev => [...prev, ...newFiles])
+      setUploadFiles((prev: any) => [...prev, ...newFiles])
     }
   }, [])
 
   // Remove file
   const removeFile = (fileId: string) => {
-    setUploadFiles(prev => {
-      const file = prev.find(f => f.id === fileId)
+    setUploadFiles((prev: any) => {
+      const file = prev.find((f: any) => f.id === fileId)
       if (file?.preview) {
         URL.revokeObjectURL(file.preview)
       }
-      return prev.filter(f => f.id !== fileId)
+      return prev.filter((f: any) => f.id !== fileId)
     })
   }
 
   // Update file metadata
   const updateFileMetadata = (fileId: string, metadata: Partial<UploadFile['metadata']>) => {
-    setUploadFiles(prev => prev.map(file =>
+    setUploadFiles((prev: any) => prev.map((file: any) =>
       file.id === fileId
         ? { ...file, metadata: { ...file.metadata, ...metadata } }
         : file
@@ -169,13 +169,13 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
 
     try {
       // Update status to uploading
-      setUploadFiles(prev => prev.map(f =>
+      setUploadFiles((prev: any) => prev.map((f: any) =>
         f.id === uploadFile.id ? { ...f, status: 'uploading' } : f
       ))
 
       // Simulate upload progress
       const progressInterval = setInterval(() => {
-        setUploadFiles(prev => prev.map(f =>
+        setUploadFiles((prev: any) => prev.map((f: any) =>
           f.id === uploadFile.id && f.status === 'uploading'
             ? { ...f, progress: Math.min(f.progress + 10, 90) }
             : f
@@ -191,14 +191,14 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
       clearInterval(progressInterval)
 
       // Update status to success
-      setUploadFiles(prev => prev.map(f =>
+      setUploadFiles((prev: any) => prev.map((f: any) =>
         f.id === uploadFile.id ? { ...f, status: 'success', progress: 100 } : f
       ))
 
       return response.data
     } catch (error: any) {
       // Update status to error
-      setUploadFiles(prev => prev.map(f =>
+      setUploadFiles((prev: any) => prev.map((f: any) =>
         f.id === uploadFile.id 
           ? { ...f, status: 'error', error: '업로드 실패' } 
           : f
@@ -210,7 +210,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   // Start upload
   const startUpload = async () => {
     setIsUploading(true)
-    const pendingFiles = uploadFiles.filter(f => f.status === 'pending')
+    const pendingFiles = uploadFiles.filter((f: any) => f.status === 'pending')
     
     let successCount = 0
     let errorCount = 0
@@ -239,10 +239,10 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
     }
   }
 
-  const pendingCount = uploadFiles.filter(f => f.status === 'pending').length
-  const uploadingCount = uploadFiles.filter(f => f.status === 'uploading').length
-  const successCount = uploadFiles.filter(f => f.status === 'success').length
-  const errorCount = uploadFiles.filter(f => f.status === 'error').length
+  const pendingCount = uploadFiles.filter((f: any) => f.status === 'pending').length
+  const uploadingCount = uploadFiles.filter((f: any) => f.status === 'uploading').length
+  const successCount = uploadFiles.filter((f: any) => f.status === 'success').length
+  const errorCount = uploadFiles.filter((f: any) => f.status === 'error').length
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -268,7 +268,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
                 input.onchange = (e) => {
                   const files = (e.target as HTMLInputElement).files
                   if (files) {
-                    const newFiles: UploadFile[] = Array.from(files).map(file => ({
+                    const newFiles: UploadFile[] = Array.from(files).map((file: any) => ({
                       file,
                       id: `${Date.now()}-${Math.random()}`,
                       status: 'pending',

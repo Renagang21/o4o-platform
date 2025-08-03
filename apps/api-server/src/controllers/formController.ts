@@ -324,7 +324,7 @@ export const formController = {
 
         // Parse recipients
         const recipients = Array.isArray(notification.to) ? notification.to : [notification.to];
-        const toEmails = recipients.map(to => {
+        const toEmails = recipients.map((to: any) => {
           if (to.startsWith('{field:') && to.endsWith('}')) {
             const fieldName = to.slice(7, -1);
             return processedData[fieldName];
@@ -346,8 +346,8 @@ export const formController = {
             html: message,
             from: notification.fromEmail ? `${notification.fromName || ''} <${notification.fromEmail}>` : undefined,
             replyTo: notification.replyTo,
-            cc: notification.cc ? notification.cc.split(',').map(e => e.trim()).filter(Boolean) : undefined,
-            bcc: notification.bcc ? notification.bcc.split(',').map(e => e.trim()).filter(Boolean) : undefined
+            cc: notification.cc ? notification.cc.split(',').map((e: any) => e.trim()).filter(Boolean) : undefined,
+            bcc: notification.bcc ? notification.bcc.split(',').map((e: any) => e.trim()).filter(Boolean) : undefined
           });
         } catch (emailError) {
           console.error('Failed to send notification email:', emailError);
@@ -570,7 +570,7 @@ export const formController = {
       const report = {
         formId,
         totalSubmissions: submissions.length,
-        uniqueSubmitters: new Set(submissions.map(s => s.userEmail || s.ipAddress)).size,
+        uniqueSubmitters: new Set(submissions.map((s: any) => s.userEmail || s.ipAddress)).size,
         conversionRate: 0, // Would need page view data to calculate
         averageCompletionTime: 0, // Would need timing data
         fieldStats: formattedFieldStats,

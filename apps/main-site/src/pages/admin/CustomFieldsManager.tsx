@@ -80,7 +80,7 @@ interface FieldGroup {
 }
 
 const CustomFieldsManager: FC = () => {
-  const [fieldGroups, setFieldGroups] = useState([]);
+  const [fieldGroups, setFieldGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
   const [editingGroup, setEditingGroup] = useState<FieldGroup | null>(null);
@@ -214,7 +214,7 @@ const CustomFieldsManager: FC = () => {
       ];
 
       setFieldGroups(mockFieldGroups);
-    } catch (error) {
+    } catch (error: any) {
       console.error('필드 그룹 로드 실패:', error);
     } finally {
       setLoading(false);
@@ -239,7 +239,7 @@ const CustomFieldsManager: FC = () => {
       resetForm();
       setActiveTab('list');
       alert('✅ 필드 그룹이 성공적으로 생성되었습니다!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('필드 그룹 생성 실패:', error);
       alert('❌ 필드 그룹 생성 중 오류가 발생했습니다.');
     }
@@ -252,9 +252,9 @@ const CustomFieldsManager: FC = () => {
       // API 호출 (Mock)
       // console.log('Deleting field group:', id);
       
-      setFieldGroups(prev => prev.filter(group => group.id !== id));
+      setFieldGroups((prev: any) => prev.filter((group: any) => group.id !== id));
       alert('✅ 필드 그룹이 삭제되었습니다.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('필드 그룹 삭제 실패:', error);
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
@@ -288,25 +288,25 @@ const CustomFieldsManager: FC = () => {
       active: true
     };
 
-    setNewGroup(prev => ({
+    setNewGroup((prev: any) => ({
       ...prev,
       fields: [...prev.fields, newField]
     }));
   };
 
   const updateField = (fieldId: string, updates: Partial<CustomField>) => {
-    setNewGroup(prev => ({
+    setNewGroup((prev: any) => ({
       ...prev,
-      fields: prev.fields.map(field =>
+      fields: prev.fields.map((field: any) =>
         field.id === fieldId ? { ...field, ...updates } : field
       )
     }));
   };
 
   const removeField = (fieldId: string) => {
-    setNewGroup(prev => ({
+    setNewGroup((prev: any) => ({
       ...prev,
-      fields: prev.fields.filter(field => field.id !== fieldId)
+      fields: prev.fields.filter((field: any) => field.id !== fieldId)
     }));
   };
 
@@ -348,7 +348,7 @@ const CustomFieldsManager: FC = () => {
     { value: 'location', label: '위치', group: '고급' }
   ];
 
-  const groupedFieldTypes = fieldTypes.reduce((acc, field) => {
+  const groupedFieldTypes = fieldTypes.reduce((acc: any, field: any) => {
     if (!acc[field.group]) {
       acc[field.group] = [];
     }
@@ -475,8 +475,8 @@ const CustomFieldsManager: FC = () => {
                         <div className="flex items-center gap-2">
                           <span className="text-gray-500">연결된 CPT:</span>
                           <div className="flex gap-2">
-                            {group.location.postType.map(cptSlug => {
-                              const cpt = availableCPTs.find(c => c.slug === cptSlug);
+                            {group.location.postType.map((cptSlug: any) => {
+                              const cpt = availableCPTs.find((c: any) => c.slug === cptSlug);
                               return (
                                 <span key={cptSlug} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                                   {cpt?.name || cptSlug}
@@ -523,7 +523,7 @@ const CustomFieldsManager: FC = () => {
                                   <span className="text-xs text-gray-500">({field.name})</span>
                                 </div>
                                 <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
-                                  <span>타입: {fieldTypes.find(t => t.value === field.type)?.label}</span>
+                                  <span>타입: {fieldTypes.find((t: any) => t.value === field.type)?.label}</span>
                                   {field.description && (
                                     <span className="truncate max-w-xs">{field.description}</span>
                                   )}
@@ -587,7 +587,7 @@ const CustomFieldsManager: FC = () => {
                     <input
                       type="text"
                       value={newGroup.title}
-                      onChange={(e: any) => setNewGroup(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setNewGroup((prev: any) => ({ ...prev, title: e.target.value }))}
                       placeholder="예: 상품 정보, 이벤트 상세"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -599,7 +599,7 @@ const CustomFieldsManager: FC = () => {
                     </label>
                     <textarea
                       value={newGroup.description}
-                      onChange={(e: any) => setNewGroup(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewGroup((prev: any) => ({ ...prev, description: e.target.value }))}
                       placeholder="이 필드 그룹의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -619,14 +619,14 @@ const CustomFieldsManager: FC = () => {
                       표시할 Post Type *
                     </label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {availableCPTs.map(cpt => (
+                      {availableCPTs.map((cpt: any) => (
                         <label key={cpt.slug} className="flex items-center">
                           <input
                             type="checkbox"
                             checked={newGroup.location.postType.includes(cpt.slug)}
                             onChange={(e: any) => {
                               if (e.target.checked) {
-                                setNewGroup(prev => ({
+                                setNewGroup((prev: any) => ({
                                   ...prev,
                                   location: {
                                     ...prev.location,
@@ -634,11 +634,11 @@ const CustomFieldsManager: FC = () => {
                                   }
                                 }));
                               } else {
-                                setNewGroup(prev => ({
+                                setNewGroup((prev: any) => ({
                                   ...prev,
                                   location: {
                                     ...prev.location,
-                                    postType: prev.location.postType.filter(slug => slug !== cpt.slug)
+                                    postType: prev.location.postType.filter((slug: any) => slug !== cpt.slug)
                                   }
                                 }));
                               }
@@ -661,14 +661,14 @@ const CustomFieldsManager: FC = () => {
                         { value: 'normal', label: '일반', desc: '콘텐츠 아래에 표시' },
                         { value: 'high', label: '높음', desc: '제목 아래에 표시' },
                         { value: 'side', label: '사이드바', desc: '우측 사이드바에 표시' }
-                      ].map(option => (
+                      ].map((option: any) => (
                         <label key={option.value} className="relative">
                           <input
                             type="radio"
                             name="placement"
                             value={option.value}
                             checked={newGroup.placement === option.value}
-                            onChange={(e: any) => setNewGroup(prev => ({ 
+                            onChange={(e: any) => setNewGroup((prev: any) => ({ 
                               ...prev, 
                               placement: e.target.value as 'normal' | 'high' | 'side'
                             }))}
@@ -749,7 +749,7 @@ const CustomFieldsManager: FC = () => {
                             >
                               {Object.entries(groupedFieldTypes).map(([groupName, types]) => (
                                 <optgroup key={groupName} label={groupName}>
-                                  {types.map(type => (
+                                  {types.map((type: any) => (
                                     <option key={type.value} value={type.value}>
                                       {type.label}
                                     </option>

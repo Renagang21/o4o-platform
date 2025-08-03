@@ -191,10 +191,10 @@ const FormBuilder: FC = () => {
 
   // Handle drag end
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active, over } = event as any;
 
     if (active.id !== over?.id) {
-      setFormData(prev => {
+      setFormData((prev: any) => {
         const oldIndex = prev.fields!.findIndex(field => field.id === active.id);
         const newIndex = prev.fields!.findIndex(field => field.id === over?.id);
         
@@ -217,7 +217,7 @@ const FormBuilder: FC = () => {
       width: 'full'
     };
 
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       fields: [...(prev.fields || []), newField]
     }));
@@ -228,9 +228,9 @@ const FormBuilder: FC = () => {
 
   // Update field
   const updateField = (fieldId: string, updates: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      fields: prev.fields?.map(field => 
+      fields: prev.fields?.map((field: any) => 
         field.id === fieldId ? { ...field, ...updates } : field
       ) || []
     }));
@@ -239,9 +239,9 @@ const FormBuilder: FC = () => {
   // Delete field
   const deleteField = (fieldId: string) => {
     if (confirm('정말 이 필드를 삭제하시겠습니까?')) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
-        fields: prev.fields?.filter(field => field.id !== fieldId) || []
+        fields: prev.fields?.filter((field: any) => field.id !== fieldId) || []
       }));
       if (selectedField === fieldId) {
         setSelectedField(null);
@@ -251,7 +251,7 @@ const FormBuilder: FC = () => {
 
   // Duplicate field
   const duplicateField = (fieldId: string) => {
-    const fieldToDuplicate = formData.fields?.find(f => f.id === fieldId);
+    const fieldToDuplicate = formData.fields?.find((f: any) => f.id === fieldId);
     if (fieldToDuplicate) {
       const newField = {
         ...fieldToDuplicate,
@@ -263,7 +263,7 @@ const FormBuilder: FC = () => {
       const newFields = [...formData.fields!];
       newFields.splice(fieldIndex + 1, 0, newField);
       
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         fields: newFields
       }));
@@ -349,7 +349,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formName"
                       value={formData.name}
-                      onChange={(e: any) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setFormData((prev: any) => ({ ...prev, name: e.target.value }))}
                       placeholder="contact_form"
                       className="font-mono"
                     />
@@ -360,7 +360,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formTitle"
                       value={formData.title}
-                      onChange={(e: any) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setFormData((prev: any) => ({ ...prev, title: e.target.value }))}
                       placeholder="문의하기"
                     />
                   </div>
@@ -370,7 +370,7 @@ const FormBuilder: FC = () => {
                     <Textarea
                       id="formDescription"
                       value={formData.description}
-                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFormData((prev: any) => ({ ...prev, description: e.target.value }))}
                       placeholder="양식에 대한 설명을 입력하세요"
                       rows={2}
                     />
@@ -408,7 +408,7 @@ const FormBuilder: FC = () => {
                       onDragEnd={handleDragEnd}
                     >
                       <SortableContext
-                        items={formData.fields?.map(f => f.id) || []}
+                        items={formData.fields?.map((f: any) => f.id) || []}
                         strategy={verticalListSortingStrategy}
                       >
                         <div className="space-y-3">
@@ -433,7 +433,7 @@ const FormBuilder: FC = () => {
               <TabsContent value="settings">
                 <FormSettingsTab
                   settings={formData.settings!}
-                  onChange={(settings: any) => setFormData(prev => ({ ...prev, settings }))}
+                  onChange={(settings: any) => setFormData((prev: any) => ({ ...prev, settings }))}
                 />
               </TabsContent>
 
@@ -441,7 +441,7 @@ const FormBuilder: FC = () => {
                 <FormNotificationsTab
                   notifications={formData.notifications!}
                   fields={formData.fields!}
-                  onChange={(notifications: any) => setFormData(prev => ({ ...prev, notifications }))}
+                  onChange={(notifications: any) => setFormData((prev: any) => ({ ...prev, notifications }))}
                 />
               </TabsContent>
 
@@ -449,7 +449,7 @@ const FormBuilder: FC = () => {
                 <FormConfirmationsTab
                   confirmations={formData.confirmations!}
                   fields={formData.fields!}
-                  onChange={(confirmations: any) => setFormData(prev => ({ ...prev, confirmations }))}
+                  onChange={(confirmations: any) => setFormData((prev: any) => ({ ...prev, confirmations }))}
                 />
               </TabsContent>
             </CardContent>
@@ -458,9 +458,9 @@ const FormBuilder: FC = () => {
 
         {/* Right Panel - Field Properties */}
         <div className="col-span-4">
-          {selectedField && formData.fields?.find(f => f.id === selectedField) ? (
+          {selectedField && formData.fields?.find((f: any) => f.id === selectedField) ? (
             <FieldPropertiesPanel
-              field={formData.fields.find(f => f.id === selectedField)!}
+              field={formData.fields.find((f: any) => f.id === selectedField)!}
               onUpdate={(field) => updateField(selectedField, field)}
               onClose={() => setSelectedField(null)}
             />
@@ -537,7 +537,7 @@ const FormBuilder: FC = () => {
                 <p className="text-gray-600 mb-6">{formData.description}</p>
               )}
               <div className="space-y-4">
-                {formData.fields?.map(field => (
+                {formData.fields?.map((field: any) => (
                   <div key={field.id}>
                     <Label>{field.label}</Label>
                     <Input placeholder={field.placeholder} disabled />

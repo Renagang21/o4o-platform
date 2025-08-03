@@ -20,7 +20,7 @@ interface ScreenMetaProps {
  */
 export const ScreenMeta: FC<ScreenMetaProps> = (props) => {
   // Convert props to ScreenOptions format
-  const screenOptions = props.columns?.map(col => ({
+  const screenOptions = props.columns?.map((col: any) => ({
     id: col.id,
     label: col.label,
     checked: col.checked,
@@ -28,7 +28,7 @@ export const ScreenMeta: FC<ScreenMetaProps> = (props) => {
   })) || [];
 
   const handleOptionsChange = (newOptions: any[]) => {
-    newOptions.forEach(opt => {
+    newOptions.forEach((opt: any) => {
       if (props.onColumnChange) {
         props.onColumnChange(opt.id, opt.checked);
       }

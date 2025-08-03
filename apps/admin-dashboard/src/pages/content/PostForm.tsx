@@ -55,8 +55,8 @@ const PostForm = () => {
     }
   })
 
-  const [selectedCategories, setSelectedCategories] = useState([])
-  const [selectedTags, setSelectedTags] = useState([])
+  const [selectedCategories, setSelectedCategories] = useState<any[]>([])
+  const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [isScheduled, setIsScheduled] = useState(false)
   const [scheduledDate, setScheduledDate] = useState('')
   const [scheduledTime, setScheduledTime] = useState('')
@@ -513,7 +513,7 @@ const PostForm = () => {
                         if (e.target.checked) {
                           setSelectedCategories([...selectedCategories, category.id])
                         } else {
-                          setSelectedCategories(selectedCategories.filter(id => id !== category.id))
+                          setSelectedCategories(selectedCategories.filter((id: any) => id !== category.id))
                         }
                       }}
                     />
@@ -544,7 +544,7 @@ const PostForm = () => {
                         if (e.target.checked) {
                           setSelectedTags([...selectedTags, tag.id])
                         } else {
-                          setSelectedTags(selectedTags.filter(id => id !== tag.id))
+                          setSelectedTags(selectedTags.filter((id: any) => id !== tag.id))
                         }
                       }}
                     />

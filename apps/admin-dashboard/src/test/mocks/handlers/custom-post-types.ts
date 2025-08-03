@@ -170,7 +170,7 @@ export const customPostTypeHandlers = [
 
   // Get single custom post type
   http.get(`${API_BASE}/v1/custom-post-types/:id`, ({ params }: any) => {
-    const cpt = customPostTypes.find(c => c.id === params.id);
+    const cpt = customPostTypes.find((c: any) => c.id === params.id);
     if (!cpt) {
       return HttpResponse.json({ error: 'Custom post type not found' }, { status: 404 });
     }
@@ -249,7 +249,7 @@ export const customPostTypeHandlers = [
     
     // If it's a custom post type request
     if (postType && postType !== 'post' && postType !== 'page') {
-      const cpt = customPostTypes.find(c => c.slug === postType);
+      const cpt = customPostTypes.find((c: any) => c.slug === postType);
       if (!cpt) {
         return HttpResponse.json({ error: 'Post type not found' }, { status: 404 });
       }

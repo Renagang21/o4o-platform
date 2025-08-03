@@ -14,7 +14,7 @@ interface RepeaterFieldEditorProps {
 }
 
 const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) => {
-  const [expandedFields, setExpandedFields] = useState([])
+  const [expandedFields, setExpandedFields] = useState<any[]>([])
 
   const handleAddSubField = () => {
     const newSubField: CustomField = {
@@ -50,9 +50,9 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
   }
 
   const toggleFieldExpanded = (fieldId: string) => {
-    setExpandedFields(prev =>
+    setExpandedFields((prev: any) =>
       prev.includes(fieldId)
-        ? prev.filter(id => id !== fieldId)
+        ? prev.filter((id: any) => id !== fieldId)
         : [...prev, fieldId]
     )
   }

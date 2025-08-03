@@ -138,7 +138,7 @@ export default function VendorOrders() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [dateRange, setDateRange] = useState('all');
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order: any) => {
     const matchesSearch = 
       order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -149,10 +149,10 @@ export default function VendorOrders() {
 
   const stats = {
     total: orders.length,
-    pending: orders.filter(o => o.status === 'pending').length,
-    processing: orders.filter(o => o.status === 'processing').length,
-    shipped: orders.filter(o => o.status === 'shipped').length,
-    delivered: orders.filter(o => o.status === 'delivered').length
+    pending: orders.filter((o: any) => o.status === 'pending').length,
+    processing: orders.filter((o: any) => o.status === 'processing').length,
+    shipped: orders.filter((o: any) => o.status === 'shipped').length,
+    delivered: orders.filter((o: any) => o.status === 'delivered').length
   };
 
   const handleViewOrder = (id: string) => {

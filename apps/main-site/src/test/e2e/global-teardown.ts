@@ -18,7 +18,7 @@ async function globalTeardown() {
     
     console.log('✅ E2E 테스트 환경 정리 완료!');
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('⚠️ E2E 테스트 환경 정리 중 오류:', error);
     // 정리 오류는 테스트 실패로 이어지지 않도록 함
   }

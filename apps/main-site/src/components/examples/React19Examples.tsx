@@ -19,7 +19,7 @@ async function addTodoAction(text: string): Promise<Todo> {
 }
 
 function OptimisticTodoList() {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState<any[]>([]);
   const [optimisticTodos, addOptimisticTodo] = useOptimistic(
     todos,
     (state, newTodo: string) => [
@@ -36,8 +36,8 @@ function OptimisticTodoList() {
     
     try {
       const newTodo = await addTodoAction(text);
-      setTodos(prev => [...prev, newTodo]);
-    } catch (error) {
+      setTodos((prev: any) => [...prev, newTodo]);
+    } catch (error: any) {
       // 에러 시 자동으로 이전 상태로 롤백
       console.error('Failed to add todo:', error);
     }
@@ -63,7 +63,7 @@ function OptimisticTodoList() {
       </form>
       
       <ul className="space-y-2">
-        {optimisticTodos.map(todo => (
+        {optimisticTodos.map((todo: any) => (
           <li
             key={todo.id}
             className={`p-2 border rounded ${
@@ -175,7 +175,7 @@ function SearchableList() {
   );
 
   const filteredItems = useMemo(() => {
-    return items.filter(item =>
+    return items.filter((item: any) =>
       item.toLowerCase().includes(deferredQuery.toLowerCase())
     );
   }, [items, deferredQuery]);
@@ -201,7 +201,7 @@ function SearchableList() {
       />
       
       <div className="h-64 overflow-y-auto space-y-1">
-        {filteredItems.slice(0, 50).map(item => (
+        {filteredItems.slice(0, 50).map((item: any) => (
           <div key={item} className="p-2 border rounded">
             {item}
           </div>

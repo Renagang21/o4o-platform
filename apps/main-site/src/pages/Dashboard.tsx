@@ -117,7 +117,7 @@ const Dashboard: FC = () => {
       try {
         const response = await servicesAPI.getStatus();
         setServicesData(response.data.services);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to load services status:', error);
         // 기본값 설정
         setServicesData({

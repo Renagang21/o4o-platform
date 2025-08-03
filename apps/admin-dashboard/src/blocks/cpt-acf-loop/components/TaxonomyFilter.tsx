@@ -48,7 +48,7 @@ export default function TaxonomyFilter({
   selectedTaxonomies,
   onTaxonomiesChange,
 }: TaxonomyFilterProps) {
-  const [availableTaxonomies, setAvailableTaxonomies] = useState<string[]>([]);
+  const [availableTaxonomies, setAvailableTaxonomies] = useState<Taxonomy[]>([]);
   const [taxonomyTerms, setTaxonomyTerms] = useState<Record<string, Term[]>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [expandedTaxonomies, setExpandedTaxonomies] = useState<string[]>([]);
@@ -103,7 +103,7 @@ export default function TaxonomyFilter({
           [taxonomySlug]: terms,
         }));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Error fetching terms for ${taxonomySlug}:`, err);
     }
   };
@@ -151,7 +151,7 @@ export default function TaxonomyFilter({
 
     if (newTerms.length === 0) {
       // Remove taxonomy filter if no terms selected
-      const { [taxonomySlug]: removed, ...rest } = selectedTaxonomies;
+      const { [taxonomySlug]: removed, ...rest } = selectedTaxonomies as any;
       onTaxonomiesChange(rest);
     } else {
       onTaxonomiesChange({
@@ -391,7 +391,7 @@ export default function TaxonomyFilter({
                     variant="tertiary"
                     isDestructive
                     onClick={() => {
-                      const { [taxonomy.slug]: removed, ...rest } = selectedTaxonomies;
+                      const { [taxonomy.slug]: removed, ...rest } = selectedTaxonomies as any;
                       onTaxonomiesChange(rest);
                     }}
                     style={{ marginTop: '8px' }}

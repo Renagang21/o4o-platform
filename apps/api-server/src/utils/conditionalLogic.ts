@@ -1,12 +1,12 @@
 import { ConditionalLogic, ConditionalRule } from '../types';
 
 export function evaluateConditionalLogic(logic: ConditionalLogic, data: Record<string, any>): boolean {
-  const results = logic.rules.map(rule => evaluateRule(rule, data));
+  const results = logic.rules.map((rule: any) => evaluateRule(rule, data));
   
   if (logic.logicType === 'all') {
-    return results.every(result => result);
+    return results.every((result: any) => result);
   } else {
-    return results.some(result => result);
+    return results.some((result: any) => result);
   }
 }
 

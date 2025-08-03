@@ -112,7 +112,7 @@ const CPTList: FC = () => {
                 블로그 게시글과 뉴스를 위한 기본 게시물 유형
               </p>
               <div className="flex flex-wrap gap-1 mb-4">
-                {['제목', '에디터', '카테고리', '태그', '대표 이미지'].map(feature => (
+                {['제목', '에디터', '카테고리', '태그', '대표 이미지'].map((feature: any) => (
                   <Badge key={feature} variant={"outline" as const} className="text-xs">
                     {feature}
                   </Badge>
@@ -151,7 +151,7 @@ const CPTList: FC = () => {
                 정적 페이지를 위한 기본 게시물 유형
               </p>
               <div className="flex flex-wrap gap-1 mb-4">
-                {['제목', '에디터', '페이지 속성', '대표 이미지'].map(feature => (
+                {['제목', '에디터', '페이지 속성', '대표 이미지'].map((feature: any) => (
                   <Badge key={feature} variant={"outline" as const} className="text-xs">
                     {feature}
                   </Badge>
@@ -241,7 +241,7 @@ const CPTList: FC = () => {
 
                   {/* Supported Features */}
                   <div className="flex flex-wrap gap-1">
-                    {getSupportBadges(postType.supports).map(feature => (
+                    {getSupportBadges(postType.supports).map((feature: any) => (
                       <Badge key={feature} variant={"outline" as const} className="text-xs">
                         {feature}
                       </Badge>
@@ -261,7 +261,7 @@ const CPTList: FC = () => {
                   {/* Taxonomies */}
                   {postType.taxonomies.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {postType.taxonomies.map(taxonomy => (
+                      {postType.taxonomies.map((taxonomy: any) => (
                         <Badge key={taxonomy} variant="secondary" className="text-xs">
                           {taxonomy}
                         </Badge>

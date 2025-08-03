@@ -73,14 +73,14 @@ export class VendorOrderController {
 
       const [orders, total] = await queryBuilder.getManyAndCount();
 
-      const formattedOrders = orders.map(order => ({
+      const formattedOrders = orders.map((order: any) => ({
         id: order.id,
         orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
         customer: {
           name: order.user.name,
           email: order.user.email
         },
-        items: order.items.map(item => ({
+        items: order.items.map((item: any) => ({
           id: item.id,
           productName: item.product.name,
           quantity: item.quantity,
@@ -138,7 +138,7 @@ export class VendorOrderController {
           email: order.user.email,
           phone: null // TODO: Add phone to User entity
         },
-        items: order.items.map(item => ({
+        items: order.items.map((item: any) => ({
           id: item.id,
           productId: item.product.id,
           productName: item.product.name,
@@ -267,7 +267,7 @@ export class VendorOrderController {
         returned: 0
       };
 
-      statusCounts.forEach(item => {
+      statusCounts.forEach((item: any) => {
         stats[item.status as keyof typeof stats] = parseInt(item.count);
         stats.total += parseInt(item.count);
       });

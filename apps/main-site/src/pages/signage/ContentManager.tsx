@@ -78,10 +78,10 @@ const ContentManager: FC = () => {
       await new Promise(resolve => setTimeout(resolve, 2000)); // 모의 업로드 지연
       
       // console.log('업로드 완료:', {
-        title: newContent.title,
-        type: newContent.type,
-        file: newContent.file.name
-      });
+      //   title: newContent.title,
+      //   type: newContent.type,
+      //   file: newContent.file.name
+      // });
 
       alert('콘텐츠가 성공적으로 업로드되었습니다!');
       
@@ -96,7 +96,7 @@ const ContentManager: FC = () => {
         fileInputRef.current.value = '';
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('업로드 실패:', error);
       alert('업로드에 실패했습니다. 다시 시도해주세요.');
     } finally {
@@ -189,7 +189,7 @@ const ContentManager: FC = () => {
                 <input
                   type="text"
                   value={newContent.title}
-                  onChange={(e: any) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e: any) => setNewContent((prev: any) => ({ ...prev, title: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   placeholder="TV에 표시될 콘텐츠 제목을 입력하세요"
                 />
@@ -201,7 +201,7 @@ const ContentManager: FC = () => {
                 </label>
                 <select
                   value={newContent.type}
-                  onChange={(e: any) => setNewContent(prev => ({ 
+                  onChange={(e: any) => setNewContent((prev: any) => ({ 
                     ...prev, 
                     type: e.target.value as 'video' | 'image' | 'slideshow' 
                   }))}

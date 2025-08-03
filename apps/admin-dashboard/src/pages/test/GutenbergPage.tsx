@@ -66,7 +66,7 @@ const EnhancedBlockItem: FC<{
 const GutenbergPage: FC = () => {
   const navigate = useNavigate();
   const [postTitle, setPostTitle] = useState('');
-  const [blocks, setBlocks] = useState([]);
+  const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
   const [selectedBlock, setSelectedBlock] = useState(null);
@@ -102,7 +102,7 @@ const GutenbergPage: FC = () => {
       setIsSaving(false);
       setLastSaved(new Date());
       if (publish) {
-        setPostSettings(prev => ({ ...prev, status: 'publish' }));
+        setPostSettings((prev: any) => ({ ...prev, status: 'publish' }));
       }
     }, 1000);
   };
@@ -115,7 +115,7 @@ const GutenbergPage: FC = () => {
 
   // Handle pattern selection
   const handleSelectPattern = (pattern: any) => {
-    setBlocks(prev => [...prev, ...pattern.blocks]);
+    setBlocks((prev: any) => [...prev, ...pattern.blocks]);
     setShowTemplates(false);
   };
 
@@ -131,7 +131,7 @@ const GutenbergPage: FC = () => {
         }
       };
       
-      setBlocks(blocks.map(block => 
+      setBlocks(blocks.map((block: any) => 
         block.id === selectedBlock.id ? updatedBlock : block
       ));
     }
@@ -159,7 +159,7 @@ const GutenbergPage: FC = () => {
             block={block}
             isEditing={true}
             onUpdate={(content) => {
-              setBlocks(blocks.map(b => 
+              setBlocks(blocks.map((b: any) => 
                 b.id === block.id ? { ...b, content } : b
               ));
             }}
@@ -315,12 +315,12 @@ const GutenbergPage: FC = () => {
             postSettings={postSettings}
             blockSettings={selectedBlock}
             onPostSettingsChange={(settings) => 
-              setPostSettings(prev => ({ ...prev, ...settings }))
+              setPostSettings((prev: any) => ({ ...prev, ...settings }))
             }
             onBlockSettingsChange={(settings) => {
               if (selectedBlock) {
                 const updated = { ...selectedBlock, ...settings };
-                setBlocks(blocks.map(block => 
+                setBlocks(blocks.map((block: any) => 
                   block.id === selectedBlock.id ? updated : block
                 ));
                 setSelectedBlock(updated);

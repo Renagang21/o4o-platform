@@ -45,7 +45,7 @@ export class FundingProjectService {
       updateCount: 0,
       // Handle file fields as strings for database storage
       mainImage: typeof mainImage === 'string' ? mainImage : undefined,
-      images: Array.isArray(images) ? images.filter(img => typeof img === 'string') : undefined,
+      images: Array.isArray(images) ? images.filter((img: any) => typeof img === 'string') : undefined,
     };
 
     const project = this.projectRepository.create(projectData as any);

@@ -183,7 +183,7 @@ export class FeedbackConversation {
 
   removeTag(tag: string): void {
     if (this.tags) {
-      this.tags = this.tags.filter(t => t !== tag);
+      this.tags = this.tags.filter((t: any) => t !== tag);
     }
   }
 }

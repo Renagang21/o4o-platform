@@ -29,7 +29,7 @@ export default function UserDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [approvalHistory, setApprovalHistory] = useState([]);
+  const [approvalHistory, setApprovalHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

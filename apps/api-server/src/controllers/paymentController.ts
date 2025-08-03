@@ -421,7 +421,7 @@ export class PaymentController {
       const [payments, totalCount] = await queryBuilder.getManyAndCount();
 
       // 민감한 정보 제거
-      const sanitizedPayments: SanitizedPayment[] = payments.map(payment => {
+      const sanitizedPayments: SanitizedPayment[] = payments.map((payment: any) => {
         const { gatewayResponse, webhookData, ...sanitizedPayment } = payment;
         return {
           ...sanitizedPayment,

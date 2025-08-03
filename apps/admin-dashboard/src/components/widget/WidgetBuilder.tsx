@@ -177,12 +177,12 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
   })
 
   const isEditing = Boolean(widget)
-  const selectedTypeDefinition = widgetTypes.find(t => t.type === selectedType)
+  const selectedTypeDefinition = widgetTypes.find((t: any) => t.type === selectedType)
 
   // Initialize content when type changes
   useEffect(() => {
     if (!isEditing && selectedTypeDefinition) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         content: selectedTypeDefinition.defaultContent
       }))
@@ -242,7 +242,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
   }
 
   const updateContent = (key: string, value: unknown) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       content: {
         ...prev.content,
@@ -252,7 +252,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
   }
 
   const updateSettings = (key: keyof WidgetSettings, value: unknown) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       settings: {
         ...prev.settings,
@@ -262,7 +262,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
   }
 
   const updateNestedSettings = (category: string, key: string, value: unknown) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       settings: {
         ...prev.settings,
@@ -784,7 +784,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                   <Label>위젯 제목</Label>
                   <Input
                     value={formData.title}
-                    onChange={(e: any) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e: any) => setFormData((prev: any) => ({ ...prev, title: e.target.value }))}
                     placeholder="위젯 제목"
                   />
                 </div>
@@ -793,7 +793,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                   <Label>위치</Label>
                   <Select
                     value={formData.position}
-                    onValueChange={(value: string) => setFormData(prev => ({ ...prev, position: value as WidgetPosition }))}
+                    onValueChange={(value: string) => setFormData((prev: any) => ({ ...prev, position: value as WidgetPosition }))}
                   >
                     <SelectTrigger>
                       <SelectValue />

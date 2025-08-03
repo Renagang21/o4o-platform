@@ -197,14 +197,14 @@ export const postHandlers = [
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '20');
 
-    let filteredPosts = posts.filter(p => p.type === type);
+    let filteredPosts = posts.filter((p: any) => p.type === type);
 
     if (status && status !== 'all') {
-      filteredPosts = filteredPosts.filter(p => p.status === status);
+      filteredPosts = filteredPosts.filter((p: any) => p.status === status);
     }
 
     if (search) {
-      filteredPosts = filteredPosts.filter(p => 
+      filteredPosts = filteredPosts.filter((p: any) => 
         p.title.toLowerCase().includes(search.toLowerCase()) ||
         p.content.toLowerCase().includes(search.toLowerCase())
       );
@@ -227,7 +227,7 @@ export const postHandlers = [
 
   // Get single post
   http.get('/api/v1/posts/:id', ({ params }: any) => {
-    const post = posts.find(p => p.id === params.id);
+    const post = posts.find((p: any) => p.id === params.id);
     if (!post) {
       return HttpResponse.json({ error: 'Post not found' }, { status: 404 });
     }
@@ -287,7 +287,7 @@ export const postHandlers = [
 
   // Duplicate post
   http.post('/api/v1/posts/:id/duplicate', ({ params }: any) => {
-    const post = posts.find(p => p.id === params.id);
+    const post = posts.find((p: any) => p.id === params.id);
     
     if (!post) {
       return HttpResponse.json({ error: 'Post not found' }, { status: 404 });
@@ -419,7 +419,7 @@ export const postHandlers = [
   http.post('/api/v1/tags/bulk-delete', async ({ request }: any) => {
     const { ids } = await request.json() as { ids: string[] };
     
-    ids.forEach(id => {
+    ids.forEach((id: any) => {
       const index = mockTags.findIndex(t => t.id === id);
       if (index !== -1) {
         mockTags.splice(index, 1);

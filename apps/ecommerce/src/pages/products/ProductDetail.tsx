@@ -82,7 +82,7 @@ export function ProductDetail() {
           text: product.shortDescription,
           url: window.location.href
         });
-      } catch (err) {
+      } catch (err: any) {
         console.error('Share failed:', err);
       }
     } else {

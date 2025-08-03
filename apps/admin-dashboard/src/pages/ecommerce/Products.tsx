@@ -22,9 +22,9 @@ const Products: FC = () => {
   const navigate = useNavigate();
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
   // API Hooks
@@ -148,7 +148,7 @@ const Products: FC = () => {
             if (e.target.checked) {
               setSelectedProducts([...selectedProducts, product.id]);
             } else {
-              setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+              setSelectedProducts(selectedProducts.filter((id: any) => id !== product.id));
             }
           }}
           className="rounded"
@@ -362,7 +362,7 @@ const Products: FC = () => {
                     type="checkbox"
                     onChange={(e: any) => {
                       if (e.target.checked) {
-                        setSelectedProducts(products.map(p => p.id));
+                        setSelectedProducts(products.map((p: any) => p.id));
                       } else {
                         setSelectedProducts([]);
                       }

@@ -266,7 +266,7 @@ class SecurityAuditService {
   ): number {
     const cutoff = new Date(Date.now() - minutes * 60000);
     
-    return this.events.filter(e => 
+    return this.events.filter((e: any) => 
       e.ipAddress === ipAddress &&
       e.timestamp > cutoff &&
       (!eventTypes || eventTypes.includes(e.type))
@@ -353,11 +353,11 @@ class SecurityAuditService {
     let filtered = [...this.events];
 
     if (options.startDate) {
-      filtered = filtered.filter(e => e.timestamp >= options.startDate!);
+      filtered = filtered.filter((e: any) => e.timestamp >= options.startDate!);
     }
 
     if (options.endDate) {
-      filtered = filtered.filter(e => e.timestamp <= options.endDate!);
+      filtered = filtered.filter((e: any) => e.timestamp <= options.endDate!);
     }
 
     const stats: SecurityStats = {
@@ -374,7 +374,7 @@ class SecurityAuditService {
 
     const ipCounts: Record<string, number> = {};
 
-    filtered.forEach(event => {
+    filtered.forEach((event: any) => {
       // Count by type
       stats.eventsByType[event.type] = (stats.eventsByType[event.type] || 0) + 1;
       
@@ -417,27 +417,27 @@ class SecurityAuditService {
 
     if (options.type) {
       const types = Array.isArray(options.type) ? options.type : [options.type];
-      filtered = filtered.filter(e => types.includes(e.type));
+      filtered = filtered.filter((e: any) => types.includes(e.type));
     }
 
     if (options.severity) {
-      filtered = filtered.filter(e => e.severity === options.severity);
+      filtered = filtered.filter((e: any) => e.severity === options.severity);
     }
 
     if (options.userId) {
-      filtered = filtered.filter(e => e.userId === options.userId);
+      filtered = filtered.filter((e: any) => e.userId === options.userId);
     }
 
     if (options.ipAddress) {
-      filtered = filtered.filter(e => e.ipAddress === options.ipAddress);
+      filtered = filtered.filter((e: any) => e.ipAddress === options.ipAddress);
     }
 
     if (options.startDate) {
-      filtered = filtered.filter(e => e.timestamp >= options.startDate!);
+      filtered = filtered.filter((e: any) => e.timestamp >= options.startDate!);
     }
 
     if (options.endDate) {
-      filtered = filtered.filter(e => e.timestamp <= options.endDate!);
+      filtered = filtered.filter((e: any) => e.timestamp <= options.endDate!);
     }
 
     return filtered.slice(0, options.limit || 100);
@@ -448,7 +448,7 @@ class SecurityAuditService {
   }
 
   updateRule(ruleId: string, updates: Partial<SecurityRule>): boolean {
-    const rule = this.rules.find(r => r.id === ruleId);
+    const rule = this.rules.find((r: any) => r.id === ruleId);
     if (!rule) return false;
 
     Object.assign(rule, updates);

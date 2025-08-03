@@ -166,12 +166,12 @@ export function getProductVariations(product: any): any[] {
  * Calculate cart totals
  */
 export function calculateCartTotals(items: any[]): any {
-  const subtotal = items.reduce((total, item) => {
+  const subtotal = items.reduce((total: any, item: any) => {
     const price = item.salePrice || item.price || item.regularPrice;
     return total + (price * item.quantity);
   }, 0);
 
-  const discount = items.reduce((total, item) => {
+  const discount = items.reduce((total: any, item: any) => {
     if (item.salePrice && item.regularPrice) {
       return total + ((item.regularPrice - item.salePrice) * item.quantity);
     }

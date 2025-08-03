@@ -117,7 +117,7 @@ export class StatusPageService {
 
     return {
       overall: overallStatus,
-      components: components.map(component => ({
+      components: components.map((component: any) => ({
         id: component.id,
         name: component.name,
         status: component.status,
@@ -520,7 +520,7 @@ export class StatusPageService {
     maintenance: StatusPageMaintenance[]
   ): { status: ServiceStatus; message: string } {
     // Check for active critical incidents
-    const criticalIncidents = incidents.filter(i => i.impact === IncidentImpact.CRITICAL);
+    const criticalIncidents = incidents.filter((i: any) => i.impact === IncidentImpact.CRITICAL);
     if (criticalIncidents.length > 0) {
       return {
         status: ServiceStatus.MAJOR_OUTAGE,
@@ -529,7 +529,7 @@ export class StatusPageService {
     }
 
     // Check for active major incidents
-    const majorIncidents = incidents.filter(i => i.impact === IncidentImpact.MAJOR);
+    const majorIncidents = incidents.filter((i: any) => i.impact === IncidentImpact.MAJOR);
     if (majorIncidents.length > 0) {
       return {
         status: ServiceStatus.PARTIAL_OUTAGE,
@@ -546,7 +546,7 @@ export class StatusPageService {
     }
 
     // Check component statuses
-    const degradedComponents = components.filter(c => 
+    const degradedComponents = components.filter((c: any) => 
       c.status === ServiceStatus.DEGRADED_PERFORMANCE || 
       c.status === ServiceStatus.PARTIAL_OUTAGE
     );
@@ -558,7 +558,7 @@ export class StatusPageService {
       };
     }
 
-    const outageComponents = components.filter(c => c.status === ServiceStatus.MAJOR_OUTAGE);
+    const outageComponents = components.filter((c: any) => c.status === ServiceStatus.MAJOR_OUTAGE);
     if (outageComponents.length > 0) {
       return {
         status: ServiceStatus.PARTIAL_OUTAGE,
@@ -595,9 +595,9 @@ export class StatusPageService {
     // Calculate uptime percentages
     const componentUptimes: { [componentId: string]: number } = {};
     for (const component of components) {
-      const componentMetrics = uptimeMetrics.filter(m => m.componentId === component.id);
+      const componentMetrics = uptimeMetrics.filter((m: any) => m.componentId === component.id);
       if (componentMetrics.length > 0) {
-        const upCount = componentMetrics.filter(m => m.value === 1).length;
+        const upCount = componentMetrics.filter((m: any) => m.value === 1).length;
         componentUptimes[component.id] = (upCount / componentMetrics.length) * 100;
       } else {
         componentUptimes[component.id] = 100; // Assume operational if no metrics
@@ -607,7 +607,7 @@ export class StatusPageService {
     // Calculate response times
     const componentResponseTimes: { [componentId: string]: number } = {};
     for (const component of components) {
-      const componentMetrics = responseTimeMetrics.filter(m => m.componentId === component.id);
+      const componentMetrics = responseTimeMetrics.filter((m: any) => m.componentId === component.id);
       if (componentMetrics.length > 0) {
         const avgResponseTime = componentMetrics.reduce((sum, m) => sum + parseFloat(m.value.toString()), 0) / componentMetrics.length;
         componentResponseTimes[component.id] = Math.round(avgResponseTime);
@@ -648,20 +648,20 @@ export class StatusPageService {
       const dayEnd = new Date(date);
       dayEnd.setHours(23, 59, 59, 999);
       
-      const dayUptimeMetrics = uptimeMetrics.filter(m => 
+      const dayUptimeMetrics = uptimeMetrics.filter((m: any) => 
         m.timestamp >= dayStart && m.timestamp <= dayEnd
       );
       
-      const dayResponseTimeMetrics = responseTimeMetrics.filter(m => 
+      const dayResponseTimeMetrics = responseTimeMetrics.filter((m: any) => 
         m.timestamp >= dayStart && m.timestamp <= dayEnd
       );
       
-      const dayIncidents = incidents.filter(i => 
+      const dayIncidents = incidents.filter((i: any) => 
         i.createdAt >= dayStart && i.createdAt <= dayEnd
       );
       
       const uptime = dayUptimeMetrics.length > 0 
-        ? (dayUptimeMetrics.filter(m => m.value === 1).length / dayUptimeMetrics.length) * 100
+        ? (dayUptimeMetrics.filter((m: any) => m.value === 1).length / dayUptimeMetrics.length) * 100
         : 100;
       
       const responseTime = dayResponseTimeMetrics.length > 0
@@ -685,7 +685,7 @@ export class StatusPageService {
     const totalIncidents = incidents.length;
     
     // Calculate MTTR (Mean Time To Recovery) in minutes
-    const resolvedIncidents = incidents.filter(i => i.resolvedAt);
+    const resolvedIncidents = incidents.filter((i: any) => i.resolvedAt);
     const mttr = resolvedIncidents.length > 0
       ? resolvedIncidents.reduce((sum, i) => sum + i.getDurationMinutes(), 0) / resolvedIncidents.length
       : 0;

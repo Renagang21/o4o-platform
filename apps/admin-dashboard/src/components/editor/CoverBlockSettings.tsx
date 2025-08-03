@@ -63,7 +63,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
       <div>
         <Label className="text-sm font-medium mb-2 block">콘텐츠 정렬</Label>
         <div className="flex gap-1">
-          {alignmentOptions.map(option => {
+          {alignmentOptions.map((option: any) => {
             const Icon = option.icon;
             return (
               <button
@@ -111,7 +111,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
         </Label>
         <div className="space-y-2">
           <div className="grid grid-cols-2 gap-2">
-            {overlayPresets.map(preset => (
+            {overlayPresets.map((preset: any) => (
               <button
                 key={preset.color}
                 onClick={() => onChange({ ...settings, overlayColor: preset.color })}

@@ -361,7 +361,7 @@ export class DeploymentMonitoringService {
 
     await Promise.all(healthCheckPromises);
 
-    const failedChecks = deployment.healthChecks.filter(check => check.status === 'failed');
+    const failedChecks = deployment.healthChecks.filter((check: any) => check.status === 'failed');
     // console.log(`🏥 Health checks completed: ${deployment.healthChecks.length - failedChecks.length}/${deployment.healthChecks.length} passed`);
   }
 
@@ -589,7 +589,7 @@ export class DeploymentMonitoringService {
         order: { createdAt: 'ASC' }
       });
 
-      return metrics.map(metric => parseFloat(metric.value.toString()));
+      return metrics.map((metric: any) => parseFloat(metric.value.toString()));
     } catch (error) {
       console.warn(`Failed to collect ${metricName} metrics:`, error);
       return [];
@@ -688,10 +688,10 @@ export class DeploymentMonitoringService {
     critical: boolean;
     reason: string;
   } {
-    const failedChecks = deployment.healthChecks.filter(check => check.status === 'failed');
+    const failedChecks = deployment.healthChecks.filter((check: any) => check.status === 'failed');
     const criticalChecks = ['API Health Check', 'Database Connectivity'];
     
-    const criticalFailures = failedChecks.filter(check => 
+    const criticalFailures = failedChecks.filter((check: any) => 
       criticalChecks.includes(check.name)
     );
 
@@ -699,7 +699,7 @@ export class DeploymentMonitoringService {
       return {
         passed: false,
         critical: true,
-        reason: `Critical health checks failed: ${criticalFailures.map(c => c.name).join(', ')}`
+        reason: `Critical health checks failed: ${criticalFailures.map((c: any) => c.name).join(', ')}`
       };
     }
 
@@ -780,17 +780,17 @@ export class DeploymentMonitoringService {
     }
 
     // Check for consistent health check passes
-    const recentHealthChecks = deployment.healthChecks.filter(check => 
+    const recentHealthChecks = deployment.healthChecks.filter((check: any) => 
       check.lastRun && (Date.now() - check.lastRun.getTime()) < 10 * 60 * 1000 // Last 10 minutes
     );
 
-    const unstableChecks = recentHealthChecks.filter(check => check.status === 'failed');
+    const unstableChecks = recentHealthChecks.filter((check: any) => check.status === 'failed');
 
     if (unstableChecks.length > 0) {
       return {
         passed: false,
-        critical: unstableChecks.some(check => ['API Health Check', 'Database Connectivity'].includes(check.name)),
-        reason: `Unstable health checks: ${unstableChecks.map(c => c.name).join(', ')}`
+        critical: unstableChecks.some((check: any) => ['API Health Check', 'Database Connectivity'].includes(check.name)),
+        reason: `Unstable health checks: ${unstableChecks.map((c: any) => c.name).join(', ')}`
       };
     }
 
@@ -810,7 +810,7 @@ export class DeploymentMonitoringService {
     if (target === 'latest') {
       // Find the latest active deployment
       deployment = Array.from(this.activeDeployments.values())
-        .filter(d => d.status === DeploymentStatus.IN_PROGRESS)
+        .filter((d: any) => d.status === DeploymentStatus.IN_PROGRESS)
         .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())[0];
     } else {
       deployment = this.activeDeployments.get(target);
@@ -1056,10 +1056,10 @@ export class DeploymentMonitoringService {
       }
     }
 
-    const failedChecks = rollbackInfo.verificationChecks.filter(check => check.status === 'failed');
+    const failedChecks = rollbackInfo.verificationChecks.filter((check: any) => check.status === 'failed');
     
     if (failedChecks.length > 0) {
-      throw new Error(`Rollback verification failed: ${failedChecks.map(c => c.name).join(', ')}`);
+      throw new Error(`Rollback verification failed: ${failedChecks.map((c: any) => c.name).join(', ')}`);
     }
 
     // console.log(`✅ Rollback verification successful: ${rollbackInfo.id}`);
@@ -1217,7 +1217,7 @@ export class DeploymentMonitoringService {
 
     // Check for failed deployments
     const failedDeployments = Array.from(this.activeDeployments.values())
-      .filter(d => d.status === DeploymentStatus.FAILED || d.status === DeploymentStatus.ROLLBACK_FAILED);
+      .filter((d: any) => d.status === DeploymentStatus.FAILED || d.status === DeploymentStatus.ROLLBACK_FAILED);
 
     if (failedDeployments.length > 0) {
       issues.push(`${failedDeployments.length} failed deployments`);
@@ -1225,7 +1225,7 @@ export class DeploymentMonitoringService {
 
     // Check for long-running deployments
     const longRunningDeployments = Array.from(this.activeDeployments.values())
-      .filter(d => {
+      .filter((d: any) => {
         const runtime = Date.now() - d.startTime.getTime();
         return runtime > 60 * 60 * 1000; // 1 hour
       });
@@ -1263,7 +1263,7 @@ export class DeploymentMonitoringService {
 
   async getDeployment(deploymentId: string): Promise<DeploymentInfo | null> {
     return this.activeDeployments.get(deploymentId) || 
-           this.deploymentHistory.find(d => d.id === deploymentId) || 
+           this.deploymentHistory.find((d: any) => d.id === deploymentId) || 
            null;
   }
 

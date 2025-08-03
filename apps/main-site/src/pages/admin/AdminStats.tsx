@@ -18,13 +18,13 @@ const mockRoleHistory = [
 
 const AdminStats: FC = () => {
   // 페이지별 접근 수 집계
-  const pageCounts = mockAccessLogs.reduce((acc, log) => {
+  const pageCounts = mockAccessLogs.reduce((acc: any, log: any) => {
     acc[log.page] = (acc[log.page] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   // 역할 변경 이력 집계 (targetUserId별 변경 횟수)
-  const roleChangeCounts = mockRoleHistory.reduce((acc, log) => {
+  const roleChangeCounts = mockRoleHistory.reduce((acc: any, log: any) => {
     acc[log.targetUserId] = (acc[log.targetUserId] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

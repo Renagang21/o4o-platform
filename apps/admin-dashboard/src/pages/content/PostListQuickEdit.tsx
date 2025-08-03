@@ -126,8 +126,8 @@ const PostListQuickEdit: FC = () => {
       slug: post.slug,
       status: post.status,
       authorId: post.author?.id,
-      categoryIds: post.categories?.map(c => c.id) || [],
-      tags: post.tags?.map(t => t.name).join(', ') || '',
+      categoryIds: post.categories?.map((c: any) => c.id) || [],
+      tags: post.tags?.map((t: any) => t.name).join(', ') || '',
       publishYear: publishDate.getFullYear().toString(),
       publishMonth: (publishDate.getMonth() + 1).toString().padStart(2, '0'),
       publishDay: publishDate.getDate().toString().padStart(2, '0'),
@@ -142,7 +142,7 @@ const PostListQuickEdit: FC = () => {
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map(id => authClient.api.delete(`/posts/${id}`)));
+      await Promise.all(ids.map((id: any) => authClient.api.delete(`/posts/${id}`)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -156,7 +156,7 @@ const PostListQuickEdit: FC = () => {
   // Bulk status update mutation
   const bulkStatusMutation = useMutation({
     mutationFn: async ({ ids, status }: { ids: string[], status: PostStatus }) => {
-      await Promise.all(ids.map(id => 
+      await Promise.all(ids.map((id: any) => 
         authClient.api.patch(`/posts/${id}`, { status })
       ));
     },
@@ -259,7 +259,7 @@ const PostListQuickEdit: FC = () => {
       label: 'Categories',
       render: (post: Post) => (
         <div className="text-sm text-gray-600">
-          {post.categories?.map(cat => cat.name).join(', ') || '—'}
+          {post.categories?.map((cat: any) => cat.name).join(', ') || '—'}
         </div>
       )
     },
@@ -268,7 +268,7 @@ const PostListQuickEdit: FC = () => {
       label: 'Tags',
       render: (post: Post) => (
         <div className="text-sm text-gray-600">
-          {post.tags?.map(tag => tag.name).join(', ') || '—'}
+          {post.tags?.map((tag: any) => tag.name).join(', ') || '—'}
         </div>
       )
     },
@@ -378,7 +378,7 @@ const PostListQuickEdit: FC = () => {
                 onChange={() => toggleItem(itemId)}
               />
             </th>
-            {columns.map(column => (
+            {columns.map((column: any) => (
               <td
                 key={column.key}
                 className={`column-${column.key}`}
@@ -475,7 +475,7 @@ const PostListQuickEdit: FC = () => {
                   onChange={toggleAll}
                 />
               </td>
-              {columns.map(column => (
+              {columns.map((column: any) => (
                 <th
                   key={column.key}
                   scope="col"
@@ -509,7 +509,7 @@ const PostListQuickEdit: FC = () => {
                   onChange={toggleAll}
                 />
               </td>
-              {columns.map(column => (
+              {columns.map((column: any) => (
                 <th key={column.key} scope="col" className={`manage-column column-${column.key}`}>
                   {column.label}
                 </th>

@@ -1289,7 +1289,7 @@ export class BetaUserController {
         take: 50
       });
 
-      const notifications = recentFeedback.map(feedback => ({
+      const notifications = recentFeedback.map((feedback: any) => ({
         id: `feedback_${feedback.id}`,
         type: feedback.isLive ? 'urgent_feedback' : 'new_feedback',
         title: feedback.isLive ? 'Live Support Request' : 'High Priority Feedback',

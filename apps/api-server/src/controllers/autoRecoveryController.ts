@@ -788,8 +788,8 @@ export class AutoRecoveryController {
   }
 
   private calculateOverallHealth(statuses: string[]): { status: string; description: string } {
-    const unhealthyCount = statuses.filter(s => s === 'unhealthy').length;
-    const degradedCount = statuses.filter(s => s === 'degraded').length;
+    const unhealthyCount = statuses.filter((s: any) => s === 'unhealthy').length;
+    const degradedCount = statuses.filter((s: any) => s === 'degraded').length;
     
     if (unhealthyCount > 0) {
       return {

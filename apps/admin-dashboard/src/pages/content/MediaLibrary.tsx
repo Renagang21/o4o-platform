@@ -56,7 +56,7 @@ const MediaLibrary: FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [viewMode, setViewMode] = useState('grid')
-  const [selectedItems, setSelectedItems] = useState([])
+  const [selectedItems, setSelectedItems] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState({
     mediaType: 'all',
@@ -116,9 +116,9 @@ const MediaLibrary: FC = () => {
 
   // Handle item selection
   const toggleItemSelection = (itemId: string) => {
-    setSelectedItems(prev =>
+    setSelectedItems((prev: any) =>
       prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id: any) => id !== itemId)
         : [...prev, itemId]
     )
   }

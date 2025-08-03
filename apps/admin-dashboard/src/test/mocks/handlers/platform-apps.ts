@@ -230,7 +230,7 @@ const mockPlatformMetrics = {
   totalUsers: 456,
   activeToday: 123,
   dailyRequests: 15678,
-  totalActiveApps: mockPlatformApps.filter(app => app.status === 'active').length,
+  totalActiveApps: mockPlatformApps.filter((app: any) => app.status === 'active').length,
   systemUptime: 99.7,
   errorRate: 0.2
 };
@@ -254,7 +254,7 @@ export const platformAppsHandlers = [
 
   // Toggle app status
   http.patch(`${API_BASE}/v1/platform/apps/:appId/status`, async ({ params, request }: any) => {
-    const { appId } = params;
+    const { appId } = params as any;
     const { status } = await request.json();
     
     const appIndex = mockPlatformApps.findIndex(app => app.id === appId);
@@ -277,14 +277,14 @@ export const platformAppsHandlers = [
 
     // Check dependencies
     if (status === 'active') {
-      const missingDeps = app.dependencies.filter(depId => {
-        const depApp = mockPlatformApps.find(a => a.id === depId);
+      const missingDeps = app.dependencies.filter((depId: any) => {
+        const depApp = mockPlatformApps.find((a: any) => a.id === depId);
         return !depApp || depApp.status !== 'active';
       });
       
       if (missingDeps.length > 0) {
-        const depNames = missingDeps.map(depId => {
-          const depApp = mockPlatformApps.find(a => a.id === depId);
+        const depNames = missingDeps.map((depId: any) => {
+          const depApp = mockPlatformApps.find((a: any) => a.id === depId);
           return depApp ? depApp.displayName : depId;
         }).join(', ');
         
@@ -322,7 +322,7 @@ export const platformAppsHandlers = [
 
   // Update app settings
   http.put(`${API_BASE}/v1/platform/apps/:appId/settings`, async ({ params, request }: any) => {
-    const { appId } = params;
+    const { appId } = params as any;
     const settings = await request.json();
     
     const appIndex = mockPlatformApps.findIndex(app => app.id === appId);
@@ -406,9 +406,9 @@ export const platformAppsHandlers = [
 
   // Get app by ID
   http.get(`${API_BASE}/v1/platform/apps/:appId`, ({ params }: any) => {
-    const { appId } = params;
+    const { appId } = params as any;
     
-    const app = mockPlatformApps.find(a => a.id === appId);
+    const app = mockPlatformApps.find((a: any) => a.id === appId);
     if (!app) {
       return HttpResponse.json(
         { success: false, error: 'App not found' },
@@ -424,11 +424,11 @@ export const platformAppsHandlers = [
 
   // Get active apps only (for menu generation)
   http.get(`${API_BASE}/v1/platform/apps/active`, () => {
-    const activeApps = mockPlatformApps.filter(app => app.status === 'active');
+    const activeApps = mockPlatformApps.filter((app: any) => app.status === 'active');
     
     return HttpResponse.json({
       success: true,
-      data: activeApps.map(app => ({
+      data: activeApps.map((app: any) => ({
         id: app.id,
         name: app.name,
         displayName: app.displayName,
@@ -440,9 +440,9 @@ export const platformAppsHandlers = [
 
   // Health check for specific app
   http.get(`${API_BASE}/v1/platform/apps/:appId/health`, ({ params }: any) => {
-    const { appId } = params;
+    const { appId } = params as any;
     
-    const app = mockPlatformApps.find(a => a.id === appId);
+    const app = mockPlatformApps.find((a: any) => a.id === appId);
     if (!app) {
       return HttpResponse.json(
         { success: false, error: 'App not found' },

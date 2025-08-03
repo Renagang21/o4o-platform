@@ -30,7 +30,7 @@ export const TestDashboard: FC = () => {
   // 서비스 상태 새로고침
   const handleRefreshService = (serviceName: string) => {
     setServices(prevServices =>
-      prevServices.map(service =>
+      prevServices.map((service: any) =>
         service.name === serviceName
           ? {
               ...service,
@@ -46,7 +46,7 @@ export const TestDashboard: FC = () => {
   const handleRefreshAll = () => {
     const now = new Date().toLocaleString('ko-KR');
     setServices(prevServices =>
-      prevServices.map(service => ({
+      prevServices.map((service: any) => ({
         ...service,
         lastChecked: now,
         responseTime: Math.floor(Math.random() * 1000) + 100

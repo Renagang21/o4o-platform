@@ -71,7 +71,7 @@ export const SpectraFormBlock: FC<{
   useEffect(() => {
     if (form) {
       const initialData: Record<string, any> = {};
-      form.fields.forEach(field => {
+      form.fields.forEach((field: any) => {
         if (field.defaultValue !== undefined) {
           initialData[field.name] = field.defaultValue;
         } else if (field.type === 'checkbox') {
@@ -162,14 +162,14 @@ export const SpectraFormBlock: FC<{
 
   // Handle field change
   const handleFieldChange = (field: FormField, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [field.name]: value
     }));
 
     // Clear error for this field
     if (errors[field.name]) {
-      setErrors(prev => {
+      setErrors((prev: any) => {
         const newErrors = { ...prev };
         delete newErrors[field.name];
         return newErrors;
@@ -178,10 +178,10 @@ export const SpectraFormBlock: FC<{
 
     // Handle calculations
     if (form) {
-      form.fields.forEach(f => {
+      form.fields.forEach((f: any) => {
         if (f.type === 'calculation' && f.calculation) {
           const result = evaluateFormula(f.calculation, { ...formData, [field.name]: value });
-          setFormData(prev => ({
+          setFormData((prev: any) => ({
             ...prev,
             [f.name]: result
           }));
@@ -195,14 +195,14 @@ export const SpectraFormBlock: FC<{
     if (!field.conditional) return true;
     
     const { action, rules, logicType } = field.conditional;
-    const results = rules.map(rule => {
+    const results = rules.map((rule: any) => {
       const fieldValue = formData[rule.field];
       return evaluateRule(rule, fieldValue);
     });
 
     const conditionMet = logicType === 'all' 
-      ? results.every(r => r)
-      : results.some(r => r);
+      ? results.every((r: any) => r)
+      : results.some((r: any) => r);
 
     return action === 'show' || action === 'enable' ? conditionMet : !conditionMet;
   };
@@ -245,7 +245,7 @@ export const SpectraFormBlock: FC<{
         
         // Basic arithmetic parser for +, -, *, /
         // For more complex expressions, consider using a library like math.js
-        const numbers = expr.split(/[+\-*/]/).map(n => parseFloat(n));
+        const numbers = expr.split(/[+\-*/]/).map((n: any) => parseFloat(n));
         const operators = expr.match(/[+\-*/]/g) || [];
         
         if (numbers.length === 0) return 0;
@@ -278,7 +278,7 @@ export const SpectraFormBlock: FC<{
 
     // Validate all visible fields
     const newErrors: Record<string, string> = {};
-    const visibleFields = form.fields.filter(field => evaluateCondition(field));
+    const visibleFields = form.fields.filter((field: any) => evaluateCondition(field));
     
     for (const field of visibleFields) {
       const error = validateField(field, formData[field.name]);
@@ -371,7 +371,7 @@ export const SpectraFormBlock: FC<{
               {field.type === 'password' && (
                 <button
                   type="button"
-                  onClick={() => setShowPassword(prev => ({ ...prev, [field.name]: !prev[field.name] }))}
+                  onClick={() => setShowPassword((prev: any) => ({ ...prev, [field.name]: !prev[field.name] }))}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   {showPassword[field.name] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -422,7 +422,7 @@ export const SpectraFormBlock: FC<{
             className={baseInputClasses}
           >
             <option value="">Select...</option>
-            {field.options?.map(option => (
+            {field.options?.map((option: any) => (
               <option key={option.value} value={option.value} disabled={option.disabled}>
                 {option.label}
               </option>
@@ -433,7 +433,7 @@ export const SpectraFormBlock: FC<{
       case 'radio':
         return (
           <div className="space-y-2">
-            {field.options?.map(option => (
+            {field.options?.map((option: any) => (
               <label key={option.value} className="flex items-center gap-2">
                 <input
                   type="radio"
@@ -455,7 +455,7 @@ export const SpectraFormBlock: FC<{
           // Multiple checkboxes
           return (
             <div className="space-y-2">
-              {field.options.map(option => (
+              {field.options.map((option: any) => (
                 <label key={option.value} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -465,7 +465,7 @@ export const SpectraFormBlock: FC<{
                       const currentValues = Array.isArray(value) ? value : [];
                       const newValues = e.target.checked
                         ? [...currentValues, option.value]
-                        : currentValues.filter(v => v !== option.value);
+                        : currentValues.filter((v: any) => v !== option.value);
                       handleFieldChange(field, newValues);
                     }}
                     disabled={isDisabled || option.disabled}
@@ -495,7 +495,7 @@ export const SpectraFormBlock: FC<{
       case 'rating':
         return (
           <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map(rating => (
+            {[1, 2, 3, 4, 5].map((rating: any) => (
               <button
                 key={rating}
                 type="button"
@@ -719,7 +719,7 @@ export const SpectraFormBlock: FC<{
           ${layout === 'two-column' ? 'grid md:grid-cols-2 gap-4' : ''}
           ${layout === 'inline' ? 'flex flex-wrap gap-4' : ''}
         `}>
-          {currentFields.map(field => renderField(field))}
+          {currentFields.map((field: any) => renderField(field))}
         </div>
 
         <div className="flex items-center justify-between pt-4">
@@ -872,11 +872,11 @@ export const SpectraViewBlock: FC<{
         {/* Filters */}
         {enableFilters && view.interaction?.enableFilters && view.interaction.filterFields && (
           <div className="flex gap-4">
-            {view.interaction.filterFields.map(field => (
+            {view.interaction.filterFields.map((field: any) => (
               <select
                 key={field}
                 value={filters[field] || ''}
-                onChange={(e: any) => setFilters(prev => ({ ...prev, [field]: e.target.value }))}
+                onChange={(e: any) => setFilters((prev: any) => ({ ...prev, [field]: e.target.value }))}
                 className="px-4 py-2 border border-gray-300 rounded-md"
               >
                 <option value="">All {field}</option>
@@ -893,7 +893,7 @@ export const SpectraViewBlock: FC<{
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {view.template.fields.map(field => (
+                {view.template.fields.map((field: any) => (
                   <th
                     key={field}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
@@ -919,7 +919,7 @@ export const SpectraViewBlock: FC<{
             <tbody className="bg-white divide-y divide-gray-200">
               {data.map((item: any, index: number) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  {view.template.fields.map(field => (
+                  {view.template.fields.map((field: any) => (
                     <td key={field} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {item[field]}
                     </td>
@@ -933,7 +933,7 @@ export const SpectraViewBlock: FC<{
         <div className={view.template.wrapperClass || 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
           {data.map((item: any, index: number) => (
             <div key={index} className={view.template.itemClass || 'bg-white rounded-lg shadow p-6'}>
-              {view.template.fields.map(field => (
+              {view.template.fields.map((field: any) => (
                 <div key={field} className="mb-2">
                   <span className="font-medium">{field}:</span>
                   <span className="ml-2">{item[field]}</span>
@@ -946,7 +946,7 @@ export const SpectraViewBlock: FC<{
         <div className={view.template.wrapperClass || 'space-y-4'}>
           {data.map((item: any, index: number) => (
             <div key={index} className={view.template.itemClass || 'bg-white rounded-lg shadow p-4'}>
-              {view.template.fields.map(field => (
+              {view.template.fields.map((field: any) => (
                 <div key={field} className="mb-1">
                   {item[field]}
                 </div>

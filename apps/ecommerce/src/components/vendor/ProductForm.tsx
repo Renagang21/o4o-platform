@@ -72,8 +72,13 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
     images: [],
     variants: [],
     tags: [],
-    dimensions: {}
-  });
+    dimensions: { length: 0, width: 0, height: 0 }
+  ,
+    seoTitle: '',
+    seoDescription: '',
+    compareAtPrice: 0,
+    cost: 0,
+    weight: 0});
 
   const [newTag, setNewTag] = useState('');
 
@@ -89,7 +94,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
         cost: product.cost,
         stockQuantity: product.inventory?.stockQuantity || 0,
         stockStatus: product.inventory?.stockStatus || 'in_stock',
-        images: product.images?.map(img => img.url) || [],
+        images: product.images?.map((img: any) => img.url) || [],
         variants: [],
         seoTitle: product.seo?.metaTitle,
         seoDescription: product.seo?.metaDescription,
@@ -188,8 +193,8 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
     const files = e.target.files;
     if (files) {
       // 실제 구현에서는 파일을 서버에 업로드하고 URL을 받아와야 함
-      const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-      setFormData(prev => ({
+      const newImages = Array.from(files).map((file: any) => URL.createObjectURL(file));
+      setFormData((prev: any) => ({
         ...prev,
         images: [...prev.images, ...newImages]
       }));
@@ -197,7 +202,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
   };
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }));
@@ -205,7 +210,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         tags: [...prev.tags, newTag.trim()]
       }));
@@ -214,9 +219,9 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
   };
 
   const removeTag = (tag: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      tags: prev.tags.filter(t => t !== tag)
+      tags: prev.tags.filter((t: any) => t !== tag)
     }));
   };
 
@@ -228,25 +233,25 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
       sku: '',
       stockQuantity: 0
     };
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       variants: [...prev.variants, newVariant]
     }));
   };
 
   const updateVariant = (id: string, field: keyof ProductVariant, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      variants: prev.variants.map(v => 
+      variants: prev.variants.map((v: any) => 
         v.id === id ? { ...v, [field]: value } : v
       )
     }));
   };
 
   const removeVariant = (id: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      variants: prev.variants.filter(v => v.id !== id)
+      variants: prev.variants.filter((v: any) => v.id !== id)
     }));
   };
 
@@ -287,7 +292,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   </label>
                   <Input
                     value={formData.name}
-                    onChange={(e: any) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e: any) => setFormData((prev: any) => ({ ...prev, name: e.target.value }))}
                     placeholder="예: 무선 블루투스 이어폰"
                     className={errors.name ? 'border-red-500' : ''}
                   />
@@ -303,7 +308,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   <Textarea
                     rows={4}
                     value={formData.description}
-                    onChange={(e: any) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e: any) => setFormData((prev: any) => ({ ...prev, description: e.target.value }))}
                     placeholder="상품의 특징과 장점을 설명해주세요"
                   />
                 </div>
@@ -315,7 +320,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     </label>
                     <Input
                       value={formData.sku}
-                      onChange={(e: any) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
+                      onChange={(e: any) => setFormData((prev: any) => ({ ...prev, sku: e.target.value }))}
                       placeholder="예: BT-EAR-001"
                       className={errors.sku ? 'border-red-500' : ''}
                     />
@@ -331,7 +336,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <select
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={formData.category}
-                      onChange={(e: any) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                      onChange={(e: any) => setFormData((prev: any) => ({ ...prev, category: e.target.value }))}
                     >
                       <option value="">카테고리 선택</option>
                       <option value="electronics">전자제품</option>
@@ -351,7 +356,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.price}
-                      onChange={(e: any) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                      onChange={(e: any) => setFormData((prev: any) => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                       placeholder="0"
                       className={errors.price ? 'border-red-500' : ''}
                     />
@@ -367,7 +372,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.compareAtPrice || ''}
-                      onChange={(e: any) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData((prev: any) => ({ 
                         ...prev, 
                         compareAtPrice: e.target.value ? parseFloat(e.target.value) : undefined 
                       }))}
@@ -382,7 +387,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.cost || ''}
-                      onChange={(e: any) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData((prev: any) => ({ 
                         ...prev, 
                         cost: e.target.value ? parseFloat(e.target.value) : undefined 
                       }))}
@@ -494,7 +499,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.stockQuantity}
-                      onChange={(e: any) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData((prev: any) => ({ 
                         ...prev, 
                         stockQuantity: parseInt(e.target.value) || 0 
                       }))}
@@ -513,7 +518,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <select
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={formData.stockStatus}
-                      onChange={(e: any) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData((prev: any) => ({ 
                         ...prev, 
                         stockStatus: e.target.value as any 
                       }))}
@@ -591,7 +596,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     type="number"
                     step="0.1"
                     value={formData.weight || ''}
-                    onChange={(e: any) => setFormData(prev => ({ 
+                    onChange={(e: any) => setFormData((prev: any) => ({ 
                       ...prev, 
                       weight: e.target.value ? parseFloat(e.target.value) : undefined 
                     }))}
@@ -607,7 +612,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                       <Input
                         type="number"
                         value={formData.dimensions?.length || ''}
-                        onChange={(e: any) => setFormData(prev => ({
+                        onChange={(e: any) => setFormData((prev: any) => ({
                           ...prev,
                           dimensions: {
                             ...prev.dimensions,
@@ -622,7 +627,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                       <Input
                         type="number"
                         value={formData.dimensions?.width || ''}
-                        onChange={(e: any) => setFormData(prev => ({
+                        onChange={(e: any) => setFormData((prev: any) => ({
                           ...prev,
                           dimensions: {
                             ...prev.dimensions,
@@ -637,7 +642,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                       <Input
                         type="number"
                         value={formData.dimensions?.height || ''}
-                        onChange={(e: any) => setFormData(prev => ({
+                        onChange={(e: any) => setFormData((prev: any) => ({
                           ...prev,
                           dimensions: {
                             ...prev.dimensions,
@@ -671,7 +676,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   </label>
                   <Input
                     value={formData.seoTitle || ''}
-                    onChange={(e: any) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
+                    onChange={(e: any) => setFormData((prev: any) => ({ ...prev, seoTitle: e.target.value }))}
                     placeholder={formData.name || '상품명이 기본값으로 사용됩니다'}
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -686,7 +691,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   <Textarea
                     rows={3}
                     value={formData.seoDescription || ''}
-                    onChange={(e: any) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
+                    onChange={(e: any) => setFormData((prev: any) => ({ ...prev, seoDescription: e.target.value }))}
                     placeholder="검색 결과에 표시될 설명을 입력하세요"
                   />
                   <p className="text-xs text-gray-500 mt-1">

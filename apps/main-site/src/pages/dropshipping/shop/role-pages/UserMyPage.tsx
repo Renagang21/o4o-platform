@@ -32,8 +32,8 @@ interface WishlistItem {
 
 const UserMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [orders, setOrders] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [wishlist, setWishlist] = useState<any[]>([]);
   const [userStats, setUserStats] = useState({
     points: 15840,
     coupons: 3,
@@ -311,7 +311,7 @@ const UserMyPage: FC<RolePageProps> = ({ user }) => {
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-xl font-bold">
-                  {menuItems.find(item => item.id === activeTab)?.name}
+                  {menuItems.find((item: any) => item.id === activeTab)?.name}
                 </h3>
               </div>
               

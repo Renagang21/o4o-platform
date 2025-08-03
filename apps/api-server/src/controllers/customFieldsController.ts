@@ -255,7 +255,7 @@ export class CustomFieldsController {
 
       // Delete field values first (cascade should handle this, but being explicit)
       const fields = await this.customFieldRepository.find({ where: { groupId: id } });
-      const fieldIds = fields.map(f => f.id);
+      const fieldIds = fields.map((f: any) => f.id);
       
       if (fieldIds.length > 0) {
         await this.customFieldValueRepository.delete({ fieldId: In(fieldIds) });
@@ -530,7 +530,7 @@ export class CustomFieldsController {
       }
       const groupedValues: Record<string, GroupedFieldValue> = {};
       
-      values.forEach(value => {
+      values.forEach((value: any) => {
         const groupId = value.field.group.id;
         const groupTitle = value.field.group.title;
         
@@ -649,14 +649,14 @@ export class CustomFieldsController {
       const fieldGroups = await queryBuilder.getMany();
 
       // Create export data (exclude IDs and timestamps for portability)
-      const exportData = fieldGroups.map(group => ({
+      const exportData = fieldGroups.map((group: any) => ({
         title: group.title,
         description: group.description,
         location: group.location,
         rules: group.rules,
         options: group.options,
         placement: group.placement,
-        fields: group.fields.map(field => ({
+        fields: group.fields.map((field: any) => ({
           name: field.name,
           label: field.label,
           type: field.type,
@@ -756,8 +756,8 @@ export class CustomFieldsController {
         }
       }
 
-      const successCount = results.filter(r => r.success).length;
-      const failureCount = results.filter(r => !r.success).length;
+      const successCount = results.filter((r: any) => r.success).length;
+      const failureCount = results.filter((r: any) => !r.success).length;
 
       res.status(201).json({
         success: true,

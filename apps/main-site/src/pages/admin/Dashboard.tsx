@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     totalCustomers: 0,
   });
 
-  const [recentActivities, setRecentActivities] = useState([]);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user || user.userType !== 'admin') {
@@ -52,19 +52,19 @@ export default function AdminDashboard() {
   const calculateStats = () => {
     // 상품 통계
     const totalProducts = mockProducts.length;
-    const pendingProducts = mockProducts.filter(p => p.approvalStatus === 'pending').length;
+    const pendingProducts = mockProducts.filter((p: any) => p.approvalStatus === 'pending').length;
 
     // 주문 통계
     const totalOrders = mockOrders.length;
     const totalRevenue = mockOrders
-      .filter(o => o.paymentStatus === 'completed')
-      .reduce((sum, order) => sum + order.totalAmount, 0);
+      .filter((o: any) => o.paymentStatus === 'completed')
+      .reduce((sum: any, order: any) => sum + order.totalAmount, 0);
 
     // 사용자 통계
     const totalUsers = mockUsers.length;
-    const totalSuppliers = mockUsers.filter(u => u.userType === 'supplier').length;
-    const totalRetailers = mockUsers.filter(u => u.userType === 'retailer').length;
-    const totalCustomers = mockUsers.filter(u => u.userType === 'customer').length;
+    const totalSuppliers = mockUsers.filter((u: any) => u.userType === 'supplier').length;
+    const totalRetailers = mockUsers.filter((u: any) => u.userType === 'retailer').length;
+    const totalCustomers = mockUsers.filter((u: any) => u.userType === 'customer').length;
 
     setStats({
       totalProducts,
@@ -82,9 +82,9 @@ export default function AdminDashboard() {
     // 최근 활동들을 시간순으로 정렬
     const activities = [
       ...mockProducts
-        .filter(p => p.approvalStatus === 'pending')
+        .filter((p: any) => p.approvalStatus === 'pending')
         .slice(0, 5)
-        .map(p => ({
+        .map((p: any) => ({
           type: 'product_pending',
           title: '상품 승인 대기',
           description: `${p.name} - ${p.supplierId}`,
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
         })),
       ...mockOrders
         .slice(0, 5)
-        .map(o => ({
+        .map((o: any) => ({
           type: 'new_order',
           title: '새 주문',
           description: `주문번호: ${o.orderNumber} - ₩${o.totalAmount.toLocaleString()}`,

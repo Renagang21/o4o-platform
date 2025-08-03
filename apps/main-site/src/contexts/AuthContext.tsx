@@ -49,7 +49,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       setUser(normalizedUser);
       toast.success('로그인되었습니다.');
       return true;
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage = error.response?.data?.error || '로그인에 실패했습니다.';
       const errorCode = error.response?.data?.code;
 
@@ -122,7 +122,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // 토큰이 유효하지 않으면 로그아웃
         logout();
       }
-    } catch (error) {
+    } catch (error: any) {
       // 토큰 검증 실패 시 로그아웃
       logout();
     } finally {
@@ -133,6 +133,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // 컴포넌트 마운트 시 인증 상태 확인
   useEffect(() => {
     checkAuthStatus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

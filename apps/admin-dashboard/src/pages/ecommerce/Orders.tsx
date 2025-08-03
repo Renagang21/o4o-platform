@@ -23,9 +23,9 @@ import { ko } from 'date-fns/locale';
 const Orders: FC = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [selectedOrders, setSelectedOrders] = useState<any[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [bulkAction, setBulkAction] = useState('');
 
@@ -303,7 +303,7 @@ const Orders: FC = () => {
                     checked={selectedOrders.length === orders.length}
                     onChange={(e: any) => {
                       if (e.target.checked) {
-                        setSelectedOrders(orders.map(o => o.id));
+                        setSelectedOrders(orders.map((o: any) => o.id));
                       } else {
                         setSelectedOrders([]);
                       }
@@ -347,7 +347,7 @@ const Orders: FC = () => {
                           if (e.target.checked) {
                             setSelectedOrders([...selectedOrders, order.id]);
                           } else {
-                            setSelectedOrders(selectedOrders.filter(id => id !== order.id));
+                            setSelectedOrders(selectedOrders.filter((id: any) => id !== order.id));
                           }
                         }}
                         className="rounded"

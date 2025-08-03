@@ -36,13 +36,13 @@ const SocialLoginConfigPage: FC = () => {
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="REST API 키"
           value={config.kakao.restApiKey}
-          onChange={e => handleChange('kakao', 'restApiKey', e.target.value)}
+          onChange={(e: any) => handleChange('kakao', 'restApiKey', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="Redirect URI"
           value={config.kakao.redirectUri}
-          onChange={e => handleChange('kakao', 'redirectUri', e.target.value)}
+          onChange={(e: any) => handleChange('kakao', 'redirectUri', e.target.value)}
         />
       </div>
       {/* Naver */}
@@ -52,19 +52,19 @@ const SocialLoginConfigPage: FC = () => {
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="Client ID"
           value={config.naver.clientId}
-          onChange={e => handleChange('naver', 'clientId', e.target.value)}
+          onChange={(e: any) => handleChange('naver', 'clientId', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="Client Secret"
           value={config.naver.clientSecret}
-          onChange={e => handleChange('naver', 'clientSecret', e.target.value)}
+          onChange={(e: any) => handleChange('naver', 'clientSecret', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="Callback URL"
           value={config.naver.callbackUrl}
-          onChange={e => handleChange('naver', 'callbackUrl', e.target.value)}
+          onChange={(e: any) => handleChange('naver', 'callbackUrl', e.target.value)}
         />
       </div>
       {/* Facebook */}
@@ -74,19 +74,19 @@ const SocialLoginConfigPage: FC = () => {
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="App ID"
           value={config.facebook.appId}
-          onChange={e => handleChange('facebook', 'appId', e.target.value)}
+          onChange={(e: any) => handleChange('facebook', 'appId', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="App Secret"
           value={config.facebook.appSecret}
-          onChange={e => handleChange('facebook', 'appSecret', e.target.value)}
+          onChange={(e: any) => handleChange('facebook', 'appSecret', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="Redirect URI"
           value={config.facebook.redirectUri}
-          onChange={e => handleChange('facebook', 'redirectUri', e.target.value)}
+          onChange={(e: any) => handleChange('facebook', 'redirectUri', e.target.value)}
         />
       </div>
       {/* Google */}
@@ -96,19 +96,19 @@ const SocialLoginConfigPage: FC = () => {
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="클라이언트 ID"
           value={config.google.clientId}
-          onChange={e => handleChange('google', 'clientId', e.target.value)}
+          onChange={(e: any) => handleChange('google', 'clientId', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="클라이언트 보안 비밀"
           value={config.google.clientSecret}
-          onChange={e => handleChange('google', 'clientSecret', e.target.value)}
+          onChange={(e: any) => handleChange('google', 'clientSecret', e.target.value)}
         />
         <input
           className="px-3 py-2 border rounded w-full mb-2 dark:bg-gray-700 dark:text-white"
           placeholder="승인된 리디렉션 URI"
           value={config.google.redirectUri}
-          onChange={e => handleChange('google', 'redirectUri', e.target.value)}
+          onChange={(e: any) => handleChange('google', 'redirectUri', e.target.value)}
         />
       </div>
       <div className="flex gap-2">

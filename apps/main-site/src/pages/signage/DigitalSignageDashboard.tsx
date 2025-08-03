@@ -77,10 +77,10 @@ export default function DigitalSignageDashboard() {
         approvedContent: 0, // Would need separate API call
         totalPlaylists: 0, // Would need separate API call
         activeSchedules: 0, // Would need separate API call
-        totalPlaytime: performances.reduce((sum, store) => sum + store.totalDuration, 0),
+        totalPlaytime: performances.reduce((sum: any, store: any) => sum + store.totalDuration, 0),
         recentActivity: []
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch dashboard stats:', err);
     } finally {
       setLoading(false);

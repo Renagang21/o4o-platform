@@ -64,9 +64,9 @@ export const usePermissions = () => {
   
   const checkMultiplePermissions = (permissions: PermissionKey[], requireAll = false): boolean => {
     if (requireAll) {
-      return permissions.every(permission => hasPermission(permission))
+      return permissions.every((permission: any) => hasPermission(permission))
     }
-    return permissions.some(permission => hasPermission(permission))
+    return permissions.some((permission: any) => hasPermission(permission))
   }
   
   const getRoleBasedPermissions = () => {

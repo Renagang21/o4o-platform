@@ -35,7 +35,7 @@ interface Comment {
 export default function CommentsListEnhanced() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
-  const [selectedComments, setSelectedComments] = useState([]);
+  const [selectedComments, setSelectedComments] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [postFilter] = useState(''); // Reserved for future use
@@ -118,7 +118,7 @@ export default function CommentsListEnhanced() {
       switch (action) {
         case 'approve':
           await Promise.all(
-            selectedComments.map(id => 
+            selectedComments.map((id: any) => 
               updateStatusMutation.mutateAsync({ id, status: 'approved' })
             )
           );
@@ -126,7 +126,7 @@ export default function CommentsListEnhanced() {
           break;
         case 'spam':
           await Promise.all(
-            selectedComments.map(id => 
+            selectedComments.map((id: any) => 
               updateStatusMutation.mutateAsync({ id, status: 'spam' })
             )
           );
@@ -134,7 +134,7 @@ export default function CommentsListEnhanced() {
           break;
         case 'trash':
           await Promise.all(
-            selectedComments.map(id => 
+            selectedComments.map((id: any) => 
               updateStatusMutation.mutateAsync({ id, status: 'trash' })
             )
           );
@@ -142,7 +142,7 @@ export default function CommentsListEnhanced() {
           break;
       }
       setSelectedComments([]);
-    } catch (err) {
+    } catch (err: any) {
       error('Failed to perform bulk action.');
     }
   };
@@ -164,7 +164,7 @@ export default function CommentsListEnhanced() {
     { id: 'date', label: 'Submitted on', width: '15%' }
   ];
   
-  const columns = allColumns.filter(col => isColumnVisible(col.id));
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
   // Transform comments to table rows
   const comments = data?.comments || [];
@@ -369,7 +369,7 @@ export default function CommentsListEnhanced() {
           if (selected) {
             setSelectedComments([...selectedComments, id]);
           } else {
-            setSelectedComments(selectedComments.filter(commentId => commentId !== id));
+            setSelectedComments(selectedComments.filter((commentId: any) => commentId !== id));
           }
         }}
         onSelectAll={(selected) => {

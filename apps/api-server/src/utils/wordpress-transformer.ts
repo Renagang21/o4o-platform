@@ -211,7 +211,7 @@ export class WordPressTransformer {
     customPosts: CustomPost[],
     options?: Parameters<typeof WordPressTransformer.transformCustomPost>[1]
   ): WordPressPost[] {
-    return customPosts.map(post => this.transformCustomPost(post, options));
+    return customPosts.map((post: any) => this.transformCustomPost(post, options));
   }
 
   /**
@@ -225,7 +225,7 @@ export class WordPressTransformer {
 
     // 모든 필드 그룹의 필드를 플랫하게 만들기
     const allFields: any[] = [];
-    fieldGroups.forEach(group => {
+    fieldGroups.forEach((group: any) => {
       if (group.fields) {
         allFields.push(...group.fields);
       }
@@ -233,7 +233,7 @@ export class WordPressTransformer {
 
     // fieldValues를 ACF 형식으로 변환
     Object.entries(fieldValues).forEach(([key, value]) => {
-      const field = allFields.find(f => f.name === key);
+      const field = allFields.find((f: any) => f.name === key);
       
       if (field) {
         // 필드 타입에 따른 변환

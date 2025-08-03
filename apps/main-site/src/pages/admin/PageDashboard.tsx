@@ -24,7 +24,7 @@ import {
 
 const PageDashboard: FC = () => {
   const navigate = useNavigate();
-  const [pages, setPages] = useState([]);
+  const [pages, setPages] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPageTitle, setNewPageTitle] = useState('');
@@ -41,7 +41,7 @@ const PageDashboard: FC = () => {
       setPages(pageList.sort((a, b) => 
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       ));
-    } catch (error) {
+    } catch (error: any) {
       console.error('페이지 목록 로드 실패:', error);
     } finally {
       setLoading(false);
@@ -62,7 +62,7 @@ const PageDashboard: FC = () => {
     }
 
     // 중복 확인
-    if (pages.some(p => p.slug === slug)) {
+    if (pages.some((p: any) => p.slug === slug)) {
       alert('이미 존재하는 슬러그입니다.');
       return;
     }
@@ -81,14 +81,14 @@ const PageDashboard: FC = () => {
         deletePage(slug);
         loadPages();
         alert('페이지가 삭제되었습니다.');
-      } catch (error) {
+      } catch (error: any) {
         alert('페이지 삭제 중 오류가 발생했습니다.');
         console.error('페이지 삭제 오류:', error);
       }
     }
   };
 
-  const filteredPages = pages.filter(page =>
+  const filteredPages = pages.filter((page: any) =>
     page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     page.slug.toLowerCase().includes(searchQuery.toLowerCase())
   );

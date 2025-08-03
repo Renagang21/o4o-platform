@@ -454,7 +454,7 @@ const InventoryManagement: FC = () => {
                 <select
                   id="type"
                   value={adjustmentForm.type}
-                  onChange={(e: any) => setAdjustmentForm(prev => ({ ...prev, type: e.target.value as any }))}
+                  onChange={(e: any) => setAdjustmentForm((prev: any) => ({ ...prev, type: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                 >
                   <option value="increase">증가</option>
@@ -470,7 +470,7 @@ const InventoryManagement: FC = () => {
                   type="number"
                   min="0"
                   value={adjustmentForm.quantity}
-                  onChange={(e: any) => setAdjustmentForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 0 }))}
+                  onChange={(e: any) => setAdjustmentForm((prev: any) => ({ ...prev, quantity: parseInt(e.target.value) || 0 }))}
                   required
                 />
               </div>
@@ -480,7 +480,7 @@ const InventoryManagement: FC = () => {
                 <select
                   id="reason"
                   value={adjustmentForm.reason}
-                  onChange={(e: any) => setAdjustmentForm(prev => ({ ...prev, reason: e.target.value }))}
+                  onChange={(e: any) => setAdjustmentForm((prev: any) => ({ ...prev, reason: e.target.value }))}
                   className="w-full px-3 py-2 border border-modern-border-primary rounded-lg mt-1"
                   required
                 >
@@ -500,7 +500,7 @@ const InventoryManagement: FC = () => {
                 <Textarea
                   id="notes"
                   value={adjustmentForm.notes}
-                  onChange={(e: any) => setAdjustmentForm(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e: any) => setAdjustmentForm((prev: any) => ({ ...prev, notes: e.target.value }))}
                   placeholder="추가 설명을 입력하세요..."
                   rows={3}
                 />

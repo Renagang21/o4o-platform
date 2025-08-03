@@ -60,7 +60,7 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
   onSelect,
   folders
 }) => {
-  const childFolders = folders.filter(f => f.parentId === folder.id)
+  const childFolders = folders.filter((f: any) => f.parentId === folder.id)
   const hasChildren = childFolders.length > 0
   const isExpanded = expandedFolders.includes(folder.id)
 
@@ -144,7 +144,7 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
 
 const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect }) => {
   const queryClient = useQueryClient()
-  const [expandedFolders, setExpandedFolders] = useState([])
+  const [expandedFolders, setExpandedFolders] = useState<any[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingFolder, setEditingFolder] = useState<MediaFolder | null>(null)
   const [formData, setFormData] = useState({
@@ -209,9 +209,9 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
 
   // Toggle folder expansion
   const toggleFolder = (folderId: string) => {
-    setExpandedFolders(prev =>
+    setExpandedFolders((prev: any) =>
       prev.includes(folderId)
-        ? prev.filter(id => id !== folderId)
+        ? prev.filter((id: any) => id !== folderId)
         : [...prev, folderId]
     )
   }

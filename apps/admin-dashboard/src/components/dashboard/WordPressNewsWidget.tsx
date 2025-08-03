@@ -125,7 +125,7 @@ const WordPressNewsWidget: FC = () => {
             {activeTab === 'events' && (
               <div className="events-list">
                 <ul className="events">
-                  {events.map(event => (
+                  {events.map((event: any) => (
                     <li key={event.id} className={`event event-${event.type}`}>
                       <div className="event-icon">
                         <Calendar className="w-4 h-4" />
@@ -174,7 +174,7 @@ const WordPressNewsWidget: FC = () => {
             {activeTab === 'news' && (
               <div className="news-list">
                 <ul className="news">
-                  {news.map(item => (
+                  {news.map((item: any) => (
                     <li key={item.id} className="news-item">
                       <h4 className="news-title">
                         <a href={item.link} target="_blank" rel="noopener noreferrer">

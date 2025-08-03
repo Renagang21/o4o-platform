@@ -135,12 +135,12 @@ const CategoryList: FC = () => {
     const rootCategories: (AdminCategory & { children?: AdminCategory[] })[] = []
 
     // First pass: create map
-    categories.forEach(cat => {
+    categories.forEach((cat: any) => {
       categoryMap.set(cat.id, { ...cat, children: [] })
     })
 
     // Second pass: build tree
-    categories.forEach(cat => {
+    categories.forEach((cat: any) => {
       const category = categoryMap.get(cat.id)!
       if (cat.parentId) {
         const parent = categoryMap.get(cat.parentId)
@@ -204,7 +204,7 @@ const CategoryList: FC = () => {
             </CardContent>
           )}
         </Card>
-        {category.children && category.children.map(child => renderCategoryCard(child, level + 1))}
+        {category.children && category.children.map((child: any) => renderCategoryCard(child, level + 1))}
       </div>
     )
   }
@@ -227,7 +227,7 @@ const CategoryList: FC = () => {
         </div>
       ) : categories.length > 0 ? (
         <div>
-          {categoryTree.map(category => renderCategoryCard(category))}
+          {categoryTree.map((category: any) => renderCategoryCard(category))}
         </div>
       ) : (
         <Card>

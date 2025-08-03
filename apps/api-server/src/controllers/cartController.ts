@@ -38,7 +38,7 @@ export class CartController {
       const userRole = (req as AuthRequest).user?.role || 'customer';
       const cartWithUserPrices = {
         ...cart,
-        items: cart.items.map(item => ({
+        items: cart.items.map((item: any) => ({
           ...item,
           product: {
             ...item.product,

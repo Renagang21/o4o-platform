@@ -37,14 +37,14 @@ const YaksaApprovalList: FC = () => {
   const [users, setUsers] = useState(mockUsers);
 
   const handleApprove = (id: string) => {
-    setUsers(users.map(user => 
+    setUsers(users.map((user: any) => 
       user.id === id ? { ...user, status: 'approved' } : user
     ));
     showToast({ type: 'success', message: '약사 회원이 승인되었습니다.' });
   };
 
   const handleReject = (id: string) => {
-    setUsers(users.map(user => 
+    setUsers(users.map((user: any) => 
       user.id === id ? { ...user, status: 'rejected' } : user
     ));
     showToast({ type: 'error', message: '약사 회원이 거절되었습니다.' });

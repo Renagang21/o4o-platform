@@ -226,7 +226,7 @@ export class AutoScalingService {
       const now = Date.now();
       const oneMinuteAgo = now - 60000;
 
-      const recentRequests = requests.filter(timestamp => 
+      const recentRequests = requests.filter((timestamp: any) => 
         parseInt(timestamp) > oneMinuteAgo
       );
 
@@ -245,7 +245,7 @@ export class AutoScalingService {
       const responseTimes = await this.redis.lrange('response_times', 0, 99);
       if (responseTimes.length === 0) return 0;
 
-      const times = responseTimes.map(t => parseFloat(t));
+      const times = responseTimes.map((t: any) => parseFloat(t));
       return times.reduce((sum, time) => sum + time, 0) / times.length;
     } catch (error) {
       console.warn('Failed to get average response time:', error);
@@ -260,7 +260,7 @@ export class AutoScalingService {
     try {
       // 최근 5분간 메트릭 가져오기
       const history = await this.redis.lrange('scaling_history', 0, 9);
-      const historicalMetrics = history.map(h => JSON.parse(h));
+      const historicalMetrics = history.map((h: any) => JSON.parse(h));
 
       // 트렌드 분석
       const trends = this.calculateTrends(historicalMetrics, currentMetrics);
@@ -299,20 +299,20 @@ export class AutoScalingService {
 
     return {
       cpuTrend: this.calculateTrendDirection(
-        older.map(m => m.cpuUsage),
-        recent.map(m => m.cpuUsage)
+        older.map((m: any) => m.cpuUsage),
+        recent.map((m: any) => m.cpuUsage)
       ),
       memoryTrend: this.calculateTrendDirection(
-        older.map(m => m.memoryUsage),
-        recent.map(m => m.memoryUsage)
+        older.map((m: any) => m.memoryUsage),
+        recent.map((m: any) => m.memoryUsage)
       ),
       requestTrend: this.calculateTrendDirection(
-        older.map(m => m.requestRate),
-        recent.map(m => m.requestRate)
+        older.map((m: any) => m.requestRate),
+        recent.map((m: any) => m.requestRate)
       ),
       responseTrend: this.calculateTrendDirection(
-        older.map(m => m.avgResponseTime),
-        recent.map(m => m.avgResponseTime)
+        older.map((m: any) => m.avgResponseTime),
+        recent.map((m: any) => m.avgResponseTime)
       ),
       overallTrend: 'stable' // 전체 트렌드는 종합적으로 계산
     };
@@ -338,8 +338,8 @@ export class AutoScalingService {
    * 예측 기반 스케일링 결정
    */
   private async makePredictiveScalingDecision(trends: MetricTrends): Promise<void> {
-    const increasingTrends = Object.values(trends).filter(t => t === 'increasing').length;
-    const decreasingTrends = Object.values(trends).filter(t => t === 'decreasing').length;
+    const increasingTrends = Object.values(trends).filter((t: any) => t === 'increasing').length;
+    const decreasingTrends = Object.values(trends).filter((t: any) => t === 'decreasing').length;
 
     if (increasingTrends >= 2) {
       // console.log('📈 Increasing trend detected - preparing for scale up');
@@ -616,7 +616,7 @@ export class AutoScalingService {
    * 사용 가능한 포트 찾기
    */
   private getAvailablePort(): number {
-    const usedPorts = Array.from(this.currentInstances.values()).map(i => i.port);
+    const usedPorts = Array.from(this.currentInstances.values()).map((i: any) => i.port);
     let port = 4001;
     
     while (usedPorts.includes(port)) {
@@ -813,7 +813,7 @@ export class AutoScalingService {
       const avgLoad = totalLoad / instances.length;
 
       // 부하 불균형 감지
-      const unbalancedInstances = instances.filter(instance => 
+      const unbalancedInstances = instances.filter((instance: any) => 
         Math.abs(instance.currentLoad - avgLoad) > 20
       );
 
@@ -866,7 +866,7 @@ export class AutoScalingService {
    * 로드 밸런서 가중치 업데이트
    */
   private async updateLoadBalancerWeights(instances: ServiceInstance[]): Promise<void> {
-    const weights = instances.map(instance => ({
+    const weights = instances.map((instance: any) => ({
       instanceId: instance.id,
       weight: this.calculateOptimalWeight(instance)
     }));
@@ -939,7 +939,7 @@ export class AutoScalingService {
 
     return {
       currentMetrics,
-      instances: instances.map(i => ({
+      instances: instances.map((i: any) => ({
         id: i.id,
         status: i.status,
         healthStatus: i.healthStatus,
@@ -968,7 +968,7 @@ export class AutoScalingService {
   private async getRecentScalingEvents(): Promise<ScalingEvent[]> {
     try {
       const events = await this.redis.lrange('scaling_events', 0, 19);
-      return events.map(e => JSON.parse(e));
+      return events.map((e: any) => JSON.parse(e));
     } catch (error) {
       console.warn('Failed to get recent scaling events:', error);
       return [];

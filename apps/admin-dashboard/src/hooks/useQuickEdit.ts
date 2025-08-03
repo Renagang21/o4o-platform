@@ -11,7 +11,7 @@ interface UseQuickEditProps {
 export function useQuickEdit({ onSave, onCancel }: UseQuickEditProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<Record<string, any>>({});
 
   // Start editing a row
   const startEdit = useCallback((id: string, initialData: any) => {

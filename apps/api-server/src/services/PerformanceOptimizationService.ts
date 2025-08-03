@@ -285,7 +285,7 @@ export class PerformanceOptimizationService {
    */
   private removeUnnecessaryFields<T>(data: T, level: CompressionLevel): T {
     if (Array.isArray(data)) {
-      return data.map(item => this.removeUnnecessaryFields(item, level)) as T;
+      return data.map((item: any) => this.removeUnnecessaryFields(item, level)) as T;
     }
 
     if (typeof data === 'object' && data !== null) {
@@ -666,7 +666,7 @@ export class PerformanceOptimizationService {
   private async getSlowQueries(): Promise<SlowQueryInfo[]> {
     try {
       const queries = await this.redis.lrange('slow_queries', 0, -1);
-      return queries.map(q => JSON.parse(q) as SlowQueryInfo);
+      return queries.map((q: any) => JSON.parse(q) as SlowQueryInfo);
     } catch (error) {
       console.warn('Failed to get slow queries:', error);
       return [];
@@ -679,7 +679,7 @@ export class PerformanceOptimizationService {
   private async getPerformanceAlerts(): Promise<PerformanceAlert[]> {
     try {
       const alerts = await this.redis.lrange('performance_alerts', 0, -1);
-      return alerts.map(a => JSON.parse(a) as PerformanceAlert);
+      return alerts.map((a: any) => JSON.parse(a) as PerformanceAlert);
     } catch (error) {
       console.warn('Failed to get performance alerts:', error);
       return [];

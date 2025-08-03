@@ -70,9 +70,9 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
   onTierUpdate,
   onCustomerAction
 }) => {
-  const [customers, setCustomers] = useState([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [upgradesPredictions, setUpgradesPredictions] = useState([]);
+  const [upgradesPredictions, setUpgradesPredictions] = useState<any[]>([]);
   const [filterTier, setFilterTier] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -322,7 +322,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
     return new Intl.NumberFormat('ko-KR').format(num);
   };
 
-  const filteredCustomers = customers.filter(customer => {
+  const filteredCustomers = customers.filter((customer: any) => {
     const matchesFilter = filterTier === 'all' || customer.tier === filterTier;
     const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -331,7 +331,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
   });
 
   const handleTierManualUpdate = (customerId: string, newTier: string) => {
-    setCustomers(prev => prev.map(customer => 
+    setCustomers((prev: any) => prev.map((customer: any) => 
       customer.id === customerId 
         ? { ...customer, tier: newTier as B2CTier | B2BTier }
         : customer
@@ -436,7 +436,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
     if (!selectedCustomer) return null;
 
     const benefits = getTierBenefits(selectedCustomer.tier);
-    const prediction = upgradesPredictions.find(p => p.customerId === selectedCustomer.id);
+    const prediction = upgradesPredictions.find((p: any) => p.customerId === selectedCustomer.id);
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -710,7 +710,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
           <h2 className="text-lg font-semibold text-purple-900 mb-3">🎯 등급 승급 예측 (AI 기반)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {upgradesPredictions.map((prediction: any) => {
-              const customer = customers.find(c => c.id === prediction.customerId);
+              const customer = customers.find((c: any) => c.id === prediction.customerId);
               if (!customer) return null;
               
               return (

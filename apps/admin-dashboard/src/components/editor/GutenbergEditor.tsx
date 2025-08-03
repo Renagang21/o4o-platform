@@ -114,7 +114,7 @@ const parseContentToBlocks = (content: string): Block[] => {
       if (attributesJson) {
         try {
           attributes = JSON.parse(attributesJson);
-        } catch (e) {
+        } catch (e: any) {
           console.error('Failed to parse block attributes:', e);
         }
       }
@@ -137,7 +137,7 @@ const parseContentToBlocks = (content: string): Block[] => {
           
         case 'core/list':
           const listItems = [...blockContent.matchAll(/<li>(.*?)<\/li>/gs)];
-          parsedContent = { items: listItems.map(item => item[1]) };
+          parsedContent = { items: listItems.map((item: any) => item[1]) };
           break;
           
         case 'core/quote':
@@ -164,7 +164,7 @@ const parseContentToBlocks = (content: string): Block[] => {
           if (dataMatch) {
             try {
               parsedContent = JSON.parse(dataMatch[1]);
-            } catch (e) {
+            } catch (e: any) {
               console.error('Failed to parse custom block data:', e);
             }
           }
@@ -176,7 +176,7 @@ const parseContentToBlocks = (content: string): Block[] => {
           if (customDataMatch) {
             try {
               parsedContent = JSON.parse(customDataMatch[1]);
-            } catch (e) {
+            } catch (e: any) {
               parsedContent = { raw: blockContent };
             }
           } else {
@@ -204,7 +204,7 @@ const parseContentToBlocks = (content: string): Block[] => {
 
 const serializeBlocksToContent = (blocks: Block[]): string => {
   // Convert blocks to WordPress block format
-  return blocks.map(block => {
+  return blocks.map((block: any) => {
     const blockName = block.type;
     const attributes = block.attributes || {};
     const content = block.content;
@@ -284,7 +284,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
 
   const filteredBlocks = activeCategory === 'all' 
     ? allBlocks 
-    : allBlocks.filter(block => block.category === activeCategory);
+    : allBlocks.filter((block: any) => block.category === activeCategory);
 
   const updateBlocks = (newBlocks: Block[]) => {
     setBlocks(newBlocks);
@@ -368,7 +368,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
   };
 
   const deleteBlock = (blockId: string) => {
-    const newBlocks = blocks.filter(block => block.id !== blockId);
+    const newBlocks = blocks.filter((block: any) => block.id !== blockId);
     updateBlocks(newBlocks);
   };
 
@@ -390,7 +390,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
   };
 
   const renderBlock = (block: Block) => {
-    const Icon = allBlocks.find(b => b.id === block.type)?.icon || FileText;
+    const Icon = allBlocks.find((b: any) => b.id === block.type)?.icon || FileText;
     
     return (
       <div
@@ -440,7 +440,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
           </div>
           <div className="flex-1">
             <div className="text-xs text-modern-text-tertiary mb-1">
-              {allBlocks.find(b => b.id === block.type)?.name}
+              {allBlocks.find((b: any) => b.id === block.type)?.name}
             </div>
             {block.type.includes('heading') && (
               <h2 className="text-2xl font-bold text-modern-text-primary">
@@ -491,7 +491,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                             height: media.height
                           }
                         };
-                        const newBlocks = blocks.map(b => 
+                        const newBlocks = blocks.map((b: any) => 
                           b.id === block.id ? updatedBlock : b
                         );
                         updateBlocks(newBlocks);
@@ -562,7 +562,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                             }]
                           }
                         };
-                        const newBlocks = blocks.map(b => 
+                        const newBlocks = blocks.map((b: any) => 
                           b.id === block.id ? updatedBlock : b
                         );
                         updateBlocks(newBlocks);
@@ -595,7 +595,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                               }]
                             }
                           };
-                          const newBlocks = blocks.map(b => 
+                          const newBlocks = blocks.map((b: any) => 
                             b.id === block.id ? updatedBlock : b
                           );
                           updateBlocks(newBlocks);
@@ -660,7 +660,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                           ...block,
                           content: { ...block.content, url: media.url }
                         };
-                        const newBlocks = blocks.map(b => 
+                        const newBlocks = blocks.map((b: any) => 
                           b.id === block.id ? updatedBlock : b
                         );
                         updateBlocks(newBlocks);
@@ -799,7 +799,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                           ...block,
                           content: { ...block.content, url: media.url }
                         };
-                        const newBlocks = blocks.map(b => 
+                        const newBlocks = blocks.map((b: any) => 
                           b.id === block.id ? updatedBlock : b
                         );
                         updateBlocks(newBlocks);
@@ -897,7 +897,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
               <div className="p-4">
                 {/* Category Tabs */}
                 <div className="flex items-center gap-2 mb-4 pb-4 border-b border-modern-border-primary">
-                  {categories.map(category => (
+                  {categories.map((category: any) => (
                     <button
                       key={category}
                       onClick={() => setActiveCategory(category)}
@@ -915,7 +915,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
 
                 {/* Block Grid */}
                 <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
-                  {filteredBlocks.map(block => {
+                  {filteredBlocks.map((block: any) => {
                     const Icon = block.icon;
                     return (
                       <button
@@ -949,7 +949,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
             mediaLibraryCallback(media);
           }
         }}
-        allowMultiple={blocks.find(b => b.id === selectedBlockId)?.type === 'core/gallery'}
+        allowMultiple={blocks.find((b: any) => b.id === selectedBlockId)?.type === 'core/gallery'}
       />
 
       {/* 블록 설정 패널 */}
@@ -965,11 +965,11 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
             </button>
           </div>
           <div className="p-4 overflow-y-auto h-full">
-            {blocks.find(b => b.id === selectedBlockId)?.type === 'core/image' && (
+            {blocks.find((b: any) => b.id === selectedBlockId)?.type === 'core/image' && (
               <ImageBlockSettings
-                settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
+                settings={blocks.find((b: any) => b.id === selectedBlockId)?.content || {}}
                 onChange={(newSettings: any) => {
-                  const newBlocks = blocks.map(block => 
+                  const newBlocks = blocks.map((block: any) => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
                       : block
@@ -978,11 +978,11 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 }}
               />
             )}
-            {blocks.find(b => b.id === selectedBlockId)?.type === 'core/gallery' && (
+            {blocks.find((b: any) => b.id === selectedBlockId)?.type === 'core/gallery' && (
               <GalleryBlockSettings
-                settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
+                settings={blocks.find((b: any) => b.id === selectedBlockId)?.content || {}}
                 onChange={(newSettings: any) => {
-                  const newBlocks = blocks.map(block => 
+                  const newBlocks = blocks.map((block: any) => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
                       : block
@@ -991,11 +991,11 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 }}
               />
             )}
-            {blocks.find(b => b.id === selectedBlockId)?.type === 'core/cover' && (
+            {blocks.find((b: any) => b.id === selectedBlockId)?.type === 'core/cover' && (
               <CoverBlockSettings
-                settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
+                settings={blocks.find((b: any) => b.id === selectedBlockId)?.content || {}}
                 onChange={(newSettings: any) => {
-                  const newBlocks = blocks.map(block => 
+                  const newBlocks = blocks.map((block: any) => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
                       : block
@@ -1004,11 +1004,11 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 }}
               />
             )}
-            {blocks.find(b => b.id === selectedBlockId)?.type === 'core/button' && (
+            {blocks.find((b: any) => b.id === selectedBlockId)?.type === 'core/button' && (
               <ButtonBlockSettings
-                settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
+                settings={blocks.find((b: any) => b.id === selectedBlockId)?.content || {}}
                 onChange={(newSettings: any) => {
-                  const newBlocks = blocks.map(block => 
+                  const newBlocks = blocks.map((block: any) => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
                       : block

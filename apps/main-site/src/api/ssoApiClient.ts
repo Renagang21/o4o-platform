@@ -113,14 +113,14 @@ class TokenManager {
         this.setTokens(accessToken, expiresIn);
         
         // 대기 중인 요청들에 새 토큰 제공
-        this.refreshQueue.forEach(resolve => resolve(accessToken));
+        this.refreshQueue.forEach((resolve: any) => resolve(accessToken));
         this.refreshQueue = [];
         
         return accessToken;
       } else {
         throw new Error('Token refresh failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('토큰 갱신 실패:', error);
       this.clearTokens();
       
@@ -184,7 +184,7 @@ ssoApiClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return ssoApiClient(originalRequest);
         }
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         console.error('토큰 갱신 실패:', refreshError);
         tokenManager.clearTokens();
         window.location.href = '/login';
@@ -244,7 +244,7 @@ export const ssoAuthAPI = {
         return tokens;
       }
       return null;
-    } catch (error) {
+    } catch (error: any) {
       console.error('토큰 갱신 실패:', error);
       return null;
     }

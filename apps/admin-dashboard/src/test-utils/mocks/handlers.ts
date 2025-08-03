@@ -180,19 +180,19 @@ export const handlers = [
 
     // 필터링 적용
     if (status) {
-      products = products.filter(p => p.status === status);
+      products = products.filter((p: any) => p.status === status);
     }
 
     if (search) {
-      products = products.filter(p => 
+      products = products.filter((p: any) => 
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.sku.toLowerCase().includes(search.toLowerCase())
       );
     }
 
     if (category) {
-      products = products.filter(p => 
-        p.categories.some(c => c.id === category)
+      products = products.filter((p: any) => 
+        p.categories.some((c: any) => c.id === category)
       );
     }
 
@@ -212,7 +212,7 @@ export const handlers = [
   }),
 
   http.get(`${API_BASE}/ecommerce/products/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     
     // Mock 상품 데이터 반환
     const product = createMockProduct({ 
@@ -244,7 +244,7 @@ export const handlers = [
   }),
 
   http.put(`${API_BASE}/ecommerce/products/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const updateData = await request.json() as Partial<Product>;
     
     const updatedProduct = createMockProduct({
@@ -261,7 +261,7 @@ export const handlers = [
   }),
 
   http.delete(`${API_BASE}/ecommerce/products/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     
     return HttpResponse.json({
       success: true,
@@ -270,7 +270,7 @@ export const handlers = [
   }),
 
   http.post(`${API_BASE}/ecommerce/products/:id/duplicate`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     
     const duplicatedProduct = createMockProduct({
       id: 'prod_dup_' + Date.now(),
@@ -306,11 +306,11 @@ export const handlers = [
 
     // 필터링 적용
     if (status) {
-      orders = orders.filter(o => o.status === status);
+      orders = orders.filter((o: any) => o.status === status);
     }
 
     if (search) {
-      orders = orders.filter(o => 
+      orders = orders.filter((o: any) => 
         o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
         o.customerEmail.toLowerCase().includes(search.toLowerCase()) ||
         o.customerName.toLowerCase().includes(search.toLowerCase())
@@ -333,7 +333,7 @@ export const handlers = [
   }),
 
   http.get(`${API_BASE}/ecommerce/orders/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     
     const order = createMockOrder({ 
       id: id as string,
@@ -347,7 +347,7 @@ export const handlers = [
   }),
 
   http.put(`${API_BASE}/ecommerce/orders/:id/status`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const { status, note } = await request.json() as { status: OrderStatus; note?: string };
     
     const updatedOrder = createMockOrder({
@@ -365,7 +365,7 @@ export const handlers = [
   }),
 
   http.post(`${API_BASE}/ecommerce/orders/:id/refund`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const { amount, reason, items } = await request.json() as { amount: number; reason: string; items: Array<{ orderItemId: string; quantity: number; amount: number }> };
     
     return HttpResponse.json({
@@ -472,10 +472,10 @@ export const handlers = [
 
     // 필터링
     if (type) {
-      activities = activities.filter(activity => activity.type === type);
+      activities = activities.filter((activity: any) => activity.type === type);
     }
     if (priority) {
-      activities = activities.filter(activity => activity.priority === priority);
+      activities = activities.filter((activity: any) => activity.priority === priority);
     }
 
     // 페이지네이션
@@ -802,16 +802,16 @@ export const handlers = [
 
     // 필터링 적용
     if (role && role !== 'all') {
-      users = users.filter(user => user.role === role);
+      users = users.filter((user: any) => user.role === role);
     }
 
     if (status && status !== 'all') {
-      users = users.filter(user => user.status === status);
+      users = users.filter((user: any) => user.status === status);
     }
 
     if (search) {
       const searchLower = search.toLowerCase();
-      users = users.filter(user => 
+      users = users.filter((user: any) => 
         user.name.toLowerCase().includes(searchLower) ||
         user.email.toLowerCase().includes(searchLower) ||
         (user.businessInfo?.businessName?.toLowerCase().includes(searchLower))
@@ -819,11 +819,11 @@ export const handlers = [
     }
 
     if (dateFrom) {
-      users = users.filter(user => new Date(user.createdAt) >= new Date(dateFrom));
+      users = users.filter((user: any) => new Date(user.createdAt) >= new Date(dateFrom));
     }
 
     if (dateTo) {
-      users = users.filter(user => new Date(user.createdAt) <= new Date(dateTo));
+      users = users.filter((user: any) => new Date(user.createdAt) <= new Date(dateTo));
     }
 
     // 최신순 정렬
@@ -862,7 +862,7 @@ export const handlers = [
 
   // Get User by ID
   http.get(`${API_BASE}/users/:id`, ({ params }) => {
-    const { id } = params;
+    const { id } = params as any;
     
     if (id === 'not-found') {
       return HttpResponse.json({
@@ -920,7 +920,7 @@ export const handlers = [
 
   // Update User
   http.put(`${API_BASE}/users/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const updateData = await request.json() as Partial<User>;
 
     const updatedUser = createMockUser({
@@ -938,7 +938,7 @@ export const handlers = [
 
   // Delete User
   http.delete(`${API_BASE}/users/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
 
     return HttpResponse.json({
       success: true,
@@ -1014,7 +1014,7 @@ export const handlers = [
 
   // User Activity Logs
   http.get(`${API_BASE}/users/:id/activity`, ({ params, request }) => {
-    const { id } = params;
+    const { id } = params as any;
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');

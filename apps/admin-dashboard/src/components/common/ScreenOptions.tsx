@@ -35,7 +35,7 @@ const ScreenOptions: FC<ScreenOptionsProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOptionChange = (optionId: string, checked: boolean) => {
-    const updatedOptions = options.map(opt => 
+    const updatedOptions = options.map((opt: any) => 
       opt.id === optionId ? { ...opt, checked } : opt
     );
     onOptionsChange(updatedOptions);
@@ -71,7 +71,7 @@ const ScreenOptions: FC<ScreenOptionsProps> = ({
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-modern-text-primary mb-2">Boxes</h3>
                 <div className="space-y-2">
-                  {options.map(option => (
+                  {options.map((option: any) => (
                     <label 
                       key={option.id}
                       className="flex items-start gap-2 text-sm text-modern-text-secondary hover:text-modern-text-primary cursor-pointer"
@@ -103,7 +103,7 @@ const ScreenOptions: FC<ScreenOptionsProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-modern-text-secondary">Number of Columns:</span>
                   <div className="flex gap-2">
-                    {[1, 2, 3, 4].map(num => (
+                    {[1, 2, 3, 4].map((num: any) => (
                       <button
                         key={num}
                         onClick={() => onColumnsChange(num)}

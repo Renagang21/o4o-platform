@@ -30,7 +30,7 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
   const [filter, setFilter] = useState<'all' | 'user' | 'order' | 'product' | 'content'>('all');
 
   // 필터링된 활동
-  const filteredActivities = activities.filter(activity => 
+  const filteredActivities = activities.filter((activity: any) => 
     filter === 'all' || activity?.type === filter
   );
 
@@ -66,7 +66,7 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
         </div>
         <div className="wp-card-body">
           <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map(i => (
+            {[1, 2, 3, 4, 5].map((i: any) => (
               <div key={i} className="flex items-start space-x-3">
                 <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
                 <div className="flex-1">
@@ -109,7 +109,7 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
         {/* Filters */}
         <div className="mb-4">
           <div className="flex flex-wrap gap-2">
-            {filters.map(filterOption => (
+            {filters.map((filterOption: any) => (
               <button
                 key={filterOption.key}
                 onClick={() => setFilter(filterOption.key as 'all' | 'user' | 'order' | 'product' | 'content')}
@@ -135,7 +135,7 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
         {/* Activity List */}
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {filteredActivities.length > 0 ? (
-            filteredActivities.map(activity => (
+            filteredActivities.map((activity: any) => (
               <ActivityItem
                 key={activity?.id || ""}
                 activity={activity}
@@ -156,7 +156,7 @@ const ActivityFeed: FC<ActivityFeedProps> = ({
                 <div>
                   <Filter className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500 text-sm">
-                    {filters.find(f => f.key === filter)?.label} 관련 활동이 없습니다
+                    {filters.find((f: any) => f.key === filter)?.label} 관련 활동이 없습니다
                   </p>
                   <button
                     onClick={() => setFilter('all')}

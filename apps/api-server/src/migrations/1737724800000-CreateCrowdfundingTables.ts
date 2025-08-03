@@ -192,14 +192,14 @@ export class CreateCrowdfundingTables1737724800000 implements MigrationInterface
     public async down(queryRunner: QueryRunner): Promise<void> {
         // Drop foreign keys
         const projectsTable = await queryRunner.getTable('crowdfunding_projects');
-        const projectsCreatorFk = projectsTable!.foreignKeys.find(fk => fk.columnNames.indexOf('creator_id') !== -1);
+        const projectsCreatorFk = projectsTable!.foreignKeys.find((fk: any) => fk.columnNames.indexOf('creator_id') !== -1);
         if (projectsCreatorFk) {
             await queryRunner.dropForeignKey('crowdfunding_projects', projectsCreatorFk);
         }
 
         const participationsTable = await queryRunner.getTable('crowdfunding_participations');
-        const participationsProjectFk = participationsTable!.foreignKeys.find(fk => fk.columnNames.indexOf('project_id') !== -1);
-        const participationsVendorFk = participationsTable!.foreignKeys.find(fk => fk.columnNames.indexOf('vendor_id') !== -1);
+        const participationsProjectFk = participationsTable!.foreignKeys.find((fk: any) => fk.columnNames.indexOf('project_id') !== -1);
+        const participationsVendorFk = participationsTable!.foreignKeys.find((fk: any) => fk.columnNames.indexOf('vendor_id') !== -1);
         
         if (participationsProjectFk) {
             await queryRunner.dropForeignKey('crowdfunding_participations', participationsProjectFk);

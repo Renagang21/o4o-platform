@@ -14,7 +14,7 @@ const vendorApi = axios.create({
 
 // Request 인터셉터 - 인증 토큰 추가
 vendorApi.interceptors.request.use(
-  async (config) => {
+  async (config: any) => {
     const token = cookieAuthClient.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -29,7 +29,7 @@ vendorApi.interceptors.request.use(
 // Response 인터셉터 - 토큰 갱신 처리
 vendorApi.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  async (error: any) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -42,7 +42,7 @@ vendorApi.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return vendorApi(originalRequest);
         }
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         // 토큰 갱신 실패 시 로그인 페이지로 리다이렉트
         window.location.href = '/login';
         return Promise.reject(refreshError);

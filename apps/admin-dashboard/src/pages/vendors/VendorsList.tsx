@@ -66,7 +66,7 @@ const VendorsList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const filteredVendors = vendors.filter(vendor => {
+  const filteredVendors = vendors.filter((vendor: any) => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -142,7 +142,7 @@ const VendorsList = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">활성 판매자</p>
                 <p className="text-2xl font-bold text-modern-success">
-                  {vendors.filter(v => v.status === 'active').length}
+                  {vendors.filter((v: any) => v.status === 'active').length}
                 </p>
               </div>
               <UserCheck className="w-8 h-8 text-modern-success opacity-20" />
@@ -155,7 +155,7 @@ const VendorsList = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">승인 대기</p>
                 <p className="text-2xl font-bold text-modern-warning">
-                  {vendors.filter(v => v.status === 'pending').length}
+                  {vendors.filter((v: any) => v.status === 'pending').length}
                 </p>
               </div>
               <Clock className="w-8 h-8 text-modern-warning opacity-20" />
@@ -168,7 +168,7 @@ const VendorsList = () => {
               <div>
                 <p className="text-sm text-modern-text-secondary">총 수수료</p>
                 <p className="text-2xl font-bold text-modern-text-primary">
-                  ₩{vendors.reduce((sum, v) => sum + v.commission, 0).toLocaleString()}
+                  ₩{vendors.reduce((sum: any, v: any) => sum + v.commission, 0).toLocaleString()}
                 </p>
               </div>
               <DollarSign className="w-8 h-8 text-modern-accent opacity-20" />

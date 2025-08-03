@@ -99,13 +99,13 @@ export default function CustomerProducts() {
     try {
       await addToCart(productId, 1);
       toast.success('장바구니에 추가되었습니다!');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('장바구니 추가에 실패했습니다.');
     }
   };
 
   const getCategoryName = (categoryId: string) => {
-    const category = flatCategories.find(cat => cat.id === categoryId);
+    const category = flatCategories.find((cat: any) => cat.id === categoryId);
     return category?.name || '미분류';
   };
 
@@ -204,14 +204,14 @@ export default function CustomerProducts() {
                   <input
                     type="number"
                     value={priceRange.min || ''}
-                    onChange={(e: any) => setPriceRange(prev => ({ ...prev, min: Number(e.target.value) }))}
+                    onChange={(e: any) => setPriceRange((prev: any) => ({ ...prev, min: Number(e.target.value) }))}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                     placeholder="최소 가격"
                   />
                   <input
                     type="number"
                     value={priceRange.max || ''}
-                    onChange={(e: any) => setPriceRange(prev => ({ ...prev, max: Number(e.target.value) }))}
+                    onChange={(e: any) => setPriceRange((prev: any) => ({ ...prev, max: Number(e.target.value) }))}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                     placeholder="최대 가격"
                   />
@@ -396,7 +396,7 @@ export default function CustomerProducts() {
                       <div className="p-4">
                         <div className="mb-2">
                           <span className="text-xs text-gray-500">
-                            {product.categories.map(catId => getCategoryName(catId)).join(', ')}
+                            {product.categories.map((catId: any) => getCategoryName(catId)).join(', ')}
                           </span>
                         </div>
                         

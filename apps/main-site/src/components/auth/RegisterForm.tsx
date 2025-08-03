@@ -77,7 +77,7 @@ const RegisterForm: FC = () => {
           }
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('회원가입 실패:', error);
     }
   };

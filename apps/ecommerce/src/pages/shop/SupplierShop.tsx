@@ -18,7 +18,6 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { ProductFilters } from '@o4o/types';
 
 export function SupplierShop() {
   const { slug } = useParams<{ slug: string }>();

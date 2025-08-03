@@ -423,7 +423,7 @@ export class OperationsDashboard {
   }
 
   removeWidget(widgetId: string): void {
-    this.layout.widgets = this.layout.widgets.filter(w => w.id !== widgetId);
+    this.layout.widgets = this.layout.widgets.filter((w: any) => w.id !== widgetId);
   }
 
   updateWidget(widgetId: string, updates: Partial<DashboardWidget>): void {
@@ -437,7 +437,7 @@ export class OperationsDashboard {
   }
 
   getWidget(widgetId: string): DashboardWidget | undefined {
-    return this.layout.widgets.find(w => w.id === widgetId);
+    return this.layout.widgets.find((w: any) => w.id === widgetId);
   }
 
   isAccessibleBy(userId: string, userRoles: string[]): boolean {
@@ -451,7 +451,7 @@ export class OperationsDashboard {
     if (this.allowedUsers && this.allowedUsers.includes(userId)) return true;
 
     // Check allowed roles
-    if (this.allowedRoles && userRoles.some(role => this.allowedRoles!.includes(role))) return true;
+    if (this.allowedRoles && userRoles.some((role: any) => this.allowedRoles!.includes(role))) return true;
 
     return false;
   }

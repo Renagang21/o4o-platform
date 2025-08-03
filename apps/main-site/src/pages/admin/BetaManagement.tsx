@@ -98,8 +98,8 @@ export const BetaManagement: FC = () => {
   const { showToast } = useToast();
   
   const [activeTab, setActiveTab] = useState('users');
-  const [betaUsers, setBetaUsers] = useState([]);
-  const [betaFeedback, setBetaFeedback] = useState([]);
+  const [betaUsers, setBetaUsers] = useState<any[]>([]);
+  const [betaFeedback, setBetaFeedback] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<BetaAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -162,7 +162,7 @@ export const BetaManagement: FC = () => {
       } else {
         showToast('베타 사용자 목록을 불러오는데 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Fetch beta users error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     } finally {
@@ -194,7 +194,7 @@ export const BetaManagement: FC = () => {
       } else {
         showToast('피드백 목록을 불러오는데 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Fetch beta feedback error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     } finally {
@@ -214,7 +214,7 @@ export const BetaManagement: FC = () => {
       if (data.success) {
         setAnalytics(data.data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Fetch analytics error:', error);
     }
   };
@@ -237,7 +237,7 @@ export const BetaManagement: FC = () => {
       } else {
         showToast('승인 처리에 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Approve user error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
@@ -261,7 +261,7 @@ export const BetaManagement: FC = () => {
       } else {
         showToast('상태 업데이트에 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update user status error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
@@ -293,7 +293,7 @@ export const BetaManagement: FC = () => {
       } else {
         showToast('응답 처리에 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Respond to feedback error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
@@ -317,7 +317,7 @@ export const BetaManagement: FC = () => {
       } else {
         showToast('상태 업데이트에 실패했습니다.', 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update feedback status error:', error);
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }

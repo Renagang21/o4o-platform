@@ -142,7 +142,7 @@ const SystemStatus = memo<SystemStatusProps>(({ className = '' }) => {
         <div className="wp-card">
           <div className="wp-card-body">
             <div className="space-y-4">
-              {[1, 2, 3, 4].map(i => (
+              {[1, 2, 3, 4].map((i: any) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg animate-pulse">
                   <div className="flex items-center">
                     <div className="w-8 h-8 bg-gray-200 rounded-lg mr-3"></div>
@@ -238,7 +238,7 @@ const SystemStatus = memo<SystemStatusProps>(({ className = '' }) => {
           </div>
           
           <div className="space-y-3">
-            {systemComponents.map(component => {
+            {systemComponents.map((component: any) => {
               const data = component.data;
               // Handle different status types from ServiceHealth interface
               let status: 'healthy' | 'warning' | 'error' = 'error';

@@ -56,7 +56,7 @@ export default function MediaUploader({
   maxFiles = 10,
   maxSize = 10 * 1024 * 1024 // 10MB
 }: MediaUploaderProps) {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<any[]>([]);
   const [convertToWebP, setConvertToWebP] = useState(true);
   const queryClient = useQueryClient();
 
@@ -99,30 +99,30 @@ export default function MediaUploader({
 
   // Update file progress
   const updateFileProgress = (fileId: string, progress: number) => {
-    setFiles(prev => prev.map(f => 
+    setFiles((prev: any) => prev.map((f: any) => 
       f.id === fileId ? { ...f, progress } : f
     ));
   };
 
   // Update file status
   const updateFileStatus = (fileId: string, status: UploadFile['status'], data?: Partial<UploadFile>) => {
-    setFiles(prev => prev.map(f => 
+    setFiles((prev: any) => prev.map((f: any) => 
       f.id === fileId ? { ...f, status, ...data } : f
     ));
   };
 
   // Remove file
   const removeFile = (fileId: string) => {
-    const file = files.find(f => f.id === fileId);
+    const file = files.find((f: any) => f.id === fileId);
     if (file?.preview) {
       URL.revokeObjectURL(file.preview);
     }
-    setFiles(prev => prev.filter(f => f.id !== fileId));
+    setFiles((prev: any) => prev.filter((f: any) => f.id !== fileId));
   };
 
   // Handle file drop/select
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const newFiles: UploadFile[] = acceptedFiles.map(file => {
+    const newFiles: UploadFile[] = acceptedFiles.map((file: any) => {
       const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const preview = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
       
@@ -135,10 +135,10 @@ export default function MediaUploader({
       };
     });
 
-    setFiles(prev => [...prev, ...newFiles]);
+    setFiles((prev: any) => [...prev, ...newFiles]);
 
     // Auto-start upload
-    newFiles.forEach(uploadFile => {
+    newFiles.forEach((uploadFile: any) => {
       updateFileStatus(uploadFile.id, 'uploading');
       uploadMutation.mutate({ file: uploadFile.file, fileId: uploadFile.id });
     });
@@ -170,7 +170,7 @@ export default function MediaUploader({
   };
 
   // Check if any files are uploading
-  const isUploading = files.some(f => f.status === 'uploading' || f.status === 'processing');
+  const isUploading = files.some((f: any) => f.status === 'uploading' || f.status === 'processing');
 
   return (
     <div className="space-y-4">
@@ -216,7 +216,7 @@ export default function MediaUploader({
       {/* File list */}
       {files.length > 0 && (
         <div className="space-y-2">
-          {files.map(file => (
+          {files.map((file: any) => (
             <Card key={file.id} className="p-4">
               <div className="flex items-start space-x-4">
                 {/* Preview or icon */}
@@ -286,12 +286,12 @@ export default function MediaUploader({
       )}
 
       {/* Upload complete callback */}
-      {onUploadComplete && files.some(f => f.status === 'completed') && (
+      {onUploadComplete && files.some((f: any) => f.status === 'completed') && (
         <Button
           onClick={() => {
             const completedFiles = files
-              .filter(f => f.status === 'completed')
-              .map(f => ({
+              .filter((f: any) => f.status === 'completed')
+              .map((f: any) => ({
                 id: f.id,
                 name: f.file.name,
                 url: f.uploadedUrl || '',
@@ -303,7 +303,7 @@ export default function MediaUploader({
           }}
           className="w-full"
         >
-          선택 완료 ({files.filter(f => f.status === 'completed').length}개 파일)
+          선택 완료 ({files.filter((f: any) => f.status === 'completed').length}개 파일)
         </Button>
       )}
     </div>

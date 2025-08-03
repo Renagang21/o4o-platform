@@ -329,7 +329,7 @@ export class AnalyticsService {
       .where('session.createdAt >= :startDate', { startDate })
       .getMany();
 
-    const engagementData = sessions.map(session => ({
+    const engagementData = sessions.map((session: any) => ({
       userId: session.betaUserId,
       sessionId: session.id,
       duration: session.durationMinutes,

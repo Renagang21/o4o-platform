@@ -169,7 +169,7 @@ export const getArchiveData = async (req: Request, res: Response) => {
     res.json({
       success: true,
       data: {
-        items: posts.map(post => ({
+        items: posts.map((post: any) => ({
           id: post.id,
           title: post.title,
           slug: post.slug,
@@ -505,7 +505,7 @@ export const getUserStats = async (req: Request, res: Response) => {
       totalComments: 0, // TODO: 댓글 시스템 구현 시 추가
       totalShares: 0,   // TODO: 공유 추적 시스템 구현 시 추가
       monthlyViews,
-      topPosts: topPosts.map(post => ({
+      topPosts: topPosts.map((post: any) => ({
         id: post.id,
         title: post.title,
         views: post.viewCount,
@@ -542,7 +542,7 @@ export const getUserAvailablePostTypes = async (req: Request, res: Response) => 
     res.json({
       success: true,
       data: {
-        postTypes: postTypes.map(pt => ({
+        postTypes: postTypes.map((pt: any) => ({
           slug: pt.slug,
           name: pt.name,
           singularName: pt.singularName,

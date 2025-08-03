@@ -150,7 +150,7 @@ export function CartPage() {
 
   // Update quantity mutation
   const updateQuantityMutation = useMutation({
-    mutationFn: async ({ }: { itemId: string; quantity: number }) => {
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
       // TODO: Replace with actual API call
       // console.log('Update quantity:', itemId, quantity);
       // const response = await authClient.patch(`/api/v1/cart/items/${itemId}`, { quantity });
@@ -204,11 +204,11 @@ export function CartPage() {
 
     // Filter selected items or use all if none selected
     const itemsToCalculate = selectedItems.size > 0
-      ? cart.items.filter(item => selectedItems.has(item.id))
+      ? cart.items.filter((item: any) => selectedItems.has(item.id))
       : cart.items;
 
     // Calculate totals based on user role
-    const subtotal = itemsToCalculate.reduce((sum, item) => {
+    const subtotal = itemsToCalculate.reduce((sum: any, item: any) => {
       if (!item.product) return sum;
       const price = item.product.pricing?.customer || 0;
       return sum + (price * item.quantity);

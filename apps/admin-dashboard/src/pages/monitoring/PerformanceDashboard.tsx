@@ -204,7 +204,7 @@ export default function PerformanceDashboard() {
               className={`mt-2 h-2 ${getProgressColor(metrics.cpu.usage)}`}
             />
             <p className="text-xs text-gray-500 mt-2">
-              Load: {metrics.cpu.loadAverage.map(l => l.toFixed(2)).join(', ')}
+              Load: {metrics.cpu.loadAverage.map((l: any) => l.toFixed(2)).join(', ')}
             </p>
           </CardContent>
         </Card>

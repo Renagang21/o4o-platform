@@ -135,7 +135,7 @@ const ForumPostForm: FC = () => {
   };
 
   const handleChange = (field: keyof ForumPostFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   if (isEditMode && isLoading) {

@@ -507,7 +507,7 @@ export class TemplatesController {
       }
 
       const files = await fs.readdir(templatesDir);
-      const templateFiles = files.filter(file => file.endsWith('.json'));
+      const templateFiles = files.filter((file: any) => file.endsWith('.json'));
 
       const systemTemplates = await Promise.all(
         templateFiles.map(async (file) => {
@@ -535,7 +535,7 @@ export class TemplatesController {
         })
       );
 
-      return systemTemplates.filter(template => template !== null);
+      return systemTemplates.filter((template: any) => template !== null);
     } catch (error) {
       console.error('Error loading system templates:', error);
       return [];

@@ -65,11 +65,11 @@ export const useAutoSave = (
       }
     },
     onMutate: () => {
-      setState(prev => ({ ...prev, isSaving: true }));
+      setState((prev: any) => ({ ...prev, isSaving: true }));
       onSaveStart?.();
     },
     onSuccess: () => {
-      setState(prev => ({
+      setState((prev: any) => ({
         ...prev,
         isSaving: false,
         lastSaved: new Date(),
@@ -81,7 +81,7 @@ export const useAutoSave = (
       localStorage.removeItem(storageKey);
     },
     onError: (error) => {
-      setState(prev => ({ ...prev, isSaving: false }));
+      setState((prev: any) => ({ ...prev, isSaving: false }));
       onSaveError?.(error);
     }
   });
@@ -96,7 +96,7 @@ export const useAutoSave = (
         postId
       };
       localStorage.setItem(storageKey, JSON.stringify(saveData));
-      setState(prev => ({ ...prev, savedInLocalStorage: true }));
+      setState((prev: any) => ({ ...prev, savedInLocalStorage: true }));
     } catch (error: any) {
       console.error('Failed to save to local storage:', error);
     }
@@ -106,7 +106,7 @@ export const useAutoSave = (
   useEffect(() => {
     const currentData = JSON.stringify(formData);
     if (currentData !== lastSavedDataRef.current && lastSavedDataRef.current !== '') {
-      setState(prev => ({ ...prev, hasUnsavedChanges: true }));
+      setState((prev: any) => ({ ...prev, hasUnsavedChanges: true }));
     }
   }, [formData]);
 
@@ -175,7 +175,7 @@ export const useAutoSave = (
   // Clear local storage
   const clearLocalStorage = useCallback(() => {
     localStorage.removeItem(storageKey);
-    setState(prev => ({ ...prev, savedInLocalStorage: false }));
+    setState((prev: any) => ({ ...prev, savedInLocalStorage: false }));
   }, [storageKey]);
 
   // Manual save

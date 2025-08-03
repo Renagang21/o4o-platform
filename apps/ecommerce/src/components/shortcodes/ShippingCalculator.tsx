@@ -43,7 +43,7 @@ export const ShippingCalculator: FC<ShortcodeProps> = ({ attributes }) => {
   const isFreeShipping = subtotal >= freeThreshold;
   
   // 선택된 배송 방법의 가격
-  const selectedShipping = shippingMethods.find(m => m.id === selectedMethod);
+  const selectedShipping = shippingMethods.find((m: any) => m.id === selectedMethod);
   const shippingPrice = isFreeShipping ? 0 : (selectedShipping?.price || 0);
 
   // 무료 배송까지 남은 금액

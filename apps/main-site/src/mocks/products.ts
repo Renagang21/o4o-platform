@@ -285,18 +285,18 @@ export const mockProducts: Product[] = [
 
 // 공급자별 상품 필터링 함수
 export const getProductsBySupplier = (supplierId: string): Product[] => {
-  return mockProducts.filter(product => product.supplierId === supplierId);
+  return mockProducts.filter((product: any) => product.supplierId === supplierId);
 };
 
 // 카테고리별 상품 필터링 함수
 export const getProductsByCategory = (categoryId: string): Product[] => {
-  return mockProducts.filter(product => product.categories.includes(categoryId));
+  return mockProducts.filter((product: any) => product.categories.includes(categoryId));
 };
 
 // 상품 검색 함수
 export const searchProducts = (query: string): Product[] => {
   const lowercaseQuery = query.toLowerCase();
-  return mockProducts.filter(product => 
+  return mockProducts.filter((product: any) => 
     product.name.toLowerCase().includes(lowercaseQuery) ||
     product.description.toLowerCase().includes(lowercaseQuery) ||
     product.brand?.toLowerCase().includes(lowercaseQuery)

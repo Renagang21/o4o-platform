@@ -206,12 +206,12 @@ const buildCommentTree = (comments: any[]) => {
   const roots: any[] = [];
 
   // First pass: create map
-  comments.forEach(comment => {
+  comments.forEach((comment: any) => {
     commentMap.set(comment.id, { ...comment, replies: [] });
   });
 
   // Second pass: build tree
-  comments.forEach(comment => {
+  comments.forEach((comment: any) => {
     const commentNode = commentMap.get(comment.id);
     if (comment.parentId) {
       const parent = commentMap.get(comment.parentId);
@@ -257,7 +257,7 @@ export const forumHandlers = [
 
   // Update category
   http.put(`${API_BASE}/v1/forum/categories/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
     
     const index = mockCategories.findIndex(c => c.id === id);
@@ -282,7 +282,7 @@ export const forumHandlers = [
 
   // Delete category
   http.delete(`${API_BASE}/v1/forum/categories/:id`, ({ params }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const index = mockCategories.findIndex(c => c.id === id);
     
     if (index === -1) {
@@ -310,16 +310,16 @@ export const forumHandlers = [
     let filteredPosts = [...mockPosts];
     
     if (category && category !== 'all') {
-      filteredPosts = filteredPosts.filter(post => post.category.id === category);
+      filteredPosts = filteredPosts.filter((post: any) => post.category.id === category);
     }
     
     if (status && status !== 'all') {
-      filteredPosts = filteredPosts.filter(post => post.status === status);
+      filteredPosts = filteredPosts.filter((post: any) => post.status === status);
     }
     
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredPosts = filteredPosts.filter(post =>
+      filteredPosts = filteredPosts.filter((post: any) =>
         post.title.toLowerCase().includes(searchLower) ||
         post.content.toLowerCase().includes(searchLower) ||
         post.author.name.toLowerCase().includes(searchLower)
@@ -341,7 +341,7 @@ export const forumHandlers = [
 
   // Get single post
   http.get(`${API_BASE}/v1/forum/posts/:id`, ({ params }: any) => {
-    const post = mockPosts.find(p => p.id === params.id);
+    const post = mockPosts.find((p: any) => p.id === params.id);
     
     if (!post) {
       return HttpResponse.json(
@@ -362,7 +362,7 @@ export const forumHandlers = [
   // Create post
   http.post(`${API_BASE}/v1/forum/posts`, async ({ request }: any) => {
     const data = await request.json();
-    const category = mockCategories.find(c => c.id === data.categoryId);
+    const category = mockCategories.find((c: any) => c.id === data.categoryId);
     
     if (!category) {
       return HttpResponse.json(
@@ -402,7 +402,7 @@ export const forumHandlers = [
 
   // Update post
   http.put(`${API_BASE}/v1/forum/posts/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
     
     const index = mockPosts.findIndex(p => p.id === id);
@@ -413,7 +413,7 @@ export const forumHandlers = [
       );
     }
     
-    const category = data.categoryId ? mockCategories.find(c => c.id === data.categoryId) : mockPosts[index].category;
+    const category = data.categoryId ? mockCategories.find((c: any) => c.id === data.categoryId) : mockPosts[index].category;
     
     mockPosts[index] = {
       ...mockPosts[index],
@@ -430,8 +430,8 @@ export const forumHandlers = [
 
   // Toggle pin
   http.post(`${API_BASE}/v1/forum/posts/:id/toggle-pin`, ({ params }: any) => {
-    const { id } = params;
-    const post = mockPosts.find(p => p.id === id);
+    const { id } = params as any;
+    const post = mockPosts.find((p: any) => p.id === id);
     
     if (!post) {
       return HttpResponse.json(
@@ -451,8 +451,8 @@ export const forumHandlers = [
 
   // Toggle lock
   http.post(`${API_BASE}/v1/forum/posts/:id/toggle-lock`, ({ params }: any) => {
-    const { id } = params;
-    const post = mockPosts.find(p => p.id === id);
+    const { id } = params as any;
+    const post = mockPosts.find((p: any) => p.id === id);
     
     if (!post) {
       return HttpResponse.json(
@@ -472,7 +472,7 @@ export const forumHandlers = [
 
   // Get comments for a post
   http.get(`${API_BASE}/v1/forum/posts/:id/comments`, ({ params }: any) => {
-    const postComments = mockComments.filter(c => c.postId === params.id);
+    const postComments = mockComments.filter((c: any) => c.postId === params.id);
     const commentTree = buildCommentTree(postComments);
     
     return HttpResponse.json({
@@ -483,10 +483,10 @@ export const forumHandlers = [
 
   // Create comment
   http.post(`${API_BASE}/v1/forum/posts/:id/comments`, async ({ params, request }: any) => {
-    const { id: postId } = params;
+    const { id: postId } = params as any;
     const data = await request.json();
     
-    const post = mockPosts.find(p => p.id === postId);
+    const post = mockPosts.find((p: any) => p.id === postId);
     if (!post) {
       return HttpResponse.json(
         { success: false, error: 'Post not found' },
@@ -521,7 +521,7 @@ export const forumHandlers = [
 
   // Update comment
   http.put(`${API_BASE}/v1/forum/comments/:id`, async ({ params, request }: any) => {
-    const { id } = params;
+    const { id } = params as any;
     const data = await request.json();
     
     const index = mockComments.findIndex(c => c.id === id);
@@ -547,8 +547,8 @@ export const forumHandlers = [
 
   // Delete comment
   http.delete(`${API_BASE}/v1/forum/comments/:id`, ({ params }: any) => {
-    const { id } = params;
-    const comment = mockComments.find(c => c.id === id);
+    const { id } = params as any;
+    const comment = mockComments.find((c: any) => c.id === id);
     
     if (!comment) {
       return HttpResponse.json(
@@ -558,7 +558,7 @@ export const forumHandlers = [
     }
     
     // Find and decrement post reply count
-    const post = mockPosts.find(p => p.id === comment.postId);
+    const post = mockPosts.find((p: any) => p.id === comment.postId);
     if (post) {
       post.replyCount--;
     }
@@ -569,8 +569,8 @@ export const forumHandlers = [
       if (index !== -1) {
         mockComments.splice(index, 1);
         // Remove replies
-        const replies = mockComments.filter(c => c.parentId === commentId);
-        replies.forEach(reply => removeCommentAndReplies(reply.id));
+        const replies = mockComments.filter((c: any) => c.parentId === commentId);
+        replies.forEach((reply: any) => removeCommentAndReplies(reply.id));
       }
     };
     

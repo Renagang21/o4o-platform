@@ -60,8 +60,8 @@ const SellerMyPage: FC<RolePageProps> = ({ user }) => {
     monthlyOrders: 89
   });
 
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     // 모의 상품 데이터
@@ -438,7 +438,7 @@ const SellerMyPage: FC<RolePageProps> = ({ user }) => {
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-xl font-bold">
-                  {menuItems.find(item => item.id === activeTab)?.name}
+                  {menuItems.find((item: any) => item.id === activeTab)?.name}
                 </h3>
               </div>
               

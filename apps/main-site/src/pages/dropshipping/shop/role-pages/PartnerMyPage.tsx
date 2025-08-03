@@ -59,8 +59,8 @@ const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
     nextLevelRequirement: 2000000
   });
 
-  const [commissionHistory, setCommissionHistory] = useState([]);
-  const [referralLinks, setReferralLinks] = useState([]);
+  const [commissionHistory, setCommissionHistory] = useState<any[]>([]);
+  const [referralLinks, setReferralLinks] = useState<any[]>([]);
 
   useEffect(() => {
     // 모의 커미션 내역
@@ -392,7 +392,7 @@ const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-xl font-bold">
-                  {menuItems.find(item => item.id === activeTab)?.name}
+                  {menuItems.find((item: any) => item.id === activeTab)?.name}
                 </h3>
               </div>
               

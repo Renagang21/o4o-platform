@@ -66,8 +66,8 @@ const SupplierMyPage: FC<RolePageProps> = ({ user }) => {
     qualityScore: 94.8
   });
 
-  const [products, setProducts] = useState([]);
-  const [partnerOrders, setPartnerOrders] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [partnerOrders, setPartnerOrders] = useState<any[]>([]);
 
   useEffect(() => {
     // 모의 상품 데이터
@@ -481,7 +481,7 @@ const SupplierMyPage: FC<RolePageProps> = ({ user }) => {
             <div className="bg-white rounded-xl border border-gray-200">
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-xl font-bold">
-                  {menuItems.find(item => item.id === activeTab)?.name}
+                  {menuItems.find((item: any) => item.id === activeTab)?.name}
                 </h3>
               </div>
               

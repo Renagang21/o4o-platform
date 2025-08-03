@@ -25,7 +25,7 @@ export default function Checkout() {
   const { user } = useAuthStore();
   const { createOrder, calculateOrderSummary, isLoading } = useOrderStore();
 
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const {
@@ -60,7 +60,7 @@ export default function Checkout() {
     
     try {
       const orderRequest: CreateOrderRequest = {
-        items: selectedItems.map(item => ({
+        items: selectedItems.map((item: any) => ({
           productId: item.productId,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -83,7 +83,7 @@ export default function Checkout() {
       navigate(`/retailer/orders/${order.id}`, {
         state: { newOrder: true }
       });
-    } catch (error) {
+    } catch (error: any) {
       toast.error('주문 처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);

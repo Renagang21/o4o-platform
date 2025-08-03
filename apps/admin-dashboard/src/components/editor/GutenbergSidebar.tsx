@@ -126,7 +126,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
 
   const handleRemoveTag = (tagToRemove: string) => {
     onPostSettingsChange({
-      tags: postSettings.tags.filter(tag => tag !== tagToRemove)
+      tags: postSettings.tags.filter((tag: any) => tag !== tagToRemove)
     });
   };
 
@@ -134,7 +134,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
     const isSelected = postSettings.categories.includes(categoryId);
     if (isSelected) {
       onPostSettingsChange({
-        categories: postSettings.categories.filter(id => id !== categoryId)
+        categories: postSettings.categories.filter((id: any) => id !== categoryId)
       });
     } else {
       onPostSettingsChange({
@@ -295,10 +295,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
 
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {availableCategories
-                    .filter(cat => 
+                    .filter((cat: any) => 
                       cat.name.toLowerCase().includes(categorySearch.toLowerCase())
                     )
-                    .map(category => (
+                    .map((category: any) => (
                       <label
                         key={category.id}
                         className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
@@ -349,7 +349,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {postSettings.tags.map(tag => (
+                  {postSettings.tags.map((tag: any) => (
                     <span
                       key={tag}
                       className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-md text-sm"
@@ -496,7 +496,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       <div>
                         <Label className="text-xs">Alignment</Label>
                         <div className="flex gap-1 mt-1">
-                          {['left', 'center', 'right'].map(align => (
+                          {['left', 'center', 'right'].map((align: any) => (
                             <Button
                               key={align}
                               variant={blockSettings.attributes?.align === align ? 'default' : 'outline'}

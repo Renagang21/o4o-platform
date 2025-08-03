@@ -31,9 +31,10 @@ export default function ProductReviews({ productId, productName }: ProductReview
   useEffect(() => {
     fetchReviewsByProduct(productId);
     fetchReviewSummary(productId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  const summary = reviewSummaries.find(s => s.productId === productId);
+  const summary = reviewSummaries.find((s: any) => s.productId === productId);
 
   const handleSortChange = (sortBy: string) => {
     setFilters({ sortBy: sortBy as 'newest' | 'oldest' | 'rating_high' | 'rating_low' | 'helpful' });

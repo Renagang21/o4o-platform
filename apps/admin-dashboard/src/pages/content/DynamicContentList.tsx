@@ -49,7 +49,7 @@ const DynamicContentList: FC = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
 
-  const [selectedPosts, setSelectedPosts] = useState([])
+  const [selectedPosts, setSelectedPosts] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
   const [page, setPage] = useState(1)
@@ -119,9 +119,9 @@ const DynamicContentList: FC = () => {
   }
 
   const togglePostSelection = (postId: string) => {
-    setSelectedPosts(prev =>
+    setSelectedPosts((prev: any) =>
       prev.includes(postId)
-        ? prev.filter(id => id !== postId)
+        ? prev.filter((id: any) => id !== postId)
         : [...prev, postId]
     )
   }

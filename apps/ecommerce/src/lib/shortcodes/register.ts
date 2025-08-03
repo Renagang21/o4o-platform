@@ -5,18 +5,18 @@ import { allShortcodes } from '@/components/shortcodes';
  * 모든 숏코드를 등록하는 함수
  */
 export function registerAllShortcodes() {
-  allShortcodes.forEach(shortcodeDef => {
+  allShortcodes.forEach((shortcodeDef: any) => {
     registerShortcode(shortcodeDef);
   });
   
-  // console.log('✅ All shortcodes registered:', allShortcodes.map(s => s.name));
+  // console.log('✅ All shortcodes registered:', allShortcodes.map((s: any) => s.name));
 }
 
 /**
  * 특정 숏코드만 등록하는 함수
  */
 export function registerShortcodeByName(name: string) {
-  const shortcode = allShortcodes.find(s => s.name === name);
+  const shortcode = allShortcodes.find((s: any) => s.name === name);
   
   if (shortcode) {
     registerShortcode(shortcode);
