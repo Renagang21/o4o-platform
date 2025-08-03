@@ -43,7 +43,6 @@ jobs:
     - name: Install dependencies
       run: |
         npm install
-        bash scripts/setup-ci-env.sh
     
     - name: Build shared packages
       run: |

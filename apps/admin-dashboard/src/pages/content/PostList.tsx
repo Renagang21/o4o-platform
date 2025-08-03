@@ -98,7 +98,7 @@ const PostList: FC = () => {
   }
 
   // 일괄 작업
-  const handleBulkAction = (action: string) => {
+  const handleBulkAction = (_action: string) => {
     if (selectedPosts.length === 0) {
       toast.error('선택된 게시글이 없습니다')
       return

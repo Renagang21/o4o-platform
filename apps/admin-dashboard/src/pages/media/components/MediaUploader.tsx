@@ -23,12 +23,12 @@ interface MediaUploaderProps {
   allowedTypes?: string[]
 }
 
-interface UploadingFile {
-  file: File
-  progress: number
-  status: 'pending' | 'uploading' | 'success' | 'error'
-  error?: string
-}
+// interface UploadingFile {
+//   file: File
+//   progress: number
+//   status: 'pending' | 'uploading' | 'success' | 'error'
+//   error?: string
+// }
 
 const MediaUploader: FC<MediaUploaderProps> = ({
   onUpload,
@@ -144,7 +144,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
   }
 
   const removeFile = (index: number) => {
-    setUploadingFiles((prev: any) => prev.filter((_, i: any) => i !== index))
+    setUploadingFiles((prev: any) => prev.filter((_: any, i: any) => i !== index))
   }
 
   const getFileIcon = (file: File) => {

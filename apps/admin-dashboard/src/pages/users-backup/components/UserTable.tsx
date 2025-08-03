@@ -1,4 +1,4 @@
-import { roleDisplayNames } from "@/types/user";
+// import { roleDisplayNames } from "@/types/user";
 import { FC } from 'react';
 import { Link } from 'react-router-dom'
 import { User, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '@/types/user'
@@ -33,23 +33,29 @@ const UserTable: FC<UserTableProps> = ({
   showBulkSelect = true
 }) => {
   const getRoleBadge = (role: UserRole) => {
-    const colors = {
+    const colors: Record<UserRole, string> = {
       admin: 'bg-red-100 text-red-800',
       business: 'bg-blue-100 text-blue-800',
       affiliate: 'bg-purple-100 text-purple-800',
-      customer: 'bg-green-100 text-green-800'
+      customer: 'bg-green-100 text-green-800',
+      seller: 'bg-orange-100 text-orange-800',
+      supplier: 'bg-teal-100 text-teal-800',
+      manager: 'bg-pink-100 text-pink-800',
+      retailer: 'bg-cyan-100 text-cyan-800'
     }
     
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[role as keyof typeof roleDisplayNames]}`}>
-        {ROLE_LABELS[role as keyof typeof roleDisplayNames]}
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[role]}`}>
+        {ROLE_LABELS[role]}
       </span>
     )
   }
 
   const getStatusBadge = (status: UserStatus) => {
-    const colors = {
+    const colors: Record<UserStatus, string> = {
       pending: 'bg-yellow-100 text-yellow-800',
+      active: 'bg-blue-100 text-blue-800',
+      inactive: 'bg-gray-100 text-gray-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       suspended: 'bg-gray-100 text-gray-800'

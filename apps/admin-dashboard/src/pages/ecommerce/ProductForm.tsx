@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useProduct, useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
 import { Product } from '@/types/ecommerce';
-import ProductVariantManager, { ProductOption, ProductVariant } from '@/components/ecommerce/ProductVariantManager';
+import ProductVariantManager from '@/components/ecommerce/ProductVariantManager';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 // import TipTapEditor from '@/components/ui/TipTapEditor';

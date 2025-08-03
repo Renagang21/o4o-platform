@@ -195,8 +195,8 @@ const FormBuilder: FC = () => {
 
     if (active.id !== over?.id) {
       setFormData((prev: any) => {
-        const oldIndex = prev.fields!.findIndex(field => field.id === active.id);
-        const newIndex = prev.fields!.findIndex(field => field.id === over?.id);
+        const oldIndex = prev.fields!.findIndex((field: any) => field.id === active.id);
+        const newIndex = prev.fields!.findIndex((field: any) => field.id === over?.id);
         
         return {
           ...prev,
@@ -432,7 +432,7 @@ const FormBuilder: FC = () => {
 
               <TabsContent value="settings">
                 <FormSettingsTab
-                  settings={formData.settings as any!}
+                  settings={formData.settings as any}
                   onChange={(settings: any) => setFormData((prev: any) => ({ ...prev, settings }))}
                 />
               </TabsContent>

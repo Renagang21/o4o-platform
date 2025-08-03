@@ -27,7 +27,7 @@ import { Switch } from '@/components/ui/switch'
 import GutenbergEditor from '@/components/editor/GutenbergEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
-import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility, Category, Tag } from '@o4o/types'
+import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility, PostType, Category, Tag } from '@o4o/types'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 // import { ko } from 'date-fns/locale'
@@ -39,7 +39,25 @@ const PostForm = () => {
   const isEditMode = !!id
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    content: string;
+    excerpt: string;
+    type: PostType;
+    status: PostStatus;
+    visibility: PostVisibility;
+    categoryIds: string[];
+    tagIds: string[];
+    password?: string;
+    slug?: string;
+    featuredImageId?: string;
+    featuredImage?: any;
+    meta: {
+      seoTitle: string;
+      seoDescription: string;
+      seoKeywords: string[];
+    };
+  }>({
     title: '',
     content: '',
     excerpt: '',
@@ -61,7 +79,7 @@ const PostForm = () => {
   const [scheduledDate, setScheduledDate] = useState('')
   const [scheduledTime, setScheduledTime] = useState('')
   const [showRecoveryNotice, setShowRecoveryNotice] = useState(false)
-  const [recoveryData, setRecoveryData] = useState(null)
+  const [recoveryData, setRecoveryData] = useState<{ data: any; timestamp: Date } | null>(null)
 
   // 게시글 조회 (수정 모드)
   const { data: post, isLoading: isLoadingPost } = useQuery({
@@ -195,8 +213,7 @@ const PostForm = () => {
           seoTitle: '',
           seoDescription: '',
           seoKeywords: []
-        },
-        scheduledAt: post.scheduledAt
+        }
       })
       setSelectedCategories(post.categoryIds || [])
       setSelectedTags(post.tagIds || [])
@@ -223,9 +240,9 @@ const PostForm = () => {
     }
 
     if (isEditMode) {
-      updateMutation.mutate({ id, ...submitData })
+      updateMutation.mutate({ id: id!, ...submitData } as UpdatePostDto)
     } else {
-      createMutation.mutate(submitData)
+      createMutation.mutate(submitData as CreatePostDto)
     }
   }
 

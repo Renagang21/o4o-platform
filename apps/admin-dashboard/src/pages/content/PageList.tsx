@@ -112,7 +112,7 @@ const PageList: FC = () => {
   }
 
   // 일괄 작업
-  const handleBulkAction = (action: string) => {
+  const handleBulkAction = (_action: string) => {
     if (selectedPages.length === 0) {
       toast.error('선택된 페이지가 없습니다')
       return

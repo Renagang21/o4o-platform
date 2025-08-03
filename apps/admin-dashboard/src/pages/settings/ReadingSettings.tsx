@@ -18,17 +18,17 @@ interface ReadingSettingsData {
   excerptLength: number;
 }
 
-interface Page {
-  id: string;
-  title: string;
-  slug: string;
-  status: string;
-}
+// interface Page {
+//   id: string;
+//   title: string;
+//   slug: string;
+//   status: string;
+// }
 
 export default function ReadingSettings() {
   const queryClient = useQueryClient();
-  const [settings, setSettings] = useState({
-    homepageType: 'latest_posts' as const,
+  const [settings, setSettings] = useState<ReadingSettingsData>({
+    homepageType: 'latest_posts',
     homepageId: undefined,
     postsPerPage: 10,
     showSummary: 'excerpt',

@@ -48,17 +48,17 @@ import type {
 } from '@o4o/types'
 import toast from 'react-hot-toast'
 
-interface MenuItemFormData {
-  label: string
-  type: MenuItemType
-  url?: string
-  target?: '_self' | '_blank'
-  icon?: string
-  cssClass?: string
-  pageId?: string
-  postId?: string
-  categoryId?: string
-}
+// interface MenuItemFormData {
+//   label: string
+//   type: MenuItemType
+//   url?: string
+//   target?: '_self' | '_blank'
+//   icon?: string
+//   cssClass?: string
+//   pageId?: string
+//   postId?: string
+//   categoryId?: string
+// }
 
 interface DraggableMenuItem extends MenuItem {
   isExpanded?: boolean
@@ -72,7 +72,7 @@ const MenuBuilder: FC = () => {
 
   // Form state
   const [menuName, setMenuName] = useState('')
-  const [menuLocation, setMenuLocation] = useState('primary')
+  const [menuLocation, setMenuLocation] = useState<MenuLocation>('primary')
   const [menuDescription, setMenuDescription] = useState('')
   const [menuItems, setMenuItems] = useState<any[]>([])
   
@@ -83,7 +83,17 @@ const MenuBuilder: FC = () => {
   const [dragOverItem, setDragOverItem] = useState<string | null>(null)
   
   // Item form state
-  const [itemFormData, setItemFormData] = useState({
+  const [itemFormData, setItemFormData] = useState<{
+    label: string;
+    type: MenuItemType;
+    url: string;
+    target: '_self' | '_blank';
+    cssClass?: string;
+    icon?: string;
+    pageId?: string;
+    postId?: string;
+    categoryId?: string;
+  }>({
     label: '',
     type: 'custom',
     url: '',
@@ -211,8 +221,8 @@ const MenuBuilder: FC = () => {
     setItemFormData({
       label: item.label,
       type: item.type,
-      url: item.url,
-      target: item.target,
+      url: item.url || '',
+      target: item.target || '_self',
       icon: item.icon,
       cssClass: item.cssClass,
       pageId: item.pageId,
@@ -742,7 +752,7 @@ const MenuBuilder: FC = () => {
               <Label htmlFor="itemCssClass">CSS 클래스 (선택)</Label>
               <Input
                 id="itemCssClass"
-                value={itemFormData.cssClass}
+                value={itemFormData.cssClass || ''}
                 onChange={(e: any) => setItemFormData({ ...itemFormData, cssClass: e.target.value })}
                 placeholder="custom-class"
               />

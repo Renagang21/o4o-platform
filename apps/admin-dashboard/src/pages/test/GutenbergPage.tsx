@@ -69,7 +69,7 @@ const GutenbergPage: FC = () => {
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
-  const [selectedBlock, setSelectedBlock] = useState(null);
+  const [selectedBlock, setSelectedBlock] = useState<any>(null);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -313,7 +313,7 @@ const GutenbergPage: FC = () => {
           <GutenbergSidebar
             activeTab={activeTab}
             postSettings={postSettings}
-            blockSettings={selectedBlock}
+            blockSettings={selectedBlock as any}
             onPostSettingsChange={(settings) => 
               setPostSettings((prev: any) => ({ ...prev, ...settings as any }))
             }

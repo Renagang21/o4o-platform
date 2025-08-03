@@ -21,7 +21,7 @@ import {
 import { 
   RecentActivitiesResponse, 
   ActivityItem,
-  ActivityFilters,
+  // ActivityFilters,  // Unused - commented out
   DASHBOARD_API_ENDPOINTS,
   DashboardApiUtils
 } from '../../../../types/dashboard-api';
@@ -82,7 +82,12 @@ const getPriorityColor = (priority: ActivityItem['priority']) => {
 };
 
 const RecentActivity = memo<RecentActivityProps>(({ className = '' }) => {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<{
+    types?: string[];
+    priorities?: string[];
+    actorRoles?: string[];
+    dateRange: { from: string; to: string };
+  }>({
     types: undefined,
     priorities: undefined,
     actorRoles: undefined,

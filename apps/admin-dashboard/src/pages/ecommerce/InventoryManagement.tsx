@@ -66,7 +66,7 @@ const InventoryManagement: FC = () => {
   const [selectedInventoryItem, setSelectedInventoryItem] = useState<InventoryItem | null>(null);
   const [isAdjustmentDialogOpen, setIsAdjustmentDialogOpen] = useState(false);
   const [isMovementHistoryOpen, setIsMovementHistoryOpen] = useState(false);
-  const [adjustmentForm, setAdjustmentForm] = useState({
+  const [adjustmentForm, setAdjustmentForm] = useState<StockAdjustmentFormData>({
     inventoryItemId: '',
     type: 'increase',
     quantity: 0,

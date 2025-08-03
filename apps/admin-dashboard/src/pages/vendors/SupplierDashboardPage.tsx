@@ -13,7 +13,7 @@ const SupplierDashboardPage = () => {
   const [showProductForm, setShowProductForm] = useState(false);
   const [stats] = useState<SupplierStats>({
     supplierId: user?.id || '',
-    period: 'month' as const as const,
+    period: 'month' as const,
     totalProducts: 45,
     pendingProducts: 3,
     approvedProducts: 38,

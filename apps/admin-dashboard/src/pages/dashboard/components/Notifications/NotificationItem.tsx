@@ -76,7 +76,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
     }
   };
 
-  const config = typeConfig[type];
+  const config = typeConfig[type as keyof typeof typeConfig];
 
   const handleMarkRead = () => {
     if (!read && onMarkRead) {

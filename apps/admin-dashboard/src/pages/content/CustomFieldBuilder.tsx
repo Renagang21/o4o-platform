@@ -95,7 +95,19 @@ const CustomFieldBuilder: FC = () => {
   })
 
   // Field form
-  const [fieldFormData, setFieldFormData] = useState({
+  const [fieldFormData, setFieldFormData] = useState<{
+    name: string;
+    key: string;
+    type: CustomField['type'];
+    label: string;
+    description: string;
+    required: boolean;
+    placeholder?: string;
+    min?: number;
+    max?: number;
+    maxLength?: number;
+    options?: { label: string; value: string }[];
+  }>({
     name: '',
     key: '',
     type: 'text',
@@ -219,7 +231,17 @@ const CustomFieldBuilder: FC = () => {
   const handleEditField = (field: CustomField, groupId: string) => {
     setEditingField({ ...field, tempId: groupId })
     setFieldFormData({
-      ...field,
+      name: field.name,
+      key: field.key,
+      type: field.type,
+      label: field.label || '',
+      description: field.description || '',
+      required: field.required || false,
+      placeholder: (field as any).placeholder,
+      min: (field as any).min,
+      max: (field as any).max,
+      maxLength: (field as any).maxLength,
+      options: (field as any).options,
     })
     setIsFieldDialogOpen(true)
   }
@@ -229,9 +251,19 @@ const CustomFieldBuilder: FC = () => {
     if (!groupId) return
 
     const newField: CustomField = {
-      id: (editingField as CustomField)?.id || `field-${Date.now()}`,
-      ...fieldFormData,
-    }
+      id: (editingField as any)?.id || `field-${Date.now()}`,
+      name: fieldFormData.name,
+      key: fieldFormData.key,
+      type: fieldFormData.type,
+      label: fieldFormData.label,
+      description: fieldFormData.description,
+      required: fieldFormData.required,
+      ...(fieldFormData.placeholder && { placeholder: fieldFormData.placeholder }),
+      ...(fieldFormData.min !== undefined && { min: fieldFormData.min }),
+      ...(fieldFormData.max !== undefined && { max: fieldFormData.max }),
+      ...(fieldFormData.maxLength !== undefined && { maxLength: fieldFormData.maxLength }),
+      ...(fieldFormData.options && { options: fieldFormData.options }),
+    } as CustomField
 
     setFieldGroups(fieldGroups.map((group: any) => {
       if (group.id === groupId) {

@@ -99,7 +99,7 @@ const OrderStatusManagement: FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
-  const [statusChangeForm, setStatusChangeForm] = useState({
+  const [statusChangeForm, setStatusChangeForm] = useState<StatusChangeData>({
     orderId: '',
     newStatus: 'pending',
     reason: '',

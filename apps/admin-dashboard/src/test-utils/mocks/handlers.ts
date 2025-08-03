@@ -43,10 +43,10 @@ const mockAdminUser = {
   email: 'admin@o4o.com',
   name: '관리자',
   role: 'admin',
-  status: 'approved',
+  status: 'active',
   permissions: ['admin.access', 'users.manage', 'content.manage', 'settings.manage'],
   lastLoginAt: new Date().toISOString(),
-  createdAt: '2024-01-01T00:00:00.000Z',
+  createdAt: new Date('2024-01-01T00:00:00.000Z'),
   updatedAt: new Date().toISOString()
 };
 
@@ -877,7 +877,7 @@ export const handlers = [
       name: `사용자 ${id}`,
       email: `user${id}@example.com`,
       role: 'customer',
-      status: 'approved'
+      status: 'active'
     });
 
     return HttpResponse.json({
@@ -906,9 +906,8 @@ export const handlers = [
       email: userData.email,
       role: userData.role,
       businessInfo: userData.businessInfo as BusinessInfo | undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      status: 'approved'
+      createdAt: new Date(),
+      status: 'active'
     });
 
     return HttpResponse.json({
@@ -925,8 +924,7 @@ export const handlers = [
 
     const updatedUser = createMockUser({
       id: id as string,
-      ...updateData,
-      updatedAt: new Date().toISOString()
+      ...updateData
     });
 
     return HttpResponse.json({
@@ -950,12 +948,15 @@ export const handlers = [
   http.post(`${API_BASE}/users/bulk`, async ({ request }) => {
     const bulkAction = await request.json() as UserBulkAction;
     
-    const actionLabels = {
+    const actionLabels: Record<string, string> = {
       approve: '승인',
       reject: '거부',
       suspend: '정지',
-      reactivate: '활성화',
-      delete: '삭제'
+      activate: '활성화',
+      deactivate: '비활성화',
+      reactivate: '재활성화',
+      delete: '삭제',
+      change_role: '역할 변경'
     };
 
     return HttpResponse.json({

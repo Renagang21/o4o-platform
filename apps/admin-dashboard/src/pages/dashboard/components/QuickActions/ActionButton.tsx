@@ -26,7 +26,7 @@ const ActionButton: FC<ActionButtonProps> = ({
   description,
   icon,
   color,
-  href,
+  href: _href,
   badge,
   disabled = false,
   highlight = false,

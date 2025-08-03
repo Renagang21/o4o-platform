@@ -15,7 +15,7 @@ import {
   Truck
 } from 'lucide-react';
 import { useOrders, useBulkOrderAction, useUpdateOrderStatus } from '@/hooks/useOrders';
-import { OrderFilters, OrderStatus } from '@/types/ecommerce';
+import { OrderStatus } from '@/types/ecommerce';  // OrderFilters is unused
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';

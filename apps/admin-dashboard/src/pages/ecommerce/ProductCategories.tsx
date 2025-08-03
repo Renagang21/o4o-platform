@@ -74,7 +74,23 @@ const ProductCategories: FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    slug: string;
+    description: string;
+    parentId: string | undefined;
+    active: boolean;
+    attributes: CategoryAttribute[];
+    shippingPolicy: {
+      freeShippingThreshold: number;
+      baseShippingFee: number;
+    };
+    seo: {
+      title: string;
+      description: string;
+      keywords: string;
+    };
+  }>({
     name: '',
     slug: '',
     description: '',
@@ -91,7 +107,7 @@ const ProductCategories: FC = () => {
       keywords: ''
     }
   });
-  const [newAttribute, setNewAttribute] = useState({
+  const [newAttribute, setNewAttribute] = useState<CategoryAttribute>({
     key: '',
     label: '',
     type: 'text',
@@ -274,7 +290,7 @@ const ProductCategories: FC = () => {
       return;
     }
 
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
       attributes: [...prev.attributes, { ...newAttribute }]
     }));
@@ -288,7 +304,7 @@ const ProductCategories: FC = () => {
   };
 
   const handleRemoveAttribute = (index: number) => {
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
       attributes: prev.attributes.filter((_, i) => i !== index)
     }));
@@ -447,7 +463,7 @@ const ProductCategories: FC = () => {
                       id="name"
                       value={formData.name}
                       onChange={(e: any) => {
-                        setFormData((prev: any) => ({
+                        setFormData((prev) => ({
                           ...prev,
                           name: e.target.value,
                           slug: editingCategory ? prev.slug : generateSlug(e.target.value)
@@ -489,7 +505,7 @@ const ProductCategories: FC = () => {
                   <Switch
                     id="active"
                     checked={formData.active}
-                    onCheckedChange={(checked: boolean) => setFormData((prev: any) => ({ ...prev, active: checked }))}
+                    onCheckedChange={(checked: boolean) => setFormData((prev) => ({ ...prev, active: checked }))}
                   />
                 </div>
               </div>

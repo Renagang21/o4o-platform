@@ -42,7 +42,7 @@ import toast from 'react-hot-toast'
 import TemplateBuilder from '@/components/template/TemplateBuilder'
 import TemplateLibrary from '@/components/template/TemplateLibrary'
 
-type ViewMode = 'grid' | 'list'
+// type ViewMode = 'grid' | 'list'
 
 const TemplateManager: FC = () => {
   const queryClient = useQueryClient()

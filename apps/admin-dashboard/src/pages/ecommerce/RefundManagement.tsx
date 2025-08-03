@@ -68,7 +68,7 @@ const RefundManagement: FC = () => {
   const [selectedRefund, setSelectedRefund] = useState<RefundRequest | null>(null);
   const [isProcessDialogOpen, setIsProcessDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [processForm, setProcessForm] = useState({
+  const [processForm, setProcessForm] = useState<RefundProcessData>({
     refundId: '',
     action: 'approve',
     approvedAmount: 0,

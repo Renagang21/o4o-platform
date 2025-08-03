@@ -1,19 +1,23 @@
 import { User as BaseUser } from '@o4o/types';
 
+export interface BusinessInfo {
+  businessName?: string;
+  businessType?: string;
+  businessPhone?: string;
+  businessAddress?: string;
+  businessRegistration?: string;
+  businessNumber?: string;
+  representativeName?: string;
+  contactPhone?: string;
+}
+
 export interface User extends BaseUser {
   lastLogin?: Date;
   last_login?: Date;
   phone?: string;
-  businessInfo?: {
-    businessName?: string;
-    businessType?: string;
-    businessPhone?: string;
-    businessAddress?: string;
-    businessRegistration?: string;
-    businessNumber?: string;
-    representativeName?: string;
-    contactPhone?: string;
-  };
+  businessInfo?: BusinessInfo;
+  createdAt?: Date;
+  created_at?: Date;
 }
 
 export type UserRole = 'admin' | 'business' | 'affiliate' | 'customer' | 'seller' | 'supplier' | 'manager' | 'retailer';
@@ -44,11 +48,12 @@ export const roleDisplayNames: Record<UserRole, string> = {
 
 // Additional exports for UserApi
 export interface UserFilters {
-  role?: UserRole;
-  status?: UserStatus;
+  role?: UserRole | 'all';
+  status?: UserStatus | 'all';
   search?: string;
   dateFrom?: string;
   dateTo?: string;
+  businessType?: string;
 }
 
 export interface UserBulkAction {
@@ -83,6 +88,9 @@ export interface UserStats {
   active: number;
   inactive: number;
   pending: number;
+  approved: number;
+  rejected: number;
+  suspended: number;
   byRole: Record<UserRole, number>;
 }
 

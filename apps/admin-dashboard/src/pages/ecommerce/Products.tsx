@@ -15,7 +15,7 @@ import {
   Upload
 } from 'lucide-react';
 import { useProducts, useDeleteProduct, useDuplicateProduct } from '@/hooks/useProducts';
-import { Product, ProductFilters } from '@/types/ecommerce';
+import { Product } from '@/types/ecommerce';  // ProductFilters is unused
 import { formatCurrency } from '@/lib/utils';
 
 const Products: FC = () => {

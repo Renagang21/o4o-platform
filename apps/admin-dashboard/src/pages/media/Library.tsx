@@ -49,13 +49,13 @@ interface MediaItem {
   altText?: string
 }
 
-interface MediaFolder {
-  id: string
-  name: string
-  parent?: string
-  createdAt: string
-  itemCount: number
-}
+// interface MediaFolder {
+//   id: string
+//   name: string
+//   parent?: string
+//   createdAt: string
+//   itemCount: number
+// }
 
 const Library: FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -172,7 +172,7 @@ const Library: FC = () => {
     return matchesSearch && matchesType && matchesFolder
   })
 
-  const handleUploadComplete = (files: File[]) => {
+  const handleUploadComplete = (_files: File[]) => {
     // 업로드 처리 로직
     // console.log('Uploaded files:', files)
     setUploadDialogOpen(false)

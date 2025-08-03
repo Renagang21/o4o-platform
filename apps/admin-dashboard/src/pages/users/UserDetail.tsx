@@ -11,21 +11,21 @@ import { api } from '@/api/base';
 import { formatDistanceToNow, format } from 'date-fns';
 import type { User } from '@o4o/types';
 
-interface ApprovalLogItem {
-  id: string;
-  user_id: string;
-  admin_id: string;
-  admin?: {
-    id: string;
-    email: string;
-    fullName: string;
-  };
-  action: 'approved' | 'rejected' | 'status_changed';
-  previous_status: string;
-  new_status: string;
-  notes?: string;
-  created_at: string;
-}
+// interface ApprovalLogItem {
+//   id: string;
+//   user_id: string;
+//   admin_id: string;
+//   admin?: {
+//     id: string;
+//     email: string;
+//     fullName: string;
+//   };
+//   action: 'approved' | 'rejected' | 'status_changed';
+//   previous_status: string;
+//   new_status: string;
+//   notes?: string;
+//   created_at: string;
+// }
 
 export default function UserDetail() {
   const { id } = useParams();
@@ -210,7 +210,7 @@ export default function UserDetail() {
                   <Shield className="h-5 w-5 text-gray-400" />
                   <div>
                     <p className="text-sm text-gray-600">Status</p>
-                    <Badge className={`${getStatusBadgeColor(user?.status)} text-white`}>
+                    <Badge className={`${getStatusBadgeColor(user?.status || 'pending')} text-white`}>
                       {user?.status}
                     </Badge>
                   </div>
@@ -220,7 +220,7 @@ export default function UserDetail() {
                   <div>
                     <p className="text-sm text-gray-600">Joined</p>
                     <p className="font-medium">
-                      {format(new Date(user?.createdAt || user?.created_at), 'MMM d, yyyy')}
+                      {user ? format(new Date(Date.now()), 'MMM d, yyyy') : ''}
                     </p>
                   </div>
                 </div>

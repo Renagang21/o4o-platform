@@ -248,8 +248,8 @@ const AddUser: FC = () => {
                     required={needsBusinessInfo}
                   >
                     <option value="">사업체 유형 선택</option>
-                    {BUSINESS_TYPES.map((type: any) => (
-                      <option key={type} value={type}>{type}</option>
+                    {Object.entries(BUSINESS_TYPES).map(([key, value]) => (
+                      <option key={key} value={key}>{value}</option>
                     ))}
                   </select>
                 </div>

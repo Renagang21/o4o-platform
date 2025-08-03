@@ -1,4 +1,4 @@
-import { User, UserRole, UserStatus, BusinessInfo } from '../../types/user';
+import { User, UserRole, BusinessInfo } from '../../types/user';
 
 export const createMockUser = (overrides: Partial<User> = {}): User => {
   const baseUser: User = {
@@ -6,10 +6,8 @@ export const createMockUser = (overrides: Partial<User> = {}): User => {
     email: `user${Date.now()}@example.com`,
     name: '홍길동',
     role: 'customer' as UserRole,
-    status: 'approved' as UserStatus,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isEmailVerified: true,
+    status: 'active' as const,
+    createdAt: new Date(),
     ...overrides
   };
 
@@ -38,7 +36,7 @@ export const createMockUserList = (count: number = 20): User[] => {
   
   for (let i = 0; i < count; i++) {
     const roles: UserRole[] = ['admin', 'customer', 'business', 'affiliate'];
-    const statuses: UserStatus[] = ['pending', 'approved', 'rejected', 'suspended'];
+    const statuses = ['pending', 'active', 'inactive'] as const;
     
     const role = roles[i % roles.length];
     const status = statuses[i % statuses.length];
@@ -49,8 +47,8 @@ export const createMockUserList = (count: number = 20): User[] => {
       name: `사용자${i + 1}`,
       role,
       status,
-      createdAt: new Date(Date.now() - (i * 86400000)).toISOString(), // i일 전
-      lastLoginAt: Math.random() > 0.3 ? new Date(Date.now() - (Math.floor(Math.random() * 7) * 86400000)).toISOString() : undefined,
+      createdAt: new Date(Date.now() - (i * 86400000)), // i일 전
+      lastLoginAt: Math.random() > 0.3 ? new Date(Date.now() - (Math.floor(Math.random() * 7) * 86400000)) : undefined,
       businessInfo: role === 'business' ? {
         businessName: `비즈니스${i + 1}`,
         businessType: '소매업',
@@ -73,7 +71,7 @@ export const createMockUsers = {
     role: 'admin',
     name: '관리자',
     email: 'admin@example.com',
-    status: 'approved',
+    status: 'active',
     ...overrides
   }),
 
@@ -81,14 +79,14 @@ export const createMockUsers = {
     role: 'customer',
     name: '일반회원',
     email: 'customer@example.com',
-    status: 'approved',
+    status: 'active',
     ...overrides
   }),
 
   business: (overrides: Partial<User> = {}) => createMockBusinessUser({
     name: '사업자회원',
     email: 'business@example.com',
-    status: 'approved',
+    status: 'active',
     ...overrides
   }),
 
@@ -96,7 +94,7 @@ export const createMockUsers = {
     role: 'affiliate',
     name: '파트너회원',
     email: 'affiliate@example.com',
-    status: 'approved',
+    status: 'active',
     ...overrides
   }),
 
@@ -104,13 +102,12 @@ export const createMockUsers = {
     status: 'pending',
     name: '승인대기회원',
     email: 'pending@example.com',
-    approvedAt: undefined,
-    approvedBy: undefined,
+    isApproved: false,
     ...overrides
   }),
 
   suspended: (overrides: Partial<User> = {}) => createMockUser({
-    status: 'suspended',
+    status: 'inactive',
     name: '정지회원',
     email: 'suspended@example.com',
     ...overrides

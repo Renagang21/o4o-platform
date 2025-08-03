@@ -46,7 +46,7 @@ export function isAppEnabled(appId: string): boolean {
 
 export function toggleApp(appId: string, enabled: boolean): void {
   const settings = getAppSettings();
-  settings[appId] = { ...settings as any[appId], enabled };
+  settings[appId] = { ...(settings as any)[appId], enabled };
   saveAppSettings(settings);
 }
 
