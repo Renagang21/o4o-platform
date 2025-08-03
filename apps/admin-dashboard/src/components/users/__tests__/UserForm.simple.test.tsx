@@ -39,8 +39,8 @@ describe('UserForm 간단 테스트', () => {
     
     expect(screen.getByPlaceholderText('사용자 이름을 입력하세요')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('user@example.com')).toBeInTheDocument();
-    expect(screen.getByText('일반회원')).toBeInTheDocument();
-    expect(screen.getByText('승인대기')).toBeInTheDocument();
+    expect(screen.getByText('고객')).toBeInTheDocument();
+    expect(screen.getByText('승인 대기')).toBeInTheDocument();
   });
 
   it('수정 모드에서 올바른 텍스트가 표시된다', () => {

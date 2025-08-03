@@ -118,7 +118,7 @@ describe('UserRoleChangeModal 간단 테스트', () => {
   });
 
   it('isOpen이 false일 때 렌더링되지 않는다', () => {
-    render(<UserRoleChangeModal {...defaultProps} isOpen={false} />);
+    render(<UserRoleChangeModal {...defaultProps} _isOpen={false} />);
     
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
