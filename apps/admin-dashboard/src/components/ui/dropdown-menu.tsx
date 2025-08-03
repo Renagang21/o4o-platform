@@ -51,7 +51,7 @@ const DropdownMenuTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<H
     return (
       <button
         ref={ref}
-        onClick={(e) => {
+        onClick={(e: any) => {
           onClick?.(e);
           context.onOpenChange(!context.open);
         }}
@@ -175,7 +175,7 @@ const DropdownMenuItem = forwardRef<HTMLDivElement, DropdownMenuItemProps>(
           inset && "pl-8",
           className
         )}
-        onClick={(e) => {
+        onClick={(e: any) => {
           if (!disabled) {
             onClick?.(e);
             context?.onOpenChange(false);
@@ -207,7 +207,7 @@ const DropdownMenuCheckboxItem = forwardRef<HTMLDivElement, DropdownMenuCheckbox
           disabled && "pointer-events-none opacity-50",
           className
         )}
-        onClick={(e) => {
+        onClick={(e: any) => {
           if (!disabled) {
             onClick?.(e);
             onCheckedChange?.(!checked);
@@ -247,7 +247,7 @@ const DropdownMenuRadioItem = forwardRef<HTMLDivElement, DropdownMenuRadioItemPr
           disabled && "pointer-events-none opacity-50",
           className
         )}
-        onClick={(e) => {
+        onClick={(e: any) => {
           if (!disabled) {
             onClick?.(e);
             context?.onValueChange(value);

@@ -38,8 +38,8 @@ export function ReviewForm({
   isSubmitting,
   className
 }: ReviewFormProps) {
-  const [images, setImages] = useState<File[]>([]);
-  const [imageUrls, setImageUrls] = useState<string[]>(review?.images || []);
+  const [images, setImages] = useState([]);
+  const [imageUrls, setImageUrls] = useState(review?.images || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {

@@ -6,7 +6,7 @@ import { PageContent, PageSection, PageInfo, DefaultPageContents, BannerSection,
 const PageManager = () => {
   const [currentPage, setCurrentPage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [pageContent, setPageContent] = useState<PageContent>({ title: '', sections: [] });
+  const [pageContent, setPageContent] = useState({ title: '', sections: [] });
   const [previewMode, setPreviewMode] = useState('desktop');
 
   // 워드프레스 스타일 페이지 목록
@@ -118,7 +118,7 @@ const PageManager = () => {
   const updateSection = (sectionId: string, updates: Partial<PageSection>) => {
     setPageContent((prev) => ({
       ...prev,
-      sections: prev.sections?.map((section) => 
+      sections: prev.sections?.map((section: any) => 
         section.id === sectionId ? { ...section, ...updates } : section
       ) || []
     }));
@@ -129,7 +129,7 @@ const PageManager = () => {
     if (confirm('이 섹션을 삭제하시겠습니까?')) {
       setPageContent((prev) => ({
         ...prev,
-        sections: prev.sections?.filter((section) => section.id !== sectionId) || []
+        sections: prev.sections?.filter((section: any) => section.id !== sectionId) || []
       }));
     }
   };
@@ -256,7 +256,7 @@ const PageManager = () => {
                     <input
                       type="text"
                       value={pageContent.title || ''}
-                      onChange={(e) => setPageContent((prev) => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setPageContent((prev) => ({ ...prev, title: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-lg"
                     />
                   </div>
@@ -270,7 +270,7 @@ const PageManager = () => {
                           type="text"
                           placeholder="Hero 제목"
                           value={pageContent.hero.title || ''}
-                          onChange={(e) => setPageContent((prev) => ({
+                          onChange={(e: any) => setPageContent((prev) => ({
                             ...prev,
                             hero: { ...prev.hero, title: e.target.value }
                           }))}
@@ -279,7 +279,7 @@ const PageManager = () => {
                         <textarea
                           placeholder="Hero 부제목"
                           value={pageContent.hero.subtitle || ''}
-                          onChange={(e) => setPageContent((prev) => ({
+                          onChange={(e: any) => setPageContent((prev) => ({
                             ...prev,
                             hero: { ...prev.hero, subtitle: e.target.value }
                           }))}
@@ -290,7 +290,7 @@ const PageManager = () => {
                           type="text"
                           placeholder="버튼 텍스트"
                           value={pageContent.hero.ctaText || ''}
-                          onChange={(e) => setPageContent((prev) => ({
+                          onChange={(e: any) => setPageContent((prev) => ({
                             ...prev,
                             hero: { ...prev.hero, ctaText: e.target.value }
                           }))}

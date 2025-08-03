@@ -23,7 +23,7 @@ import { ProductFilters } from '@o4o/types';
 export function SupplierShop() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [productFilters, setProductFilters] = useState<ProductFilters>({
+  const [productFilters, setProductFilters] = useState({
     limit: 12,
     page: 1
   });

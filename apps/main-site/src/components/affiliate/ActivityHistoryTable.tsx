@@ -90,7 +90,7 @@ const ActivityHistoryTable: FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentActivities.map((activity) => (
+            {currentActivities.map((activity: any) => (
               <tr key={activity.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-base text-text-main">
                   {activity.date}

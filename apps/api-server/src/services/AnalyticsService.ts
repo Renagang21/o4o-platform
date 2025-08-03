@@ -404,7 +404,7 @@ export class AnalyticsService {
       totalContentViews: contentLogs.length,
       uniqueContent: Object.keys(contentUsage).length,
       topContent: Object.values(contentUsage)
-        .map((c) => ({
+        .map((c: any) => ({
           ...c,
           uniqueStores: c.uniqueStores.size,
           avgDuration: c.totalDuration / c.views

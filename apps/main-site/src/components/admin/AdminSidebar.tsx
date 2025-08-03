@@ -110,7 +110,7 @@ const menuItems: MenuItem[] = [
 
 const AdminSidebar: FC = () => {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>(['content', 'data-structure']);
+  const [expandedItems, setExpandedItems] = useState(['content', 'data-structure']);
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 

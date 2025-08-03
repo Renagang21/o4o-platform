@@ -47,7 +47,7 @@ interface TemplateLibraryProps {
 
 const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
   const queryClient = useQueryClient()
-  const [filter, setFilter] = useState<TemplateLibraryFilter>({
+  const [filter, setFilter] = useState({
     category: undefined,
     search: '',
     isPremium: undefined,
@@ -144,7 +144,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
   const renderStars = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
+        {[1, 2, 3, 4, 5].map((star: any) => (
           <Star
             key={star}
             className={`w-3 h-3 ${
@@ -252,7 +252,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredTemplates.map((template) => (
+                  {filteredTemplates.map((template: any) => (
                     <Card key={template.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                       {/* Preview */}
                       <div className="aspect-video bg-gray-100 relative group">
@@ -358,7 +358,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
 
                         {/* Tags */}
                         <div className="flex flex-wrap gap-1 mb-3">
-                          {template.metadata.tags.slice(0, 3).map((tag) => (
+                          {template.metadata.tags.slice(0, 3).map((tag: any) => (
                             <Badge key={tag} variant={"outline" as const} className="text-xs">
                               {tag}
                             </Badge>

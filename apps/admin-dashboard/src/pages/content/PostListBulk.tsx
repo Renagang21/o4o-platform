@@ -281,7 +281,7 @@ const PostListBulk: FC = () => {
               type="search"
               placeholder="Search posts..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
               className="w-[300px]"
             />
             <Button variant="secondary">

@@ -35,10 +35,10 @@ interface Comment {
 export default function CommentsListEnhanced() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
-  const [selectedComments, setSelectedComments] = useState<string[]>([]);
+  const [selectedComments, setSelectedComments] = useState([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [postFilter] = useState<string>(''); // Reserved for future use
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [postFilter] = useState(''); // Reserved for future use
   const [page] = useState(1); // Reserved for pagination
 
   // Default column configuration
@@ -268,7 +268,7 @@ export default function CommentsListEnhanced() {
           <a 
             href="#" 
             className={statusFilter === 'all' ? 'current' : ''}
-            onClick={(e) => { e.preventDefault(); setStatusFilter('all'); }}
+            onClick={(e: any) => { e.preventDefault(); setStatusFilter('all'); }}
           >
             All <span className="count">({statusCounts.all})</span>
           </a> |
@@ -277,7 +277,7 @@ export default function CommentsListEnhanced() {
           <a 
             href="#" 
             className={statusFilter === 'pending' ? 'current' : ''}
-            onClick={(e) => { e.preventDefault(); setStatusFilter('pending'); }}
+            onClick={(e: any) => { e.preventDefault(); setStatusFilter('pending'); }}
           >
             Pending <span className="count">({statusCounts.pending})</span>
           </a> |
@@ -286,7 +286,7 @@ export default function CommentsListEnhanced() {
           <a 
             href="#" 
             className={statusFilter === 'approved' ? 'current' : ''}
-            onClick={(e) => { e.preventDefault(); setStatusFilter('approved'); }}
+            onClick={(e: any) => { e.preventDefault(); setStatusFilter('approved'); }}
           >
             Approved <span className="count">({statusCounts.approved})</span>
           </a> |
@@ -295,7 +295,7 @@ export default function CommentsListEnhanced() {
           <a 
             href="#" 
             className={statusFilter === 'spam' ? 'current' : ''}
-            onClick={(e) => { e.preventDefault(); setStatusFilter('spam'); }}
+            onClick={(e: any) => { e.preventDefault(); setStatusFilter('spam'); }}
           >
             Spam <span className="count">({statusCounts.spam})</span>
           </a> |
@@ -304,7 +304,7 @@ export default function CommentsListEnhanced() {
           <a 
             href="#" 
             className={statusFilter === 'trash' ? 'current' : ''}
-            onClick={(e) => { e.preventDefault(); setStatusFilter('trash'); }}
+            onClick={(e: any) => { e.preventDefault(); setStatusFilter('trash'); }}
           >
             Trash <span className="count">({statusCounts.trash})</span>
           </a>
@@ -320,7 +320,7 @@ export default function CommentsListEnhanced() {
           type="search"
           id="comment-search-input"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e: any) => setSearch(e.target.value)}
           placeholder="Search comments..."
           className="w-auto inline-block mr-2"
         />

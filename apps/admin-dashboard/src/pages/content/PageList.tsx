@@ -37,7 +37,7 @@ const PageList: FC = () => {
   const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
-  const [selectedPages, setSelectedPages] = useState<string[]>([])
+  const [selectedPages, setSelectedPages] = useState([])
 
   // 페이지 목록 조회
   const { data, isLoading, error } = useQuery({

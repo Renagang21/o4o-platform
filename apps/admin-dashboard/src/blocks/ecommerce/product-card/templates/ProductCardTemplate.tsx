@@ -90,7 +90,7 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
 
   return (
     <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-      {products.map((product) => {
+      {products.map((product: any) => {
         const isOnSale = product.salePrice && product.salePrice < product.regularPrice;
         const discountPercentage = isOnSale ? calculateDiscountPercentage(product.regularPrice, product.salePrice) : 0;
 

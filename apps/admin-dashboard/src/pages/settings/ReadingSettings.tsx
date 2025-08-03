@@ -27,14 +27,14 @@ interface Page {
 
 export default function ReadingSettings() {
   const queryClient = useQueryClient();
-  const [settings, setSettings] = useState<ReadingSettingsData>({
+  const [settings, setSettings] = useState({
     homepageType: 'latest_posts',
     homepageId: undefined,
     postsPerPage: 10,
     showSummary: 'excerpt',
     excerptLength: 200
   });
-  const [pages, setPages] = useState<Page[]>([]);
+  const [pages, setPages] = useState([]);
 
   // Fetch available pages
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
@@ -155,7 +155,7 @@ export default function ReadingSettings() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">— 선택 —</SelectItem>
-                        {pages.map((page) => (
+                        {pages.map((page: any) => (
                           <SelectItem key={page.id} value={page.id}>
                             {page.title}
                           </SelectItem>

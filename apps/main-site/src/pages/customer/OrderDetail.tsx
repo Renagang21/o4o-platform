@@ -266,7 +266,7 @@ export default function CustomerOrderDetail() {
                 <h2 className="text-lg font-medium text-gray-900 mb-4">주문 상품</h2>
                 
                 <div className="space-y-4">
-                  {currentOrder.items.map((item) => (
+                  {currentOrder.items.map((item: any) => (
                     <div key={item.id} className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                       <img
                         src={item.productImage}

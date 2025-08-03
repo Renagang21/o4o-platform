@@ -55,7 +55,7 @@ const UsersList: FC = () => {
   const queryClient = useQueryClient();
   
   // 상태 관리
-  const [filters, setFilters] = useState<UserFilters>({
+  const [filters, setFilters] = useState({
     role: 'all',
     status: 'all',
     search: '',
@@ -64,7 +64,7 @@ const UsersList: FC = () => {
   });
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   
   // 모달 상태
   const [deleteModal, setDeleteModal] = useState<{

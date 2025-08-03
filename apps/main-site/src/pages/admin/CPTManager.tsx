@@ -58,7 +58,7 @@ interface CustomPostType {
 }
 
 const CPTManager: FC = () => {
-  const [cpts, setCPTs] = useState<CustomPostType[]>([]);
+  const [cpts, setCPTs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCPT, setEditingCPT] = useState<CustomPostType | null>(null);
@@ -327,7 +327,7 @@ const CPTManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cpts.map((cpt) => (
+                {cpts.map((cpt: any) => (
                   <div key={cpt.slug} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -424,7 +424,7 @@ const CPTManager: FC = () => {
                     <input
                       type="text"
                       value={newCPT.slug}
-                      onChange={(e) => setNewCPT(prev => ({ ...prev, slug: e.target.value }))}
+                      onChange={(e: any) => setNewCPT(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="예: product, event, service"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -438,7 +438,7 @@ const CPTManager: FC = () => {
                     <input
                       type="text"
                       value={newCPT.name}
-                      onChange={(e) => setNewCPT(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setNewCPT(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: 상품들, 이벤트들"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -451,7 +451,7 @@ const CPTManager: FC = () => {
                     <input
                       type="text"
                       value={newCPT.singularName}
-                      onChange={(e) => setNewCPT(prev => ({ ...prev, singularName: e.target.value }))}
+                      onChange={(e: any) => setNewCPT(prev => ({ ...prev, singularName: e.target.value }))}
                       placeholder="예: 상품, 이벤트"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -464,7 +464,7 @@ const CPTManager: FC = () => {
                     <input
                       type="text"
                       value={newCPT.icon}
-                      onChange={(e) => setNewCPT(prev => ({ ...prev, icon: e.target.value }))}
+                      onChange={(e: any) => setNewCPT(prev => ({ ...prev, icon: e.target.value }))}
                       placeholder="📦"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -476,7 +476,7 @@ const CPTManager: FC = () => {
                     </label>
                     <textarea
                       value={newCPT.description}
-                      onChange={(e) => setNewCPT(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewCPT(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 CPT의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -511,7 +511,7 @@ const CPTManager: FC = () => {
                           <input
                             type="text"
                             value={group.name}
-                            onChange={(e) => {
+                            onChange={(e: any) => {
                               setNewCPT(prev => ({
                                 ...prev,
                                 fieldGroups: prev.fieldGroups.map(g =>
@@ -536,7 +536,7 @@ const CPTManager: FC = () => {
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {group.fields.map((field) => (
+                            {group.fields.map((field: any) => (
                               <div key={field.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded bg-gray-50">
                                 <div className="flex items-center gap-2 text-gray-500">
                                   {getFieldIcon(field.type)}
@@ -546,20 +546,20 @@ const CPTManager: FC = () => {
                                   <input
                                     type="text"
                                     value={field.label}
-                                    onChange={(e) => updateField(group.id, field.id, { label: e.target.value })}
+                                    onChange={(e: any) => updateField(group.id, field.id, { label: e.target.value })}
                                     placeholder="필드 라벨"
                                     className="px-2 py-1 text-sm border border-gray-200 rounded"
                                   />
                                   <input
                                     type="text"
                                     value={field.name}
-                                    onChange={(e) => updateField(group.id, field.id, { name: e.target.value })}
+                                    onChange={(e: any) => updateField(group.id, field.id, { name: e.target.value })}
                                     placeholder="필드명"
                                     className="px-2 py-1 text-sm border border-gray-200 rounded"
                                   />
                                   <select
                                     value={field.type}
-                                    onChange={(e) => updateField(group.id, field.id, { type: e.target.value as any })}
+                                    onChange={(e: any) => updateField(group.id, field.id, { type: e.target.value as any })}
                                     className="px-2 py-1 text-sm border border-gray-200 rounded"
                                   >
                                     <option value="text">텍스트</option>
@@ -577,7 +577,7 @@ const CPTManager: FC = () => {
                                       <input
                                         type="checkbox"
                                         checked={field.required}
-                                        onChange={(e) => updateField(group.id, field.id, { required: e.target.checked })}
+                                        onChange={(e: any) => updateField(group.id, field.id, { required: e.target.checked })}
                                         className="mr-1"
                                       />
                                       필수

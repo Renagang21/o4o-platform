@@ -49,9 +49,9 @@ const initialUsers: ApprovalUser[] = [
 ];
 
 export const ApprovalProvider = ({ children }: { children: ReactNode }) => {
-  const [users, setUsers] = useState<ApprovalUser[]>(initialUsers);
-  const [filter, setFilter] = useState<string>('all');
-  const [search, setSearch] = useState<string>('');
+  const [users, setUsers] = useState(initialUsers);
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   const approveUser = (id: string) => {
     setUsers(users => users.map(u => u.id === id ? { ...u, status: 'approved' } : u));

@@ -116,33 +116,33 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
             label={__('Layout', 'o4o')}
             value={layout}
             options={layoutOptions}
-            onChange={(value) => setAttributes({ layout: value })}
+            onChange={(value: any) => setAttributes({ layout: value })}
           />
           <SelectControl
             label={__('Filter Style', 'o4o')}
             value={filterStyle}
             options={filterStyleOptions}
-            onChange={(value) => setAttributes({ filterStyle: value })}
+            onChange={(value: any) => setAttributes({ filterStyle: value })}
           />
           <ToggleControl
             label={__('Show Filter Count', 'o4o')}
             checked={showFilterCount}
-            onChange={(value) => setAttributes({ showFilterCount: value })}
+            onChange={(value: any) => setAttributes({ showFilterCount: value })}
           />
           <ToggleControl
             label={__('Show Clear All Button', 'o4o')}
             checked={showClearAll}
-            onChange={(value) => setAttributes({ showClearAll: value })}
+            onChange={(value: any) => setAttributes({ showClearAll: value })}
           />
           <ToggleControl
             label={__('Enable AJAX Filtering', 'o4o')}
             checked={ajaxFilter}
-            onChange={(value) => setAttributes({ ajaxFilter: value })}
+            onChange={(value: any) => setAttributes({ ajaxFilter: value })}
           />
           <ToggleControl
             label={__('Mobile Toggle Button', 'o4o')}
             checked={mobileToggle}
-            onChange={(value) => setAttributes({ mobileToggle: value })}
+            onChange={(value: any) => setAttributes({ mobileToggle: value })}
           />
         </PanelBody>
 
@@ -150,7 +150,7 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
           <ToggleControl
             label={__('Price Filter', 'o4o')}
             checked={showPriceFilter}
-            onChange={(value) => setAttributes({ showPriceFilter: value })}
+            onChange={(value: any) => setAttributes({ showPriceFilter: value })}
           />
           {showPriceFilter && (
             <>
@@ -180,32 +180,32 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
           <ToggleControl
             label={__('Category Filter', 'o4o')}
             checked={showCategoryFilter}
-            onChange={(value) => setAttributes({ showCategoryFilter: value })}
+            onChange={(value: any) => setAttributes({ showCategoryFilter: value })}
           />
           <ToggleControl
             label={__('Tag Filter', 'o4o')}
             checked={showTagFilter}
-            onChange={(value) => setAttributes({ showTagFilter: value })}
+            onChange={(value: any) => setAttributes({ showTagFilter: value })}
           />
           <ToggleControl
             label={__('Brand Filter', 'o4o')}
             checked={showBrandFilter}
-            onChange={(value) => setAttributes({ showBrandFilter: value })}
+            onChange={(value: any) => setAttributes({ showBrandFilter: value })}
           />
           <ToggleControl
             label={__('Stock Filter', 'o4o')}
             checked={showStockFilter}
-            onChange={(value) => setAttributes({ showStockFilter: value })}
+            onChange={(value: any) => setAttributes({ showStockFilter: value })}
           />
           <ToggleControl
             label={__('Rating Filter', 'o4o')}
             checked={showRatingFilter}
-            onChange={(value) => setAttributes({ showRatingFilter: value })}
+            onChange={(value: any) => setAttributes({ showRatingFilter: value })}
           />
           <ToggleControl
             label={__('Sale Filter', 'o4o')}
             checked={showSaleFilter}
-            onChange={(value) => setAttributes({ showSaleFilter: value })}
+            onChange={(value: any) => setAttributes({ showSaleFilter: value })}
           />
         </PanelBody>
 
@@ -213,19 +213,19 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
           <ToggleControl
             label={__('Show Sort Options', 'o4o')}
             checked={showSortOptions}
-            onChange={(value) => setAttributes({ showSortOptions: value })}
+            onChange={(value: any) => setAttributes({ showSortOptions: value })}
           />
           {showSortOptions && (
             <div>
               <p className="components-base-control__label">
                 {__('Available Sort Options', 'o4o')}
               </p>
-              {sortOptionChoices.map((option) => (
+              {sortOptionChoices.map((option: any) => (
                 <ToggleControl
                   key={option.value}
                   label={option.label}
                   checked={sortOptions.includes(option.value)}
-                  onChange={(checked) => {
+                  onChange={(checked: any) => {
                     const newOptions = checked
                       ? [...sortOptions, option.value]
                       : sortOptions.filter((v: any) => v !== option.value);
@@ -242,7 +242,7 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
             label={__('Target Product Block ID', 'o4o')}
             help={__('Enter the block ID of the product listing to filter', 'o4o')}
             value={targetProductBlock || ''}
-            onChange={(value) => setAttributes({ targetProductBlock: value })}
+            onChange={(value: any) => setAttributes({ targetProductBlock: value })}
             placeholder="block-123456"
           />
         </PanelBody>

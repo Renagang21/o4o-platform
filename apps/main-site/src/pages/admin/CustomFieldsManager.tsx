@@ -80,7 +80,7 @@ interface FieldGroup {
 }
 
 const CustomFieldsManager: FC = () => {
-  const [fieldGroups, setFieldGroups] = useState<FieldGroup[]>([]);
+  const [fieldGroups, setFieldGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
   const [editingGroup, setEditingGroup] = useState<FieldGroup | null>(null);
@@ -441,7 +441,7 @@ const CustomFieldsManager: FC = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {fieldGroups.map((group) => (
+                {fieldGroups.map((group: any) => (
                   <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
                     {/* Header */}
                     <div className="p-6 border-b border-gray-100">
@@ -508,7 +508,7 @@ const CustomFieldsManager: FC = () => {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {group.fields.map((field) => (
+                          {group.fields.map((field: any) => (
                             <div key={field.id} className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg bg-gray-50">
                               <div className="flex items-center gap-2 text-gray-500">
                                 {getFieldIcon(field.type)}
@@ -587,7 +587,7 @@ const CustomFieldsManager: FC = () => {
                     <input
                       type="text"
                       value={newGroup.title}
-                      onChange={(e) => setNewGroup(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setNewGroup(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="예: 상품 정보, 이벤트 상세"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -599,7 +599,7 @@ const CustomFieldsManager: FC = () => {
                     </label>
                     <textarea
                       value={newGroup.description}
-                      onChange={(e) => setNewGroup(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewGroup(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 필드 그룹의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -624,7 +624,7 @@ const CustomFieldsManager: FC = () => {
                           <input
                             type="checkbox"
                             checked={newGroup.location.postType.includes(cpt.slug)}
-                            onChange={(e) => {
+                            onChange={(e: any) => {
                               if (e.target.checked) {
                                 setNewGroup(prev => ({
                                   ...prev,
@@ -668,7 +668,7 @@ const CustomFieldsManager: FC = () => {
                             name="placement"
                             value={option.value}
                             checked={newGroup.placement === option.value}
-                            onChange={(e) => setNewGroup(prev => ({ 
+                            onChange={(e: any) => setNewGroup(prev => ({ 
                               ...prev, 
                               placement: e.target.value as 'normal' | 'high' | 'side'
                             }))}
@@ -719,7 +719,7 @@ const CustomFieldsManager: FC = () => {
                             <input
                               type="text"
                               value={field.label}
-                              onChange={(e) => updateField(field.id, { label: e.target.value })}
+                              onChange={(e: any) => updateField(field.id, { label: e.target.value })}
                               placeholder="필드 라벨"
                               className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
                             />
@@ -732,7 +732,7 @@ const CustomFieldsManager: FC = () => {
                             <input
                               type="text"
                               value={field.name}
-                              onChange={(e) => updateField(field.id, { name: e.target.value })}
+                              onChange={(e: any) => updateField(field.id, { name: e.target.value })}
                               placeholder="field_name"
                               className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
                             />
@@ -744,7 +744,7 @@ const CustomFieldsManager: FC = () => {
                             </label>
                             <select
                               value={field.type}
-                              onChange={(e) => updateField(field.id, { type: e.target.value as 'text' | 'textarea' | 'number' | 'date' | 'datetime' | 'select' | 'radio' | 'checkbox' | 'image' | 'gallery' | 'url' | 'email' | 'password' | 'wysiwyg' | 'repeater' | 'relation' | 'location' })}
+                              onChange={(e: any) => updateField(field.id, { type: e.target.value as 'text' | 'textarea' | 'number' | 'date' | 'datetime' | 'select' | 'radio' | 'checkbox' | 'image' | 'gallery' | 'url' | 'email' | 'password' | 'wysiwyg' | 'repeater' | 'relation' | 'location' })}
                               className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
                             >
                               {Object.entries(groupedFieldTypes).map(([groupName, types]) => (
@@ -764,7 +764,7 @@ const CustomFieldsManager: FC = () => {
                               <input
                                 type="checkbox"
                                 checked={field.required}
-                                onChange={(e) => updateField(field.id, { required: e.target.checked })}
+                                onChange={(e: any) => updateField(field.id, { required: e.target.checked })}
                                 className="mr-1"
                               />
                               필수
@@ -786,7 +786,7 @@ const CustomFieldsManager: FC = () => {
                             <input
                               type="text"
                               value={field.description || ''}
-                              onChange={(e) => updateField(field.id, { description: e.target.value })}
+                              onChange={(e: any) => updateField(field.id, { description: e.target.value })}
                               placeholder="필드 설명"
                               className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
                             />
@@ -799,7 +799,7 @@ const CustomFieldsManager: FC = () => {
                             <input
                               type="text"
                               value={field.placeholder || ''}
-                              onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
+                              onChange={(e: any) => updateField(field.id, { placeholder: e.target.value })}
                               placeholder="예시 텍스트"
                               className="w-full px-2 py-1 text-sm border border-gray-200 rounded"
                             />

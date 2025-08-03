@@ -50,7 +50,7 @@ const AffiliateStats: FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2">
-        {stats.map((stat) => (
+        {stats.map((stat: any) => (
           <div
             key={stat.id}
             className="relative p-6 bg-white border border-gray-200 rounded-lg"

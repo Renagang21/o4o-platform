@@ -218,7 +218,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     type="datetime-local"
                     value={postSettings.publishDate}
-                    onChange={(e) => 
+                    onChange={(e: any) => 
                       onPostSettingsChange({ publishDate: e.target.value })
                     }
                     className="mt-1"
@@ -255,7 +255,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <Input
                   value={postSettings.slug}
-                  onChange={(e) => 
+                  onChange={(e: any) => 
                     onPostSettingsChange({ slug: e.target.value })
                   }
                   placeholder="post-url-slug"
@@ -286,7 +286,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                         autoFocus
                         placeholder="Search..."
                         value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
+                        onChange={(e: any) => setCategorySearch(e.target.value)}
                         className="border-0 focus-visible:ring-0"
                       />
                     </div>
@@ -332,7 +332,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     placeholder="Add new tag"
                     value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
+                    onChange={(e: any) => setTagInput(e.target.value)}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -523,7 +523,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       <Input
                         placeholder="custom-class"
                         value={blockSettings.attributes?.className || ''}
-                        onChange={(e) => 
+                        onChange={(e: any) => 
                           onBlockSettingsChange?.({
                             attributes: { ...blockSettings.attributes, className: e.target.value }
                           })
@@ -537,7 +537,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       <Input
                         placeholder="anchor-id"
                         value={blockSettings.attributes?.anchor || ''}
-                        onChange={(e) => 
+                        onChange={(e: any) => 
                           onBlockSettingsChange?.({
                             attributes: { ...blockSettings.attributes, anchor: e.target.value }
                           })

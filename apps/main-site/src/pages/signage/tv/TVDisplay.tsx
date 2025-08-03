@@ -15,7 +15,7 @@ interface SignageContent {
 const TVDisplay: FC = () => {
   const [currentContent, setCurrentContent] = useState<SignageContent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState<string>('');
+  const [lastUpdate, setLastUpdate] = useState('');
 
   // 활성 콘텐츠 로드
   const loadActiveContent = () => {

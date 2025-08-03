@@ -33,9 +33,9 @@ interface CouponInfo {
 }
 
 const CartPage: FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [coupons, setCoupons] = useState<CouponInfo[]>([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [coupons, setCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -282,7 +282,7 @@ const CartPage: FC = () => {
 
               {/* 상품 목록 */}
               <div className="space-y-4">
-                {cartItems.map((item) => (
+                {cartItems.map((item: any) => (
                   <div key={item.id} className="bg-white rounded-xl p-6 border border-gray-200">
                     <div className="flex items-start gap-4">
                       <input
@@ -401,7 +401,7 @@ const CartPage: FC = () => {
               <div className="bg-white rounded-xl p-6">
                 <h3 className="text-lg font-bold mb-4">🔥 함께 구매하면 좋은 상품</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[1, 2, 3, 4].map((i) => (
+                  {[1, 2, 3, 4].map((i: any) => (
                     <Link
                       key={i}
                       to={`/dropshipping/product/${i + 10}`}
@@ -438,14 +438,14 @@ const CartPage: FC = () => {
                     사용 가능한 쿠폰 {coupons.filter(c => c.isApplicable).length}개
                   </div>
                   
-                  {coupons.filter(c => c.isApplicable).map((coupon) => (
+                  {coupons.filter(c => c.isApplicable).map((coupon: any) => (
                     <label key={coupon.id} className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                       <input
                         type="radio"
                         name="coupon"
                         value={coupon.id}
                         checked={selectedCoupon === coupon.id}
-                        onChange={(e) => setSelectedCoupon(e.target.value)}
+                        onChange={(e: any) => setSelectedCoupon(e.target.value)}
                         className="mt-1"
                       />
                       <div className="flex-1">

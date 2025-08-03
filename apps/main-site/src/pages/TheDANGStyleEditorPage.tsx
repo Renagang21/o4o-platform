@@ -3,7 +3,7 @@ import TheDANGHomeEditor from '@shared/components/editor/TheDANGHomeEditor';
 import DOMPurify from 'dompurify';
 
 const TheDANGStyleEditorPage: FC = () => {
-  const [savedContent, setSavedContent] = useState<string>('');
+  const [savedContent, setSavedContent] = useState('');
 
   // Initial content structure for the homepage
   const initialContent = `

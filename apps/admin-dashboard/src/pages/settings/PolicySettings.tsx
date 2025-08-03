@@ -72,7 +72,7 @@ interface PolicySettings {
 }
 
 const PolicySettings: FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('partners');
+  const [activeTab, setActiveTab] = useState('partners');
   const [settings, setSettings] = useState<PolicySettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -312,7 +312,7 @@ const PolicySettings: FC = () => {
 
       {/* Policy Categories Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {policyCategories.map((category) => (
+        {policyCategories.map((category: any) => (
           <div
             key={category.id}
             className={`wp-card cursor-pointer transition-all duration-200 hover:shadow-lg ${

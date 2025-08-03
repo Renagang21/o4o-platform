@@ -39,14 +39,14 @@ const PolicyHistory: FC<PolicyHistoryProps> = ({
   category, 
   maxItems = 50 
 }) => {
-  const [historyItems, setHistoryItems] = useState<PolicyHistoryItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<PolicyHistoryItem[]>([]);
+  const [historyItems, setHistoryItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>(category || 'all');
-  const [selectedAction, setSelectedAction] = useState<string>('all');
-  const [dateRange, setDateRange] = useState<string>('7d');
-  const [selectedUser, setSelectedUser] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState(category || 'all');
+  const [selectedAction, setSelectedAction] = useState('all');
+  const [dateRange, setDateRange] = useState('7d');
+  const [selectedUser, setSelectedUser] = useState('all');
 
   // Mock data for demonstration
   const mockHistoryItems: PolicyHistoryItem[] = [

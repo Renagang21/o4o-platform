@@ -21,7 +21,7 @@ const ProductGrid: FC<ProductGridProps> = ({ products, columns = 4 }) => {
 
   return (
     <div className={`grid ${gridCols} gap-6`}>
-      {products.map((product) => (
+      {products.map((product: any) => (
         <ProductCard key={product.id} product={product} />
       ))}
     </div>
@@ -114,7 +114,7 @@ const ProductCard: FC<{ product: Product }> = ({ product }) => {
               {/* Quick Add to Cart */}
               {product.stockQuantity > 0 && (
                 <button
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.preventDefault();
                     // TODO: Add to cart functionality
                     // console.log('Add to cart:', product.id);

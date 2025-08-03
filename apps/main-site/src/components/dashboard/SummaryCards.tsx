@@ -50,7 +50,7 @@ const SummaryCards: FC = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {cards.map((card) => (
+      {cards.map((card: any) => (
         <div
           key={card.title}
           className="bg-white rounded-xl shadow-sm p-6"

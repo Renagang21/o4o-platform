@@ -48,7 +48,7 @@ const ApprovalNotice: FC = () => {
       </div>
 
       <div className="divide-y divide-gray-200">
-        {notices.map((notice) => (
+        {notices.map((notice: any) => (
           <div key={notice.id} className="p-6">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">

@@ -35,7 +35,7 @@ const Menu: FC<MenuProps> = ({
   selectedKeys,
   onSelect,
 }) => {
-  const [internalSelectedKeys, setInternalSelectedKeys] = useState<string[]>(defaultSelectedKeys);
+  const [internalSelectedKeys, setInternalSelectedKeys] = useState(defaultSelectedKeys);
   const currentSelectedKeys = selectedKeys || internalSelectedKeys;
 
   const sizeStyles = {

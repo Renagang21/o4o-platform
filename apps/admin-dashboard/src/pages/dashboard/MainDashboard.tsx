@@ -76,7 +76,7 @@ const transformStats = (stats: any) => {
 };
 
 const MainDashboard: FC = () => {
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [lastRefresh, setLastRefresh] = useState(new Date());
   
   // Dashboard data management
   const { 

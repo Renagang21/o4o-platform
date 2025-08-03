@@ -24,12 +24,12 @@ const Accordion: FC<AccordionProps> = ({
   className,
   onChange,
 }) => {
-  const [openItems, setOpenItems] = useState<string[]>(defaultOpen);
+  const [openItems, setOpenItems] = useState(defaultOpen);
 
   const handleItemClick = (itemId: string) => {
     const newOpenItems = allowMultiple
       ? openItems.includes(itemId)
-        ? openItems.filter((id) => id !== itemId)
+        ? openItems.filter((id: any) => id !== itemId)
         : [...openItems, itemId]
       : openItems.includes(itemId)
       ? []
@@ -41,7 +41,7 @@ const Accordion: FC<AccordionProps> = ({
 
   return (
     <div className={twMerge('divide-y divide-gray-200', className)}>
-      {items.map((item) => (
+      {items.map((item: any) => (
         <div key={item.id} className="py-2">
           <button
             className={twMerge(

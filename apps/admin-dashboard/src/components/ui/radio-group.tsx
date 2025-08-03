@@ -65,7 +65,7 @@ const RadioGroupItem = forwardRef<HTMLInputElement, RadioGroupItemProps>(
           name={context.name}
           value={value}
           checked={isChecked}
-          onChange={(e) => {
+          onChange={(e: any) => {
             if (e.target.checked) {
               context.onValueChange(value);
             }

@@ -43,7 +43,7 @@ const ProductGridComponent: FC<ProductGridProps> = ({
 
   return (
     <div className={`grid ${gridCols} gap-6`}>
-      {products.map((product) => (
+      {products.map((product: any) => (
         <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
           <Link to={`/products/${product.slug}`}>
             {product.images?.[0] && (

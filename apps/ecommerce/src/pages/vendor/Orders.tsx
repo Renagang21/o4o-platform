@@ -133,7 +133,7 @@ const paymentStatusConfig = {
 
 export default function VendorOrders() {
   const navigate = useNavigate();
-  const [orders] = useState<Order[]>(mockOrders);
+  const [orders] = useState(mockOrders);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [dateRange, setDateRange] = useState('all');
@@ -247,7 +247,7 @@ export default function VendorOrders() {
                 type="text"
                 placeholder="주문번호, 고객명, 이메일로 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -255,7 +255,7 @@ export default function VendorOrders() {
               <select
                 className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
+                onChange={(e: any) => setSelectedStatus(e.target.value)}
               >
                 <option value="all">전체 상태</option>
                 <option value="pending">주문확인중</option>
@@ -267,7 +267,7 @@ export default function VendorOrders() {
               <select
                 className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
+                onChange={(e: any) => setDateRange(e.target.value)}
               >
                 <option value="all">전체 기간</option>
                 <option value="today">오늘</option>
@@ -311,7 +311,7 @@ export default function VendorOrders() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredOrders.map((order) => {
+                {filteredOrders.map((order: any) => {
                   const status = statusConfig[order.status];
                   const paymentStatus = paymentStatusConfig[order.paymentStatus];
                   return (

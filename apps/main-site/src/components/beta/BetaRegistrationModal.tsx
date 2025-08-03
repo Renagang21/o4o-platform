@@ -74,7 +74,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<BetaRegistrationData>({
+  const [formData, setFormData] = useState({
     email: '',
     name: '',
     phone: '',
@@ -190,7 +190,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
         label="이메일 주소 *"
         type="email"
         value={formData.email}
-        onChange={(e) => handleInputChange('email', e.target.value)}
+        onChange={(e: any) => handleInputChange('email', e.target.value)}
         placeholder="your.email@example.com"
         required
       />
@@ -198,7 +198,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
       <Input
         label="이름 *"
         value={formData.name}
-        onChange={(e) => handleInputChange('name', e.target.value)}
+        onChange={(e: any) => handleInputChange('name', e.target.value)}
         placeholder="홍길동"
         required
       />
@@ -206,21 +206,21 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
       <Input
         label="전화번호"
         value={formData.phone}
-        onChange={(e) => handleInputChange('phone', e.target.value)}
+        onChange={(e: any) => handleInputChange('phone', e.target.value)}
         placeholder="010-1234-5678"
       />
       
       <Input
         label="회사명"
         value={formData.company}
-        onChange={(e) => handleInputChange('company', e.target.value)}
+        onChange={(e: any) => handleInputChange('company', e.target.value)}
         placeholder="회사명 (개인의 경우 생략 가능)"
       />
       
       <Input
         label="직책"
         value={formData.jobTitle}
-        onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+        onChange={(e: any) => handleInputChange('jobTitle', e.target.value)}
         placeholder="대표, 마케팅 매니저, 개발자 등"
       />
     </div>
@@ -238,7 +238,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
       <Select
         label="사용자 유형 *"
         value={formData.type}
-        onChange={(value) => handleInputChange('type', value)}
+        onChange={(value: any) => handleInputChange('type', value)}
         options={USER_TYPES}
         required
       />
@@ -246,7 +246,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
       <Select
         label="관심 분야 *"
         value={formData.interestArea}
-        onChange={(value) => handleInputChange('interestArea', value)}
+        onChange={(value: any) => handleInputChange('interestArea', value)}
         options={INTEREST_AREAS}
         required
       />
@@ -257,7 +257,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
         </label>
         <textarea
           value={formData.useCase}
-          onChange={(e) => handleInputChange('useCase', e.target.value)}
+          onChange={(e: any) => handleInputChange('useCase', e.target.value)}
           placeholder="어떤 목적으로 사이니지 시스템을 사용하실 예정인지 구체적으로 설명해주세요."
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -280,7 +280,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
           관심 있는 기능들
         </label>
         <div className="grid grid-cols-2 gap-2">
-          {FEATURES.map((feature) => (
+          {FEATURES.map((feature: any) => (
             <label key={feature} className="flex items-center space-x-2 text-sm">
               <input
                 type="checkbox"
@@ -300,7 +300,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
         </label>
         <textarea
           value={formData.expectations}
-          onChange={(e) => handleInputChange('expectations', e.target.value)}
+          onChange={(e: any) => handleInputChange('expectations', e.target.value)}
           placeholder="베타 프로그램에서 기대하는 점이나 특별히 원하는 기능이 있다면 알려주세요."
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -310,7 +310,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
       <Select
         label="어떻게 저희를 알게 되셨나요?"
         value={formData.referralSource}
-        onChange={(value) => handleInputChange('referralSource', value)}
+        onChange={(value: any) => handleInputChange('referralSource', value)}
         options={REFERRAL_SOURCES}
         placeholder="선택해주세요"
       />
@@ -319,7 +319,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center space-x-4 mb-6">
-      {[1, 2, 3].map((step) => (
+      {[1, 2, 3].map((step: any) => (
         <div key={step} className="flex items-center">
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${

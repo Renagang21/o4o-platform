@@ -34,7 +34,7 @@ const UsersListBulk: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [roleFilter, setRoleFilter] = useState('all');
 
   // Users query
   const { data: users = [], isLoading, error } = useQuery({
@@ -302,7 +302,7 @@ const UsersListBulk: FC = () => {
           type="search"
           placeholder="Search users..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e: any) => setSearchQuery(e.target.value)}
           className="w-[300px]"
         />
         <Button variant="secondary">

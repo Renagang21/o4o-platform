@@ -161,13 +161,13 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             label={__('Layout', 'o4o')}
             value={layout}
             options={layoutOptions}
-            onChange={(value) => setAttributes({ layout: value })}
+            onChange={(value: any) => setAttributes({ layout: value })}
           />
           {(layout === 'card' || layout === 'grid') && (
             <RangeControl
               label={__('Columns', 'o4o')}
               value={columns}
-              onChange={(value) => setAttributes({ columns: value })}
+              onChange={(value: any) => setAttributes({ columns: value })}
               min={1}
               max={6}
             />
@@ -176,7 +176,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             label={__('Card Style', 'o4o')}
             value={cardStyle}
             options={cardStyleOptions}
-            onChange={(value) => setAttributes({ cardStyle: value })}
+            onChange={(value: any) => setAttributes({ cardStyle: value })}
           />
         </PanelBody>
 
@@ -184,7 +184,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
           <ToggleControl
             label={__('Show Product Image', 'o4o')}
             checked={showImage}
-            onChange={(value) => setAttributes({ showImage: value })}
+            onChange={(value: any) => setAttributes({ showImage: value })}
           />
           {showImage && (
             <>
@@ -192,30 +192,30 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
                 label={__('Image Size', 'o4o')}
                 value={imageSize}
                 options={imageSizeOptions}
-                onChange={(value) => setAttributes({ imageSize: value })}
+                onChange={(value: any) => setAttributes({ imageSize: value })}
               />
               <SelectControl
                 label={__('Image Aspect Ratio', 'o4o')}
                 value={imageAspectRatio}
                 options={aspectRatioOptions}
-                onChange={(value) => setAttributes({ imageAspectRatio: value })}
+                onChange={(value: any) => setAttributes({ imageAspectRatio: value })}
               />
             </>
           )}
           <ToggleControl
             label={__('Show Title', 'o4o')}
             checked={showTitle}
-            onChange={(value) => setAttributes({ showTitle: value })}
+            onChange={(value: any) => setAttributes({ showTitle: value })}
           />
           <ToggleControl
             label={__('Show Categories', 'o4o')}
             checked={showCategories}
-            onChange={(value) => setAttributes({ showCategories: value })}
+            onChange={(value: any) => setAttributes({ showCategories: value })}
           />
           <ToggleControl
             label={__('Show Rating', 'o4o')}
             checked={showRating}
-            onChange={(value) => setAttributes({ showRating: value })}
+            onChange={(value: any) => setAttributes({ showRating: value })}
           />
         </PanelBody>
 
@@ -223,31 +223,31 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
           <ToggleControl
             label={__('Show Price', 'o4o')}
             checked={showPrice}
-            onChange={(value) => setAttributes({ showPrice: value })}
+            onChange={(value: any) => setAttributes({ showPrice: value })}
           />
           {showPrice && (
             <>
               <ToggleControl
                 label={__('Show Regular Price', 'o4o')}
                 checked={showRegularPrice}
-                onChange={(value) => setAttributes({ showRegularPrice: value })}
+                onChange={(value: any) => setAttributes({ showRegularPrice: value })}
               />
               <ToggleControl
                 label={__('Show Sale Price', 'o4o')}
                 checked={showSalePrice}
-                onChange={(value) => setAttributes({ showSalePrice: value })}
+                onChange={(value: any) => setAttributes({ showSalePrice: value })}
               />
               <ToggleControl
                 label={__('Show Sale Badge', 'o4o')}
                 checked={showSaleBadge}
-                onChange={(value) => setAttributes({ showSaleBadge: value })}
+                onChange={(value: any) => setAttributes({ showSaleBadge: value })}
               />
             </>
           )}
           <ToggleControl
             label={__('Show Stock Status', 'o4o')}
             checked={showStock}
-            onChange={(value) => setAttributes({ showStock: value })}
+            onChange={(value: any) => setAttributes({ showStock: value })}
           />
         </PanelBody>
 
@@ -255,17 +255,17 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
           <ToggleControl
             label={__('Show Add to Cart', 'o4o')}
             checked={showAddToCart}
-            onChange={(value) => setAttributes({ showAddToCart: value })}
+            onChange={(value: any) => setAttributes({ showAddToCart: value })}
           />
           <ToggleControl
             label={__('Show Quick View', 'o4o')}
             checked={showQuickView}
-            onChange={(value) => setAttributes({ showQuickView: value })}
+            onChange={(value: any) => setAttributes({ showQuickView: value })}
           />
           <ToggleControl
             label={__('Show Wishlist', 'o4o')}
             checked={showWishlist}
-            onChange={(value) => setAttributes({ showWishlist: value })}
+            onChange={(value: any) => setAttributes({ showWishlist: value })}
           />
         </PanelBody>
 
@@ -276,7 +276,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             <input
               type="color"
               value={priceColor || '#000000'}
-              onChange={(e) => setAttributes({ priceColor: e.target.value })}
+              onChange={(e: any) => setAttributes({ priceColor: e.target.value })}
               style={{ width: '100%', height: '32px' }}
             />
           </div>
@@ -285,7 +285,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             <input
               type="color"
               value={salePriceColor || '#e74c3c'}
-              onChange={(e) => setAttributes({ salePriceColor: e.target.value })}
+              onChange={(e: any) => setAttributes({ salePriceColor: e.target.value })}
               style={{ width: '100%', height: '32px' }}
             />
           </div>
@@ -294,7 +294,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             <input
               type="color"
               value={buttonColor || '#007cba'}
-              onChange={(e) => setAttributes({ buttonColor: e.target.value })}
+              onChange={(e: any) => setAttributes({ buttonColor: e.target.value })}
               style={{ width: '100%', height: '32px' }}
             />
           </div>
@@ -303,7 +303,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             <input
               type="color"
               value={buttonTextColor || '#ffffff'}
-              onChange={(e) => setAttributes({ buttonTextColor: e.target.value })}
+              onChange={(e: any) => setAttributes({ buttonTextColor: e.target.value })}
               style={{ width: '100%', height: '32px' }}
             />
           </div>

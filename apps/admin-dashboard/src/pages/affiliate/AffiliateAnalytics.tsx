@@ -289,7 +289,7 @@ const AffiliateAnalytics = () => {
           </div>
           <div className="wp-card-body">
             <div className="space-y-4">
-              {productPerformance.map((product) => (
+              {productPerformance.map((product: any) => (
                 <div key={product.id}>
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-medium text-modern-text-primary">{product.name}</p>

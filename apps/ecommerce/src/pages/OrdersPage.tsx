@@ -238,7 +238,7 @@ export function OrdersPage() {
               type="search"
               placeholder="주문번호 또는 상품명 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>

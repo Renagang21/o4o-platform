@@ -20,7 +20,7 @@ interface AdminSidebarProps {
 const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation()
   const { user } = useAuth()
-  const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [expandedItems, setExpandedItems] = useState([])
   const [isCollapsed, setIsCollapsed] = useState(false)
   
   // 동적 메뉴 가져오기 (활성화된 앱 기반)

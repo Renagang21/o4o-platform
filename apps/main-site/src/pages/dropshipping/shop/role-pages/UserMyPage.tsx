@@ -32,8 +32,8 @@ interface WishlistItem {
 
 const UserMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [orders, setOrders] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   const [userStats, setUserStats] = useState({
     points: 15840,
     coupons: 3,
@@ -232,7 +232,7 @@ const UserMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  {orders.slice(0, 3).map((order) => (
+                  {orders.slice(0, 3).map((order: any) => (
                     <div key={order.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
@@ -274,7 +274,7 @@ const UserMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  {wishlist.slice(0, 4).map((item) => (
+                  {wishlist.slice(0, 4).map((item: any) => (
                     <Link
                       key={item.id}
                       to={`/dropshipping/product/${item.id}`}

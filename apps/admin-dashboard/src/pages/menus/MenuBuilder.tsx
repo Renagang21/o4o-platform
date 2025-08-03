@@ -72,9 +72,9 @@ const MenuBuilder: FC = () => {
 
   // Form state
   const [menuName, setMenuName] = useState('')
-  const [menuLocation, setMenuLocation] = useState<MenuLocation>('primary')
+  const [menuLocation, setMenuLocation] = useState('primary')
   const [menuDescription, setMenuDescription] = useState('')
-  const [menuItems, setMenuItems] = useState<DraggableMenuItem[]>([])
+  const [menuItems, setMenuItems] = useState([])
   
   // UI state
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false)
@@ -83,7 +83,7 @@ const MenuBuilder: FC = () => {
   const [dragOverItem, setDragOverItem] = useState<string | null>(null)
   
   // Item form state
-  const [itemFormData, setItemFormData] = useState<MenuItemFormData>({
+  const [itemFormData, setItemFormData] = useState({
     label: '',
     type: 'custom',
     url: '',
@@ -236,7 +236,7 @@ const MenuBuilder: FC = () => {
     if (editingItem) {
       // Function to update item in tree
       const updateInTree = (items: DraggableMenuItem[]): DraggableMenuItem[] => {
-        return items.map((item) => {
+        return items.map((item: any) => {
           if (item.id === editingItem.id) {
             return { ...newItem, isExpanded: item.isExpanded }
           }

@@ -14,7 +14,7 @@ interface SessionInfo {
 
 export default function SessionSyncTest() {
   const { user, isAuthenticated, logout, logoutAll } = useCookieAuth();
-  const [sessions, setSessions] = useState<SessionInfo[]>([]);
+  const [sessions, setSessions] = useState([]);
   const [linkedAccounts, setLinkedAccounts] = useState({
     local: false,
     google: false,
@@ -22,7 +22,7 @@ export default function SessionSyncTest() {
     naver: false
   });
   const [loading, setLoading] = useState(false);
-  const [lastEvent, setLastEvent] = useState<string>('');
+  const [lastEvent, setLastEvent] = useState('');
 
   // Fetch active sessions
   const fetchSessions = async () => {

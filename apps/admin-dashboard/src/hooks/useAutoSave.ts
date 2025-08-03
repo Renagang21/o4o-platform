@@ -34,7 +34,7 @@ export const useAutoSave = (
     onSaveError
   } = options;
 
-  const [state, setState] = useState<AutoSaveState>({
+  const [state, setState] = useState({
     isSaving: false,
     lastSaved: null,
     hasUnsavedChanges: false,

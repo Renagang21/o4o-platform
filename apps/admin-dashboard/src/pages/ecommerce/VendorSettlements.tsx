@@ -55,7 +55,7 @@ const VendorSettlements: FC = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedSettlements, setSelectedSettlements] = useState<string[]>([]);
+  const [selectedSettlements, setSelectedSettlements] = useState([]);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [approvalMemo, setApprovalMemo] = useState('');
 
@@ -274,7 +274,7 @@ const VendorSettlements: FC = () => {
                 <Input
                   placeholder="판매자명, 이메일로 검색..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: any) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -308,7 +308,7 @@ const VendorSettlements: FC = () => {
                   <th className="px-4 py-3 text-left">
                     <input
                       type="checkbox"
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         if (e.target.checked) {
                           setSelectedSettlements(settlements.map(s => s.id));
                         } else {
@@ -360,13 +360,13 @@ const VendorSettlements: FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  settlements.map((settlement) => (
+                  settlements.map((settlement: any) => (
                     <tr key={settlement.id} className="hover:bg-modern-bg-hover">
                       <td className="px-4 py-4">
                         <input
                           type="checkbox"
                           checked={selectedSettlements.includes(settlement.id)}
-                          onChange={(e) => {
+                          onChange={(e: any) => {
                             if (e.target.checked) {
                               setSelectedSettlements([...selectedSettlements, settlement.id]);
                             } else {
@@ -505,7 +505,7 @@ const VendorSettlements: FC = () => {
               <Input
                 id="approvalMemo"
                 value={approvalMemo}
-                onChange={(e) => setApprovalMemo(e.target.value)}
+                onChange={(e: any) => setApprovalMemo(e.target.value)}
                 placeholder="승인 관련 메모를 입력하세요"
               />
             </div>

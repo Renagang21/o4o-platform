@@ -20,7 +20,7 @@ interface Product {
 }
 
 const ShoppingHome: FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -116,7 +116,7 @@ const ShoppingHome: FC = () => {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: any) => setSearchTerm(e.target.value)}
                   placeholder="찾고 싶은 상품을 검색해보세요!"
                   className="w-full px-4 py-3 pr-12 text-lg border-2 border-blue-400 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -145,7 +145,7 @@ const ShoppingHome: FC = () => {
       <div className="bg-gray-50 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-8 py-4 overflow-x-auto">
-            {categories.map((category) => (
+            {categories.map((category: any) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
@@ -191,7 +191,7 @@ const ShoppingHome: FC = () => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {products.map((product: any) => (
               <Link
                 key={product.id}
                 to={`/dropshipping/product/${product.id}`}
@@ -259,7 +259,7 @@ const ShoppingHome: FC = () => {
                   </div>
                   
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {product.tags.map((tag) => (
+                    {product.tags.map((tag: any) => (
                       <span key={tag} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
                         {tag}
                       </span>
@@ -275,7 +275,7 @@ const ShoppingHome: FC = () => {
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">카테고리별 인기상품</h2>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.slice(1).map((category) => (
+            {categories.slice(1).map((category: any) => (
               <Link
                 key={category.id}
                 to={`/dropshipping/category/${category.id}`}

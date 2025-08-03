@@ -102,7 +102,7 @@ const ScreenOptionsEnhanced: FC<ScreenOptionsEnhancedProps> = ({
                       id={`${column.id}-hide`}
                       checked={column.visible}
                       disabled={column.required}
-                      onChange={(e) => onColumnToggle?.(column.id, e.target.checked)}
+                      onChange={(e: any) => onColumnToggle?.(column.id, e.target.checked)}
                     />
                     {column.label}
                   </label>
@@ -124,7 +124,7 @@ const ScreenOptionsEnhanced: FC<ScreenOptionsEnhancedProps> = ({
                       type="checkbox"
                       id={`${option.id}-hide`}
                       checked={option.checked}
-                      onChange={(e) => onCustomOptionChange?.(option.id, e.target.checked)}
+                      onChange={(e: any) => onCustomOptionChange?.(option.id, e.target.checked)}
                     />
                     {option.label}
                     {option.description && (
@@ -201,7 +201,7 @@ const ScreenOptionsEnhanced: FC<ScreenOptionsEnhancedProps> = ({
                 name="items_per_page"
                 id="items_per_page"
                 value={tempItemsPerPage}
-                onChange={(e) => {
+                onChange={(e: any) => {
                   const value = parseInt(e.target.value);
                   if (value > 0 && value < 1000) {
                     setTempItemsPerPage(value);
@@ -284,7 +284,7 @@ export const ScreenOptionsReact: FC<ScreenOptionsEnhancedProps> = (props) => {
                         type="checkbox"
                         checked={column.visible}
                         disabled={column.required}
-                        onChange={(e) => props.onColumnToggle?.(column.id, e.target.checked)}
+                        onChange={(e: any) => props.onColumnToggle?.(column.id, e.target.checked)}
                         className="rounded border-gray-300"
                       />
                       <span className={column.required ? 'text-gray-500' : ''}>
@@ -310,7 +310,7 @@ export const ScreenOptionsReact: FC<ScreenOptionsEnhancedProps> = (props) => {
                       <input
                         type="checkbox"
                         checked={option.checked}
-                        onChange={(e) => props.onCustomOptionChange?.(option.id, e.target.checked)}
+                        onChange={(e: any) => props.onCustomOptionChange?.(option.id, e.target.checked)}
                         className="rounded border-gray-300 mt-0.5"
                       />
                       <div>
@@ -367,7 +367,7 @@ export const ScreenOptionsReact: FC<ScreenOptionsEnhancedProps> = (props) => {
                     min="1"
                     max="999"
                     value={tempItemsPerPage}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       const value = parseInt(e.target.value);
                       if (value > 0) setTempItemsPerPage(value);
                     }}

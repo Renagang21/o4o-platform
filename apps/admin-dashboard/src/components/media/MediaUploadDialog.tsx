@@ -51,7 +51,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   acceptedTypes,
   maxFileSize = 100 * 1024 * 1024 // 100MB default
 }) => {
-  const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([])
+  const [uploadFiles, setUploadFiles] = useState([])
   const [isUploading, setIsUploading] = useState(false)
   const [currentEditingFile, setCurrentEditingFile] = useState<string | null>(null)
 
@@ -294,7 +294,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {uploadFiles.map((uploadFile) => (
+              {uploadFiles.map((uploadFile: any) => (
                 <div
                   key={uploadFile.id}
                   className={`border rounded-lg p-4 ${

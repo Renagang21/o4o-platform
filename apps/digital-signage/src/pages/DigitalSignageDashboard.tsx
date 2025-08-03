@@ -37,7 +37,7 @@ interface DashboardStats {
 export default function DigitalSignageDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [selectedStoreId] = useState<string>('');
+  const [selectedStoreId] = useState('');
   const [loading, setLoading] = useState(true);
 
   // This would come from auth context - using dynamic value to avoid TS literal type inference
@@ -72,7 +72,7 @@ export default function DigitalSignageDashboard() {
 
       setStats({
         totalStores: stores.length,
-        activeStores: stores.filter((s) => s.status === 'active').length,
+        activeStores: stores.filter((s: any) => s.status === 'active').length,
         totalContent: contentData.data?.pagination?.total || 0,
         approvedContent: 0, // Would need separate API call
         totalPlaylists: 0, // Would need separate API call
@@ -127,7 +127,7 @@ export default function DigitalSignageDashboard() {
             {/* Tabs */}
             <div className="mt-6">
               <nav className="flex space-x-8">
-                {tabs.map((tab) => {
+                {tabs.map((tab: any) => {
                   const Icon = tab.icon;
                   return (
                     <button
@@ -264,7 +264,7 @@ export default function DigitalSignageDashboard() {
               <div className="p-6">
                 {stats?.recentActivity && stats.recentActivity.length > 0 ? (
                   <div className="space-y-4">
-                    {stats.recentActivity.map((activity) => (
+                    {stats.recentActivity.map((activity: any) => (
                       <div key={activity.id} className="flex items-start space-x-3">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                         <div className="flex-1">

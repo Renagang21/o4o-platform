@@ -23,9 +23,9 @@ import { ko } from 'date-fns/locale';
 const Orders: FC = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<OrderFilters>({});
+  const [filters, setFilters] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [bulkAction, setBulkAction] = useState('');
 
@@ -195,7 +195,7 @@ const Orders: FC = () => {
           >
             전체 ({ordersData?.total || 0})
           </button>
-          {['pending', 'processing', 'shipped', 'completed', 'cancelled', 'refunded'].map((status) => {
+          {['pending', 'processing', 'shipped', 'completed', 'cancelled', 'refunded'].map((status: any) => {
             const statusInfo = statusColors[status];
             return (
               <button
@@ -335,7 +335,7 @@ const Orders: FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {orders.map((order) => {
+              {orders.map((order: any) => {
                 const statusInfo = statusColors[order.status] || statusColors.pending;
                 return (
                   <tr key={order.id} className="hover:bg-gray-50">

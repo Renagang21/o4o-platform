@@ -27,7 +27,7 @@ interface UseProductsResult {
 }
 
 export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(0);

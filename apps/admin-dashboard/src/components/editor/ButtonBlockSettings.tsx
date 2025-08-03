@@ -38,7 +38,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
         <Input
           id="text"
           value={settings.text || ''}
-          onChange={(e) => onChange({ ...settings, text: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings, text: e.target.value })}
           placeholder="버튼 텍스트"
         />
       </div>
@@ -53,7 +53,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
           id="url"
           type="url"
           value={settings.url || ''}
-          onChange={(e) => onChange({ ...settings, url: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings, url: e.target.value })}
           placeholder="https://example.com"
         />
         <div className="mt-2">
@@ -61,7 +61,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
             <input
               type="checkbox"
               checked={settings.target === '_blank'}
-              onChange={(e) => onChange({ 
+              onChange={(e: any) => onChange({ 
                 ...settings, 
                 target: e.target.checked ? '_blank' : '_self' 
               })}
@@ -142,7 +142,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
               id="bgColor"
               type="color"
               value={settings.backgroundColor || '#007cba'}
-              onChange={(e) => onChange({ ...settings, backgroundColor: e.target.value })}
+              onChange={(e: any) => onChange({ ...settings, backgroundColor: e.target.value })}
               className="mt-1 h-8"
             />
           </div>
@@ -152,7 +152,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
               id="textColor"
               type="color"
               value={settings.textColor || '#ffffff'}
-              onChange={(e) => onChange({ ...settings, textColor: e.target.value })}
+              onChange={(e: any) => onChange({ ...settings, textColor: e.target.value })}
               className="mt-1 h-8"
             />
           </div>
@@ -171,7 +171,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
             min="0"
             max="50"
             value={settings.borderRadius || 4}
-            onChange={(e) => onChange({ ...settings, borderRadius: parseInt(e.target.value) })}
+            onChange={(e: any) => onChange({ ...settings, borderRadius: parseInt(e.target.value) })}
             className="flex-1"
           />
           <span className="text-sm w-12 text-right">{settings.borderRadius || 4}px</span>

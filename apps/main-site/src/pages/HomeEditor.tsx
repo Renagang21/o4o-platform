@@ -35,7 +35,7 @@ const HomeEditorPage: FC = () => {
                 <input
                   type="text"
                   value={homeContent.title}
-                  onChange={(e) => setHomeContent({...homeContent, title: e.target.value})}
+                  onChange={(e: any) => setHomeContent({...homeContent, title: e.target.value})}
                   className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
                 />
               ) : (
@@ -49,7 +49,7 @@ const HomeEditorPage: FC = () => {
                 <input
                   type="text"
                   value={homeContent.subtitle}
-                  onChange={(e) => setHomeContent({...homeContent, subtitle: e.target.value})}
+                  onChange={(e: any) => setHomeContent({...homeContent, subtitle: e.target.value})}
                   className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
                 />
               ) : (
@@ -62,7 +62,7 @@ const HomeEditorPage: FC = () => {
               {isEditing ? (
                 <textarea
                   value={homeContent.description}
-                  onChange={(e) => setHomeContent({...homeContent, description: e.target.value})}
+                  onChange={(e: any) => setHomeContent({...homeContent, description: e.target.value})}
                   rows={4}
                   className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
                 />

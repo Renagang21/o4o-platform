@@ -43,7 +43,7 @@ const PopoverTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBu
     return (
       <button
         ref={ref}
-        onClick={(e) => {
+        onClick={(e: any) => {
           onClick?.(e);
           context.onOpenChange(!context.open);
         }}

@@ -31,7 +31,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
   onDelete
 }) => {
   const queryClient = useQueryClient()
-  const [editData, setEditData] = useState<MediaEditDto>({
+  const [editData, setEditData] = useState({
     title: media.title,
     alt: media.alt,
     caption: media.caption,

@@ -70,7 +70,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
 }) => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<BetaFeedbackData>({
+  const [formData, setFormData] = useState({
     betaUserEmail: '',
     type: 'general_feedback',
     title: '',
@@ -197,7 +197,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           </label>
           <textarea
             value={formData.reproductionSteps}
-            onChange={(e) => handleInputChange('reproductionSteps', e.target.value)}
+            onChange={(e: any) => handleInputChange('reproductionSteps', e.target.value)}
             placeholder="문제를 재현하기 위한 단계를 순서대로 설명해주세요&#10;1. 첫 번째 단계&#10;2. 두 번째 단계&#10;3. ..."
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -210,7 +210,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           </label>
           <textarea
             value={formData.expectedBehavior}
-            onChange={(e) => handleInputChange('expectedBehavior', e.target.value)}
+            onChange={(e: any) => handleInputChange('expectedBehavior', e.target.value)}
             placeholder="어떻게 동작해야 한다고 생각하시나요?"
             rows={2}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -223,7 +223,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           </label>
           <textarea
             value={formData.actualBehavior}
-            onChange={(e) => handleInputChange('actualBehavior', e.target.value)}
+            onChange={(e: any) => handleInputChange('actualBehavior', e.target.value)}
             placeholder="실제로는 어떻게 동작하나요?"
             rows={2}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -242,7 +242,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           만족도 평가 (1-5점)
         </label>
         <div className="flex space-x-2">
-          {[1, 2, 3, 4, 5].map((rating) => (
+          {[1, 2, 3, 4, 5].map((rating: any) => (
             <button
               key={rating}
               type="button"
@@ -287,7 +287,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
             label="베타 사용자 이메일 *"
             type="email"
             value={formData.betaUserEmail}
-            onChange={(e) => handleInputChange('betaUserEmail', e.target.value)}
+            onChange={(e: any) => handleInputChange('betaUserEmail', e.target.value)}
             placeholder="베타 프로그램에 등록한 이메일 주소"
             required
           />
@@ -295,7 +295,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           <Select
             label="피드백 유형 *"
             value={formData.type}
-            onChange={(value) => handleInputChange('type', value)}
+            onChange={(value: any) => handleInputChange('type', value)}
             options={FEEDBACK_TYPES}
             required
           />
@@ -303,7 +303,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           <Input
             label="제목 *"
             value={formData.title}
-            onChange={(e) => handleInputChange('title', e.target.value)}
+            onChange={(e: any) => handleInputChange('title', e.target.value)}
             placeholder="피드백 제목을 간단히 입력해주세요 (5자 이상)"
             required
           />
@@ -314,7 +314,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(e: any) => handleInputChange('description', e.target.value)}
               placeholder="피드백 내용을 자세히 설명해주세요 (10자 이상)"
               rows={4}
               required
@@ -327,7 +327,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           <Select
             label="관련 기능"
             value={formData.feature}
-            onChange={(value) => handleInputChange('feature', value)}
+            onChange={(value: any) => handleInputChange('feature', value)}
             options={SIGNAGE_FEATURES}
             placeholder="관련된 기능을 선택해주세요"
           />
@@ -335,7 +335,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
           <Select
             label="우선순위"
             value={formData.priority}
-            onChange={(value) => handleInputChange('priority', value)}
+            onChange={(value: any) => handleInputChange('priority', value)}
             options={PRIORITIES}
           />
 
@@ -345,7 +345,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
             label="회신받을 이메일"
             type="email"
             value={formData.contactEmail}
-            onChange={(e) => handleInputChange('contactEmail', e.target.value)}
+            onChange={(e: any) => handleInputChange('contactEmail', e.target.value)}
             placeholder="다른 이메일로 회신을 원하시면 입력해주세요"
           />
 
@@ -355,7 +355,7 @@ export const BetaFeedbackModal: FC<BetaFeedbackModalProps> = ({
             </label>
             <textarea
               value={formData.additionalComments}
-              onChange={(e) => handleInputChange('additionalComments', e.target.value)}
+              onChange={(e: any) => handleInputChange('additionalComments', e.target.value)}
               placeholder="추가로 전달하고 싶은 내용이 있다면 자유롭게 작성해주세요"
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"

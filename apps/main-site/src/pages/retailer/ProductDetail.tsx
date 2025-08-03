@@ -214,7 +214,7 @@ export default function ProductDetail() {
             {/* 평점 및 리뷰 */}
             <div className="mt-3 flex items-center">
               <div className="flex items-center">
-                {[0, 1, 2, 3, 4].map((rating) => (
+                {[0, 1, 2, 3, 4].map((rating: any) => (
                   <svg
                     key={rating}
                     className={`${
@@ -288,10 +288,10 @@ export default function ProductDetail() {
                 <select
                   id="quantity"
                   value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  onChange={(e: any) => setQuantity(Number(e.target.value))}
                   className="max-w-full rounded-md border border-gray-300 py-1.5 text-base leading-5 font-medium text-gray-700 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
-                  {Array.from({ length: Math.min(50, currentProduct.stockQuantity) }, (_, i) => i + 1).map((num) => (
+                  {Array.from({ length: Math.min(50, currentProduct.stockQuantity) }, (_, i) => i + 1).map((num: any) => (
                     <option key={num} value={num}>
                       {num}
                     </option>

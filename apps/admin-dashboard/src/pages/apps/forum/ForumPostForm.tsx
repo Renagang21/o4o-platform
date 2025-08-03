@@ -33,7 +33,7 @@ const ForumPostForm: FC = () => {
   const queryClient = useQueryClient();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState<ForumPostFormData>({
+  const [formData, setFormData] = useState({
     title: '',
     content: '',
     categoryId: '',
@@ -175,7 +175,7 @@ const ForumPostForm: FC = () => {
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => handleChange('title', e.target.value)}
+                  onChange={(e: any) => handleChange('title', e.target.value)}
                   placeholder="게시글 제목을 입력하세요"
                   required
                 />
@@ -205,7 +205,7 @@ const ForumPostForm: FC = () => {
                 <Textarea
                   id="content"
                   value={formData.content}
-                  onChange={(e) => handleChange('content', e.target.value)}
+                  onChange={(e: any) => handleChange('content', e.target.value)}
                   placeholder="게시글 내용을 입력하세요..."
                   rows={12}
                   required

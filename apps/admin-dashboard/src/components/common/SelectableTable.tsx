@@ -96,7 +96,7 @@ export const SelectableTable: FC<SelectableTableProps> = ({
                     id={`cb-select-${itemId}`}
                     checked={selected}
                     onCheckedChange={() => onToggleItem(itemId)}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e: any) => e.stopPropagation()}
                   />
                 </th>
                 {columns.map(column => (

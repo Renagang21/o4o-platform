@@ -13,7 +13,7 @@ interface CommissionHistoryProps {
 }
 
 export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId }) => {
-  const [commissions, setCommissions] = useState<AffiliateCommission[]>([]);
+  const [commissions, setCommissions] = useState([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'paid' | 'cancelled'>('all');
   const [period, setPeriod] = useState<'all' | 'month' | 'quarter' | 'year'>('month');
   const [searchQuery, setSearchQuery] = useState('');
@@ -207,7 +207,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
             <Input
               placeholder="주문번호로 검색..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
               className="flex-1"
             />
             <Select value={filter} onValueChange={(value: any) => setFilter(value)}>
@@ -262,7 +262,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
                     </td>
                   </tr>
                 ) : (
-                  filteredCommissions.map((commission) => (
+                  filteredCommissions.map((commission: any) => (
                     <tr key={commission.id} className="border-b border-modern-border-primary hover:bg-modern-bg-tertiary">
                       <td className="py-3 px-2">
                         <p className="font-medium text-sm">{commission.orderId}</p>

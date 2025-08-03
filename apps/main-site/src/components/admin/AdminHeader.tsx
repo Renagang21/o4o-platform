@@ -97,7 +97,7 @@ const AdminHeader: FC = () => {
                   <h3 className="text-lg font-medium text-gray-900">알림</h3>
                 </div>
                 <div className="max-h-64 overflow-y-auto">
-                  {mockNotifications.map((notification) => (
+                  {mockNotifications.map((notification: any) => (
                     <div key={notification.id} className="p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">

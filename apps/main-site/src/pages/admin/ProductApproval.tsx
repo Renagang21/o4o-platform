@@ -18,7 +18,7 @@ export default function ProductApproval() {
     clearError,
   } = useProductStore();
 
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [statusFilter, setStatusFilter] = useState<'pending' | 'approved' | 'rejected' | ''>('pending');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
@@ -174,7 +174,7 @@ export default function ProductApproval() {
               </label>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e: any) => setStatusFilter(e.target.value as any)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="">전체 상태</option>
@@ -191,7 +191,7 @@ export default function ProductApproval() {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="상품명, 브랜드로 검색"
               />
@@ -259,7 +259,7 @@ export default function ProductApproval() {
                   <input
                     type="checkbox"
                     checked={selectedProducts.length === filteredProducts.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    onChange={(e: any) => handleSelectAll(e.target.checked)}
                     className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   />
                   <span className="ml-3 text-sm font-medium text-gray-900">
@@ -270,14 +270,14 @@ export default function ProductApproval() {
 
               {/* 상품 목록 */}
               <div className="divide-y divide-gray-200">
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product: any) => (
                   <div key={product.id} className="p-6 hover:bg-gray-50">
                     <div className="flex items-start space-x-4">
                       {/* 체크박스 */}
                       <input
                         type="checkbox"
                         checked={selectedProducts.includes(product.id)}
-                        onChange={(e) => handleProductSelect(product.id, e.target.checked)}
+                        onChange={(e: any) => handleProductSelect(product.id, e.target.checked)}
                         className="mt-4 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       />
 

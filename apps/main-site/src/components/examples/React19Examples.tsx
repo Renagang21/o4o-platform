@@ -19,7 +19,7 @@ async function addTodoAction(text: string): Promise<Todo> {
 }
 
 function OptimisticTodoList() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState([]);
   const [optimisticTodos, addOptimisticTodo] = useOptimistic(
     todos,
     (state, newTodo: string) => [
@@ -195,7 +195,7 @@ function SearchableList() {
       
       <input
         value={query}
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={(e: any) => handleSearch(e.target.value)}
         placeholder="검색..."
         className="w-full border p-2 rounded mb-4"
       />

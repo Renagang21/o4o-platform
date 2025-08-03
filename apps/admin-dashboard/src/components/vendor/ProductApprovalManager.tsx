@@ -16,7 +16,7 @@ import type { VendorProduct, ProductApprovalRequest } from '@o4o/types';
 
 export const ProductApprovalManager: FC = () => {
   const { user } = useAuth();
-  const [products, setProducts] = useState<VendorProduct[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState('all');
@@ -172,7 +172,7 @@ export const ProductApprovalManager: FC = () => {
                 <Input
                   placeholder="제품명 또는 SKU로 검색..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e: any) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -242,7 +242,7 @@ export const ProductApprovalManager: FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((product) => {
+                  filteredProducts.map((product: any) => {
                     const calc = calculateProfitDistribution({
                       sellPrice: product.sellPrice,
                       supplyPrice: product.supplyPrice,

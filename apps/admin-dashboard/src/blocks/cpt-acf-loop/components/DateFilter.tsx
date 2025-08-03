@@ -210,7 +210,7 @@ export default function DateFilter({
           label={__('Time Period', 'o4o')}
           value={dateFilter.relative || ''}
           options={relativeOptions}
-          onChange={(relative) => onDateFilterChange({
+          onChange={(relative: any) => onDateFilterChange({
             ...dateFilter,
             relative,
           })}
@@ -223,7 +223,7 @@ export default function DateFilter({
             <h4 style={{ margin: '0 0 8px 0' }}>{__('Start Date', 'o4o')}</h4>
             <DateTimePicker
               currentDate={dateFilter.startDate}
-              onChange={(startDate) => onDateFilterChange({
+              onChange={(startDate: any) => onDateFilterChange({
                 ...dateFilter,
                 startDate: startDate || undefined,
               })}
@@ -235,7 +235,7 @@ export default function DateFilter({
             <h4 style={{ margin: '0 0 8px 0' }}>{__('End Date', 'o4o')}</h4>
             <DateTimePicker
               currentDate={dateFilter.endDate}
-              onChange={(endDate) => onDateFilterChange({
+              onChange={(endDate: any) => onDateFilterChange({
                 ...dateFilter,
                 endDate: endDate || undefined,
               })}
@@ -246,7 +246,7 @@ export default function DateFilter({
           <ToggleControl
             label={__('Include time in filter', 'o4o')}
             checked={dateFilter.includeTime || false}
-            onChange={(includeTime) => onDateFilterChange({
+            onChange={(includeTime: any) => onDateFilterChange({
               ...dateFilter,
               includeTime,
             })}

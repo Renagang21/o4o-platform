@@ -62,7 +62,7 @@ export function ReviewList({
 
       {/* Reviews */}
       <div className="space-y-6">
-        {reviews.reviews.map((review) => (
+        {reviews.reviews.map((review: any) => (
           <ReviewItem
             key={review.id}
             review={review}
@@ -93,7 +93,7 @@ export function ReviewList({
 function ReviewListSkeleton() {
   return (
     <div className="space-y-6">
-      {[1, 2, 3].map((i) => (
+      {[1, 2, 3].map((i: any) => (
         <div key={i} className="border-b pb-6 last:border-0">
           <div className="flex items-start gap-3 mb-2">
             <Skeleton className="h-5 w-24" />

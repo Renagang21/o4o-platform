@@ -117,7 +117,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
             step={step}
             disabled={disabled}
             className="sr-only"
-            onChange={(e) => handleValueChange(Number(e.target.value))}
+            onChange={(e: any) => handleValueChange(Number(e.target.value))}
           />
         </div>
       </div>

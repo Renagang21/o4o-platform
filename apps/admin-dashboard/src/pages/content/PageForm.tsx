@@ -62,7 +62,7 @@ const PageForm: FC = () => {
   })
   
   const [showRecoveryNotice, setShowRecoveryNotice] = useState(false)
-  const [recoveryData, setRecoveryData] = useState<any>(null)
+  const [recoveryData, setRecoveryData] = useState(null)
 
   // 페이지 조회 (수정 모드)
   const { data: page, isLoading: isLoadingPage } = useQuery({
@@ -286,7 +286,7 @@ const PageForm: FC = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {pageTemplates.map((template) => (
+                        {pageTemplates.map((template: any) => (
                           <SelectItem key={template.value} value={template.value}>
                             {template.label}
                           </SelectItem>

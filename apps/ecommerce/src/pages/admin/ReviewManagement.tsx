@@ -18,7 +18,7 @@ import {
 import { toast } from 'sonner';
 
 export function ReviewManagement() {
-  const [filters, setFilters] = useState<ReviewFilters>({
+  const [filters, setFilters] = useState({
     status: ReviewStatus.PENDING,
     limit: 20
   });
@@ -84,7 +84,7 @@ export function ReviewManagement() {
           <Input
             placeholder="리뷰 검색..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: any) => setSearchQuery(e.target.value)}
             className="w-64"
           />
           <Button type="submit" size="icon">
@@ -148,7 +148,7 @@ export function ReviewManagement() {
         <TabsContent value={filters.status} className="mt-6">
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3].map((i: any) => (
                 <Skeleton key={i} className="h-32 w-full" />
               ))}
             </div>
@@ -180,7 +180,7 @@ export function ReviewManagement() {
               {filters.status === ReviewStatus.PENDING && reviewsData && reviewsData.reviews.length > 0 && (
                 <div className="border-t p-4">
                   <div className="flex gap-2">
-                    {reviewsData.reviews.map((review) => (
+                    {reviewsData.reviews.map((review: any) => (
                       <div key={review.id} className="flex gap-2 items-center p-2 border rounded">
                         <span className="text-sm">{review.title}</span>
                         <Button

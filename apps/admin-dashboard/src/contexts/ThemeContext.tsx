@@ -31,7 +31,7 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({
   defaultTheme = 'system',
   storageKey = 'o4o-admin-theme',
 }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
+  const [theme, setThemeState] = useState(() => {
     // Check localStorage first
     const stored = localStorage.getItem(storageKey) as Theme | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) {
@@ -40,7 +40,7 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({
     return defaultTheme;
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => {
+  const [resolvedTheme, setResolvedTheme] = useState(() => {
     if (theme === 'system') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }

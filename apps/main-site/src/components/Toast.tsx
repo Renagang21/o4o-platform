@@ -23,7 +23,7 @@ const Toast: FC = () => {
   return (
     <div className="fixed z-50 bottom-4 right-4 flex flex-col gap-2 max-w-xs w-full">
       <AnimatePresence>
-        {toasts.map((toast) => (
+        {toasts.map((toast: any) => (
           <motion.div
             key={toast.id}
             initial={{ opacity: 0, y: 40 }}

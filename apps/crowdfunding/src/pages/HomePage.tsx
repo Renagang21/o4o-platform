@@ -74,7 +74,7 @@ export function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {trendingProjects?.projects.map((project) => (
+              {trendingProjects?.projects.map((project: any) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>
@@ -106,7 +106,7 @@ export function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {endingSoon?.projects.map((project) => (
+              {endingSoon?.projects.map((project: any) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>
@@ -138,7 +138,7 @@ export function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {staffPicks?.projects.map((project) => (
+              {staffPicks?.projects.map((project: any) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>

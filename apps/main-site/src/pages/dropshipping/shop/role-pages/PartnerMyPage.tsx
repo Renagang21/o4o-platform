@@ -45,7 +45,7 @@ interface ReferralLink {
 
 const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [partnerStats, setPartnerStats] = useState<PartnerStats>({
+  const [partnerStats, setPartnerStats] = useState({
     totalEarnings: 1850000,
     monthlyEarnings: 320000,
     totalClicks: 12547,
@@ -59,8 +59,8 @@ const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
     nextLevelRequirement: 2000000
   });
 
-  const [commissionHistory, setCommissionHistory] = useState<CommissionHistory[]>([]);
-  const [referralLinks, setReferralLinks] = useState<ReferralLink[]>([]);
+  const [commissionHistory, setCommissionHistory] = useState([]);
+  const [referralLinks, setReferralLinks] = useState([]);
 
   useEffect(() => {
     // 모의 커미션 내역
@@ -311,7 +311,7 @@ const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  {commissionHistory.slice(0, 5).map((item) => (
+                  {commissionHistory.slice(0, 5).map((item: any) => (
                     <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className="text-2xl">{getTypeIcon(item.type)}</div>
@@ -344,7 +344,7 @@ const PartnerMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  {referralLinks.map((link) => (
+                  {referralLinks.map((link: any) => (
                     <div key={link.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="font-medium text-gray-900">{link.name}</div>

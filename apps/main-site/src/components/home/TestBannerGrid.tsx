@@ -34,7 +34,7 @@ const TestBannerGrid: FC<TestBannerGridProps> = ({
         <div className="mb-12">
           <h3 className="text-xl font-medium text-gray-800 mb-6">주요 기능 테스트</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featureBanners.map((banner) => (
+            {featureBanners.map((banner: any) => (
               <Card
                 key={banner.id}
                 variant="elevated"
@@ -81,7 +81,7 @@ const TestBannerGrid: FC<TestBannerGridProps> = ({
         <div>
           <h3 className="text-xl font-medium text-gray-800 mb-6">관리자 도구</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {utilityBanners.map((banner) => (
+            {utilityBanners.map((banner: any) => (
               <Card
                 key={banner.id}
                 variant="default"

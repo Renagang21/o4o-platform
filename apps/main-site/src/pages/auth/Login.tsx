@@ -9,7 +9,7 @@ import { defaultAccounts } from '../../mocks/users';
 export default function Login() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuthStore();
-  const [selectedUserType, setSelectedUserType] = useState<string>('customer');
+  const [selectedUserType, setSelectedUserType] = useState('customer');
   
   const {
     register,
@@ -85,7 +85,7 @@ export default function Login() {
 
         {/* 사용자 타입 선택 */}
         <div className="grid grid-cols-2 gap-3">
-          {userTypes.map((type) => (
+          {userTypes.map((type: any) => (
             <button
               key={type.value}
               type="button"

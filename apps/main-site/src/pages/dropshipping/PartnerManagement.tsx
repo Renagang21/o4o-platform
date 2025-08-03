@@ -21,12 +21,12 @@ interface Partner {
 }
 
 const PartnerManagement: FC = () => {
-  const [currentRole, setCurrentRole] = useState<UserRole>('supplier');
-  const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string>('partner_001');
+  const [currentRole, setCurrentRole] = useState('supplier');
+  const [viewMode, setViewMode] = useState('dashboard');
+  const [selectedPartnerId, setSelectedPartnerId] = useState('partner_001');
 
   // 샘플 파트너 데이터
-  const [partners] = useState<Partner[]>([
+  const [partners] = useState([
     {
       id: 'partner_001',
       name: '박인플루',
@@ -450,7 +450,7 @@ const PartnerManagement: FC = () => {
               <span className="text-sm text-gray-600">역할:</span>
               <select
                 value={currentRole}
-                onChange={(e) => setCurrentRole(e.target.value as UserRole)}
+                onChange={(e: any) => setCurrentRole(e.target.value as UserRole)}
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
               >
                 <option value="supplier">공급자</option>

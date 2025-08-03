@@ -578,7 +578,7 @@ function SupplierStoreSettingsSkeleton() {
       <Skeleton className="h-10 w-48 mb-2" />
       <Skeleton className="h-6 w-96 mb-8" />
       <div className="space-y-8">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map((i: any) => (
           <Card key={i}>
             <CardHeader>
               <Skeleton className="h-6 w-32 mb-2" />

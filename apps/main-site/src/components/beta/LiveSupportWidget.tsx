@@ -45,7 +45,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [isLiveSupport, setIsLiveSupport] = useState(false);
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
@@ -316,7 +316,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
                   ref={inputRef}
                   type="text"
                   value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
+                  onChange={(e: any) => setNewMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="메시지를 입력하세요..."
                   disabled={!conversation || connectionStatus !== 'connected'}

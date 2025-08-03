@@ -19,8 +19,8 @@ export default function ProductList() {
     clearError,
   } = useProductStore();
 
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function ProductList() {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="상품명, 브랜드로 검색"
               />
@@ -150,7 +150,7 @@ export default function ProductList() {
               </label>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e: any) => setStatusFilter(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="">전체 상태</option>
@@ -240,7 +240,7 @@ export default function ProductList() {
                       <input
                         type="checkbox"
                         checked={selectedProducts.length === filteredProducts.length}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           if (e.target.checked) {
                             setSelectedProducts(filteredProducts.map(p => p.id));
                           } else {
@@ -271,13 +271,13 @@ export default function ProductList() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredProducts.map((product) => (
+                  {filteredProducts.map((product: any) => (
                     <tr key={product.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
                           checked={selectedProducts.includes(product.id)}
-                          onChange={(e) => {
+                          onChange={(e: any) => {
                             if (e.target.checked) {
                               setSelectedProducts([...selectedProducts, product.id]);
                             } else {
@@ -354,7 +354,7 @@ export default function ProductList() {
                         </button>
                         <select
                           value={product.status}
-                          onChange={(e) => handleStatusChange(product.id, e.target.value as Product['status'])}
+                          onChange={(e: any) => handleStatusChange(product.id, e.target.value as Product['status'])}
                           className="text-sm border-gray-300 rounded"
                         >
                           <option value="draft">임시저장</option>

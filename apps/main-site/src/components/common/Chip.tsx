@@ -100,7 +100,7 @@ const Chip: FC<ChipProps> = ({
             'ml-1 rounded-full p-0.5 hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-offset-2',
             iconSizeStyles[size]
           )}
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.stopPropagation();
             onDelete();
           }}

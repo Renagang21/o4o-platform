@@ -98,8 +98,8 @@ export const BetaManagement: FC = () => {
   const { showToast } = useToast();
   
   const [activeTab, setActiveTab] = useState('users');
-  const [betaUsers, setBetaUsers] = useState<BetaUser[]>([]);
-  const [betaFeedback, setBetaFeedback] = useState<BetaFeedback[]>([]);
+  const [betaUsers, setBetaUsers] = useState([]);
+  const [betaFeedback, setBetaFeedback] = useState([]);
   const [analytics, setAnalytics] = useState<BetaAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
   
@@ -478,7 +478,7 @@ export const BetaManagement: FC = () => {
           <Input
             placeholder="이름, 이메일, 회사명으로 검색..."
             value={userSearchQuery}
-            onChange={(e) => setUserSearchQuery(e.target.value)}
+            onChange={(e: any) => setUserSearchQuery(e.target.value)}
             className="flex-1"
           />
           <Select
@@ -599,7 +599,7 @@ export const BetaManagement: FC = () => {
           <Input
             placeholder="제목, 설명으로 검색..."
             value={feedbackSearchQuery}
-            onChange={(e) => setFeedbackSearchQuery(e.target.value)}
+            onChange={(e: any) => setFeedbackSearchQuery(e.target.value)}
             className="flex-1"
           />
           <Select
@@ -716,7 +716,7 @@ export const BetaManagement: FC = () => {
             <div className="mt-6 flex space-x-3">
               <Select
                 value={selectedUser.status}
-                onChange={(status) => handleUpdateUserStatus(selectedUser.id, status)}
+                onChange={(status: any) => handleUpdateUserStatus(selectedUser.id, status)}
                 options={[
                   { value: 'pending', label: '대기 중' },
                   { value: 'approved', label: '승인됨' },
@@ -760,7 +760,7 @@ export const BetaManagement: FC = () => {
             <div className="mt-6 flex space-x-3">
               <Select
                 value={selectedFeedback.status}
-                onChange={(status) => handleUpdateFeedbackStatus(selectedFeedback.id, status)}
+                onChange={(status: any) => handleUpdateFeedbackStatus(selectedFeedback.id, status)}
                 options={[
                   { value: 'pending', label: '대기 중' },
                   { value: 'reviewed', label: '검토됨' },
@@ -798,7 +798,7 @@ export const BetaManagement: FC = () => {
               </label>
               <textarea
                 value={responseText}
-                onChange={(e) => setResponseText(e.target.value)}
+                onChange={(e: any) => setResponseText(e.target.value)}
                 rows={6}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="사용자에게 전달할 응답을 작성해주세요..."

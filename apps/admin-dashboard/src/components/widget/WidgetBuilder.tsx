@@ -168,7 +168,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
   onSave,
   onCancel
 }) => {
-  const [selectedType, setSelectedType] = useState<WidgetType>(widget?.type || 'text')
+  const [selectedType, setSelectedType] = useState(widget?.type || 'text')
   const [formData, setFormData] = useState({
     title: widget?.title || '',
     position: widget?.position || 'footer-1' as WidgetPosition,
@@ -763,7 +763,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
                 <div>
                   <Label>위젯 타입</Label>
                   <div className="grid grid-cols-2 gap-2 mt-2">
-                    {widgetTypes.map((type) => (
+                    {widgetTypes.map((type: any) => (
                       <Button
                         key={type.type}
                         variant={selectedType === type.type ? 'default' : 'outline'}

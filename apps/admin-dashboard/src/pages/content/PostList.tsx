@@ -37,7 +37,7 @@ const PostList: FC = () => {
   const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
-  const [selectedPosts, setSelectedPosts] = useState<string[]>([])
+  const [selectedPosts, setSelectedPosts] = useState([])
 
   // 게시글 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -247,7 +247,7 @@ const PostList: FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {post.categories?.map((category) => (
+                      {post.categories?.map((category: any) => (
                         <Badge key={category.id} variant={"outline" as const} className="mr-1">
                           {category.name}
                         </Badge>

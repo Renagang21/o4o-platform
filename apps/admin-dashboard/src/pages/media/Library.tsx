@@ -62,7 +62,7 @@ const Library: FC = () => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([
+  const [mediaItems, setMediaItems] = useState([
     {
       id: '1',
       name: 'product-hero.jpg',
@@ -114,7 +114,7 @@ const Library: FC = () => {
     }
   ])
 
-  const [folders, ] = useState<MediaFolder[]>([ // setFolders not used
+  const [folders, ] = useState([ // setFolders not used
     {
       id: 'folder-1',
       name: '제품 이미지',
@@ -136,7 +136,7 @@ const Library: FC = () => {
   ])
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedType, setSelectedType] = useState<string>('all')
+  const [selectedType, setSelectedType] = useState('all')
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
 
   const toggleItemSelection = (itemId: string) => {
@@ -201,7 +201,7 @@ const Library: FC = () => {
                 <Input
                   placeholder="미디어 검색..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e: any) => setSearchQuery(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -353,7 +353,7 @@ const Library: FC = () => {
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={(e) => {
+                            onClick={(e: any) => {
                               e.stopPropagation()
                               toggleItemSelection(item.id)
                             }}
@@ -384,7 +384,7 @@ const Library: FC = () => {
                         type="checkbox"
                         checked={selectedItems.has(item.id)}
                         onChange={() => toggleItemSelection(item.id)}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e: any) => e.stopPropagation()}
                         className="rounded"
                       />
                       

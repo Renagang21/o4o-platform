@@ -68,7 +68,7 @@ export function ProjectListPage() {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
                 placeholder="프로젝트 검색..."
                 className="w-full pl-10 pr-4 py-2 border border-border-main rounded-lg focus:outline-none focus:border-primary"
               />
@@ -94,7 +94,7 @@ export function ProjectListPage() {
                   />
                   <span className="text-sm">전체</span>
                 </label>
-                {categories.map((cat) => (
+                {categories.map((cat: any) => (
                   <label key={cat.value} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
@@ -123,7 +123,7 @@ export function ProjectListPage() {
                   />
                   <span className="text-sm">전체</span>
                 </label>
-                {statusOptions.map((status) => (
+                {statusOptions.map((status: any) => (
                   <label key={status.value} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
@@ -143,7 +143,7 @@ export function ProjectListPage() {
               <h3 className="font-medium text-text-main mb-3">정렬</h3>
               <select
                 value={filters.sortBy}
-                onChange={(e) => updateFilter('sort', e.target.value)}
+                onChange={(e: any) => updateFilter('sort', e.target.value)}
                 className="w-full px-3 py-2 border border-border-main rounded-lg focus:outline-none focus:border-primary"
               >
                 <option value="latest">최신순</option>
@@ -178,7 +178,7 @@ export function ProjectListPage() {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {data?.projects.map((project) => (
+                  {data?.projects.map((project: any) => (
                     <ProjectCard key={project.id} project={project} />
                   ))}
                 </div>

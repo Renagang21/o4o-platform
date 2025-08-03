@@ -266,7 +266,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
   onContentChange
 }) => {
   // Initialize blocks from content if provided
-  const [blocks, setBlocks] = useState<Block[]>(() => {
+  const [blocks, setBlocks] = useState(() => {
     if (content) {
       return parseContentToBlocks(content);
     }
@@ -410,7 +410,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
               <Move className="w-4 h-4 text-modern-text-secondary" />
             </button>
             <button 
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 duplicateBlock(block.id);
               }}
@@ -419,7 +419,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
               <Copy className="w-4 h-4 text-modern-text-secondary" />
             </button>
             <button 
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 deleteBlock(block.id);
               }}
@@ -478,7 +478,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                   </div>
                 ) : (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       setMediaLibraryCallback(() => (media: any) => {
                         const updatedBlock = {
@@ -509,7 +509,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 )}
                 {selectedBlockId === block.id && block.content.url && (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       setShowBlockSettings(true);
                     }}
@@ -547,7 +547,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                   </div>
                 ) : (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       setMediaLibraryCallback(() => (media: any) => {
                         const updatedBlock = {
@@ -580,7 +580,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 {selectedBlockId === block.id && block.content.images?.length > 0 && (
                   <div className="flex gap-2">
                     <button
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation();
                         setMediaLibraryCallback(() => (media: any) => {
                           const updatedBlock = {
@@ -607,7 +607,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                       이미지 추가
                     </button>
                     <button
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation();
                         setShowBlockSettings(true);
                       }}
@@ -653,7 +653,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 </div>
                 {!block.content.url && (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       setMediaLibraryCallback(() => (media: any) => {
                         const updatedBlock = {
@@ -675,7 +675,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                 )}
                 {selectedBlockId === block.id && (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       setShowBlockSettings(true);
                     }}
@@ -792,7 +792,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
                   />
                 ) : (
                   <button
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       setMediaLibraryCallback(() => (media: any) => {
                         const updatedBlock = {
@@ -944,7 +944,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
           setShowMediaLibrary(false);
           setMediaLibraryCallback(null);
         }}
-        onSelect={(media) => {
+        onSelect={(media: any) => {
           if (mediaLibraryCallback) {
             mediaLibraryCallback(media);
           }
@@ -968,7 +968,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
             {blocks.find(b => b.id === selectedBlockId)?.type === 'core/image' && (
               <ImageBlockSettings
                 settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
-                onChange={(newSettings) => {
+                onChange={(newSettings: any) => {
                   const newBlocks = blocks.map(block => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
@@ -981,7 +981,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
             {blocks.find(b => b.id === selectedBlockId)?.type === 'core/gallery' && (
               <GalleryBlockSettings
                 settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
-                onChange={(newSettings) => {
+                onChange={(newSettings: any) => {
                   const newBlocks = blocks.map(block => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
@@ -994,7 +994,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
             {blocks.find(b => b.id === selectedBlockId)?.type === 'core/cover' && (
               <CoverBlockSettings
                 settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
-                onChange={(newSettings) => {
+                onChange={(newSettings: any) => {
                   const newBlocks = blocks.map(block => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }
@@ -1007,7 +1007,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
             {blocks.find(b => b.id === selectedBlockId)?.type === 'core/button' && (
               <ButtonBlockSettings
                 settings={blocks.find(b => b.id === selectedBlockId)?.content || {}}
-                onChange={(newSettings) => {
+                onChange={(newSettings: any) => {
                   const newBlocks = blocks.map(block => 
                     block.id === selectedBlockId 
                       ? { ...block, content: { ...block.content, ...newSettings } }

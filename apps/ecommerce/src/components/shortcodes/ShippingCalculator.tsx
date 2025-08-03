@@ -14,7 +14,7 @@ import { Truck, Package } from 'lucide-react';
  */
 export const ShippingCalculator: FC<ShortcodeProps> = ({ attributes }) => {
   const { cart } = useCartStore();
-  const [selectedMethod, setSelectedMethod] = useState<string>('standard');
+  const [selectedMethod, setSelectedMethod] = useState('standard');
   
   // 기본 속성값
   const freeThreshold = Number(attributes.freeThreshold) || 50000;
@@ -71,7 +71,7 @@ export const ShippingCalculator: FC<ShortcodeProps> = ({ attributes }) => {
 
       {/* 배송 방법 선택 */}
       <div className="space-y-2">
-        {shippingMethods.map((method) => {
+        {shippingMethods.map((method: any) => {
           const Icon = method.icon;
           const price = isFreeShipping ? 0 : method.price;
           
@@ -93,7 +93,7 @@ export const ShippingCalculator: FC<ShortcodeProps> = ({ attributes }) => {
                   name="shipping-method"
                   value={method.id}
                   checked={selectedMethod === method.id}
-                  onChange={(e) => setSelectedMethod(e.target.value)}
+                  onChange={(e: any) => setSelectedMethod(e.target.value)}
                   className="text-primary"
                 />
                 <Icon className="w-5 h-5 text-gray-600" />

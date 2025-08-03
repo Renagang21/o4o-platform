@@ -123,7 +123,7 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
 
       {hasChildren && isExpanded && (
         <div>
-          {childFolders.map((childFolder) => (
+          {childFolders.map((childFolder: any) => (
             <FolderTreeItem
               key={childFolder.id}
               folder={childFolder}
@@ -144,10 +144,10 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
 
 const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect }) => {
   const queryClient = useQueryClient()
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([])
+  const [expandedFolders, setExpandedFolders] = useState([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingFolder, setEditingFolder] = useState<MediaFolder | null>(null)
-  const [formData, setFormData] = useState<CreateMediaFolderDto>({
+  const [formData, setFormData] = useState({
     name: '',
     parentId: undefined,
     description: '',

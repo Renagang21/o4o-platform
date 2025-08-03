@@ -68,7 +68,7 @@ const ProductCarousel: FC<ProductCarouselProps> = ({
             transform: `translateX(-${currentIndex * (100 / visibleProducts)}%)`
           }}
         >
-          {products.map((product) => (
+          {products.map((product: any) => (
             <div
               key={product.id}
               className="w-full md:w-1/2 lg:w-1/4 px-2 flex-shrink-0"

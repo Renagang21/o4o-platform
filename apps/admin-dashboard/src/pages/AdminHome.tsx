@@ -110,7 +110,7 @@ const AdminHome: FC = () => {
         <div className="wp-card">
           <h3 className="text-base font-semibold text-wp-text-primary mb-4">한눈에 보기</h3>
           <div className="space-y-2">
-            {atAGlanceItems.map((item) => {
+            {atAGlanceItems.map((item: any) => {
               const Icon = item.icon;
               return (
                 <div key={item.label} className="flex items-center justify-between py-1">
@@ -188,7 +188,7 @@ const AdminHome: FC = () => {
 
       {/* 빠른 통계 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {quickStats.map((stat) => {
+        {quickStats.map((stat: any) => {
           const Icon = stat.icon;
           return (
             <Link 
@@ -217,7 +217,7 @@ const AdminHome: FC = () => {
           <div className="wp-card">
             <h2 className="text-lg font-semibold text-wp-text-primary mb-4">빠른 작업</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {quickActions.map((action) => {
+              {quickActions.map((action: any) => {
                 const Icon = action.icon;
                 return (
                   <Link
@@ -274,7 +274,7 @@ const AdminHome: FC = () => {
         <div className="wp-card">
           <h2 className="text-lg font-semibold text-wp-text-primary mb-4">최근 활동</h2>
           <div className="space-y-3">
-            {recentActivity.map((activity) => (
+            {recentActivity.map((activity: any) => (
               <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border border-gray-200 last:border-0 last:pb-0">
                 <div className="flex-shrink-0 mt-1">
                   <div className="w-2 h-2 bg-admin-blue rounded-full"></div>

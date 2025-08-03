@@ -77,11 +77,11 @@ interface View {
 }
 
 const ViewsManager: FC = () => {
-  const [views, setViews] = useState<View[]>([]);
+  const [views, setViews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingView, setEditingView] = useState<View | null>(null);
-  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewData, setPreviewData] = useState([]);
 
   // 새 View 생성 폼 상태
   const [newView, setNewView] = useState({
@@ -542,7 +542,7 @@ const ViewsManager: FC = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {views.map((view) => (
+                {views.map((view: any) => (
                   <div key={view.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -684,7 +684,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.name}
-                      onChange={(e) => setNewView(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setNewView(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: featured_products, recent_posts"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -698,7 +698,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.title}
-                      onChange={(e) => setNewView(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setNewView(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="예: 추천 상품 목록"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -710,7 +710,7 @@ const ViewsManager: FC = () => {
                     </label>
                     <textarea
                       value={newView.description}
-                      onChange={(e) => setNewView(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewView(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 View의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -730,7 +730,7 @@ const ViewsManager: FC = () => {
                   </label>
                   <select
                     value={newView.query.postType}
-                    onChange={(e) => setNewView(prev => ({
+                    onChange={(e: any) => setNewView(prev => ({
                       ...prev,
                       query: { ...prev.query, postType: e.target.value }
                     }))}
@@ -768,7 +768,7 @@ const ViewsManager: FC = () => {
                           {index > 0 && (
                             <select
                               value={filter.relation}
-                              onChange={(e) => updateFilter(filter.id, { relation: e.target.value as 'AND' | 'OR' })}
+                              onChange={(e: any) => updateFilter(filter.id, { relation: e.target.value as 'AND' | 'OR' })}
                               className="px-2 py-1 text-sm border border-gray-200 rounded"
                             >
                               <option value="AND">AND</option>
@@ -778,7 +778,7 @@ const ViewsManager: FC = () => {
                           
                           <select
                             value={filter.field}
-                            onChange={(e) => updateFilter(filter.id, { field: e.target.value })}
+                            onChange={(e: any) => updateFilter(filter.id, { field: e.target.value })}
                             className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded"
                           >
                             <option value="">필드 선택</option>
@@ -789,7 +789,7 @@ const ViewsManager: FC = () => {
                           
                           <select
                             value={filter.operator}
-                            onChange={(e) => updateFilter(filter.id, { operator: e.target.value as any })}
+                            onChange={(e: any) => updateFilter(filter.id, { operator: e.target.value as any })}
                             className="px-2 py-1 text-sm border border-gray-200 rounded"
                           >
                             {operators.map(op => (
@@ -800,7 +800,7 @@ const ViewsManager: FC = () => {
                           <input
                             type="text"
                             value={Array.isArray(filter.value) ? filter.value.join(',') : filter.value}
-                            onChange={(e) => updateFilter(filter.id, { value: e.target.value })}
+                            onChange={(e: any) => updateFilter(filter.id, { value: e.target.value })}
                             placeholder="값"
                             className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded"
                           />
@@ -841,7 +841,7 @@ const ViewsManager: FC = () => {
                         <div key={index} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
                           <select
                             value={sort.field}
-                            onChange={(e) => updateSort(index, { field: e.target.value })}
+                            onChange={(e: any) => updateSort(index, { field: e.target.value })}
                             className="flex-1 px-2 py-1 text-sm border border-gray-200 rounded"
                           >
                             <option value="">필드 선택</option>
@@ -852,7 +852,7 @@ const ViewsManager: FC = () => {
                           
                           <select
                             value={sort.direction}
-                            onChange={(e) => updateSort(index, { direction: e.target.value as 'ASC' | 'DESC' })}
+                            onChange={(e: any) => updateSort(index, { direction: e.target.value as 'ASC' | 'DESC' })}
                             className="px-2 py-1 text-sm border border-gray-200 rounded"
                           >
                             <option value="ASC">오름차순</option>
@@ -879,7 +879,7 @@ const ViewsManager: FC = () => {
                       <input
                         type="checkbox"
                         checked={newView.query.pagination.enabled}
-                        onChange={(e) => setNewView(prev => ({
+                        onChange={(e: any) => setNewView(prev => ({
                           ...prev,
                           query: {
                             ...prev.query,
@@ -900,7 +900,7 @@ const ViewsManager: FC = () => {
                           <input
                             type="number"
                             value={newView.query.pagination.itemsPerPage}
-                            onChange={(e) => setNewView(prev => ({
+                            onChange={(e: any) => setNewView(prev => ({
                               ...prev,
                               query: {
                                 ...prev.query,
@@ -941,7 +941,7 @@ const ViewsManager: FC = () => {
                           name="templateType"
                           value={type.value}
                           checked={newView.template.type === type.value}
-                          onChange={(e) => setNewView(prev => ({
+                          onChange={(e: any) => setNewView(prev => ({
                             ...prev,
                             template: { ...prev.template, type: e.target.value as any }
                           }))}
@@ -972,7 +972,7 @@ const ViewsManager: FC = () => {
                           <input
                             type="checkbox"
                             checked={newView.template.fields.includes(field.name)}
-                            onChange={(e) => {
+                            onChange={(e: any) => {
                               if (e.target.checked) {
                                 setNewView(prev => ({
                                   ...prev,
@@ -1011,7 +1011,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.template.wrapperClass}
-                      onChange={(e) => setNewView(prev => ({
+                      onChange={(e: any) => setNewView(prev => ({
                         ...prev,
                         template: { ...prev.template, wrapperClass: e.target.value }
                       }))}
@@ -1027,7 +1027,7 @@ const ViewsManager: FC = () => {
                     <input
                       type="text"
                       value={newView.template.itemClass}
-                      onChange={(e) => setNewView(prev => ({
+                      onChange={(e: any) => setNewView(prev => ({
                         ...prev,
                         template: { ...prev.template, itemClass: e.target.value }
                       }))}

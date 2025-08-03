@@ -47,7 +47,7 @@ interface Order {
 
 const SellerMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [sellerStats, setSellerStats] = useState<SellerStats>({
+  const [sellerStats, setSellerStats] = useState({
     totalProducts: 24,
     activeProducts: 18,
     totalSales: 1247,
@@ -60,8 +60,8 @@ const SellerMyPage: FC<RolePageProps> = ({ user }) => {
     monthlyOrders: 89
   });
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     // 모의 상품 데이터
@@ -295,7 +295,7 @@ const SellerMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  {orders.slice(0, 5).map((order) => (
+                  {orders.slice(0, 5).map((order: any) => (
                     <div key={order.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="text-center">
@@ -332,7 +332,7 @@ const SellerMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {products.map((product) => (
+                  {products.map((product: any) => (
                     <div key={product.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-start justify-between mb-3">
                         <img

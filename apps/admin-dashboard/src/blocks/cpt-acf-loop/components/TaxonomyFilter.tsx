@@ -48,10 +48,10 @@ export default function TaxonomyFilter({
   selectedTaxonomies,
   onTaxonomiesChange,
 }: TaxonomyFilterProps) {
-  const [availableTaxonomies, setAvailableTaxonomies] = useState<Taxonomy[]>([]);
+  const [availableTaxonomies, setAvailableTaxonomies] = useState([]);
   const [taxonomyTerms, setTaxonomyTerms] = useState<Record<string, Term[]>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedTaxonomies, setExpandedTaxonomies] = useState<string[]>([]);
+  const [expandedTaxonomies, setExpandedTaxonomies] = useState([]);
   const [searchQuery, setSearchQuery] = useState<Record<string, string>>({});
 
   // Fetch taxonomies for the post type
@@ -226,7 +226,7 @@ export default function TaxonomyFilter({
               </span>
             }
             checked={isChecked}
-            onChange={(checked) => handleTermToggle(taxonomySlug, term.id, checked)}
+            onChange={(checked: any) => handleTermToggle(taxonomySlug, term.id, checked)}
           />
           {term.children && term.children.length > 0 && (
             renderHierarchicalTerms(term.children, taxonomySlug, level + 1)
@@ -258,7 +258,7 @@ export default function TaxonomyFilter({
             </span>
           }
           checked={isChecked}
-          onChange={(checked) => handleTermToggle(taxonomySlug, term.id, checked)}
+          onChange={(checked: any) => handleTermToggle(taxonomySlug, term.id, checked)}
         />
       );
     });
@@ -340,7 +340,7 @@ export default function TaxonomyFilter({
                       type="search"
                       placeholder={__('Search terms...', 'o4o')}
                       value={searchQuery[taxonomy.slug] || ''}
-                      onChange={(e) => setSearchQuery(prev => ({
+                      onChange={(e: any) => setSearchQuery(prev => ({
                         ...prev,
                         [taxonomy.slug]: e.target.value,
                       }))}
@@ -364,7 +364,7 @@ export default function TaxonomyFilter({
                       { label: __('Exclude these', 'o4o'), value: 'NOT IN' },
                       { label: __('Include all of these', 'o4o'), value: 'AND' },
                     ]}
-                    onChange={(value) => handleOperatorChange(
+                    onChange={(value: any) => handleOperatorChange(
                       taxonomy.slug, 
                       value as 'IN' | 'NOT IN' | 'AND'
                     )}

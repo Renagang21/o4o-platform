@@ -321,7 +321,7 @@ const RelatedProductsComponent: FC<RelatedProductsProps> = ({
         )}
         <div className="relative overflow-hidden">
           <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-4">
-            {relatedProducts.map((product) => (
+            {relatedProducts.map((product: any) => (
               <div key={product.id} className="flex-none w-64">
                 <ProductCard product={product} />
               </div>
@@ -338,7 +338,7 @@ const RelatedProductsComponent: FC<RelatedProductsProps> = ({
         <h3 className="text-2xl font-bold mb-6">{title}</h3>
       )}
       <div className={`grid grid-cols-2 md:grid-cols-${Math.min(limit, 4)} gap-6`}>
-        {relatedProducts.map((product) => (
+        {relatedProducts.map((product: any) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

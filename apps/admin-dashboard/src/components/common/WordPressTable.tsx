@@ -74,7 +74,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                 />
               </td>
             )}
-            {columns.map((column) => (
+            {columns.map((column: any) => (
               <th
                 key={column.id}
                 scope="col"
@@ -117,7 +117,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
               </td>
             </tr>
           ) : (
-            rows.map((row) => (
+            rows.map((row: any) => (
               <tr
                 key={row.id}
                 className={clsx(

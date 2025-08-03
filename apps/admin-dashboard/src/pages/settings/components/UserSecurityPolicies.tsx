@@ -615,7 +615,7 @@ const UserSecurityPolicies: FC<UserSecurityPoliciesProps> = ({ settings, onUpdat
         </div>
         <div className="wp-card-body">
           <div className="space-y-3">
-            {recentSecurityEvents.map((event) => (
+            {recentSecurityEvents.map((event: any) => (
               <div
                 key={event.id}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"

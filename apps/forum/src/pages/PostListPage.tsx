@@ -145,7 +145,7 @@ const PostListPage = () => {
                   type="text"
                   placeholder="제목, 내용, 태그로 검색..."
                   value={filters.search}
-                  onChange={(e) => updateFilter('search', e.target.value)}
+                  onChange={(e: any) => updateFilter('search', e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -166,7 +166,7 @@ const PostListPage = () => {
                   <label className="text-sm font-medium mb-2 block">카테고리</label>
                   <select
                     value={filters.categoryId || 'all'}
-                    onChange={(e) => updateFilter('categoryId', e.target.value === 'all' ? undefined : e.target.value)}
+                    onChange={(e: any) => updateFilter('categoryId', e.target.value === 'all' ? undefined : e.target.value)}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="all">모든 카테고리</option>
@@ -182,7 +182,7 @@ const PostListPage = () => {
                   <label className="text-sm font-medium mb-2 block">게시글 유형</label>
                   <select
                     value={filters.type || 'all'}
-                    onChange={(e) => updateFilter('type', e.target.value === 'all' ? undefined : e.target.value)}
+                    onChange={(e: any) => updateFilter('type', e.target.value === 'all' ? undefined : e.target.value)}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="all">모든 유형</option>
@@ -198,7 +198,7 @@ const PostListPage = () => {
                   <label className="text-sm font-medium mb-2 block">정렬 기준</label>
                   <select
                     value={filters.sortBy}
-                    onChange={(e) => updateFilter('sortBy', e.target.value)}
+                    onChange={(e: any) => updateFilter('sortBy', e.target.value)}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="createdAt">최신순</option>

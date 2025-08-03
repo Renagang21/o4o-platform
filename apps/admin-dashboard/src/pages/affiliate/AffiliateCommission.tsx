@@ -76,9 +76,9 @@ const mockCommissions: CommissionEntry[] = [
 ];
 
 const AffiliateCommission = () => {
-  const [commissions] = useState<CommissionEntry[]>(mockCommissions);
+  const [commissions] = useState(mockCommissions);
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   const filteredCommissions = commissions.filter(commission => {
     const matchesPeriod = selectedPeriod === 'all' || commission.period === selectedPeriod;
@@ -239,7 +239,7 @@ const AffiliateCommission = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <select
           value={selectedPeriod}
-          onChange={(e) => setSelectedPeriod(e.target.value)}
+          onChange={(e: any) => setSelectedPeriod(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">전체 기간</option>
@@ -249,7 +249,7 @@ const AffiliateCommission = () => {
         </select>
         <select
           value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
+          onChange={(e: any) => setSelectedStatus(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">모든 상태</option>
@@ -296,7 +296,7 @@ const AffiliateCommission = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-modern-border-primary">
-              {filteredCommissions.map((commission) => (
+              {filteredCommissions.map((commission: any) => (
                 <tr key={commission.id} className="hover:bg-modern-bg-hover">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-modern-text-primary">
@@ -364,7 +364,7 @@ const AffiliateCommission = () => {
             <div className="space-y-3">
               {filteredCommissions
                 .filter(c => c.status === 'pending' && c.period === selectedPeriod)
-                .map((commission) => (
+                .map((commission: any) => (
                   <div key={commission.id} className="flex items-center justify-between py-2 border-b border-modern-border-primary last:border-b-0">
                     <div>
                       <p className="font-medium text-modern-text-primary">{commission.partnerName}</p>

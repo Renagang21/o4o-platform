@@ -162,7 +162,7 @@ const CrowdfundingProjects: FC = () => {
               type="text"
               placeholder="프로젝트명, 설명, 개발사명으로 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -171,7 +171,7 @@ const CrowdfundingProjects: FC = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={statusFilter}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
@@ -224,7 +224,7 @@ const CrowdfundingProjects: FC = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => {
+            {projects.map((project: any) => {
               const progress = calculateProgress(project.currentParticipantCount, project.targetParticipantCount);
               const remainingDays = getRemainingDays(project.endDate);
               const isActive = project.status === 'recruiting' && remainingDays > 0;

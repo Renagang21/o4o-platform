@@ -51,7 +51,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
   });
 
   const [priceCalculation, setPriceCalculation] = useState<PriceCalculation | null>(null);
-  const [marginWarning, setMarginWarning] = useState<string>('');
+  const [marginWarning, setMarginWarning] = useState('');
   const [loading, setLoading] = useState(false);
 
   // 가격 계산
@@ -158,7 +158,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e: any) => handleInputChange('name', e.target.value)}
                 placeholder="제품명을 입력하세요"
                 required
               />
@@ -168,7 +168,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
               <Input
                 id="sku"
                 value={formData.sku}
-                onChange={(e) => handleInputChange('sku', e.target.value)}
+                onChange={(e: any) => handleInputChange('sku', e.target.value)}
                 placeholder="재고 관리 코드"
                 required
               />
@@ -225,7 +225,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="supplyPrice"
                 type="number"
                 value={formData.supplyPrice}
-                onChange={(e) => handleInputChange('supplyPrice', Number(e.target.value))}
+                onChange={(e: any) => handleInputChange('supplyPrice', Number(e.target.value))}
                 placeholder="0"
                 min="0"
                 required
@@ -237,7 +237,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="marginRate"
                 type="number"
                 value={formData.marginRate}
-                onChange={(e) => handleInputChange('marginRate', Number(e.target.value))}
+                onChange={(e: any) => handleInputChange('marginRate', Number(e.target.value))}
                 placeholder="30"
                 min="0"
                 max="100"
@@ -263,7 +263,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
               id="sellPrice"
               type="number"
               value={formData.sellPrice}
-              onChange={(e) => handleInputChange('sellPrice', Number(e.target.value))}
+              onChange={(e: any) => handleInputChange('sellPrice', Number(e.target.value))}
               placeholder="0"
               min="0"
               required
@@ -279,7 +279,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="affiliateRate"
                 type="number"
                 value={formData.affiliateRate}
-                onChange={(e) => handleInputChange('affiliateRate', Number(e.target.value))}
+                onChange={(e: any) => handleInputChange('affiliateRate', Number(e.target.value))}
                 placeholder="5"
                 min="0"
                 max="50"
@@ -292,7 +292,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="adminFeeRate"
                 type="number"
                 value={formData.adminFeeRate}
-                onChange={(e) => handleInputChange('adminFeeRate', Number(e.target.value))}
+                onChange={(e: any) => handleInputChange('adminFeeRate', Number(e.target.value))}
                 placeholder="3"
                 min="0"
                 max="50"
@@ -366,7 +366,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="supplierStock"
                 type="number"
                 value={formData.supplierStock}
-                onChange={(e) => handleInputChange('supplierStock', Number(e.target.value))}
+                onChange={(e: any) => handleInputChange('supplierStock', Number(e.target.value))}
                 placeholder="0"
                 min="0"
                 required
@@ -378,7 +378,7 @@ export const SupplierProductForm: FC<SupplierProductFormProps> = ({
                 id="lowStockThreshold"
                 type="number"
                 value={formData.lowStockThreshold}
-                onChange={(e) => handleInputChange('lowStockThreshold', Number(e.target.value))}
+                onChange={(e: any) => handleInputChange('lowStockThreshold', Number(e.target.value))}
                 placeholder="10"
                 min="1"
               />

@@ -69,7 +69,7 @@ const blockTypes = [
 const HomepageEditor: FC = () => {
   const navigate = useNavigate();
   const [template, setTemplate] = useState<Template | null>(null);
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [blocks, setBlocks] = useState([]);
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

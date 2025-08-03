@@ -26,7 +26,7 @@ interface ScheduleManagerProps {
 }
 
 export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schedules, setSchedules] = useState([]);
   const [activeSchedule, setActiveSchedule] = useState<Schedule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -209,7 +209,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
 
         {schedules.length > 0 ? (
           <div className="divide-y">
-            {schedules.map((schedule) => (
+            {schedules.map((schedule: any) => (
               <div
                 key={schedule.id}
                 className={`p-6 ${

@@ -106,7 +106,7 @@ const UserRoleSwitch: FC<UserRoleSwitchProps> = ({
         <div>
           <h4 className="text-md font-medium text-gray-900 mb-3">🔄 다른 역할로 전환:</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {getAvailableRoles().map((roleId) => {
+            {getAvailableRoles().map((roleId: any) => {
               const role = roleInfoMap[roleId];
               return (
                 <div
@@ -148,7 +148,7 @@ const UserRoleSwitch: FC<UserRoleSwitchProps> = ({
                             ? `bg-${role.color} bg-opacity-20 text-${role.color} border border-${role.color} border-opacity-30` 
                             : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                           }`}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.stopPropagation();
                           handleRoleChange(roleId);
                         }}

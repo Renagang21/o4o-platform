@@ -20,7 +20,7 @@ export const RewardSelector: FC<RewardSelectorProps> = ({
 
   const handleQuantityChange = (rewardId: string, change: number) => {
     const currentQuantity = selectedRewards[rewardId] || 0;
-    const reward = rewards.find((r) => r.id === rewardId);
+    const reward = rewards.find((r: any) => r.id === rewardId);
     
     if (!reward) return;
 
@@ -45,7 +45,7 @@ export const RewardSelector: FC<RewardSelectorProps> = ({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {rewards.map((reward) => {
+      {rewards.map((reward: any) => {
         const available = isAvailable(reward);
         const quantity = selectedRewards[reward.id] || 0;
         

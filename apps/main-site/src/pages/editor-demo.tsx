@@ -18,7 +18,7 @@ const initialContent: JSONContent = {
 }
 
 export default function EditorDemo() {
-  const [content, setContent] = useState<JSONContent>(initialContent)
+  const [content, setContent] = useState(initialContent)
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">

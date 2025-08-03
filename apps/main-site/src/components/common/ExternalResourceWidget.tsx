@@ -354,7 +354,7 @@ export const ExternalResourceList: FC<ExternalResourceListProps> = ({
               <span>{getTypeLabel(type as ResourceType)} ({typeResources.length}개)</span>
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {typeResources.map((resource) => (
+              {typeResources.map((resource: any) => (
                 <ExternalResourceWidget 
                   key={resource.id} 
                   resource={resource}
@@ -376,7 +376,7 @@ export const ExternalResourceList: FC<ExternalResourceListProps> = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {displayedResources.map((resource) => (
+        {displayedResources.map((resource: any) => (
           <ExternalResourceWidget 
             key={resource.id} 
             resource={resource}

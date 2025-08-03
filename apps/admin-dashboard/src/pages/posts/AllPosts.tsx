@@ -25,9 +25,9 @@ import toast from 'react-hot-toast'
 
 const AllPosts: FC = () => {
   const [loading, setLoading] = useState(true)
-  const [posts, setPosts] = useState<Post[]>([])
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
-  const [selectedPosts, setSelectedPosts] = useState<string[]>([])
+  const [posts, setPosts] = useState([])
+  const [filteredPosts, setFilteredPosts] = useState([])
+  const [selectedPosts, setSelectedPosts] = useState([])
   const [_viewMode, _setViewMode] = useState<'list' | 'grid'>('list')
   const [_showBulkActions, _setShowBulkActions] = useState(false)
 
@@ -402,7 +402,7 @@ const AllPosts: FC = () => {
       <div className="wp-card">
         <div className="wp-card-header border-b-0">
           <div className="flex space-x-1">
-            {postTypes.map((type) => (
+            {postTypes.map((type: any) => (
               <button
                 key={type.value}
                 onClick={() => updateFilter('type', type.value)}
@@ -590,7 +590,7 @@ const AllPosts: FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPosts.map((post) => (
+                  {filteredPosts.map((post: any) => (
                     <tr key={post.id} className="hover:bg-gray-50">
                       <td>
                         <input

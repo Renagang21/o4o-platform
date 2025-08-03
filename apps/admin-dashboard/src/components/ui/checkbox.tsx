@@ -26,7 +26,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           ref={mergedRef}
           checked={checked}
-          onChange={(e) => {
+          onChange={(e: any) => {
             onChange?.(e);
             onCheckedChange?.(e.target.checked);
           }}

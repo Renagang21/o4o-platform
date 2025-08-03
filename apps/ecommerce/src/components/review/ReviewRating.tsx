@@ -50,7 +50,7 @@ export function ReviewRating({
   return (
     <div className={cn('flex items-center gap-1', className)}>
       <div className="flex">
-        {[1, 2, 3, 4, 5].map((value) => (
+        {[1, 2, 3, 4, 5].map((value: any) => (
           <button
             key={value}
             type="button"

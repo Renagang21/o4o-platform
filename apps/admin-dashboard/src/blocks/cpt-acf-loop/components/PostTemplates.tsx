@@ -63,8 +63,8 @@ export const CardTemplate = ({
         {post.acf && selectedFields.length > 0 && (
           <div className="o4o-cpt-acf-loop__acf-fields">
             {selectedFields
-              .filter((field) => field.visible && post.acf?.[field.name])
-              .map((field) => (
+              .filter((field: any) => field.visible && post.acf?.[field.name])
+              .map((field: any) => (
                 <ACFFieldRenderer
                   key={field.key}
                   field={field}
@@ -154,8 +154,8 @@ export const ListTemplate = ({
           {post.acf && selectedFields.length > 0 && (
             <div className="o4o-cpt-acf-loop__acf-fields">
               {selectedFields
-                .filter((field) => field.visible && post.acf?.[field.name])
-                .map((field) => (
+                .filter((field: any) => field.visible && post.acf?.[field.name])
+                .map((field: any) => (
                   <ACFFieldRenderer
                     key={field.key}
                     field={field}
@@ -191,9 +191,9 @@ export const MinimalTemplate = ({
       {post.acf && selectedFields.length > 0 && (
         <div className="o4o-cpt-acf-loop__acf-fields o4o-cpt-acf-loop__acf-fields--inline">
           {selectedFields
-            .filter((field) => field.visible && post.acf?.[field.name])
+            .filter((field: any) => field.visible && post.acf?.[field.name])
             .slice(0, 3) // Show only first 3 fields in minimal layout
-            .map((field) => (
+            .map((field: any) => (
               <ACFFieldRenderer
                 key={field.key}
                 field={field}
@@ -286,8 +286,8 @@ export const MagazineTemplate = ({
         {post.acf && selectedFields.length > 0 && (
           <div className="o4o-cpt-acf-loop__acf-fields">
             {selectedFields
-              .filter((field) => field.visible && post.acf?.[field.name])
-              .map((field) => (
+              .filter((field: any) => field.visible && post.acf?.[field.name])
+              .map((field: any) => (
                 <ACFFieldRenderer
                   key={field.key}
                   field={field}

@@ -26,7 +26,7 @@ interface WordPressPost {
 }
 
 export default function LoopBlockTest() {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [postType, setPostType] = useState('products');

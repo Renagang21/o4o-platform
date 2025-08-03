@@ -75,7 +75,7 @@ const UserFilters: FC<UserFiltersProps> = ({
               className="wp-select min-w-[140px]"
             >
               <option value="all">전체 사업체</option>
-              {BUSINESS_TYPES.map((type) => (
+              {BUSINESS_TYPES.map((type: any) => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>

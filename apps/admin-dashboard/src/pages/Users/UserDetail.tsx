@@ -28,8 +28,8 @@ interface ApprovalLog {
 export default function UserDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [approvalHistory, setApprovalHistory] = useState<ApprovalLog[]>([]);
+  const [user, setUser] = useState(null);
+  const [approvalHistory, setApprovalHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -318,7 +318,7 @@ export default function UserDetail() {
                 </p>
               ) : (
                 <div className="space-y-4">
-                  {approvalHistory.map((log) => (
+                  {approvalHistory.map((log: any) => (
                     <div key={log.id} className="flex items-start gap-4 p-4 border rounded-lg">
                       <div className="mt-1">{getActionIcon(log.action)}</div>
                       <div className="flex-1">

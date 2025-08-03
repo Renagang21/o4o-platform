@@ -79,7 +79,7 @@ const ScreenOptions: FC<ScreenOptionsProps> = ({
                       <input
                         type="checkbox"
                         checked={option.checked}
-                        onChange={(e) => handleOptionChange(option.id, e.target.checked)}
+                        onChange={(e: any) => handleOptionChange(option.id, e.target.checked)}
                         className="mt-0.5 rounded border-modern-border-primary text-modern-primary focus:ring-modern-primary"
                       />
                       <div>
@@ -136,7 +136,7 @@ const ScreenOptions: FC<ScreenOptionsProps> = ({
                     min="1"
                     max="999"
                     value={itemsPerPage}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       const value = parseInt(e.target.value);
                       if (value > 0) onItemsPerPageChange(value);
                     }}

@@ -100,7 +100,7 @@ const UserTable: FC<UserTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {users.map((user: any) => (
             <tr key={user.id}>
               {showBulkSelect && (
                 <td>

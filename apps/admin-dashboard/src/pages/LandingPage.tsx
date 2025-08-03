@@ -97,7 +97,7 @@ const LandingPage = () => {
 
         {/* Main Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mainFeatures.map((feature) => (
+          {mainFeatures.map((feature: any) => (
             <div
               key={feature.path}
               onClick={() => navigate(feature.path)}

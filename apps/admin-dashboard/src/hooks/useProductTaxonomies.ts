@@ -21,7 +21,7 @@ interface UseBrandsResult {
 }
 
 export function useProductCategories(): UseTaxonomiesResult {
-  const [categories, setCategories] = useState<Taxonomy[]>([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +53,7 @@ export function useProductCategories(): UseTaxonomiesResult {
 }
 
 export function useProductBrands(): UseBrandsResult {
-  const [brands, setBrands] = useState<Taxonomy[]>([]);
+  const [brands, setBrands] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,7 +114,7 @@ function getMockBrands(): Taxonomy[] {
 }
 
 export function useProductTags(): UseTaxonomiesResult {
-  const [categories, setCategories] = useState<Taxonomy[]>([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

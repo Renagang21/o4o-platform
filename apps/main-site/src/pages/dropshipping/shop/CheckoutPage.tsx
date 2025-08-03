@@ -38,10 +38,10 @@ interface PaymentMethod {
 }
 
 const CheckoutPage: FC = () => {
-  const [checkoutItems, setCheckoutItems] = useState<CheckoutItem[]>([]);
-  const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<string>('');
-  const [selectedPayment, setSelectedPayment] = useState<string>('');
+  const [checkoutItems, setCheckoutItems] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -188,7 +188,7 @@ const CheckoutPage: FC = () => {
               </h2>
               
               <div className="space-y-4">
-                {checkoutItems.map((item) => (
+                {checkoutItems.map((item: any) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg">
                     <img
                       src={item.image}
@@ -246,7 +246,7 @@ const CheckoutPage: FC = () => {
               </div>
               
               <div className="space-y-4">
-                {addresses.map((address) => (
+                {addresses.map((address: any) => (
                   <label
                     key={address.id}
                     className={`block p-4 border-2 rounded-lg cursor-pointer transition-colors ${
@@ -261,7 +261,7 @@ const CheckoutPage: FC = () => {
                         name="address"
                         value={address.id}
                         checked={selectedAddress === address.id}
-                        onChange={(e) => setSelectedAddress(e.target.value)}
+                        onChange={(e: any) => setSelectedAddress(e.target.value)}
                         className="mt-1"
                       />
                       
@@ -294,11 +294,11 @@ const CheckoutPage: FC = () => {
                 </label>
                 <select
                   value={deliveryMessage}
-                  onChange={(e) => setDeliveryMessage(e.target.value)}
+                  onChange={(e: any) => setDeliveryMessage(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">선택해주세요</option>
-                  {deliveryMessages.map((message) => (
+                  {deliveryMessages.map((message: any) => (
                     <option key={message} value={message}>
                       {message}
                     </option>
@@ -323,7 +323,7 @@ const CheckoutPage: FC = () => {
               </h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {paymentMethods.map((method) => (
+                {paymentMethods.map((method: any) => (
                   <label
                     key={method.id}
                     className={`relative flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
@@ -337,7 +337,7 @@ const CheckoutPage: FC = () => {
                       name="payment"
                       value={method.id}
                       checked={selectedPayment === method.id}
-                      onChange={(e) => setSelectedPayment(e.target.value)}
+                      onChange={(e: any) => setSelectedPayment(e.target.value)}
                       className="sr-only"
                     />
                     
@@ -378,7 +378,7 @@ const CheckoutPage: FC = () => {
                   <input
                     type="checkbox"
                     checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                    onChange={(e: any) => setAgreeTerms(e.target.checked)}
                     className="mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <div className="flex-1">

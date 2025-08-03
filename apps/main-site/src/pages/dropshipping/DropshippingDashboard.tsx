@@ -14,8 +14,8 @@ interface DashboardStats {
 }
 
 const DropshippingDashboard: FC = () => {
-  const [currentRole, setCurrentRole] = useState<UserRole>('supplier');
-  const [stats] = useState<DashboardStats>({
+  const [currentRole, setCurrentRole] = useState('supplier');
+  const [stats] = useState({
     totalProducts: 147,
     activePartners: 23,
     monthlyRevenue: 45680000,

@@ -127,18 +127,18 @@ const mockFiles: MediaFile[] = [
 ];
 
 const MediaLibrary: FC = () => {
-  const [files, setFiles] = useState<MediaFile[]>(mockFiles);
-  const [folders, setFolders] = useState<MediaFolder[]>(mockFolders);
-  const [selectedFolder, setSelectedFolder] = useState<string>('all');
+  const [files, setFiles] = useState(mockFiles);
+  const [folders, setFolders] = useState(mockFolders);
+  const [selectedFolder, setSelectedFolder] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
   const [showFileDetails, setShowFileDetails] = useState(false);
-  const [copiedUrl, setCopiedUrl] = useState<string>('');
+  const [copiedUrl, setCopiedUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 필터링된 파일 목록
@@ -307,7 +307,7 @@ const MediaLibrary: FC = () => {
                 type="text"
                 placeholder="파일명, 태그로 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -315,7 +315,7 @@ const MediaLibrary: FC = () => {
             <div className="flex gap-2">
               <select
                 value={selectedFolder}
-                onChange={(e) => setSelectedFolder(e.target.value)}
+                onChange={(e: any) => setSelectedFolder(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 폴더</option>
@@ -380,7 +380,7 @@ const MediaLibrary: FC = () => {
           {viewMode === 'grid' ? (
             // 그리드 뷰
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {filteredFiles.map((file) => (
+              {filteredFiles.map((file: any) => (
                 <div
                   key={file.id}
                   className={`relative bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg cursor-pointer group ${
@@ -418,7 +418,7 @@ const MediaLibrary: FC = () => {
                   {/* 액션 버튼 */}
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={(e) => {
+                      onClick={(e: any) => {
                         e.stopPropagation();
                         handleShowFileDetails(file);
                       }}
@@ -449,7 +449,7 @@ const MediaLibrary: FC = () => {
                       <input
                         type="checkbox"
                         checked={selectedFiles.length === filteredFiles.length && filteredFiles.length > 0}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           if (e.target.checked) {
                             setSelectedFiles(filteredFiles.map(f => f.id));
                           } else {
@@ -474,7 +474,7 @@ const MediaLibrary: FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredFiles.map((file) => (
+                  {filteredFiles.map((file: any) => (
                     <tr key={file.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4">
                         <input
@@ -577,7 +577,7 @@ const MediaLibrary: FC = () => {
               <input
                 type="text"
                 value={newFolderName}
-                onChange={(e) => setNewFolderName(e.target.value)}
+                onChange={(e: any) => setNewFolderName(e.target.value)}
                 placeholder="폴더명을 입력하세요"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 onKeyPress={(e) => e.key === 'Enter' && handleCreateFolder()}

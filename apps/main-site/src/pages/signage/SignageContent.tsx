@@ -32,10 +32,10 @@ interface ContentFilters {
 }
 
 export default function SignageContent() {
-  const [contents, setContents] = useState<Content[]>([]);
+  const [contents, setContents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<ContentFilters>({});
+  const [filters, setFilters] = useState({});
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -189,7 +189,7 @@ export default function SignageContent() {
                 placeholder="Search content..."
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={filters.search || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                onChange={(e: any) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function SignageContent() {
           <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={filters.status || ''}
-            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value || undefined }))}
+            onChange={(e: any) => setFilters(prev => ({ ...prev, status: e.target.value || undefined }))}
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -209,7 +209,7 @@ export default function SignageContent() {
           <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={filters.type || ''}
-            onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value || undefined }))}
+            onChange={(e: any) => setFilters(prev => ({ ...prev, type: e.target.value || undefined }))}
           >
             <option value="">All Types</option>
             <option value="youtube">YouTube</option>
@@ -219,7 +219,7 @@ export default function SignageContent() {
           <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={filters.isPublic?.toString() || ''}
-            onChange={(e) => setFilters(prev => ({ 
+            onChange={(e: any) => setFilters(prev => ({ 
               ...prev, 
               isPublic: e.target.value ? e.target.value === 'true' : undefined 
             }))}
@@ -240,7 +240,7 @@ export default function SignageContent() {
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contents.map((content) => (
+        {contents.map((content: any) => (
           <div key={content.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
             {/* Thumbnail */}
             <div className="aspect-video bg-gray-100 relative">

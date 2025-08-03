@@ -53,7 +53,7 @@ const Layout = () => {
               
               {/* Desktop Navigation */}
               <nav className="hidden md:flex ml-10 space-x-1">
-                {navigation.map((item) => (
+                {navigation.map((item: any) => (
                   <Link
                     key={item.name}
                     to={item.href}
@@ -78,7 +78,7 @@ const Layout = () => {
                 <>
                   {/* Desktop User Menu */}
                   <div className="hidden md:flex items-center gap-4">
-                    {userNavigation.map((item) => (
+                    {userNavigation.map((item: any) => (
                       <Link
                         key={item.name}
                         to={item.href}
@@ -146,7 +146,7 @@ const Layout = () => {
         {mobileMenuOpen && (
           <div className="md:hidden border-t">
             <nav className="px-2 pt-2 pb-3 space-y-1">
-              {navigation.map((item) => (
+              {navigation.map((item: any) => (
                 <Link
                   key={item.name}
                   to={item.href}
@@ -167,7 +167,7 @@ const Layout = () => {
               {user && (
                 <>
                   <div className="border-t pt-2 mt-2">
-                    {userNavigation.map((item) => (
+                    {userNavigation.map((item: any) => (
                       <Link
                         key={item.name}
                         to={item.href}

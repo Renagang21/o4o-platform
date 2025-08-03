@@ -49,7 +49,7 @@ const DynamicContentList: FC = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
 
-  const [selectedPosts, setSelectedPosts] = useState<string[]>([])
+  const [selectedPosts, setSelectedPosts] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
   const [page, setPage] = useState(1)

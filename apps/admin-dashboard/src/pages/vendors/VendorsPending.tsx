@@ -74,7 +74,7 @@ const mockPendingVendors: PendingVendor[] = [
 ];
 
 const VendorsPending = () => {
-  const [vendors, setVendors] = useState<PendingVendor[]>(mockPendingVendors);
+  const [vendors, setVendors] = useState(mockPendingVendors);
   const [selectedVendor, setSelectedVendor] = useState<PendingVendor | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -187,7 +187,7 @@ const VendorsPending = () => {
 
       {/* Pending Vendors List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {vendors.map((vendor) => {
+        {vendors.map((vendor: any) => {
           const docStatus = getDocumentStatus(vendor.documents);
           return (
             <div key={vendor.id} className="wp-card">

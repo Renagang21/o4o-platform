@@ -98,7 +98,7 @@ const PageHeader: FC<PageHeaderProps> = ({
               {/* Secondary Actions */}
               {secondaryActions.length > 0 && (
                 <div className="flex items-center gap-2">
-                  {secondaryActions.slice(0, 2).map((action) => (
+                  {secondaryActions.slice(0, 2).map((action: any) => (
                     <button
                       key={action.id}
                       onClick={action.onClick}

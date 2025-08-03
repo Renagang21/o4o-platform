@@ -62,7 +62,7 @@ const MediaList: FC<MediaListProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {files.map((file) => (
+          {files.map((file: any) => (
             <tr key={file.id} className="hover:bg-gray-50">
               <td className="px-6 py-4">
                 <input

@@ -23,8 +23,8 @@ interface TagFormData {
 const TagList: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingTag, setEditingTag] = useState<Tag | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [formData, setFormData] = useState<TagFormData>({
+  const [selectedTags, setSelectedTags] = useState([])
+  const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: ''

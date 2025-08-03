@@ -54,7 +54,7 @@ const timeFormats = [
 export default function GeneralSettings() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
-  const [settings, setSettings] = useState<GeneralSettingsData>({
+  const [settings, setSettings] = useState({
     siteName: '',
     siteDescription: '',
     siteUrl: '',
@@ -196,7 +196,7 @@ export default function GeneralSettings() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {timezones.map((tz) => (
+                  {timezones.map((tz: any) => (
                     <SelectItem key={tz.value} value={tz.value}>
                       {tz.label}
                     </SelectItem>
@@ -230,7 +230,7 @@ export default function GeneralSettings() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {dateFormats.map((format) => (
+                  {dateFormats.map((format: any) => (
                     <SelectItem key={format.value} value={format.value}>
                       {format.label}
                     </SelectItem>
@@ -248,7 +248,7 @@ export default function GeneralSettings() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {timeFormats.map((format) => (
+                  {timeFormats.map((format: any) => (
                     <SelectItem key={format.value} value={format.value}>
                       {format.label}
                     </SelectItem>

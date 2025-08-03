@@ -47,7 +47,7 @@ import WidgetLibrary from '@/components/widget/WidgetLibrary'
 type ViewMode = 'builder' | 'list' | 'library'
 
 const WidgetManager: FC = () => {
-  const [viewMode, setViewMode] = useState<ViewMode>('builder')
+  const [viewMode, setViewMode] = useState('builder')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPosition, setSelectedPosition] = useState<WidgetPosition | 'all'>('all')
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
@@ -258,7 +258,7 @@ const WidgetManager: FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {areas.map((area) => (
+                    {areas.map((area: any) => (
                       <div key={area.id} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div>
@@ -456,7 +456,7 @@ const WidgetManager: FC = () => {
 
           {/* Widget List */}
           <div className="grid gap-4">
-            {filteredWidgets.map((widget) => (
+            {filteredWidgets.map((widget: any) => (
               <Card key={widget.id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">

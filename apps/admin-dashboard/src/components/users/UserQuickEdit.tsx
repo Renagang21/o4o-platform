@@ -62,7 +62,7 @@ export const UserQuickEdit: FC<UserQuickEditProps> = ({
                   name="display_name"
                   className="ptitle"
                   value={formData.name || ''}
-                  onChange={(e) => onUpdate('name', e.target.value)}
+                  onChange={(e: any) => onUpdate('name', e.target.value)}
                 />
               </span>
             </label>
@@ -74,7 +74,7 @@ export const UserQuickEdit: FC<UserQuickEditProps> = ({
                   type="email"
                   name="email"
                   value={formData.email || ''}
-                  onChange={(e) => onUpdate('email', e.target.value)}
+                  onChange={(e: any) => onUpdate('email', e.target.value)}
                 />
               </span>
             </label>
@@ -106,7 +106,7 @@ export const UserQuickEdit: FC<UserQuickEditProps> = ({
                   type="checkbox" 
                   name="send_user_notification"
                   checked={formData.sendNotification || false}
-                  onChange={(e) => onUpdate('sendNotification', e.target.checked)}
+                  onChange={(e: any) => onUpdate('sendNotification', e.target.checked)}
                 />
                 <span className="checkbox-title">Send the user a notification about their updated profile</span>
               </label>

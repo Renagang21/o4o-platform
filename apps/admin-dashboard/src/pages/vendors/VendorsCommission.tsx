@@ -72,9 +72,9 @@ const commissionRates: CommissionRate[] = [
 ];
 
 const VendorsCommission = () => {
-  const [commissions] = useState<CommissionData[]>(mockCommissionData);
+  const [commissions] = useState(mockCommissionData);
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const filteredCommissions = commissions.filter(commission => {
     const matchesPeriod = commission.period === selectedPeriod || selectedPeriod === 'all';
@@ -275,7 +275,7 @@ const VendorsCommission = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-modern-border-primary">
-              {filteredCommissions.map((commission) => (
+              {filteredCommissions.map((commission: any) => (
                 <tr key={`${commission.vendorId}-${commission.period}`} className="hover:bg-modern-bg-hover">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>

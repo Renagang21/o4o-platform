@@ -72,7 +72,7 @@ export const AtAGlance: FC = () => {
       <CardContent className="p-6">
         <h3 className="text-lg font-semibold mb-4">At a Glance</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {items.map((item) => {
+          {items.map((item: any) => {
             const Icon = item.icon;
             return (
               <Link

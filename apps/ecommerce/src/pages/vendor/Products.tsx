@@ -206,7 +206,7 @@ export default function VendorProducts() {
                 type="text"
                 placeholder="상품명 또는 SKU로 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -214,7 +214,7 @@ export default function VendorProducts() {
               <select
                 className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e: any) => setSelectedCategory(e.target.value)}
               >
                 {categoryOptions.map(cat => (
                   <option key={cat} value={cat}>

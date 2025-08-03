@@ -39,7 +39,7 @@ const PostForm = () => {
   const isEditMode = !!id
 
   // Form state
-  const [formData, setFormData] = useState<CreatePostDto>({
+  const [formData, setFormData] = useState({
     title: '',
     content: '',
     excerpt: '',
@@ -55,13 +55,13 @@ const PostForm = () => {
     }
   })
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState([])
+  const [selectedTags, setSelectedTags] = useState([])
   const [isScheduled, setIsScheduled] = useState(false)
   const [scheduledDate, setScheduledDate] = useState('')
   const [scheduledTime, setScheduledTime] = useState('')
   const [showRecoveryNotice, setShowRecoveryNotice] = useState(false)
-  const [recoveryData, setRecoveryData] = useState<any>(null)
+  const [recoveryData, setRecoveryData] = useState(null)
 
   // 게시글 조회 (수정 모드)
   const { data: post, isLoading: isLoadingPost } = useQuery({

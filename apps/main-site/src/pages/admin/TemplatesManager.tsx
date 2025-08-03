@@ -55,7 +55,7 @@ interface Template {
 }
 
 const TemplatesManager: FC = () => {
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
@@ -90,7 +90,7 @@ const TemplatesManager: FC = () => {
   ]);
 
   // 사용 가능한 필드/숏코드 (Mock)
-  const [availableFields] = useState<TemplateField[]>([
+  const [availableFields] = useState([
     { name: 'title', label: '제목', shortcode: '[field name="title"]', example: '상품 제목' },
     { name: 'content', label: '내용', shortcode: '[field name="content"]', example: '상품 설명' },
     { name: 'featured_image', label: '대표 이미지', shortcode: '[field name="featured_image"]', example: '<img src="..." />' },
@@ -520,7 +520,7 @@ const TemplatesManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {templates.map((template) => (
+                {templates.map((template: any) => (
                   <div key={template.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -646,7 +646,7 @@ const TemplatesManager: FC = () => {
                     <input
                       type="text"
                       value={newTemplate.name}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: product_card"
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -659,7 +659,7 @@ const TemplatesManager: FC = () => {
                     <input
                       type="text"
                       value={newTemplate.title}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="예: 상품 카드"
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -671,7 +671,7 @@ const TemplatesManager: FC = () => {
                     </label>
                     <textarea
                       value={newTemplate.description}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="템플릿 설명"
                       rows={3}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -696,7 +696,7 @@ const TemplatesManager: FC = () => {
                         name="templateType"
                         value={type.value}
                         checked={newTemplate.type === type.value}
-                        onChange={(e) => setNewTemplate(prev => ({ ...prev, type: e.target.value as any }))}
+                        onChange={(e: any) => setNewTemplate(prev => ({ ...prev, type: e.target.value as any }))}
                         className="mt-1 mr-2"
                       />
                       <div>
@@ -714,7 +714,7 @@ const TemplatesManager: FC = () => {
                     </label>
                     <select
                       value={newTemplate.postType}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, postType: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, postType: e.target.value }))}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Post Type 선택</option>
@@ -778,7 +778,7 @@ const TemplatesManager: FC = () => {
                     <textarea
                       id="html-editor"
                       value={newTemplate.htmlContent}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, htmlContent: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, htmlContent: e.target.value }))}
                       placeholder="HTML 코드를 입력하세요..."
                       className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -787,7 +787,7 @@ const TemplatesManager: FC = () => {
                   {activeEditor === 'css' && (
                     <textarea
                       value={newTemplate.cssContent}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, cssContent: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, cssContent: e.target.value }))}
                       placeholder="CSS 스타일을 입력하세요..."
                       className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -796,7 +796,7 @@ const TemplatesManager: FC = () => {
                   {activeEditor === 'js' && (
                     <textarea
                       value={newTemplate.jsContent}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, jsContent: e.target.value }))}
+                      onChange={(e: any) => setNewTemplate(prev => ({ ...prev, jsContent: e.target.value }))}
                       placeholder="JavaScript 코드를 입력하세요..."
                       className="w-full h-full resize-none border border-gray-300 rounded p-3 font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />

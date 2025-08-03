@@ -14,7 +14,7 @@ const UIShowcase = () => {
     { id: 'theme', title: 'Theme System', order: 3 },
   ]);
 
-  const [screenOptions, setScreenOptions] = useState<ScreenOption[]>([
+  const [screenOptions, setScreenOptions] = useState([
     { id: 'colors', label: 'Color Palette', checked: true },
     { id: 'components', label: 'Components', checked: true },
     { id: 'inline', label: 'Inline Editing', checked: true },
@@ -77,7 +77,7 @@ const UIShowcase = () => {
 
       {/* Draggable Widgets */}
       <WidgetContainer onReorder={handleReorder} columns={columns}>
-        {visibleWidgets.map((widget) => {
+        {visibleWidgets.map((widget: any) => {
           switch (widget.id) {
             case 'colors':
               return (
@@ -94,7 +94,7 @@ const UIShowcase = () => {
                       Modern color system with CSS variables for easy theming
                     </p>
                     <div className="grid grid-cols-2 gap-3">
-                      {colorPalette.map((color) => (
+                      {colorPalette.map((color: any) => (
                         <div key={color.name} className="space-y-2">
                           <div className={`h-20 rounded-lg ${color.class} shadow-md`} />
                           <div>

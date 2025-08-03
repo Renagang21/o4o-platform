@@ -88,7 +88,7 @@ const RolePermissions = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-modern-border-primary">
-                {allMenuItems.map((menuItem) => (
+                {allMenuItems.map((menuItem: any) => (
                   <tr key={menuItem.id} className="hover:bg-modern-bg-hover">
                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-modern-text-primary sticky left-0 bg-white">
                       <div className="flex items-center gap-2">

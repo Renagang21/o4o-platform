@@ -40,7 +40,7 @@ interface Review {
 const ProductDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState([]);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -240,7 +240,7 @@ const ProductDetail: FC = () => {
 
               {/* 태그들 */}
               <div className="flex flex-wrap gap-2 mb-6">
-                {product.tags.map((tag) => (
+                {product.tags.map((tag: any) => (
                   <span key={tag} className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
                     {tag}
                   </span>
@@ -362,7 +362,7 @@ const ProductDetail: FC = () => {
                 { id: 'specifications', name: '상품정보' },
                 { id: 'reviews', name: `리뷰 (${product.reviewCount.toLocaleString()})` },
                 { id: 'qna', name: '문의' }
-              ].map((tab) => (
+              ].map((tab: any) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -432,7 +432,7 @@ const ProductDetail: FC = () => {
                   </div>
                   
                   <div className="space-y-6">
-                    {reviews.map((review) => (
+                    {reviews.map((review: any) => (
                       <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">

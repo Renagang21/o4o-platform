@@ -14,7 +14,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           type="checkbox"
           ref={ref}
           checked={checked}
-          onChange={(e) => {
+          onChange={(e: any) => {
             onChange?.(e);
             onCheckedChange?.(e.target.checked);
           }}

@@ -40,7 +40,7 @@ export default function MediaLibraryEnhanced() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
+  const [selectedMedia, setSelectedMedia] = useState([]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
@@ -271,7 +271,7 @@ export default function MediaLibraryEnhanced() {
               id="media-search-input"
               className="search"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e: any) => setSearch(e.target.value)}
               placeholder="Search media..."
             />
           </div>

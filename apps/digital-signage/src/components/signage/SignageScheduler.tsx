@@ -20,12 +20,12 @@ const SignageScheduler: FC<SignageSchedulerProps> = ({
   schedule,
   onChange
 }) => {
-  const [selectedDays, setSelectedDays] = useState<string[]>(schedule.days);
-  const [timeRanges, setTimeRanges] = useState<TimeRange[]>(schedule.timeRanges);
+  const [selectedDays, setSelectedDays] = useState(schedule.days);
+  const [timeRanges, setTimeRanges] = useState(schedule.timeRanges);
 
   const handleDayToggle = (day: string) => {
     const newDays = selectedDays.includes(day)
-      ? selectedDays.filter((d) => d !== day)
+      ? selectedDays.filter((d: any) => d !== day)
       : [...selectedDays, day];
     setSelectedDays(newDays);
     onChange({ days: newDays, timeRanges });
@@ -63,7 +63,7 @@ const SignageScheduler: FC<SignageSchedulerProps> = ({
       <div>
         <h3 className="text-lg font-medium text-text-main mb-4">송출 요일</h3>
         <div className="flex flex-wrap gap-2">
-          {DAYS.map((day) => (
+          {DAYS.map((day: any) => (
             <button
               key={day}
               onClick={() => handleDayToggle(day)}
@@ -99,7 +99,7 @@ const SignageScheduler: FC<SignageSchedulerProps> = ({
               <input
                 type="time"
                 value={range.start}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   handleTimeRangeChange(index, 'start', e.target.value)
                 }
                 className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -108,7 +108,7 @@ const SignageScheduler: FC<SignageSchedulerProps> = ({
               <input
                 type="time"
                 value={range.end}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   handleTimeRangeChange(index, 'end', e.target.value)
                 }
                 className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"

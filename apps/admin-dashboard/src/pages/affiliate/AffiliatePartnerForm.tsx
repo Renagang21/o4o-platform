@@ -38,7 +38,7 @@ const AffiliatePartnerForm: FC = () => {
   const queryClient = useQueryClient();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState<AffiliatePartnerFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     website: '',

@@ -412,7 +412,7 @@ const UserForm: FC<UserFormProps> = ({
                     className="wp-input-field"
                   >
                     <option value="">사업자 유형 선택</option>
-                    {BUSINESS_TYPES.map((type) => (
+                    {BUSINESS_TYPES.map((type: any) => (
                       <option key={type} value={type}>
                         {type}
                       </option>

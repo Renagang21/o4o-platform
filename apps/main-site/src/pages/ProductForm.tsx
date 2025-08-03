@@ -11,7 +11,7 @@ interface ProductFormData {
 
 const ProductForm: FC = () => {
   const { showToast } = useToast();
-  const [form, setForm] = useState<ProductFormData>({
+  const [form, setForm] = useState({
     name: '',
     description: '',
     price: '',

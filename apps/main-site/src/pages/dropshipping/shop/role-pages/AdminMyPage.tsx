@@ -46,7 +46,7 @@ interface PendingApproval {
 
 const AdminMyPage: FC<RolePageProps> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [systemStats, setSystemStats] = useState<SystemStats>({
+  const [systemStats, setSystemStats] = useState({
     totalUsers: 12547,
     newUsersToday: 23,
     totalOrders: 8934,
@@ -61,8 +61,8 @@ const AdminMyPage: FC<RolePageProps> = ({ user }) => {
     serverLoad: 67
   });
 
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
 
   useEffect(() => {
     // 모의 최근 활동 데이터
@@ -382,7 +382,7 @@ const AdminMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  {pendingApprovals.slice(0, 4).map((approval) => (
+                  {pendingApprovals.slice(0, 4).map((approval: any) => (
                     <div key={approval.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className="text-2xl">{getApprovalIcon(approval.type)}</div>
@@ -417,7 +417,7 @@ const AdminMyPage: FC<RolePageProps> = ({ user }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  {recentActivity.map((activity) => (
+                  {recentActivity.map((activity: any) => (
                     <div key={activity.id} className="flex items-center justify-between p-4 border-l-4 border-l-blue-500 bg-gray-50 rounded-r-lg">
                       <div className="flex items-center gap-3">
                         <div className="text-xl">{getActivityIcon(activity.type)}</div>
@@ -501,7 +501,7 @@ const AdminMyPage: FC<RolePageProps> = ({ user }) => {
                     </div>
                     
                     <div className="space-y-4">
-                      {pendingApprovals.map((approval) => (
+                      {pendingApprovals.map((approval: any) => (
                         <div key={approval.id} className="border border-gray-200 rounded-lg p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">

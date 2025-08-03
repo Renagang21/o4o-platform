@@ -98,9 +98,9 @@ const mockLinks: AffiliateLink[] = [
 ];
 
 const AffiliateLinks = () => {
-  const [links] = useState<AffiliateLink[]>(mockLinks);
-  const [selectedPartner, setSelectedPartner] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [links] = useState(mockLinks);
+  const [selectedPartner, setSelectedPartner] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
   // TODO: Implement create modal
   // const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -232,7 +232,7 @@ const AffiliateLinks = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <select
           value={selectedPartner}
-          onChange={(e) => setSelectedPartner(e.target.value)}
+          onChange={(e: any) => setSelectedPartner(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">모든 제휴사</option>
@@ -242,7 +242,7 @@ const AffiliateLinks = () => {
         </select>
         <select
           value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
+          onChange={(e: any) => setSelectedStatus(e.target.value)}
           className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
         >
           <option value="all">모든 상태</option>
@@ -254,7 +254,7 @@ const AffiliateLinks = () => {
 
       {/* Links Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredLinks.map((link) => (
+        {filteredLinks.map((link: any) => (
           <div key={link.id} className="wp-card">
             <div className="wp-card-body">
               <div className="flex items-start justify-between mb-4">

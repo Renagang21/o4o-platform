@@ -178,8 +178,8 @@ export default function ACFFieldSelector({
   selectedFields,
   onFieldsChange,
 }: ACFFieldSelectorProps) {
-  // const [fieldGroups, setFieldGroups] = useState<ACFFieldGroup[]>([]);
-  const [availableFields, setAvailableFields] = useState<ACFField[]>([]);
+  // const [fieldGroups, setFieldGroups] = useState([]);
+  const [availableFields, setAvailableFields] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // const [expandedField, setExpandedField] = useState<string | null>(null);
@@ -197,7 +197,7 @@ export default function ACFFieldSelector({
     })
       .then((groups) => {
         // Filter groups that apply to this post type
-        const relevantGroups = groups.filter((group) => {
+        const relevantGroups = groups.filter((group: any) => {
           if (!group.location) return false;
           
           return group.location.some((rule: any) =>
@@ -290,14 +290,14 @@ export default function ACFFieldSelector({
       onFieldsChange([...selectedFields, newField]);
     } else {
       // Remove field
-      onFieldsChange(selectedFields.filter((f) => f.key !== field.key));
+      onFieldsChange(selectedFields.filter((f: any) => f.key !== field.key));
     }
   };
 
   // Handle field visibility toggle
   const handleVisibilityToggle = (fieldKey: string) => {
     onFieldsChange(
-      selectedFields.map((field) =>
+      selectedFields.map((field: any) =>
         field.key === fieldKey
           ? { ...field, visible: !field.visible }
           : field
@@ -308,7 +308,7 @@ export default function ACFFieldSelector({
   // Handle custom label change
   const handleLabelChange = (fieldKey: string, label: string) => {
     onFieldsChange(
-      selectedFields.map((field) =>
+      selectedFields.map((field: any) =>
         field.key === fieldKey
           ? { ...field, customLabel: label }
           : field
@@ -391,7 +391,7 @@ export default function ACFFieldSelector({
           </h3>
           
           <div style={{ marginBottom: '20px' }}>
-            {availableFields.map((field) => (
+            {availableFields.map((field: any) => (
               <CheckboxControl
                 key={field.key}
                 label={
@@ -412,7 +412,7 @@ export default function ACFFieldSelector({
                   </span>
                 }
                 checked={selectedFields.some((f) => f.key === field.key)}
-                onChange={(checked) => handleFieldToggle(field, checked)}
+                onChange={(checked: any) => handleFieldToggle(field, checked)}
               />
             ))}
           </div>
@@ -429,7 +429,7 @@ export default function ACFFieldSelector({
                 onDragEnd={handleDragEnd}
               >
                 <SortableContext
-                  items={selectedFields.map((f) => f.key)}
+                  items={selectedFields.map((f: any) => f.key)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div
@@ -440,7 +440,7 @@ export default function ACFFieldSelector({
                       background: '#f9f9f9',
                     }}
                   >
-                    {selectedFields.map((field) => (
+                    {selectedFields.map((field: any) => (
                       <SortableFieldItem
                         key={field.key}
                         field={field}

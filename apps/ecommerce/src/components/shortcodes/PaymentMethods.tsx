@@ -11,7 +11,7 @@ import { CreditCard, Smartphone, Banknote, Building } from 'lucide-react';
  * [payment-methods show-icons="true" default="card"]
  */
 export const PaymentMethods: FC<ShortcodeProps> = ({ attributes }) => {
-  const [selectedMethod, setSelectedMethod] = useState<string>(
+  const [selectedMethod, setSelectedMethod] = useState(
     String(attributes.default || 'card')
   );
   
@@ -84,7 +84,7 @@ export const PaymentMethods: FC<ShortcodeProps> = ({ attributes }) => {
                 name="payment-method"
                 value={method.id}
                 checked={isSelected}
-                onChange={(e) => setSelectedMethod(e.target.value)}
+                onChange={(e: any) => setSelectedMethod(e.target.value)}
                 className="text-primary"
               />
               

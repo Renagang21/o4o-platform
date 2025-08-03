@@ -82,7 +82,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
         </Label>
         <select
           value={settings.linkTo || 'none'}
-          onChange={(e) => onChange({ ...settings, linkTo: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings, linkTo: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="none">링크 없음</option>

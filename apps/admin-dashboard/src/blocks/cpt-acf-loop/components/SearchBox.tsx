@@ -29,7 +29,7 @@ export const SearchBox = ({
   showSearchIn = true,
 }: SearchBoxProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchIn, setSearchIn] = useState<string[]>(searchFields);
+  const [searchIn, setSearchIn] = useState(searchFields);
   const [isRealTime, setIsRealTime] = useState(true);
 
   // Debounced search function
@@ -122,7 +122,7 @@ export const SearchBox = ({
                   <input
                     type="checkbox"
                     checked={searchIn.includes('title')}
-                    onChange={(e) => handleSearchFieldToggle('title', e.target.checked)}
+                    onChange={(e: any) => handleSearchFieldToggle('title', e.target.checked)}
                   />
                   <span>{__('Title', 'o4o')}</span>
                 </label>
@@ -131,7 +131,7 @@ export const SearchBox = ({
                   <input
                     type="checkbox"
                     checked={searchIn.includes('content')}
-                    onChange={(e) => handleSearchFieldToggle('content', e.target.checked)}
+                    onChange={(e: any) => handleSearchFieldToggle('content', e.target.checked)}
                   />
                   <span>{__('Content', 'o4o')}</span>
                 </label>
@@ -140,7 +140,7 @@ export const SearchBox = ({
                   <input
                     type="checkbox"
                     checked={searchIn.includes('excerpt')}
-                    onChange={(e) => handleSearchFieldToggle('excerpt', e.target.checked)}
+                    onChange={(e: any) => handleSearchFieldToggle('excerpt', e.target.checked)}
                   />
                   <span>{__('Excerpt', 'o4o')}</span>
                 </label>
@@ -149,7 +149,7 @@ export const SearchBox = ({
                   <input
                     type="checkbox"
                     checked={searchIn.includes('acf')}
-                    onChange={(e) => handleSearchFieldToggle('acf', e.target.checked)}
+                    onChange={(e: any) => handleSearchFieldToggle('acf', e.target.checked)}
                   />
                   <span>{__('Custom Fields', 'o4o')}</span>
                 </label>
@@ -223,25 +223,25 @@ export const SearchSettings = ({
             <ToggleControl
               label={__('Title', 'o4o')}
               checked={searchIn.includes('title')}
-              onChange={(checked) => handleSearchFieldToggle('title', checked)}
+              onChange={(checked: any) => handleSearchFieldToggle('title', checked)}
             />
             
             <ToggleControl
               label={__('Content', 'o4o')}
               checked={searchIn.includes('content')}
-              onChange={(checked) => handleSearchFieldToggle('content', checked)}
+              onChange={(checked: any) => handleSearchFieldToggle('content', checked)}
             />
             
             <ToggleControl
               label={__('Excerpt', 'o4o')}
               checked={searchIn.includes('excerpt')}
-              onChange={(checked) => handleSearchFieldToggle('excerpt', checked)}
+              onChange={(checked: any) => handleSearchFieldToggle('excerpt', checked)}
             />
             
             <ToggleControl
               label={__('ACF Fields', 'o4o')}
               checked={searchIn.includes('acf')}
-              onChange={(checked) => handleSearchFieldToggle('acf', checked)}
+              onChange={(checked: any) => handleSearchFieldToggle('acf', checked)}
               help={__('Search in custom field values', 'o4o')}
             />
           </div>

@@ -76,8 +76,8 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
   const [mediaFile, setMediaFile] = useState<MediaFile | null>(null)
   const [imageFormats, setImageFormats] = useState<ImageFormats | null>(null)
   const [loadingState, setLoadingState] = useState<'loading' | 'loaded' | 'error'>('loading')
-  const [currentSrc, setCurrentSrc] = useState<string>('')
-  const [placeholderSrc, setPlaceholderSrc] = useState<string>('')
+  const [currentSrc, setCurrentSrc] = useState('')
+  const [placeholderSrc, setPlaceholderSrc] = useState('')
   const imgRef = useRef<HTMLImageElement>(null)
   const [isIntersecting, setIsIntersecting] = useState(!loading || priority)
 

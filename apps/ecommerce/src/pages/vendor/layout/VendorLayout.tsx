@@ -73,13 +73,13 @@ export default function VendorLayout() {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4">
-            {navigation.map((item) => {
+            {navigation.map((item: any) => {
               const isActive = location.pathname === item.href;
               return (
                 <a
                   key={item.name}
                   href={item.href}
-                  onClick={(e) => {
+                  onClick={(e: any) => {
                     e.preventDefault();
                     navigate(item.href);
                     setSidebarOpen(false);

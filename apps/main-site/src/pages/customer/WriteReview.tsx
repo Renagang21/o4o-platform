@@ -15,7 +15,7 @@ const WriteReview: FC = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<ReviewForm>();
   const [rating, setRating] = useState(0);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewImages, setPreviewImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: ReviewForm) => {
@@ -43,7 +43,7 @@ const WriteReview: FC = () => {
                 별점
               </label>
               <div className="flex space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map((star: any) => (
                   <button
                     key={star}
                     type="button"

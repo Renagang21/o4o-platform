@@ -157,7 +157,7 @@ const OrderDetail: FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {order.items?.map((item) => (
+                  {order.items?.map((item: any) => (
                     <tr key={item.id} className="border-b">
                       <td className="py-4">
                         <div className="flex items-center gap-3">

@@ -222,7 +222,7 @@ const AppsManager: FC = () => {
         <div className="flex gap-2">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e: any) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>
@@ -316,7 +316,7 @@ const AppsManager: FC = () => {
             조건에 맞는 앱이 없습니다.
           </div>
         ) : (
-          filteredApps.map((app) => (
+          filteredApps.map((app: any) => (
             <Card key={app.id} className="relative">
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
@@ -439,7 +439,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="autoStart"
                 checked={settingsForm.autoStart || false}
-                onChange={(e) => setSettingsForm(prev => ({ ...prev, autoStart: e.target.checked }))}
+                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, autoStart: e.target.checked }))}
               />
             </div>
 
@@ -449,7 +449,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="requiresApproval"
                 checked={settingsForm.requiresApproval || false}
-                onChange={(e) => setSettingsForm(prev => ({ ...prev, requiresApproval: e.target.checked }))}
+                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, requiresApproval: e.target.checked }))}
               />
             </div>
 
@@ -459,7 +459,7 @@ const AppsManager: FC = () => {
                 type="checkbox"
                 id="maintenanceMode"
                 checked={settingsForm.maintenanceMode || false}
-                onChange={(e) => setSettingsForm(prev => ({ ...prev, maintenanceMode: e.target.checked }))}
+                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, maintenanceMode: e.target.checked }))}
               />
             </div>
 
@@ -469,7 +469,7 @@ const AppsManager: FC = () => {
                 id="maxUsers"
                 type="number"
                 value={settingsForm.maxUsers || ''}
-                onChange={(e) => setSettingsForm(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || undefined }))}
+                onChange={(e: any) => setSettingsForm(prev => ({ ...prev, maxUsers: parseInt(e.target.value) || undefined }))}
                 placeholder="제한 없음"
               />
             </div>

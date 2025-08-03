@@ -34,7 +34,7 @@ const mockUsers: ApprovalUser[] = [
 const YaksaApprovalList: FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [users, setUsers] = useState<ApprovalUser[]>(mockUsers);
+  const [users, setUsers] = useState(mockUsers);
 
   const handleApprove = (id: string) => {
     setUsers(users.map(user => 
@@ -104,7 +104,7 @@ const YaksaApprovalList: FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {users.map((user) => (
+                {users.map((user: any) => (
                   <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">

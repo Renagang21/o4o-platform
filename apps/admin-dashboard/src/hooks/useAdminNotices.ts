@@ -45,7 +45,7 @@ const useAdminNoticesStore = create<AdminNoticesStore>((set) => ({
     if (notice.duration && notice.duration > 0) {
       setTimeout(() => {
         set((state) => ({
-          notices: state.notices.filter((n) => n.id !== id),
+          notices: state.notices.filter((n: any) => n.id !== id),
         }));
       }, notice.duration);
     }
@@ -55,7 +55,7 @@ const useAdminNoticesStore = create<AdminNoticesStore>((set) => ({
   
   dismissNotice: (id) => {
     set((state) => ({
-      notices: state.notices.filter((notice) => notice.id !== id),
+      notices: state.notices.filter((notice: any) => notice.id !== id),
     }));
   },
   
@@ -65,7 +65,7 @@ const useAdminNoticesStore = create<AdminNoticesStore>((set) => ({
   
   clearNoticesByType: (type) => {
     set((state) => ({
-      notices: state.notices.filter((notice) => notice.type !== type),
+      notices: state.notices.filter((notice: any) => notice.type !== type),
     }));
   },
 }));

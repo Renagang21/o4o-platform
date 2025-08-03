@@ -21,7 +21,7 @@ import toast from 'react-hot-toast'
 const Categories: FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState([])
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [showModal, setShowModal] = useState(false)

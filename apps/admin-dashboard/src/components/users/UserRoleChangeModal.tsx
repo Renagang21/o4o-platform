@@ -22,7 +22,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
   users,
   isLoading = false
 }) => {
-  const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
+  const [selectedRole, setSelectedRole] = useState('customer');
 
   if (!isOpen) return null;
 
@@ -102,7 +102,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
               </span>
             </div>
             <div className="bg-wp-bg-tertiary rounded-lg p-3 max-h-32 overflow-y-auto">
-              {users.map((user) => (
+              {users.map((user: any) => (
                 <div key={user.id} className="flex items-center justify-between py-1">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-wp-text-primary">{user.name}</span>

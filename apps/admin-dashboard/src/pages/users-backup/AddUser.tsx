@@ -12,7 +12,7 @@ const AddUser: FC = () => {
   const isEditMode = Boolean(userId)
   
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState<UserFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     role: 'customer',
@@ -248,7 +248,7 @@ const AddUser: FC = () => {
                     required={needsBusinessInfo}
                   >
                     <option value="">사업체 유형 선택</option>
-                    {BUSINESS_TYPES.map((type) => (
+                    {BUSINESS_TYPES.map((type: any) => (
                       <option key={type} value={type}>{type}</option>
                     ))}
                   </select>

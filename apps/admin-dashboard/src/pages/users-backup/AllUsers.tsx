@@ -9,11 +9,11 @@ import BulkActions from './components/BulkActions'
 import toast from 'react-hot-toast'
 
 const AllUsers: FC = () => {
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<UserStats | null>(null)
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [filters, setFilters] = useState<IUserFilters>({})
+  const [selectedUsers, setSelectedUsers] = useState([])
+  const [filters, setFilters] = useState({})
   const [pagination, setPagination] = useState({
     current: 1,
     total: 1,

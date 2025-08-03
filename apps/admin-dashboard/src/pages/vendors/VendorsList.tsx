@@ -62,9 +62,9 @@ const mockVendors: Vendor[] = [
 ];
 
 const VendorsList = () => {
-  const [vendors] = useState<Vendor[]>(mockVendors);
+  const [vendors] = useState(mockVendors);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -186,7 +186,7 @@ const VendorsList = () => {
               type="text"
               placeholder="이름, 사업자명, 이메일로 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
             />
           </div>
@@ -236,7 +236,7 @@ const VendorsList = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-modern-border-primary">
-              {filteredVendors.map((vendor) => (
+              {filteredVendors.map((vendor: any) => (
                 <tr key={vendor.id} className="hover:bg-modern-bg-hover">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

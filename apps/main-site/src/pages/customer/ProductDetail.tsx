@@ -13,7 +13,7 @@ export default function ProductDetail() {
   const { products, fetchProducts, flatCategories } = useProductStore();
   const { addToCart } = useOrderStore();
   
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'reviews'>('description');
@@ -195,7 +195,7 @@ export default function ProductDetail() {
                   <select
                     id="quantity"
                     value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value))}
+                    onChange={(e: any) => setQuantity(parseInt(e.target.value))}
                     className="mt-1 block w-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   >
                     {[...Array(Math.min(product.stockQuantity, 10))].map((_, i) => (

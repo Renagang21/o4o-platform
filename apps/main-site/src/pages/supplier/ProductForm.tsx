@@ -50,7 +50,7 @@ export default function ProductForm() {
   const [specifications, setSpecifications] = useState<{[key: string]: string}>({});
 
   // Handle images as array of strings
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState([]);
 
   const [specKey, setSpecKey] = useState('');
   const [specValue, setSpecValue] = useState('');
@@ -366,7 +366,7 @@ export default function ProductForm() {
             <div className="flex space-x-2 mb-4">
               <input
                 value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                onChange={(e: any) => setImageUrl(e.target.value)}
                 type="url"
                 className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="이미지 URL을 입력하세요"
@@ -440,14 +440,14 @@ export default function ProductForm() {
               <div className="flex space-x-2 mb-4">
                 <input
                   value={specKey}
-                  onChange={(e) => setSpecKey(e.target.value)}
+                  onChange={(e: any) => setSpecKey(e.target.value)}
                   type="text"
                   className="w-1/3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="스펙명 (예: CPU)"
                 />
                 <input
                   value={specValue}
-                  onChange={(e) => setSpecValue(e.target.value)}
+                  onChange={(e: any) => setSpecValue(e.target.value)}
                   type="text"
                   className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   placeholder="스펙값 (예: Intel i7-12700H)"

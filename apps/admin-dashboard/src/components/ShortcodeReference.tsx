@@ -143,7 +143,7 @@ const ShortcodeReference: FC = () => {
       </div>
 
       <div className="space-y-4">
-        {shortcodes.map((shortcode) => {
+        {shortcodes.map((shortcode: any) => {
           const Icon = shortcode.icon;
           const isExpanded = expandedShortcode === shortcode.name;
 
@@ -173,7 +173,7 @@ const ShortcodeReference: FC = () => {
                   <div className="mb-4">
                     <h4 className="font-medium text-sm text-gray-700 mb-2">파라미터</h4>
                     <div className="space-y-2">
-                      {shortcode.parameters.map((param) => (
+                      {shortcode.parameters.map((param: any) => (
                         <div key={param.name} className="text-sm">
                           <code className="bg-gray-200 px-1 rounded">{param.name}</code>
                           <span className="text-gray-600 ml-2">

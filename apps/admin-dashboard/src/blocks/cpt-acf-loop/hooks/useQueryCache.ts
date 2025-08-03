@@ -161,7 +161,7 @@ export const useCachedQuery = <T = any>(
 ) => {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState(null);
   
   const { 
     generateCacheKey, 

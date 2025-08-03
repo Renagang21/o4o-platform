@@ -200,8 +200,8 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'templates' | 'patterns'>('templates');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [favorites, setFavorites] = useState([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Template categories
@@ -274,7 +274,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
           <Input
             placeholder="Search templates and patterns..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: any) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>

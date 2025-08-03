@@ -26,7 +26,7 @@ interface SocialLoginConfigContextType {
 const SocialLoginConfigContext = createContext<SocialLoginConfigContextType | undefined>(undefined);
 
 export const SocialLoginConfigProvider = ({ children }: { children: ReactNode }) => {
-  const [config, setConfig] = useState<SocialConfig>(defaultConfig);
+  const [config, setConfig] = useState(defaultConfig);
 
   useEffect(() => {
     const saved = localStorage.getItem('socialLoginConfig');

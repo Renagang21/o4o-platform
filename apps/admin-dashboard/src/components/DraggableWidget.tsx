@@ -59,7 +59,7 @@ const DraggableWidget: FC<DraggableWidgetProps> = ({
         <div className="flex items-center gap-1">
           {isCollapsible && (
             <button
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 setIsCollapsed(!isCollapsed);
               }}
@@ -80,7 +80,7 @@ const DraggableWidget: FC<DraggableWidgetProps> = ({
           )}
           {isClosable && onClose && (
             <button
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation();
                 handleClose();
               }}

@@ -38,7 +38,7 @@ const MediaUploader: FC<MediaUploaderProps> = ({
   maxFileSize = 100 * 1024 * 1024, // 100MB
   allowedTypes = ['image/*', 'video/*', 'audio/*', 'application/pdf']
 }) => {
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
+  const [uploadingFiles, setUploadingFiles] = useState([])
   const [isUploading, setIsUploading] = useState(false)
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {

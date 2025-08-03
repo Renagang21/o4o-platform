@@ -19,9 +19,9 @@ export default function CustomerHome() {
   
   const { addToCart } = useOrderStore();
 
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [newProducts, setNewProducts] = useState<Product[]>([]);
-  const [popularProducts, setPopularProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [newProducts, setNewProducts] = useState([]);
+  const [popularProducts, setPopularProducts] = useState([]);
 
   useEffect(() => {
     // 활성화된 상품들만 가져오기
@@ -166,7 +166,7 @@ export default function CustomerHome() {
           </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {categoryGroups.slice(0, 6).map((group) => (
+            {categoryGroups.slice(0, 6).map((group: any) => (
               <div
                 key={group.id}
                 onClick={() => navigate(`/customer/products?category=${group.id}`)}
@@ -203,7 +203,7 @@ export default function CustomerHome() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProducts.map((product) => (
+              {featuredProducts.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -232,7 +232,7 @@ export default function CustomerHome() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {newProducts.map((product) => (
+              {newProducts.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -261,7 +261,7 @@ export default function CustomerHome() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {popularProducts.map((product) => (
+              {popularProducts.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

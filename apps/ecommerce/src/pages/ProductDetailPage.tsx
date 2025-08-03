@@ -291,7 +291,7 @@ export function ProductDetailPage() {
                 <Input
                   type="number"
                   value={quantity}
-                  onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                  onChange={(e: any) => handleQuantityChange(Number(e.target.value))}
                   className="w-20 text-center"
                   min={1}
                   max={product.inventory.stockQuantity}

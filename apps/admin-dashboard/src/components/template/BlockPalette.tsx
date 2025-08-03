@@ -219,7 +219,7 @@ const blockDefinitions: BlockDefinition[] = [
 const categories = ['Basic', 'Media', 'Layout', 'Content', 'Interactive', 'Advanced']
 
 const BlockPalette: FC<BlockPaletteProps> = ({ onAddBlock }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Basic')
+  const [selectedCategory, setSelectedCategory] = useState('Basic')
 
   const filteredBlocks = blockDefinitions.filter(
     block => block.category === selectedCategory
@@ -229,7 +229,7 @@ const BlockPalette: FC<BlockPaletteProps> = ({ onAddBlock }) => {
     <div className="space-y-4">
       {/* Category Tabs */}
       <div className="space-y-2">
-        {categories.map((category) => (
+        {categories.map((category: any) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
@@ -246,7 +246,7 @@ const BlockPalette: FC<BlockPaletteProps> = ({ onAddBlock }) => {
 
       {/* Block List */}
       <div className="space-y-2">
-        {filteredBlocks.map((block) => (
+        {filteredBlocks.map((block: any) => (
           <div
             key={block.type}
             className="border rounded-lg p-3 hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all group"

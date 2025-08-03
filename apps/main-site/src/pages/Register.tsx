@@ -15,7 +15,7 @@ interface SimpleRegisterData {
 
 const Register: FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<SimpleRegisterData>({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: ''
@@ -238,7 +238,7 @@ const Register: FC = () => {
                 id="confirmPassword"
                 name="confirmPassword"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e: any) => setConfirmPassword(e.target.value)}
                 required
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                 placeholder="비밀번호를 다시 입력하세요"

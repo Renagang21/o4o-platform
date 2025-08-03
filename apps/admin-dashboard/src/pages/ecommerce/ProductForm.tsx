@@ -53,9 +53,9 @@ const ProductForm: FC = () => {
     categories: [],
   });
 
-  const [productOptions, setProductOptions] = useState<ProductOption[]>([]);
-  const [productVariants, setProductVariants] = useState<ProductVariant[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [productOptions, setProductOptions] = useState([]);
+  const [productVariants, setProductVariants] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   // const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
 

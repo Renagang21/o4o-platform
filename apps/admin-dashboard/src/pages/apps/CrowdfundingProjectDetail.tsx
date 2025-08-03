@@ -209,7 +209,7 @@ const CrowdfundingProjectDetail = () => {
                 <div>
                   <h3 className="text-lg font-semibold mb-3">참여 매장 ({project.participants.length}개)</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {project.participants.map((participant) => (
+                    {project.participants.map((participant: any) => (
                       <div key={participant.id} className="flex items-center gap-3 p-3 bg-modern-bg-tertiary rounded-lg">
                         <div className="w-10 h-10 bg-modern-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
                           {participant.vendorName?.charAt(0) || 'U'}

@@ -133,8 +133,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   });
 
   // State
-  const [postTypes, setPostTypes] = useState<PostType[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [postTypes, setPostTypes] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [totalPosts, setTotalPosts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -274,7 +274,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       }
 
       // Find the rest base for the post type
-      const selectedType = postTypes.find((type) => type.slug === postType);
+      const selectedType = postTypes.find((type: any) => type.slug === postType);
       const restBase = selectedType?.rest_base || postType;
 
       // Fetch posts - Use our CPT API that returns WordPress-formatted data
@@ -376,7 +376,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   // Prepare post type options
   const postTypeOptions = [
     { label: __('Select a post type', 'o4o'), value: '' },
-    ...postTypes.map((type) => ({
+    ...postTypes.map((type: any) => ({
       label: type.name,
       value: type.slug,
     })),
@@ -435,7 +435,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               label={__('Post Type', 'o4o')}
               value={postType}
               options={postTypeOptions}
-              onChange={(value) => setAttributes({ postType: value })}
+              onChange={(value: any) => setAttributes({ postType: value })}
               help={__('Select a custom post type to display', 'o4o')}
             />
           </PanelBody>
@@ -489,14 +489,14 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__('Post Type', 'o4o')}
             value={postType}
             options={postTypeOptions}
-            onChange={(value) => setAttributes({ postType: value, currentPage: 1 })}
+            onChange={(value: any) => setAttributes({ postType: value, currentPage: 1 })}
             help={__('Select a custom post type to display', 'o4o')}
           />
           
           <RangeControl
             label={__('Number of Posts', 'o4o')}
             value={postsPerPage}
-            onChange={(value) => setAttributes({ postsPerPage: value || 12 })}
+            onChange={(value: any) => setAttributes({ postsPerPage: value || 12 })}
             min={1}
             max={50}
             step={1}
@@ -506,7 +506,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__('Order By', 'o4o')}
             value={orderBy}
             options={orderByOptions}
-            onChange={(value) => setAttributes({ orderBy: value })}
+            onChange={(value: any) => setAttributes({ orderBy: value })}
           />
           
           <SelectControl
@@ -516,7 +516,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               { label: __('Descending', 'o4o'), value: 'desc' },
               { label: __('Ascending', 'o4o'), value: 'asc' },
             ]}
-            onChange={(value) => setAttributes({ order: value })}
+            onChange={(value: any) => setAttributes({ order: value })}
           />
         </PanelBody>
 
@@ -525,7 +525,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__('Template', 'o4o')}
             value={layoutType}
             options={templateOptions}
-            onChange={(value) => setAttributes({ layoutType: value })}
+            onChange={(value: any) => setAttributes({ layoutType: value })}
           />
           
           {layoutType === 'grid' && (
@@ -533,7 +533,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               <RangeControl
                 label={__('Desktop Columns', 'o4o')}
                 value={columnsDesktop}
-                onChange={(value) => setAttributes({ columnsDesktop: value || 3 })}
+                onChange={(value: any) => setAttributes({ columnsDesktop: value || 3 })}
                 min={1}
                 max={6}
                 step={1}
@@ -541,7 +541,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               <RangeControl
                 label={__('Tablet Columns', 'o4o')}
                 value={columnsTablet}
-                onChange={(value) => setAttributes({ columnsTablet: value || 2 })}
+                onChange={(value: any) => setAttributes({ columnsTablet: value || 2 })}
                 min={1}
                 max={4}
                 step={1}
@@ -549,7 +549,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               <RangeControl
                 label={__('Mobile Columns', 'o4o')}
                 value={columnsMobile}
-                onChange={(value) => setAttributes({ columnsMobile: value || 1 })}
+                onChange={(value: any) => setAttributes({ columnsMobile: value || 1 })}
                 min={1}
                 max={2}
                 step={1}

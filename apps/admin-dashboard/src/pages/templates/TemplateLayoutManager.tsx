@@ -64,8 +64,8 @@ const mockTemplates: LayoutTemplate[] = [
 ];
 
 const TemplateLayoutManager: FC = () => {
-  const [templates, _setTemplates] = useState<LayoutTemplate[]>(mockTemplates);
-  const [selectedLayoutType, setSelectedLayoutType] = useState<string>('all');
+  const [templates, _setTemplates] = useState(mockTemplates);
+  const [selectedLayoutType, setSelectedLayoutType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
@@ -161,7 +161,7 @@ const TemplateLayoutManager: FC = () => {
 
       {/* Templates Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTemplates.map((template) => (
+        {filteredTemplates.map((template: any) => (
           <div
             key={template.id}
             className={`wp-card overflow-hidden transition-all duration-200 ${
@@ -219,7 +219,7 @@ const TemplateLayoutManager: FC = () => {
 
               {/* Tags */}
               <div className="flex flex-wrap gap-1 mb-4">
-                {template.tags.map((tag) => (
+                {template.tags.map((tag: any) => (
                   <span
                     key={tag}
                     className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"

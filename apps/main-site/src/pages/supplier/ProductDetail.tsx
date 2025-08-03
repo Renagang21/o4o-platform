@@ -286,7 +286,7 @@ export default function ProductDetail() {
                   </label>
                   <select
                     value={currentProduct.status}
-                    onChange={(e) => handleStatusChange(e.target.value as Product['status'])}
+                    onChange={(e: any) => handleStatusChange(e.target.value as Product['status'])}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   >
                     <option value="draft">임시저장</option>

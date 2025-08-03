@@ -98,7 +98,7 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
                   min="1"
                   max="6"
                   value={columns}
-                  onChange={(e) => onColumnsChange(parseInt(e.target.value) || 1)}
+                  onChange={(e: any) => onColumnsChange(parseInt(e.target.value) || 1)}
                   className="mt-1 w-full"
                 />
               </div>
@@ -115,7 +115,7 @@ export const ScreenOptions: FC<ScreenOptionsProps> = ({
                   min="1"
                   max="999"
                   value={itemsPerPage}
-                  onChange={(e) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
+                  onChange={(e: any) => onItemsPerPageChange(parseInt(e.target.value) || 20)}
                   className="mt-1 w-full"
                 />
               </div>

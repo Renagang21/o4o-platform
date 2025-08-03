@@ -38,7 +38,7 @@ interface StoreSettings {
 export default function VendorSettings() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('store');
-  const [settings, setSettings] = useState<StoreSettings>({
+  const [settings, setSettings] = useState({
     storeName: user?.name || 'My Store',
     storeDescription: '고품질 전자제품 및 액세서리를 판매하는 온라인 스토어입니다.',
     logo: '/api/placeholder/200/200',
@@ -99,7 +99,7 @@ export default function VendorSettings() {
         {/* 사이드바 */}
         <div className="w-64">
           <nav className="space-y-1">
-            {tabs.map((tab) => (
+            {tabs.map((tab: any) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -149,7 +149,7 @@ export default function VendorSettings() {
                   </label>
                   <Input
                     value={settings.storeName}
-                    onChange={(e) => handleInputChange('storeName', e.target.value)}
+                    onChange={(e: any) => handleInputChange('storeName', e.target.value)}
                   />
                 </div>
 
@@ -161,7 +161,7 @@ export default function VendorSettings() {
                   <Textarea
                     rows={3}
                     value={settings.storeDescription}
-                    onChange={(e) => handleInputChange('storeDescription', e.target.value)}
+                    onChange={(e: any) => handleInputChange('storeDescription', e.target.value)}
                   />
                 </div>
 
@@ -175,7 +175,7 @@ export default function VendorSettings() {
                     <Input
                       type="email"
                       value={settings.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e: any) => handleInputChange('email', e.target.value)}
                     />
                   </div>
                   <div>
@@ -185,7 +185,7 @@ export default function VendorSettings() {
                     </label>
                     <Input
                       value={settings.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      onChange={(e: any) => handleInputChange('phone', e.target.value)}
                     />
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export default function VendorSettings() {
                   </label>
                   <Input
                     value={settings.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    onChange={(e: any) => handleInputChange('address', e.target.value)}
                   />
                 </div>
 
@@ -210,7 +210,7 @@ export default function VendorSettings() {
                   </label>
                   <Input
                     value={settings.businessHours}
-                    onChange={(e) => handleInputChange('businessHours', e.target.value)}
+                    onChange={(e: any) => handleInputChange('businessHours', e.target.value)}
                   />
                 </div>
               </CardContent>
@@ -230,7 +230,7 @@ export default function VendorSettings() {
                   <select
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={settings.bankName}
-                    onChange={(e) => handleInputChange('bankName', e.target.value)}
+                    onChange={(e: any) => handleInputChange('bankName', e.target.value)}
                   >
                     <option>국민은행</option>
                     <option>신한은행</option>
@@ -246,7 +246,7 @@ export default function VendorSettings() {
                   </label>
                   <Input
                     value={settings.bankAccount}
-                    onChange={(e) => handleInputChange('bankAccount', e.target.value)}
+                    onChange={(e: any) => handleInputChange('bankAccount', e.target.value)}
                   />
                 </div>
 
@@ -256,7 +256,7 @@ export default function VendorSettings() {
                   </label>
                   <Input
                     value={settings.accountHolder}
-                    onChange={(e) => handleInputChange('accountHolder', e.target.value)}
+                    onChange={(e: any) => handleInputChange('accountHolder', e.target.value)}
                   />
                 </div>
 
@@ -283,7 +283,7 @@ export default function VendorSettings() {
                     <Input
                       type="number"
                       value={settings.shippingFee}
-                      onChange={(e) => handleInputChange('shippingFee', parseInt(e.target.value))}
+                      onChange={(e: any) => handleInputChange('shippingFee', parseInt(e.target.value))}
                       className="w-40"
                     />
                     <span className="ml-2">원</span>
@@ -298,7 +298,7 @@ export default function VendorSettings() {
                     <Input
                       type="number"
                       value={settings.freeShippingThreshold}
-                      onChange={(e) => handleInputChange('freeShippingThreshold', parseInt(e.target.value))}
+                      onChange={(e: any) => handleInputChange('freeShippingThreshold', parseInt(e.target.value))}
                       className="w-40"
                     />
                     <span className="ml-2">원 이상</span>
@@ -313,7 +313,7 @@ export default function VendorSettings() {
                     <Input
                       type="number"
                       value={settings.returnPeriod}
-                      onChange={(e) => handleInputChange('returnPeriod', parseInt(e.target.value))}
+                      onChange={(e: any) => handleInputChange('returnPeriod', parseInt(e.target.value))}
                       className="w-40"
                     />
                     <span className="ml-2">일</span>
@@ -325,7 +325,7 @@ export default function VendorSettings() {
                     <input
                       type="checkbox"
                       checked={settings.autoConfirmOrder}
-                      onChange={(e) => handleInputChange('autoConfirmOrder', e.target.checked)}
+                      onChange={(e: any) => handleInputChange('autoConfirmOrder', e.target.checked)}
                       className="rounded border-gray-300"
                     />
                     <span className="ml-2 text-sm">주문 자동 확인 (결제 완료 시 자동으로 주문 확정)</span>
@@ -348,7 +348,7 @@ export default function VendorSettings() {
                       <input
                         type="checkbox"
                         checked={settings.notificationEmail}
-                        onChange={(e) => handleInputChange('notificationEmail', e.target.checked)}
+                        onChange={(e: any) => handleInputChange('notificationEmail', e.target.checked)}
                         className="rounded border-gray-300"
                       />
                       <span className="ml-2">이메일 알림</span>
@@ -357,7 +357,7 @@ export default function VendorSettings() {
                       <input
                         type="checkbox"
                         checked={settings.notificationSms}
-                        onChange={(e) => handleInputChange('notificationSms', e.target.checked)}
+                        onChange={(e: any) => handleInputChange('notificationSms', e.target.checked)}
                         className="rounded border-gray-300"
                       />
                       <span className="ml-2">SMS 알림</span>
@@ -366,7 +366,7 @@ export default function VendorSettings() {
                       <input
                         type="checkbox"
                         checked={settings.notificationPush}
-                        onChange={(e) => handleInputChange('notificationPush', e.target.checked)}
+                        onChange={(e: any) => handleInputChange('notificationPush', e.target.checked)}
                         className="rounded border-gray-300"
                       />
                       <span className="ml-2">푸시 알림 (모바일 앱)</span>

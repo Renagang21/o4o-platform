@@ -45,7 +45,7 @@ const Footer: FC = () => {
           <div>
             <h4 className="text-sm font-semibold mb-4">회사</h4>
             <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
+              {footerLinks.company.map((link: any) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
@@ -61,7 +61,7 @@ const Footer: FC = () => {
           <div>
             <h4 className="text-sm font-semibold mb-4">고객지원</h4>
             <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
+              {footerLinks.support.map((link: any) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
@@ -77,7 +77,7 @@ const Footer: FC = () => {
           <div>
             <h4 className="text-sm font-semibold mb-4">법적 고지</h4>
             <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
+              {footerLinks.legal.map((link: any) => (
                 <li key={link.name}>
                   <a
                     href={link.href}

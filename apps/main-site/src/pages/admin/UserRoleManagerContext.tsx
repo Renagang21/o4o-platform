@@ -34,7 +34,7 @@ const initialUsers: UserRoleUser[] = [
 ];
 
 export const UserRoleManagerProvider = ({ children }: { children: ReactNode }) => {
-  const [users, setUsers] = useState<UserRoleUser[]>(initialUsers);
+  const [users, setUsers] = useState(initialUsers);
   const [filter, setFilter] = useState<UserRole | 'all'>('all');
   const [search, setSearch] = useState('');
   const adminId = '1'; // 관리자 본인 ID (mock)

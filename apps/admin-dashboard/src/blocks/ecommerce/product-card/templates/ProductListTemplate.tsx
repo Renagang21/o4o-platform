@@ -57,7 +57,7 @@ export function ProductListTemplate({ products, attributes, isLoading, error }: 
 
   return (
     <div className="space-y-4">
-      {products.map((product) => {
+      {products.map((product: any) => {
         const isOnSale = product.salePrice && product.salePrice < product.regularPrice;
         const discountPercentage = isOnSale ? calculateDiscountPercentage(product.regularPrice, product.salePrice) : 0;
 

@@ -41,9 +41,9 @@ interface PlaylistManagerProps {
 }
 
 export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
-  const [playlistItems, setPlaylistItems] = useState<PlaylistItem[]>([]);
+  const [playlistItems, setPlaylistItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -251,7 +251,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
           </div>
 
           <div className="divide-y">
-            {playlists.map((playlist) => (
+            {playlists.map((playlist: any) => (
               <div
                 key={playlist.id}
                 className={`p-4 cursor-pointer hover:bg-gray-50 ${

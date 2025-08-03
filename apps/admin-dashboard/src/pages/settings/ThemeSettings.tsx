@@ -17,7 +17,7 @@ const themes = {
 const ThemeSettings: FC = () => {
   const { theme: currentThemeName, setTheme } = useTheme()
   const currentTheme = themes[currentThemeName as ThemeName] || themes.light
-  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(currentTheme.name)
+  const [selectedTheme, setSelectedTheme] = useState(currentTheme.name)
   const [isApplying, setIsApplying] = useState(false)
 
   const handleApplyTheme = () => {
@@ -66,7 +66,7 @@ const ThemeSettings: FC = () => {
         </div>
         <div className="wp-card-body">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Object.values(themes).map((theme) => {
+            {Object.values(themes).map((theme: any) => {
               const colors = getThemeColors(theme.name)
               const isSelected = selectedTheme === theme.name
               const isCurrent = currentTheme.name === theme.name

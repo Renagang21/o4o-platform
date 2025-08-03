@@ -45,7 +45,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library');
   const queryClient = useQueryClient();
 
@@ -176,7 +176,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
                       type="search"
                       placeholder="미디어 검색..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e: any) => setSearchQuery(e.target.value)}
                       className="pl-10 w-64"
                     />
                   </div>

@@ -13,7 +13,7 @@ export const AdminNotices: FC = () => {
 
   return (
     <div className="wp-admin-notices">
-      {notices.map((notice) => (
+      {notices.map((notice: any) => (
         <AdminNotice
           key={notice.id}
           {...notice}

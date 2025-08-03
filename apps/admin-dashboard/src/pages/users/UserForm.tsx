@@ -247,7 +247,7 @@ export default function UserForm() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {roles.map((role) => (
+                  {roles.map((role: any) => (
                     <div
                       key={role.value}
                       className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
@@ -256,7 +256,7 @@ export default function UserForm() {
                       <Checkbox
                         checked={selectedRoles?.includes(role.value) || false}
                         onCheckedChange={() => handleRoleToggle(role.value)}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e: any) => e.stopPropagation()}
                       />
                       <div className="flex-1">
                         <div className="font-medium">{role.label}</div>

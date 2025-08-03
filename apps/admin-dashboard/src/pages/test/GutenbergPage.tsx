@@ -66,10 +66,10 @@ const EnhancedBlockItem: FC<{
 const GutenbergPage: FC = () => {
   const navigate = useNavigate();
   const [postTitle, setPostTitle] = useState('');
-  const [blocks, setBlocks] = useState<any[]>([]);
+  const [blocks, setBlocks] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
-  const [selectedBlock, setSelectedBlock] = useState<any>(null);
+  const [selectedBlock, setSelectedBlock] = useState(null);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -189,7 +189,7 @@ const GutenbergPage: FC = () => {
             <Input
               placeholder="Add title"
               value={postTitle}
-              onChange={(e) => setPostTitle(e.target.value)}
+              onChange={(e: any) => setPostTitle(e.target.value)}
               className="text-2xl font-bold border-0 focus-visible:ring-0 p-0"
             />
           </div>
@@ -304,7 +304,7 @@ const GutenbergPage: FC = () => {
           
           {/* Render custom Spectra blocks */}
           <div className="max-w-4xl mx-auto px-12 pb-8">
-            {blocks.map((block) => renderBlock(block))}
+            {blocks.map((block: any) => renderBlock(block))}
           </div>
         </div>
         

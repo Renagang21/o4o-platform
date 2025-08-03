@@ -13,7 +13,7 @@ interface AuthTestStep {
 
 const AuthFlowTest: FC = () => {
   const { user, login, logout, getSessionStatus } = useAuth();
-  const [testSteps, setTestSteps] = useState<AuthTestStep[]>([
+  const [testSteps, setTestSteps] = useState([
     {
       id: 'check-sso',
       name: 'Check SSO Configuration',
@@ -248,14 +248,14 @@ const AuthFlowTest: FC = () => {
                   type="email"
                   placeholder="Email"
                   value={testCredentials.email}
-                  onChange={(e) => setTestCredentials(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e: any) => setTestCredentials(prev => ({ ...prev, email: e.target.value }))}
                   className="px-3 py-1.5 text-sm border border-modern-border-primary rounded focus:outline-none focus:ring-2 focus:ring-modern-primary"
                 />
                 <input
                   type="password"
                   placeholder="Password"
                   value={testCredentials.password}
-                  onChange={(e) => setTestCredentials(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e: any) => setTestCredentials(prev => ({ ...prev, password: e.target.value }))}
                   className="px-3 py-1.5 text-sm border border-modern-border-primary rounded focus:outline-none focus:ring-2 focus:ring-modern-primary"
                 />
               </div>

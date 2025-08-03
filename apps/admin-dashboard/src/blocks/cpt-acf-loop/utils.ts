@@ -66,7 +66,7 @@ export async function fetchPosts(
   try {
     // Find the rest base for the post type
     const postTypes = await fetchPostTypes();
-    const selectedType = postTypes.find((type) => type.slug === postType);
+    const selectedType = postTypes.find((type: any) => type.slug === postType);
     const restBase = selectedType?.rest_base || postType;
 
     // Build query parameters

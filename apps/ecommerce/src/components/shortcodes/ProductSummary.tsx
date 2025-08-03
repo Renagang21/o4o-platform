@@ -30,7 +30,7 @@ export const ProductSummary: FC<ShortcodeProps> = ({ attributes }) => {
 
   return (
     <div className="space-y-4">
-      {cart.items.map((item) => (
+      {cart.items.map((item: any) => (
         <div key={item.id} className="flex items-start gap-4 pb-4 border-b">
           {showImage && item.product?.featuredImageUrl && (
             <img

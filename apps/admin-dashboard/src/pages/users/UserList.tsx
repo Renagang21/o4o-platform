@@ -41,12 +41,12 @@ interface UserListResponse {
 
 export default function UserList() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [total, setTotal] = useState(0);
@@ -242,7 +242,7 @@ export default function UserList() {
                 <Input
                   placeholder="Search users..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e: any) => setSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -336,7 +336,7 @@ export default function UserList() {
                     </td>
                   </tr>
                 ) : (
-                  users.map((user) => (
+                  users.map((user: any) => (
                     <tr key={user.id} className="border-b hover:bg-gray-50">
                       <td className="p-4">
                         <Checkbox
@@ -359,7 +359,7 @@ export default function UserList() {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-1 flex-wrap">
-                          {user.roles.map((role) => (
+                          {user.roles.map((role: any) => (
                             <Badge
                               key={role}
                               className={`${getRoleBadgeColor(role)} text-white`}

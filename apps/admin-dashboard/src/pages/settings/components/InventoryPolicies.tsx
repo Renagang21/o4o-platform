@@ -28,7 +28,7 @@ interface InventoryPoliciesProps {
 }
 
 const InventoryPolicies: FC<InventoryPoliciesProps> = ({ settings, onUpdate }) => {
-  const [_selectedCategory, _setSelectedCategory] = useState<string>('all');
+  const [_selectedCategory, _setSelectedCategory] = useState('all');
 
   // Mock inventory data for demonstration
   const inventoryStats = {
@@ -469,7 +469,7 @@ const InventoryPolicies: FC<InventoryPoliciesProps> = ({ settings, onUpdate }) =
         </div>
         <div className="wp-card-body">
           <div className="space-y-3">
-            {recentAlerts.map((alert) => (
+            {recentAlerts.map((alert: any) => (
               <div
                 key={alert.id}
                 className={`flex items-center justify-between p-3 rounded-lg border ${getStockStatusColor(alert.type)}`}

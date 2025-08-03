@@ -11,7 +11,7 @@ interface FilterSidebarProps {
 }
 
 export function FilterSidebar({ attributes, categories, brands, isEditor = false }: FilterSidebarProps) {
-  const [expandedSections, setExpandedSections] = useState<string[]>(['price', 'category']);
+  const [expandedSections, setExpandedSections] = useState(['price', 'category']);
   const [selectedFilters, setSelectedFilters] = useState({
     priceRange: [attributes.priceMin, attributes.priceMax],
     categories: [] as number[],
@@ -113,7 +113,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
                 <input
                   type="number"
                   value={selectedFilters.priceRange[0]}
-                  onChange={(e) => handlePriceChange(0, parseInt(e.target.value) || 0)}
+                  onChange={(e: any) => handlePriceChange(0, parseInt(e.target.value) || 0)}
                   className="w-full px-2 py-1 border rounded"
                   placeholder={formatPrice(attributes.priceMin)}
                 />
@@ -121,7 +121,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
                 <input
                   type="number"
                   value={selectedFilters.priceRange[1]}
-                  onChange={(e) => handlePriceChange(1, parseInt(e.target.value) || attributes.priceMax)}
+                  onChange={(e: any) => handlePriceChange(1, parseInt(e.target.value) || attributes.priceMax)}
                   className="w-full px-2 py-1 border rounded"
                   placeholder={formatPrice(attributes.priceMax)}
                 />
@@ -132,7 +132,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
                 max={attributes.priceMax}
                 step={attributes.priceStep}
                 value={selectedFilters.priceRange[1]}
-                onChange={(e) => handlePriceChange(1, parseInt(e.target.value))}
+                onChange={(e: any) => handlePriceChange(1, parseInt(e.target.value))}
                 className="w-full"
               />
               <div className="flex justify-between text-sm text-gray-600">
@@ -217,7 +217,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             <input
               type="checkbox"
               checked={selectedFilters.inStock}
-              onChange={(e) => setSelectedFilters({ ...selectedFilters, inStock: e.target.checked })}
+              onChange={(e: any) => setSelectedFilters({ ...selectedFilters, inStock: e.target.checked })}
               className="rounded"
             />
             <span className="font-medium">{__('In Stock Only', 'o4o')}</span>
@@ -232,7 +232,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             <input
               type="checkbox"
               checked={selectedFilters.onSale}
-              onChange={(e) => setSelectedFilters({ ...selectedFilters, onSale: e.target.checked })}
+              onChange={(e: any) => setSelectedFilters({ ...selectedFilters, onSale: e.target.checked })}
               className="rounded"
             />
             <span className="font-medium">{__('On Sale', 'o4o')}</span>

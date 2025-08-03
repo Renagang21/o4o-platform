@@ -4,7 +4,7 @@ import CustomerTierManager from '../../components/dropshipping/CustomerTierManag
 type CustomerType = 'b2c' | 'b2b';
 
 const CustomerManagement: FC = () => {
-  const [customerType, setCustomerType] = useState<CustomerType>('b2c');
+  const [customerType, setCustomerType] = useState('b2c');
 
   const handleTierUpdate = (customerId: string, newTier: string) => {
     // console.log('고객 등급 업데이트:', { customerId, newTier });

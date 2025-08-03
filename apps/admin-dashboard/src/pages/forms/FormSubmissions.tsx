@@ -59,9 +59,9 @@ const FormSubmissions: FC = () => {
   const navigate = useNavigate();
   const { formId } = useParams();
   
-  const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
+  const [selectedSubmissions, setSelectedSubmissions] = useState([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [starredFilter, setStarredFilter] = useState<boolean | null>(null);
   const [page, setPage] = useState(1);
   const [viewingSubmission, setViewingSubmission] = useState<FormSubmission | null>(null);
@@ -261,7 +261,7 @@ const FormSubmissions: FC = () => {
               <Input
                 placeholder="제출 검0색..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e: any) => setSearch(e.target.value)}
                 className="w-full pl-10"
               />
             </div>

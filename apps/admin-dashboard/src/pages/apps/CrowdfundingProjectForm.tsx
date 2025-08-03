@@ -17,7 +17,7 @@ const CrowdfundingProjectForm: FC = () => {
   const queryClient = useQueryClient();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState<CrowdfundingProjectFormData>({
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
     targetParticipantCount: 10,
@@ -194,7 +194,7 @@ const CrowdfundingProjectForm: FC = () => {
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
+                onChange={(e: any) => handleChange('title', e.target.value)}
                 placeholder="예: 친환경 포장재 대량 구매 프로젝트"
                 className={errors.title ? 'border-red-500' : ''}
               />
@@ -208,7 +208,7 @@ const CrowdfundingProjectForm: FC = () => {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => handleChange('description', e.target.value)}
+                onChange={(e: any) => handleChange('description', e.target.value)}
                 placeholder="프로젝트의 목적, 혜택, 예상 절감 비용 등을 상세히 설명해주세요..."
                 rows={8}
                 className={errors.description ? 'border-red-500' : ''}
@@ -241,7 +241,7 @@ const CrowdfundingProjectForm: FC = () => {
                   min="1"
                   max="1000"
                   value={formData.targetParticipantCount}
-                  onChange={(e) => handleChange('targetParticipantCount', parseInt(e.target.value) || 0)}
+                  onChange={(e: any) => handleChange('targetParticipantCount', parseInt(e.target.value) || 0)}
                   className={`max-w-xs ${errors.targetParticipantCount ? 'border-red-500' : ''}`}
                 />
                 <span className="text-modern-text-secondary">개 매장</span>
@@ -262,7 +262,7 @@ const CrowdfundingProjectForm: FC = () => {
                   type="date"
                   min={today}
                   value={formData.startDate}
-                  onChange={(e) => handleChange('startDate', e.target.value)}
+                  onChange={(e: any) => handleChange('startDate', e.target.value)}
                   className={errors.startDate ? 'border-red-500' : ''}
                 />
                 {errors.startDate && (
@@ -277,7 +277,7 @@ const CrowdfundingProjectForm: FC = () => {
                   type="date"
                   min={formData.startDate || today}
                   value={formData.endDate}
-                  onChange={(e) => handleChange('endDate', e.target.value)}
+                  onChange={(e: any) => handleChange('endDate', e.target.value)}
                   className={errors.endDate ? 'border-red-500' : ''}
                 />
                 {errors.endDate && (
@@ -302,7 +302,7 @@ const CrowdfundingProjectForm: FC = () => {
               <Input
                 id="forumLink"
                 value={formData.forumLink}
-                onChange={(e) => handleChange('forumLink', e.target.value)}
+                onChange={(e: any) => handleChange('forumLink', e.target.value)}
                 placeholder="/forum/posts/project-discussion"
               />
               <p className="text-sm text-modern-text-secondary mt-1">

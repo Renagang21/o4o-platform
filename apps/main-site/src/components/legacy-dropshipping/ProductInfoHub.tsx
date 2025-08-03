@@ -76,8 +76,8 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('basic');
   const [basicInfo, setBasicInfo] = useState<ProductBasicInfo | null>(null);
-  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
-  const [externalResources, setExternalResources] = useState<ExternalResource[]>([]);
+  const [mediaAssets, setMediaAssets] = useState([]);
+  const [externalResources, setExternalResources] = useState([]);
   const [verificationData, setVerificationData] = useState<VerificationData | null>(null);
   const [commissionSettings, setCommissionSettings] = useState<CommissionSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -146,7 +146,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
       </div>
 
       <div className="space-y-3">
-        {tabs.map((tab) => (
+        {tabs.map((tab: any) => (
           <div key={tab.id} className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span>{tab.icon}</span>
@@ -200,7 +200,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <input
               type="text"
               value={basicInfo?.name || ''}
-              onChange={(e) => setBasicInfo(prev => prev ? {...prev, name: e.target.value} : null)}
+              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, name: e.target.value} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             />
@@ -209,7 +209,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
             <select
               value={basicInfo?.category || ''}
-              onChange={(e) => setBasicInfo(prev => prev ? {...prev, category: e.target.value} : null)}
+              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, category: e.target.value} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             >
@@ -225,7 +225,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <input
               type="number"
               value={basicInfo?.supplierPrice || ''}
-              onChange={(e) => setBasicInfo(prev => prev ? {...prev, supplierPrice: Number(e.target.value)} : null)}
+              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, supplierPrice: Number(e.target.value)} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             />
@@ -235,7 +235,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
             <input
               type="number"
               value={basicInfo?.price || ''}
-              onChange={(e) => setBasicInfo(prev => prev ? {...prev, price: Number(e.target.value)} : null)}
+              onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, price: Number(e.target.value)} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
             />
@@ -246,7 +246,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">제품 설명</label>
           <textarea
             value={basicInfo?.description || ''}
-            onChange={(e) => setBasicInfo(prev => prev ? {...prev, description: e.target.value} : null)}
+            onChange={(e: any) => setBasicInfo(prev => prev ? {...prev, description: e.target.value} : null)}
             disabled={readonly}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500 focus:border-transparent"
@@ -262,7 +262,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
         <h3 className="text-lg font-semibold text-gray-900 mb-4">멀티미디어 자료</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {mediaAssets.map((asset) => (
+          {mediaAssets.map((asset: any) => (
             <div key={asset.id} className="border border-gray-200 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">{asset.title}</span>
@@ -387,7 +387,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
               type="number"
               max="35"
               value={commissionSettings?.baseCommission || ''}
-              onChange={(e) => setCommissionSettings(prev => prev ? {...prev, baseCommission: Number(e.target.value)} : null)}
+              onChange={(e: any) => setCommissionSettings(prev => prev ? {...prev, baseCommission: Number(e.target.value)} : null)}
               disabled={readonly}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
             />
@@ -438,7 +438,7 @@ const ProductInfoHub: FC<ProductInfoHubProps> = ({
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-4">
-            {tabs.map((tab) => (
+            {tabs.map((tab: any) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}

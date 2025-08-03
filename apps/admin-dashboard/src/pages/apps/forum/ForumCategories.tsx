@@ -38,7 +38,7 @@ const ForumCategories: FC = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ForumCategory | null>(null);
-  const [formData, setFormData] = useState<CategoryFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: '',
@@ -298,7 +298,7 @@ const ForumCategories: FC = () => {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     setFormData(prev => ({
                       ...prev,
                       name: e.target.value,
@@ -314,7 +314,7 @@ const ForumCategories: FC = () => {
                 <Input
                   id="slug"
                   value={formData.slug}
-                  onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                  onChange={(e: any) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                   placeholder="예: general-discussion"
                 />
               </div>
@@ -323,7 +323,7 @@ const ForumCategories: FC = () => {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e: any) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="카테고리에 대한 설명을 입력하세요..."
                   rows={3}
                 />

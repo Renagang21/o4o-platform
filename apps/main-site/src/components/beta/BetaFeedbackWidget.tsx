@@ -19,7 +19,7 @@ export const BetaFeedbackWidget: FC<BetaFeedbackWidgetProps> = ({
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [betaUserEmail, setBetaUserEmail] = useState('');
-  const [feedbackType, setFeedbackType] = useState<string>('general_feedback');
+  const [feedbackType, setFeedbackType] = useState('general_feedback');
 
   const handleQuickFeedback = (type: string) => {
     const email = localStorage.getItem('betaUserEmail');
@@ -147,7 +147,7 @@ export const BetaFeedbackWidget: FC<BetaFeedbackWidgetProps> = ({
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 빠른 피드백
               </h4>
-              {quickFeedbackButtons.map((button) => (
+              {quickFeedbackButtons.map((button: any) => (
                 <button
                   key={button.type}
                   onClick={() => handleQuickFeedback(button.type)}
@@ -174,7 +174,7 @@ export const BetaFeedbackWidget: FC<BetaFeedbackWidgetProps> = ({
                   <input
                     type="email"
                     value={betaUserEmail}
-                    onChange={(e) => setBetaUserEmail(e.target.value)}
+                    onChange={(e: any) => setBetaUserEmail(e.target.value)}
                     placeholder="beta@example.com"
                     className="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   />

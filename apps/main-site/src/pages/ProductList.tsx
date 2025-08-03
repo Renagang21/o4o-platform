@@ -27,7 +27,7 @@ const tempProducts: Product[] = [
 
 const ProductList: FC = () => {
   const { showToast } = useToast();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,13 +42,13 @@ const ProductList: FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+    setProducts((prev) => prev.filter((p: any) => p.id !== id));
     showToast({ type: 'success', message: '상품이 삭제되었습니다.' });
   };
 
   const handleToggleActive = (id: string) => {
     setProducts((prev) =>
-      prev.map((p) =>
+      prev.map((p: any) =>
         p.id === id ? { ...p, isActive: !p.isActive } : p
       )
     );
@@ -75,7 +75,7 @@ const ProductList: FC = () => {
           <div className="text-center text-gray-500 dark:text-gray-300 py-16">등록된 상품이 없습니다.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {products.map((product: any) => (
               <ProductCard
                 key={product.id}
                 product={product}

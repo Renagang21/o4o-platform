@@ -76,7 +76,7 @@ export default function CustomerShop() {
               { name: '식품', icon: '🍎', count: '0' },
               { name: '화장품', icon: '💄', count: '0' },
               { name: '도서', icon: '📚', count: '0' },
-            ].map((category) => (
+            ].map((category: any) => (
               <div key={category.name} className="bg-white rounded-lg shadow p-6 text-center hover:shadow-md transition-shadow cursor-pointer">
                 <div className="text-3xl mb-2">{category.icon}</div>
                 <h4 className="font-medium text-gray-900">{category.name}</h4>

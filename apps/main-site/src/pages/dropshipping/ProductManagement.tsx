@@ -18,14 +18,14 @@ interface Product {
 }
 
 const ProductManagement: FC = () => {
-  const [currentRole, setCurrentRole] = useState<UserRole>('supplier');
+  const [currentRole, setCurrentRole] = useState('supplier');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductInfoHub, setShowProductInfoHub] = useState(false);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   // 샘플 제품 데이터
-  const [products] = useState<Product[]>([
+  const [products] = useState([
     {
       id: 'prod_001',
       name: '프리미엄 비타민 D3 1000IU',
@@ -279,7 +279,7 @@ const ProductManagement: FC = () => {
             <div className="flex items-center space-x-4">
               <select
                 value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
+                onChange={(e: any) => setFilterCategory(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
               >
                 <option value="all">모든 카테고리</option>
@@ -291,7 +291,7 @@ const ProductManagement: FC = () => {
 
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e: any) => setFilterStatus(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
               >
                 <option value="all">모든 상태</option>

@@ -102,7 +102,7 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {categories?.map((category) => (
+              {categories?.map((category: any) => (
                 <Link
                   key={category.id}
                   to={`/categories/${category.slug}`}
@@ -154,7 +154,7 @@ const HomePage = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {trendingPosts?.map((post) => (
+                {trendingPosts?.map((post: any) => (
                   <PostCard key={post.id} post={post} />
                 ))}
               </div>
@@ -176,7 +176,7 @@ const HomePage = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {recentPosts?.map((post) => (
+                {recentPosts?.map((post: any) => (
                   <PostCard key={post.id} post={post} />
                 ))}
                 

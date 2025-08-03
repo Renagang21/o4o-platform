@@ -149,7 +149,7 @@ const YaksaApprovalDetail: FC = () => {
             </h3>
             <textarea
               value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
+              onChange={(e: any) => setRejectionReason(e.target.value)}
               className="w-full h-32 p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="거절 사유를 입력해주세요..."
             />

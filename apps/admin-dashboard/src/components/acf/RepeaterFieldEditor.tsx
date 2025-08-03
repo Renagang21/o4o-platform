@@ -14,7 +14,7 @@ interface RepeaterFieldEditorProps {
 }
 
 const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) => {
-  const [expandedFields, setExpandedFields] = useState<string[]>([])
+  const [expandedFields, setExpandedFields] = useState([])
 
   const handleAddSubField = () => {
     const newSubField: CustomField = {
@@ -184,7 +184,7 @@ const RepeaterFieldEditor: FC<RepeaterFieldEditorProps> = ({ field, onChange }) 
                   <CardContent className="pt-0">
                     <FieldEditor
                       field={subField}
-                      onChange={(updated) => handleUpdateSubField(index, updated)}
+                      onChange={(updated: any) => handleUpdateSubField(index, updated)}
                     />
                   </CardContent>
                 )}

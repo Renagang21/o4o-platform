@@ -66,7 +66,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
   const canvasRef = useRef<HTMLDivElement>(null)
 
   // Builder state
-  const [builderState, setBuilderState] = useState<TemplateBuilderState>(() => ({
+  const [builderState, setBuilderState] = useState(() => ({
     template: template || {
       id: '',
       name: '',
@@ -607,7 +607,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                       </div>
                     </div>
                   ) : (
-                    builderState.template.blocks.map((block) => (
+                    builderState.template.blocks.map((block: any) => (
                       <BlockRenderer
                         key={block.id}
                         block={block}
@@ -639,7 +639,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
               <div className="p-4">
                 <BlockEditor
                   block={builderState.template.blocks.find(b => b.id === builderState.selectedBlockId)!}
-                  onChange={(updates) => updateBlock(builderState.selectedBlockId!, updates)}
+                  onChange={(updates: any) => updateBlock(builderState.selectedBlockId!, updates)}
                 />
               </div>
             </div>

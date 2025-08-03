@@ -47,7 +47,7 @@ const FormList: FC = () => {
   const queryClient = useQueryClient();
   
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -155,7 +155,7 @@ const FormList: FC = () => {
               <Input
                 placeholder="양식 검색..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e: any) => setSearch(e.target.value)}
                 className="w-full pl-10"
               />
             </div>

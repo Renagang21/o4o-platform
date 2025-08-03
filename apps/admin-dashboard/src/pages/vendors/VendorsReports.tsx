@@ -71,7 +71,7 @@ const categoryPerformance = [
 ];
 
 const VendorsReports = () => {
-  const [selectedVendor, setSelectedVendor] = useState<string>('all');
+  const [selectedVendor, setSelectedVendor] = useState('all');
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [reportType, setReportType] = useState<'summary' | 'detailed'>('summary');
 
@@ -265,7 +265,7 @@ const VendorsReports = () => {
               </div>
               <div className="wp-card-body">
                 <div className="space-y-3">
-                  {categoryPerformance.map((category) => (
+                  {categoryPerformance.map((category: any) => (
                     <div key={category.category}>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm font-medium text-modern-text-primary">

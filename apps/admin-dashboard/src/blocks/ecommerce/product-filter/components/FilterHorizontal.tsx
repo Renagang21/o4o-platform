@@ -182,7 +182,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
                     <input
                       type="number"
                       value={selectedFilters.priceRange[0]}
-                      onChange={(e) => setSelectedFilters({
+                      onChange={(e: any) => setSelectedFilters({
                         ...selectedFilters,
                         priceRange: [parseInt(e.target.value) || 0, selectedFilters.priceRange[1]]
                       })}
@@ -193,7 +193,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
                     <input
                       type="number"
                       value={selectedFilters.priceRange[1]}
-                      onChange={(e) => setSelectedFilters({
+                      onChange={(e: any) => setSelectedFilters({
                         ...selectedFilters,
                         priceRange: [selectedFilters.priceRange[0], parseInt(e.target.value) || attributes.priceMax]
                       })}
@@ -279,7 +279,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
             <input
               type="checkbox"
               checked={selectedFilters.inStock}
-              onChange={(e) => setSelectedFilters({ ...selectedFilters, inStock: e.target.checked })}
+              onChange={(e: any) => setSelectedFilters({ ...selectedFilters, inStock: e.target.checked })}
               className="rounded"
             />
             <span>{__('In Stock', 'o4o')}</span>
@@ -291,7 +291,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
             <input
               type="checkbox"
               checked={selectedFilters.onSale}
-              onChange={(e) => setSelectedFilters({ ...selectedFilters, onSale: e.target.checked })}
+              onChange={(e: any) => setSelectedFilters({ ...selectedFilters, onSale: e.target.checked })}
               className="rounded"
             />
             <span>{__('On Sale', 'o4o')}</span>

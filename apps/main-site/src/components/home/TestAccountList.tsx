@@ -24,7 +24,7 @@ const TestAccountList: FC<TestAccountListProps> = ({
     });
   };
 
-  const listItems = accounts.map((account) => ({
+  const listItems = accounts.map((account: any) => ({
     id: account.id,
     content: (
       <div className="flex flex-col space-y-1">

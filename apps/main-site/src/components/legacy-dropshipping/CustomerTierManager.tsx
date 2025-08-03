@@ -70,10 +70,10 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
   onTierUpdate,
   onCustomerAction
 }) => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [upgradesPredictions, setUpgradesPredictions] = useState<TierUpgradePrediction[]>([]);
-  const [filterTier, setFilterTier] = useState<string>('all');
+  const [upgradesPredictions, setUpgradesPredictions] = useState([]);
+  const [filterTier, setFilterTier] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   // 샘플 데이터
@@ -670,7 +670,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
           <div className="flex items-center space-x-4">
             <select
               value={filterTier}
-              onChange={(e) => setFilterTier(e.target.value)}
+              onChange={(e: any) => setFilterTier(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
             >
               <option value="all">모든 등급</option>
@@ -693,7 +693,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
               type="text"
               placeholder={customerType === 'b2c' ? '고객명 또는 이메일 검색' : '고객명, 회사명 또는 이메일 검색'}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
             />
           </div>
@@ -709,7 +709,7 @@ const CustomerTierManager: FC<CustomerTierManagerProps> = ({
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-6">
           <h2 className="text-lg font-semibold text-purple-900 mb-3">🎯 등급 승급 예측 (AI 기반)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upgradesPredictions.map((prediction) => {
+            {upgradesPredictions.map((prediction: any) => {
               const customer = customers.find(c => c.id === prediction.customerId);
               if (!customer) return null;
               

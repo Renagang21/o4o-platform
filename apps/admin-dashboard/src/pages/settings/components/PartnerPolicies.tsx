@@ -35,7 +35,7 @@ interface PartnerPoliciesProps {
 
 const PartnerPolicies: FC<PartnerPoliciesProps> = ({ settings, onUpdate }) => {
   const [editingTier, setEditingTier] = useState<number | null>(null);
-  const [newTier, setNewTier] = useState<PartnerTier>({
+  const [newTier, setNewTier] = useState({
     name: '',
     minSales: 0,
     commissionRate: 0

@@ -134,7 +134,7 @@ const ContentManager: FC = () => {
               ref={fileInputRef}
               type="file"
               accept="image/*,video/*"
-              onChange={(e) => handleFileSelect(e.target.files)}
+              onChange={(e: any) => handleFileSelect(e.target.files)}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
             
@@ -177,7 +177,7 @@ const ContentManager: FC = () => {
                 <input
                   type="text"
                   value={newContent.title}
-                  onChange={(e) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e: any) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   placeholder="TV에 표시될 콘텐츠 제목을 입력하세요"
                 />
@@ -189,7 +189,7 @@ const ContentManager: FC = () => {
                 </label>
                 <select
                   value={newContent.type}
-                  onChange={(e) => setNewContent(prev => ({ 
+                  onChange={(e: any) => setNewContent(prev => ({ 
                     ...prev, 
                     type: e.target.value as 'video' | 'image' | 'slideshow' 
                   }))}
@@ -273,7 +273,7 @@ const ContentManager: FC = () => {
                 isActive: false,
                 size: '1.8 MB'
               }
-            ].map((content) => (
+            ].map((content: any) => (
               <div key={content.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                 <div className="flex items-center gap-4">
                   <div className="p-2 bg-gray-100 rounded">

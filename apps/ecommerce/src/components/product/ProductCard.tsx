@@ -167,7 +167,7 @@ export const ProductCard: FC<ProductCardProps> = ({
           {/* Quick Add to Cart for customer mode */}
           {mode === 'customer' && product.inventory?.stockQuantity && product.inventory.stockQuantity > 0 && onAddToCart && (
             <button
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.preventDefault();
                 onAddToCart(product.id);
               }}

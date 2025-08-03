@@ -50,7 +50,7 @@ interface PlaybackStatus {
 }
 
 export default function StoreManagement() {
-  const [stores, setStores] = useState<Store[]>([]);
+  const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -190,7 +190,7 @@ export default function StoreManagement() {
           </div>
 
           <div className="divide-y">
-            {stores.map((store) => (
+            {stores.map((store: any) => (
               <div
                 key={store.id}
                 className={`p-4 cursor-pointer hover:bg-gray-50 ${

@@ -69,7 +69,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                   name="post_title"
                   className="ptitle"
                   value={formData.title || ''}
-                  onChange={(e) => onUpdate('title', e.target.value)}
+                  onChange={(e: any) => onUpdate('title', e.target.value)}
                 />
               </span>
             </label>
@@ -81,7 +81,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                   type="text"
                   name="post_name"
                   value={formData.slug || ''}
-                  onChange={(e) => onUpdate('slug', e.target.value)}
+                  onChange={(e: any) => onUpdate('slug', e.target.value)}
                 />
               </span>
             </label>
@@ -124,7 +124,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                     value={formData.publishDay || ''}
                     size={2}
                     maxLength={2}
-                    onChange={(e) => onUpdate('publishDay', e.target.value)}
+                    onChange={(e: any) => onUpdate('publishDay', e.target.value)}
                     className="inline-edit-day"
                   />
                 </label>
@@ -137,7 +137,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                     value={formData.publishYear || ''}
                     size={4}
                     maxLength={4}
-                    onChange={(e) => onUpdate('publishYear', e.target.value)}
+                    onChange={(e: any) => onUpdate('publishYear', e.target.value)}
                     className="inline-edit-year"
                   />
                 </label>
@@ -171,7 +171,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                   type="text"
                   name="post_password"
                   value={formData.password || ''}
-                  onChange={(e) => onUpdate('password', e.target.value)}
+                  onChange={(e: any) => onUpdate('password', e.target.value)}
                 />
               </span>
               <em className="alignleft">
@@ -184,7 +184,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                 type="checkbox" 
                 name="keep_private"
                 checked={formData.isPrivate || false}
-                onChange={(e) => onUpdate('isPrivate', e.target.checked)}
+                onChange={(e: any) => onUpdate('isPrivate', e.target.checked)}
               />
               <span className="checkbox-title">Private</span>
             </label>
@@ -203,7 +203,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                       name="post_category[]"
                       value={category.id}
                       checked={formData.categoryIds?.includes(category.id) || false}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         const ids = formData.categoryIds || [];
                         if (e.target.checked) {
                           onUpdate('categoryIds', [...ids, category.id]);
@@ -227,7 +227,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
               name="tax_input[post_tag]"
               className="tax_input_post_tag"
               value={formData.tags || ''}
-              onChange={(e) => onUpdate('tags', e.target.value)}
+              onChange={(e: any) => onUpdate('tags', e.target.value)}
               placeholder="Separate tags with commas"
             />
           </label>
@@ -290,7 +290,7 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                 type="checkbox" 
                 name="sticky"
                 checked={formData.isSticky || false}
-                onChange={(e) => onUpdate('isSticky', e.target.checked)}
+                onChange={(e: any) => onUpdate('isSticky', e.target.checked)}
               />
               <span className="checkbox-title">Make this post sticky</span>
             </label>

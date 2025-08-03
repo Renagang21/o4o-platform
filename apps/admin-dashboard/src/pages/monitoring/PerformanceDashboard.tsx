@@ -172,7 +172,7 @@ export default function PerformanceDashboard() {
             <input
               type="checkbox"
               checked={autoRefresh}
-              onChange={(e) => setAutoRefresh(e.target.checked)}
+              onChange={(e: any) => setAutoRefresh(e.target.checked)}
               className="rounded"
             />
           </div>

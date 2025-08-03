@@ -302,7 +302,7 @@ export function ProductsPage() {
               type="search"
               placeholder="상품 검색..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e: any) => setSearch(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -325,7 +325,7 @@ export function ProductsPage() {
                 <label className="text-sm font-medium mb-1 block">카테고리</label>
                 <Select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e: any) => setCategory(e.target.value)}
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>
@@ -341,7 +341,7 @@ export function ProductsPage() {
                   type="number"
                   placeholder="0"
                   value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
+                  onChange={(e: any) => setMinPrice(e.target.value)}
                 />
               </div>
               
@@ -351,7 +351,7 @@ export function ProductsPage() {
                   type="number"
                   placeholder="999999"
                   value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
+                  onChange={(e: any) => setMaxPrice(e.target.value)}
                 />
               </div>
               
@@ -370,7 +370,7 @@ export function ProductsPage() {
             <label className="text-sm font-medium">정렬:</label>
             <Select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e: any) => setSortBy(e.target.value)}
               className="w-40"
             >
               {sortOptions.map(option => (

@@ -87,18 +87,18 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
   onClose
 }) => {
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
+  const [filterType, setFilterType] = useState('all');
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
   // Mock data
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([
+  const [mediaItems, setMediaItems] = useState([
     {
       id: '1',
       name: 'product-image-1.jpg',
@@ -129,7 +129,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
     },
   ]);
 
-  const [folders] = useState<MediaFolder[]>([
+  const [folders] = useState([
     {
       id: 'folder-1',
       name: 'Products',
@@ -283,7 +283,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
             <Input
               placeholder="Search media..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
               className="pl-10 w-64"
             />
           </div>
@@ -438,7 +438,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                             size={"icon" as const}
                             variant="secondary"
                             className="h-8 w-8"
-                            onClick={(e) => {
+                            onClick={(e: any) => {
                               e.stopPropagation();
                               // Preview
                             }}
@@ -449,7 +449,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                             size={"icon" as const}
                             variant="secondary"
                             className="h-8 w-8"
-                            onClick={(e) => {
+                            onClick={(e: any) => {
                               e.stopPropagation();
                               setEditingItem(item);
                               setShowEditDialog(true);
@@ -518,7 +518,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                           size={"icon" as const}
                           variant={"ghost" as const}
                           className="h-8 w-8"
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation();
                             setEditingItem(item);
                             setShowEditDialog(true);
@@ -530,7 +530,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
                           size={"icon" as const}
                           variant={"ghost" as const}
                           className="h-8 w-8"
-                          onClick={(e) => {
+                          onClick={(e: any) => {
                             e.stopPropagation();
                             // Delete
                           }}

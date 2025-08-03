@@ -76,13 +76,13 @@ const EnhancedSignageDashboard: FC = () => {
   const { showToast } = useToast();
   
   // State
-  const [contents, setContents] = useState<SignageContent[]>([]);
-  const [stores, setStores] = useState<Store[]>([]);
+  const [contents, setContents] = useState([]);
+  const [stores, setStores] = useState([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [liveDashboard, setLiveDashboard] = useState<LiveDashboard | null>(null);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [loading, setLoading] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
@@ -370,7 +370,7 @@ const EnhancedSignageDashboard: FC = () => {
                   {liveDashboard.liveActivity.length > 0 && (
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium text-gray-700">Store Status</h3>
-                      {liveDashboard.liveActivity.slice(0, 5).map((activity) => (
+                      {liveDashboard.liveActivity.slice(0, 5).map((activity: any) => (
                         <div key={activity.storeId} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">{activity.storeName}</p>
@@ -393,14 +393,14 @@ const EnhancedSignageDashboard: FC = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Store Management</h3>
                 <select
                   value={selectedStore?.id || ''}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     const store = stores.find(s => s.id === e.target.value);
                     setSelectedStore(store || null);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">All Stores</option>
-                  {stores.map((store) => (
+                  {stores.map((store: any) => (
                     <option key={store.id} value={store.id}>
                       {store.name} ({store.status})
                     </option>
@@ -475,13 +475,13 @@ const EnhancedSignageDashboard: FC = () => {
                       type="text"
                       placeholder="Search content..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e: any) => setSearchQuery(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <select
                     value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
+                    onChange={(e: any) => setFilterStatus(e.target.value)}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="all">All Status</option>
@@ -496,7 +496,7 @@ const EnhancedSignageDashboard: FC = () => {
               {/* Content Grid */}
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {contents.map((content) => (
+                  {contents.map((content: any) => (
                     <div key={content.id} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                       <div className="relative">
                         {content.thumbnailUrl ? (
@@ -543,7 +543,7 @@ const EnhancedSignageDashboard: FC = () => {
                         
                         {content.tags && content.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {content.tags.slice(0, 3).map((tag) => (
+                            {content.tags.slice(0, 3).map((tag: any) => (
                               <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
                                 {tag}
                               </span>

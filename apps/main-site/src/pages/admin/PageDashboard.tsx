@@ -24,7 +24,7 @@ import {
 
 const PageDashboard: FC = () => {
   const navigate = useNavigate();
-  const [pages, setPages] = useState<PageListItem[]>([]);
+  const [pages, setPages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPageTitle, setNewPageTitle] = useState('');
@@ -137,7 +137,7 @@ const PageDashboard: FC = () => {
                 type="text"
                 placeholder="페이지 제목 또는 슬러그로 검색..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -172,7 +172,7 @@ const PageDashboard: FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredPages.map((page) => (
+            {filteredPages.map((page: any) => (
               <div key={page.slug} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
@@ -243,7 +243,7 @@ const PageDashboard: FC = () => {
                   <input
                     type="text"
                     value={newPageTitle}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       setNewPageTitle(e.target.value);
                       if (!newPageSlug) {
                         setNewPageSlug(generateSlug(e.target.value));
@@ -263,7 +263,7 @@ const PageDashboard: FC = () => {
                     <input
                       type="text"
                       value={newPageSlug}
-                      onChange={(e) => setNewPageSlug(e.target.value.toLowerCase())}
+                      onChange={(e: any) => setNewPageSlug(e.target.value.toLowerCase())}
                       placeholder="about-us"
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ml-1"
                     />

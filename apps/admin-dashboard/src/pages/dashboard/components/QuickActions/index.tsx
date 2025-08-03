@@ -118,7 +118,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
 
       {/* 빠른 작업 그리드 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {quickActions.map((action) => (
+        {quickActions.map((action: any) => (
           <button
             key={action.id}
             onClick={() => handleActionClick(action)}

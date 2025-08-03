@@ -42,7 +42,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
         <Input
           id="title"
           value={settings.title || ''}
-          onChange={(e) => onChange({ ...settings, title: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings, title: e.target.value })}
           placeholder="Cover 제목"
         />
       </div>
@@ -53,7 +53,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
         <Textarea
           id="text"
           value={settings.text || ''}
-          onChange={(e) => onChange({ ...settings, text: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings, text: e.target.value })}
           placeholder="Cover 부제목 텍스트"
           rows={2}
         />
@@ -96,7 +96,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
             min="100"
             max="800"
             value={settings.minHeight || 300}
-            onChange={(e) => onChange({ ...settings, minHeight: parseInt(e.target.value) })}
+            onChange={(e: any) => onChange({ ...settings, minHeight: parseInt(e.target.value) })}
             className="flex-1"
           />
           <span className="text-sm w-16 text-right">{settings.minHeight || 300}px</span>
@@ -136,7 +136,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
               id="customColor"
               type="text"
               value={settings.overlayColor || ''}
-              onChange={(e) => onChange({ ...settings, overlayColor: e.target.value })}
+              onChange={(e: any) => onChange({ ...settings, overlayColor: e.target.value })}
               placeholder="rgba(0, 0, 0, 0.5)"
               className="mt-1"
             />

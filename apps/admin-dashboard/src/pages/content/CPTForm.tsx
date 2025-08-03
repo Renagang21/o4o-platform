@@ -52,7 +52,7 @@ const CPTForm: FC = () => {
   const isEditMode = !!id
 
   // Form state
-  const [formData, setFormData] = useState<CreateCustomPostTypeDto>({
+  const [formData, setFormData] = useState({
     name: '',
     singularName: '',
     pluralName: '',
@@ -79,7 +79,7 @@ const CPTForm: FC = () => {
     taxonomies: [],
   })
 
-  const [selectedTaxonomies, setSelectedTaxonomies] = useState<string[]>([])
+  const [selectedTaxonomies, setSelectedTaxonomies] = useState([])
 
   // Fetch CPT data (edit mode)
   const { data: cpt, isLoading: isLoadingCPT } = useQuery({

@@ -89,7 +89,7 @@ const Select: FC<SelectProps> = ({
           disabled={disabled}
           {...props}
         >
-          {options.map((option) => (
+          {options.map((option: any) => (
             <option
               key={option.value}
               value={option.value}

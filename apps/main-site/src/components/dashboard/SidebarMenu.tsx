@@ -42,7 +42,7 @@ const SidebarMenu: FC = () => {
 
       <nav className="mt-6">
         <div className="px-4 space-y-1">
-          {menuItems.map((item) => {
+          {menuItems.map((item: any) => {
             const isActive = location.pathname === item.path;
             return (
               <Link

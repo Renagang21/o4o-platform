@@ -64,7 +64,7 @@ const RecentOrders: FC = () => {
       </div>
 
       <div className="divide-y divide-gray-200">
-        {orders.map((order) => (
+        {orders.map((order: any) => (
           <div key={order.id} className="p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-900">

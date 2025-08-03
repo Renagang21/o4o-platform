@@ -32,7 +32,7 @@ interface Pagination {
 
 const AdminDashboard: FC = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<Pagination | null>(null);
 
@@ -291,7 +291,7 @@ const AdminDashboard: FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  users.map((user) => (
+                  users.map((user: any) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
@@ -327,7 +327,7 @@ const AdminDashboard: FC = () => {
                   {Math.min(pagination.current * 10, pagination.totalUsers)}명 표시
                 </div>
                 <div className="flex gap-2">
-                  {Array.from({ length: pagination.total }, (_, i) => i + 1).map((page) => (
+                  {Array.from({ length: pagination.total }, (_, i) => i + 1).map((page: any) => (
                     <button
                       key={page}
                       onClick={() => loadUsers(page)}

@@ -18,7 +18,7 @@ import toast from 'react-hot-toast';
 import type { AffiliateCommission, ProcessCommissionRequest } from '@o4o/types';
 
 export const CommissionApprovalManager: FC = () => {
-  const [commissions, setCommissions] = useState<AffiliateCommission[]>([]);
+  const [commissions, setCommissions] = useState([]);
   const [selectedCommissions, setSelectedCommissions] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('pending');
@@ -244,7 +244,7 @@ export const CommissionApprovalManager: FC = () => {
                 <Input
                   placeholder="주문번호 또는 추천인ID로 검색..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e: any) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -330,7 +330,7 @@ export const CommissionApprovalManager: FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredCommissions.map((commission) => {
+                  filteredCommissions.map((commission: any) => {
                     // 의심 거래 체크 (예: 비정상적으로 높은 금액)
                     const isSuspicious = commission.orderAmount > 5000000 || 
                                        commission.commissionRate > 20;

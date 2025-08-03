@@ -150,7 +150,7 @@ export default function ProductBrowse() {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="상품명, 브랜드로 검색"
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -163,11 +163,11 @@ export default function ProductBrowse() {
               </label>
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e: any) => setSelectedCategory(e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="">전체 카테고리</option>
-                {flatCategories.map((category) => (
+                {flatCategories.map((category: any) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -182,7 +182,7 @@ export default function ProductBrowse() {
               <input
                 type="number"
                 value={priceRange.min || ''}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: Number(e.target.value) }))}
+                onChange={(e: any) => setPriceRange(prev => ({ ...prev, min: Number(e.target.value) }))}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="최소 가격"
               />
@@ -194,7 +194,7 @@ export default function ProductBrowse() {
               </label>
               <select
                 value={`${sortBy}_${sortOrder}`}
-                onChange={(e) => {
+                onChange={(e: any) => {
                   const [newSortBy, newSortOrder] = e.target.value.split('_');
                   setSortBy(newSortBy as 'name' | 'price' | 'sales' | 'rating');
                   setSortOrder(newSortOrder as 'asc' | 'desc');
@@ -252,7 +252,7 @@ export default function ProductBrowse() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-6">
-              {products.map((product) => {
+              {products.map((product: any) => {
                 const gradePrice = getGradePrice(product);
                 const discountRate = getDiscountRate(product.basePrice, gradePrice);
                 
@@ -377,7 +377,7 @@ export default function ProductBrowse() {
                   
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                      {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                      {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page: any) => (
                         <button
                           key={page}
                           onClick={() => {

@@ -62,7 +62,7 @@ export const HelpTab: FC = () => {
                 >
                   <a
                     href={`#tab-panel-${tab.id}`}
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.preventDefault();
                       setActiveTab(tab.id);
                     }}

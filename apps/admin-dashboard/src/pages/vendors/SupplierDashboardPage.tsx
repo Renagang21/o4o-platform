@@ -11,7 +11,7 @@ import type { VendorSupplierStats as SupplierStats, VendorProduct } from '@o4o/t
 const SupplierDashboardPage = () => {
   const { user } = useAuth();
   const [showProductForm, setShowProductForm] = useState(false);
-  const [stats] = useState<SupplierStats>({
+  const [stats] = useState({
     supplierId: user?.id || '',
     period: 'month',
     totalProducts: 45,
@@ -29,9 +29,9 @@ const SupplierDashboardPage = () => {
     completedSettlement: 8500000
   });
 
-  const [lowStockProducts, setLowStockProducts] = useState<VendorProduct[]>([]);
-  const [pendingProducts, setPendingProducts] = useState<VendorProduct[]>([]);
-  const [recentOrders] = useState<any[]>([
+  const [lowStockProducts, setLowStockProducts] = useState([]);
+  const [pendingProducts, setPendingProducts] = useState([]);
+  const [recentOrders] = useState([
     {
       id: '1',
       orderNumber: '20240315001',

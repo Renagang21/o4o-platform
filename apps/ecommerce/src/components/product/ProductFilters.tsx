@@ -124,7 +124,7 @@ export const ProductFilters: FC<ProductFiltersProps> = ({
         <div className="px-2">
           <Slider
             value={currentPriceRange[1]}
-            onChange={(e) => onPriceRangeChange([currentPriceRange[0], parseInt(e.target.value)])}
+            onChange={(e: any) => onPriceRangeChange([currentPriceRange[0], parseInt(e.target.value)])}
             min={priceRange.min}
             max={priceRange.max}
             step={1000}

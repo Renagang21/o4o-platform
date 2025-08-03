@@ -120,7 +120,7 @@ const SignageDetail: FC = () => {
                   <span className="text-text-secondary">송출 요일</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {content.schedule.days.map((day) => (
+                  {content.schedule.days.map((day: any) => (
                     <span
                       key={day}
                       className="px-3 py-1 bg-secondary text-text-secondary rounded-full text-sm"

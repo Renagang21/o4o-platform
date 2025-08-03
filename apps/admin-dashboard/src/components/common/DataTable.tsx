@@ -114,7 +114,7 @@ const DataTable = <T extends object>({
 
     return (
       <div className="flex items-center gap-2">
-        {visibleActions.map((action) => (
+        {visibleActions.map((action: any) => (
           <button
             key={action.id}
             onClick={() => action.onClick(item)}
@@ -174,7 +174,7 @@ const DataTable = <T extends object>({
                 )}
 
                 {/* Column headers */}
-                {columns.map((column) => (
+                {columns.map((column: any) => (
                   <th
                     key={column.id}
                     className={clsx(
@@ -251,7 +251,7 @@ const DataTable = <T extends object>({
                     )}
 
                     {/* Data cells */}
-                    {columns.map((column) => (
+                    {columns.map((column: any) => (
                       <td
                         key={column.id}
                         className={clsx(

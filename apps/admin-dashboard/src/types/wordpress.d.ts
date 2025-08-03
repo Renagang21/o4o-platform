@@ -127,7 +127,7 @@ declare module '@wordpress/element' {
   export function useMemo<T>(factory: () => T, deps: any[]): T;
   export function useReducer<S, A>(reducer: (state: S, action: A) => S, initialState: S): [S, (action: A) => void];
   export function useRef<T>(initialValue?: T): { current: T };
-  export function useState<S>(initialState: S | (() => S)): [S, (value: S | ((prevState: S) => S)) => void];
+  export function useState(initialState: S | (() => S)): [S, (value: S | ((prevState: S) => S)) => void];
   export function useSyncExternalStore<T>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => T, getServerSnapshot?: () => T): T;
   
   export const version: string;

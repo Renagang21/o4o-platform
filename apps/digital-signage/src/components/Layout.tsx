@@ -36,7 +36,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
         
         <nav className="mt-8">
-          {navigation.map((item) => {
+          {navigation.map((item: any) => {
             const Icon = item.icon;
             return (
               <Link

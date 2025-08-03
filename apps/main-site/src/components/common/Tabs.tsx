@@ -83,7 +83,7 @@ const Tabs: FC<TabsProps> = ({
           sizeStyles[size].tabList
         )}
       >
-        {items.map((item) => (
+        {items.map((item: any) => (
           <button
             key={item.id}
             onClick={() => !item.disabled && handleTabClick(item.id)}
@@ -105,7 +105,7 @@ const Tabs: FC<TabsProps> = ({
         ))}
       </div>
       <div className="mt-4">
-        {items.map((item) => (
+        {items.map((item: any) => (
           <div
             key={item.id}
             id={`panel-${item.id}`}

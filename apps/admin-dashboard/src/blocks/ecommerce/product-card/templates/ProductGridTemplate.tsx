@@ -61,7 +61,7 @@ export function ProductGridTemplate({ products, attributes, isLoading, error }: 
 
   return (
     <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-      {products.map((product) => (
+      {products.map((product: any) => (
         <article key={product.id} className="group">
           {showImage && (
             <div className="relative overflow-hidden bg-gray-100 rounded mb-2">

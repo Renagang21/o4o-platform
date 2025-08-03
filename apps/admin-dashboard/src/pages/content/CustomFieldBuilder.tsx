@@ -78,12 +78,12 @@ const CustomFieldBuilder: FC = () => {
   const { cptId } = useParams()
   const queryClient = useQueryClient()
 
-  const [fieldGroups, setFieldGroups] = useState<CustomFieldGroup[]>([])
+  const [fieldGroups, setFieldGroups] = useState([])
   const [editingGroup, setEditingGroup] = useState<CustomFieldGroup | null>(null)
   const [editingField, setEditingField] = useState<FieldFormData | null>(null)
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false)
   const [isFieldDialogOpen, setIsFieldDialogOpen] = useState(false)
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([])
+  const [expandedGroups, setExpandedGroups] = useState([])
 
   // Field group form
   const [groupFormData, setGroupFormData] = useState({
@@ -95,7 +95,7 @@ const CustomFieldBuilder: FC = () => {
   })
 
   // Field form
-  const [fieldFormData, setFieldFormData] = useState<FieldFormData>({
+  const [fieldFormData, setFieldFormData] = useState({
     name: '',
     key: '',
     type: 'text',
@@ -359,7 +359,7 @@ const CustomFieldBuilder: FC = () => {
                 {expandedGroups.includes(group.id) && (
                   <CardContent>
                     <div className="space-y-2">
-                      {group.fields.map((field) => (
+                      {group.fields.map((field: any) => (
                         <div
                           key={field.id}
                           className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"

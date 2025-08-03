@@ -111,7 +111,7 @@ export const InlineEdit: FC<InlineEditProps> = ({
           <Textarea
             ref={textareaRef}
             value={value}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setValue(e.target.value);
               setError('');
             }}
@@ -129,7 +129,7 @@ export const InlineEdit: FC<InlineEditProps> = ({
             ref={inputRef}
             type="text"
             value={value}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setValue(e.target.value);
               setError('');
             }}

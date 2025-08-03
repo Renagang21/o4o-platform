@@ -10,7 +10,7 @@ import {
 type AdminPage = 'dashboard' | 'pages' | 'pages-new' | 'pages-edit';
 
 export function AdminDashboardTest() {
-  const [currentPage, setCurrentPage] = useState<AdminPage>('dashboard');
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
 
   // URL 파라미터에서 페이지 정보 추출 (실제 환경에서는 React Router 사용)

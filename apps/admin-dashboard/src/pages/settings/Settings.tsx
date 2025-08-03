@@ -58,7 +58,7 @@ const Settings: FC = () => {
       {/* Settings Navigation Tabs */}
       <div className="border-b border-gray-300">
         <nav className="-mb-px flex space-x-8">
-          {settingsTabs.map((tab) => {
+          {settingsTabs.map((tab: any) => {
             const isActive = tab.path === currentPath || (tab.path === '' && currentPath === 'settings')
             return (
               <Link

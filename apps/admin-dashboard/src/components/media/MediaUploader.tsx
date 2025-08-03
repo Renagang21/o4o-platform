@@ -56,7 +56,7 @@ export default function MediaUploader({
   maxFiles = 10,
   maxSize = 10 * 1024 * 1024 // 10MB
 }: MediaUploaderProps) {
-  const [files, setFiles] = useState<UploadFile[]>([]);
+  const [files, setFiles] = useState([]);
   const [convertToWebP, setConvertToWebP] = useState(true);
   const queryClient = useQueryClient();
 

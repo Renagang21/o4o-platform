@@ -20,7 +20,7 @@ export default function Cart() {
     clearError,
   } = useOrderStore();
 
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
     if (user?.id) {
@@ -229,7 +229,7 @@ export default function Cart() {
                       <input
                         type="checkbox"
                         checked={selectedItems.length === cartItems.length}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        onChange={(e: any) => handleSelectAll(e.target.checked)}
                         className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       />
                       <span className="ml-3 text-sm font-medium text-gray-900">
@@ -247,14 +247,14 @@ export default function Cart() {
 
                 {/* 아이템 목록 */}
                 <div className="divide-y divide-gray-200">
-                  {cartItems.map((item) => (
+                  {cartItems.map((item: any) => (
                     <div key={item.id} className="p-6">
                       <div className="flex items-start">
                         {/* 체크박스 */}
                         <input
                           type="checkbox"
                           checked={selectedItems.includes(item.id)}
-                          onChange={(e) => handleItemSelect(item.id, e.target.checked)}
+                          onChange={(e: any) => handleItemSelect(item.id, e.target.checked)}
                           className="mt-4 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
 
@@ -310,10 +310,10 @@ export default function Cart() {
                               <select
                                 id={`quantity-${item.id}`}
                                 value={item.quantity}
-                                onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
+                                onChange={(e: any) => handleQuantityChange(item.id, Number(e.target.value))}
                                 className="rounded border-gray-300 text-sm shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                               >
-                                {Array.from({ length: Math.min(50, item.stockQuantity) }, (_, i) => i + 1).map((num) => (
+                                {Array.from({ length: Math.min(50, item.stockQuantity) }, (_, i) => i + 1).map((num: any) => (
                                   <option key={num} value={num}>
                                     {num}
                                   </option>

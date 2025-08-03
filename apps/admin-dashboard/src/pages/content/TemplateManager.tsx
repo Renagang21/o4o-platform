@@ -46,11 +46,11 @@ type ViewMode = 'grid' | 'list'
 
 const TemplateManager: FC = () => {
   const queryClient = useQueryClient()
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [viewMode, setViewMode] = useState('grid')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [selectedType, setSelectedType] = useState<string>('all')
-  const [selectedStatus, setSelectedStatus] = useState<string>('all')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedType, setSelectedType] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState('all')
   const [isBuilderOpen, setIsBuilderOpen] = useState(false)
   const [isLibraryOpen, setIsLibraryOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null)

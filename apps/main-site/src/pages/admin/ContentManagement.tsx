@@ -134,13 +134,13 @@ const mockContents: Content[] = [
 ];
 
 const ContentManagement: FC = () => {
-  const [contents, setContents] = useState<Content[]>(mockContents);
+  const [contents, setContents] = useState(mockContents);
   const [selectedContent, setSelectedContent] = useState<Content | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [activeEditTab, setActiveEditTab] = useState<'content' | 'seo'>('content');
   const [showPreview, setShowPreview] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
@@ -429,7 +429,7 @@ const ContentManagement: FC = () => {
                   <input
                     type="text"
                     value={selectedContent.title}
-                    onChange={(e) => setSelectedContent(prev => prev ? { ...prev, title: e.target.value } : null)}
+                    onChange={(e: any) => setSelectedContent(prev => prev ? { ...prev, title: e.target.value } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -440,7 +440,7 @@ const ContentManagement: FC = () => {
                   <input
                     type="text"
                     value={selectedContent.slug}
-                    onChange={(e) => setSelectedContent(prev => prev ? { ...prev, slug: e.target.value } : null)}
+                    onChange={(e: any) => setSelectedContent(prev => prev ? { ...prev, slug: e.target.value } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -450,7 +450,7 @@ const ContentManagement: FC = () => {
                   </label>
                   <select
                     value={selectedContent.status}
-                    onChange={(e) => setSelectedContent(prev => prev ? { 
+                    onChange={(e: any) => setSelectedContent(prev => prev ? { 
                       ...prev, 
                       status: e.target.value as 'draft' | 'published' | 'archived' 
                     } : null)}
@@ -468,7 +468,7 @@ const ContentManagement: FC = () => {
                   <input
                     type="text"
                     value={selectedContent.category || ''}
-                    onChange={(e) => setSelectedContent(prev => prev ? { ...prev, category: e.target.value } : null)}
+                    onChange={(e: any) => setSelectedContent(prev => prev ? { ...prev, category: e.target.value } : null)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="카테고리를 입력하세요"
                   />
@@ -482,7 +482,7 @@ const ContentManagement: FC = () => {
                   </label>
                   <textarea
                     value={selectedContent.excerpt || ''}
-                    onChange={(e) => setSelectedContent(prev => prev ? { ...prev, excerpt: e.target.value } : null)}
+                    onChange={(e: any) => setSelectedContent(prev => prev ? { ...prev, excerpt: e.target.value } : null)}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="포스트 요약을 입력하세요"
@@ -497,7 +497,7 @@ const ContentManagement: FC = () => {
                 {[
                   { id: 'content', name: '컨텐츠 편집', icon: Edit3 },
                   { id: 'seo', name: 'SEO 설정', icon: Search }
-                ].map((tab) => (
+                ].map((tab: any) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveEditTab(tab.id as 'content' | 'seo')}
@@ -522,7 +522,7 @@ const ContentManagement: FC = () => {
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                     <EnhancedTiptapEditor
                       content={selectedContent.content}
-                      onChange={(content) => setSelectedContent(prev => prev ? { ...prev, content } : null)}
+                      onChange={(content: any) => setSelectedContent(prev => prev ? { ...prev, content } : null)}
                       onSave={handleSave}
                       isLoading={isLoading}
                       page={selectedContent.id}
@@ -561,7 +561,7 @@ const ContentManagement: FC = () => {
                         noFollow: false,
                         customMeta: []
                       }}
-                      onChange={(seo) => setSelectedContent(prev => prev ? { ...prev, seo } : null)}
+                      onChange={(seo: any) => setSelectedContent(prev => prev ? { ...prev, seo } : null)}
                       contentType={selectedContent.type}
                       slug={selectedContent.slug}
                     />
@@ -677,14 +677,14 @@ const ContentManagement: FC = () => {
                 type="text"
                 placeholder="제목, 작성자, 태그로 검색..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                onChange={(e: any) => setFilterType(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 타입</option>
@@ -695,7 +695,7 @@ const ContentManagement: FC = () => {
               </select>
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e: any) => setFilterStatus(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">모든 상태</option>
@@ -745,7 +745,7 @@ const ContentManagement: FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredContents.map((content) => (
+                {filteredContents.map((content: any) => (
                   <tr key={content.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div>
@@ -767,7 +767,7 @@ const ContentManagement: FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
                         value={content.status}
-                        onChange={(e) => handleStatusChange(content.id, e.target.value as 'draft' | 'published' | 'archived')}
+                        onChange={(e: any) => handleStatusChange(content.id, e.target.value as 'draft' | 'published' | 'archived')}
                         className={`text-xs px-2 py-1 rounded-full border-0 ${getStatusColor(content.status)}`}
                       >
                         <option value="draft">초안</option>

@@ -24,7 +24,7 @@ export function ReviewStats({ stats, className }: ReviewStatsProps) {
 
       {/* Rating Distribution */}
       <div className="space-y-2">
-        {[5, 4, 3, 2, 1].map((rating) => {
+        {[5, 4, 3, 2, 1].map((rating: any) => {
           const count = stats.ratingDistribution[rating as keyof typeof stats.ratingDistribution];
           const percentage = stats.totalReviews > 0 
             ? (count / stats.totalReviews) * 100 

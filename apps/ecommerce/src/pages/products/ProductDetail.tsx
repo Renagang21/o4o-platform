@@ -183,7 +183,7 @@ export function ProductDetail() {
                 <input
                   type="number"
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e: any) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                   className="w-20 text-center border rounded-md px-2 py-1"
                   min="1"
                   max={product.inventory.maxOrderQuantity || 999}
@@ -329,7 +329,7 @@ function ProductDetailSkeleton() {
         <div className="space-y-4">
           <Skeleton className="aspect-square rounded-lg" />
           <div className="grid grid-cols-5 gap-2">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4, 5].map((i: any) => (
               <Skeleton key={i} className="aspect-square rounded-md" />
             ))}
           </div>

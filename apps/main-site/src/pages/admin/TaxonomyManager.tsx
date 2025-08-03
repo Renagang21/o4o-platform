@@ -46,11 +46,11 @@ interface Taxonomy {
 }
 
 const TaxonomyManager: FC = () => {
-  const [taxonomies, setTaxonomies] = useState<Taxonomy[]>([]);
+  const [taxonomies, setTaxonomies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
   const [selectedTaxonomy, setSelectedTaxonomy] = useState<Taxonomy | null>(null);
-  const [expandedTaxonomies, setExpandedTaxonomies] = useState<string[]>([]);
+  const [expandedTaxonomies, setExpandedTaxonomies] = useState([]);
 
   // 새 Taxonomy 생성 폼 상태
   const [newTaxonomy, setNewTaxonomy] = useState({
@@ -330,7 +330,7 @@ const TaxonomyManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {taxonomies.map((taxonomy) => {
+                {taxonomies.map((taxonomy: any) => {
                   const isExpanded = expandedTaxonomies.includes(taxonomy.slug);
                   
                   return (
@@ -484,7 +484,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.slug}
-                      onChange={(e) => setNewTaxonomy(prev => ({ ...prev, slug: e.target.value }))}
+                      onChange={(e: any) => setNewTaxonomy(prev => ({ ...prev, slug: e.target.value }))}
                       placeholder="예: category, location, tags"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -498,7 +498,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.name}
-                      onChange={(e) => setNewTaxonomy(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setNewTaxonomy(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: 카테고리, 지역, 태그"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -511,7 +511,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.singularName}
-                      onChange={(e) => setNewTaxonomy(prev => ({ ...prev, singularName: e.target.value }))}
+                      onChange={(e: any) => setNewTaxonomy(prev => ({ ...prev, singularName: e.target.value }))}
                       placeholder="예: 카테고리, 지역, 태그"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -524,7 +524,7 @@ const TaxonomyManager: FC = () => {
                     <input
                       type="text"
                       value={newTaxonomy.icon}
-                      onChange={(e) => setNewTaxonomy(prev => ({ ...prev, icon: e.target.value }))}
+                      onChange={(e: any) => setNewTaxonomy(prev => ({ ...prev, icon: e.target.value }))}
                       placeholder="🏷️"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -536,7 +536,7 @@ const TaxonomyManager: FC = () => {
                     </label>
                     <textarea
                       value={newTaxonomy.description}
-                      onChange={(e) => setNewTaxonomy(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewTaxonomy(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 분류 체계의 용도를 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -562,7 +562,7 @@ const TaxonomyManager: FC = () => {
                           name="taxonomyType"
                           value="hierarchical"
                           checked={newTaxonomy.type === 'hierarchical'}
-                          onChange={(e) => setNewTaxonomy(prev => ({ 
+                          onChange={(e: any) => setNewTaxonomy(prev => ({ 
                             ...prev, 
                             type: e.target.value as 'hierarchical' | 'flat',
                             settings: { ...prev.settings, hierarchical: true }
@@ -591,7 +591,7 @@ const TaxonomyManager: FC = () => {
                           name="taxonomyType"
                           value="flat"
                           checked={newTaxonomy.type === 'flat'}
-                          onChange={(e) => setNewTaxonomy(prev => ({ 
+                          onChange={(e: any) => setNewTaxonomy(prev => ({ 
                             ...prev, 
                             type: e.target.value as 'hierarchical' | 'flat',
                             settings: { ...prev.settings, hierarchical: false }
@@ -627,7 +627,7 @@ const TaxonomyManager: FC = () => {
                           <input
                             type="checkbox"
                             checked={newTaxonomy.connectedCPTs.includes(cpt.slug)}
-                            onChange={(e) => {
+                            onChange={(e: any) => {
                               if (e.target.checked) {
                                 setNewTaxonomy(prev => ({
                                   ...prev,
@@ -658,7 +658,7 @@ const TaxonomyManager: FC = () => {
                         <input
                           type="checkbox"
                           checked={newTaxonomy.settings.public}
-                          onChange={(e) => setNewTaxonomy(prev => ({
+                          onChange={(e: any) => setNewTaxonomy(prev => ({
                             ...prev,
                             settings: { ...prev.settings, public: e.target.checked }
                           }))}
@@ -670,7 +670,7 @@ const TaxonomyManager: FC = () => {
                         <input
                           type="checkbox"
                           checked={newTaxonomy.settings.showInMenu}
-                          onChange={(e) => setNewTaxonomy(prev => ({
+                          onChange={(e: any) => setNewTaxonomy(prev => ({
                             ...prev,
                             settings: { ...prev.settings, showInMenu: e.target.checked }
                           }))}

@@ -66,7 +66,7 @@ const ContentSearchManager: FC = () => {
   const toast = useToast();
 
   // State
-  const [searchOptions, setSearchOptions] = useState<SearchOptions>({
+  const [searchOptions, setSearchOptions] = useState({
     page: 1,
     limit: 20,
     sortBy: 'latest'
@@ -74,7 +74,7 @@ const ContentSearchManager: FC = () => {
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedContent, setSelectedContent] = useState<Set<string>>(new Set());
 
@@ -249,7 +249,7 @@ const ContentSearchManager: FC = () => {
                 type="text"
                 placeholder="Search by title, description, or tags..."
                 value={searchOptions.query || ''}
-                onChange={(e) => setSearchOptions(prev => ({ ...prev, query: e.target.value }))}
+                onChange={(e: any) => setSearchOptions(prev => ({ ...prev, query: e.target.value }))}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -282,7 +282,7 @@ const ContentSearchManager: FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Content Type</label>
                   <select
                     value={searchOptions.contentType || ''}
-                    onChange={(e) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions(prev => ({ 
                       ...prev, 
                       contentType: e.target.value as 'youtube' | 'vimeo' | undefined 
                     }))}
@@ -298,7 +298,7 @@ const ContentSearchManager: FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                   <select
                     value={searchOptions.status || ''}
-                    onChange={(e) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions(prev => ({ 
                       ...prev, 
                       status: e.target.value as 'pending' | 'approved' | 'rejected' | 'inactive' | undefined 
                     }))}
@@ -316,7 +316,7 @@ const ContentSearchManager: FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
                   <select
                     value={searchOptions.sortBy || 'latest'}
-                    onChange={(e) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions(prev => ({ 
                       ...prev, 
                       sortBy: e.target.value as 'latest' | 'popular' | 'duration' | 'name' 
                     }))}
@@ -337,7 +337,7 @@ const ContentSearchManager: FC = () => {
                   <input
                     type="date"
                     value={searchOptions.dateRange?.start || ''}
-                    onChange={(e) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions(prev => ({ 
                       ...prev, 
                       dateRange: { ...prev.dateRange, start: e.target.value }
                     }))}
@@ -350,7 +350,7 @@ const ContentSearchManager: FC = () => {
                   <input
                     type="date"
                     value={searchOptions.dateRange?.end || ''}
-                    onChange={(e) => setSearchOptions(prev => ({ 
+                    onChange={(e: any) => setSearchOptions(prev => ({ 
                       ...prev, 
                       dateRange: { ...prev.dateRange, end: e.target.value }
                     }))}
@@ -363,7 +363,7 @@ const ContentSearchManager: FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
                 <div className="flex flex-wrap gap-2">
-                  {popularTags.map((tag) => (
+                  {popularTags.map((tag: any) => (
                     <button
                       key={tag}
                       type="button"
@@ -433,7 +433,7 @@ const ContentSearchManager: FC = () => {
             {/* Grid View */}
             {viewMode === 'grid' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {searchResult.content.map((content) => {
+                {searchResult.content.map((content: any) => {
                   const ContentIcon = getContentIcon(content.type);
                   
                   return (
@@ -550,7 +550,7 @@ const ContentSearchManager: FC = () => {
                         <input
                           type="checkbox"
                           checked={selectedContent.size === searchResult.content.length && selectedContent.size > 0}
-                          onChange={(e) => {
+                          onChange={(e: any) => {
                             if (e.target.checked) {
                               setSelectedContent(new Set(searchResult.content.map(c => c.id)));
                             } else {
@@ -581,7 +581,7 @@ const ContentSearchManager: FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {searchResult.content.map((content) => {
+                    {searchResult.content.map((content: any) => {
                       const ContentIcon = getContentIcon(content.type);
                       
                       return (

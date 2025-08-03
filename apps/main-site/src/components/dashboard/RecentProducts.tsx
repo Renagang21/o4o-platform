@@ -67,7 +67,7 @@ const RecentProducts: FC = () => {
       </div>
 
       <div className="divide-y divide-gray-200">
-        {products.map((product) => (
+        {products.map((product: any) => (
           <div key={product.id} className="p-6">
             <div className="flex items-center space-x-4">
               <div className="flex-shrink-0 w-12 h-12">

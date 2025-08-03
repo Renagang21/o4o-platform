@@ -82,7 +82,7 @@ const getPriorityColor = (priority: ActivityItem['priority']) => {
 };
 
 const RecentActivity = memo<RecentActivityProps>(({ className = '' }) => {
-  const [filters, setFilters] = useState<ActivityFilters>({
+  const [filters, setFilters] = useState({
     types: undefined,
     priorities: undefined,
     actorRoles: undefined,
@@ -305,7 +305,7 @@ const RecentActivity = memo<RecentActivityProps>(({ className = '' }) => {
                 </div>
               ))
             ) : activityData && activityData.data.activities.length > 0 ? (
-              activityData.data.activities.map((activity) => (
+              activityData.data.activities.map((activity: any) => (
                 <div key={activity.id} className="flex items-start space-x-3 group hover:bg-gray-50 -mx-4 px-4 py-2 rounded-lg transition-colors">
                   {/* 활동 아이콘 */}
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getActivityColor(activity.type)}`}>

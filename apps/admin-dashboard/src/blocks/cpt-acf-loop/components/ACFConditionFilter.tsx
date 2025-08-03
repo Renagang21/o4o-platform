@@ -41,7 +41,7 @@ export default function ACFConditionFilter({
   conditionGroups,
   onConditionsChange,
 }: ACFConditionFilterProps) {
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState([]);
 
   // Compare operators
   const compareOperators = [
@@ -187,7 +187,7 @@ export default function ACFConditionFilter({
         <TextControl
           label={__('Values (comma separated)', 'o4o')}
           value={condition.value}
-          onChange={(value) => updateCondition(groupId, condition.id, { value })}
+          onChange={(value: any) => updateCondition(groupId, condition.id, { value })}
           placeholder="value1, value2, value3"
         />
       );
@@ -198,7 +198,7 @@ export default function ACFConditionFilter({
         <TextControl
           label={__('Range (min, max)', 'o4o')}
           value={condition.value}
-          onChange={(value) => updateCondition(groupId, condition.id, { value })}
+          onChange={(value: any) => updateCondition(groupId, condition.id, { value })}
           placeholder="10, 100"
         />
       );
@@ -209,7 +209,7 @@ export default function ACFConditionFilter({
       <TextControl
         label={__('Value', 'o4o')}
         value={condition.value}
-        onChange={(value) => updateCondition(groupId, condition.id, { value })}
+        onChange={(value: any) => updateCondition(groupId, condition.id, { value })}
         type={condition.type === 'NUMERIC' ? 'number' : 'text'}
       />
     );
@@ -293,7 +293,7 @@ export default function ACFConditionFilter({
                             { label: __('AND', 'o4o'), value: 'AND' },
                             { label: __('OR', 'o4o'), value: 'OR' },
                           ]}
-                          onChange={(relation) => updateConditionGroup(group.id, { 
+                          onChange={(relation: any) => updateConditionGroup(group.id, { 
                             relation: relation as 'AND' | 'OR' 
                           })}
                         />
@@ -328,14 +328,14 @@ export default function ACFConditionFilter({
                             label={__('Field', 'o4o')}
                             value={condition.field}
                             options={fieldOptions}
-                            onChange={(field) => updateCondition(group.id, condition.id, { field })}
+                            onChange={(field: any) => updateCondition(group.id, condition.id, { field })}
                           />
 
                           <SelectControl
                             label={__('Comparison', 'o4o')}
                             value={condition.compare}
                             options={compareOperators}
-                            onChange={(compare) => updateCondition(group.id, condition.id, { compare })}
+                            onChange={(compare: any) => updateCondition(group.id, condition.id, { compare })}
                           />
 
                           {renderValueInput(condition, group.id)}
@@ -344,7 +344,7 @@ export default function ACFConditionFilter({
                             label={__('Type', 'o4o')}
                             value={condition.type}
                             options={valueTypes}
-                            onChange={(type) => updateCondition(group.id, condition.id, { type })}
+                            onChange={(type: any) => updateCondition(group.id, condition.id, { type })}
                           />
 
                           {group.conditions.length > 1 && (

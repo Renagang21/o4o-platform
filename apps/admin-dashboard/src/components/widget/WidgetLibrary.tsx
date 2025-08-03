@@ -98,7 +98,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
   const renderStars = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
+        {[1, 2, 3, 4, 5].map((star: any) => (
           <Star
             key={star}
             className={`w-3 h-3 ${
@@ -188,7 +188,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
       {/* Templates Grid/List */}
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTemplates.map((template) => (
+          {filteredTemplates.map((template: any) => (
             <Card key={template.id} className="group hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
                 <div className="aspect-video bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg mb-3 relative overflow-hidden">
@@ -259,7 +259,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredTemplates.map((template) => (
+          {filteredTemplates.map((template: any) => (
             <Card key={template.id}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
@@ -371,7 +371,7 @@ const WidgetLibrary: FC<WidgetLibraryProps> = ({ onApplyTemplate }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {templates.slice(0, 3).map((template) => (
+          {templates.slice(0, 3).map((template: any) => (
             <Card key={template.id} className="group hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
                 <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-100 rounded-lg mb-3 relative overflow-hidden">

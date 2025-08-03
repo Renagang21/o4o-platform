@@ -107,7 +107,7 @@ export const TestDashboard: FC = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {services.map((service) => (
+            {services.map((service: any) => (
               <ServiceStatusCard
                 key={service.name}
                 service={service}
@@ -121,7 +121,7 @@ export const TestDashboard: FC = () => {
         <section>
           <h2 className="text-xl font-semibold text-white mb-6">주요 서비스</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {sampleMainServices.map((service) => (
+            {sampleMainServices.map((service: any) => (
               <ServiceLinkCard
                 key={service.id}
                 service={service}
@@ -135,7 +135,7 @@ export const TestDashboard: FC = () => {
         <section>
           <h2 className="text-xl font-semibold text-white mb-6">개발/테스트 도구</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sampleDevTools.map((tool) => (
+            {sampleDevTools.map((tool: any) => (
               <DevToolCard
                 key={tool.id}
                 tool={tool}
@@ -149,14 +149,14 @@ export const TestDashboard: FC = () => {
         <section>
           <h2 className="text-xl font-semibold text-white mb-6">기능별 테스트</h2>
           <div className="space-y-6">
-            {sampleFeatureTests.map((category) => (
+            {sampleFeatureTests.map((category: any) => (
               <div key={category.id} className="bg-gray-800 border border-gray-700 rounded-lg p-6">
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold text-white">{category.name}</h3>
                   <p className="text-gray-400 text-sm">{category.description}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {category.tests.map((test) => (
+                  {category.tests.map((test: any) => (
                     <div key={test.id} className="bg-gray-700 rounded-lg p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="text-white font-medium">{test.name}</h4>
@@ -195,7 +195,7 @@ export const TestDashboard: FC = () => {
           <h2 className="text-xl font-semibold text-white mb-6">최근 업데이트</h2>
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
             <div className="space-y-4">
-              {sampleRecentUpdates.map((update) => (
+              {sampleRecentUpdates.map((update: any) => (
                 <div key={update.id} className="flex items-start gap-4 p-4 bg-gray-700 rounded-lg">
                   <div className={`w-2 h-2 rounded-full mt-2 ${
                     update.type === 'feature' ? 'bg-green-500' :
@@ -234,7 +234,7 @@ export const TestDashboard: FC = () => {
         <section>
           <h2 className="text-xl font-semibold text-white mb-6">빠른 링크</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {sampleQuickLinks.map((link) => (
+            {sampleQuickLinks.map((link: any) => (
               <a
                 key={link.id}
                 href={link.url}

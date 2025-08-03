@@ -103,7 +103,7 @@ const Home: FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {services.map((service) => (
+            {services.map((service: any) => (
               <div
                 key={service.id}
                 className={`bg-gradient-to-br ${service.color} text-white transform transition-all duration-300 hover:scale-105 rounded-xl shadow-xl`}

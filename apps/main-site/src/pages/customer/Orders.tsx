@@ -168,7 +168,7 @@ export default function CustomerOrders() {
               </label>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}
+                onChange={(e: any) => setStatusFilter(e.target.value as OrderStatus | '')}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="">전체 상태</option>
@@ -189,7 +189,7 @@ export default function CustomerOrders() {
               <input
                 type="date"
                 value={dateRange.from}
-                onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
+                onChange={(e: any) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
@@ -201,7 +201,7 @@ export default function CustomerOrders() {
               <input
                 type="date"
                 value={dateRange.to}
-                onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
+                onChange={(e: any) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
@@ -245,7 +245,7 @@ export default function CustomerOrders() {
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
+              {filteredOrders.map((order: any) => (
                 <div key={order.id} className="p-6 hover:bg-gray-50">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4">
@@ -267,7 +267,7 @@ export default function CustomerOrders() {
 
                   {/* 주문 상품 목록 */}
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-4">
-                    {order.items.slice(0, 3).map((item) => (
+                    {order.items.slice(0, 3).map((item: any) => (
                       <div key={item.id} className="flex items-center space-x-3">
                         <img
                           src={item.productImage}

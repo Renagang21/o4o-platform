@@ -30,7 +30,7 @@ interface ProductReviewSectionProps {
 
 export function ProductReviewSection({ product, className }: ProductReviewSectionProps) {
   const { user } = useAuth();
-  const [filters, setFilters] = useState<ReviewFilters>({
+  const [filters, setFilters] = useState({
     sort: 'recent',
     limit: 10
   });
@@ -217,7 +217,7 @@ export function ProductReviewSection({ product, className }: ProductReviewSectio
                 rows={4}
                 placeholder="신고 사유를 입력해주세요"
                 value={reportReason}
-                onChange={(e) => setReportReason(e.target.value)}
+                onChange={(e: any) => setReportReason(e.target.value)}
               />
             </div>
             <div className="flex gap-2">

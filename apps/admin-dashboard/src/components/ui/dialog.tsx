@@ -42,7 +42,7 @@ const DialogTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBut
     return (
       <button
         ref={ref}
-        onClick={(e) => {
+        onClick={(e: any) => {
           onClick?.(e);
           context.onOpenChange(true);
         }}
@@ -73,7 +73,7 @@ const DialogClose = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButto
     return (
       <button
         ref={ref}
-        onClick={(e) => {
+        onClick={(e: any) => {
           onClick?.(e);
           context.onOpenChange(false);
         }}
@@ -95,7 +95,7 @@ const DialogOverlay = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>
           "fixed inset-0 z-50 bg-black/80",
           className
         )}
-        onClick={(e) => {
+        onClick={(e: any) => {
           onClick?.(e);
           if (e.target === e.currentTarget) {
             context.onOpenChange(false);

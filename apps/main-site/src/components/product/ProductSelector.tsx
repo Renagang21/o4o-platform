@@ -44,7 +44,7 @@ const ProductSelector: FC<ProductSelectorProps> = ({
         상품 선택
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map((product) => (
+        {products.map((product: any) => (
           <button
             key={product.id}
             onClick={() => onSelect(product)}

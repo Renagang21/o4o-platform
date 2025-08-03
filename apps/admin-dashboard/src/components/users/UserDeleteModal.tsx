@@ -103,7 +103,7 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
                 </span>
               </div>
               <div className="bg-wp-bg-tertiary rounded-lg p-3 max-h-32 overflow-y-auto">
-                {(users as User[]).map((user) => (
+                {(users as User[]).map((user: any) => (
                   <div key={user.id} className="flex items-center justify-between py-1">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm text-wp-text-primary">{user.name}</span>

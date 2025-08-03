@@ -102,7 +102,7 @@ export const CartItem: FC<CartItemProps> = ({
           <Input
             type="number"
             value={quantity}
-            onChange={(e) => handleQuantityChange(Number(e.target.value))}
+            onChange={(e: any) => handleQuantityChange(Number(e.target.value))}
             className="w-16 h-8 text-center"
             min={1}
             max={(product as any).stockQuantity || 100}

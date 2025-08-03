@@ -349,7 +349,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formName"
                       value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="contact_form"
                       className="font-mono"
                     />
@@ -360,7 +360,7 @@ const FormBuilder: FC = () => {
                     <Input
                       id="formTitle"
                       value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e: any) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="문의하기"
                     />
                   </div>
@@ -412,7 +412,7 @@ const FormBuilder: FC = () => {
                         strategy={verticalListSortingStrategy}
                       >
                         <div className="space-y-3">
-                          {formData.fields?.map((field) => (
+                          {formData.fields?.map((field: any) => (
                             <SortableFieldCard
                               key={field.id}
                               field={field}
@@ -433,7 +433,7 @@ const FormBuilder: FC = () => {
               <TabsContent value="settings">
                 <FormSettingsTab
                   settings={formData.settings!}
-                  onChange={(settings) => setFormData(prev => ({ ...prev, settings }))}
+                  onChange={(settings: any) => setFormData(prev => ({ ...prev, settings }))}
                 />
               </TabsContent>
 
@@ -441,7 +441,7 @@ const FormBuilder: FC = () => {
                 <FormNotificationsTab
                   notifications={formData.notifications!}
                   fields={formData.fields!}
-                  onChange={(notifications) => setFormData(prev => ({ ...prev, notifications }))}
+                  onChange={(notifications: any) => setFormData(prev => ({ ...prev, notifications }))}
                 />
               </TabsContent>
 
@@ -449,7 +449,7 @@ const FormBuilder: FC = () => {
                 <FormConfirmationsTab
                   confirmations={formData.confirmations!}
                   fields={formData.fields!}
-                  onChange={(confirmations) => setFormData(prev => ({ ...prev, confirmations }))}
+                  onChange={(confirmations: any) => setFormData(prev => ({ ...prev, confirmations }))}
                 />
               </TabsContent>
             </CardContent>

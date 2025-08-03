@@ -176,19 +176,19 @@ export default function CustomerProducts() {
                       name="category"
                       value=""
                       checked={selectedCategory === ''}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      onChange={(e: any) => setSelectedCategory(e.target.value)}
                       className="rounded-full border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                     />
                     <span className="ml-2 text-sm text-gray-700">전체</span>
                   </label>
-                  {categoryGroups.map((group) => (
+                  {categoryGroups.map((group: any) => (
                     <label key={group.id} className="flex items-center">
                       <input
                         type="radio"
                         name="category"
                         value={group.id}
                         checked={selectedCategory === group.id}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e: any) => setSelectedCategory(e.target.value)}
                         className="rounded-full border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       />
                       <span className="ml-2 text-sm text-gray-700">{group.name}</span>
@@ -204,14 +204,14 @@ export default function CustomerProducts() {
                   <input
                     type="number"
                     value={priceRange.min || ''}
-                    onChange={(e) => setPriceRange(prev => ({ ...prev, min: Number(e.target.value) }))}
+                    onChange={(e: any) => setPriceRange(prev => ({ ...prev, min: Number(e.target.value) }))}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                     placeholder="최소 가격"
                   />
                   <input
                     type="number"
                     value={priceRange.max || ''}
-                    onChange={(e) => setPriceRange(prev => ({ ...prev, max: Number(e.target.value) }))}
+                    onChange={(e: any) => setPriceRange(prev => ({ ...prev, max: Number(e.target.value) }))}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                     placeholder="최대 가격"
                   />
@@ -223,7 +223,7 @@ export default function CustomerProducts() {
                 <h3 className="text-sm font-medium text-gray-900 mb-3">정렬</h3>
                 <select
                   value={`${sortBy}_${sortOrder}`}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     const [newSortBy, newSortOrder] = e.target.value.split('_');
                     setSortBy(newSortBy as any);
                     setSortOrder(newSortOrder as any);
@@ -265,7 +265,7 @@ export default function CustomerProducts() {
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e: any) => setSearchTerm(e.target.value)}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     placeholder="상품명, 브랜드로 검색"
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -295,11 +295,11 @@ export default function CustomerProducts() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
                       <select
                         value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e: any) => setSelectedCategory(e.target.value)}
                         className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       >
                         <option value="">전체 카테고리</option>
-                        {categoryGroups.map((group) => (
+                        {categoryGroups.map((group: any) => (
                           <option key={group.id} value={group.id}>{group.name}</option>
                         ))}
                       </select>
@@ -309,7 +309,7 @@ export default function CustomerProducts() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">정렬</label>
                       <select
                         value={`${sortBy}_${sortOrder}`}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           const [newSortBy, newSortOrder] = e.target.value.split('_');
                           setSortBy(newSortBy as any);
                           setSortOrder(newSortOrder as any);
@@ -379,7 +379,7 @@ export default function CustomerProducts() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 p-6">
-                  {products.map((product) => (
+                  {products.map((product: any) => (
                     <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                       <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg bg-gray-200">
                         <img

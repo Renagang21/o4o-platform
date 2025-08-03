@@ -20,7 +20,7 @@ interface SignageContent {
 }
 
 const SignageDashboard: FC = () => {
-  const [contents, setContents] = useState<SignageContent[]>([]);
+  const [contents, setContents] = useState([]);
   const [currentDisplay, setCurrentDisplay] = useState<SignageContent | null>(null);
   const [displayStatus, setDisplayStatus] = useState<'playing' | 'paused' | 'stopped'>('stopped');
 
@@ -225,7 +225,7 @@ const SignageDashboard: FC = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {contents.map((content) => (
+                {contents.map((content: any) => (
                   <div
                     key={content.id}
                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
@@ -272,7 +272,7 @@ const SignageDashboard: FC = () => {
                     
                     <div className="mt-3 flex gap-2">
                       <button
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           e.stopPropagation();
                           handleContentSelect(content);
                         }}
@@ -288,7 +288,7 @@ const SignageDashboard: FC = () => {
                       <Link
                         to={`/signage/content/edit/${content.id}`}
                         className="px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e: any) => e.stopPropagation()}
                       >
                         <Settings className="w-4 h-4" />
                       </Link>

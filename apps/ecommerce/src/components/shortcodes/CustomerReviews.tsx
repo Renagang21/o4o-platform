@@ -187,7 +187,7 @@ const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
 
       {/* Reviews List */}
       <div className="space-y-4">
-        {displayReviews.map((review) => (
+        {displayReviews.map((review: any) => (
           <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-start justify-between mb-2">
               <div>

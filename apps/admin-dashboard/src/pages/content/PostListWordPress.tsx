@@ -30,7 +30,7 @@ const PostListWordPress: FC = () => {
   const { success, error } = useAdminNotices();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
-  const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
+  const [selectedPosts, setSelectedPosts] = useState([]);
 
   // Default column configuration
   const defaultColumns: ColumnOption[] = [
@@ -269,7 +269,7 @@ const PostListWordPress: FC = () => {
           type="search"
           id="post-search-input"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e: any) => setSearchQuery(e.target.value)}
           placeholder="Search posts..."
           className="w-auto inline-block mr-2"
         />

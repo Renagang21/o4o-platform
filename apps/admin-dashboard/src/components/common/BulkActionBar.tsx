@@ -38,7 +38,7 @@ export const BulkActionBar: FC<BulkActionBarProps> = ({
           id={`bulk-action-selector-${position}`}
           name="action"
           value={selectedAction}
-          onChange={(e) => setSelectedAction(e.target.value)}
+          onChange={(e: any) => setSelectedAction(e.target.value)}
           disabled={isProcessing}
         >
           <option value="">Bulk actions</option>

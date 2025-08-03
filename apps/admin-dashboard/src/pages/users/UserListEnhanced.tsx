@@ -43,12 +43,12 @@ interface UserListResponse {
 export default function UserListEnhanced() {
   // const navigate = useNavigate(); // Not used
   const { success, error } = useAdminNotices();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -199,7 +199,7 @@ export default function UserListEnhanced() {
   const columns = allColumns.filter(col => isColumnVisible(col.id));
 
   // Transform users to table rows
-  const rows: WordPressTableRow[] = users.map((user) => ({
+  const rows: WordPressTableRow[] = users.map((user: any) => ({
     id: user.id,
     data: {
       name: (
@@ -223,7 +223,7 @@ export default function UserListEnhanced() {
       ),
       role: (
         <div className="flex gap-1 flex-wrap">
-          {user.roles.map((role) => (
+          {user.roles.map((role: any) => (
             <Badge
               key={role}
               className={`${getRoleBadgeColor(role)} text-white`}
@@ -298,7 +298,7 @@ export default function UserListEnhanced() {
           type="search"
           id="user-search-input"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e: any) => setSearch(e.target.value)}
           placeholder="Search users..."
           className="w-auto inline-block mr-2"
         />

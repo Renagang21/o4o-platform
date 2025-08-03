@@ -114,7 +114,7 @@ export const SupplierDashboard: FC<SupplierDashboardProps> = ({
               </p>
             ) : (
               <div className="space-y-3">
-                {lowStockProducts.slice(0, 5).map((product) => {
+                {lowStockProducts.slice(0, 5).map((product: any) => {
                   const stockStatus = getStockStatus(product.supplierStock || 0, product.lowStockThreshold || 10);
                   return (
                     <div key={product.id} className="flex items-center justify-between p-3 border border-modern-border-primary rounded-lg">
@@ -158,7 +158,7 @@ export const SupplierDashboard: FC<SupplierDashboardProps> = ({
               </p>
             ) : (
               <div className="space-y-3">
-                {pendingProducts.slice(0, 5).map((product) => {
+                {pendingProducts.slice(0, 5).map((product: any) => {
                   const statusBadge = getProductStatusBadge(product.approvalStatus);
                   return (
                     <div key={product.id} className="flex items-center justify-between p-3 border border-modern-border-primary rounded-lg">
@@ -207,7 +207,7 @@ export const SupplierDashboard: FC<SupplierDashboardProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {recentOrders.slice(0, 5).map((order) => (
+                  {recentOrders.slice(0, 5).map((order: any) => (
                     <tr key={order.id} className="border-b border-modern-border-primary">
                       <td className="py-3 px-2 text-sm">#{order.orderNumber}</td>
                       <td className="py-3 px-2 text-sm">{order.productName}</td>

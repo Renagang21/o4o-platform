@@ -163,7 +163,7 @@ const TheDANGStyleHome: FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-tiptap-section="services-grid">
-            {services.map((service) => (
+            {services.map((service: any) => (
               <div
                 key={service.id}
                 className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"

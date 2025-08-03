@@ -55,10 +55,10 @@ const MediaLibrary: FC = () => {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [viewMode, setViewMode] = useState('grid')
+  const [selectedItems, setSelectedItems] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [filter, setFilter] = useState<MediaFilter>({
+  const [filter, setFilter] = useState({
     mediaType: 'all',
     folderId: undefined,
     status: 'all'

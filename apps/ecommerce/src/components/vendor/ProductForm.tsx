@@ -61,7 +61,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
   const [activeTab, setActiveTab] = useState('basic');
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const [formData, setFormData] = useState<ProductFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     sku: '',
@@ -262,7 +262,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
         <div className="mt-6">
           {/* 탭 네비게이션 */}
           <div className="flex space-x-1 border-b">
-            {tabs.map((tab) => (
+            {tabs.map((tab: any) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -287,7 +287,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   </label>
                   <Input
                     value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e: any) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="예: 무선 블루투스 이어폰"
                     className={errors.name ? 'border-red-500' : ''}
                   />
@@ -303,7 +303,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   <Textarea
                     rows={4}
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e: any) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="상품의 특징과 장점을 설명해주세요"
                   />
                 </div>
@@ -315,7 +315,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     </label>
                     <Input
                       value={formData.sku}
-                      onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
+                      onChange={(e: any) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
                       placeholder="예: BT-EAR-001"
                       className={errors.sku ? 'border-red-500' : ''}
                     />
@@ -331,7 +331,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <select
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={formData.category}
-                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                      onChange={(e: any) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                     >
                       <option value="">카테고리 선택</option>
                       <option value="electronics">전자제품</option>
@@ -351,7 +351,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.price}
-                      onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                      onChange={(e: any) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                       placeholder="0"
                       className={errors.price ? 'border-red-500' : ''}
                     />
@@ -367,7 +367,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.compareAtPrice || ''}
-                      onChange={(e) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData(prev => ({ 
                         ...prev, 
                         compareAtPrice: e.target.value ? parseFloat(e.target.value) : undefined 
                       }))}
@@ -382,7 +382,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.cost || ''}
-                      onChange={(e) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData(prev => ({ 
                         ...prev, 
                         cost: e.target.value ? parseFloat(e.target.value) : undefined 
                       }))}
@@ -399,7 +399,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   <div className="flex gap-2 mb-2">
                     <Input
                       value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
+                      onChange={(e: any) => setNewTag(e.target.value)}
                       placeholder="태그 입력"
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     />
@@ -408,7 +408,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {formData.tags.map((tag) => (
+                    {formData.tags.map((tag: any) => (
                       <span
                         key={tag}
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700"
@@ -494,7 +494,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <Input
                       type="number"
                       value={formData.stockQuantity}
-                      onChange={(e) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData(prev => ({ 
                         ...prev, 
                         stockQuantity: parseInt(e.target.value) || 0 
                       }))}
@@ -513,7 +513,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     <select
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={formData.stockStatus}
-                      onChange={(e) => setFormData(prev => ({ 
+                      onChange={(e: any) => setFormData(prev => ({ 
                         ...prev, 
                         stockStatus: e.target.value as any 
                       }))}
@@ -537,31 +537,31 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
 
                   {formData.variants.length > 0 && (
                     <div className="space-y-3">
-                      {formData.variants.map((variant) => (
+                      {formData.variants.map((variant: any) => (
                         <div key={variant.id} className="p-4 border rounded-lg space-y-3">
                           <div className="grid grid-cols-4 gap-3">
                             <Input
                               placeholder="옵션명"
                               value={variant.name}
-                              onChange={(e) => updateVariant(variant.id, 'name', e.target.value)}
+                              onChange={(e: any) => updateVariant(variant.id, 'name', e.target.value)}
                             />
                             <Input
                               placeholder="SKU"
                               value={variant.sku}
-                              onChange={(e) => updateVariant(variant.id, 'sku', e.target.value)}
+                              onChange={(e: any) => updateVariant(variant.id, 'sku', e.target.value)}
                             />
                             <Input
                               type="number"
                               placeholder="가격"
                               value={variant.price}
-                              onChange={(e) => updateVariant(variant.id, 'price', parseFloat(e.target.value) || 0)}
+                              onChange={(e: any) => updateVariant(variant.id, 'price', parseFloat(e.target.value) || 0)}
                             />
                             <div className="flex gap-2">
                               <Input
                                 type="number"
                                 placeholder="재고"
                                 value={variant.stockQuantity}
-                                onChange={(e) => updateVariant(variant.id, 'stockQuantity', parseInt(e.target.value) || 0)}
+                                onChange={(e: any) => updateVariant(variant.id, 'stockQuantity', parseInt(e.target.value) || 0)}
                               />
                               <Button
                                 onClick={() => removeVariant(variant.id)}
@@ -591,7 +591,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                     type="number"
                     step="0.1"
                     value={formData.weight || ''}
-                    onChange={(e) => setFormData(prev => ({ 
+                    onChange={(e: any) => setFormData(prev => ({ 
                       ...prev, 
                       weight: e.target.value ? parseFloat(e.target.value) : undefined 
                     }))}
@@ -607,7 +607,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                       <Input
                         type="number"
                         value={formData.dimensions?.length || ''}
-                        onChange={(e) => setFormData(prev => ({
+                        onChange={(e: any) => setFormData(prev => ({
                           ...prev,
                           dimensions: {
                             ...prev.dimensions,
@@ -622,7 +622,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                       <Input
                         type="number"
                         value={formData.dimensions?.width || ''}
-                        onChange={(e) => setFormData(prev => ({
+                        onChange={(e: any) => setFormData(prev => ({
                           ...prev,
                           dimensions: {
                             ...prev.dimensions,
@@ -637,7 +637,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                       <Input
                         type="number"
                         value={formData.dimensions?.height || ''}
-                        onChange={(e) => setFormData(prev => ({
+                        onChange={(e: any) => setFormData(prev => ({
                           ...prev,
                           dimensions: {
                             ...prev.dimensions,
@@ -671,7 +671,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   </label>
                   <Input
                     value={formData.seoTitle || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
+                    onChange={(e: any) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
                     placeholder={formData.name || '상품명이 기본값으로 사용됩니다'}
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -686,7 +686,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
                   <Textarea
                     rows={3}
                     value={formData.seoDescription || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
+                    onChange={(e: any) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
                     placeholder="검색 결과에 표시될 설명을 입력하세요"
                   />
                   <p className="text-xs text-gray-500 mt-1">

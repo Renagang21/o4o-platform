@@ -29,6 +29,9 @@
     },
     "@typescript-eslint/utils": {
       "typescript": "*"
+    },
+    "typescript-eslint": {
+      "typescript": "*"
     }
   },
   "scripts": {
@@ -66,12 +69,15 @@
     "install:all": "npm install && npm run build"
   },
   "devDependencies": {
+    "@eslint/js": "9.32.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/socket.io-client": "^1.4.36",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "concurrently": "^7.6.0",
     "eslint": "^9.31.0",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "5.2.0",
     "prettier": "^3.0.0",
     "typescript": "~5.9.2"
   },

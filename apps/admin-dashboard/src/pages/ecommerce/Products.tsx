@@ -22,9 +22,9 @@ const Products: FC = () => {
   const navigate = useNavigate();
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<ProductFilters>({});
+  const [filters, setFilters] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
   // API Hooks
@@ -348,7 +348,7 @@ const Products: FC = () => {
         </div>
       ) : view === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {products.map((product: any) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
@@ -391,7 +391,7 @@ const Products: FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
+              {products.map((product: any) => (
                 <ProductRow key={product.id} product={product} />
               ))}
             </tbody>
@@ -411,7 +411,7 @@ const Products: FC = () => {
               이전
             </button>
             
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p: any) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}

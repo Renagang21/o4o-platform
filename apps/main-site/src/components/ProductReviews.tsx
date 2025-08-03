@@ -24,7 +24,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
   } = useReviewStore();
 
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportingReviewId, setReportingReviewId] = useState<string>('');
+  const [reportingReviewId, setReportingReviewId] = useState('');
   const [reportReason, setReportReason] = useState('');
   const [reportDescription, setReportDescription] = useState('');
 
@@ -123,7 +123,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">� ��</h3>
               <div className="space-y-2">
-                {[5, 4, 3, 2, 1].map((rating) => (
+                {[5, 4, 3, 2, 1].map((rating: any) => (
                   <div key={rating} className="flex items-center">
                     <span className="text-sm text-gray-600 w-3">{rating}</span>
                     <svg className="w-4 h-4 text-yellow-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
@@ -163,7 +163,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
           {/* � D0 */}
           <select
             value={filters.rating || ''}
-            onChange={(e) => handleFilterChange(e.target.value ? parseInt(e.target.value) : undefined)}
+            onChange={(e: any) => handleFilterChange(e.target.value ? parseInt(e.target.value) : undefined)}
             className="border-gray-300 rounded-md text-sm"
           >
             <option value="">�� �</option>
@@ -177,7 +177,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
           {/* l� Ux D0 */}
           <select
             value={filters.isPurchaseVerified === true ? 'verified' : filters.isPurchaseVerified === false ? 'unverified' : ''}
-            onChange={(e) => handleFilterChange(undefined, e.target.value)}
+            onChange={(e: any) => handleFilterChange(undefined, e.target.value)}
             className="border-gray-300 rounded-md text-sm"
           >
             <option value="">� ��</option>
@@ -189,7 +189,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
         {/* , */}
         <select
           value={filters.sortBy}
-          onChange={(e) => handleSortChange(e.target.value)}
+          onChange={(e: any) => handleSortChange(e.target.value)}
           className="border-gray-300 rounded-md text-sm"
         >
           <option value="newest">\�</option>
@@ -215,7 +215,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
         </div>
       ) : (
         <div className="space-y-6">
-          {reviews.map((review) => (
+          {reviews.map((review: any) => (
             <div key={review.id} className="border-b border-gray-200 pb-6">
               {/* �� �T */}
               <div className="flex items-start justify-between mb-3">
@@ -249,7 +249,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
               {/* �� t�� */}
               {review.images && review.images.length > 0 && (
                 <div className="flex space-x-2 mb-4">
-                  {review.images.map((image) => (
+                  {review.images.map((image: any) => (
                     <img
                       key={image.id}
                       src={image.url}
@@ -309,7 +309,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
                   </label>
                   <select
                     value={reportReason}
-                    onChange={(e) => setReportReason(e.target.value)}
+                    onChange={(e: any) => setReportReason(e.target.value)}
                     className="w-full border-gray-300 rounded-md"
                     required
                   >
@@ -328,7 +328,7 @@ export default function ProductReviews({ productId, productName }: ProductReview
                   </label>
                   <textarea
                     value={reportDescription}
-                    onChange={(e) => setReportDescription(e.target.value)}
+                    onChange={(e: any) => setReportDescription(e.target.value)}
                     className="w-full border-gray-300 rounded-md"
                     rows={3}
                     placeholder="�� � �  \ �8\ $�D �%t�8�"

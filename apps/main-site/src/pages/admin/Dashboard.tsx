@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     totalCustomers: 0,
   });
 
-  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
     if (!user || user.userType !== 'admin') {

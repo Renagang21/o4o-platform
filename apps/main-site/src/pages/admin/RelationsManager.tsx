@@ -45,7 +45,7 @@ interface Relation {
 }
 
 const RelationsManager: FC = () => {
-  const [relations, setRelations] = useState<Relation[]>([]);
+  const [relations, setRelations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit'>('list');
   const [editingRelation, setEditingRelation] = useState<Relation | null>(null);
@@ -395,7 +395,7 @@ const RelationsManager: FC = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {relations.map((relation) => (
+                {relations.map((relation: any) => (
                   <div key={relation.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-6">
@@ -538,7 +538,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="text"
                       value={newRelation.name}
-                      onChange={(e) => setNewRelation(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e: any) => setNewRelation(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="예: product_brand, event_team"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -552,7 +552,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="text"
                       value={newRelation.label}
-                      onChange={(e) => setNewRelation(prev => ({ ...prev, label: e.target.value }))}
+                      onChange={(e: any) => setNewRelation(prev => ({ ...prev, label: e.target.value }))}
                       placeholder="예: 상품-브랜드 관계"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
@@ -564,7 +564,7 @@ const RelationsManager: FC = () => {
                     </label>
                     <textarea
                       value={newRelation.description}
-                      onChange={(e) => setNewRelation(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e: any) => setNewRelation(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="이 관계의 목적과 사용법을 설명해주세요"
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -604,7 +604,7 @@ const RelationsManager: FC = () => {
                         name="relationType"
                         value={type.value}
                         checked={newRelation.type === type.value}
-                        onChange={(e) => updateRelationType(e.target.value as any)}
+                        onChange={(e: any) => updateRelationType(e.target.value as any)}
                         className="sr-only"
                       />
                       <div className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
@@ -624,7 +624,7 @@ const RelationsManager: FC = () => {
                   <input
                     type="checkbox"
                     checked={newRelation.bidirectional}
-                    onChange={(e) => setNewRelation(prev => ({ ...prev, bidirectional: e.target.checked }))}
+                    onChange={(e: any) => setNewRelation(prev => ({ ...prev, bidirectional: e.target.checked }))}
                     className="mr-2"
                   />
                   <span className="text-sm text-gray-700">양방향 관계 (두 Post Type 모두에 관계 필드 생성)</span>
@@ -649,7 +649,7 @@ const RelationsManager: FC = () => {
                       </label>
                       <select
                         value={newRelation.from.postType}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, postType: e.target.value }
                         }))}
@@ -671,7 +671,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.from.label}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, label: e.target.value }
                         }))}
@@ -687,7 +687,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.from.fieldName}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, fieldName: e.target.value }
                         }))}
@@ -704,7 +704,7 @@ const RelationsManager: FC = () => {
                         <input
                           type="number"
                           value={newRelation.from.maxItems || ''}
-                          onChange={(e) => setNewRelation(prev => ({
+                          onChange={(e: any) => setNewRelation(prev => ({
                             ...prev,
                             from: { 
                               ...prev.from, 
@@ -721,7 +721,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="checkbox"
                         checked={newRelation.from.required}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           from: { ...prev.from, required: e.target.checked }
                         }))}
@@ -744,7 +744,7 @@ const RelationsManager: FC = () => {
                       </label>
                       <select
                         value={newRelation.to.postType}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, postType: e.target.value }
                         }))}
@@ -766,7 +766,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.to.label}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, label: e.target.value }
                         }))}
@@ -782,7 +782,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="text"
                         value={newRelation.to.fieldName}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, fieldName: e.target.value }
                         }))}
@@ -799,7 +799,7 @@ const RelationsManager: FC = () => {
                         <input
                           type="number"
                           value={newRelation.to.maxItems || ''}
-                          onChange={(e) => setNewRelation(prev => ({
+                          onChange={(e: any) => setNewRelation(prev => ({
                             ...prev,
                             to: { 
                               ...prev.to, 
@@ -816,7 +816,7 @@ const RelationsManager: FC = () => {
                       <input
                         type="checkbox"
                         checked={newRelation.to.required}
-                        onChange={(e) => setNewRelation(prev => ({
+                        onChange={(e: any) => setNewRelation(prev => ({
                           ...prev,
                           to: { ...prev.to, required: e.target.checked }
                         }))}
@@ -837,7 +837,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="checkbox"
                       checked={newRelation.settings.sortable}
-                      onChange={(e) => setNewRelation(prev => ({
+                      onChange={(e: any) => setNewRelation(prev => ({
                         ...prev,
                         settings: { ...prev.settings, sortable: e.target.checked }
                       }))}
@@ -850,7 +850,7 @@ const RelationsManager: FC = () => {
                     <input
                       type="checkbox"
                       checked={newRelation.settings.duplicates}
-                      onChange={(e) => setNewRelation(prev => ({
+                      onChange={(e: any) => setNewRelation(prev => ({
                         ...prev,
                         settings: { ...prev.settings, duplicates: e.target.checked }
                       }))}
@@ -865,7 +865,7 @@ const RelationsManager: FC = () => {
                     </label>
                     <select
                       value={newRelation.settings.deleteAction}
-                      onChange={(e) => setNewRelation(prev => ({
+                      onChange={(e: any) => setNewRelation(prev => ({
                         ...prev,
                         settings: { 
                           ...prev.settings, 

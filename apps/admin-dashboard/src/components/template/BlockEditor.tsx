@@ -445,13 +445,13 @@ const BlockEditor: FC<BlockEditorProps> = ({ block, onChange }) => {
           <SpacingControls
             label="여백 (Margin)"
             value={block.settings.margin as Record<string, string> || {}}
-            onChange={(value) => onChange({ settings: { ...block.settings, margin: value } })}
+            onChange={(value: any) => onChange({ settings: { ...block.settings, margin: value } })}
           />
 
           <SpacingControls
             label="패딩 (Padding)"
             value={block.settings.padding as Record<string, string> || {}}
-            onChange={(value) => onChange({ settings: { ...block.settings, padding: value } })}
+            onChange={(value: any) => onChange({ settings: { ...block.settings, padding: value } })}
           />
 
           {/* Background */}

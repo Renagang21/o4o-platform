@@ -56,7 +56,7 @@ export function ReviewFiltersBar({
         {/* Sort */}
         <Select
           value={filters.sort || 'recent'}
-          onChange={(e) => handleSortChange(e.target.value)}
+          onChange={(e: any) => handleSortChange(e.target.value)}
         >
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -80,7 +80,7 @@ export function ReviewFiltersBar({
           <ToggleGroupItem value="all" className="gap-1">
             전체
           </ToggleGroupItem>
-          {[5, 4, 3, 2, 1].map((rating) => (
+          {[5, 4, 3, 2, 1].map((rating: any) => (
             <ToggleGroupItem
               key={rating}
               value={rating.toString()}

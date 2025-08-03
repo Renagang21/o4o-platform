@@ -12,7 +12,7 @@ interface SignageContent {
 }
 
 const SignageList: FC = () => {
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
 
   // Mock 데이터
@@ -144,7 +144,7 @@ const SignageList: FC = () => {
 
         <select
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'date' | 'name')}
+          onChange={(e: any) => setSortBy(e.target.value as 'date' | 'name')}
           className="px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="date">등록일순</option>
@@ -153,7 +153,7 @@ const SignageList: FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredContents.map((content) => (
+        {filteredContents.map((content: any) => (
           <Link
             key={content.id}
             to={`/signage/${content.id}`}

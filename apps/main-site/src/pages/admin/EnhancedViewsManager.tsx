@@ -201,11 +201,11 @@ interface EnhancedView {
 }
 
 const EnhancedViewsManager: FC = () => {
-  const [views, setViews] = useState<EnhancedView[]>([]);
+  const [views, setViews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'create' | 'edit' | 'preview'>('list');
   const [editingView, setEditingView] = useState<EnhancedView | null>(null);
-  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewData, setPreviewData] = useState([]);
   const [queryBuilderMode, setQueryBuilderMode] = useState<'visual' | 'sql'>('visual');
 
   // Available data sources
@@ -779,7 +779,7 @@ const EnhancedViewsManager: FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {views.map((view) => (
+                {views.map((view: any) => (
                   <div key={view.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">

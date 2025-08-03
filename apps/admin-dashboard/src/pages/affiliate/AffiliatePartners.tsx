@@ -92,10 +92,10 @@ const mockPartners: AffiliatePartner[] = [
 ];
 
 const AffiliatePartners = () => {
-  const [partners] = useState<AffiliatePartner[]>(mockPartners);
+  const [partners] = useState(mockPartners);
   const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const filteredPartners = partners.filter(partner => {
     const matchesSearch = partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -232,7 +232,7 @@ const AffiliatePartners = () => {
               type="text"
               placeholder="이름, 이메일로 검색..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
             />
           </div>
@@ -241,7 +241,7 @@ const AffiliatePartners = () => {
           <Filter className="w-5 h-5 text-modern-text-secondary" />
           <select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
+            onChange={(e: any) => setTypeFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 유형</option>
@@ -252,7 +252,7 @@ const AffiliatePartners = () => {
           </select>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e: any) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
           >
             <option value="all">모든 상태</option>
@@ -296,7 +296,7 @@ const AffiliatePartners = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-modern-border-primary">
-              {filteredPartners.map((partner) => (
+              {filteredPartners.map((partner: any) => (
                 <tr key={partner.id} className="hover:bg-modern-bg-hover">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

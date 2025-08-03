@@ -38,7 +38,7 @@ export const SortableFieldCard: FC<SortableFieldCardProps> = ({
               <Button
                 variant={"ghost" as const}
                 size={"icon" as const}
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   onDuplicate();
                 }}
@@ -48,7 +48,7 @@ export const SortableFieldCard: FC<SortableFieldCardProps> = ({
               <Button
                 variant={"ghost" as const}
                 size={"icon" as const}
-                onClick={(e) => {
+                onClick={(e: any) => {
                   e.stopPropagation();
                   onDelete();
                 }}

@@ -75,7 +75,7 @@ const Table = <T extends Record<string, unknown>>({
       <table className={twMerge('min-w-full divide-y divide-gray-200', className)}>
         <thead className="bg-gray-50">
           <tr>
-            {columns.map((column) => (
+            {columns.map((column: any) => (
               <th
                 key={column.key}
                 scope="col"
@@ -102,7 +102,7 @@ const Table = <T extends Record<string, unknown>>({
               )}
               onClick={onRowClick ? () => onRowClick(record) : undefined}
             >
-              {columns.map((column) => (
+              {columns.map((column: any) => (
                 <td
                   key={column.key}
                   className={twMerge(

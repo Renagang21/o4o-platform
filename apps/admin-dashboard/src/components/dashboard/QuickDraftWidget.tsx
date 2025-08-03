@@ -58,7 +58,7 @@ const QuickDraftWidget: FC = () => {
             placeholder="Title"
             autoComplete="off"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e: any) => setTitle(e.target.value)}
             className="wp-input"
           />
         </div>
@@ -71,7 +71,7 @@ const QuickDraftWidget: FC = () => {
             placeholder="What's on your mind?"
             rows={4}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e: any) => setContent(e.target.value)}
             className="wp-textarea"
           />
         </div>

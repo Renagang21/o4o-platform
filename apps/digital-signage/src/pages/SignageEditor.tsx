@@ -16,7 +16,7 @@ interface SignageContent {
 
 const SignageEditor: FC = () => {
   const navigate = useNavigate();
-  const [content, setContent] = useState<SignageContent>({
+  const [content, setContent] = useState({
     title: '',
     type: 'image',
     content: '',
@@ -153,7 +153,7 @@ const SignageEditor: FC = () => {
                 type="text"
                 id="title"
                 value={content.title}
-                onChange={(e) =>
+                onChange={(e: any) =>
                   setContent({ ...content, title: e.target.value })
                 }
                 className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"

@@ -68,7 +68,7 @@ const List: FC<ListProps> = ({
         className
       )}
     >
-      {items.map((item) => (
+      {items.map((item: any) => (
         <li
           key={item.id}
           className={twMerge(

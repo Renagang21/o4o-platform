@@ -36,7 +36,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
 
   const updateConfirmation = (id: string, updates: Partial<FormConfirmation>) => {
     onChange(
-      confirmations.map((confirmation) =>
+      confirmations.map((confirmation: any) =>
         confirmation.id === id ? { ...confirmation, ...updates } : confirmation
       )
     );
@@ -47,19 +47,19 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
       alert('최소 하나의 확인 메시지가 필요합니다.');
       return;
     }
-    onChange(confirmations.filter((confirmation) => confirmation.id !== id));
+    onChange(confirmations.filter((confirmation: any) => confirmation.id !== id));
     if (selectedConfirmation === id) {
       setSelectedConfirmation(confirmations[0]?.id || null);
     }
   };
 
-  const currentConfirmation = confirmations.find((c) => c.id === selectedConfirmation);
+  const currentConfirmation = confirmations.find((c: any) => c.id === selectedConfirmation);
 
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-4">
         <div className="space-y-2">
-          {confirmations.map((confirmation) => (
+          {confirmations.map((confirmation: any) => (
             <Card
               key={confirmation.id}
               className={`p-3 cursor-pointer ${
@@ -76,7 +76,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Button
                     variant={"ghost" as const}
                     size={"icon" as const}
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.stopPropagation();
                       deleteConfirmation(confirmation.id);
                     }}
@@ -102,7 +102,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>확인 이름</Label>
                 <Input
                   value={currentConfirmation.name}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     updateConfirmation(currentConfirmation.id, { name: e.target.value })
                   }
                 />
@@ -146,7 +146,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>페이지 ID</Label>
                   <Input
                     value={currentConfirmation.pageId || ''}
-                    onChange={(e) =>
+                    onChange={(e: any) =>
                       updateConfirmation(currentConfirmation.id, { pageId: e.target.value })
                     }
                     placeholder="감사 페이지의 ID를 입력하세요"
@@ -159,7 +159,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                   <Label>리디렉션 URL</Label>
                   <Input
                     value={currentConfirmation.redirectUrl || ''}
-                    onChange={(e) =>
+                    onChange={(e: any) =>
                       updateConfirmation(currentConfirmation.id, { redirectUrl: e.target.value })
                     }
                     placeholder="https://example.com/thank-you"
@@ -171,7 +171,7 @@ export const FormConfirmationsTab: FC<FormConfirmationsTabProps> = ({
                 <Label>쿼리 문자열 추가</Label>
                 <Input
                   value={currentConfirmation.queryString || ''}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     updateConfirmation(currentConfirmation.id, { queryString: e.target.value })
                   }
                   placeholder="utm_source=form&entry_id={entry_id}"

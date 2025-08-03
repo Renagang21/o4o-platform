@@ -39,14 +39,14 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
   onApprove,
   onReject
 }) => {
-  const [requests, setRequests] = useState<CommissionRequest[]>([]);
+  const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState<CommissionRequest | null>(null);
   const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [reviewModal, setReviewModal] = useState(false);
   const [reviewDecision, setReviewDecision] = useState<'approve' | 'reject' | null>(null);
   const [reviewComment, setReviewComment] = useState('');
-  const [adjustedRate, setAdjustedRate] = useState<number>(0);
+  const [adjustedRate, setAdjustedRate] = useState(0);
 
   // 샘플 데이터 (실제로는 API에서 가져올 것)
   useEffect(() => {
@@ -292,7 +292,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">📋 요청 현황</h3>
           <div className="flex items-center space-x-2">
-            {(['all', 'pending', 'approved', 'rejected'] as const).map((filter) => (
+            {(['all', 'pending', 'approved', 'rejected'] as const).map((filter: any) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
@@ -315,7 +315,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
 
         {/* 요청 목록 */}
         <div className="space-y-4">
-          {filteredRequests.map((request) => (
+          {filteredRequests.map((request: any) => (
             <div key={request.id} className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -406,7 +406,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
                   min="0"
                   max="35"
                   value={adjustedRate}
-                  onChange={(e) => setAdjustedRate(Number(e.target.value))}
+                  onChange={(e: any) => setAdjustedRate(Number(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
                 />
                 {adjustedRate > 35 && (
@@ -418,7 +418,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">검토 의견</label>
                 <textarea
                   value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
+                  onChange={(e: any) => setReviewComment(e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-o4o-primary-500"
                   placeholder="승인/거절 사유를 입력하세요"
@@ -444,7 +444,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
                     name="decision"
                     value="approve"
                     checked={reviewDecision === 'approve'}
-                    onChange={(e) => setReviewDecision(e.target.value as 'approve')}
+                    onChange={(e: any) => setReviewDecision(e.target.value as 'approve')}
                     className="text-trust-verified"
                   />
                   <span className="ml-2 text-sm text-trust-verified">승인</span>
@@ -455,7 +455,7 @@ const CommissionManagementSystem: FC<CommissionManagementSystemProps> = ({
                     name="decision"
                     value="reject"
                     checked={reviewDecision === 'reject'}
-                    onChange={(e) => setReviewDecision(e.target.value as 'reject')}
+                    onChange={(e: any) => setReviewDecision(e.target.value as 'reject')}
                     className="text-trust-warning"
                   />
                   <span className="ml-2 text-sm text-trust-warning">거절</span>

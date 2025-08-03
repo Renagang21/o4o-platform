@@ -24,7 +24,7 @@ export default function CustomerCheckout() {
   const { user } = useAuthStore();
   const { createOrder, calculateOrderSummary, isLoading } = useOrderStore();
 
-  const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const {
@@ -345,7 +345,7 @@ export default function CustomerCheckout() {
                 
                 {/* 주문 상품 목록 */}
                 <div className="space-y-4 mb-6">
-                  {selectedItems.map((item) => (
+                  {selectedItems.map((item: any) => (
                     <div key={item.id} className="flex">
                       <img
                         src={item.productImage}

@@ -20,7 +20,7 @@ const roles = [
 
 const RegisterForm: FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<RegisterFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
@@ -110,7 +110,7 @@ const RegisterForm: FC = () => {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
                   className="appearance-none rounded-lg relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-text-main focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
@@ -136,7 +136,7 @@ const RegisterForm: FC = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
                   className="appearance-none rounded-lg relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-text-main focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
@@ -162,7 +162,7 @@ const RegisterForm: FC = () => {
                   type="password"
                   required
                   value={formData.password}
-                  onChange={(e) =>
+                  onChange={(e: any) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
                   className="appearance-none rounded-lg relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-text-main focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
@@ -180,7 +180,7 @@ const RegisterForm: FC = () => {
               사용자 역할
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-              {roles.map((role) => {
+              {roles.map((role: any) => {
                 const Icon = role.icon;
                 return (
                   <button

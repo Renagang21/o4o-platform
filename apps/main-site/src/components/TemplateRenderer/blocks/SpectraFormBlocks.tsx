@@ -405,7 +405,7 @@ export const SpectraFormBlock: FC<{
         return (
           <textarea
             value={value || ''}
-            onChange={(e) => handleFieldChange(field, e.target.value)}
+            onChange={(e: any) => handleFieldChange(field, e.target.value)}
             placeholder={field.placeholder}
             disabled={isDisabled}
             rows={field.rows || 4}
@@ -417,7 +417,7 @@ export const SpectraFormBlock: FC<{
         return (
           <select
             value={value || ''}
-            onChange={(e) => handleFieldChange(field, e.target.value)}
+            onChange={(e: any) => handleFieldChange(field, e.target.value)}
             disabled={isDisabled}
             className={baseInputClasses}
           >
@@ -440,7 +440,7 @@ export const SpectraFormBlock: FC<{
                   name={field.name}
                   value={option.value}
                   checked={value === option.value}
-                  onChange={(e) => handleFieldChange(field, e.target.value)}
+                  onChange={(e: any) => handleFieldChange(field, e.target.value)}
                   disabled={isDisabled || option.disabled}
                   className="text-blue-600"
                 />
@@ -461,7 +461,7 @@ export const SpectraFormBlock: FC<{
                     type="checkbox"
                     value={option.value}
                     checked={Array.isArray(value) && value.includes(option.value)}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       const currentValues = Array.isArray(value) ? value : [];
                       const newValues = e.target.checked
                         ? [...currentValues, option.value]
@@ -483,7 +483,7 @@ export const SpectraFormBlock: FC<{
               <input
                 type="checkbox"
                 checked={!!value}
-                onChange={(e) => handleFieldChange(field, e.target.checked)}
+                onChange={(e: any) => handleFieldChange(field, e.target.checked)}
                 disabled={isDisabled}
                 className="text-blue-600"
               />
@@ -519,7 +519,7 @@ export const SpectraFormBlock: FC<{
             <input
               type="range"
               value={value || field.min || 0}
-              onChange={(e) => handleFieldChange(field, Number(e.target.value))}
+              onChange={(e: any) => handleFieldChange(field, Number(e.target.value))}
               min={field.min || 0}
               max={field.max || 100}
               step={field.step || 1}
@@ -539,7 +539,7 @@ export const SpectraFormBlock: FC<{
         return (
           <input
             type="file"
-            onChange={(e) => handleFieldChange(field, e.target.files?.[0])}
+            onChange={(e: any) => handleFieldChange(field, e.target.files?.[0])}
             accept={field.accept || (field.type === 'image' ? 'image/*' : '*')}
             disabled={isDisabled}
             multiple={field.multiple}
@@ -552,7 +552,7 @@ export const SpectraFormBlock: FC<{
           <input
             type="color"
             value={value || '#000000'}
-            onChange={(e) => handleFieldChange(field, e.target.value)}
+            onChange={(e: any) => handleFieldChange(field, e.target.value)}
             disabled={isDisabled}
             className="h-10 w-full"
           />
@@ -578,7 +578,7 @@ export const SpectraFormBlock: FC<{
           <input
             type={showPassword[field.name] ? 'text' : 'password'}
             value={value || ''}
-            onChange={(e) => handleFieldChange(field, e.target.value)}
+            onChange={(e: any) => handleFieldChange(field, e.target.value)}
             placeholder={field.placeholder}
             disabled={isDisabled}
             className={baseInputClasses}
@@ -590,7 +590,7 @@ export const SpectraFormBlock: FC<{
           <input
             type={field.type}
             value={value || ''}
-            onChange={(e) => handleFieldChange(field, e.target.value)}
+            onChange={(e: any) => handleFieldChange(field, e.target.value)}
             placeholder={field.placeholder}
             disabled={isDisabled}
             min={field.min}
@@ -863,7 +863,7 @@ export const SpectraViewBlock: FC<{
               type="text"
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -876,7 +876,7 @@ export const SpectraViewBlock: FC<{
               <select
                 key={field}
                 value={filters[field] || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, [field]: e.target.value }))}
+                onChange={(e: any) => setFilters(prev => ({ ...prev, [field]: e.target.value }))}
                 className="px-4 py-2 border border-gray-300 rounded-md"
               >
                 <option value="">All {field}</option>

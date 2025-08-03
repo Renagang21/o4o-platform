@@ -104,7 +104,7 @@ const BlogList: FC<BlogListProps> = ({ postsPerPage = 10 }) => {
         ) : (
           <>
             <div className="space-y-8">
-              {posts.map((post) => (
+              {posts.map((post: any) => (
                 <article key={post.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
                   <Link to={`/blog/${post.slug}`} className="block p-6">
                     <div className="flex items-start space-x-6">

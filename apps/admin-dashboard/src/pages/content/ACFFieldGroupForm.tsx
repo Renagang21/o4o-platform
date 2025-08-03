@@ -68,10 +68,10 @@ const ACFFieldGroupForm: FC = () => {
     }],
   })
 
-  const [expandedFields, setExpandedFields] = useState<string[]>([])
+  const [expandedFields, setExpandedFields] = useState([])
   const [isFieldDialogOpen, setIsFieldDialogOpen] = useState(false)
   const [editingField, setEditingField] = useState<ACFField | null>(null)
-  const [selectedFieldType, setSelectedFieldType] = useState<string>('text')
+  const [selectedFieldType, setSelectedFieldType] = useState('text')
 
   // Fetch field group data (edit mode)
   const { data: fieldGroup, isLoading } = useQuery({
@@ -301,7 +301,7 @@ const ACFFieldGroupForm: FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {formData.fields?.map((field) => (
+                  {formData.fields?.map((field: any) => (
                     <Card key={field.id}>
                       <CardHeader className="py-3">
                         <div className="flex items-center justify-between">

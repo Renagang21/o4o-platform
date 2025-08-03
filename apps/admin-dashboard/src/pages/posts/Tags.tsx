@@ -20,9 +20,9 @@ import toast from 'react-hot-toast'
 const Tags: FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [tags, setTags] = useState<Tag[]>([])
-  const [filteredTags, setFilteredTags] = useState<Tag[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [tags, setTags] = useState([])
+  const [filteredTags, setFilteredTags] = useState([])
+  const [selectedTags, setSelectedTags] = useState([])
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [showMergeModal, setShowMergeModal] = useState(false)
@@ -485,7 +485,7 @@ const Tags: FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {getDisplayedTags().map((tag) => (
+                  {getDisplayedTags().map((tag: any) => (
                     <tr key={tag.id} className="hover:bg-gray-50">
                       <td>
                         <input

@@ -7,10 +7,10 @@ import BulkActions from './components/BulkActions'
 import toast from 'react-hot-toast'
 
 const PendingApproval: FC = () => {
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [businessTypeFilter, setBusinessTypeFilter] = useState<string>('all')
+  const [selectedUsers, setSelectedUsers] = useState([])
+  const [businessTypeFilter, setBusinessTypeFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [pagination, setPagination] = useState({
     current: 1,
@@ -159,7 +159,7 @@ const PendingApproval: FC = () => {
                 className="wp-select min-w-[150px]"
               >
                 <option value="all">전체 사업체</option>
-                {businessTypes.map((type) => (
+                {businessTypes.map((type: any) => (
                   <option key={type} value={type}>{type}</option>
                 ))}
               </select>
