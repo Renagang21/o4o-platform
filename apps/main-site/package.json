@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "engines": {
-    "node": ">=22.0.0 <23.0.0",
-    "npm": ">=10.9.0"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "dev": "vite",
@@ -38,7 +38,7 @@
     "@types/dompurify": "^3.0.5",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
-    "date-fns": "^3.3.1",
+    "date-fns": "3.6.0",
     "dompurify": "^3.2.6",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.523.0",
