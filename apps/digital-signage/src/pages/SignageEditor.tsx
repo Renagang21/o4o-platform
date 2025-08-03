@@ -16,12 +16,12 @@ interface SignageContent {
 
 const SignageEditor: FC = () => {
   const navigate = useNavigate();
-  const [content, setContent] = useState({
+  const [content, setContent] = useState<SignageContent>({
     title: '',
     type: 'image',
     content: '',
     schedule: {
-      days: [],
+      days: [] as string[],
       timeRanges: [{ start: '09:00', end: '18:00' }]
     }
   });
@@ -134,7 +134,7 @@ const SignageEditor: FC = () => {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-2xl font-semibold text-text-main">
-          {content.id ? '콘텐츠 수정' : '새 콘텐츠 등록'}
+          {(content as any).id ? '콘텐츠 수정' : '새 콘텐츠 등록'}
         </h1>
       </div>
 

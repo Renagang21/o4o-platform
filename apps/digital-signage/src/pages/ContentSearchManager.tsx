@@ -37,19 +37,7 @@ interface VideoContent {
   };
 }
 
-interface SearchOptions {
-  query?: string;
-  contentType?: 'youtube' | 'vimeo';
-  status?: 'pending' | 'approved' | 'rejected' | 'inactive';
-  tags?: string[];
-  sortBy?: 'latest' | 'popular' | 'duration' | 'name';
-  dateRange?: {
-    start?: string;
-    end?: string;
-  };
-  page: number;
-  limit: number;
-}
+// SearchOptions interface removed - not used
 
 interface SearchResult {
   content: VideoContent[];
@@ -66,7 +54,18 @@ const ContentSearchManager: FC = () => {
   const toast = useToast();
 
   // State
-  const [searchOptions, setSearchOptions] = useState({
+  const [searchOptions, setSearchOptions] = useState<{
+    page: number;
+    limit: number;
+    sortBy: string;
+    query?: string;
+    contentType?: 'youtube' | 'vimeo';
+    status?: 'pending' | 'approved' | 'rejected' | 'inactive';
+    dateRange?: {
+      start?: string;
+      end?: string;
+    };
+  }>({
     page: 1,
     limit: 20,
     sortBy: 'latest'

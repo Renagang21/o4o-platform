@@ -10,7 +10,7 @@
     "src"
   ],
   "scripts": {
-    "build": "npx tsc",
+    "build": "node build.cjs",
     "dev": "echo 'Types package - no dev mode'",
     "type-check": "tsc --noEmit"
   },

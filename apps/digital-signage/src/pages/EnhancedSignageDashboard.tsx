@@ -14,6 +14,7 @@ import { useToast } from '../hooks/useToast';
 import axios from 'axios';
 
 // Types
+/* SignageContent interface removed - not used
 interface SignageContent {
   id: string;
   title: string;
@@ -35,6 +36,7 @@ interface SignageContent {
   createdAt: string;
   updatedAt: string;
 }
+*/
 
 interface Store {
   id: string;

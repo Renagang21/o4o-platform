@@ -24,12 +24,7 @@ interface Content {
   updatedAt: string;
 }
 
-interface ContentFilters {
-  status?: string;
-  type?: string;
-  search?: string;
-  isPublic?: boolean;
-}
+// ContentFilters interface removed - not used
 
 export default function SignageContent() {
   const [contents, setContents] = useState<Content[]>([]);
@@ -286,7 +281,7 @@ export default function SignageContent() {
               {/* Tags */}
               {content.tags && content.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {content.tags.slice(0, 3).map((tag, index) => (
+                  {content.tags.slice(0, 3).map((tag: string, index: number) => (
                     <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                       {tag}
                     </span>

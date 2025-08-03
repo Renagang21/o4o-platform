@@ -1,0 +1,2 @@
+// Media Library types
+export {};
