@@ -86,3 +86,22 @@ temp/
 /*_ANALYSIS_REPORT.md
 /CI_CD_FAILURE_INVESTIGATION_REPORT.md
 /O4O_PLATFORM_SERVER_SYNC_ANALYSIS_REPORT.md
+
+# Temporary files
+*.tmp
+*.temp
+
+# Sensitive configuration files with tokens
+claude_config_*.json
+final_claude_config.json
+updated_claude_config.json
+
+# Build outputs
+*.tgz
+*.tar.gz
+
+# SSH and security
+*.pem
+*.ppk
+*.p12
+test_ssh.bat

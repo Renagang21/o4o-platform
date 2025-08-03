@@ -1,0 +1,79 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "args": [
+        "@modelcontextprotocol/server-filesystem",
+        "PATH_TO_YOUR_CODING_DIRECTORY"
+      ],
+      "command": "npx"
+    },
+    "playwright": {
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "command": "npx"
+    },
+    "everything": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ],
+      "command": "npx"
+    },
+    "postgres": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://username:password@YOUR_SERVER_IP:5432/database"
+      ],
+      "command": "npx"
+    },
+    "github": {
+      "args": [
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
+      },
+      "command": "npx"
+    },
+    "memory": {
+      "args": [
+        "@modelcontextprotocol/server-memory"
+      ],
+      "command": "npx"
+    },
+    "sequential-thinking": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "command": "npx"
+    },
+    "puppeteer": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "command": "npx"
+    },
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "@wonderwhy-er/desktop-commander@latest"
+      ]
+    },
+    "task-manager": {
+      "command": "npx",
+      "args": [
+        "mcp-shrimp-task-manager"
+      ]
+    },
+    "windows-cli": {
+      "command": "npx",
+      "args": [
+        "@simonb97/server-win-cli"
+      ]
+    }
+  }
+}

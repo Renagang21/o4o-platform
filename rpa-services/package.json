@@ -1,0 +1,38 @@
+{
+  "name": "rpa-services",
+  "version": "1.0.0",
+  "description": "RPA Services for microservices architecture",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "dev": "nodemon src/main.ts",
+    "build": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@renagang21/common-core": "file:../common-core",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "helmet": "^6.0.1",
+    "winston": "^3.8.2",
+    "puppeteer": "^19.7.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/cors": "^2.8.13",
+    "@types/jest": "^29.4.0",
+    "@types/node": "^18.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
+    "eslint": "^8.34.0",
+    "jest": "^29.4.3",
+    "nodemon": "^2.0.20",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  }
+} 
