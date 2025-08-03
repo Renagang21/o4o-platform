@@ -1,10 +1,9 @@
-import { ErrorInfo } from "react"
+import { Component, ErrorInfo, ReactNode } from "react"
 /**
  * Error Boundary Component
  * 대시보드 에러 처리
  */
 
-import { ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Props {

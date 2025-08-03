@@ -61,8 +61,8 @@ export interface UserBulkAction {
 export interface UserFormData {
   email: string;
   name: string;
-  role: 'admin' | 'customer' | 'business' | 'affiliate';
-  status: 'pending' | 'approved' | 'rejected' | 'suspended';
+  role: UserRole;
+  status: UserStatus;
   password?: string;
   phone?: string;
   businessInfo?: {

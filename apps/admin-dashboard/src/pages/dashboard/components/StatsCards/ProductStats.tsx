@@ -5,7 +5,7 @@ import { FC } from 'react';
  */
 
 
-import { Package, AlertTriangle, Plus, Award, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Package, AlertTriangle, Plus, Award, ArrowUpRight, TrendingDown } from 'lucide-react';
 
 interface ProductStatsProps {
   data?: {
@@ -129,7 +129,7 @@ const ProductStats: FC<ProductStatsProps> = ({ data, isLoading = false }) => {
           {trend === 'up' ? (
             <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
           ) : (
-            <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
+            <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
           )}
           <span className={`font-medium ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
             {Math.abs(change).toFixed(1)}%

@@ -12,7 +12,7 @@ import {
   TrendingUp, 
   AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight,
+  TrendingDown,
   Clock,
   Crown
 } from 'lucide-react';
@@ -82,7 +82,7 @@ const UserStatsCard = memo<UserStatsCardProps>(({
   const registrationChangeIcon = overview.userGrowthType === 'increase' 
     ? <ArrowUpRight className="w-4 h-4 text-green-500" />
     : overview.userGrowthType === 'decrease'
-    ? <ArrowDownRight className="w-4 h-4 text-red-500" />
+    ? <TrendingDown className="w-4 h-4 text-red-500" />
     : <TrendingUp className="w-4 h-4 text-wp-text-secondary" />;
 
   return (

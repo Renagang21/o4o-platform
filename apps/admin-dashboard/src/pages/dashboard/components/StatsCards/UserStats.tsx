@@ -5,7 +5,7 @@ import { FC } from 'react';
  */
 
 
-import { Users, UserCheck, UserPlus, ArrowUpRight, ArrowDownRight, AlertCircle } from 'lucide-react';
+import { Users, UserCheck, UserPlus, ArrowUpRight, TrendingDown, AlertCircle } from 'lucide-react';
 
 interface UserStatsProps {
   data?: {
@@ -109,7 +109,7 @@ const UserStats: FC<UserStatsProps> = ({ data, isLoading = false }) => {
           {trend === 'up' ? (
             <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
           ) : (
-            <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
+            <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
           )}
           <span className={`font-medium ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
             {formatPercentage(Math.abs(change))}

@@ -12,7 +12,7 @@ import {
   TrendingUp, 
   AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight
+  TrendingDown
 } from 'lucide-react';
 import { EcommerceStatsResponse, DashboardApiUtils } from '../../../../types/dashboard-api';
 
@@ -80,13 +80,13 @@ const EcommerceStatsCard = memo<EcommerceStatsCardProps>(({
   const revenueChangeIcon = sales.revenueChangeType === 'increase' 
     ? <ArrowUpRight className="w-4 h-4 text-green-500" />
     : sales.revenueChangeType === 'decrease'
-    ? <ArrowDownRight className="w-4 h-4 text-red-500" />
+    ? <TrendingDown className="w-4 h-4 text-red-500" />
     : <TrendingUp className="w-4 h-4 text-wp-text-secondary" />;
 
   const orderChangeIcon = orders.orderChangeType === 'increase'
     ? <ArrowUpRight className="w-4 h-4 text-green-500" />
     : orders.orderChangeType === 'decrease'
-    ? <ArrowDownRight className="w-4 h-4 text-red-500" />
+    ? <TrendingDown className="w-4 h-4 text-red-500" />
     : <TrendingUp className="w-4 h-4 text-wp-text-secondary" />;
 
   return (

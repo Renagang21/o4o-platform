@@ -5,7 +5,7 @@ import { FC } from 'react';
  */
 
 
-import { TrendingUp, Target, ArrowUpRight, ArrowDownRight, Calendar } from 'lucide-react';
+import { TrendingUp, Target, ArrowUpRight, TrendingDown, Calendar } from 'lucide-react';
 
 interface SalesStatsProps {
   data?: {
@@ -117,7 +117,7 @@ const SalesStats: FC<SalesStatsProps> = ({ data, isLoading = false }) => {
           {trend === 'up' ? (
             <ArrowUpRight className="w-4 h-4 text-green-500 mr-1" />
           ) : (
-            <ArrowDownRight className="w-4 h-4 text-red-500 mr-1" />
+            <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
           )}
           <span className={`font-medium ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
             {Math.abs(changePercent).toFixed(1)}%

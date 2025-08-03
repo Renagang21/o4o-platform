@@ -49,11 +49,11 @@ const userFormSchema = z.object({
       '비밀번호는 대문자, 소문자, 숫자와 특수문자를 포함해야 합니다')
     .optional(),
   
-  role: z.enum(['admin', 'customer', 'business', 'affiliate']).refine(val => val !== undefined, {
+  role: z.enum(['admin', 'customer', 'business', 'affiliate', 'seller', 'supplier', 'vendor', 'manager', 'retailer']).refine(val => val !== undefined, {
     message: '역할을 선택해주세요'
   }),
   
-  status: z.enum(['pending', 'approved', 'rejected', 'suspended']).refine(val => val !== undefined, {
+  status: z.enum(['pending', 'approved', 'rejected', 'suspended', 'active', 'inactive']).refine(val => val !== undefined, {
     message: '상태를 선택해주세요'
   }),
   

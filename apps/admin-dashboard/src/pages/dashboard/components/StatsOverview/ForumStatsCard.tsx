@@ -11,7 +11,7 @@ import {
   TrendingUp, 
   AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight,
+  TrendingDown,
   Clock
 } from 'lucide-react';
 import { ForumStatsResponse, DashboardApiUtils } from '../../../../types/dashboard-api';
@@ -80,7 +80,7 @@ const ForumStatsCard = memo<ForumStatsCardProps>(({
   const postChangeIcon = posts.postChangeType === 'increase' 
     ? <ArrowUpRight className="w-4 h-4 text-green-500" />
     : posts.postChangeType === 'decrease'
-    ? <ArrowDownRight className="w-4 h-4 text-red-500" />
+    ? <TrendingDown className="w-4 h-4 text-red-500" />
     : <TrendingUp className="w-4 h-4 text-wp-text-secondary" />;
 
   return (

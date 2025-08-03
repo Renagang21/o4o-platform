@@ -46,7 +46,12 @@ interface TemplateLibraryProps {
 
 const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
   const queryClient = useQueryClient()
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<{
+    category?: string
+    search: string
+    isPremium?: boolean
+    rating?: number
+  }>({
     category: undefined,
     search: '',
     isPremium: undefined,
@@ -63,8 +68,8 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
       
       if (filter.search) params.append('search', filter.search)
       if (filter.category) params.append('category', filter.category)
-      if (filter.isPremium !== undefined) params.append('isPremium', filter.isPremium.toString() as any)
-      if (filter.rating) params.append('rating', filter.rating.toString() as any)
+      if (filter.isPremium !== undefined) params.append('isPremium', filter.isPremium.toString())
+      if (filter.rating) params.append('rating', filter.rating.toString())
 
       const response = await authClient.api.get(`/template-library?${params}`)
       return response.data

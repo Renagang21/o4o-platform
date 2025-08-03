@@ -11,7 +11,7 @@ import {
   Users, 
   AlertTriangle,
   ArrowUpRight,
-  ArrowDownRight,
+  TrendingDown,
   DollarSign,
   Clock
 } from 'lucide-react';
@@ -150,7 +150,7 @@ const EcommerceStats: FC = () => {
                     {stat.trend === 'up' ? (
                       <ArrowUpRight className={`w-4 h-4 ${stat.changeColor} mr-1`} />
                     ) : (
-                      <ArrowDownRight className="w-4 h-4 text-red-600 mr-1" />
+                      <TrendingDown className="w-4 h-4 text-red-600 mr-1" />
                     )}
                     <span className={`text-sm font-medium ${stat.changeColor}`}>
                       {stat.change}
