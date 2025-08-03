@@ -15,14 +15,19 @@
     "npm": ">=10.9.0"
   },
   "overrides": {
-    "node": ">=22.0.0 <23.0.0",
-    "@typescript-eslint/typescript-estree": {
-      "typescript": "*"
-    },
     "@typescript-eslint/eslint-plugin": {
       "typescript": "*"
     },
     "@typescript-eslint/parser": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/type-utils": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/utils": {
       "typescript": "*"
     }
   },
@@ -63,8 +68,8 @@
   "devDependencies": {
     "@testing-library/user-event": "^14.6.1",
     "@types/socket.io-client": "^1.4.36",
-    "@typescript-eslint/eslint-plugin": "^8.18.2",
-    "@typescript-eslint/parser": "^8.18.2",
+    "@typescript-eslint/eslint-plugin": "8.18.2",
+    "@typescript-eslint/parser": "8.18.2",
     "concurrently": "^7.6.0",
     "eslint": "^9.31.0",
     "prettier": "^3.0.0",
