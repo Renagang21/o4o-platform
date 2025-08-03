@@ -38,7 +38,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
         <Input
           id="text"
           value={settings.text || ''}
-          onChange={(e: any) => onChange({ ...settings, text: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, text: e.target.value })}
           placeholder="버튼 텍스트"
         />
       </div>
@@ -53,7 +53,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
           id="url"
           type="url"
           value={settings.url || ''}
-          onChange={(e: any) => onChange({ ...settings, url: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, url: e.target.value })}
           placeholder="https://example.com"
         />
         <div className="mt-2">
@@ -62,7 +62,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
               type="checkbox"
               checked={settings.target === '_blank'}
               onChange={(e: any) => onChange({ 
-                ...settings, 
+                ...settings as any, 
                 target: e.target.checked ? '_blank' : '_self' 
               })}
               className="rounded"
@@ -77,7 +77,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
         <Label className="text-sm font-medium mb-2 block">버튼 스타일</Label>
         <div className="flex gap-2">
           <button
-            onClick={() => onChange({ ...settings, style: 'fill' })}
+            onClick={() => onChange({ ...settings as any, style: 'fill' })}
             className={clsx(
               'flex-1 p-2 rounded transition-colors text-sm',
               settings.style === 'fill'
@@ -88,7 +88,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
             채우기
           </button>
           <button
-            onClick={() => onChange({ ...settings, style: 'outline' })}
+            onClick={() => onChange({ ...settings as any, style: 'outline' })}
             className={clsx(
               'flex-1 p-2 rounded transition-colors text-sm',
               settings.style === 'outline'
@@ -112,7 +112,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
             <button
               key={preset.bg}
               onClick={() => onChange({ 
-                ...settings, 
+                ...settings as any, 
                 backgroundColor: preset.bg,
                 textColor: preset.text
               })}
@@ -142,7 +142,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
               id="bgColor"
               type="color"
               value={settings.backgroundColor || '#007cba'}
-              onChange={(e: any) => onChange({ ...settings, backgroundColor: e.target.value })}
+              onChange={(e: any) => onChange({ ...settings as any, backgroundColor: e.target.value })}
               className="mt-1 h-8"
             />
           </div>
@@ -152,7 +152,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
               id="textColor"
               type="color"
               value={settings.textColor || '#ffffff'}
-              onChange={(e: any) => onChange({ ...settings, textColor: e.target.value })}
+              onChange={(e: any) => onChange({ ...settings as any, textColor: e.target.value })}
               className="mt-1 h-8"
             />
           </div>
@@ -171,7 +171,7 @@ const ButtonBlockSettings: FC<ButtonBlockSettingsProps> = ({ settings, onChange 
             min="0"
             max="50"
             value={settings.borderRadius || 4}
-            onChange={(e: any) => onChange({ ...settings, borderRadius: parseInt(e.target.value) })}
+            onChange={(e: any) => onChange({ ...settings as any, borderRadius: parseInt(e.target.value) })}
             className="flex-1"
           />
           <span className="text-sm w-12 text-right">{settings.borderRadius || 4}px</span>

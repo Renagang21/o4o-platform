@@ -72,8 +72,8 @@ const DynamicContentList: FC = () => {
     queryFn: async () => {
       const params = new URLSearchParams({
         post_type: slug || '',
-        page: page.toString(),
-        limit: limit.toString(),
+        page: page.toString() as any,
+        limit: limit.toString() as any,
       })
       
       if (statusFilter !== 'all') {

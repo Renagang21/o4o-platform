@@ -36,7 +36,7 @@ export function CartIcon({
 
       {showDropdown && (
         <MiniCart
-          isOpen={isCartOpen}
+          _isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
           position="dropdown"
         />

@@ -358,17 +358,17 @@ const BlockRenderer: FC<BlockRendererProps> = ({
 
         {/* Visibility indicators */}
         <div className="flex items-center gap-1 bg-white border rounded-lg shadow-sm p-1">
-          {block.settings.visibility?.desktop !== false && (
+          {(block.settings as any).visibility?.desktop !== false && (
             <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
               <span className="text-xs">D</span>
             </div>
           )}
-          {block.settings.visibility?.tablet !== false && (
+          {(block.settings as any).visibility?.tablet !== false && (
             <div className="w-4 h-4 bg-green-100 rounded flex items-center justify-center">
               <span className="text-xs">T</span>
             </div>
           )}
-          {block.settings.visibility?.mobile !== false && (
+          {(block.settings as any).visibility?.mobile !== false && (
             <div className="w-4 h-4 bg-purple-100 rounded flex items-center justify-center">
               <span className="text-xs">M</span>
             </div>

@@ -432,7 +432,7 @@ const FormBuilder: FC = () => {
 
               <TabsContent value="settings">
                 <FormSettingsTab
-                  settings={formData.settings!}
+                  settings={formData.settings as any!}
                   onChange={(settings: any) => setFormData((prev: any) => ({ ...prev, settings }))}
                 />
               </TabsContent>

@@ -137,23 +137,23 @@ export interface AllSettings {
 class SettingsService {
   // General Settings
   async getGeneralSettings(): Promise<GeneralSettings> {
-    const response = await api.get<GeneralSettings>(apiEndpoints.settings.general);
+    const response = await api.get<GeneralSettings>((apiEndpoints.settings as any).general);
     return response.data;
   }
 
   async updateGeneralSettings(settings: Partial<GeneralSettings>): Promise<GeneralSettings> {
-    const response = await api.put<GeneralSettings>(apiEndpoints.settings.general, settings);
+    const response = await api.put<GeneralSettings>((apiEndpoints.settings as any).general, settings);
     return response.data;
   }
 
   // Appearance Settings
   async getAppearanceSettings(): Promise<AppearanceSettings> {
-    const response = await api.get<AppearanceSettings>(apiEndpoints.settings.appearance);
+    const response = await api.get<AppearanceSettings>((apiEndpoints.settings as any).appearance);
     return response.data;
   }
 
   async updateAppearanceSettings(settings: Partial<AppearanceSettings>): Promise<AppearanceSettings> {
-    const response = await api.put<AppearanceSettings>(apiEndpoints.settings.appearance, settings);
+    const response = await api.put<AppearanceSettings>((apiEndpoints.settings as any).appearance, settings);
     return response.data;
   }
 
@@ -162,7 +162,7 @@ class SettingsService {
     formData.append('file', file);
     formData.append('type', 'logo');
 
-    const response = await api.post<{ url: string }>(`${apiEndpoints.settings.appearance}/upload`, formData, {
+    const response = await api.post<{ url: string }>(`${(apiEndpoints.settings as any).appearance}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -172,18 +172,18 @@ class SettingsService {
 
   // Email Settings
   async getEmailSettings(): Promise<EmailSettings> {
-    const response = await api.get<EmailSettings>(apiEndpoints.settings.email);
+    const response = await api.get<EmailSettings>((apiEndpoints.settings as any).email);
     return response.data;
   }
 
   async updateEmailSettings(settings: Partial<EmailSettings>): Promise<EmailSettings> {
-    const response = await api.put<EmailSettings>(apiEndpoints.settings.email, settings);
+    const response = await api.put<EmailSettings>((apiEndpoints.settings as any).email, settings);
     return response.data;
   }
 
   async testEmailSettings(testEmail: string): Promise<{ success: boolean; message: string }> {
     const response = await api.post<{ success: boolean; message: string }>(
-      `${apiEndpoints.settings.email}/test`,
+      `${(apiEndpoints.settings as any).email}/test`,
       { testEmail }
     );
     return response.data;
@@ -191,18 +191,18 @@ class SettingsService {
 
   // Integration Settings
   async getIntegrationSettings(): Promise<IntegrationSettings> {
-    const response = await api.get<IntegrationSettings>(apiEndpoints.settings.integrations);
+    const response = await api.get<IntegrationSettings>((apiEndpoints.settings as any).integrations);
     return response.data;
   }
 
   async updateIntegrationSettings(settings: Partial<IntegrationSettings>): Promise<IntegrationSettings> {
-    const response = await api.put<IntegrationSettings>(apiEndpoints.settings.integrations, settings);
+    const response = await api.put<IntegrationSettings>((apiEndpoints.settings as any).integrations, settings);
     return response.data;
   }
 
   async testIntegration(integration: string): Promise<{ success: boolean; message: string }> {
     const response = await api.post<{ success: boolean; message: string }>(
-      `${apiEndpoints.settings.integrations}/test/${integration}`
+      `${(apiEndpoints.settings as any).integrations}/test/${integration}`
     );
     return response.data;
   }

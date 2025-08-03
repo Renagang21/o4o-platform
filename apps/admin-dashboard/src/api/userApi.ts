@@ -9,8 +9,8 @@ export class UserApi {
     filters: UserFilters = {}
   ): Promise<PaginatedResponse<User>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+      page: page.toString() as any,
+      limit: limit.toString() as any,
       ...Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value && value !== 'all')
       )
@@ -26,8 +26,8 @@ export class UserApi {
     businessType?: string
   ): Promise<PaginatedResponse<User>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+      page: page.toString() as any,
+      limit: limit.toString() as any,
       status: 'pending'
     })
 
@@ -97,7 +97,9 @@ export class UserApi {
   static async exportUsers(filters: UserFilters = {}): Promise<Blob> {
     const params = new URLSearchParams(
       Object.fromEntries(
-        Object.entries(filters).filter(([_, value]) => value && value !== 'all')
+        Object.entries(filters)
+          .filter(([_, value]) => value && value !== 'all')
+          .map(([key, value]) => [key, String(value)])
       )
     )
 

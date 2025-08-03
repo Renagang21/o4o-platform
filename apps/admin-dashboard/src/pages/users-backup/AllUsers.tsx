@@ -1,7 +1,7 @@
 import { useState, useEffect, FC } from 'react';
 import { Link } from 'react-router-dom'
 import { Plus, Users, TrendingUp, AlertTriangle, UserX } from 'lucide-react'
-import { User, UserFilters as IUserFilters, UserBulkAction, UserStats } from '@/types/user'
+import { UserBulkAction, UserStats } from '@/types/user'
 import { UserApi } from '@/api/userApi'
 import UserTable from './components/UserTable'
 import UserFilters from './components/UserFilters'

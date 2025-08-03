@@ -1,0 +1,4 @@
+// Add at line ~126
+const selectedBlock = blocks.find((b: any) => b.id === selectedBlockId) || null;
+// Replace spread operator issues
+const blockProps = selectedBlock ? { ...selectedBlock } : {};

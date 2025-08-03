@@ -6,14 +6,14 @@ import { SupplierDashboard } from '@/components/vendor/SupplierDashboard';
 import { SupplierProductForm } from '@/components/vendor/SupplierProductForm';
 import { getSupplierProducts } from '@/api/vendor/products';
 import { useAuth } from '@o4o/auth-context';
-import type { VendorSupplierStats as SupplierStats, VendorProduct } from '@o4o/types';
+import type { VendorSupplierStats as SupplierStats } from '@o4o/types';
 
 const SupplierDashboardPage = () => {
   const { user } = useAuth();
   const [showProductForm, setShowProductForm] = useState(false);
-  const [stats] = useState({
+  const [stats] = useState<SupplierStats>({
     supplierId: user?.id || '',
-    period: 'month',
+    period: 'month' as const as const,
     totalProducts: 45,
     pendingProducts: 3,
     approvedProducts: 38,

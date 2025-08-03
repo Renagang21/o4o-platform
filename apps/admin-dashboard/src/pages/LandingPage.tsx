@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@o4o/auth-context';
 import { 
   Squares2X2Icon,
-  UserGroupIcon,
+  UsersIcon,
   DocumentTextIcon,
-  ShoppingBagIcon,
+  ShoppingCartIcon,
   ChartBarIcon,
   CogIcon
 } from '@heroicons/react/24/outline';
@@ -22,7 +22,7 @@ const LandingPage = () => {
       color: 'bg-blue-500'
     },
     {
-      icon: <UserGroupIcon className="w-10 h-10" />,
+      icon: <UsersIcon className="w-10 h-10" />,
       title: '사용자 관리',
       description: '회원 정보와 권한을 관리합니다',
       path: '/users',
@@ -36,7 +36,7 @@ const LandingPage = () => {
       color: 'bg-purple-500'
     },
     {
-      icon: <ShoppingBagIcon className="w-10 h-10" />,
+      icon: <ShoppingCartIcon className="w-10 h-10" />,
       title: '전자상거래',
       description: '상품과 주문을 관리합니다',
       path: '/ecommerce/products',

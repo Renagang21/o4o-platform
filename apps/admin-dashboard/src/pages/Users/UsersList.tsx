@@ -68,18 +68,18 @@ const UsersList: FC = () => {
   
   // 모달 상태
   const [deleteModal, setDeleteModal] = useState<{
-    isOpen: boolean;
+    _isOpen: boolean;
     users: User | User[];
   }>({
-    isOpen: false,
+    _isOpen: false,
     users: [] as User[]
   });
   
   const [roleChangeModal, setRoleChangeModal] = useState<{
-    isOpen: boolean;
+    _isOpen: boolean;
     users: User[];
   }>({
-    isOpen: false,
+    _isOpen: false,
     users: []
   });
 
@@ -93,8 +93,8 @@ const UsersList: FC = () => {
     queryKey: ['users', page, limit, filters],
     queryFn: async () => {
       const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString()
+        page: page.toString() as any,
+        limit: limit.toString() as any
       });
 
       if (filters.role && filters.role !== 'all') {
@@ -154,7 +154,7 @@ const UsersList: FC = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setSelectedUsers([]);
-      setDeleteModal({ isOpen: false, users: [] as User[] });
+      setDeleteModal({ _isOpen: false, users: [] as User[] });
       
       toast.success(
         <div className="flex items-center">
@@ -183,7 +183,7 @@ const UsersList: FC = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setSelectedUsers([]);
-      setRoleChangeModal({ isOpen: false, users: [] });
+      setRoleChangeModal({ _isOpen: false, users: [] });
       
       toast.success(
         <div className="flex items-center">
@@ -380,7 +380,7 @@ const UsersList: FC = () => {
   // 핸들러 함수들
   const handleSingleUserDelete = (user: User) => {
     setDeleteModal({
-      isOpen: true,
+      _isOpen: true,
       users: user
     });
   };
@@ -392,7 +392,7 @@ const UsersList: FC = () => {
     
     if (usersToDelete.length > 0) {
       setDeleteModal({
-        isOpen: true,
+        _isOpen: true,
         users: usersToDelete
       });
     }
@@ -405,7 +405,7 @@ const UsersList: FC = () => {
     
     if (usersToChange.length > 0) {
       setRoleChangeModal({
-        isOpen: true,
+        _isOpen: true,
         users: usersToChange
       });
     }
@@ -668,8 +668,8 @@ const UsersList: FC = () => {
 
       {/* 사용자 삭제 모달 */}
       <UserDeleteModal
-        isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, users: [] as User[] })}
+        isOpen={deleteModal._isOpen}
+        onClose={() => setDeleteModal({ _isOpen: false, users: [] as User[] })}
         onConfirm={handleDeleteConfirm}
         users={deleteModal.users}
         isLoading={deleteUsersMutation.isPending}
@@ -677,8 +677,8 @@ const UsersList: FC = () => {
 
       {/* 사용자 역할 변경 모달 */}
       <UserRoleChangeModal
-        isOpen={roleChangeModal.isOpen}
-        onClose={() => setRoleChangeModal({ isOpen: false, users: [] })}
+        isOpen={roleChangeModal._isOpen}
+        onClose={() => setRoleChangeModal({ _isOpen: false, users: [] })}
         onConfirm={handleRoleChangeConfirm}
         users={roleChangeModal.users}
         isLoading={changeUserRolesMutation.isPending}

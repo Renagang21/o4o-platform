@@ -26,7 +26,7 @@ describe('UserRoleChangeModal 간단 테스트', () => {
   };
 
   const defaultProps = {
-    isOpen: true,
+    _isOpen: true,
     onClose: mockOnClose,
     onConfirm: mockOnConfirm,
     users: [customerUser],

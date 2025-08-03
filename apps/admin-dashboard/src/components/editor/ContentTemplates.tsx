@@ -1,4 +1,4 @@
-import { Component, FC, useState } from 'react';
+import { FC, useState } from 'react';
 import {
   Layout,
   FileText,
@@ -370,7 +370,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                       
                       <div className="mt-4 p-3 bg-gray-50 rounded-md">
                         <p className="text-xs text-gray-600 mb-1">Contains:</p>
-                        <p className="text-sm">{template.blocks.length} blocks</p>
+                        <p className="text-sm">{(template.blocks as any).length} blocks</p>
                       </div>
                     </CardContent>
                     
@@ -459,7 +459,7 @@ const ContentTemplates: FC<ContentTemplatesProps> = ({
                     </div>
                     <h4 className="font-medium">{pattern.name}</h4>
                     <p className="text-sm text-gray-600 mt-1">
-                      {pattern.blocks.length} blocks
+                      {(pattern.blocks as any).length} blocks
                     </p>
                   </CardContent>
                 </Card>

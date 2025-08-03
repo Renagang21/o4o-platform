@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import { UserCheck, UserX, Clock, AlertTriangle, Filter } from 'lucide-react'
-import { User, UserBulkAction } from '@/types/user'
+import { UserBulkAction } from '@/types/user'
 import { UserApi } from '@/api/userApi'
 import UserTable from './components/UserTable'
 import BulkActions from './components/BulkActions'

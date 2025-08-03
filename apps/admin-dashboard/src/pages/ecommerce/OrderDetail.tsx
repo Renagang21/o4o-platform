@@ -457,7 +457,7 @@ const OrderDetail: FC = () => {
                     type="number"
                     value={refundAmount}
                     onChange={(e: any) => setRefundAmount(e.target.value)}
-                    placeholder={order.total.toString()}
+                    placeholder={order.total.toString() as any}
                     max={order.total}
                     className="w-full pl-8 pr-3 py-2 border rounded-lg"
                   />

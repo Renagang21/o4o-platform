@@ -1,3 +1,4 @@
+import { roleDisplayNames } from "@/types/user";
 import { useState, useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom'; // Not used
 // import { UserPlus } from 'lucide-react'; // Not used
@@ -81,8 +82,8 @@ export default function UserListEnhanced() {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: page.toString(),
-        limit: itemsPerPage.toString(),
+        page: page.toString() as any,
+        limit: itemsPerPage.toString() as any,
       });
       
       if (search) params.append('search', search);
@@ -171,7 +172,7 @@ export default function UserListEnhanced() {
       moderator: 'bg-indigo-500',
       partner: 'bg-pink-500',
     };
-    return colors[role] || 'bg-gray-500';
+    return colors[role as keyof typeof roleDisplayNames] || 'bg-gray-500';
   };
 
   // Get status badge

@@ -271,7 +271,7 @@ const WidgetManager: FC = () => {
                         </div>
 
                         {/* Widgets in this area */}
-                        <div className={`grid gap-3 ${area.settings.columns > 1 ? `grid-cols-${area.settings.columns}` : 'grid-cols-1'}`}>
+                        <div className={`grid gap-3 ${(area.settings as any).columns > 1 ? `grid-cols-${(area.settings as any).columns}` : 'grid-cols-1'}`}>
                           {widgetsByPosition[area.position]?.map((widget: any) => (
                             <div
                               key={widget.id}

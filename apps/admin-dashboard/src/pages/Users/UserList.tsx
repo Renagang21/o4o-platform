@@ -1,3 +1,4 @@
+import { roleDisplayNames } from "@/types/user";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Download, UserPlus, UserCheck, UserX, Trash2 } from 'lucide-react';
@@ -57,8 +58,8 @@ export default function UserList() {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
+        page: page.toString() as any,
+        limit: limit.toString() as any,
       });
       
       if (search) params.append('search', search);
@@ -207,7 +208,7 @@ export default function UserList() {
       moderator: 'bg-indigo-500',
       partner: 'bg-pink-500',
     };
-    return colors[role] || 'bg-gray-500';
+    return colors[role as keyof typeof roleDisplayNames] || 'bg-gray-500';
   };
 
   // Get status badge color

@@ -1,3 +1,4 @@
+import { roleDisplayNames } from "@/types/user";
 import { FC } from 'react';
 import { Link } from 'react-router-dom'
 import { User, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '@/types/user'
@@ -40,8 +41,8 @@ const UserTable: FC<UserTableProps> = ({
     }
     
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[role]}`}>
-        {ROLE_LABELS[role]}
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[role as keyof typeof roleDisplayNames]}`}>
+        {ROLE_LABELS[role as keyof typeof roleDisplayNames]}
       </span>
     )
   }

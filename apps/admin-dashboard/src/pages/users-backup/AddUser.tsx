@@ -12,7 +12,7 @@ const AddUser: FC = () => {
   const isEditMode = Boolean(userId)
   
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     name: '',
     email: '',
     role: 'customer',
@@ -64,10 +64,10 @@ const AddUser: FC = () => {
       setLoading(true)
       
       if (isEditMode && userId) {
-        await UserApi.updateUser(userId, formData)
+        await UserApi.updateUser(userId, formData as any)
         toast.success('사용자 정보가 수정되었습니다.')
       } else {
-        await UserApi.createUser(formData)
+        await UserApi.createUser(formData as any)
         toast.success('사용자가 생성되었습니다.')
       }
       

@@ -7,7 +7,7 @@ import { PanelBody, SelectControl, RangeControl, Spinner, Notice, Placeholder, T
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { grid, listView, update } from '@wordpress/icons';
+import { grid, listView, update, loop as icon } from '@wordpress/icons';
 
 // Import all components
 import ACFFieldSelector from './components/ACFFieldSelector';
@@ -26,6 +26,14 @@ import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { eventBus, EVENTS } from '@/lib/eventBus';
 
 // Types
+interface PostType {
+  slug: string;
+  name: string;
+  rest_base?: string;
+  supports?: string[];
+  taxonomies?: string[];
+}
+
 interface SelectedField {
   key: string;
   name: string;
@@ -71,7 +79,7 @@ interface EditProps {
   setAttributes: (attributes: Partial<EditProps['attributes']>) => void;
 }
 
-interface Post {
+interface PostItem {
   id: number;
   title: {
     rendered: string;
@@ -117,8 +125,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   });
 
   // State
-  const [postTypes, setPostTypes] = useState<string[]>([]);
-  const [posts, setPosts] = useState<string[]>([]);
+  const [postTypes, setPostTypes] = useState<PostType[]>([]);
+  const [posts, setPosts] = useState<PostItem[]>([]);
   const [totalPosts, setTotalPosts] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -258,7 +266,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       }
 
       // Find the rest base for the post type
-      const selectedType = postTypes.find((type: any) => type.slug === postType);
+      const selectedType = postTypes.find((type) => type.slug === postType);
       const restBase = selectedType?.rest_base || postType;
 
       // Fetch posts - Use our CPT API that returns WordPress-formatted data

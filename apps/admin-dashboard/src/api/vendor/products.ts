@@ -23,11 +23,11 @@ export async function getSupplierProducts(params?: {
     if (params?.supplierId) queryParams.append('supplierId', params.supplierId);
     if (params?.approvalStatus) queryParams.append('approvalStatus', params.approvalStatus);
     if (params?.status) queryParams.append('status', params.status);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString() as any);
+    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
     if (params?.search) queryParams.append('search', params.search);
 
-    const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString()}`);
+    const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     console.error('Get supplier products error:', error);
@@ -135,11 +135,11 @@ export async function getApprovedProducts(params?: {
     queryParams.append('status', 'active');
     
     if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString() as any);
+    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
     if (params?.search) queryParams.append('search', params.search);
 
-    const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString()}`);
+    const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     console.error('Get approved products error:', error);

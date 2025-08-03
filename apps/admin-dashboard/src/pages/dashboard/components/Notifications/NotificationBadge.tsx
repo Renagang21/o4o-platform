@@ -36,7 +36,7 @@ const NotificationBadge: FC<NotificationBadgeProps> = ({
     green: 'bg-green-500 text-white'
   };
 
-  const displayCount = count > max ? `${max}+` : count.toString();
+  const displayCount = count > max ? `${max}+` : count.toString() as any;
 
   return (
     <span

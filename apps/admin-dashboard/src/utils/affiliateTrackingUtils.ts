@@ -201,7 +201,7 @@ export function initializeReferralTracking(): void {
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('ref');
     cleanUrl.searchParams.delete('utm_source');
-    window.history.replaceState({}, '', cleanUrl.toString());
+    window.history.replaceState({}, '', cleanUrl.toString() as any);
   }
 }
 

@@ -28,7 +28,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
           {columnOptions.map((col: any) => (
             <button
               key={col}
-              onClick={() => onChange({ ...settings, columns: col })}
+              onClick={() => onChange({ ...settings as any, columns: col })}
               className={clsx(
                 'p-2 rounded transition-colors text-sm',
                 settings.columns === col
@@ -50,7 +50,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
         </Label>
         <div className="flex gap-2">
           <button
-            onClick={() => onChange({ ...settings, imageCrop: true })}
+            onClick={() => onChange({ ...settings as any, imageCrop: true })}
             className={clsx(
               'flex-1 p-2 rounded transition-colors text-sm',
               settings.imageCrop
@@ -61,7 +61,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
             자르기
           </button>
           <button
-            onClick={() => onChange({ ...settings, imageCrop: false })}
+            onClick={() => onChange({ ...settings as any, imageCrop: false })}
             className={clsx(
               'flex-1 p-2 rounded transition-colors text-sm',
               !settings.imageCrop
@@ -82,7 +82,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
         </Label>
         <select
           value={settings.linkTo || 'none'}
-          onChange={(e: any) => onChange({ ...settings, linkTo: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, linkTo: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="none">링크 없음</option>
@@ -107,7 +107,7 @@ const GalleryBlockSettings: FC<GalleryBlockSettingsProps> = ({ settings, onChang
                 <button
                   onClick={() => {
                     const newImages = settings.images!.filter((_, i) => i !== index);
-                    onChange({ ...settings, images: newImages });
+                    onChange({ ...settings as any, images: newImages });
                   }}
                   className="text-red-600 hover:text-red-700 text-sm"
                 >

@@ -109,13 +109,13 @@ const GutenbergPage: FC = () => {
 
   // Handle template selection
   const handleSelectTemplate = (template: any) => {
-    setBlocks(template.blocks);
+    setBlocks(template.blocks as any);
     setShowTemplates(false);
   };
 
   // Handle pattern selection
   const handleSelectPattern = (pattern: any) => {
-    setBlocks((prev: any) => [...prev, ...pattern.blocks]);
+    setBlocks((prev: any) => [...prev, ...pattern.blocks as any]);
     setShowTemplates(false);
   };
 
@@ -315,11 +315,11 @@ const GutenbergPage: FC = () => {
             postSettings={postSettings}
             blockSettings={selectedBlock}
             onPostSettingsChange={(settings) => 
-              setPostSettings((prev: any) => ({ ...prev, ...settings }))
+              setPostSettings((prev: any) => ({ ...prev, ...settings as any }))
             }
             onBlockSettingsChange={(settings) => {
               if (selectedBlock) {
-                const updated = { ...selectedBlock, ...settings };
+                const updated = { ...selectedBlock, ...settings as any };
                 setBlocks(blocks.map((block: any) => 
                   block.id === selectedBlock.id ? updated : block
                 ));

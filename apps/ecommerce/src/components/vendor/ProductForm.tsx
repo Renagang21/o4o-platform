@@ -25,29 +25,6 @@ interface ProductFormProps {
   onSubmit: (data: Partial<Product>) => Promise<void>;
 }
 
-interface ProductFormData {
-  name: string;
-  description: string;
-  sku: string;
-  category: string;
-  price: number;
-  compareAtPrice?: number;
-  cost?: number;
-  stockQuantity: number;
-  stockStatus: 'in_stock' | 'out_of_stock' | 'on_backorder';
-  images: string[];
-  variants: ProductVariant[];
-  seoTitle?: string;
-  seoDescription?: string;
-  tags: string[];
-  weight?: number;
-  dimensions?: {
-    length?: number;
-    width?: number;
-    height?: number;
-  };
-}
-
 interface ProductVariant {
   id: string;
   name: string;
@@ -61,7 +38,24 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
   const [activeTab, setActiveTab] = useState('basic');
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    sku: string;
+    category: string;
+    price: number;
+    stockQuantity: number;
+    stockStatus: 'in_stock' | 'out_of_stock' | 'on_backorder';
+    images: string[];
+    variants: ProductVariant[];
+    tags: string[];
+    dimensions: { length: number; width: number; height: number };
+    seoTitle: string;
+    seoDescription: string;
+    compareAtPrice: number;
+    cost: number;
+    weight: number;
+  }>({
     name: '',
     description: '',
     sku: '',
@@ -72,13 +66,13 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
     images: [],
     variants: [],
     tags: [],
-    dimensions: { length: 0, width: 0, height: 0 }
-  ,
+    dimensions: { length: 0, width: 0, height: 0 },
     seoTitle: '',
     seoDescription: '',
     compareAtPrice: 0,
     cost: 0,
-    weight: 0});
+    weight: 0
+  });
 
   const [newTag, setNewTag] = useState('');
 
@@ -91,16 +85,16 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
         category: product.categories?.[0] || '',
         price: product.pricing?.customer || 0,
         compareAtPrice: 0, // Not in Product interface
-        cost: product.cost,
+        cost: product.cost || 0,
         stockQuantity: product.inventory?.stockQuantity || 0,
         stockStatus: product.inventory?.stockStatus || 'in_stock',
         images: product.images?.map((img: any) => img.url) || [],
         variants: [],
-        seoTitle: product.seo?.metaTitle,
-        seoDescription: product.seo?.metaDescription,
+        seoTitle: product.seo?.metaTitle || '',
+        seoDescription: product.seo?.metaDescription || '',
         tags: product.tags || [],
-        weight: product.shippingInfo?.weight,
-        dimensions: product.shippingInfo?.dimensions || {}
+        weight: product.shippingInfo?.weight || 0,
+        dimensions: product.shippingInfo?.dimensions || { length: 0, width: 0, height: 0 }
       });
     }
   }, [product]);
@@ -204,13 +198,13 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
   const removeImage = (index: number) => {
     setFormData((prev: any) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_: string, i: number) => i !== index)
     }));
   };
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData((prev: any) => ({
+      setFormData((prev) => ({
         ...prev,
         tags: [...prev.tags, newTag.trim()]
       }));
@@ -219,9 +213,9 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
   };
 
   const removeTag = (tag: string) => {
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((t: any) => t !== tag)
+      tags: prev.tags.filter((t) => t !== tag)
     }));
   };
 

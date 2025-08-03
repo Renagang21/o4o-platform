@@ -30,7 +30,7 @@ export function generateReferralLink(
   // 추천 코드 파라미터 추가
   url.searchParams.set('ref', referralCode);
   
-  return url.toString();
+  return url.toString() as any;
 }
 
 /**

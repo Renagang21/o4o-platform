@@ -138,7 +138,7 @@ export const usePermissions = () => {
     canAccessMenu,
     isAdmin: isAdmin(),
     userRole: user?.role,
-    userPermissions: user?.permissions || []
+    userPermissions: (user as any)?.permissions || []
   }
 }
 

@@ -11,7 +11,7 @@ import {
   User,
   ROLE_LABELS,
   STATUS_LABELS,
-  BUSINESS_TYPES
+  BUSINESS_TYPE_OPTIONS
 } from '../../types/user';
 import {
   AlertTriangle,
@@ -412,9 +412,9 @@ const UserForm: FC<UserFormProps> = ({
                     className="wp-input-field"
                   >
                     <option value="">사업자 유형 선택</option>
-                    {BUSINESS_TYPES.map((type: any) => (
-                      <option key={type} value={type}>
-                        {type}
+                    {BUSINESS_TYPE_OPTIONS.map((type: any) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
                       </option>
                     ))}
                   </select>

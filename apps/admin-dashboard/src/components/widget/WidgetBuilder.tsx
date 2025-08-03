@@ -173,7 +173,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
     title: widget?.title || '',
     position: widget?.position || 'footer-1' as WidgetPosition,
     content: widget?.content || {},
-    settings: widget?.settings || getDefaultSettings()
+    settings: widget?.settings as any || getDefaultSettings()
   })
 
   const isEditing = Boolean(widget)
@@ -227,7 +227,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
       updateMutation.mutate({
         title: formData.title,
         content: formData.content,
-        settings: formData.settings,
+        settings: formData.settings as any,
         position: formData.position
       })
     } else {
@@ -236,7 +236,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
         title: formData.title,
         content: formData.content,
         position: formData.position,
-        settings: formData.settings
+        settings: formData.settings as any
       })
     }
   }
@@ -255,7 +255,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
     setFormData((prev: any) => ({
       ...prev,
       settings: {
-        ...prev.settings,
+        ...prev.settings as any,
         [key]: value
       }
     }))
@@ -265,9 +265,9 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
     setFormData((prev: any) => ({
       ...prev,
       settings: {
-        ...prev.settings,
+        ...prev.settings as any,
         [category]: {
-          ...((prev.settings as unknown as Record<string, unknown>)[category] as Record<string, unknown> || {}),
+          ...((prev.settings as any as unknown as Record<string, unknown>)[category] as Record<string, unknown> || {}),
           [key]: value
         }
       }
@@ -649,21 +649,21 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
           <div className="flex items-center justify-between">
             <Label className="text-sm">데스크톱에서 표시</Label>
             <Switch
-              checked={formData.settings.visibility?.desktop !== false}
+              checked={(formData.settings as any).visibility?.desktop !== false}
               onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'desktop', checked)}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-sm">태블릿에서 표시</Label>
             <Switch
-              checked={formData.settings.visibility?.tablet !== false}
+              checked={(formData.settings as any).visibility?.tablet !== false}
               onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'tablet', checked)}
             />
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-sm">모바일에서 표시</Label>
             <Switch
-              checked={formData.settings.visibility?.mobile !== false}
+              checked={(formData.settings as any).visibility?.mobile !== false}
               onCheckedChange={(checked: boolean) => updateNestedSettings('visibility', 'mobile', checked)}
             />
           </div>
@@ -679,7 +679,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
           <div>
             <Label className="text-sm">타입</Label>
             <Select
-              value={formData.settings.animation?.type || 'none'}
+              value={(formData.settings as any).animation?.type || 'none'}
               onValueChange={(value: string) => updateNestedSettings('animation', 'type', value)}
             >
               <SelectTrigger>
@@ -694,33 +694,33 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
             </Select>
           </div>
 
-          {formData.settings.animation?.type !== 'none' && (
+          {(formData.settings as any).animation?.type !== 'none' && (
             <>
               <div>
                 <Label className="text-sm">지속시간 (ms)</Label>
                 <Slider
-                  value={[formData.settings.animation?.duration || 300]}
+                  value={[(formData.settings as any).animation?.duration || 300]}
                   onValueChange={([value]: number[]) => updateNestedSettings('animation', 'duration', value)}
                   max={2000}
                   min={100}
                   step={100}
                 />
                 <div className="text-xs text-gray-500 mt-1">
-                  {formData.settings.animation?.duration || 300}ms
+                  {(formData.settings as any).animation?.duration || 300}ms
                 </div>
               </div>
 
               <div>
                 <Label className="text-sm">지연시간 (ms)</Label>
                 <Slider
-                  value={[formData.settings.animation?.delay || 0]}
+                  value={[(formData.settings as any).animation?.delay || 0]}
                   onValueChange={([value]: number[]) => updateNestedSettings('animation', 'delay', value)}
                   max={1000}
                   min={0}
                   step={100}
                 />
                 <div className="text-xs text-gray-500 mt-1">
-                  {formData.settings.animation?.delay || 0}ms
+                  {(formData.settings as any).animation?.delay || 0}ms
                 </div>
               </div>
             </>
@@ -735,7 +735,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
         </CardHeader>
         <CardContent>
           <Textarea
-            value={formData.settings.customCSS || ''}
+            value={(formData.settings as any).customCSS || ''}
             onChange={(e: any) => updateSettings('customCSS', e.target.value)}
             placeholder=".my-widget { color: red; }"
             rows={4}
@@ -813,7 +813,7 @@ const WidgetBuilder: FC<WidgetBuilderProps> = ({
 
                 <div className="flex items-center space-x-2">
                   <Switch
-                    checked={formData.settings.showTitle}
+                    checked={(formData.settings as any).showTitle}
                     onCheckedChange={(checked: boolean) => updateSettings('showTitle', checked)}
                   />
                   <Label>제목 표시</Label>

@@ -50,7 +50,7 @@ export async function getAffiliateStats(params: GetAffiliateStatsRequest) {
     if (params.startDate) queryParams.append('startDate', params.startDate);
     if (params.endDate) queryParams.append('endDate', params.endDate);
 
-    const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString()}`);
+    const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     console.error('Get affiliate stats error:', error);
@@ -74,12 +74,12 @@ export async function getCommissionHistory(params: {
     
     if (params.affiliateId) queryParams.append('affiliateId', params.affiliateId);
     if (params.status) queryParams.append('status', params.status);
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.page) queryParams.append('page', params.page.toString() as any);
+    if (params.limit) queryParams.append('limit', params.limit.toString() as any);
     if (params.startDate) queryParams.append('startDate', params.startDate);
     if (params.endDate) queryParams.append('endDate', params.endDate);
 
-    const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString()}`);
+    const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     console.error('Get commission history error:', error);
@@ -187,11 +187,11 @@ export async function getAffiliateList(params?: {
     const queryParams = new URLSearchParams();
     
     if (params?.status) queryParams.append('status', params.status);
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString() as any);
+    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
     if (params?.search) queryParams.append('search', params.search);
 
-    const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString()}`);
+    const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     console.error('Get affiliate list error:', error);

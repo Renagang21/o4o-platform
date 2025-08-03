@@ -12,7 +12,7 @@ interface FormSettingsTabProps {
 
 export const FormSettingsTab: FC<FormSettingsTabProps> = ({ settings, onChange }) => {
   const updateSettings = (updates: Partial<FormSettings>) => {
-    onChange({ ...settings, ...updates });
+    onChange({ ...settings as any, ...updates });
   };
 
   return (

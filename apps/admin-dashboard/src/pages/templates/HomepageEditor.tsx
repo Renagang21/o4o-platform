@@ -35,7 +35,7 @@ const blocksToTipTap = (blocks: Block[]): TipTapJSONContent => {
         id: block.id,
         blockType: block.type,
         content: block.content,
-        settings: block.settings
+        settings: block.settings as any
       }
     }))
   };
@@ -52,7 +52,7 @@ const tipTapToBlocks = (content: TipTapJSONContent): Block[] => {
       id: node.attrs?.id as string || `block-${Date.now()}-${Math.random()}`,
       type: node.attrs?.blockType as string || 'paragraph',
       content: node.attrs?.content || {},
-      settings: node.attrs?.settings as Record<string, any> || {}
+      settings: node.attrs?.settings as any as Record<string, any> || {}
     }));
 };
 
@@ -119,7 +119,7 @@ const HomepageEditor: FC = () => {
       content: getDefaultContent(type),
       settings: getDefaultSettings(type),
     };
-    setBlocks([...blocks, newBlock]);
+    setBlocks([...blocks as any, newBlock]);
   };
 
   const getDefaultContent = (type: string) => {
@@ -175,7 +175,7 @@ const HomepageEditor: FC = () => {
     const index = blocks.findIndex(b => b.id === blockId);
     if (index === -1) return;
 
-    const newBlocks = [...blocks];
+    const newBlocks = [...blocks as any];
     if (direction === 'up' && index > 0) {
       [newBlocks[index], newBlocks[index - 1]] = [newBlocks[index - 1], newBlocks[index]];
     } else if (direction === 'down' && index < blocks.length - 1) {

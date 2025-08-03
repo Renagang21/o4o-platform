@@ -51,7 +51,7 @@ const PartnerPolicies: FC<PartnerPoliciesProps> = ({ settings, onUpdate }) => {
   };
 
   const handleTierUpdate = (index: number, tier: PartnerTier) => {
-    const newTiers = [...settings.tierLevels];
+    const newTiers = [...(settings as any).tierLevels];
     newTiers[index] = tier;
     onUpdate({ tierLevels: newTiers });
     setEditingTier(null);
@@ -70,7 +70,7 @@ const PartnerPolicies: FC<PartnerPoliciesProps> = ({ settings, onUpdate }) => {
       return;
     }
     
-    const newTiers = [...settings.tierLevels, newTier];
+    const newTiers = [...(settings as any).tierLevels, newTier];
     // Sort by minSales ascending
     newTiers.sort((a: any, b: any) => a.minSales - b.minSales);
     

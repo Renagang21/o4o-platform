@@ -127,21 +127,21 @@ export const PricingTableBlock: FC<{
     {
       name: 'Basic',
       price: '$9',
-      period: 'month',
+      period: 'month' as const,
       features: ['10 GB Storage', '100 GB Bandwidth', 'Email Support', 'Basic Analytics'],
       highlighted: false
     },
     {
       name: 'Pro',
       price: '$29',
-      period: 'month',
+      period: 'month' as const,
       features: ['100 GB Storage', '1 TB Bandwidth', 'Priority Support', 'Advanced Analytics', 'Custom Domain'],
       highlighted: true
     },
     {
       name: 'Enterprise',
       price: '$99',
-      period: 'month',
+      period: 'month' as const,
       features: ['Unlimited Storage', 'Unlimited Bandwidth', '24/7 Phone Support', 'Advanced Analytics', 'Custom Domain', 'API Access'],
       highlighted: false
     }

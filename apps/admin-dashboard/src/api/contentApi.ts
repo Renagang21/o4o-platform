@@ -24,14 +24,14 @@ export class ContentApi {
     filters?: ContentFilters
   ): Promise<ApiResponse<Post[]>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      pageSize: pageSize.toString()
+      page: page.toString() as any,
+      pageSize: pageSize.toString() as any
     })
     
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined) {
-          params.append(key, value.toString())
+          params.append(key, value.toString() as any)
         }
       })
     }
@@ -102,14 +102,14 @@ export class ContentApi {
     filters?: ContentFilters
   ): Promise<ApiResponse<Page[]>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      pageSize: pageSize.toString()
+      page: page.toString() as any,
+      pageSize: pageSize.toString() as any
     })
     
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined) {
-          params.append(key, value.toString())
+          params.append(key, value.toString() as any)
         }
       })
     }
@@ -249,8 +249,8 @@ export class ContentApi {
     search?: string
   ): Promise<ApiResponse<MediaFile[]>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      pageSize: pageSize.toString(),
+      page: page.toString() as any,
+      pageSize: pageSize.toString() as any,
       ...(folderId && { folderId }),
       ...(type && { type }),
       ...(search && { search })

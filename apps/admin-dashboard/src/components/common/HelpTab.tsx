@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
  */
 export const HelpTab: FC = () => {
   const { 
-    isOpen, 
+    _isOpen: isOpen, 
     activeTab, 
     tabs, 
     sidebar,

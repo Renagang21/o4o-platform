@@ -33,7 +33,7 @@ interface UploadFile {
 }
 
 interface MediaUploadDialogProps {
-  isOpen: boolean
+  _isOpen: boolean
   onClose: () => void
   onUploadComplete: () => void
   files?: FileList | null
@@ -43,7 +43,7 @@ interface MediaUploadDialogProps {
 }
 
 const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
-  isOpen,
+  _isOpen,
   onClose,
   onUploadComplete,
   files,
@@ -57,7 +57,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
 
   // Initialize files when opened
   useEffect(() => {
-    if (isOpen && files && files.length > 0) {
+    if (_isOpen && files && files.length > 0) {
       const newFiles: UploadFile[] = Array.from(files).map((file: File) => ({
         file,
         id: `${Date.now()}-${Math.random()}`,
@@ -70,7 +70,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
       }))
       setUploadFiles(newFiles)
     }
-  }, [isOpen, files])
+  }, [_isOpen, files])
 
   // Clean up preview URLs
   useEffect(() => {
@@ -245,7 +245,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
   const errorCount = uploadFiles.filter((f: any) => f.status === 'error').length
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={_isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>미디어 업로드</DialogTitle>

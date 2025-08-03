@@ -31,7 +31,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       <AdminBar onLogout={handleLogout} />
       
       {/* Sidebar */}
-      <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <AdminSidebar _isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       {/* Main content wrapper with proper positioning */}
       <div className="wordpress-admin-content">

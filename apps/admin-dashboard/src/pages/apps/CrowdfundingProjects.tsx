@@ -34,7 +34,7 @@ const CrowdfundingProjects: FC = () => {
           }
           return acc;
         }, {} as Record<string, string>)
-      ).toString();
+      ).toString() as any;
 
       const response = await authClient.api.get(`/v1/crowdfunding-simple/projects?${queryString}`);
       return response.data;

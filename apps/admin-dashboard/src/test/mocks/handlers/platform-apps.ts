@@ -337,8 +337,8 @@ export const platformAppsHandlers = [
     mockPlatformApps[appIndex] = {
       ...mockPlatformApps[appIndex],
       settings: {
-        ...mockPlatformApps[appIndex].settings,
-        ...settings
+        ...mockPlatformApps[appIndex].settings as any,
+        ...settings as any
       },
       lastUpdated: new Date().toISOString()
     };

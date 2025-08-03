@@ -300,7 +300,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
       attributes: {}
     };
     
-    const newBlocks = [...blocks, newBlock];
+    const newBlocks = [...blocks as any, newBlock];
     updateBlocks(newBlocks);
     setShowBlockInserter(false);
   };
@@ -381,9 +381,9 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
         id: `block-${Date.now()}`
       };
       const newBlocks = [
-        ...blocks.slice(0, blockIndex + 1),
+        ...(blocks as any).slice(0, blockIndex + 1),
         newBlock,
-        ...blocks.slice(blockIndex + 1)
+        ...(blocks as any).slice(blockIndex + 1)
       ];
       updateBlocks(newBlocks);
     }
@@ -939,7 +939,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
 
       {/* 미디어 라이브러리 모달 */}
       <MediaLibraryModal
-        isOpen={showMediaLibrary}
+        _isOpen={showMediaLibrary}
         onClose={() => {
           setShowMediaLibrary(false);
           setMediaLibraryCallback(null);

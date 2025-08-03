@@ -13,11 +13,11 @@ import { useAuth } from '@o4o/auth-context'
 import { useDynamicMenu } from '@/hooks/useDynamicMenu'
 
 interface AdminSidebarProps {
-  isOpen: boolean
+  _isOpen: boolean
   onClose: () => void
 }
 
-const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
+const AdminSidebar: FC<AdminSidebarProps> = ({ onClose }) => {
   const location = useLocation()
   const { user } = useAuth()
   const [expandedItems, setExpandedItems] = useState<any[]>([])

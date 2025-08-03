@@ -41,21 +41,21 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
       // Build query parameters
       const params = new URLSearchParams();
       
-      if (query.perPage) params.append('per_page', query.perPage.toString());
-      if (query.page) params.append('page', query.page.toString());
-      if (query.offset) params.append('offset', query.offset.toString());
+      if (query.perPage) params.append('per_page', query.perPage.toString() as any);
+      if (query.page) params.append('page', query.page.toString() as any);
+      if (query.offset) params.append('offset', query.offset.toString() as any);
       if (query.order) params.append('order', query.order);
       if (query.orderBy) params.append('orderby', query.orderBy);
       if (query.search) params.append('search', query.search);
       if (query.categories?.length) params.append('categories', query.categories.join(','));
       if (query.tags?.length) params.append('tags', query.tags.join(','));
-      if (query.featured !== undefined) params.append('featured', query.featured.toString());
-      if (query.onSale !== undefined) params.append('on_sale', query.onSale.toString());
+      if (query.featured !== undefined) params.append('featured', query.featured.toString() as any);
+      if (query.onSale !== undefined) params.append('on_sale', query.onSale.toString() as any);
       if (query.inStock !== undefined) params.append('stock_status', 'instock');
-      if (query.minPrice) params.append('min_price', query.minPrice.toString());
-      if (query.maxPrice) params.append('max_price', query.maxPrice.toString());
+      if (query.minPrice) params.append('min_price', query.minPrice.toString() as any);
+      if (query.maxPrice) params.append('max_price', query.maxPrice.toString() as any);
 
-      const response = await fetch(`/api/ecommerce/products?${params.toString()}`);
+      const response = await fetch(`/api/ecommerce/products?${params.toString() as any}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch products');

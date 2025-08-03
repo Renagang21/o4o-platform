@@ -65,7 +65,7 @@ export default function MediaUploader({
     mutationFn: async ({ file, fileId }: { file: File; fileId: string }) => {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('convertToWebP', convertToWebP.toString());
+      formData.append('convertToWebP', convertToWebP.toString() as any);
 
       // Track upload progress
       const config = {

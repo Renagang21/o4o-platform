@@ -4,7 +4,7 @@ import { ErrorInfo } from "react"
  * 대시보드 에러 처리
  */
 
-import { Component, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Props {
@@ -93,7 +93,7 @@ class ErrorBoundary extends Component<Props, State> {
                   개발자 정보 (개발 모드에서만 표시)
                 </summary>
                 <pre className="mt-2 text-xs bg-gray-100 p-3 rounded overflow-auto">
-                  {this.state.error.toString()}
+                  {this.state.error.toString() as any}
                   {this.state.errorInfo?.componentStack}
                 </pre>
               </details>

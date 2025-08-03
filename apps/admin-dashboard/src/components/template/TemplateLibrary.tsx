@@ -35,8 +35,7 @@ import { authClient } from '@o4o/auth-client'
 import type { 
   TemplateLibraryItem, 
   TemplateLibraryResponse,
-  TemplateCategory,
-  TemplateLibraryFilter 
+  TemplateCategory
 } from '@o4o/types'
 import toast from 'react-hot-toast'
 
@@ -64,8 +63,8 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
       
       if (filter.search) params.append('search', filter.search)
       if (filter.category) params.append('category', filter.category)
-      if (filter.isPremium !== undefined) params.append('isPremium', filter.isPremium.toString())
-      if (filter.rating) params.append('rating', filter.rating.toString())
+      if (filter.isPremium !== undefined) params.append('isPremium', filter.isPremium.toString() as any)
+      if (filter.rating) params.append('rating', filter.rating.toString() as any)
 
       const response = await authClient.api.get(`/template-library?${params}`)
       return response.data
@@ -191,7 +190,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                 value={filter.category || 'all'}
                 onValueChange={(value: string) => setFilter({ 
                   ...filter, 
-                  category: value === 'all' ? undefined : value as TemplateCategory 
+                  category: (value === 'all' ? undefined : value as TemplateCategory) as any 
                 })}
               >
                 <SelectTrigger className="w-[180px]">
@@ -213,7 +212,7 @@ const TemplateLibrary: FC<TemplateLibraryProps> = ({ onClose, onImport }) => {
                 value={filter.isPremium === undefined ? 'all' : filter.isPremium ? 'premium' : 'free'}
                 onValueChange={(value: string) => setFilter({ 
                   ...filter, 
-                  isPremium: value === 'all' ? undefined : value === 'premium'
+                  isPremium: (value === 'all' ? undefined : value === 'premium') as any
                 })}
               >
                 <SelectTrigger className="w-[120px]">

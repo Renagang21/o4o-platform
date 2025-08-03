@@ -64,12 +64,12 @@ export async function getMyVideoList(params?: {
   try {
     const queryParams = new URLSearchParams();
     
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.page) queryParams.append('page', params.page.toString() as any);
+    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
     if (params?.search) queryParams.append('search', params.search);
     if (params?.category) queryParams.append('category', params.category);
 
-    const response = await authClient.api.get(`/v1/signage/my-videos?${queryParams.toString()}`);
+    const response = await authClient.api.get(`/v1/signage/my-videos?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     console.error('Get my videos error:', error);

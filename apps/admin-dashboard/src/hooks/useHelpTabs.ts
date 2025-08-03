@@ -14,7 +14,7 @@ export interface HelpSidebar {
 }
 
 interface HelpTabsStore {
-  isOpen: boolean;
+  _isOpen: boolean;
   activeTab: string | null;
   tabs: HelpTab[];
   sidebar: HelpSidebar | null;
@@ -33,34 +33,34 @@ interface HelpTabsStore {
  * Zustand store for WordPress-style Help Tabs
  */
 const useHelpTabsStore = create<HelpTabsStore>((set) => ({
-  isOpen: false,
+  _isOpen: false,
   activeTab: null,
   tabs: [],
   sidebar: null,
   
   toggleHelp: () => set((state) => ({ 
-    isOpen: !state.isOpen,
-    activeTab: state.isOpen ? null : (state.tabs[0]?.id || null)
+    _isOpen: !state._isOpen,
+    activeTab: state._isOpen ? null : (state.tabs[0]?.id || null)
   })),
   
   openHelp: () => set((state) => ({ 
-    isOpen: true,
+    _isOpen: true,
     activeTab: state.tabs[0]?.id || null
   })),
   
-  closeHelp: () => set({ isOpen: false, activeTab: null }),
+  closeHelp: () => set({ _isOpen: false, activeTab: null }),
   
   setActiveTab: (tabId) => set({ activeTab: tabId }),
   
   setTabs: (tabs) => set((state) => ({ 
     tabs,
-    activeTab: state.isOpen ? (tabs[0]?.id || null) : state.activeTab
+    activeTab: state._isOpen ? (tabs[0]?.id || null) : state.activeTab
   })),
   
   setSidebar: (sidebar) => set({ sidebar }),
   
   reset: () => set({ 
-    isOpen: false, 
+    _isOpen: false, 
     activeTab: null, 
     tabs: [], 
     sidebar: null 

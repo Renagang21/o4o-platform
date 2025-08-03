@@ -20,7 +20,7 @@ declare global {
 
 // Register custom block category if it doesn't exist
 const registerO4OCategory = () => {
-  const { getCategories, setCategories } = window.wp.blocks;
+  const { getCategories, setCategories } = window.wp.blocks as any;
   const categories = getCategories();
   
   if (!categories.find((cat: any) => cat.slug === 'o4o-blocks')) {

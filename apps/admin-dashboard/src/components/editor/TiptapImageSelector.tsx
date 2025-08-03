@@ -14,7 +14,7 @@ import { Editor } from '@tiptap/react';
 
 interface TiptapImageSelectorProps {
   editor: Editor;
-  isOpen: boolean;
+  _isOpen: boolean;
   onClose: () => void;
 }
 
@@ -32,7 +32,7 @@ interface MediaFile {
   createdAt?: string;
 }
 
-export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapImageSelectorProps) {
+export default function TiptapImageSelector({ editor, _isOpen, onClose }: TiptapImageSelectorProps) {
   const [selectedImage, setSelectedImage] = useState<MediaFile | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [altText, setAltText] = useState('');
@@ -51,7 +51,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
       });
       return response.data.data || [];
     },
-    enabled: isOpen && activeTab === 'library'
+    enabled: _isOpen && activeTab === 'library'
   });
 
   // Handle image selection
@@ -81,7 +81,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
     if (uploadedFiles.length > 0) {
       const firstImage = uploadedFiles[0];
       handleSelectImage({
-        id: Date.now().toString(),
+        id: Date.now().toString() as any,
         url: firstImage.url,
         webpUrl: firstImage.webpUrl,
         name: firstImage.name,
@@ -112,7 +112,7 @@ export default function TiptapImageSelector({ editor, isOpen, onClose }: TiptapI
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={_isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>이미지 삽입</DialogTitle>

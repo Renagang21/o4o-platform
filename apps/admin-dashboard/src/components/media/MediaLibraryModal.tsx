@@ -29,7 +29,7 @@ interface MediaItem {
 }
 
 interface MediaLibraryModalProps {
-  isOpen: boolean;
+  _isOpen: boolean;
   onClose: () => void;
   onSelect: (media: MediaItem) => void;
   allowMultiple?: boolean;
@@ -37,7 +37,7 @@ interface MediaLibraryModalProps {
 }
 
 const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
-  isOpen,
+  _isOpen,
   onClose,
   onSelect,
   allowMultiple = false,
@@ -59,7 +59,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
       const response = await authClient.api.get(`/media?${params}`);
       return response.data;
     },
-    enabled: isOpen
+    enabled: _isOpen
   });
 
   // 파일 업로드 mutation
@@ -121,7 +121,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!_isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

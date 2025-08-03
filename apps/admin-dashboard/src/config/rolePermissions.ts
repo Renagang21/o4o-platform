@@ -1,3 +1,4 @@
+// import { roleDisplayNames } from "@/types/user"; // Unused - available from bottom export
 // Role-based menu permissions configuration
 // Defines which roles have access to which menu items and features
 
@@ -369,17 +370,7 @@ export function filterMenuByRole(menuItems: any[], userRole: UserRole, userPermi
     .filter(Boolean);
 }
 
-// Role display names (Korean)
-export const roleDisplayNames: Record<UserRole, string> = {
-  admin: '관리자',
-  business: '비즈니스',
-  affiliate: '제휴사',
-  customer: '고객',
-  seller: '판매자',
-  supplier: '공급자',
-  manager: '매니저',
-  retailer: '소매업자'
-};
+// Note: roleDisplayNames is imported from @/types/user
 
 // Role capabilities summary
 export const roleCapabilities: Record<UserRole, string[]> = {
@@ -430,3 +421,4 @@ export const roleCapabilities: Record<UserRole, string[]> = {
     '프로필 관리'
   ]
 };
+export { roleDisplayNames } from '@/types/user';

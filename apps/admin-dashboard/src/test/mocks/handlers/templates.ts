@@ -488,8 +488,8 @@ export const templateHandlers = [
       type: data.type,
       category: data.category,
       status: 'draft',
-      blocks: data.template?.blocks || [],
-      settings: data.template?.settings || {
+      blocks: data.template?.blocks as any || [],
+      settings: data.template?.settings as any || {
         layout: {
           containerWidth: '1200px',
           contentWidth: '100%',

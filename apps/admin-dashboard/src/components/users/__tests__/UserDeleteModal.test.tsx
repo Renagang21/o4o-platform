@@ -47,7 +47,7 @@ describe('UserDeleteModal 컴포넌트', () => {
   };
 
   const defaultProps = {
-    isOpen: true,
+    _isOpen: true,
     onClose: mockOnClose,
     onConfirm: mockOnConfirm,
     users: sampleUser,

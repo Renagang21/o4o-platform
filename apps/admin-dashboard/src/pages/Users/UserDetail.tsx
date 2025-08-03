@@ -1,3 +1,4 @@
+import { roleDisplayNames } from "@/types/user";
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, UserCheck, UserX, Clock, Shield, Mail, Calendar, Activity } from 'lucide-react';
@@ -9,7 +10,7 @@ import toast from 'react-hot-toast';
 import { api } from '@/api/base';
 import { formatDistanceToNow, format } from 'date-fns';
 
-interface ApprovalLog {
+// interface ApprovalLog {
   id: string;
   user_id: string;
   admin_id: string;
@@ -103,7 +104,7 @@ export default function UserDetail() {
       moderator: 'bg-indigo-500',
       partner: 'bg-pink-500',
     };
-    return colors[role] || 'bg-gray-500';
+    return colors[role as keyof typeof roleDisplayNames] || 'bg-gray-500';
   };
 
   const getStatusBadgeColor = (status: string) => {

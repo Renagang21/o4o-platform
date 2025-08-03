@@ -1,3 +1,4 @@
+import { roleDisplayNames } from "@/types/user";
 import { useState, useEffect } from 'react';
 import { Users, UserCheck, Clock, UserX, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -155,7 +156,7 @@ export default function UserStatistics() {
               return (
                 <div key={role} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-1">
-                    <span className="text-sm font-medium w-32">{roleNames[role] || role}</span>
+                    <span className="text-sm font-medium w-32">{roleNames[role as keyof typeof roleDisplayNames] || role}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-blue-500 h-2 rounded-full transition-all duration-300"

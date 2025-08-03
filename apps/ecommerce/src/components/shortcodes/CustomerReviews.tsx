@@ -117,7 +117,7 @@ const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
   const averageRating = mockReviews.reduce((sum: any, r: any) => sum + r.rating, 0) / totalReviews;
 
   const handleHelpful = (reviewId: string) => {
-    setHelpfulReviews((prev: any) => {
+    setHelpfulReviews((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(reviewId)) {
         newSet.delete(reviewId);
@@ -225,7 +225,7 @@ const CustomerReviewsComponent: FC<CustomerReviewsProps> = ({
 
             {showImages && review.images && review.images.length > 0 && (
               <div className="flex space-x-2 mb-3">
-                {review.images.map((image, index) => (
+                {review.images.map((image: string, index: number) => (
                   <img
                     key={index}
                     src={image}

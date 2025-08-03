@@ -156,21 +156,21 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
             <>
               <TextControl
                 label={__('Min Price', 'o4o')}
-                value={priceMin.toString()}
+                value={priceMin.toString() as any}
                 type="number"
                 onChange={(value: string) => setAttributes({ priceMin: parseInt(value) || 0 })}
                 min={0}
               />
               <TextControl
                 label={__('Max Price', 'o4o')}
-                value={priceMax.toString()}
+                value={priceMax.toString() as any}
                 type="number"
                 onChange={(value: string) => setAttributes({ priceMax: parseInt(value) || 1000000 })}
                 min={0}
               />
               <TextControl
                 label={__('Price Step', 'o4o')}
-                value={priceStep.toString()}
+                value={priceStep.toString() as any}
                 type="number"
                 onChange={(value: string) => setAttributes({ priceStep: parseInt(value) || 10000 })}
                 min={1000}

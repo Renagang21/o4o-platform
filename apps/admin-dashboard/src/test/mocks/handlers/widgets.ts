@@ -509,7 +509,7 @@ export const widgetHandlers = [
           padding: { top: '1rem', right: '1rem', bottom: '1rem', left: '1rem' }
         },
         styling: { textAlign: 'left' },
-        ...data.settings
+        ...data.settings as any
       },
       position: data.position,
       order: widgets.filter((w: any) => w.position === data.position).length + 1,
@@ -536,8 +536,8 @@ export const widgetHandlers = [
       title: data.title || widgets[index].title,
       content: data.content || widgets[index].content,
       settings: {
-        ...widgets[index].settings,
-        ...data.settings
+        ...widgets[index].settings as any,
+        ...data.settings as any
       },
       position: data.position || widgets[index].position,
       order: data.order !== undefined ? data.order : widgets[index].order,

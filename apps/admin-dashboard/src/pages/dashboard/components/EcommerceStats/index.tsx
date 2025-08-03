@@ -48,7 +48,7 @@ const EcommerceStats: FC = () => {
     },
     {
       title: '오늘 주문',
-      value: (stats?.todayOrders || 0).toString() + '건',
+      value: (stats?.todayOrders || 0).toString() as any + '건',
       change: '+8.3%',
       trend: 'up' as const,
       icon: ShoppingCart,
@@ -59,7 +59,7 @@ const EcommerceStats: FC = () => {
     },
     {
       title: '전체 상품',
-      value: (stats?.totalProducts || 0).toString() + '개',
+      value: (stats?.totalProducts || 0).toString() as any + '개',
       subtitle: `재고부족: ${stats?.lowStockProducts || 0}개`,
       icon: Package,
       color: 'purple',
@@ -80,7 +80,7 @@ const EcommerceStats: FC = () => {
     },
     {
       title: '대기 주문',
-      value: (stats?.pendingOrders || 0).toString() + '건',
+      value: (stats?.pendingOrders || 0).toString() as any + '건',
       icon: Clock,
       color: 'yellow',
       bgColor: 'bg-yellow-50',

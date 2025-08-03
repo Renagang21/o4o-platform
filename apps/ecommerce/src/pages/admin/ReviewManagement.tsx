@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
-import { ReviewFilters, ReviewStatus } from '@o4o/types';
+import { ReviewStatus } from '@o4o/types';
+import type { ReviewFilters } from '@o4o/types';
 import { ReviewList } from '@/components/review';
 import { Card, CardContent, CardHeader, CardTitle } from '@o4o/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
@@ -18,9 +19,10 @@ import {
 import { toast } from 'sonner';
 
 export function ReviewManagement() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ReviewFilters>({
     status: ReviewStatus.PENDING,
-    limit: 20
+    limit: 20,
+    page: 1
   });
   const [searchQuery, setSearchQuery] = useState('');
 

@@ -150,7 +150,7 @@ export function CartPage() {
 
   // Update quantity mutation
   const updateQuantityMutation = useMutation({
-    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
+    mutationFn: async (_: { itemId: string; quantity: number }) => {
       // TODO: Replace with actual API call
       // console.log('Update quantity:', itemId, quantity);
       // const response = await authClient.patch(`/api/v1/cart/items/${itemId}`, { quantity });

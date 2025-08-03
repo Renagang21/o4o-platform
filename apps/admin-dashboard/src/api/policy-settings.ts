@@ -148,7 +148,7 @@ export const policySettingsApi = {
     try {
       const params = new URLSearchParams();
       if (category) params.append('category', category);
-      params.append('limit', limit.toString());
+      params.append('limit', limit.toString() as any);
 
       const response = await api.get(`/admin/policy-settings/history?${params}`);
       return response.data;

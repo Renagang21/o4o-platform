@@ -5,12 +5,12 @@ import { useCart } from '../../services/cartService';
 import { formatPrice } from '../../utils/ecommerce';
 
 interface MiniCartProps {
-  isOpen?: boolean;
+  _isOpen?: boolean;
   onClose?: () => void;
   position?: 'dropdown' | 'sidebar';
 }
 
-export function MiniCart({ isOpen = false, onClose, position = 'dropdown' }: MiniCartProps) {
+export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: MiniCartProps) {
   const { cart, updateQuantity, removeItem, clearCart } = useCart();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export function MiniCart({ isOpen = false, onClose, position = 'dropdown' }: Min
     setIsUpdating(null);
   };
 
-  if (!isOpen && position === 'dropdown') {
+  if (!_isOpen && position === 'dropdown') {
     return null;
   }
 
@@ -37,14 +37,14 @@ export function MiniCart({ isOpen = false, onClose, position = 'dropdown' }: Min
   return (
     <>
       {/* Backdrop for sidebar */}
-      {position === 'sidebar' && isOpen && (
+      {position === 'sidebar' && _isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={onClose}
         />
       )}
 
-      <div className={`${containerClasses} ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`${containerClasses} ${_isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold flex items-center gap-2">

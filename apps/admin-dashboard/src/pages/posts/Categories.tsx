@@ -146,7 +146,7 @@ const Categories: FC = () => {
   }
 
   const toggleExpanded = (categoryId: string) => {
-    setExpandedCategories((prev: any) => {
+    setExpandedCategories((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(categoryId)) {
         newSet.delete(categoryId)

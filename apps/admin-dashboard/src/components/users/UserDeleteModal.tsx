@@ -8,7 +8,7 @@ import { AlertTriangle, X, Trash2, Users } from 'lucide-react';
 import { User } from '../../types/user';
 
 interface UserDeleteModalProps {
-  isOpen: boolean;
+  _isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   users: User | User[];
@@ -16,13 +16,13 @@ interface UserDeleteModalProps {
 }
 
 const UserDeleteModal: FC<UserDeleteModalProps> = ({
-  isOpen,
+  _isOpen,
   onClose,
   onConfirm,
   users,
   isLoading = false
 }) => {
-  if (!isOpen) return null;
+  if (!_isOpen) return null;
 
   const isMultiple = Array.isArray(users);
   const userCount = isMultiple ? users.length : 1;
@@ -36,8 +36,8 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
 
   // 활성 사용자 체크  
   const hasActiveUsers = isMultiple
-    ? (users as User[]).some((user: any) => user.status === 'approved')
-    : (users as User).status === 'approved';
+    ? (users as User[]).some((user: any) => user.status === 'active')
+    : (users as User).status === 'active';
 
   const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget && !isLoading) {
@@ -115,7 +115,7 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
                           관리자
                         </span>
                       )}
-                      {user.status === 'approved' && (
+                      {user.status === 'active' && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                           활성
                         </span>
@@ -139,7 +139,7 @@ const UserDeleteModal: FC<UserDeleteModalProps> = ({
                         관리자
                       </span>
                     )}
-                    {(users as User).status === 'approved' && (
+                    {(users as User).status === 'active' && (
                       <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
                         활성
                       </span>

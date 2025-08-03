@@ -312,8 +312,8 @@ export default function VendorOrders() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOrders.map((order: any) => {
-                  const status = statusConfig[order.status];
-                  const paymentStatus = paymentStatusConfig[order.paymentStatus];
+                  const status = statusConfig[order.status as keyof typeof statusConfig];
+                  const paymentStatus = paymentStatusConfig[order.paymentStatus as keyof typeof paymentStatusConfig];
                   return (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">

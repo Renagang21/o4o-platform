@@ -74,8 +74,8 @@ const MediaLibrary: FC = () => {
     queryKey: ['media', { ...filter, search: searchQuery, page, limit }],
     queryFn: async () => {
       const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
+        page: page.toString() as any,
+        limit: limit.toString() as any,
       })
 
       if (searchQuery) params.append('search', searchQuery)

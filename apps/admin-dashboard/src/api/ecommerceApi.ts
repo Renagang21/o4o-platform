@@ -36,8 +36,8 @@ export class EcommerceApi {
     filters: ProductFilters = {}
   ): Promise<PaginatedResponse<Product>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+      page: page.toString() as any,
+      limit: limit.toString() as any,
       ...Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
       )
@@ -116,8 +116,8 @@ export class EcommerceApi {
     filters: OrderFilters = {}
   ): Promise<PaginatedResponse<Order>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+      page: page.toString() as any,
+      limit: limit.toString() as any,
       ...Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
       )
@@ -163,8 +163,8 @@ export class EcommerceApi {
     search?: string
   ): Promise<PaginatedResponse<Customer>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
+      page: page.toString() as any,
+      limit: limit.toString() as any
     })
 
     if (search) {
@@ -188,8 +188,8 @@ export class EcommerceApi {
   // Coupons
   static async getCoupons(page = 1, limit = 20): Promise<PaginatedResponse<Coupon>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
+      page: page.toString() as any,
+      limit: limit.toString() as any
     })
 
     const response = await apiClient.get(`/ecommerce/coupons?${params}`)
@@ -223,8 +223,8 @@ export class EcommerceApi {
     lowStock?: boolean
   ): Promise<PaginatedResponse<InventoryItem>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
+      page: page.toString() as any,
+      limit: limit.toString() as any
     })
 
     if (lowStock) {
@@ -255,8 +255,8 @@ export class EcommerceApi {
     limit = 20
   ): Promise<PaginatedResponse<StockMovement>> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
+      page: page.toString() as any,
+      limit: limit.toString() as any
     })
 
     if (productId) {
@@ -384,7 +384,7 @@ export class EcommerceApi {
     return {
       success: true,
       data: { 
-        id: Date.now().toString(),
+        id: Date.now().toString() as any,
         name: reward.name || '',
         title: reward.title || reward.name || '',
         description: reward.description || '',
@@ -684,7 +684,7 @@ export class EcommerceApi {
     
     return {
       success: true,
-      data: { ...defaultSettings, ...settings },
+      data: { ...defaultSettings, ...settings as any },
       message: 'Shipping settings updated successfully'
     }
   }
@@ -744,7 +744,7 @@ export class EcommerceApi {
     return {
       success: true,
       data: {
-        id: Date.now().toString(),
+        id: Date.now().toString() as any,
         title: banner.title || '',
         description: banner.description || '',
         couponCode: banner.couponCode || '',

@@ -214,7 +214,7 @@ const MediaLibrary: FC<MediaLibraryProps> = ({
 
   // Handle selection confirmation
   const handleSelectConfirm = () => {
-    const selected = mediaItems.filter((item: any) => selectedItems.includes(item.id));
+    const selected = mediaItems.filter((item: any) => selectedItems.includes(item.id)) as MediaItem[];
     onSelect?.(selected);
     onClose?.();
   };

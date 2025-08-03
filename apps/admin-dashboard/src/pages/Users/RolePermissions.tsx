@@ -51,11 +51,11 @@ const RolePermissions = () => {
               <div className="flex items-center gap-3 mb-3">
                 <Users className="w-6 h-6 text-modern-primary" />
                 <h3 className="font-semibold text-modern-text-primary">
-                  {roleDisplayNames[role]}
+                  {roleDisplayNames[role as keyof typeof roleDisplayNames]}
                 </h3>
               </div>
               <ul className="space-y-1">
-                {roleCapabilities[role].map((capability, index) => (
+                {roleCapabilities[role as keyof typeof roleDisplayNames].map((capability, index) => (
                   <li key={index} className="text-sm text-modern-text-secondary flex items-start gap-2">
                     <Check className="w-4 h-4 text-modern-success flex-shrink-0 mt-0.5" />
                     <span>{capability}</span>
@@ -82,7 +82,7 @@ const RolePermissions = () => {
                   </th>
                   {roles.map((role: any) => (
                     <th key={role} className="px-4 py-3 text-center text-xs font-medium text-modern-text-secondary uppercase tracking-wider min-w-[100px]">
-                      {roleDisplayNames[role]}
+                      {roleDisplayNames[role as keyof typeof roleDisplayNames]}
                     </th>
                   ))}
                 </tr>

@@ -42,7 +42,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
         <Input
           id="title"
           value={settings.title || ''}
-          onChange={(e: any) => onChange({ ...settings, title: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, title: e.target.value })}
           placeholder="Cover 제목"
         />
       </div>
@@ -53,7 +53,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
         <Textarea
           id="text"
           value={settings.text || ''}
-          onChange={(e: any) => onChange({ ...settings, text: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, text: e.target.value })}
           placeholder="Cover 부제목 텍스트"
           rows={2}
         />
@@ -68,7 +68,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
             return (
               <button
                 key={option.value}
-                onClick={() => onChange({ ...settings, contentAlign: option.value })}
+                onClick={() => onChange({ ...settings as any, contentAlign: option.value })}
                 className={clsx(
                   'p-2 rounded transition-colors',
                   settings.contentAlign === option.value
@@ -96,7 +96,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
             min="100"
             max="800"
             value={settings.minHeight || 300}
-            onChange={(e: any) => onChange({ ...settings, minHeight: parseInt(e.target.value) })}
+            onChange={(e: any) => onChange({ ...settings as any, minHeight: parseInt(e.target.value) })}
             className="flex-1"
           />
           <span className="text-sm w-16 text-right">{settings.minHeight || 300}px</span>
@@ -114,7 +114,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
             {overlayPresets.map((preset: any) => (
               <button
                 key={preset.color}
-                onClick={() => onChange({ ...settings, overlayColor: preset.color })}
+                onClick={() => onChange({ ...settings as any, overlayColor: preset.color })}
                 className={clsx(
                   'p-2 rounded border-2 text-sm transition-colors',
                   settings.overlayColor === preset.color
@@ -136,7 +136,7 @@ const CoverBlockSettings: FC<CoverBlockSettingsProps> = ({ settings, onChange })
               id="customColor"
               type="text"
               value={settings.overlayColor || ''}
-              onChange={(e: any) => onChange({ ...settings, overlayColor: e.target.value })}
+              onChange={(e: any) => onChange({ ...settings as any, overlayColor: e.target.value })}
               placeholder="rgba(0, 0, 0, 0.5)"
               className="mt-1"
             />

@@ -71,7 +71,7 @@ const UserSecurityPolicies: FC<UserSecurityPoliciesProps> = ({ settings, onUpdat
   const handlePasswordPolicyChange = (policy: Partial<UserSecuritySettings['passwordPolicy']>) => {
     onUpdate({
       passwordPolicy: {
-        ...settings.passwordPolicy,
+        ...(settings as any).passwordPolicy,
         ...policy
       }
     });

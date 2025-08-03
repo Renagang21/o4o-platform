@@ -41,7 +41,6 @@ import { authClient } from '@o4o/auth-client'
 import type { 
   Template, 
   TemplateBlock, 
-  TemplateBuilderState, 
   CreateTemplateDto,
   UpdateTemplateDto,
   TemplateBlockType 
@@ -161,8 +160,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
   // Add history state
   const addHistory = useCallback((action: string) => {
     const newState = {
-      blocks: [...builderState.template.blocks],
-      settings: { ...builderState.template.settings },
+      blocks: [...builderState.template.blocks as any],
+      settings: { ...builderState.template.settings as any },
       timestamp: new Date(),
       action
     }
@@ -172,7 +171,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
       history: [...prev.history.slice(0, prev.historyIndex + 1), newState],
       historyIndex: prev.historyIndex + 1
     }))
-  }, [builderState.template.blocks, builderState.template.settings, builderState.historyIndex])
+  }, [builderState.template.blocks as any, builderState.template.settings as any, builderState.historyIndex])
 
   // Update template data
   const updateTemplate = useCallback((updates: Partial<Template>) => {
@@ -189,10 +188,10 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
       type,
       content: getDefaultContent(type),
       settings: getDefaultSettings(type),
-      order: builderState.template.blocks.length
+      order: (builderState.template.blocks as any).length
     }
 
-    let newBlocks = [...builderState.template.blocks]
+    let newBlocks = [...builderState.template.blocks as any]
     if (afterBlockId) {
       const index = newBlocks.findIndex(b => b.id === afterBlockId)
       newBlocks.splice(index + 1, 0, newBlock)
@@ -206,21 +205,21 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     updateTemplate({ blocks: newBlocks })
     setBuilderState((prev: any) => ({ ...prev, selectedBlockId: newBlock.id }))
     addHistory(`Added ${type} block`)
-  }, [builderState.template.blocks, updateTemplate, addHistory])
+  }, [builderState.template.blocks as any, updateTemplate, addHistory])
 
   // Update block
   const updateBlock = useCallback((blockId: string, updates: Partial<TemplateBlock>) => {
-    const newBlocks = builderState.template.blocks.map((block: any) =>
+    const newBlocks = (builderState.template.blocks as any).map((block: any) =>
       block.id === blockId ? { ...block, ...updates } : block
     )
     updateTemplate({ blocks: newBlocks })
-  }, [builderState.template.blocks, updateTemplate])
+  }, [builderState.template.blocks as any, updateTemplate])
 
   // Delete block
   const deleteBlock = useCallback((blockId: string) => {
-    const newBlocks = builderState.template.blocks
+    const newBlocks = (builderState.template.blocks as any)
       .filter((block: any) => block.id !== blockId)
-      .map((block, index) => ({ ...block, order: index }))
+      .map((block: any, index: number) => ({ ...block, order: index }))
     
     updateTemplate({ blocks: newBlocks })
     setBuilderState((prev: any) => ({ 
@@ -228,11 +227,11 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
       selectedBlockId: prev.selectedBlockId === blockId ? null : prev.selectedBlockId 
     }))
     addHistory('Deleted block')
-  }, [builderState.template.blocks, updateTemplate, addHistory])
+  }, [builderState.template.blocks as any, updateTemplate, addHistory])
 
   // Move block
   const moveBlock = useCallback((blockId: string, direction: 'up' | 'down') => {
-    const blocks = [...builderState.template.blocks]
+    const blocks = [...builderState.template.blocks as any]
     const currentIndex = blocks.findIndex(b => b.id === blockId)
     
     if (currentIndex === -1) return
@@ -248,11 +247,11 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     
     updateTemplate({ blocks: newBlocks })
     addHistory(`Moved block ${direction}`)
-  }, [builderState.template.blocks, updateTemplate, addHistory])
+  }, [builderState.template.blocks as any, updateTemplate, addHistory])
 
   // Duplicate block
   const duplicateBlock = useCallback((blockId: string) => {
-    const originalBlock = builderState.template.blocks.find((b: any) => b.id === blockId)
+    const originalBlock = (builderState.template.blocks as any).find((b: any) => b.id === blockId)
     if (!originalBlock) return
 
     const newBlock: TemplateBlock = {
@@ -260,7 +259,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
       id: `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     }
 
-    const newBlocks = [...builderState.template.blocks]
+    const newBlocks = [...builderState.template.blocks as any]
     const index = newBlocks.findIndex(b => b.id === blockId)
     newBlocks.splice(index + 1, 0, newBlock)
     
@@ -270,7 +269,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     updateTemplate({ blocks: orderedBlocks })
     setBuilderState((prev: any) => ({ ...prev, selectedBlockId: newBlock.id }))
     addHistory('Duplicated block')
-  }, [builderState.template.blocks, updateTemplate, addHistory])
+  }, [builderState.template.blocks as any, updateTemplate, addHistory])
 
   // Save template
   const handleSave = () => {
@@ -286,8 +285,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
         updates: {
           name: builderState.template.name,
           description: builderState.template.description,
-          blocks: builderState.template.blocks,
-          settings: builderState.template.settings,
+          blocks: builderState.template.blocks as any,
+          settings: builderState.template.settings as any,
           status: builderState.template.status
         }
       })
@@ -308,8 +307,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     if (builderState.historyIndex > 0) {
       const prevState = builderState.history[builderState.historyIndex - 1]
       updateTemplate({
-        blocks: prevState.blocks,
-        settings: prevState.settings
+        blocks: (prevState as any).blocks as any,
+        settings: (prevState as any).settings as any
       })
       setBuilderState((prev: any) => ({ ...prev, historyIndex: prev.historyIndex - 1 }))
     }
@@ -319,8 +318,8 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
     if (builderState.historyIndex < builderState.history.length - 1) {
       const nextState = builderState.history[builderState.historyIndex + 1]
       updateTemplate({
-        blocks: nextState.blocks,
-        settings: nextState.settings
+        blocks: (nextState as any).blocks as any,
+        settings: (nextState as any).settings as any
       })
       setBuilderState((prev: any) => ({ ...prev, historyIndex: prev.historyIndex + 1 }))
     }
@@ -372,7 +371,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
 
               <TabsContent value="layers" className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-2">
-                  {builderState.template.blocks.map((block, index) => (
+                  {(builderState.template.blocks as any).map((block: any, index: number) => (
                     <div
                       key={block.id}
                       className={`group flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
@@ -406,7 +405,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                             e.stopPropagation()
                             moveBlock(block.id, 'down')
                           }}
-                          disabled={index === builderState.template.blocks.length - 1}
+                          disabled={index === (builderState.template.blocks as any).length - 1}
                         >
                           <ArrowDown className="w-3 h-3" />
                         </Button>
@@ -599,7 +598,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                 style={{ transform: `scale(${builderState.zoom})` }}
               >
                 <div className={`bg-white shadow-lg ${getDeviceClass()} min-h-96 transition-all duration-300`}>
-                  {builderState.template.blocks.length === 0 ? (
+                  {(builderState.template.blocks as any).length === 0 ? (
                     <div className="flex items-center justify-center h-96 text-gray-500">
                       <div className="text-center">
                         <Plus className="w-12 h-12 mx-auto mb-4" />
@@ -607,7 +606,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
                       </div>
                     </div>
                   ) : (
-                    builderState.template.blocks.map((block: any) => (
+                    (builderState.template.blocks as any).map((block: any) => (
                       <BlockRenderer
                         key={block.id}
                         block={block}
@@ -638,7 +637,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
               </div>
               <div className="p-4">
                 <BlockEditor
-                  block={builderState.template.blocks.find((b: any) => b.id === builderState.selectedBlockId)!}
+                  block={(builderState.template.blocks as any).find((b: any) => b.id === builderState.selectedBlockId)!}
                   onChange={(updates: any) => updateBlock(builderState.selectedBlockId!, updates)}
                 />
               </div>

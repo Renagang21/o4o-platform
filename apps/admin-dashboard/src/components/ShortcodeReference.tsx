@@ -26,10 +26,10 @@ const shortcodes: ShortcodeInfo[] = [
     icon: Package,
     description: '단일 상품을 표시합니다',
     parameters: [
-      { name: 'id', type: 'string', description: '상품 ID 또는 슬러그', required: true },
+      { name: 'id', type: 'string' as any, description: '상품 ID 또는 슬러그', required: true },
       { name: 'show_price', type: 'boolean', default: 'true', description: '가격 표시 여부' },
       { name: 'show_cart', type: 'boolean', default: 'true', description: '장바구니 버튼 표시 여부' },
-      { name: 'class', type: 'string', description: '추가 CSS 클래스' }
+      { name: 'class', type: 'string' as any, description: '추가 CSS 클래스' }
     ],
     examples: [
       { code: '[product id="123"]', description: '기본 상품 표시' },
@@ -42,12 +42,12 @@ const shortcodes: ShortcodeInfo[] = [
     icon: Grid,
     description: '상품 그리드를 표시합니다',
     parameters: [
-      { name: 'category', type: 'string', description: '카테고리 ID 또는 슬러그' },
+      { name: 'category', type: 'string' as any, description: '카테고리 ID 또는 슬러그' },
       { name: 'limit', type: 'number', default: '12', description: '표시할 상품 수' },
       { name: 'columns', type: 'number', default: '4', description: '그리드 열 수 (1-6)' },
       { name: 'featured', type: 'boolean', default: 'false', description: '추천 상품만 표시' },
-      { name: 'orderby', type: 'string', default: 'created_at', description: '정렬 기준 (price, name, created_at)' },
-      { name: 'order', type: 'string', default: 'desc', description: '정렬 순서 (asc, desc)' }
+      { name: 'orderby', type: 'string' as any, default: 'created_at', description: '정렬 기준 (price, name, created_at)' },
+      { name: 'order', type: 'string' as any, default: 'desc', description: '정렬 순서 (asc, desc)' }
     ],
     examples: [
       { code: '[product_grid category="electronics" limit="8"]', description: '전자제품 카테고리 8개 표시' },
@@ -60,10 +60,10 @@ const shortcodes: ShortcodeInfo[] = [
     icon: ShoppingBag,
     description: '장바구니 추가 버튼을 표시합니다',
     parameters: [
-      { name: 'id', type: 'string', description: '상품 ID', required: true },
-      { name: 'text', type: 'string', default: '장바구니에 담기', description: '버튼 텍스트' },
+      { name: 'id', type: 'string' as any, description: '상품 ID', required: true },
+      { name: 'text', type: 'string' as any, default: '장바구니에 담기', description: '버튼 텍스트' },
       { name: 'show_price', type: 'boolean', default: 'true', description: '가격 표시 여부' },
-      { name: 'class', type: 'string', description: '추가 CSS 클래스' }
+      { name: 'class', type: 'string' as any, description: '추가 CSS 클래스' }
     ],
     examples: [
       { code: '[add_to_cart id="123"]', description: '기본 장바구니 버튼' },
@@ -76,10 +76,10 @@ const shortcodes: ShortcodeInfo[] = [
     icon: Zap,
     description: '상품 캐러셀을 표시합니다',
     parameters: [
-      { name: 'category', type: 'string', description: '카테고리 ID 또는 슬러그' },
+      { name: 'category', type: 'string' as any, description: '카테고리 ID 또는 슬러그' },
       { name: 'limit', type: 'number', default: '10', description: '표시할 상품 수' },
       { name: 'autoplay', type: 'boolean', default: 'true', description: '자동 재생 여부' },
-      { name: 'title', type: 'string', description: '캐러셀 제목' }
+      { name: 'title', type: 'string' as any, description: '캐러셀 제목' }
     ],
     examples: [
       { code: '[product_carousel category="new-arrivals"]', description: '신상품 캐러셀' },
@@ -94,7 +94,7 @@ const shortcodes: ShortcodeInfo[] = [
     parameters: [
       { name: 'limit', type: 'number', default: '4', description: '표시할 상품 수' },
       { name: 'columns', type: 'number', default: '4', description: '그리드 열 수' },
-      { name: 'title', type: 'string', default: '추천 상품', description: '섹션 제목' }
+      { name: 'title', type: 'string' as any, default: '추천 상품', description: '섹션 제목' }
     ],
     examples: [
       { code: '[featured_products]', description: '기본 추천 상품 4개' },
@@ -191,7 +191,7 @@ const ShortcodeReference: FC = () => {
                   <div>
                     <h4 className="font-medium text-sm text-gray-700 mb-2">사용 예시</h4>
                     <div className="space-y-2">
-                      {shortcode.examples.map((example, index) => (
+                      {shortcode.examples.map((example: any, index: number) => (
                         <div key={index} className="bg-white rounded p-3">
                           <div className="flex items-center justify-between mb-1">
                             <code className="text-sm font-mono text-blue-600">

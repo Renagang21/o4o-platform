@@ -28,7 +28,7 @@ interface Page {
 export default function ReadingSettings() {
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState({
-    homepageType: 'latest_posts',
+    homepageType: 'latest_posts' as const,
     homepageId: undefined,
     postsPerPage: 10,
     showSummary: 'excerpt',
@@ -82,7 +82,7 @@ export default function ReadingSettings() {
 
   const handleSave = () => {
     // Validate settings
-    if (settings.homepageType === 'static_page' && !settings.homepageId) {
+    if (settings.homepageType !== 'latest_posts' && !settings.homepageId) {
       toast.error('홈페이지로 사용할 페이지를 선택해주세요');
       return;
     }
@@ -143,7 +143,7 @@ export default function ReadingSettings() {
                   특정 페이지를 홈페이지로 사용합니다
                 </p>
                 
-                {settings.homepageType === 'static_page' && (
+                {settings.homepageType !== 'latest_posts' && (
                   <div className="space-y-2 ml-6">
                     <Label htmlFor="homepage-select">홈페이지</Label>
                     <Select
@@ -190,7 +190,7 @@ export default function ReadingSettings() {
           <div className="space-y-2">
             <Label htmlFor="posts-per-page">페이지당 글 수</Label>
             <Select
-              value={settings.postsPerPage.toString()}
+              value={settings.postsPerPage.toString() as any}
               onValueChange={(value: string) => handleChange('postsPerPage', parseInt(value))}
             >
               <SelectTrigger id="posts-per-page">
@@ -232,7 +232,7 @@ export default function ReadingSettings() {
             <div className="space-y-2">
               <Label htmlFor="excerpt-length">요약문 길이 (글자 수)</Label>
               <Select
-                value={settings.excerptLength.toString()}
+                value={settings.excerptLength.toString() as any}
                 onValueChange={(value: string) => handleChange('excerptLength', parseInt(value))}
               >
                 <SelectTrigger id="excerpt-length">

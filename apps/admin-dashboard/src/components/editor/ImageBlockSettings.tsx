@@ -54,7 +54,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
             return (
               <button
                 key={option.value}
-                onClick={() => onChange({ ...settings, alignment: option.value })}
+                onClick={() => onChange({ ...settings as any, alignment: option.value })}
                 className={clsx(
                   'p-2 rounded transition-colors',
                   settings.alignment === option.value
@@ -75,7 +75,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
         <Label className="text-sm font-medium mb-2 block">이미지 크기</Label>
         <select
           value={settings.size || 'large'}
-          onChange={(e: any) => onChange({ ...settings, size: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, size: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {sizeOptions.map((option: any) => (
@@ -95,7 +95,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
               id="width"
               type="number"
               value={settings.width || ''}
-              onChange={(e: any) => onChange({ ...settings, width: parseInt(e.target.value) || undefined })}
+              onChange={(e: any) => onChange({ ...settings as any, width: parseInt(e.target.value) || undefined })}
               placeholder="px"
             />
           </div>
@@ -105,7 +105,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
               id="height"
               type="number"
               value={settings.height || ''}
-              onChange={(e: any) => onChange({ ...settings, height: parseInt(e.target.value) || undefined })}
+              onChange={(e: any) => onChange({ ...settings as any, height: parseInt(e.target.value) || undefined })}
               placeholder="px"
             />
           </div>
@@ -121,7 +121,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
         <Input
           id="alt"
           value={settings.alt || ''}
-          onChange={(e: any) => onChange({ ...settings, alt: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, alt: e.target.value })}
           placeholder="이미지 설명"
         />
         <p className="text-xs text-gray-500 mt-1">접근성을 위해 이미지를 설명하세요</p>
@@ -133,7 +133,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
         <Textarea
           id="caption"
           value={settings.caption || ''}
-          onChange={(e: any) => onChange({ ...settings, caption: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, caption: e.target.value })}
           placeholder="이미지 캡션 (선택사항)"
           rows={2}
         />
@@ -149,7 +149,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
           id="link"
           type="url"
           value={settings.link || ''}
-          onChange={(e: any) => onChange({ ...settings, link: e.target.value })}
+          onChange={(e: any) => onChange({ ...settings as any, link: e.target.value })}
           placeholder="https://example.com"
         />
         {settings.link && (
@@ -159,7 +159,7 @@ const ImageBlockSettings: FC<ImageBlockSettingsProps> = ({ settings, onChange })
                 type="checkbox"
                 checked={settings.linkTarget === '_blank'}
                 onChange={(e: any) => onChange({ 
-                  ...settings, 
+                  ...settings as any, 
                   linkTarget: e.target.checked ? '_blank' : '_self' 
                 })}
                 className="rounded"

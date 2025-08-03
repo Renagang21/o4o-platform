@@ -84,7 +84,7 @@ const RefundManagement: FC = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
-      const response = await authClient.api.get(`/v1/payments/refunds?${params.toString()}`);
+      const response = await authClient.api.get(`/v1/payments/refunds?${params.toString() as any}`);
       return response.data;
     }
   });

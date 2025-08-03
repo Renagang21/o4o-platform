@@ -66,8 +66,8 @@ export default function CommentsListEnhanced() {
     queryKey: ['comments', statusFilter, search, postFilter, page, itemsPerPage],
     queryFn: async () => {
       const params = new URLSearchParams({
-        page: page.toString(),
-        limit: itemsPerPage.toString(),
+        page: page.toString() as any,
+        limit: itemsPerPage.toString() as any,
       });
       
       if (search) params.append('search', search);

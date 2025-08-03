@@ -34,7 +34,7 @@ import type { MediaFolder, CreateMediaFolderDto, UpdateMediaFolderDto } from '@o
 import toast from 'react-hot-toast'
 
 interface FolderManagerProps {
-  isOpen: boolean
+  _isOpen: boolean
   onClose: () => void
   onFolderSelect?: (folderId: string) => void
 }
@@ -142,14 +142,14 @@ const FolderTreeItem: FC<FolderTreeItemProps> = ({
   )
 }
 
-const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect }) => {
+const FolderManager: FC<FolderManagerProps> = ({ _isOpen, onClose, onFolderSelect }) => {
   const queryClient = useQueryClient()
   const [expandedFolders, setExpandedFolders] = useState<any[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingFolder, setEditingFolder] = useState<MediaFolder | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    parentId: undefined,
+    parentId: undefined as string | undefined,
     description: '',
   })
 
@@ -171,7 +171,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
       toast.success('폴더가 생성되었습니다')
       queryClient.invalidateQueries({ queryKey: ['media-folders'] })
       setIsCreateDialogOpen(false)
-      setFormData({ name: '', parentId: undefined, description: '' })
+      setFormData({ name: '', parentId: undefined as string | undefined, description: '' })
     },
     onError: () => {
       toast.error('폴더 생성에 실패했습니다')
@@ -244,7 +244,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={_isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>폴더 관리</DialogTitle>
@@ -259,7 +259,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
               variant={"outline" as const}
               size={"sm" as const}
               onClick={() => {
-                setFormData({ name: '', parentId: undefined, description: '' })
+                setFormData({ name: '', parentId: undefined as string | undefined, description: '' })
                 setEditingFolder(null)
                 setIsCreateDialogOpen(true)
               }}
@@ -280,7 +280,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
               <Button
                 variant={"outline" as const}
                 onClick={() => {
-                  setFormData({ name: '', parentId: undefined, description: '' })
+                  setFormData({ name: '', parentId: undefined as string | undefined, description: '' })
                   setEditingFolder(null)
                   setIsCreateDialogOpen(true)
                 }}
@@ -303,7 +303,7 @@ const FolderManager: FC<FolderManagerProps> = ({ isOpen, onClose, onFolderSelect
                     setFormData({
                       name: folder.name,
                       parentId: folder.parentId,
-                      description: folder.description,
+                      description: folder.description || '',
                     })
                     setIsCreateDialogOpen(true)
                   }}

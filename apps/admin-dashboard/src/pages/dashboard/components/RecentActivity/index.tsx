@@ -102,8 +102,8 @@ const RecentActivity = memo<RecentActivityProps>(({ className = '' }) => {
     queryKey: ['dashboard', 'recent-activities', page, filters],
     queryFn: async () => {
       const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
+        page: page.toString() as any,
+        limit: limit.toString() as any,
       });
       
       if (filters.types && filters.types.length > 0) params.append('type', filters.types[0]);

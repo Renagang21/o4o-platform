@@ -118,7 +118,7 @@ class SSOService {
       targetUrl.searchParams.set('return_path', returnPath);
     }
 
-    window.open(targetUrl.toString(), '_blank');
+    window.open(targetUrl.toString() as any, '_blank');
   }
 }
 

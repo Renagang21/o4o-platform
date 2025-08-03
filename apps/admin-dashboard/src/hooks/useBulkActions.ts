@@ -47,7 +47,7 @@ export function useBulkActions({ items, idField = 'id', actions }: UseBulkAction
 
   // Toggle single item selection
   const toggleItem = useCallback((itemId: string) => {
-    setSelectedIds((prev: any) => {
+    setSelectedIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(itemId)) {
         newSet.delete(itemId);

@@ -188,10 +188,10 @@ const AppsManager: FC = () => {
     setSelectedApp(app);
     setSettingsForm({
       appId: app.id,
-      autoStart: app.settings.autoStart,
-      requiresApproval: app.settings.requiresApproval,
-      maintenanceMode: app.settings.maintenanceMode,
-      maxUsers: app.settings.maxUsers
+      autoStart: (app.settings as any).autoStart,
+      requiresApproval: (app.settings as any).requiresApproval,
+      maintenanceMode: (app.settings as any).maintenanceMode,
+      maxUsers: (app.settings as any).maxUsers
     });
     setIsSettingsDialogOpen(true);
   };

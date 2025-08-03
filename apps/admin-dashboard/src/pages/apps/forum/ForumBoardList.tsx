@@ -67,7 +67,7 @@ const ForumBoardList: FC = () => {
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (searchTerm) params.append('search', searchTerm);
 
-      const response = await authClient.api.get(`/v1/forum/posts?${params.toString()}`);
+      const response = await authClient.api.get(`/v1/forum/posts?${params.toString() as any}`);
       return response.data;
     }
   });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Product, ReviewFilters, CreateReviewDto, UpdateReviewDto } from '@o4o/types';
+import { Product, CreateReviewDto, UpdateReviewDto } from '@o4o/types';
+import type { ReviewFilters } from '@o4o/types';
 import { ReviewStats } from './ReviewStats';
 import { ReviewList } from './ReviewList';
 import { ReviewForm } from './ReviewForm';
@@ -30,9 +31,10 @@ interface ProductReviewSectionProps {
 
 export function ProductReviewSection({ product, className }: ProductReviewSectionProps) {
   const { user } = useAuth();
-  const [filters, setFilters] = useState({
-    sort: 'recent',
-    limit: 10
+  const [filters, setFilters] = useState<ReviewFilters>({
+    sort: 'recent' as const,
+    limit: 10,
+    page: 1
   });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [editingReview, setEditingReview] = useState<string | null>(null);

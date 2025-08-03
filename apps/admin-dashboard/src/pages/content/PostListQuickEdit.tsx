@@ -128,7 +128,7 @@ const PostListQuickEdit: FC = () => {
       authorId: post.author?.id,
       categoryIds: post.categories?.map((c: any) => c.id) || [],
       tags: post.tags?.map((t: any) => t.name).join(', ') || '',
-      publishYear: publishDate.getFullYear().toString(),
+      publishYear: publishDate.getFullYear().toString() as any,
       publishMonth: (publishDate.getMonth() + 1).toString().padStart(2, '0'),
       publishDay: publishDate.getDate().toString().padStart(2, '0'),
       commentStatus: post.commentStatus || 'open',

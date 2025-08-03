@@ -8,7 +8,7 @@ import { Shield, X, Check, Users, AlertTriangle } from 'lucide-react';
 import { User, UserRole, ROLE_LABELS } from '../../types/user';
 
 interface UserRoleChangeModalProps {
-  isOpen: boolean;
+  _isOpen: boolean;
   onClose: () => void;
   onConfirm: (newRole: UserRole) => void;
   users: User[];
@@ -16,7 +16,7 @@ interface UserRoleChangeModalProps {
 }
 
 const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
-  isOpen,
+  _isOpen,
   onClose,
   onConfirm,
   users,
@@ -24,7 +24,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
 }) => {
   const [selectedRole, setSelectedRole] = useState('customer');
 
-  if (!isOpen) return null;
+  if (!_isOpen) return null;
 
   const userCount = users.length;
 
@@ -50,7 +50,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
 
   const handleConfirm = () => {
     if (!isLoading && hasChanges) {
-      onConfirm(selectedRole);
+      onConfirm(selectedRole as any);
     }
   };
 
@@ -109,7 +109,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
                     <span className="text-xs text-wp-text-secondary">({user.email})</span>
                   </div>
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-wp-bg-tertiary text-wp-text-primary">
-                    {ROLE_LABELS[user.role]}
+                    {ROLE_LABELS[user.role as UserRole]}
                   </span>
                 </div>
               ))}
@@ -160,7 +160,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
                   {Object.entries(roleChanges).map(([fromRole, count]) => (
                     <div key={fromRole} className="flex items-center justify-between text-sm">
                       <span className="text-wp-text-secondary">
-                        {ROLE_LABELS[fromRole as UserRole]}에서 {ROLE_LABELS[selectedRole]}로
+                        {ROLE_LABELS[fromRole as UserRole]}에서 {ROLE_LABELS[selectedRole as UserRole]}로
                       </span>
                       <span className="font-medium text-blue-900">{String(count)}명</span>
                     </div>
@@ -196,7 +196,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
                 <div className="flex">
                   <div className="ml-3">
                     <p className="text-sm text-yellow-700">
-                      선택한 사용자들이 모두 이미 '{ROLE_LABELS[selectedRole]}' 역할입니다.
+                      선택한 사용자들이 모두 이미 '{ROLE_LABELS[selectedRole as UserRole]}' 역할입니다.
                       변경할 내용이 없습니다.
                     </p>
                   </div>
@@ -209,7 +209,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
           {hasChanges && (
             <div className="mb-6">
               <p className="text-sm text-wp-text-secondary">
-                정말로 선택한 {userCount}명 사용자 역할을 '{ROLE_LABELS[selectedRole]}'로 변경하시겠습니까?
+                정말로 선택한 {userCount}명 사용자 역할을 '{ROLE_LABELS[selectedRole as UserRole]}'로 변경하시겠습니까?
               </p>
             </div>
           )}
