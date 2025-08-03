@@ -38,7 +38,20 @@ const AffiliatePartnerForm: FC = () => {
   const queryClient = useQueryClient();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    website: string;
+    type: 'influencer' | 'blog' | 'business' | 'individual';
+    commissionRate: number;
+    paymentMethod: string;
+    bankName?: string;
+    accountNumber?: string;
+    accountHolder?: string;
+    paypalEmail?: string;
+    businessNumber?: string;
+    notes: string;
+  }>({
     name: '',
     email: '',
     website: '',
@@ -116,9 +129,9 @@ const AffiliatePartnerForm: FC = () => {
     e.preventDefault();
     
     if (isEditMode) {
-      updateMutation.mutate(formData);
+      updateMutation.mutate(formData as AffiliatePartnerFormData);
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(formData as AffiliatePartnerFormData);
     }
   };
 

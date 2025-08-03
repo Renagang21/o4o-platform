@@ -33,7 +33,7 @@ const ForumPostForm: FC = () => {
   const queryClient = useQueryClient();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ForumPostFormData>({
     title: '',
     content: '',
     categoryId: '',

@@ -43,13 +43,13 @@ import {
 } from '@/components/ui/select'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
-import type { MediaItem, MediaFolder, MediaType, MediaFilter } from '@o4o/types'
+import type { MediaItem, MediaFolder, MediaType } from '@o4o/types'
 import toast from 'react-hot-toast'
 import MediaUploadDialog from '@/components/media/MediaUploadDialog'
 import MediaDetails from '@/components/media/MediaDetails'
 import FolderManager from '@/components/media/FolderManager'
 
-type ViewMode = 'grid' | 'list'
+// type ViewMode = 'grid' | 'list' // Commented out as it's not used
 
 const MediaLibrary: FC = () => {
   const queryClient = useQueryClient()
@@ -234,7 +234,7 @@ const MediaLibrary: FC = () => {
           {data?.folders && data.folders.length > 0 && (
             <Select 
               value={filter.folderId || 'all'} 
-              onValueChange={(value: string) => setFilter({ ...filter, folderId: value === 'all' ? undefined : value })}
+              onValueChange={(value: string) => setFilter({ ...filter, folderId: value === 'all' ? undefined : value as any })}
             >
               <SelectTrigger className="w-[180px]">
                 <FolderOpen className="w-4 h-4 mr-2" />
@@ -575,7 +575,7 @@ const MediaLibrary: FC = () => {
 
       {/* Media Upload Dialog */}
       <MediaUploadDialog
-        isOpen={isUploaderOpen}
+        _isOpen={isUploaderOpen}
         onClose={() => {
           setIsUploaderOpen(false)
           fileInputRef.current!.value = ''
@@ -604,10 +604,10 @@ const MediaLibrary: FC = () => {
 
       {/* Folder Manager */}
       <FolderManager
-        isOpen={isFolderManagerOpen}
+        _isOpen={isFolderManagerOpen}
         onClose={() => setIsFolderManagerOpen(false)}
         onFolderSelect={(folderId) => {
-          setFilter({ ...filter, folderId })
+          setFilter({ ...filter, folderId: folderId as any })
           setIsFolderManagerOpen(false)
         }}
       />
