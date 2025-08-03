@@ -17,6 +17,18 @@
   "overrides": {
     "@typescript-eslint/typescript-estree": {
       "typescript": "*"
+    },
+    "@typescript-eslint/parser": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/type-utils": {
+      "typescript": "*"
+    },
+    "@typescript-eslint/utils": {
+      "typescript": "*"
     }
   },
   "scripts": {
