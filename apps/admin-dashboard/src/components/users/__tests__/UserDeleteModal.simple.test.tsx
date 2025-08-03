@@ -92,7 +92,7 @@ describe('UserDeleteModal 간단 테스트', () => {
   });
 
   it('isOpen이 false일 때 렌더링되지 않는다', () => {
-    render(<UserDeleteModal {...defaultProps} isOpen={false} />);
+    render(<UserDeleteModal {...defaultProps} _isOpen={false} />);
     
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
