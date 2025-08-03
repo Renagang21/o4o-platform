@@ -21,7 +21,7 @@ const SignageEditor: FC = () => {
     type: 'image',
     content: '',
     schedule: {
-      days: [] as string[],
+      days: [] as string[] as string[],
       timeRanges: [{ start: '09:00', end: '18:00' }]
     }
   });

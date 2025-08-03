@@ -265,10 +265,29 @@ GOOGLE_CLIENT_SECRET=optional
 
 ## ⚠️ Known Issues & Solutions
 
-### Node.js 버전 관련 참고사항
+### npm 명령어 "2" 추가 문제 (Shell 환경 오류)
+**증상**: npm 명령어 실행 시 자동으로 "2"가 인자로 추가됨
+**원인**: Shell 환경 설정 또는 npm wrapper 파싱 오류
+- **Firebase Studio와 전혀 무관** (이전 문서의 잘못된 진단)
+- Shell alias/function 오류 또는 환경 변수 오염이 주 원인
+- Claude Code의 shell snapshot 메커니즘과 상호작용 문제 가능성
+
+**해결책**:
+```bash
+# 1. 깨끗한 환경에서 실행
+env -i PATH="/usr/bin:/bin:/usr/local/bin" npm install
+
+# 2. npm 직접 경로 사용
+/usr/bin/npm install
+
+# 3. 스크립트 파일 활용
+./scripts/dev.sh install
+```
+
+### Node.js 버전 요구사항
 **⚠️ 중요**: 프로젝트는 Node.js 22.18.0 LTS를 사용합니다
-- npm 명령어 끝에 "2"가 붙는 문제는 특정 환경의 npm wrapper 문제
 - 모든 개발 환경은 Node.js 22.18.0 LTS를 사용해야 합니다
+- npm 버전: 10.9.3 (Node.js 22에 포함)
 
 ## 🚨 Never Do These
 1. Never import React namespace in React 17+

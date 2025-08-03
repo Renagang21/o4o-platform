@@ -15,27 +15,7 @@ import axios from 'axios';
 
 // Types
 /* SignageContent interface removed - not used
-interface SignageContent {
-  id: string;
-  title: string;
-  description?: string;
-  type: 'youtube' | 'vimeo';
-  url: string;
-  videoId: string;
-  thumbnailUrl?: string;
-  duration?: number;
-  status: 'pending' | 'approved' | 'rejected' | 'inactive';
-  tags?: string[];
-  isPublic: boolean;
-  createdBy: string;
-  creator?: { id: string; username: string };
-  approvedBy?: string;
-  approver?: { id: string; username: string };
-  approvedAt?: string;
-  rejectedReason?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+
 */
 
 interface Store {

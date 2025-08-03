@@ -92,6 +92,7 @@
   "author": "O4O Platform Team",
   "license": "MIT",
   "dependencies": {
+    "@tailwindcss/postcss": "^4.0.0-beta.8",
     "rate-limit-redis": "^4.2.1",
     "slugify": "^1.6.6"
   }

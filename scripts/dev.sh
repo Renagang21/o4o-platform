@@ -23,10 +23,12 @@ usage() {
     echo "  build:packages Build only packages"
     echo "  start         Start local development servers"
     echo "  stop          Stop local development servers"
+    echo "  ci-prepare    Prepare for CI/CD (fix configs, build packages)"
     echo ""
     echo "Examples:"
     echo "  $0 lint"
     echo "  $0 build"
+    echo "  $0 ci-prepare"
     exit 1
 }
 
@@ -149,6 +151,24 @@ stop_dev() {
     echo -e "${GREEN}✅ All servers stopped${NC}"
 }
 
+# CI/CD 준비
+ci_prepare() {
+    echo -e "${YELLOW}🚀 Preparing for CI/CD...${NC}"
+    
+    # Fix PostCSS configuration
+    echo "Fixing PostCSS configuration..."
+    for config in apps/*/postcss.config.js; do
+        if [ -f "$config" ]; then
+            echo "export default { plugins: { '@tailwindcss/postcss': {}, autoprefixer: {} } }" > "$config"
+        fi
+    done
+    
+    # Build packages
+    build_packages
+    
+    echo -e "${GREEN}✅ CI/CD preparation complete${NC}"
+}
+
 # 메인 로직
 case "$1" in
     lint)
@@ -176,6 +196,9 @@ case "$1" in
         ;;
     stop)
         stop_dev
+        ;;
+    ci-prepare)
+        ci_prepare
         ;;
     *)
         usage

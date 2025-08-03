@@ -56,6 +56,15 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           bash scripts/ci-install.sh
+      
+      - name: Fix PostCSS configuration
+        run: |
+          echo "Fixing PostCSS configuration for Tailwind CSS v4..."
+          for config in apps/*/postcss.config.js; do
+            if [ -f "$config" ]; then
+              echo "export default { plugins: { '@tailwindcss/postcss': {}, autoprefixer: {} } }" > "$config"
+            fi
+          done
 
   # 타입 체크
   type-check:
