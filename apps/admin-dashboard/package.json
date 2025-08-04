@@ -24,7 +24,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^2.0.18",
-    "@hookform/resolvers": "^5.1.1",
+    "@hookform/resolvers": "^5.2.1",
     "@o4o/auth-client": "file:../../packages/auth-client",
     "@o4o/auth-context": "file:../../packages/auth-context",
     "@o4o/types": "file:../../packages/types",

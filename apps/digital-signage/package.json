@@ -12,7 +12,7 @@
     "test": "vitest --passWithNoTests"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.9.1",
+    "@hookform/resolvers": "^5.2.1",
     "@o4o/auth-context": "file:../../packages/auth-context",
     "@o4o/types": "file:../../packages/types",
     "@o4o/ui": "file:../../packages/ui",
