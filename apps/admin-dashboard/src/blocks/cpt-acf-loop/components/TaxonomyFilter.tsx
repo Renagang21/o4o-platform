@@ -77,8 +77,8 @@ export default function TaxonomyFilter({
           fetchTermsForTaxonomy(tax.slug, tax.rest_base);
         });
       })
-      .catch((err) => {
-        console.error('Error fetching taxonomies:', err);
+      .catch(() => {
+        // Silently handle error - will use empty taxonomies
         setIsLoading(false);
       });
   }, [postType]);
@@ -104,7 +104,7 @@ export default function TaxonomyFilter({
         }));
       }
     } catch (err: any) {
-      console.error(`Error fetching terms for ${taxonomySlug}:`, err);
+      // Silently handle error - will use empty terms
     }
   };
 

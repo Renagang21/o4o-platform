@@ -17,6 +17,57 @@ import { Settings as Setting } from '../entities/Settings';
 
 const router: Router = Router();
 
+// Helper function to get OAuth settings
+async function getOAuthSettings(): Promise<OAuthSettingsData> {
+  const settingsRepo = AppDataSource.getRepository(Setting);
+  const setting = await settingsRepo.findOne({ where: { key: 'oauth' } });
+  
+  if (!setting) {
+    // Return default settings if not found
+    return {
+      google: { 
+        provider: 'google',
+        enabled: false, 
+        clientId: '', 
+        clientSecret: '',
+        callbackUrl: '',
+        scope: []
+      },
+      kakao: { 
+        provider: 'kakao',
+        enabled: false, 
+        clientId: '', 
+        clientSecret: '',
+        callbackUrl: '',
+        scope: []
+      },
+      naver: { 
+        provider: 'naver',
+        enabled: false, 
+        clientId: '', 
+        clientSecret: '',
+        callbackUrl: '',
+        scope: []
+      }
+    };
+  }
+  
+  const data = setting.value as unknown as OAuthSettingsData;
+  
+  // Decrypt secrets
+  if (data.google.clientSecret) {
+    data.google.clientSecret = decrypt(data.google.clientSecret);
+  }
+  if (data.kakao.clientSecret) {
+    data.kakao.clientSecret = decrypt(data.kakao.clientSecret);
+  }
+  if (data.naver.clientSecret) {
+    data.naver.clientSecret = decrypt(data.naver.clientSecret);
+  }
+  
+  return data;
+}
+
 // Validation rules
 const oauthUpdateValidation = [
   body('provider').isIn(['google', 'kakao', 'naver']).withMessage('Invalid OAuth provider'),
@@ -292,5 +343,31 @@ router.post('/oauth/test',
     }
   }
 );
+
+// GET /api/settings/oauth/providers - Get enabled OAuth providers (public)
+router.get('/oauth/providers', async (req: Request, res: Response) => {
+  try {
+    const oauthSettings = await getOAuthSettings();
+    
+    // Return only enabled status for each provider (no sensitive data)
+    const providers = {
+      google: { enabled: oauthSettings.google.enabled },
+      kakao: { enabled: oauthSettings.kakao.enabled },
+      naver: { enabled: oauthSettings.naver.enabled }
+    };
+    
+    res.json({ providers });
+  } catch (error: any) {
+    logger.error('Failed to get OAuth providers:', error);
+    res.status(500).json({ 
+      message: 'OAuth 제공자 정보를 가져오는데 실패했습니다',
+      providers: {
+        google: { enabled: false },
+        kakao: { enabled: false },
+        naver: { enabled: false }
+      }
+    });
+  }
+});
 
 export default router;

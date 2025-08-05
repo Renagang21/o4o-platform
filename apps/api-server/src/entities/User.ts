@@ -3,8 +3,9 @@ import { UserRole, UserStatus } from '../types/auth';
 import { BusinessInfo } from '../types/user';
 import { RefreshToken } from './RefreshToken';
 import { ApprovalLog } from './ApprovalLog';
+import { LinkedAccount } from './LinkedAccount';
+import { AccountActivity } from './AccountActivity';
 import * as bcrypt from 'bcryptjs';
-// import { IsEmail, IsEnum, IsArray, IsOptional } from 'class-validator';
 
 // Re-export types for external use
 export { UserRole, UserStatus };
@@ -134,6 +135,14 @@ export class User {
   // Approval logs relationship
   @OneToMany(() => ApprovalLog, log => log.user)
   approvalLogs: ApprovalLog[];
+
+  // Linked accounts relationship
+  @OneToMany(() => LinkedAccount, linkedAccount => linkedAccount.user)
+  linkedAccounts: LinkedAccount[];
+
+  // Account activities relationship
+  @OneToMany(() => AccountActivity, activity => activity.user)
+  accountActivities: AccountActivity[];
 
   // Admin actions relationship
   @OneToMany(() => ApprovalLog, log => log.admin)

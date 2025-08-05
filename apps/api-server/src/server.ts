@@ -4,7 +4,6 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { AppDataSource } from './database/connection';
-// import apiV1Router from './routes/v1'; // Disabled - using main.ts instead
 
 // 환경 변수 검증
 const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'];
@@ -153,6 +152,10 @@ async function startServer() {
     await AppDataSource.initialize();
     // console.log('✅ Database connected successfully');
 
+    // Start scheduled jobs
+    const { cleanupLoginAttemptsJob } = await import('./jobs/cleanupLoginAttempts');
+    cleanupLoginAttemptsJob.start();
+
     // 서버 시작
     app.listen(PORT, () => {
       // console.log('🚀 API Server Information:');
@@ -172,7 +175,7 @@ async function startServer() {
       // console.log('✨ Server is ready to accept connections');
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   }

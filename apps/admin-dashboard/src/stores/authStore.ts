@@ -9,6 +9,7 @@ interface User {
   role: string
   roles?: string[]
   avatar?: string
+  createdAt?: string
 }
 
 interface AuthState {

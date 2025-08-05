@@ -51,7 +51,7 @@ export async function fetchPostTypes(): Promise<PostType[]> {
       (type: PostType) => !excludedTypes.includes(type.slug)
     );
   } catch (error: any) {
-    console.error('Error fetching post types:', error);
+    // Silently handle error - will return empty array
     return [];
   }
 }
@@ -88,7 +88,7 @@ export async function fetchPosts(
 
     return posts;
   } catch (error: any) {
-    console.error('Error fetching posts:', error);
+    // Silently handle error - will return empty array
     return [];
   }
 }
@@ -112,7 +112,7 @@ export async function fetchACFFieldGroups(postType: string): Promise<any[]> {
 
     return response;
   } catch (error: any) {
-    console.error('Error fetching ACF field groups:', error);
+    // Silently handle error - will return empty array
     return [];
   }
 }
@@ -135,7 +135,7 @@ export async function fetchACFFields(fieldGroupId: string): Promise<any[]> {
 
     return response;
   } catch (error: any) {
-    console.error('Error fetching ACF fields:', error);
+    // Silently handle error - will return empty array
     return [];
   }
 }

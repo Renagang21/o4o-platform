@@ -4,6 +4,9 @@ import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/connection';
 import { User, UserRole, UserStatus } from '../entities/User';
 import { authService } from '../services/AuthService';
+import { AuthServiceV2 } from '../services/AuthServiceV2';
+import { UserService } from '../services/UserService';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 import { SessionSyncService } from '../services/sessionSyncService';
 import { PasswordResetService } from '../services/passwordResetService';
 import { authenticateCookie, AuthRequest } from '../middleware/auth-v2';
@@ -22,9 +25,9 @@ router.post('/login',
       }
 
       const { email, password } = req.body;
-      const { userAgent, ipAddress } = authService.getRequestMetadata(req);
+      const { userAgent, ipAddress } = AuthServiceV2.getRequestMetadata(req);
 
-      const result = await authService.login(email, password, userAgent, ipAddress);
+      const result = await AuthServiceV2.login(email, password, userAgent, ipAddress);
       
       if (!result) {
         return res.status(401).json({
@@ -34,7 +37,7 @@ router.post('/login',
       }
 
       // Set httpOnly cookies
-      authService.setAuthCookies(res, result.tokens);
+      AuthServiceV2.setAuthCookies(res, result.tokens);
       
       // Set session ID cookie for SSO
       res.cookie('sessionId', result.sessionId, {
@@ -44,6 +47,12 @@ router.post('/login',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         domain: process.env.COOKIE_DOMAIN || undefined // For cross-subdomain SSO
       });
+
+      // Create SSO session (we need to fetch full user for this)
+      const fullUser = await UserService.getUserById(result.user.id);
+      if (fullUser) {
+        await SessionSyncService.createSession(fullUser, result.sessionId!);
+      }
 
       // Return user data (no tokens in response body)
       res.json({
@@ -58,7 +67,7 @@ router.post('/login',
           businessInfo: result.user.businessInfo
         }
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       
       if (error.message.includes('Account is')) {
@@ -118,7 +127,7 @@ router.post('/register',
       // Send email verification
       try {
         await PasswordResetService.requestEmailVerification(user.id);
-      } catch (error: any) {
+      } catch (error) {
         console.error('Failed to send verification email:', error);
         // Don't fail registration if email fails
       }
@@ -134,7 +143,7 @@ router.post('/register',
           status: user.status
         }
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Registration error:', error);
       res.status(500).json({
         error: 'Internal server error',
@@ -156,11 +165,11 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
-    const { userAgent, ipAddress } = authService.getRequestMetadata(req);
-    const tokens = await authService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+    const { userAgent, ipAddress } = AuthServiceV2.getRequestMetadata(req);
+    const tokens = await AuthServiceV2.refreshTokens(refreshToken, { userAgent, ipAddress });
     
     if (!tokens) {
-      authService.clearAuthCookies(res);
+      AuthServiceV2.clearAuthCookies(res);
       return res.status(401).json({
         error: 'Invalid refresh token',
         code: 'INVALID_REFRESH_TOKEN'
@@ -168,13 +177,13 @@ router.post('/refresh', async (req, res) => {
     }
 
     // Set new cookies
-    authService.setAuthCookies(res, tokens);
+    AuthServiceV2.setAuthCookies(res, tokens);
 
     res.json({
       success: true,
       message: 'Token refreshed successfully'
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Token refresh error:', error);
     authService.clearAuthCookies(res);
     res.status(500).json({
@@ -213,7 +222,7 @@ router.post('/logout', async (req, res) => {
       success: true,
       message: 'Logout successful'
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Logout error:', error);
     // Still clear cookies even if error occurs
     authService.clearAuthCookies(res);
@@ -247,7 +256,7 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
       success: true,
       user
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get user error:', error);
     res.status(500).json({
       error: 'Internal server error',
@@ -282,7 +291,7 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
       success: true,
       message: 'Logged out from all devices'
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Logout all error:', error);
     res.status(500).json({
       error: 'Internal server error',
@@ -310,7 +319,7 @@ router.post('/forgot-password',
         success: true,
         message: 'If an account exists with this email, a password reset link has been sent.'
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Password reset request error:', error);
       res.status(500).json({
         error: 'Failed to process password reset request',
@@ -339,7 +348,7 @@ router.post('/reset-password',
         success: true,
         message: 'Password has been reset successfully'
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Password reset error:', error);
       res.status(400).json({
         error: error.message || 'Failed to reset password',
@@ -349,8 +358,8 @@ router.post('/reset-password',
   }
 );
 
-// Request email verification
-router.post('/resend-verification', authenticateCookie, async (req: AuthRequest, res) => {
+// Request email verification (for authenticated users)
+router.post('/resend-verification-auth', authenticateCookie, async (req: AuthRequest, res) => {
   try {
     if (!req.user?.userId) {
       return res.status(401).json({
@@ -365,7 +374,7 @@ router.post('/resend-verification', authenticateCookie, async (req: AuthRequest,
       success: true,
       message: 'Verification email has been sent'
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Email verification request error:', error);
     res.status(400).json({
       error: error.message || 'Failed to send verification email',
@@ -374,7 +383,64 @@ router.post('/resend-verification', authenticateCookie, async (req: AuthRequest,
   }
 });
 
-// Verify email with token
+// Request email verification (for unauthenticated users)
+router.post('/resend-verification',
+  body('email').isEmail().withMessage('Valid email is required'),
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { email } = req.body;
+      const userRepository = AppDataSource.getRepository(User);
+      
+      // Find user by email
+      const user = await userRepository.findOne({ where: { email } });
+      
+      if (!user) {
+        // Don't reveal if email exists
+        return res.json({
+          success: true,
+          message: 'If an account exists with this email, a verification email has been sent.'
+        });
+      }
+
+      // Check if already verified
+      if (user.isEmailVerified) {
+        return res.status(400).json({
+          error: 'Email is already verified',
+          code: 'ALREADY_VERIFIED'
+        });
+      }
+
+      // Send verification email
+      try {
+        await PasswordResetService.requestEmailVerification(user.id);
+      } catch (error) {
+        console.error('Failed to send verification email:', error);
+        return res.status(500).json({
+          error: 'Failed to send verification email',
+          code: 'EMAIL_SEND_FAILED'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Verification email has been sent'
+      });
+    } catch (error) {
+      console.error('Email verification request error:', error);
+      res.status(500).json({
+        error: 'Internal server error',
+        code: 'INTERNAL_SERVER_ERROR'
+      });
+    }
+  }
+);
+
+// Verify email with token (POST)
 router.post('/verify-email',
   body('token').notEmpty().withMessage('Verification token is required'),
   async (req, res) => {
@@ -392,7 +458,7 @@ router.post('/verify-email',
         success: true,
         message: 'Email has been verified successfully'
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Email verification error:', error);
       res.status(400).json({
         error: error.message || 'Failed to verify email',
@@ -401,5 +467,43 @@ router.post('/verify-email',
     }
   }
 );
+
+// Verify email with token (GET) - for email links
+router.get('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.query;
+    
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({
+        error: 'Verification token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+    
+    await PasswordResetService.verifyEmail(token);
+
+    res.json({
+      success: true,
+      message: 'Email has been verified successfully'
+    });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    
+    // Provide specific error codes based on error message
+    let errorCode = 'VERIFICATION_FAILED';
+    if (error.message.includes('expired')) {
+      errorCode = 'TOKEN_EXPIRED';
+    } else if (error.message.includes('invalid')) {
+      errorCode = 'INVALID_TOKEN';
+    } else if (error.message.includes('already verified')) {
+      errorCode = 'ALREADY_VERIFIED';
+    }
+    
+    res.status(400).json({
+      error: error.message || 'Failed to verify email',
+      code: errorCode
+    });
+  }
+});
 
 export default router;

@@ -25,7 +25,7 @@ for (const envPath of possiblePaths) {
       envLoaded = true;
       break;
     }
-  } catch (error: any) {
+  } catch (error) {
     // Continue to next path
   }
 }
@@ -80,11 +80,15 @@ import contentRoutes from './routes/content';
 import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
 import oauthSettingsRoutes from './routes/settings.routes';
+import emailAuthRoutes from './routes/email-auth.routes';
 import crowdfundingRoutes from './routes/crowdfunding';
 import linkedAccountsRoutes from './routes/linked-accounts';
+import accountLinkingRoutes from './routes/account-linking.routes';
+import unifiedAuthRoutes from './routes/unified-auth.routes';
 import vendorRoutes from './routes/vendor';
 import formsRoutes from './routes/forms';
 import monitoringRoutes from './routes/monitoring';
+import sessionsRoutes from './routes/sessions';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -333,6 +337,7 @@ app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
 app.use('/api/crowdfunding', crowdfundingRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
+app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 
 // Direct public endpoints for main site
 app.get('/api/posts', publicLimiter, async (req, res) => {
@@ -376,7 +381,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
         totalItems: 1
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching posts:', error);
     res.status(500).json({
       success: false,
@@ -387,6 +392,9 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
 
 app.use('/api/settings', settingsRoutes);
 app.use('/api/settings', oauthSettingsRoutes);
+app.use('/api/auth', emailAuthRoutes);
+app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
+app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes

@@ -29,8 +29,8 @@ export class PasswordResetService {
 
     // Invalidate any existing tokens
     await tokenRepo.update(
-      { userId: user.id, isUsed: false },
-      { isUsed: true }
+      { userId: user.id, usedAt: null },
+      { usedAt: new Date() }
     );
 
     // Generate new token
@@ -67,7 +67,7 @@ export class PasswordResetService {
     const resetToken = await tokenRepo.findOne({
       where: {
         token: hashedToken,
-        isUsed: false
+        usedAt: null
       },
       relations: ['user']
     });
@@ -91,7 +91,7 @@ export class PasswordResetService {
     await userRepo.save(resetToken.user);
 
     // Mark token as used
-    resetToken.isUsed = true;
+    resetToken.usedAt = new Date();
     await tokenRepo.save(resetToken);
 
     return true;
@@ -116,8 +116,8 @@ export class PasswordResetService {
 
     // Invalidate any existing tokens
     await tokenRepo.update(
-      { userId: user.id, isUsed: false },
-      { isUsed: true }
+      { userId: user.id, usedAt: null },
+      { usedAt: new Date() }
     );
 
     // Generate new token
@@ -154,7 +154,7 @@ export class PasswordResetService {
     const verificationToken = await tokenRepo.findOne({
       where: {
         token: hashedToken,
-        isUsed: false
+        usedAt: null
       },
       relations: ['user']
     });
@@ -180,7 +180,7 @@ export class PasswordResetService {
     await userRepo.save(verificationToken.user);
 
     // Mark token as used
-    verificationToken.isUsed = true;
+    verificationToken.usedAt = new Date();
     await tokenRepo.save(verificationToken);
 
     // Send welcome email
@@ -206,7 +206,7 @@ export class PasswordResetService {
       .createQueryBuilder()
       .delete()
       .where('expiresAt < :now', { now })
-      .orWhere('isUsed = true')
+      .orWhere('usedAt IS NOT NULL')
       .execute();
 
     // Delete expired email verification tokens
@@ -214,7 +214,7 @@ export class PasswordResetService {
       .createQueryBuilder()
       .delete()
       .where('expiresAt < :now', { now })
-      .orWhere('isUsed = true')
+      .orWhere('usedAt IS NOT NULL')
       .execute();
   }
 }

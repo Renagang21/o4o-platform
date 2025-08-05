@@ -145,6 +145,7 @@ export interface LoginResponse {
   user: UserData;
   tokens: AuthTokens;
   success?: boolean;
+  sessionId?: string;
 }
 
 // Cookie configuration

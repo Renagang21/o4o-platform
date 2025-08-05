@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 // import { formatDate } from '@/lib/utils'; // Not used
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -167,7 +167,10 @@ const UsersListBulk: FC = () => {
       sortable: true,
       render: (user: User) => (
         <div className="flex items-center gap-3">
-          <Avatar name={user.name} src={user.avatar} size="sm" />
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback>{user.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
           <div>
             <Link to={`/users/${user.id}/edit`} className="font-medium text-blue-600 hover:text-blue-800">
               {user.name}

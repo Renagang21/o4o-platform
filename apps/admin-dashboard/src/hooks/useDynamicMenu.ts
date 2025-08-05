@@ -15,25 +15,10 @@ interface ActiveApp {
  * 비활성화된 앱의 메뉴는 자동으로 숨김 처리
  */
 export const useDynamicMenu = () => {
-  // Mock 모드 확인
-  const isMockMode = import.meta.env.VITE_USE_MOCK === 'true';
-  
   // 활성화된 앱 목록 가져오기
   const { data: activeAppsData, isLoading } = useQuery({
     queryKey: ['active-apps'],
     queryFn: async () => {
-      // Mock 모드에서는 모든 핵심 앱을 활성화로 간주
-      if (isMockMode) {
-        return {
-          data: [
-            { id: 'ecommerce', name: 'ecommerce', displayName: 'E-commerce', permissions: ['products:read', 'products:write'], category: 'commerce' },
-            { id: 'users', name: 'users', displayName: 'User Management', permissions: ['users:read', 'users:write'], category: 'core' },
-            { id: 'content', name: 'content', displayName: 'Pages & Posts', permissions: ['content:read', 'content:write'], category: 'content' },
-            { id: 'forum', name: 'forum', displayName: 'Forum', permissions: ['forum:read', 'forum:write'], category: 'community' }
-          ]
-        };
-      }
-      
       const response = await authClient.api.get('/v1/platform/apps/active');
       return response.data;
     },
@@ -99,13 +84,6 @@ export const useDynamicMenu = () => {
 
   // 동적 메뉴 생성
   const dynamicMenu = filterMenuItems([...wordpressMenuItems]);
-  
-  // 디버깅용 로그
-  if (isMockMode) {
-    // console.log('[useDynamicMenu] Mock mode active');
-    // console.log('[useDynamicMenu] Active apps:', activeApps);
-    // console.log('[useDynamicMenu] Menu items:', dynamicMenu);
-  }
 
   // 앱 상태 변경 시 메뉴 다시 로드
   const refreshMenu = () => {

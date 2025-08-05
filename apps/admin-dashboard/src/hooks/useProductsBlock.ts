@@ -107,7 +107,7 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
       setTotalPages(data.totalPages || 1);
       setTotalProducts(data.totalProducts || transformedProducts.length);
     } catch (err: any) {
-      console.error('Error fetching products:', err);
+      // Error will be displayed to user via error state
       setError(err instanceof Error ? err.message : 'Failed to load products');
       
       // Set mock data for development

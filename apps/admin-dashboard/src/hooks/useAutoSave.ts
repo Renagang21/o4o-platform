@@ -98,7 +98,7 @@ export const useAutoSave = (
       localStorage.setItem(storageKey, JSON.stringify(saveData));
       setState((prev: any) => ({ ...prev, savedInLocalStorage: true }));
     } catch (error: any) {
-      console.error('Failed to save to local storage:', error);
+      // Silently fail - localStorage may be disabled
     }
   }, [storageKey, postType, postId]);
 
@@ -167,7 +167,7 @@ export const useAutoSave = (
         return { data, timestamp: new Date(timestamp) };
       }
     } catch (error: any) {
-      console.error('Failed to recover from local storage:', error);
+      // Silently fail - localStorage may be disabled or empty
     }
     return null;
   }, [storageKey]);
