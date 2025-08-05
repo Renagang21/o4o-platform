@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon, BookOpen } from 'lucide-react'
+import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon, BookOpen, Key } from 'lucide-react'
 import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
+import OAuthSettings from './OAuthSettings'
 
 const UserSettings: FC = () => (
   <div className="wp-card">
@@ -39,6 +40,7 @@ const settingsTabs = [
   { id: 'general', label: '일반 설정', icon: <SettingsIcon className="w-4 h-4" />, path: '' },
   { id: 'reading', label: '읽기 설정', icon: <BookOpen className="w-4 h-4" />, path: 'reading' },
   { id: 'theme', label: '테마 설정', icon: <Palette className="w-4 h-4" />, path: 'theme' },
+  { id: 'oauth', label: 'OAuth 설정', icon: <Key className="w-4 h-4" />, path: 'oauth' },
   { id: 'users', label: '사용자 설정', icon: <Users className="w-4 h-4" />, path: 'users' },
   { id: 'email', label: '이메일 설정', icon: <Mail className="w-4 h-4" />, path: 'email' },
   { id: 'integrations', label: '연동 설정', icon: <LinkIcon className="w-4 h-4" />, path: 'integrations' }
@@ -58,7 +60,7 @@ const Settings: FC = () => {
       {/* Settings Navigation Tabs */}
       <div className="border-b border-gray-300">
         <nav className="-mb-px flex space-x-8">
-          {settingsTabs.map((tab: any) => {
+          {settingsTabs.map((tab) => {
             const isActive = tab.path === currentPath || (tab.path === '' && currentPath === 'settings')
             return (
               <Link
@@ -85,6 +87,7 @@ const Settings: FC = () => {
         <Route index element={<GeneralSettings />} />
         <Route path="reading" element={<ReadingSettings />} />
         <Route path="theme" element={<ThemeSettingsWithAuth />} />
+        <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />
         <Route path="email" element={<EmailSettings />} />
         <Route path="integrations" element={<IntegrationSettings />} />

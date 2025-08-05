@@ -79,6 +79,7 @@ import signageRoutes from './routes/signage';
 import contentRoutes from './routes/content';
 import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
+import oauthSettingsRoutes from './routes/settings.routes';
 import crowdfundingRoutes from './routes/crowdfunding';
 import linkedAccountsRoutes from './routes/linked-accounts';
 import vendorRoutes from './routes/vendor';
@@ -385,6 +386,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
 });
 
 app.use('/api/settings', settingsRoutes);
+app.use('/api/settings', oauthSettingsRoutes);
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
