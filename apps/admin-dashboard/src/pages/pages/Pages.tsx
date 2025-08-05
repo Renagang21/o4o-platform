@@ -8,7 +8,8 @@ import {
   Eye,
   FileText,
   Home,
-  User
+  User,
+  Layers
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -166,13 +167,22 @@ const Pages: FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">페이지 관리</h1>
             <p className="text-gray-600 mt-1">웹사이트의 정적 페이지를 관리합니다</p>
           </div>
-          <Link
-            to="/pages/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>새 페이지</span>
-          </Link>
+          <div className="flex items-center space-x-2">
+            <Link
+              to="/pages/pattern-builder"
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+            >
+              <Layers className="w-4 h-4" />
+              <span>패턴 빌더</span>
+            </Link>
+            <Link
+              to="/pages/new"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>새 페이지</span>
+            </Link>
+          </div>
         </div>
 
         {/* 필터 및 검색 */}

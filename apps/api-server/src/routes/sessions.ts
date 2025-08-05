@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middleware/auth';
 import { SessionSyncService } from '../services/sessionSyncService';
 
-const router = Router();
+const router: Router = Router();
 
 // Apply authentication to all routes
 router.use(authenticateToken);

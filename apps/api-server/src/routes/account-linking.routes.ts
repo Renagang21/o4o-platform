@@ -5,7 +5,7 @@ import { body, query, validationResult } from 'express-validator';
 import { AuthProvider, SecurityVerification } from '../types/account-linking';
 import logger from '../utils/logger';
 
-const router = Router();
+const router: Router = Router();
 
 // Validation middleware
 const validateDto = (req: any, res: any, next: any) => {

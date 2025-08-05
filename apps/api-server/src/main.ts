@@ -89,6 +89,10 @@ import vendorRoutes from './routes/vendor';
 import formsRoutes from './routes/forms';
 import monitoringRoutes from './routes/monitoring';
 import sessionsRoutes from './routes/sessions';
+import postsRoutes from './routes/posts';
+import reusableBlocksRoutes from './routes/reusable-blocks.routes';
+import blockPatternsRoutes from './routes/block-patterns.routes';
+import templatePartsRoutes from './routes/template-parts.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -398,6 +402,10 @@ app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
+app.use('/api/posts', postsRoutes); // Posts routes (WordPress-compatible)
+app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
+app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
+app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
 app.use('/api', contentRoutes);
 
 

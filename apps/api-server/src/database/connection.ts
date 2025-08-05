@@ -30,6 +30,11 @@ import { StorePlaylist } from '../entities/StorePlaylist';
 import { PlaylistItem } from '../entities/PlaylistItem';
 import { ScreenTemplate } from '../entities/ScreenTemplate';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
+import { Post } from '../entities/Post';
+import { Page } from '../entities/Page';
+import { ReusableBlock } from '../entities/ReusableBlock';
+import { BlockPattern } from '../entities/BlockPattern';
+import { TemplatePart } from '../entities/TemplatePart';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -97,7 +102,13 @@ export const AppDataSource = new DataSource({
         StorePlaylist,
         PlaylistItem,
         ScreenTemplate,
-        ContentUsageLog
+        ContentUsageLog,
+        // Content entities
+        Post,
+        Page,
+        ReusableBlock,
+        BlockPattern,
+        TemplatePart
       ],
   
   // 마이그레이션 설정

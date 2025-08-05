@@ -5,7 +5,7 @@ import { authenticate } from '../middleware/auth.middleware';
 import { AuthProvider, OAuthProfile } from '../types/account-linking';
 import logger from '../utils/logger';
 
-const router = Router();
+const router: Router = Router();
 const unifiedAuthService = new UnifiedAuthService();
 
 // Validation middleware

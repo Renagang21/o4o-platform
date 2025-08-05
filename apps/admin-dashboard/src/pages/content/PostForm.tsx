@@ -128,11 +128,17 @@ const PostForm = () => {
 
   // 페이지 로드 시 복구 데이터 확인
   useEffect(() => {
-    const recovered = recoverFromLocalStorage();
-    if (recovered && !id) { // 새 게시글일 때만 복구 제안
-      setRecoveryData(recovered);
-      setShowRecoveryNotice(true);
-    }
+    const checkRecovery = async () => {
+      const recovered = await recoverFromLocalStorage();
+      if (recovered && !id) { // 새 게시글일 때만 복구 제안
+        setRecoveryData({
+          data: recovered,
+          timestamp: new Date()
+        });
+        setShowRecoveryNotice(true);
+      }
+    };
+    checkRecovery();
   }, [id, recoverFromLocalStorage]);
 
   // 복구 처리

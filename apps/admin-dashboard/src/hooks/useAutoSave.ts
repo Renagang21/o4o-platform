@@ -1,196 +1,270 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { authClient } from '@o4o/auth-client';
-import { CreatePostDto, UpdatePostDto } from '@o4o/types';
+/**
+ * Auto-save Hook with Data Loss Prevention
+ * Automatically saves content and prevents data loss
+ */
 
-export interface AutoSaveOptions {
-  postId?: string;
-  postType: 'post' | 'page';
-  interval?: number; // in milliseconds, default 30000 (30 seconds)
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useDebounce as useDebounceHook } from './useDebounce';
+import toast from 'react-hot-toast';
+
+interface AutoSaveConfig {
+  saveInterval?: number; // milliseconds
+  debounceDelay?: number; // milliseconds
+  enableLocalStorage?: boolean;
+  enableCloudSave?: boolean;
+  onSave?: (data: any) => Promise<void>;
+  onRestore?: () => Promise<any>;
   storageKey?: string;
-  onSaveStart?: () => void;
+  postId?: string;
+  postType?: string;
+  interval?: number; // alias for saveInterval
   onSaveSuccess?: () => void;
-  onSaveError?: (error: any) => void;
 }
 
-export interface AutoSaveState {
+interface AutoSaveState {
   isSaving: boolean;
-  lastSaved: Date | null;
+  lastSavedAt: Date | null;
   hasUnsavedChanges: boolean;
-  savedInLocalStorage: boolean;
+  error: string | null;
+  backupExists: boolean;
 }
 
-export const useAutoSave = (
-  formData: CreatePostDto | UpdatePostDto,
-  options: AutoSaveOptions
-) => {
+export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
   const {
-    postId,
-    postType,
-    interval = 30000, // 30 seconds
-    storageKey = `autosave_${postType}_${postId || 'new'}`,
-    onSaveStart,
-    onSaveSuccess,
-    onSaveError
-  } = options;
+    saveInterval = config.interval || 30000, // 30 seconds
+    debounceDelay = 1000, // 1 second
+    enableLocalStorage = true,
+    enableCloudSave = true,
+    onSave,
+    onRestore,
+    storageKey = config.postId 
+      ? `wordpress-editor-autosave-${config.postType || 'post'}-${config.postId}`
+      : 'wordpress-editor-autosave',
+    onSaveSuccess
+  } = config;
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<AutoSaveState>({
     isSaving: false,
-    lastSaved: null,
+    lastSavedAt: null,
     hasUnsavedChanges: false,
-    savedInLocalStorage: false
+    error: null,
+    backupExists: false
   });
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastSavedDataRef = useRef<string>('');
+  const [content, setContent] = useState<any>(initialContent || null);
+  const debouncedContent = useDebounceHook(content, debounceDelay);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const isRestoringRef = useRef(false);
 
-  // Auto-save mutation
-  const autoSaveMutation = useMutation({
-    mutationFn: async (data: CreatePostDto | UpdatePostDto) => {
-      if (postId) {
-        // Update existing post
-        const response = await authClient.api.put(`/posts/${postId}`, {
-          ...data,
-          status: 'draft' // Always save as draft during auto-save
-        });
-        return response.data;
-      } else {
-        // Create new post
-        const response = await authClient.api.post('/posts', {
-          ...data,
-          status: 'draft',
-          type: postType
-        });
-        return response.data;
-      }
-    },
-    onMutate: () => {
-      setState((prev: any) => ({ ...prev, isSaving: true }));
-      onSaveStart?.();
-    },
-    onSuccess: () => {
-      setState((prev: any) => ({
-        ...prev,
-        isSaving: false,
-        lastSaved: new Date(),
-        hasUnsavedChanges: false
-      }));
-      onSaveSuccess?.();
-      
-      // Clear local storage after successful save
-      localStorage.removeItem(storageKey);
-    },
-    onError: (error) => {
-      setState((prev: any) => ({ ...prev, isSaving: false }));
-      onSaveError?.(error);
+  // Check for existing backup
+  useEffect(() => {
+    if (enableLocalStorage) {
+      const backup = localStorage.getItem(storageKey);
+      setState(prev => ({ ...prev, backupExists: !!backup }));
     }
-  });
+  }, [enableLocalStorage, storageKey]);
 
   // Save to local storage
   const saveToLocalStorage = useCallback((data: any) => {
+    if (!enableLocalStorage) return;
+
     try {
       const saveData = {
-        data,
+        content: data,
         timestamp: new Date().toISOString(),
-        postType,
-        postId
+        version: '1.0'
       };
       localStorage.setItem(storageKey, JSON.stringify(saveData));
-      setState((prev: any) => ({ ...prev, savedInLocalStorage: true }));
-    } catch (error: any) {
-      // Silently fail - localStorage may be disabled
+      console.log('Content saved to local storage');
+    } catch (error) {
+      console.error('Failed to save to local storage:', error);
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        // Clear old data if storage is full
+        try {
+          localStorage.removeItem(storageKey + '-old');
+          localStorage.setItem(storageKey + '-old', localStorage.getItem(storageKey) || '');
+          localStorage.setItem(storageKey, JSON.stringify(data));
+        } catch (e) {
+          console.error('Storage cleanup failed:', e);
+        }
+      }
     }
-  }, [storageKey, postType, postId]);
+  }, [enableLocalStorage, storageKey]);
 
-  // Check for unsaved changes
-  useEffect(() => {
-    const currentData = JSON.stringify(formData);
-    if (currentData !== lastSavedDataRef.current && lastSavedDataRef.current !== '') {
-      setState((prev: any) => ({ ...prev, hasUnsavedChanges: true }));
-    }
-  }, [formData]);
+  // Save to cloud
+  const saveToCloud = useCallback(async (data: any) => {
+    if (!enableCloudSave || !onSave) return;
 
-  // Auto-save effect
-  useEffect(() => {
-    const performAutoSave = () => {
-      const currentData = JSON.stringify(formData);
+    setState(prev => ({ ...prev, isSaving: true, error: null }));
+
+    try {
+      await onSave(data);
+      setState(prev => ({
+        ...prev,
+        isSaving: false,
+        lastSavedAt: new Date(),
+        hasUnsavedChanges: false
+      }));
       
-      // Only save if data has changed
-      if (currentData !== lastSavedDataRef.current) {
-        // Save to local storage immediately
-        saveToLocalStorage(formData);
-        
-        // Save to server
-        autoSaveMutation.mutate(formData as any);
-        lastSavedDataRef.current = currentData;
+      // Call onSaveSuccess if provided
+      if (onSaveSuccess) {
+        onSaveSuccess();
       }
-    };
+      
+      // Clear local backup after successful cloud save
+      if (enableLocalStorage) {
+        localStorage.removeItem(storageKey);
+        setState(prev => ({ ...prev, backupExists: false }));
+      }
+      
+      console.log('Content saved to cloud');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setState(prev => ({
+        ...prev,
+        isSaving: false,
+        error: errorMessage
+      }));
+      
+      // Keep local backup on cloud save failure
+      saveToLocalStorage(data);
+      
+      toast.error('Failed to save to cloud. Local backup created.');
+    }
+  }, [enableCloudSave, onSave, enableLocalStorage, storageKey, saveToLocalStorage, onSaveSuccess]);
 
-    // Clear existing timer
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
+  // Main save function
+  const save = useCallback(async (data: any = content, force: boolean = false) => {
+    if (!data || isRestoringRef.current) return;
+
+    // Save to local storage immediately
+    saveToLocalStorage(data);
+
+    // Save to cloud (with debouncing unless forced)
+    if (force || !saveTimeoutRef.current) {
+      await saveToCloud(data);
+    }
+  }, [content, saveToLocalStorage, saveToCloud]);
+
+  // Track content changes
+  const updateContent = useCallback((newContent: any) => {
+    if (isRestoringRef.current) return;
+    
+    setContent(newContent);
+    setState(prev => ({ ...prev, hasUnsavedChanges: true }));
+  }, []);
+
+  // Auto-save on content change
+  useEffect(() => {
+    if (!debouncedContent || isRestoringRef.current) return;
+
+    save(debouncedContent);
+  }, [debouncedContent, save]);
+
+  // Periodic auto-save
+  useEffect(() => {
+    if (!enableCloudSave || !state.hasUnsavedChanges) return;
+
+    const intervalId = setInterval(() => {
+      if (state.hasUnsavedChanges && content) {
+        save(content, true);
+      }
+    }, saveInterval);
+
+    return () => clearInterval(intervalId);
+  }, [enableCloudSave, state.hasUnsavedChanges, content, save, saveInterval]);
+
+  // Restore from backup
+  const restoreFromBackup = useCallback(async () => {
+    isRestoringRef.current = true;
+    
+    try {
+      // Try to restore from cloud first
+      if (onRestore) {
+        const cloudData = await onRestore();
+        if (cloudData) {
+          setContent(cloudData);
+          setState(prev => ({ 
+            ...prev, 
+            hasUnsavedChanges: false,
+            lastSavedAt: new Date()
+          }));
+          isRestoringRef.current = false;
+          return cloudData;
+        }
+      }
+
+      // Fall back to local storage
+      if (enableLocalStorage) {
+        const backup = localStorage.getItem(storageKey);
+        if (backup) {
+          const { content: savedContent, timestamp } = JSON.parse(backup);
+          setContent(savedContent);
+          
+          toast.success(`Restored from backup (${new Date(timestamp).toLocaleString()})`);
+          
+          isRestoringRef.current = false;
+          return savedContent;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to restore backup:', error);
+      toast.error('Failed to restore backup');
+    } finally {
+      isRestoringRef.current = false;
     }
 
-    // Set up new timer
-    timerRef.current = setInterval(performAutoSave, interval);
+    return null;
+  }, [onRestore, enableLocalStorage, storageKey]);
 
-    // Cleanup
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [formData, interval, saveToLocalStorage, autoSaveMutation]);
+  // Clear backup
+  const clearBackup = useCallback(() => {
+    if (enableLocalStorage) {
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(storageKey + '-old');
+      setState(prev => ({ ...prev, backupExists: false }));
+      toast.success('Backup cleared');
+    }
+  }, [enableLocalStorage, storageKey]);
 
-  // Save on window unload
+  // Handle beforeunload event
   useEffect(() => {
-    const handleBeforeUnload = (e: globalThis.BeforeUnloadEvent) => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (state.hasUnsavedChanges) {
-        saveToLocalStorage(formData);
+        const message = 'You have unsaved changes. Are you sure you want to leave?';
         e.preventDefault();
-        e.returnValue = '변경사항이 저장되지 않았습니다. 페이지를 나가시겠습니까?';
+        e.returnValue = message;
+        return message;
       }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [state.hasUnsavedChanges, formData, saveToLocalStorage]);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [state.hasUnsavedChanges]);
 
-  // Recover from local storage
-  const recoverFromLocalStorage = useCallback(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const { data, timestamp } = JSON.parse(saved);
-        return { data, timestamp: new Date(timestamp) };
+  // Handle visibility change (save when tab becomes hidden)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && state.hasUnsavedChanges && content) {
+        save(content, true);
       }
-    } catch (error: any) {
-      // Silently fail - localStorage may be disabled or empty
-    }
-    return null;
-  }, [storageKey]);
+    };
 
-  // Clear local storage
-  const clearLocalStorage = useCallback(() => {
-    localStorage.removeItem(storageKey);
-    setState((prev: any) => ({ ...prev, savedInLocalStorage: false }));
-  }, [storageKey]);
-
-  // Manual save
-  const manualSave = useCallback(() => {
-    const currentData = JSON.stringify(formData);
-    saveToLocalStorage(formData);
-    autoSaveMutation.mutate(formData as any);
-    lastSavedDataRef.current = currentData;
-  }, [formData, saveToLocalStorage, autoSaveMutation]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [state.hasUnsavedChanges, content, save]);
 
   return {
     ...state,
-    recoverFromLocalStorage,
-    clearLocalStorage,
-    manualSave,
-    isAutoSaving: autoSaveMutation.isPending
+    updateContent,
+    save: () => save(content, true),
+    restoreFromBackup,
+    clearBackup,
+    // Compatibility aliases for existing forms
+    lastSaved: state.lastSavedAt,
+    savedInLocalStorage: state.backupExists,
+    recoverFromLocalStorage: restoreFromBackup,
+    clearLocalStorage: clearBackup
   };
-};
+}
+

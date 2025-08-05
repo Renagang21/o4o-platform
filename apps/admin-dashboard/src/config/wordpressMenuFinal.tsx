@@ -101,7 +101,8 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'themes', label: '테마 관리', icon: <Palette className="w-4 h-4" />, path: '/themes' },
       { id: 'customize', label: '사용자 정의하기', icon: <Palette className="w-4 h-4" />, path: '/themes/customize' },
       { id: 'homepage', label: '홈페이지 편집', icon: <Layout className="w-4 h-4" />, path: '/themes/homepage' },
-      { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/themes/menus' }
+      { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/themes/menus' },
+      { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' }
     ]
   },
   {

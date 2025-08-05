@@ -3,7 +3,7 @@ import { authenticateToken, requireAdmin } from '../../middleware/auth';
 import { LoginSecurityService } from '../../services/LoginSecurityService';
 import { UserService } from '../../services/UserService';
 
-const router = Router();
+const router: Router = Router();
 
 // Apply admin authentication to all routes
 router.use(authenticateToken);

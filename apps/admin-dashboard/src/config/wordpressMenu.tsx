@@ -15,7 +15,8 @@ import {
   Brush,
   Box,
   Plug,
-  Layout
+  Layout,
+  Archive
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -70,6 +71,15 @@ export const wordpressMenuItems: MenuItem[] = [
     children: [
       { id: 'pages-all', label: '모든 페이지', icon: <FileTextIcon className="w-4 h-4" />, path: '/pages' },
       { id: 'pages-new', label: '새 페이지', icon: <FileTextIcon className="w-4 h-4" />, path: '/pages/new' }
+    ]
+  },
+  {
+    id: 'reusable-blocks',
+    label: '재사용 블록',
+    icon: <Archive className="w-5 h-5" />,
+    children: [
+      { id: 'reusable-blocks-all', label: '모든 블록', icon: <Archive className="w-4 h-4" />, path: '/reusable-blocks' },
+      { id: 'reusable-blocks-new', label: '새 블록', icon: <Archive className="w-4 h-4" />, path: '/reusable-blocks/new' }
     ]
   },
   {

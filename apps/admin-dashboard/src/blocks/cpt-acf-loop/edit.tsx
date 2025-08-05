@@ -503,12 +503,12 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           
           <SelectControl
             label={__('Order', 'o4o')}
-            value={order}
+            value={order as any}
             options={[
               { label: __('Descending', 'o4o'), value: 'desc' },
               { label: __('Ascending', 'o4o'), value: 'asc' },
             ]}
-            onChange={(value: any) => setAttributes({ order: value })}
+            onChange={(value: 'asc' | 'desc') => setAttributes({ order: value })}
           />
         </PanelBody>
 
