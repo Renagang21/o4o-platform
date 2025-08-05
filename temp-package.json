@@ -1,9 +1,0 @@
-{
-  "name": "o4o-platform-temp",
-  "version": "1.0.0",
-  "description": "Temporary for lockfile generation",
-  "engines": {
-    "node": ">=22.0.0 <23.0.0",
-    "npm": ">=10.9.0"
-  }
-}
