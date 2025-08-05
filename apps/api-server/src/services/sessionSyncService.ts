@@ -9,6 +9,25 @@ interface SessionData {
   status: string;
   loginAt: Date;
   expiresAt: Date;
+  deviceInfo?: DeviceInfo;
+  ipAddress?: string;
+  lastActivity?: Date;
+}
+
+interface DeviceInfo {
+  userAgent: string;
+  platform?: string;
+  browser?: string;
+  deviceType?: 'desktop' | 'mobile' | 'tablet';
+}
+
+interface SessionEvent {
+  userId: string;
+  event: 'created' | 'removed' | 'logout_all' | 'updated';
+  sessionId?: string;
+  sessionCount?: number;
+  timestamp: number;
+  metadata?: Record<string, unknown>;
 }
 
 export class SessionSyncService {
@@ -31,14 +50,21 @@ export class SessionSyncService {
   /**
    * Create a new session across all apps
    */
-  static async createSession(user: User, sessionId: string): Promise<void> {
+  static async createSession(
+    user: User, 
+    sessionId: string,
+    metadata?: { userAgent?: string; ipAddress?: string }
+  ): Promise<void> {
     const sessionData: SessionData = {
       userId: user.id,
       email: user.email,
       role: user.role,
       status: user.status,
       loginAt: new Date(),
-      expiresAt: new Date(Date.now() + this.SESSION_TTL * 1000)
+      expiresAt: new Date(Date.now() + this.SESSION_TTL * 1000),
+      ipAddress: metadata?.ipAddress,
+      lastActivity: new Date(),
+      deviceInfo: metadata?.userAgent ? this.parseDeviceInfo(metadata.userAgent) : undefined
     };
 
     // Store session data
@@ -53,12 +79,14 @@ export class SessionSyncService {
     await this.redis.expire(`${this.USER_SESSIONS_PREFIX}${user.id}`, this.SESSION_TTL);
 
     // Publish session creation event
-    await this.redis.publish('session:events', JSON.stringify({
+    const event: SessionEvent = {
       userId: user.id,
       event: 'created',
       sessionId,
-      timestamp: Date.now()
-    }));
+      timestamp: Date.now(),
+      metadata: { ipAddress: metadata?.ipAddress }
+    };
+    await this.redis.publish('session:events', JSON.stringify(event));
   }
 
   /**
@@ -90,12 +118,13 @@ export class SessionSyncService {
     await this.redis.srem(`${this.USER_SESSIONS_PREFIX}${userId}`, sessionId);
 
     // Publish session removal event
-    await this.redis.publish('session:events', JSON.stringify({
+    const event: SessionEvent = {
       userId,
       event: 'removed',
       sessionId,
       timestamp: Date.now()
-    }));
+    };
+    await this.redis.publish('session:events', JSON.stringify(event));
   }
 
   /**
@@ -113,12 +142,13 @@ export class SessionSyncService {
     await pipeline.exec();
 
     // Publish logout all event
-    await this.redis.publish('session:events', JSON.stringify({
+    const event: SessionEvent = {
       userId,
       event: 'logout_all',
       sessionCount: sessions.length,
       timestamp: Date.now()
-    }));
+    };
+    await this.redis.publish('session:events', JSON.stringify(event));
   }
 
   /**
@@ -153,12 +183,117 @@ export class SessionSyncService {
   }
 
   /**
+   * Parse device info from user agent
+   */
+  private static parseDeviceInfo(userAgent: string): DeviceInfo {
+    const deviceInfo: DeviceInfo = { userAgent };
+    
+    // Simple device type detection
+    if (/mobile/i.test(userAgent)) {
+      deviceInfo.deviceType = 'mobile';
+    } else if (/tablet/i.test(userAgent)) {
+      deviceInfo.deviceType = 'tablet';
+    } else {
+      deviceInfo.deviceType = 'desktop';
+    }
+    
+    // Browser detection
+    if (/chrome/i.test(userAgent)) {
+      deviceInfo.browser = 'Chrome';
+    } else if (/safari/i.test(userAgent)) {
+      deviceInfo.browser = 'Safari';
+    } else if (/firefox/i.test(userAgent)) {
+      deviceInfo.browser = 'Firefox';
+    }
+    
+    // Platform detection
+    if (/windows/i.test(userAgent)) {
+      deviceInfo.platform = 'Windows';
+    } else if (/mac/i.test(userAgent)) {
+      deviceInfo.platform = 'macOS';
+    } else if (/linux/i.test(userAgent)) {
+      deviceInfo.platform = 'Linux';
+    } else if (/android/i.test(userAgent)) {
+      deviceInfo.platform = 'Android';
+    } else if (/ios|iphone|ipad/i.test(userAgent)) {
+      deviceInfo.platform = 'iOS';
+    }
+    
+    return deviceInfo;
+  }
+
+  /**
+   * Update session activity
+   */
+  static async updateSessionActivity(sessionId: string): Promise<void> {
+    const data = await this.redis.get(`${this.SESSION_PREFIX}${sessionId}`);
+    if (!data) return;
+    
+    const sessionData = JSON.parse(data) as SessionData;
+    sessionData.lastActivity = new Date();
+    
+    await this.redis.setex(
+      `${this.SESSION_PREFIX}${sessionId}`,
+      this.SESSION_TTL,
+      JSON.stringify(sessionData)
+    );
+  }
+
+  /**
+   * Get active session count for a user
+   */
+  static async getActiveSessionCount(userId: string): Promise<number> {
+    const sessions = await this.getUserSessions(userId);
+    return sessions.length;
+  }
+
+  /**
+   * Check for concurrent sessions
+   */
+  static async checkConcurrentSessions(userId: string, maxSessions: number = 5): Promise<{
+    allowed: boolean;
+    currentCount: number;
+    maxAllowed: number;
+  }> {
+    const currentCount = await this.getActiveSessionCount(userId);
+    
+    return {
+      allowed: currentCount < maxSessions,
+      currentCount,
+      maxAllowed: maxSessions
+    };
+  }
+
+  /**
+   * Remove oldest session if limit exceeded
+   */
+  static async enforceSessionLimit(userId: string, maxSessions: number = 5): Promise<void> {
+    const sessions = await this.getUserSessions(userId);
+    
+    if (sessions.length >= maxSessions) {
+      // Sort by login time and remove oldest
+      const sortedSessions = sessions.sort((a, b) => 
+        new Date(a.loginAt).getTime() - new Date(b.loginAt).getTime()
+      );
+      
+      const sessionsToRemove = sessions.length - maxSessions + 1;
+      
+      for (let i = 0; i < sessionsToRemove; i++) {
+        const sessionIds = await this.redis.smembers(`${this.USER_SESSIONS_PREFIX}${userId}`);
+        if (sessionIds.length > 0) {
+          await this.removeSession(sessionIds[0], userId);
+        }
+      }
+    }
+  }
+
+  /**
    * Subscribe to session events
    */
   static subscribeToSessionEvents(
-    onSessionCreated: (data: any) => void,
-    onSessionRemoved: (data: any) => void,
-    onLogoutAll: (data: any) => void
+    onSessionCreated: (data: SessionEvent) => void,
+    onSessionRemoved: (data: SessionEvent) => void,
+    onLogoutAll: (data: SessionEvent) => void
   ): void {
     const subscriber = this.redis.duplicate();
     
@@ -166,7 +301,7 @@ export class SessionSyncService {
     
     subscriber.on('message', (channel, message) => {
       if (channel === 'session:events') {
-        const data = JSON.parse(message);
+        const data = JSON.parse(message) as SessionEvent;
         
         switch (data.event) {
           case 'created':

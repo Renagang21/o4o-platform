@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useAuthStore } from '@/api/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import ThemeSettings from './ThemeSettings'
 import { Shield } from 'lucide-react'
 

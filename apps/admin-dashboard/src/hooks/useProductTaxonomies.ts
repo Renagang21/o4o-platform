@@ -34,7 +34,7 @@ export function useProductCategories(): UseTaxonomiesResult {
         const data = await response.json();
         setCategories(data.categories || getMockCategories());
       } catch (err: any) {
-        console.error('Error fetching categories:', err);
+        // Error will be displayed to user via error state
         setError(err instanceof Error ? err.message : 'Failed to load categories');
         
         // Use mock data in development
@@ -66,7 +66,7 @@ export function useProductBrands(): UseBrandsResult {
         const data = await response.json();
         setBrands(data.brands || getMockBrands());
       } catch (err: any) {
-        console.error('Error fetching brands:', err);
+        // Error will be displayed to user via error state
         setError(err instanceof Error ? err.message : 'Failed to load brands');
         
         // Use mock data in development

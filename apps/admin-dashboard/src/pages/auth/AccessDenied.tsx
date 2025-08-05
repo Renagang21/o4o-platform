@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '@/api/authStore'
+import { useAuthStore } from '@/stores/authStore'
 
 const AccessDenied = () => {
   const logout = useAuthStore(state => state.logout)

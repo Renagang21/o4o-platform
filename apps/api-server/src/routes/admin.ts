@@ -10,6 +10,7 @@ import {
   getDashboardStats
 } from '../controllers/adminController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
+import securityRoutes from './admin/security';
 
 const router: Router = Router();
 
@@ -52,5 +53,8 @@ router.post('/users/:userId/reactivate',
   param('userId').isMongoId().withMessage('Valid user ID is required'),
   reactivateUser
 );
+
+// Security management routes
+router.use('/security', securityRoutes);
 
 export default router;

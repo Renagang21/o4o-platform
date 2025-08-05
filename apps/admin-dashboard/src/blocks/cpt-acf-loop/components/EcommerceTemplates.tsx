@@ -96,7 +96,7 @@ export const ProductCardTemplate = ({
             {false && (
               <button
                 className="o4o-product-card__action o4o-product-card__action--quickview"
-                onClick={() => console.log('Quick view', post.id)}
+                onClick={() => {/* TODO: Implement quick view */}}
                 aria-label={__('Quick View', 'o4o')}
               >
                 👁️
@@ -381,7 +381,7 @@ export const ProductListTemplate = ({
             {false && (
               <button
                 className="o4o-product-list__button o4o-product-list__button--quickview"
-                onClick={() => console.log('Quick view', post.id)}
+                onClick={() => {/* TODO: Implement quick view */}}
               >
                 {__('Quick View', 'o4o')}
               </button>

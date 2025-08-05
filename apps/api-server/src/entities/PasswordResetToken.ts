@@ -20,8 +20,11 @@ export class PasswordResetToken {
   @Column({ type: 'timestamp' })
   expiresAt: Date;
 
-  @Column({ default: false })
-  isUsed: boolean;
+  @Column()
+  email: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  usedAt: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;

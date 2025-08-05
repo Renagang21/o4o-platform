@@ -83,7 +83,7 @@ const StatsOverview = memo<StatsOverviewProps>(({ className = '' }) => {
           message: "E-commerce statistics retrieved successfully"
         } as EcommerceStatsResponse;
       } catch (error: any) {
-        console.error('Failed to fetch ecommerce stats:', error);
+        // Return sample data on error - error handled in UI
         // Return sample data on error
         return SAMPLE_ECOMMERCE_STATS;
       }

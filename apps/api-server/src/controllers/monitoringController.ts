@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import * as os from 'os';
-// import * as diskusage from 'diskusage';
 import { AppDataSource } from '../database/connection';
 import { backupService } from '../services/BackupService';
 import { errorAlertService } from '../services/ErrorAlertService';

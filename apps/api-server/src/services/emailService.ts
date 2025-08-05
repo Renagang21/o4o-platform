@@ -148,6 +148,42 @@ export class EmailService {
   }
 
   /**
+   * Send security alert email
+   */
+  async sendSecurityAlert(email: string, alertData: {
+    type: 'suspicious_login_attempts' | 'account_locked' | 'password_changed' | 'new_device_login';
+    details: {
+      message: string;
+      recommendation?: string;
+      ipAddress?: string;
+      deviceInfo?: string;
+      timestamp?: Date;
+    };
+  }): Promise<boolean> {
+    const subject = {
+      suspicious_login_attempts: 'Security Alert: Suspicious Login Attempts',
+      account_locked: 'Security Alert: Account Locked',
+      password_changed: 'Security Alert: Password Changed',
+      new_device_login: 'Security Alert: New Device Login'
+    };
+
+    return this.sendEmail({
+      to: email,
+      subject: subject[alertData.type] || 'Security Alert - O4O Platform',
+      template: 'security-alert',
+      templateData: {
+        alertType: alertData.type,
+        message: alertData.details.message,
+        recommendation: alertData.details.recommendation,
+        ipAddress: alertData.details.ipAddress,
+        deviceInfo: alertData.details.deviceInfo,
+        timestamp: alertData.details.timestamp || new Date(),
+        year: new Date().getFullYear()
+      }
+    });
+  }
+
+  /**
    * Send welcome email
    */
   async sendWelcomeEmail(email: string, name: string): Promise<boolean> {

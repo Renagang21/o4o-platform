@@ -15,6 +15,7 @@ import {
   UserStatus,
   CookieConfig 
 } from '../types/auth';
+import { RefreshTokenService } from './RefreshTokenService';
 
 class AuthService {
   private userRepository: Repository<User>;

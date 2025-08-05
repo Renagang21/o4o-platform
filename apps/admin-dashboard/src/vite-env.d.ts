@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_URL: string
-  readonly VITE_USE_MOCK: string
   readonly VITE_OAUTH_REDIRECT_URI: string
   readonly VITE_OAUTH_GOOGLE_CLIENT_ID: string
   readonly VITE_OAUTH_KAKAO_CLIENT_ID: string

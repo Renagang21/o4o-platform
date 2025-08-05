@@ -32,6 +32,15 @@ export class AuthClient {
   async logout(): Promise<void> {
     await this.api.post('/auth/logout');
   }
+
+  async checkSession(): Promise<{ isAuthenticated: boolean; user?: any }> {
+    try {
+      const response = await this.api.get('/auth/sso/check');
+      return response.data;
+    } catch (error) {
+      return { isAuthenticated: false };
+    }
+  }
 }
 
 // Singleton instance

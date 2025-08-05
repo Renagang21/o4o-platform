@@ -2,10 +2,17 @@ import { FC, useEffect  } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { DevAuthProvider } from './lib/DevAuthProvider';
+import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
 import Login from './pages/auth/Login';
-import AuthCallback from './pages/auth/AuthCallback';
+import AuthCallbackV2 from './pages/auth/AuthCallbackV2';
+import { OAuthCallback } from './pages/auth/OAuthCallback';
+import { EmailVerificationPending } from './pages/auth/EmailVerificationPending';
+import { EmailVerificationSuccess } from './pages/auth/EmailVerificationSuccess';
+import { EmailVerificationError } from './pages/auth/EmailVerificationError';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 // User Type Dashboards (non-shared components)
 import AdminDashboard from './pages/admin/Dashboard';
@@ -50,6 +57,9 @@ const App: FC = () => {
   const { checkAuth } = useAuthStore();
 
   useEffect(() => {
+    // Initialize auth interceptor
+    initializeAuthInterceptor();
+    
     // 앱 시작 시 인증 상태 확인
     checkAuth();
   }, []);
@@ -62,7 +72,13 @@ const App: FC = () => {
           {/* Public Routes */}
           <Route path="/" element={<HomeWithSettings />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/callback" element={<AuthCallbackV2 />} />
+          <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
+          <Route path="/auth/verify-email/pending" element={<EmailVerificationPending />} />
+          <Route path="/auth/verify-email/success" element={<EmailVerificationSuccess />} />
+          <Route path="/auth/verify-email/error" element={<EmailVerificationError />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
           
           {/* Protected Admin Routes */}
           <Route path="/admin" element={

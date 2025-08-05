@@ -85,19 +85,28 @@ export const dashboardApi = {
     let crowdfundingStats: any = null;
     
     try {
-      // 개발 환경에서는 Mock 데이터 사용
-      if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
-        const response = await api.get('/dashboard/stats');
-        return response.data.data.stats;
-      }
-      
-      // Production: Use EcommerceApi and App services for dashboard stats
+      // Use EcommerceApi and App services for dashboard stats
       const [dashboardStatsResponse, usersResponse, forumStatsRes, signageStatsRes, crowdfundingStatsRes] = await Promise.all([
         EcommerceApi.getDashboardStats(),
-        api.get('/api/users/stats').catch(() => ({ data: {} })),
-        forumService.getStats().catch(() => null),
-        signageService.getStats().catch(() => null),
-        crowdfundingService.getStats().catch(() => null)
+        api.get('/api/users/stats').catch(() => {
+          // API 오류 시 기본값 반환하고 토스트 메시지 표시
+          import('react-hot-toast').then(({ default: toast }) => {
+            toast.error('사용자 통계를 불러올 수 없습니다');
+          });
+          return { data: { total: 0, pending: 0, todayCount: 0, activeRate: 0 } };
+        }),
+        forumService.getStats().catch(() => {
+          // 포럼 통계 실패는 조용히 처리 (선택적 기능)
+          return null;
+        }),
+        signageService.getStats().catch(() => {
+          // 사이니지 통계 실패는 조용히 처리 (선택적 기능)
+          return null;
+        }),
+        crowdfundingService.getStats().catch(() => {
+          // 크라우드펀딩 통계 실패는 조용히 처리 (선택적 기능)
+          return null;
+        })
       ]);
       
       forumStats = forumStatsRes;
@@ -232,13 +241,7 @@ export const dashboardApi = {
   // 차트 데이터 조회
   async getChartData() {
     try {
-      // 개발 환경에서는 Mock 데이터 사용
-      if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
-        const response = await api.get('/dashboard/charts');
-        return response.data.data;
-      }
-      
-      // Production: Use EcommerceApi for sales report
+      // Use EcommerceApi for sales report
       const [salesReportResponse, ordersResponse] = await Promise.all([
         EcommerceApi.getSalesReport('month'),
         EcommerceApi.getOrders(1, 100) // Get recent orders for status distribution

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/api/authStore'
+import { useAuthStore } from '@/stores/authStore'
 
 export interface Permission {
   resource: string
@@ -56,7 +56,21 @@ export const PERMISSIONS = {
 export type PermissionKey = typeof PERMISSIONS[keyof typeof PERMISSIONS]
 
 export const usePermissions = () => {
-  const { hasPermission, isAdmin, user } = useAuthStore()
+  const user = useAuthStore(state => state.user)
+  
+  const isAdmin = () => {
+    return user?.role === 'admin' || user?.roles?.includes('admin') || false
+  }
+  
+  const hasPermission = (_permission: string): boolean => {
+    if (!user) return false
+    
+    // Super admin has all permissions
+    if (isAdmin()) return true
+    
+    // Check specific permission in user permissions
+    return false // For now, as permissions are not stored in the current user object
+  }
   
   const checkPermission = (permission: PermissionKey): boolean => {
     return hasPermission(permission)
@@ -138,7 +152,7 @@ export const usePermissions = () => {
     canAccessMenu,
     isAdmin: isAdmin(),
     userRole: user?.role,
-    userPermissions: (user as any)?.permissions || []
+    userPermissions: []
   }
 }
 

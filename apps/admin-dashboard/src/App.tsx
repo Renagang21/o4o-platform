@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AdminProtectedRoute, SessionManager } from '@o4o/auth-context';
 import { AuthClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { DevAuthProvider } from '@/lib/DevAuthProvider';
 import { useEffect, Suspense, lazy } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import AppGuard from '@/components/AppGuard';
@@ -106,29 +105,26 @@ function App() {
   
   // Initialize SSO on app start
   useEffect(() => {
-    // Only start SSO session monitoring if not using mock
-    if (import.meta.env.VITE_USE_MOCK !== 'true') {
-      // Initial SSO session check
-      checkSSOSession().catch((error) => {
-        console.error('Initial session check failed:', error);
-        // 초기 체크 실패 시 로컬 스토리지 정리
-        localStorage.removeItem('auth-storage');
-        localStorage.removeItem('authToken');
-      });
-      
-      // Start SSO session monitoring
-      ssoService.startSessionCheck((isAuthenticated) => {
-        if (!isAuthenticated) {
-          toast.error('Session expired. Please log in again.');
-          // Update auth store when session expires
-          checkSSOSession();
-        }
-      });
-      
-      return () => {
-        ssoService.stopSessionCheck();
-      };
-    }
+    // Initial SSO session check
+    checkSSOSession().catch((error) => {
+      console.error('Initial session check failed:', error);
+      // 초기 체크 실패 시 로컬 스토리지 정리
+      localStorage.removeItem('auth-storage');
+      localStorage.removeItem('authToken');
+    });
+    
+    // Start SSO session monitoring
+    ssoService.startSessionCheck((isAuthenticated) => {
+      if (!isAuthenticated) {
+        toast.error('Session expired. Please log in again.');
+        // Update auth store when session expires
+        checkSSOSession();
+      }
+    });
+    
+    return () => {
+      ssoService.stopSessionCheck();
+    };
   }, [checkSSOSession]);
   
   // 인증 오류 처리
@@ -159,22 +155,15 @@ function App() {
     });
   };
 
-  // 프로덕션에서는 항상 AuthProvider 사용
-  // DevAuthProvider는 VITE_USE_MOCK=true일 때만 사용
-  // 임시: 프로덕션에서도 VITE_USE_MOCK 체크
-  const useDevAuth = import.meta.env.VITE_USE_MOCK === 'true';
-  const AuthProviderComponent = useDevAuth ? DevAuthProvider : AuthProvider;
   
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProviderComponent 
-          {...(!useDevAuth ? {
-            ssoClient,
-            autoRefresh: true,
-            onAuthError: handleAuthError,
-            onSessionExpiring: handleSessionExpiring
-          } : {})}
+        <AuthProvider
+          ssoClient={ssoClient}
+          autoRefresh={true}
+          onAuthError={handleAuthError}
+          onSessionExpiring={handleSessionExpiring}
         >
           <SessionManager
             warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
@@ -757,7 +746,7 @@ function App() {
             } />
         </Routes>
       </SessionManager>
-    </AuthProviderComponent>
+    </AuthProvider>
     </ThemeProvider>
     </ErrorBoundary>
   );
