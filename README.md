@@ -12,3 +12,4 @@
 ## 개발자 가이드
 
 Claude Code 및 AI 어시스턴트와 함께 작업하는 방법은 [CLAUDE.md](./CLAUDE.md)를 참조하세요.
+# Updated Tue Aug  5 12:01:23 KST 2025
