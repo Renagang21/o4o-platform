@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
 import { apiClient } from '@/services/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@o4o/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
 
 interface VerifyResponse {
   success: boolean;

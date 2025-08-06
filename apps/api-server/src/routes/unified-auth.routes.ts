@@ -1,11 +1,12 @@
 import { Router } from 'express';
+import type { Router as ExpressRouter } from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { UnifiedAuthService } from '../services/unified-auth.service';
 import { authenticate } from '../middleware/auth.middleware';
 import { AuthProvider, OAuthProfile } from '../types/account-linking';
 import logger from '../utils/logger';
 
-const router = Router();
+const router: ExpressRouter = Router();
 const unifiedAuthService = new UnifiedAuthService();
 
 // Validation middleware

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   AuthState, 
@@ -28,6 +28,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading: true,
     error: null
   });
+
+  const clearAuthState = useCallback(() => {
+    // Clear localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+
+    // Clear authorization header
+    delete apiClient.defaults.headers.common['Authorization'];
+
+    // Reset state
+    setState({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null
+    });
+  }, []);
 
   // Load auth state from localStorage on mount
   useEffect(() => {
@@ -60,9 +80,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     loadAuthState();
-  }, []);
+  }, [clearAuthState]);
 
-  const saveAuthState = (data: AuthResponse['data']) => {
+  const saveAuthState = useCallback((data: AuthResponse['data']) => {
     if (!data) return;
 
     const { user, accessToken, refreshToken } = data;
@@ -86,27 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isLoading: false,
       error: null
     });
-  };
-
-  const clearAuthState = () => {
-    // Clear localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-
-    // Clear authorization header
-    delete apiClient.defaults.headers.common['Authorization'];
-
-    // Reset state
-    setState({
-      user: null,
-      accessToken: null,
-      refreshToken: null,
-      isAuthenticated: false,
-      isLoading: false,
-      error: null
-    });
-  };
+  }, []);
 
   const login = async (data: LoginFormData): Promise<AuthResponse> => {
     try {
@@ -168,7 +168,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const refreshToken = async () => {
+  const refreshToken = useCallback(async () => {
     try {
       const currentRefreshToken = state.refreshToken || localStorage.getItem('refreshToken');
       
@@ -190,7 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clearAuthState();
       navigate('/auth/login');
     }
-  };
+  }, [state.refreshToken, saveAuthState, clearAuthState, navigate]);
 
   // Setup axios interceptor for token refresh
   useEffect(() => {
