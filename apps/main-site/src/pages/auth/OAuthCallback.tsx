@@ -3,8 +3,8 @@ import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { apiClient } from '@/services/api';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@o4o/ui';
+import { Button } from '@o4o/ui';
 
 interface OAuthCallbackResponse {
   success: boolean;
