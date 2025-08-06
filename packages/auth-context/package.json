@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "npx tsc",
+    "build": "node build.js",
+    "build:tsc": "npx tsc",
     "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
