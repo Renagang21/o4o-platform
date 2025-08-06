@@ -190,7 +190,7 @@ export class CreateBlockPatternsTable1738500000004 implements MigrationInterface
             columnNames: ["authorId"] 
         }))
 
-        console.log('✅ Block patterns table created successfully')
+        // Block patterns table created successfully
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -211,6 +211,6 @@ export class CreateBlockPatternsTable1738500000004 implements MigrationInterface
         // Drop table
         await queryRunner.dropTable("block_patterns")
 
-        console.log('✅ Block patterns table dropped successfully')
+        // Block patterns table dropped successfully
     }
 }

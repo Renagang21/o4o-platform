@@ -215,7 +215,7 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
         await queryRunner.createIndex("post_categories", new TableIndex({ name: "IDX_post_categories_postId", columnNames: ["postId"] }))
         await queryRunner.createIndex("post_categories", new TableIndex({ name: "IDX_post_categories_categoryId", columnNames: ["categoryId"] }))
 
-        console.log('✅ Posts table and relationships created successfully')
+        // Posts table and relationships created successfully
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -239,6 +239,6 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
         await queryRunner.dropTable("post_categories")
         await queryRunner.dropTable("posts")
 
-        console.log('✅ Posts table and relationships dropped successfully')
+        // Posts table and relationships dropped successfully
     }
 }

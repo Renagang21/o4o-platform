@@ -242,7 +242,7 @@ export default function PlaylistManager({ storeId }: PlaylistManagerProps) {
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">Playlists</h2>
               <button
-                onClick={() => console.log('Create modal would open')}
+                onClick={() => {/* TODO: Implement create modal */}}
                 className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center"
               >
                 <Plus className="w-3 h-3 mr-1" />

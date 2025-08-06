@@ -254,7 +254,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
             );
         `);
 
-        console.log('✅ Default block patterns seeded successfully');
+        // Default block patterns seeded successfully
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -263,6 +263,6 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
             DELETE FROM block_patterns WHERE source = 'core'
         `);
 
-        console.log('✅ Default block patterns removed successfully');
+        // Default block patterns removed successfully
     }
 }

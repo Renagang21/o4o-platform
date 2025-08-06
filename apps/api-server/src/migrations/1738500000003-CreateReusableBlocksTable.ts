@@ -165,7 +165,7 @@ export class CreateReusableBlocksTable1738500000003 implements MigrationInterfac
             columnNames: ["usageCount"] 
         }))
 
-        console.log('✅ Reusable blocks table created successfully')
+        // Reusable blocks table created successfully
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -185,6 +185,6 @@ export class CreateReusableBlocksTable1738500000003 implements MigrationInterfac
         // Drop table
         await queryRunner.dropTable("reusable_blocks")
 
-        console.log('✅ Reusable blocks table dropped successfully')
+        // Reusable blocks table dropped successfully
     }
 }

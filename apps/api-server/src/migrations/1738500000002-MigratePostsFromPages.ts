@@ -8,7 +8,7 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
             // Check if Pages table exists and has post-type records
             const pagesTableExists = await queryRunner.hasTable("pages")
             if (!pagesTableExists) {
-                console.log('⚠️  Pages table does not exist, skipping migration')
+                // Pages table does not exist, skipping migration
                 return
             }
 
@@ -18,10 +18,10 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
             `)
             
             const totalPosts = parseInt(postTypeCount[0]?.count || '0')
-            console.log(`📊 Found ${totalPosts} post-type records to migrate`)
+            // Found post-type records to migrate
 
             if (totalPosts === 0) {
-                console.log('✅ No post-type records found in pages table')
+                // No post-type records found in pages table
                 return
             }
 
@@ -74,7 +74,7 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
             const migratedCount = await queryRunner.query(`SELECT COUNT(*) as count FROM "posts"`)
             const actualMigrated = parseInt(migratedCount[0]?.count || '0')
             
-            console.log(`✅ Successfully migrated ${actualMigrated} posts from pages table`)
+            // Successfully migrated posts from pages table
 
             // Optional: Create a backup log of migrated records
             await queryRunner.query(`
@@ -107,7 +107,7 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
                 })
             ])
 
-            console.log('📝 Migration log created successfully')
+            // Migration log created successfully
 
         } catch (error) {
             console.error('❌ Error during posts migration:', error)
@@ -130,7 +130,7 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
                 migratedCount = parseInt(logRecord[0]?.records_migrated || '0')
             }
 
-            console.log(`🔄 Rolling back migration of ${migratedCount} posts`)
+            // Rolling back migration of posts
 
             // Note: We don't delete the migrated posts as they might have been modified
             // Instead, we just log the rollback attempt
@@ -155,8 +155,8 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
                 ])
             }
 
-            console.log('⚠️  Rollback logged. Posts data preserved for safety.')
-            console.log('💡 If you need to remove migrated posts, do it manually after verification.')
+            // Rollback logged. Posts data preserved for safety.
+            // If you need to remove migrated posts, do it manually after verification.
 
         } catch (error) {
             console.error('❌ Error during rollback:', error)
