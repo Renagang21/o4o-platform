@@ -8,6 +8,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
+import { AuthRequest } from '../types/auth';
 
 export class MediaController {
   private mediaFileRepository = AppDataSource.getRepository(MediaFile);
@@ -183,11 +184,6 @@ export class MediaController {
 
       try {
         const files = req.files as Express.Multer.File[];
-        interface AuthRequest extends Request {
-          user?: {
-            id: string;
-          };
-        }
         const userId = (req as AuthRequest).user?.id;
         const { folderId } = req.body;
 

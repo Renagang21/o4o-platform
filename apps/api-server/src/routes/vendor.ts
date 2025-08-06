@@ -3,21 +3,7 @@ import { authenticateToken as authMiddleware, requireRole } from '../middleware/
 import { VendorStatsController } from '../controllers/vendor/vendorStatsController';
 import { VendorProductController } from '../controllers/vendor/vendorProductController';
 import { VendorOrderController } from '../controllers/vendor/vendorOrderController';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    name?: string;
-    businessInfo?: {
-      companyName?: string;
-      [key: string]: any;
-    };
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../types/auth';
 
 const router: Router = Router();
 

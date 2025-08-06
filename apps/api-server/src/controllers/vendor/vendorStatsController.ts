@@ -3,16 +3,7 @@ import { AppDataSource } from '../../database/connection';
 import { Order, OrderStatus } from '../../entities/Order';
 import { Product, ProductStatus } from '../../entities/Product';
 import { Between, MoreThan } from 'typeorm';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../../types/auth';
 
 export class VendorStatsController {
   // 벤더 대시보드 통계

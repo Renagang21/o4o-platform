@@ -41,9 +41,8 @@ export interface JWTPayload {
   exp?: number;
 }
 
-export interface AuthRequest extends Request {
-  user?: JWTPayload;
-}
+// AuthRequest interface is now extended via global.d.ts
+export type AuthRequest = Request;
 
 export interface LoginCredentials {
   email: string;

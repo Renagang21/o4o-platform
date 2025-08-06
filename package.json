@@ -92,6 +92,7 @@
   "author": "O4O Platform Team",
   "license": "MIT",
   "dependencies": {
+    "@babel/runtime": "7.28.2",
     "@radix-ui/react-alert-dialog": "1.1.14",
     "@radix-ui/react-avatar": "1.1.10",
     "@radix-ui/react-toast": "1.2.14",

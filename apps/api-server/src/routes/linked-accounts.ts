@@ -1,16 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middleware/auth';
 import { SessionSyncService } from '../services/sessionSyncService';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../types/auth';
 
 const router: Router = Router();
 

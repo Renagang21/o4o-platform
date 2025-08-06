@@ -165,7 +165,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
           <p className="text-gray-600">Manage content schedules for this store</p>
         </div>
         <button
-          onClick={() => console.log('Create modal would open')}
+          onClick={() => {/* TODO: Implement create modal */}}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -306,7 +306,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Schedules</h3>
             <p className="text-gray-600 mb-4">Create your first schedule to automate content playback</p>
             <button
-              onClick={() => console.log('Create modal would open')}
+              onClick={() => {/* TODO: Implement create modal */}}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center mx-auto"
             >
               <Plus className="w-4 h-4 mr-2" />

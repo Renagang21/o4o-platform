@@ -4,12 +4,7 @@ import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
 import { BetaUser } from '../entities/BetaUser';
 import { authService } from '../services/AuthService';
-import { UserRole, UserStatus, AccessTokenPayload } from '../types/auth';
-
-// Use AccessTokenPayload for req.user since that's what authService returns
-interface AuthRequest extends Request {
-  user?: AccessTokenPayload;
-}
+import { UserRole, UserStatus, AccessTokenPayload, AuthRequest } from '../types/auth';
 
 // Request 타입 확장은 types/express.d.ts에서 처리됨
 

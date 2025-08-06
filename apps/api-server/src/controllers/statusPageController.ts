@@ -1,16 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusPageService } from '../services/StatusPageService';
 import { IncidentImpact, IncidentStatus, ComponentType, ServiceStatus } from '../entities/StatusPage';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../types/auth';
 
 export class StatusPageController {
   private statusPageService: StatusPageService;

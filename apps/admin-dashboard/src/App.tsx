@@ -39,6 +39,7 @@ const Settings = lazy(() => import('@/pages/settings/Settings'));
 const Pages = lazy(() => import('@/pages/pages/Pages'));
 const Media = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
+const ReusableBlocksPage = lazy(() => import('@/pages/content/ReusableBlocksPage'));
 const Categories = lazy(() => import('@/pages/categories/Categories'));
 const HomepageEditor = lazy(() => import('@/pages/templates/HomepageEditor'));
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
@@ -47,6 +48,10 @@ const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories
 const Menus = lazy(() => import('@/pages/menus/Menus'));
 const TestPage = lazy(() => import('@/pages/test/TestPage'));
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
+
+// Appearance Pages
+const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
+const TemplatePartEditor = lazy(() => import('@/pages/appearance/TemplatePartEditor'));
 const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
@@ -281,6 +286,15 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
+                    {/* 재사용 블록 관리 */}
+                    <Route path="/reusable-blocks" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ReusableBlocksPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
                     {/* 테마 관리 */}
                     <Route path="/themes/*" element={
                       <AdminProtectedRoute requiredPermissions={['templates:write']}>
@@ -310,6 +324,29 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['menus:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Menus />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Appearance - Template Parts */}
+                    <Route path="/appearance/template-parts" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplateParts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/appearance/template-parts/new" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplatePartEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/appearance/template-parts/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <TemplatePartEditor />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

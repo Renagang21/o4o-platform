@@ -2,16 +2,7 @@ import { Request, Response } from 'express';
 import { OperationsMonitoringService, SystemStatus, HealthCheckResult, AlertRule } from '../services/OperationsMonitoringService';
 import { MetricType, MetricCategory, SystemMetrics } from '../entities/SystemMetrics';
 import { AlertSeverity, AlertStatus } from '../entities/Alert';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../types/auth';
 
 export class OperationsController {
   private operationsService: OperationsMonitoringService;

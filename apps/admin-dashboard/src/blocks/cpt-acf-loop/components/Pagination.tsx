@@ -15,7 +15,7 @@ interface PaginationProps {
   totalItems: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
-  paginationType: 'numbers' | 'loadmore' | 'infinite';
+  paginationType: 'numbers' | 'loadmore' | 'infinite' | 'none';
   isLoading?: boolean;
   onLoadMore?: () => void;
   hasMore?: boolean;
@@ -315,7 +315,7 @@ export const PaginationSettings = ({
     <>
       <SelectControl
         label={__('Pagination Type', 'o4o')}
-        value={paginationType}
+        value={paginationType as any}
         options={[
           { label: __('Page Numbers', 'o4o'), value: 'numbers' },
           { label: __('Load More Button', 'o4o'), value: 'loadmore' },

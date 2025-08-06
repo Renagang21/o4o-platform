@@ -1,14 +1,127 @@
 /**
- * Register all custom Gutenberg blocks
+ * Custom Blocks Registration
+ * Import and register all custom blocks for the WordPress editor
  */
 
-// Setup WordPress API for our backend
-import '@/lib/wordpress-api-setup';
+import domReady from '@wordpress/dom-ready';
 
-// Import all blocks
-import './cpt-acf-loop';
+// Import custom block types
+import './group';
+import './columns';
+import './cover';
 
-// Export block names for reference
-export const BLOCK_NAMES = {
-  CPT_ACF_LOOP: 'o4o/cpt-acf-loop',
-} as const;
+// Additional block styles
+const blockStyles = `
+  /* Group Block Styles */
+  .o4o-group-block {
+    box-sizing: border-box;
+  }
+  
+  .o4o-group-block.flex {
+    display: flex;
+  }
+  
+  .o4o-group-block.grid {
+    display: grid;
+  }
+  
+  /* Columns Block Styles */
+  .o4o-columns-block {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .o4o-column-block {
+    box-sizing: border-box;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .o4o-columns-block.stack-on-mobile {
+      flex-direction: column !important;
+    }
+    
+    .o4o-columns-block.stack-on-mobile .o4o-column-block {
+      flex-basis: 100% !important;
+      margin-bottom: 20px;
+    }
+  }
+  
+  /* Cover Block Styles */
+  .o4o-cover-block {
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  .o4o-cover-block.is-dark {
+    color: #ffffff;
+  }
+  
+  .o4o-cover-block.is-light {
+    color: #000000;
+  }
+  
+  .o4o-cover-block__overlay {
+    transition: opacity 0.3s ease;
+  }
+  
+  .o4o-cover-block__content {
+    text-align: center;
+  }
+  
+  /* InnerBlocks Styles */
+  .block-editor-inner-blocks {
+    height: 100%;
+  }
+  
+  .block-editor-inner-blocks .block-editor-block-list__layout {
+    height: 100%;
+  }
+  
+  /* Block Appender Styles */
+  .block-list-appender {
+    margin-top: 20px;
+  }
+  
+  .block-editor-button-block-appender {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    border: 2px dashed #ddd;
+    color: #555;
+    transition: all 0.2s ease;
+  }
+  
+  .block-editor-button-block-appender:hover {
+    border-color: #007cba;
+    color: #007cba;
+    background-color: rgba(0, 124, 186, 0.04);
+  }
+`;
+
+// Initialize custom blocks
+export function initializeCustomBlocks() {
+  domReady(() => {
+    // Add custom styles to the editor
+    const styleElement = document.createElement('style');
+    styleElement.textContent = blockStyles;
+    document.head.appendChild(styleElement);
+    
+    console.log('Custom blocks initialized:', [
+      'o4o/group',
+      'o4o/columns',
+      'o4o/column',
+      'o4o/cover'
+    ]);
+  });
+}
+
+// Export block names for use in allowed blocks lists
+export const CUSTOM_BLOCKS = [
+  'o4o/group',
+  'o4o/columns',
+  'o4o/cover'
+];

@@ -4,16 +4,7 @@ import { Product } from '../../entities/Product';
 import { Category } from '../../entities/Category';
 import { Like, In } from 'typeorm';
 import slugify from 'slugify';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../../types/auth';
 
 export class VendorProductController {
   // 벤더의 상품 목록 조회

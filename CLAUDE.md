@@ -168,6 +168,19 @@ npm install
 - **Always** commit `package-lock.json` when dependencies change
 - **IMPORTANT**: Never create commits - user will handle all git commits manually
 
+### Code Change Checklist
+When modifying any code, ALWAYS check:
+1. **ESLint**: Run `npm run lint` to ensure no warnings/errors
+2. **TypeScript**: Run `npm run type-check` to verify type safety
+3. **Dependencies**: Check React Hook dependencies are complete
+4. **Build**: Run `npm run build` to ensure successful compilation
+5. **Tests**: Run relevant tests if available
+
+**특히 React Hooks 사용 시**:
+- useEffect, useCallback, useMemo의 dependency array 확인
+- 누락된 의존성이 있으면 추가
+- 함수를 의존성에 포함할 때는 해당 함수도 useCallback으로 감싸기
+
 ### Quick Commands
 ```bash
 # Essential development commands via dev.sh script

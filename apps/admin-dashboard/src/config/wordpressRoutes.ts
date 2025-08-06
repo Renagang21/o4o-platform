@@ -30,6 +30,10 @@ export const wordpressRoutes: WordPressRoute[] = [
   { wpPath: '/wp-admin/edit.php?post_type=page', reactPath: '/pages', title: 'Pages' },
   { wpPath: '/wp-admin/post-new.php?post_type=page', reactPath: '/pages/new', title: 'Add New Page' },
   
+  // Reusable Blocks
+  { wpPath: '/wp-admin/edit.php?post_type=wp_block', reactPath: '/reusable-blocks', title: 'Reusable Blocks' },
+  { wpPath: '/wp-admin/post-new.php?post_type=wp_block', reactPath: '/reusable-blocks/new', title: 'Add New Block' },
+  
   // Comments
   { wpPath: '/wp-admin/edit-comments.php', reactPath: '/comments', title: 'Comments' },
   

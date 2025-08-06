@@ -3,16 +3,7 @@ import { AppDataSource } from '../../database/connection';
 import { Order } from '../../entities/Order';
 import { OrderStatus } from '../../entities/Order';
 import { Between, Like } from 'typeorm';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../../types/auth';
 
 export class VendorOrderController {
   // 벤더의 주문 목록 조회
