@@ -218,7 +218,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       apiClient.interceptors.response.eject(interceptor);
     };
-  }, [state.accessToken]);
+  }, [state.accessToken, refreshToken]);
 
   const value: AuthContextType = {
     ...state,

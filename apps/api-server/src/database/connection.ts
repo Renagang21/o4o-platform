@@ -4,6 +4,8 @@ import { RefreshToken } from '../entities/RefreshToken';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { ApprovalLog } from '../entities/ApprovalLog';
+import { LinkedAccount } from '../entities/LinkedAccount';
+import { AccountActivity } from '../entities/AccountActivity';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
 import { Product } from '../entities/Product';
@@ -70,6 +72,8 @@ export const AppDataSource = new DataSource({
         PasswordResetToken,
         EmailVerificationToken,
         ApprovalLog,
+        LinkedAccount,
+        AccountActivity,
         MediaFile,
         MediaFolder,
         Product,
