@@ -26,11 +26,11 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@/types': path.resolve(__dirname, './src/types'),
       '@/api': path.resolve(__dirname, './src/api'),
       '@/styles': path.resolve(__dirname, './src/styles'),
-      '@o4o/types': path.resolve(__dirname, '../../packages/types/dist'),
-      '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist'),
-      '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist'),
-      '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/dist'),
-      '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist')
+      '@o4o/types': path.resolve(__dirname, '../../packages/types'),
+      '@o4o/utils': path.resolve(__dirname, '../../packages/utils'),
+      '@o4o/ui': path.resolve(__dirname, '../../packages/ui'),
+      '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client'),
+      '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context')
     }
   },
   server: {
