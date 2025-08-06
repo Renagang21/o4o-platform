@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -31,11 +29,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: rgb(var(--color-border));
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
@@ -70,19 +69,32 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    --tw-ring-color: rgb(var(--color-ring));
+    --tw-ring-offset-color: rgb(var(--color-background));
   }
   
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+    background-color: rgb(var(--color-primary));
+    color: rgb(var(--color-primary-foreground));
+  }
+  
+  .btn-primary:hover {
+    background-color: rgb(var(--color-primary) / 0.9);
   }
   
   .btn-secondary {
-    @apply bg-muted text-muted-foreground hover:bg-muted/80;
+    background-color: rgb(var(--color-muted));
+    color: rgb(var(--color-muted-foreground));
   }
   
-  .btn-ghost {
-    @apply hover:bg-muted hover:text-foreground;
+  .btn-secondary:hover {
+    background-color: rgb(var(--color-muted) / 0.8);
+  }
+  
+  .btn-ghost:hover {
+    background-color: rgb(var(--color-muted));
+    color: rgb(var(--color-foreground));
   }
   
   .btn-sm {
@@ -98,27 +110,48 @@
   }
   
   .input {
-    @apply flex h-10 w-full rounded-md border border-input bg-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    border-color: rgb(var(--color-border));
+    background-color: rgb(var(--color-input));
+    --tw-ring-color: rgb(var(--color-ring));
+    --tw-ring-offset-color: rgb(var(--color-background));
+  }
+  
+  .input::placeholder {
+    color: rgb(var(--color-muted-foreground));
   }
   
   .textarea {
-    @apply flex min-h-[80px] w-full rounded-md border border-input bg-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    border-color: rgb(var(--color-border));
+    background-color: rgb(var(--color-input));
+    --tw-ring-color: rgb(var(--color-ring));
+    --tw-ring-offset-color: rgb(var(--color-background));
+  }
+  
+  .textarea::placeholder {
+    color: rgb(var(--color-muted-foreground));
   }
   
   .card {
-    @apply rounded-lg border bg-background p-6 shadow-sm;
+    @apply rounded-lg border p-6 shadow-sm;
+    background-color: rgb(var(--color-background));
+    border-color: rgb(var(--color-border));
   }
   
   .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+    --tw-ring-color: rgb(var(--color-ring));
   }
   
   .badge-primary {
-    @apply bg-primary/10 text-primary;
+    background-color: rgb(var(--color-primary) / 0.1);
+    color: rgb(var(--color-primary));
   }
   
   .badge-secondary {
-    @apply bg-muted text-muted-foreground;
+    background-color: rgb(var(--color-muted));
+    color: rgb(var(--color-muted-foreground));
   }
 }
 
@@ -153,19 +186,23 @@
 }
 
 .markdown-content code {
-  @apply bg-muted px-1 py-0.5 rounded text-sm;
+  @apply px-1 py-0.5 rounded text-sm;
+  background-color: rgb(var(--color-muted));
 }
 
 .markdown-content pre {
-  @apply bg-muted p-4 rounded-lg overflow-x-auto mb-4;
+  @apply p-4 rounded-lg overflow-x-auto mb-4;
+  background-color: rgb(var(--color-muted));
 }
 
 .markdown-content blockquote {
-  @apply border-l-4 border-primary/30 pl-4 italic my-4;
+  @apply border-l-4 pl-4 italic my-4;
+  border-color: rgb(var(--color-primary) / 0.3);
 }
 
 .markdown-content a {
-  @apply text-primary hover:underline;
+  @apply hover:underline;
+  color: rgb(var(--color-primary));
 }
 
 /* Loading skeleton */
@@ -179,8 +216,9 @@
 }
 
 .skeleton {
-  @apply relative overflow-hidden bg-muted;
-  background: linear-gradient(
+  @apply relative overflow-hidden;
+  background-color: rgb(var(--color-muted));
+  background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
     rgba(255, 255, 255, 0.1) 50%,
@@ -197,15 +235,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted;
+  background-color: rgb(var(--color-muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-md;
+  @apply rounded-md;
+  background-color: rgb(var(--color-muted-foreground) / 0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground/30;
+  background-color: rgb(var(--color-muted-foreground) / 0.3);
 }
 
 /* Smooth transitions */

@@ -29,7 +29,8 @@
   },
   "include": [
     "src/**/*",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "src/types/express.d.ts"
   ],
   "exclude": [
     "node_modules",

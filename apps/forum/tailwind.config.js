@@ -9,18 +9,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: 'rgb(var(--color-border) / <alpha-value>)',
-        input: 'rgb(var(--color-input) / <alpha-value>)',
-        ring: 'rgb(var(--color-ring) / <alpha-value>)',
-        background: 'rgb(var(--color-background) / <alpha-value>)',
-        foreground: 'rgb(var(--color-foreground) / <alpha-value>)',
+        border: '#e5e7eb',
+        input: '#ffffff',
+        ring: '#0ea5e9',
+        background: '#ffffff',
+        foreground: '#111827',
         primary: {
-          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
-          foreground: 'rgb(var(--color-primary-foreground) / <alpha-value>)',
+          DEFAULT: '#0ea5e9',
+          foreground: '#ffffff',
         },
         muted: {
-          DEFAULT: 'rgb(var(--color-muted) / <alpha-value>)',
-          foreground: 'rgb(var(--color-muted-foreground) / <alpha-value>)',
+          DEFAULT: '#f3f4f6',
+          foreground: '#6b7280',
         },
       },
       borderRadius: {

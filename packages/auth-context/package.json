@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "node build.js",
+    "build:server": "node build-server.js",
     "build:tsc": "npx tsc",
     "type-check": "npx tsc --noEmit"
   },
