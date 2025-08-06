@@ -76,14 +76,15 @@ jobs:
     - name: Setup SSH
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        WEB_SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
       run: |
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
-        cat >> ~/.ssh/config << 'EOF'
+        cat >> ~/.ssh/config << EOF
         Host web-server
-          HostName ${{ secrets.WEB_SERVER_HOST }}
+          HostName $WEB_SERVER_HOST
           User ubuntu
           Port 22
           IdentityFile ~/.ssh/id_rsa
@@ -189,6 +190,8 @@ jobs:
         curl -I -L --connect-timeout 10 https://neture.co.kr || true
         
     - name: Health check with diagnostics
+      env:
+        WEB_SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
       run: |
         echo "🏥 Running health checks..."
         MAX_ATTEMPTS=10
@@ -218,7 +221,7 @@ jobs:
             
             # Additional diagnostics
             echo "Checking server directly..."
-            curl -s -I --connect-timeout 5 http://${{ secrets.WEB_SERVER_HOST }} || true
+            curl -s -I --connect-timeout 5 http://$WEB_SERVER_HOST || true
             
             ATTEMPT=$((ATTEMPT + 1))
             
@@ -235,7 +238,7 @@ jobs:
           # Final diagnostics
           echo "Running final diagnostics..."
           echo "1. Checking if server is reachable:"
-          ping -c 3 ${{ secrets.WEB_SERVER_HOST }} || true
+          ping -c 3 $WEB_SERVER_HOST || true
           
           echo "2. Checking SSL certificate:"
           openssl s_client -connect neture.co.kr:443 -servername neture.co.kr < /dev/null || true
