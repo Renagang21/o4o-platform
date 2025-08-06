@@ -5,6 +5,45 @@
 
 import { useState, useCallback } from 'react';
 
+// Generate unique client ID for blocks
+const generateClientId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
+// Helper function to convert WordPress blocks to pattern blocks
+const convertBlocksToPatternBlocks = (blocks: any[]): PatternBlock[] => {
+  return blocks.map(block => ({
+    name: block.name,
+    attributes: block.attributes,
+    innerBlocks: block.innerBlocks ? convertBlocksToPatternBlocks(block.innerBlocks) : undefined,
+    innerHTML: block.innerHTML
+  }));
+};
+
+// Transform pattern to WordPress blocks
+const transformPatternToBlocks = (pattern: BlockPattern): any[] => {
+  // Transform pattern content to WordPress block format
+  const transformBlock = (patternBlock: PatternBlock): any => {
+    const block: any = {
+      name: patternBlock.name,
+      attributes: patternBlock.attributes || {},
+      innerBlocks: [],
+      innerHTML: patternBlock.innerHTML || ''
+    };
+
+    if (patternBlock.innerBlocks && patternBlock.innerBlocks.length > 0) {
+      block.innerBlocks = patternBlock.innerBlocks.map(transformBlock);
+    }
+
+    // Generate client ID for WordPress block editor
+    block.clientId = generateClientId();
+
+    return block;
+  };
+
+  return pattern.content.map(transformBlock);
+};
+
 interface PatternBlock {
   name: string;
   attributes?: Record<string, any>;
@@ -85,45 +124,6 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Generate unique client ID for blocks
-  const generateClientId = (): string => {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  };
-
-  // Helper function to convert WordPress blocks to pattern blocks
-  const convertBlocksToPatternBlocks = useCallback((blocks: any[]): PatternBlock[] => {
-    return blocks.map(block => ({
-      name: block.name,
-      attributes: block.attributes,
-      innerBlocks: block.innerBlocks ? convertBlocksToPatternBlocks(block.innerBlocks) : undefined,
-      innerHTML: block.innerHTML
-    }));
-  }, []);
-
-  // Transform pattern to WordPress blocks
-  const transformPatternToBlocks = useCallback((pattern: BlockPattern): any[] => {
-    // Transform pattern content to WordPress block format
-    const transformBlock = (patternBlock: PatternBlock): any => {
-      const block: any = {
-        name: patternBlock.name,
-        attributes: patternBlock.attributes || {},
-        innerBlocks: [],
-        innerHTML: patternBlock.innerHTML || ''
-      };
-
-      if (patternBlock.innerBlocks && patternBlock.innerBlocks.length > 0) {
-        block.innerBlocks = patternBlock.innerBlocks.map(transformBlock);
-      }
-
-      // Generate client ID for WordPress block editor
-      block.clientId = generateClientId();
-
-      return block;
-    };
-
-    return pattern.content.map(transformBlock);
-  }, []);
-
   // Insert block pattern into editor
   const insertBlockPattern = useCallback(async (patternId: string): Promise<any[] | null> => {
     setLoading(true);
@@ -152,7 +152,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } finally {
       setLoading(false);
     }
-  }, [transformPatternToBlocks]);
+  }, []);
 
   // Create new block pattern
   const createBlockPattern = useCallback(async (data: CreatePatternData): Promise<BlockPattern | null> => {
@@ -320,7 +320,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
         createdFrom: 'editor'
       }
     };
-  }, [convertBlocksToPatternBlocks]);
+  }, []);
 
   // Validate pattern compatibility
   const validatePatternCompatibility = useCallback((pattern: BlockPattern, availableBlocks: string[]): boolean => {
