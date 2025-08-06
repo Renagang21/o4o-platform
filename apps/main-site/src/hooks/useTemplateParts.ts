@@ -87,7 +87,7 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
     };
 
     fetchTemplateParts();
-  }, [area, context?.pageId, context?.postType]);
+  }, [area, context?.pageId, context?.postType, context]);
 
   return { templateParts, loading, error };
 }

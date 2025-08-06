@@ -113,7 +113,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [transformPatternToBlocks]);
 
   // Create new block pattern
   const createBlockPattern = useCallback(async (data: CreatePatternData): Promise<BlockPattern | null> => {
@@ -242,6 +242,16 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     }
   }, []);
 
+  // Helper function to convert WordPress blocks to pattern blocks
+  const convertBlocksToPatternBlocks = useCallback((blocks: any[]): PatternBlock[] => {
+    return blocks.map(block => ({
+      name: block.name,
+      attributes: block.attributes,
+      innerBlocks: block.innerBlocks ? convertBlocksToPatternBlocks(block.innerBlocks) : undefined,
+      innerHTML: block.innerHTML
+    }));
+  }, []);
+
   // Convert selected blocks to pattern data
   const convertBlocksToPattern = useCallback((selectedBlocks: any[]): CreatePatternData => {
     // Extract pattern content from WordPress blocks
@@ -281,17 +291,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
         createdFrom: 'editor'
       }
     };
-  }, []);
-
-  // Helper function to convert WordPress blocks to pattern blocks
-  const convertBlocksToPatternBlocks = (blocks: any[]): PatternBlock[] => {
-    return blocks.map(block => ({
-      name: block.name,
-      attributes: block.attributes,
-      innerBlocks: block.innerBlocks ? convertBlocksToPatternBlocks(block.innerBlocks) : undefined,
-      innerHTML: block.innerHTML
-    }));
-  };
+  }, [convertBlocksToPatternBlocks]);
 
   // Transform pattern to WordPress blocks
   const transformPatternToBlocks = useCallback((pattern: BlockPattern): any[] => {
