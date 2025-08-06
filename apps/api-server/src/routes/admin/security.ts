@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
+import type { Router as ExpressRouter } from 'express';
 import { authenticateToken, requireAdmin } from '../../middleware/auth';
 import { LoginSecurityService } from '../../services/LoginSecurityService';
 import { UserService } from '../../services/UserService';
 
-const router: Router = Router();
+const router: ExpressRouter = Router();
 
 // Apply admin authentication to all routes
 router.use(authenticateToken);

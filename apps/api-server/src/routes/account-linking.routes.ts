@@ -1,11 +1,12 @@
 import { Router } from 'express';
+import type { Router as ExpressRouter } from 'express';
 import { authenticate } from '../middleware/auth.middleware';
 import { AccountLinkingService } from '../services/account-linking.service';
 import { body, query, validationResult } from 'express-validator';
 import { AuthProvider, SecurityVerification } from '../types/account-linking';
 import logger from '../utils/logger';
 
-const router: Router = Router();
+const router: ExpressRouter = Router();
 
 // Validation middleware
 const validateDto = (req: any, res: any, next: any) => {

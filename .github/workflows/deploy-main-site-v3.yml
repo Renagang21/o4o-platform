@@ -1,0 +1,282 @@
+name: Deploy Main Site (v3 - Improved)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/main-site/**'
+      - 'packages/**'
+      - '.github/workflows/deploy-main-site-v3.yml'
+
+concurrency:
+  group: deploy-main-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+        
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build packages
+      run: ./scripts/dev.sh build:packages
+      
+    - name: Build main site
+      run: |
+        cd apps/main-site
+        cat > .env.production << 'EOF'
+        NODE_ENV=production
+        VITE_API_BASE_URL=https://api.neture.co.kr
+        VITE_APP_TITLE=O4O Platform
+        VITE_ADMIN_URL=https://admin.neture.co.kr
+        VITE_SITE_URL=https://neture.co.kr
+        VITE_ENABLE_ANALYTICS=true
+        VITE_ENABLE_ERROR_REPORTING=true
+        VITE_BUILD_TIMESTAMP=${{ github.run_number }}
+        EOF
+        npm run build
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: main-site-dist
+        path: apps/main-site/dist/
+        retention-days: 1
+
+  deploy:
+    name: Deploy to Server
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: main-site-dist
+        path: dist/
+        
+    - name: Setup SSH
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        WEB_SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        cat >> ~/.ssh/config << EOF
+        Host web-server
+          HostName $WEB_SERVER_HOST
+          User ubuntu
+          Port 22
+          IdentityFile ~/.ssh/id_rsa
+          StrictHostKeyChecking no
+          ServerAliveInterval 30
+          ServerAliveCountMax 3
+        EOF
+        
+    - name: Test SSH connection
+      run: |
+        echo "Testing SSH connection..."
+        ssh web-server "echo 'SSH connection successful'"
+        
+    - name: Deploy files
+      run: |
+        echo "📦 Deploying to server..."
+        
+        # Create deployment directory
+        ssh web-server "sudo mkdir -p /var/www/neture.co.kr"
+        
+        # Deploy using rsync with better error handling
+        rsync -avz --delete \
+          --exclude='.git' \
+          --exclude='node_modules' \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          dist/ web-server:/tmp/neture-deploy/
+          
+        # Move files and set permissions
+        ssh web-server << 'ENDSSH'
+          # Backup current deployment
+          if [ -d "/var/www/neture.co.kr/index.html" ]; then
+            sudo cp -r /var/www/neture.co.kr /var/www/neture.co.kr.backup.$(date +%Y%m%d_%H%M%S)
+          fi
+          
+          # Deploy new files
+          sudo rm -rf /var/www/neture.co.kr/*
+          sudo mv /tmp/neture-deploy/* /var/www/neture.co.kr/
+          sudo rmdir /tmp/neture-deploy
+          
+          # Set proper permissions
+          sudo chown -R www-data:www-data /var/www/neture.co.kr
+          sudo chmod -R 755 /var/www/neture.co.kr
+          
+          # Verify files exist
+          echo "📁 Deployed files:"
+          ls -la /var/www/neture.co.kr/
+        ENDSSH
+        
+    - name: Verify Nginx configuration
+      run: |
+        ssh web-server << 'ENDSSH'
+          echo "🔍 Checking Nginx configuration..."
+          
+          # Check if site config exists
+          if [ -f "/etc/nginx/sites-available/neture.co.kr" ]; then
+            echo "✅ Nginx config exists"
+            
+            # Test configuration
+            if sudo nginx -t; then
+              echo "✅ Nginx configuration is valid"
+              sudo systemctl reload nginx
+              echo "✅ Nginx reloaded"
+            else
+              echo "❌ Nginx configuration error"
+              exit 1
+            fi
+          else
+            echo "❌ Nginx config not found at /etc/nginx/sites-available/neture.co.kr"
+            exit 1
+          fi
+          
+          # Check Nginx status
+          sudo systemctl status nginx --no-pager
+        ENDSSH
+
+  health-check:
+    name: Health Check
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Initial wait
+      run: |
+        echo "⏳ Waiting 60 seconds for deployment to stabilize..."
+        sleep 60
+        
+    - name: DNS check
+      run: |
+        echo "🔍 Checking DNS resolution..."
+        nslookup neture.co.kr || true
+        dig neture.co.kr || true
+        
+    - name: Test connectivity
+      run: |
+        echo "🔌 Testing connectivity..."
+        
+        # Test HTTP redirect
+        echo "Testing HTTP..."
+        curl -I -L --connect-timeout 10 http://neture.co.kr || true
+        
+        # Test HTTPS
+        echo "Testing HTTPS..."
+        curl -I -L --connect-timeout 10 https://neture.co.kr || true
+        
+    - name: Health check with diagnostics
+      env:
+        WEB_SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
+      run: |
+        echo "🏥 Running health checks..."
+        MAX_ATTEMPTS=10
+        ATTEMPT=1
+        SUCCESS=false
+        
+        while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+          echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
+          
+          # Get detailed response
+          RESPONSE=$(curl -s -I -L --connect-timeout 10 --max-time 30 \
+            https://neture.co.kr 2>&1 || true)
+          
+          # Extract HTTP status
+          HTTP_STATUS=$(echo "$RESPONSE" | grep -E "^HTTP" | tail -1 | awk '{print $2}' || echo "000")
+          
+          echo "Response headers:"
+          echo "$RESPONSE"
+          echo "HTTP Status: $HTTP_STATUS"
+          
+          if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "301" ] || [ "$HTTP_STATUS" = "302" ]; then
+            echo "✅ Site is responding (HTTP $HTTP_STATUS)"
+            SUCCESS=true
+            break
+          else
+            echo "⚠️ Site not ready (HTTP $HTTP_STATUS)"
+            
+            # Additional diagnostics
+            echo "Checking server directly..."
+            curl -s -I --connect-timeout 5 http://$WEB_SERVER_HOST || true
+            
+            ATTEMPT=$((ATTEMPT + 1))
+            
+            if [ $ATTEMPT -le $MAX_ATTEMPTS ]; then
+              echo "Waiting 30 seconds..."
+              sleep 30
+            fi
+          fi
+        done
+        
+        if [ "$SUCCESS" = "false" ]; then
+          echo "❌ Health check failed after $MAX_ATTEMPTS attempts"
+          
+          # Final diagnostics
+          echo "Running final diagnostics..."
+          echo "1. Checking if server is reachable:"
+          ping -c 3 $WEB_SERVER_HOST || true
+          
+          echo "2. Checking SSL certificate:"
+          openssl s_client -connect neture.co.kr:443 -servername neture.co.kr < /dev/null || true
+          
+          exit 1
+        fi
+        
+    - name: Verify site content
+      run: |
+        echo "📄 Verifying site content..."
+        
+        # Check if index.html loads
+        CONTENT=$(curl -s --connect-timeout 10 https://neture.co.kr || true)
+        
+        if echo "$CONTENT" | grep -q "O4O Platform"; then
+          echo "✅ Site content verified"
+        else
+          echo "⚠️ Site content may not be correct"
+          echo "First 500 characters:"
+          echo "$CONTENT" | head -c 500
+        fi
+
+  notify:
+    name: Deployment Status
+    needs: [deploy, health-check]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify success
+      if: needs.health-check.result == 'success'
+      run: |
+        echo "✅ Main site deployed successfully!"
+        echo "🌐 URL: https://neture.co.kr"
+        echo "📅 Deployed at: $(date)"
+        
+    - name: Notify failure
+      if: needs.deploy.result == 'failure' || needs.health-check.result == 'failure'
+      run: |
+        echo "❌ Deployment failed!"
+        echo "Check the logs for details."

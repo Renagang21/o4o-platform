@@ -71,6 +71,14 @@ export const sharedViteConfig: UserConfig = {
                 id.includes('js-cookie')) {
               return 'vendor-utils';
             }
+            // Socket.io
+            if (id.includes('socket.io')) {
+              return 'vendor-socket';
+            }
+            // 차트 라이브러리
+            if (id.includes('recharts') || id.includes('d3')) {
+              return 'vendor-charts';
+            }
           }
         }
       },

@@ -2,8 +2,8 @@ import { useState, useEffect, FC } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@o4o/ui';
+import { Button } from '@o4o/ui';
 
 const AuthCallbackV2: FC = () => {
   const navigate = useNavigate();

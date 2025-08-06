@@ -1,9 +1,7 @@
 /* Import all theme variations - must come first */
 @import './themes/index.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -406,39 +404,59 @@
   /* WordPress-style form elements */
   .wp-input {
     @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded;
-    @apply focus:outline-none focus:ring-2 focus:ring-admin-blue focus:border-transparent;
+    @apply focus:outline-none focus:ring-2 focus:border-transparent;
     @apply transition-colors duration-200;
   }
   
+  .wp-input:focus {
+    --tw-ring-color: var(--wp-admin-blue);
+  }
+  
   .wp-textarea {
-    @apply wp-input resize-none;
+    @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded resize-none;
+    @apply focus:outline-none focus:ring-2 focus:border-transparent;
+    @apply transition-colors duration-200;
+  }
+  
+  .wp-textarea:focus {
+    --tw-ring-color: var(--wp-admin-blue);
   }
   
   .wp-select {
-    @apply wp-input pr-8 bg-white;
+    @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded pr-8 bg-white;
+    @apply focus:outline-none focus:ring-2 focus:border-transparent;
+    @apply transition-colors duration-200;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;
     background-repeat: no-repeat;
     background-size: 1.5em 1.5em;
   }
   
+  .wp-select:focus {
+    --tw-ring-color: var(--wp-admin-blue);
+  }
+  
   /* WordPress-style tables */
   .wp-table {
-    @apply w-full border-wp-border-secondary rounded-lg overflow-hidden;
+    @apply w-full rounded-lg overflow-hidden;
+    border: 1px solid var(--wp-border-secondary);
   }
   
   .wp-table th {
-    @apply bg-wp-bg-tertiary px-6 py-3 text-left text-xs font-medium text-wp-text-secondary uppercase tracking-wider;
-    @apply border-b border-wp-border-secondary;
+    @apply px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b;
+    background-color: var(--wp-bg-tertiary);
+    color: var(--wp-text-secondary);
+    border-color: var(--wp-border-secondary);
   }
   
   .wp-table td {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-wp-text-primary;
-    @apply border-b border-wp-border-secondary;
+    @apply px-6 py-4 whitespace-nowrap text-sm border-b;
+    color: var(--wp-text-primary);
+    border-color: var(--wp-border-secondary);
   }
   
   .wp-table tbody tr:hover {
-    @apply bg-wp-bg-tertiary;
+    background-color: var(--wp-bg-tertiary);
   }
   
   /* WordPress-style cards */
@@ -1057,7 +1075,7 @@
   }
   
   .widget-selector-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center;
+    @apply fixed inset-0 bg-black/50 z-50 flex items-center justify-center;
   }
   
   .widget-selector-modal {
@@ -1124,7 +1142,7 @@
   }
   
   [data-theme="dark"] .empty-container.drag-over {
-    @apply border-blue-500 bg-blue-900 bg-opacity-20;
+    @apply border-blue-500 bg-blue-900/20;
   }
   
   /* WordPress Welcome Panel */
@@ -1267,7 +1285,8 @@
   
   /* Loading states */
   .loading-spinner {
-    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-admin-blue;
+    @apply animate-spin rounded-full h-6 w-6 border-b-2;
+    border-color: var(--wp-admin-blue);
   }
   
   /* Custom scrollbar */

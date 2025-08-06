@@ -2,11 +2,11 @@ import { FC, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { XCircle, RefreshCw, AlertTriangle, Clock, CheckCircle } from 'lucide-react';
 import { apiClient } from '@/services/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@o4o/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/ui';
+import { Alert, AlertDescription } from '@o4o/ui';
+import { Input } from '@o4o/ui';
+import { Label } from '@o4o/ui';
 
 interface ResendResponse {
   success: boolean;
