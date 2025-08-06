@@ -18,7 +18,7 @@ import {
   serialize, 
   parse 
 } from '@wordpress/blocks';
-import { Popover, SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { Button } from '../ui/button';
 import { Save, Archive, Layers, AlertCircle, RotateCcw } from 'lucide-react';
 import ReusableBlocksBrowser from './ReusableBlocksBrowser';
@@ -363,8 +363,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
                 <BlockInspector />
               </div>
 
-          {/* Popovers for block controls */}
-          <Popover.Slot />
+          {/* Popovers for block controls are now managed automatically in newer versions */}
         </BlockEditorProvider>
       </SlotFillProvider>
 
