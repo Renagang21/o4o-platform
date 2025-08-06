@@ -19,9 +19,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@o4o/auth-client": ["../auth-client/src"],
-      "@o4o/types": ["../types/src"]
+      "@/*": ["./src/*"]
     },
     "types": []
   },

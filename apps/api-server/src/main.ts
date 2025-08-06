@@ -45,6 +45,7 @@ if (!envLoaded) {
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import { RedisStore } from 'connect-redis';
 import passport from './config/passport';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -63,6 +64,9 @@ import logger from './utils/simpleLogger';
 import { backupService } from './services/BackupService';
 import { errorAlertService } from './services/ErrorAlertService';
 import { securityAuditService } from './services/SecurityAuditService';
+
+// Email service
+import { emailService } from './services/email.service';
 
 // 라우트 imports 
 import authRoutes from './routes/auth';
@@ -258,8 +262,8 @@ app.use(cookieParser() as any);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Session middleware for passport (required for OAuth)
-app.use(session({
+// Configure session store
+let sessionConfig: any = {
   secret: process.env.SESSION_SECRET || 'o4o-platform-session-secret',
   resave: false,
   saveUninitialized: false,
@@ -270,7 +274,24 @@ app.use(session({
     domain: process.env.COOKIE_DOMAIN || undefined, // Enable cross-subdomain cookies
     sameSite: 'lax'
   }
-}) as any);
+};
+
+// Use Redis store in production
+if (process.env.NODE_ENV === 'production') {
+  const sessionRedisClient = new Redis({
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+    password: process.env.REDIS_PASSWORD
+  });
+  
+  sessionConfig.store = new RedisStore({
+    client: sessionRedisClient,
+    prefix: 'sess:'
+  });
+}
+
+// Session middleware for passport (required for OAuth)
+app.use(session(sessionConfig) as any);
 
 // Initialize passport
 app.use(passport.initialize() as any);
@@ -506,6 +527,14 @@ const startServer = async () => {
         // console.log('✅ Monitoring services initialized');
       } catch (serviceError) {
         console.error('⚠️  Failed to initialize monitoring services:', serviceError);
+      }
+
+      // Initialize email service
+      try {
+        await emailService.initialize();
+        // console.log('✅ Email service initialized');
+      } catch (emailError) {
+        console.error('⚠️  Failed to initialize email service:', emailError);
       }
     }
   } catch (dbError) {
