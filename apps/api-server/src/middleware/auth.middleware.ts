@@ -2,10 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../database/connection';
 import { User } from '../entities/User';
-
-export interface AuthRequest extends Request {
-  user?: User & { id: string };
-}
+import { AuthRequest } from '../types/auth';
 
 export const authenticate = async (
   req: AuthRequest,

@@ -2,14 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { authService } from '../services/AuthService';
 import { UserRole } from '../types/auth';
+import type { AuthRequest } from '../types/auth';
 
-export interface AuthRequest extends Request {
-  user?: {
-    userId: string;
-    email: string;
-    role: string;
-  };
-}
+export type { AuthRequest };
 
 /**
  * Middleware to authenticate requests using httpOnly cookies

@@ -5,16 +5,7 @@ import { User } from '../entities/User';
 import { MockDataService } from '../services/MockDataService';
 import path from 'path';
 import fs from 'fs/promises';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../types/auth';
 
 export class TemplatesController {
   private templateRepository = AppDataSource.getRepository(Template);

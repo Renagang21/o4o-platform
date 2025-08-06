@@ -8,6 +8,7 @@ import { SystemMetrics, MetricType } from '../entities/SystemMetrics';
 import { AnalyticsReport, ReportType, ReportCategory, ReportStatus } from '../entities/AnalyticsReport';
 import { Alert, AlertStatus, AlertSeverity, AlertType } from '../entities/Alert';
 import { BetaUser } from '../entities/BetaUser';
+import { AuthRequest } from '../types/auth';
 
 export class AnalyticsController {
   private analyticsService: AnalyticsService;
@@ -555,11 +556,6 @@ export class AnalyticsController {
     try {
       const { id } = req.params;
       const { note } = req.body;
-      interface AuthRequest extends Request {
-        user?: {
-          id: string;
-        };
-      }
       const userId = (req as AuthRequest).user?.id || 'system';
 
       const alert = await this.alertRepo.findOne({ where: { id } });
@@ -597,11 +593,6 @@ export class AnalyticsController {
     try {
       const { id } = req.params;
       const { note, action } = req.body;
-      interface AuthRequest extends Request {
-        user?: {
-          id: string;
-        };
-      }
       const userId = (req as AuthRequest).user?.id || 'system';
 
       const alert = await this.alertRepo.findOne({ where: { id } });

@@ -2,16 +2,7 @@ import { Request, Response } from 'express';
 import { CrowdfundingRepository } from '../repositories/CrowdfundingRepository';
 import AppDataSource from '../database/data-source';
 import { CrowdfundingProject } from '../entities/CrowdfundingProject';
-
-// Ensure proper typing for req.user
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest } from '../types/auth';
 
 export class CrowdfundingController {
   private crowdfundingRepository: CrowdfundingRepository;

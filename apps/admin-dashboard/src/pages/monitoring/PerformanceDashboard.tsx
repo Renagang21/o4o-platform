@@ -16,22 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { apiClient } from '@/lib/api-client';
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
+// Charts removed - placeholder UI used instead
 
 interface SystemMetrics {
   cpu: {
@@ -151,12 +136,12 @@ export default function PerformanceDashboard() {
     );
   }
 
-  const pieData = [
-    { name: 'Used', value: metrics.memory.used },
-    { name: 'Free', value: metrics.memory.free }
-  ];
-
-  const COLORS = ['#3B82F6', '#E5E7EB'];
+  // Chart data variables removed since we're using placeholder UI
+  // const pieData = [
+  //   { name: 'Used', value: metrics.memory.used },
+  //   { name: 'Free', value: metrics.memory.free }
+  // ];
+  // const COLORS = ['#3B82F6', '#E5E7EB'];
 
   return (
     <div className="space-y-6">
@@ -285,31 +270,25 @@ export default function PerformanceDashboard() {
                 <CardDescription>Real-time resource utilization</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={history || []}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="timestamp" 
-                      tickFormatter={(value: any) => new Date(value).toLocaleTimeString()}
-                    />
-                    <YAxis />
-                    <Tooltip />
-                    <Line 
-                      type="monotone" 
-                      dataKey="cpu" 
-                      stroke="#3B82F6" 
-                      name="CPU %"
-                      strokeWidth={2}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="memory" 
-                      stroke="#10B981" 
-                      name="Memory %"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] bg-gray-50 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <Activity className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">CPU & Memory Chart</p>
+                    <p className="text-xs text-gray-400 mt-1">Chart visualization coming soon</p>
+                  </div>
+                </div>
+                {/* Chart data preview */}
+                <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Current CPU:</span>
+                    <span className="ml-2 font-medium">{metrics?.cpu?.usage?.toFixed(1) || 0}%</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Current Memory:</span>
+                    <span className="ml-2 font-medium">{metrics?.memory?.percentage?.toFixed(1) || 0}%</span>
+                  </div>
+                </div>
+                {/* LineChart placeholder - original recharts code removed */}
               </CardContent>
             </Card>
 
@@ -320,25 +299,28 @@ export default function PerformanceDashboard() {
                 <CardDescription>Current memory allocation</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {pieData.map((_entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => formatBytes(value)} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="h-[300px] bg-gray-50 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <MemoryStick className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">Memory Distribution Chart</p>
+                    <p className="text-xs text-gray-400 mt-1">Chart visualization coming soon</p>
+                  </div>
+                </div>
+                {/* Memory data preview */}
+                <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Used Memory:</span>
+                    <span className="ml-2 font-medium">{formatBytes(metrics.memory.used)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Free Memory:</span>
+                    <span className="ml-2 font-medium">{formatBytes(metrics.memory.free)}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-gray-500">Usage:</span>
+                    <span className="ml-2 font-medium">{metrics.memory.percentage.toFixed(1)}%</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -378,33 +360,37 @@ export default function PerformanceDashboard() {
               <CardDescription>System performance over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <AreaChart data={history || []}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="timestamp" 
-                    tickFormatter={(value) => new Date(value).toLocaleTimeString()}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="requests" 
-                    stackId="1"
-                    stroke="#3B82F6" 
-                    fill="#3B82F6"
-                    name="Requests/min"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="errors" 
-                    stackId="1"
-                    stroke="#EF4444" 
-                    fill="#EF4444"
-                    name="Errors/min"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div className="h-[400px] bg-gray-50 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Performance History Chart</p>
+                  <p className="text-xs text-gray-400 mt-1">Chart visualization coming soon</p>
+                </div>
+              </div>
+              {/* Performance data preview */}
+              {history && history.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium">Recent Data Points:</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500">Latest CPU:</span>
+                      <span className="ml-2 font-medium">{history[history.length - 1]?.cpu?.toFixed(1) || 0}%</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Latest Memory:</span>
+                      <span className="ml-2 font-medium">{history[history.length - 1]?.memory?.toFixed(1) || 0}%</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Latest Response:</span>
+                      <span className="ml-2 font-medium">{history[history.length - 1]?.responseTime || 0}ms</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Data Points:</span>
+                      <span className="ml-2 font-medium">{history.length}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -523,21 +509,39 @@ export default function PerformanceDashboard() {
               <CardDescription>API endpoint performance breakdown</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[
-                  { endpoint: '/api/posts', time: 45 },
-                  { endpoint: '/api/users', time: 32 },
-                  { endpoint: '/api/products', time: 58 },
-                  { endpoint: '/api/orders', time: 72 },
-                  { endpoint: '/api/analytics', time: 125 },
-                ]}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="endpoint" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="time" fill="#3B82F6" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="h-[300px] bg-gray-50 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <Activity className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Response Time Distribution Chart</p>
+                  <p className="text-xs text-gray-400 mt-1">Chart visualization coming soon</p>
+                </div>
+              </div>
+              {/* Endpoint performance data preview */}
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium">Sample Endpoint Performance:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  <div className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-gray-600">/api/posts</span>
+                    <span className="font-medium">45ms</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-gray-600">/api/users</span>
+                    <span className="font-medium">32ms</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-gray-600">/api/products</span>
+                    <span className="font-medium">58ms</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-gray-600">/api/orders</span>
+                    <span className="font-medium">72ms</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-gray-600">/api/analytics</span>
+                    <span className="font-medium">125ms</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
