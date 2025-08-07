@@ -75,7 +75,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
         version: '1.0'
       };
       localStorage.setItem(storageKey, JSON.stringify(saveData));
-      console.log('Content saved to local storage');
+      // console.log('Content saved to local storage');
     } catch (error) {
       console.error('Failed to save to local storage:', error);
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
@@ -117,7 +117,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
         setState(prev => ({ ...prev, backupExists: false }));
       }
       
-      console.log('Content saved to cloud');
+      // console.log('Content saved to cloud');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setState(prev => ({
