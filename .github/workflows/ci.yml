@@ -330,3 +330,4 @@ jobs:
           echo "CI Pipeline completed"
           echo "Lint: ${{ needs.lint.result }}"
           echo "Unit Tests: ${{ needs.test-unit.result }}"
+          echo "Build: ${{ needs.build.result }}"
