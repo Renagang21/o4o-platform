@@ -227,6 +227,19 @@ When modifying any code, ALWAYS check:
 ./scripts/dev.sh start         # Start all dev servers
 ./scripts/dev.sh stop          # Stop all dev servers
 ./scripts/dev.sh test          # Run tests
+
+# Build commands (more efficient)
+npm run build:all              # Build everything (packages + all apps)
+npm run build:all:fast         # Build with parallel app builds (faster)
+npm run build:production       # Clean build for production
+npm run build:apps             # Build all apps only (assumes packages built)
+npm run build:apps:parallel    # Build all apps in parallel (faster but more CPU)
+
+# Individual app builds (includes package build)
+npm run build:api              # API server only
+npm run build:admin            # Admin dashboard only
+npm run build:web              # Main site only
+npm run build:ecommerce        # E-commerce only
 ```
 
 ## 📁 Project Architecture
