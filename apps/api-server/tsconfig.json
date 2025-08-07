@@ -25,7 +25,7 @@
     "noImplicitReturns": false,
     "strictPropertyInitialization": false,
     "composite": true,
-    "types": ["node", "express"]
+    "types": ["node"]
   },
   "include": [
     "src/**/*",
