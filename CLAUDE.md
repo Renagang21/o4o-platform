@@ -165,6 +165,9 @@ npm install
 ### Code Quality Standards
 - **Zero-tolerance** for CI/CD failures: NO warnings, NO TypeScript errors
 - **Never** use `console.log` - use structured logging with winston
+  - API Server: Use winston logger from `src/utils/logger.ts`
+  - Frontend Apps: Use appropriate logging library or remove console statements
+  - Scripts: Console usage is acceptable for CLI output
 - **Always** commit `package-lock.json` when dependencies change
 - **IMPORTANT**: Never create commits - user will handle all git commits manually
 

@@ -4,13 +4,14 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { AppDataSource } from './database/connection';
+import logger from './utils/logger';
 
 // 환경 변수 검증
 const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'];
 const missingEnvVars = requiredEnvVars.filter((varName: any) => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
-  console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
+  logger.error('❌ Missing required environment variables:', { missingVars: missingEnvVars });
   process.exit(1);
 }
 
@@ -70,7 +71,10 @@ app.use(compression() as any);
 // 요청 로깅 (개발 환경)
 if (NODE_ENV === 'development') {
   app.use((req, res, next) => {
-    // console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+    logger.http(`${req.method} ${req.path}`, { 
+      timestamp: new Date().toISOString(),
+      ip: req.ip 
+    });
     next();
   });
 }
@@ -123,7 +127,12 @@ app.use('*', (req, res) => {
 
 // 전역 에러 핸들러
 app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('❌ Server Error:', error);
+  logger.error('❌ Server Error:', { 
+    error: error.message,
+    stack: error.stack,
+    path: req.path,
+    method: req.method
+  });
 
   // CORS 에러 처리
   if (error.message === 'Not allowed by CORS policy') {
@@ -148,9 +157,9 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
 async function startServer() {
   try {
     // 데이터베이스 연결
-    // console.log('🔗 Initializing database connection...');
+    logger.info('🔗 Initializing database connection...');
     await AppDataSource.initialize();
-    // console.log('✅ Database connected successfully');
+    logger.info('✅ Database connected successfully');
 
     // Start scheduled jobs
     const { cleanupLoginAttemptsJob } = await import('./jobs/cleanupLoginAttempts');
@@ -158,25 +167,27 @@ async function startServer() {
 
     // 서버 시작
     app.listen(PORT, () => {
-      // console.log('🚀 API Server Information:');
-      // console.log(`   Environment: ${NODE_ENV}`);
-      // console.log(`   Port: ${PORT}`);
-      // console.log(`   Database: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
-      // console.log(`   URL: http://localhost:${PORT}`);
-      // console.log(`   API: http://localhost:${PORT}/api/v1`);
-      // console.log(`   Health: http://localhost:${PORT}/health`);
-      // console.log('');
-      // console.log('📋 Available API Endpoints:');
-      // console.log('   🏢 Business API: /api/v1/business/*');
-      // console.log('   🔧 Admin API: /api/v1/admin/*');
-      // console.log('   🤝 Partner API: /api/v1/partner/*');
-      // console.log('   🔒 Internal API: /api/v1/internal/*');
-      // console.log('');
-      // console.log('✨ Server is ready to accept connections');
+      logger.info('🚀 API Server Information:', {
+        environment: NODE_ENV,
+        port: PORT,
+        database: `${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+        urls: {
+          base: `http://localhost:${PORT}`,
+          api: `http://localhost:${PORT}/api/v1`,
+          health: `http://localhost:${PORT}/health`
+        },
+        endpoints: {
+          business: '/api/v1/business/*',
+          admin: '/api/v1/admin/*',
+          partner: '/api/v1/partner/*',
+          internal: '/api/v1/internal/*'
+        }
+      });
+      logger.info('✨ Server is ready to accept connections');
     });
 
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    logger.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }
