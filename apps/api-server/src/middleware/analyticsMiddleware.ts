@@ -4,16 +4,6 @@ import { ActionType, ActionCategory } from '../entities/UserAction';
 import { MetricType, MetricCategory } from '../entities/SystemMetrics';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface AnalyticsRequest extends Request {
-  analytics?: {
-    sessionId: string;
-    startTime: number;
-    betaUserId?: string;
-    userAgent: string;
-    ipAddress: string;
-  };
-}
-
 export class AnalyticsMiddleware {
   private analyticsService: AnalyticsService;
 
@@ -23,7 +13,7 @@ export class AnalyticsMiddleware {
 
   // Initialize analytics tracking for each request
   initializeTracking() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const startTime = Date.now();
       const sessionId = req.headers['x-session-id'] as string || uuidv4();
       interface UserWithBetaId extends Request {
@@ -71,7 +61,7 @@ export class AnalyticsMiddleware {
 
   // Track request performance and completion
   trackPerformance() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const originalSend = res.send;
       const originalJson = res.json;
       
@@ -149,7 +139,7 @@ export class AnalyticsMiddleware {
 
   // Track specific actions based on endpoint patterns
   trackActions() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       if (!req.analytics?.betaUserId) {
         return next();
       }
@@ -183,7 +173,7 @@ export class AnalyticsMiddleware {
 
   // Track errors and exceptions
   trackErrors() {
-    return async (err: Error, req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (err: Error, req: Request, res: Response, next: NextFunction) => {
       if (req.analytics?.betaUserId) {
         try {
           await this.analyticsService.trackError(
@@ -222,7 +212,7 @@ export class AnalyticsMiddleware {
 
   // Session management middleware
   manageSession() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       if (!req.analytics?.betaUserId) {
         return next();
       }
@@ -256,7 +246,7 @@ export class AnalyticsMiddleware {
 
   // Custom tracking methods for specific use cases
   trackLogin() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const originalSend = res.send;
       const originalJson = res.json;
       
@@ -297,7 +287,7 @@ export class AnalyticsMiddleware {
   }
 
   trackFeedback() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const originalSend = res.send;
       const originalJson = res.json;
       
@@ -344,7 +334,7 @@ export class AnalyticsMiddleware {
   }
 
   trackContentUsage() {
-    return async (req: AnalyticsRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const originalSend = res.send;
       const originalJson = res.json;
       
@@ -394,7 +384,7 @@ export class AnalyticsMiddleware {
   }
 
   // Helper methods
-  private getActionTypeFromRequest(req: AnalyticsRequest): ActionType | null {
+  private getActionTypeFromRequest(req: Request): ActionType | null {
     const path = req.path.toLowerCase();
     const method = req.method.toLowerCase();
 
@@ -432,14 +422,14 @@ export class AnalyticsMiddleware {
     return null;
   }
 
-  private getActionNameFromRequest(req: AnalyticsRequest): string {
+  private getActionNameFromRequest(req: Request): string {
     const actionType = this.getActionTypeFromRequest(req);
     if (!actionType) return `${req.method} ${req.path}`;
     
     return actionType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
 
-  private getContentActionType(req: AnalyticsRequest): ActionType | null {
+  private getContentActionType(req: Request): ActionType | null {
     const path = req.path.toLowerCase();
     const method = req.method.toLowerCase();
 
