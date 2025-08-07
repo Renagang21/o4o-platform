@@ -15,7 +15,7 @@ export class AuthClient {
     });
 
     // Add auth token to requests
-    this.api.interceptors.request.use((config) => {
+    this.api.interceptors.request.use((config: any) => {
       const token = localStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

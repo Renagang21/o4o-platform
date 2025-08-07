@@ -24,7 +24,7 @@ export class CookieAuthClient {
 
     // Response interceptor to handle token refresh
     this.api.interceptors.response.use(
-      (response) => response,
+      (response: any) => response,
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
 
