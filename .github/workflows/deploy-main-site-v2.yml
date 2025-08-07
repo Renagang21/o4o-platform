@@ -101,6 +101,22 @@ jobs:
       run: |
         echo "🔐 Setting up SSH connection..."
         
+        # Check if secrets are set
+        if [ -z "${{ secrets.WEB_SSH_KEY }}" ]; then
+          echo "❌ WEB_SSH_KEY secret is not set"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.WEB_HOST }}" ]; then
+          echo "❌ WEB_HOST secret is not set"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.WEB_USER }}" ]; then
+          echo "❌ WEB_USER secret is not set"
+          exit 1
+        fi
+        
         # SSH 디렉토리 생성
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
@@ -109,8 +125,9 @@ jobs:
         echo "${{ secrets.WEB_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
-        # SSH 설정 파일 생성
-        cat > ~/.ssh/config << EOF
+        # SSH 설정 파일 생성 - 변수가 비어있지 않은 경우에만
+        if [ -n "${{ secrets.WEB_HOST }}" ] && [ -n "${{ secrets.WEB_USER }}" ]; then
+          cat > ~/.ssh/config << EOF
         Host web-server
           HostName ${{ secrets.WEB_HOST }}
           User ${{ secrets.WEB_USER }}
@@ -123,9 +140,11 @@ jobs:
           ConnectTimeout 10
           ConnectionAttempts 3
         EOF
-        chmod 600 ~/.ssh/config
-        
-        echo "✅ SSH configuration completed"
+          chmod 600 ~/.ssh/config
+          echo "✅ SSH configuration completed"
+        else
+          echo "⚠️ Using direct SSH without config file"
+        fi
         
     # SSH 연결 테스트 - 실패 시 재시도
     - name: Test SSH connection with retries

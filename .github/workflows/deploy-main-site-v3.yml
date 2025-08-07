@@ -74,17 +74,26 @@ jobs:
         path: dist/
         
     - name: Setup SSH
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        WEB_SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
       run: |
+        # Check if secrets are set
+        if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+          echo "❌ SSH_PRIVATE_KEY secret is not set"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.WEB_SERVER_HOST }}" ]; then
+          echo "❌ WEB_SERVER_HOST secret is not set"
+          exit 1
+        fi
+        
         mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
-        cat >> ~/.ssh/config << EOF
+        # Create SSH config with proper variable substitution
+        cat > ~/.ssh/config << EOF
         Host web-server
-          HostName $WEB_SERVER_HOST
+          HostName ${{ secrets.WEB_SERVER_HOST }}
           User ubuntu
           Port 22
           IdentityFile ~/.ssh/id_rsa
@@ -92,6 +101,7 @@ jobs:
           ServerAliveInterval 30
           ServerAliveCountMax 3
         EOF
+        chmod 600 ~/.ssh/config
         
     - name: Test SSH connection
       run: |
