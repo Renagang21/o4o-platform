@@ -183,7 +183,7 @@ export class MediaController {
       }
 
       try {
-        const files = req.files as Express.Multer.File[];
+        const files = req.files as any[];
         const userId = (req as AuthRequest).user?.id;
         const { folderId } = req.body;
 

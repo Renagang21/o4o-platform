@@ -8,6 +8,7 @@ import { AuthRequest } from '../types/auth';
 import { sendEmail } from '../utils/email';
 import { evaluateConditionalLogic } from '../utils/conditionalLogic';
 import { calculateFormula } from '../utils/formula';
+import type { Express } from 'express';
 import { Between, In, Like } from 'typeorm';
 import * as geoip from 'geoip-lite';
 import * as UAParser from 'ua-parser-js';
@@ -167,7 +168,7 @@ export const formController = {
     try {
       const { formId } = req.params;
       const data = req.body;
-      const files = req.files as Express.Multer.File[];
+      const files = req.files as any[];
 
       // Get form
       const form = await formRepository.findOne({ where: { id: formId } });
