@@ -5,22 +5,37 @@ import path from 'path';
 import fs from 'fs/promises';
 
 export class EmailService {
-  private transporter: Transporter;
+  private transporter: Transporter | null = null;
   private isInitialized: boolean = false;
+  private isEnabled: boolean = false;
 
   constructor() {
-    this.transporter = this.createTransport();
+    // Check if email service should be enabled
+    this.isEnabled = process.env.EMAIL_SERVICE_ENABLED !== 'false';
+    
+    if (this.isEnabled) {
+      this.transporter = this.createTransport();
+    } else {
+      logger.info('Email service is disabled via EMAIL_SERVICE_ENABLED environment variable');
+    }
   }
 
-  private createTransport(): Transporter {
+  private createTransport(): Transporter | null {
     const {
       SMTP_HOST,
       SMTP_PORT,
       SMTP_SECURE,
       SMTP_USER,
       SMTP_PASS,
-      NODE_ENV
+      NODE_ENV,
+      EMAIL_SERVICE_ENABLED
     } = process.env;
+
+    // Check if email service is explicitly disabled
+    if (EMAIL_SERVICE_ENABLED === 'false') {
+      logger.info('Email service disabled by configuration');
+      return null;
+    }
 
     // Development mode: Use ethereal email for testing
     if (NODE_ENV === 'development' && !SMTP_HOST) {
@@ -30,38 +45,91 @@ export class EmailService {
       });
     }
 
-    // Production mode: Use actual SMTP settings
+    // Check if all required SMTP settings are provided
     if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
-      logger.error('SMTP configuration missing. Email service disabled.');
-      return nodemailer.createTransport({
-        jsonTransport: true
-      });
+      logger.warn('SMTP configuration incomplete. Email service will be disabled.');
+      logger.warn('Required: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS');
+      logger.warn('To disable this warning, set EMAIL_SERVICE_ENABLED=false');
+      return null;
     }
 
-    return nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: parseInt(SMTP_PORT, 10),
-      secure: SMTP_SECURE === 'true',
-      auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS
-      }
-    });
+    try {
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: parseInt(SMTP_PORT, 10),
+        secure: SMTP_SECURE === 'true',
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASS
+        },
+        // Add timeout settings to prevent hanging
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000
+      });
+      
+      logger.info('Email transporter created with SMTP settings');
+      return transporter;
+    } catch (error) {
+      logger.error('Failed to create email transporter:', error);
+      return null;
+    }
   }
 
   async initialize(): Promise<void> {
-    try {
-      // Test the connection
-      await this.transporter.verify();
-      this.isInitialized = true;
-      logger.info('Email service initialized successfully');
-    } catch (error) {
-      logger.error('Failed to initialize email service:', error);
+    // Skip initialization if service is disabled
+    if (!this.isEnabled) {
+      logger.info('Email service initialization skipped (service disabled)');
+      return;
+    }
+
+    // Skip if transporter wasn't created
+    if (!this.transporter) {
+      logger.warn('Email service initialization skipped (no transporter available)');
       this.isInitialized = false;
+      return;
+    }
+
+    try {
+      // Test the connection with timeout
+      const verifyPromise = this.transporter.verify();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email service verification timeout')), 10000)
+      );
+      
+      await Promise.race([verifyPromise, timeoutPromise]);
+      this.isInitialized = true;
+      logger.info('Email service initialized and verified successfully');
+    } catch (error: any) {
+      logger.error('Failed to initialize email service:', {
+        message: error.message,
+        code: error.code,
+        hint: 'Email functionality will be disabled. Set EMAIL_SERVICE_ENABLED=false to suppress this error.'
+      });
+      this.isInitialized = false;
+      // Disable the transporter to prevent further attempts
+      this.transporter = null;
     }
   }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
+    // Check if email service is available
+    if (!this.isEnabled) {
+      logger.debug('Email service is disabled, skipping email send', {
+        to: options.to,
+        subject: options.subject
+      });
+      return false;
+    }
+
+    if (!this.transporter) {
+      logger.warn('Email transporter not available, skipping email send', {
+        to: options.to,
+        subject: options.subject
+      });
+      return false;
+    }
+
     try {
       const { to, subject, template, data } = options;
       
@@ -69,15 +137,20 @@ export class EmailService {
       const html = await this.renderTemplate(template, data);
       
       const mailOptions = {
-        from: `"${process.env.EMAIL_FROM_NAME || 'O4O Platform'}" <${process.env.EMAIL_FROM_ADDRESS || 'noreply@o4o.com'}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'O4O Platform'}" <${process.env.EMAIL_FROM_ADDRESS || process.env.SMTP_USER || 'noreply@o4o.com'}>`,
         to,
         subject,
         html,
         text: this.htmlToText(html)
       };
 
-      // Send email
-      const info = await this.transporter.sendMail(mailOptions);
+      // Send email with timeout
+      const sendPromise = this.transporter.sendMail(mailOptions);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email send timeout')), 30000)
+      );
+      
+      const info = await Promise.race([sendPromise, timeoutPromise]) as any;
       
       // Log in development mode
       if (process.env.NODE_ENV === 'development' && !process.env.SMTP_HOST) {
@@ -87,7 +160,9 @@ export class EmailService {
           messageId: info.messageId,
           preview: nodemailer.getTestMessageUrl(info)
         });
-        console.log('Email content:', JSON.parse(info.message).html);
+        if (info.message) {
+          logger.debug('Email content preview available');
+        }
       } else {
         logger.info('Email sent successfully:', {
           to,
@@ -97,8 +172,13 @@ export class EmailService {
       }
 
       return true;
-    } catch (error) {
-      logger.error('Failed to send email:', error);
+    } catch (error: any) {
+      logger.error('Failed to send email:', {
+        message: error.message,
+        code: error.code,
+        to: options.to,
+        subject: options.subject
+      });
       return false;
     }
   }
@@ -315,6 +395,20 @@ export class EmailService {
       .replace(/<[^>]+>/g, '')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  // Public method to check if email service is available
+  isServiceAvailable(): boolean {
+    return this.isEnabled && this.isInitialized && this.transporter !== null;
+  }
+
+  // Public method to get service status
+  getServiceStatus(): { enabled: boolean; initialized: boolean; available: boolean } {
+    return {
+      enabled: this.isEnabled,
+      initialized: this.isInitialized,
+      available: this.isServiceAvailable()
+    };
   }
 }
 

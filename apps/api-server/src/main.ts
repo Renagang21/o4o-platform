@@ -537,12 +537,23 @@ const startServer = async () => {
         console.error('⚠️  Failed to initialize monitoring services:', serviceError);
       }
 
-      // Initialize email service
+      // Initialize email service (graceful, non-blocking)
       try {
         await emailService.initialize();
-        // console.log('✅ Email service initialized');
-      } catch (emailError) {
-        console.error('⚠️  Failed to initialize email service:', emailError);
+        const status = emailService.getServiceStatus();
+        if (status.available) {
+          logger.info('Email service initialized successfully');
+        } else if (status.enabled && !status.available) {
+          logger.warn('Email service enabled but not available (check SMTP config)');
+        } else {
+          logger.info('Email service disabled');
+        }
+      } catch (emailError: any) {
+        logger.error('Failed to initialize email service:', {
+          error: emailError.message || emailError,
+          hint: 'Email functionality will be disabled. Set EMAIL_SERVICE_ENABLED=false to suppress this error.'
+        });
+        // Don't throw - let the app continue without email
       }
     }
   } catch (dbError) {

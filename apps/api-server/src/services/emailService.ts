@@ -3,6 +3,7 @@ import { Transporter } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import path from 'path';
 import fs from 'fs/promises';
+import logger from '../utils/logger';
 
 interface EmailOptions {
   to: string | string[];
@@ -27,19 +28,38 @@ interface SMTPConfig {
 export class EmailService {
   private static instance: EmailService;
   private transporter: Transporter | null = null;
-  private config: SMTPConfig;
+  private config: SMTPConfig | null = null;
   private templatesPath: string;
+  private isEnabled: boolean;
 
   private constructor() {
-    this.config = {
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER || '',
-        pass: process.env.SMTP_PASS || ''
-      }
-    };
+    // Check if email service should be enabled
+    this.isEnabled = process.env.EMAIL_SERVICE_ENABLED !== 'false';
+    
+    if (!this.isEnabled) {
+      logger.info('Email service is disabled via EMAIL_SERVICE_ENABLED=false');
+      this.templatesPath = path.join(__dirname, '..', 'templates', 'emails');
+      return;
+    }
+
+    // Only configure if enabled
+    const hasConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+    
+    if (hasConfig) {
+      this.config = {
+        host: process.env.SMTP_HOST!,
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER!,
+          pass: process.env.SMTP_PASS!
+        }
+      };
+    } else {
+      logger.warn('Email service: SMTP configuration incomplete');
+      logger.warn('Required: SMTP_HOST, SMTP_USER, SMTP_PASS');
+      logger.warn('To disable this warning, set EMAIL_SERVICE_ENABLED=false');
+    }
 
     this.templatesPath = path.join(__dirname, '..', 'templates', 'emails');
     this.initializeTransporter();
@@ -53,23 +73,39 @@ export class EmailService {
   }
 
   private async initializeTransporter(): Promise<void> {
+    // Skip if service is disabled
+    if (!this.isEnabled) {
+      this.transporter = null;
+      return;
+    }
+
+    // Skip if config is not available
+    if (!this.config) {
+      this.transporter = null;
+      return;
+    }
+
     try {
-      // Skip initialization if SMTP credentials are not configured
-      if (!this.config.auth.user || !this.config.auth.pass) {
-        // console.log('⚠️  Email service disabled: SMTP credentials not configured');
-        this.transporter = null;
-        return;
-      }
+      // Create transporter with timeout settings
+      this.transporter = nodemailer.createTransport({
+        ...this.config,
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000
+      } as any);
 
-      // Create transporter
-      this.transporter = nodemailer.createTransport(this.config);
-
-      // Verify connection
-      await this.transporter.verify();
-      // console.log('✅ Email service connected successfully');
-    } catch (error) {
-      console.error('⚠️  Email service initialization failed:', error);
-      // console.log('📌 Email functionality will be disabled');
+      // Verify connection with timeout
+      const verifyPromise = this.transporter.verify();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email verification timeout')), 10000)
+      );
+      
+      await Promise.race([verifyPromise, timeoutPromise]);
+      logger.info('Email service connected successfully');
+    } catch (error: any) {
+      logger.error('Email service initialization failed:', error.message || error);
+      logger.warn('Email functionality will be disabled');
+      logger.info('To suppress this message, set EMAIL_SERVICE_ENABLED=false');
       this.transporter = null;
     }
   }
@@ -78,8 +114,14 @@ export class EmailService {
    * Send email with options
    */
   async sendEmail(options: EmailOptions): Promise<boolean> {
+    // Check if service is enabled
+    if (!this.isEnabled) {
+      logger.debug('Email service disabled - skipping email:', options.subject);
+      return false;
+    }
+
     if (!this.transporter) {
-      // console.log('⚠️  Email service not available - skipping email send');
+      logger.warn('Email transporter not available - skipping email:', options.subject);
       return false;
     }
 
@@ -94,8 +136,9 @@ export class EmailService {
         text = template.text || text;
       }
 
+      const fromEmail = process.env.EMAIL_FROM_ADDRESS || process.env.SMTP_USER || 'noreply@o4o.com';
       const mailOptions: Mail.Options = {
-        from: `"${process.env.EMAIL_FROM_NAME || 'O4O Platform'}" <${process.env.SMTP_USER}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'O4O Platform'}" <${fromEmail}>`,
         to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
         subject: options.subject,
         text: text || this.htmlToText(html || ''),
@@ -103,11 +146,17 @@ export class EmailService {
         attachments: options.attachments
       };
 
-      const info = await this.transporter.sendMail(mailOptions);
-      // console.log('Email sent successfully:', info.messageId);
+      // Send with timeout
+      const sendPromise = this.transporter.sendMail(mailOptions);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email send timeout')), 30000)
+      );
+      
+      const info = await Promise.race([sendPromise, timeoutPromise]) as any;
+      logger.info('Email sent successfully:', info.messageId);
       return true;
-    } catch (error) {
-      console.error('Failed to send email:', error);
+    } catch (error: any) {
+      logger.error('Failed to send email:', error.message || error);
       return false;
     }
   }
@@ -257,7 +306,7 @@ export class EmailService {
 
       return { html, text };
     } catch (error) {
-      console.error(`Failed to load template ${templateName}:`, error);
+      logger.error(`Failed to load template ${templateName}:`, error);
       // Fallback to simple HTML
       return {
         html: this.generateSimpleTemplate(templateName, data)
@@ -351,6 +400,10 @@ export class EmailService {
    * Test email configuration
    */
   async testConnection(): Promise<boolean> {
+    if (!this.isEnabled) {
+      return false;
+    }
+
     if (!this.transporter) {
       return false;
     }
@@ -359,9 +412,27 @@ export class EmailService {
       await this.transporter.verify();
       return true;
     } catch (error) {
-      console.error('Email connection test failed:', error);
+      logger.error('Email connection test failed:', error);
       return false;
     }
+  }
+
+  /**
+   * Check if email service is available
+   */
+  isServiceAvailable(): boolean {
+    return this.isEnabled && this.transporter !== null;
+  }
+
+  /**
+   * Get service status
+   */
+  getServiceStatus(): { enabled: boolean; configured: boolean; connected: boolean } {
+    return {
+      enabled: this.isEnabled,
+      configured: this.config !== null,
+      connected: this.transporter !== null
+    };
   }
 }
 
