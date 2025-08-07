@@ -75,26 +75,43 @@ jobs:
         
     - name: Setup SSH
       run: |
-        # Check if secrets are set
-        if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
-          echo "❌ SSH_PRIVATE_KEY secret is not set"
+        # Check if secrets are set - try both naming conventions
+        SSH_KEY="${{ secrets.WEB_SSH_KEY }}"
+        if [ -z "$SSH_KEY" ]; then
+          SSH_KEY="${{ secrets.SSH_PRIVATE_KEY }}"
+        fi
+        
+        HOST="${{ secrets.WEB_HOST }}"
+        if [ -z "$HOST" ]; then
+          HOST="${{ secrets.WEB_SERVER_HOST }}"
+        fi
+        
+        USER="${{ secrets.WEB_USER }}"
+        if [ -z "$USER" ]; then
+          USER="ubuntu"
+        fi
+        
+        if [ -z "$SSH_KEY" ]; then
+          echo "❌ Neither WEB_SSH_KEY nor SSH_PRIVATE_KEY secret is set"
           exit 1
         fi
         
-        if [ -z "${{ secrets.WEB_SERVER_HOST }}" ]; then
-          echo "❌ WEB_SERVER_HOST secret is not set"
+        if [ -z "$HOST" ]; then
+          echo "❌ Neither WEB_HOST nor WEB_SERVER_HOST secret is set"
           exit 1
         fi
+        
+        echo "✅ Using SSH key and host: $HOST"
         
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         
         # Create SSH config with proper variable substitution
         cat > ~/.ssh/config << EOF
         Host web-server
-          HostName ${{ secrets.WEB_SERVER_HOST }}
-          User ubuntu
+          HostName $HOST
+          User $USER
           Port 22
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
