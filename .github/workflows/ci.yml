@@ -315,7 +315,6 @@ jobs:
       
       - name: Run npm audit
         run: npm audit --audit-level=high || echo "Note: WordPress packages have known moderate vulnerabilities pending upstream fixes"
-        continue-on-error: true
 
   # 종합 상태 체크
   status-check:
