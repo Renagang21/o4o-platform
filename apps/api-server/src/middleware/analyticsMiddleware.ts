@@ -33,7 +33,7 @@ export class AnalyticsMiddleware {
       }
       const betaUserId = req.headers['x-beta-user-id'] as string || (req as UserWithBetaId).user?.betaUserId;
       const userAgent = req.headers['user-agent'] || 'Unknown';
-      const ipAddress = req.ip || req.connection.remoteAddress || 'Unknown';
+      const ipAddress = req.ip || (req.socket?.remoteAddress) || 'Unknown';
 
       req.analytics = {
         sessionId,
@@ -77,7 +77,7 @@ export class AnalyticsMiddleware {
       
       const analyticsService = this.analyticsService;
       
-      res.send = function(data) {
+      res.send = function(data: any) {
         res.send = originalSend;
         const responseTime = Date.now() - (req.analytics?.startTime || 0);
         
@@ -108,9 +108,9 @@ export class AnalyticsMiddleware {
         });
 
         return originalSend.call(res, data);
-      };
+      } as any;
 
-      res.json = function(data) {
+      res.json = function(data: any) {
         res.json = originalJson;
         const responseTime = Date.now() - (req.analytics?.startTime || 0);
         
@@ -280,13 +280,13 @@ export class AnalyticsMiddleware {
         }
       };
 
-      res.send = function(data) {
+      res.send = function(data: any) {
         res.send = originalSend;
         setImmediate(trackLoginSuccess);
         return originalSend.call(res, data);
       };
 
-      res.json = function(data) {
+      res.json = function(data: any) {
         res.json = originalJson;
         setImmediate(trackLoginSuccess);
         return originalJson.call(res, data);
@@ -327,13 +327,13 @@ export class AnalyticsMiddleware {
         }
       };
 
-      res.send = function(data) {
+      res.send = function(data: any) {
         res.send = originalSend;
         setImmediate(trackFeedbackSuccess);
         return originalSend.call(res, data);
       };
 
-      res.json = function(data) {
+      res.json = function(data: any) {
         res.json = originalJson;
         setImmediate(trackFeedbackSuccess);
         return originalJson.call(res, data);
@@ -377,13 +377,13 @@ export class AnalyticsMiddleware {
         }
       };
 
-      res.send = function(data) {
+      res.send = function(data: any) {
         res.send = originalSend;
         setImmediate(trackContentSuccess);
         return originalSend.call(res, data);
       };
 
-      res.json = function(data) {
+      res.json = function(data: any) {
         res.json = originalJson;
         setImmediate(trackContentSuccess);
         return originalJson.call(res, data);
