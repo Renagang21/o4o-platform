@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/table'
 import { formatDate } from '@/lib/utils'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { authClient } from '@o4o/auth-client'
+import { apiClient } from '../../utils/apiClient'
 import type { Post, PostStatus } from '@o4o/types'
 import toast from 'react-hot-toast'
 
@@ -48,15 +48,15 @@ const PostList: FC = () => {
       if (searchQuery) params.set('search', searchQuery)
       params.set('type', 'post')
       
-      const response = await authClient.api.get(`/posts?${params}`)
-      return response.data
+      const response = await apiClient.get(`/posts?${params}`)
+      return response
     }
   })
 
   // 게시글 삭제
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await authClient.api.delete(`/posts/${id}`)
+      await apiClient.delete(`/posts/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] })
@@ -70,7 +70,7 @@ const PostList: FC = () => {
   // 게시글 복제
   const duplicateMutation = useMutation({
     mutationFn: async (id: string) => {
-      await authClient.api.post(`/posts/${id}/duplicate`)
+      await apiClient.post(`/posts/${id}/duplicate`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] })

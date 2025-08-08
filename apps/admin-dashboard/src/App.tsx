@@ -601,7 +601,7 @@ function App() {
                     } />
                     
                     {/* CPT & ACF */}
-                    <Route path="/cpt" element={
+                    <Route path="/cpt/*" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Content />
@@ -609,7 +609,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/acf" element={
+                    <Route path="/acf/*" element={
                       <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <CustomFields />
@@ -645,7 +645,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/signage" element={
+                    <Route path="/signage/*" element={
                       <AdminProtectedRoute requiredPermissions={['signage:read']}>
                         <AppGuard appName="signage">
                           <Suspense fallback={<PageLoader />}>
@@ -655,7 +655,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/crowdfunding" element={
+                    <Route path="/crowdfunding/*" element={
                       <AdminProtectedRoute requiredPermissions={['crowdfunding:read']}>
                         <AppGuard appName="crowdfunding">
                           <Suspense fallback={<PageLoader />}>
