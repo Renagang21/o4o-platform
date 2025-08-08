@@ -6,6 +6,52 @@ import { AuthRequest } from '../types/auth';
 const router: Router = Router();
 
 /**
+ * SSO Check endpoint - Check if user is authenticated (no auth required)
+ * This endpoint should be accessible without authentication to check SSO status
+ */
+router.get('/sso/check', async (req: Request, res: Response) => {
+  try {
+    // Check for session cookie
+    const sessionId = req.cookies?.sessionId;
+    
+    if (!sessionId) {
+      return res.json({
+        authenticated: false,
+        message: 'No session found'
+      });
+    }
+
+    // Verify session in Redis
+    const session = await SessionSyncService.validateSession(sessionId);
+    
+    if (!session) {
+      return res.json({
+        authenticated: false,
+        message: 'Invalid or expired session'
+      });
+    }
+
+    // Return authenticated status with user info
+    res.json({
+      authenticated: true,
+      user: {
+        id: session.userId,
+        email: session.email,
+        role: session.role,
+        status: session.status
+      },
+      sessionId: sessionId
+    });
+  } catch (error: any) {
+    console.error('SSO check error:', error);
+    res.status(500).json({
+      authenticated: false,
+      error: 'Failed to check SSO status'
+    });
+  }
+});
+
+/**
  * Get user's linked accounts
  */
 router.get('/linked-accounts', authenticateToken, async (req: AuthRequest, res: Response) => {

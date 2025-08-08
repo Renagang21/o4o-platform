@@ -96,7 +96,7 @@ const Login: FC = () => {
       <div className="max-w-md w-full space-y-8">
         {/* 헤더 */}
         <div>
-          <div className="mx-auto h-16 w-16 bg-admin-blue rounded-full flex items-center justify-center">
+          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center">
             <Lock className="h-8 w-8 text-white" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-bold text-wp-text-primary">
@@ -251,7 +251,7 @@ const Login: FC = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e: any) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-admin-blue focus:ring-admin-blue border border-gray-200 rounded"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border border-gray-200 rounded"
                 disabled={isLoading}
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-wp-text-primary">
@@ -262,7 +262,7 @@ const Login: FC = () => {
             <div className="text-sm">
               <Link 
                 to="/forgot-password" 
-                className="font-medium text-admin-blue hover:text-admin-blue-dark"
+                className="font-medium text-blue-600 hover:text-blue-700"
               >
                 비밀번호를 잊으셨나요?
               </Link>
@@ -274,7 +274,7 @@ const Login: FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-admin-blue hover:bg-admin-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-admin-blue disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -296,7 +296,7 @@ const Login: FC = () => {
               관리자 계정이 필요하신가요?{' '}
               <a 
                 href="mailto:admin@neture.co.kr?subject=관리자 계정 요청" 
-                className="font-medium text-admin-blue hover:text-admin-blue-dark"
+                className="font-medium text-blue-600 hover:text-blue-700"
               >
                 문의하기
               </a>

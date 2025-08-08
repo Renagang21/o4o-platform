@@ -2,7 +2,6 @@
   "name": "@o4o/utils",
   "version": "1.0.0",
   "description": "Shared utility functions for O4O Platform",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

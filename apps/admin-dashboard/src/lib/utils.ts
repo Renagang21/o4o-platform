@@ -1,8 +1,10 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import * as utils from '@o4o/utils';
 
 // Re-export from @o4o/utils
-export { formatCurrency, formatDate } from '@o4o/utils';
+export const formatCurrency = utils.formatCurrency;
+export const formatDate = utils.formatDate;
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

@@ -90,6 +90,13 @@ export class SessionSyncService {
   }
 
   /**
+   * Get session data without validation (alias for validateSession)
+   */
+  static async getSession(sessionId: string): Promise<SessionData | null> {
+    return this.validateSession(sessionId);
+  }
+
+  /**
    * Validate session across apps
    */
   static async validateSession(sessionId: string): Promise<SessionData | null> {

@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/simpleLogger';
 
-type RequestWithTiming = Request;
+interface RequestWithTiming extends Request {
+  startTime?: number;
+}
 
 // Performance monitoring middleware
 export const performanceMonitor = (req: RequestWithTiming, res: Response, next: NextFunction) => {
