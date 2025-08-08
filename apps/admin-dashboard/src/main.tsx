@@ -1,5 +1,5 @@
+import './react-shim'; // React 19 compatibility - MUST be first
 import { StrictMode } from 'react';
-import './utils/react-compat'; // React 19 호환성
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'

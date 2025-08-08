@@ -18,7 +18,11 @@ export const sharedViteConfig: UserConfig = {
   ],
   resolve: {
     alias: {
-      // React 19 호환성을 위한 alias 제거 (번들 분리로 해결)
+      // React 19 호환성을 위한 alias - 모든 React imports가 동일한 인스턴스를 사용하도록
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react/jsx-runtime': path.resolve(__dirname, 'node_modules/react/jsx-runtime'),
+      'react/jsx-dev-runtime': path.resolve(__dirname, 'node_modules/react/jsx-dev-runtime'),
     }
   },
   define: {
