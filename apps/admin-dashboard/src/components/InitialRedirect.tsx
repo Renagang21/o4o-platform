@@ -1,6 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@o4o/auth-context';
-import LandingPage from '@/pages/LandingPage';
 
 const InitialRedirect = () => {
   const { isAuthenticated, isLoading, isAdmin } = useAuth();
@@ -32,8 +31,8 @@ const InitialRedirect = () => {
     );
   }
 
-  // 인증된 관리자는 랜딩 페이지 표시
-  return <LandingPage />;
+  // 인증된 관리자는 WordPress 대시보드로 리다이렉트
+  return <Navigate to="/admin" replace />;
 };
 
 export default InitialRedirect;

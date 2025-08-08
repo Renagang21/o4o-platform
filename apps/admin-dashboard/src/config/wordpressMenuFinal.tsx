@@ -1,6 +1,5 @@
 import { ReactElement } from 'react';
 import { 
-  Home,
   LayoutDashboard, 
   FileText, 
   Image, 
@@ -47,16 +46,10 @@ export interface MenuItem {
 
 export const wordpressMenuItems: MenuItem[] = [
   {
-    id: 'home',
-    label: '홈',
-    icon: <Home className="w-5 h-5" />,
-    path: '/home'
-  },
-  {
     id: 'dashboard',
     label: '대시보드',
     icon: <LayoutDashboard className="w-5 h-5" />,
-    path: '/dashboard'
+    path: '/admin'
   },
   {
     id: 'separator-1',

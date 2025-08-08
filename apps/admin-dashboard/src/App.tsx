@@ -19,6 +19,7 @@ const Login = lazy(() => import('@/pages/auth/Login'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
+const WordPressDashboard = lazy(() => import('@/pages/WordPressDashboard'));
 // const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard')); // Not used
 const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
 const UsersPage = lazy(() => import('@/pages/users'));
@@ -208,6 +209,13 @@ function App() {
               >
                 <AdminLayout>
                   <Routes>
+                    {/* WordPress 스타일 메인 대시보드 */}
+                    <Route path="/admin" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <WordPressDashboard />
+                      </Suspense>
+                    } />
+                    
                     <Route path="/home" element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminHome />
