@@ -148,7 +148,7 @@ registerBlockType('o4o/columns', {
             <RangeControl
               label="Columns"
               value={columns}
-              onChange={(value) => value !== undefined && updateColumns(value)}
+              onChange={(value?: number) => value !== undefined && updateColumns(value)}
               min={1}
               max={6}
             />
@@ -156,7 +156,7 @@ registerBlockType('o4o/columns', {
             <RangeControl
               label="Gap between columns"
               value={gap}
-              onChange={(value) => setAttributes({ gap: value })}
+              onChange={(value?: number) => setAttributes({ gap: value || 0 })}
               min={0}
               max={100}
               step={5}
@@ -165,8 +165,9 @@ registerBlockType('o4o/columns', {
             <ToggleControl
               label="Stack on Mobile"
               checked={isStackedOnMobile}
-              onChange={(value) => setAttributes({ isStackedOnMobile: value })}
+              onChange={(value: boolean) => setAttributes({ isStackedOnMobile: value })}
               help="Stack columns vertically on mobile devices"
+              disabled={false}
             />
           </PanelBody>
         </InspectorControls>
@@ -268,7 +269,7 @@ registerBlockType('o4o/column', {
             <RangeControl
               label="Width (%)"
               value={width || 50}
-              onChange={(value) => setAttributes({ width: value })}
+              onChange={(value?: number) => setAttributes({ width: value || 50 })}
               min={10}
               max={100}
               step={1}
@@ -284,7 +285,7 @@ registerBlockType('o4o/column', {
                 { label: 'Bottom', value: 'bottom' },
                 { label: 'Stretch', value: 'stretch' }
               ]}
-              onChange={(value) => setAttributes({ verticalAlignment: value as any })}
+              onChange={(value: string) => setAttributes({ verticalAlignment: value as 'top' | 'center' | 'bottom' | 'stretch' | '' })}
             />
           </PanelBody>
         </InspectorControls>

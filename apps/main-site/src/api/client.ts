@@ -1,7 +1,7 @@
 import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // API 클라이언트 설정
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr:8443/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

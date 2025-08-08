@@ -180,8 +180,12 @@ export default function ACFConditionFilter({
         <TextControl
           label={__('Values (comma separated)', 'o4o')}
           value={condition.value}
-          onChange={(value: any) => updateCondition(groupId, condition.id, { value })}
+          onChange={(value: string) => updateCondition(groupId, condition.id, { value })}
           placeholder="value1, value2, value3"
+          className=""
+          help=""
+          __nextHasNoMarginBottom={false}
+          hideLabelFromVision={false}
         />
       );
     }
@@ -191,8 +195,12 @@ export default function ACFConditionFilter({
         <TextControl
           label={__('Range (min, max)', 'o4o')}
           value={condition.value}
-          onChange={(value: any) => updateCondition(groupId, condition.id, { value })}
+          onChange={(value: string) => updateCondition(groupId, condition.id, { value })}
           placeholder="10, 100"
+          className=""
+          help=""
+          __nextHasNoMarginBottom={false}
+          hideLabelFromVision={false}
         />
       );
     }
@@ -202,6 +210,10 @@ export default function ACFConditionFilter({
       <TextControl
         label={__('Value', 'o4o')}
         value={condition.value}
+        className=""
+        help=""
+        __nextHasNoMarginBottom={false}
+        hideLabelFromVision={false}
         onChange={(value: any) => updateCondition(groupId, condition.id, { value })}
         type={condition.type === 'NUMERIC' ? 'number' : 'text'}
       />

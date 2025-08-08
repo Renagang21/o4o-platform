@@ -126,7 +126,7 @@ registerBlockType('o4o/group', {
                 { label: 'Flex', value: 'flex' },
                 { label: 'Grid', value: 'grid' }
               ]}
-              onChange={(value) => setAttributes({ layout: value as any })}
+              onChange={(value: string) => setAttributes({ layout: value as 'default' | 'flex' | 'grid' })}
             />
             
             {layout === 'flex' && (
@@ -139,13 +139,14 @@ registerBlockType('o4o/group', {
                     { label: 'Center', value: 'center' },
                     { label: 'Bottom', value: 'bottom' }
                   ]}
-                  onChange={(value) => setAttributes({ verticalAlignment: value as any })}
+                  onChange={(value: string) => setAttributes({ verticalAlignment: value as 'top' | 'center' | 'bottom' })}
                 />
                 
                 <ToggleControl
                   label="Stack on Mobile"
                   checked={isStackedOnMobile}
-                  onChange={(value) => setAttributes({ isStackedOnMobile: value })}
+                  onChange={(value: boolean) => setAttributes({ isStackedOnMobile: value })}
+                  disabled={false}
                 />
               </>
             )}
@@ -155,7 +156,7 @@ registerBlockType('o4o/group', {
             <RangeControl
               label="Padding"
               value={padding}
-              onChange={(value) => setAttributes({ padding: value })}
+              onChange={(value?: number) => setAttributes({ padding: value || 0 })}
               min={0}
               max={100}
               step={5}
@@ -164,7 +165,7 @@ registerBlockType('o4o/group', {
             <RangeControl
               label="Margin"
               value={margin}
-              onChange={(value) => setAttributes({ margin: value })}
+              onChange={(value?: number) => setAttributes({ margin: value || 0 })}
               min={0}
               max={100}
               step={5}
@@ -173,7 +174,7 @@ registerBlockType('o4o/group', {
             <RangeControl
               label="Border Radius"
               value={borderRadius}
-              onChange={(value) => setAttributes({ borderRadius: value })}
+              onChange={(value?: number) => setAttributes({ borderRadius: value || 0 })}
               min={0}
               max={50}
               step={1}

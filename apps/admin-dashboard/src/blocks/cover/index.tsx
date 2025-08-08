@@ -212,14 +212,16 @@ registerBlockType('o4o/cover', {
                 <ToggleControl
                   label="Fixed Background"
                   checked={hasParallax}
-                  onChange={(value) => setAttributes({ hasParallax: value })}
+                  onChange={(value: boolean) => setAttributes({ hasParallax: value })}
                   help="Creates a parallax effect when scrolling"
+                  disabled={false}
                 />
                 
                 <ToggleControl
                   label="Repeated Background"
                   checked={isRepeated}
-                  onChange={(value) => setAttributes({ isRepeated: value })}
+                  onChange={(value: boolean) => setAttributes({ isRepeated: value })}
+                  disabled={false}
                 />
 
                 <FocalPointPicker
@@ -236,7 +238,7 @@ registerBlockType('o4o/cover', {
             <RangeControl
               label="Opacity"
               value={dimRatio}
-              onChange={(value) => setAttributes({ dimRatio: value })}
+              onChange={(value?: number) => setAttributes({ dimRatio: value || 0 })}
               min={0}
               max={100}
               step={10}
@@ -245,14 +247,15 @@ registerBlockType('o4o/cover', {
             <p className="mb-2">Overlay Color</p>
             <ColorPalette
               value={overlayColor || customOverlayColor}
-              onChange={(color) => setAttributes({ customOverlayColor: color })}
+              onChange={(color?: string) => setAttributes({ customOverlayColor: color })}
             />
 
             <ToggleControl
               label="Dark Text"
               checked={!isDark}
-              onChange={(value) => setAttributes({ isDark: !value })}
+              onChange={(value: boolean) => setAttributes({ isDark: !value })}
               help="Use dark text for light backgrounds"
+              disabled={false}
             />
           </PanelBody>
 
@@ -262,7 +265,7 @@ registerBlockType('o4o/cover', {
                 <RangeControl
                   label="Minimum Height"
                   value={minHeight}
-                  onChange={(value) => setAttributes({ minHeight: value })}
+                  onChange={(value?: number) => setAttributes({ minHeight: value || 300 })}
                   min={50}
                   max={1000}
                   step={10}
@@ -275,7 +278,7 @@ registerBlockType('o4o/cover', {
                   { label: 'vh', value: 'vh' },
                   { label: '%', value: '%' }
                 ]}
-                onChange={(value) => setAttributes({ minHeightUnit: value as any })}
+                onChange={(value: string) => setAttributes({ minHeightUnit: value as 'px' | 'vh' | '%' })}
               />
             </div>
           </PanelBody>

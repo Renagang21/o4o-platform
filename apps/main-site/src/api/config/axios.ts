@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr:8443/api';
+const baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
 
 const axiosInstance = axios.create({
   baseURL,
