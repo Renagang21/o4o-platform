@@ -215,6 +215,8 @@ registerBlockType('o4o/cover', {
                   onChange={(value: boolean) => setAttributes({ hasParallax: value })}
                   help="Creates a parallax effect when scrolling"
                   disabled={false}
+                  className=""
+                  __nextHasNoMarginBottom={false}
                 />
                 
                 <ToggleControl
@@ -222,6 +224,8 @@ registerBlockType('o4o/cover', {
                   checked={isRepeated}
                   onChange={(value: boolean) => setAttributes({ isRepeated: value })}
                   disabled={false}
+                  className=""
+                  __nextHasNoMarginBottom={false}
                 />
 
                 <FocalPointPicker
@@ -256,6 +260,8 @@ registerBlockType('o4o/cover', {
               onChange={(value: boolean) => setAttributes({ isDark: !value })}
               help="Use dark text for light backgrounds"
               disabled={false}
+              className=""
+              __nextHasNoMarginBottom={false}
             />
           </PanelBody>
 

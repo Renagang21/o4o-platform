@@ -177,6 +177,7 @@ export function Edit({ attributes, setAttributes, clientId: _clientId }: EditPro
             label={__('Show Product Image', 'o4o')}
             checked={showImage}
             onChange={(value: any) => setAttributes({ showImage: value })}
+            disabled={false}
           />
           {showImage && (
             <>

@@ -147,6 +147,8 @@ registerBlockType('o4o/group', {
                   checked={isStackedOnMobile}
                   onChange={(value: boolean) => setAttributes({ isStackedOnMobile: value })}
                   disabled={false}
+                  className=""
+                  __nextHasNoMarginBottom={false}
                 />
               </>
             )}

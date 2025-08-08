@@ -72,18 +72,21 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
             label={__('Featured products only', 'o4o')}
             checked={query.featured || false}
             onChange={(value: boolean) => updateQuery('featured', value)}
+            disabled={false}
           />
 
           <ToggleControl
             label={__('On sale only', 'o4o')}
             checked={query.onSale || false}
             onChange={(value: boolean) => updateQuery('onSale', value)}
+            disabled={false}
           />
 
           <ToggleControl
             label={__('In stock only', 'o4o')}
             checked={query.inStock || false}
             onChange={(value: boolean) => updateQuery('inStock', value)}
+            disabled={false}
           />
 
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -93,6 +96,10 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
                 type="number"
                 value={query.minPrice || ''}
                 onChange={(value: string) => updateQuery('minPrice', value ? parseInt(value) : undefined)}
+                className=""
+                help=""
+                __nextHasNoMarginBottom={false}
+                hideLabelFromVision={false}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -101,6 +108,10 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
                 type="number"
                 value={query.maxPrice || ''}
                 onChange={(value: string) => updateQuery('maxPrice', value ? parseInt(value) : undefined)}
+                className=""
+                help=""
+                __nextHasNoMarginBottom={false}
+                hideLabelFromVision={false}
               />
             </div>
           </div>
@@ -112,6 +123,10 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
         value={query.search || ''}
         onChange={(value: string) => updateQuery('search', value)}
         placeholder={__('Search products...', 'o4o')}
+        className=""
+        help=""
+        __nextHasNoMarginBottom={false}
+        hideLabelFromVision={false}
       />
 
       <TextControl
@@ -120,6 +135,9 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
         type="number"
         value={query.offset || 0}
         onChange={(value: string) => updateQuery('offset', value ? parseInt(value) : 0)}
+        className=""
+        __nextHasNoMarginBottom={false}
+        hideLabelFromVision={false}
       />
     </div>
   );

@@ -168,6 +168,8 @@ registerBlockType('o4o/columns', {
               onChange={(value: boolean) => setAttributes({ isStackedOnMobile: value })}
               help="Stack columns vertically on mobile devices"
               disabled={false}
+              className=""
+              __nextHasNoMarginBottom={false}
             />
           </PanelBody>
         </InspectorControls>
@@ -285,7 +287,7 @@ registerBlockType('o4o/column', {
                 { label: 'Bottom', value: 'bottom' },
                 { label: 'Stretch', value: 'stretch' }
               ]}
-              onChange={(value: string) => setAttributes({ verticalAlignment: value as 'top' | 'center' | 'bottom' | 'stretch' | '' })}
+              onChange={(value: string) => setAttributes({ verticalAlignment: (value === '' ? undefined : value) as 'top' | 'center' | 'bottom' | 'stretch' | undefined })}
             />
           </PanelBody>
         </InspectorControls>

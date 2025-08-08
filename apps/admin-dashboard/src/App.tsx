@@ -16,6 +16,8 @@ import InitialRedirect from '@/components/InitialRedirect';
 
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
+const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
 // const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard')); // Not used
 const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
@@ -179,6 +181,19 @@ function App() {
             <Route path="/login" element={
               <Suspense fallback={<PageLoader />}>
                 <Login />
+              </Suspense>
+            } />
+            
+            {/* 비밀번호 재설정 페이지 */}
+            <Route path="/forgot-password" element={
+              <Suspense fallback={<PageLoader />}>
+                <ForgotPassword />
+              </Suspense>
+            } />
+            
+            <Route path="/reset-password" element={
+              <Suspense fallback={<PageLoader />}>
+                <ResetPassword />
               </Suspense>
             } />
             

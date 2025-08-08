@@ -251,6 +251,7 @@ export default function DateFilter({
               includeTime,
             })}
             help={__('When disabled, only dates are compared (time is ignored)', 'o4o')}
+            disabled={false}
           />
         </>
       )}

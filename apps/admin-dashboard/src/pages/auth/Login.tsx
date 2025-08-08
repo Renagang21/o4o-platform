@@ -1,5 +1,5 @@
 import { FC, FormEvent, useEffect, useState } from 'react';
-import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Navigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail, Shield, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
@@ -260,12 +260,12 @@ const Login: FC = () => {
             </div>
 
             <div className="text-sm">
-              <a 
-                href="mailto:admin@neture.co.kr?subject=비밀번호 재설정 요청" 
+              <Link 
+                to="/forgot-password" 
                 className="font-medium text-admin-blue hover:text-admin-blue-dark"
               >
                 비밀번호를 잊으셨나요?
-              </a>
+              </Link>
             </div>
           </div>
 
