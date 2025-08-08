@@ -346,8 +346,8 @@ app.use('/api/', limiter);
 // API 라우트
 app.use('/api/auth', authRoutes);
 app.use('/api/v1/auth/v2', authV2Routes); // Cookie-based auth routes
+app.use('/api/v1/auth', linkedAccountsRoutes); // Linked accounts routes (must be before socialAuthRoutes for /sso/check)
 app.use('/api/v1/auth', socialAuthRoutes); // Social auth routes
-app.use('/api/v1/auth', linkedAccountsRoutes); // Linked accounts routes
 app.use('/api/users', userRoutes);
 app.use('/api/v1/users', userManagementRoutes); // New user management routes
 app.use('/api/admin', adminRoutes);
