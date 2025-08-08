@@ -15,16 +15,18 @@ mkdirSync('./dist', { recursive: true });
 // Run TypeScript compiler with specific config
 const tscConfig = {
   compilerOptions: {
+    target: "ES2022",
+    module: "ESNext",
+    moduleResolution: "bundler",
     outDir: "./dist",
     declaration: true,
     declarationMap: true,
     skipLibCheck: true,
     esModuleInterop: true,
     allowSyntheticDefaultImports: true,
-    moduleResolution: "node",
     noEmit: false,
-    isolatedModules: false,
-    noResolve: false
+    isolatedModules: true,
+    resolveJsonModule: true
   },
   include: ["src/**/*"],
   exclude: ["node_modules", "dist"]
