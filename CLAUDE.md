@@ -2,8 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-⚠️ **DEVELOPMENT ENVIRONMENT MIGRATION WARNING** ⚠️
-- Currently transitioning from Firebase IDE to local VS Code environment
+⚠️ **DEVELOPMENT ENVIRONMENT WARNING** ⚠️
+- Development environment may have npm command issues (mysterious "2" appended to commands)
 - Careful synchronization required to avoid conflicts and data loss
 - Always verify git status before major operations
 
@@ -15,9 +15,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 git status
 git log --oneline -5
 
-# 2. Ensure all changes are committed in Firebase IDE
+# 2. Ensure all changes are committed
 git add .
-git commit -m "Pre-migration commit from Firebase IDE"
+git commit -m "Pre-migration commit"
 
 # 3. Push to remote repository
 git push origin main
@@ -40,7 +40,7 @@ node --version  # Must be v22.18.0
 npm install
 
 # 4. Restore environment files
-# Copy .env files from Firebase IDE or recreate them
+# Copy .env files from previous environment or recreate them
 
 # 5. Build packages
 ./scripts/dev.sh build:packages
@@ -54,7 +54,7 @@ npm install
 2. **Always backup environment files** before switching
 3. **Verify builds work** in both environments
 4. **Test critical paths** after each sync
-5. **Keep Firebase IDE open** until VS Code setup is confirmed working
+5. **Keep previous environment accessible** until new setup is confirmed working
 
 ## 🔌 MCP (Model Context Protocol) Integration
 
