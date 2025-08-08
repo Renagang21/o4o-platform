@@ -47,7 +47,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     const checkInitialAuth = async () => {
       try {
         const storedUser = getInitialState();
-        const storedToken = localStorage.getItem('authToken');
+        const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
         
         if (storedUser && storedToken) {
           // 저장된 사용자 정보가 있으면 유효성 검증
@@ -61,6 +61,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({
                 // SSO 세션이 유효하지 않으면 로그아웃
                 setUser(null);
                 localStorage.removeItem('admin-auth-storage');
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('token');
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('user');
               }
@@ -93,13 +96,21 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       
       // 토큰을 localStorage에 저장
       if (response.token) {
-        localStorage.setItem('authToken', response.token);
+        // accessToken으로도 저장 (AuthClient가 이 키를 찾음)
+        localStorage.setItem('accessToken', response.token);
+        localStorage.setItem('token', response.token); // 하위 호환성
+        
+        if (response.refreshToken) {
+          localStorage.setItem('refreshToken', response.refreshToken);
+        }
         
         // admin-auth-storage 구조도 업데이트 (apiClient 호환성을 위해)
         const authStorage = {
           state: {
             user: response.user,
             token: response.token,
+            accessToken: response.token,
+            refreshToken: response.refreshToken,
             isAuthenticated: true
           }
         };
@@ -121,6 +132,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     setError(null);
     
     // 모든 인증 관련 데이터 제거
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('admin-auth-storage');
     localStorage.removeItem('user');
