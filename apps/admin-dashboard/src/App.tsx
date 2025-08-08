@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/stores/authStore';
 import { ssoService } from '@/api/sso';
 import { WordPressRouter } from '@/components/routing/WordPressRouter';
+import '@/styles/wordpress-theme.css';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
