@@ -36,7 +36,7 @@ class SSOService {
           onSessionChange(response.isAuthenticated);
         }
       } catch (error: any) {
-        console.error('[SSO] Session check failed:', error);
+    // Error logging - use proper error handler
       }
     }, ssoConfig.sessionCheckInterval);
   }
@@ -59,7 +59,7 @@ class SSOService {
       const response = await api.get<SSOCheckResponse>(apiEndpoints.auth.ssoCheck);
       return response.data;
     } catch (error: any) {
-      console.error('[SSO] Session check error:', error);
+    // Error logging - use proper error handler
       // 에러를 상위로 전달하여 401 처리 가능하도록 함
       if (error?.response?.status === 401) {
         throw error;
@@ -108,7 +108,7 @@ class SSOService {
   redirectToApp(app: string, returnPath?: string) {
     const token = this.getTokenFromCookie();
     if (!token) {
-      console.warn('[SSO] No token available for redirect');
+    // Removed console.warn
       return;
     }
 

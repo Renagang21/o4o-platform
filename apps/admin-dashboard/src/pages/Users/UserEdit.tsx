@@ -104,7 +104,7 @@ const UserEdit: FC = () => {
       await updateUserMutation.mutateAsync(data);
     } catch (error: any) {
       // 에러는 mutation의 onError에서 처리됨
-      console.error('Update user error:', error);
+    // Error logging - use proper error handler
     } finally {
       setIsSubmitting(false);
     }

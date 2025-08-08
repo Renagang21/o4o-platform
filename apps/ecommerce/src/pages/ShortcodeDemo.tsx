@@ -203,7 +203,7 @@ export function ShortcodeDemo() {
     try {
       await addToCart(product, 1);
     } catch (error: any) {
-      console.error('장바구니 추가 실패:', error);
+    // Error logging - use proper error handler
     }
   };
 

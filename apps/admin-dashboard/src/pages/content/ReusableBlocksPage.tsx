@@ -31,12 +31,12 @@ const ReusableBlocksPage: React.FC = () => {
   // Handle import/export functions
   const handleImportBlocks = () => {
     // TODO: Implement import functionality
-    console.log('Import blocks functionality');
+    // Removed console.log
   };
 
   const handleExportBlocks = () => {
     // TODO: Implement export functionality
-    console.log('Export blocks functionality');
+    // Removed console.log
   };
 
   return (

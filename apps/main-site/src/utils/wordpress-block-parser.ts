@@ -326,7 +326,7 @@ export function transformWordPressBlock(wpBlock: WordPressBlock): MainSiteBlock 
 
     // Default case for unknown blocks
     default:
-      console.warn(`Unknown block type: ${wpBlock.name}`);
+    // Removed console.warn
       return {
         ...block,
         type: 'unknown',
@@ -428,7 +428,7 @@ export function parseWordPressContent(content: string): MainSiteBlock[] {
     
     return [];
   } catch (error) {
-    console.error('Failed to parse WordPress content:', error);
+    // Error logging - use proper error handler
     return [];
   }
 }

@@ -45,7 +45,7 @@ const PageViewer: FC = () => {
         }
       }
     } catch (err: any) {
-      console.error('페이지 로드 오류:', err);
+    // Error logging - use proper error handler
       setError('페이지를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);

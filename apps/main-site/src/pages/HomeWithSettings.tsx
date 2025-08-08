@@ -70,7 +70,7 @@ const HomeWithSettings: FC = () => {
 
   // Error fallback - show dynamic homepage
   if (settingsError) {
-    console.error('Failed to load homepage settings:', settingsError);
+    // Error logging - use proper error handler
     return <HomeDynamic />;
   }
 

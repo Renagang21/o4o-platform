@@ -104,7 +104,7 @@ const PatternPageBuilder: React.FC<PatternPageBuilderProps> = ({
       setEditorBlocks(allBlocks);
       setSelectedTemplate(template);
     } catch (error) {
-      console.error('Error building page from template:', error);
+    // Error logging - use proper error handler
     } finally {
       setIsBuilding(false);
     }

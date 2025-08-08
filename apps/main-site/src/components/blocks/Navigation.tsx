@@ -36,7 +36,7 @@ const Navigation: FC<NavigationProps> = ({
           setMenuItems(response.data.items || []);
         }
       } catch (error) {
-        console.error('Error fetching menu:', error);
+    // Error logging - use proper error handler
         // Fallback menu items
         setMenuItems([
           { id: '1', title: '홈', url: '/' },

@@ -198,7 +198,7 @@ const UserForm: FC<UserFormProps> = ({
 
       await onSubmit(data);
     } catch (error: any) {
-      console.error('Form submission error:', error);
+    // Error logging - use proper error handler
     }
   };
 

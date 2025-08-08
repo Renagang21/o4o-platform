@@ -48,7 +48,7 @@ export const SocialLoginButtonsV2: FC<SocialLoginButtonsV2Props> = ({ disabled =
       
       setEnabledProviders(enabled);
     } catch (error) {
-      console.error('Failed to fetch OAuth providers:', error);
+    // Error logging - use proper error handler
       // Default to showing all providers if fetch fails
       setEnabledProviders(new Set(['google', 'kakao', 'naver']));
     } finally {

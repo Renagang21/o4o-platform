@@ -86,7 +86,7 @@ export const loadHomePageData = (): HomePageData => {
       return JSON.parse(saved);
     }
   } catch (error: any) {
-    console.error('홈페이지 데이터 로드 실패:', error);
+    // Error logging - use proper error handler
   }
   return getDefaultHomeData();
 };
@@ -100,7 +100,7 @@ export const saveHomePageData = (data: HomePageData): void => {
     };
     localStorage.setItem('homepage_data', JSON.stringify(updatedData));
   } catch (error: any) {
-    console.error('홈페이지 데이터 저장 실패:', error);
+    // Error logging - use proper error handler
   }
 };
 

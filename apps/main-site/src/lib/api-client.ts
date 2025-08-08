@@ -20,7 +20,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('[API] Request error:', error);
+    // Error logging - use proper error handler
     return Promise.reject(error);
   }
 );
@@ -37,15 +37,15 @@ apiClient.interceptors.response.use(
   (error) => {
     // Log error details
     if (error.response) {
-      console.error('[API] Response error:', {
+    // Error logging - use proper error handler
         status: error.response.status,
         data: error.response.data,
         url: error.config?.url,
       });
     } else if (error.request) {
-      console.error('[API] No response received:', error.request);
+    // Error logging - use proper error handler
     } else {
-      console.error('[API] Error:', error.message);
+    // Error logging - use proper error handler
     }
 
     return Promise.reject(error);

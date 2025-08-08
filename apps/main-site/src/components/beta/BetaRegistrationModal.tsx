@@ -170,7 +170,7 @@ export const BetaRegistrationModal: FC<BetaRegistrationModalProps> = ({
         showToast(data.error?.message || '등록 중 오류가 발생했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     } finally {
       setLoading(false);

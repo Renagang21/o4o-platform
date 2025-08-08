@@ -73,7 +73,7 @@ export default function UserForm() {
         setValue('status', userData.status);
       }
     } catch (error: any) {
-      console.error('Error fetching user:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to load user');
       navigate('/users');
     } finally {
@@ -107,7 +107,7 @@ export default function UserForm() {
       
       navigate('/users');
     } catch (error: any) {
-      console.error('Error saving user:', error);
+    // Error logging - use proper error handler
       toast.error(error.response?.data?.error || 'Failed to save user');
     } finally {
       setLoading(false);

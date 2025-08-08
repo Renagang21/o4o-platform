@@ -64,7 +64,7 @@ const Tags: FC = () => {
       const response = await ContentApi.getTags()
       setTags(response.data)
     } catch (error: any) {
-      console.error('Failed to load tags:', error)
+    // Error logging - use proper error handler
       toast.error('태그를 불러오는데 실패했습니다.')
     } finally {
       setLoading(false)
@@ -155,7 +155,7 @@ const Tags: FC = () => {
       closeModal()
       loadTags()
     } catch (error: any) {
-      console.error('Failed to save tag:', error)
+    // Error logging - use proper error handler
       toast.error('저장에 실패했습니다.')
     } finally {
       setSaving(false)
@@ -178,7 +178,7 @@ const Tags: FC = () => {
       toast.success('태그가 삭제되었습니다.')
       loadTags()
     } catch (error: any) {
-      console.error('Failed to delete tag:', error)
+    // Error logging - use proper error handler
       toast.error('삭제에 실패했습니다.')
     }
   }
@@ -202,7 +202,7 @@ const Tags: FC = () => {
       setQuickAddMode(false)
       loadTags()
     } catch (error: any) {
-      console.error('Failed to create tag:', error)
+    // Error logging - use proper error handler
       toast.error('태그 생성에 실패했습니다.')
     }
   }
@@ -246,7 +246,7 @@ const Tags: FC = () => {
       setSelectedTags([])
       loadTags()
     } catch (error: any) {
-      console.error('Failed to bulk delete tags:', error)
+    // Error logging - use proper error handler
       toast.error('일괄 삭제에 실패했습니다.')
     }
   }
@@ -276,7 +276,7 @@ const Tags: FC = () => {
       setMergeToTag(null)
       loadTags()
     } catch (error: any) {
-      console.error('Failed to merge tags:', error)
+    // Error logging - use proper error handler
       toast.error('태그 병합에 실패했습니다.')
     }
   }

@@ -191,7 +191,7 @@ const RelationsManager: FC = () => {
 
       setRelations(mockRelations);
     } catch (error: any) {
-      console.error('관계 로드 실패:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -215,7 +215,7 @@ const RelationsManager: FC = () => {
       setActiveTab('list');
       alert('✅ 관계가 성공적으로 생성되었습니다!');
     } catch (error: any) {
-      console.error('관계 생성 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ 관계 생성 중 오류가 발생했습니다.');
     }
   };
@@ -230,7 +230,7 @@ const RelationsManager: FC = () => {
       setRelations((prev: any) => prev.filter((rel: any) => rel.id !== id));
       alert('✅ 관계가 삭제되었습니다.');
     } catch (error: any) {
-      console.error('관계 삭제 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };

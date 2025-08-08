@@ -363,7 +363,7 @@ const ContentManagement: FC = () => {
       
       // console.log('저장 완료:', selectedContent.id);
     } catch (error: any) {
-      console.error('저장 실패:', error);
+    // Error logging - use proper error handler
     } finally {
       setIsLoading(false);
     }
@@ -540,7 +540,7 @@ const ContentManagement: FC = () => {
                             // console.log('자동 저장됨:', selectedContent.id);
                             return true;
                           } catch (error: any) {
-                            console.error('자동 저장 실패:', error);
+    // Error logging - use proper error handler
                             return false;
                           }
                         }

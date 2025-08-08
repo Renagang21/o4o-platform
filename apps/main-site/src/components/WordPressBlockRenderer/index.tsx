@@ -23,7 +23,7 @@ export const WordPressBlockRenderer: FC<WordPressBlockRendererProps> = ({
       const wpBlocks = JSON.parse(blocks);
       parsedBlocks = transformWordPressBlocks(Array.isArray(wpBlocks) ? wpBlocks : [wpBlocks]);
     } catch (error) {
-      console.error('Failed to parse WordPress blocks:', error);
+    // Error logging - use proper error handler
       return <div className="error">Failed to render content</div>;
     }
   } else if (Array.isArray(blocks)) {

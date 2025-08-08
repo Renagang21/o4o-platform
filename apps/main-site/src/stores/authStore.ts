@@ -157,7 +157,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             get().logout();
           }
         } catch (error: any) {
-          console.error('Auth check failed:', error);
+    // Error logging - use proper error handler
           get().logout();
         }
       },

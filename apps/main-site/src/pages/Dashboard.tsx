@@ -118,7 +118,7 @@ const Dashboard: FC = () => {
         const response = await servicesAPI.getStatus();
         setServicesData(response.data.services);
       } catch (error: any) {
-        console.error('Failed to load services status:', error);
+    // Error logging - use proper error handler
         // 기본값 설정
         setServicesData({
           ai: { status: 'maintenance', version: '1.0.0' },

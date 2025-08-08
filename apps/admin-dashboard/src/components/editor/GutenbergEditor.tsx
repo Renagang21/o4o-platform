@@ -115,7 +115,7 @@ const parseContentToBlocks = (content: string): Block[] => {
         try {
           attributes = JSON.parse(attributesJson);
         } catch (e: any) {
-          console.error('Failed to parse block attributes:', e);
+    // Error logging - use proper error handler
         }
       }
       
@@ -165,7 +165,7 @@ const parseContentToBlocks = (content: string): Block[] => {
             try {
               parsedContent = JSON.parse(dataMatch[1]);
             } catch (e: any) {
-              console.error('Failed to parse custom block data:', e);
+    // Error logging - use proper error handler
             }
           }
           break;

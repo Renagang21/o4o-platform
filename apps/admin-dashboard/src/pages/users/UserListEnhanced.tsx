@@ -98,7 +98,7 @@ export default function UserListEnhanced() {
         setTotalPages(response.data.data.pagination.totalPages);
       }
     } catch (err: any) {
-      console.error('Error fetching users:', err);
+    // Error logging - use proper error handler
       error('Failed to load users');
     } finally {
       setLoading(false);

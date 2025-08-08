@@ -32,7 +32,7 @@ export const useRefresh = (
         : 0;
       
       if (timeLeft > 0) {
-        console.warn(`너무 빠른 새로고침 요청입니다. ${timeLeft}초 후에 다시 시도하세요.`);
+    // Removed console.warn
         return;
       }
     }
@@ -48,7 +48,7 @@ export const useRefresh = (
       
       setLastRefreshTime(new Date());
     } catch (error: any) {
-      console.error('Refresh failed:', error);
+    // Error logging - use proper error handler
       throw error;
     } finally {
       setIsRefreshing(false);

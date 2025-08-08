@@ -101,7 +101,7 @@ const PostsList: React.FC = () => {
       setTotalPosts(totalPosts);
       setTotalPages(totalPages);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     } finally {
       setLoading(false);
@@ -151,7 +151,7 @@ const PostsList: React.FC = () => {
       ));
       // TODO: Show success toast
     } catch (error) {
-      console.error('Error deleting posts:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     }
   };
@@ -167,7 +167,7 @@ const PostsList: React.FC = () => {
       ));
       // TODO: Show success toast
     } catch (error) {
-      console.error('Error updating posts:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     }
   };
@@ -181,7 +181,7 @@ const PostsList: React.FC = () => {
       fetchPosts(currentPage, searchQuery, statusFilter);
       // TODO: Show success toast
     } catch (error) {
-      console.error('Error deleting post:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     }
   };

@@ -25,16 +25,16 @@ export async function loadBlock(blockName: string): Promise<void> {
 
   const importFn = blockImportMap[blockName as keyof typeof blockImportMap];
   if (!importFn) {
-    console.warn(`No import function found for block: ${blockName}`);
+    // Removed console.warn
     return;
   }
 
   try {
     await importFn();
     loadedBlocks.add(blockName);
-    console.log(`Block loaded: ${blockName}`);
+    // Removed console.log
   } catch (error) {
-    console.error(`Failed to load block ${blockName}:`, error);
+    // Error logging - use proper error handler
   }
 }
 

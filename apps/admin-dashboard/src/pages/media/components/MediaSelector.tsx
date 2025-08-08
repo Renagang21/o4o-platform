@@ -122,7 +122,7 @@ const MediaSelector: FC<MediaSelectorProps> = ({
       toast.success(`${files.length}개 파일이 업로드되었습니다.`)
       refetch()
     } catch (error: any) {
-      console.error('Upload failed:', error)
+    // Error logging - use proper error handler
       toast.error('업로드에 실패했습니다.')
     }
   }

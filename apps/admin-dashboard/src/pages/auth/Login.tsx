@@ -72,7 +72,7 @@ const Login: FC = () => {
       
       toast.success('관리자 로그인 성공!');
     } catch (error: any) {
-      console.error('Admin login failed:', error);
+    // Error logging - use proper error handler
       
       // 구체적인 에러 메시지 표시
       let errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';

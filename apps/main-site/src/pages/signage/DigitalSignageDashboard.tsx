@@ -81,7 +81,7 @@ export default function DigitalSignageDashboard() {
         recentActivity: []
       });
     } catch (err: any) {
-      console.error('Failed to fetch dashboard stats:', err);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }

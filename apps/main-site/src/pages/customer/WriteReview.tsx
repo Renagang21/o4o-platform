@@ -25,7 +25,7 @@ const WriteReview: FC = () => {
       // TODO: API call to submit review
       navigate('/customer/reviews');
     } catch (error: any) {
-      console.error('Error submitting review:', error);
+    // Error logging - use proper error handler
     }
     setIsSubmitting(false);
   };

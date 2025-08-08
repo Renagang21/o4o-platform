@@ -175,7 +175,7 @@ export const dashboardApi = {
         }
       };
     } catch (error: any) {
-      console.error('Failed to fetch dashboard stats:', error);
+    // Error logging - use proper error handler
       // Return default data on error
       return {
         users: {
@@ -277,7 +277,7 @@ export const dashboardApi = {
         users: this.getDefaultUsersData()
       };
     } catch (error: any) {
-      console.error('Failed to fetch chart data:', error);
+    // Error logging - use proper error handler
       // 에러 시 기본 차트 데이터 반환
       return {
         sales: this.getDefaultSalesData(),
@@ -304,7 +304,7 @@ export const dashboardApi = {
         approval
       };
     } catch (error: any) {
-      console.error('Failed to fetch notifications:', error);
+    // Error logging - use proper error handler
       return {
         items: this.getDefaultNotifications(),
         total: 4,
@@ -320,7 +320,7 @@ export const dashboardApi = {
       const response = await api.get('/admin/activities?limit=15');
       return response.data.activities || this.getDefaultActivities();
     } catch (error: any) {
-      console.error('Failed to fetch activities:', error);
+    // Error logging - use proper error handler
       return this.getDefaultActivities();
     }
   },
@@ -331,7 +331,7 @@ export const dashboardApi = {
       const response = await api.get('/system/health');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to fetch system health:', error);
+    // Error logging - use proper error handler
       return this.getDefaultSystemHealth();
     }
   },

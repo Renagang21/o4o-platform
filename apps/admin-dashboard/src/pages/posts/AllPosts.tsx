@@ -81,7 +81,7 @@ const AllPosts: FC = () => {
       setTotalItems(response.pagination?.totalItems || 0)
       calculateStats(response.data)
     } catch (error: any) {
-      console.error('Failed to load posts:', error)
+    // Error logging - use proper error handler
       toast.error('게시물을 불러오는데 실패했습니다.')
     } finally {
       setLoading(false)
@@ -93,7 +93,7 @@ const AllPosts: FC = () => {
       const response = await ContentApi.getCategories()
       setCategories(response.data)
     } catch (error: any) {
-      console.error('Failed to load categories:', error)
+    // Error logging - use proper error handler
     }
   }
 
@@ -102,7 +102,7 @@ const AllPosts: FC = () => {
       const response = await ContentApi.getAuthors()
       setAuthors(response.data)
     } catch (error: any) {
-      console.error('Failed to load authors:', error)
+    // Error logging - use proper error handler
     }
   }
 
@@ -224,7 +224,7 @@ const AllPosts: FC = () => {
       setSelectedPosts([])
       loadPosts()
     } catch (error: any) {
-      console.error('Bulk action failed:', error)
+    // Error logging - use proper error handler
       toast.error('일괄 작업에 실패했습니다.')
     }
   }
@@ -236,7 +236,7 @@ const AllPosts: FC = () => {
         toast.success('게시물이 삭제되었습니다.')
         loadPosts()
       } catch (error: any) {
-        console.error('Failed to delete post:', error)
+    // Error logging - use proper error handler
         toast.error('삭제에 실패했습니다.')
       }
     }
@@ -248,7 +248,7 @@ const AllPosts: FC = () => {
       toast.success('게시물이 복제되었습니다.')
       loadPosts()
     } catch (error: any) {
-      console.error('Failed to clone post:', error)
+    // Error logging - use proper error handler
       toast.error('복제에 실패했습니다.')
     }
   }

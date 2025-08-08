@@ -491,7 +491,7 @@ const EnhancedViewsManager: FC = () => {
 
       setViews(mockViews);
     } catch (error: any) {
-      console.error('Failed to load views:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -621,7 +621,7 @@ const EnhancedViewsManager: FC = () => {
       setActiveTab('list');
       alert('✅ View created successfully!');
     } catch (error: any) {
-      console.error('Failed to create view:', error);
+    // Error logging - use proper error handler
       alert('❌ Failed to create view');
     }
   };
@@ -634,7 +634,7 @@ const EnhancedViewsManager: FC = () => {
       setViews((prev: any) => prev.filter((view: any) => view.id !== id));
       alert('✅ View deleted successfully');
     } catch (error: any) {
-      console.error('Failed to delete view:', error);
+    // Error logging - use proper error handler
       alert('❌ Failed to delete view');
     }
   };

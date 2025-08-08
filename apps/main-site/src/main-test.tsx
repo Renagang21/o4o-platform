@@ -4,19 +4,19 @@ import ReactDOM from 'react-dom/client';
 import TestApp from './TestApp';
 
 // 콘솔에 디버그 메시지 출력
-console.log('🚀 React 앱 시작 시도...');
+    // Removed console.log
 
 try {
   const rootElement = document.getElementById('root');
   if (!rootElement) {
-    console.error('❌ root element를 찾을 수 없습니다!');
+    // Error logging - use proper error handler
     throw new Error('Root element not found');
   }
   
-  console.log('✅ root element 발견:', rootElement);
+    // Removed console.log
   
   const root = ReactDOM.createRoot(rootElement);
-  console.log('✅ React root 생성 완료');
+    // Removed console.log
   
   root.render(
     <StrictMode>
@@ -24,9 +24,9 @@ try {
     </StrictMode>
   );
   
-  console.log('✅ React 앱 렌더링 완료!');
+    // Removed console.log
 } catch (error: any) {
-  console.error('❌ React 앱 시작 실패:', error);
+    // Error logging - use proper error handler
   // 에러 발생 시 간단한 HTML 표시
   document.body.innerHTML = `
     <div style="padding: 20px; text-align: center;">

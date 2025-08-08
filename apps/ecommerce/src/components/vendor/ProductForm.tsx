@@ -177,7 +177,7 @@ export function ProductForm({ product, isOpen, onClose, onSubmit }: ProductFormP
       });
       onClose();
     } catch (error: any) {
-      console.error('Failed to save product:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }

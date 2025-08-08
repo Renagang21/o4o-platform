@@ -77,7 +77,7 @@ export const loadPageContent = (slug: string): PageContent => {
       return JSON.parse(saved);
     }
   } catch (error: any) {
-    console.error('페이지 로드 실패:', error);
+    // Error logging - use proper error handler
   }
   
   return getDefaultPageContent(slug);
@@ -95,7 +95,7 @@ export const savePageContent = (content: PageContent): void => {
     // 페이지 목록도 업데이트
     updatePageList(content.slug, content.title, content.status);
   } catch (error: any) {
-    console.error('페이지 저장 실패:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 };
@@ -108,7 +108,7 @@ export const getPageList = (): PageListItem[] => {
       return JSON.parse(saved);
     }
   } catch (error: any) {
-    console.error('페이지 목록 로드 실패:', error);
+    // Error logging - use proper error handler
   }
   
   return [];
@@ -134,7 +134,7 @@ export const updatePageList = (slug: string, title: string, status: 'draft' | 'p
     
     localStorage.setItem('page_list', JSON.stringify(pageList));
   } catch (error: any) {
-    console.error('페이지 목록 업데이트 실패:', error);
+    // Error logging - use proper error handler
   }
 };
 
@@ -147,7 +147,7 @@ export const deletePage = (slug: string): void => {
     const filteredList = pageList.filter((p: any) => p.slug !== slug);
     localStorage.setItem('page_list', JSON.stringify(filteredList));
   } catch (error: any) {
-    console.error('페이지 삭제 실패:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 };

@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // 임시 toast 모킹 (react-hot-toast 미설치)
 const toast = {
-  success: (_message: string) => {}, // console.log('SUCCESS:', message),
+  success: (_message: string) => {}, // Success handler
   error: (_message: string) => {}, // console.error('ERROR:', message),
 };
 

@@ -78,7 +78,7 @@ export default function IntegratedMonitoring() {
       await apiClient.post('/monitoring/backup/trigger');
       refetch();
     } catch (error: any) {
-      console.error('Failed to trigger backup:', error);
+    // Error logging - use proper error handler
     }
   };
 

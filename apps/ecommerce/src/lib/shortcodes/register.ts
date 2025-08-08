@@ -22,6 +22,6 @@ export function registerShortcodeByName(name: string) {
     registerShortcode(shortcode);
     // console.log(`✅ Shortcode "${name}" registered`);
   } else {
-    console.warn(`⚠️ Shortcode "${name}" not found`);
+    // Removed console.warn
   }
 }

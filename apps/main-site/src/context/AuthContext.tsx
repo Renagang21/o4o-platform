@@ -118,7 +118,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
             });
           }
         } catch (error: any) {
-          console.error('인증 상태 복원 실패:', error);
+    // Error logging - use proper error handler
           dispatch({ type: 'LOGOUT' });
         }
       }
@@ -148,7 +148,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
               dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
             }
           } catch (error: any) {
-            console.error('토큰 갱신 실패:', error);
+    // Error logging - use proper error handler
             dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
           }
         }, refreshTime);
@@ -211,7 +211,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     try {
       await authApi.logout();
     } catch (error: any) {
-      console.error('로그아웃 오류:', error);
+    // Error logging - use proper error handler
     } finally {
       dispatch({ type: 'LOGOUT' });
     }
@@ -231,7 +231,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       }
       return success;
     } catch (error: any) {
-      console.error('토큰 갱신 실패:', error);
+    // Error logging - use proper error handler
       dispatch({ type: 'TOKEN_REFRESH_FAILURE' });
       return false;
     }

@@ -163,7 +163,7 @@ export const BetaManagement: FC = () => {
         showToast('베타 사용자 목록을 불러오는데 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Fetch beta users error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     } finally {
       setLoading(false);
@@ -195,7 +195,7 @@ export const BetaManagement: FC = () => {
         showToast('피드백 목록을 불러오는데 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Fetch beta feedback error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     } finally {
       setLoading(false);
@@ -215,7 +215,7 @@ export const BetaManagement: FC = () => {
         setAnalytics(data.data);
       }
     } catch (error: any) {
-      console.error('Fetch analytics error:', error);
+    // Error logging - use proper error handler
     }
   };
 
@@ -238,7 +238,7 @@ export const BetaManagement: FC = () => {
         showToast('승인 처리에 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Approve user error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
   };
@@ -262,7 +262,7 @@ export const BetaManagement: FC = () => {
         showToast('상태 업데이트에 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Update user status error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
   };
@@ -294,7 +294,7 @@ export const BetaManagement: FC = () => {
         showToast('응답 처리에 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Respond to feedback error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
   };
@@ -318,7 +318,7 @@ export const BetaManagement: FC = () => {
         showToast('상태 업데이트에 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Update feedback status error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
   };

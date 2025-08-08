@@ -38,7 +38,7 @@ const AdminHeader: FC = () => {
       await logout();
       navigate('/login');
     } catch (error: any) {
-      console.error('로그아웃 중 오류:', error);
+    // Error logging - use proper error handler
     }
   };
 

@@ -121,7 +121,7 @@ class TokenManager {
         throw new Error('Token refresh failed');
       }
     } catch (error: any) {
-      console.error('토큰 갱신 실패:', error);
+    // Error logging - use proper error handler
       this.clearTokens();
       
       // 로그인 페이지로 리다이렉트
@@ -185,7 +185,7 @@ ssoApiClient.interceptors.response.use(
           return ssoApiClient(originalRequest);
         }
       } catch (refreshError: any) {
-        console.error('토큰 갱신 실패:', refreshError);
+    // Error logging - use proper error handler
         tokenManager.clearTokens();
         window.location.href = '/login';
         return Promise.reject(refreshError);
@@ -245,7 +245,7 @@ export const ssoAuthAPI = {
       }
       return null;
     } catch (error: any) {
-      console.error('토큰 갱신 실패:', error);
+    // Error logging - use proper error handler
       return null;
     }
   },

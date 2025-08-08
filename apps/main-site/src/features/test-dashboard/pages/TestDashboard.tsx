@@ -66,7 +66,7 @@ export const TestDashboard: FC = () => {
   // 개발 도구 클릭 핸들러
   const handleDevToolClick = (tool: DevTool) => {
     // 실제로는 각 도구의 구현에 따라 다르게 처리
-    console.log(`Opening dev tool: ${tool.name}`);
+    // Removed console.log
     // 임시로 URL로 이동 (실제로는 모달이나 별도 페이지 등)
     if (tool.url.startsWith('/')) {
       window.location.href = tool.url;

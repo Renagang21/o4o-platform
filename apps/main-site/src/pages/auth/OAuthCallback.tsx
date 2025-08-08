@@ -103,7 +103,7 @@ export const OAuthCallback: FC = () => {
         setStatus('error');
       }
     } catch (error: any) {
-      console.error('OAuth callback error:', error);
+    // Error logging - use proper error handler
       
       let errorMessage = '로그인 처리 중 오류가 발생했습니다.';
       

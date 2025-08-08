@@ -83,7 +83,7 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ affiliateUserId 
 
       setCommissions(mockCommissions);
     } catch (error: any) {
-      console.error('Failed to load commissions:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }

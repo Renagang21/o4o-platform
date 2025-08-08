@@ -114,7 +114,7 @@ export default function StoreManagement() {
         setPlaybackStatus(data.data);
       }
     } catch (err: any) {
-      console.error('Failed to fetch playback status:', err);
+    // Error logging - use proper error handler
     }
   };
 

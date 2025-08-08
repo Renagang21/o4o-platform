@@ -111,9 +111,8 @@ function App() {
   // Initialize SSO on app start
   useEffect(() => {
     // Initial SSO session check
-    checkSSOSession().catch((error) => {
-      console.error('Initial session check failed:', error);
-      // 초기 체크 실패 시 로컬 스토리지 정리
+    checkSSOSession().catch(() => {
+      // SSO session check failed - clear local storage
       localStorage.removeItem('auth-storage');
       localStorage.removeItem('authToken');
     });
@@ -134,7 +133,7 @@ function App() {
   
   // 인증 오류 처리
   const handleAuthError = (error: string) => {
-    console.error('Auth error:', error);
+    // Error logging - use proper error handler
     
     switch (error) {
       case 'token_refresh_failed':

@@ -238,7 +238,7 @@ export const useDashboardData = () => {
     try {
       await Promise.allSettled(refreshPromises);
     } catch (error: any) {
-      console.error('Error refreshing dashboard data:', error);
+    // Error logging - use proper error handler
       throw error;
     }
   }, [refetchStats, refetchCharts, refetchNotifications, refetchActivities, refetchHealth]);

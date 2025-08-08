@@ -125,7 +125,7 @@ const BlockPatternsBrowser: React.FC<BlockPatternsBrowserProps> = ({
       setPatterns(data);
       setTotalPages(totalPages);
     } catch (error) {
-      console.error('Error fetching block patterns:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -140,7 +140,7 @@ const BlockPatternsBrowser: React.FC<BlockPatternsBrowserProps> = ({
         setCategories(data);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+    // Error logging - use proper error handler
     }
   };
 

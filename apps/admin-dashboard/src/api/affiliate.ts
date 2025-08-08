@@ -17,7 +17,7 @@ export async function createAffiliate(data: CreateAffiliateRequest): Promise<Cre
     const response = await authClient.api.post('/v1/affiliate/create', data);
     return response.data;
   } catch (error: any) {
-    console.error('Create affiliate error:', error);
+    // Error logging - use proper error handler
     return {
       success: false,
       message: error.response?.data?.message || '제휴 회원 생성에 실패했습니다.'
@@ -33,7 +33,7 @@ export async function getAffiliateUser(userId?: string): Promise<AffiliateUser |
     const response = await authClient.api.get(`/v1/affiliate/user${userId ? `/${userId}` : ''}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get affiliate user error:', error);
+    // Error logging - use proper error handler
     return null;
   }
 }
@@ -53,7 +53,7 @@ export async function getAffiliateStats(params: GetAffiliateStatsRequest) {
     const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get affiliate stats error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -82,7 +82,7 @@ export async function getCommissionHistory(params: {
     const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get commission history error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -95,7 +95,7 @@ export async function processCommissions(request: ProcessCommissionRequest) {
     const response = await authClient.api.post('/v1/affiliate/commissions/process', request);
     return response.data;
   } catch (error: any) {
-    console.error('Process commissions error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -110,7 +110,7 @@ export async function generateReferralLink(
     const response = await authClient.api.post('/v1/affiliate/generate-link', request);
     return response.data;
   } catch (error: any) {
-    console.error('Generate referral link error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -130,7 +130,7 @@ export async function trackReferralClick(data: {
     const response = await authClient.api.post('/v1/affiliate/track-click', data);
     return response.data;
   } catch (error: any) {
-    console.error('Track referral click error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -147,7 +147,7 @@ export async function trackReferralConversion(data: {
     const response = await authClient.api.post('/v1/affiliate/track-conversion', data);
     return response.data;
   } catch (error: any) {
-    console.error('Track referral conversion error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -166,7 +166,7 @@ export async function validateReferralRelationship(
     });
     return response.data;
   } catch (error: any) {
-    console.error('Validate referral error:', error);
+    // Error logging - use proper error handler
     return {
       valid: false,
       reason: error.response?.data?.message || '추천 관계 검증에 실패했습니다.'
@@ -194,7 +194,7 @@ export async function getAffiliateList(params?: {
     const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get affiliate list error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -214,7 +214,7 @@ export async function updateAffiliateStatus(
     });
     return response.data;
   } catch (error: any) {
-    console.error('Update affiliate status error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -227,7 +227,7 @@ export async function getAffiliatePolicy() {
     const response = await authClient.api.get('/v1/affiliate/policy');
     return response.data;
   } catch (error: any) {
-    console.error('Get affiliate policy error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }

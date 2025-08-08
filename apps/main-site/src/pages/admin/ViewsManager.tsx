@@ -269,7 +269,7 @@ const ViewsManager: FC = () => {
 
       setViews(mockViews);
     } catch (error: any) {
-      console.error('View 로드 실패:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -294,7 +294,7 @@ const ViewsManager: FC = () => {
       setActiveTab('list');
       alert('✅ View가 성공적으로 생성되었습니다!');
     } catch (error: any) {
-      console.error('View 생성 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ View 생성 중 오류가 발생했습니다.');
     }
   };
@@ -309,7 +309,7 @@ const ViewsManager: FC = () => {
       setViews((prev: any) => prev.filter((view: any) => view.id !== id));
       alert('✅ View가 삭제되었습니다.');
     } catch (error: any) {
-      console.error('View 삭제 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };

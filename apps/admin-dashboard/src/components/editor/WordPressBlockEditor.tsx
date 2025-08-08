@@ -79,7 +79,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
   const { metrics, measureRenderTime } = usePerformanceMonitor({
     onPerformanceIssue: (metrics) => {
       if (metrics.blockCount > 100) {
-        console.warn('High block count detected:', metrics.blockCount);
+    // Removed console.warn
       }
     }
   });
@@ -112,9 +112,8 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
     disableCustomGradients: false,
     enableCustomSpacing: true,
     isRTL: false,
-    mediaUpload: ({ filesList }: any) => {
+    mediaUpload: ({}: any) => {
       // Handle media upload - integrate with existing media system
-      console.log('Media upload requested:', filesList);
       // TODO: Integrate with admin dashboard media system
     },
     __experimentalBlockPatterns: [],
@@ -152,7 +151,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
           }
         }
       } catch (error) {
-        console.error('Failed to initialize editor:', error);
+    // Error logging - use proper error handler
       } finally {
         setIsInitializing(false);
       }
@@ -177,7 +176,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
           setBlocks([paragraphBlock]);
         }
       } catch (error) {
-        console.warn('Failed to parse initial content:', error);
+    // Removed console.warn
         // Create empty paragraph as fallback
         const emptyBlock = createBlock('core/paragraph');
         setBlocks([emptyBlock]);
@@ -202,7 +201,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
           const serializedContent = serialize(newBlocks);
           onChange(serializedContent, newBlocks);
         } catch (error) {
-          console.error('Failed to serialize blocks:', error);
+    // Error logging - use proper error handler
         }
       }
     });
@@ -224,7 +223,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
         setShowReusableBlocksBrowser(false);
       }
     } catch (error) {
-      console.error('Failed to insert reusable block:', error);
+    // Error logging - use proper error handler
     }
   };
 
@@ -238,7 +237,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
         setShowBlockPatternsBrowser(false);
       }
     } catch (error) {
-      console.error('Failed to insert block pattern:', error);
+    // Error logging - use proper error handler
     }
   };
 
@@ -250,8 +249,8 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
   };
 
   // Handle successful save of reusable block
-  const handleReusableBlockSaved = (savedBlock: any) => {
-    console.log('Reusable block saved:', savedBlock);
+  const handleReusableBlockSaved = () => {
+    // Reusable block saved
     // TODO: Show success toast
   };
 

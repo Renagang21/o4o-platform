@@ -32,7 +32,7 @@ api.interceptors.request.use(
             token = parsed.state.token
           }
         } catch (e: any) {
-          console.warn('Failed to parse admin-auth-storage')
+          // Failed to parse admin-auth-storage
         }
       }
     }
@@ -53,7 +53,7 @@ api.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error('[API Request Error]', error)
+    // API Request Error
     return Promise.reject(error)
   }
 )
@@ -72,14 +72,7 @@ api.interceptors.response.use(
     return response
   },
   (error: AxiosError) => {
-    // 에러 로깅
-    console.error('[API Error]', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      message: error.message,
-      data: error.response?.data
-    })
+    // API Error - details available in development tools
     
     if (error.response?.status === 401) {
       // Clear auth state on 401

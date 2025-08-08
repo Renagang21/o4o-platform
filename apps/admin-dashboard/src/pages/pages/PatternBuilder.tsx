@@ -21,7 +21,7 @@ const PatternBuilder: FC = () => {
       navigate(`/pages/${response.data.id}/edit`);
     } catch (error) {
       toast.error('페이지 저장에 실패했습니다');
-      console.error('Failed to save page:', error);
+    // Error logging - use proper error handler
     }
   };
 

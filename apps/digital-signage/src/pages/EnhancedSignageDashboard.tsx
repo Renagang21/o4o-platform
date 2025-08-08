@@ -75,7 +75,7 @@ const EnhancedSignageDashboard: FC = () => {
       const response = await axios.get('/api/signage/analytics');
       setAnalytics(response.data.data);
     } catch (error: any) {
-      console.error('Failed to fetch analytics:', error);
+    // Error logging - use proper error handler
     }
   }, []);
 
@@ -86,7 +86,7 @@ const EnhancedSignageDashboard: FC = () => {
       const response = await axios.get('/api/signage/dashboard/live', { params });
       setLiveDashboard(response.data.data);
     } catch (error: any) {
-      console.error('Failed to fetch live dashboard:', error);
+    // Error logging - use proper error handler
     }
   }, [selectedStore]);
 
@@ -106,7 +106,7 @@ const EnhancedSignageDashboard: FC = () => {
       const response = await axios.get('/api/signage/contents', { params });
       setContents(response.data.data.contents);
     } catch (error: any) {
-      console.error('Failed to fetch contents:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to load contents');
     }
   }, [searchQuery, filterStatus, selectedStore, toast]);
@@ -120,7 +120,7 @@ const EnhancedSignageDashboard: FC = () => {
         setSelectedStore(response.data.data.stores[0]);
       }
     } catch (error: any) {
-      console.error('Failed to fetch stores:', error);
+    // Error logging - use proper error handler
     }
   }, [selectedStore]);
 

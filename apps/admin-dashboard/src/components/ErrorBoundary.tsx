@@ -23,11 +23,11 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // 에러 로깅
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Error logging - use proper error handler
     
     // 개발 환경에서 상세 정보 표시
     if (import.meta.env.DEV) {
-      console.error('Component Stack:', errorInfo.componentStack);
+    // Error logging - use proper error handler
     }
 
     this.setState({

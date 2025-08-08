@@ -39,7 +39,7 @@ export const VideoCopyButton: FC<VideoCopyButtonProps> = ({
         const exists = await checkVideoInMyList(postId);
         setIsCopied(exists);
       } catch (error: any) {
-        console.error('Failed to check video status:', error);
+    // Error logging - use proper error handler
       } finally {
         setIsChecking(false);
       }

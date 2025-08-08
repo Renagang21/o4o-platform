@@ -85,7 +85,7 @@ const ContentManager: FC = () => {
       }
       
     } catch (error: any) {
-      console.error('업로드 실패:', error);
+    // Error logging - use proper error handler
       alert('업로드에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setUploading(false);

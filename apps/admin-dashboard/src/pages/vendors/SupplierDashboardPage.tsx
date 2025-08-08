@@ -76,7 +76,7 @@ const SupplierDashboardPage = () => {
       });
       setPendingProducts(pendingResponse.data || []);
     } catch (error: any) {
-      console.error('Failed to load products:', error);
+    // Error logging - use proper error handler
     }
   };
 

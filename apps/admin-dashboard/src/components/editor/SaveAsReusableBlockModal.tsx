@@ -83,7 +83,7 @@ const SaveAsReusableBlockModal: React.FC<SaveAsReusableBlockModalProps> = ({
           setCategories(data);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+    // Error logging - use proper error handler
       }
     };
 
@@ -136,7 +136,7 @@ const SaveAsReusableBlockModal: React.FC<SaveAsReusableBlockModalProps> = ({
         });
       }
     } catch (err) {
-      console.error('Error saving block:', err);
+    // Error logging - use proper error handler
     }
   };
 

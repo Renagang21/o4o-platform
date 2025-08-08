@@ -253,7 +253,7 @@ export const BetaStatusChecker: FC<BetaStatusProps> = ({
         onStatusChange?.(null);
       }
     } catch (error: any) {
-      console.error('Status check error:', error);
+    // Error logging - use proper error handler
       setStatus(null);
       onStatusChange?.(null);
     } finally {

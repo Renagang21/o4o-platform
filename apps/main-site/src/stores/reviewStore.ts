@@ -565,7 +565,7 @@ export const useReviewStore = create<ReviewState & ReviewActions>()(
             reviewSummaries: [...mockReviewSummaries],
           }));
         } catch (error: any) {
-          console.error('상품 평점 업데이트 중 오류:', error);
+    // Error logging - use proper error handler
         }
       },
 

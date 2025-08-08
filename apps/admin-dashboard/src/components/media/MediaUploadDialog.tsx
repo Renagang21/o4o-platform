@@ -221,7 +221,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
         successCount++
       } catch (error: any) {
         errorCount++
-        console.error('Upload error:', error)
+    // Error logging - use proper error handler
       }
     }
 

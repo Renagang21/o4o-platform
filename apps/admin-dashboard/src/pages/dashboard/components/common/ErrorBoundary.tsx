@@ -33,7 +33,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Dashboard Error Boundary caught an error:', error, errorInfo);
+    // Error logging - use proper error handler
     
     this.setState({
       error,

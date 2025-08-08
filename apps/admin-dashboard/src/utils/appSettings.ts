@@ -26,7 +26,7 @@ export function getAppSettings(): AppSettings {
       return { ...defaultSettings, ...JSON.parse(stored) };
     }
   } catch (error: any) {
-    console.error('Error loading app settings:', error);
+    // Error logging - use proper error handler
   }
   return defaultSettings;
 }
@@ -35,7 +35,7 @@ export function saveAppSettings(settings: AppSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   } catch (error: any) {
-    console.error('Error saving app settings:', error);
+    // Error logging - use proper error handler
   }
 }
 

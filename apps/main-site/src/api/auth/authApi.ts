@@ -40,7 +40,7 @@ export const authApi = {
           throw new Error(ssoResponse.message || 'Login failed');
         }
       } catch (error: any) {
-        console.error('SSO 로그인 실패, 레거시 시스템으로 폴백:', error);
+    // Error logging - use proper error handler
         // SSO 실패 시 레거시 시스템으로 폴백
         return this.legacyLogin(data);
       }
@@ -71,7 +71,7 @@ export const authApi = {
         const ssoUser = await ssoAuthAPI.getCurrentUser();
         return ssoUserToLegacyUser(ssoUser);
       } catch (error: any) {
-        console.error('SSO 사용자 정보 조회 실패, 레거시로 폴백:', error);
+    // Error logging - use proper error handler
         // SSO 실패 시 레거시로 폴백
       }
     }
@@ -89,7 +89,7 @@ export const authApi = {
     if (USE_SSO && ssoAuthAPI.isAuthenticated()) {
       promises.push(
         ssoAuthAPI.logout().catch(error => 
-          console.error('SSO 로그아웃 오류:', error)
+    // Error logging - use proper error handler
         )
       );
     }
@@ -99,7 +99,7 @@ export const authApi = {
     if (legacyToken) {
       promises.push(
         axiosInstance.post(API_ENDPOINTS.AUTH.LEGACY_LOGOUT).catch(error =>
-          console.error('레거시 로그아웃 오류:', error)
+    // Error logging - use proper error handler
         )
       );
     }

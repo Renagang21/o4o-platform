@@ -62,7 +62,7 @@ const LiveTVDisplay: FC = () => {
       setIsConnected(true);
       setError(null);
     } catch (error: any) {
-      console.error('Failed to fetch playback status:', error);
+    // Error logging - use proper error handler
       setIsConnected(false);
       setError('Connection lost. Retrying...');
     }

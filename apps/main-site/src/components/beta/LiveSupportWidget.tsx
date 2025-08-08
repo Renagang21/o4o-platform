@@ -93,7 +93,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
     });
 
     socketInstance.on('error', (error) => {
-      console.error('Socket error:', error);
+    // Error logging - use proper error handler
       showToast('연결 오류가 발생했습니다.', 'error');
     });
 
@@ -171,7 +171,7 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
         showToast(data.error?.message || '실시간 지원 요청에 실패했습니다.', 'error');
       }
     } catch (error: any) {
-      console.error('Start live support error:', error);
+    // Error logging - use proper error handler
       showToast('네트워크 오류가 발생했습니다.', 'error');
     }
   };

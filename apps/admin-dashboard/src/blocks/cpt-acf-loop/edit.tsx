@@ -143,8 +143,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   useEffect(() => {
     fetchPostTypes()
       .then(setPostTypes)
-      .catch((err) => {
-        console.error('Error fetching post types:', err);
+      .catch(() => {
+        // Failed to load post types
         setError(__('Failed to load post types', 'o4o'));
       });
   }, []);
@@ -290,7 +290,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       setTotalPosts(total);
       setTotalPages(totalPages);
     } catch (err: any) {
-      console.error('Error fetching posts:', err);
+    // Error logging - use proper error handler
       setError(__('Failed to load posts', 'o4o'));
     } finally {
       setIsLoading(false);

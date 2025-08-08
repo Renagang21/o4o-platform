@@ -77,7 +77,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
       localStorage.setItem(storageKey, JSON.stringify(saveData));
       // console.log('Content saved to local storage');
     } catch (error) {
-      console.error('Failed to save to local storage:', error);
+    // Error logging - use proper error handler
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         // Clear old data if storage is full
         try {
@@ -85,7 +85,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
           localStorage.setItem(storageKey + '-old', localStorage.getItem(storageKey) || '');
           localStorage.setItem(storageKey, JSON.stringify(data));
         } catch (e) {
-          console.error('Storage cleanup failed:', e);
+    // Error logging - use proper error handler
         }
       }
     }
@@ -208,7 +208,7 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
         }
       }
     } catch (error) {
-      console.error('Failed to restore backup:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to restore backup');
     } finally {
       isRestoringRef.current = false;

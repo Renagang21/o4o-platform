@@ -28,7 +28,7 @@ apiClient.interceptors.request.use(
             token = parsed.state.token
           }
         } catch {
-          console.warn('Failed to parse stored auth token')
+    // Removed console.warn
         }
       }
     }

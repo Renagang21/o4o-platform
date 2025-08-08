@@ -104,7 +104,7 @@ export const useAuthStore = create<AuthState>()(
             })
           }
         } catch (error: any) {
-          console.error('[Auth] SSO session check failed:', error)
+    // Error logging - use proper error handler
           // 401 에러 시 자동 로그아웃
           if (error?.response?.status === 401) {
             set({

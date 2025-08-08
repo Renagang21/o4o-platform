@@ -105,7 +105,7 @@ const ReusableBlocksBrowser: React.FC<ReusableBlocksBrowserProps> = ({
       setBlocks(data);
       setTotalPages(totalPages);
     } catch (error) {
-      console.error('Error fetching reusable blocks:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     } finally {
       setLoading(false);
@@ -124,7 +124,7 @@ const ReusableBlocksBrowser: React.FC<ReusableBlocksBrowserProps> = ({
         setCategories(data);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+    // Error logging - use proper error handler
     }
   };
 
@@ -158,7 +158,7 @@ const ReusableBlocksBrowser: React.FC<ReusableBlocksBrowserProps> = ({
         // TODO: Show success toast
       }
     } catch (error) {
-      console.error('Error duplicating block:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     }
   };
@@ -180,7 +180,7 @@ const ReusableBlocksBrowser: React.FC<ReusableBlocksBrowserProps> = ({
         // TODO: Show success toast
       }
     } catch (error) {
-      console.error('Error deleting block:', error);
+    // Error logging - use proper error handler
       // TODO: Show error toast
     }
   };

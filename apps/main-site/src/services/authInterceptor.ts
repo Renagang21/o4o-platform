@@ -88,13 +88,13 @@ export const setupAuthInterceptor = () => {
       // Handle other errors
       if (error.response?.status === 403) {
         // Forbidden - user doesn't have permission
-        console.error('Access forbidden:', error.response.data);
+    // Error logging - use proper error handler
       } else if (error.response?.status === 429) {
         // Too many requests
-        console.error('Rate limit exceeded:', error.response.data);
+    // Error logging - use proper error handler
       } else if (error.response?.status >= 500) {
         // Server error
-        console.error('Server error:', error.response.data);
+    // Error logging - use proper error handler
       }
 
       return Promise.reject(error);

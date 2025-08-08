@@ -97,7 +97,7 @@ const ContentSearchManager: FC = () => {
       setSearchResult(response.data.data);
     } catch (error: any) {
       toast.error('Search failed');
-      console.error('Search error:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }

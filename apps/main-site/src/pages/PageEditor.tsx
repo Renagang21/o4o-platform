@@ -26,7 +26,7 @@ const PageEditor: FC = () => {
       // 페이지 제목 설정
       document.title = `편집 중: ${content.title}`;
     } catch (err: any) {
-      console.error('페이지 로드 오류:', err);
+    // Error logging - use proper error handler
       setError('페이지를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ const PageEditor: FC = () => {
       
       // console.log('페이지 저장 완료:', updatedContent);
     } catch (error: any) {
-      console.error('페이지 저장 실패:', error);
+    // Error logging - use proper error handler
       throw error;
     }
   };

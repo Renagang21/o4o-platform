@@ -127,7 +127,7 @@ export function useProductTags(): UseTaxonomiesResult {
         const data = await response.json();
         setCategories(data.tags || getMockTags());
       } catch (err: any) {
-        console.error('Error fetching tags:', err);
+    // Error logging - use proper error handler
         setError(err instanceof Error ? err.message : 'Failed to load tags');
         
         // Use mock data in development

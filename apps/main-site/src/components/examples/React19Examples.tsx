@@ -39,7 +39,7 @@ function OptimisticTodoList() {
       setTodos((prev: any) => [...prev, newTodo]);
     } catch (error: any) {
       // 에러 시 자동으로 이전 상태로 롤백
-      console.error('Failed to add todo:', error);
+    // Error logging - use proper error handler
     }
   };
 

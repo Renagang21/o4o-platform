@@ -218,7 +218,7 @@ export async function fetchYouTubeVideoInfo(
       }
     }
   } catch (error: any) {
-    console.error('YouTube API error:', error);
+    // Error logging - use proper error handler
   }
   
   return null;

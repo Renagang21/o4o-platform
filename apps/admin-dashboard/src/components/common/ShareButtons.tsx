@@ -93,7 +93,7 @@ export const ShareButtons: FC<ShareButtonsProps> = ({
         ],
       });
     } catch (error: any) {
-      console.error('Kakao share error:', error);
+    // Error logging - use proper error handler
       toast.error('카카오톡 공유 중 오류가 발생했습니다.');
     }
   };
@@ -156,7 +156,7 @@ export const ShareButtons: FC<ShareButtonsProps> = ({
       } catch (error: any) {
         // 사용자가 공유를 취소한 경우는 에러 표시하지 않음
         if (error.name !== 'AbortError') {
-          console.error('Native share error:', error);
+    // Error logging - use proper error handler
           toast.error('공유하기에 실패했습니다.');
         }
       }

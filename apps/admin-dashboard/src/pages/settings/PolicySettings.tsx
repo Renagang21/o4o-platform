@@ -167,7 +167,7 @@ const PolicySettings: FC = () => {
       
       setSettings(mockSettings);
     } catch (error: any) {
-      console.error('Failed to load policy settings:', error);
+    // Error logging - use proper error handler
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +186,7 @@ const PolicySettings: FC = () => {
       
       // Success notification could be added here
     } catch (error: any) {
-      console.error('Failed to save policy settings:', error);
+    // Error logging - use proper error handler
     } finally {
       setIsSaving(false);
     }

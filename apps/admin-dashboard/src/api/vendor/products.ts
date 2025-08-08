@@ -30,7 +30,7 @@ export async function getSupplierProducts(params?: {
     const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get supplier products error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -43,7 +43,7 @@ export async function getVendorProduct(productId: string) {
     const response = await authClient.api.get(`/v1/vendor/products/${productId}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get vendor product error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -56,7 +56,7 @@ export async function createVendorProduct(data: Partial<VendorProduct>) {
     const response = await authClient.api.post('/v1/vendor/products', data);
     return response.data;
   } catch (error: any) {
-    console.error('Create vendor product error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -69,7 +69,7 @@ export async function updateVendorProduct(productId: string, data: Partial<Vendo
     const response = await authClient.api.put(`/v1/vendor/products/${productId}`, data);
     return response.data;
   } catch (error: any) {
-    console.error('Update vendor product error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -82,7 +82,7 @@ export async function approveProducts(request: ProductApprovalRequest): Promise<
     const response = await authClient.api.post('/v1/vendor/products/approve', request);
     return response.data;
   } catch (error: any) {
-    console.error('Approve products error:', error);
+    // Error logging - use proper error handler
     return {
       success: false,
       approved: [],
@@ -101,7 +101,7 @@ export async function updateStock(request: StockUpdateRequest) {
     const response = await authClient.api.post('/v1/vendor/products/stock', request);
     return response.data;
   } catch (error: any) {
-    console.error('Update stock error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -142,7 +142,7 @@ export async function getApprovedProducts(params?: {
     const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get approved products error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -158,7 +158,7 @@ export async function updateProductStatus(
     const response = await authClient.api.patch(`/v1/vendor/products/${productId}/status`, { status });
     return response.data;
   } catch (error: any) {
-    console.error('Update product status error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }
@@ -171,7 +171,7 @@ export async function deleteVendorProduct(productId: string) {
     const response = await authClient.api.delete(`/v1/vendor/products/${productId}`);
     return response.data;
   } catch (error: any) {
-    console.error('Delete vendor product error:', error);
+    // Error logging - use proper error handler
     throw error;
   }
 }

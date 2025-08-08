@@ -55,7 +55,7 @@ class CartService {
       const cartData = localStorage.getItem(this.cartKey);
       return cartData ? JSON.parse(cartData) : null;
     } catch (error: any) {
-      console.error('Error reading cart from storage:', error);
+    // Error logging - use proper error handler
       return null;
     }
   }
@@ -65,7 +65,7 @@ class CartService {
       localStorage.setItem(this.cartKey, JSON.stringify(cart));
       this.notifyListeners(cart);
     } catch (error: any) {
-      console.error('Error saving cart to storage:', error);
+    // Error logging - use proper error handler
     }
   }
 
@@ -153,7 +153,7 @@ class CartService {
 
       return true;
     } catch (error: any) {
-      console.error('Error adding to cart:', error);
+    // Error logging - use proper error handler
       return false;
     }
   }
@@ -181,7 +181,7 @@ class CartService {
       this.saveCartToStorage(updatedCart);
       return true;
     } catch (error: any) {
-      console.error('Error updating quantity:', error);
+    // Error logging - use proper error handler
       return false;
     }
   }
@@ -199,7 +199,7 @@ class CartService {
       this.saveCartToStorage(updatedCart);
       return true;
     } catch (error: any) {
-      console.error('Error removing item:', error);
+    // Error logging - use proper error handler
       return false;
     }
   }
@@ -238,10 +238,10 @@ class CartService {
       });
 
       if (!response.ok) {
-        console.error('Cart sync failed:', await response.text());
+    // Error logging - use proper error handler
       }
     } catch (error: any) {
-      console.error('Error syncing cart with server:', error);
+    // Error logging - use proper error handler
     }
   }
 
@@ -268,7 +268,7 @@ class CartService {
 
       return result;
     } catch (error: any) {
-      console.error('Error applying coupon:', error);
+    // Error logging - use proper error handler
       return {
         success: false,
         message: 'Failed to apply coupon'
@@ -296,7 +296,7 @@ class CartService {
         errors
       };
     } catch (error: any) {
-      console.error('Error validating cart:', error);
+    // Error logging - use proper error handler
       return {
         valid: false,
         errors: ['Cart validation failed']

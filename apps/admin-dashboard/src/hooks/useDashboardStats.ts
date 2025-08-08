@@ -142,7 +142,7 @@ export const useDashboardStats = () => {
           }
         };
       } catch (error: any) {
-        console.error('Failed to fetch dashboard statistics:', error);
+    // Error logging - use proper error handler
         
         // Return default data on error
         return generateDefaultDashboardData();

@@ -74,7 +74,7 @@ export default function UserList() {
         setTotalPages(response.data.data.pagination.totalPages);
       }
     } catch (error: any) {
-      console.error('Error fetching users:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to load users');
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ export default function UserList() {
       setSelectedUsers([]);
       fetchUsers();
     } catch (error: any) {
-      console.error('Error approving users:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to approve users');
     }
   };
@@ -138,7 +138,7 @@ export default function UserList() {
       setSelectedUsers([]);
       fetchUsers();
     } catch (error: any) {
-      console.error('Error rejecting users:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to reject users');
     }
   };
@@ -152,7 +152,7 @@ export default function UserList() {
 
       fetchUsers();
     } catch (error: any) {
-      console.error('Error approving user:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to approve user');
     }
   };
@@ -166,7 +166,7 @@ export default function UserList() {
 
       fetchUsers();
     } catch (error: any) {
-      console.error('Error rejecting user:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to reject user');
     }
   };
@@ -191,7 +191,7 @@ export default function UserList() {
       link.click();
       link.remove();
     } catch (error: any) {
-      console.error('Error exporting users:', error);
+    // Error logging - use proper error handler
       toast.error('Failed to export users');
     }
   };

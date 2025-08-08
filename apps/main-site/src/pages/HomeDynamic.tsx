@@ -60,7 +60,7 @@ const HomeDynamic: FC = () => {
 
   // Show error state
   if (isError) {
-    console.error('Homepage template error:', error);
+    // Error logging - use proper error handler
     // Fallback to static homepage on error
     return <StaticHomepage />;
   }

@@ -147,7 +147,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error inserting block pattern:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
@@ -180,7 +180,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error creating block pattern:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
@@ -213,7 +213,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error duplicating block pattern:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
@@ -241,7 +241,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error deleting block pattern:', err);
+    // Error logging - use proper error handler
       return false;
     } finally {
       setLoading(false);
@@ -274,7 +274,7 @@ export const useBlockPatterns = (): UseBlockPatternsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error updating block pattern:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);

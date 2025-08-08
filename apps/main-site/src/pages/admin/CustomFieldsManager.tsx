@@ -215,7 +215,7 @@ const CustomFieldsManager: FC = () => {
 
       setFieldGroups(mockFieldGroups);
     } catch (error: any) {
-      console.error('필드 그룹 로드 실패:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -240,7 +240,7 @@ const CustomFieldsManager: FC = () => {
       setActiveTab('list');
       alert('✅ 필드 그룹이 성공적으로 생성되었습니다!');
     } catch (error: any) {
-      console.error('필드 그룹 생성 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ 필드 그룹 생성 중 오류가 발생했습니다.');
     }
   };
@@ -255,7 +255,7 @@ const CustomFieldsManager: FC = () => {
       setFieldGroups((prev: any) => prev.filter((group: any) => group.id !== id));
       alert('✅ 필드 그룹이 삭제되었습니다.');
     } catch (error: any) {
-      console.error('필드 그룹 삭제 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };

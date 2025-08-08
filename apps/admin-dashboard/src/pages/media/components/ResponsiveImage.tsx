@@ -122,7 +122,7 @@ const ResponsiveImage: FC<ResponsiveImageProps> = ({
       }
       
     } catch (error: any) {
-      console.error('Failed to load media file:', error)
+    // Error logging - use proper error handler
       setLoadingState('error')
       onError?.(error as Error)
     }

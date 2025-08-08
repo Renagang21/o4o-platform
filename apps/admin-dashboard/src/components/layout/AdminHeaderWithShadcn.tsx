@@ -34,7 +34,7 @@ const AdminHeaderWithShadcn: FC<AdminHeaderProps> = ({ onMenuClick }) => {
       logout();
       toast.success('로그아웃되었습니다.');
     } catch (error: any) {
-      console.error('Logout failed:', error);
+    // Error logging - use proper error handler
       toast.error('로그아웃 처리 중 오류가 발생했습니다.');
     }
   };

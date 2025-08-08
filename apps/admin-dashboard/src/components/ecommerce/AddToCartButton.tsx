@@ -56,7 +56,7 @@ export function AddToCartButton({
         onAddToCart?.(false);
       }
     } catch (error: any) {
-      console.error('Add to cart error:', error);
+    // Error logging - use proper error handler
       toast.error(__('An error occurred', 'o4o'));
       onAddToCart?.(false);
     } finally {

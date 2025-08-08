@@ -68,7 +68,7 @@ const TemplatePartRenderer: FC<TemplatePartRendererProps> = ({
     const BlockComponent = blockComponents[block.type];
     
     if (!BlockComponent) {
-      console.warn(`Unknown block type: ${block.type}`);
+    // Removed console.warn
       return null;
     }
 

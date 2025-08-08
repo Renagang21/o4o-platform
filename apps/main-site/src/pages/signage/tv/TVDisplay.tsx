@@ -114,7 +114,7 @@ const TVDisplay: FC = () => {
             muted
             controls={false}
             onError={() => {
-              console.error('비디오 로드 실패:', currentContent.url);
+    // Error logging - use proper error handler
             }}
           >
             <source src={currentContent.url} type="video/mp4" />

@@ -106,7 +106,7 @@ const HomepageEditor: FC = () => {
         setBlocks([]);
       }
     } catch (error: any) {
-      console.error('Failed to load homepage template:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -197,7 +197,7 @@ const HomepageEditor: FC = () => {
       setTemplate(updateResponse.data);
       alert('Homepage template saved successfully!');
     } catch (error: any) {
-      console.error('Failed to save template:', error);
+    // Error logging - use proper error handler
       alert('Failed to save template');
     } finally {
       setSaving(false);
@@ -216,7 +216,7 @@ const HomepageEditor: FC = () => {
       // or cache invalidation to update the live site
       alert('Homepage published successfully! The changes are now live.');
     } catch (error: any) {
-      console.error('Failed to publish template:', error);
+    // Error logging - use proper error handler
       alert('Failed to publish template');
     } finally {
       setSaving(false);

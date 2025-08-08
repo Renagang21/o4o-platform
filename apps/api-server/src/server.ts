@@ -197,22 +197,22 @@ startServer();
 
 // 종료 시 정리
 process.on('SIGTERM', async () => {
-  // console.log('🛑 SIGTERM received, shutting down gracefully...');
+  logger.info('🛑 SIGTERM received, shutting down gracefully...');
   
   if (AppDataSource.isInitialized) {
     await AppDataSource.destroy();
-    // console.log('✅ Database connection closed');
+    logger.info('✅ Database connection closed');
   }
   
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  // console.log('🛑 SIGINT received, shutting down gracefully...');
+  logger.info('🛑 SIGINT received, shutting down gracefully...');
   
   if (AppDataSource.isInitialized) {
     await AppDataSource.destroy();
-    // console.log('✅ Database connection closed');
+    logger.info('✅ Database connection closed');
   }
   
   process.exit(0);

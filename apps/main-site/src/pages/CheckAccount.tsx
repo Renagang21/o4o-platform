@@ -48,7 +48,7 @@ const CheckAccount: FC = () => {
       }, 1500);
 
     } catch (error: any) {
-      console.error('Account check error:', error);
+    // Error logging - use proper error handler
       setError('계정 확인에 실패했습니다. 다시 시도해주세요.');
       setLoading(false);
     }

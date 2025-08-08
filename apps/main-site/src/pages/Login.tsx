@@ -50,7 +50,7 @@ const Login: FC = () => {
       }
 
     } catch (error: any) {
-      console.error('Login error:', error);
+    // Error logging - use proper error handler
       
       let errorMessage = error instanceof Error ? error.message : '로그인에 실패했습니다.';
       

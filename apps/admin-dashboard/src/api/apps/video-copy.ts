@@ -23,7 +23,7 @@ export async function copyVideoToMyList(params: CopyVideoParams): Promise<CopyVi
 
     return response.data;
   } catch (error: any) {
-    console.error('Video copy error:', error);
+    // Error logging - use proper error handler
     
     if (error.response?.status === 409) {
       return {
@@ -47,7 +47,7 @@ export async function checkVideoInMyList(postId: string): Promise<boolean> {
     const response = await authClient.api.get(`/v1/signage/check-video/${postId}`);
     return response.data.exists || false;
   } catch (error: any) {
-    console.error('Check video error:', error);
+    // Error logging - use proper error handler
     return false;
   }
 }
@@ -72,7 +72,7 @@ export async function getMyVideoList(params?: {
     const response = await authClient.api.get(`/v1/signage/my-videos?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
-    console.error('Get my videos error:', error);
+    // Error logging - use proper error handler
     return {
       success: false,
       data: [],
@@ -103,7 +103,7 @@ export async function updateVideoInfo(postId: string, data: {
     const response = await authClient.api.put(`/v1/signage/videos/${postId}`, data);
     return response.data;
   } catch (error: any) {
-    console.error('Update video error:', error);
+    // Error logging - use proper error handler
     return {
       success: false,
       message: error.response?.data?.message || '비디오 정보 수정 중 오류가 발생했습니다.',

@@ -38,7 +38,7 @@ export class ModuleErrorBoundary extends Component<Props, State> {
     });
 
     // 에러 로깅
-    console.error(`${this.props.moduleName} Module Error:`, error, errorInfo);
+    // Error logging - use proper error handler
     
     // 선택적 에러 콜백 실행
     if (this.props.onError) {

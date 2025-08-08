@@ -141,7 +141,7 @@ const TaxonomyManager: FC = () => {
 
       setTaxonomies(mockTaxonomies);
     } catch (error: any) {
-      console.error('Taxonomy 로드 실패:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -165,7 +165,7 @@ const TaxonomyManager: FC = () => {
       setActiveTab('list');
       alert('✅ Taxonomy가 성공적으로 생성되었습니다!');
     } catch (error: any) {
-      console.error('Taxonomy 생성 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ Taxonomy 생성 중 오류가 발생했습니다.');
     }
   };
@@ -180,7 +180,7 @@ const TaxonomyManager: FC = () => {
       setTaxonomies((prev: any) => prev.filter((tax: any) => tax.slug !== slug));
       alert('✅ Taxonomy가 삭제되었습니다.');
     } catch (error: any) {
-      console.error('Taxonomy 삭제 실패:', error);
+    // Error logging - use proper error handler
       alert('❌ 삭제 중 오류가 발생했습니다.');
     }
   };

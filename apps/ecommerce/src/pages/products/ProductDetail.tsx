@@ -83,7 +83,7 @@ export function ProductDetail() {
           url: window.location.href
         });
       } catch (err: any) {
-        console.error('Share failed:', err);
+    // Error logging - use proper error handler
       }
     } else {
       navigator.clipboard.writeText(window.location.href);

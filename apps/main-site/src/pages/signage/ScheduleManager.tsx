@@ -73,7 +73,7 @@ export default function ScheduleManager({ storeId }: ScheduleManagerProps) {
         setActiveSchedule(data.data.activeSchedule);
       }
     } catch (err: any) {
-      console.error('Failed to fetch active schedule:', err);
+    // Error logging - use proper error handler
     }
   };
 

@@ -89,7 +89,7 @@ const Register: FC = () => {
       }, 3000);
 
     } catch (error: any) {
-      console.error('Registration error:', error);
+    // Error logging - use proper error handler
       
       let errorMessage = '회원가입에 실패했습니다.';
       

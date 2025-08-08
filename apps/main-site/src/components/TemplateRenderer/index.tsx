@@ -62,7 +62,7 @@ const TemplateRenderer: FC<TemplateRendererProps> = ({ blocks, className = '' })
         const BlockComponent = blockComponents[block.type];
         
         if (!BlockComponent) {
-          console.warn(`Unknown block type: ${block.type}. Available types:`, Object.keys(blockComponents));
+    // Removed console.warn
           
           // Use ErrorBlock for better debugging
           return (

@@ -39,7 +39,7 @@ const AddUser: FC = () => {
         sendWelcomeEmail: false
       })
     } catch (error: any) {
-      console.error('Failed to load user:', error)
+    // Error logging - use proper error handler
       toast.error('사용자 정보를 불러오는데 실패했습니다.')
       navigate('/users')
     } finally {
@@ -73,7 +73,7 @@ const AddUser: FC = () => {
       
       navigate('/users')
     } catch (error: any) {
-      console.error('Failed to save user:', error)
+    // Error logging - use proper error handler
       const axiosError = error as AxiosError<{ message?: string }>
       toast.error(axiosError.response?.data?.message || '저장에 실패했습니다.')
     } finally {

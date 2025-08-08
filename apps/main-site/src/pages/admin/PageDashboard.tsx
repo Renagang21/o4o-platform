@@ -42,7 +42,7 @@ const PageDashboard: FC = () => {
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       ));
     } catch (error: any) {
-      console.error('페이지 목록 로드 실패:', error);
+    // Error logging - use proper error handler
     } finally {
       setLoading(false);
     }
@@ -83,7 +83,7 @@ const PageDashboard: FC = () => {
         alert('페이지가 삭제되었습니다.');
       } catch (error: any) {
         alert('페이지 삭제 중 오류가 발생했습니다.');
-        console.error('페이지 삭제 오류:', error);
+    // Error logging - use proper error handler
       }
     }
   };

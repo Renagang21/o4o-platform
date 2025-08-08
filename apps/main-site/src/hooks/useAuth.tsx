@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Set default authorization header
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         } catch (error) {
-          console.error('Failed to parse auth state:', error);
+    // Error logging - use proper error handler
           clearAuthState();
         }
       } else {
@@ -161,7 +161,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await apiClient.post('/api/auth/logout');
       }
     } catch (error) {
-      console.error('Logout error:', error);
+    // Error logging - use proper error handler
     } finally {
       clearAuthState();
       navigate('/auth/login');
@@ -186,7 +186,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error('Token refresh failed');
       }
     } catch (error) {
-      console.error('Token refresh error:', error);
+    // Error logging - use proper error handler
       clearAuthState();
       navigate('/auth/login');
     }

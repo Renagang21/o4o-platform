@@ -101,7 +101,7 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error saving reusable block:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
@@ -135,7 +135,7 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error inserting reusable block:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
@@ -168,7 +168,7 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error duplicating reusable block:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
@@ -196,7 +196,7 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error deleting reusable block:', err);
+    // Error logging - use proper error handler
       return false;
     } finally {
       setLoading(false);
@@ -229,7 +229,7 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Error updating reusable block:', err);
+    // Error logging - use proper error handler
       return null;
     } finally {
       setLoading(false);
