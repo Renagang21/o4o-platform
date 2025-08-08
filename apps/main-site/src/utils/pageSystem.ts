@@ -85,19 +85,14 @@ export const loadPageContent = (slug: string): PageContent => {
 
 // 페이지 데이터 저장
 export const savePageContent = (content: PageContent): void => {
-  try {
-    const updatedContent = {
-      ...content,
-      updatedAt: new Date().toISOString()
-    };
-    localStorage.setItem(`page_content_${content.slug}`, JSON.stringify(updatedContent));
-    
-    // 페이지 목록도 업데이트
-    updatePageList(content.slug, content.title, content.status);
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const updatedContent = {
+    ...content,
+    updatedAt: new Date().toISOString()
+  };
+  localStorage.setItem(`page_content_${content.slug}`, JSON.stringify(updatedContent));
+  
+  // 페이지 목록도 업데이트
+  updatePageList(content.slug, content.title, content.status);
 };
 
 // 페이지 목록 관리
@@ -140,16 +135,11 @@ export const updatePageList = (slug: string, title: string, status: 'draft' | 'p
 
 // 페이지 삭제
 export const deletePage = (slug: string): void => {
-  try {
-    localStorage.removeItem(`page_content_${slug}`);
-    
-    const pageList = getPageList();
-    const filteredList = pageList.filter((p: any) => p.slug !== slug);
-    localStorage.setItem('page_list', JSON.stringify(filteredList));
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  localStorage.removeItem(`page_content_${slug}`);
+  
+  const pageList = getPageList();
+  const filteredList = pageList.filter((p: any) => p.slug !== slug);
+  localStorage.setItem('page_list', JSON.stringify(filteredList));
 };
 
 // 페이지 존재 확인

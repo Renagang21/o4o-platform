@@ -42,20 +42,15 @@ export async function getAffiliateUser(userId?: string): Promise<AffiliateUser |
  * 제휴 통계 조회
  */
 export async function getAffiliateStats(params: GetAffiliateStatsRequest) {
-  try {
-    const queryParams = new URLSearchParams();
-    
-    if (params.affiliateId) queryParams.append('affiliateId', params.affiliateId);
-    queryParams.append('period', params.period);
-    if (params.startDate) queryParams.append('startDate', params.startDate);
-    if (params.endDate) queryParams.append('endDate', params.endDate);
+  const queryParams = new URLSearchParams();
+  
+  if (params.affiliateId) queryParams.append('affiliateId', params.affiliateId);
+  queryParams.append('period', params.period);
+  if (params.startDate) queryParams.append('startDate', params.startDate);
+  if (params.endDate) queryParams.append('endDate', params.endDate);
 
-    const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString() as any}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString() as any}`);
+  return response.data;
 }
 
 /**
@@ -69,35 +64,25 @@ export async function getCommissionHistory(params: {
   startDate?: string;
   endDate?: string;
 }) {
-  try {
-    const queryParams = new URLSearchParams();
-    
-    if (params.affiliateId) queryParams.append('affiliateId', params.affiliateId);
-    if (params.status) queryParams.append('status', params.status);
-    if (params.page) queryParams.append('page', params.page.toString() as any);
-    if (params.limit) queryParams.append('limit', params.limit.toString() as any);
-    if (params.startDate) queryParams.append('startDate', params.startDate);
-    if (params.endDate) queryParams.append('endDate', params.endDate);
+  const queryParams = new URLSearchParams();
+  
+  if (params.affiliateId) queryParams.append('affiliateId', params.affiliateId);
+  if (params.status) queryParams.append('status', params.status);
+  if (params.page) queryParams.append('page', params.page.toString() as any);
+  if (params.limit) queryParams.append('limit', params.limit.toString() as any);
+  if (params.startDate) queryParams.append('startDate', params.startDate);
+  if (params.endDate) queryParams.append('endDate', params.endDate);
 
-    const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString() as any}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString() as any}`);
+  return response.data;
 }
 
 /**
  * 커미션 승인/거절/지급 처리 (관리자)
  */
 export async function processCommissions(request: ProcessCommissionRequest) {
-  try {
-    const response = await authClient.api.post('/v1/affiliate/commissions/process', request);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.post('/v1/affiliate/commissions/process', request);
+  return response.data;
 }
 
 /**
@@ -106,13 +91,8 @@ export async function processCommissions(request: ProcessCommissionRequest) {
 export async function generateReferralLink(
   request: GenerateReferralLinkRequest
 ): Promise<GenerateReferralLinkResponse> {
-  try {
-    const response = await authClient.api.post('/v1/affiliate/generate-link', request);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.post('/v1/affiliate/generate-link', request);
+  return response.data;
 }
 
 /**
@@ -126,13 +106,8 @@ export async function trackReferralClick(data: {
   userAgent?: string;
   referer?: string;
 }) {
-  try {
-    const response = await authClient.api.post('/v1/affiliate/track-click', data);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.post('/v1/affiliate/track-click', data);
+  return response.data;
 }
 
 /**
@@ -143,13 +118,8 @@ export async function trackReferralConversion(data: {
   referralCode: string;
   conversionType: 'signup' | 'purchase';
 }) {
-  try {
-    const response = await authClient.api.post('/v1/affiliate/track-conversion', data);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.post('/v1/affiliate/track-conversion', data);
+  return response.data;
 }
 
 /**
@@ -183,20 +153,15 @@ export async function getAffiliateList(params?: {
   limit?: number;
   search?: string;
 }) {
-  try {
-    const queryParams = new URLSearchParams();
-    
-    if (params?.status) queryParams.append('status', params.status);
-    if (params?.page) queryParams.append('page', params.page.toString() as any);
-    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
-    if (params?.search) queryParams.append('search', params.search);
+  const queryParams = new URLSearchParams();
+  
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.page) queryParams.append('page', params.page.toString() as any);
+  if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
+  if (params?.search) queryParams.append('search', params.search);
 
-    const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString() as any}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString() as any}`);
+  return response.data;
 }
 
 /**
@@ -207,27 +172,17 @@ export async function updateAffiliateStatus(
   status: 'active' | 'inactive' | 'suspended',
   reason?: string
 ) {
-  try {
-    const response = await authClient.api.patch(`/v1/affiliate/users/${affiliateId}/status`, {
-      status,
-      reason
-    });
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.patch(`/v1/affiliate/users/${affiliateId}/status`, {
+    status,
+    reason
+  });
+  return response.data;
 }
 
 /**
  * 제휴 정책 조회
  */
 export async function getAffiliatePolicy() {
-  try {
-    const response = await authClient.api.get('/v1/affiliate/policy');
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get('/v1/affiliate/policy');
+  return response.data;
 }

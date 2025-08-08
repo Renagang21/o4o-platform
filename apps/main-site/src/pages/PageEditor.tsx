@@ -36,22 +36,17 @@ const PageEditor: FC = () => {
   const handleSave = async (html: string, json: Record<string, unknown>) => {
     if (!pageContent || !slug) return;
 
-    try {
-      const updatedContent: PageContent = {
-        ...pageContent,
-        content: html,
-        json: json,
-        updatedAt: new Date().toISOString(),
-      };
+    const updatedContent: PageContent = {
+      ...pageContent,
+      content: html,
+      json: json,
+      updatedAt: new Date().toISOString(),
+    };
 
-      savePageContent(updatedContent);
-      setPageContent(updatedContent);
-      
-      // console.log('페이지 저장 완료:', updatedContent);
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      throw error;
-    }
+    savePageContent(updatedContent);
+    setPageContent(updatedContent);
+    
+    // Page saved successfully
   };
 
   const handleBack = () => {

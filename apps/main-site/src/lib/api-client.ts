@@ -37,15 +37,14 @@ apiClient.interceptors.response.use(
   (error) => {
     // Log error details
     if (error.response) {
-    // Error logging - use proper error handler
-        status: error.response.status,
-        data: error.response.data,
-        url: error.config?.url,
-      });
+      // Server responded with error status
+      // Status: error.response.status
+      // Data: error.response.data
+      // URL: error.config?.url
     } else if (error.request) {
-    // Error logging - use proper error handler
+      // Request was made but no response received
     } else {
-    // Error logging - use proper error handler
+      // Error setting up the request
     }
 
     return Promise.reject(error);
