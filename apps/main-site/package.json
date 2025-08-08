@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "NODE_ENV=production vite build --mode production",
+    "build": "bash -c 'NODE_ENV=production vite build --mode production'",
     "build:clean": "rm -rf dist && NODE_ENV=production vite build --mode production",
     "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --max-warnings 500 || true",
     "lint:fix": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --fix",
