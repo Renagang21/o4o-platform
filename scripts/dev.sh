@@ -1,8 +1,15 @@
 #!/bin/bash
 # 통합 개발 도구 스크립트
-# Firebase Studio npm "2" 버그 우회 및 주요 개발 명령어 통합
+# Monospace/Claude Code 환경의 npm "2" 버그 우회 및 주요 개발 명령어 통합
 
 set -e
+
+# Monospace 환경에서 추가되는 "2" 인자 무시
+# 참고: Monospace/Claude Code에서 npm 명령 실행 시 자동으로 "2"가 추가됨
+if [ "$2" = "2" ] && [ "$MONOSPACE_ENV" = "true" ]; then
+    echo "# Monospace 환경 감지 - 추가 인자 '2' 무시"
+    set -- "$1"  # 첫 번째 인자만 유지
+fi
 
 # 색상 정의
 GREEN='\033[0;32m'

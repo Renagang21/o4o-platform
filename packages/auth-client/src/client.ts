@@ -44,8 +44,38 @@ export class AuthClient {
 }
 
 // Singleton instance
-export const authClient = new AuthClient(
-  typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:4000/api/v1'
-    : '/api/v1'
-);
+// Use environment variable or default based on hostname
+const getApiUrl = () => {
+  if (typeof window === 'undefined') {
+    return 'http://localhost:4000/api/v1';
+  }
+  
+  // Check for environment variable first (Vite specific)
+  try {
+    // @ts-ignore - Vite environment variable
+    if ((globalThis as any).import?.meta?.env?.VITE_API_URL) {
+      // @ts-ignore
+      return (globalThis as any).import.meta.env.VITE_API_URL;
+    }
+  } catch {
+    // Ignore if import.meta is not available
+  }
+  
+  // Check window global variable (for runtime config)
+  if ((window as any).__API_URL__) {
+    return (window as any).__API_URL__;
+  }
+  
+  // Fallback to hostname-based detection
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:4000/api/v1';
+  } else if (hostname === 'admin.neture.co.kr' || hostname === 'www.neture.co.kr') {
+    return 'https://api.neture.co.kr/api/v1';
+  }
+  
+  // Default fallback
+  return '/api/v1';
+};
+
+export const authClient = new AuthClient(getApiUrl());

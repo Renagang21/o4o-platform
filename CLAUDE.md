@@ -387,7 +387,26 @@ export const handler = (fn: (req: Request, res: Response) => Promise<any>)
 ### Version Requirements
 All environments MUST use Node.js 22.18.0. Common errors:
 - `npm error Invalid Version:` → Check Node.js version first
-- npm commands ending with "2" → Environment issue, use dev.sh scripts instead
+- npm commands ending with "2" → Monospace/Claude Code environment issue (see below)
+
+### Known Environment Issues
+
+#### Monospace/Claude Code npm "2" Bug
+**증상**: npm 명령 실행 시 자동으로 "2"가 인자로 추가됨
+```bash
+# 예시: npm run test → 실제로는 npm run test 2 로 실행됨
+npm verbose argv "run" "test" "--loglevel" "silly" "2"
+```
+
+**원인**: Monospace/Claude Code IDE 환경의 특수한 동작
+- `MONOSPACE_ENV=true` 환경에서만 발생
+- npm alias나 설정 문제가 아님
+- 다른 개발 환경이나 프로덕션에서는 발생하지 않음
+
+**해결 방법**:
+1. `./scripts/dev.sh` 사용 (자동으로 "2" 무시 처리)
+2. package.json 스크립트에 `bash -c` 래퍼 사용
+3. 테스트 시 `--passWithNoTests` 중복 제거
 
 ## 🔐 Environment Variables
 
