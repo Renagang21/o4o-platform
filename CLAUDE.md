@@ -217,29 +217,84 @@ When modifying any code, ALWAYS check:
 - 반드시 모든 앱이 성공적으로 빌드될 때까지 반복
 - 새로운 에러가 나타날 수 있으므로 항상 재빌드 필수
 
-### Quick Commands
+### 🎯 Smart Build System (권장)
+
+**서비스가 많아진 현재, 변경된 부분만 빌드하는 것이 효율적입니다.**
+
+#### 1. **가장 자주 사용하는 명령어**
 ```bash
-# Essential development commands via dev.sh script
-./scripts/dev.sh lint          # ESLint check
-./scripts/dev.sh type-check    # TypeScript check
-./scripts/dev.sh build         # Build all packages and apps
-./scripts/dev.sh build:packages # Build only packages (required first)
-./scripts/dev.sh start         # Start all dev servers
-./scripts/dev.sh stop          # Stop all dev servers
-./scripts/dev.sh test          # Run tests
+# 🔥 핵심 명령어 - 이것만 기억하세요!
+npm run build:changed       # 현재 변경된 파일만 감지해서 빌드
+npm run build:after-pull    # git pull 후 변경된 것만 빌드
 
-# Build commands (more efficient)
-npm run build:all              # Build everything (packages + all apps)
-npm run build:all:fast         # Build with parallel app builds (faster)
-npm run build:production       # Clean build for production
-npm run build:apps             # Build all apps only (assumes packages built)
-npm run build:apps:parallel    # Build all apps in parallel (faster but more CPU)
+# 예시 워크플로우
+git pull origin main        # 최신 코드 받기
+npm run build:after-pull    # 변경된 것만 자동 빌드
+```
 
-# Individual app builds (includes package build)
-npm run build:api              # API server only
-npm run build:admin            # Admin dashboard only
-npm run build:web              # Main site only
-npm run build:ecommerce        # E-commerce only
+#### 2. **스마트 빌드 (고급 옵션)**
+```bash
+# 자동 감지 모드
+npm run build:smart         # 변경사항 자동 감지 후 필요한 것만 빌드
+npm run build:smart:check   # 무엇이 빌드될지 미리보기 (실제 빌드 X)
+npm run build:smart:sync    # 마지막 git pull 이후 변경사항 빌드
+
+# 전체 빌드 (필요시)
+npm run build:smart:full    # 모든 것을 강제로 빌드
+```
+
+#### 3. **안전한 빌드 (빌드 멈춤 방지)**
+```bash
+# 빌드가 자주 멈추는 경우 사용
+npm run build:safe          # 타임아웃과 재시도로 안전하게 전체 빌드
+npm run build:safe:web      # 웹 앱들만 안전하게 빌드
+npm run build:safe:api      # API 서버만 안전하게 빌드
+
+# 실시간 모니터링하며 빌드
+npm run build:monitor       # 진행 상황을 보면서 빌드
+```
+
+#### 4. **기존 빌드 명령어 (레거시)**
+```bash
+# 전체 빌드 (모든 패키지와 앱)
+npm run build:all           # 순차적 빌드
+npm run build:all:fast      # 병렬 빌드 (빠르지만 메모리 많이 사용)
+npm run build:production    # 프로덕션용 클린 빌드
+
+# 개별 앱 빌드 (패키지 포함)
+npm run build:api           # API 서버
+npm run build:admin         # 관리자 대시보드
+npm run build:web           # 메인 사이트
+npm run build:ecommerce     # 이커머스
+```
+
+### 📋 빌드 시나리오별 가이드
+
+| 상황 | 추천 명령어 | 설명 |
+|------|------------|------|
+| **코드 수정 후** | `npm run build:changed` | 수정한 파일 자동 감지하여 빌드 |
+| **git pull 후** | `npm run build:after-pull` | pull로 받은 변경사항만 빌드 |
+| **빌드 전 확인** | `npm run build:smart:check` | 무엇이 빌드될지 미리보기 |
+| **전체 빌드 필요** | `npm run build:smart:full` | 모든 것을 강제 빌드 |
+| **빌드가 멈출 때** | `npm run build:safe` | 타임아웃/재시도로 안전하게 빌드 |
+| **CI/CD 환경** | `npm run build:production` | 클린 상태에서 전체 빌드 |
+
+### 🔄 빌드 동작 원리
+
+1. **변경 감지**: Git diff를 사용해 변경된 파일 감지
+2. **의존성 분석**: 
+   - `types`나 `utils` 변경 시 → 모든 앱 재빌드
+   - 개별 앱 변경 시 → 해당 앱만 빌드
+3. **빌드 순서**: 패키지 먼저, 그 다음 앱 (의존성 순서 준수)
+
+### Quick Commands (기타)
+```bash
+# 개발 명령어
+./scripts/dev.sh lint          # ESLint 검사
+./scripts/dev.sh type-check    # TypeScript 검사
+./scripts/dev.sh start         # 모든 개발 서버 시작
+./scripts/dev.sh stop          # 모든 개발 서버 중지
+./scripts/dev.sh test          # 테스트 실행
 ```
 
 ## 📁 Project Architecture
