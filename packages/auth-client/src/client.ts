@@ -35,7 +35,7 @@ export class AuthClient {
 
   async checkSession(): Promise<{ isAuthenticated: boolean; user?: any }> {
     try {
-      const response = await this.api.get('/auth/sso/check');
+      const response = await this.api.get('/accounts/sso/check');
       return response.data;
     } catch (error) {
       return { isAuthenticated: false };

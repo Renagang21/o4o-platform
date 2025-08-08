@@ -336,18 +336,24 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Apply rate limiting to specific endpoints
+// Apply rate limiting to specific endpoints  
 app.use('/api/v1/auth/sso/check', ssoCheckLimiter);
 app.use('/api/public', publicLimiter);
 
-// Apply standard rate limiting to other endpoints
+// API 라우트 - auth routes MUST be before general rate limiter
+// IMPORTANT: Basic auth routes must come FIRST before any other auth-related routes
+app.use('/api/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes); // v1 compatibility - this MUST be the first /api/v1/auth route
+
+// Other specialized auth routes come AFTER basic auth
+app.use('/api/v1/auth/v2', authV2Routes); // Cookie-based auth routes
+app.use('/api/v1/accounts', linkedAccountsRoutes); // Linked accounts routes (moved to avoid conflict)
+app.use('/api/v1/social', socialAuthRoutes); // Social auth routes (moved to avoid conflict)
+
+// Apply standard rate limiting to authenticated endpoints
 app.use('/api/', limiter);
 
-// API 라우트
-app.use('/api/auth', authRoutes);
-app.use('/api/v1/auth/v2', authV2Routes); // Cookie-based auth routes
-app.use('/api/v1/auth', linkedAccountsRoutes); // Linked accounts routes (must be before socialAuthRoutes for /sso/check)
-app.use('/api/v1/auth', socialAuthRoutes); // Social auth routes
+// Protected API routes (after rate limiter)
 app.use('/api/users', userRoutes);
 app.use('/api/v1/users', userManagementRoutes); // New user management routes
 app.use('/api/admin', adminRoutes);
@@ -423,7 +429,7 @@ app.use('/api/posts', postsRoutes); // Posts routes (WordPress-compatible)
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
 app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
-app.use('/api', contentRoutes);
+app.use('/api/content', contentRoutes); // Content routes - moved to specific path to avoid conflicts
 
 
 // 루트 접근 시 API 서버임을 알림
