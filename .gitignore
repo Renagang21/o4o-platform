@@ -10,6 +10,8 @@ dist/
 build/
 .next/
 out/
+*.map
+.vite/
 
 # Environment variables
 .env
@@ -99,6 +101,10 @@ updated_claude_config.json
 # Build outputs
 *.tgz
 *.tar.gz
+
+# Large data files
+*.dat
+*.mmdb
 
 # SSH and security
 *.pem

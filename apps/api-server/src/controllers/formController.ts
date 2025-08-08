@@ -10,8 +10,8 @@ import { evaluateConditionalLogic } from '../utils/conditionalLogic';
 import { calculateFormula } from '../utils/formula';
 import type { Express } from 'express';
 import { Between, In, Like } from 'typeorm';
-import * as geoip from 'geoip-lite';
 import * as UAParser from 'ua-parser-js';
+import { getGeoLocation } from '../utils/geoLocation';
 
 const formRepository = AppDataSource.getRepository(Form);
 const submissionRepository = AppDataSource.getRepository(FormSubmission);
@@ -263,9 +263,9 @@ export const formController = {
       const parser = new (UAParser as any)(req.headers['user-agent']);
       const uaResult = parser.getResult();
 
-      // Get geo location
+      // Get geo location (using lightweight API)
       const ip = req.ip || req.connection.remoteAddress || '';
-      const geo = geoip.lookup(ip);
+      const geo = await getGeoLocation(ip);
 
       // Handle file uploads
       const uploadedFiles = [];
@@ -295,13 +295,7 @@ export const formController = {
         source: req.headers.origin || '',
         files: uploadedFiles,
         fieldTimings,
-        geoLocation: geo ? {
-          country: geo.country,
-          region: geo.region,
-          city: geo.city,
-          lat: geo.ll?.[0],
-          lng: geo.ll?.[1]
-        } : undefined,
+        geoLocation: geo || undefined,
         deviceType: uaResult.device.type || 'desktop',
         browser: uaResult.browser.name || '',
         os: uaResult.os.name || ''
