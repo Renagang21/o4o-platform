@@ -32,7 +32,9 @@
     },
     "typescript-eslint": {
       "typescript": "*"
-    }
+    },
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:admin\"",
