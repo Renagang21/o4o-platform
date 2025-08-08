@@ -15,7 +15,7 @@ jobs:
       matrix:
         service:
           - name: API Server
-            url: https://api.neture.co.kr:8443/api/health
+            url: https://api.neture.co.kr/api/health
             timeout: 10
           - name: Main Site
             url: https://www.neture.co.kr
@@ -86,10 +86,10 @@ jobs:
       continue-on-error: true
       run: |
         # Health check
-        curl -k -f -s https://api.neture.co.kr:8443/api/health || echo "⚠️ Health endpoint failed"
+        curl -k -f -s https://api.neture.co.kr/api/health || echo "⚠️ Health endpoint failed"
         
         # Auth endpoint
-        response=$(curl -k -s -o /dev/null -w "%{http_code}" https://api.neture.co.kr:8443/api/auth/status || echo "000")
+        response=$(curl -k -s -o /dev/null -w "%{http_code}" https://api.neture.co.kr/api/auth/status || echo "000")
         if [ "$response" = "200" ] || [ "$response" = "401" ]; then
           echo "✅ Auth endpoint is healthy"
         else
@@ -97,7 +97,7 @@ jobs:
         fi
         
         # Products endpoint (public)
-        curl -k -f -s https://api.neture.co.kr:8443/api/products?limit=1 || echo "⚠️ Products endpoint failed"
+        curl -k -f -s https://api.neture.co.kr/api/products?limit=1 || echo "⚠️ Products endpoint failed"
         
         echo "Health check completed"
 
