@@ -59,7 +59,8 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/v1/auth/v2/reset-password', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
+      const response = await fetch(`${apiUrl}/auth/v2/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
