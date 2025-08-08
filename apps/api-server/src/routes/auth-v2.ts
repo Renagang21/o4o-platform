@@ -241,7 +241,7 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
-      where: { id: req.user?.userId },
+      where: { id: (req.user as any)?.userId || (req.user as any)?.id },
       select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'permissions']
     });
 
@@ -268,7 +268,7 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
 // Logout from all devices
 router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => {
   try {
-    if (!req.user?.userId) {
+    if (!(req.user as any)?.userId && !(req.user as any)?.id) {
       return res.status(401).json({
         error: 'Unauthorized',
         code: 'UNAUTHORIZED'
@@ -276,10 +276,10 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
     }
 
     // Revoke all refresh tokens
-    await authService.revokeAllUserTokens(req.user.userId);
+    await authService.revokeAllUserTokens((req.user as any).userId || (req.user as any)!.id);
     
     // Remove all SSO sessions
-    await SessionSyncService.removeAllUserSessions(req.user.userId);
+    await SessionSyncService.removeAllUserSessions((req.user as any).userId || (req.user as any)!.id);
     
     // Clear current session cookies
     authService.clearAuthCookies(res);
@@ -361,14 +361,14 @@ router.post('/reset-password',
 // Request email verification (for authenticated users)
 router.post('/resend-verification-auth', authenticateCookie, async (req: AuthRequest, res) => {
   try {
-    if (!req.user?.userId) {
+    if (!(req.user as any)?.userId && !(req.user as any)?.id) {
       return res.status(401).json({
         error: 'Unauthorized',
         code: 'UNAUTHORIZED'
       });
     }
 
-    await PasswordResetService.requestEmailVerification(req.user.userId);
+    await PasswordResetService.requestEmailVerification((req.user as any).userId || (req.user as any)!.id);
 
     res.json({
       success: true,

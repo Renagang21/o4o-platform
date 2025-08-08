@@ -162,12 +162,12 @@ export const requireRole = (roles: string[]) => {
       });
     }
 
-    if (!roles.includes(authReq.user.role)) {
+    if (!roles.includes((authReq.user as any).role)) {
       return res.status(403).json({ 
         error: 'Insufficient permissions',
         code: 'INSUFFICIENT_PERMISSIONS',
         required: roles,
-        current: authReq.user.role
+        current: (authReq.user as any).role
       });
     }
 

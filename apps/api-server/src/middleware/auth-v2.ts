@@ -91,12 +91,12 @@ export const requireRole = (roles: string | string[]) => {
       });
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!allowedRoles.includes((req.user as any).role)) {
       return res.status(403).json({
         error: 'Insufficient permissions',
         code: 'FORBIDDEN',
         requiredRoles: allowedRoles,
-        userRole: req.user.role
+        userRole: (req.user as any).role
       });
     }
 
