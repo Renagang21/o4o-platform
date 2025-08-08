@@ -48,13 +48,9 @@ export const sharedViteConfig: UserConfig = {
           }
           
           if (id.includes('node_modules')) {
-            // React 관련
-            if (id.includes('react') && !id.includes('react-')) {
+            // React 관련 - Radix UI도 포함시켜서 순서 보장
+            if ((id.includes('react') && !id.includes('react-')) || id.includes('@radix-ui')) {
               return 'vendor-react';
-            }
-            // Radix UI는 별도 청크로 분리 (React 19 호환성 문제)
-            if (id.includes('@radix-ui')) {
-              return 'vendor-radix';
             }
             // 기타 UI 라이브러리
             if (id.includes('lucide-react') || 

@@ -6,9 +6,30 @@
     <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>O4O Admin Dashboard</title>
+    <script>
+      // React 19 Compatibility - Initialize global React before any modules load
+      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || {};
+      window.__REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled = false;
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      // Import React first and make it globally available
+      import * as React from 'react';
+      import * as ReactDOM from 'react-dom';
+      
+      // Make React available globally before other modules load
+      window.React = React;
+      window.ReactDOM = ReactDOM;
+      
+      // Ensure React.Children exists
+      if (!React.Children) {
+        console.error('React.Children not found - React 19 compatibility issue');
+      }
+      
+      // Now load the main application
+      import('/src/main.tsx');
+    </script>
   </body>
 </html>
