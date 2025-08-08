@@ -228,10 +228,6 @@ const corsOptions: CorsOptions = {
       "https://signage.neture.co.kr",
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
-      // Port 8443 URLs
-      "https://neture.co.kr:8443",
-      "https://www.neture.co.kr:8443",
-      "https://admin.neture.co.kr:8443",
       // Add environment-defined origins
       ...envOrigins
     ];
