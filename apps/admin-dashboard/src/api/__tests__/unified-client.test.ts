@@ -1,9 +1,26 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import axios from 'axios';
-import { unifiedApi } from '../unified-client';
 
-// Mock axios
-vi.mock('axios');
+// Mock axios before importing unifiedApi
+vi.mock('axios', () => ({
+  default: {
+    create: vi.fn(() => ({
+      interceptors: {
+        request: {
+          use: vi.fn()
+        },
+        response: {
+          use: vi.fn()
+        }
+      },
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+      delete: vi.fn()
+    }))
+  }
+}));
 
 // Mock auth store
 vi.mock('@/stores/authStore', () => ({
@@ -21,6 +38,9 @@ vi.mock('react-hot-toast', () => ({
     error: vi.fn()
   }
 }));
+
+// Import after mocks are set up
+import { unifiedApi } from '../unified-client';
 
 describe('UnifiedApiClient', () => {
   beforeEach(() => {

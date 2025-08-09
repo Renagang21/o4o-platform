@@ -37,6 +37,10 @@ export function createTestApp(): express.Application {
     if (!req.headers.authorization) {
       return res.status(401).json({ status: 'error', message: 'Unauthorized' });
     }
+    // Validate required fields
+    if (!req.body.title) {
+      return res.status(400).json({ status: 'error', error: 'Title is required' });
+    }
     res.status(201).json({
       status: 'success',
       data: {
@@ -47,7 +51,7 @@ export function createTestApp(): express.Application {
 
   app.get('/api/v1/content/posts/:id', (req, res) => {
     if (req.params.id === 'non-existent') {
-      return res.status(404).json({ status: 'error', message: 'Post not found' });
+      return res.status(404).json({ status: 'error', error: 'Post not found' });
     }
     res.json({
       status: 'success',

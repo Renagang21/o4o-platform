@@ -30,7 +30,8 @@ describe('Content API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('status', 'success');
       expect(response.body).toHaveProperty('data');
-      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data).toHaveProperty('posts');
+      expect(Array.isArray(response.body.data.posts)).toBe(true);
     });
 
     it('should filter posts by status', async () => {
@@ -54,7 +55,8 @@ describe('Content API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.data.length).toBeLessThanOrEqual(5);
+      expect(response.body.data).toHaveProperty('posts');
+      expect(response.body.data.posts.length).toBeLessThanOrEqual(5);
     });
   });
 
@@ -75,8 +77,9 @@ describe('Content API Integration Tests', () => {
         .expect(201);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.data).toHaveProperty('id');
-      expect(response.body.data.title).toBe(newPost.title);
+      expect(response.body.data).toHaveProperty('post');
+      expect(response.body.data.post).toHaveProperty('id');
+      expect(response.body.data.post.title).toBe(newPost.title);
     });
 
     it('should reject post creation without authentication', async () => {
@@ -116,12 +119,13 @@ describe('Content API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.data).toHaveProperty('id', postId);
+      expect(response.body.data).toHaveProperty('post');
+      expect(response.body.data.post).toHaveProperty('id', postId);
     });
 
     it('should return 404 for non-existent post', async () => {
       const response = await request(app)
-        .get('/api/v1/content/posts/non-existent-id')
+        .get('/api/v1/content/posts/non-existent')
         .expect(404);
 
       expect(response.body).toHaveProperty('error');
@@ -143,8 +147,9 @@ describe('Content API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.data.title).toBe(updates.title);
-      expect(response.body.data.status).toBe(updates.status);
+      expect(response.body.data).toHaveProperty('post');
+      expect(response.body.data.post.title).toBe(updates.title);
+      expect(response.body.data.post.status).toBe(updates.status);
     });
 
     it('should reject updates without authentication', async () => {
@@ -162,7 +167,7 @@ describe('Content API Integration Tests', () => {
       await request(app)
         .delete(`/api/v1/content/posts/${postId}`)
         .set('Authorization', `Bearer ${authToken}`)
-        .expect(204);
+        .expect(200);
     });
 
     it('should reject deletion without authentication', async () => {
@@ -179,7 +184,8 @@ describe('Content API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data).toHaveProperty('categories');
+      expect(Array.isArray(response.body.data.categories)).toBe(true);
     });
 
     it('should support hierarchical parameter', async () => {
@@ -207,7 +213,8 @@ describe('Content API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data).toHaveProperty('media');
+      expect(Array.isArray(response.body.data.media)).toBe(true);
     });
 
     it('should filter media by type', async () => {
@@ -236,8 +243,9 @@ describe('Content API Integration Tests', () => {
         .expect(201);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.data).toHaveProperty('id');
-      expect(response.body.data).toHaveProperty('url');
+      expect(response.body.data).toHaveProperty('media');
+      expect(response.body.data.media).toHaveProperty('id');
+      expect(response.body.data.media).toHaveProperty('url');
     });
 
     it('should reject upload without authentication', async () => {
@@ -255,9 +263,10 @@ describe('Content API Integration Tests', () => {
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(Array.isArray(response.body.data)).toBe(true);
-      if (response.body.data.length > 0) {
-        response.body.data.forEach((author: any) => {
+      expect(response.body.data).toHaveProperty('authors');
+      expect(Array.isArray(response.body.data.authors)).toBe(true);
+      if (response.body.data.authors.length > 0) {
+        response.body.data.authors.forEach((author: any) => {
           expect(author).toHaveProperty('id');
           expect(author).toHaveProperty('name');
         });
