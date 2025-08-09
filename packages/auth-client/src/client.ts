@@ -63,8 +63,11 @@ export class AuthClient {
 // Singleton instance
 // Use environment variable or default based on hostname
 const getApiUrl = () => {
+  // Always use production API server
+  const DEFAULT_API_URL = 'https://api.neture.co.kr/api/v1';
+  
   if (typeof window === 'undefined') {
-    return 'http://localhost:4000/api/v1';
+    return DEFAULT_API_URL;
   }
   
   // Check for environment variable first (Vite specific)
@@ -83,16 +86,8 @@ const getApiUrl = () => {
     return (window as any).__API_URL__;
   }
   
-  // Fallback to hostname-based detection
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:4000/api/v1';
-  } else if (hostname === 'admin.neture.co.kr' || hostname === 'www.neture.co.kr') {
-    return 'https://api.neture.co.kr/api/v1';
-  }
-  
-  // Default fallback
-  return '/api/v1';
+  // Always return production API URL
+  return DEFAULT_API_URL;
 };
 
 export const authClient = new AuthClient(getApiUrl());

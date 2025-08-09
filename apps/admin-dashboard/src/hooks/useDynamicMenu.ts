@@ -19,12 +19,19 @@ export const useDynamicMenu = () => {
   const { data: activeAppsData, isLoading } = useQuery({
     queryKey: ['active-apps'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/platform/apps/active');
-      return response.data;
+      // Return mock data since API doesn't exist yet
+      return {
+        data: [
+          { id: 'ecommerce', name: 'ecommerce', displayName: 'E-commerce', permissions: [], category: 'business' },
+          { id: 'crowdfunding', name: 'crowdfunding', displayName: 'Crowdfunding', permissions: [], category: 'business' },
+          { id: 'forum', name: 'forum', displayName: 'Forum', permissions: [], category: 'community' },
+          { id: 'signage', name: 'signage', displayName: 'Digital Signage', permissions: [], category: 'marketing' }
+        ]
+      };
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
     gcTime: 10 * 60 * 1000, // 10분간 캐시 유지
-    enabled: true, // Always enable query
+    enabled: false, // Disable for now since API doesn't exist
     refetchOnMount: false, // Don't refetch on mount
     refetchOnWindowFocus: false // Don't refetch on window focus
   });
@@ -107,7 +114,7 @@ export const useAppStatus = (appName: string) => {
   const { data: activeAppsData } = useQuery({
     queryKey: ['active-apps'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/platform/apps/active');
+      const response = await authClient.api.get('/platform/apps/active');
       return response.data;
     },
     staleTime: 5 * 60 * 1000
@@ -129,7 +136,7 @@ export const useAppPermissions = () => {
   const { data: activeAppsData } = useQuery({
     queryKey: ['active-apps'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/platform/apps/active');
+      const response = await authClient.api.get('/platform/apps/active');
       return response.data;
     }
   });
