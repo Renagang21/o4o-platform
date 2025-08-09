@@ -77,7 +77,7 @@ export function useHelpTabs() {
   // Reset help tabs when route changes
   useEffect(() => {
     store.reset();
-  }, [location.pathname, store]);
+  }, [location.pathname]); // Remove store from dependencies to fix Hook error
   
   return store;
 }
@@ -91,6 +91,7 @@ export function useRegisterHelp(tabs: HelpTab[], sidebar?: HelpSidebar | null) {
   
   // Create stable reference for tabs
   const tabsKey = JSON.stringify(tabs);
+  const sidebarKey = JSON.stringify(sidebar);
   
   useEffect(() => {
     setTabs(tabs);
@@ -101,5 +102,5 @@ export function useRegisterHelp(tabs: HelpTab[], sidebar?: HelpSidebar | null) {
       setTabs([]);
       setSidebar(null);
     };
-  }, [tabsKey, sidebar, setTabs, setSidebar, tabs]);
+  }, [tabsKey, sidebarKey]); // Use only stable keys, not function references
 }

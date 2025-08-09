@@ -55,11 +55,22 @@ class SSOService {
    * Check SSO session status
    */
   async checkSession(): Promise<SSOCheckResponse> {
+    // SSO is disabled, always return unauthenticated
+    // This prevents unnecessary API calls to non-existent endpoints
+    if (!ssoConfig.enabled) {
+      return { isAuthenticated: false };
+    }
+    
     try {
-      const response = await api.get<SSOCheckResponse>(apiEndpoints.auth.ssoCheck);
-      return response.data;
+      // For now, return false as SSO endpoint doesn't exist
+      // TODO: Implement SSO endpoint in backend when needed
+      return { isAuthenticated: false };
+      
+      // Original code - uncomment when SSO endpoint is implemented
+      // const response = await api.get<SSOCheckResponse>(apiEndpoints.auth.ssoCheck);
+      // return response.data;
     } catch (error: any) {
-    // Error logging - use proper error handler
+      // Error logging - use proper error handler
       // 에러를 상위로 전달하여 401 처리 가능하도록 함
       if (error?.response?.status === 401) {
         throw error;

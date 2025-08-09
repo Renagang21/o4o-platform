@@ -52,25 +52,39 @@ export const useDynamicMenu = () => {
       }
 
       // 핵심 메뉴는 항상 표시 (대시보드, 사용자, 페이지/글)
-      const coreMenus = ['dashboard', 'users', 'posts', 'pages', 'media', 'themes', 'settings'];
+      const coreMenus = [
+        'dashboard', 'users', 'posts', 'pages', 'media', 
+        'theme', 'themes', 'settings', 'tools', 'apps', 
+        'monitoring', 'mail', 'cpt-acf', 'collapse'
+      ];
       if (coreMenus.includes(item.id)) {
         return true;
       }
 
-      // 앱별 메뉴 활성화 상태 확인
-      const appMenuMappings: Record<string, string> = {
-        'ecommerce': 'ecommerce',
-        'forum': 'forum',
-        'signage': 'signage',
-        'crowdfunding': 'crowdfunding',
-        'affiliate': 'affiliate',
-        'vendors': 'vendors'
-      };
-
-      const appName = appMenuMappings[item.id];
-      if (appName) {
-        return isAppActive(appName);
+      // 모든 앱 메뉴를 표시 (임시로 활성화)
+      // TODO: 실제 앱 활성화 API 구현 후 조건부 표시
+      const appMenus = [
+        'ecommerce', 'forum', 'signage', 'crowdfunding', 
+        'affiliate', 'vendors'
+      ];
+      if (appMenus.includes(item.id)) {
+        return true; // 임시로 모든 앱 메뉴 표시
       }
+
+      // 앱별 메뉴 활성화 상태 확인 (API 구현 시 사용)
+      // const appMenuMappings: Record<string, string> = {
+      //   'ecommerce': 'ecommerce',
+      //   'forum': 'forum',
+      //   'signage': 'signage',
+      //   'crowdfunding': 'crowdfunding',
+      //   'affiliate': 'affiliate',
+      //   'vendors': 'vendors'
+      // };
+
+      // const appName = appMenuMappings[item.id];
+      // if (appName) {
+      //   return isAppActive(appName);
+      // }
 
       // 하위 메뉴가 있는 경우 재귀적으로 필터링
       if (item.children) {

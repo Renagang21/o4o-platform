@@ -17,8 +17,20 @@ import './styles/help-tab.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        // Don't retry on 404 or 401 errors
+        if (error?.response?.status === 404 || error?.response?.status === 401) {
+          return false;
+        }
+        // Retry up to 1 time for other errors
+        return failureCount < 1;
+      },
       refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
+      cacheTime: 10 * 60 * 1000, // Keep cache for 10 minutes
+    },
+    mutations: {
+      retry: false, // Don't retry mutations by default
     },
   },
 })

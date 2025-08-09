@@ -82,29 +82,39 @@ const HomepageEditor: FC = () => {
   const loadHomepageTemplate = async () => {
     try {
       setLoading(true);
-      const response = await ContentApi.getTemplates();
-      const templates = response.data || [];
-      const homepageTemplate = templates.find((t: Template) => t.name === 'homepage' && t.type === 'page');
+      // Templates API not implemented yet, use mock data
+      // TODO: Implement templates API in backend
+      const mockHomepageTemplate: Template = {
+        id: 'homepage-1',
+        name: 'homepage',
+        type: 'page',
+        layoutType: 'custom',
+        description: 'Main homepage template',
+        content: blocksToTipTap([]),
+        status: 'active',
+        isDefault: true,
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       
-      if (homepageTemplate) {
-        setTemplate(homepageTemplate);
-        setBlocks(tipTapToBlocks(homepageTemplate.content));
-      } else {
-        // Create new homepage template if not exists
-        const newTemplate: Partial<Template> = {
-          name: 'homepage',
-          type: 'page',
-          layoutType: 'custom',
-          description: 'Main homepage template',
-          content: blocksToTipTap([]),
-          status: 'active',
-          isDefault: true,
-          active: true,
-        };
-        const createResponse = await ContentApi.createTemplate(newTemplate);
-        setTemplate(createResponse.data);
-        setBlocks([]);
-      }
+      setTemplate(mockHomepageTemplate);
+      setBlocks([]);
+      
+      // Original code - uncomment when templates API is implemented
+      // const response = await ContentApi.getTemplates();
+      // const templates = response.data || [];
+      // const homepageTemplate = templates.find((t: Template) => t.name === 'homepage' && t.type === 'page');
+      
+      // if (homepageTemplate) {
+      //   setTemplate(homepageTemplate);
+      //   setBlocks(tipTapToBlocks(homepageTemplate.content));
+      // } else {
+      //   const newTemplate: Partial<Template> = {...};
+      //   const createResponse = await ContentApi.createTemplate(newTemplate);
+      //   setTemplate(createResponse.data);
+      //   setBlocks([]);
+      // }
     } catch (error: any) {
     // Error logging - use proper error handler
     } finally {
