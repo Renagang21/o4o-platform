@@ -33,15 +33,15 @@ vi.mock('@/stores/authStore', () => ({
 }));
 
 // Mock toast
-const mockToastError = vi.fn();
 vi.mock('react-hot-toast', () => ({
   default: {
-    error: mockToastError
+    error: vi.fn()
   }
 }));
 
 // Import after mocks are set up
 import { unifiedApi } from '../unified-client';
+import toast from 'react-hot-toast';
 
 describe('UnifiedApiClient', () => {
   beforeEach(() => {
@@ -186,7 +186,7 @@ describe('UnifiedApiClient', () => {
 
   describe('Error Handling', () => {
     beforeEach(() => {
-      mockToastError.mockClear();
+      vi.mocked(toast.error).mockClear();
     });
 
     it.skip('should handle 401 errors by logging out', async () => {
@@ -205,7 +205,7 @@ describe('UnifiedApiClient', () => {
         // Expected to reject
       }
 
-      expect(mockToastError).toHaveBeenCalledWith('접근 권한이 없습니다.');
+      expect(toast.error).toHaveBeenCalledWith('접근 권한이 없습니다.');
     });
 
     it('should show toast for 429 errors', async () => {
@@ -220,7 +220,7 @@ describe('UnifiedApiClient', () => {
         // Expected to reject
       }
 
-      expect(mockToastError).toHaveBeenCalledWith('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
+      expect(toast.error).toHaveBeenCalledWith('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
     });
 
     it('should show toast for server errors', async () => {
@@ -235,7 +235,7 @@ describe('UnifiedApiClient', () => {
         // Expected to reject
       }
 
-      expect(mockToastError).toHaveBeenCalledWith('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      expect(toast.error).toHaveBeenCalledWith('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     });
 
     it('should handle timeout errors', async () => {
@@ -250,7 +250,7 @@ describe('UnifiedApiClient', () => {
         // Expected to reject
       }
 
-      expect(mockToastError).toHaveBeenCalledWith('요청 시간이 초과되었습니다.');
+      expect(toast.error).toHaveBeenCalledWith('요청 시간이 초과되었습니다.');
     });
   });
 
