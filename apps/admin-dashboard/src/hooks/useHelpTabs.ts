@@ -77,7 +77,7 @@ export function useHelpTabs() {
   // Reset help tabs when route changes
   useEffect(() => {
     store.reset();
-  }, [location.pathname]);
+  }, [location.pathname, store]);
   
   return store;
 }
@@ -89,6 +89,9 @@ export function useRegisterHelp(tabs: HelpTab[], sidebar?: HelpSidebar | null) {
   const setTabs = useHelpTabsStore((state) => state.setTabs);
   const setSidebar = useHelpTabsStore((state) => state.setSidebar);
   
+  // Create stable reference for tabs
+  const tabsKey = JSON.stringify(tabs);
+  
   useEffect(() => {
     setTabs(tabs);
     setSidebar(sidebar || null);
@@ -98,5 +101,5 @@ export function useRegisterHelp(tabs: HelpTab[], sidebar?: HelpSidebar | null) {
       setTabs([]);
       setSidebar(null);
     };
-  }, [JSON.stringify(tabs), sidebar]);
+  }, [tabsKey, sidebar, setTabs, setSidebar, tabs]);
 }
