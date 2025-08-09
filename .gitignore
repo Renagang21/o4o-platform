@@ -15,10 +15,18 @@ out/
 
 # Environment variables
 .env
+.env.*
+!.env.example
+!.env.*.example
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+*.env.backup.*
+.env.backup.*
 
 # OS generated files
 .DS_Store
@@ -72,10 +80,13 @@ temp/
 
 # Backup files
 *.backup
+*.backup.*
 *.bak
 *.backup-*
 *DESKTOP-*.ts
 *DESKTOP-*.tsx
+CLAUDE.md.backup.*
+*.md.backup.*
 
 # AWS
 .aws/
