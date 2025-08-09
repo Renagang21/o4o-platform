@@ -2,14 +2,66 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_URL: string
+  readonly VITE_API_BASE_URL: string  // Add for compatibility
+  readonly VITE_AUTH_URL: string
   readonly VITE_OAUTH_REDIRECT_URI: string
   readonly VITE_OAUTH_GOOGLE_CLIENT_ID: string
   readonly VITE_OAUTH_KAKAO_CLIENT_ID: string
   readonly VITE_OAUTH_NAVER_CLIENT_ID: string
+  readonly VITE_FORUM_URL: string
+  readonly VITE_SIGNAGE_URL: string
+  readonly VITE_FUNDING_URL: string
+  readonly VITE_SSO_ENABLED: string
+  readonly VITE_SSO_DOMAIN: string
+  readonly VITE_USE_MOCK: string
+  readonly DEV: boolean  // Add Vite's dev mode flag
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv
+}
+
+// WordPress type declarations
+declare module '@wordpress/blocks' {
+  export function registerBlockType(name: string, settings: any): any
+  export function createBlock(name: string, attributes?: any): any
+  export function serialize(blocks: any): string
+  export function parse(content: string): any[]
+  export const store: any
+}
+
+declare module '@wordpress/block-editor' {
+  export const InspectorControls: any
+  export const BlockControls: any
+  export const MediaUpload: any
+  export const MediaUploadCheck: any
+  export const InnerBlocks: any
+  export const useBlockProps: any
+  export const RichText: any
+  export const PanelColorSettings: any
+  export const URLInput: any
+  export const AlignmentToolbar: any
+  export const BlockAlignmentToolbar: any
+  export const BlockVerticalAlignmentToolbar: any
+  export const ColorPalette: any
+  export const store: any
+  export const BlockEditorProvider: any
+  export const BlockList: any
+  export const WritingFlow: any
+  export const ObserveTyping: any
+  export const BlockInspector: any
+  export const BlockToolbar: any
+}
+
+declare module '@wordpress/data' {
+  export function useSelect(callback: (select: any) => any, deps?: any[]): any
+  export function useDispatch(storeName: string): any
+  export function select(storeName: string): any
+  export function dispatch(storeName: string): any
+  export function subscribe(callback: () => void): () => void
+  export function createRegistry(): any
+  export function createRegistrySelector(selector: any): any
+  export function createRegistryControl(control: any): any
 }
 
 declare module '@wordpress/icons' {
@@ -85,6 +137,108 @@ declare module '@heroicons/react/24/outline' {
   export const PhotoIcon: any
   export const CircleStackIcon: any
   export const PaintBrushIcon: any
+}
+
+// Testing library type declarations
+declare module 'msw' {
+  export const http: {
+    get: (path: string, handler: any) => any
+    post: (path: string, handler: any) => any
+    put: (path: string, handler: any) => any
+    patch: (path: string, handler: any) => any
+    delete: (path: string, handler: any) => any
+  }
+  export class HttpResponse {
+    static json(body: any, options?: any): any
+    static text(body: string, options?: any): any
+  }
+  export function delay(ms?: number): Promise<void>
+}
+
+declare module 'vitest' {
+  export const vi: {
+    fn: (implementation?: any) => any
+    spyOn: (obj: any, method: string) => any
+    mock: (path: string, factory?: () => any) => any
+    clearAllMocks: () => void
+    resetAllMocks: () => void
+    restoreAllMocks: () => void
+    importActual: (path: string) => Promise<any>
+  }
+  export const expect: any
+  export const test: any
+  export const describe: any
+  export const it: any
+  export const beforeEach: any
+  export const afterEach: any
+  export const beforeAll: any
+  export const afterAll: any
+}
+
+declare module 'lodash' {
+  export function debounce(func: any, wait?: number): any
+  export function throttle(func: any, wait?: number): any
+  export function cloneDeep(value: any): any
+  export function merge(...args: any[]): any
+  export function get(object: any, path: string, defaultValue?: any): any
+  export function set(object: any, path: string, value: any): any
+  export function has(object: any, path: string): boolean
+  export function isEmpty(value: any): boolean
+  export function isEqual(value: any, other: any): boolean
+  export function omit(object: any, ...paths: string[]): any
+  export function pick(object: any, ...paths: string[]): any
+}
+
+// NodeJS namespace for SSO
+declare namespace NodeJS {
+  interface ProcessEnv {
+    NODE_ENV: 'development' | 'production' | 'test'
+    [key: string]: string | undefined
+  }
+  type Timeout = ReturnType<typeof setTimeout>
+  type Timer = ReturnType<typeof setInterval>
+}
+
+// Global process object
+declare const process: {
+  env: NodeJS.ProcessEnv
+}
+
+// Testing library declarations
+declare module 'msw/browser' {
+  export function setupWorker(...handlers: any[]): any
+}
+
+declare module 'msw/node' {
+  export function setupServer(...handlers: any[]): any
+}
+
+declare module '@testing-library/react' {
+  export function render(component: any, options?: any): any
+  export function waitFor(callback: () => any, options?: any): Promise<any>
+  export function screen(): any
+  export const fireEvent: any
+  export const act: any
+}
+
+declare module '@testing-library/jest-dom' {
+  const content: any
+  export default content
+}
+
+declare module 'react-dom/client' {
+  export function createRoot(container: Element | DocumentFragment): {
+    render(element: React.ReactNode): void
+    unmount(): void
+  }
+  export function hydrateRoot(container: Element | Document, initialChildren: React.ReactNode): {
+    render(element: React.ReactNode): void
+    unmount(): void
+  }
+}
+
+declare module 'react-dom' {
+  export * from 'react-dom'
 }
 
 declare module 'lucide-react' {

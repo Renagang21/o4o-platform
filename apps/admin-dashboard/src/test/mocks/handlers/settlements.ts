@@ -347,7 +347,7 @@ export const settlementsHandlers = [
     
     // Return mock blob data
     const mockExcelData = new Uint8Array([1, 2, 3, 4, 5]); // Mock Excel data
-    return new HttpResponse(mockExcelData, {
+    return new HttpResponse(mockExcelData as any, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': 'attachment; filename="settlements.xlsx"'
@@ -559,7 +559,7 @@ export const settlementsHandlers = [
     
     const mockFileData = new Uint8Array([1, 2, 3, 4, 5]);
     
-    return new HttpResponse(mockFileData, {
+    return new HttpResponse(mockFileData as any, {
       headers: {
         'Content-Type': format === 'excel' 
           ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

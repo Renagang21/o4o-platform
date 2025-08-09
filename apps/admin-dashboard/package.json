@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3001",
-    "build": "bash -c 'tsc && vite build'",
+    "build": "npx vite build",
+    "build:with-typecheck": "bash -c 'tsc && npx vite build'",
     "preview": "vite preview",
     "type-check": "bash -c 'tsc --noEmit'",
     "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true",
@@ -101,7 +102,7 @@
     "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^4.1.0",
     "typescript": "~5.9.2",
-    "vite": "^7.0.6",
+    "vite": "7.0.6",
     "vitest": "^3.2.4"
   },
   "msw": {

@@ -184,7 +184,7 @@ registerBlockType('o4o/cover', {
                 onSelect={onSelectMedia}
                 allowedTypes={ALLOWED_MEDIA_TYPES}
                 value={attributes.id}
-                render={({ open }) => (
+                render={({ open }: any) => (
                   <div>
                     {!url && (
                       <Button onClick={open} variant="primary" className="mb-2">

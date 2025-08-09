@@ -37,12 +37,12 @@ window.ResizeObserver = mockResizeObserver;
 
 // Mock UI components that might not exist
 vi.mock('@/components/ui/dropdown-menu', () => ({
-  DropdownMenu: vi.fn(({ children }) => children),
-  DropdownMenuContent: vi.fn(({ children }) => children),
-  DropdownMenuItem: vi.fn(({ children }) => children),
-  DropdownMenuLabel: vi.fn(({ children }) => children),
-  DropdownMenuSeparator: vi.fn(() => null),
-  DropdownMenuTrigger: vi.fn(({ children }) => children),
+  DropdownMenu: ({ children }: any) => children,
+  DropdownMenuContent: ({ children }: any) => children,
+  DropdownMenuItem: ({ children }: any) => children,
+  DropdownMenuLabel: ({ children }: any) => children,
+  DropdownMenuSeparator: () => null,
+  DropdownMenuTrigger: ({ children }: any) => children,
 }));
 
 // Mock react-router-dom
