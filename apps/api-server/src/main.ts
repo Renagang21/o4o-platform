@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -86,6 +87,7 @@ import settingsRoutes from './routes/settingsRoutes';
 import oauthSettingsRoutes from './routes/settings.routes';
 import emailAuthRoutes from './routes/email-auth.routes';
 import crowdfundingRoutes from './routes/crowdfunding';
+import forumRoutes from './routes/forum';
 import linkedAccountsRoutes from './routes/linked-accounts';
 import accountLinkingRoutes from './routes/account-linking.routes';
 import unifiedAuthRoutes from './routes/unified-auth.routes';
@@ -97,6 +99,12 @@ import postsRoutes from './routes/posts';
 import reusableBlocksRoutes from './routes/reusable-blocks.routes';
 import blockPatternsRoutes from './routes/block-patterns.routes';
 import templatePartsRoutes from './routes/template-parts.routes';
+
+// Import v1 API routes
+import contentV1Routes from './routes/v1/content.routes';
+import platformV1Routes from './routes/v1/platform.routes';
+import ecommerceV1Routes from './routes/v1/ecommerce.routes';
+import forumV1Routes from './routes/v1/forum.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -202,6 +210,19 @@ const publicLimiter = rateLimit({
 // 미들웨어 설정
 app.use(helmet({
   contentSecurityPolicy: false, // React 개발 서버와의 호환성을 위해
+}));
+
+// Enable compression for all responses
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      // Don't compress responses if this header is present
+      return false;
+    }
+    // Use compression filter function
+    return compression.filter(req, res);
+  },
+  level: 6, // Compression level (0-9, where 9 is best compression but slowest)
 }));
 
 // CORS configuration for multiple origins
@@ -363,6 +384,7 @@ app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/signage', signageRoutes);
 app.use('/api/crowdfunding', crowdfundingRoutes);
+app.use('/api/forum', forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 
@@ -435,6 +457,11 @@ app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (W
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
 app.use('/api/content', contentRoutes); // Content routes - moved to specific path to avoid conflicts
 
+// V1 API routes (new standardized endpoints)
+app.use('/api/v1/content', contentV1Routes);
+app.use('/api/v1/platform', platformV1Routes);
+app.use('/api/v1/ecommerce', ecommerceV1Routes);
+app.use('/api/v1/forum', forumV1Routes);
 
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {
@@ -496,6 +523,14 @@ app.use('*', (req, res) => {
     requestedPath: req.originalUrl
   });
 });
+
+// Swagger documentation
+import { setupSwagger } from './config/swagger';
+
+// Setup Swagger API documentation (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  setupSwagger(app);
+}
 
 // 서버 시작
 const startServer = async () => {

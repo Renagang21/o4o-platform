@@ -3,7 +3,7 @@
  * 대시보드용 API 클라이언트 - 44개 기존 엔드포인트 활용
  */
 
-import { api } from './base';
+import { unifiedApi } from './unified-client';
 import { EcommerceApi } from './ecommerceApi';
 import { SalesDataItem, Notification, Activity, OrderStatusData, UserChartData, SystemHealthStatus } from '../types/dashboard';
 import { forumService, signageService, crowdfundingService } from './apps';
@@ -88,7 +88,7 @@ export const dashboardApi = {
       // Use EcommerceApi and App services for dashboard stats
       const [dashboardStatsResponse, usersResponse, forumStatsRes, signageStatsRes, crowdfundingStatsRes] = await Promise.all([
         EcommerceApi.getDashboardStats(),
-        api.get('/api/users/stats').catch(() => {
+        unifiedApi.raw.get('/api/users/stats').catch(() => {
           // API 오류 시 기본값 반환하고 토스트 메시지 표시
           import('react-hot-toast').then(({ default: toast }) => {
             toast.error('사용자 통계를 불러올 수 없습니다');
@@ -290,7 +290,7 @@ export const dashboardApi = {
   // 알림 데이터 조회
   async getNotifications() {
     try {
-      const response = await api.get('/admin/notifications?limit=20');
+      const response = await unifiedApi.raw.get('/admin/notifications?limit=20');
       const notifications = response.data.notifications || [];
 
       // 알림 타입별 카운트
@@ -317,7 +317,7 @@ export const dashboardApi = {
   // 최근 활동 조회
   async getRecentActivities() {
     try {
-      const response = await api.get('/admin/activities?limit=15');
+      const response = await unifiedApi.raw.get('/admin/activities?limit=15');
       return response.data.activities || this.getDefaultActivities();
     } catch (error: any) {
     // Error logging - use proper error handler
@@ -328,7 +328,7 @@ export const dashboardApi = {
   // 시스템 상태 조회
   async getSystemHealth() {
     try {
-      const response = await api.get('/system/health');
+      const response = await unifiedApi.raw.get('/system/health');
       return response.data;
     } catch (error: any) {
     // Error logging - use proper error handler

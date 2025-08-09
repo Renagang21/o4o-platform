@@ -1,4 +1,4 @@
-import { api } from './base';
+import { unifiedApi } from './unified-client';
 import { apiEndpoints } from '@/config/apps.config';
 
 export interface GeneralSettings {
@@ -138,23 +138,23 @@ export interface AllSettings {
 class SettingsService {
   // General Settings
   async getGeneralSettings(): Promise<GeneralSettings> {
-    const response = await api.get<GeneralSettings>((apiEndpoints.settings as any).general);
+    const response = await unifiedApi.raw.get<GeneralSettings>((apiEndpoints.settings as any).general);
     return response.data;
   }
 
   async updateGeneralSettings(settings: Partial<GeneralSettings>): Promise<GeneralSettings> {
-    const response = await api.put<GeneralSettings>((apiEndpoints.settings as any).general, settings);
+    const response = await unifiedApi.raw.put<GeneralSettings>((apiEndpoints.settings as any).general, settings);
     return response.data;
   }
 
   // Appearance Settings
   async getAppearanceSettings(): Promise<AppearanceSettings> {
-    const response = await api.get<AppearanceSettings>((apiEndpoints.settings as any).appearance);
+    const response = await unifiedApi.raw.get<AppearanceSettings>((apiEndpoints.settings as any).appearance);
     return response.data;
   }
 
   async updateAppearanceSettings(settings: Partial<AppearanceSettings>): Promise<AppearanceSettings> {
-    const response = await api.put<AppearanceSettings>((apiEndpoints.settings as any).appearance, settings);
+    const response = await unifiedApi.raw.put<AppearanceSettings>((apiEndpoints.settings as any).appearance, settings);
     return response.data;
   }
 
@@ -163,7 +163,7 @@ class SettingsService {
     formData.append('file', file);
     formData.append('type', 'logo');
 
-    const response = await api.post<{ url: string }>(`${(apiEndpoints.settings as any).appearance}/upload`, formData, {
+    const response = await unifiedApi.raw.post<{ url: string }>(`${(apiEndpoints.settings as any).appearance}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -173,17 +173,17 @@ class SettingsService {
 
   // Email Settings
   async getEmailSettings(): Promise<EmailSettings> {
-    const response = await api.get<EmailSettings>((apiEndpoints.settings as any).email);
+    const response = await unifiedApi.raw.get<EmailSettings>((apiEndpoints.settings as any).email);
     return response.data;
   }
 
   async updateEmailSettings(settings: Partial<EmailSettings>): Promise<EmailSettings> {
-    const response = await api.put<EmailSettings>((apiEndpoints.settings as any).email, settings);
+    const response = await unifiedApi.raw.put<EmailSettings>((apiEndpoints.settings as any).email, settings);
     return response.data;
   }
 
   async testEmailSettings(testEmail: string): Promise<{ success: boolean; message: string }> {
-    const response = await api.post<{ success: boolean; message: string }>(
+    const response = await unifiedApi.raw.post<{ success: boolean; message: string }>(
       `${(apiEndpoints.settings as any).email}/test`,
       { testEmail }
     );
@@ -192,17 +192,17 @@ class SettingsService {
 
   // Integration Settings
   async getIntegrationSettings(): Promise<IntegrationSettings> {
-    const response = await api.get<IntegrationSettings>((apiEndpoints.settings as any).integrations);
+    const response = await unifiedApi.raw.get<IntegrationSettings>((apiEndpoints.settings as any).integrations);
     return response.data;
   }
 
   async updateIntegrationSettings(settings: Partial<IntegrationSettings>): Promise<IntegrationSettings> {
-    const response = await api.put<IntegrationSettings>((apiEndpoints.settings as any).integrations, settings);
+    const response = await unifiedApi.raw.put<IntegrationSettings>((apiEndpoints.settings as any).integrations, settings);
     return response.data;
   }
 
   async testIntegration(integration: string): Promise<{ success: boolean; message: string }> {
-    const response = await api.post<{ success: boolean; message: string }>(
+    const response = await unifiedApi.raw.post<{ success: boolean; message: string }>(
       `${(apiEndpoints.settings as any).integrations}/test/${integration}`
     );
     return response.data;
@@ -210,13 +210,13 @@ class SettingsService {
 
   // Security Settings
   async getSecuritySettings(): Promise<SecuritySettings> {
-    const response = await api.get<SecuritySettings>('/v1/settings/security');
-    return response.data;
+    const response = await unifiedApi.platform.settings.get();
+    return response.data as any;
   }
 
   async updateSecuritySettings(settings: Partial<SecuritySettings>): Promise<SecuritySettings> {
-    const response = await api.put<SecuritySettings>('/v1/settings/security', settings);
-    return response.data;
+    const response = await unifiedApi.platform.settings.update(settings);
+    return response.data as any;
   }
 
   // All Settings (bulk operations)
@@ -239,7 +239,7 @@ class SettingsService {
   }
 
   async exportSettings(): Promise<Blob> {
-    const response = await api.get('/v1/settings/export', {
+    const response = await unifiedApi.raw.get('/v1/settings/export', {
       responseType: 'blob',
     });
     return response.data;
@@ -249,7 +249,7 @@ class SettingsService {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await api.post<{ success: boolean; message: string }>(
+    const response = await unifiedApi.raw.post<{ success: boolean; message: string }>(
       '/v1/settings/import',
       formData,
       {
@@ -264,12 +264,12 @@ class SettingsService {
   // Reset settings
   async resetSettings(section?: 'general' | 'appearance' | 'email' | 'integrations' | 'security'): Promise<void> {
     const endpoint = section ? `/v1/settings/${section}/reset` : '/v1/settings/reset';
-    await api.post(endpoint);
+    await unifiedApi.raw.post(endpoint);
   }
 
   // Cache management
   async clearCache(type?: 'all' | 'settings' | 'content' | 'users'): Promise<void> {
-    await api.post('/v1/settings/cache/clear', { type: type || 'all' });
+    await unifiedApi.raw.post('/v1/settings/cache/clear', { type: type || 'all' });
   }
 }
 

@@ -55,13 +55,23 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
       if (query.minPrice) params.append('min_price', query.minPrice.toString() as any);
       if (query.maxPrice) params.append('max_price', query.maxPrice.toString() as any);
 
-      const response = await fetch(`/api/ecommerce/products?${params.toString() as any}`);
+      // TODO: Update to use correct API endpoint when backend is ready
+      // const response = await fetch(`https://api.neture.co.kr/api/v1/ecommerce/products?${params.toString() as any}`);
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-
-      const data = await response.json();
+      // Mock data for now to prevent 500 errors
+      const data = {
+        products: [],
+        total: 0,
+        page: 1,
+        limit: 20
+      };
+      
+      // Original code - uncomment when API is working
+      // const response = await fetch(`/api/ecommerce/products?${params.toString() as any}`);
+      // if (!response.ok) {
+      //   throw new Error('Failed to fetch products');
+      // }
+      // const data = await response.json();
 
       // Transform product data
       const transformedProducts = data.products.map((product: any) => {

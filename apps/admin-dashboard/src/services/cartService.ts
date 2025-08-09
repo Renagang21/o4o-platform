@@ -226,7 +226,7 @@ class CartService {
   // Sync with server
   private async syncWithServer(action: string, data?: any) {
     try {
-      const response = await fetch('/api/ecommerce/cart', {
+      const response = await fetch('/api/v1/ecommerce/cart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -248,7 +248,7 @@ class CartService {
   // Apply coupon
   async applyCoupon(code: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch('/api/ecommerce/cart/coupon', {
+      const response = await fetch('/api/v1/ecommerce/cart/coupon', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

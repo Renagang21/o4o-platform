@@ -38,8 +38,17 @@ const MenuList: FC = () => {
   const { data: menuData, isLoading } = useQuery({
     queryKey: ['menus'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/menus')
-      return response.data
+      // TODO: Implement menus API endpoint in backend
+      // const response = await authClient.api.get('/menus')
+      // return response.data
+      
+      // Mock data for now
+      return {
+        menus: [
+          { id: '1', name: 'Main Menu', location: 'primary', items: [], isActive: true },
+          { id: '2', name: 'Footer Menu', location: 'footer', items: [], isActive: true }
+        ]
+      }
     }
   })
 

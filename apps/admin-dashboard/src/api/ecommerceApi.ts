@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { unifiedApi } from './unified-client'
 import { 
   Product, 
   Order, 
@@ -43,69 +43,69 @@ export class EcommerceApi {
       )
     })
 
-    const response = await apiClient.get(`/ecommerce/products?${params}`)
+    const response = await unifiedApi.ecommerce.products.list(Object.fromEntries(params))
     return response.data
   }
 
   static async getProduct(productId: string): Promise<ApiResponse<Product>> {
-    const response = await apiClient.get(`/ecommerce/products/${productId}`)
+    const response = await unifiedApi.ecommerce.products.get(productId)
     return response.data
   }
 
   static async createProduct(productData: Partial<Product>): Promise<ApiResponse<Product>> {
-    const response = await apiClient.post('/ecommerce/products', productData)
+    const response = await unifiedApi.ecommerce.products.create(productData)
     return response.data
   }
 
   static async updateProduct(productId: string, productData: Partial<Product>): Promise<ApiResponse<Product>> {
-    const response = await apiClient.put(`/ecommerce/products/${productId}`, productData)
+    const response = await unifiedApi.ecommerce.products.update(productId, productData)
     return response.data
   }
 
   static async deleteProduct(productId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`/ecommerce/products/${productId}`)
+    const response = await unifiedApi.ecommerce.products.delete(productId)
     return response.data
   }
 
   static async bulkProductAction(action: BulkProductAction): Promise<ApiResponse<void>> {
-    const response = await apiClient.post('/ecommerce/products/bulk', action)
+    const response = await unifiedApi.raw.post('/v1/ecommerce/products/bulk', action)
     return response.data
   }
 
   static async duplicateProduct(productId: string): Promise<ApiResponse<Product>> {
-    const response = await apiClient.post(`/ecommerce/products/${productId}/duplicate`)
+    const response = await unifiedApi.raw.post(`/v1/ecommerce/products/${productId}/duplicate`)
     return response.data
   }
 
   // Product Categories
   static async getCategories(): Promise<ApiResponse<ProductCategory[]>> {
-    const response = await apiClient.get('/ecommerce/categories')
+    const response = await unifiedApi.raw.get('/v1/ecommerce/categories')
     return response.data
   }
 
   static async createCategory(categoryData: Partial<ProductCategory>): Promise<ApiResponse<ProductCategory>> {
-    const response = await apiClient.post('/ecommerce/categories', categoryData)
+    const response = await unifiedApi.raw.post('/v1/ecommerce/categories', categoryData)
     return response.data
   }
 
   static async updateCategory(categoryId: string, categoryData: Partial<ProductCategory>): Promise<ApiResponse<ProductCategory>> {
-    const response = await apiClient.put(`/ecommerce/categories/${categoryId}`, categoryData)
+    const response = await unifiedApi.raw.put(`/v1/ecommerce/categories/${categoryId}`, categoryData)
     return response.data
   }
 
   static async deleteCategory(categoryId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`/ecommerce/categories/${categoryId}`)
+    const response = await unifiedApi.raw.delete(`/v1/ecommerce/categories/${categoryId}`)
     return response.data
   }
 
   // Product Tags
   static async getTags(): Promise<ApiResponse<ProductTag[]>> {
-    const response = await apiClient.get('/ecommerce/tags')
+    const response = await unifiedApi.raw.get('/v1/ecommerce/tags')
     return response.data
   }
 
   static async createTag(tagData: Partial<ProductTag>): Promise<ApiResponse<ProductTag>> {
-    const response = await apiClient.post('/ecommerce/tags', tagData)
+    const response = await unifiedApi.raw.post('/v1/ecommerce/tags', tagData)
     return response.data
   }
 
@@ -123,17 +123,17 @@ export class EcommerceApi {
       )
     })
 
-    const response = await apiClient.get(`/ecommerce/orders?${params}`)
+    const response = await unifiedApi.ecommerce.orders.list(Object.fromEntries(params))
     return response.data
   }
 
   static async getOrder(orderId: string): Promise<ApiResponse<Order>> {
-    const response = await apiClient.get(`/ecommerce/orders/${orderId}`)
+    const response = await unifiedApi.ecommerce.orders.get(orderId)
     return response.data
   }
 
   static async updateOrderStatus(orderId: string, status: string, note?: string): Promise<ApiResponse<Order>> {
-    const response = await apiClient.put(`/ecommerce/orders/${orderId}/status`, { status, note })
+    const response = await unifiedApi.ecommerce.orders.updateStatus(orderId, status, note)
     return response.data
   }
 
@@ -143,7 +143,7 @@ export class EcommerceApi {
     reason?: string,
     items?: Array<{ orderItemId: string; quantity: number; amount: number }>
   ): Promise<ApiResponse<void>> {
-    const response = await apiClient.post(`/ecommerce/orders/${orderId}/refund`, {
+    const response = await unifiedApi.raw.post(`/v1/ecommerce/orders/${orderId}/refund`, {
       amount,
       reason,
       items
@@ -152,7 +152,7 @@ export class EcommerceApi {
   }
 
   static async bulkOrderAction(action: BulkOrderAction): Promise<ApiResponse<void>> {
-    const response = await apiClient.post('/ecommerce/orders/bulk', action)
+    const response = await unifiedApi.raw.post('/v1/ecommerce/orders/bulk', action)
     return response.data
   }
 
@@ -171,17 +171,17 @@ export class EcommerceApi {
       params.append('search', search)
     }
 
-    const response = await apiClient.get(`/ecommerce/customers?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/customers?${params}`)
     return response.data
   }
 
   static async getCustomer(customerId: string): Promise<ApiResponse<Customer>> {
-    const response = await apiClient.get(`/ecommerce/customers/${customerId}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/customers/${customerId}`)
     return response.data
   }
 
   static async getCustomerOrders(customerId: string): Promise<ApiResponse<Order[]>> {
-    const response = await apiClient.get(`/ecommerce/customers/${customerId}/orders`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/customers/${customerId}/orders`)
     return response.data
   }
 
@@ -192,27 +192,27 @@ export class EcommerceApi {
       limit: limit.toString() as any
     })
 
-    const response = await apiClient.get(`/ecommerce/coupons?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/coupons?${params}`)
     return response.data
   }
 
   static async getCoupon(_id: string): Promise<ApiResponse<Coupon>> {
-    const response = await apiClient.get(`/ecommerce/coupons/${_id}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/coupons/${_id}`)
     return response.data
   }
 
   static async createCoupon(couponData: Partial<Coupon>): Promise<ApiResponse<Coupon>> {
-    const response = await apiClient.post('/ecommerce/coupons', couponData)
+    const response = await unifiedApi.raw.post('/v1/ecommerce/coupons', couponData)
     return response.data
   }
 
   static async updateCoupon(couponId: string, couponData: Partial<Coupon>): Promise<ApiResponse<Coupon>> {
-    const response = await apiClient.put(`/ecommerce/coupons/${couponId}`, couponData)
+    const response = await unifiedApi.raw.put(`/v1/ecommerce/coupons/${couponId}`, couponData)
     return response.data
   }
 
   static async deleteCoupon(couponId: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete(`/ecommerce/coupons/${couponId}`)
+    const response = await unifiedApi.raw.delete(`/v1/ecommerce/coupons/${couponId}`)
     return response.data
   }
 
@@ -231,7 +231,7 @@ export class EcommerceApi {
       params.append('lowStock', 'true')
     }
 
-    const response = await apiClient.get(`/ecommerce/inventory?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/inventory?${params}`)
     return response.data
   }
 
@@ -241,7 +241,7 @@ export class EcommerceApi {
     type: 'set' | 'increase' | 'decrease',
     note?: string
   ): Promise<ApiResponse<void>> {
-    const response = await apiClient.put(`/ecommerce/inventory/${productId}`, {
+    const response = await unifiedApi.raw.put(`/v1/ecommerce/inventory/${productId}`, {
       quantity,
       type,
       note
@@ -263,7 +263,7 @@ export class EcommerceApi {
       params.append('productId', productId)
     }
 
-    const response = await apiClient.get(`/ecommerce/stock-movements?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/stock-movements?${params}`)
     return response.data
   }
 
@@ -278,7 +278,7 @@ export class EcommerceApi {
     if (startDate) params.append('startDate', startDate)
     if (endDate) params.append('endDate', endDate)
 
-    const response = await apiClient.get(`/ecommerce/reports/sales?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/reports/sales?${params}`)
     return response.data
   }
 
@@ -289,10 +289,10 @@ export class EcommerceApi {
     const params = new URLSearchParams({ period })
     
     const endpoint = productId 
-      ? `/ecommerce/reports/products/${productId}?${params}`
-      : `/ecommerce/reports/products?${params}`
+      ? `/v1/ecommerce/reports/products/${productId}?${params}`
+      : `/v1/ecommerce/reports/products?${params}`
 
-    const response = await apiClient.get(endpoint)
+    const response = await unifiedApi.raw.get(endpoint)
     return response.data
   }
 
@@ -304,18 +304,18 @@ export class EcommerceApi {
     pendingOrders: number
     totalCustomers: number
   }>> {
-    const response = await apiClient.get('/ecommerce/dashboard/stats')
+    const response = await unifiedApi.raw.get('/v1/ecommerce/dashboard/stats')
     return response.data
   }
 
   // Settings
   static async getSettings(): Promise<ApiResponse<EcommerceSettings>> {
-    const response = await apiClient.get('/ecommerce/settings')
+    const response = await unifiedApi.raw.get('/v1/ecommerce/settings')
     return response.data
   }
 
   static async updateSettings(settings: Partial<EcommerceSettings>): Promise<ApiResponse<EcommerceSettings>> {
-    const response = await apiClient.put('/ecommerce/settings', settings)
+    const response = await unifiedApi.raw.put('/v1/ecommerce/settings', settings)
     return response.data
   }
 
@@ -694,7 +694,7 @@ export class EcommerceApi {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await apiClient.post('/ecommerce/media/upload', formData, {
+    const response = await unifiedApi.raw.post('/v1/ecommerce/media/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -710,7 +710,7 @@ export class EcommerceApi {
       )
     )
 
-    const response = await apiClient.get(`/ecommerce/products/export?${params}`, {
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/products/export?${params}`, {
       responseType: 'blob'
     })
     return response.data
@@ -723,7 +723,7 @@ export class EcommerceApi {
       )
     )
 
-    const response = await apiClient.get(`/ecommerce/orders/export?${params}`, {
+    const response = await unifiedApi.raw.get(`/v1/ecommerce/orders/export?${params}`, {
       responseType: 'blob'
     })
     return response.data
