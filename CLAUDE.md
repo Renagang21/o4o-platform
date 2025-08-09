@@ -431,21 +431,52 @@ VITE_USE_MOCK=true  # Auto-login for testing
 - Apps: `apps/main-site`, `apps/admin-dashboard`, `apps/ecommerce`
 - Static files: `/var/www/[domain]/`
 
+### 🚨 서버별 작업 규칙 (CRITICAL!)
+
+#### API 서버 (43.202.242.215)에서 할 작업:
+- ✅ `apps/api-server` 코드 수정 및 빌드
+- ✅ PostgreSQL 데이터베이스 관리
+- ✅ API 서버 재시작 (`pm2 restart api-server`)
+- ❌ **절대 하지 말 것**: 프론트엔드 앱 빌드 (admin-dashboard, main-site 등)
+
+#### Web 서버 (13.125.144.8)에서 할 작업:
+- ✅ 프론트엔드 앱 빌드 (`apps/admin-dashboard`, `apps/main-site`, `apps/ecommerce`)
+- ✅ 정적 파일 배포 (`/var/www/` 디렉토리)
+- ✅ Nginx 설정 관리
+- ❌ **절대 하지 말 것**: API 서버 코드 수정 또는 데이터베이스 작업
+
+#### 작업 전 확인사항:
+```bash
+# 현재 서버 확인
+curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+# 43.202.242.215 = API Server
+# 13.125.144.8 = Web Server
+```
+
 ### Post-CI/CD Server Work
 After CI/CD completion:
 
 ```bash
-# API Server (43.202.242.215)
+# API Server (43.202.242.215) - API 코드만 업데이트
 ssh ubuntu@43.202.242.215
 cd /home/ubuntu/o4o-platform
-git fetch origin main
-git checkout origin/main -- apps/api-server/ scripts/
+git pull origin main
+# API 서버 빌드 및 재시작
+npm run build:api
 pm2 restart api-server
 curl http://localhost:4000/api/health
 
-# Web Server (13.125.144.8)
+# Web Server (13.125.144.8) - 프론트엔드 앱만 빌드
 ssh ubuntu@13.125.144.8
-ls -la /var/www/neture.co.kr/
+cd /home/ubuntu/o4o-platform
+git pull origin main
+# 프론트엔드 앱 빌드
+npm run build:admin
+npm run build:web
+npm run build:ecommerce
+# 빌드 결과물을 웹 서버 디렉토리로 복사
+cp -r apps/admin-dashboard/dist/* /var/www/admin.neture.co.kr/
+cp -r apps/main-site/dist/* /var/www/neture.co.kr/
 sudo chown -R www-data:www-data /var/www/
 ```
 
@@ -497,6 +528,59 @@ All apps share common packages for types, UI components, and utilities.
 - All major browser compatibility
 - Mobile responsive design
 - Accessibility (ARIA) compliance
+
+## 📝 File Modification Guidelines
+
+### When to Modify Files on Server vs Local
+
+**IMPORTANT**: Before modifying any files, determine whether the modification should be done locally or on the server.
+
+#### Prefer LOCAL modification when:
+1. **TypeScript type errors** need fixing (IDE IntelliSense helps)
+2. **Multiple related files** need simultaneous changes
+3. **Complex refactoring** is required
+4. **Testing is needed** before committing
+5. **Breaking changes** might occur
+
+#### Server modification is acceptable for:
+1. **Simple configuration changes** (single file, clear change)
+2. **Emergency hotfixes** (critical production issues)
+3. **Build script adjustments** (package.json scripts)
+4. **Environment variable updates** (.env files)
+
+### File Modification Process
+
+1. **Analyze the issue first**
+   - Identify all files that need modification
+   - Check if changes are interconnected
+   - Assess risk level
+
+2. **Determine modification location**
+   - If TypeScript/complex → Recommend local modification
+   - If simple/isolated → Can modify on server
+
+3. **For local modifications, provide:**
+   ```
+   📋 Files to modify:
+   - path/to/file1.ts: [specific changes needed]
+   - path/to/file2.tsx: [specific changes needed]
+   
+   💡 Reason for local modification:
+   [Explain why local is better]
+   
+   🔧 After local changes:
+   git add .
+   git commit -m "fix: description"
+   git push origin main
+   
+   Then on server:
+   git pull origin main
+   npm run build:after-pull
+   ```
+
+4. **Always revert attempted server modifications**
+   - If server modification fails, revert immediately
+   - Document the issue for local resolution
 
 ---
 
