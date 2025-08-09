@@ -384,6 +384,14 @@ function App() {
                     } />
                     
                     {/* E-commerce 관리 */}
+                    <Route path="/ecommerce" element={
+                      <AdminProtectedRoute requiredPermissions={['products:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <DashboardSimple />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
                     <Route path="/ecommerce/products" element={
                       <AdminProtectedRoute requiredPermissions={['products:read']}>
                         <Suspense fallback={<PageLoader />}>

@@ -23,7 +23,6 @@ import {
   ClipboardList,
   UserPlus,
   TrendingUp,
-  Cog,
   Link,
   BarChart3,
   Store,
@@ -106,24 +105,21 @@ export const wordpressMenuItems: MenuItem[] = [
   },
   {
     id: 'ecommerce',
-    label: 'E-commerce',
+    label: '전자상거래',
     icon: <ShoppingCart className="w-5 h-5" />,
     children: [
-      { id: 'products', label: '제품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
+      { id: 'ecommerce-dashboard', label: '대시보드', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce' },
+      { id: 'products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
       { id: 'categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/ecommerce/categories' },
-      { id: 'inventory', label: '재고 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/inventory' },
       { id: 'orders', label: '주문 관리', icon: <ClipboardList className="w-4 h-4" />, path: '/ecommerce/orders' },
-      { id: 'order-status', label: '주문 상태', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/order-status' },
       { id: 'customers', label: '고객 관리', icon: <Users className="w-4 h-4" />, path: '/ecommerce/customers' },
-      { id: 'coupons', label: '쿠폰', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/coupons' },
-      { id: 'refunds', label: '환불 관리', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/refunds' },
-      { id: 'toss-payments', label: '토스페이먼츠', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/payments/toss' },
-      { id: 'settlement-dashboard', label: '정산 대시보드', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/settlements' },
-      { id: 'vendor-settlements', label: '판매자 정산', icon: <Store className="w-4 h-4" />, path: '/ecommerce/vendor-settlements' },
-      { id: 'fee-management', label: '수수료 관리', icon: <DollarSign className="w-4 h-4" />, path: '/ecommerce/fee-management' },
-      { id: 'settlement-reports', label: '정산 보고서', icon: <FileCheck className="w-4 h-4" />, path: '/ecommerce/settlement-reports' },
+      { id: 'inventory', label: '재고 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/inventory' },
+      { id: 'coupons', label: '쿠폰/할인', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/coupons' },
+      { id: 'refunds', label: '환불/교환', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/refunds' },
+      { id: 'toss-payments', label: '결제 설정', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/payments/toss' },
+      { id: 'settlement-dashboard', label: '정산 관리', icon: <DollarSign className="w-4 h-4" />, path: '/ecommerce/settlements' },
       { id: 'reports', label: '매출 보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/ecommerce/reports' },
-      { id: 'ecommerce-settings', label: '설정', icon: <Cog className="w-4 h-4" />, path: '/ecommerce/settings' }
+      { id: 'ecommerce-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/ecommerce/settings' }
     ]
   },
   {
@@ -156,21 +152,42 @@ export const wordpressMenuItems: MenuItem[] = [
   },
   {
     id: 'forum',
-    label: 'Forum',
+    label: '포럼',
     icon: <MessageSquare className="w-5 h-5" />,
-    path: '/forum'
+    children: [
+      { id: 'forum-boards', label: '게시판 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/boards' },
+      { id: 'forum-categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/forum/categories' },
+      { id: 'forum-posts', label: '게시글 관리', icon: <FileText className="w-4 h-4" />, path: '/forum/posts' },
+      { id: 'forum-comments', label: '댓글 관리', icon: <MessageSquare className="w-4 h-4" />, path: '/forum/comments' },
+      { id: 'forum-reports', label: '신고 관리', icon: <Shield className="w-4 h-4" />, path: '/forum/reports' },
+      { id: 'forum-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/forum/settings' }
+    ]
   },
   {
     id: 'signage',
-    label: 'Signage',
+    label: '디지털 사이니지',
     icon: <Monitor className="w-5 h-5" />,
-    path: '/signage'
+    children: [
+      { id: 'signage-screens', label: '화면 관리', icon: <Monitor className="w-4 h-4" />, path: '/signage/screens' },
+      { id: 'signage-content', label: '콘텐츠 관리', icon: <FileText className="w-4 h-4" />, path: '/signage/content' },
+      { id: 'signage-playlists', label: '재생목록', icon: <ClipboardList className="w-4 h-4" />, path: '/signage/playlists' },
+      { id: 'signage-schedule', label: '스케줄 관리', icon: <Activity className="w-4 h-4" />, path: '/signage/schedule' },
+      { id: 'signage-devices', label: '디바이스 관리', icon: <Monitor className="w-4 h-4" />, path: '/signage/devices' },
+      { id: 'signage-analytics', label: '분석', icon: <BarChart3 className="w-4 h-4" />, path: '/signage/analytics' }
+    ]
   },
   {
     id: 'crowdfunding',
-    label: 'Crowdfunding',
+    label: '크라우드펀딩',
     icon: <DollarSign className="w-5 h-5" />,
-    path: '/crowdfunding'
+    children: [
+      { id: 'crowdfunding-projects', label: '프로젝트 관리', icon: <FileText className="w-4 h-4" />, path: '/crowdfunding/projects' },
+      { id: 'crowdfunding-backers', label: '후원자 관리', icon: <Users className="w-4 h-4" />, path: '/crowdfunding/backers' },
+      { id: 'crowdfunding-rewards', label: '리워드 관리', icon: <Package className="w-4 h-4" />, path: '/crowdfunding/rewards' },
+      { id: 'crowdfunding-payments', label: '결제 관리', icon: <CreditCard className="w-4 h-4" />, path: '/crowdfunding/payments' },
+      { id: 'crowdfunding-reports', label: '보고서', icon: <BarChart3 className="w-4 h-4" />, path: '/crowdfunding/reports' },
+      { id: 'crowdfunding-settings', label: '설정', icon: <Settings className="w-4 h-4" />, path: '/crowdfunding/settings' }
+    ]
   },
   {
     id: 'separator-4',
