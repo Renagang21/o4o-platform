@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { ssoService } from '@/api/sso';
 import { WordPressRouter } from '@/components/routing/WordPressRouter';
 import '@/styles/wordpress-theme.css';
+import '@/styles/wordpress-sidebar.css';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';

@@ -16,7 +16,24 @@ export class AuthClient {
 
     // Add auth token to requests
     this.api.interceptors.request.use((config: any) => {
-      const token = localStorage.getItem('accessToken');
+      // Check multiple possible token locations
+      let token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+      
+      // Also check auth-storage for token
+      if (!token) {
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          try {
+            const parsed = JSON.parse(authStorage);
+            if (parsed.state?.token) {
+              token = parsed.state.token;
+            }
+          } catch {
+            // Ignore parse errors
+          }
+        }
+      }
+      
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
