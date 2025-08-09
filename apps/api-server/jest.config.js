@@ -4,8 +4,12 @@ module.exports = {
   passWithNoTests: true,
   roots: ['<rootDir>/src'],
   testMatch: [
-    '**/__tests__/**/*.+(ts|tsx|js)',
+    '**/__tests__/**/*.test.+(ts|tsx|js)',
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/setup/'
   ],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',

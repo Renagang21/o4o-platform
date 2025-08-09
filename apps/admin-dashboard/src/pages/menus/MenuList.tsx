@@ -43,10 +43,11 @@ const MenuList: FC = () => {
       // return response.data
       
       // Mock data for now
+      const now = new Date()
       return {
         menus: [
-          { id: '1', name: 'Main Menu', location: 'primary', items: [], isActive: true },
-          { id: '2', name: 'Footer Menu', location: 'footer', items: [], isActive: true }
+          { id: '1', name: 'Main Menu', location: 'primary' as MenuLocation, items: [], isActive: true, createdAt: now, updatedAt: now },
+          { id: '2', name: 'Footer Menu', location: 'footer' as MenuLocation, items: [], isActive: true, createdAt: now, updatedAt: now }
         ]
       }
     }

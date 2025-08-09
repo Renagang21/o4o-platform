@@ -1,14 +1,18 @@
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import { Express } from 'express';
+import express from 'express';
 import jwt from 'jsonwebtoken';
+import { createTestApp } from '../setup/testApp';
 
-// Mock express app (will be replaced with actual app in real tests)
-let app: Express;
+// Test app instance
+let app: express.Application;
 let authToken: string;
 
 describe('Content API Integration Tests', () => {
   beforeAll(() => {
+    // Initialize test app
+    app = createTestApp();
+    
     // Generate test auth token
     authToken = jwt.sign(
       { id: 'test-user', email: 'test@example.com', role: 'admin' },

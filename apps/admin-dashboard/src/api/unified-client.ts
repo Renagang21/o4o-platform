@@ -90,7 +90,6 @@ class UnifiedApiClient {
 
   private handleError(error: AxiosError): Promise<never> {
     const status = error.response?.status;
-    const message = (error.response?.data as any)?.message || error.message;
 
     switch (status) {
       case 401:

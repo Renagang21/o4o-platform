@@ -63,7 +63,9 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
         products: [],
         total: 0,
         page: 1,
-        limit: 20
+        limit: 20,
+        totalPages: 1,
+        totalProducts: 0
       };
       
       // Original code - uncomment when API is working
