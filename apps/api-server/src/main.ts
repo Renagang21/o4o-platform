@@ -419,6 +419,10 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
 
 app.use('/api/settings', settingsRoutes);
 app.use('/api/settings', oauthSettingsRoutes);
+
+// Email settings routes
+import emailSettingsRoutes from './routes/email-settings.routes';
+app.use('/api/v1/settings', emailSettingsRoutes);
 app.use('/api/auth', emailAuthRoutes);
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes

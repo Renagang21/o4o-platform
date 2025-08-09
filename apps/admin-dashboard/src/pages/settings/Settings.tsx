@@ -16,15 +16,7 @@ const UserSettings: FC = () => (
   </div>
 )
 
-const EmailSettings: FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-wp-text-secondary">
-        <p>이메일 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
+import EmailSettings from './EmailSettings'
 
 const IntegrationSettings: FC = () => (
   <div className="wp-card">

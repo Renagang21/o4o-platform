@@ -112,14 +112,14 @@ export class EmailService {
     }
   }
 
-  async sendEmail(options: EmailOptions): Promise<boolean> {
+  async sendEmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
     // Check if email service is available
     if (!this.isEnabled) {
       logger.debug('Email service is disabled, skipping email send', {
         to: options.to,
         subject: options.subject
       });
-      return false;
+      return { success: false, error: 'Email service is disabled' };
     }
 
     if (!this.transporter) {
@@ -127,22 +127,30 @@ export class EmailService {
         to: options.to,
         subject: options.subject
       });
-      return false;
+      return { success: false, error: 'Email transporter not configured' };
     }
 
     try {
-      const { to, subject, template, data } = options;
+      const { to, subject, template, data, html: directHtml, text: directText } = options;
       
-      // Get email template
-      const html = await this.renderTemplate(template, data);
-      
-      const mailOptions = {
-        from: `"${process.env.EMAIL_FROM_NAME || 'O4O Platform'}" <${process.env.EMAIL_FROM_ADDRESS || process.env.SMTP_USER || 'noreply@o4o.com'}>`,
+      let mailOptions: any = {
+        from: `"${process.env.EMAIL_FROM_NAME || process.env.EMAIL_FROM || 'O4O Platform'}" <${process.env.EMAIL_FROM || process.env.SMTP_USER || 'noreply@o4o.com'}>`,
         to,
-        subject,
-        html,
-        text: this.htmlToText(html)
+        subject
       };
+
+      // Use direct HTML/text if provided, otherwise use template
+      if (directHtml || directText) {
+        mailOptions.html = directHtml;
+        mailOptions.text = directText || (directHtml ? this.htmlToText(directHtml) : undefined);
+      } else if (template && data) {
+        // Get email template
+        const html = await this.renderTemplate(template, data);
+        mailOptions.html = html;
+        mailOptions.text = this.htmlToText(html);
+      } else {
+        return { success: false, error: 'No email content provided' };
+      }
 
       // Send email with timeout
       const sendPromise = this.transporter.sendMail(mailOptions);
@@ -171,7 +179,7 @@ export class EmailService {
         });
       }
 
-      return true;
+      return { success: true };
     } catch (error: any) {
       logger.error('Failed to send email:', {
         message: error.message,
@@ -179,7 +187,7 @@ export class EmailService {
         to: options.to,
         subject: options.subject
       });
-      return false;
+      return { success: false, error: error.message || 'Failed to send email' };
     }
   }
 

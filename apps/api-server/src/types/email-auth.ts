@@ -84,8 +84,10 @@ export interface PasswordResetEmailData extends EmailTemplateData {
 export interface EmailOptions {
   to: string;
   subject: string;
-  template: 'verification' | 'passwordReset' | 'welcome' | 'accountLocked';
-  data: EmailTemplateData;
+  template?: 'verification' | 'passwordReset' | 'welcome' | 'accountLocked';
+  data?: EmailTemplateData;
+  html?: string;
+  text?: string;
 }
 
 // Token types
