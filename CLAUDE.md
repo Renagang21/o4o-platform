@@ -434,49 +434,98 @@ VITE_USE_MOCK=true  # Auto-login for testing
 ### 🚨 서버별 작업 규칙 (CRITICAL!)
 
 #### API 서버 (43.202.242.215)에서 할 작업:
-- ✅ `apps/api-server` 코드 수정 및 빌드
-- ✅ PostgreSQL 데이터베이스 관리
-- ✅ API 서버 재시작 (`pm2 restart api-server`)
-- ❌ **절대 하지 말 것**: 프론트엔드 앱 빌드 (admin-dashboard, main-site 등)
+##### ✅ 빌드 대상 (이것만 빌드!):
+- **api-server**: 운영 중인 Express API 서버
+- **api-gateway**: 개발 중인 API 게이트웨이 서비스
+
+##### ✅ 할 수 있는 작업:
+- `apps/api-server` 코드 수정 및 빌드
+- `apps/api-gateway` 코드 수정 및 빌드
+- PostgreSQL 데이터베이스 관리
+- PM2로 서비스 재시작
+
+##### ❌ **절대 하지 말 것**:
+- 프론트엔드 앱 빌드 (admin-dashboard, main-site, ecommerce, crowdfunding, forum, digital-signage)
+- 프론트엔드 빌드 명령어 실행 금지: `npm run build:admin`, `npm run build:web` 등
 
 #### Web 서버 (13.125.144.8)에서 할 작업:
-- ✅ 프론트엔드 앱 빌드 (`apps/admin-dashboard`, `apps/main-site`, `apps/ecommerce`)
-- ✅ 정적 파일 배포 (`/var/www/` 디렉토리)
-- ✅ Nginx 설정 관리
-- ❌ **절대 하지 말 것**: API 서버 코드 수정 또는 데이터베이스 작업
+##### ✅ 빌드 대상 (이것만 빌드!):
+- **admin-dashboard**: WordPress 스타일 관리자 대시보드
+- **main-site**: 고객용 메인 사이트
+- **ecommerce**: 이커머스 스토어프론트
+- **crowdfunding**: 크라우드펀딩 플랫폼
+- **forum**: 커뮤니티 포럼
+- **digital-signage**: 디지털 사이니지
 
-#### 작업 전 확인사항:
+##### ✅ 할 수 있는 작업:
+- 프론트엔드 앱 빌드 및 배포
+- 정적 파일 `/var/www/` 디렉토리 관리
+- Nginx 설정 관리
+
+##### ❌ **절대 하지 말 것**:
+- API 서버 코드 수정 또는 빌드
+- api-server, api-gateway 빌드 금지
+- 데이터베이스 작업
+
+#### 작업 전 필수 확인사항:
 ```bash
-# 현재 서버 확인
+# 1. 현재 서버 확인 (가장 먼저!)
 curl -s http://169.254.169.254/latest/meta-data/public-ipv4
-# 43.202.242.215 = API Server
-# 13.125.144.8 = Web Server
+# 43.202.242.215 = API Server (api-server, api-gateway만 빌드)
+# 13.125.144.8 = Web Server (프론트엔드 앱만 빌드)
+
+# 2. 빌드 대상 확인
+# API Server에서는:
+ls apps/ | grep -E "api-server|api-gateway"  # 이것만 빌드!
+
+# Web Server에서는:
+ls apps/ | grep -vE "api-server|api-gateway"  # API 제외한 나머지만 빌드!
 ```
 
 ### Post-CI/CD Server Work
 After CI/CD completion:
 
 ```bash
-# API Server (43.202.242.215) - API 코드만 업데이트
+# API Server (43.202.242.215) - 백엔드 서비스만 빌드
 ssh ubuntu@43.202.242.215
 cd /home/ubuntu/o4o-platform
 git pull origin main
-# API 서버 빌드 및 재시작
-npm run build:api
+
+# 패키지 빌드 (필요시)
+npm run build:packages
+
+# API 서비스들만 빌드 (이것만!)
+npm run build --workspace=@o4o/api-server
+npm run build --workspace=@o4o/api-gateway  # api-gateway 운영 시작 시
+
+# PM2 재시작
 pm2 restart api-server
+# pm2 restart api-gateway  # api-gateway 운영 시작 시
+
+# 헬스 체크
 curl http://localhost:4000/api/health
 
 # Web Server (13.125.144.8) - 프론트엔드 앱만 빌드
 ssh ubuntu@13.125.144.8
 cd /home/ubuntu/o4o-platform
 git pull origin main
-# 프론트엔드 앱 빌드
-npm run build:admin
-npm run build:web
-npm run build:ecommerce
+
+# 패키지 빌드 (필요시)
+npm run build:packages
+
+# 프론트엔드 앱들만 빌드 (이것만!)
+npm run build --workspace=@o4o/admin-dashboard
+npm run build --workspace=@o4o/main-site
+npm run build --workspace=@o4o/ecommerce
+# 필요시 추가
+# npm run build --workspace=@o4o/crowdfunding
+# npm run build --workspace=@o4o/forum
+# npm run build --workspace=@o4o/digital-signage
+
 # 빌드 결과물을 웹 서버 디렉토리로 복사
 cp -r apps/admin-dashboard/dist/* /var/www/admin.neture.co.kr/
 cp -r apps/main-site/dist/* /var/www/neture.co.kr/
+cp -r apps/ecommerce/dist/* /var/www/shop.neture.co.kr/
 sudo chown -R www-data:www-data /var/www/
 ```
 
