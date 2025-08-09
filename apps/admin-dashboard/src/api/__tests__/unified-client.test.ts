@@ -209,7 +209,6 @@ describe('UnifiedApiClient', () => {
     });
 
     it('should show toast for 429 errors', async () => {
-      const toast = require('react-hot-toast').default;
       const error = {
         response: { status: 429 }
       };
@@ -224,7 +223,6 @@ describe('UnifiedApiClient', () => {
     });
 
     it('should show toast for server errors', async () => {
-      const toast = require('react-hot-toast').default;
       const error = {
         response: { status: 500 }
       };
@@ -239,7 +237,6 @@ describe('UnifiedApiClient', () => {
     });
 
     it('should handle timeout errors', async () => {
-      const toast = require('react-hot-toast').default;
       const error = {
         code: 'ECONNABORTED'
       };
