@@ -77,7 +77,8 @@ export function useHelpTabs() {
   // Reset help tabs when route changes
   useEffect(() => {
     store.reset();
-  }, [location.pathname]); // Remove store from dependencies to fix Hook error
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]); // Intentionally omitting store to avoid re-render loop
   
   return store;
 }
@@ -102,5 +103,6 @@ export function useRegisterHelp(tabs: HelpTab[], sidebar?: HelpSidebar | null) {
       setTabs([]);
       setSidebar(null);
     };
-  }, [tabsKey, sidebarKey]); // Use only stable keys, not function references
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabsKey, sidebarKey]); // Using stable keys to avoid infinite re-renders
 }
