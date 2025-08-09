@@ -11,7 +11,10 @@ export const apiClient = axios.create({
 
 // Add auth token to requests
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  // Try multiple keys for backward compatibility
+  const token = localStorage.getItem('accessToken') || 
+                localStorage.getItem('token') || 
+                localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -23,7 +26,15 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear all possible auth tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('admin-auth-storage');
+      localStorage.removeItem('user');
+      
+      // Redirect to login
       window.location.href = '/login';
     }
     return Promise.reject(error);
