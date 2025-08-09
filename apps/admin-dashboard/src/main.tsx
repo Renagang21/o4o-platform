@@ -27,7 +27,7 @@ const queryClient = new QueryClient({
       },
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
-      cacheTime: 10 * 60 * 1000, // Keep cache for 10 minutes
+      gcTime: 10 * 60 * 1000, // Keep cache for 10 minutes (gcTime replaced cacheTime in v5)
     },
     mutations: {
       retry: false, // Don't retry mutations by default

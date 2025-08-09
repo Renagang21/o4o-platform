@@ -29,6 +29,7 @@ export interface EmailSettings {
   smtpHost?: string;
   smtpPort?: number;
   smtpUser?: string;
+  smtpPass?: string;
   smtpSecure?: boolean;
   apiKey?: string;
   fromEmail: string;

@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { Mail, Send, CheckCircle, XCircle, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, Send, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { settingsService, EmailSettings as EmailSettingsType } from '@/api/settings';
 import { useToast } from '@/hooks/use-toast';
 

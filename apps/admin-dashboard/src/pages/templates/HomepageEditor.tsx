@@ -41,20 +41,21 @@ const blocksToTipTap = (blocks: Block[]): TipTapJSONContent => {
   };
 };
 
-const tipTapToBlocks = (content: TipTapJSONContent): Block[] => {
-  if (!content || !content.content || !Array.isArray(content.content)) {
-    return [];
-  }
-  
-  return content.content
-    .filter((node: any) => node.type === 'custom-block' && node.attrs)
-    .map((node: any) => ({
-      id: node.attrs?.id as string || `block-${Date.now()}-${Math.random()}`,
-      type: node.attrs?.blockType as string || 'paragraph',
-      content: node.attrs?.content || {},
-      settings: node.attrs?.settings as any as Record<string, any> || {}
-    }));
-};
+// Commented out - not used currently
+// const tipTapToBlocks = (content: TipTapJSONContent): Block[] => {
+//   if (!content || !content.content || !Array.isArray(content.content)) {
+//     return [];
+//   }
+//   
+//   return content.content
+//     .filter((node: any) => node.type === 'custom-block' && node.attrs)
+//     .map((node: any) => ({
+//       id: node.attrs?.id as string || `block-${Date.now()}-${Math.random()}`,
+//       type: node.attrs?.blockType as string || 'paragraph',
+//       content: node.attrs?.content || {},
+//       settings: node.attrs?.settings as any as Record<string, any> || {}
+//     }));
+// };
 
 const blockTypes = [
   { type: 'hero', label: 'Hero Section', icon: '🏔️' },

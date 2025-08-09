@@ -1,5 +1,5 @@
-import { api } from './base';
-import { ssoConfig, apiEndpoints } from '@/config/apps.config';
+// import { api } from './base';
+import { ssoConfig } from '@/config/apps.config';
 
 export interface SSOCheckResponse {
   isAuthenticated: boolean;
