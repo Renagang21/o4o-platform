@@ -94,6 +94,9 @@ CLAUDE.md.backup.*
 # Local development
 *.local
 
+# Claude Code specific files - DO NOT SYNC
+CLAUDE.md
+
 # Temporary reports in root directory only
 /*_REPORT.md
 /*_ANALYSIS_REPORT.md

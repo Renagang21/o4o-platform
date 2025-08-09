@@ -4,21 +4,16 @@
   "description": "API Gateway for O4O Platform",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --experimental-specifier-resolution=node src/server.ts",
-    "build": "tsc",
-    "start": "node --experimental-specifier-resolution=node dist/server.js",
-    "type-check": "npx tsc --noEmit",
-    "lint": "eslint src/**/*.ts",
-    "test": "vitest --passWithNoTests"
+    "dev": "bash -c 'nodemon --experimental-specifier-resolution=node src/server.ts'",
+    "build": "bash -c 'npx tsc'",
+    "start": "bash -c 'node --experimental-specifier-resolution=node dist/server.js'",
+    "type-check": "bash -c 'npx tsc --noEmit'",
+    "lint": "bash -c 'eslint src/**/*.ts'",
+    "test": "bash -c 'vitest --passWithNoTests'"
   },
   "dependencies": {
     "@o4o/types": "file:../../packages/types",
     "@o4o/utils": "file:../../packages/utils",
-    "@wordpress/block-editor": "14.4.0",
-    "@wordpress/blocks": "13.9.0",
-    "@wordpress/components": "28.9.0",
-    "@wordpress/element": "6.9.0",
-    "@wordpress/i18n": "5.9.0",
     "axios": "^1.10.0",
     "compression": "^1.7.6",
     "cookie-parser": "^1.4.6",
