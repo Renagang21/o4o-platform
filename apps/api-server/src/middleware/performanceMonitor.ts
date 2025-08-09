@@ -6,7 +6,7 @@ interface RequestWithTiming extends Request {
 }
 
 // Performance monitoring middleware
-export const performanceMonitor = (req: RequestWithTiming, res: Response, next: NextFunction) => {
+export const performanceMonitor = (req: Request & RequestWithTiming, res: Response, next: NextFunction) => {
   // Record start time
   req.startTime = Date.now();
 
