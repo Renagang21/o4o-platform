@@ -225,8 +225,12 @@ export class ProductVariationController {
         // 가격 조정 계산
         let priceAdjustment = 0;
         for (const [attrSlug, valueSlug] of Object.entries(combination.slugMap)) {
-          if (priceAdjustments[attrSlug]?.[valueSlug]) {
-            priceAdjustment += priceAdjustments[attrSlug][valueSlug];
+          const attrAdjustments = priceAdjustments[attrSlug as string];
+          if (attrAdjustments && typeof attrAdjustments === 'object') {
+            const adjustment = attrAdjustments[valueSlug as string];
+            if (typeof adjustment === 'number') {
+              priceAdjustment += adjustment;
+            }
           }
         }
 

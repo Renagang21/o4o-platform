@@ -45,6 +45,9 @@ export class Product {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   affiliatePrice?: number;
+  
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  salePrice?: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   cost?: number;
@@ -134,7 +137,7 @@ export class Product {
   @Column({ default: false })
   hasVariations: boolean;
 
-  @OneToMany(() => ProductAttribute, attribute => attribute.product, { cascade: true })
+  @OneToMany(() => ProductAttribute, (attribute) => attribute.product, { cascade: true })
   attributes: ProductAttribute[];
 
   @OneToMany(() => ProductVariation, variation => variation.product, { cascade: true })
