@@ -1,0 +1,285 @@
+/**
+ * Admin Layout Styles - Fixed Version
+ * Resolves layout overlap and content visibility issues
+ */
+
+/* Reset and Base */
+* {
+  box-sizing: border-box;
+}
+
+/* Main container */
+.wordpress-admin {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  background-color: #f1f1f1;
+}
+
+/* Admin Bar (Top Bar) - Fixed at top */
+.wordpress-admin-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background-color: #23282d;
+  z-index: 99999; /* Highest z-index */
+  display: flex;
+  align-items: center;
+}
+
+/* Sidebar - Fixed positioning */
+.admin-sidebar {
+  position: fixed;
+  top: 32px; /* Below admin bar */
+  left: 0;
+  bottom: 0;
+  width: 160px;
+  background-color: #23282d;
+  z-index: 9998; /* Below admin bar */
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+/* Sidebar expanded state */
+.admin-sidebar.expanded,
+.admin-sidebar.open {
+  width: 240px;
+}
+
+/* Main Content Area - Properly offset */
+.wordpress-admin-content {
+  position: relative;
+  margin-left: 160px; /* Offset by sidebar width */
+  margin-top: 32px; /* Offset by admin bar height */
+  min-height: calc(100vh - 32px);
+  width: calc(100% - 160px);
+  background-color: #f1f1f1;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  overflow: visible; /* Ensure content is not clipped */
+}
+
+/* Adjust content when sidebar is expanded */
+.admin-sidebar.expanded ~ .wordpress-admin-content,
+.admin-sidebar.open ~ .wordpress-admin-content {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+}
+
+/* Main content padding */
+.wordpress-admin-content main {
+  padding: 20px;
+  max-width: 100%;
+  position: relative;
+  z-index: 1; /* Ensure content is above background */
+}
+
+/* Ensure content is visible */
+.wordpress-admin-content > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Desktop Large Screens (> 1280px) */
+@media (min-width: 1280px) {
+  .admin-sidebar {
+    width: 240px;
+  }
+  
+  .wordpress-admin-content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+}
+
+/* Tablet and Mobile (< 1024px) */
+@media (max-width: 1023px) {
+  /* Sidebar becomes overlay */
+  .admin-sidebar {
+    transform: translateX(-100%);
+    width: 240px;
+    z-index: 10000; /* Above content on mobile */
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  }
+  
+  /* Full width content on mobile */
+  .wordpress-admin-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Mobile backdrop */
+  .admin-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+  }
+  
+  .admin-sidebar-backdrop.show {
+    display: block;
+  }
+  
+  /* Mobile menu toggle button */
+  .admin-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: #0073aa;
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10001;
+    cursor: pointer;
+  }
+}
+
+/* Small Mobile (< 600px) */
+@media (max-width: 599px) {
+  .wordpress-admin-bar {
+    height: 46px;
+  }
+  
+  .admin-sidebar {
+    top: 46px;
+  }
+  
+  .wordpress-admin-content {
+    margin-top: 46px;
+    min-height: calc(100vh - 46px);
+  }
+}
+
+/* Desktop only styles */
+@media (min-width: 1024px) {
+  .admin-sidebar-toggle,
+  .admin-sidebar-backdrop {
+    display: none !important;
+  }
+}
+
+/* Sidebar Menu Styles */
+.admin-sidebar-menu {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.admin-sidebar-menu-item {
+  display: block;
+  padding: 8px 20px;
+  color: #eee;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.2s, color 0.2s;
+  position: relative;
+}
+
+.admin-sidebar-menu-item:hover {
+  background-color: #191e23;
+  color: #00b9eb;
+}
+
+.admin-sidebar-menu-item.active {
+  background-color: #0073aa;
+  color: #fff;
+}
+
+/* Submenu Styles */
+.admin-sidebar-submenu {
+  background-color: #32373c;
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-sidebar-menu-item.expanded .admin-sidebar-submenu,
+.admin-sidebar-menu-item.open .admin-sidebar-submenu {
+  display: block;
+}
+
+.admin-sidebar-submenu-item {
+  display: block;
+  padding: 6px 20px 6px 40px;
+  color: rgba(240, 245, 250, 0.7);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.admin-sidebar-submenu-item:hover {
+  color: #00b9eb;
+}
+
+.admin-sidebar-submenu-item.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Content Cards */
+.wp-card {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+  padding: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for any overlapping elements */
+.wordpress-admin-content .page-header,
+.wordpress-admin-content .content-area,
+.wordpress-admin-content .dashboard-widgets {
+  position: relative;
+  z-index: 1;
+  background-color: transparent;
+}
+
+/* Ensure proper stacking order */
+.admin-notices {
+  position: relative;
+  z-index: 100;
+}
+
+/* Responsive tables */
+@media (max-width: 782px) {
+  .wp-list-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    min-width: 100%;
+  }
+}
+
+/* Debug helper - Remove in production */
+.debug-border {
+  border: 2px solid red !important;
+}
+
+/* Ensure main content is always visible */
+.wordpress-admin-content main > * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

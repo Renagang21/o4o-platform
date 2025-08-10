@@ -211,12 +211,13 @@ const Products: FC = () => {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">상품 관리</h1>
-          <p className="text-gray-600 mt-1">
+    <div className="products-page" style={{ position: 'relative', zIndex: 1, backgroundColor: '#f1f1f1', minHeight: '100vh' }}>
+      <div className="space-y-6" style={{ padding: '20px', maxWidth: '100%', margin: '0 auto' }}>
+        {/* Header */}
+        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">상품 관리</h1>
+            <p className="text-gray-600 mt-1">
             총 {productsData?.total || 0}개의 상품이 등록되어 있습니다
           </p>
         </div>
@@ -433,6 +434,7 @@ const Products: FC = () => {
           </nav>
         </div>
       )}
+      </div>
     </div>
   );
 };

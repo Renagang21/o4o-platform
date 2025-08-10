@@ -6,7 +6,7 @@ import AdminBar from './AdminBar'
 import { AdminNotices } from '../notices/AdminNotices'
 import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
-import '../../styles/admin-layout.css'
+import '../../styles/admin-layout-fixed.css'
 
 interface AdminLayoutProps {
   children: ReactNode
