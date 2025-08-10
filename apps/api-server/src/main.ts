@@ -108,6 +108,7 @@ import forumV1Routes from './routes/v1/forum.routes';
 import adminV1Routes from './routes/v1/admin.routes';
 import mediaV1Routes from './routes/v1/media.routes';
 import appsV1Routes from './routes/v1/apps.routes';
+import couponV1Routes from './routes/v1/coupon.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -467,6 +468,7 @@ app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes);
 app.use('/api/v1/apps', appsV1Routes);
+app.use('/api/v1/coupons', couponV1Routes);
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);

@@ -35,13 +35,15 @@ const OrderStatusManagement = lazy(() => import('@/pages/ecommerce/OrderStatusMa
 const InventoryManagement = lazy(() => import('@/pages/ecommerce/InventoryManagement'));
 const TossPaymentsSettings = lazy(() => import('@/pages/ecommerce/TossPaymentsSettings'));
 const RefundManagement = lazy(() => import('@/pages/ecommerce/RefundManagement'));
+const Coupons = lazy(() => import('@/pages/ecommerce/Coupons'));
+const CouponForm = lazy(() => import('@/pages/ecommerce/CouponForm'));
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 const VendorSettlements = lazy(() => import('@/pages/ecommerce/VendorSettlements'));
 const FeeManagement = lazy(() => import('@/pages/ecommerce/FeeManagement'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
-const Pages = lazy(() => import('@/pages/pages/Pages'));
+const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
 const Media = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 const ReusableBlocksPage = lazy(() => import('@/pages/content/ReusableBlocksPage'));
@@ -93,6 +95,7 @@ const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 
 // Apps Manager
 const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
+const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
 
 // Loading component
 const PageLoader = () => (
@@ -245,6 +248,13 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
+                    <Route path="/users/new" element={
+                      <AdminProtectedRoute requiredPermissions={['users:create']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
                     
                     <Route path="/users/profile" element={
                       <AdminProtectedRoute requiredPermissions={['users:read']}>
@@ -305,7 +315,7 @@ function App() {
                     <Route path="/pages/*" element={
                       <AdminProtectedRoute requiredPermissions={['pages:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Pages />
+                          <PagesRouter />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -452,6 +462,28 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['products:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <InventoryManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/coupons" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Coupons />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/ecommerce/coupons/new" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CouponForm />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/ecommerce/coupons/:id/edit" element={
+                      <AdminProtectedRoute requiredPermissions={['products:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <CouponForm />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -724,6 +756,13 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <AppsManager />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/apps/settings" element={
+                      <AdminProtectedRoute requiredPermissions={['admin']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AppSettings />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

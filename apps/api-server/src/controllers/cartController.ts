@@ -4,11 +4,13 @@ import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Product } from '../entities/Product';
 import { AuthRequest } from '../types/auth';
+import { CouponService } from '../services/CouponService';
 
 export class CartController {
   private cartRepository = AppDataSource.getRepository(Cart);
   private cartItemRepository = AppDataSource.getRepository(CartItem);
   private productRepository = AppDataSource.getRepository(Product);
+  private couponService = new CouponService();
 
   // 장바구니 조회
   getCart = async (req: Request, res: Response) => {
@@ -332,6 +334,140 @@ export class CartController {
       res.status(500).json({
         success: false,
         error: 'Failed to clear cart'
+      });
+    }
+  };
+
+  // 쿠폰 적용
+  applyCoupon = async (req: Request, res: Response) => {
+    try {
+      const userId = (req as AuthRequest).user?.id;
+      const { couponCode } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+      }
+
+      if (!couponCode) {
+        return res.status(400).json({
+          success: false,
+          error: 'Coupon code is required'
+        });
+      }
+
+      // 장바구니 조회
+      const cart = await this.cartRepository.findOne({
+        where: { userId },
+        relations: ['items', 'items.product']
+      });
+
+      if (!cart || cart.items.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Cart is empty'
+        });
+      }
+
+      // 장바구니 총액 계산
+      const userRole = (req as AuthRequest).user?.role || 'customer';
+      let subtotal = 0;
+      const productIds: string[] = [];
+      const categoryIds: string[] = [];
+
+      cart.items.forEach((item: any) => {
+        const price = item.product.getPriceForUser(userRole);
+        subtotal += price * item.quantity;
+        productIds.push(item.productId);
+        
+        // Collect category IDs if available
+        if (item.product.categoryId) {
+          categoryIds.push(item.product.categoryId);
+        }
+      });
+
+      // 쿠폰 검증
+      const validation = await this.couponService.validateCoupon({
+        code: couponCode,
+        customerId: userId,
+        subtotal,
+        productIds,
+        categoryIds
+      });
+
+      if (!validation.valid) {
+        return res.status(400).json({
+          success: false,
+          error: validation.message || 'Invalid coupon'
+        });
+      }
+
+      // 쿠폰 정보 저장 (실제 주문 시 사용하기 위해)
+      // Note: Cart 엔티티에 couponCode, discountAmount 필드가 필요할 수 있음
+      // 현재는 응답으로만 반환
+      
+      const finalAmount = subtotal - (validation.discount || 0);
+
+      res.json({
+        success: true,
+        data: {
+          couponCode,
+          subtotal,
+          discount: validation.discount || 0,
+          finalAmount,
+          message: validation.message
+        }
+      });
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to apply coupon'
+      });
+    }
+  };
+
+  // 쿠폰 제거
+  removeCoupon = async (req: Request, res: Response) => {
+    try {
+      const userId = (req as AuthRequest).user?.id;
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required'
+        });
+      }
+
+      // 장바구니 조회
+      const cart = await this.cartRepository.findOne({
+        where: { userId },
+        relations: ['items', 'items.product']
+      });
+
+      if (!cart) {
+        return res.status(404).json({
+          success: false,
+          error: 'Cart not found'
+        });
+      }
+
+      // Note: Cart 엔티티에 couponCode 필드가 있다면 여기서 null로 설정
+      // cart.couponCode = null;
+      // cart.discountAmount = 0;
+      // await this.cartRepository.save(cart);
+
+      res.json({
+        success: true,
+        message: 'Coupon removed successfully'
+      });
+    } catch (error) {
+      console.error('Error removing coupon:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to remove coupon'
       });
     }
   };

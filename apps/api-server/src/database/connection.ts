@@ -15,6 +15,7 @@ import { Cart } from '../entities/Cart';
 import { CartItem } from '../entities/CartItem';
 import { Category } from '../entities/Category';
 import { Settings } from '../entities/Settings';
+import { Coupon, CouponUsage } from '../entities/Coupon';
 import { FundingProject } from '../entities/crowdfunding/FundingProject';
 import { FundingReward } from '../entities/crowdfunding/FundingReward';
 import { FundingBacking } from '../entities/crowdfunding/FundingBacking';
@@ -88,6 +89,8 @@ export const AppDataSource = new DataSource({
         CartItem,
         Category,
         Settings,
+        Coupon,
+        CouponUsage,
         // Crowdfunding entities
         FundingProject,
         FundingReward,

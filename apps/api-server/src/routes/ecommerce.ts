@@ -28,6 +28,8 @@ router.post('/cart/items', cartController.addToCart);
 router.put('/cart/items/:itemId', cartController.updateCartItem);
 router.delete('/cart/items/:itemId', cartController.removeCartItem);
 router.delete('/cart', cartController.clearCart);
+router.post('/cart/coupon', cartController.applyCoupon);
+router.delete('/cart/coupon', cartController.removeCoupon);
 
 // 주문 라우트 (인증 필요)
 router.use('/orders', authenticateToken);
