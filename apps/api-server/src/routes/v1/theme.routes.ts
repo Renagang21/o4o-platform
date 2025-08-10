@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { ThemeController } from '../../controllers/ThemeController';
 import { authenticateToken } from '../../middleware/auth';
-import { requireRole } from '../../middleware/roleCheck';
+import { requireAdmin } from '../../middleware/auth';
 
-const router = Router();
+const router: any = Router();
 const themeController = new ThemeController();
 
 // Public routes
@@ -12,7 +12,7 @@ router.get('/:id/preview', themeController.getThemePreview);
 
 // Protected routes
 router.use(authenticateToken);
-router.use(requireRole(['admin']));
+router.use(requireAdmin);
 
 // Theme management
 router.get('/', themeController.getAllThemes);

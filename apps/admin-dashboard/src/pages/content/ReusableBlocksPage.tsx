@@ -15,7 +15,7 @@ import { useReusableBlocks } from '../../hooks/useReusableBlocks';
 const ReusableBlocksPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
-  const reusableBlocksData = useReusableBlocks(); // TODO: Use loading state for UI feedback
+  const _reusableBlocksData = useReusableBlocks(); // TODO: Use loading state for UI feedback
 
   // Handle creating new reusable block
   const handleCreateNew = () => {

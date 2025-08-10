@@ -86,7 +86,7 @@ export class HookSystem extends EventEmitter {
     
     for (const hook of hooks) {
       try {
-        await hook.callback(...args);
+        await (hook.callback as HookCallback)(...args);
       } catch (error) {
         console.error(`Error in action hook ${hookName}:`, error);
         this.emit('hook:error', { type: 'action', hookName, error });

@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { authenticateJWT } from '../../middleware/auth';
-import { requireRole } from '../../middleware/roleCheck';
+import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router = Router();
+const router: any = Router();
 
 // Admin pages endpoint
-router.get('/pages', authenticateJWT, requireRole(['admin']), async (req, res) => {
+router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {
   try {
     // Mock data for now - replace with actual database query
     const pages = [
@@ -44,7 +43,7 @@ router.get('/pages', authenticateJWT, requireRole(['admin']), async (req, res) =
 });
 
 // Custom field groups endpoint
-router.get('/custom-field-groups', authenticateJWT, requireRole(['admin']), async (req, res) => {
+router.get('/custom-field-groups', authenticateToken, requireAdmin, async (req, res) => {
   try {
     // Mock data for now
     const fieldGroups = [

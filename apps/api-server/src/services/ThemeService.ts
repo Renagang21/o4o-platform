@@ -4,7 +4,7 @@ import { Theme, ThemeInstallation } from '../entities/Theme';
 import { hooks, WP_HOOKS } from './HookSystem';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as AdmZip from 'adm-zip';
+import AdmZip from 'adm-zip';
 import axios from 'axios';
 
 export interface ThemeManifest {

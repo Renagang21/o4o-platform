@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import { authenticate } from '../../middleware/auth';
-import { hasRole } from '../../middleware/rbac';
+import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router = Router();
+const router: any = Router();
 
 // In-memory storage for app states (replace with database in production)
 const appStates = new Map<string, boolean>([
@@ -17,7 +16,7 @@ const appStates = new Map<string, boolean>([
 ]);
 
 // Get all app states
-router.get('/states', authenticate, hasRole(['admin']), (req, res) => {
+router.get('/states', authenticateToken, requireAdmin, (req, res) => {
   try {
     const states = Object.fromEntries(appStates);
     res.json({
@@ -34,7 +33,7 @@ router.get('/states', authenticate, hasRole(['admin']), (req, res) => {
 });
 
 // Get single app state
-router.get('/states/:appId', authenticate, hasRole(['admin']), (req, res) => {
+router.get('/states/:appId', authenticateToken, requireAdmin, (req, res) => {
   try {
     const { appId } = req.params;
     const isActive = appStates.get(appId);
@@ -63,7 +62,7 @@ router.get('/states/:appId', authenticate, hasRole(['admin']), (req, res) => {
 });
 
 // Update app state
-router.put('/states/:appId', authenticate, hasRole(['admin']), (req, res) => {
+router.put('/states/:appId', authenticateToken, requireAdmin, (req, res) => {
   try {
     const { appId } = req.params;
     const { isActive } = req.body;
@@ -133,7 +132,7 @@ router.put('/states/:appId', authenticate, hasRole(['admin']), (req, res) => {
 });
 
 // Batch update app states
-router.post('/states/batch', authenticate, hasRole(['admin']), (req, res) => {
+router.post('/states/batch', authenticateToken, requireAdmin, (req, res) => {
   try {
     const { updates } = req.body;
     

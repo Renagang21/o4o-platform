@@ -76,7 +76,7 @@ export class MediaController {
   /**
    * Upload single file
    */
-  uploadSingle = [
+  uploadSingle: any[] = [
     upload.single('file'),
     async (req: Request, res: Response) => {
       try {
@@ -110,15 +110,15 @@ export class MediaController {
 
         // Create media file record
         const mediaFile = this.mediaRepository.create({
-          name: req.file.filename,
+          filename: req.file.filename,
           originalName: req.file.originalname,
           path: uploadPath,
           url: fileUrl,
           mimeType: req.file.mimetype,
           size: req.file.size,
           folderId: folderId || null,
-          uploadedById: userId,
-          alt,
+          uploadedBy: userId,
+          altText: alt,
           caption,
           description,
           metadata
@@ -155,7 +155,7 @@ export class MediaController {
   /**
    * Upload multiple files
    */
-  uploadMultiple = [
+  uploadMultiple: any[] = [
     upload.array('files', 10),
     async (req: Request, res: Response) => {
       try {
@@ -188,14 +188,14 @@ export class MediaController {
           }
 
           const mediaFile = this.mediaRepository.create({
-            name: file.filename,
+            filename: file.filename,
             originalName: file.originalname,
             path: uploadPath,
             url: fileUrl,
             mimeType: file.mimetype,
             size: file.size,
             folderId: folderId || null,
-            uploadedById: userId,
+            uploadedBy: userId,
             metadata
           });
 
@@ -352,7 +352,7 @@ export class MediaController {
       }
 
       // Update fields
-      if (alt !== undefined) media.alt = alt;
+      if (alt !== undefined) media.altText = alt;
       if (caption !== undefined) media.caption = caption;
       if (description !== undefined) media.description = description;
       if (folderId !== undefined) media.folderId = folderId;
@@ -397,13 +397,13 @@ export class MediaController {
 
         // Delete thumbnail if exists
         if (media.metadata?.thumbnail) {
-          const thumbnailPath = path.join(process.cwd(), media.metadata.thumbnail);
+          const thumbnailPath = path.join(process.cwd(), media.metadata.thumbnail as string);
           await fs.unlink(thumbnailPath);
         }
 
         // Delete medium size if exists
         if (media.metadata?.medium) {
-          const mediumPath = path.join(process.cwd(), media.metadata.medium);
+          const mediumPath = path.join(process.cwd(), media.metadata.medium as string);
           await fs.unlink(mediumPath);
         }
       } catch (error) {
@@ -457,21 +457,20 @@ export class MediaController {
         });
       }
 
-      // Create folder path
-      let folderPath = '/' + name.toLowerCase().replace(/[^a-z0-9]/gi, '-');
+      // Create folder slug
+      let folderSlug = name.toLowerCase().replace(/[^a-z0-9]/gi, '-');
       
       if (parentId) {
         const parent = await this.folderRepository.findOne({ where: { id: parentId } });
         if (parent) {
-          folderPath = parent.path + folderPath;
+          folderSlug = parent.slug + '/' + folderSlug;
         }
       }
 
       const folder = this.folderRepository.create({
         name,
-        path: folderPath,
-        parentId: parentId || null,
-        createdById: userId
+        slug: folderSlug,
+        parentId: parentId || null
       });
 
       const savedFolder = await this.folderRepository.save(folder);

@@ -1,18 +1,17 @@
 import { Router } from 'express';
 import { CouponController } from '../../controllers/CouponController';
-import { authenticate } from '../../middleware/auth';
-import { hasRole } from '../../middleware/rbac';
+import { authenticateToken, requireAdmin, requireManagerOrAdmin } from '../../middleware/auth';
 
-const router = Router();
+const router: any = Router();
 const couponController = new CouponController();
 
 // Public routes - validate coupon (requires authentication)
-router.post('/validate', authenticate, couponController.validateCoupon);
-router.get('/my-coupons', authenticate, couponController.getCustomerCoupons);
+router.post('/validate', authenticateToken, couponController.validateCoupon);
+router.get('/my-coupons', authenticateToken, couponController.getCustomerCoupons);
 
 // Admin routes
-router.use(authenticate);
-router.use(hasRole(['admin']));
+router.use(authenticateToken);
+router.use(requireAdmin);
 
 // CRUD operations
 router.get('/', couponController.getAllCoupons);

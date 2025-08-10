@@ -108,7 +108,7 @@ export class ThemeController {
   /**
    * Upload and install theme
    */
-  uploadTheme = [
+  uploadTheme: any[] = [
     upload.single('theme'),
     async (req: Request, res: Response) => {
       try {

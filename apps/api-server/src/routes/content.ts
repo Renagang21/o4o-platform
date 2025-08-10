@@ -1,6 +1,6 @@
 import express from 'express';
 import { PagesController } from '../controllers/pagesController';
-import { MediaController } from '../controllers/mediaController';
+import { MediaController } from '../controllers/MediaController';
 import { TemplatesController } from '../controllers/templatesController';
 import { CustomFieldsController } from '../controllers/customFieldsController';
 import { authenticateToken } from '../middleware/auth';
@@ -46,21 +46,16 @@ router.get('/admin/pages/tree', pagesController.getPageTree.bind(pagesController
 // ============================================================================
 
 // Media files
-router.get('/admin/media', mediaController.getMediaFiles.bind(mediaController));
-router.get('/admin/media/:id', mediaController.getMediaFile.bind(mediaController));
-router.post('/admin/media/upload', mediaController.uploadFiles.bind(mediaController));
-router.put('/admin/media/:id', mediaController.updateMediaFile.bind(mediaController));
-router.delete('/admin/media/:id', mediaController.deleteMediaFile.bind(mediaController));
-router.delete('/admin/media/bulk', mediaController.bulkDeleteMediaFiles.bind(mediaController));
+router.get('/admin/media', mediaController.getMedia.bind(mediaController));
+router.get('/admin/media/:id', mediaController.getMediaById.bind(mediaController));
+router.post('/admin/media/upload', mediaController.uploadSingle);
+router.put('/admin/media/:id', mediaController.updateMedia.bind(mediaController));
+router.delete('/admin/media/:id', mediaController.deleteMedia.bind(mediaController));
 
 // Media folders
-router.get('/admin/media/folders', mediaController.getMediaFolders.bind(mediaController));
-router.post('/admin/media/folders', mediaController.createMediaFolder.bind(mediaController));
-router.put('/admin/media/folders/:id', mediaController.updateMediaFolder.bind(mediaController));
-router.delete('/admin/media/folders/:id', mediaController.deleteMediaFolder.bind(mediaController));
-
-// Optimized image serving
-router.get('/media/optimize/:id', mediaController.getOptimizedImage.bind(mediaController));
+router.get('/admin/media/folders', mediaController.getFolders.bind(mediaController));
+router.post('/admin/media/folders', mediaController.createFolder.bind(mediaController));
+router.delete('/admin/media/folders/:id', mediaController.deleteFolder.bind(mediaController));
 
 // ============================================================================
 // TEMPLATES ROUTES

@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { authenticateJWT } from '../../middleware/auth';
+import { authenticateToken } from '../../middleware/auth';
 import { MediaController } from '../../controllers/MediaController';
 
-const router = Router();
+const router: any = Router();
 const mediaController = new MediaController();
 
 // Apply authentication to all routes
-router.use(authenticateJWT);
+router.use(authenticateToken);
 
 // Media file routes
 router.post('/upload', mediaController.uploadSingle);
