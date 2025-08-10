@@ -11,8 +11,8 @@
     "!packages/*.backup"
   ],
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "node": ">=22.18.0",
+    "npm": ">=10.9.3"
   },
   "overrides": {
     "typescript": "~5.9.2",
@@ -59,8 +59,13 @@
     "build:supplier-connector": "npm run build --workspace=@o4o/supplier-connector",
     "build:apps": "npm run build:apps:api && npm run build:apps:frontend",
     "build:apps:api": "npm run build --workspace=@o4o/api-server",
-    "build:apps:frontend": "npm run build --workspace=@o4o/main-site && npm run build --workspace=@o4o/admin-dashboard && npm run build --workspace=@o4o/ecommerce && npm run build --workspace=@o4o/crowdfunding && npm run build --workspace=@o4o/forum && npm run build --workspace=@o4o/digital-signage",
-    "build:apps:parallel": "concurrently \"npm run build --workspace=@o4o/api-server\" \"npm run build --workspace=@o4o/main-site\" \"npm run build --workspace=@o4o/admin-dashboard\" \"npm run build --workspace=@o4o/ecommerce\" \"npm run build --workspace=@o4o/crowdfunding\" \"npm run build --workspace=@o4o/forum\" \"npm run build --workspace=@o4o/digital-signage\"",
+    "build:apps:frontend": "npm run build:main-site && npm run build:admin && npm run build:ecommerce && npm run build:crowdfunding && npm run build:forum && npm run build --workspace=@o4o/digital-signage",
+    "build:main-site": "npm run build --workspace=@o4o/main-site",
+    "build:admin": "npm run build --workspace=@o4o/admin-dashboard",
+    "build:ecommerce": "npm run build --workspace=@o4o/ecommerce",
+    "build:crowdfunding": "npm run build --workspace=@o4o/crowdfunding",
+    "build:forum": "npm run build --workspace=@o4o/forum",
+    "build:apps:parallel": "concurrently \"npm run build --workspace=@o4o/api-server\" \"npm run build --workspace=@o4o/main-site\" \"npm run build --workspace=@o4o/admin-dashboard\" \"npm run build --workspace=@o4o/ecommerce\" \"npm run build --workspace=@o4o/crowdfunding\" \"npm run build --workspace=@o4o/forum\" \"cd apps/digital-signage && npm run build\"",
     "build:signage": "npm run build --workspace=@o4o/digital-signage",
     "build:all": "npm run build",
     "build:all:fast": "npm run build:packages && npm run build:apps:parallel",
@@ -78,9 +83,9 @@
     "clean:dist": "rm -rf apps/*/dist packages/*/dist",
     "build:api": "npm run build:packages && npm run build --workspace=@o4o/api-server",
     "build:web": "npm run build:packages && npm run build --workspace=@o4o/main-site",
-    "build:admin": "npm run build:packages && npm run build --workspace=@o4o/admin-dashboard",
-    "build:ecommerce": "npm run build:packages && npm run build --workspace=@o4o/ecommerce",
-    "build:crowdfunding": "npm run build:packages && npm run build --workspace=@o4o/crowdfunding",
+    "build:admin:full": "npm run build:packages && npm run build --workspace=@o4o/admin-dashboard",
+    "build:ecommerce:full": "npm run build:packages && npm run build --workspace=@o4o/ecommerce",
+    "build:crowdfunding:full": "npm run build:packages && npm run build --workspace=@o4o/crowdfunding",
     "type-check": "./scripts/dev.sh type-check",
     "lint": "./scripts/dev.sh lint",
     "lint:fix": "./scripts/dev.sh lint:fix",

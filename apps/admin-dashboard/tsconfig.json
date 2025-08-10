@@ -9,7 +9,7 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "composite": true,
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
@@ -33,7 +33,15 @@
     },
     "types": []
   },
-  "include": ["src", "vite-env.d.ts"],
+  "include": [
+    "src",
+    "vite-env.d.ts",
+    "../../packages/auth-context/src/**/*",
+    "../../packages/auth-client/src/**/*",
+    "../../packages/types/src/**/*",
+    "../../packages/utils/src/**/*",
+    "../../packages/ui/src/**/*"
+  ],
   "exclude": [
     "**/*.test.tsx",
     "**/*.test.ts",

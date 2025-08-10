@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { ssoService } from '@/api/sso'
 
-interface User {
+export interface User {
   id: string
   email: string
   name: string
