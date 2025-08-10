@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from './User';
+import { ProductAttribute } from './ProductAttribute';
+import { ProductVariation } from './ProductVariation';
 
 export enum ProductStatus {
   DRAFT = 'draft',
@@ -128,9 +130,32 @@ export class Product {
   @Column({ nullable: true })
   userId?: string;
 
+  // 변형 관련 필드
+  @Column({ default: false })
+  hasVariations: boolean;
+
+  @OneToMany(() => ProductAttribute, attribute => attribute.product, { cascade: true })
+  attributes: ProductAttribute[];
+
+  @OneToMany(() => ProductVariation, variation => variation.product, { cascade: true })
+  variations: ProductVariation[];
+
+  // Additional fields for compatibility
+  reviews?: any[];
+  compareAtPrice?: number;
+  rating?: number;
+  reviewCount?: number;
+  salesCount?: number;
+  brand?: string;
+  metadata?: Record<string, any>;
+
   // Compatibility fields
   get price(): number {
     return this.retailPrice;
+  }
+
+  set price(value: number) {
+    this.retailPrice = value;
   }
 
   get stock(): number {

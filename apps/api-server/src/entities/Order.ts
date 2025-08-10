@@ -154,6 +154,50 @@ export class Order {
     referrer?: string;
     couponCode?: string;
     adminNotes?: string;
+    lastStatusChange?: string;
+    statusHistory?: any[];
+    deliveredAt?: string;
+    reviewRequested?: string;
+    receiptUrl?: string;
+    paymentKey?: string;
+    [key: string]: any;
+  };
+
+  // Legacy support for billing
+  @Column({ type: 'json', nullable: true })
+  billing?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+
+  // Legacy support for shipping
+  @Column({ type: 'json', nullable: true })
+  shipping?: {
+    firstName?: string;
+    lastName?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    method?: string;
+    trackingNumber?: string;
+    trackingUrl?: string;
+    carrier?: string;
+    status?: string;
+    shippedAt?: Date;
+    deliveredAt?: Date;
+    estimatedDelivery?: Date;
+    currentLocation?: string;
+    cost?: number;
+    paidBy?: string;
   };
 
   @CreateDateColumn()

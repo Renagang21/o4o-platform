@@ -5,5 +5,8 @@
   "main": "index.ts",
   "types": "index.ts",
   "license": "MIT",
+  "scripts": {
+    "build": "echo 'No build required for supplier-connector'"
+  },
   "dependencies": {}
 }
