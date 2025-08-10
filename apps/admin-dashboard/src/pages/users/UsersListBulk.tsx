@@ -45,7 +45,12 @@ const UsersListBulk: FC = () => {
       if (searchQuery) params.set('search', searchQuery);
       
       const response = await authClient.api.get(`/users?${params}`);
-      return response.data;
+      // Extract users array from the response
+      if (response.data?.data?.users) {
+        return response.data.data.users;
+      }
+      // Fallback to response.data if it's already an array
+      return Array.isArray(response.data) ? response.data : [];
     }
   });
 

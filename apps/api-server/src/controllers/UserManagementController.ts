@@ -23,25 +23,118 @@ export class UserManagementController {
         const mockUsers = [
           {
             id: '1',
+            name: 'Admin User',
             email: 'admin@neture.co.kr',
             firstName: 'Admin',
             lastName: 'User',
-            role: 'admin',
+            role: 'administrator',
+            avatar: null,
+            posts: 42,
             status: 'active',
             createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: '2',
+            name: 'Editor Kim',
+            email: 'editor@neture.co.kr',
+            firstName: 'Editor',
+            lastName: 'Kim',
+            role: 'editor',
+            avatar: null,
+            posts: 15,
+            status: 'active',
+            createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            lastLogin: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: '3',
+            name: 'Author Lee',
+            email: 'author@neture.co.kr',
+            firstName: 'Author',
+            lastName: 'Lee',
+            role: 'author',
+            avatar: null,
+            posts: 8,
+            status: 'active',
+            createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+            lastLogin: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: '4',
+            name: 'Contributor Park',
+            email: 'contributor@neture.co.kr',
+            firstName: 'Contributor',
+            lastName: 'Park',
+            role: 'contributor',
+            avatar: null,
+            posts: 3,
+            status: 'active',
+            createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+            lastLogin: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: '5',
+            name: 'Subscriber Choi',
+            email: 'subscriber@neture.co.kr',
+            firstName: 'Subscriber',
+            lastName: 'Choi',
+            role: 'subscriber',
+            avatar: null,
+            posts: 0,
+            status: 'active',
+            createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
+            lastLogin: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: '6',
+            name: 'Pending User',
+            email: 'pending@neture.co.kr',
+            firstName: 'Pending',
+            lastName: 'User',
+            role: 'subscriber',
+            avatar: null,
+            posts: 0,
+            status: 'pending',
+            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            lastLogin: null,
             updatedAt: new Date().toISOString()
           }
         ];
 
+        // Apply filters
+        let filteredUsers = [...mockUsers];
+        
+        if (role && role !== 'all') {
+          filteredUsers = filteredUsers.filter(user => user.role === role);
+        }
+        
+        if (search) {
+          const searchLower = String(search).toLowerCase();
+          filteredUsers = filteredUsers.filter(user => 
+            user.name.toLowerCase().includes(searchLower) ||
+            user.email.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        if (status) {
+          filteredUsers = filteredUsers.filter(user => user.status === status);
+        }
+
         res.json({
           success: true,
           data: {
-            users: mockUsers,
+            users: filteredUsers,
             pagination: {
-              total: 1,
-              page: 1,
-              limit: 20,
-              totalPages: 1
+              total: filteredUsers.length,
+              page: Number(page),
+              limit: Number(limit),
+              totalPages: Math.ceil(filteredUsers.length / Number(limit))
             }
           }
         });

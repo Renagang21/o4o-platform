@@ -240,9 +240,13 @@ export const wordpressMenuItems: MenuItem[] = [
   },
   {
     id: 'apps',
-    label: 'Apps',
+    label: '앱 관리',
     icon: <Package className="w-5 h-5" />,
-    path: '/apps'
+    children: [
+      { id: 'apps-installed', label: '설치된 앱', icon: <Package className="w-4 h-4" />, path: '/apps' },
+      { id: 'apps-settings', label: '앱 설정', icon: <Settings className="w-4 h-4" />, path: '/apps/settings' },
+      { id: 'apps-marketplace', label: '앱 마켓플레이스', icon: <Store className="w-4 h-4" />, path: '/apps/marketplace' }
+    ]
   },
   {
     id: 'monitoring',

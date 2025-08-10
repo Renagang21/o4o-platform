@@ -92,7 +92,7 @@ const GutenbergPage = lazy(() => import('@/pages/test/GutenbergPage'));
 const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 
 // Apps Manager
-const AppsManager = lazy(() => import('@/pages/apps/AppsManager'));
+const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
 
 // Loading component
 const PageLoader = () => (
