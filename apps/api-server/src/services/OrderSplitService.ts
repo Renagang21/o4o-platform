@@ -43,14 +43,18 @@ export class OrderSplitService {
     // Add domestic API supplier
     this.supplierManager.addSupplier('domestic-api', {
       type: 'api',
-      apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
-      endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
+      credentials: {
+        apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
+        endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
+      }
     });
 
     // Add CSV catalog supplier
     this.supplierManager.addSupplier('csv-catalog', {
       type: 'csv',
-      endpoint: './catalogs/supplier-products.csv'
+      options: {
+        webhookUrl: './catalogs/supplier-products.csv'
+      }
     });
   }
 
@@ -122,10 +126,10 @@ export class OrderSplitService {
       
       // If product doesn't have supplier info, find best supplier
       if (!product.supplierId) {
-        const bestSupplierId = this.supplierManager.findBestSupplier(product.sku);
+        const bestSupplier = await this.supplierManager.findBestSupplier(product.sku, item.quantity);
         
-        if (bestSupplierId) {
-          supplierId = bestSupplierId;
+        if (bestSupplier) {
+          supplierId = bestSupplier.supplierId;
         }
       }
       
@@ -190,14 +194,14 @@ export class OrderSplitService {
         // Create order with supplier
         const response = await supplier.createOrder(supplierOrder);
         
-        if (response && response.supplierOrderId) {
+        if (response && response.success && response.data) {
           // Update order item with supplier order ID
           for (const item of splitOrder.items) {
-            item.supplierOrderId = response.supplierOrderId;
+            item.supplierOrderId = response.data.supplierOrderId;
             await this.orderItemRepository.save(item);
           }
           
-          console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${response.supplierOrderId}`);
+          console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${response.data.supplierOrderId}`);
         } else {
           console.error(`Failed to forward order to supplier ${splitOrder.supplierId}`);
         }

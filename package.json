@@ -47,7 +47,7 @@
     "dev:crowdfunding": "npm run dev --workspace=@o4o/crowdfunding",
     "dev:signage": "npm run dev --workspace=@o4o/digital-signage",
     "build": "npm run build:packages && npm run build:apps",
-    "build:packages": "npm run build:types && npm run build:utils && npm run build:ui && npm run build:auth-client && npm run build:auth-context && npm run build:crowdfunding-types && npm run build:forum-types && npm run build:shortcodes",
+    "build:packages": "npm run build:types && npm run build:utils && npm run build:ui && npm run build:auth-client && npm run build:auth-context && npm run build:crowdfunding-types && npm run build:forum-types && npm run build:shortcodes && npm run build:supplier-connector",
     "build:types": "npm run build --workspace=@o4o/types",
     "build:utils": "npm run build --workspace=@o4o/utils",
     "build:ui": "npm run build --workspace=@o4o/ui",
@@ -56,6 +56,7 @@
     "build:crowdfunding-types": "npm run build --workspace=@o4o/crowdfunding-types",
     "build:forum-types": "npm run build --workspace=@o4o/forum-types",
     "build:shortcodes": "npm run build --workspace=@o4o/shortcodes",
+    "build:supplier-connector": "npm run build --workspace=@o4o/supplier-connector",
     "build:apps": "npm run build:apps:api && npm run build:apps:frontend",
     "build:apps:api": "npm run build --workspace=@o4o/api-server",
     "build:apps:frontend": "npm run build --workspace=@o4o/main-site && npm run build --workspace=@o4o/admin-dashboard && npm run build --workspace=@o4o/ecommerce && npm run build --workspace=@o4o/crowdfunding && npm run build --workspace=@o4o/forum && npm run build --workspace=@o4o/digital-signage",
@@ -89,8 +90,13 @@
     "install:all": "npm install && npm run build"
   },
   "devDependencies": {
-    "@eslint/js": "9.32.0",
+    "@eslint/js": "9.33.0",
     "@testing-library/react": "16.3.0",
+    "vite": "^5.4.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^4.1.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "29.5.14",
     "@types/node-cron": "3.0.11",
@@ -107,7 +113,6 @@
     "prettier": "^3.0.0",
     "ts-jest": "29.4.1",
     "typescript": "~5.9.2",
-    "vite": "7.1.1",
     "vitest": "3.2.4"
   },
   "keywords": [

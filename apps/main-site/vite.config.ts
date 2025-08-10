@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename)
 // https://vite.dev/config/
 export default defineConfig(mergeConfig(sharedViteConfig, {
   resolve: {
+    preserveSymlinks: true,
+    dedupe: ['react', 'react-dom'],
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@o4o/types': path.resolve(__dirname, '../../packages/types/src'),
@@ -18,6 +20,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/src'),
       '@o4o/config': path.resolve(__dirname, '../../packages/config'),
     },
+  },
+  optimizeDeps: {
+    exclude: ['@o4o/supplier-connector', '@o4o/types', '@o4o/utils', '@o4o/ui', '@o4o/auth-client', '@o4o/auth-context']
   },
   server: {
     host: '0.0.0.0',
@@ -33,6 +38,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'admin.neture.co.kr',
       'localhost',
       '127.0.0.1'
-    ]
+    ],
+    fs: {
+      allow: ['..', '../..']
+    }
   }
 }))
