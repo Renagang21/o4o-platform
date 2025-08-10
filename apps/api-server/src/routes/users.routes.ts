@@ -78,6 +78,17 @@ router.get(
   userController.getPendingUsers
 );
 
+// Handle /new path explicitly (return empty data for new user form)
+router.get('/new', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      user: null,
+      roles: ['admin', 'editor', 'author', 'customer', 'vendor']
+    }
+  });
+});
+
 // Get single user
 router.get(
   '/:id',

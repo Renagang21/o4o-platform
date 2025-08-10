@@ -105,6 +105,8 @@ import contentV1Routes from './routes/v1/content.routes';
 import platformV1Routes from './routes/v1/platform.routes';
 import ecommerceV1Routes from './routes/v1/ecommerce.routes';
 import forumV1Routes from './routes/v1/forum.routes';
+import adminV1Routes from './routes/v1/admin.routes';
+import mediaV1Routes from './routes/v1/media.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -462,6 +464,11 @@ app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
+app.use('/api/v1/media', mediaV1Routes);
+
+// Admin routes with correct paths
+app.use('/api/admin', adminV1Routes);
+app.use('/api/settings', settingsRoutes);
 
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {

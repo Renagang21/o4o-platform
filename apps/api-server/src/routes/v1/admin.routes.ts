@@ -1,0 +1,77 @@
+import { Router } from 'express';
+import { authenticateJWT } from '../../middleware/auth';
+import { requireRole } from '../../middleware/roleCheck';
+
+const router = Router();
+
+// Admin pages endpoint
+router.get('/pages', authenticateJWT, requireRole(['admin']), async (req, res) => {
+  try {
+    // Mock data for now - replace with actual database query
+    const pages = [
+      {
+        id: '1',
+        title: 'Home',
+        slug: 'home',
+        status: 'published',
+        author: 'admin',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: '2',
+        title: 'About',
+        slug: 'about',
+        status: 'published',
+        author: 'admin',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: pages,
+      total: pages.length
+    });
+  } catch (error) {
+    console.error('Error fetching pages:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch pages'
+    });
+  }
+});
+
+// Custom field groups endpoint
+router.get('/custom-field-groups', authenticateJWT, requireRole(['admin']), async (req, res) => {
+  try {
+    // Mock data for now
+    const fieldGroups = [
+      {
+        id: '1',
+        title: 'Product Details',
+        fields: [
+          { name: 'price', type: 'number', label: 'Price' },
+          { name: 'sku', type: 'text', label: 'SKU' }
+        ],
+        location: 'product',
+        active: true
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: fieldGroups,
+      total: fieldGroups.length
+    });
+  } catch (error) {
+    console.error('Error fetching custom field groups:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch custom field groups'
+    });
+  }
+});
+
+export default router;

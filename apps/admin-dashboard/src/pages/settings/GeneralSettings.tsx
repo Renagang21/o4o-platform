@@ -76,7 +76,7 @@ export default function GeneralSettings() {
   const { isLoading } = useQuery({
     queryKey: ['settings', 'general'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/settings/general');
+      const response = await apiClient.get('/settings/general');
       const data = response.data.data;
       if (data) {
         setSettings(data);
@@ -88,7 +88,7 @@ export default function GeneralSettings() {
   // Save settings mutation
   const saveMutation = useMutation({
     mutationFn: async (data: GeneralSettingsData) => {
-      return apiClient.put('/api/settings/general', data);
+      return apiClient.put('/settings/general', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'general'] });
