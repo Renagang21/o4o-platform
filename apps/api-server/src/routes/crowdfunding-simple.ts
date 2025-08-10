@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { CrowdfundingController } from '../controllers/CrowdfundingController';
+import { crowdfundingController } from '../controllers/crowdfundingController';
 import { authenticateToken, requireRole } from '../middleware/auth';
 
 const router: Router = Router();
-const crowdfundingController = new CrowdfundingController();
+// crowdfundingController is already instantiated in the import
 
 // 프로젝트 관련 라우트 (인증 필요)
 router.use(authenticateToken);

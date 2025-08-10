@@ -25,7 +25,9 @@ export enum PaymentGatewayStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
   CANCELLED = 'cancelled',
-  EXPIRED = 'expired'
+  EXPIRED = 'expired',
+  REFUNDED = 'refunded',
+  PARTIALLY_REFUNDED = 'partially_refunded'
 }
 
 @Entity('payments')
@@ -132,6 +134,16 @@ export class Payment {
   // 메타데이터
   @Column({ type: 'json', nullable: true })
   metadata?: PaymentMetadata;
+
+  // Additional properties for compatibility
+  @Column({ nullable: true })
+  paidAt?: Date;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true, default: 0 })
+  refundedAmount?: number;
+
+  @Column({ nullable: true })
+  failureCode?: string;
 
   @CreateDateColumn()
   createdAt!: Date;

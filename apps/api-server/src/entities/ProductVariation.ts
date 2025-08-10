@@ -96,6 +96,9 @@ export class ProductVariation {
   @Column({ default: 0 })
   position: number; // 표시 순서
 
+  @Column({ default: false })
+  lowStockAlert: boolean;
+
   // Compatibility fields
   get price(): number {
     return this.retailPrice;

@@ -69,6 +69,9 @@ export class User {
   // @IsArray()
   permissions!: string[];
 
+  @Column({ type: 'json', nullable: true })
+  metadata?: Record<string, any>;
+
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 

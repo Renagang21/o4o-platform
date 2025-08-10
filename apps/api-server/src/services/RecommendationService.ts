@@ -4,7 +4,7 @@
  */
 
 import { AppDataSource } from '../database/connection';
-import { Product } from '../entities/Product';
+import { Product, ProductStatus } from '../entities/Product';
 import { Order } from '../entities/Order';
 import { User } from '../entities/User';
 import { ProductReview } from '../entities/ProductReview';
@@ -529,7 +529,7 @@ export class RecommendationService {
    */
   private async getFallbackRecommendations(limit: number): Promise<RecommendationScore[]> {
     const bestSellers = await this.productRepository.find({
-      where: { status: 'active' },
+      where: { status: ProductStatus.ACTIVE },
       order: { salesCount: 'DESC' },
       take: limit
     });

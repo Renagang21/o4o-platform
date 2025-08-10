@@ -10,6 +10,7 @@ import {
 
 export enum CouponDiscountType {
   PERCENT = 'percent',
+  PERCENTAGE = 'percentage',
   FIXED_CART = 'fixed_cart',
   FIXED_PRODUCT = 'fixed_product'
 }
@@ -105,6 +106,27 @@ export class Coupon {
 
   @OneToMany(() => CouponUsage, usage => usage.coupon)
   usages?: CouponUsage[];
+
+  // Compatibility properties for legacy code
+  get isActive(): boolean {
+    return this.status === CouponStatus.ACTIVE;
+  }
+
+  get usageLimit(): number {
+    return this.usageLimitPerCoupon;
+  }
+
+  get usageCount(): number {
+    return this.usedCount;
+  }
+
+  get minimumAmount(): number {
+    return this.minOrderAmount || 0;
+  }
+
+  get maximumDiscount(): number {
+    return this.maxDiscountAmount || 0;
+  }
 
   // Validation methods
   isValid(): boolean {

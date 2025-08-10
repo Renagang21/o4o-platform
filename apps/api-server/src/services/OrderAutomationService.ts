@@ -3,7 +3,7 @@
  * 주문 처리 워크플로우 자동화 및 알림
  */
 
-import { Order } from '../entities/Order';
+import { Order, OrderStatus } from '../entities/Order';
 import { AppDataSource } from '../database/connection';
 import { emailService } from './email.service';
 import logger from '../utils/simpleLogger';
