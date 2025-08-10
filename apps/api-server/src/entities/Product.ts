@@ -121,6 +121,34 @@ export class Product {
   @Column({ nullable: true })
   vendorId?: string;
 
+  // Supplier info for dropshipping
+  @Column({ nullable: true })
+  supplierId?: string;
+
+  @Column({ nullable: true })
+  userId?: string;
+
+  // Compatibility fields
+  get price(): number {
+    return this.retailPrice;
+  }
+
+  get stock(): number {
+    return this.stockQuantity;
+  }
+
+  get isActive(): boolean {
+    return this.status === ProductStatus.ACTIVE;
+  }
+
+  get category(): string | undefined {
+    return this.categoryId;
+  }
+
+  get vendor(): string | undefined {
+    return this.vendorId;
+  }
+
   // 배송 정보
   @Column({ type: 'json', nullable: true })
   shipping?: {

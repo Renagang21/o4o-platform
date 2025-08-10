@@ -43,10 +43,11 @@ export const authenticateCookie = async (
           const newPayload = authService.verifyAccessToken(tokens.accessToken);
           if (newPayload) {
             req.user = {
+              id: newPayload.userId || newPayload.sub || '',
               userId: newPayload.userId || newPayload.sub || '',
               email: newPayload.email || '',
               role: String(newPayload.role || UserRole.CUSTOMER)
-            };
+            } as any;
             next();
             return;
           }
@@ -62,10 +63,11 @@ export const authenticateCookie = async (
     }
 
     req.user = {
+      id: payload.userId || payload.sub || '',
       userId: payload.userId || payload.sub || '',
       email: payload.email || '',
       role: String(payload.role || UserRole.CUSTOMER)
-    };
+    } as any;
     next();
   } catch (error: any) {
     console.error('Auth middleware error:', error);
@@ -120,10 +122,11 @@ export const optionalAuth = async (
       const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
         req.user = {
+          id: payload.userId || payload.sub || '',
           userId: payload.userId || payload.sub || '',
           email: payload.email || '',
           role: String(payload.role || UserRole.CUSTOMER)
-        };
+        } as any;
       }
     }
     

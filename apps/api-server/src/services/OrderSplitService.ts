@@ -169,7 +169,7 @@ export class OrderSplitService {
       }
 
       // Prepare supplier order
-      const supplierOrder: SupplierOrder = {
+      const supplierOrder: any = {
         orderId: `${order.id}-${splitOrder.supplierId}`,
         items: splitOrder.items.map(item => ({
           sku: item.product.sku,
@@ -178,17 +178,17 @@ export class OrderSplitService {
           cost: item.product.cost
         })),
         customer: {
-          name: order.customer?.name || order.customerName,
-          email: order.customer?.email || order.customerEmail,
-          phone: order.customer?.phone || order.customerPhone
+          name: order.user?.name || order.customerName || '',
+          email: order.user?.email || order.customerEmail || '',
+          phone: order.user?.phone || order.customerPhone || ''
         },
         shipping: {
           name: order.shippingAddress?.name || order.customerName,
-          address1: order.shippingAddress?.address1 || '',
-          address2: order.shippingAddress?.address2,
+          address1: order.shippingAddress?.address || '',
+          address2: order.shippingAddress?.addressDetail,
           city: order.shippingAddress?.city || '',
           state: order.shippingAddress?.state || '',
-          postalCode: order.shippingAddress?.postalCode || '',
+          postalCode: order.shippingAddress?.zipCode || '',
           country: order.shippingAddress?.country || 'KR',
           phone: order.shippingAddress?.phone || order.customerPhone
         },
@@ -310,7 +310,7 @@ export class OrderSplitService {
     
     if (allSameStatus) {
       // Update main order status
-      order.status = status;
+      order.status = status as any;
       await this.orderRepository.save(order);
     }
   }

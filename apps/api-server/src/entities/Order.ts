@@ -12,6 +12,9 @@ export enum OrderStatus {
   REFUNDED = 'refunded'
 }
 
+// Legacy string literal type for compatibility
+export type OrderStatusString = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+
 export enum PaymentStatus {
   PENDING = 'pending',
   PAID = 'paid',
@@ -42,6 +45,22 @@ export class Order {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
   user!: User;
+
+  // Customer fields for compatibility
+  @Column({ nullable: true })
+  customerName?: string;
+
+  @Column({ nullable: true })
+  customerEmail?: string;
+
+  @Column({ nullable: true })
+  customerPhone?: string;
+
+  @Column({ nullable: true, default: 'KRW' })
+  currency?: string;
+
+  @Column({ nullable: true })
+  affiliateId?: string;
 
   @Column({ nullable: true })
   vendorId?: string;

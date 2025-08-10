@@ -3,7 +3,7 @@
  * [supplier_dashboard] - 공급자 전용 대시보드
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 interface CardProps {
   className?: string;
@@ -85,11 +85,7 @@ export const SupplierDashboard: React.FC = () => {
   const [inventory, setInventory] = useState<ProductInventory[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSupplierData();
-  }, [user]);
-
-  const fetchSupplierData = async () => {
+  const fetchSupplierData = useCallback(async () => {
     if (!user?.id) return;
     
     try {
@@ -120,7 +116,11 @@ export const SupplierDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchSupplierData();
+  }, [fetchSupplierData]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ko-KR', {

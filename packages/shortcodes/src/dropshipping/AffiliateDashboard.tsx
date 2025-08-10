@@ -3,7 +3,7 @@
  * [affiliate_dashboard] - 제휴자 전용 대시보드
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 interface CardProps {
   className?: string;
@@ -89,11 +89,7 @@ export const AffiliateDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAffiliateData();
-  }, [user]);
-
-  const fetchAffiliateData = async () => {
+  const fetchAffiliateData = useCallback(async () => {
     if (!user?.id) return;
     
     try {
@@ -124,7 +120,11 @@ export const AffiliateDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchAffiliateData();
+  }, [fetchAffiliateData]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ko-KR', {

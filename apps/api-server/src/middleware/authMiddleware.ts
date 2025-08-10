@@ -318,7 +318,11 @@ export class AuthMiddleware {
 
       // 토큰 검증
       const payload = await authService.verifyAccessToken(token);
-      req.user = payload;
+      req.user = {
+        ...payload,
+        id: payload.id || payload.userId || '',
+        userId: payload.userId || payload.id || ''
+      } as any;
 
       next();
     } catch (error: any) {
@@ -416,7 +420,11 @@ export class AuthMiddleware {
       if (token) {
         try {
           const payload = await authService.verifyAccessToken(token);
-          req.user = payload;
+          req.user = {
+        ...payload,
+        id: payload.id || payload.userId || '',
+        userId: payload.userId || payload.id || ''
+      } as any;
         } catch (error: any) {
           // 토큰이 유효하지 않아도 계속 진행
         }

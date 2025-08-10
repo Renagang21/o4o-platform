@@ -29,4 +29,21 @@ export class VendorOrderItem extends OrderItem {
   @ManyToOne(() => VendorProduct)
   @JoinColumn({ name: 'productId' })
   vendorProduct: VendorProduct;
+
+  // Compatibility fields
+  get cost(): number {
+    return this.supplyPrice;
+  }
+
+  get vendorProfit(): number {
+    return this.supplierProfit;
+  }
+
+  get platformCommission(): number {
+    return this.adminCommission || 0;
+  }
+
+  get vendor(): string {
+    return this.vendorId;
+  }
 }

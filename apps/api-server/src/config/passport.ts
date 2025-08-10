@@ -15,7 +15,7 @@ passport.deserializeUser(async (id: string, done) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
     const user = await userRepo.findOne({ where: { id } });
-    done(null, user);
+    done(null, user as any);
   } catch (error: any) {
     done(error, null);
   }
@@ -44,7 +44,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       // Update last login
       user.lastLoginAt = new Date();
       await userRepo.save(user);
-      return done(null, user);
+      return done(null, user as any);
     }
 
     // Create new user
@@ -66,7 +66,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     // Send welcome email
     await emailService.sendWelcomeEmail(user.email, user.name || user.email);
 
-    done(null, user);
+    done(null, user as any);
   } catch (error: any) {
     done(error as Error, undefined);
   }
@@ -103,7 +103,7 @@ if (process.env.KAKAO_CLIENT_ID) {
       // Update last login
       user.lastLoginAt = new Date();
       await userRepo.save(user);
-      return done(null, user);
+      return done(null, user as any);
     }
 
     // Create new user
@@ -123,7 +123,7 @@ if (process.env.KAKAO_CLIENT_ID) {
     // Send welcome email
     await emailService.sendWelcomeEmail(user.email, user.name || user.email);
 
-    done(null, user);
+    done(null, user as any);
   } catch (error: any) {
     done(error as Error, undefined);
   }
@@ -160,7 +160,7 @@ if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
       // Update last login
       user.lastLoginAt = new Date();
       await userRepo.save(user);
-      return done(null, user);
+      return done(null, user as any);
     }
 
     // Create new user
@@ -180,7 +180,7 @@ if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
     // Send welcome email
     await emailService.sendWelcomeEmail(user.email, user.name || user.email);
 
-    done(null, user);
+    done(null, user as any);
   } catch (error: any) {
     done(error as Error, undefined);
   }

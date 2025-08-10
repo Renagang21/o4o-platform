@@ -205,7 +205,7 @@ export class ShippingService {
       });
       
       if (order) {
-        order.status = 'delivered';
+        order.status = OrderStatus.DELIVERED;
         order.deliveredAt = new Date();
         await this.orderRepository.save(order);
       }
@@ -281,7 +281,7 @@ export class ShippingService {
       
       if (order) {
         order.trackingNumber = null;
-        order.status = 'pending';
+        order.status = OrderStatus.PENDING;
         await this.orderRepository.save(order);
       }
     }

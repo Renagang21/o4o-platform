@@ -41,7 +41,10 @@ export const authenticate = async (
     }
 
     // Attach user to request
-    req.user = user;
+    req.user = {
+      ...user,
+      userId: user.id
+    } as any;
     next();
   } catch (error) {
     return res.status(401).json({

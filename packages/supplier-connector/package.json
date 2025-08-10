@@ -1,23 +1,9 @@
 {
   "name": "@o4o/supplier-connector",
   "version": "1.0.0",
-  "description": "Supplier API connector framework for dropshipping automation",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "npx tsc",
-    "type-check": "npx tsc --noEmit",
-    "dev": "npx tsc --watch"
-  },
-  "dependencies": {
-    "@o4o/types": "file:../types",
-    "axios": "^1.10.0",
-    "csv-parse": "^5.5.0",
-    "xml2js": "^0.6.2"
-  },
-  "devDependencies": {
-    "@types/node": "^20.5.0",
-    "@types/xml2js": "^0.4.11",
-    "typescript": "^5.1.6"
-  }
+  "description": "Supplier connector framework for dropshipping",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "dependencies": {}
 }

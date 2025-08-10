@@ -41,6 +41,16 @@ export class OrderItem {
     category?: string;
   };
 
+  // For supplier order tracking
+  @Column({ nullable: true })
+  supplierOrderId?: string;
+
+  @Column({ nullable: true })
+  trackingNumber?: string;
+
+  @Column({ nullable: true })
+  status?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 

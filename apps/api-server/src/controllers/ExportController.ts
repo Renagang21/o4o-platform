@@ -58,8 +58,8 @@ export class ExportController {
           exportData.push({
             '주문번호': order.id,
             '주문일시': order.createdAt.toISOString(),
-            '고객명': order.customer?.name || order.customerName,
-            '고객이메일': order.customer?.email || order.customerEmail,
+            '고객명': order.user?.name || order.customerName || '',
+            '고객이메일': order.user?.email || order.customerEmail || '',
             '상품SKU': item.product?.sku || '',
             '상품명': item.product?.name || '',
             '판매자ID': item.product?.vendorId || '',
@@ -71,8 +71,8 @@ export class ExportController {
             '예상수수료': (item.price * item.quantity * 0.08),
             '주문상태': order.status,
             '결제방법': order.paymentMethod,
-            '배송주소': `${order.shippingAddress?.address1} ${order.shippingAddress?.address2}`,
-            '배송우편번호': order.shippingAddress?.postalCode
+            '배송주소': `${order.shippingAddress?.address} ${order.shippingAddress?.addressDetail || ''}`,
+            '배송우편번호': order.shippingAddress?.zipCode
           });
         }
       }
@@ -331,7 +331,7 @@ export class ExportController {
         
         exportData.push({
           '제휴사ID': order.affiliateId,
-          '제휴사명': order.affiliate?.name || '',
+          '제휴사명': '',
           '주문번호': order.id,
           '주문일': order.createdAt.toISOString().split('T')[0],
           '주문금액': totalAmount,
