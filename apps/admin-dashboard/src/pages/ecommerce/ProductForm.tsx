@@ -96,7 +96,7 @@ const ProductForm: FC = () => {
       } else {
         await createProduct.mutateAsync(formData);
       }
-      navigate('/products');
+      navigate('/ecommerce/products');
     } catch (error: any) {
     // Error logging - use proper error handler
     } finally {
@@ -161,7 +161,7 @@ const ProductForm: FC = () => {
         <div className="flex items-center">
           <button
             type="button"
-            onClick={() => navigate('/products')}
+            onClick={() => navigate('/ecommerce/products')}
             className="mr-4 p-2 hover:bg-gray-100 rounded-lg"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -178,7 +178,7 @@ const ProductForm: FC = () => {
         <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => navigate('/products')}
+            onClick={() => navigate('/ecommerce/products')}
             className="px-4 py-2 border rounded-lg hover:bg-gray-50"
           >
             취소

@@ -66,10 +66,10 @@ export const wordpressRoutes: WordPressRoute[] = [
   { wpPath: '/wp-admin/options-permalink.php', reactPath: '/settings/permalinks', title: 'Permalink Settings' },
   
   // WooCommerce (E-commerce)
-  { wpPath: '/wp-admin/edit.php?post_type=product', reactPath: '/products', title: 'Products' },
-  { wpPath: '/wp-admin/post-new.php?post_type=product', reactPath: '/products/new', title: 'Add Product' },
-  { wpPath: '/wp-admin/edit.php?post_type=shop_order', reactPath: '/orders', title: 'Orders' },
-  { wpPath: '/wp-admin/admin.php?page=wc-reports', reactPath: '/reports', title: 'Reports' },
+  { wpPath: '/wp-admin/edit.php?post_type=product', reactPath: '/ecommerce/products', title: 'Products' },
+  { wpPath: '/wp-admin/post-new.php?post_type=product', reactPath: '/ecommerce/products/new', title: 'Add Product' },
+  { wpPath: '/wp-admin/edit.php?post_type=shop_order', reactPath: '/ecommerce/orders', title: 'Orders' },
+  { wpPath: '/wp-admin/admin.php?page=wc-reports', reactPath: '/ecommerce/reports', title: 'Reports' },
   { wpPath: '/wp-admin/admin.php?page=wc-settings', reactPath: '/ecommerce/settings', title: 'WooCommerce Settings' },
 ];
 
@@ -115,7 +115,7 @@ export function transformWordPressRoute(wpPath: string): string {
   if (wpAdminPatterns.isCustomPostType(params)) {
     const postType = params.get('post_type');
     if (postType === 'page') return getReactPath(wpPath) || '/pages';
-    if (postType === 'product') return getReactPath(wpPath) || '/products';
+    if (postType === 'product') return getReactPath(wpPath) || '/ecommerce/products';
     // Add more custom post types as needed
   }
   
@@ -124,7 +124,7 @@ export function transformWordPressRoute(wpPath: string): string {
     const taxonomy = params.get('taxonomy');
     if (taxonomy === 'category') return '/posts/categories';
     if (taxonomy === 'post_tag') return '/posts/tags';
-    if (taxonomy === 'product_cat') return '/products/categories';
+    if (taxonomy === 'product_cat') return '/ecommerce/categories';
     // Add more taxonomies as needed
   }
   

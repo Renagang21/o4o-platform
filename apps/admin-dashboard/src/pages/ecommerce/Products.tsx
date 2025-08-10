@@ -80,7 +80,7 @@ const Products: FC = () => {
             </button>
             <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
               <button
-                onClick={() => navigate(`/products/${product.id}/edit`)}
+                onClick={() => navigate(`/ecommerce/products/${product.id}/edit`)}
                 className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
               >
                 <Edit className="w-4 h-4 inline mr-2" />
@@ -195,7 +195,7 @@ const Products: FC = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <button
-          onClick={() => navigate(`/products/${product.id}/edit`)}
+          onClick={() => navigate(`/ecommerce/products/${product.id}/edit`)}
           className="text-indigo-600 hover:text-indigo-900 mr-3"
         >
           편집
@@ -231,7 +231,7 @@ const Products: FC = () => {
             내보내기
           </button>
           <button
-            onClick={() => navigate('/products/new')}
+            onClick={() => navigate('/ecommerce/products/new')}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -340,7 +340,7 @@ const Products: FC = () => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">상품이 없습니다</h3>
           <p className="text-gray-500 mb-4">첫 번째 상품을 등록해보세요</p>
           <button
-            onClick={() => navigate('/products/new')}
+            onClick={() => navigate('/ecommerce/products/new')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4 mr-2" />
