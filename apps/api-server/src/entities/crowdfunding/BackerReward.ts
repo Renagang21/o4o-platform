@@ -43,8 +43,8 @@ export class BackerReward {
   @Column({ type: 'varchar', length: 100, nullable: true })
   shippingRegion: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  totalPrice: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  totalPrice?: number;
 
   @Column({ type: 'varchar', length: 20, default: 'pending' })
   status: string;

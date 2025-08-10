@@ -35,6 +35,16 @@ export class FundingUpdate {
   @Column({ type: 'varchar', length: 255 })
   author: string;
 
+  // Development stage tracking
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  stage?: 'idea' | 'prototype' | 'production' | 'shipping';
+
+  @Column({ type: 'int', nullable: true })
+  progressPercentage?: number;
+
+  @Column({ type: 'simple-json', nullable: true })
+  images?: string[];
+
   // Timestamps
   @CreateDateColumn()
   createdAt: Date;

@@ -96,6 +96,35 @@ export class ProductVariation {
   @Column({ default: 0 })
   position: number; // 표시 순서
 
+  // Compatibility fields
+  get price(): number {
+    return this.retailPrice;
+  }
+  
+  set price(value: number) {
+    this.retailPrice = value;
+  }
+  
+  get compareAtPrice(): number | undefined {
+    return this.salePrice;
+  }
+  
+  set compareAtPrice(value: number | undefined) {
+    this.salePrice = value || 0;
+  }
+  
+  get stock(): number {
+    return this.stockQuantity;
+  }
+  
+  set stock(value: number) {
+    this.stockQuantity = value;
+  }
+  
+  get isActive(): boolean {
+    return this.status === 'active';
+  }
+  
   @Column({ type: 'json', nullable: true })
   metadata: {
     costPrice?: number; // 원가

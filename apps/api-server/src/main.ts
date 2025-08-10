@@ -59,6 +59,7 @@ import { WebSocketSessionSync } from './websocket/sessionSync';
 import { errorHandler } from './middleware/errorHandler';
 import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
+import { startCrowdfundingSchedules } from './schedules/crowdfundingSchedule';
 import logger from './utils/simpleLogger';
 
 // Monitoring services
@@ -86,7 +87,7 @@ import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
 import oauthSettingsRoutes from './routes/settings.routes';
 import emailAuthRoutes from './routes/email-auth.routes';
-import crowdfundingRoutes from './routes/crowdfunding';
+import crowdfundingRoutes from './routes/crowdfundingRoutes';
 import forumRoutes from './routes/forum';
 import linkedAccountsRoutes from './routes/linked-accounts';
 import accountLinkingRoutes from './routes/account-linking.routes';
@@ -663,6 +664,9 @@ const startServer = async () => {
       webSocketSessionSync = new WebSocketSessionSync(io);
       // console.log('✅ WebSocket session sync initialized');
     }
+    
+    // Start crowdfunding schedules
+    startCrowdfundingSchedules();
   } catch (redisError) {
     // console.log('⚠️  Redis initialization failed:', (redisError as Error).message);
     // console.log('📌 Running without session synchronization');

@@ -141,13 +141,29 @@ export class Product {
   variations: ProductVariation[];
 
   // Additional fields for compatibility
+  @Column({ type: 'json', nullable: true })
   reviews?: any[];
+  
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   compareAtPrice?: number;
+  
+  @Column({ type: 'decimal', precision: 3, scale: 2, nullable: true, default: 0 })
   rating?: number;
+  
+  @Column({ type: 'int', nullable: true, default: 0 })
   reviewCount?: number;
+  
+  @Column({ type: 'int', nullable: true, default: 0 })
   salesCount?: number;
+  
+  @Column({ nullable: true })
   brand?: string;
+  
+  @Column({ type: 'json', nullable: true })
   metadata?: Record<string, any>;
+  
+  @Column({ nullable: true, default: 'visible' })
+  visibility?: string;
 
   // Compatibility fields
   get price(): number {
@@ -160,6 +176,10 @@ export class Product {
 
   get stock(): number {
     return this.stockQuantity;
+  }
+  
+  set stock(value: number) {
+    this.stockQuantity = value;
   }
 
   get isActive(): boolean {

@@ -1,0 +1,59 @@
+name: Debug SSH Connection
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  debug-ssh:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+    - name: Test SSH connection with verbose output
+      run: |
+        echo "Testing SSH connection to ${{ secrets.API_HOST }}"
+        ssh -vvv -o ConnectTimeout=10 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "echo 'SSH connection successful'" || {
+          echo "=== SSH Connection Failed ==="
+          echo "Attempting alternative methods..."
+        }
+        
+    - name: Test with IP instead of hostname
+      if: failure()
+      run: |
+        echo "Testing with IP address..."
+        # Try common cloud provider IPs or alternative ports
+        ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@13.125.144.8 "echo 'SSH via IP successful'" || echo "IP connection failed"
+        
+    - name: Check network connectivity
+      if: always()
+      run: |
+        echo "=== Network Diagnostics ==="
+        # Test DNS resolution
+        nslookup ${{ secrets.API_HOST }} || echo "DNS lookup failed"
+        nslookup api.neture.co.kr || echo "DNS lookup failed for api.neture.co.kr"
+        
+        # Test basic connectivity
+        ping -c 3 ${{ secrets.API_HOST }} || echo "Ping failed"
+        
+        # Test port connectivity
+        nc -zv -w5 ${{ secrets.API_HOST }} 22 || echo "Port 22 not reachable"
+        nc -zv -w5 ${{ secrets.API_HOST }} 80 || echo "Port 80 not reachable"
+        nc -zv -w5 ${{ secrets.API_HOST }} 443 || echo "Port 443 not reachable"
+        
+    - name: Alternative deployment via HTTP API
+      if: failure()
+      run: |
+        echo "=== Attempting HTTP-based deployment trigger ==="
+        # If SSH fails, try triggering deployment via HTTP webhook
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{"service": "api-server", "commit": "${{ github.sha }}"}' \
+          https://api.neture.co.kr/deploy/webhook || echo "HTTP trigger failed"
