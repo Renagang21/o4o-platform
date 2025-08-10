@@ -97,6 +97,11 @@ const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
 const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
 
+// Theme Pages
+const ThemeMarketplace = lazy(() => import('@/pages/themes/ThemeMarketplace'));
+const ThemeEditor = lazy(() => import('@/pages/themes/ThemeEditor'));
+const ThemePreview = lazy(() => import('@/pages/themes/ThemePreview'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -358,6 +363,30 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['menus:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Menus />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/themes/marketplace" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ThemeMarketplace />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/themes/:id/editor" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ThemeEditor />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/themes/:id/preview" element={
+                      <AdminProtectedRoute requiredPermissions={['templates:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ThemePreview />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

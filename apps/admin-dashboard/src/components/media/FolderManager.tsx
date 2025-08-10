@@ -157,7 +157,7 @@ const FolderManager: FC<FolderManagerProps> = ({ _isOpen, onClose, onFolderSelec
   const { data: folders = [], isLoading } = useQuery({
     queryKey: ['media-folders'],
     queryFn: async () => {
-      const response = await authClient.api.get('/media/folders')
+      const response = await authClient.api.get('/v1/media/folders')
       return response.data
     }
   })
@@ -165,7 +165,7 @@ const FolderManager: FC<FolderManagerProps> = ({ _isOpen, onClose, onFolderSelec
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: CreateMediaFolderDto) => {
-      return authClient.api.post('/media/folders', data)
+      return authClient.api.post('/v1/media/folders', data)
     },
     onSuccess: () => {
       toast.success('폴더가 생성되었습니다')
@@ -181,7 +181,7 @@ const FolderManager: FC<FolderManagerProps> = ({ _isOpen, onClose, onFolderSelec
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateMediaFolderDto) => {
-      return authClient.api.put(`/media/folders/${data.id}`, data)
+      return authClient.api.put(`/v1/media/folders/${data.id}`, data)
     },
     onSuccess: () => {
       toast.success('폴더가 수정되었습니다')
@@ -196,7 +196,7 @@ const FolderManager: FC<FolderManagerProps> = ({ _isOpen, onClose, onFolderSelec
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/media/folders/${id}`)
+      return authClient.api.delete(`/v1/media/folders/${id}`)
     },
     onSuccess: () => {
       toast.success('폴더가 삭제되었습니다')

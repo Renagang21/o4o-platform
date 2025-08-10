@@ -107,6 +107,8 @@ import ecommerceV1Routes from './routes/v1/ecommerce.routes';
 import forumV1Routes from './routes/v1/forum.routes';
 import adminV1Routes from './routes/v1/admin.routes';
 import mediaV1Routes from './routes/v1/media.routes';
+import couponRoutes from './routes/v1/coupon.routes';
+import themeRoutes from './routes/v1/theme.routes';
 import appsV1Routes from './routes/v1/apps.routes';
 import couponV1Routes from './routes/v1/coupon.routes';
 
@@ -469,6 +471,7 @@ app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes);
 app.use('/api/v1/apps', appsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);
+app.use('/api/v1/themes', themeRoutes);
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);

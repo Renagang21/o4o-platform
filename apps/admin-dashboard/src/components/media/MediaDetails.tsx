@@ -43,7 +43,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: MediaEditDto) => {
-      return authClient.api.put(`/media/${media.id}`, data)
+      return authClient.api.put(`/v1/media/${media.id}`, data)
     },
     onSuccess: () => {
       toast.success('미디어가 업데이트되었습니다')
@@ -58,7 +58,7 @@ const MediaDetails: FC<MediaDetailsProps> = ({
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      return authClient.api.delete(`/media/${media.id}`)
+      return authClient.api.delete(`/v1/media/${media.id}`)
     },
     onSuccess: () => {
       toast.success('미디어가 삭제되었습니다')

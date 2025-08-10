@@ -83,7 +83,7 @@ const MediaLibrary: FC = () => {
       if (filter.folderId) params.append('folderId', filter.folderId)
       if (filter.status && filter.status !== 'all') params.append('status', filter.status)
 
-      const response = await authClient.api.get(`/media?${params}`)
+      const response = await authClient.api.get(`/v1/media?${params}`)
       return response.data
     }
   })
@@ -91,10 +91,9 @@ const MediaLibrary: FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      return authClient.api.post('/media/bulk', {
-        action: 'delete',
-        mediaIds: ids
-      })
+      // Delete each media item
+      const promises = ids.map(id => authClient.api.delete(`/v1/media/${id}`))
+      return Promise.all(promises)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] })
