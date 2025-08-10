@@ -33,3 +33,7 @@ export const renderShortcodes = (content: string, context?: any) => {
 
 // Provider export
 export { ShortcodeProvider, useShortcodeContext, ShortcodeContent } from './provider';
+
+// Dropshipping shortcodes
+export { registerDropshippingShortcodes } from './dropshipping';
+export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropshipping';
