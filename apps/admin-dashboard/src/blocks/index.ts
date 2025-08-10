@@ -5,10 +5,7 @@
 
 import domReady from '@wordpress/dom-ready';
 
-// Import custom block types
-import './group';
-import './columns';
-import './cover';
+// Custom block types are dynamically loaded via lazy.ts to improve performance
 
 // Additional block styles
 const blockStyles = `

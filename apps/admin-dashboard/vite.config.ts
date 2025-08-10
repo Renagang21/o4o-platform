@@ -68,6 +68,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
   build: {
     ...sharedViteConfig.build,
     outDir: 'dist',
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
       output: {
@@ -86,6 +87,24 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             if (id.includes('socket.io')) {
               return 'vendor-socket';
             }
+          }
+          
+          // 큰 페이지들을 별도 청크로 분리
+          if (id.includes('/src/pages/')) {
+            if (id.includes('TemplatePartEditor') || id.includes('GutenbergEditor') || id.includes('GutenbergPage')) {
+              return 'editor-pages';
+            }
+            if (id.includes('Content') || id.includes('MediaLibrary')) {
+              return 'content-pages';
+            }
+            if (id.includes('Settings') || id.includes('ProductForm') || id.includes('OrderDetail')) {
+              return 'admin-pages';
+            }
+          }
+          
+          // Gutenberg/Editor 관련 코드 분리
+          if (id.includes('/src/') && (id.includes('gutenberg') || id.includes('editor') || id.includes('blocks'))) {
+            return 'editor-core';
           }
         }
       }
