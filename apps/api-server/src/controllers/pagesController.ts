@@ -14,6 +14,7 @@ interface PageTreeNode extends Page {
 interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
+    userId: string;
     email: string;
     role: string;
   };

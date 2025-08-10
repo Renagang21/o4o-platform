@@ -189,9 +189,9 @@ export class ExportController {
         if (!vendorSettlements.has(vendorKey)) {
           vendorSettlements.set(vendorKey, {
             vendorId: item.vendorId,
-            vendorName: item.vendor?.name || '',
-            vendorEmail: item.vendor?.email || '',
-            businessNumber: item.vendor?.businessNumber || '',
+            vendorName: '',
+            vendorEmail: '',
+            businessNumber: '',
             totalSales: 0,
             totalCost: 0,
             totalProfit: 0,
@@ -269,8 +269,8 @@ export class ExportController {
       const exportData = products.map(p => ({
         'SKU': p.sku,
         '상품명': p.name,
-        '카테고리': p.category?.name || '',
-        '벤더': p.vendor?.name || '',
+        '카테고리': '',
+        '벤더': p.vendor || '',
         '현재재고': p.stock,
         '재고임계값': p.lowStockThreshold || 10,
         '재고상태': p.stock <= (p.lowStockThreshold || 10) ? '부족' : '정상',

@@ -43,23 +43,14 @@ export class OrderSplitService {
     // Add domestic API supplier
     this.supplierManager.addSupplier('domestic-api', {
       type: 'api',
-      credentials: {
-        apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
-        endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
-      },
-      options: {
-        rateLimit: 10,
-        timeout: 30000,
-        retryAttempts: 3
-      }
+      apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
+      endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
     });
 
     // Add CSV catalog supplier
     this.supplierManager.addSupplier('csv-catalog', {
       type: 'csv',
-      credentials: {
-        endpoint: './catalogs/supplier-products.csv'
-      }
+      endpoint: './catalogs/supplier-products.csv'
     });
   }
 
@@ -131,13 +122,10 @@ export class OrderSplitService {
       
       // If product doesn't have supplier info, find best supplier
       if (!product.supplierId) {
-        const bestSupplier = await this.supplierManager.findBestSupplier(
-          product.sku,
-          item.quantity
-        );
+        const bestSupplierId = this.supplierManager.findBestSupplier(product.sku);
         
-        if (bestSupplier) {
-          supplierId = bestSupplier.supplierId;
+        if (bestSupplierId) {
+          supplierId = bestSupplierId;
         }
       }
       
@@ -180,7 +168,7 @@ export class OrderSplitService {
         customer: {
           name: order.user?.name || order.customerName || '',
           email: order.user?.email || order.customerEmail || '',
-          phone: order.user?.phone || order.customerPhone || ''
+          phone: order.customerPhone || order.shippingAddress?.phone || ''
         },
         shipping: {
           name: order.shippingAddress?.name || order.customerName,
@@ -202,16 +190,16 @@ export class OrderSplitService {
         // Create order with supplier
         const response = await supplier.createOrder(supplierOrder);
         
-        if (response.success && response.data) {
+        if (response && response.supplierOrderId) {
           // Update order item with supplier order ID
           for (const item of splitOrder.items) {
-            item.supplierOrderId = response.data.supplierOrderId;
+            item.supplierOrderId = response.supplierOrderId;
             await this.orderItemRepository.save(item);
           }
           
-          console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${response.data.supplierOrderId}`);
+          console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${response.supplierOrderId}`);
         } else {
-          console.error(`Failed to forward order to supplier ${splitOrder.supplierId}: ${response.error}`);
+          console.error(`Failed to forward order to supplier ${splitOrder.supplierId}`);
         }
       } catch (error) {
         console.error(`Error forwarding order to supplier ${splitOrder.supplierId}:`, error);
@@ -337,6 +325,6 @@ export class OrderSplitService {
       return null;
     }
     
-    return await supplier.trackShipment(orderItem.trackingNumber);
+    return await supplier.getOrderStatus(supplierOrderId);
   }
 }

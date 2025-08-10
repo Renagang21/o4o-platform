@@ -3,7 +3,7 @@
  * 배송 추적 정보를 주기적으로 업데이트
  */
 
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import { shippingService } from '../services/shipping/ShippingService';
 import logger from '../utils/simpleLogger';
 

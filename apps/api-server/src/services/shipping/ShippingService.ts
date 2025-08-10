@@ -4,7 +4,7 @@
  */
 
 import { AppDataSource } from '../../database/connection';
-import { Order } from '../../entities/Order';
+import { Order, OrderStatus, PaymentMethod } from '../../entities/Order';
 import { Shipment } from '../../entities/Shipment';
 import { ShippingCarrier } from '../../entities/ShippingCarrier';
 import { CJLogisticsConnector } from './connectors/CJLogisticsConnector';
@@ -130,7 +130,16 @@ export class ShippingService {
     shipment.orderId = orderId;
     shipment.carrier = carrierCode;
     shipment.status = 'pending';
-    shipment.shippingAddress = order.shippingAddress;
+    shipment.shippingAddress = {
+      name: order.shippingAddress.name,
+      phone: order.shippingAddress.phone,
+      address1: order.shippingAddress.address,
+      address2: order.shippingAddress.addressDetail,
+      city: order.shippingAddress.city,
+      state: order.shippingAddress.state,
+      postalCode: order.shippingAddress.zipCode,
+      country: order.shippingAddress.country
+    };
     shipment.items = order.items.map(item => ({
       productId: item.productId,
       productName: item.product?.name || '',
@@ -138,13 +147,25 @@ export class ShippingService {
       weight: item.product?.weight || 0
     }));
 
+    // Convert address format for carrier API
+    const receiverAddress = {
+      name: order.shippingAddress.name,
+      phone: order.shippingAddress.phone,
+      address1: order.shippingAddress.address,
+      address2: order.shippingAddress.addressDetail,
+      city: order.shippingAddress.city,
+      state: order.shippingAddress.state,
+      postalCode: order.shippingAddress.zipCode,
+      country: order.shippingAddress.country
+    };
+
     // Request tracking number from carrier
     const labelResponse = await connector.createLabel({
       order,
       sender: await this.getDefaultSenderAddress(),
-      receiver: order.shippingAddress,
+      receiver: receiverAddress,
       items: order.items,
-      cod: order.paymentMethod === 'cod', // Cash on delivery
+      cod: order.paymentMethod === PaymentMethod.CASH_ON_DELIVERY, // Cash on delivery
       insurance: order.totalAmount > 100000 // Insure high-value orders
     });
 
@@ -156,7 +177,7 @@ export class ShippingService {
     await this.shipmentRepository.save(shipment);
 
     // Update order status
-    order.status = 'processing';
+    order.status = OrderStatus.PROCESSING;
     order.trackingNumber = labelResponse.trackingNumber;
     await this.orderRepository.save(order);
 

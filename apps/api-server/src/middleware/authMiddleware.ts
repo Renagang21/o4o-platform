@@ -62,6 +62,7 @@ export class AuthMiddleware {
 
       req.user = {
         id: user.id,
+        userId: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
@@ -70,7 +71,7 @@ export class AuthMiddleware {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         lastLoginAt: user.lastLoginAt
-      };
+      } as any;
 
       next();
     } catch (error: any) {
@@ -132,6 +133,7 @@ export class AuthMiddleware {
 
         req.user = {
           id: betaUser.id,
+          userId: betaUser.id,
           email: betaUser.email,
           name: betaUser.name,
           role: 'beta_user',
@@ -139,7 +141,7 @@ export class AuthMiddleware {
           betaUserId: betaUser.id,
           createdAt: betaUser.createdAt,
           updatedAt: betaUser.updatedAt
-        };
+        } as any;
 
         next();
       } else {
@@ -188,6 +190,7 @@ export class AuthMiddleware {
         if (betaUser && betaUser.canProvideFeedback()) {
           req.user = {
             id: betaUser.id,
+            userId: betaUser.id,
             email: betaUser.email,
             name: betaUser.name,
             role: 'beta_user',
@@ -195,7 +198,7 @@ export class AuthMiddleware {
             betaUserId: betaUser.id,
             createdAt: betaUser.createdAt,
             updatedAt: betaUser.updatedAt
-          };
+          } as any;
         }
       } else if (decoded.userId) {
         // Try regular user
@@ -207,6 +210,7 @@ export class AuthMiddleware {
         if (user && user.status === UserStatus.APPROVED) {
           req.user = {
             id: user.id,
+            userId: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
@@ -215,7 +219,7 @@ export class AuthMiddleware {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
             lastLoginAt: user.lastLoginAt
-          };
+          } as any;
         }
       }
 

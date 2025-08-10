@@ -16,12 +16,7 @@ export class AnalyticsMiddleware {
     return async (req: Request, res: Response, next: NextFunction) => {
       const startTime = Date.now();
       const sessionId = req.headers['x-session-id'] as string || uuidv4();
-      interface UserWithBetaId extends Request {
-        user?: {
-          betaUserId?: string;
-        };
-      }
-      const betaUserId = req.headers['x-beta-user-id'] as string || (req as UserWithBetaId).user?.betaUserId;
+      const betaUserId = req.headers['x-beta-user-id'] as string || (req as any).user?.betaUserId;
       const userAgent = req.headers['user-agent'] || 'Unknown';
       const ipAddress = req.ip || (req.socket?.remoteAddress) || 'Unknown';
 
