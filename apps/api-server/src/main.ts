@@ -113,6 +113,7 @@ import appsV1Routes from './routes/v1/apps.routes';
 import couponV1Routes from './routes/v1/coupon.routes';
 import exportV1Routes from './routes/v1/export.routes';
 import shippingV1Routes from './routes/v1/shipping.routes';
+import dropshippingV1Routes from './routes/v1/dropshipping.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -476,6 +477,7 @@ app.use('/api/v1/coupons', couponV1Routes);
 app.use('/api/v1/themes', themeRoutes);
 app.use('/api/v1/export', exportV1Routes);
 app.use('/api/v1/shipping', shippingV1Routes);
+app.use('/api/v1/dropshipping', dropshippingV1Routes);
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
@@ -543,12 +545,10 @@ app.use('*', (req, res) => {
 });
 
 // Swagger documentation
-import { setupSwagger } from './config/swagger';
+import { setupSwagger } from './config/swagger-enhanced';
 
-// Setup Swagger API documentation (only in development)
-if (process.env.NODE_ENV !== 'production') {
-  setupSwagger(app);
-}
+// Setup Swagger API documentation
+setupSwagger(app);
 
 // 서버 시작
 const startServer = async () => {

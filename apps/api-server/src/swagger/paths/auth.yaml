@@ -1,0 +1,302 @@
+# Authentication Endpoints
+
+/auth/login:
+  post:
+    tags:
+      - Auth
+    summary: 사용자 로그인
+    description: 이메일과 비밀번호로 로그인하여 JWT 토큰을 발급받습니다
+    operationId: login
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginRequest'
+    responses:
+      '200':
+        description: 로그인 성공
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginResponse'
+      '400':
+        description: 잘못된 요청
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationError'
+      '401':
+        description: 인증 실패
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      '429':
+        description: 너무 많은 요청
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+/auth/register:
+  post:
+    tags:
+      - Auth
+    summary: 신규 사용자 등록
+    description: 새로운 사용자 계정을 생성합니다
+    operationId: register
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterRequest'
+    responses:
+      '201':
+        description: 회원가입 성공
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: 회원가입이 완료되었습니다
+                data:
+                  $ref: '#/components/schemas/User'
+      '400':
+        description: 잘못된 요청 또는 이미 존재하는 이메일
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationError'
+      '500':
+        description: 서버 오류
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+/auth/refresh:
+  post:
+    tags:
+      - Auth
+    summary: 토큰 갱신
+    description: 리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다
+    operationId: refreshToken
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - refreshToken
+            properties:
+              refreshToken:
+                type: string
+                description: 리프레시 토큰
+    responses:
+      '200':
+        description: 토큰 갱신 성공
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                      description: 새로운 액세스 토큰
+                    refreshToken:
+                      type: string
+                      description: 새로운 리프레시 토큰
+      '401':
+        description: 유효하지 않은 리프레시 토큰
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+/auth/logout:
+  post:
+    tags:
+      - Auth
+    summary: 로그아웃
+    description: 현재 세션을 종료하고 토큰을 무효화합니다
+    operationId: logout
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: 로그아웃 성공
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: 로그아웃되었습니다
+
+/auth/verify-email:
+  post:
+    tags:
+      - Auth
+    summary: 이메일 인증
+    description: 이메일 인증 토큰을 검증합니다
+    operationId: verifyEmail
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - token
+            properties:
+              token:
+                type: string
+                description: 이메일 인증 토큰
+    responses:
+      '200':
+        description: 이메일 인증 성공
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: 이메일이 성공적으로 인증되었습니다
+      '400':
+        description: 유효하지 않거나 만료된 토큰
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+/auth/forgot-password:
+  post:
+    tags:
+      - Auth
+    summary: 비밀번호 재설정 요청
+    description: 비밀번호 재설정 링크를 이메일로 전송합니다
+    operationId: forgotPassword
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email:
+                type: string
+                format: email
+                description: 등록된 이메일 주소
+    responses:
+      '200':
+        description: 재설정 이메일 전송 완료
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: 비밀번호 재설정 이메일이 전송되었습니다
+
+/auth/reset-password:
+  post:
+    tags:
+      - Auth
+    summary: 비밀번호 재설정
+    description: 새로운 비밀번호로 변경합니다
+    operationId: resetPassword
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - token
+              - password
+            properties:
+              token:
+                type: string
+                description: 비밀번호 재설정 토큰
+              password:
+                type: string
+                format: password
+                minLength: 8
+                description: 새로운 비밀번호
+    responses:
+      '200':
+        description: 비밀번호 재설정 성공
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: 비밀번호가 성공적으로 변경되었습니다
+      '400':
+        description: 유효하지 않거나 만료된 토큰
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+
+/auth/me:
+  get:
+    tags:
+      - Auth
+    summary: 현재 사용자 정보 조회
+    description: 인증된 사용자의 정보를 반환합니다
+    operationId: getCurrentUser
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: 사용자 정보 조회 성공
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  $ref: '#/components/schemas/User'
+      '401':
+        description: 인증 필요
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'

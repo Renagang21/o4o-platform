@@ -148,7 +148,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-export const approveUser = async (req: Request, res: Response) => {
+export const approveUser = async (req: AuthRequest, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -187,7 +187,7 @@ export const approveUser = async (req: Request, res: Response) => {
     await userRepository.update(userId, {
       status: UserStatus.APPROVED,
       approvedAt: new Date(),
-      approvedBy: (req as AuthRequest).user!.id
+      approvedBy: (req.user as any)?.id || (req.user as any)?.userId || 'system'
     });
 
     // TODO: 승인 이메일 발송

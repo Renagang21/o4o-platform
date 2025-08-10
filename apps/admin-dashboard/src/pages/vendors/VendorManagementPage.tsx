@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProductApprovalManager } from '@/components/vendor/ProductApprovalManager';
+import { DropshippingSettings } from '@/components/dropshipping/DropshippingSettings';
 import { formatPrice } from '@/utils/vendorUtils';
 
 const VendorManagementPage = () => {
@@ -106,11 +107,12 @@ const VendorManagementPage = () => {
 
       {/* 메인 탭 */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-6 w-full max-w-3xl">
           <TabsTrigger value="approval">제품 승인</TabsTrigger>
           <TabsTrigger value="suppliers">공급자 관리</TabsTrigger>
           <TabsTrigger value="vendors">판매자 관리</TabsTrigger>
           <TabsTrigger value="settlements">정산 관리</TabsTrigger>
+          <TabsTrigger value="dropshipping">드랍쉬핑</TabsTrigger>
           <TabsTrigger value="settings">설정</TabsTrigger>
         </TabsList>
 
@@ -184,6 +186,10 @@ const VendorManagementPage = () => {
               </p>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="dropshipping" className="space-y-6">
+          <DropshippingSettings />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">

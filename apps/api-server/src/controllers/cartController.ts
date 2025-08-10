@@ -13,9 +13,9 @@ export class CartController {
   private couponService = new CouponService();
 
   // 장바구니 조회
-  getCart = async (req: Request, res: Response) => {
+  getCart = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
 
       if (!userId) {
         return res.status(401).json({
@@ -37,7 +37,7 @@ export class CartController {
       }
 
       // 사용자 역할에 따른 가격 조정
-      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const userRole = (req.user as any)?.role || 'customer';
       const cartWithUserPrices = {
         ...cart,
         items: cart.items.map((item: any) => ({
@@ -63,9 +63,9 @@ export class CartController {
   };
 
   // 장바구니에 상품 추가
-  addToCart = async (req: Request, res: Response) => {
+  addToCart = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
       const { productId, quantity = 1 } = req.body;
 
       if (!userId) {
@@ -124,7 +124,7 @@ export class CartController {
         where: { cartId: cart.id, productId }
       });
 
-      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const userRole = (req.user as any)?.role || 'customer';
       const priceForUser = product.getPriceForUser(userRole);
 
       if (existingItem) {
@@ -178,9 +178,9 @@ export class CartController {
   };
 
   // 장바구니 아이템 수량 수정
-  updateCartItem = async (req: Request, res: Response) => {
+  updateCartItem = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
       const { itemId } = req.params;
       const { quantity } = req.body;
 
@@ -249,9 +249,9 @@ export class CartController {
   };
 
   // 장바구니에서 아이템 제거
-  removeCartItem = async (req: Request, res: Response) => {
+  removeCartItem = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
       const { itemId } = req.params;
 
       if (!userId) {
@@ -300,9 +300,9 @@ export class CartController {
   };
 
   // 장바구니 비우기
-  clearCart = async (req: Request, res: Response) => {
+  clearCart = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
 
       if (!userId) {
         return res.status(401).json({
@@ -339,9 +339,9 @@ export class CartController {
   };
 
   // 쿠폰 적용
-  applyCoupon = async (req: Request, res: Response) => {
+  applyCoupon = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
       const { couponCode } = req.body;
 
       if (!userId) {
@@ -372,7 +372,7 @@ export class CartController {
       }
 
       // 장바구니 총액 계산
-      const userRole = (req as AuthRequest).user?.role || 'customer';
+      const userRole = (req.user as any)?.role || 'customer';
       let subtotal = 0;
       const productIds: string[] = [];
       const categoryIds: string[] = [];
@@ -430,9 +430,9 @@ export class CartController {
   };
 
   // 쿠폰 제거
-  removeCoupon = async (req: Request, res: Response) => {
+  removeCoupon = async (req: AuthRequest, res: Response) => {
     try {
-      const userId = (req as AuthRequest).user?.id;
+      const userId = (req.user as any)?.id;
 
       if (!userId) {
         return res.status(401).json({
