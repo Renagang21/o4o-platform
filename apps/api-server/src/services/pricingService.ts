@@ -2,7 +2,7 @@ import { AppDataSource } from '../database/connection';
 import { Product } from '../entities/Product';
 import { PricePolicy, PricePolicyType, UserRole } from '../entities/PricePolicy';
 import { User } from '../entities/User';
-import { cacheService } from './cacheService';
+import { cacheService } from './CacheService';
 
 export interface PricingContext {
   user?: User;

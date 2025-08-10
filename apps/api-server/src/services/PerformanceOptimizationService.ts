@@ -1,6 +1,6 @@
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AppDataSource } from '../database/connection';
-import { CacheService } from './cacheService';
+import { CacheService } from './CacheService';
 import { AnalyticsService } from './AnalyticsService';
 import Redis from 'ioredis';
 import { performance } from 'perf_hooks';

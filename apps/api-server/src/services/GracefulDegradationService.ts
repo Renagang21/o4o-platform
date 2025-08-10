@@ -4,7 +4,7 @@ import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertSeverity } from '../entities/Alert';
 import { PricingResult } from '../types/auth';
 import { signageService } from './signageService';
-import { cacheService } from './cacheService';
+import { cacheService } from './CacheService';
 import {
   DegradationMetadata,
   DegradationParameters,

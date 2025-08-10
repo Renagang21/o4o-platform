@@ -3,7 +3,7 @@
  * 재고 부족, 재입고, 재고 이상 감지 등 알림 처리
  */
 
-import { Product } from '../entities/Product';
+import { Product, ProductStatus } from '../entities/Product';
 import { ProductVariation } from '../entities/ProductVariation';
 import { AppDataSource } from '../database/connection';
 import { emailService } from './email.service';
@@ -149,7 +149,7 @@ export class InventoryAlertService extends EventEmitter {
       const products = await this.productRepository.find({
         where: { 
           hasVariations: false,
-          status: 'active'
+          status: ProductStatus.ACTIVE
         }
       });
 

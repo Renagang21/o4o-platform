@@ -13,7 +13,7 @@
  */
 
 import Redis from 'ioredis';
-import LRU from 'lru-cache';
+import { LRUCache } from 'lru-cache';
 import zlib from 'zlib';
 import { promisify } from 'util';
 import crypto from 'crypto';
@@ -72,7 +72,7 @@ enum CircuitState {
 export class CacheService {
   private static instance: CacheService;
   
-  private memoryCache: LRU<string, any>;
+  private memoryCache: LRUCache<string, any>;
   private redisClient: Redis | null = null;
   private config: CacheConfig;
   private stats: CacheStats;
@@ -105,7 +105,7 @@ export class CacheService {
     };
     
     // Initialize L1 memory cache
-    this.memoryCache = new LRU({
+    this.memoryCache = new LRUCache({
       max: this.config.memory.max,
       ttl: this.config.memory.ttl,
       updateAgeOnGet: this.config.memory.updateAgeOnGet,

@@ -219,11 +219,11 @@ export class OrderAutomationService extends EventEmitter {
     try {
       const orders = await this.orderRepository.find({
         where: [
-          { status: 'pending' },
-          { status: 'processing' },
-          { status: 'ready_to_ship' },
-          { status: 'shipped' },
-          { status: 'delivered' }
+          { status: OrderStatus.PENDING },
+          { status: OrderStatus.PROCESSING },
+          { status: OrderStatus.READY_TO_SHIP },
+          { status: OrderStatus.SHIPPED },
+          { status: OrderStatus.DELIVERED }
         ],
         relations: ['items', 'items.product', 'shipping']
       });

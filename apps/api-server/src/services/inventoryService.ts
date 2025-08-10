@@ -2,7 +2,7 @@ import { AppDataSource } from '../database/connection';
 import { Product } from '../entities/Product';
 import { Order, OrderStatus } from '../entities/Order';
 import { OrderItem } from '../entities/OrderItem';
-import { cacheService } from './cacheService';
+import { cacheService } from './CacheService';
 
 export interface InventoryReservation {
   productId: string;

@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
 import { SystemMetrics, MetricCategory } from '../entities/SystemMetrics';
 import { Alert, AlertSeverity } from '../entities/Alert';
-import { cacheService } from './cacheService';
+import { cacheService } from './CacheService';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as os from 'os';

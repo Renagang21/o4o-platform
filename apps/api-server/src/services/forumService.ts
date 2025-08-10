@@ -5,7 +5,7 @@ import { ForumPost, PostStatus, PostType } from '../entities/ForumPost';
 import { ForumComment, CommentStatus } from '../entities/ForumComment';
 import { ForumTag } from '../entities/ForumTag';
 import { User } from '../entities/User';
-import { cacheService } from './cacheService';
+import { cacheService } from './CacheService';
 
 export interface ForumSearchOptions {
   query?: string;
