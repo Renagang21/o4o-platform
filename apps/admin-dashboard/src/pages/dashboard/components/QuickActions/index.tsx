@@ -44,7 +44,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
       description: '새로운 상품을 등록합니다',
       icon: <Package className="w-5 h-5" />,
       color: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
-      href: '/admin/products/new',
+      href: '/ecommerce/products/new',
     },
     {
       id: 'add-user',
@@ -52,7 +52,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
       description: '새로운 사용자를 추가합니다',
       icon: <Users className="w-5 h-5" />,
       color: 'bg-green-50 text-green-600 hover:bg-green-100',
-      href: '/admin/users/new',
+      href: '/users/new',
     },
     {
       id: 'create-post',
@@ -60,7 +60,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
       description: '새 게시글을 작성합니다',
       icon: <FileText className="w-5 h-5" />,
       color: 'bg-purple-50 text-purple-600 hover:bg-purple-100',
-      href: '/admin/posts/new',
+      href: '/posts/new',
     },
     {
       id: 'manage-orders',
@@ -68,7 +68,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
       description: '대기 중인 주문을 확인합니다',
       icon: <Package className="w-5 h-5" />,
       color: 'bg-orange-50 text-orange-600 hover:bg-orange-100',
-      href: '/admin/orders',
+      href: '/ecommerce/orders',
       badge: 12,
     },
     {
@@ -77,7 +77,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
       description: '승인 대기 게시글을 확인합니다',
       icon: <MessageSquare className="w-5 h-5" />,
       color: 'bg-pink-50 text-pink-600 hover:bg-pink-100',
-      href: '/admin/forum/moderation',
+      href: '/forum/moderation',
       badge: 5,
     },
     {
@@ -86,7 +86,7 @@ const QuickActions = memo<QuickActionsProps>(({ className = '' }) => {
       description: '상세 분석 리포트를 확인합니다',
       icon: <BarChart3 className="w-5 h-5" />,
       color: 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100',
-      href: '/admin/analytics',
+      href: '/analytics',
     },
   ];
 

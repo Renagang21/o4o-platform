@@ -70,8 +70,8 @@ const AdminHome: FC = () => {
   ];
 
   const quickActions = [
-    { title: '새 상품 추가', icon: Package, link: '/products/new', color: 'text-blue-600' },
-    { title: '주문 관리', icon: ShoppingBag, link: '/orders', color: 'text-green-600' },
+    { title: '새 상품 추가', icon: Package, link: '/ecommerce/products/new', color: 'text-blue-600' },
+    { title: '주문 관리', icon: ShoppingBag, link: '/ecommerce/orders', color: 'text-green-600' },
     { title: '고객 관리', icon: Users, link: '/users', color: 'text-purple-600' },
     { title: '콘텐츠 작성', icon: FileText, link: '/posts/new', color: 'text-orange-600' },
     { title: '리뷰 관리', icon: MessageSquare, link: '/reviews', color: 'text-pink-600' },
@@ -165,7 +165,7 @@ const AdminHome: FC = () => {
               <Plus className="h-4 w-4" />
               새 게시글 작성
             </Link>
-            <Link to="/products/new" className="flex items-center gap-2 text-sm text-admin-blue hover:text-admin-blue-dark">
+            <Link to="/ecommerce/products/new" className="flex items-center gap-2 text-sm text-admin-blue hover:text-admin-blue-dark">
               <Plus className="h-4 w-4" />
               새 상품 추가
             </Link>
