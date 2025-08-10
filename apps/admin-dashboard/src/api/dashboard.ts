@@ -6,7 +6,8 @@
 import { unifiedApi } from './unified-client';
 import { EcommerceApi } from './ecommerceApi';
 import { SalesDataItem, Notification, Activity, OrderStatusData, UserChartData, SystemHealthStatus } from '../types/dashboard';
-import { forumService, signageService, crowdfundingService } from './apps';
+// Note: App services would be imported if available
+// import { forumService, signageService, crowdfundingService } from './apps';
 
 // Dashboard Stats type
 interface DashboardStats {
@@ -85,8 +86,8 @@ export const dashboardApi = {
     let crowdfundingStats: any = null;
     
     try {
-      // Use EcommerceApi and App services for dashboard stats
-      const [dashboardStatsResponse, usersResponse, forumStatsRes, signageStatsRes, crowdfundingStatsRes] = await Promise.all([
+      // Use EcommerceApi for dashboard stats
+      const [dashboardStatsResponse, usersResponse] = await Promise.all([
         EcommerceApi.getDashboardStats(),
         unifiedApi.raw.get('/api/users/stats').catch(() => {
           // API 오류 시 기본값 반환하고 토스트 메시지 표시
@@ -94,24 +95,17 @@ export const dashboardApi = {
             toast.error('사용자 통계를 불러올 수 없습니다');
           });
           return { data: { total: 0, pending: 0, todayCount: 0, activeRate: 0 } };
-        }),
-        forumService.getStats().catch(() => {
-          // 포럼 통계 실패는 조용히 처리 (선택적 기능)
-          return null;
-        }),
-        signageService.getStats().catch(() => {
-          // 사이니지 통계 실패는 조용히 처리 (선택적 기능)
-          return null;
-        }),
-        crowdfundingService.getStats().catch(() => {
-          // 크라우드펀딩 통계 실패는 조용히 처리 (선택적 기능)
-          return null;
         })
+        // Note: App services would be called here if available
+        // forumService.getStats().catch(() => null),
+        // signageService.getStats().catch(() => null),
+        // crowdfundingService.getStats().catch(() => null)
       ]);
       
-      forumStats = forumStatsRes;
-      signageStats = signageStatsRes;
-      crowdfundingStats = crowdfundingStatsRes;
+      // Set default values for app stats since services are not available
+      forumStats = null;
+      signageStats = null;
+      crowdfundingStats = null;
 
       const ecommerceStats = dashboardStatsResponse.data;
 

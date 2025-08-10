@@ -6,20 +6,17 @@ import {
   Star, 
   Eye, 
   ShoppingCart,
-  Filter,
   Grid,
   List,
-  Check,
   X,
   Info,
-  DollarSign,
   Calendar,
   User,
   Package,
   Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 

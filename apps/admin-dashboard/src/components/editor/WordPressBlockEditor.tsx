@@ -112,7 +112,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
     disableCustomGradients: false,
     enableCustomSpacing: true,
     isRTL: false,
-    mediaUpload: ({}: any) => {
+    mediaUpload: (options: any) => {
       // Handle media upload - integrate with existing media system
       // TODO: Integrate with admin dashboard media system
     },

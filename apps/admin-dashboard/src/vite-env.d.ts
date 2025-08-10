@@ -1213,7 +1213,7 @@ declare module 'lucide-react' {
   export const IndentDecrease: any
   export const IndentIncrease: any
   export const IndianRupee: any
-  export const Infinity: any
+  export const InfinityIcon: any
   export const Info: any
   export const InspectionPanel: any
   export const Instagram: any

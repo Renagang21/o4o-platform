@@ -11,18 +11,13 @@ import {
   ChevronRight,
   ChevronDown,
   Search,
-  RefreshCw,
-  Download,
-  Upload,
   AlertTriangle,
   Check,
   Copy,
   Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import toast from 'react-hot-toast';
-import api from '@/lib/api';
 import MonacoEditor from '@monaco-editor/react';
 
 interface FileNode {

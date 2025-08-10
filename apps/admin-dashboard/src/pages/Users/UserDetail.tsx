@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { api } from '@/api/base';
 import { formatDistanceToNow, format } from 'date-fns';
 
-// interface ApprovalLog {
+interface ApprovalLog {
   id: string;
   user_id: string;
   admin_id: string;

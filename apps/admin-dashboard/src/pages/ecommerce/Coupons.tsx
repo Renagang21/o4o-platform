@@ -8,16 +8,12 @@ import {
   Copy,
   Ticket,
   Calendar,
-  DollarSign,
-  Users,
-  Package,
   TrendingUp,
   AlertCircle,
-  Download,
-  Upload
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -51,8 +47,6 @@ const Coupons: FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showBulkModal, setShowBulkModal] = useState(false);
 
   // Fetch coupons
   const fetchCoupons = async () => {
@@ -216,13 +210,6 @@ const Coupons: FC = () => {
           <p className="text-gray-600 mt-1">할인 쿠폰을 생성하고 관리하세요</p>
         </div>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setShowBulkModal(true)}
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            대량 생성
-          </Button>
           <Button
             onClick={() => navigate('/ecommerce/coupons/new')}
           >

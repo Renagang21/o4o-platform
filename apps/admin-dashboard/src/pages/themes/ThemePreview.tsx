@@ -1,18 +1,15 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-  X, 
   Monitor, 
   Tablet, 
   Smartphone,
-  RotateCw,
   Settings,
   Palette,
   Layout,
   Type,
   Save,
   ChevronLeft,
-  ChevronRight,
   Home,
   FileText,
   ShoppingCart,
@@ -22,9 +19,7 @@ import {
   Sun
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import toast from 'react-hot-toast';
-import api from '@/lib/api';
 
 interface ThemePreviewData {
   theme: {

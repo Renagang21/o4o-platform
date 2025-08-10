@@ -5,8 +5,6 @@ import {
   ToggleLeft, 
   ToggleRight, 
   Info,
-  Download,
-  Trash2,
   Shield,
   ShoppingCart,
   Users,
@@ -428,7 +426,7 @@ const AppsManagerV2: FC = () => {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => window.location.href = app.settings}
+                        onClick={() => window.location.href = app.settings || '#'}
                       >
                         <Settings className="w-4 h-4 mr-1" />
                         설정
