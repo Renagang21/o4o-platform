@@ -10,12 +10,10 @@ import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import ReusableBlocksBrowser from '../../components/editor/ReusableBlocksBrowser';
-import { useReusableBlocks } from '../../hooks/useReusableBlocks';
-
 const ReusableBlocksPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
-  const _reusableBlocksData = useReusableBlocks(); // TODO: Use loading state for UI feedback
+  // TODO: Integrate useReusableBlocks hook for loading state and actual data
 
   // Handle creating new reusable block
   const handleCreateNew = () => {
