@@ -83,7 +83,7 @@ run_tests() {
     for dir in apps/* packages/*; do
         if [ -f "$dir/package.json" ] && grep -q "\"test\":" "$dir/package.json"; then
             echo "Testing $(basename $dir)..."
-            (cd "$dir" && npm test -- --passWithNoTests) || true
+            (cd "$dir" && npm test) || true
         fi
     done
 }

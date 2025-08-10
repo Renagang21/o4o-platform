@@ -9,7 +9,7 @@
     "start": "bash -c 'node --experimental-specifier-resolution=node dist/server.js'",
     "type-check": "bash -c 'npx tsc --noEmit'",
     "lint": "bash -c 'eslint src/**/*.ts'",
-    "test": "bash -c 'vitest --passWithNoTests'"
+    "test": "bash -c 'npx vitest --passWithNoTests'"
   },
   "dependencies": {
     "@o4o/types": "file:../../packages/types",
@@ -32,14 +32,19 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "6.6.4",
+    "@testing-library/react": "16.3.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
     "@types/response-time": "^2.3.8",
+    "@vitejs/plugin-react": "5.0.0",
     "@vitest/ui": "^2.1.8",
+    "jsdom": "26.1.0",
     "nodemon": "^3.1.10",
     "typescript": "~5.9.2",
+    "vite": "7.1.1",
     "vitest": "3.2.4"
   },
   "engines": {

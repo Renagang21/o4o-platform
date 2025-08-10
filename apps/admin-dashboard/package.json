@@ -4,21 +4,21 @@
   "description": "WordPress-style Admin Dashboard for O4O Platform",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3001",
+    "dev": "npx vite --port 3001",
     "build": "npx vite build",
     "build:with-typecheck": "bash -c 'tsc && npx vite build'",
-    "preview": "vite preview",
+    "preview": "npx vite preview",
     "type-check": "bash -c 'tsc --noEmit'",
     "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true",
     "lint:fix": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --fix",
-    "test": "vitest --passWithNoTests",
-    "test:coverage": "vitest run --coverage",
+    "test": "npx vitest --passWithNoTests",
+    "test:coverage": "npx vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "build:analyze": "vite build --mode production --config vite.config.analyze.ts || echo 'Bundle analysis not configured'"
+    "build:analyze": "npx vite build --mode production --config vite.config.analyze.ts || echo 'Bundle analysis not configured'"
   },
   "dependencies": {
     "@babel/runtime": "^7.26.10",
@@ -78,8 +78,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.53.2",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
+    "@testing-library/jest-dom": "6.6.4",
+    "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.20",
@@ -93,18 +93,19 @@
     "@types/wordpress__i18n": "3.4.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
-    "@vitejs/plugin-react": "^4.4.1",
+    "@vitejs/plugin-react": "4.7.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.31.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "jsdom": "26.1.0",
     "msw": "^2.10.3",
     "postcss": "^8.4.49",
     "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^4.1.0",
     "typescript": "~5.9.2",
     "vite": "7.0.6",
-    "vitest": "^3.2.4"
+    "vitest": "3.2.4"
   },
   "msw": {
     "workerDirectory": [
