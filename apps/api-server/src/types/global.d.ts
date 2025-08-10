@@ -6,16 +6,16 @@ import 'express';
 declare global {
   namespace Express {
     interface User {
-      id?: string;  // Make optional for compatibility
-      userId?: string;  // Make userId optional as some places use id
-      email?: string;  // Make optional for compatibility
-      role?: UserRole | string;  // Allow string for backward compatibility
-      status?: UserStatus | string;  // Allow string for backward compatibility
+      id: string;  // Always present
+      userId: string;  // Always present (same as id)
+      email: string;  // Always present
+      role: UserRole | string;
+      status?: UserStatus | string;
       name?: string;
-      businessInfo?: BusinessInfo | any;  // Allow any for backward compatibility
-      createdAt?: Date | string;  // Allow string for compatibility
-      updatedAt?: Date | string;  // Allow string for compatibility
-      lastLoginAt?: Date | string;  // Allow string for compatibility
+      businessInfo?: BusinessInfo | any;
+      createdAt?: Date | string;
+      updatedAt?: Date | string;
+      lastLoginAt?: Date | string;
       betaUserId?: string;
       iat?: number;
       exp?: number;

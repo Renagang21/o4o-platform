@@ -386,7 +386,7 @@ export class UserManagementController {
     try {
       const { id } = req.params;
       const { notes } = req.body;
-      const adminId = req.user?.id || req.user?.userId;
+      const adminId = (req.user as any)?.id || (req.user as any)?.userId;
 
       if (!adminId) {
         res.status(401).json({
@@ -416,7 +416,7 @@ export class UserManagementController {
     try {
       const { id } = req.params;
       const { notes } = req.body;
-      const adminId = req.user?.id || req.user?.userId;
+      const adminId = (req.user as any)?.id || (req.user as any)?.userId;
 
       if (!adminId) {
         res.status(401).json({
@@ -445,7 +445,7 @@ export class UserManagementController {
   bulkApprove = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { userIds, notes } = req.body;
-      const adminId = req.user?.id || req.user?.userId;
+      const adminId = (req.user as any)?.id || (req.user as any)?.userId;
 
       if (!adminId) {
         res.status(401).json({
@@ -476,7 +476,7 @@ export class UserManagementController {
   bulkReject = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { userIds, notes } = req.body;
-      const adminId = req.user?.id || req.user?.userId;
+      const adminId = (req.user as any)?.id || (req.user as any)?.userId;
 
       if (!adminId) {
         res.status(401).json({

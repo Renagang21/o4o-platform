@@ -111,6 +111,7 @@ import couponRoutes from './routes/v1/coupon.routes';
 import themeRoutes from './routes/v1/theme.routes';
 import appsV1Routes from './routes/v1/apps.routes';
 import couponV1Routes from './routes/v1/coupon.routes';
+import exportV1Routes from './routes/v1/export.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -472,6 +473,7 @@ app.use('/api/v1/media', mediaV1Routes);
 app.use('/api/v1/apps', appsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);
 app.use('/api/v1/themes', themeRoutes);
+app.use('/api/v1/export', exportV1Routes);
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);

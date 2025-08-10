@@ -97,7 +97,7 @@ router.post('/link/:provider', authenticateCookie, async (req: AuthRequest, res)
     }
 
     const user = await SocialAuthService.linkSocialAccount(
-      req.user!.userId,
+      (req.user as any).userId || (req.user as any).id || '',
       provider,
       providerId
     );
@@ -124,7 +124,7 @@ router.post('/link/:provider', authenticateCookie, async (req: AuthRequest, res)
 // Unlink social account
 router.delete('/unlink', authenticateCookie, async (req: AuthRequest, res) => {
   try {
-    const user = await SocialAuthService.unlinkSocialAccount(req.user!.userId);
+    const user = await SocialAuthService.unlinkSocialAccount((req.user as any).userId || (req.user as any).id || '');
 
     res.json({
       success: true,
@@ -148,7 +148,7 @@ router.delete('/unlink', authenticateCookie, async (req: AuthRequest, res) => {
 // Get linked accounts
 router.get('/linked-accounts', authenticateCookie, async (req: AuthRequest, res) => {
   try {
-    const accounts = await SocialAuthService.getLinkedAccounts(req.user!.userId);
+    const accounts = await SocialAuthService.getLinkedAccounts((req.user as any).userId || (req.user as any).id || '');
 
     res.json({
       success: true,

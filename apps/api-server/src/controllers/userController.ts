@@ -20,7 +20,7 @@ export class UserController {
         });
       }
 
-      const user = await authService.getUserById(authReq.user.id);
+      const user = await authService.getUserById((authReq.user as any).id || (authReq.user as any).userId);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -105,7 +105,7 @@ export class UserController {
         });
       }
 
-      const user = await authService.updateUserBusinessInfo(authReq.user.id, businessInfo);
+      const user = await authService.updateUserBusinessInfo((authReq.user as any).id || (authReq.user as any).userId, businessInfo);
       if (!user) {
         return res.status(404).json({
           success: false,
