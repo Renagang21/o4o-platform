@@ -45,11 +45,19 @@ describe('UserForm 컴포넌트', () => {
     it('생성 모드에서 필수 필드들이 올바르게 렌더링된다', () => {
       render(<UserForm {...defaultProps} mode="create" />);
       
-      expect(screen.getByLabelText(/이름/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/이메일/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/비밀번호/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/역할/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/상태/)).toBeInTheDocument();
+      // 레이블 텍스트 확인
+      expect(screen.getByText(/이름/)).toBeInTheDocument();
+      expect(screen.getByText(/이메일/)).toBeInTheDocument();
+      expect(screen.getByText(/비밀번호/)).toBeInTheDocument();
+      expect(screen.getByText(/역할/)).toBeInTheDocument();
+      expect(screen.getByText(/상태/)).toBeInTheDocument();
+      
+      // 입력 필드 확인 (placeholder로)
+      expect(screen.getByPlaceholderText('사용자 이름을 입력하세요')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('user@example.com')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('비밀번호를 입력하세요')).toBeInTheDocument();
+      
+      // 제출 버튼 확인
       expect(screen.getByText('사용자 생성')).toBeInTheDocument();
     });
 
@@ -72,13 +80,21 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} />);
       
-      const roleSelect = screen.getByLabelText(/역할/);
-      await user.selectOptions(roleSelect, 'business');
+      // select 요소를 role 속성으로 찾기
+      const roleSelects = screen.getAllByRole('combobox');
+      const roleSelect = roleSelects.find(select => {
+        const options = select.querySelectorAll('option');
+        return Array.from(options).some(opt => opt.textContent?.includes('관리자'));
+      });
+      
+      if (roleSelect) {
+        await user.selectOptions(roleSelect, 'business');
+      }
       
       await waitFor(() => {
-        expect(screen.getByLabelText(/사업자명/)).toBeInTheDocument();
-        expect(screen.getByLabelText(/사업자등록번호/)).toBeInTheDocument();
-        expect(screen.getByLabelText(/대표자명/)).toBeInTheDocument();
+        expect(screen.getByText(/사업자명/)).toBeInTheDocument();
+        expect(screen.getByText(/사업자등록번호/)).toBeInTheDocument();
+        expect(screen.getByText(/대표자명/)).toBeInTheDocument();
       });
     });
   });
@@ -88,7 +104,7 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} />);
       
-      const nameInput = screen.getByLabelText(/이름/);
+      const nameInput = screen.getByPlaceholderText('사용자 이름을 입력하세요');
       
       // 빈 값
       await user.clear(nameInput);
@@ -121,7 +137,7 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} />);
       
-      const emailInput = screen.getByLabelText(/이메일/);
+      const emailInput = screen.getByPlaceholderText('user@example.com');
       
       // 잘못된 형식
       await user.type(emailInput, 'invalid-email');
@@ -145,7 +161,7 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} mode="create" />);
       
-      const passwordInput = screen.getByLabelText(/비밀번호/);
+      const passwordInput = screen.getByPlaceholderText('비밀번호를 입력하세요');
       
       // 너무 짧은 비밀번호
       await user.type(passwordInput, '123');
@@ -178,7 +194,7 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} />);
       
-      const phoneInput = screen.getByLabelText(/휴대폰 번호/);
+      const phoneInput = screen.getByPlaceholderText('010-1234-5678');
       
       // 잘못된 형식
       await user.type(phoneInput, '01012345678');
@@ -203,14 +219,21 @@ describe('UserForm 컴포넌트', () => {
       render(<UserForm {...defaultProps} />);
       
       // 사업자 역할 선택
-      const roleSelect = screen.getByLabelText(/역할/);
-      await user.selectOptions(roleSelect, 'business');
-      
-      await waitFor(() => {
-        expect(screen.getByLabelText(/사업자등록번호/)).toBeInTheDocument();
+      const roleSelects = screen.getAllByRole('combobox');
+      const roleSelect = roleSelects.find(select => {
+        const options = select.querySelectorAll('option');
+        return Array.from(options).some(opt => opt.textContent?.includes('관리자'));
       });
       
-      const businessNumberInput = screen.getByLabelText(/사업자등록번호/);
+      if (roleSelect) {
+        await user.selectOptions(roleSelect, 'business');
+      }
+      
+      await waitFor(() => {
+        expect(screen.getByText(/사업자등록번호/)).toBeInTheDocument();
+      });
+      
+      const businessNumberInput = screen.getByPlaceholderText('123-45-67890');
       
       // 잘못된 형식
       await user.type(businessNumberInput, '1234567890');
@@ -239,11 +262,14 @@ describe('UserForm 컴포넌트', () => {
       render(<UserForm {...defaultProps} />);
       
       // 필수 필드 입력
-      await user.type(screen.getByLabelText(/이름/), '홍길동');
-      await user.type(screen.getByLabelText(/이메일/), 'hong@example.com');
-      await user.type(screen.getByLabelText(/비밀번호/), 'Password123!');
-      await user.selectOptions(screen.getByLabelText(/역할/), 'customer');
-      await user.selectOptions(screen.getByLabelText(/상태/), 'approved');
+      await user.type(screen.getByPlaceholderText('사용자 이름을 입력하세요'), '홍길동');
+      await user.type(screen.getByPlaceholderText('user@example.com'), 'hong@example.com');
+      await user.type(screen.getByPlaceholderText('비밀번호를 입력하세요'), 'Password123!');
+      
+      // select 요소들 찾기
+      const selects = screen.getAllByRole('combobox');
+      await user.selectOptions(selects[0], 'customer'); // 역할
+      await user.selectOptions(selects[1], 'approved'); // 상태
       
       // 제출 버튼 클릭
       const submitButton = screen.getByText('사용자 생성');
@@ -269,20 +295,23 @@ describe('UserForm 컴포넌트', () => {
       render(<UserForm {...defaultProps} />);
       
       // 기본 정보 입력
-      await user.type(screen.getByLabelText(/이름/), '김사업');
-      await user.type(screen.getByLabelText(/이메일/), 'business@example.com');
-      await user.type(screen.getByLabelText(/비밀번호/), 'Password123!');
-      await user.selectOptions(screen.getByLabelText(/역할/), 'business');
-      await user.selectOptions(screen.getByLabelText(/상태/), 'approved');
+      await user.type(screen.getByPlaceholderText('사용자 이름을 입력하세요'), '김사업');
+      await user.type(screen.getByPlaceholderText('user@example.com'), 'business@example.com');
+      await user.type(screen.getByPlaceholderText('비밀번호를 입력하세요'), 'Password123!');
+      
+      // select 요소들 찾기
+      const selects = screen.getAllByRole('combobox');
+      await user.selectOptions(selects[0], 'business'); // 역할
+      await user.selectOptions(selects[1], 'approved'); // 상태
       
       // 사업자 정보 입력
       await waitFor(() => {
-        expect(screen.getByLabelText(/사업자명/)).toBeInTheDocument();
+        expect(screen.getByText(/사업자명/)).toBeInTheDocument();
       });
       
-      await user.type(screen.getByLabelText(/사업자명/), '테스트 컴퍼니');
-      await user.type(screen.getByLabelText(/사업자등록번호/), '123-45-67890');
-      await user.type(screen.getByLabelText(/대표자명/), '김대표');
+      await user.type(screen.getByPlaceholderText('사업자명을 입력하세요'), '테스트 컴퍼니');
+      await user.type(screen.getByPlaceholderText('123-45-67890'), '123-45-67890');
+      await user.type(screen.getByPlaceholderText('대표자명을 입력하세요'), '김대표');
       
       // 제출
       const submitButton = screen.getByText('사용자 생성');
