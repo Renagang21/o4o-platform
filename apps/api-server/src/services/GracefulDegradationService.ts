@@ -420,9 +420,7 @@ export class GracefulDegradationService {
       keyBy: parameters.keyBy || 'ip',
       degradationLevel: degradation.level
     };
-    if (true) {
-      await cacheService.set(rateLimitKey, rateLimitData, undefined, { ttl: 1800 });
-    }
+    await cacheService.set(rateLimitKey, rateLimitData, undefined, { ttl: 1800 });
     
     // console.log(`🚦 Enabled rate limiting for: ${target} (${parameters.requestsPerMinute} req/min)`);
   }
@@ -438,9 +436,7 @@ export class GracefulDegradationService {
       priority: parameters.priority || 'fifo',
       degradationLevel: degradation.level
     };
-    if (true) {
-      await cacheService.set(queueKey, queueData, undefined, { ttl: 1800 });
-    }
+    await cacheService.set(queueKey, queueData, undefined, { ttl: 1800 });
     
     // console.log(`📥 Enabled request queuing for: ${target} (max: ${parameters.maxQueueSize || 1000})`);
   }
@@ -457,9 +453,7 @@ export class GracefulDegradationService {
       statusCode: parameters.statusCode || 302,
       degradationLevel: degradation.level
     };
-    if (true) {
-      await cacheService.set(redirectKey, redirectData, undefined, { ttl: 1800 });
-    }
+    await cacheService.set(redirectKey, redirectData, undefined, { ttl: 1800 });
     
     // console.log(`🔀 Enabled traffic redirection for: ${target} to ${parameters.targetUrl || parameters.targetServer}`);
   }
