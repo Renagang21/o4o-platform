@@ -31,7 +31,7 @@
       "@o4o/utils": ["../../packages/utils/src"],
       "@o4o/ui": ["../../packages/ui/src"]
     },
-    "types": []
+    "types": ["vite/client", "node"]
   },
   "include": [
     "src",

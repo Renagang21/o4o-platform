@@ -80,7 +80,7 @@ registerBlockType('o4o/group', {
     }
   },
 
-  edit: ({ attributes, setAttributes }: { attributes: GroupBlockAttributes; setAttributes: (attrs: Partial<GroupBlockAttributes>) => void }) => {
+  edit: function Edit({ attributes, setAttributes }: { attributes: GroupBlockAttributes; setAttributes: (attrs: Partial<GroupBlockAttributes>) => void }) {
     const { 
       backgroundColor, 
       textColor, 

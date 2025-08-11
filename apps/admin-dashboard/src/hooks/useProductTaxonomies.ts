@@ -38,7 +38,7 @@ export function useProductCategories(): UseTaxonomiesResult {
         setError(err instanceof Error ? err.message : 'Failed to load categories');
         
         // Use mock data in development
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           setCategories(getMockCategories());
         }
       } finally {
@@ -70,7 +70,7 @@ export function useProductBrands(): UseBrandsResult {
         setError(err instanceof Error ? err.message : 'Failed to load brands');
         
         // Use mock data in development
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           setBrands(getMockBrands());
         }
       } finally {
@@ -131,7 +131,7 @@ export function useProductTags(): UseTaxonomiesResult {
         setError(err instanceof Error ? err.message : 'Failed to load tags');
         
         // Use mock data in development
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           setCategories(getMockTags());
         }
       } finally {

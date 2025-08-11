@@ -30,6 +30,9 @@ export enum PaymentGatewayStatus {
   PARTIALLY_REFUNDED = 'partially_refunded'
 }
 
+// For backwards compatibility with services using string literals
+export type PaymentGatewayStatusString = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'expired' | 'refunded' | 'partially_refunded';
+
 @Entity('payments')
 export class Payment {
   @PrimaryGeneratedColumn('uuid')

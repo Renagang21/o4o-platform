@@ -27,7 +27,7 @@ const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
-const Content = lazy(() => import('@/pages/content/Content'));
+const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content'));
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
 const OrderDetail = lazy(() => import('@/pages/ecommerce/OrderDetail'));
@@ -46,9 +46,13 @@ const Settings = lazy(() => import('@/pages/settings/Settings'));
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
 const Media = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
-const ReusableBlocksPage = lazy(() => import('@/pages/content/ReusableBlocksPage'));
+const ReusableBlocksPage = lazy(() => 
+  import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
+);
 const Categories = lazy(() => import('@/pages/categories/Categories'));
-const HomepageEditor = lazy(() => import('@/pages/templates/HomepageEditor'));
+const HomepageEditor = lazy(() => 
+  import(/* webpackChunkName: "homepage-editor" */ '@/pages/templates/HomepageEditor')
+);
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
@@ -58,7 +62,7 @@ const TestPage = lazy(() => import('@/pages/test/TestPage'));
 
 // Appearance Pages
 const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
-const TemplatePartEditor = lazy(() => import('@/pages/appearance/TemplatePartEditor'));
+const TemplatePartEditor = lazy(() => import(/* webpackChunkName: "template-editor" */ '@/pages/appearance/TemplatePartEditor'));
 const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 // const WidgetManager = lazy(() => import('@/pages/content/WidgetManager')); // Loaded via Content router
@@ -90,7 +94,9 @@ const RolePermissions = lazy(() => import('@/pages/users/RolePermissions'));
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
-const GutenbergPage = lazy(() => import('@/pages/test/GutenbergPage'));
+const GutenbergPage = lazy(() => 
+  import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPage')
+);
 const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 
 // Apps Manager
@@ -99,7 +105,9 @@ const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
 
 // Theme Pages
 const ThemeMarketplace = lazy(() => import('@/pages/themes/ThemeMarketplace'));
-const ThemeEditor = lazy(() => import('@/pages/themes/ThemeEditor'));
+const ThemeEditor = lazy(() => 
+  import(/* webpackChunkName: "theme-editor" */ '@/pages/themes/ThemeEditor')
+);
 const ThemePreview = lazy(() => import('@/pages/themes/ThemePreview'));
 
 // Loading component

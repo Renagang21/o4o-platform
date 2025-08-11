@@ -8,7 +8,7 @@ import { Shield, X, Check, Users, AlertTriangle } from 'lucide-react';
 import { User, UserRole, ROLE_LABELS } from '../../types/user';
 
 interface UserRoleChangeModalProps {
-  _isOpen: boolean;
+  isOpen: boolean;
   onClose: () => void;
   onConfirm: (newRole: UserRole) => void;
   users: User[];
@@ -16,7 +16,7 @@ interface UserRoleChangeModalProps {
 }
 
 const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
-  _isOpen,
+  isOpen,
   onClose,
   onConfirm,
   users,
@@ -24,7 +24,7 @@ const UserRoleChangeModal: FC<UserRoleChangeModalProps> = ({
 }) => {
   const [selectedRole, setSelectedRole] = useState('customer');
 
-  if (!_isOpen) return null;
+  if (!isOpen) return null;
 
   const userCount = users.length;
 

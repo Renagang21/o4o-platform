@@ -110,7 +110,7 @@ registerBlockType('o4o/cover', {
     }
   },
 
-  edit: ({ attributes, setAttributes }: { attributes: CoverBlockAttributes; setAttributes: (attrs: Partial<CoverBlockAttributes>) => void }) => {
+  edit: function Edit({ attributes, setAttributes }: { attributes: CoverBlockAttributes; setAttributes: (attrs: Partial<CoverBlockAttributes>) => void }) {
     const { 
       url, 
       hasParallax, 

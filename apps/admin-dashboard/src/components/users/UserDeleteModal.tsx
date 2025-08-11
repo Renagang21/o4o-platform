@@ -8,7 +8,7 @@ import { AlertTriangle, X, Trash2, Users } from 'lucide-react';
 import { User } from '../../types/user';
 
 interface UserDeleteModalProps {
-  _isOpen: boolean;
+  isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   users: User | User[];
@@ -16,13 +16,13 @@ interface UserDeleteModalProps {
 }
 
 const UserDeleteModal: FC<UserDeleteModalProps> = ({
-  _isOpen,
+  isOpen,
   onClose,
   onConfirm,
   users,
   isLoading = false
 }) => {
-  if (!_isOpen) return null;
+  if (!isOpen) return null;
 
   const isMultiple = Array.isArray(users);
   const userCount = isMultiple ? users.length : 1;

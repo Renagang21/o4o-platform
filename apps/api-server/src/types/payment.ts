@@ -53,7 +53,7 @@ export interface PaymentMetadata {
   lastCancel?: any;
   lastWebhook?: any;
   canceledAt?: string;
-  [key: string]: any;
+  [key: string]: any; // Allow additional properties for flexibility
 }
 
 // Sanitized payment response types

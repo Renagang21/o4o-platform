@@ -59,7 +59,7 @@ export function useUpdateOrderStatus() {
         trackingNumber?: string;
         carrier?: string;
       }
-    }) => vendorOrderApi.updateOrderStatus(id, data),
+    }) => vendorOrderApi.updateOrderStatus(id, data) as Promise<any>,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'orders'] });
       queryClient.invalidateQueries({ queryKey: ['vendor', 'orders', variables.id] });
@@ -78,7 +78,7 @@ export function useBulkUpdateOrders() {
 
   return useMutation({
     mutationFn: ({ orderIds, status }: { orderIds: string[]; status: string }) => 
-      vendorOrderApi.bulkUpdateOrders(orderIds, status),
+      vendorOrderApi.bulkUpdateOrders(orderIds, status) as Promise<any>,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'orders'] });
       queryClient.invalidateQueries({ queryKey: ['vendor', 'order-stats'] });

@@ -70,7 +70,7 @@ registerBlockType('o4o/columns', {
     }
   },
 
-  edit: ({ attributes, setAttributes, clientId }: any) => {
+  edit: function Edit({ attributes, setAttributes, clientId }: any) {
     const { columns, verticalAlignment, isStackedOnMobile, gap } = attributes;
     const { insertBlock, removeBlock } = useDispatch('core/block-editor') as any;
     
@@ -250,7 +250,7 @@ registerBlockType('o4o/column', {
     }
   },
 
-  edit: ({ attributes, setAttributes }: { attributes: ColumnBlockAttributes; setAttributes: (attrs: Partial<ColumnBlockAttributes>) => void }) => {
+  edit: function Edit({ attributes, setAttributes }: { attributes: ColumnBlockAttributes; setAttributes: (attrs: Partial<ColumnBlockAttributes>) => void }) {
     const { width, verticalAlignment } = attributes;
     
     const blockProps = useBlockProps({

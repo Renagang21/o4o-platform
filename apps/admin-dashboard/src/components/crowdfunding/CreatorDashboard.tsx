@@ -2,15 +2,15 @@
  * 크리에이터 대시보드 컴포넌트
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { api } from '@/lib/api';
-import { useToast } from '@/components/ui/use-toast';
+import { authClient } from '@o4o/auth-client';
+import toast from 'react-hot-toast';
 import { 
   Plus,
   TrendingUp,
@@ -19,7 +19,6 @@ import {
   Clock,
   Edit,
   Eye,
-  MessageSquare,
   Upload,
   Package,
   BarChart3
@@ -40,10 +39,8 @@ interface DashboardData {
 
 export function CreatorDashboard() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -52,18 +49,13 @@ export function CreatorDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/crowdfunding/creator/dashboard');
+      const response = await authClient.api.get('/crowdfunding/creator/dashboard');
       setDashboardData(response.data.data);
-      if (response.data.data.projects.length > 0) {
-        setSelectedProject(response.data.data.projects[0].id);
-      }
+      // if (response.data.data.projects.length > 0) {
+      //   setSelectedProject(response.data.data.projects[0].id);
+      // }
     } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data',
-        variant: 'destructive'
-      });
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }

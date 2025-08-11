@@ -20,7 +20,7 @@ export class CookieAuthClient {
         'Content-Type': 'application/json',
       },
       withCredentials: true, // Important for cookies
-    });
+    }) as any;
 
     // Response interceptor to handle token refresh
     this.api.interceptors.response.use(
@@ -35,7 +35,7 @@ export class CookieAuthClient {
           if (this.refreshPromise) {
             const success = await this.refreshPromise;
             if (success) {
-              return this.api(originalRequest);
+              return this.api.request(originalRequest);
             }
             throw error;
           }
@@ -46,7 +46,7 @@ export class CookieAuthClient {
           this.refreshPromise = null;
 
           if (success) {
-            return this.api(originalRequest);
+            return this.api.request(originalRequest);
           }
         }
 

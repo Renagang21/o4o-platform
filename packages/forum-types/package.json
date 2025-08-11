@@ -23,6 +23,8 @@
   "author": "O4O Platform Team",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "24.2.1",
+    "eslint": "9.33.0",
     "typescript": "~5.9.2"
   },
   "dependencies": {

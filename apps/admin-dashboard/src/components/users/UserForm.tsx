@@ -551,7 +551,7 @@ const UserForm: FC<UserFormProps> = ({
         </div>
 
         {/* 폼 상태 표시 (개발 환경) */}
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.DEV && (
           <div className="mt-4 p-3 bg-wp-bg-tertiary rounded text-xs">
             <p>폼 상태: {isValid ? '유효' : '유효하지 않음'} | 변경됨: {isDirty ? 'Y' : 'N'}</p>
             {Object.keys(errors).length > 0 && (

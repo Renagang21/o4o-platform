@@ -40,7 +40,7 @@ vendorApi.interceptors.response.use(
         const newToken = cookieAuthClient.getAccessToken();
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return vendorApi(originalRequest);
+          return vendorApi.request(originalRequest);
         }
       } catch (refreshError: any) {
         // 토큰 갱신 실패 시 로그인 페이지로 리다이렉트

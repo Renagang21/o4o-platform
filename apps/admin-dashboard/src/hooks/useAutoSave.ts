@@ -220,12 +220,26 @@ export function useAutoSave(initialContent?: any, config: AutoSaveConfig = {}) {
   // Clear backup
   const clearBackup = useCallback(() => {
     if (enableLocalStorage) {
+      // Clear all related storage keys
       localStorage.removeItem(storageKey);
       localStorage.removeItem(storageKey + '-old');
-      setState(prev => ({ ...prev, backupExists: false }));
-      toast.success('Backup cleared');
+      // Also clear any page-specific keys
+      if (config.postId) {
+        localStorage.removeItem(`page-${config.postId}-draft`);
+        localStorage.removeItem(`post-${config.postId}-draft`);
+      }
+      setState(prev => ({ 
+        ...prev, 
+        backupExists: false,
+        hasUnsavedChanges: false 
+      }));
+      // Reset content to prevent re-saving
+      isRestoringRef.current = true;
+      setTimeout(() => {
+        isRestoringRef.current = false;
+      }, 100);
     }
-  }, [enableLocalStorage, storageKey]);
+  }, [enableLocalStorage, storageKey, config.postId]);
 
   // Handle beforeunload event
   useEffect(() => {

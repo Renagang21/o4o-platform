@@ -12,7 +12,7 @@ export class AuthClient {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    }) as any;
 
     // Add auth token to requests
     this.api.interceptors.request.use((config: any) => {

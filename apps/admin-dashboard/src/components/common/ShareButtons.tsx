@@ -46,7 +46,7 @@ export const ShareButtons: FC<ShareButtonsProps> = ({
     const initKakao = () => {
       if (window.Kakao && !window.Kakao.isInitialized()) {
         // 실제 앱에서는 환경변수로 관리
-        window.Kakao.init(process.env.REACT_APP_KAKAO_JS_KEY || 'YOUR_KAKAO_JS_KEY');
+        window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY || 'YOUR_KAKAO_JS_KEY');
         setKakaoReady(true);
       }
     };

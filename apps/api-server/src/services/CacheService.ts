@@ -502,6 +502,73 @@ export class CacheService {
       circuitBreakerState: this.circuitBreaker.state
     };
   }
+
+  // Alias methods for backwards compatibility
+  public async getCache(key: string, namespace?: string): Promise<any> {
+    return this.get(key, namespace);
+  }
+
+  public async setCache(key: string, value: any, ttl?: number, namespace?: string): Promise<void> {
+    return this.set(key, value, namespace, { ttl });
+  }
+
+  public async clearAll(): Promise<void> {
+    return this.clear();
+  }
+
+  // Pricing cache methods
+  public generatePricingCacheKey(productId: number, userId?: number): string {
+    return userId ? `pricing:${productId}:${userId}` : `pricing:${productId}`;
+  }
+
+  public async getCachedPricingResult(key: string): Promise<any> {
+    return this.get(key, 'pricing');
+  }
+
+  public async cachePricingResult(key: string, result: any, ttl?: number): Promise<void> {
+    return this.set(key, result, 'pricing', { ttl });
+  }
+
+  public async invalidateProductPricing(productId: number): Promise<void> {
+    return this.clear(`pricing:${productId}*`);
+  }
+
+  public async invalidateUserPricing(userId: number): Promise<void> {
+    return this.clear(`pricing:*:${userId}`);
+  }
+
+  // Inventory cache methods
+  public async getTotalReservedQuantity(productId: number): Promise<number> {
+    const key = `inventory:reserved:${productId}`;
+    const reserved = await this.get<number>(key, 'inventory');
+    return reserved || 0;
+  }
+
+  public async reserveInventory(productId: number, quantity: number): Promise<void> {
+    const key = `inventory:reserved:${productId}`;
+    const current = await this.getTotalReservedQuantity(productId);
+    await this.set(key, current + quantity, 'inventory', { ttl: 900 }); // 15 minutes
+  }
+
+  public async releaseInventoryReservation(productId: number, quantity: number): Promise<void> {
+    const key = `inventory:reserved:${productId}`;
+    const current = await this.getTotalReservedQuantity(productId);
+    const newQuantity = Math.max(0, current - quantity);
+    if (newQuantity > 0) {
+      await this.set(key, newQuantity, 'inventory', { ttl: 900 });
+    } else {
+      await this.delete(key, 'inventory');
+    }
+  }
+
+  // Redis availability properties for backward compatibility
+  public get redis(): Redis | null {
+    return this.redisClient;
+  }
+
+  public get isEnabled(): boolean {
+    return this.isRedisAvailable();
+  }
   
   /**
    * Reset statistics

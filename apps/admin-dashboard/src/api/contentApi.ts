@@ -254,7 +254,7 @@ export class ContentApi {
   static async uploadFiles(
     files: File[],
     folderId?: string,
-    onProgress?: (progress: number) => void
+    _onProgress?: (progress: number) => void
   ): Promise<ApiResponse<MediaFile[]>> {
     const formData = new FormData()
     
@@ -269,14 +269,8 @@ export class ContentApi {
     const response = await unifiedApi.raw.post('/v1/content/media/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
-      },
-      onUploadProgress: (progressEvent) => {
-        if (onProgress && progressEvent.total) {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          onProgress(progress)
-        }
       }
-    })
+    } as any)
     
     return response.data
   }

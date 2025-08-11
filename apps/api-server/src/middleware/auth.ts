@@ -12,18 +12,18 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
   try {
     // 개발 환경에서 DB 연결 없이 인증 우회
     if (!AppDataSource.isInitialized && process.env.NODE_ENV === 'development') {
-      (req as AuthRequest).user = {
-        id: 'dev-user-1',
-        userId: 'dev-user-1',
-        email: 'admin@o4o.com',
-        name: '개발 관리자',
-        role: UserRole.ADMIN,
-        status: UserStatus.APPROVED,
-        businessInfo: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastLoginAt: new Date()
-      };
+      // Create a mock User entity for development
+      const devUser = new User();
+      devUser.id = 'dev-user-1';
+      devUser.email = 'admin@o4o.com';
+      devUser.name = '개발 관리자';
+      devUser.role = UserRole.ADMIN;
+      devUser.status = UserStatus.APPROVED;
+      devUser.createdAt = new Date();
+      devUser.updatedAt = new Date();
+      devUser.lastLoginAt = new Date();
+      
+      (req as AuthRequest).user = devUser;
       return next();
     }
 
@@ -47,18 +47,19 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
             // Verify new access token
             const newPayload = authService.verifyAccessToken(tokens.accessToken);
             if (newPayload) {
-              (req as AuthRequest).user = {
-                id: newPayload.userId || newPayload.sub || '',
-                userId: newPayload.userId || newPayload.sub || '',
-                email: newPayload.email || '',
-                role: newPayload.role as UserRole || UserRole.CUSTOMER,
-                status: newPayload.status as UserStatus || UserStatus.ACTIVE,
-                name: newPayload.name,
-                businessInfo: newPayload.businessInfo,
-                createdAt: newPayload.createdAt as Date || new Date(),
-                updatedAt: newPayload.updatedAt as Date || new Date(),
-                lastLoginAt: newPayload.lastLoginAt as Date
-              };
+              // Create User entity from token payload
+              const tokenUser = new User();
+              tokenUser.id = newPayload.userId || newPayload.sub || '';
+              tokenUser.email = newPayload.email || '';
+              tokenUser.role = newPayload.role as UserRole || UserRole.CUSTOMER;
+              tokenUser.status = newPayload.status as UserStatus || UserStatus.ACTIVE;
+              tokenUser.name = newPayload.name;
+              tokenUser.businessInfo = newPayload.businessInfo;
+              tokenUser.createdAt = newPayload.createdAt as Date || new Date();
+              tokenUser.updatedAt = newPayload.updatedAt as Date || new Date();
+              tokenUser.lastLoginAt = newPayload.lastLoginAt as Date;
+              
+              (req as AuthRequest).user = tokenUser;
               return next();
             }
           }
@@ -71,18 +72,19 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         });
       }
 
-      (req as AuthRequest).user = {
-        id: payload.userId || payload.sub || '',
-        userId: payload.userId || payload.sub || '',
-        email: payload.email || '',
-        role: payload.role as UserRole || UserRole.CUSTOMER,
-        status: payload.status as UserStatus || UserStatus.ACTIVE,
-        name: payload.name,
-        businessInfo: payload.businessInfo,
-        createdAt: payload.createdAt as Date || new Date(),
-        updatedAt: payload.updatedAt as Date || new Date(),
-        lastLoginAt: payload.lastLoginAt as Date
-      };
+      // Create User entity from token payload
+      const cookieUser = new User();
+      cookieUser.id = payload.userId || payload.sub || '';
+      cookieUser.email = payload.email || '';
+      cookieUser.role = payload.role as UserRole || UserRole.CUSTOMER;
+      cookieUser.status = payload.status as UserStatus || UserStatus.ACTIVE;
+      cookieUser.name = payload.name;
+      cookieUser.businessInfo = payload.businessInfo;
+      cookieUser.createdAt = payload.createdAt as Date || new Date();
+      cookieUser.updatedAt = payload.updatedAt as Date || new Date();
+      cookieUser.lastLoginAt = payload.lastLoginAt as Date;
+      
+      (req as AuthRequest).user = cookieUser;
       return next();
     }
 
@@ -131,18 +133,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       });
     }
 
-    (req as AuthRequest).user = {
-      id: user.id,
-      userId: user.id,
-      email: user.email,
-      role: user.role as UserRole,
-      status: user.status as UserStatus,
-      name: user.name,
-      businessInfo: user.businessInfo,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      lastLoginAt: user.lastLoginAt
-    };
+    (req as AuthRequest).user = user;
     next();
   } catch (error: any) {
     return res.status(401).json({ 
@@ -186,18 +177,19 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     if (accessToken) {
       const payload = authService.verifyAccessToken(accessToken);
       if (payload) {
-        (req as AuthRequest).user = {
-          id: payload.userId || payload.sub || '',
-          userId: payload.userId || payload.sub || '',
-          email: payload.email || '',
-          role: payload.role as UserRole || UserRole.CUSTOMER,
-          status: payload.status as UserStatus || UserStatus.ACTIVE,
-          name: payload.name,
-          businessInfo: payload.businessInfo,
-          createdAt: payload.createdAt as Date || new Date(),
-          updatedAt: payload.updatedAt as Date || new Date(),
-          lastLoginAt: payload.lastLoginAt as Date
-        };
+        // Create User entity from token payload
+        const refreshTokenUser = new User();
+        refreshTokenUser.id = payload.userId || payload.sub || '';
+        refreshTokenUser.email = payload.email || '';
+        refreshTokenUser.role = payload.role as UserRole || UserRole.CUSTOMER;
+        refreshTokenUser.status = payload.status as UserStatus || UserStatus.ACTIVE;
+        refreshTokenUser.name = payload.name;
+        refreshTokenUser.businessInfo = payload.businessInfo;
+        refreshTokenUser.createdAt = payload.createdAt as Date || new Date();
+        refreshTokenUser.updatedAt = payload.updatedAt as Date || new Date();
+        refreshTokenUser.lastLoginAt = payload.lastLoginAt as Date;
+        
+        (req as AuthRequest).user = refreshTokenUser;
         return next();
       }
     }
@@ -231,18 +223,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     });
     
     if (user && user.status === UserStatus.APPROVED) {
-      (req as AuthRequest).user = {
-        id: user.id,
-        userId: user.id,
-        email: user.email,
-        role: user.role as UserRole,
-        status: user.status as UserStatus,
-        name: user.name,
-        businessInfo: user.businessInfo,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        lastLoginAt: user.lastLoginAt
-      };
+      (req as AuthRequest).user = user;
     }
 
     next();

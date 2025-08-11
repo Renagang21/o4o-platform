@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Settings, 
   Globe, 
   Zap, 
   TrendingUp, 
   Shield, 
   Database,
   RefreshCw,
-  CheckCircle,
-  AlertTriangle,
-  Play,
-  Pause,
   Users,
   Package,
   DollarSign

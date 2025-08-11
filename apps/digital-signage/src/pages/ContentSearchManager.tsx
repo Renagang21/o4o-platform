@@ -94,7 +94,7 @@ const ContentSearchManager: FC = () => {
       };
 
       const response = await axios.post('/api/signage/contents/search', searchPayload);
-      setSearchResult(response.data.data);
+      setSearchResult((response.data as any).data);
     } catch (error: any) {
       toast.error('Search failed');
     // Error logging - use proper error handler

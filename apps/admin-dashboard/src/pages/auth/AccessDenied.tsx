@@ -9,7 +9,7 @@ const AccessDenied = () => {
     const timer = setTimeout(() => {
       logout()
       // 메인 사이트로 리디렉션
-      window.location.href = process.env.NODE_ENV === 'production' 
+      window.location.href = import.meta.env.PROD 
         ? 'https://neture.co.kr' 
         : 'http://localhost:3000'
     }, 3000)
@@ -19,7 +19,7 @@ const AccessDenied = () => {
 
   const handleRedirectNow = () => {
     logout()
-    window.location.href = process.env.NODE_ENV === 'production' 
+    window.location.href = import.meta.env.PROD 
       ? 'https://neture.co.kr' 
       : 'http://localhost:3000'
   }

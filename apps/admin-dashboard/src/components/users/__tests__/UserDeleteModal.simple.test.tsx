@@ -26,7 +26,7 @@ describe('UserDeleteModal 간단 테스트', () => {
   };
 
   const defaultProps = {
-    _isOpen: true,
+    isOpen: true,
     onClose: mockOnClose,
     onConfirm: mockOnConfirm,
     users: sampleUser,
@@ -92,7 +92,7 @@ describe('UserDeleteModal 간단 테스트', () => {
   });
 
   it('isOpen이 false일 때 렌더링되지 않는다', () => {
-    render(<UserDeleteModal {...defaultProps} _isOpen={false} />);
+    render(<UserDeleteModal {...defaultProps} isOpen={false} />);
     
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

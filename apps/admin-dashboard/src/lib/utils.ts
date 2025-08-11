@@ -6,6 +6,13 @@ import * as utils from '@o4o/utils';
 export const formatCurrency = utils.formatCurrency;
 export const formatDate = utils.formatDate;
 
+/**
+ * Format number with commas
+ */
+export function formatNumber(num: number): string {
+  return num.toLocaleString();
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }

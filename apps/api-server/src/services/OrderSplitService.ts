@@ -43,14 +43,26 @@ export class OrderSplitService {
     // Add domestic API supplier
     this.supplierManager.addSupplier('domestic-api', {
       type: 'api',
-      apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
-      endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
+      credentials: {
+        apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
+        endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
+      },
+      options: {
+        rateLimit: 10,
+        timeout: 30000,
+        retryAttempts: 3
+      }
     } as any);
 
     // Add CSV catalog supplier
     this.supplierManager.addSupplier('csv-catalog', {
       type: 'csv',
-      webhookUrl: './catalogs/supplier-products.csv'
+      options: {
+        webhookUrl: './catalogs/supplier-products.csv',
+        rateLimit: 10,
+        timeout: 30000,
+        retryAttempts: 3
+      }
     } as any);
   }
 
@@ -157,13 +169,13 @@ export class OrderSplitService {
       }
 
       // Prepare supplier order
-      const supplierOrder: any = {
+      const supplierOrder: SupplierOrder = {
         orderId: `${order.id}-${splitOrder.supplierId}`,
         items: splitOrder.items.map(item => ({
           sku: item.product.sku,
           quantity: item.quantity,
           price: item.price,
-          cost: item.product.cost
+          cost: item.product.cost || 0
         })),
         customer: {
           name: order.user?.name || order.customerName || '',
@@ -171,7 +183,7 @@ export class OrderSplitService {
           phone: order.customerPhone || order.shippingAddress?.phone || ''
         },
         shipping: {
-          name: order.shippingAddress?.name || order.customerName,
+          name: order.shippingAddress?.name || order.customerName || '',
           address1: order.shippingAddress?.address || '',
           address2: order.shippingAddress?.addressDetail,
           city: order.shippingAddress?.city || '',

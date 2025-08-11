@@ -54,11 +54,11 @@ export default function VendorProducts() {
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
 
-  const products = productsData?.products || [];
-  const pagination = productsData?.pagination;
+  const products = (productsData as any)?.products || [];
+  const pagination = (productsData as any)?.pagination;
 
   // 카테고리 목록 구성
-  const categoryOptions = ['all', ...categories.map((cat: any) => cat.name)];
+  const categoryOptions = ['all', ...(categories as any[]).map((cat: any) => cat.name)];
 
   // 검색/카테고리 변경 시 페이지 리셋
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function VendorProducts() {
           sortOrder: 0,
           isFeatured: true
         }] : [],
-        categories: categories.filter((c: any) => c.name === product.category).map((c: any) => c.id),
+        categories: (categories as any[]).filter((c: any) => c.name === product.category).map((c: any) => c.id),
         inventory: {
           stockQuantity: product.stock,
           stockStatus: product.status === 'out_of_stock' ? 'out_of_stock' : 'in_stock',

@@ -1,0 +1,112 @@
+/* Media Upload Dialog Z-Index Fixes */
+
+/* Ensure media upload dialog and overlays appear above admin sidebar */
+.media-upload-overlay {
+  z-index: 100000 !important;
+}
+
+.media-upload-dialog {
+  z-index: 100001 !important;
+}
+
+/* Media upload container adjustments */
+.media-upload-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Drag and drop area */
+.media-dropzone {
+  position: relative;
+  z-index: 10;
+  background: white;
+}
+
+.media-dropzone-active {
+  background: #f0f9ff;
+  border-color: #3b82f6;
+}
+
+/* File preview grid */
+.media-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* File preview item */
+.media-preview-item {
+  position: relative;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: white;
+}
+
+.media-preview-item.uploading {
+  opacity: 0.7;
+}
+
+.media-preview-item.error {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.media-preview-item.success {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+/* Progress bar */
+.media-upload-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e5e7eb;
+  border-radius: 0 0 0.5rem 0.5rem;
+  overflow: hidden;
+}
+
+.media-upload-progress-bar {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .media-preview-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Ensure dialog is visible on mobile */
+  .media-upload-dialog {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 4rem) !important;
+    margin: 0 !important;
+  }
+}
+
+/* WordPress admin compatibility */
+.wp-admin .media-upload-overlay,
+.wp-admin .media-upload-dialog {
+  z-index: 100001 !important;
+}
+
+/* Fix for admin bar overlap */
+.admin-bar .media-upload-dialog {
+  margin-top: 32px;
+}
+
+@media (max-width: 782px) {
+  .admin-bar .media-upload-dialog {
+    margin-top: 46px;
+  }
+}

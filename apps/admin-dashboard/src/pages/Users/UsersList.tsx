@@ -668,7 +668,7 @@ const UsersList: FC = () => {
 
       {/* 사용자 삭제 모달 */}
       <UserDeleteModal
-        isOpen={deleteModal._isOpen}
+        _isOpen={deleteModal._isOpen}
         onClose={() => setDeleteModal({ _isOpen: false, users: [] as User[] })}
         onConfirm={handleDeleteConfirm}
         users={deleteModal.users}

@@ -73,7 +73,7 @@ const EnhancedSignageDashboard: FC = () => {
   const fetchAnalytics = useCallback(async () => {
     try {
       const response = await axios.get('/api/signage/analytics');
-      setAnalytics(response.data.data);
+      setAnalytics((response.data as any).data);
     } catch (error: any) {
     // Error logging - use proper error handler
     }
@@ -84,7 +84,7 @@ const EnhancedSignageDashboard: FC = () => {
     try {
       const params = selectedStore ? { storeId: selectedStore.id } : {};
       const response = await axios.get('/api/signage/dashboard/live', { params });
-      setLiveDashboard(response.data.data);
+      setLiveDashboard((response.data as any).data);
     } catch (error: any) {
     // Error logging - use proper error handler
     }
@@ -104,7 +104,7 @@ const EnhancedSignageDashboard: FC = () => {
       if (selectedStore) params.storeId = selectedStore.id;
       
       const response = await axios.get('/api/signage/contents', { params });
-      setContents(response.data.data.contents);
+      setContents((response.data as any).data.contents);
     } catch (error: any) {
     // Error logging - use proper error handler
       toast.error('Failed to load contents');
@@ -115,9 +115,10 @@ const EnhancedSignageDashboard: FC = () => {
   const fetchStores = useCallback(async () => {
     try {
       const response = await axios.get('/api/signage/stores');
-      setStores(response.data.data.stores);
-      if (response.data.data.stores.length > 0 && !selectedStore) {
-        setSelectedStore(response.data.data.stores[0]);
+      const storesData = (response.data as any).data.stores;
+      setStores(storesData);
+      if (storesData.length > 0 && !selectedStore) {
+        setSelectedStore(storesData[0]);
       }
     } catch (error: any) {
     // Error logging - use proper error handler

@@ -58,7 +58,7 @@ const LiveTVDisplay: FC = () => {
   const fetchPlaybackStatus = useCallback(async () => {
     try {
       const response = await axios.get(`/api/signage/stores/${storeId}/playback/status`);
-      setPlaybackStatus(response.data.data);
+      setPlaybackStatus((response.data as any).data);
       setIsConnected(true);
       setError(null);
     } catch (error: any) {
