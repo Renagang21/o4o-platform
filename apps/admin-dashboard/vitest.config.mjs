@@ -11,7 +11,9 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/build/**',
-      '**/.{idea,git,cache,output,temp}/**'
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/e2e/**',
+      '**/*.spec.ts'
     ]
   },
   resolve: {

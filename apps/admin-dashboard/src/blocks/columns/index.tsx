@@ -70,7 +70,7 @@ registerBlockType('o4o/columns', {
     }
   },
 
-  edit: ({ attributes, setAttributes, clientId }: any) => {
+  edit: function Edit({ attributes, setAttributes, clientId }: any) {
     const { columns, verticalAlignment, isStackedOnMobile, gap } = attributes;
     const { insertBlock, removeBlock } = useDispatch('core/block-editor') as any;
     
