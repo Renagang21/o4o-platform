@@ -12,11 +12,7 @@ import Edit from './edit';
 import save from './save';
 
 // Declare wp global
-declare global {
-  interface Window {
-    wp: any;
-  }
-}
+// Window.wp type is already declared in wordpress-polyfill.ts
 
 // Register custom block category if it doesn't exist
 const registerO4OCategory = () => {

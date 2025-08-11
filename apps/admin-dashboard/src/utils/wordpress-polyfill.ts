@@ -14,11 +14,11 @@ export function initWordPressI18n() {
   // i18n 기본 구현 (나중에 실제 다국어 지원 시 교체 가능)
   window.wp.i18n = {
     // 기본 번역 함수
-    __: (text: string, domain?: string) => text,
-    _x: (text: string, context: string, domain?: string) => text,
-    _n: (single: string, plural: string, number: number, domain?: string) => 
+    __: (text: string, _domain?: string) => text,
+    _x: (text: string, _context: string, _domain?: string) => text,
+    _n: (single: string, plural: string, number: number, _domain?: string) => 
       number === 1 ? single : plural,
-    _nx: (single: string, plural: string, number: number, context: string, domain?: string) => 
+    _nx: (single: string, plural: string, number: number, _context: string, _domain?: string) => 
       number === 1 ? single : plural,
     
     // sprintf 구현
@@ -29,10 +29,10 @@ export function initWordPressI18n() {
     
     // 기타 유틸리티
     isRTL: () => false,
-    setLocaleData: (data: any, domain?: string) => {},
-    getLocaleData: (domain?: string) => ({}),
-    hasTranslation: (text: string, context?: string, domain?: string) => false,
-    subscribe: (callback: () => void) => () => {},
+    setLocaleData: (_data: any, _domain?: string) => {},
+    getLocaleData: (_domain?: string) => ({}),
+    hasTranslation: (_text: string, _context?: string, _domain?: string) => false,
+    subscribe: (_callback: () => void) => () => {},
   };
 }
 
@@ -44,10 +44,10 @@ export function initWordPressData() {
   
   // 기본 데이터 저장소 (필요시 Redux나 Zustand로 교체 가능)
   window.wp.data = window.wp.data || {
-    select: (storeName: string) => ({}),
-    dispatch: (storeName: string) => ({}),
-    subscribe: (callback: () => void) => () => {},
-    registerStore: (name: string, config: any) => {},
+    select: (_storeName: string) => ({}),
+    dispatch: (_storeName: string) => ({}),
+    subscribe: (_callback: () => void) => () => {},
+    registerStore: (_name: string, _config: any) => {},
   };
 }
 
@@ -61,7 +61,7 @@ export function initWordPressHooks() {
   const actions: Record<string, Function[]> = {};
   
   window.wp.hooks = {
-    addFilter: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+    addFilter: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
       filters[hookName] = filters[hookName] || [];
       filters[hookName].push(callback);
     },
@@ -69,7 +69,7 @@ export function initWordPressHooks() {
       const callbacks = filters[hookName] || [];
       return callbacks.reduce((val, callback) => callback(val, ...args), value);
     },
-    addAction: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+    addAction: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
       actions[hookName] = actions[hookName] || [];
       actions[hookName].push(callback);
     },
@@ -77,10 +77,10 @@ export function initWordPressHooks() {
       const callbacks = actions[hookName] || [];
       callbacks.forEach(callback => callback(...args));
     },
-    removeFilter: (hookName: string, namespace: string) => {
+    removeFilter: (_hookName: string, _namespace: string) => {
       // 구현 필요시 추가
     },
-    removeAction: (hookName: string, namespace: string) => {
+    removeAction: (_hookName: string, _namespace: string) => {
       // 구현 필요시 추가
     },
   };
@@ -106,8 +106,8 @@ export function initWordPress() {
   
   // Element 관련 (React 래퍼)
   window.wp.element = window.wp.element || {
-    createElement: (...args: any[]) => null, // React.createElement로 교체 가능
-    render: (...args: any[]) => null, // ReactDOM.render로 교체 가능
+    createElement: (..._args: any[]) => null, // React.createElement로 교체 가능
+    render: (..._args: any[]) => null, // ReactDOM.render로 교체 가능
   };
 }
 
