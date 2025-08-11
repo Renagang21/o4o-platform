@@ -59,15 +59,15 @@ describe('UserRoleChangeModal 컴포넌트', () => {
   });
 
   describe('모달 표시/숨김', () => {
-    it('isOpen이 false일 때 모달이 렌더링되지 않는다', () => {
+    it('_isOpen이 false일 때 모달이 렌더링되지 않는다', () => {
       render(
-        <UserRoleChangeModal {...defaultProps} isOpen={false} />
+        <UserRoleChangeModal {...defaultProps} _isOpen={false} />
       );
       
-      expect(screen.queryByText('사용자 역할 변경')).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('isOpen이 true일 때 모달이 렌더링된다', () => {
+    it('_isOpen이 true일 때 모달이 렌더링된다', () => {
       render(<UserRoleChangeModal {...defaultProps} />);
       
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -109,7 +109,9 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       expect(screen.getByText('선택 사용자 (1명)')).toBeInTheDocument();
       expect(screen.getByText('홍길동')).toBeInTheDocument();
       expect(screen.getByText('(hong@example.com)')).toBeInTheDocument();
-      expect(screen.getByText('일반회원')).toBeInTheDocument(); // customer role label
+      // 역할 라벨은 중복될 수 있으므로 getAllByText 사용
+      const customerLabels = screen.getAllByText('일반회원');
+      expect(customerLabels.length).toBeGreaterThan(0);
     });
 
     it('다중 사용자 정보가 올바르게 표시된다', () => {
@@ -123,13 +125,15 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       
       // 모든 사용자 표시 확인
       expect(screen.getByText('홍길동')).toBeInTheDocument();
-      expect(screen.getByText('관리자')).toBeInTheDocument();
-      expect(screen.getByText('사업자')).toBeInTheDocument();
       
-      // 역할 라벨 확인
+      // '관리자'와 '사업자'는 이름과 역할이 같으므로 getAllByText 사용
+      const adminTexts = screen.getAllByText('관리자');
+      expect(adminTexts.length).toBeGreaterThan(0);
+      
+      const businessTexts = screen.getAllByText('사업자');
+      expect(businessTexts.length).toBeGreaterThan(0);
+      
       expect(screen.getByText('일반회원')).toBeInTheDocument();
-      expect(screen.getByText('관리자')).toBeInTheDocument();
-      expect(screen.getByText('사업자')).toBeInTheDocument();
     });
 
     it('사용자 목록이 스크롤 가능하다', () => {
@@ -155,10 +159,14 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       render(<UserRoleChangeModal {...defaultProps} />);
       
       expect(screen.getByText('변경할 역할 선택')).toBeInTheDocument();
-      expect(screen.getByText('관리자')).toBeInTheDocument();
-      expect(screen.getByText('일반회원')).toBeInTheDocument();
-      expect(screen.getByText('사업자')).toBeInTheDocument();
-      expect(screen.getByText('제휴 파트너')).toBeInTheDocument();
+      // 역할 옵션들을 특정하기 위해 button role로 찾기
+      const roleButtons = screen.getAllByRole('button');
+      const roleTexts = roleButtons.map(btn => btn.textContent);
+      
+      expect(roleTexts.some(text => text?.includes('관리자'))).toBe(true);
+      expect(roleTexts.some(text => text?.includes('일반회원'))).toBe(true);
+      expect(roleTexts.some(text => text?.includes('사업자'))).toBe(true);
+      expect(roleTexts.some(text => text?.includes('제휴 파트너'))).toBe(true);
     });
 
     it('각 역할에 대한 설명이 표시된다', () => {
