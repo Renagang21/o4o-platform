@@ -274,7 +274,7 @@ export class AuthMiddleware {
     }
 
     // Beta users can only access their own analytics data
-    if (req.user.role === 'beta_user') {
+    if (req.user.role === UserRole.BETA_USER) {
       // Check if the request is for their own data
       const userId = req.params.userId || req.query.userId;
       if (userId && userId !== req.user.betaUserId) {

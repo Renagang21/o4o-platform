@@ -169,7 +169,7 @@ export class OrderSplitService {
       }
 
       // Prepare supplier order
-      const supplierOrder: SupplierOrder = {
+      const supplierOrder: any = {
         orderId: `${order.id}-${splitOrder.supplierId}`,
         items: splitOrder.items.map(item => ({
           sku: item.product.sku,

@@ -11,6 +11,7 @@ export enum UserRole {
   BUSINESS = 'business',
   MODERATOR = 'moderator',
   PARTNER = 'partner',
+  BETA_USER = 'beta_user',
   // Legacy roles kept for backward compatibility
   SUPPLIER = 'supplier',
   MANAGER = 'manager'
