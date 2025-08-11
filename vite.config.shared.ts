@@ -48,8 +48,8 @@ export const sharedViteConfig: UserConfig = {
           }
           
           if (id.includes('node_modules')) {
-            // React 관련 - Radix UI도 포함시켜서 순서 보장
-            if ((id.includes('react') && !id.includes('react-')) || id.includes('@radix-ui')) {
+            // React 관련 - react-query는 제외하고 순수 React만
+            if (id.includes('react') && !id.includes('react-query') && !id.includes('@tanstack')) {
               return 'vendor-react';
             }
             // 기타 UI 라이브러리

@@ -53,12 +53,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react',
       'react-dom',
       'react/jsx-runtime',
+      '@tanstack/react-query',
       '@o4o/types', 
       '@o4o/utils', 
       '@o4o/ui', 
       '@o4o/auth-client', 
       '@o4o/auth-context'
     ],
+    exclude: [],
     esbuildOptions: {
       define: {
         global: 'globalThis',
