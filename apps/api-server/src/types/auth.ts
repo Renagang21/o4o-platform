@@ -1,6 +1,7 @@
 // Authentication and Authorization Types
 
 import { Request } from 'express';
+import { User } from '../entities/User';
 
 export enum UserRole {
   SUPER_ADMIN = 'super_admin',
@@ -42,8 +43,10 @@ export interface JWTPayload {
   exp?: number;
 }
 
-// AuthRequest interface is now extended via global.d.ts
-export type AuthRequest = Request;
+// AuthRequest interface with proper User type
+export interface AuthRequest extends Request {
+  user?: User;
+}
 
 export interface LoginCredentials {
   email: string;
