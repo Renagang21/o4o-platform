@@ -217,7 +217,7 @@ export class RecommendationService {
     
     if (!product) return [];
     
-    const relatedCategories = complementaryCategories[product.category?.slug || ''] || [];
+    const relatedCategories = complementaryCategories[product.category || ''] || [];
     
     if (relatedCategories.length === 0) return [];
     

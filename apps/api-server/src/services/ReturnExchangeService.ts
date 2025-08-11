@@ -4,7 +4,7 @@
  */
 
 import { AppDataSource } from '../database/connection';
-import { Order } from '../entities/Order';
+import { Order, OrderStatus, PaymentStatus } from '../entities/Order';
 import { Product } from '../entities/Product';
 import { User } from '../entities/User';
 import { tossPaymentsService } from './TossPaymentsService';
@@ -468,8 +468,8 @@ export class ReturnExchangeService extends EventEmitter {
     });
 
     if (product?.category) {
-      if (this.returnPolicy.excludedCategories.includes(product.category.slug)) {
-        throw new Error(`Product category ${product.category.name} is not eligible for return`);
+      if (this.returnPolicy.excludedCategories.includes(product.category as string)) {
+        throw new Error(`Product category ${product.category} is not eligible for return`);
       }
     }
   }
@@ -537,24 +537,24 @@ export class ReturnExchangeService extends EventEmitter {
 
     // 새 주문 생성 (교환)
     const exchangeOrder = this.orderRepository.create({
-      userId: returnRequest.userId,
+      user: { id: returnRequest.userId } as any,
       orderNumber: this.generateOrderNumber(),
-      status: 'processing',
-      paymentStatus: 'paid', // 이미 결제됨
+      status: OrderStatus.PROCESSING,
+      paymentStatus: PaymentStatus.PAID, // 이미 결제됨
       totalAmount: 0, // 교환은 추가 비용 없음
-      billing: originalOrder.billing,
-      shipping: originalOrder.shipping,
+      billingAddress: originalOrder.billingAddress,
+      shippingAddress: originalOrder.shippingAddress,
       items: [], // 교환 상품으로 채움
       metadata: {
         isExchange: true,
         originalOrderId: originalOrder.id,
         returnRequestId: returnRequest.id
       }
-    });
+    } as any);
 
-    await this.orderRepository.save(exchangeOrder);
+    const savedOrder = await this.orderRepository.save(exchangeOrder);
 
-    return exchangeOrder;
+    return (Array.isArray(savedOrder) ? savedOrder[0] : savedOrder) as Order;
   }
 
   /**

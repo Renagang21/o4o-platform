@@ -216,7 +216,7 @@ export class GracefulDegradationService {
           return false; // Service is available
         
         case 'cache':
-          await cacheService.getCachedPricingResult('health-check');
+          await cacheService.get('health-check');
           return false; // Service is available
         
         case 'signage':
@@ -373,8 +373,8 @@ export class GracefulDegradationService {
       fallbackData: parameters.fallbackData || {}
     };
     // Use direct redis access through cacheService
-    if (cacheService.redis && cacheService.isEnabled) {
-      await cacheService.redis.setex(cacheKey, parameters.ttl || 3600, JSON.stringify(cacheData));
+    if (true) {
+      await cacheService.set(cacheKey, cacheData, undefined, { ttl: parameters.ttl || 3600 });
     }
     
     // console.log(`🗄️ Enabled cache fallback for: ${target}`);
@@ -389,8 +389,8 @@ export class GracefulDegradationService {
       staticContent: parameters.contentPath || 'Service temporarily unavailable',
       degradationLevel: degradation.level
     };
-    if (cacheService.redis && cacheService.isEnabled) {
-      await cacheService.redis.setex(staticKey, parameters.expiryTime || 7200, JSON.stringify(staticData));
+    if (true) {
+      await cacheService.set(staticKey, staticData, undefined, { ttl: parameters.expiryTime || 7200 });
     }
     
     // console.log(`📄 Enabled static content for: ${target}`);
@@ -408,8 +408,8 @@ export class GracefulDegradationService {
       essentialOnly: parameters.essentialOnly || false,
       degradationLevel: degradation.level
     };
-    if (cacheService.redis && cacheService.isEnabled) {
-      await cacheService.redis.setex(uiKey, 3600, JSON.stringify(uiData));
+    if (true) {
+      await cacheService.set(uiKey, uiData, undefined, { ttl: 3600 });
     }
     
     // console.log(`🎨 Enabled simplified UI for: ${target}`);
@@ -426,8 +426,8 @@ export class GracefulDegradationService {
       keyBy: parameters.keyBy || 'ip',
       degradationLevel: degradation.level
     };
-    if (cacheService.redis && cacheService.isEnabled) {
-      await cacheService.redis.setex(rateLimitKey, 1800, JSON.stringify(rateLimitData));
+    if (true) {
+      await cacheService.set(rateLimitKey, rateLimitData, undefined, { ttl: 1800 });
     }
     
     // console.log(`🚦 Enabled rate limiting for: ${target} (${parameters.requestsPerMinute} req/min)`);
@@ -444,8 +444,8 @@ export class GracefulDegradationService {
       priority: parameters.priority || 'fifo',
       degradationLevel: degradation.level
     };
-    if (cacheService.redis && cacheService.isEnabled) {
-      await cacheService.redis.setex(queueKey, 1800, JSON.stringify(queueData));
+    if (true) {
+      await cacheService.set(queueKey, queueData, undefined, { ttl: 1800 });
     }
     
     // console.log(`📥 Enabled request queuing for: ${target} (max: ${parameters.maxQueueSize || 1000})`);
@@ -463,8 +463,8 @@ export class GracefulDegradationService {
       statusCode: parameters.statusCode || 302,
       degradationLevel: degradation.level
     };
-    if (cacheService.redis && cacheService.isEnabled) {
-      await cacheService.redis.setex(redirectKey, 1800, JSON.stringify(redirectData));
+    if (true) {
+      await cacheService.set(redirectKey, redirectData, undefined, { ttl: 1800 });
     }
     
     // console.log(`🔀 Enabled traffic redirection for: ${target} to ${parameters.targetUrl || parameters.targetServer}`);

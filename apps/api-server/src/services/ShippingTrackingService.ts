@@ -4,7 +4,7 @@
  */
 
 import { AppDataSource } from '../database/connection';
-import { Order } from '../entities/Order';
+import { Order, OrderStatus } from '../entities/Order';
 import logger from '../utils/simpleLogger';
 import { EventEmitter } from 'events';
 import axios from 'axios';
@@ -350,7 +350,7 @@ export class ShippingTrackingService extends EventEmitter {
   async updateAllTrackingStatus(): Promise<void> {
     // 배송중인 모든 주문 조회
     const orders = await this.orderRepository.find({
-      where: { status: 'shipped' }
+      where: { status: OrderStatus.SHIPPED }
     });
 
     for (const order of orders) {
@@ -381,7 +381,7 @@ export class ShippingTrackingService extends EventEmitter {
     
     // 배송 완료
     if (trackingInfo.status === 'delivered' && previousStatus !== 'delivered') {
-      order.status = 'delivered';
+      order.status = OrderStatus.DELIVERED;
       order.shipping = {
         ...order.shipping,
         status: 'delivered',

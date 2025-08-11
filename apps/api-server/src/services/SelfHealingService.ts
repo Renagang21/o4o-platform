@@ -259,7 +259,7 @@ export class SelfHealingService {
     }
     
     // Clear any in-memory caches
-    cacheService.clearAll?.();
+    await cacheService.clear();
   }
 
   private async clearRedisCache(parameters?: { pattern?: string }): Promise<void> {
@@ -291,7 +291,7 @@ export class SelfHealingService {
 
   private async clearApplicationCache(): Promise<void> {
     // Clear application-specific caches
-    await cacheService.clearAll?.();
+    await cacheService.clear();
   }
 
   // Connection reset functionality

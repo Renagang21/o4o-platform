@@ -19,7 +19,7 @@ interface CacheConfig {
 }
 
 // Default cache configurations by route pattern
-const cacheConfigs: Map<RegExp, CacheConfig> = new Map([
+const cacheConfigs = new Map<RegExp, CacheConfig>([
   // Product listings - cache for 5 minutes
   [/^\/api\/v1\/products$/, {
     ttl: 300,

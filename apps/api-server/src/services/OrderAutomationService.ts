@@ -279,7 +279,7 @@ export class OrderAutomationService extends EventEmitter {
   async updateOrderStatus(order: Order, newStatus: string) {
     const previousStatus = order.status;
     
-    order.status = newStatus;
+    order.status = newStatus as OrderStatus;
     order.metadata = {
       ...order.metadata,
       lastStatusChange: new Date().toISOString(),
@@ -341,11 +341,10 @@ export class OrderAutomationService extends EventEmitter {
 
     const emailData = this.prepareEmailData(order, template);
     
-    await emailService.sendTemplatedEmail({
+    await emailService.sendEmail({
       to: customerEmail,
       subject: emailData.subject,
-      template: template,
-      data: emailData.data
+      text: JSON.stringify(emailData.data)
     });
   }
 
@@ -370,11 +369,10 @@ export class OrderAutomationService extends EventEmitter {
     for (const email of adminEmails) {
       const emailData = this.prepareEmailData(order, template);
       
-      await emailService.sendTemplatedEmail({
+      await emailService.sendEmail({
         to: email.trim(),
         subject: `[Admin] ${emailData.subject}`,
-        template: template,
-        data: emailData.data
+        text: JSON.stringify(emailData.data)
       });
     }
   }

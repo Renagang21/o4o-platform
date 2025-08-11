@@ -53,7 +53,7 @@ export class PerformanceOptimizationService {
       commandTimeout: 5000
     });
 
-    this.cacheService = new CacheService();
+    this.cacheService = CacheService.getInstance();
     this.analyticsService = new AnalyticsService();
     this.initializePerformanceMonitoring();
   }

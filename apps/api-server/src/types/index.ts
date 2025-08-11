@@ -125,6 +125,10 @@ export interface User {
   name: string;
   avatar?: string;
   role?: string;
+  permissions?: string[];
+  businessInfo?: any;
+  betaUserId?: string;
+  domain?: string;
 }
 
 export interface Pagination {

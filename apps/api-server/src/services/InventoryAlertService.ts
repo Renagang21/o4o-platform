@@ -169,7 +169,7 @@ export class InventoryAlertService extends EventEmitter {
   private async checkVariationStock(variation: ProductVariation) {
     const alertKey = `variation_${variation.id}`;
     const currentStock = variation.stock;
-    const lowStockThreshold = variation.lowStockAlert || this.thresholds.lowStock;
+    const lowStockThreshold = typeof variation.lowStockAlert === 'number' ? variation.lowStockAlert : this.thresholds.lowStock;
 
     // 재고 없음
     if (currentStock === 0) {
@@ -236,7 +236,7 @@ export class InventoryAlertService extends EventEmitter {
   private async checkProductStock(product: Product) {
     const alertKey = `product_${product.id}`;
     const currentStock = product.stock || 0;
-    const lowStockThreshold = product.metadata?.lowStockAlert || this.thresholds.lowStock;
+    const lowStockThreshold = typeof product.metadata?.lowStockAlert === 'number' ? product.metadata.lowStockAlert : this.thresholds.lowStock;
 
     if (currentStock === 0) {
       await this.createOrUpdateAlert({

@@ -79,7 +79,7 @@ export class ForumService {
 
   async getCategories(includeInactive: boolean = false): Promise<ForumCategory[]> {
     const cacheKey = `forum_categories_${includeInactive}`;
-    const cached = await cacheService.getCache<ForumCategory[]>(cacheKey);
+    const cached = await cacheService.get(cacheKey) as ForumCategory[] | null;
     
     if (cached) {
       return cached;
@@ -100,7 +100,7 @@ export class ForumService {
     const categories = await queryBuilder.getMany();
 
     // 캐시에 저장 (10분)
-    await cacheService.setCache(cacheKey, categories, 600);
+    await cacheService.set(cacheKey, categories, undefined, { ttl: 600 });
 
     return categories;
   }
@@ -391,7 +391,7 @@ export class ForumService {
   // Statistics and Analytics
   async getForumStatistics(): Promise<ForumStatistics> {
     const cacheKey = 'forum_statistics';
-    const cached = await cacheService.getCache<ForumStatistics>(cacheKey);
+    const cached = await cacheService.get(cacheKey) as ForumStatistics | null;
     
     if (cached) {
       return cached;
@@ -442,7 +442,7 @@ export class ForumService {
     };
 
     // 캐시에 저장 (5분)
-    await cacheService.setCache(cacheKey, statistics, 300);
+    await cacheService.set(cacheKey, statistics, undefined, { ttl: 300 });
 
     return statistics;
   }

@@ -5,8 +5,8 @@
 
 import axios from 'axios';
 import crypto from 'crypto';
-import { Order } from '../entities/Order';
-import { Payment } from '../entities/Payment';
+import { Order, OrderStatus, PaymentStatus as OrderPaymentStatus } from '../entities/Order';
+import { Payment, PaymentGatewayStatus, PaymentProvider, PaymentType } from '../entities/Payment';
 import { AppDataSource } from '../database/connection';
 import logger from '../utils/simpleLogger';
 
@@ -119,12 +119,17 @@ export class TossPaymentsService {
 
       // Payment 엔티티 생성
       const payment = this.paymentRepository.create({
+        order: order,
         orderId: order.id,
+        user: order.user,
+        userId: order.userId,
         amount: request.amount,
         currency: 'KRW',
-        status: 'pending',
-        provider: 'tosspayments',
+        status: PaymentGatewayStatus.PENDING,
+        provider: PaymentProvider.TOSS_PAYMENTS,
         method: request.method || 'card',
+        type: PaymentType.PAYMENT,
+        transactionId: `toss_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         metadata: {
           orderName: request.orderName,
           customerName: request.customerName,
@@ -213,7 +218,7 @@ export class TossPaymentsService {
       });
       
       if (payment) {
-        payment.status = 'failed';
+        payment.status = PaymentGatewayStatus.FAILED;
         payment.failureReason = error.response?.data?.message || error.message;
         await this.paymentRepository.save(payment);
       }
@@ -254,15 +259,15 @@ export class TossPaymentsService {
 
       if (payment) {
         payment.status = cancelAmount && cancelAmount < payment.amount 
-          ? 'partially_refunded' 
-          : 'refunded';
+          ? PaymentGatewayStatus.PARTIALLY_REFUNDED 
+          : PaymentGatewayStatus.REFUNDED;
         payment.refundedAmount = (payment.refundedAmount || 0) + (cancelAmount || payment.amount);
         payment.metadata = {
           ...payment.metadata,
           lastCancel: {
             reason: cancelReason,
             amount: cancelAmount,
-            canceledAt: new Date()
+            canceledAt: new Date().toISOString()
           }
         };
 
@@ -422,14 +427,27 @@ export class TossPaymentsService {
 
     if (!payment) {
       // 새 결제 정보 생성 (웹훅이 먼저 도착한 경우)
+      const order = await this.orderRepository.findOne({
+        where: { id: data.orderId },
+        relations: ['user']
+      });
+      
+      if (!order) {
+        throw new Error('Order not found for payment webhook');
+      }
+      
       const newPayment = this.paymentRepository.create({
+        order: order,
         orderId: data.orderId,
+        user: order.user,
+        userId: order.userId,
         transactionId: data.paymentKey,
         amount: data.amount,
         currency: 'KRW',
-        status: 'completed',
-        provider: 'tosspayments',
+        status: PaymentGatewayStatus.COMPLETED,
+        provider: PaymentProvider.TOSS_PAYMENTS,
         method: data.method,
+        type: PaymentType.PAYMENT,
         paidAt: new Date(data.approvedAt),
         metadata: {
           tossData: data
@@ -438,7 +456,7 @@ export class TossPaymentsService {
 
       await this.paymentRepository.save(newPayment);
     } else {
-      payment.status = 'completed';
+      payment.status = PaymentGatewayStatus.COMPLETED;
       payment.transactionId = data.paymentKey;
       payment.paidAt = new Date(data.approvedAt);
       payment.metadata = {
@@ -470,7 +488,7 @@ export class TossPaymentsService {
     });
 
     if (payment) {
-      payment.status = 'failed';
+      payment.status = PaymentGatewayStatus.FAILED;
       payment.failureReason = data.failure?.message || 'Unknown error';
       payment.failureCode = data.failure?.code;
       await this.paymentRepository.save(payment);
@@ -488,11 +506,11 @@ export class TossPaymentsService {
     });
 
     if (payment) {
-      payment.status = 'refunded';
+      payment.status = PaymentGatewayStatus.REFUNDED;
       payment.refundedAmount = data.amount;
       payment.metadata = {
         ...payment.metadata,
-        canceledAt: new Date()
+        canceledAt: new Date().toISOString()
       };
       await this.paymentRepository.save(payment);
     }
@@ -516,19 +534,19 @@ export class TossPaymentsService {
   /**
    * 토스 상태를 내부 상태로 매핑
    */
-  private mapTossStatus(tossStatus: string): string {
-    const statusMap: Record<string, string> = {
-      'READY': 'pending',
-      'IN_PROGRESS': 'processing',
-      'WAITING_FOR_DEPOSIT': 'pending',
-      'DONE': 'completed',
-      'CANCELED': 'refunded',
-      'PARTIAL_CANCELED': 'partially_refunded',
-      'ABORTED': 'failed',
-      'EXPIRED': 'failed'
+  private mapTossStatus(tossStatus: string): PaymentGatewayStatus {
+    const statusMap: Record<string, PaymentGatewayStatus> = {
+      'READY': PaymentGatewayStatus.PENDING,
+      'IN_PROGRESS': PaymentGatewayStatus.PROCESSING,
+      'WAITING_FOR_DEPOSIT': PaymentGatewayStatus.PENDING,
+      'DONE': PaymentGatewayStatus.COMPLETED,
+      'CANCELED': PaymentGatewayStatus.REFUNDED,
+      'PARTIAL_CANCELED': PaymentGatewayStatus.PARTIALLY_REFUNDED,
+      'ABORTED': PaymentGatewayStatus.FAILED,
+      'EXPIRED': PaymentGatewayStatus.FAILED
     };
 
-    return statusMap[tossStatus] || 'pending';
+    return statusMap[tossStatus] || PaymentGatewayStatus.PENDING;
   }
 
   /**
@@ -540,13 +558,13 @@ export class TossPaymentsService {
     });
 
     if (order) {
-      order.paymentStatus = status;
+      order.paymentStatus = status as OrderPaymentStatus;
       
       // 주문 상태도 함께 업데이트
       if (status === 'paid' || status === 'processing') {
-        order.status = 'processing';
+        order.status = OrderStatus.PROCESSING;
       } else if (status === 'failed' || status === 'cancelled') {
-        order.status = 'cancelled';
+        order.status = OrderStatus.CANCELLED;
       }
 
       await this.orderRepository.save(order);

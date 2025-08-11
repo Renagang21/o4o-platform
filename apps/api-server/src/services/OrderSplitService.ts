@@ -43,19 +43,15 @@ export class OrderSplitService {
     // Add domestic API supplier
     this.supplierManager.addSupplier('domestic-api', {
       type: 'api',
-      credentials: {
-        apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
-        endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
-      }
-    });
+      apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
+      endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
+    } as any);
 
     // Add CSV catalog supplier
     this.supplierManager.addSupplier('csv-catalog', {
       type: 'csv',
-      options: {
-        webhookUrl: './catalogs/supplier-products.csv'
-      }
-    });
+      webhookUrl: './catalogs/supplier-products.csv'
+    } as any);
   }
 
   /**
@@ -126,10 +122,10 @@ export class OrderSplitService {
       
       // If product doesn't have supplier info, find best supplier
       if (!product.supplierId) {
-        const bestSupplier = await this.supplierManager.findBestSupplier(product.sku, item.quantity);
+        const bestSupplier = await this.supplierManager.findBestSupplier(product.sku);
         
         if (bestSupplier) {
-          supplierId = bestSupplier.supplierId;
+          supplierId = bestSupplier as any;
         }
       }
       
@@ -192,16 +188,16 @@ export class OrderSplitService {
 
       try {
         // Create order with supplier
-        const response = await supplier.createOrder(supplierOrder);
+        const response = await supplier.createOrder(supplierOrder) as any;
         
-        if (response && response.success && response.data) {
+        if (response && (response as any).success && (response as any).data) {
           // Update order item with supplier order ID
           for (const item of splitOrder.items) {
-            item.supplierOrderId = response.data.supplierOrderId;
+            item.supplierOrderId = (response as any).data.supplierOrderId;
             await this.orderItemRepository.save(item);
           }
           
-          console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${response.data.supplierOrderId}`);
+          console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${(response as any).data.supplierOrderId}`);
         } else {
           console.error(`Failed to forward order to supplier ${splitOrder.supplierId}`);
         }

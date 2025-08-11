@@ -36,20 +36,10 @@ export class PricingService {
    */
   async calculatePrice(product: Product, context: PricingContext): Promise<PricingResult> {
     // 캐시 키 생성
-    const cacheKey = cacheService.generatePricingCacheKey(
-      product.id,
-      context.userRole || 'customer',
-      context.userId,
-      context.quantity,
-      {
-        region: context.region,
-        city: context.city,
-        orderAmount: context.orderAmount
-      }
-    );
+    const cacheKey = `pricing:${product.id}:${context.userRole || 'customer'}:${context.userId || 'guest'}:${context.quantity}:${context.region || ''}:${context.city || ''}:${context.orderAmount || 0}`;
 
     // 캐시된 결과 확인
-    const cachedResult = await cacheService.getCachedPricingResult(cacheKey);
+    const cachedResult = await cacheService.get(cacheKey) as PricingResult | null;
     if (cachedResult) {
       return cachedResult;
     }
@@ -106,7 +96,7 @@ export class PricingService {
     };
 
     // 결과를 캐시에 저장 (5분 TTL)
-    await cacheService.cachePricingResult(cacheKey, result, 300);
+    await cacheService.set(cacheKey, result, undefined, { ttl: 300 });
 
     return result;
   }
@@ -415,12 +405,12 @@ export class PricingService {
     try {
       // 특정 상품 정책인 경우 해당 상품 캐시 무효화
       if (policy.productId) {
-        await cacheService.invalidateProductPricing(policy.productId);
+        await cacheService.clear(`pricing:*`);
       }
 
       // 특정 사용자 정책인 경우 해당 사용자 캐시 무효화
       if (policy.targetUserId) {
-        await cacheService.invalidateUserPricing(policy.targetUserId);
+        await cacheService.clear(`pricing:*`);
       }
 
       // 역할 기반 정책인 경우 해당 역할의 모든 캐시 무효화는
