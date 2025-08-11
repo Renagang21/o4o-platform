@@ -10,14 +10,7 @@ import { Product, ProductType } from '../entities/Product';
 import { VendorInfo } from '../entities/VendorInfo';
 import { SupplierManager } from '@o4o/supplier-connector';
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    userId: string;
-    email: string;
-    role: string;
-  };
-}
+// Using global Express.Request extension instead
 
 interface DropshippingSettings {
   autoOrderRouting: boolean;
@@ -50,7 +43,7 @@ export class DropshippingController {
   /**
    * Get dropshipping settings
    */
-  async getSettings(req: AuthenticatedRequest, res: Response) {
+  async getSettings(req: Request, res: Response) {
     try {
       // Mock settings - in production, these would come from a settings table
       const settings: DropshippingSettings = {
@@ -102,7 +95,7 @@ export class DropshippingController {
   /**
    * Update dropshipping settings
    */
-  async updateSettings(req: AuthenticatedRequest, res: Response) {
+  async updateSettings(req: Request, res: Response) {
     try {
       const settings: Partial<DropshippingSettings> = req.body;
 
@@ -126,7 +119,7 @@ export class DropshippingController {
   /**
    * Get supplier connectors status
    */
-  async getConnectors(req: AuthenticatedRequest, res: Response) {
+  async getConnectors(req: Request, res: Response) {
     try {
       const connectors = [
         {
@@ -188,7 +181,7 @@ export class DropshippingController {
   /**
    * Test supplier connector
    */
-  async testConnector(req: AuthenticatedRequest, res: Response) {
+  async testConnector(req: Request, res: Response) {
     try {
       const { connectorId } = req.params;
 
@@ -221,7 +214,7 @@ export class DropshippingController {
   /**
    * Get margin policies
    */
-  async getMarginPolicies(req: AuthenticatedRequest, res: Response) {
+  async getMarginPolicies(req: Request, res: Response) {
     try {
       const policies = [
         {
@@ -269,7 +262,7 @@ export class DropshippingController {
   /**
    * Get dropshipping statistics
    */
-  async getStatistics(req: AuthenticatedRequest, res: Response) {
+  async getStatistics(req: Request, res: Response) {
     try {
       // Mock statistics - in production, calculate from actual data
       const stats = {

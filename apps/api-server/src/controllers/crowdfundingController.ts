@@ -459,11 +459,11 @@ export class CrowdfundingController {
         return;
       }
 
-      const backing = await crowdfundingService.backProject(
+      const backing = await crowdfundingService.createBacking({
         projectId,
-        userId,
-        req.body
-      );
+        backerId: userId,
+        ...req.body
+      });
       
       res.status(201).json({
         success: true,

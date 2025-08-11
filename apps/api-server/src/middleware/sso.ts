@@ -55,13 +55,7 @@ export const validateSSOSession = async (
     }
 
     // Add user to request
-    req.user = {
-      id: user.id,
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-      status: user.status
-    };
+    req.user = user;
 
     next();
   } catch (error: any) {
@@ -106,13 +100,7 @@ export const optionalSSOSession = async (
     });
 
     if (user) {
-      req.user = {
-        id: user.id,
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        status: user.status
-      };
+      req.user = user;
     }
 
     next();

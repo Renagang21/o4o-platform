@@ -3,39 +3,21 @@
  */
 
 // Business information for business users
+// Aligned with BusinessInfo type in auth.ts
 export interface BusinessInfo {
-  businessName: string;
-  businessType: string;
-  businessNumber?: string;
-  businessAddress?: string;
-  businessPhone?: string;
-  businessEmail?: string;
-  website?: string;
-  description?: string;
-  logoUrl?: string;
-  category?: string;
-  registrationDate?: string;
+  companyName?: string;
+  businessType?: string;
   taxId?: string;
-  bankAccount?: {
-    bankName?: string;
-    accountNumber?: string;
-    accountHolder?: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
   };
-  socialMedia?: {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    youtube?: string;
-    [key: string]: string | undefined;
+  contactInfo?: {
+    phone: string;
+    website?: string;
   };
-  operatingHours?: {
-    monday?: string;
-    tuesday?: string;
-    wednesday?: string;
-    thursday?: string;
-    friday?: string;
-    saturday?: string;
-    sunday?: string;
-  };
-  [key: string]: unknown;
+  metadata?: Record<string, string | number | boolean>;
 }

@@ -11,14 +11,7 @@ interface PageTreeNode extends Page {
   children: PageTreeNode[];
 }
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    userId: string;
-    email: string;
-    role: string;
-  };
-}
+// Using global Express.Request extension instead
 
 interface PageData extends Partial<Page> {
   customFields?: Record<string, unknown>;
@@ -186,7 +179,7 @@ export class PagesController {
   // POST /api/admin/pages
   async createPage(req: Request, res: Response) {
     try {
-      const userId = (req as AuthenticatedRequest).user?.id;
+      const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({
           success: false,
@@ -293,7 +286,7 @@ export class PagesController {
   async updatePage(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as AuthenticatedRequest).user?.id;
+      const userId = req.user?.id;
 
       const page = await this.pageRepository.findOne({ where: { id } });
       if (!page) {
@@ -437,7 +430,7 @@ export class PagesController {
   async clonePage(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as AuthenticatedRequest).user?.id;
+      const userId = req.user?.id;
 
       const originalPage = await this.pageRepository.findOne({ where: { id } });
       if (!originalPage) {
@@ -516,7 +509,7 @@ export class PagesController {
     try {
       const { id } = req.params;
       const { content } = req.body;
-      const userId = (req as AuthenticatedRequest).user?.id;
+      const userId = req.user?.id;
 
       const page = await this.pageRepository.findOne({ where: { id } });
       if (!page) {
@@ -550,7 +543,7 @@ export class PagesController {
   async bulkUpdatePages(req: Request, res: Response) {
     try {
       const { ids, data } = req.body;
-      const userId = (req as AuthenticatedRequest).user?.id;
+      const userId = req.user?.id;
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({
@@ -714,7 +707,7 @@ export class PagesController {
   async restorePageRevision(req: Request, res: Response) {
     try {
       const { id, revisionId } = req.params;
-      const userId = (req as AuthenticatedRequest).user?.id;
+      const userId = req.user?.id;
 
       const page = await this.pageRepository.findOne({ where: { id } });
       if (!page) {
