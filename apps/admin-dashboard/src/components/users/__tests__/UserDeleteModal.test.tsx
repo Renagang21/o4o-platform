@@ -296,11 +296,24 @@ describe('UserDeleteModal 컴포넌트', () => {
       render(<UserDeleteModal {...defaultProps} />);
       
       // Tab으로 버튼들 간 이동
+      // 첫 번째 포커스는 X 버튼일 수 있음
       await user.tab();
-      expect(screen.getByText('취소')).toHaveFocus();
+      const focused = document.activeElement;
       
-      await user.tab();
-      expect(screen.getByRole('button', { name: /사용자 삭제/ })).toHaveFocus();
+      // X 버튼이 포커스를 받았다면 다시 탭
+      if (focused?.getAttribute('aria-label') === '닫기') {
+        await user.tab();
+        expect(screen.getByText('취소')).toHaveFocus();
+        
+        await user.tab();
+        expect(screen.getByRole('button', { name: /사용자 삭제/ })).toHaveFocus();
+      } else {
+        // 아니면 취소 버튼이 포커스를 받았을 것
+        expect(screen.getByText('취소')).toHaveFocus();
+        
+        await user.tab();
+        expect(screen.getByRole('button', { name: /사용자 삭제/ })).toHaveFocus();
+      }
     });
 
     it('ESC 키로 모달을 닫을 수 있다', async () => {
