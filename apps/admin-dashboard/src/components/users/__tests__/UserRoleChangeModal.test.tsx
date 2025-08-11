@@ -47,7 +47,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
   };
 
   const defaultProps = {
-    _isOpen: true,
+    isOpen: true,
     onClose: mockOnClose,
     onConfirm: mockOnConfirm,
     users: [customerUser],
@@ -59,15 +59,15 @@ describe('UserRoleChangeModal 컴포넌트', () => {
   });
 
   describe('모달 표시/숨김', () => {
-    it('_isOpen이 false일 때 모달이 렌더링되지 않는다', () => {
+    it('isOpen이 false일 때 모달이 렌더링되지 않는다', () => {
       render(
-        <UserRoleChangeModal {...defaultProps} _isOpen={false} />
+        <UserRoleChangeModal {...defaultProps} isOpen={false} />
       );
       
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('_isOpen이 true일 때 모달이 렌더링된다', () => {
+    it('isOpen이 true일 때 모달이 렌더링된다', () => {
       render(<UserRoleChangeModal {...defaultProps} />);
       
       expect(screen.getByRole('dialog')).toBeInTheDocument();
