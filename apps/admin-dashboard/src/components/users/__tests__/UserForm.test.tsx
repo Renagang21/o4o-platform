@@ -47,7 +47,9 @@ describe('UserForm 컴포넌트', () => {
       
       // 레이블 텍스트 확인
       expect(screen.getByText(/이름/)).toBeInTheDocument();
-      expect(screen.getByText(/이메일/)).toBeInTheDocument();
+      // '이메일'은 여러 곳에 있을 수 있으므로 getAllByText 사용
+      const emailLabels = screen.getAllByText(/이메일/);
+      expect(emailLabels.length).toBeGreaterThan(0);
       expect(screen.getByText(/비밀번호/)).toBeInTheDocument();
       expect(screen.getByText(/역할/)).toBeInTheDocument();
       expect(screen.getByText(/상태/)).toBeInTheDocument();

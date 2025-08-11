@@ -133,7 +133,8 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       const businessTexts = screen.getAllByText('사업자');
       expect(businessTexts.length).toBeGreaterThan(0);
       
-      expect(screen.getByText('고객')).toBeInTheDocument();
+      const customerTexts = screen.getAllByText('고객');
+      expect(customerTexts.length).toBeGreaterThan(0);
     });
 
     it('사용자 목록이 스크롤 가능하다', () => {

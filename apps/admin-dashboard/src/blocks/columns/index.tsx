@@ -250,7 +250,7 @@ registerBlockType('o4o/column', {
     }
   },
 
-  edit: ({ attributes, setAttributes }: { attributes: ColumnBlockAttributes; setAttributes: (attrs: Partial<ColumnBlockAttributes>) => void }) => {
+  edit: function Edit({ attributes, setAttributes }: { attributes: ColumnBlockAttributes; setAttributes: (attrs: Partial<ColumnBlockAttributes>) => void }) {
     const { width, verticalAlignment } = attributes;
     
     const blockProps = useBlockProps({
