@@ -79,9 +79,34 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           if (sharedChunk) return sharedChunk;
           
           if (id.includes('node_modules')) {
+            // WordPress 패키지들을 별도 청크로 분리
+            if (id.includes('@wordpress')) {
+              // 각 WordPress 패키지를 개별 청크로 분리
+              if (id.includes('@wordpress/block-editor')) {
+                return 'wp-block-editor';
+              }
+              if (id.includes('@wordpress/blocks')) {
+                return 'wp-blocks';
+              }
+              if (id.includes('@wordpress/components')) {
+                return 'wp-components';
+              }
+              if (id.includes('@wordpress/element')) {
+                return 'wp-element';
+              }
+              if (id.includes('@wordpress/i18n')) {
+                return 'wp-i18n';
+              }
+              // 기타 WordPress 패키지
+              return 'wp-core';
+            }
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {
-              return 'vendor-editor';
+              return 'vendor-tiptap';
+            }
+            // Monaco 에디터
+            if (id.includes('monaco-editor')) {
+              return 'vendor-monaco';
             }
             // 기타 큰 라이브러리들
             if (id.includes('socket.io')) {
@@ -89,22 +114,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             }
           }
           
-          // 큰 페이지들을 별도 청크로 분리
-          if (id.includes('/src/pages/')) {
-            if (id.includes('TemplatePartEditor') || id.includes('GutenbergEditor') || id.includes('GutenbergPage')) {
-              return 'editor-pages';
-            }
-            if (id.includes('Content') || id.includes('MediaLibrary')) {
-              return 'content-pages';
-            }
-            if (id.includes('Settings') || id.includes('ProductForm') || id.includes('OrderDetail')) {
-              return 'admin-pages';
-            }
+          // 페이지별 청크 분리
+          if (id.includes('TemplatePartEditor')) {
+            return 'page-template-editor';
           }
-          
-          // Gutenberg/Editor 관련 코드 분리
-          if (id.includes('/src/') && (id.includes('gutenberg') || id.includes('editor') || id.includes('blocks'))) {
-            return 'editor-core';
+          if (id.includes('GutenbergEditor') || id.includes('WordPressBlockEditor')) {
+            return 'page-gutenberg';
           }
         }
       }

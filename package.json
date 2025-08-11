@@ -46,7 +46,7 @@
     "dev:ecommerce": "npm run dev --workspace=@o4o/ecommerce",
     "dev:crowdfunding": "npm run dev --workspace=@o4o/crowdfunding",
     "dev:signage": "npm run dev --workspace=@o4o/digital-signage",
-    "build": "npm run build:packages && npm run build:apps",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' npm run build:packages && NODE_OPTIONS='--max-old-space-size=8192' npm run build:apps",
     "build:packages": "npm run build:types && npm run build:utils && npm run build:ui && npm run build:auth-client && npm run build:auth-context && npm run build:crowdfunding-types && npm run build:forum-types && npm run build:shortcodes && npm run build:supplier-connector",
     "build:types": "npm run build --workspace=@o4o/types",
     "build:utils": "npm run build --workspace=@o4o/utils",
