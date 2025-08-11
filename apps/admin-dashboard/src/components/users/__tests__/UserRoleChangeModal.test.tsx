@@ -110,7 +110,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       expect(screen.getByText('홍길동')).toBeInTheDocument();
       expect(screen.getByText('(hong@example.com)')).toBeInTheDocument();
       // 역할 라벨은 중복될 수 있으므로 getAllByText 사용
-      const customerLabels = screen.getAllByText('일반회원');
+      const customerLabels = screen.getAllByText('고객');
       expect(customerLabels.length).toBeGreaterThan(0);
     });
 
@@ -133,7 +133,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       const businessTexts = screen.getAllByText('사업자');
       expect(businessTexts.length).toBeGreaterThan(0);
       
-      expect(screen.getByText('일반회원')).toBeInTheDocument();
+      expect(screen.getByText('고객')).toBeInTheDocument();
     });
 
     it('사용자 목록이 스크롤 가능하다', () => {
@@ -164,9 +164,9 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       const roleTexts = roleButtons.map(btn => btn.textContent);
       
       expect(roleTexts.some(text => text?.includes('관리자'))).toBe(true);
-      expect(roleTexts.some(text => text?.includes('일반회원'))).toBe(true);
+      expect(roleTexts.some(text => text?.includes('고객'))).toBe(true);
       expect(roleTexts.some(text => text?.includes('사업자'))).toBe(true);
-      expect(roleTexts.some(text => text?.includes('제휴 파트너'))).toBe(true);
+      expect(roleTexts.some(text => text?.includes('제휴사'))).toBe(true);
     });
 
     it('각 역할에 대한 설명이 표시된다', () => {
@@ -175,7 +175,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       expect(screen.getByText('시스템 관리 권한')).toBeInTheDocument();
       expect(screen.getByText('일반 고객 권한')).toBeInTheDocument();
       expect(screen.getByText('사업자 고객 권한')).toBeInTheDocument();
-      expect(screen.getByText('제휴 파트너 권한')).toBeInTheDocument();
+      expect(screen.getByText('제휴사 권한')).toBeInTheDocument();
     });
 
     it('역할 선택 시 UI가 업데이트된다', async () => {
@@ -183,7 +183,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       render(<UserRoleChangeModal {...defaultProps} />);
       
       // 초기 선택: customer (기본값)
-      const customerButton = screen.getByRole('button', { name: /일반회원/ });
+      const customerButton = screen.getByRole('button', { name: /고객/ });
       expect(customerButton).toHaveClass('border-blue-500');
       
       // business 선택
@@ -199,9 +199,9 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       
       const roleButtons = screen.getAllByRole('button').filter(btn => 
         btn.textContent?.includes('관리자') || 
-        btn.textContent?.includes('일반회원') ||
+        btn.textContent?.includes('고객') ||
         btn.textContent?.includes('사업자') ||
-        btn.textContent?.includes('제휴 파트너')
+        btn.textContent?.includes('제휴사')
       );
       
       roleButtons.forEach(button => {
@@ -216,11 +216,11 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       render(<UserRoleChangeModal {...defaultProps} />);
       
       // customer 역할로 변경 (이미 customer이므로 변경 없음)
-      const customerButton = screen.getByRole('button', { name: /일반회원/ });
+      const customerButton = screen.getByRole('button', { name: /고객/ });
       await user.click(customerButton);
       
       await waitFor(() => {
-        expect(screen.getByText(/선택한 사용자들이 모두 이미 '일반회원' 역할입니다/)).toBeInTheDocument();
+        expect(screen.getByText(/선택한 사용자들이 모두 이미 '고객' 역할입니다/)).toBeInTheDocument();
         expect(screen.getByText('변경할 내용이 없습니다.')).toBeInTheDocument();
       });
     });
@@ -235,7 +235,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       
       await waitFor(() => {
         expect(screen.getByText('변경 사항 요약')).toBeInTheDocument();
-        expect(screen.getByText('일반회원에서 관리자로')).toBeInTheDocument();
+        expect(screen.getByText('고객에서 관리자로')).toBeInTheDocument();
         expect(screen.getByText('1명')).toBeInTheDocument();
       });
     });
@@ -248,14 +248,14 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       );
       
       // affiliate 역할로 변경
-      const affiliateButton = screen.getByRole('button', { name: /제휴 파트너/ });
+      const affiliateButton = screen.getByRole('button', { name: /제휴사/ });
       await user.click(affiliateButton);
       
       await waitFor(() => {
         expect(screen.getByText('변경 사항 요약')).toBeInTheDocument();
-        expect(screen.getByText('일반회원에서 제휴 파트너로')).toBeInTheDocument();
-        expect(screen.getByText('관리자에서 제휴 파트너로')).toBeInTheDocument();
-        expect(screen.getByText('사업자에서 제휴 파트너로')).toBeInTheDocument();
+        expect(screen.getByText('고객에서 제휴사로')).toBeInTheDocument();
+        expect(screen.getByText('관리자에서 제휴사로')).toBeInTheDocument();
+        expect(screen.getByText('사업자에서 제휴사로')).toBeInTheDocument();
       });
     });
   });
@@ -269,7 +269,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       );
       
       // customer 역할로 변경 (모든 관리자 권한 제거)
-      const customerButton = screen.getByRole('button', { name: /일반회원/ });
+      const customerButton = screen.getByRole('button', { name: /고객/ });
       await user.click(customerButton);
       
       await waitFor(() => {
@@ -303,7 +303,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       );
       
       // customer 역할로 변경
-      const customerButton = screen.getByRole('button', { name: /일반회원/ });
+      const customerButton = screen.getByRole('button', { name: /고객/ });
       await user.click(customerButton);
       
       await waitFor(() => {
@@ -344,7 +344,7 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       render(<UserRoleChangeModal {...defaultProps} />);
       
       // 같은 역할(customer) 선택
-      const customerButton = screen.getByRole('button', { name: /일반회원/ });
+      const customerButton = screen.getByRole('button', { name: /고객/ });
       await user.click(customerButton);
       
       await waitFor(() => {
@@ -409,9 +409,9 @@ describe('UserRoleChangeModal 컴포넌트', () => {
       
       const roleButtons = screen.getAllByRole('button').filter(btn => 
         btn.textContent?.includes('관리자') || 
-        btn.textContent?.includes('일반회원') ||
+        btn.textContent?.includes('고객') ||
         btn.textContent?.includes('사업자') ||
-        btn.textContent?.includes('제휴 파트너')
+        btn.textContent?.includes('제휴사')
       );
       
       expect(roleButtons.length).toBe(4);

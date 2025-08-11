@@ -18,7 +18,7 @@ describe('UserDeleteModal 컴포넌트', () => {
     name: '홍길동',
     email: 'hong@example.com',
     role: 'customer',
-    status: 'approved',
+    status: 'active',
     phone: '010-1234-5678',
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z'
@@ -29,7 +29,7 @@ describe('UserDeleteModal 컴포넌트', () => {
     name: '관리자',
     email: 'admin@example.com',
     role: 'admin',
-    status: 'approved',
+    status: 'active',
     phone: '010-1111-1111',
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z'
