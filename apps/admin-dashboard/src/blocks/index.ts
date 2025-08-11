@@ -3,8 +3,6 @@
  * Import and register all custom blocks for the WordPress editor
  */
 
-import domReady from '@wordpress/dom-ready';
-
 // Custom block types are dynamically loaded via lazy.ts to improve performance
 
 // Additional block styles
@@ -101,6 +99,15 @@ const blockStyles = `
 
 // Initialize custom blocks
 export function initializeCustomBlocks() {
+  // WordPress polyfill이 초기화되었는지 확인
+  const domReady = window.wp?.domReady || ((callback: () => void) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', callback);
+    } else {
+      callback();
+    }
+  });
+  
   domReady(() => {
     // Add custom styles to the editor
     const styleElement = document.createElement('style');

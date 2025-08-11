@@ -3,9 +3,6 @@
  * Container block that groups other blocks together
  */
 
-import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks, useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, SelectControl, RangeControl, ToggleControl } from '@wordpress/components';
 import { Group } from 'lucide-react';
 
 // Block attributes
@@ -21,8 +18,19 @@ interface GroupBlockAttributes {
   isStackedOnMobile?: boolean;
 }
 
-// Register the Group block
-registerBlockType('o4o/group', {
+// Lazy registration to ensure WordPress polyfill is loaded
+export const registerGroupBlock = () => {
+  if (!window.wp?.blocks?.registerBlockType) {
+    console.warn('[Group Block] WordPress blocks API not available yet');
+    return;
+  }
+  
+  const { registerBlockType } = window.wp.blocks as any;
+  const { InnerBlocks, useBlockProps, InspectorControls } = window.wp.blockEditor as any;
+  const { PanelBody, SelectControl, RangeControl, ToggleControl } = window.wp.components as any;
+  
+  // Register the Group block
+  registerBlockType('o4o/group', {
   title: 'Group',
   description: 'Group blocks together in a container',
   category: 'design',
@@ -234,4 +242,13 @@ registerBlockType('o4o/group', {
       </div>
     );
   }
-});
+  });
+};
+
+// Try to register immediately if WordPress is available
+if (window.wp?.blocks?.registerBlockType) {
+  registerGroupBlock();
+} else {
+  // Otherwise wait for DOM ready
+  document.addEventListener('DOMContentLoaded', registerGroupBlock);
+}

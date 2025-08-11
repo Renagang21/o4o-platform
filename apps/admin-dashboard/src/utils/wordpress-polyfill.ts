@@ -88,6 +88,8 @@ export function initWordPressHooks() {
 
 // WordPress 전체 초기화
 export function initWordPress() {
+  console.log('[WordPress Polyfill] Initializing WordPress global objects...');
+  
   initWordPressI18n();
   initWordPressData();
   initWordPressHooks();
@@ -109,6 +111,15 @@ export function initWordPress() {
     createElement: (..._args: any[]) => null, // React.createElement로 교체 가능
     render: (..._args: any[]) => null, // ReactDOM.render로 교체 가능
   };
+  
+  // blocks API 추가 (블록 에디터 지원)
+  window.wp.blocks = window.wp.blocks || {
+    registerBlockType: (_name: string, _config: any) => {},
+    getCategories: () => [],
+    setCategories: (_categories: any[]) => {},
+  };
+  
+  console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
 }
 
 // TypeScript 타입 정의
