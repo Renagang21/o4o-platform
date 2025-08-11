@@ -65,7 +65,7 @@ export const TossPaymentButton: React.FC<TossPaymentButtonProps> = ({
   useEffect(() => {
     const initTossPayments = async () => {
       try {
-        const clientKey = process.env.REACT_APP_TOSS_CLIENT_KEY || 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
+        const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq';
         const toss = await loadTossPayments(clientKey);
         setTossPayments(toss);
       } catch (error) {

@@ -123,7 +123,7 @@ export function useProductsBlock(query: ProductQuery = {}): UseProductsResult {
       setError(err instanceof Error ? err.message : 'Failed to load products');
       
       // Set mock data for development
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         setProducts(getMockProducts());
         setTotalPages(1);
         setTotalProducts(6);

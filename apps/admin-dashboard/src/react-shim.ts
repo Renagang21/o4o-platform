@@ -41,7 +41,7 @@ if (typeof window !== 'undefined') {
 export { ReactNamespace as React, ReactDOMExports as ReactDOM };
 
 // Log for debugging
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
   console.log('React shim loaded:', {
     hasChildren: 'Children' in ReactNamespace,
     hasCreateElement: 'createElement' in ReactNamespace,
