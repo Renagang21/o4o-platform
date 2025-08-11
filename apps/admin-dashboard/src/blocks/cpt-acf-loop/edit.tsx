@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 /**
  * CPT/ACF Loop Block Editor Component
  */

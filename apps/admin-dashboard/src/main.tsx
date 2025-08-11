@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
 import App from './App'
+import initWordPress from './utils/wordpress-polyfill'
 import './styles/globals.css'
 import './styles/wordpress-dashboard.css'
 import './styles/dashboard-simple.css'
@@ -36,6 +37,9 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// WordPress 모듈 초기화 (블록 에디터 사용 전 필수)
+initWordPress();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

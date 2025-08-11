@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { ShoppingCart, Package } from 'lucide-react';
 // import { formatPrice } from '../../../../utils/ecommerce';
 const formatPrice = (price: number, symbol: string = '$') => `${symbol}${price.toFixed(2)}`;

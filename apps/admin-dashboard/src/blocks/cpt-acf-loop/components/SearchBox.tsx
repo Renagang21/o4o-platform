@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { FormEvent } from 'react';
 /**
  * Search Box Component

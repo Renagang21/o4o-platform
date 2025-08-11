@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { useState } from 'react';
 import { ChevronDown, Filter } from 'lucide-react';
 import { formatPrice } from '../../../../utils/ecommerce';

@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { ShoppingCart, Package, Star } from 'lucide-react';
 import { formatPrice, calculateDiscountPercentage } from '../../../../utils/ecommerce';
 

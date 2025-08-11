@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 // import { useState, useEffect } from 'react';
 import {
   InspectorControls,
