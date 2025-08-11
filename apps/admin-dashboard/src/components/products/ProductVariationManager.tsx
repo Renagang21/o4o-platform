@@ -378,7 +378,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
 
             <Grid container spacing={2}>
               {attributes.map((attr) => (
-                <Grid xs={12} md={6} key={attr.id}>
+                <Grid size={{ xs: 12, md: 6 }} key={attr.id}>
                   <Paper elevation={1} sx={{ p: 2 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                       <Typography variant="subtitle1" fontWeight="bold">

@@ -1,4 +1,4 @@
-import { FC, useState, useRef, useEffect } from 'react';
+import { FC, useState, useRef } from 'react';
 import { 
   Plus, 
   Type, 
@@ -7,20 +7,17 @@ import {
   Columns, 
   Code, 
   Quote,
-  FileText,
   Video,
   Music,
   Download,
   Maximize2,
   Minimize2,
   Settings,
-  MoreVertical,
   Move,
   Copy,
   Trash2,
   ChevronUp,
   ChevronDown,
-  X,
   Search,
   Heading1,
   Heading2,

@@ -104,7 +104,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
 }) => {
   const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
   const [variations, setVariations] = useState<ProductVariation[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedVariations, setSelectedVariations] = useState<string[]>([]);
   
@@ -291,7 +291,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
       ) : (
         <Grid container spacing={2}>
           {attributes.map((attr) => (
-            <Grid key={attr.id} xs={12}>
+            <Grid key={attr.id} size={12}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -568,7 +568,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid xs={6}>
+            <Grid size={6}>
               <TextField
                 label="속성 이름"
                 fullWidth
@@ -581,7 +581,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                 placeholder="예: Color, Size"
               />
             </Grid>
-            <Grid xs={6}>
+            <Grid size={6}>
               <FormControl fullWidth>
                 <InputLabel>속성 타입</InputLabel>
                 <Select
@@ -599,7 +599,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12}>
+            <Grid size={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -614,7 +614,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
               />
             </Grid>
             
-            <Grid xs={12}>
+            <Grid size={12}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="subtitle1">속성 값</Typography>
                 <Button
