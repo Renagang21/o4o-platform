@@ -5,7 +5,6 @@
 import { useBlockProps, InspectorControls, BlockControls } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, RangeControl, Spinner, Notice, Placeholder, ToolbarGroup, ToolbarButton,  } from '@wordpress/components';
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { grid, listView, update, loop as icon } from '@wordpress/icons';
 
@@ -145,7 +144,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       .then(setPostTypes)
       .catch(() => {
         // Failed to load post types
-        setError(__('Failed to load post types', 'o4o'));
+        setError('Failed to load post types');
       });
   }, []);
 
@@ -291,7 +290,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       setTotalPages(totalPages);
     } catch (err: any) {
     // Error logging - use proper error handler
-      setError(__('Failed to load posts', 'o4o'));
+      setError('Failed to load posts');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -367,7 +366,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
   // Prepare post type options
   const postTypeOptions = [
-    { label: __('Select a post type', 'o4o'), value: '' },
+    { label: 'Select a post type', value: '' },
     ...postTypes.map((type: any) => ({
       label: type.name,
       value: type.slug,
@@ -376,29 +375,29 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
   // Order by options
   const orderByOptions = [
-    { label: __('Date', 'o4o'), value: 'date' },
-    { label: __('Title', 'o4o'), value: 'title' },
-    { label: __('Menu Order', 'o4o'), value: 'menu_order' },
-    { label: __('Random', 'o4o'), value: 'rand' },
-    { label: __('Modified Date', 'o4o'), value: 'modified' },
-    { label: __('Comment Count', 'o4o'), value: 'comment_count' },
+    { label: 'Date', value: 'date' },
+    { label: 'Title', value: 'title' },
+    { label: 'Menu Order', value: 'menu_order' },
+    { label: 'Random', value: 'rand' },
+    { label: 'Modified Date', value: 'modified' },
+    { label: 'Comment Count', value: 'comment_count' },
   ];
 
   // Template options
   const templateOptions = [
-    { label: __('Card', 'o4o'), value: 'card' },
-    { label: __('List', 'o4o'), value: 'list' },
-    { label: __('Minimal', 'o4o'), value: 'minimal' },
-    { label: __('Magazine', 'o4o'), value: 'magazine' },
+    { label: 'Card', value: 'card' },
+    { label: 'List', value: 'list' },
+    { label: 'Minimal', value: 'minimal' },
+    { label: 'Magazine', value: 'magazine' },
   ];
 
   // Render loading state
   if (isLoading && postType && !isRefreshing) {
     return (
       <div {...blockProps}>
-        <Placeholder icon={icon} label={__('CPT/ACF Loop', 'o4o')}>
+        <Placeholder icon={icon} label={'CPT/ACF Loop'}>
           <Spinner />
-          <p>{__('Loading posts...', 'o4o')}</p>
+          <p>{'Loading posts...'}</p>
         </Placeholder>
       </div>
     );
@@ -408,7 +407,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   if (error && !isRefreshing) {
     return (
       <div {...blockProps}>
-        <Placeholder icon={icon} label={__('CPT/ACF Loop', 'o4o')}>
+        <Placeholder icon={icon} label={'CPT/ACF Loop'}>
           <Notice status="error" isDismissible={false}>
             {error}
           </Notice>
@@ -422,20 +421,20 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     return (
       <div {...blockProps}>
         <InspectorControls>
-          <PanelBody title={__('Query Settings', 'o4o')} initialOpen={true}>
+          <PanelBody title={'Query Settings'} initialOpen={true}>
             <SelectControl
-              label={__('Post Type', 'o4o')}
+              label={'Post Type'}
               value={postType}
               options={postTypeOptions}
               onChange={(value: any) => setAttributes({ postType: value })}
-              help={__('Select a custom post type to display', 'o4o')}
+              help={'Select a custom post type to display'}
             />
           </PanelBody>
         </InspectorControls>
         
         <Placeholder
           icon={icon}
-          label={__('CPT/ACF Loop', 'o4o')}
+          label={'CPT/ACF Loop'}
           instructions={__(
             'Select a post type from the block settings to begin.',
             'o4o'
@@ -452,13 +451,13 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         <ToolbarGroup>
           <ToolbarButton
             icon={grid}
-            label={__('Grid view', 'o4o')}
+            label={'Grid view'}
             onClick={() => setAttributes({ layoutType: 'grid' })}
             isPressed={layoutType === 'grid'}
           />
           <ToolbarButton
             icon={listView}
-            label={__('List view', 'o4o')}
+            label={'List view'}
             onClick={() => setAttributes({ layoutType: 'list' })}
             isPressed={layoutType === 'list'}
           />
@@ -466,7 +465,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         <ToolbarGroup>
           <ToolbarButton
             icon={update}
-            label={__('Refresh posts', 'o4o')}
+            label={'Refresh posts'}
             onClick={() => {
               clearCache();
               manualRefresh();
@@ -476,17 +475,17 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       </BlockControls>
 
       <InspectorControls>
-        <PanelBody title={__('Query Settings', 'o4o')} initialOpen={true}>
+        <PanelBody title={'Query Settings'} initialOpen={true}>
           <SelectControl
-            label={__('Post Type', 'o4o')}
+            label={'Post Type'}
             value={postType}
             options={postTypeOptions}
             onChange={(value: any) => setAttributes({ postType: value, currentPage: 1 })}
-            help={__('Select a custom post type to display', 'o4o')}
+            help={'Select a custom post type to display'}
           />
           
           <RangeControl
-            label={__('Number of Posts', 'o4o')}
+            label={'Number of Posts'}
             value={postsPerPage}
             onChange={(value: any) => setAttributes({ postsPerPage: value || 12 })}
             min={1}
@@ -495,26 +494,26 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           />
           
           <SelectControl
-            label={__('Order By', 'o4o')}
+            label={'Order By'}
             value={orderBy}
             options={orderByOptions}
             onChange={(value: any) => setAttributes({ orderBy: value })}
           />
           
           <SelectControl
-            label={__('Order', 'o4o')}
+            label={'Order'}
             value={order as any}
             options={[
-              { label: __('Descending', 'o4o'), value: 'desc' },
-              { label: __('Ascending', 'o4o'), value: 'asc' },
+              { label: 'Descending', value: 'desc' },
+              { label: 'Ascending', value: 'asc' },
             ]}
             onChange={(value: 'asc' | 'desc') => setAttributes({ order: value })}
           />
         </PanelBody>
 
-        <PanelBody title={__('Layout Settings', 'o4o')} initialOpen={false}>
+        <PanelBody title={'Layout Settings'} initialOpen={false}>
           <SelectControl
-            label={__('Template', 'o4o')}
+            label={'Template'}
             value={layoutType}
             options={templateOptions}
             onChange={(value: any) => setAttributes({ layoutType: value })}
@@ -523,7 +522,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           {layoutType === 'grid' && (
             <>
               <RangeControl
-                label={__('Desktop Columns', 'o4o')}
+                label={'Desktop Columns'}
                 value={columnsDesktop}
                 onChange={(value: any) => setAttributes({ columnsDesktop: value || 3 })}
                 min={1}
@@ -531,7 +530,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                 step={1}
               />
               <RangeControl
-                label={__('Tablet Columns', 'o4o')}
+                label={'Tablet Columns'}
                 value={columnsTablet}
                 onChange={(value: any) => setAttributes({ columnsTablet: value || 2 })}
                 min={1}
@@ -539,7 +538,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                 step={1}
               />
               <RangeControl
-                label={__('Mobile Columns', 'o4o')}
+                label={'Mobile Columns'}
                 value={columnsMobile}
                 onChange={(value: any) => setAttributes({ columnsMobile: value || 1 })}
                 min={1}
@@ -582,7 +581,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           })}
         />
 
-        <PanelBody title={__('Search Settings', 'o4o')} initialOpen={false}>
+        <PanelBody title={'Search Settings'} initialOpen={false}>
           <SearchSettings
             enableSearch={enableSearch}
             searchPlaceholder={searchPlaceholder}
@@ -595,7 +594,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           />
         </PanelBody>
 
-        <PanelBody title={__('Pagination Settings', 'o4o')} initialOpen={false}>
+        <PanelBody title={'Pagination Settings'} initialOpen={false}>
           <PaginationSettings
             paginationType={paginationType}
             postsPerPage={postsPerPage}
@@ -619,8 +618,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 
         {/* Posts Display */}
         {posts.length === 0 ? (
-          <Placeholder icon={icon} label={__('CPT/ACF Loop', 'o4o')}>
-            <p>{__('No posts found.', 'o4o')}</p>
+          <Placeholder icon={icon} label={'CPT/ACF Loop'}>
+            <p>{'No posts found.'}</p>
           </Placeholder>
         ) : (
           <>

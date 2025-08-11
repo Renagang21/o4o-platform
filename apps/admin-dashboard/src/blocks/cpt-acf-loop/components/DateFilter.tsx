@@ -12,7 +12,6 @@ import {
   Button,
   ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { calendar } from '@wordpress/icons';
 
 interface DateFilterProps {
@@ -34,26 +33,26 @@ export default function DateFilter({
 
   // Relative date options
   const relativeOptions = [
-    { label: __('Select a period', 'o4o'), value: '' },
-    { label: __('Today', 'o4o'), value: 'today' },
-    { label: __('Yesterday', 'o4o'), value: 'yesterday' },
-    { label: __('This week', 'o4o'), value: 'this_week' },
-    { label: __('Last week', 'o4o'), value: 'last_week' },
-    { label: __('This month', 'o4o'), value: 'this_month' },
-    { label: __('Last month', 'o4o'), value: 'last_month' },
-    { label: __('This year', 'o4o'), value: 'this_year' },
-    { label: __('Last year', 'o4o'), value: 'last_year' },
-    { label: __('Last 7 days', 'o4o'), value: 'last_7_days' },
-    { label: __('Last 30 days', 'o4o'), value: 'last_30_days' },
-    { label: __('Last 90 days', 'o4o'), value: 'last_90_days' },
-    { label: __('Last 365 days', 'o4o'), value: 'last_365_days' },
+    { label: 'Select a period', value: '' },
+    { label: 'Today', value: 'today' },
+    { label: 'Yesterday', value: 'yesterday' },
+    { label: 'This week', value: 'this_week' },
+    { label: 'Last week', value: 'last_week' },
+    { label: 'This month', value: 'this_month' },
+    { label: 'Last month', value: 'last_month' },
+    { label: 'This year', value: 'this_year' },
+    { label: 'Last year', value: 'last_year' },
+    { label: 'Last 7 days', value: 'last_7_days' },
+    { label: 'Last 30 days', value: 'last_30_days' },
+    { label: 'Last 90 days', value: 'last_90_days' },
+    { label: 'Last 365 days', value: 'last_365_days' },
   ];
 
   // Filter type options
   const filterTypeOptions = [
-    { label: __('No date filter', 'o4o'), value: 'none' },
-    { label: __('Relative date', 'o4o'), value: 'relative' },
-    { label: __('Custom date range', 'o4o'), value: 'absolute' },
+    { label: 'No date filter', value: 'none' },
+    { label: 'Relative date', value: 'relative' },
+    { label: 'Custom date range', value: 'absolute' },
   ];
 
   // Handle filter type change
@@ -161,7 +160,7 @@ export default function DateFilter({
   // Get preview text for current filter
   const getFilterPreview = (): string => {
     if (dateFilter.type === 'none') {
-      return __('All dates', 'o4o');
+      return 'All dates';
     }
 
     if (dateFilter.type === 'relative' && dateFilter.relative) {
@@ -176,12 +175,12 @@ export default function DateFilter({
       return `${formatDateDisplay(new Date(dateFilter.startDate))} - ${formatDateDisplay(new Date(dateFilter.endDate))}`;
     }
 
-    return __('Configure date filter', 'o4o');
+    return 'Configure date filter';
   };
 
   return (
     <PanelBody 
-      title={__('Date Filter', 'o4o')} 
+      title={'Date Filter'} 
       initialOpen={false}
       icon={calendar}
     >
@@ -199,7 +198,7 @@ export default function DateFilter({
       </div>
 
       <SelectControl
-        label={__('Filter Type', 'o4o')}
+        label={'Filter Type'}
         value={dateFilter.type}
         options={filterTypeOptions}
         onChange={handleFilterTypeChange}
@@ -207,7 +206,7 @@ export default function DateFilter({
 
       {dateFilter.type === 'relative' && (
         <SelectControl
-          label={__('Time Period', 'o4o')}
+          label={'Time Period'}
           value={dateFilter.relative || ''}
           options={relativeOptions}
           onChange={(relative: any) => onDateFilterChange({
@@ -220,7 +219,7 @@ export default function DateFilter({
       {dateFilter.type === 'absolute' && (
         <>
           <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ margin: '0 0 8px 0' }}>{__('Start Date', 'o4o')}</h4>
+            <h4 style={{ margin: '0 0 8px 0' }}>{'Start Date'}</h4>
             <DateTimePicker
               currentDate={dateFilter.startDate}
               onChange={(startDate: any) => onDateFilterChange({
@@ -232,7 +231,7 @@ export default function DateFilter({
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ margin: '0 0 8px 0' }}>{__('End Date', 'o4o')}</h4>
+            <h4 style={{ margin: '0 0 8px 0' }}>{'End Date'}</h4>
             <DateTimePicker
               currentDate={dateFilter.endDate}
               onChange={(endDate: any) => onDateFilterChange({
@@ -244,13 +243,13 @@ export default function DateFilter({
           </div>
 
           <ToggleControl
-            label={__('Include time in filter', 'o4o')}
+            label={'Include time in filter'}
             checked={dateFilter.includeTime || false}
             onChange={(includeTime: any) => onDateFilterChange({
               ...dateFilter,
               includeTime,
             })}
-            help={__('When disabled, only dates are compared (time is ignored)', 'o4o')}
+            help={'When disabled, only dates are compared (time is ignored)'}
             disabled={false}
           />
         </>
@@ -265,14 +264,14 @@ export default function DateFilter({
           })}
           style={{ marginTop: '8px' }}
         >
-          {__('Clear date filter', 'o4o')}
+          {'Clear date filter'}
         </Button>
       )}
 
       {/* Presets for quick selection */}
       {dateFilter.type === 'absolute' && (
         <div style={{ marginTop: '16px' }}>
-          <h4 style={{ margin: '0 0 8px 0' }}>{__('Quick Presets', 'o4o')}</h4>
+          <h4 style={{ margin: '0 0 8px 0' }}>{'Quick Presets'}</h4>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             <Button
               variant="secondary"
@@ -288,7 +287,7 @@ export default function DateFilter({
                 });
               }}
             >
-              {__('Last 7 days', 'o4o')}
+              {'Last 7 days'}
             </Button>
             
             <Button
@@ -305,7 +304,7 @@ export default function DateFilter({
                 });
               }}
             >
-              {__('Last 30 days', 'o4o')}
+              {'Last 30 days'}
             </Button>
             
             <Button
@@ -321,7 +320,7 @@ export default function DateFilter({
                 });
               }}
             >
-              {__('This year', 'o4o')}
+              {'This year'}
             </Button>
           </div>
         </div>

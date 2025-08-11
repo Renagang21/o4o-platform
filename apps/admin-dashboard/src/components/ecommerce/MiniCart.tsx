@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 import { useCart } from '../../services/cartService';
 import { formatPrice } from '../../utils/ecommerce';
 
@@ -49,7 +48,7 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
-            {__('Shopping Cart', 'o4o')}
+            {'Shopping Cart'}
             {cart.items.length > 0 && (
               <span className="text-sm bg-blue-500 text-white px-2 py-0.5 rounded-full">
                 {cart.items.length}
@@ -60,7 +59,7 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
             <button
               onClick={onClose}
               className="p-1 hover:bg-gray-100 rounded"
-              aria-label={__('Close cart', 'o4o')}
+              aria-label={'Close cart'}
             >
               <X className="w-5 h-5" />
             </button>
@@ -72,7 +71,7 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
           {cart.items.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>{__('Your cart is empty', 'o4o')}</p>
+              <p>{'Your cart is empty'}</p>
             </div>
           ) : (
             <div className="divide-y">
@@ -108,7 +107,7 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
                           onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                           disabled={isUpdating === item.id || item.quantity <= 1}
                           className="p-1 hover:bg-gray-200 rounded disabled:opacity-50"
-                          aria-label={__('Decrease quantity', 'o4o')}
+                          aria-label={'Decrease quantity'}
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -119,7 +118,7 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
                           onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                           disabled={isUpdating === item.id}
                           className="p-1 hover:bg-gray-200 rounded disabled:opacity-50"
-                          aria-label={__('Increase quantity', 'o4o')}
+                          aria-label={'Increase quantity'}
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -132,13 +131,13 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
                         {formatPrice(item.price * item.quantity)}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {formatPrice(item.price)} {__('each', 'o4o')}
+                        {formatPrice(item.price)} {'each'}
                       </p>
                       <button
                         onClick={() => handleRemoveItem(item.id)}
                         disabled={isUpdating === item.id}
                         className="mt-2 p-1 text-red-600 hover:bg-red-50 rounded"
-                        aria-label={__('Remove item', 'o4o')}
+                        aria-label={'Remove item'}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -156,27 +155,27 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
             {/* Totals */}
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>{__('Subtotal', 'o4o')}</span>
+                <span>{'Subtotal'}</span>
                 <span>{formatPrice(cart.subtotal)}</span>
               </div>
               {cart.discount > 0 && (
                 <div className="flex justify-between text-green-600">
-                  <span>{__('Discount', 'o4o')}</span>
+                  <span>{'Discount'}</span>
                   <span>-{formatPrice(cart.discount)}</span>
                 </div>
               )}
               {cart.shipping > 0 && (
                 <div className="flex justify-between">
-                  <span>{__('Shipping', 'o4o')}</span>
+                  <span>{'Shipping'}</span>
                   <span>{formatPrice(cart.shipping)}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span>{__('Tax', 'o4o')}</span>
+                <span>{'Tax'}</span>
                 <span>{formatPrice(cart.tax)}</span>
               </div>
               <div className="flex justify-between font-bold text-base pt-2 border-t">
-                <span>{__('Total', 'o4o')}</span>
+                <span>{'Total'}</span>
                 <span>{formatPrice(cart.total)}</span>
               </div>
             </div>
@@ -187,26 +186,26 @@ export function MiniCart({ _isOpen = false, onClose, position = 'dropdown' }: Mi
                 href="/cart"
                 className="block w-full py-2 text-center bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
               >
-                {__('View Cart', 'o4o')}
+                {'View Cart'}
               </a>
               <a
                 href="/checkout"
                 className="block w-full py-2 text-center bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
               >
-                {__('Checkout', 'o4o')}
+                {'Checkout'}
               </a>
             </div>
 
             {/* Clear Cart */}
             <button
               onClick={() => {
-                if (window.confirm(__('Are you sure you want to clear your cart?', 'o4o'))) {
+                if (window.confirm('Are you sure you want to clear your cart?')) {
                   clearCart();
                 }
               }}
               className="w-full text-sm text-gray-500 hover:text-red-600 transition-colors"
             >
-              {__('Clear Cart', 'o4o')}
+              {'Clear Cart'}
             </button>
           </div>
         )}

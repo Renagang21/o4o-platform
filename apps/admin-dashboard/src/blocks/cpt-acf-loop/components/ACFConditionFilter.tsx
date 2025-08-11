@@ -6,7 +6,6 @@
 
 import { useState } from '@wordpress/element';
 import { PanelBody, Button, SelectControl, TextControl, Notice,  } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { plus, trash, settings } from '@wordpress/icons';
 
 export interface ACFCondition {
@@ -38,30 +37,30 @@ export default function ACFConditionFilter({
 
   // Compare operators
   const compareOperators = [
-    { label: __('Equal to', 'o4o'), value: '=' },
-    { label: __('Not equal to', 'o4o'), value: '!=' },
-    { label: __('Greater than', 'o4o'), value: '>' },
-    { label: __('Greater than or equal', 'o4o'), value: '>=' },
-    { label: __('Less than', 'o4o'), value: '<' },
-    { label: __('Less than or equal', 'o4o'), value: '<=' },
-    { label: __('Contains', 'o4o'), value: 'LIKE' },
-    { label: __('Does not contain', 'o4o'), value: 'NOT LIKE' },
-    { label: __('Exists', 'o4o'), value: 'EXISTS' },
-    { label: __('Does not exist', 'o4o'), value: 'NOT EXISTS' },
-    { label: __('In array', 'o4o'), value: 'IN' },
-    { label: __('Not in array', 'o4o'), value: 'NOT IN' },
-    { label: __('Between', 'o4o'), value: 'BETWEEN' },
-    { label: __('Not between', 'o4o'), value: 'NOT BETWEEN' },
+    { label: 'Equal to', value: '=' },
+    { label: 'Not equal to', value: '!=' },
+    { label: 'Greater than', value: '>' },
+    { label: 'Greater than or equal', value: '>=' },
+    { label: 'Less than', value: '<' },
+    { label: 'Less than or equal', value: '<=' },
+    { label: 'Contains', value: 'LIKE' },
+    { label: 'Does not contain', value: 'NOT LIKE' },
+    { label: 'Exists', value: 'EXISTS' },
+    { label: 'Does not exist', value: 'NOT EXISTS' },
+    { label: 'In array', value: 'IN' },
+    { label: 'Not in array', value: 'NOT IN' },
+    { label: 'Between', value: 'BETWEEN' },
+    { label: 'Not between', value: 'NOT BETWEEN' },
   ];
 
   // Value types
   const valueTypes = [
-    { label: __('Text', 'o4o'), value: 'CHAR' },
-    { label: __('Number', 'o4o'), value: 'NUMERIC' },
-    { label: __('Date', 'o4o'), value: 'DATE' },
-    { label: __('DateTime', 'o4o'), value: 'DATETIME' },
-    { label: __('Time', 'o4o'), value: 'TIME' },
-    { label: __('Binary', 'o4o'), value: 'BINARY' },
+    { label: 'Text', value: 'CHAR' },
+    { label: 'Number', value: 'NUMERIC' },
+    { label: 'Date', value: 'DATE' },
+    { label: 'DateTime', value: 'DATETIME' },
+    { label: 'Time', value: 'TIME' },
+    { label: 'Binary', value: 'BINARY' },
   ];
 
   // Generate unique ID
@@ -157,7 +156,7 @@ export default function ACFConditionFilter({
 
   // Get field options
   const fieldOptions = [
-    { label: __('Select a field', 'o4o'), value: '' },
+    { label: 'Select a field', value: '' },
     ...availableFields.map((field: any) => ({
       label: field.label,
       value: field.name,
@@ -178,7 +177,7 @@ export default function ACFConditionFilter({
     if (arrayOperators.includes(condition.compare)) {
       return (
         <TextControl
-          label={__('Values (comma separated)', 'o4o')}
+          label={'Values (comma separated)'}
           value={condition.value}
           onChange={(value: string) => updateCondition(groupId, condition.id, { value })}
           placeholder="value1, value2, value3"
@@ -193,7 +192,7 @@ export default function ACFConditionFilter({
     if (rangeOperators.includes(condition.compare)) {
       return (
         <TextControl
-          label={__('Range (min, max)', 'o4o')}
+          label={'Range (min, max)'}
           value={condition.value}
           onChange={(value: string) => updateCondition(groupId, condition.id, { value })}
           placeholder="10, 100"
@@ -208,7 +207,7 @@ export default function ACFConditionFilter({
     // Default text input
     return (
       <TextControl
-        label={__('Value', 'o4o')}
+        label={'Value'}
         value={condition.value}
         className=""
         help=""
@@ -222,14 +221,14 @@ export default function ACFConditionFilter({
 
   return (
     <PanelBody 
-      title={__('ACF Field Filters', 'o4o')} 
+      title={'ACF Field Filters'} 
       initialOpen={false}
       icon={settings}
     >
       {conditionGroups.length === 0 ? (
         <Notice status="info" isDismissible={false}>
-          <p>{__('No field filters active.', 'o4o')}</p>
-          <p>{__('Add filters to query posts based on ACF field values.', 'o4o')}</p>
+          <p>{'No field filters active.'}</p>
+          <p>{'Add filters to query posts based on ACF field values.'}</p>
         </Notice>
       ) : (
         <div style={{ marginBottom: '16px' }}>
@@ -257,7 +256,7 @@ export default function ACFConditionFilter({
                       size={"small" as any}
                     />
                     <span style={{ fontWeight: '600' }}>
-                      {__('Filter Group', 'o4o')} {groupIndex + 1}
+                      {'Filter Group'} {groupIndex + 1}
                     </span>
                     <span style={{
                       background: '#0073aa',
@@ -266,7 +265,7 @@ export default function ACFConditionFilter({
                       borderRadius: '12px',
                       fontSize: '11px',
                     }}>
-                      {group.conditions.length} {group.conditions.length === 1 ? __('condition', 'o4o') : __('conditions', 'o4o')}
+                      {group.conditions.length} {group.conditions.length === 1 ? 'condition' : 'conditions'}
                     </span>
                   </div>
                   <Button
@@ -275,7 +274,7 @@ export default function ACFConditionFilter({
                     variant="tertiary"
                     size={"small" as any}
                     isDestructive
-                    label={__('Remove group', 'o4o')}
+                    label={'Remove group'}
                   />
                 </div>
 
@@ -292,11 +291,11 @@ export default function ACFConditionFilter({
                         borderRadius: '4px',
                       }}>
                         <SelectControl
-                          label={__('Combine with previous group using', 'o4o')}
+                          label={'Combine with previous group using'}
                           value={group.relation}
                           options={[
-                            { label: __('AND', 'o4o'), value: 'AND' },
-                            { label: __('OR', 'o4o'), value: 'OR' },
+                            { label: 'AND', value: 'AND' },
+                            { label: 'OR', value: 'OR' },
                           ]}
                           onChange={(relation: any) => updateConditionGroup(group.id, { 
                             relation: relation as 'AND' | 'OR' 
@@ -330,14 +329,14 @@ export default function ACFConditionFilter({
 
                         <div style={{ display: 'grid', gap: '8px' }}>
                           <SelectControl
-                            label={__('Field', 'o4o')}
+                            label={'Field'}
                             value={condition.field}
                             options={fieldOptions}
                             onChange={(field: any) => updateCondition(group.id, condition.id, { field })}
                           />
 
                           <SelectControl
-                            label={__('Comparison', 'o4o')}
+                            label={'Comparison'}
                             value={condition.compare}
                             options={compareOperators}
                             onChange={(compare: any) => updateCondition(group.id, condition.id, { compare })}
@@ -346,7 +345,7 @@ export default function ACFConditionFilter({
                           {renderValueInput(condition, group.id)}
 
                           <SelectControl
-                            label={__('Type', 'o4o')}
+                            label={'Type'}
                             value={condition.type}
                             options={valueTypes}
                             onChange={(type: any) => updateCondition(group.id, condition.id, { type })}
@@ -360,7 +359,7 @@ export default function ACFConditionFilter({
                               size={"small" as any}
                               isDestructive
                             >
-                              {__('Remove condition', 'o4o')}
+                              {'Remove condition'}
                             </Button>
                           )}
                         </div>
@@ -374,7 +373,7 @@ export default function ACFConditionFilter({
                       variant="secondary"
                       size={"small" as any}
                     >
-                      {__('Add condition', 'o4o')}
+                      {'Add condition'}
                     </Button>
                   </div>
                 )}
@@ -391,8 +390,8 @@ export default function ACFConditionFilter({
         variant="primary"
       >
         {conditionGroups.length === 0 
-          ? __('Add filter group', 'o4o')
-          : __('Add another filter group', 'o4o')
+          ? 'Add filter group'
+          : 'Add another filter group'
         }
       </Button>
     </PanelBody>

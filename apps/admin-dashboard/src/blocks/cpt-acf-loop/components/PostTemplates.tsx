@@ -4,7 +4,6 @@
  * Different layout templates for displaying posts
  */
 
-import { __ } from '@wordpress/i18n';
 import { ACFFieldRenderer } from './ACFFieldRenderers';
 import { getFeaturedImageUrl, formatDate, getAuthorName } from '../utils';
 
@@ -132,7 +131,7 @@ export const ListTemplate = ({
             <div className="o4o-cpt-acf-loop__meta o4o-cpt-acf-loop__meta--header">
               {showAuthor && (
                 <span className="o4o-cpt-acf-loop__meta-item">
-                  {__('By', 'o4o')} {getAuthorName(post)}
+                  {'By'} {getAuthorName(post)}
                 </span>
               )}
               {showDate && (

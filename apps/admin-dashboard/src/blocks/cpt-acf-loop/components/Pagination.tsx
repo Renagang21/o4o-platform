@@ -6,7 +6,6 @@
 
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { Button, Spinner, SelectControl, RangeControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 
 interface PaginationProps {
@@ -123,10 +122,10 @@ const NumbersPagination = ({
   return (
     <nav 
       className="o4o-cpt-acf-loop__pagination o4o-cpt-acf-loop__pagination--numbers"
-      aria-label={__('Posts navigation', 'o4o')}
+      aria-label={'Posts navigation'}
     >
       <div className="o4o-cpt-acf-loop__pagination-info">
-        {__('Showing', 'o4o')} {startItem}-{endItem} {__('of', 'o4o')} {totalItems} {__('items', 'o4o')}
+        {'Showing'} {startItem}-{endItem} {'of'} {totalItems} {'items'}
       </div>
 
       <div className="o4o-cpt-acf-loop__pagination-controls">
@@ -136,9 +135,9 @@ const NumbersPagination = ({
           icon={chevronLeft}
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || isLoading}
-          label={__('Previous page', 'o4o')}
+          label={'Previous page'}
         >
-          {__('Previous', 'o4o')}
+          {'Previous'}
         </Button>
 
         {/* Page numbers */}
@@ -181,9 +180,9 @@ const NumbersPagination = ({
           iconPosition="right"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages || isLoading}
-          label={__('Next page', 'o4o')}
+          label={'Next page'}
         >
-          {__('Next', 'o4o')}
+          {'Next'}
         </Button>
       </div>
     </nav>
@@ -204,7 +203,7 @@ const LoadMorePagination = ({
     return (
       <div className="o4o-cpt-acf-loop__pagination o4o-cpt-acf-loop__pagination--loadmore">
         <p className="o4o-cpt-acf-loop__pagination-end">
-          {__('No more posts to load', 'o4o')}
+          {'No more posts to load'}
         </p>
       </div>
     );
@@ -221,10 +220,10 @@ const LoadMorePagination = ({
         {isLoading ? (
           <>
             <Spinner />
-            <span style={{ marginLeft: '8px' }}>{__('Loading...', 'o4o')}</span>
+            <span style={{ marginLeft: '8px' }}>{'Loading...'}</span>
           </>
         ) : (
-          __('Load More Posts', 'o4o')
+          'Load More Posts'
         )}
       </Button>
     </div>
@@ -286,7 +285,7 @@ const InfiniteScrollPagination = ({
       {isLoading && (
         <div className="o4o-cpt-acf-loop__pagination-loader">
           <Spinner />
-          <span>{__('Loading more posts...', 'o4o')}</span>
+          <span>{'Loading more posts...'}</span>
         </div>
       )}
       
@@ -314,27 +313,27 @@ export const PaginationSettings = ({
   return (
     <>
       <SelectControl
-        label={__('Pagination Type', 'o4o')}
+        label={'Pagination Type'}
         value={paginationType as any}
         options={[
-          { label: __('Page Numbers', 'o4o'), value: 'numbers' },
-          { label: __('Load More Button', 'o4o'), value: 'loadmore' },
-          { label: __('Infinite Scroll', 'o4o'), value: 'infinite' },
-          { label: __('No Pagination', 'o4o'), value: 'none' },
+          { label: 'Page Numbers', value: 'numbers' },
+          { label: 'Load More Button', value: 'loadmore' },
+          { label: 'Infinite Scroll', value: 'infinite' },
+          { label: 'No Pagination', value: 'none' },
         ]}
         onChange={onTypeChange}
-        help={__('Choose how users navigate through posts', 'o4o')}
+        help={'Choose how users navigate through posts'}
       />
 
       {paginationType !== 'none' && (
         <RangeControl
-          label={__('Posts Per Page', 'o4o')}
+          label={'Posts Per Page'}
           value={postsPerPage}
           onChange={(value: number | undefined) => value !== undefined && onPostsPerPageChange(value)}
           min={1}
           max={50}
           step={1}
-          help={__('Number of posts to display per page', 'o4o')}
+          help={'Number of posts to display per page'}
         />
       )}
     </>

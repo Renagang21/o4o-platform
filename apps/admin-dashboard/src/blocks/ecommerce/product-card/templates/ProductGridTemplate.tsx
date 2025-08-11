@@ -1,5 +1,4 @@
 import { ShoppingCart, Package } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 // import { formatPrice } from '../../../../utils/ecommerce';
 const formatPrice = (price: number, symbol: string = '$') => `${symbol}${price.toFixed(2)}`;
 
@@ -44,7 +43,7 @@ export function ProductGridTemplate({ products, attributes, isLoading, error }: 
     return (
       <div className="text-center py-8 text-gray-500">
         <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        <p>{error || __('No products found', 'o4o')}</p>
+        <p>{error || 'No products found'}</p>
       </div>
     );
   }
@@ -80,7 +79,7 @@ export function ProductGridTemplate({ products, attributes, isLoading, error }: 
                       data-product-id={product.id}
                     >
                       <ShoppingCart className="w-4 h-4" />
-                      {__('Quick Add', 'o4o')}
+                      {'Quick Add'}
                     </button>
                   </div>
                 )}

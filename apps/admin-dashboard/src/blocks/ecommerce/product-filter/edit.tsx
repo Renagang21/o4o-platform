@@ -1,5 +1,4 @@
 // import { useState, useEffect } from 'react';
-import { __ } from '@wordpress/i18n';
 import {
   InspectorControls,
   BlockControls,
@@ -52,25 +51,25 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
   const { brands } = useProductBrands();
 
   const layoutOptions = [
-    { label: __('Sidebar', 'o4o'), value: 'sidebar' },
-    { label: __('Horizontal', 'o4o'), value: 'horizontal' },
-    { label: __('Off-canvas', 'o4o'), value: 'offcanvas' }
+    { label: 'Sidebar', value: 'sidebar' },
+    { label: 'Horizontal', value: 'horizontal' },
+    { label: 'Off-canvas', value: 'offcanvas' }
   ];
 
   const filterStyleOptions = [
-    { label: __('Accordion', 'o4o'), value: 'accordion' },
-    { label: __('Expanded', 'o4o'), value: 'expanded' },
-    { label: __('Dropdown', 'o4o'), value: 'dropdown' }
+    { label: 'Accordion', value: 'accordion' },
+    { label: 'Expanded', value: 'expanded' },
+    { label: 'Dropdown', value: 'dropdown' }
   ];
 
   const sortOptionChoices = [
-    { label: __('Popularity', 'o4o'), value: 'popularity' },
-    { label: __('Average Rating', 'o4o'), value: 'rating' },
-    { label: __('Latest', 'o4o'), value: 'date' },
-    { label: __('Price: Low to High', 'o4o'), value: 'price' },
-    { label: __('Price: High to Low', 'o4o'), value: 'price-desc' },
-    { label: __('Name: A to Z', 'o4o'), value: 'title' },
-    { label: __('Name: Z to A', 'o4o'), value: 'title-desc' }
+    { label: 'Popularity', value: 'popularity' },
+    { label: 'Average Rating', value: 'rating' },
+    { label: 'Latest', value: 'date' },
+    { label: 'Price: Low to High', value: 'price' },
+    { label: 'Price: High to Low', value: 'price-desc' },
+    { label: 'Name: A to Z', value: 'title' },
+    { label: 'Name: Z to A', value: 'title-desc' }
   ];
 
   const renderFilters = () => {
@@ -97,13 +96,13 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
         <ToolbarGroup>
           <ToolbarButton
             icon={<List className="w-4 h-4" />}
-            label={__('Sidebar Layout', 'o4o')}
+            label={'Sidebar Layout'}
             onClick={() => setAttributes({ layout: 'sidebar' })}
             isActive={layout === 'sidebar'}
           />
           <ToolbarButton
             icon={<Grid className="w-4 h-4" />}
-            label={__('Horizontal Layout', 'o4o')}
+            label={'Horizontal Layout'}
             onClick={() => setAttributes({ layout: 'horizontal' })}
             isActive={layout === 'horizontal'}
           />
@@ -111,65 +110,65 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
       </BlockControls>
 
       <InspectorControls>
-        <PanelBody title={__('Layout Settings', 'o4o')} initialOpen={true}>
+        <PanelBody title={'Layout Settings'} initialOpen={true}>
           <SelectControl
-            label={__('Layout', 'o4o')}
+            label={'Layout'}
             value={layout}
             options={layoutOptions}
             onChange={(value: any) => setAttributes({ layout: value })}
           />
           <SelectControl
-            label={__('Filter Style', 'o4o')}
+            label={'Filter Style'}
             value={filterStyle}
             options={filterStyleOptions}
             onChange={(value: any) => setAttributes({ filterStyle: value })}
           />
           <ToggleControl
-            label={__('Show Filter Count', 'o4o')}
+            label={'Show Filter Count'}
             checked={showFilterCount}
             onChange={(value: any) => setAttributes({ showFilterCount: value })}
           />
           <ToggleControl
-            label={__('Show Clear All Button', 'o4o')}
+            label={'Show Clear All Button'}
             checked={showClearAll}
             onChange={(value: any) => setAttributes({ showClearAll: value })}
           />
           <ToggleControl
-            label={__('Enable AJAX Filtering', 'o4o')}
+            label={'Enable AJAX Filtering'}
             checked={ajaxFilter}
             onChange={(value: any) => setAttributes({ ajaxFilter: value })}
           />
           <ToggleControl
-            label={__('Mobile Toggle Button', 'o4o')}
+            label={'Mobile Toggle Button'}
             checked={mobileToggle}
             onChange={(value: any) => setAttributes({ mobileToggle: value })}
           />
         </PanelBody>
 
-        <PanelBody title={__('Filter Options', 'o4o')} initialOpen={false}>
+        <PanelBody title={'Filter Options'} initialOpen={false}>
           <ToggleControl
-            label={__('Price Filter', 'o4o')}
+            label={'Price Filter'}
             checked={showPriceFilter}
             onChange={(value: any) => setAttributes({ showPriceFilter: value })}
           />
           {showPriceFilter && (
             <>
               <TextControl
-                label={__('Min Price', 'o4o')}
+                label={'Min Price'}
                 value={priceMin.toString() as any}
                 type="number"
                 onChange={(value: string) => setAttributes({ priceMin: parseInt(value) || 0 })}
                 min={0}
               />
               <TextControl
-                label={__('Max Price', 'o4o')}
+                label={'Max Price'}
                 value={priceMax.toString() as any}
                 type="number"
                 onChange={(value: string) => setAttributes({ priceMax: parseInt(value) || 1000000 })}
                 min={0}
               />
               <TextControl
-                label={__('Price Step', 'o4o')}
+                label={'Price Step'}
                 value={priceStep.toString() as any}
                 type="number"
                 onChange={(value: string) => setAttributes({ priceStep: parseInt(value) || 10000 })}
@@ -178,47 +177,47 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
             </>
           )}
           <ToggleControl
-            label={__('Category Filter', 'o4o')}
+            label={'Category Filter'}
             checked={showCategoryFilter}
             onChange={(value: any) => setAttributes({ showCategoryFilter: value })}
           />
           <ToggleControl
-            label={__('Tag Filter', 'o4o')}
+            label={'Tag Filter'}
             checked={showTagFilter}
             onChange={(value: any) => setAttributes({ showTagFilter: value })}
           />
           <ToggleControl
-            label={__('Brand Filter', 'o4o')}
+            label={'Brand Filter'}
             checked={showBrandFilter}
             onChange={(value: any) => setAttributes({ showBrandFilter: value })}
           />
           <ToggleControl
-            label={__('Stock Filter', 'o4o')}
+            label={'Stock Filter'}
             checked={showStockFilter}
             onChange={(value: any) => setAttributes({ showStockFilter: value })}
           />
           <ToggleControl
-            label={__('Rating Filter', 'o4o')}
+            label={'Rating Filter'}
             checked={showRatingFilter}
             onChange={(value: any) => setAttributes({ showRatingFilter: value })}
           />
           <ToggleControl
-            label={__('Sale Filter', 'o4o')}
+            label={'Sale Filter'}
             checked={showSaleFilter}
             onChange={(value: any) => setAttributes({ showSaleFilter: value })}
           />
         </PanelBody>
 
-        <PanelBody title={__('Sort Options', 'o4o')} initialOpen={false}>
+        <PanelBody title={'Sort Options'} initialOpen={false}>
           <ToggleControl
-            label={__('Show Sort Options', 'o4o')}
+            label={'Show Sort Options'}
             checked={showSortOptions}
             onChange={(value: any) => setAttributes({ showSortOptions: value })}
           />
           {showSortOptions && (
             <div>
               <p className="components-base-control__label">
-                {__('Available Sort Options', 'o4o')}
+                {'Available Sort Options'}
               </p>
               {sortOptionChoices.map((option: any) => (
                 <ToggleControl
@@ -237,10 +236,10 @@ export function Edit({ attributes, setAttributes }: { attributes: any; setAttrib
           )}
         </PanelBody>
 
-        <PanelBody title={__('Integration', 'o4o')} initialOpen={false}>
+        <PanelBody title={'Integration'} initialOpen={false}>
           <TextControl
-            label={__('Target Product Block ID', 'o4o')}
-            help={__('Enter the block ID of the product listing to filter', 'o4o')}
+            label={'Target Product Block ID'}
+            help={'Enter the block ID of the product listing to filter'}
             value={targetProductBlock || ''}
             onChange={(value: any) => setAttributes({ targetProductBlock: value })}
             placeholder="block-123456"

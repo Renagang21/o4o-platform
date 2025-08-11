@@ -13,7 +13,6 @@ import {
   Notice,
   Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { filter } from '@wordpress/icons';
 
@@ -252,10 +251,10 @@ export default function TaxonomyFilter({
 
   if (isLoading) {
     return (
-      <PanelBody title={__('Taxonomy Filters', 'o4o')} initialOpen={false}>
+      <PanelBody title={'Taxonomy Filters'} initialOpen={false}>
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <Spinner />
-          <p>{__('Loading taxonomies...', 'o4o')}</p>
+          <p>{'Loading taxonomies...'}</p>
         </div>
       </PanelBody>
     );
@@ -263,9 +262,9 @@ export default function TaxonomyFilter({
 
   if (availableTaxonomies.length === 0) {
     return (
-      <PanelBody title={__('Taxonomy Filters', 'o4o')} initialOpen={false}>
+      <PanelBody title={'Taxonomy Filters'} initialOpen={false}>
         <Notice status="info" isDismissible={false}>
-          {__('No taxonomies available for this post type.', 'o4o')}
+          {'No taxonomies available for this post type.'}
         </Notice>
       </PanelBody>
     );
@@ -273,7 +272,7 @@ export default function TaxonomyFilter({
 
   return (
     <PanelBody 
-      title={__('Taxonomy Filters', 'o4o')} 
+      title={'Taxonomy Filters'} 
       initialOpen={false}
       icon={filter}
     >
@@ -324,7 +323,7 @@ export default function TaxonomyFilter({
                   <div style={{ marginBottom: '12px' }}>
                     <input
                       type="search"
-                      placeholder={__('Search terms...', 'o4o')}
+                      placeholder={'Search terms...'}
                       value={searchQuery[taxonomy.slug] || ''}
                       onChange={(e: any) => setSearchQuery((prev: any) => ({
                         ...prev,
@@ -343,12 +342,12 @@ export default function TaxonomyFilter({
                 {/* Operator selection */}
                 {hasSelectedTerms && (
                   <SelectControl
-                    label={__('Filter Logic', 'o4o')}
+                    label={'Filter Logic'}
                     value={selectedTaxonomies[taxonomy.slug].operator}
                     options={[
-                      { label: __('Include any of these', 'o4o'), value: 'IN' },
-                      { label: __('Exclude these', 'o4o'), value: 'NOT IN' },
-                      { label: __('Include all of these', 'o4o'), value: 'AND' },
+                      { label: 'Include any of these', value: 'IN' },
+                      { label: 'Exclude these', value: 'NOT IN' },
+                      { label: 'Include all of these', value: 'AND' },
                     ]}
                     onChange={(value: any) => handleOperatorChange(
                       taxonomy.slug, 
@@ -362,7 +361,7 @@ export default function TaxonomyFilter({
                 <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
                   {terms.length === 0 ? (
                     <p style={{ color: '#666', fontStyle: 'italic' }}>
-                      {__('No terms found', 'o4o')}
+                      {'No terms found'}
                     </p>
                   ) : taxonomy.hierarchical ? (
                     renderHierarchicalTerms(terms, taxonomy.slug)
@@ -382,7 +381,7 @@ export default function TaxonomyFilter({
                     }}
                     style={{ marginTop: '8px' }}
                   >
-                    {__('Clear selection', 'o4o')}
+                    {'Clear selection'}
                   </Button>
                 )}
               </div>

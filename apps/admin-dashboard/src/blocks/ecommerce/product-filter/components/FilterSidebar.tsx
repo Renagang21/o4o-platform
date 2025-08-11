@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { __ } from '@wordpress/i18n';
 import { ChevronDown, Filter } from 'lucide-react';
 import { formatPrice } from '../../../../utils/ecommerce';
 
@@ -78,7 +77,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
       <div className="flex items-center justify-between mb-4 pb-2 border-b">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Filter className="w-5 h-5" />
-          {__('Filter Products', 'o4o')}
+          {'Filter Products'}
           {attributes.showFilterCount && activeFilterCount > 0 && (
             <span className="text-sm bg-blue-500 text-white px-2 py-1 rounded-full">
               {activeFilterCount}
@@ -90,7 +89,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             onClick={clearAllFilters}
             className="text-sm text-blue-600 hover:text-blue-800"
           >
-            {__('Clear All', 'o4o')}
+            {'Clear All'}
           </button>
         )}
       </div>
@@ -102,7 +101,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             onClick={() => toggleSection('price')}
             className="flex items-center justify-between w-full text-left font-medium mb-3"
           >
-            <span>{__('Price', 'o4o')}</span>
+            <span>{'Price'}</span>
             <ChevronDown 
               className={`w-4 h-4 transition-transform ${isExpanded('price') ? 'rotate-180' : ''}`}
             />
@@ -151,7 +150,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             onClick={() => toggleSection('category')}
             className="flex items-center justify-between w-full text-left font-medium mb-3"
           >
-            <span>{__('Categories', 'o4o')}</span>
+            <span>{'Categories'}</span>
             <ChevronDown 
               className={`w-4 h-4 transition-transform ${isExpanded('category') ? 'rotate-180' : ''}`}
             />
@@ -184,7 +183,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             onClick={() => toggleSection('brand')}
             className="flex items-center justify-between w-full text-left font-medium mb-3"
           >
-            <span>{__('Brands', 'o4o')}</span>
+            <span>{'Brands'}</span>
             <ChevronDown 
               className={`w-4 h-4 transition-transform ${isExpanded('brand') ? 'rotate-180' : ''}`}
             />
@@ -220,7 +219,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
               onChange={(e: any) => setSelectedFilters({ ...selectedFilters, inStock: e.target.checked })}
               className="rounded"
             />
-            <span className="font-medium">{__('In Stock Only', 'o4o')}</span>
+            <span className="font-medium">{'In Stock Only'}</span>
           </label>
         </div>
       )}
@@ -235,7 +234,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
               onChange={(e: any) => setSelectedFilters({ ...selectedFilters, onSale: e.target.checked })}
               className="rounded"
             />
-            <span className="font-medium">{__('On Sale', 'o4o')}</span>
+            <span className="font-medium">{'On Sale'}</span>
           </label>
         </div>
       )}
@@ -247,7 +246,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
             onClick={() => toggleSection('rating')}
             className="flex items-center justify-between w-full text-left font-medium mb-3"
           >
-            <span>{__('Rating', 'o4o')}</span>
+            <span>{'Rating'}</span>
             <ChevronDown 
               className={`w-4 h-4 transition-transform ${isExpanded('rating') ? 'rotate-180' : ''}`}
             />
@@ -271,7 +270,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
                         ★
                       </span>
                     ))}
-                    <span className="text-sm text-gray-600">{__('& Up', 'o4o')}</span>
+                    <span className="text-sm text-gray-600">{'& Up'}</span>
                   </div>
                 </label>
               ))}
@@ -284,7 +283,7 @@ export function FilterSidebar({ attributes, categories, brands, isEditor = false
         <button
           className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
-          {__('Apply Filters', 'o4o')}
+          {'Apply Filters'}
         </button>
       )}
     </div>

@@ -12,7 +12,6 @@ import {
   Notice,
   Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -141,8 +140,8 @@ const SortableFieldItem = ({
             onClick={() => handleVisibilityToggle(field.key)}
             label={
               field.visible
-                ? __('Hide field', 'o4o')
-                : __('Show field', 'o4o')
+                ? 'Hide field'
+                : 'Show field'
             }
           />
           
@@ -152,14 +151,14 @@ const SortableFieldItem = ({
             variant="tertiary"
             onClick={() => {
               const newLabel = prompt(
-                __('Custom label for this field:', 'o4o'),
+                'Custom label for this field:',
                 field.customLabel || field.label
               );
               if (newLabel !== null) {
                 handleLabelChange(field.key, newLabel);
               }
             }}
-            label={__('Edit label', 'o4o')}
+            label={'Edit label'}
           />
         </div>
       </div>
@@ -271,7 +270,7 @@ export default function ACFFieldSelector({
           ]);
         }
         
-        setError(__('ACF REST API not available. Using sample fields.', 'o4o'));
+        setError('ACF REST API not available. Using sample fields.');
         setIsLoading(false);
       });
   }, [postType]);
@@ -363,17 +362,17 @@ export default function ACFFieldSelector({
 
   if (isLoading) {
     return (
-      <PanelBody title={__('ACF Fields', 'o4o')} initialOpen={false}>
+      <PanelBody title={'ACF Fields'} initialOpen={false}>
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <Spinner />
-          <p>{__('Loading ACF fields...', 'o4o')}</p>
+          <p>{'Loading ACF fields...'}</p>
         </div>
       </PanelBody>
     );
   }
 
   return (
-    <PanelBody title={__('ACF Fields', 'o4o')} initialOpen={false}>
+    <PanelBody title={'ACF Fields'} initialOpen={false}>
       {error && (
         <Notice status="info" isDismissible={false}>
           {error}
@@ -382,12 +381,12 @@ export default function ACFFieldSelector({
 
       {availableFields.length === 0 ? (
         <Notice status="warning" isDismissible={false}>
-          {__('No ACF fields found for this post type.', 'o4o')}
+          {'No ACF fields found for this post type.'}
         </Notice>
       ) : (
         <>
           <h3 style={{ marginTop: 0, marginBottom: '10px' }}>
-            {__('Available Fields', 'o4o')}
+            {'Available Fields'}
           </h3>
           
           <div style={{ marginBottom: '20px' }}>
@@ -404,7 +403,7 @@ export default function ACFFieldSelector({
           {selectedFields.length > 0 && (
             <>
               <h3 style={{ marginBottom: '10px' }}>
-                {__('Selected Fields', 'o4o')}
+                {'Selected Fields'}
               </h3>
               
               <DndContext 

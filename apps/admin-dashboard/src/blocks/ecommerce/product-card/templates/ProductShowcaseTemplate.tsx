@@ -1,5 +1,4 @@
 import { ShoppingCart, Package, Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 import { useState } from 'react';
 import { formatPrice, calculateDiscountPercentage } from '../../../../utils/ecommerce';
 
@@ -53,7 +52,7 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
     return (
       <div className="text-center py-12 text-gray-500">
         <Package className="w-16 h-16 mx-auto mb-4 opacity-50" />
-        <p className="text-lg">{error || __('No products found', 'o4o')}</p>
+        <p className="text-lg">{error || 'No products found'}</p>
       </div>
     );
   }
@@ -96,14 +95,14 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
                   <button
                     onClick={handlePrevious}
                     className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label={__('Previous product', 'o4o')}
+                    aria-label={'Previous product'}
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <button
                     onClick={handleNext}
                     className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label={__('Next product', 'o4o')}
+                    aria-label={'Next product'}
                   >
                     <ChevronRight className="w-6 h-6" />
                   </button>
@@ -164,7 +163,7 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
                 ))}
               </div>
               <span className="text-gray-600">
-                {currentProduct.averageRating.toFixed(1)} ({currentProduct.ratingCount} {__('reviews', 'o4o')})
+                {currentProduct.averageRating.toFixed(1)} ({currentProduct.ratingCount} {'reviews'})
               </span>
             </div>
           )}
@@ -186,7 +185,7 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
                     {formatPrice(currentProduct.salePrice, currentProduct.currency)}
                   </span>
                   <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded">
-                    {__('Save', 'o4o')} {formatPrice(currentProduct.regularPrice - currentProduct.salePrice, currentProduct.currency)}
+                    {'Save'} {formatPrice(currentProduct.regularPrice - currentProduct.salePrice, currentProduct.currency)}
                   </span>
                 </div>
               ) : (
@@ -214,9 +213,9 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
               <span className={`font-medium ${currentProduct.stockStatus === 'in_stock' ? 'text-green-600' : 'text-red-600'}`}>
                 {currentProduct.stockStatus === 'in_stock' 
                   ? currentProduct.stockQuantity 
-                    ? `${currentProduct.stockQuantity} ${__('in stock', 'o4o')}`
-                    : __('In stock', 'o4o')
-                  : __('Out of stock', 'o4o')
+                    ? `${currentProduct.stockQuantity} ${'in stock'}`
+                    : 'In stock'
+                  : 'Out of stock'
                 }
               </span>
             </div>
@@ -225,7 +224,7 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
           {/* Product Meta */}
           {currentProduct.sku && (
             <div className="text-sm text-gray-600">
-              <span className="font-medium">{__('SKU:', 'o4o')}</span> {currentProduct.sku}
+              <span className="font-medium">{'SKU:'}</span> {currentProduct.sku}
             </div>
           )}
 
@@ -244,8 +243,8 @@ export function ProductShowcaseTemplate({ products, attributes, isLoading, error
               >
                 <ShoppingCart className="w-5 h-5" />
                 {currentProduct.stockStatus === 'out_of_stock' 
-                  ? __('Out of Stock', 'o4o')
-                  : __('Add to Cart', 'o4o')
+                  ? 'Out of Stock'
+                  : 'Add to Cart'
                 }
               </button>
             </div>

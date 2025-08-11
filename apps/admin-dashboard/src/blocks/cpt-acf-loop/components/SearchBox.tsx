@@ -7,7 +7,6 @@ import { FormEvent } from 'react';
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { TextControl, ToggleControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 // import { search as searchIcon } from '@wordpress/icons';
 import { debounce } from 'lodash';
 
@@ -22,7 +21,7 @@ interface SearchBoxProps {
 
 export const SearchBox = ({
   onSearch,
-  placeholder = __('Search posts...', 'o4o'),
+  placeholder = 'Search posts...',
   showAdvancedOptions = false,
   searchFields = ['title', 'content', 'excerpt'],
   debounceTime = 500,
@@ -84,7 +83,7 @@ export const SearchBox = ({
       >
         <div className="o4o-cpt-acf-loop__search-input-wrapper">
           <TextControl
-            label={__('Search', 'o4o')}
+            label={'Search'}
             hideLabelFromVision={true}
             value={searchQuery}
             onChange={handleSearchChange}
@@ -98,7 +97,7 @@ export const SearchBox = ({
             <button
               type="submit"
               className="o4o-cpt-acf-loop__search-button"
-              aria-label={__('Search', 'o4o')}
+              aria-label={'Search'}
             >
               <span className="dashicons dashicons-search" />
             </button>
@@ -108,17 +107,17 @@ export const SearchBox = ({
         {showAdvancedOptions && (
           <div className="o4o-cpt-acf-loop__search-options">
             <ToggleControl
-              label={__('Real-time search', 'o4o')}
+              label={'Real-time search'}
               checked={isRealTime}
               onChange={setIsRealTime}
-              help={__('Search as you type', 'o4o')}
+              help={'Search as you type'}
               disabled={false}
             />
 
             {showSearchIn && (
               <div className="o4o-cpt-acf-loop__search-fields">
                 <p className="o4o-cpt-acf-loop__search-fields-label">
-                  {__('Search in:', 'o4o')}
+                  {'Search in:'}
                 </p>
                 
                 <label className="o4o-cpt-acf-loop__search-field">
@@ -127,7 +126,7 @@ export const SearchBox = ({
                     checked={searchIn.includes('title')}
                     onChange={(e: any) => handleSearchFieldToggle('title', e.target.checked)}
                   />
-                  <span>{__('Title', 'o4o')}</span>
+                  <span>{'Title'}</span>
                 </label>
                 
                 <label className="o4o-cpt-acf-loop__search-field">
@@ -136,7 +135,7 @@ export const SearchBox = ({
                     checked={searchIn.includes('content')}
                     onChange={(e: any) => handleSearchFieldToggle('content', e.target.checked)}
                   />
-                  <span>{__('Content', 'o4o')}</span>
+                  <span>{'Content'}</span>
                 </label>
                 
                 <label className="o4o-cpt-acf-loop__search-field">
@@ -145,7 +144,7 @@ export const SearchBox = ({
                     checked={searchIn.includes('excerpt')}
                     onChange={(e: any) => handleSearchFieldToggle('excerpt', e.target.checked)}
                   />
-                  <span>{__('Excerpt', 'o4o')}</span>
+                  <span>{'Excerpt'}</span>
                 </label>
                 
                 <label className="o4o-cpt-acf-loop__search-field">
@@ -154,7 +153,7 @@ export const SearchBox = ({
                     checked={searchIn.includes('acf')}
                     onChange={(e: any) => handleSearchFieldToggle('acf', e.target.checked)}
                   />
-                  <span>{__('Custom Fields', 'o4o')}</span>
+                  <span>{'Custom Fields'}</span>
                 </label>
               </div>
             )}
@@ -196,20 +195,20 @@ export const SearchSettings = ({
   return (
     <>
       <ToggleControl
-        label={__('Enable Search', 'o4o')}
+        label={'Enable Search'}
         checked={enableSearch}
         onChange={onEnableChange}
-        help={__('Add a search box to filter posts', 'o4o')}
+        help={'Add a search box to filter posts'}
         disabled={false}
       />
 
       {enableSearch && (
         <>
           <TextControl
-            label={__('Search Placeholder', 'o4o')}
+            label={'Search Placeholder'}
             value={searchPlaceholder}
             onChange={onPlaceholderChange}
-            placeholder={__('Search posts...', 'o4o')}
+            placeholder={'Search posts...'}
             className=""
             help=""
             __nextHasNoMarginBottom={false}
@@ -217,44 +216,44 @@ export const SearchSettings = ({
           />
 
           <ToggleControl
-            label={__('Real-time Search', 'o4o')}
+            label={'Real-time Search'}
             checked={realTimeSearch}
             onChange={onRealTimeChange}
-            help={__('Search as users type (may impact performance)', 'o4o')}
+            help={'Search as users type (may impact performance)'}
             disabled={false}
           />
 
           <div style={{ marginTop: '16px' }}>
             <p style={{ marginBottom: '8px', fontWeight: '600' }}>
-              {__('Search Fields', 'o4o')}
+              {'Search Fields'}
             </p>
             
             <ToggleControl
-              label={__('Title', 'o4o')}
+              label={'Title'}
               checked={searchIn.includes('title')}
               onChange={(checked: any) => handleSearchFieldToggle('title', checked)}
               disabled={false}
             />
             
             <ToggleControl
-              label={__('Content', 'o4o')}
+              label={'Content'}
               checked={searchIn.includes('content')}
               onChange={(checked: any) => handleSearchFieldToggle('content', checked)}
               disabled={false}
             />
             
             <ToggleControl
-              label={__('Excerpt', 'o4o')}
+              label={'Excerpt'}
               checked={searchIn.includes('excerpt')}
               onChange={(checked: any) => handleSearchFieldToggle('excerpt', checked)}
               disabled={false}
             />
             
             <ToggleControl
-              label={__('ACF Fields', 'o4o')}
+              label={'ACF Fields'}
               checked={searchIn.includes('acf')}
               onChange={(checked: any) => handleSearchFieldToggle('acf', checked)}
-              help={__('Search in custom field values', 'o4o')}
+              help={'Search in custom field values'}
               disabled={false}
             />
           </div>

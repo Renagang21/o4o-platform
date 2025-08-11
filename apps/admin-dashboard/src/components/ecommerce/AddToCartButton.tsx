@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ShoppingCart, Check, Loader2 } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 import { cartService } from '../../services/cartService';
 import { isProductPurchasable } from '../../utils/ecommerce';
 import toast from 'react-hot-toast';
@@ -33,7 +32,7 @@ export function AddToCartButton({
 
   const handleAddToCart = async () => {
     if (!isProductPurchasable(product)) {
-      toast.error(__('This product cannot be purchased', 'o4o'));
+      toast.error('This product cannot be purchased');
       return;
     }
 
@@ -44,7 +43,7 @@ export function AddToCartButton({
       
       if (success) {
         setIsAdded(true);
-        toast.success(__('Added to cart!', 'o4o'));
+        toast.success('Added to cart!');
         
         // Reset added state after 2 seconds
         setTimeout(() => setIsAdded(false), 2000);
@@ -52,12 +51,12 @@ export function AddToCartButton({
         // Call callback if provided
         onAddToCart?.(true);
       } else {
-        toast.error(__('Failed to add to cart', 'o4o'));
+        toast.error('Failed to add to cart');
         onAddToCart?.(false);
       }
     } catch (error: any) {
     // Error logging - use proper error handler
-      toast.error(__('An error occurred', 'o4o'));
+      toast.error('An error occurred');
       onAddToCart?.(false);
     } finally {
       setIsLoading(false);
@@ -89,15 +88,15 @@ export function AddToCartButton({
 
   const getButtonText = () => {
     if (product.stockStatus === 'out_of_stock') {
-      return __('Out of Stock', 'o4o');
+      return 'Out of Stock';
     }
     if (isLoading) {
-      return __('Adding...', 'o4o');
+      return 'Adding...';
     }
     if (isAdded) {
-      return __('Added!', 'o4o');
+      return 'Added!';
     }
-    return __('Add to Cart', 'o4o');
+    return 'Add to Cart';
   };
 
   const getButtonIcon = () => {
@@ -119,7 +118,7 @@ export function AddToCartButton({
       className={buttonClasses}
       data-product-id={product.id}
       data-product-type={product.type}
-      aria-label={`${__('Add', 'o4o')} ${product.title} ${__('to cart', 'o4o')}`}
+      aria-label={`${'Add'} ${product.title} ${'to cart'}`}
     >
       {getButtonIcon()}
       <span>{getButtonText()}</span>

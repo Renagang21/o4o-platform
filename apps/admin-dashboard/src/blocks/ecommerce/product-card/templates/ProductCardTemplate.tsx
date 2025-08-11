@@ -1,5 +1,4 @@
 import { ShoppingCart, Heart, Eye, Package } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 import { formatPrice, calculateDiscountPercentage } from '../../../../utils/ecommerce';
 
 interface ProductCardTemplateProps {
@@ -62,7 +61,7 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
     return (
       <div className="text-center py-8 text-gray-500">
         <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        <p>{__('No products found', 'o4o')}</p>
+        <p>{'No products found'}</p>
       </div>
     );
   }
@@ -115,7 +114,7 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
                   {/* Stock Badge */}
                   {showStock && product.stockStatus === 'out_of_stock' && (
                     <div className="absolute top-2 right-2 bg-gray-800 text-white px-2 py-1 text-xs font-bold rounded">
-                      {__('Out of Stock', 'o4o')}
+                      {'Out of Stock'}
                     </div>
                   )}
 
@@ -125,7 +124,7 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
                       {showQuickView && (
                         <button
                           className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                          aria-label={__('Quick View', 'o4o')}
+                          aria-label={'Quick View'}
                         >
                           <Eye className="w-5 h-5" />
                         </button>
@@ -133,7 +132,7 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
                       {showWishlist && (
                         <button
                           className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                          aria-label={__('Add to Wishlist', 'o4o')}
+                          aria-label={'Add to Wishlist'}
                         >
                           <Heart className="w-5 h-5" />
                         </button>
@@ -209,7 +208,7 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
               {/* Stock Status */}
               {showStock && product.stockStatus === 'in_stock' && product.stockQuantity && (
                 <p className="text-sm text-green-600 mb-3">
-                  {product.stockQuantity} {__('in stock', 'o4o')}
+                  {product.stockQuantity} {'in stock'}
                 </p>
               )}
 
@@ -227,8 +226,8 @@ export function ProductCardTemplate({ products, attributes, isLoading, error }: 
                 >
                   <ShoppingCart className="w-4 h-4" />
                   {product.stockStatus === 'out_of_stock' 
-                    ? __('Out of Stock', 'o4o')
-                    : __('Add to Cart', 'o4o')
+                    ? 'Out of Stock'
+                    : 'Add to Cart'
                   }
                 </button>
               )}

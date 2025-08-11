@@ -1,5 +1,4 @@
 import { ShoppingCart, Package, Star } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 import { formatPrice, calculateDiscountPercentage } from '../../../../utils/ecommerce';
 
 interface ProductListTemplateProps {
@@ -50,7 +49,7 @@ export function ProductListTemplate({ products, attributes, isLoading, error }: 
     return (
       <div className="text-center py-8 text-gray-500">
         <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        <p>{error || __('No products found', 'o4o')}</p>
+        <p>{error || 'No products found'}</p>
       </div>
     );
   }
@@ -108,7 +107,7 @@ export function ProductListTemplate({ products, attributes, isLoading, error }: 
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-gray-500">({product.ratingCount} {__('reviews', 'o4o')})</span>
+                      <span className="text-sm text-gray-500">({product.ratingCount} {'reviews'})</span>
                     </div>
                   )}
 
@@ -124,9 +123,9 @@ export function ProductListTemplate({ products, attributes, isLoading, error }: 
                     <p className={`text-sm mb-2 ${product.stockStatus === 'in_stock' ? 'text-green-600' : 'text-red-600'}`}>
                       {product.stockStatus === 'in_stock' 
                         ? product.stockQuantity 
-                          ? `${product.stockQuantity} ${__('in stock', 'o4o')}`
-                          : __('In stock', 'o4o')
-                        : __('Out of stock', 'o4o')
+                          ? `${product.stockQuantity} ${'in stock'}`
+                          : 'In stock'
+                        : 'Out of stock'
                       }
                     </p>
                   )}
@@ -180,8 +179,8 @@ export function ProductListTemplate({ products, attributes, isLoading, error }: 
                     >
                       <ShoppingCart className="w-4 h-4" />
                       {product.stockStatus === 'out_of_stock' 
-                        ? __('Out of Stock', 'o4o')
-                        : __('Add to Cart', 'o4o')
+                        ? 'Out of Stock'
+                        : 'Add to Cart'
                       }
                     </button>
                   )}

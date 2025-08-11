@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import {
   SelectControl,
   RangeControl,
@@ -25,24 +24,24 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
   };
 
   const orderByOptions = postType === 'product' ? [
-    { label: __('Date', 'o4o'), value: 'date' },
-    { label: __('Title', 'o4o'), value: 'title' },
-    { label: __('Price', 'o4o'), value: 'price' },
-    { label: __('Sales', 'o4o'), value: 'sales' },
-    { label: __('Rating', 'o4o'), value: 'rating' },
-    { label: __('Menu Order', 'o4o'), value: 'menu_order' },
-    { label: __('Random', 'o4o'), value: 'rand' }
+    { label: 'Date', value: 'date' },
+    { label: 'Title', value: 'title' },
+    { label: 'Price', value: 'price' },
+    { label: 'Sales', value: 'sales' },
+    { label: 'Rating', value: 'rating' },
+    { label: 'Menu Order', value: 'menu_order' },
+    { label: 'Random', value: 'rand' }
   ] : [
-    { label: __('Date', 'o4o'), value: 'date' },
-    { label: __('Title', 'o4o'), value: 'title' },
-    { label: __('Menu Order', 'o4o'), value: 'menu_order' },
-    { label: __('Random', 'o4o'), value: 'rand' }
+    { label: 'Date', value: 'date' },
+    { label: 'Title', value: 'title' },
+    { label: 'Menu Order', value: 'menu_order' },
+    { label: 'Random', value: 'rand' }
   ];
 
   return (
     <div className="o4o-query-controls">
       <RangeControl
-        label={__('Number of items', 'o4o')}
+        label={'Number of items'}
         value={query.perPage || 9}
         onChange={(value: number | undefined) => updateQuery('perPage', value)}
         min={1}
@@ -50,18 +49,18 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
       />
 
       <SelectControl
-        label={__('Order by', 'o4o')}
+        label={'Order by'}
         value={query.orderBy || 'date'}
         options={orderByOptions}
         onChange={(value: string) => updateQuery('orderBy', value)}
       />
 
       <SelectControl
-        label={__('Order', 'o4o')}
+        label={'Order'}
         value={query.order || 'desc'}
         options={[
-          { label: __('Descending', 'o4o'), value: 'desc' },
-          { label: __('Ascending', 'o4o'), value: 'asc' }
+          { label: 'Descending', value: 'desc' },
+          { label: 'Ascending', value: 'asc' }
         ]}
         onChange={(value: string) => updateQuery('order', value)}
       />
@@ -69,21 +68,21 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
       {postType === 'product' && (
         <>
           <ToggleControl
-            label={__('Featured products only', 'o4o')}
+            label={'Featured products only'}
             checked={query.featured || false}
             onChange={(value: boolean) => updateQuery('featured', value)}
             disabled={false}
           />
 
           <ToggleControl
-            label={__('On sale only', 'o4o')}
+            label={'On sale only'}
             checked={query.onSale || false}
             onChange={(value: boolean) => updateQuery('onSale', value)}
             disabled={false}
           />
 
           <ToggleControl
-            label={__('In stock only', 'o4o')}
+            label={'In stock only'}
             checked={query.inStock || false}
             onChange={(value: boolean) => updateQuery('inStock', value)}
             disabled={false}
@@ -92,7 +91,7 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>
               <TextControl
-                label={__('Min Price', 'o4o')}
+                label={'Min Price'}
                 type="number"
                 value={query.minPrice || ''}
                 onChange={(value: string) => updateQuery('minPrice', value ? parseInt(value) : undefined)}
@@ -104,7 +103,7 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
             </div>
             <div style={{ flex: 1 }}>
               <TextControl
-                label={__('Max Price', 'o4o')}
+                label={'Max Price'}
                 type="number"
                 value={query.maxPrice || ''}
                 onChange={(value: string) => updateQuery('maxPrice', value ? parseInt(value) : undefined)}
@@ -119,10 +118,10 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
       )}
 
       <TextControl
-        label={__('Search', 'o4o')}
+        label={'Search'}
         value={query.search || ''}
         onChange={(value: string) => updateQuery('search', value)}
-        placeholder={__('Search products...', 'o4o')}
+        placeholder={'Search products...'}
         className=""
         help=""
         __nextHasNoMarginBottom={false}
@@ -130,8 +129,8 @@ export function QueryControls({ attributes, setAttributes, postType = 'product' 
       />
 
       <TextControl
-        label={__('Offset', 'o4o')}
-        help={__('Number of items to skip', 'o4o')}
+        label={'Offset'}
+        help={'Number of items to skip'}
         type="number"
         value={query.offset || 0}
         onChange={(value: string) => updateQuery('offset', value ? parseInt(value) : 0)}

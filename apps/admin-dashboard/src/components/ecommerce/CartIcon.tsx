@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
-import { __ } from '@wordpress/i18n';
 import { useCart } from '../../services/cartService';
 import { MiniCart } from './MiniCart';
 
@@ -24,7 +23,7 @@ export function CartIcon({
       <button
         onClick={() => setIsCartOpen(!isCartOpen)}
         className={`relative p-2 hover:bg-gray-100 rounded-md transition-colors ${className}`}
-        aria-label={__('Shopping cart', 'o4o')}
+        aria-label={'Shopping cart'}
       >
         <ShoppingCart className="w-6 h-6" />
         {showCount && itemCount > 0 && (

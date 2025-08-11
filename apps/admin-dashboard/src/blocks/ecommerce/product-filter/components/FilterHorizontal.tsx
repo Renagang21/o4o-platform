@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { __ } from '@wordpress/i18n';
 import { ChevronDown, X } from 'lucide-react';
 // import { formatPrice } from '../../../../utils/ecommerce';
 const formatPrice = (price: number, symbol: string = '$') => `${symbol}${price.toFixed(2)}`;
@@ -74,13 +73,13 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
   };
 
   const sortOptions = [
-    { value: 'date', label: __('Latest', 'o4o') },
-    { value: 'popularity', label: __('Popularity', 'o4o') },
-    { value: 'rating', label: __('Average Rating', 'o4o') },
-    { value: 'price', label: __('Price: Low to High', 'o4o') },
-    { value: 'price-desc', label: __('Price: High to Low', 'o4o') },
-    { value: 'title', label: __('Name: A to Z', 'o4o') },
-    { value: 'title-desc', label: __('Name: Z to A', 'o4o') }
+    { value: 'date', label: 'Latest' },
+    { value: 'popularity', label: 'Popularity' },
+    { value: 'rating', label: 'Average Rating' },
+    { value: 'price', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' },
+    { value: 'title', label: 'Name: A to Z' },
+    { value: 'title-desc', label: 'Name: Z to A' }
   ];
 
   const activeFilters = [];
@@ -115,17 +114,17 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
   });
   
   if (selectedFilters.inStock) {
-    activeFilters.push({ type: 'inStock', label: __('In Stock', 'o4o') });
+    activeFilters.push({ type: 'inStock', label: 'In Stock' });
   }
   
   if (selectedFilters.onSale) {
-    activeFilters.push({ type: 'onSale', label: __('On Sale', 'o4o') });
+    activeFilters.push({ type: 'onSale', label: 'On Sale' });
   }
   
   if (selectedFilters.rating > 0) {
     activeFilters.push({
       type: 'rating',
-      label: `${selectedFilters.rating}★ ${__('& Up', 'o4o')}`
+      label: `${selectedFilters.rating}★ ${'& Up'}`
     });
   }
 
@@ -139,7 +138,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onClick={() => toggleDropdown('sort')}
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
-              <span>{__('Sort by:', 'o4o')} {sortOptions.find((o: any) => o.value === selectedFilters.sortBy)?.label}</span>
+              <span>{'Sort by:'} {sortOptions.find((o: any) => o.value === selectedFilters.sortBy)?.label}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             {activeDropdown === 'sort' && (
@@ -172,7 +171,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onClick={() => toggleDropdown('price')}
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
-              <span>{__('Price', 'o4o')}</span>
+              <span>{'Price'}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             {activeDropdown === 'price' && (
@@ -205,7 +204,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
                     onClick={() => setActiveDropdown(null)}
                     className="w-full py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
                   >
-                    {__('Apply', 'o4o')}
+                    {'Apply'}
                   </button>
                 </div>
               </div>
@@ -219,7 +218,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onClick={() => toggleDropdown('category')}
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
-              <span>{__('Category', 'o4o')}</span>
+              <span>{'Category'}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             {activeDropdown === 'category' && (
@@ -249,7 +248,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onClick={() => toggleDropdown('brand')}
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
-              <span>{__('Brand', 'o4o')}</span>
+              <span>{'Brand'}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             {activeDropdown === 'brand' && (
@@ -282,7 +281,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onChange={(e: any) => setSelectedFilters({ ...selectedFilters, inStock: e.target.checked })}
               className="rounded"
             />
-            <span>{__('In Stock', 'o4o')}</span>
+            <span>{'In Stock'}</span>
           </label>
         )}
 
@@ -294,7 +293,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               onChange={(e: any) => setSelectedFilters({ ...selectedFilters, onSale: e.target.checked })}
               className="rounded"
             />
-            <span>{__('On Sale', 'o4o')}</span>
+            <span>{'On Sale'}</span>
           </label>
         )}
       </div>
@@ -302,7 +301,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
       {/* Active Filters */}
       {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-gray-600">{__('Active Filters:', 'o4o')}</span>
+          <span className="text-sm text-gray-600">{'Active Filters:'}</span>
           {activeFilters.map((filter, index) => (
             <span
               key={index}
@@ -330,7 +329,7 @@ export function FilterHorizontal({ attributes, categories, brands, isEditor: _is
               })}
               className="text-sm text-blue-600 hover:text-blue-800"
             >
-              {__('Clear All', 'o4o')}
+              {'Clear All'}
             </button>
           )}
         </div>

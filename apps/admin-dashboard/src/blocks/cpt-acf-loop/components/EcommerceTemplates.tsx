@@ -4,7 +4,6 @@
  * Specialized layouts for product display
  */
 
-import { __ } from '@wordpress/i18n';
 import { Icon, check, starEmpty, starHalf } from '@wordpress/icons';
 // Placeholder utility functions
 const formatPrice = (price: number, symbol: string = '$') => `${symbol}${price.toFixed(2)}`;
@@ -76,7 +75,7 @@ export const ProductCardTemplate = ({
           
           {!inStock && (
             <span className="o4o-product-card__badge o4o-product-card__badge--out-of-stock">
-              {__('Out of Stock', 'o4o')}
+              {'Out of Stock'}
             </span>
           )}
           
@@ -97,7 +96,7 @@ export const ProductCardTemplate = ({
               <button
                 className="o4o-product-card__action o4o-product-card__action--quickview"
                 onClick={() => {/* TODO: Implement quick view */}}
-                aria-label={__('Quick View', 'o4o')}
+                aria-label={'Quick View'}
               >
                 👁️
               </button>
@@ -164,7 +163,7 @@ export const ProductCardTemplate = ({
           {post.acf?.free_shipping && (
             <div className="o4o-product-card__shipping">
               🚚
-              <span>{__('Free Shipping', 'o4o')}</span>
+              <span>{'Free Shipping'}</span>
             </div>
           )}
 
@@ -175,7 +174,7 @@ export const ProductCardTemplate = ({
               onClick={() => onAddToCart?.(post.id)}
             >
               🛒
-              <span>{__('Add to Cart', 'o4o')}</span>
+              <span>{'Add to Cart'}</span>
             </button>
           )}
         </div>
@@ -253,7 +252,7 @@ export const ProductGridTemplate = ({
               onClick={() => onAddToCart?.(post.id)}
               disabled={!inStock}
             >
-              {inStock ? __('Add to Cart', 'o4o') : __('Out of Stock', 'o4o')}
+              {inStock ? 'Add to Cart' : 'Out of Stock'}
             </button>
           )}
         </div>
@@ -284,7 +283,7 @@ export const ProductListTemplate = ({
         <div className="o4o-product-list__image-wrapper">
           {discount > 0 && (
             <span className="o4o-product-list__badge">
-              {__('SALE', 'o4o')}
+              {'SALE'}
             </span>
           )}
           
@@ -316,7 +315,7 @@ export const ProductListTemplate = ({
             
             {sku && (
               <span className="o4o-product-list__sku">
-                {__('SKU:', 'o4o')} {sku}
+                {'SKU:'} {sku}
               </span>
             )}
           </div>
@@ -349,7 +348,7 @@ export const ProductListTemplate = ({
             {post.acf?.free_shipping && (
               <span className="o4o-product-list__shipping">
                 🚚
-                {__('Free Shipping', 'o4o')}
+                {'Free Shipping'}
               </span>
             )}
           </div>
@@ -367,7 +366,7 @@ export const ProductListTemplate = ({
                   {formatPrice(price, currencySymbol)}
                 </span>
                 <span className="o4o-product-list__discount">
-                  {__('Save', 'o4o')} {discount}%
+                  {'Save'} {discount}%
                 </span>
               </>
             ) : (
@@ -383,7 +382,7 @@ export const ProductListTemplate = ({
                 className="o4o-product-list__button o4o-product-list__button--quickview"
                 onClick={() => {/* TODO: Implement quick view */}}
               >
-                {__('Quick View', 'o4o')}
+                {'Quick View'}
               </button>
             )}
             
@@ -394,7 +393,7 @@ export const ProductListTemplate = ({
                 disabled={!inStock}
               >
                 🛒
-                <span>{inStock ? __('Add to Cart', 'o4o') : __('Out of Stock', 'o4o')}</span>
+                <span>{inStock ? 'Add to Cart' : 'Out of Stock'}</span>
               </button>
             )}
           </div>
@@ -428,7 +427,7 @@ export const ProductShowcaseTemplate = ({
           {discount > 0 && (
             <div className="o4o-product-showcase__badge-wrapper">
               <span className="o4o-product-showcase__badge o4o-product-showcase__badge--discount">
-                {__('SALE', 'o4o')}
+                {'SALE'}
                 <br />
                 -{discount}%
               </span>
@@ -486,7 +485,7 @@ export const ProductShowcaseTemplate = ({
             <div className="o4o-product-showcase__rating">
               {renderStars(rating)}
               <span className="o4o-product-showcase__rating-text">
-                {rating.toFixed(1)} {__('out of 5', 'o4o')}
+                {rating.toFixed(1)} {'out of 5'}
               </span>
             </div>
           )}
@@ -504,7 +503,7 @@ export const ProductShowcaseTemplate = ({
                   </span>
                 </div>
                 <div className="o4o-product-showcase__savings">
-                  {__('You save:', 'o4o')} {formatPrice(price - salePrice, currencySymbol)} ({discount}%)
+                  {'You save:'} {formatPrice(price - salePrice, currencySymbol)} ({discount}%)
                 </div>
               </>
             ) : (
@@ -527,7 +526,7 @@ export const ProductShowcaseTemplate = ({
           {/* Features */}
           {post.acf?.features && post.acf.features.length > 0 && (
             <div className="o4o-product-showcase__features">
-              <h4>{__('Key Features:', 'o4o')}</h4>
+              <h4>{'Key Features:'}</h4>
               <ul>
                 {post.acf.features.map((feature: any, index: number) => (
                   <li key={index}>
@@ -546,11 +545,11 @@ export const ProductShowcaseTemplate = ({
               {inStock ? (
                 <>
                   <Icon icon={check} />
-                  <span>{__('In Stock', 'o4o')}</span>
+                  <span>{'In Stock'}</span>
                 </>
               ) : (
                 <span className="o4o-product-showcase__out-of-stock">
-                  {__('Out of Stock', 'o4o')}
+                  {'Out of Stock'}
                 </span>
               )}
             </div>
@@ -563,7 +562,7 @@ export const ProductShowcaseTemplate = ({
                   onClick={() => onAddToCart?.(post.id)}
                 >
                   🛒
-                  <span>{__('Add to Cart', 'o4o')}</span>
+                  <span>{'Add to Cart'}</span>
                 </button>
               )}
               
@@ -571,7 +570,7 @@ export const ProductShowcaseTemplate = ({
                 href={post.link}
                 className="o4o-product-showcase__button o4o-product-showcase__button--secondary"
               >
-                {__('View Details', 'o4o')}
+                {'View Details'}
               </a>
             </div>
 
@@ -579,7 +578,7 @@ export const ProductShowcaseTemplate = ({
             {post.acf?.free_shipping && (
               <div className="o4o-product-showcase__shipping-info">
                 🚚
-                <span>{__('FREE Shipping on this item', 'o4o')}</span>
+                <span>{'FREE Shipping on this item'}</span>
               </div>
             )}
           </div>

@@ -4,7 +4,6 @@
  * Components for rendering different ACF field types
  */
 
-import { __ } from '@wordpress/i18n';
 
 interface BaseFieldProps {
   value: any;
@@ -187,7 +186,7 @@ export const TrueFalseFieldRenderer = ({ value, label, showLabel = true }: BaseF
       )}
       <div className="o4o-acf-field__value">
         <span className={`o4o-acf-field__boolean o4o-acf-field__boolean--${value ? 'true' : 'false'}`}>
-          {value ? __('Yes', 'o4o') : __('No', 'o4o')}
+          {value ? 'Yes' : 'No'}
         </span>
       </div>
     </div>
@@ -291,7 +290,7 @@ export const RelationshipFieldRenderer = ({ value, label, showLabel = true }: Ba
             <li key={index}>
               {typeof post === 'object' ? (
                 <a href={post.link || '#'}>
-                  {post.title?.rendered || post.post_title || __('Untitled', 'o4o')}
+                  {post.title?.rendered || post.post_title || 'Untitled'}
                 </a>
               ) : (
                 post
