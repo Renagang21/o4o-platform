@@ -373,9 +373,7 @@ export class GracefulDegradationService {
       fallbackData: parameters.fallbackData || {}
     };
     // Use direct redis access through cacheService
-    if (true) {
-      await cacheService.set(cacheKey, cacheData, undefined, { ttl: parameters.ttl || 3600 });
-    }
+    await cacheService.set(cacheKey, cacheData, undefined, { ttl: parameters.ttl || 3600 });
     
     // console.log(`🗄️ Enabled cache fallback for: ${target}`);
   }
@@ -389,9 +387,7 @@ export class GracefulDegradationService {
       staticContent: parameters.contentPath || 'Service temporarily unavailable',
       degradationLevel: degradation.level
     };
-    if (true) {
-      await cacheService.set(staticKey, staticData, undefined, { ttl: parameters.expiryTime || 7200 });
-    }
+    await cacheService.set(staticKey, staticData, undefined, { ttl: parameters.expiryTime || 7200 });
     
     // console.log(`📄 Enabled static content for: ${target}`);
   }
@@ -408,9 +404,7 @@ export class GracefulDegradationService {
       essentialOnly: parameters.essentialOnly || false,
       degradationLevel: degradation.level
     };
-    if (true) {
-      await cacheService.set(uiKey, uiData, undefined, { ttl: 3600 });
-    }
+    await cacheService.set(uiKey, uiData, undefined, { ttl: 3600 });
     
     // console.log(`🎨 Enabled simplified UI for: ${target}`);
   }

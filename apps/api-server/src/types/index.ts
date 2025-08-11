@@ -119,17 +119,7 @@ export interface BaseEntity {
   updatedAt: Date | string;
 }
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  role?: string;
-  permissions?: string[];
-  businessInfo?: any;
-  betaUserId?: string;
-  domain?: string;
-}
+// Note: User type is defined in ../entities/User.ts as a TypeORM entity
 
 export interface Pagination {
   page: number;

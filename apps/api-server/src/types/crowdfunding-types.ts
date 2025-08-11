@@ -1,4 +1,5 @@
 // Crowdfunding type definitions for API server
+import type { User } from '../entities/User';
 
 // Basic types
 export type FundingStatus = 'draft' | 'pending' | 'ongoing' | 'successful' | 'failed' | 'cancelled';
@@ -14,12 +15,6 @@ export interface BaseEntity {
   updatedAt: Date | string;
 }
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}
 
 export interface MediaItem {
   id: string;
