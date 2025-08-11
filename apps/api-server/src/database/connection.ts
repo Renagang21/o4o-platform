@@ -9,6 +9,9 @@ import { AccountActivity } from '../entities/AccountActivity';
 import { MediaFile } from '../entities/MediaFile';
 import { MediaFolder } from '../entities/MediaFolder';
 import { Product } from '../entities/Product';
+import { ProductAttribute } from '../entities/ProductAttribute';
+import { ProductAttributeValue } from '../entities/ProductAttributeValue';
+import { ProductVariation } from '../entities/ProductVariation';
 import { Order } from '../entities/Order';
 import { OrderItem } from '../entities/OrderItem';
 import { Cart } from '../entities/Cart';
@@ -84,6 +87,9 @@ export const AppDataSource = new DataSource({
         MediaFile,
         MediaFolder,
         Product,
+        ProductAttribute,
+        ProductAttributeValue,
+        ProductVariation,
         Order,
         OrderItem,
         Cart,
