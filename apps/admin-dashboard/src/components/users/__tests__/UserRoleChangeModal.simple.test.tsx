@@ -26,7 +26,7 @@ describe('UserRoleChangeModal 간단 테스트', () => {
   };
 
   const defaultProps = {
-    _isOpen: true,
+    isOpen: true,
     onClose: mockOnClose,
     onConfirm: mockOnConfirm,
     users: [customerUser],
@@ -118,7 +118,7 @@ describe('UserRoleChangeModal 간단 테스트', () => {
   });
 
   it('isOpen이 false일 때 렌더링되지 않는다', () => {
-    render(<UserRoleChangeModal {...defaultProps} _isOpen={false} />);
+    render(<UserRoleChangeModal {...defaultProps} isOpen={false} />);
     
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
