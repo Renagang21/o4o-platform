@@ -20,7 +20,7 @@ export class CookieAuthClient {
         'Content-Type': 'application/json',
       },
       withCredentials: true, // Important for cookies
-    });
+    }) as any;
 
     // Response interceptor to handle token refresh
     this.api.interceptors.response.use(

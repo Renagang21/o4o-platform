@@ -36,6 +36,7 @@
   },
   "include": [
     "src",
+    "src/vite-env.d.ts",
     "../../packages/types/src/**/*",
     "../../packages/ui/src/**/*",
     "../../packages/utils/src/**/*",

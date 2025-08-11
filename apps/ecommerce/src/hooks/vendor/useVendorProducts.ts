@@ -51,7 +51,7 @@ export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vendorProductApi.createProduct,
+    mutationFn: (data: any) => vendorProductApi.createProduct(data) as Promise<any>,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'products'] });
       toast.success('상품이 성공적으로 등록되었습니다.');
@@ -68,7 +68,7 @@ export function useUpdateProduct() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => 
-      vendorProductApi.updateProduct(id, data),
+      vendorProductApi.updateProduct(id, data) as Promise<any>,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'products'] });
       queryClient.invalidateQueries({ queryKey: ['vendor', 'products', variables.id] });
@@ -85,7 +85,7 @@ export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: vendorProductApi.deleteProduct,
+    mutationFn: (id: string) => vendorProductApi.deleteProduct(id) as Promise<any>,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendor', 'products'] });
       toast.success('상품이 삭제되었습니다.');
