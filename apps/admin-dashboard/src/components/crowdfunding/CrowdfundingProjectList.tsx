@@ -2,7 +2,7 @@
  * 크라우드펀딩 프로젝트 목록 컴포넌트
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Table, 
@@ -23,8 +23,8 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { api } from '@/lib/api';
-import { useToast } from '@/components/ui/use-toast';
+import { authClient } from '@o4o/auth-client';
+import toast from 'react-hot-toast';
 import { 
   CheckCircle, 
   XCircle, 
@@ -32,7 +32,6 @@ import {
   Eye, 
   Edit, 
   Search,
-  Filter,
   TrendingUp,
   Users,
   DollarSign
@@ -58,7 +57,6 @@ interface FundingProject {
 
 export function CrowdfundingProjectList() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [projects, setProjects] = useState<FundingProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -82,16 +80,11 @@ export function CrowdfundingProjectList() {
         ...(searchTerm && { search: searchTerm })
       });
 
-      const response = await api.get(`/api/crowdfunding/projects?${params}`);
+      const response = await authClient.api.get(`/crowdfunding/projects?${params}`);
       setProjects(response.data.data);
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
-      console.error('Failed to fetch projects:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load projects',
-        variant: 'destructive'
-      });
+      toast.error('Failed to load projects');
     } finally {
       setLoading(false);
     }
@@ -99,18 +92,11 @@ export function CrowdfundingProjectList() {
 
   const handleApprove = async (projectId: string) => {
     try {
-      await api.post(`/api/crowdfunding/admin/projects/${projectId}/approve`);
-      toast({
-        title: 'Success',
-        description: 'Project approved successfully'
-      });
+      await authClient.api.post(`/crowdfunding/admin/projects/${projectId}/approve`);
+      toast.success('Project approved successfully');
       fetchProjects();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to approve project',
-        variant: 'destructive'
-      });
+      toast.error('Failed to approve project');
     }
   };
 
@@ -119,27 +105,20 @@ export function CrowdfundingProjectList() {
     if (!reason) return;
 
     try {
-      await api.post(`/api/crowdfunding/admin/projects/${projectId}/reject`, { reason });
-      toast({
-        title: 'Success',
-        description: 'Project rejected'
-      });
+      await authClient.api.post(`/crowdfunding/admin/projects/${projectId}/reject`, { reason });
+      toast.success('Project rejected');
       fetchProjects();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to reject project',
-        variant: 'destructive'
-      });
+      toast.error('Failed to reject project');
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'default' | 'secondary' | 'success' | 'destructive' | 'outline'> = {
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
       draft: 'secondary',
       pending: 'outline',
       ongoing: 'default',
-      successful: 'success',
+      successful: 'default',
       failed: 'destructive',
       cancelled: 'destructive'
     };

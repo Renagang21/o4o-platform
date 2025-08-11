@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Box, 
   Card, 
@@ -39,10 +39,7 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
   Palette as ColorIcon,
-  Straighten as SizeIcon,
   Category as CategoryIcon,
   AutoAwesome as AutoGenerateIcon,
   Inventory as InventoryIcon,
@@ -51,8 +48,6 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   ContentCopy as DuplicateIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
 
 interface ProductAttribute {
@@ -103,9 +98,9 @@ interface ProductVariationManagerProps {
 
 export const ProductVariationManager: React.FC<ProductVariationManagerProps> = ({
   productId,
-  productSku,
-  basePrice,
-  onUpdate
+  // productSku,
+  // basePrice,
+  // onUpdate
 }) => {
   const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
   const [variations, setVariations] = useState<ProductVariation[]>([]);
@@ -115,8 +110,9 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
   
   // Dialog states
   const [attributeDialog, setAttributeDialog] = useState(false);
-  const [variationDialog, setVariationDialog] = useState(false);
-  const [bulkEditDialog, setBulkEditDialog] = useState(false);
+  // const [variationDialog] = useState(false);
+  // const [bulkEditDialog] = useState(false);
+  const setBulkEditDialog = useState(false)[1];
   
   // Form states
   const [currentAttribute, setCurrentAttribute] = useState<ProductAttribute>({
@@ -129,7 +125,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
     position: 0
   });
   
-  const [currentVariation, setCurrentVariation] = useState<ProductVariation | null>(null);
+  // const [currentVariation] = useState<ProductVariation | null>(null);
   const [expandedAttribute, setExpandedAttribute] = useState<string | null>(null);
 
   useEffect(() => {
@@ -251,10 +247,10 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
     }
   };
 
-  const handleBulkEdit = async (field: string, value: any) => {
-    // Implement bulk edit logic
-    console.log('Bulk edit:', field, value, selectedVariations);
-  };
+  // const handleBulkEdit = async (field: string, value: any) => {
+  //   // Implement bulk edit logic
+  //   console.log('Bulk edit:', field, value, selectedVariations);
+  // };
 
   const handleVariationToggle = async (variationId: string, enabled: boolean) => {
     try {
@@ -295,7 +291,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
       ) : (
         <Grid container spacing={2}>
           {attributes.map((attr) => (
-            <Grid item xs={12} key={attr.id}>
+            <Grid key={attr.id} xs={12}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -324,7 +320,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                     <Box>
                       <IconButton
                         onClick={() => setExpandedAttribute(
-                          expandedAttribute === attr.id ? null : attr.id
+                          expandedAttribute === attr.id ? null : (attr.id || null)
                         )}
                       >
                         {expandedAttribute === attr.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -342,7 +338,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                     <Box mt={2}>
                       <Grid container spacing={1}>
                         {attr.values.map((value) => (
-                          <Grid item key={value.id}>
+                          <Grid key={value.id}>
                             {attr.type === 'color' ? (
                               <Tooltip title={value.value}>
                                 <Box
@@ -546,7 +542,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
             상품 변형 관리
           </Typography>
           
-          <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)}>
+          <Tabs value={activeTab} onChange={(_e, v) => setActiveTab(v)}>
             <Tab label="속성 설정" icon={<CategoryIcon />} iconPosition="start" />
             <Tab label="변형 관리" icon={<InventoryIcon />} iconPosition="start" />
             <Tab label="가격 설정" icon={<PriceIcon />} iconPosition="start" />
@@ -572,7 +568,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={6}>
+            <Grid xs={6}>
               <TextField
                 label="속성 이름"
                 fullWidth
@@ -585,7 +581,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                 placeholder="예: Color, Size"
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid xs={6}>
               <FormControl fullWidth>
                 <InputLabel>속성 타입</InputLabel>
                 <Select
@@ -603,7 +599,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -618,7 +614,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
               />
             </Grid>
             
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="subtitle1">속성 값</Typography>
                 <Button

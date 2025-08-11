@@ -17,6 +17,7 @@ import {
 import { useProducts, useDeleteProduct, useDuplicateProduct } from '@/hooks/useProducts';
 import { Product } from '@/types/ecommerce';  // ProductFilters is unused
 import { formatCurrency } from '@/lib/utils';
+import { NoDataEmptyState, SearchEmptyState, LoadingState } from '@/components/ui/EmptyState';
 
 const Products: FC = () => {
   const navigate = useNavigate();
@@ -331,22 +332,23 @@ const Products: FC = () => {
 
       {/* Products Display */}
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
+        <LoadingState 
+          title="상품을 불러오는 중..."
+          description="잠시만 기다려주세요"
+        />
       ) : products.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
-          <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">상품이 없습니다</h3>
-          <p className="text-gray-500 mb-4">첫 번째 상품을 등록해보세요</p>
-          <button
-            onClick={() => navigate('/ecommerce/products/new')}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            상품 추가
-          </button>
-        </div>
+        searchTerm ? (
+          <SearchEmptyState 
+            searchTerm={searchTerm}
+            onClear={() => setSearchTerm('')}
+          />
+        ) : (
+          <NoDataEmptyState 
+            title="등록된 상품이 없습니다"
+            description="첫 번째 상품을 등록하여 판매를 시작해보세요"
+            onAdd={() => navigate('/ecommerce/products/new')}
+          />
+        )
       ) : view === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product: any) => (

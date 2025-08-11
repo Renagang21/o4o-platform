@@ -48,7 +48,7 @@ export const TossPaymentButton: React.FC<TossPaymentButtonProps> = ({
   customerName,
   customerEmail,
   customerMobilePhone,
-  onSuccess,
+  // onSuccess,
   onFail,
   buttonText = '결제하기',
   buttonVariant = 'contained',

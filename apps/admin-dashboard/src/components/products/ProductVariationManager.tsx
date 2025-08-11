@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -24,13 +24,11 @@ import {
   MenuItem,
   Alert,
   Switch,
-  FormControlLabel,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Stack,
   InputAdornment,
-  Tooltip
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -41,11 +39,10 @@ import {
   Cancel as CancelIcon,
   Refresh as RefreshIcon,
   ColorLens as ColorIcon,
-  Image as ImageIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon
 } from '@mui/icons-material';
-import { ChromePicker } from 'react-color';
+// import { ChromePicker } from 'react-color';
 
 interface ProductAttribute {
   id?: string;
@@ -89,8 +86,8 @@ interface ProductVariationManagerProps {
 
 export const ProductVariationManager: React.FC<ProductVariationManagerProps> = ({
   productId,
-  productName,
-  basePrice,
+  // productName,
+  // basePrice,
   onSave
 }) => {
   const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
@@ -101,9 +98,9 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
   
   // Dialog states
   const [attributeDialogOpen, setAttributeDialogOpen] = useState(false);
-  const [variationDialogOpen, setVariationDialogOpen] = useState(false);
+  // const [variationDialogOpen, setVariationDialogOpen] = useState(false);
   const [editingAttribute, setEditingAttribute] = useState<ProductAttribute | null>(null);
-  const [editingVariation, setEditingVariation] = useState<ProductVariation | null>(null);
+  // const [editingVariation, setEditingVariation] = useState<ProductVariation | null>(null);
   
   // Form states
   const [attributeForm, setAttributeForm] = useState<ProductAttribute>({
@@ -381,7 +378,7 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
 
             <Grid container spacing={2}>
               {attributes.map((attr) => (
-                <Grid item xs={12} md={6} key={attr.id}>
+                <Grid xs={12} md={6} key={attr.id}>
                   <Paper elevation={1} sx={{ p: 2 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                       <Typography variant="subtitle1" fontWeight="bold">
@@ -636,9 +633,14 @@ export const ProductVariationManager: React.FC<ProductVariationManagerProps> = (
                           left={0}
                           onClick={() => setShowColorPicker(false)}
                         />
-                        <ChromePicker
+                        {/* <ChromePicker
                           color={selectedColor}
-                          onChange={(color) => setSelectedColor(color.hex)}
+                          onChange={(color: any) => setSelectedColor(color.hex)}
+                        /> */}
+                        <input
+                          type="color"
+                          value={selectedColor}
+                          onChange={(e) => setSelectedColor(e.target.value)}
                         />
                       </Box>
                     )}

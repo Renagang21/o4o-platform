@@ -2,15 +2,15 @@
  * 후원자 대시보드 컴포넌트
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { api } from '@/lib/api';
-import { useToast } from '@/components/ui/use-toast';
+import { authClient } from '@o4o/auth-client';
+import toast from 'react-hot-toast';
 import { 
   Heart,
   Package,
@@ -19,7 +19,6 @@ import {
   XCircle,
   TrendingUp,
   DollarSign,
-  Calendar,
   Eye,
   MessageSquare
 } from 'lucide-react';
@@ -37,7 +36,6 @@ interface BackerDashboardData {
 
 export function BackerDashboard() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [dashboardData, setDashboardData] = useState<BackerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('active');
@@ -49,15 +47,10 @@ export function BackerDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/crowdfunding/backer/dashboard');
+      const response = await authClient.api.get('/crowdfunding/backer/dashboard');
       setDashboardData(response.data.data);
     } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data',
-        variant: 'destructive'
-      });
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
