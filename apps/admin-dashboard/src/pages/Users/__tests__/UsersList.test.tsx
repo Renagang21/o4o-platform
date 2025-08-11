@@ -11,6 +11,19 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import UsersList from '../UsersList';
 import { User } from '../../../types/user';
+import { AuthProvider } from '@o4o/auth-context';
+
+// Mock apiClient base - UsersList uses apiClient from api/base - use vi.hoisted to ensure this is available before mocks
+const { mockApiClient } = vi.hoisted(() => {
+  const mockApiClient = {
+    get: vi.fn(),
+    delete: vi.fn(),
+    put: vi.fn(),
+    post: vi.fn(),
+    patch: vi.fn()
+  };
+  return { mockApiClient };
+});
 
 // Mock dependencies
 vi.mock('react-hot-toast', () => ({
@@ -21,10 +34,71 @@ vi.mock('react-hot-toast', () => ({
 }));
 
 vi.mock('../../../api/base', () => ({
-  default: {
-    get: vi.fn(),
-    delete: vi.fn(),
-    put: vi.fn(),
+  default: mockApiClient
+}));
+
+// Mock authClient
+vi.mock('@o4o/auth-client', () => ({
+  authClient: {
+    api: mockApiClient
+  }
+}))
+
+// Mock useAuth hook
+const mockUseAuth = vi.fn(() => ({
+  user: {
+    id: 'test-user',
+    email: 'test@example.com',
+    name: 'Test User',
+    role: 'admin'
+  },
+  isAuthenticated: true,
+  isLoading: false,
+  login: vi.fn(),
+  logout: vi.fn(),
+  refreshToken: vi.fn(),
+  updateUser: vi.fn()
+}));
+
+vi.mock('@o4o/auth-context', () => ({
+  useAuth: () => mockUseAuth(),
+  AuthProvider: ({ children }: { children: ReactNode }) => <>{children}</>
+}));
+
+// Mock useTheme hook
+vi.mock('../../../contexts/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'light',
+    toggleTheme: vi.fn(),
+    setTheme: vi.fn()
+  }),
+  ThemeProvider: ({ children }: any) => children
+}));
+
+// Mock UserDeleteModal and UserRoleChangeModal
+vi.mock('../../components/users/UserDeleteModal', () => ({
+  default: ({ _isOpen, onClose, onConfirm, users, isLoading }: any) => {
+    if (!_isOpen) return null;
+    return (
+      <div data-testid="user-delete-modal">
+        <h2>사용자 삭제</h2>
+        <button onClick={onConfirm}>확인</button>
+        <button onClick={onClose}>취소</button>
+      </div>
+    );
+  }
+}));
+
+vi.mock('../../components/users/UserRoleChangeModal', () => ({
+  default: ({ isOpen, onClose, onConfirm, users, isLoading }: any) => {
+    if (!isOpen) return null;
+    return (
+      <div data-testid="user-role-change-modal">
+        <h2>사용자 역할 변경</h2>
+        <button onClick={() => onConfirm('admin')}>확인</button>
+        <button onClick={onClose}>취소</button>
+      </div>
+    );
   }
 }));
 
@@ -105,7 +179,9 @@ const TestWrapper: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <MemoryRouter>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </MemoryRouter>
     </QueryClientProvider>
   );
@@ -116,14 +192,13 @@ describe('UsersList 컴포넌트', () => {
   let mockDelete: ReturnType<typeof vi.fn>;
   let mockPut: ReturnType<typeof vi.fn>;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
     
-    // API 모킹
-    const { default: apiClient } = await import('../../../api/base');
-    mockGet = apiClient.get;
-    mockDelete = apiClient.delete;
-    mockPut = apiClient.put;
+    // Set up mock responses
+    mockGet = mockApiClient.get;
+    mockDelete = mockApiClient.delete;
+    mockPut = mockApiClient.put;
     
     mockGet.mockResolvedValue({ data: mockUsersResponse });
     mockDelete.mockResolvedValue({ data: { success: true, message: '삭제되었습니다.' } });
@@ -385,7 +460,10 @@ describe('UsersList 컴포넌트', () => {
       await user.click(bulkDeleteButton);
 
       // 삭제 모달이 열림
-      expect(screen.getByText('사용자 삭제')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('user-delete-modal')).toBeInTheDocument();
+        expect(screen.getByText('사용자 삭제')).toBeInTheDocument();
+      });
     });
 
     it('역할 변경 버튼 클릭 시 역할 변경 모달이 열린다', async () => {
@@ -409,7 +487,10 @@ describe('UsersList 컴포넌트', () => {
       await user.click(roleChangeButton);
 
       // 역할 변경 모달이 열림
-      expect(screen.getByText('사용자 역할 변경')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('user-role-change-modal')).toBeInTheDocument();
+        expect(screen.getByText('사용자 역할 변경')).toBeInTheDocument();
+      });
     });
   });
 
@@ -462,7 +543,10 @@ describe('UsersList 컴포넌트', () => {
       await user.click(deleteButtons[0]);
 
       // 삭제 모달이 열림
-      expect(screen.getByText('사용자 삭제')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('user-delete-modal')).toBeInTheDocument();
+        expect(screen.getByText('사용자 삭제')).toBeInTheDocument();
+      });
     });
   });
 
