@@ -238,7 +238,7 @@ describe('UserDeleteModal 컴포넌트', () => {
       render(<UserDeleteModal {...defaultProps} isLoading={true} />);
       
       const cancelButton = screen.getByText('취소');
-      const deleteButton = screen.getByText('삭제 중...');
+      const deleteButton = screen.getByText('삭제 중...').closest('button');
       
       expect(cancelButton).toBeDisabled();
       expect(deleteButton).toBeDisabled();
@@ -286,9 +286,9 @@ describe('UserDeleteModal 컴포넌트', () => {
     it('경고 아이콘이 적절한 색상으로 표시된다', () => {
       render(<UserDeleteModal {...defaultProps} />);
       
-      const warningIcon = screen.getByTestId('alert-triangle') || 
-                         document.querySelector('.text-red-600');
+      const warningIcon = document.querySelector('.lucide-triangle-alert');
       expect(warningIcon).toBeInTheDocument();
+      expect(warningIcon).toHaveClass('text-red-600');
     });
 
     it('키보드 내비게이션이 작동한다', async () => {

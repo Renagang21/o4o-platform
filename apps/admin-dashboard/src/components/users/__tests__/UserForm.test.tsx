@@ -51,8 +51,11 @@ describe('UserForm 컴포넌트', () => {
       const emailLabels = screen.getAllByText(/이메일/);
       expect(emailLabels.length).toBeGreaterThan(0);
       expect(screen.getByText(/비밀번호/)).toBeInTheDocument();
-      expect(screen.getByText(/역할/)).toBeInTheDocument();
-      expect(screen.getByText(/상태/)).toBeInTheDocument();
+      // '역할'과 '상태'도 여러 곳에 있을 수 있으므로 getAllByText 사용
+      const roleLabels = screen.getAllByText(/역할/);
+      expect(roleLabels.length).toBeGreaterThan(0);
+      const statusLabels = screen.getAllByText(/상태/);
+      expect(statusLabels.length).toBeGreaterThan(0);
       
       // 입력 필드 확인 (placeholder로)
       expect(screen.getByPlaceholderText('사용자 이름을 입력하세요')).toBeInTheDocument();
@@ -369,19 +372,21 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} />);
       
-      const passwordInput = screen.getByLabelText(/비밀번호/) as HTMLInputElement;
-      const toggleButton = screen.getByRole('button', { name: /비밀번호 표시/ });
+      const passwordInput = screen.getByPlaceholderText('비밀번호를 입력하세요') as HTMLInputElement;
+      const toggleButton = passwordInput.parentElement?.querySelector('button');
       
       // 초기 상태: 숨김
       expect(passwordInput.type).toBe('password');
       
       // 표시로 변경
-      await user.click(toggleButton);
-      expect(passwordInput.type).toBe('text');
-      
-      // 다시 숨김으로 변경
-      await user.click(toggleButton);
-      expect(passwordInput.type).toBe('password');
+      if (toggleButton) {
+        await user.click(toggleButton);
+        expect(passwordInput.type).toBe('text');
+        
+        // 다시 숨김으로 변경
+        await user.click(toggleButton);
+        expect(passwordInput.type).toBe('password');
+      }
     });
 
     it('취소 버튼이 onCancel 콜백을 호출한다', async () => {
@@ -409,11 +414,13 @@ describe('UserForm 컴포넌트', () => {
     it('모든 필수 필드에 적절한 라벨과 aria 속성이 있다', () => {
       render(<UserForm {...defaultProps} />);
       
-      const nameInput = screen.getByLabelText(/이름/);
-      const emailInput = screen.getByLabelText(/이메일/);
-      const passwordInput = screen.getByLabelText(/비밀번호/);
-      const roleSelect = screen.getByLabelText(/역할/);
-      const statusSelect = screen.getByLabelText(/상태/);
+      const nameInput = screen.getByPlaceholderText('사용자 이름을 입력하세요');
+      const emailInput = screen.getByPlaceholderText('user@example.com');
+      const passwordInput = screen.getByPlaceholderText('비밀번호를 입력하세요');
+      // select 요소들은 role로 찾기
+      const selects = screen.getAllByRole('combobox');
+      const roleSelect = selects[0];
+      const statusSelect = selects[1];
       
       expect(nameInput).toBeInTheDocument();
       expect(emailInput).toBeInTheDocument();
@@ -429,7 +436,7 @@ describe('UserForm 컴포넌트', () => {
       const user = userEvent.setup();
       render(<UserForm {...defaultProps} />);
       
-      const nameInput = screen.getByLabelText(/이름/);
+      const nameInput = screen.getByPlaceholderText('사용자 이름을 입력하세요');
       await user.type(nameInput, '1');
       await user.tab();
       

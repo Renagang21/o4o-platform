@@ -232,14 +232,15 @@ describe('UsersList 컴포넌트', () => {
 
       await waitFor(() => {
         expect(screen.getByText('홍길동')).toBeInTheDocument();
-        expect(screen.getByText('관리자')).toBeInTheDocument();
-        expect(screen.getByText('사업자')).toBeInTheDocument();
+        // '관리자'와 '사업자'는 여러 곳에 나타날 수 있음
+        const adminTexts = screen.getAllByText('관리자');
+        expect(adminTexts.length).toBeGreaterThan(0);
+        const businessTexts = screen.getAllByText('사업자');
+        expect(businessTexts.length).toBeGreaterThan(0);
       });
 
-      // 역할 배지 확인
+      // 역할 배지 확인 - 이미 위에서 확인했으므로 생략
       expect(screen.getByText('일반회원')).toBeInTheDocument();
-      expect(screen.getByText('관리자')).toBeInTheDocument();
-      expect(screen.getByText('사업자')).toBeInTheDocument();
     });
 
     it('통계 요약 카드가 표시된다', async () => {
