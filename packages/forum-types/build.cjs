@@ -26,7 +26,8 @@ const tscConfig = {
     allowSyntheticDefaultImports: true,
     noEmit: false,
     isolatedModules: true,
-    resolveJsonModule: true
+    resolveJsonModule: true,
+    types: []
   },
   include: ["src/**/*"],
   exclude: ["node_modules", "dist"]
