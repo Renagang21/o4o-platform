@@ -46,6 +46,11 @@ export interface PaymentMetadata {
   userAgent?: string;
   source?: string;
   adminNotes?: string;
+  tossData?: any;
+  lastCancel?: any;
+  lastWebhook?: any;
+  canceledAt?: string;
+  [key: string]: any; // Allow additional properties for flexibility
 }
 
 // Sanitized payment response types

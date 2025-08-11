@@ -182,7 +182,7 @@ const MediaUploadDialog: FC<MediaUploadDialogProps> = ({
         ))
       }, 200)
 
-      const response = await authClient.api.post('/v1/media/upload', formData, {
+      const response = await authClient.api.post('/media/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

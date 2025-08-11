@@ -10,10 +10,15 @@ import toast from 'react-hot-toast';
  */
 class UnifiedApiClient {
   private client: AxiosInstance;
-  private baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api';
+  private baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
   private version = 'v1';
 
   constructor() {
+    // Remove /v1 from baseURL if it already exists to avoid duplication
+    if (this.baseURL.endsWith('/v1')) {
+      this.baseURL = this.baseURL.slice(0, -3); // Remove '/v1'
+    }
+    
     this.client = axios.create({
       baseURL: this.baseURL,
       timeout: 30000,
