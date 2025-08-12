@@ -20,7 +20,6 @@ export async function ensureWordPressLoaded() {
   initWordPress();
   
   isWordPressInitialized = true;
-  console.log('[WordPress Loader] WordPress modules initialized');
 }
 
 export function isWordPressLoaded() {
