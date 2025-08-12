@@ -4,7 +4,6 @@
  */
 
 import { useState, useCallback } from 'react';
-import { parse } from '@wordpress/blocks';
 
 interface ReusableBlock {
   id: string;
@@ -126,9 +125,19 @@ export const useReusableBlocks = (): UseReusableBlocksReturn => {
       const blockData = await response.json();
       
       // Parse the block content for insertion
-      const parsedBlocks = Array.isArray(blockData.content) 
-        ? blockData.content 
-        : parse(blockData.content);
+      let parsedBlocks;
+      if (Array.isArray(blockData.content)) {
+        parsedBlocks = blockData.content;
+      } else {
+        // Dynamically import WordPress parse only when needed
+        if (window.wp?.blocks?.parse) {
+          parsedBlocks = window.wp.blocks.parse(blockData.content);
+        } else {
+          // If WordPress isn't loaded yet, dynamically import it
+          const { parse } = await import('@wordpress/blocks');
+          parsedBlocks = parse(blockData.content);
+        }
+      }
 
       return parsedBlocks;
       

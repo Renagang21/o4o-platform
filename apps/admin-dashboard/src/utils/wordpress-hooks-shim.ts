@@ -106,9 +106,9 @@ if (typeof window !== 'undefined') {
   if (!window.wp.i18n) {
     window.wp.i18n = {
       __: (text: string) => text,
-      _x: (text: string, context: string) => text,
+      _x: (text: string, _context: string) => text,
       _n: (single: string, plural: string, number: number) => number === 1 ? single : plural,
-      _nx: (single: string, plural: string, number: number, context: string) => number === 1 ? single : plural,
+      _nx: (single: string, plural: string, number: number, _context: string) => number === 1 ? single : plural,
       sprintf: (format: string, ...args: any[]) => {
         let i = 0;
         return format.replace(/%[sdjf]/g, () => String(args[i++]));
