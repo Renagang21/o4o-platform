@@ -23,9 +23,61 @@
     <link rel="modulepreload" crossorigin href="/assets/vendor-utils-DQ8F5vJI.js">
     <link rel="modulepreload" crossorigin href="/assets/wp-components-CLkQS2qf.js">
     <link rel="modulepreload" crossorigin href="/assets/page-gutenberg-iVBL5IS_.js">
+    <link rel="stylesheet" href="/assets/main-BuPuPhfr.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Critical: Initialize WordPress hooks BEFORE any module loads
+      // This prevents "Cannot access before initialization" errors
+      window.wp = window.wp || {};
+      
+      // Create hooks implementation that will be used by wp-i18n
+      window.wp.hooks = (function() {
+        const filters = {};
+        const actions = {};
+        const current = { filters: new Set(), actions: new Set() };
+        
+        return {
+          addFilter: function(hookName, namespace, callback, priority) {
+            filters[hookName] = filters[hookName] || [];
+            filters[hookName].push({ callback, priority: priority || 10, namespace });
+            return hookName;
+          },
+          applyFilters: function(hookName, value) {
+            const args = Array.prototype.slice.call(arguments, 1);
+            const callbacks = filters[hookName] || [];
+            return callbacks.reduce(function(val, hook) {
+              return hook.callback.apply(null, [val].concat(args.slice(1)));
+            }, value);
+          },
+          addAction: function(hookName, namespace, callback, priority) {
+            actions[hookName] = actions[hookName] || [];
+            actions[hookName].push({ callback, priority: priority || 10, namespace });
+            return hookName;
+          },
+          doAction: function(hookName) {
+            const args = Array.prototype.slice.call(arguments, 1);
+            const callbacks = actions[hookName] || [];
+            callbacks.forEach(function(hook) {
+              hook.callback.apply(null, args);
+            });
+          },
+          removeFilter: function() { return 0; },
+          removeAction: function() { return 0; },
+          hasFilter: function() { return false; },
+          hasAction: function() { return false; },
+          removeAllFilters: function() { return 0; },
+          removeAllActions: function() { return 0; },
+          currentFilter: function() { return null; },
+          currentAction: function() { return null; },
+          doingFilter: function() { return false; },
+          doingAction: function() { return false; },
+          didFilter: function() { return 0; },
+          didAction: function() { return 0; }
+        };
+      })();
+    </script>
     <script>
       // WordPress polyfill - MUST be initialized before any WordPress modules load
       (function() {
@@ -113,5 +165,6 @@
         // All WordPress polyfills initialized successfully
       })();
     </script>
+    <script type="module" crossorigin src="/assets/main-leEspGRm.js"></script>
   </body>
 </html>
