@@ -8,7 +8,7 @@
     "build": "tsc && npx vite build",
     "preview": "npx vite preview",
     "type-check": "tsc --noEmit",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "npx vitest --passWithNoTests"
   },
   "dependencies": {
