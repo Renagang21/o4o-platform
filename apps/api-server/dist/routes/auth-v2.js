@@ -62,9 +62,10 @@ router.post('/login', (0, express_validator_1.body)('email').isEmail().withMessa
     }
     catch (error) {
         console.error('Login error:', error);
-        if (error.message.includes('Account is')) {
+        const errorMessage = error instanceof Error ? error.message : 'Login failed';
+        if (errorMessage.includes('Account is')) {
             return res.status(403).json({
-                error: error.message,
+                error: errorMessage,
                 code: 'ACCOUNT_NOT_ACTIVE'
             });
         }
@@ -303,7 +304,7 @@ router.post('/reset-password', (0, express_validator_1.body)('token').notEmpty()
     catch (error) {
         console.error('Password reset error:', error);
         res.status(400).json({
-            error: error.message || 'Failed to reset password',
+            error: error instanceof Error ? error.message : 'Failed to reset password',
             code: 'RESET_FAILED'
         });
     }
@@ -327,7 +328,7 @@ router.post('/resend-verification-auth', auth_v2_1.authenticateCookie, async (re
     catch (error) {
         console.error('Email verification request error:', error);
         res.status(400).json({
-            error: error.message || 'Failed to send verification email',
+            error: error instanceof Error ? error.message : 'Failed to send verification email',
             code: 'VERIFICATION_REQUEST_FAILED'
         });
     }
@@ -398,7 +399,7 @@ router.post('/verify-email', (0, express_validator_1.body)('token').notEmpty().w
     catch (error) {
         console.error('Email verification error:', error);
         res.status(400).json({
-            error: error.message || 'Failed to verify email',
+            error: error instanceof Error ? error.message : 'Failed to verify email',
             code: 'VERIFICATION_FAILED'
         });
     }
@@ -422,18 +423,19 @@ router.get('/verify-email', async (req, res) => {
     catch (error) {
         console.error('Email verification error:', error);
         // Provide specific error codes based on error message
+        const errorMessage = error instanceof Error ? error.message : '';
         let errorCode = 'VERIFICATION_FAILED';
-        if (error.message.includes('expired')) {
+        if (errorMessage.includes('expired')) {
             errorCode = 'TOKEN_EXPIRED';
         }
-        else if (error.message.includes('invalid')) {
+        else if (errorMessage.includes('invalid')) {
             errorCode = 'INVALID_TOKEN';
         }
-        else if (error.message.includes('already verified')) {
+        else if (errorMessage.includes('already verified')) {
             errorCode = 'ALREADY_VERIFIED';
         }
         res.status(400).json({
-            error: error.message || 'Failed to verify email',
+            error: error instanceof Error ? error.message : 'Failed to verify email',
             code: errorCode
         });
     }

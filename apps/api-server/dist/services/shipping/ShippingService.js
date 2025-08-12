@@ -196,7 +196,8 @@ class ShippingService {
                 { status: 'out_for_delivery' }
             ]
         });
-        console.log(`Updating tracking for ${activeShipments.length} shipments...`);
+        // TODO: Replace with proper logger
+        // console.log(`Updating tracking for ${activeShipments.length} shipments...`);
         for (const shipment of activeShipments) {
             try {
                 await this.trackShipment(shipment.trackingNumber, shipment.carrier);

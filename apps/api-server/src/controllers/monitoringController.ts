@@ -164,7 +164,7 @@ export class MonitoringController {
       logger.error('Error triggering backup:', error);
       res.status(500).json({ 
         success: false,
-        error: error.message || 'Failed to trigger backup' 
+        error: error instanceof Error ? error.message : 'Failed to trigger backup' 
       });
     }
   }
