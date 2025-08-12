@@ -18,7 +18,24 @@
       (function() {
         window.wp = window.wp || {};
         
-        // Initialize hooks first (needed by other WP modules)
+        // Pre-initialize i18n to prevent circular reference
+        window.wp.i18n = window.wp.i18n || {
+          __: (text) => text,
+          _x: (text) => text,
+          _n: (single, plural, number) => number === 1 ? single : plural,
+          _nx: (single, plural, number) => number === 1 ? single : plural,
+          sprintf: (format, ...args) => {
+            let i = 0;
+            return format.replace(/%[sdjf]/g, () => String(args[i++]));
+          },
+          isRTL: () => false,
+          setLocaleData: () => {},
+          getLocaleData: () => ({}),
+          hasTranslation: () => false,
+          subscribe: () => () => {}
+        };
+        
+        // Initialize hooks (needed by other WP modules)
         const filters = {};
         const actions = {};
         
@@ -53,7 +70,34 @@
           didAction: () => 0
         };
         
-        console.log('[WordPress Polyfill] Hooks initialized early:', window.wp.hooks);
+        // Initialize other core WP modules to prevent initialization errors
+        window.wp.data = window.wp.data || {
+          select: () => ({}),
+          dispatch: () => ({}),
+          subscribe: () => () => {},
+          registerStore: () => {}
+        };
+        
+        window.wp.element = window.wp.element || {
+          createElement: () => null,
+          render: () => null
+        };
+        
+        window.wp.blocks = window.wp.blocks || {
+          registerBlockType: () => {},
+          getCategories: () => [],
+          setCategories: () => {}
+        };
+        
+        window.wp.domReady = window.wp.domReady || ((callback) => {
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', callback);
+          } else {
+            callback();
+          }
+        });
+        
+        // All WordPress polyfills initialized successfully
       })();
     </script>
     <script type="module">
