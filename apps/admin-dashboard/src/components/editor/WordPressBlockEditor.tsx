@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import { 
   BlockEditorProvider, 
   BlockList, 
@@ -70,6 +71,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
   const [showSaveAsReusableModal, setShowSaveAsReusableModal] = useState(false);
   const [showBlockPatternsBrowser, setShowBlockPatternsBrowser] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isWordPressReady, setIsWordPressReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { insertReusableBlock, loading: reusableBlocksLoading } = useReusableBlocks();
@@ -122,7 +124,16 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
   };
 
   // Initialize editor systems on mount
+  // WordPress 모듈 초기화
   useEffect(() => {
+    ensureWordPressLoaded().then(() => {
+      setIsWordPressReady(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isWordPressReady) return;
+    
     const initializeEditor = async () => {
       setIsInitializing(true);
       
@@ -158,7 +169,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
     };
     
     initializeEditor();
-  }, []);
+  }, [isWordPressReady]);
 
   // Initialize blocks from content
   useEffect(() => {
@@ -255,7 +266,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
   };
 
   // Show loading skeleton while initializing
-  if (isInitializing) {
+  if (!isWordPressReady || isInitializing) {
     return <EditorSkeleton showSidebar={true} />;
   }
 
