@@ -83,7 +83,8 @@ run_tests() {
     for dir in apps/* packages/*; do
         if [ -f "$dir/package.json" ] && grep -q "\"test\":" "$dir/package.json"; then
             echo "Testing $(basename $dir)..."
-            (cd "$dir" && npm test) || true
+            # Run test with proper error handling to avoid EPIPE
+            (cd "$dir" && npm test 2>&1 || echo "Test completed with status: $?") | cat
         fi
     done
 }
