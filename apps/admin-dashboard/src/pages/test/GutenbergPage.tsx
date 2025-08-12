@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import { useState, FC, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -24,6 +24,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import GutenbergEditor from '@/components/editor/GutenbergEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaLibrary from '@/components/media/MediaLibrary';
@@ -74,6 +75,14 @@ const GutenbergPage: FC = () => {
   const [showTemplates, setShowTemplates] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isWordPressReady, setIsWordPressReady] = useState(false);
+
+  // WordPress 모듈 초기화
+  useEffect(() => {
+    ensureWordPressLoaded().then(() => {
+      setIsWordPressReady(true);
+    });
+  }, []);
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -170,6 +179,18 @@ const GutenbergPage: FC = () => {
     
     return null;
   };
+
+  // WordPress가 로드되지 않았으면 로딩 표시
+  if (!isWordPressReady) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="loading-spinner mb-4" />
+          <p className="text-gray-600">에디터를 초기화하는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
