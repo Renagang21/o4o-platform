@@ -1,87 +1,66 @@
-# WordPress i18n Error Fix - Deployment Instructions
+# Admin Dashboard 배포 가이드
 
-## Problem
-The production server (admin.neture.co.kr) was showing the error:
-```
-wp-i18n-DOK2wPpo.js:1 Uncaught ReferenceError: Cannot access 'q' before initialization
-```
+## 현재 상황
+- 서버에서 npm 빌드가 타임아웃되는 문제가 있습니다
+- 로컬에서 빌드 후 dist 폴더를 GitHub에 푸시하는 방식으로 배포해야 합니다
 
-## Solution
-We've implemented a WordPress polyfill that initializes the `window.wp` global object before any @wordpress packages are loaded.
+## 로컬 빌드 및 배포 절차
 
-## Deployment Steps
-
-### On the Production Server:
-
-1. **Pull the latest changes from GitHub:**
+### 1. 로컬 환경에서 최신 코드 가져오기
 ```bash
-cd /path/to/o4o-platform
 git pull origin main
 ```
 
-2. **Install dependencies (if package.json changed):**
+### 2. 의존성 설치 (필요시)
 ```bash
-npm ci
+npm install
 ```
 
-3. **Build the admin-dashboard with the fix:**
+### 3. Admin Dashboard 빌드
 ```bash
-npm run build --workspace=@o4o/admin-dashboard
+# 프로젝트 루트에서
+npm run build:admin
+
+# 또는 admin-dashboard 디렉토리에서
+cd apps/admin-dashboard
+npm run build
 ```
 
-4. **Deploy the new build files:**
-   - The build outputs to `apps/admin-dashboard/dist/`
-   - Copy or sync these files to your web server's document root
-   - Example (adjust paths as needed):
+### 4. 빌드 결과 확인
 ```bash
-rsync -av apps/admin-dashboard/dist/ /var/www/admin.neture.co.kr/
+# dist 폴더가 생성되었는지 확인
+ls -la apps/admin-dashboard/dist/
+
+# index.html에 React 초기화 코드가 있는지 확인
+grep "React 19 Compatibility" apps/admin-dashboard/dist/index.html
 ```
 
-5. **Clear browser cache and CDN cache (if applicable):**
-   - Clear any CloudFlare or other CDN caches
-   - Force refresh in browser: Ctrl+F5 (Windows) or Cmd+Shift+R (Mac)
-
-## What Changed
-
-1. **Added WordPress Polyfill** (`src/utils/wordpress-polyfill.ts`):
-   - Initializes `window.wp` global object
-   - Provides mock implementations for i18n, data, hooks, blocks APIs
-   - Prevents "Cannot access before initialization" errors
-
-2. **Updated Block Registration**:
-   - All custom blocks now use lazy loading pattern
-   - Blocks wait for `window.wp` to be available before registering
-   - Affected files:
-     - `src/blocks/cpt-acf-loop/index.tsx`
-     - `src/blocks/group/index.tsx`
-     - `src/blocks/columns/index.tsx`
-     - `src/blocks/cover/index.tsx`
-
-3. **Modified main.tsx**:
-   - Calls `initWordPress()` before React app initialization
-   - Ensures polyfill runs before any WordPress packages are imported
-
-## Verification
-
-After deployment, verify the fix:
-
-1. Open admin.neture.co.kr in browser
-2. Open browser console (F12)
-3. Check for any errors
-4. You should see: `[WordPress Polyfill] Initializing WordPress global objects...`
-5. The wp-i18n error should be resolved
-
-## Rollback (if needed)
-
-If issues occur, rollback to previous version:
+### 5. Git에 dist 폴더 추가 및 커밋
 ```bash
-git revert HEAD
+git add apps/admin-dashboard/dist/
+git commit -m "build: update admin-dashboard dist for production deployment"
 git push origin main
-# Then rebuild and redeploy
 ```
 
-## Notes
+### 6. 서버에서 배포
+서버에 SSH 접속 후:
+```bash
+cd /home/sohae21/o4o-platform
+git pull origin main
+# 서버가 자동으로 dist 폴더의 파일을 서빙합니다
+```
 
-- The polyfill provides basic mock implementations that return default values
-- When implementing actual multilingual support in the future, replace the mock i18n functions with real implementations
-- The WordPress block editor functionality is preserved and working
+## 중요 체크리스트
+- [ ] dist/index.html에 React 19 초기화 코드가 포함되어 있는가?
+- [ ] vendor-react가 다른 모듈보다 먼저 로드되도록 설정되어 있는가?
+- [ ] WordPress 모듈(wp-all)이 React 이후에 로드되는가?
+
+## 문제 해결
+만약 "Cannot read properties of undefined (reading 'createContext')" 오류가 발생하면:
+1. dist/index.html의 modulepreload 순서 확인
+2. vendor-react가 가장 먼저 로드되는지 확인
+3. 필요시 index.html을 수동으로 수정하여 순서 조정
+
+## 참고사항
+- 서버 npm 타임아웃 문제가 해결될 때까지 이 방식을 사용해야 합니다
+- dist 폴더는 일반적으로 .gitignore에 포함되지만, 현재 상황에서는 예외적으로 커밋합니다
