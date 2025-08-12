@@ -39,7 +39,7 @@ export declare class CJLogisticsConnector {
      * Track shipment
      */
     track(trackingNumber: string): Promise<{
-        status: "pending" | "delivered" | "failed" | "picked_up" | "in_transit" | "out_for_delivery";
+        status: "pending" | "failed" | "delivered" | "picked_up" | "in_transit" | "out_for_delivery";
         currentLocation: string;
         estimatedDelivery: Date;
         events: {
@@ -58,7 +58,7 @@ export declare class CJLogisticsConnector {
      */
     parseWebhook(data: any): Promise<{
         trackingNumber: any;
-        status: "pending" | "delivered" | "failed" | "picked_up" | "in_transit" | "out_for_delivery";
+        status: "pending" | "failed" | "delivered" | "picked_up" | "in_transit" | "out_for_delivery";
         location: any;
         timestamp: Date;
     }>;
