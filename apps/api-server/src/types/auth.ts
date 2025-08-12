@@ -45,7 +45,10 @@ export interface JWTPayload {
 
 // AuthRequest interface with proper User type
 export interface AuthRequest extends Request {
-  user?: User;
+  user?: User & {
+    id: string;
+    role: UserRole;
+  };
 }
 
 export interface LoginCredentials {

@@ -8,7 +8,7 @@ import { DropshippingController } from '../../controllers/DropshippingController
 // import { authenticateToken } from '../../middleware/authMiddleware';
 // import { requireRole } from '../../middleware/requireRole';
 
-const router = Router();
+const router: Router = Router();
 const dropshippingController = new DropshippingController();
 
 // All routes require authentication

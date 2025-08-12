@@ -9,7 +9,7 @@ import { requireRole } from '../middleware/requireRole';
 import { validateRequest } from '../middleware/validateRequest';
 import { body, param, query } from 'express-validator';
 
-const router = Router();
+const router: Router = Router();
 
 // ==================== Public Routes ====================
 
