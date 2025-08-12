@@ -5,6 +5,7 @@ import { User } from '../entities/User';
 import { CustomFieldValue } from '../entities/CustomField';
 import { v4 as uuidv4 } from 'uuid';
 import { In } from 'typeorm';
+import type { AuthRequest } from '../types/auth';
 
 // Type definitions
 interface PageTreeNode extends Page {
@@ -23,7 +24,7 @@ export class PagesController {
   private customFieldValueRepository = AppDataSource.getRepository(CustomFieldValue);
 
   // GET /api/admin/pages
-  async getPages(req: Request, res: Response) {
+  async getPages(req: AuthRequest, res: Response) {
     try {
       const {
         page = 1,
@@ -132,7 +133,7 @@ export class PagesController {
   }
 
   // GET /api/admin/pages/:id
-  async getPage(req: Request, res: Response) {
+  async getPage(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
 
@@ -177,7 +178,7 @@ export class PagesController {
   }
 
   // POST /api/admin/pages
-  async createPage(req: Request, res: Response) {
+  async createPage(req: AuthRequest, res: Response) {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -283,7 +284,7 @@ export class PagesController {
   }
 
   // PUT /api/admin/pages/:id
-  async updatePage(req: Request, res: Response) {
+  async updatePage(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
       const userId = req.user?.id;
@@ -379,7 +380,7 @@ export class PagesController {
   }
 
   // DELETE /api/admin/pages/:id
-  async deletePage(req: Request, res: Response) {
+  async deletePage(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
 
@@ -427,7 +428,7 @@ export class PagesController {
   }
 
   // POST /api/admin/pages/:id/clone
-  async clonePage(req: Request, res: Response) {
+  async clonePage(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
       const userId = req.user?.id;
@@ -505,7 +506,7 @@ export class PagesController {
   }
 
   // POST /api/admin/pages/:id/autosave (draft)
-  async savePageDraft(req: Request, res: Response) {
+  async savePageDraft(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
       const { content } = req.body;
@@ -540,7 +541,7 @@ export class PagesController {
   }
 
   // PATCH /api/admin/pages/bulk
-  async bulkUpdatePages(req: Request, res: Response) {
+  async bulkUpdatePages(req: AuthRequest, res: Response) {
     try {
       const { ids, data } = req.body;
       const userId = req.user?.id;
@@ -575,7 +576,7 @@ export class PagesController {
   }
 
   // DELETE /api/admin/pages/bulk
-  async bulkDeletePages(req: Request, res: Response) {
+  async bulkDeletePages(req: AuthRequest, res: Response) {
     try {
       const { ids } = req.body;
 
@@ -626,7 +627,7 @@ export class PagesController {
   }
 
   // GET /api/admin/pages/:id/preview
-  async getPagePreview(req: Request, res: Response) {
+  async getPagePreview(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
 
@@ -664,7 +665,7 @@ export class PagesController {
   }
 
   // GET /api/admin/pages/:id/revisions
-  async getPageRevisions(req: Request, res: Response) {
+  async getPageRevisions(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
 
@@ -704,7 +705,7 @@ export class PagesController {
   }
 
   // POST /api/admin/pages/:id/revisions/:revisionId/restore
-  async restorePageRevision(req: Request, res: Response) {
+  async restorePageRevision(req: AuthRequest, res: Response) {
     try {
       const { id, revisionId } = req.params;
       const userId = req.user?.id;
@@ -766,7 +767,7 @@ export class PagesController {
   }
 
   // GET /api/admin/pages/tree
-  async getPageTree(req: Request, res: Response) {
+  async getPageTree(req: AuthRequest, res: Response) {
     try {
       const pages = await this.pageRepository.find({
         where: { type: 'page' },

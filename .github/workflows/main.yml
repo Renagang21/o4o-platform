@@ -38,6 +38,25 @@ jobs:
     - name: Run ESLint
       run: npm run lint
     
+    - name: Check for console.log statements
+      run: |
+        # Find all console.log statements, excluding comments and test files
+        CONSOLE_LOGS=$(grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
+          --exclude-dir=node_modules --exclude-dir=dist \
+          --exclude-dir=test --exclude-dir=e2e \
+          --exclude="*test*" --exclude="*spec*" \
+          | grep -v "//.*console\.log" \
+          | grep -v "^\s*//" \
+          | grep -v "\*.*console\.log" || true)
+        
+        if [ -n "$CONSOLE_LOGS" ]; then
+          echo "❌ Found console.log statements in production code:"
+          echo "$CONSOLE_LOGS"
+          exit 1
+        else
+          echo "✅ No console.log statements found in production code"
+        fi
+    
     - name: Run tests
       run: npm test
 
@@ -93,7 +112,7 @@ jobs:
       uses: actions/download-artifact@v4
       continue-on-error: true
       with:
-        name: api-server-build
+        name: api-server-dist
         path: apps/api-server/dist
     
     - name: Setup SSH key

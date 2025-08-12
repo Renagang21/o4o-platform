@@ -60,6 +60,7 @@ export function initWordPressHooks() {
   const filters: Record<string, Function[]> = {};
   const actions: Record<string, Function[]> = {};
   
+  // 완전한 hooks 구현
   window.wp.hooks = {
     addFilter: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
       filters[hookName] = filters[hookName] || [];
@@ -79,16 +80,28 @@ export function initWordPressHooks() {
     },
     removeFilter: (_hookName: string, _namespace: string) => {
       // 구현 필요시 추가
+      return 0;
     },
     removeAction: (_hookName: string, _namespace: string) => {
       // 구현 필요시 추가
+      return 0;
     },
+    hasFilter: (_hookName: string, _namespace?: string) => false,
+    hasAction: (_hookName: string, _namespace?: string) => false,
+    removeAllFilters: (_hookName: string) => 0,
+    removeAllActions: (_hookName: string) => 0,
+    currentFilter: () => null,
+    currentAction: () => null,
+    doingFilter: (_hookName?: string) => false,
+    doingAction: (_hookName?: string) => false,
+    didFilter: (_hookName: string) => 0,
+    didAction: (_hookName: string) => 0,
   };
 }
 
 // WordPress 전체 초기화
 export function initWordPress() {
-  console.log('[WordPress Polyfill] Initializing WordPress global objects...');
+  // console.log('[WordPress Polyfill] Initializing WordPress global objects...');
   
   initWordPressI18n();
   initWordPressData();
@@ -119,7 +132,7 @@ export function initWordPress() {
     setCategories: (_categories: any[]) => {},
   };
   
-  console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
+  // console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
 }
 
 // TypeScript 타입 정의

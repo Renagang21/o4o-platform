@@ -32,7 +32,7 @@ export const useRefresh = (
         : 0;
       
       if (timeLeft > 0) {
-    // Removed console.warn
+      // console.warn(`Please wait ${timeLeft} seconds before refreshing again`);
         return;
       }
     }
@@ -47,9 +47,6 @@ export const useRefresh = (
       ]);
       
       setLastRefreshTime(new Date());
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      throw error;
     } finally {
       setIsRefreshing(false);
     }

@@ -83,13 +83,13 @@ const AdminDashboard: FC = () => {
     return (
       <div className="flex gap-2">
         <button
-          onClick={() => console.log('Edit user:', user.id)}
+          onClick={() => {/* TODO: Implement edit user: ${user.id} */}}
           className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition-colors"
         >
           편집
         </button>
         <button
-          onClick={() => console.log('Delete user:', user.id)}
+          onClick={() => {/* TODO: Implement delete user: ${user.id} */}}
           className="px-3 py-1 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition-colors"
         >
           삭제

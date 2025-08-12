@@ -235,12 +235,7 @@ export const useDashboardData = () => {
       refetchHealth()
     ];
 
-    try {
-      await Promise.allSettled(refreshPromises);
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      throw error;
-    }
+    await Promise.allSettled(refreshPromises);
   }, [refetchStats, refetchCharts, refetchNotifications, refetchActivities, refetchHealth]);
 
   // 초기 데이터 로드 제거 - enabled: true로 자동 로드됨

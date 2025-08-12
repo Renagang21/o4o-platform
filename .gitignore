@@ -6,7 +6,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Production builds
-dist/
+# dist/  # Temporarily commented out to include dist folders in git
 build/
 .next/
 out/

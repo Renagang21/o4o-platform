@@ -560,7 +560,7 @@ export const setupSwagger = (app: Application) => {
       res.json(postmanCollection);
     });
     
-    console.log('📚 API Documentation available at /api-docs');
+    // console.log('📚 API Documentation available at /api-docs');
     
   } catch (error) {
     console.error('Failed to setup Swagger:', error);

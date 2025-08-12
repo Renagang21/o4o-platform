@@ -6,7 +6,7 @@ import { LayoutDashboard, FileVideo, Calendar, Store, LogOut } from 'lucide-reac
 const useAuth = () => ({ 
   user: { name: '관리자', email: 'admin@o4o.com' },
   isAuthenticated: true,
-  logout: () => console.log('Logout')
+  logout: () => {/* TODO: Implement logout */}
 });
 
 interface LayoutProps {

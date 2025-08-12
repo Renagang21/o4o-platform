@@ -229,7 +229,7 @@ get_header();
           language: 'javascript',
           content: `// Main Theme Scripts
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Theme initialized');
+  // console.log('Theme initialized');
   
   // Mobile menu toggle
   const menuToggle = document.querySelector('.menu-toggle');

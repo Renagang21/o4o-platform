@@ -183,7 +183,7 @@ const PostListWordPress: FC = () => {
     },
     actions: [
       { label: 'Edit', href: `/content/posts/${post.id}/edit` },
-      { label: 'Quick Edit', onClick: () => console.log('Quick edit', post.id) },
+      { label: 'Quick Edit', onClick: () => {/* console.log('Quick edit', post.id) */} },
       { 
         label: 'Trash', 
         onClick: () => deleteMutation.mutate(post.id),

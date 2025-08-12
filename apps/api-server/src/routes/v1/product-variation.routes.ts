@@ -3,7 +3,7 @@ import { ProductVariationController } from '../../controllers/productVariationCo
 import { authenticateToken } from '../../middleware/auth';
 import { requireRole } from '../../middleware/requireRole';
 
-const router = Router();
+const router: Router = Router();
 const controller = new ProductVariationController();
 
 // 상품 속성 관리

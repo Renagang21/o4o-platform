@@ -6,12 +6,13 @@ import { Request, Response } from 'express';
 import { crowdfundingService } from '../services/CrowdfundingService';
 import logger from '../utils/simpleLogger';
 import type { FundingCategory, FundingStatus } from '../types/crowdfunding-types';
+import type { AuthRequest } from '../types/auth';
 
 export class CrowdfundingController {
   /**
    * 프로젝트 생성
    */
-  async createProject(req: Request, res: Response): Promise<void> {
+  async createProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -38,7 +39,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 수정
    */
-  async updateProject(req: Request, res: Response): Promise<void> {
+  async updateProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -67,7 +68,7 @@ export class CrowdfundingController {
   /**
    * 리워드 생성
    */
-  async createReward(req: Request, res: Response): Promise<void> {
+  async createReward(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -98,7 +99,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 승인 (관리자)
    */
-  async approveProject(req: Request, res: Response): Promise<void> {
+  async approveProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const adminId = req.user?.id;
@@ -127,7 +128,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 거절 (관리자)
    */
-  async rejectProject(req: Request, res: Response): Promise<void> {
+  async rejectProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const { reason } = req.body;
@@ -157,7 +158,7 @@ export class CrowdfundingController {
   /**
    * 후원하기
    */
-  async createBacking(req: Request, res: Response): Promise<void> {
+  async createBacking(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -189,7 +190,7 @@ export class CrowdfundingController {
   /**
    * 결제 확인
    */
-  async confirmPayment(req: Request, res: Response): Promise<void> {
+  async confirmPayment(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { backingId } = req.params;
       const { paymentId } = req.body;
@@ -213,7 +214,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 업데이트 작성
    */
-  async createProjectUpdate(req: Request, res: Response): Promise<void> {
+  async createProjectUpdate(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -246,7 +247,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 목록 조회
    */
-  async getProjects(req: Request, res: Response): Promise<void> {
+  async getProjects(req: AuthRequest, res: Response): Promise<void> {
     try {
       const filter = {
         status: req.query.status as FundingStatus,
@@ -281,7 +282,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 상세 조회
    */
-  async getProjectDetails(req: Request, res: Response): Promise<void> {
+  async getProjectDetails(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       
@@ -303,7 +304,7 @@ export class CrowdfundingController {
   /**
    * 크리에이터 대시보드
    */
-  async getCreatorDashboard(req: Request, res: Response): Promise<void> {
+  async getCreatorDashboard(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -329,7 +330,7 @@ export class CrowdfundingController {
   /**
    * 후원자 대시보드
    */
-  async getBackerDashboard(req: Request, res: Response): Promise<void> {
+  async getBackerDashboard(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -355,7 +356,7 @@ export class CrowdfundingController {
   /**
    * 펀딩 종료 (수동 - 관리자)
    */
-  async endFunding(req: Request, res: Response): Promise<void> {
+  async endFunding(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       
@@ -378,7 +379,7 @@ export class CrowdfundingController {
   /**
    * 승인 대기 프로젝트 목록 (관리자)
    */
-  async getPendingProjects(req: Request, res: Response): Promise<void> {
+  async getPendingProjects(req: AuthRequest, res: Response): Promise<void> {
     try {
       const filter = {
         status: 'draft' as FundingStatus,
@@ -410,14 +411,14 @@ export class CrowdfundingController {
   /**
    * 프로젝트 ID로 조회 (별칭 메서드)
    */
-  async getProjectById(req: Request, res: Response): Promise<void> {
+  async getProjectById(req: AuthRequest, res: Response): Promise<void> {
     return this.getProjectDetails(req, res);
   }
 
   /**
    * 대시보드 통계 조회
    */
-  async getDashboardStats(req: Request, res: Response): Promise<void> {
+  async getDashboardStats(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -449,7 +450,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 후원하기
    */
-  async backProject(req: Request, res: Response): Promise<void> {
+  async backProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -482,14 +483,14 @@ export class CrowdfundingController {
   /**
    * 프로젝트 참여 (후원) - alias
    */
-  async joinProject(req: Request, res: Response): Promise<void> {
+  async joinProject(req: AuthRequest, res: Response): Promise<void> {
     return this.backProject(req, res);
   }
 
   /**
    * 참여 취소
    */
-  async cancelParticipation(req: Request, res: Response): Promise<void> {
+  async cancelParticipation(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -516,7 +517,7 @@ export class CrowdfundingController {
   /**
    * 참여 상태 조회
    */
-  async getParticipationStatus(req: Request, res: Response): Promise<void> {
+  async getParticipationStatus(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -546,7 +547,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 삭제
    */
-  async deleteProject(req: Request, res: Response): Promise<void> {
+  async deleteProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const userId = req.user?.id;
@@ -575,7 +576,7 @@ export class CrowdfundingController {
   /**
    * 프로젝트 상태 업데이트
    */
-  async updateProjectStatus(req: Request, res: Response): Promise<void> {
+  async updateProjectStatus(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { projectId } = req.params;
       const { status } = req.body;

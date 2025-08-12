@@ -6,7 +6,7 @@ import { Order } from '../../entities/Order';
 import { AuthRequest } from '../../types/auth';
 import logger from '../../utils/simpleLogger';
 
-const router = Router();
+const router: Router = Router();
 const orderRepository = AppDataSource.getRepository(Order);
 
 /**
