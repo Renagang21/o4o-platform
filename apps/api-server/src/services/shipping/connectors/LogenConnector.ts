@@ -58,7 +58,8 @@ export class LogenConnector {
   }
 
   async cancelLabel(trackingNumber: string): Promise<boolean> {
-    console.log(`Cancelling Logen shipment: ${trackingNumber}`);
+    // TODO: Replace with proper logger
+    // console.log(`Cancelling Logen shipment: ${trackingNumber}`);
     return true;
   }
 

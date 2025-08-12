@@ -136,7 +136,8 @@ export class CJLogisticsConnector {
   async cancelLabel(trackingNumber: string): Promise<boolean> {
     try {
       // In production, call CJ's cancellation API
-      console.log(`Cancelling CJ shipment: ${trackingNumber}`);
+      // TODO: Replace with proper logger
+      // console.log(`Cancelling CJ shipment: ${trackingNumber}`);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));

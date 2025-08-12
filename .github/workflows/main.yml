@@ -38,6 +38,20 @@ jobs:
     - name: Run ESLint
       run: npm run lint
     
+    - name: Check for console.log statements
+      run: |
+        if grep -r "console\.log" apps/ --include="*.ts" --include="*.tsx" \
+          --exclude-dir=node_modules --exclude-dir=dist \
+          --exclude-dir=test --exclude-dir=e2e \
+          --exclude="*test*" --exclude="*spec*" \
+          | grep -v "^[[:space:]]*//" \
+          | grep -v "^[[:space:]]*\*"; then
+          echo "❌ Found console.log statements in production code"
+          exit 1
+        else
+          echo "✅ No console.log statements found in production code"
+        fi
+    
     - name: Run tests
       run: npm test
 
