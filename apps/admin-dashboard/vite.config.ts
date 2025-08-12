@@ -81,26 +81,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           if (sharedChunk) return sharedChunk;
           
           if (id.includes('node_modules')) {
-            // WordPress 패키지들을 별도 청크로 분리
+            // WordPress 패키지들을 하나의 청크로 묶어서 순환 참조 방지
             if (id.includes('@wordpress')) {
-              // 각 WordPress 패키지를 개별 청크로 분리
-              if (id.includes('@wordpress/block-editor')) {
-                return 'wp-block-editor';
-              }
-              if (id.includes('@wordpress/blocks')) {
-                return 'wp-blocks';
-              }
-              if (id.includes('@wordpress/components')) {
-                return 'wp-components';
-              }
-              if (id.includes('@wordpress/element')) {
-                return 'wp-element';
-              }
-              if (id.includes('@wordpress/i18n')) {
-                return 'wp-i18n';
-              }
-              // 기타 WordPress 패키지
-              return 'wp-core';
+              // 모든 WordPress 패키지를 하나의 청크로 통합
+              return 'wp-all';
             }
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {

@@ -103,9 +103,17 @@ export function initWordPressHooks() {
 export function initWordPress() {
   // console.log('[WordPress Polyfill] Initializing WordPress global objects...');
   
-  initWordPressI18n();
+  // Only initialize if not already present (hooks-shim may have already done this)
+  if (!window.wp?.i18n) {
+    initWordPressI18n();
+  }
+  
   initWordPressData();
-  initWordPressHooks();
+  
+  // Only initialize hooks if not already present
+  if (!window.wp?.hooks) {
+    initWordPressHooks();
+  }
   
   // 추가 WordPress 전역 객체들
   window.wp = window.wp || {};

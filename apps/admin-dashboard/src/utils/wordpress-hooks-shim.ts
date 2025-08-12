@@ -6,17 +6,13 @@
  * This prevents circular dependency issues.
  */
 
-// Ensure window.wp exists
-if (typeof window !== 'undefined') {
-  window.wp = window.wp || {};
+// Create a simple hooks implementation to avoid circular dependencies
+const createHooks = () => {
+  const filters: Record<string, any[]> = {};
+  const actions: Record<string, any[]> = {};
   
-  // If hooks don't exist, create a complete implementation
-  if (!window.wp.hooks) {
-    const filters: Record<string, any[]> = {};
-    const actions: Record<string, any[]> = {};
-    
-    window.wp.hooks = {
-      addFilter: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+  return {
+    addFilter: (hookName: string, namespace: string, callback: Function, priority = 10) => {
         filters[hookName] = filters[hookName] || [];
         filters[hookName].push({ callback, priority, namespace });
         filters[hookName].sort((a, b) => a.priority - b.priority);
@@ -94,6 +90,34 @@ if (typeof window !== 'undefined') {
       doingAction: () => false,
       didFilter: (hookName: string) => filters[hookName]?.length || 0,
       didAction: (hookName: string) => actions[hookName]?.length || 0,
+  };
+};
+
+// Initialize hooks immediately
+if (typeof window !== 'undefined') {
+  window.wp = window.wp || {};
+  
+  // Always create fresh hooks to avoid conflicts with WordPress packages
+  if (!window.wp.hooks) {
+    window.wp.hooks = createHooks();
+  }
+  
+  // Also ensure i18n is available with hooks support
+  if (!window.wp.i18n) {
+    window.wp.i18n = {
+      __: (text: string) => text,
+      _x: (text: string, context: string) => text,
+      _n: (single: string, plural: string, number: number) => number === 1 ? single : plural,
+      _nx: (single: string, plural: string, number: number, context: string) => number === 1 ? single : plural,
+      sprintf: (format: string, ...args: any[]) => {
+        let i = 0;
+        return format.replace(/%[sdjf]/g, () => String(args[i++]));
+      },
+      isRTL: () => false,
+      setLocaleData: () => {},
+      getLocaleData: () => ({}),
+      hasTranslation: () => false,
+      subscribe: () => () => {},
     };
   }
 }
