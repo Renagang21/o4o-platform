@@ -52,7 +52,8 @@ class KoreanPostConnector {
         };
     }
     async cancelLabel(trackingNumber) {
-        console.log(`Cancelling Korean Post shipment: ${trackingNumber}`);
+        // TODO: Replace with proper logger
+        // console.log(`Cancelling Korean Post shipment: ${trackingNumber}`);
         return true;
     }
     async parseWebhook(data) {

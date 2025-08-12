@@ -220,7 +220,7 @@ class BackupService {
 
     } catch (error) {
       history.status = 'failed';
-      history.error = error.message;
+      history.error = error instanceof Error ? error.message : 'Unknown error';
       this.status.failedBackups++;
 
       logger.error('❌ Backup failed:', error);
@@ -479,7 +479,7 @@ class BackupService {
       
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
 }

@@ -49,7 +49,8 @@ class LogenConnector {
         };
     }
     async cancelLabel(trackingNumber) {
-        console.log(`Cancelling Logen shipment: ${trackingNumber}`);
+        // TODO: Replace with proper logger
+        // console.log(`Cancelling Logen shipment: ${trackingNumber}`);
         return true;
     }
     async parseWebhook(data) {

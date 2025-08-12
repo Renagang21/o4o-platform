@@ -93,7 +93,8 @@ class HanjinConnector {
      */
     async cancelLabel(trackingNumber) {
         try {
-            console.log(`Cancelling Hanjin shipment: ${trackingNumber}`);
+            // TODO: Replace with proper logger
+            // console.log(`Cancelling Hanjin shipment: ${trackingNumber}`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             return true;
         }
