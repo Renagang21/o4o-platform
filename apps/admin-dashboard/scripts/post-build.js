@@ -1,40 +1,16 @@
-<!doctype html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>O4O Admin Dashboard</title>
-    <script>
-      // React 19 Compatibility - Initialize global React before any modules load
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || {};
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled = false;
-    </script>
-    <script>
-      // Initialize WordPress global object BEFORE page load
-      window.wp = window.wp || {};
-      
-      // Pre-create all WordPress module namespaces to prevent initialization errors
-      window.wp.hooks = window.wp.hooks || {};
-      window.wp.i18n = window.wp.i18n || {};
-      window.wp.data = window.wp.data || {};
-      window.wp.element = window.wp.element || {};
-      window.wp.blocks = window.wp.blocks || {};
-      window.wp.components = window.wp.components || {};
-      window.wp.blockEditor = window.wp.blockEditor || {};
-      window.wp.domReady = window.wp.domReady || function(fn) {
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', fn);
-        } else {
-          fn();
-        }
-      };
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script>
-      // WordPress polyfill - Additional initialization after DOM is ready
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+const indexHtmlPath = path.join(__dirname, '../dist/index.html');
+
+if (fs.existsSync(indexHtmlPath)) {
+  let html = fs.readFileSync(indexHtmlPath, 'utf-8');
+  
+  // WordPress polyfill 스크립트를 body 태그 직후에 추가
+  const wpPolyfillScript = `    <script>
+      // WordPress polyfill - MUST be initialized before any WordPress modules load
       (function() {
         window.wp = window.wp || {};
         
@@ -120,22 +96,17 @@
         // All WordPress polyfills initialized successfully
       })();
     </script>
-    <script type="module">
-      // Import React first and make it globally available
-      import * as React from 'react';
-      import * as ReactDOM from 'react-dom';
-      
-      // Make React available globally before other modules load
-      window.React = React;
-      window.ReactDOM = ReactDOM;
-      
-      // Ensure React.Children exists
-      if (!React.Children) {
-        console.error('React.Children not found - React 19 compatibility issue');
-      }
-      
-      // Now load the main application
-      import('/src/main.tsx');
-    </script>
-  </body>
-</html>
+`;
+
+  // <div id="root"></div> 다음에 스크립트 추가
+  html = html.replace(
+    '<div id="root"></div>',
+    `<div id="root"></div>\n${wpPolyfillScript}`
+  );
+  
+  fs.writeFileSync(indexHtmlPath, html, 'utf-8');
+  console.log('✅ WordPress polyfill script added to dist/index.html');
+} else {
+  console.error('❌ dist/index.html not found');
+  process.exit(1);
+}

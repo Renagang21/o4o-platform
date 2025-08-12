@@ -10,6 +10,26 @@
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || {};
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled = false;
     </script>
+    <script>
+      // Initialize WordPress global object BEFORE page load
+      window.wp = window.wp || {};
+      
+      // Pre-create all WordPress module namespaces to prevent initialization errors
+      window.wp.hooks = window.wp.hooks || {};
+      window.wp.i18n = window.wp.i18n || {};
+      window.wp.data = window.wp.data || {};
+      window.wp.element = window.wp.element || {};
+      window.wp.blocks = window.wp.blocks || {};
+      window.wp.components = window.wp.components || {};
+      window.wp.blockEditor = window.wp.blockEditor || {};
+      window.wp.domReady = window.wp.domReady || function(fn) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', fn);
+        } else {
+          fn();
+        }
+      };
+    </script>
     <script type="module" crossorigin src="/assets/index-BXUXYk-6.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/wp-i18n-Niz9RVma.js">
     <link rel="modulepreload" crossorigin href="/assets/wp-core-BctBwZpo.js">
@@ -27,7 +47,7 @@
   <body>
     <div id="root"></div>
     <script>
-      // WordPress polyfill - MUST be initialized before any WordPress modules load
+      // WordPress polyfill - Additional initialization after DOM is ready
       (function() {
         window.wp = window.wp || {};
         
