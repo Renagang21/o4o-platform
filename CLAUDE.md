@@ -96,9 +96,29 @@ npm run lint:fix  # 자동 수정
 ```
 
 ### 테스트
+
+#### 로컬 환경에서 테스트 실행
+서버의 npm 타임아웃 문제로 인해 테스트는 **반드시 로컬 환경에서 실행**해야 합니다:
+
 ```bash
+# 로컬에서 의존성 설치
+npm install
+
+# 전체 테스트 실행
 npm run test
+
+# 워크스페이스별 테스트
+npm run test --workspace=@o4o/admin-dashboard
+npm run test --workspace=@o4o/api-server
+npm run test --workspace=@o4o/main-site
+
+# E2E 테스트
+npm run test:e2e
 ```
+
+**주의사항:**
+- CI/CD 환경에서 npm 설치 타임아웃이 발생할 수 있으므로, 테스트는 로컬에서 수행하고 결과를 확인하세요
+- 테스트 의존성(vitest, jest)이 제대로 설치되지 않으면 `npm install`을 다시 실행하세요
 
 ## 주의사항
 - TypeScript 버전은 5.9.2로 고정되어 있습니다
