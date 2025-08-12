@@ -13,6 +13,49 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // WordPress polyfill - MUST be initialized before any WordPress modules load
+      (function() {
+        window.wp = window.wp || {};
+        
+        // Initialize hooks first (needed by other WP modules)
+        const filters = {};
+        const actions = {};
+        
+        window.wp.hooks = {
+          addFilter: (hookName, namespace, callback, priority = 10) => {
+            filters[hookName] = filters[hookName] || [];
+            filters[hookName].push(callback);
+          },
+          applyFilters: (hookName, value, ...args) => {
+            const callbacks = filters[hookName] || [];
+            return callbacks.reduce((val, callback) => callback(val, ...args), value);
+          },
+          addAction: (hookName, namespace, callback, priority = 10) => {
+            actions[hookName] = actions[hookName] || [];
+            actions[hookName].push(callback);
+          },
+          doAction: (hookName, ...args) => {
+            const callbacks = actions[hookName] || [];
+            callbacks.forEach(callback => callback(...args));
+          },
+          removeFilter: () => 0,
+          removeAction: () => 0,
+          hasFilter: () => false,
+          hasAction: () => false,
+          removeAllFilters: () => 0,
+          removeAllActions: () => 0,
+          currentFilter: () => null,
+          currentAction: () => null,
+          doingFilter: () => false,
+          doingAction: () => false,
+          didFilter: () => 0,
+          didAction: () => 0
+        };
+        
+        console.log('[WordPress Polyfill] Hooks initialized early:', window.wp.hooks);
+      })();
+    </script>
     <script type="module">
       // Import React first and make it globally available
       import * as React from 'react';
