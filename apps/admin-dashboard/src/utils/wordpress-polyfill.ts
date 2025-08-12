@@ -101,7 +101,7 @@ export function initWordPressHooks() {
 
 // WordPress 전체 초기화
 export function initWordPress() {
-  console.log('[WordPress Polyfill] Initializing WordPress global objects...');
+  // console.log('[WordPress Polyfill] Initializing WordPress global objects...');
   
   initWordPressI18n();
   initWordPressData();
@@ -132,7 +132,7 @@ export function initWordPress() {
     setCategories: (_categories: any[]) => {},
   };
   
-  console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
+  // console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
 }
 
 // TypeScript 타입 정의
