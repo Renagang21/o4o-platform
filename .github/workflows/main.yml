@@ -93,7 +93,7 @@ jobs:
       uses: actions/download-artifact@v4
       continue-on-error: true
       with:
-        name: api-server-build
+        name: api-server-dist
         path: apps/api-server/dist
     
     - name: Setup SSH key

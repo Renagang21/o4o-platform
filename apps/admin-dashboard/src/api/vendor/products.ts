@@ -17,61 +17,41 @@ export async function getSupplierProducts(params?: {
   limit?: number;
   search?: string;
 }) {
-  try {
-    const queryParams = new URLSearchParams();
-    
-    if (params?.supplierId) queryParams.append('supplierId', params.supplierId);
-    if (params?.approvalStatus) queryParams.append('approvalStatus', params.approvalStatus);
-    if (params?.status) queryParams.append('status', params.status);
-    if (params?.page) queryParams.append('page', params.page.toString() as any);
-    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
-    if (params?.search) queryParams.append('search', params.search);
+  const queryParams = new URLSearchParams();
+  
+  if (params?.supplierId) queryParams.append('supplierId', params.supplierId);
+  if (params?.approvalStatus) queryParams.append('approvalStatus', params.approvalStatus);
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.page) queryParams.append('page', params.page.toString() as any);
+  if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
+  if (params?.search) queryParams.append('search', params.search);
 
-    const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
+  return response.data;
 }
 
 /**
  * 제품 상세 조회
  */
 export async function getVendorProduct(productId: string) {
-  try {
-    const response = await authClient.api.get(`/v1/vendor/products/${productId}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get(`/v1/vendor/products/${productId}`);
+  return response.data;
 }
 
 /**
  * 제품 등록 (공급자)
  */
 export async function createVendorProduct(data: Partial<VendorProduct>) {
-  try {
-    const response = await authClient.api.post('/v1/vendor/products', data);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.post('/v1/vendor/products', data);
+  return response.data;
 }
 
 /**
  * 제품 수정 (공급자)
  */
 export async function updateVendorProduct(productId: string, data: Partial<VendorProduct>) {
-  try {
-    const response = await authClient.api.put(`/v1/vendor/products/${productId}`, data);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.put(`/v1/vendor/products/${productId}`, data);
+  return response.data;
 }
 
 /**
@@ -97,13 +77,8 @@ export async function approveProducts(request: ProductApprovalRequest): Promise<
  * 재고 업데이트
  */
 export async function updateStock(request: StockUpdateRequest) {
-  try {
-    const response = await authClient.api.post('/v1/vendor/products/stock', request);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.post('/v1/vendor/products/stock', request);
+  return response.data;
 }
 
 /**
@@ -128,23 +103,18 @@ export async function getApprovedProducts(params?: {
   limit?: number;
   search?: string;
 }) {
-  try {
-    const queryParams = new URLSearchParams();
-    
-    queryParams.append('approvalStatus', 'approved');
-    queryParams.append('status', 'active');
-    
-    if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
-    if (params?.page) queryParams.append('page', params.page.toString() as any);
-    if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
-    if (params?.search) queryParams.append('search', params.search);
+  const queryParams = new URLSearchParams();
+  
+  queryParams.append('approvalStatus', 'approved');
+  queryParams.append('status', 'active');
+  
+  if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+  if (params?.page) queryParams.append('page', params.page.toString() as any);
+  if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
+  if (params?.search) queryParams.append('search', params.search);
 
-    const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
+  return response.data;
 }
 
 /**
@@ -154,24 +124,14 @@ export async function updateProductStatus(
   productId: string, 
   status: 'draft' | 'active' | 'inactive' | 'soldout'
 ) {
-  try {
-    const response = await authClient.api.patch(`/v1/vendor/products/${productId}/status`, { status });
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.patch(`/v1/vendor/products/${productId}/status`, { status });
+  return response.data;
 }
 
 /**
  * 제품 삭제 (소프트 삭제)
  */
 export async function deleteVendorProduct(productId: string) {
-  try {
-    const response = await authClient.api.delete(`/v1/vendor/products/${productId}`);
-    return response.data;
-  } catch (error: any) {
-    // Error logging - use proper error handler
-    throw error;
-  }
+  const response = await authClient.api.delete(`/v1/vendor/products/${productId}`);
+  return response.data;
 }
