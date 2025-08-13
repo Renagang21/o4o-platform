@@ -85,7 +85,6 @@ temp/
 *.backup-*
 *DESKTOP-*.ts
 *DESKTOP-*.tsx
-CLAUDE.md.backup.*
 *.md.backup.*
 
 # AWS
@@ -96,6 +95,7 @@ CLAUDE.md.backup.*
 
 # Claude Code specific files - DO NOT SYNC
 CLAUDE.md
+CLAUDE.md.backup*
 
 # Temporary reports in root directory only
 /*_REPORT.md
@@ -104,8 +104,6 @@ CLAUDE.md
 /O4O_PLATFORM_SERVER_SYNC_ANALYSIS_REPORT.md
 
 # Local configuration files (DO NOT SYNC)
-CLAUDE.md
-CLAUDE.md.backup*
 API_SERVER_DEPLOYMENT.md
 
 # Temporary files
