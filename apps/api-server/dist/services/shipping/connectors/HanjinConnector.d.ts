@@ -38,7 +38,7 @@ export declare class HanjinConnector {
      * Track shipment
      */
     track(trackingNumber: string): Promise<{
-        status: "pending" | "failed" | "delivered" | "picked_up" | "in_transit" | "out_for_delivery";
+        status: "pending" | "delivered" | "failed" | "picked_up" | "in_transit" | "out_for_delivery";
         currentLocation: string;
         estimatedDelivery: Date;
         events: {
@@ -57,7 +57,7 @@ export declare class HanjinConnector {
      */
     parseWebhook(data: any): Promise<{
         trackingNumber: any;
-        status: "pending" | "failed" | "delivered" | "picked_up" | "in_transit" | "out_for_delivery";
+        status: "pending" | "delivered" | "failed" | "picked_up" | "in_transit" | "out_for_delivery";
         location: any;
         timestamp: Date;
     }>;
