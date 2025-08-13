@@ -48,7 +48,7 @@ export default function WordPressBlockEditorDynamic({
   settings
 }: WordPressBlockEditorProps) {
   const [blocks, setBlocks] = useState<any[]>([]);
-  const [selectedBlocks, setSelectedBlocks] = useState<any[]>([]);
+  const [selectedBlocks] = useState<any[]>([]);
   const [showReusableBlocksBrowser, setShowReusableBlocksBrowser] = useState(false);
   const [showSaveAsReusableModal, setShowSaveAsReusableModal] = useState(false);
   const [showBlockPatternsBrowser, setShowBlockPatternsBrowser] = useState(false);
@@ -365,25 +365,56 @@ export default function WordPressBlockEditorDynamic({
 
       {/* Modals */}
       {showReusableBlocksBrowser && (
-        <ReusableBlocksBrowser
-          onSelect={handleInsertReusableBlock}
-          onClose={() => setShowReusableBlocksBrowser(false)}
-        />
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Reusable Blocks</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowReusableBlocksBrowser(false)}
+              >
+                ×
+              </Button>
+            </div>
+            <div className="p-4 overflow-auto max-h-[calc(90vh-120px)]">
+              <ReusableBlocksBrowser
+                onInsertBlock={handleInsertReusableBlock}
+                compact={false}
+              />
+            </div>
+          </div>
+        </div>
       )}
       
-      {showSaveAsReusableModal && (
-        <SaveAsReusableBlockModal
-          blocks={selectedBlocks}
-          onSave={handleReusableBlockSaved}
-          onClose={() => setShowSaveAsReusableModal(false)}
-        />
-      )}
+      <SaveAsReusableBlockModal
+        isOpen={showSaveAsReusableModal}
+        selectedBlocks={selectedBlocks}
+        onSaved={handleReusableBlockSaved}
+        onClose={() => setShowSaveAsReusableModal(false)}
+      />
       
       {showBlockPatternsBrowser && (
-        <BlockPatternsBrowser
-          onSelect={handleInsertBlockPattern}
-          onClose={() => setShowBlockPatternsBrowser(false)}
-        />
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Block Patterns</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowBlockPatternsBrowser(false)}
+              >
+                ×
+              </Button>
+            </div>
+            <div className="p-4 overflow-auto max-h-[calc(90vh-120px)]">
+              <BlockPatternsBrowser
+                onInsertPattern={handleInsertBlockPattern}
+                compact={false}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

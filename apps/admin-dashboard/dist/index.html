@@ -9,177 +9,19 @@
       // React 19 Compatibility - Initialize global React before any modules load
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || {};
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled = false;
-      
-      // Pre-initialize React placeholders for WordPress
-      // This ensures WordPress modules don't fail when accessing React before it's loaded
-      window.React = window.React || {
-        createElement: function() { 
-          console.warn('React.createElement called before React loaded');
-          return null;
-        },
-        createContext: function(defaultValue) {
-          console.warn('React.createContext called before React loaded');
-          const context = { 
-            _currentValue: defaultValue,
-            Provider: function(props) { return props.children || null; }, 
-            Consumer: function(props) { return props.children ? props.children(defaultValue) : null; },
-            displayName: 'Context'
-          };
-          return context;
-        },
-        Component: function() {},
-        PureComponent: function() {},
-        Fragment: Symbol.for('react.fragment'),
-        StrictMode: Symbol.for('react.strict_mode'),
-        useState: function() { return [null, function() {}]; },
-        useEffect: function() {},
-        useContext: function() { return null; },
-        useCallback: function(fn) { return fn; },
-        useMemo: function(fn) { return fn(); },
-        useRef: function() { return { current: null }; },
-        forwardRef: function(fn) { return fn; },
-        memo: function(fn) { return fn; },
-        lazy: function(fn) { return fn; },
-        Suspense: function() { return null; },
-        Children: {
-          map: function() { return []; },
-          forEach: function() {},
-          count: function() { return 0; },
-          toArray: function() { return []; },
-          only: function(c) { return c; }
-        }
-      };
-      
-      window.ReactDOM = window.ReactDOM || {
-        render: function() {},
-        createRoot: function() { return { render: function() {} }; },
-        unmountComponentAtNode: function() {},
-        findDOMNode: function() { return null; }
-      };
     </script>
-    <script>
-      // Initialize WordPress global object BEFORE page load
-      window.wp = window.wp || {};
-      
-      // Pre-create all WordPress module namespaces to prevent initialization errors
-      window.wp.hooks = window.wp.hooks || {};
-      window.wp.i18n = window.wp.i18n || {};
-      window.wp.data = window.wp.data || {};
-      window.wp.element = window.wp.element || {};
-      window.wp.blocks = window.wp.blocks || {};
-      window.wp.components = window.wp.components || {};
-      window.wp.blockEditor = window.wp.blockEditor || {};
-      window.wp.privateApis = window.wp.privateApis || {};
-      window.wp.compose = window.wp.compose || {};
-      window.wp.apiFetch = window.wp.apiFetch || function() { return Promise.resolve(); };
-      
-      // Initialize private APIs to prevent initialization errors
-      window.wp.privateApis.lock = () => {};
-      window.wp.privateApis.unlock = () => {};
-      
-      window.wp.domReady = window.wp.domReady || function(fn) {
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', fn);
-        } else {
-          fn();
-        }
-      };
-    </script>
-    <script type="module" crossorigin src="/assets/index-CPWclHhy.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-BkLtITBR.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-D_7XgcHg.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-monaco-cpVGocfO.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CPLvoCm3.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-query-BtistrhA.js">
+    <script type="module" crossorigin src="/assets/index-C-wyiE3c.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-ui-CrFdsnXa.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-query-LYSOqK5P.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-D-spY-QM.js">
+    <link rel="modulepreload" crossorigin href="/assets/page-template-editor-C7FodHrK.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-monaco-BxJH8uUv.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-BQ6HOJoh.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-socket-CMcZe9fK.js">
+    <link rel="stylesheet" crossorigin href="/assets/wp-misc-tzKQ2IyL.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BmuPEP2D.css">
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      // WordPress polyfill - Additional initialization after DOM is ready
-      (function() {
-        window.wp = window.wp || {};
-        
-        // Pre-initialize i18n to prevent circular reference
-        window.wp.i18n = window.wp.i18n || {
-          __: (text) => text,
-          _x: (text) => text,
-          _n: (single, plural, number) => number === 1 ? single : plural,
-          _nx: (single, plural, number) => number === 1 ? single : plural,
-          sprintf: (format, ...args) => {
-            let i = 0;
-            return format.replace(/%[sdjf]/g, () => String(args[i++]));
-          },
-          isRTL: () => false,
-          setLocaleData: () => {},
-          getLocaleData: () => ({}),
-          hasTranslation: () => false,
-          subscribe: () => () => {}
-        };
-        
-        // Initialize hooks (needed by other WP modules)
-        const filters = {};
-        const actions = {};
-        
-        window.wp.hooks = {
-          addFilter: (hookName, namespace, callback, priority = 10) => {
-            filters[hookName] = filters[hookName] || [];
-            filters[hookName].push(callback);
-          },
-          applyFilters: (hookName, value, ...args) => {
-            const callbacks = filters[hookName] || [];
-            return callbacks.reduce((val, callback) => callback(val, ...args), value);
-          },
-          addAction: (hookName, namespace, callback, priority = 10) => {
-            actions[hookName] = actions[hookName] || [];
-            actions[hookName].push(callback);
-          },
-          doAction: (hookName, ...args) => {
-            const callbacks = actions[hookName] || [];
-            callbacks.forEach(callback => callback(...args));
-          },
-          removeFilter: () => 0,
-          removeAction: () => 0,
-          hasFilter: () => false,
-          hasAction: () => false,
-          removeAllFilters: () => 0,
-          removeAllActions: () => 0,
-          currentFilter: () => null,
-          currentAction: () => null,
-          doingFilter: () => false,
-          doingAction: () => false,
-          didFilter: () => 0,
-          didAction: () => 0
-        };
-        
-        // Initialize other core WP modules to prevent initialization errors
-        window.wp.data = window.wp.data || {
-          select: () => ({}),
-          dispatch: () => ({}),
-          subscribe: () => () => {},
-          registerStore: () => {}
-        };
-        
-        window.wp.element = window.wp.element || {
-          createElement: () => null,
-          render: () => null
-        };
-        
-        window.wp.blocks = window.wp.blocks || {
-          registerBlockType: () => {},
-          getCategories: () => [],
-          setCategories: () => {}
-        };
-        
-        window.wp.domReady = window.wp.domReady || ((callback) => {
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', callback);
-          } else {
-            callback();
-          }
-        });
-        
-        // All WordPress polyfills initialized successfully
-      })();
-    </script>
   </body>
 </html>

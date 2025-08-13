@@ -5,6 +5,8 @@
  * not included in the main bundle at all.
  */
 
+import { initializeWordPress } from './wordpress-initializer';
+
 let wpModulesCache: any = null;
 
 export interface WordPressModules {
@@ -29,15 +31,17 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
   }
 
   try {
-    // Ensure React is ready first
+    // Initialize WordPress polyfills first
+    await initializeWordPress();
+    
+    // Ensure React is ready
     if (!window.React) {
       throw new Error('React must be loaded before WordPress modules');
     }
 
-    // Load WordPress modules in parallel
+    // Load core modules first (smaller chunks)
     const [
       blocks,
-      blockEditor,
       components,
       element,
       data,
@@ -47,7 +51,6 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
       apiFetch
     ] = await Promise.all([
       import(/* webpackChunkName: "wp-blocks" */ '@wordpress/blocks'),
-      import(/* webpackChunkName: "wp-block-editor" */ '@wordpress/block-editor'),
       import(/* webpackChunkName: "wp-components" */ '@wordpress/components'),
       import(/* webpackChunkName: "wp-element" */ '@wordpress/element'),
       import(/* webpackChunkName: "wp-data" */ '@wordpress/data'),
@@ -56,6 +59,10 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
       import(/* webpackChunkName: "wp-compose" */ '@wordpress/compose'),
       import(/* webpackChunkName: "wp-api-fetch" */ '@wordpress/api-fetch')
     ]);
+
+    // Load block editor separately using optimized loader
+    const { loadMinimalBlockEditor } = await import('./wordpress-block-loader');
+    const blockEditor = await loadMinimalBlockEditor();
 
     wpModulesCache = {
       blocks,

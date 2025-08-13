@@ -1,0 +1,20 @@
+/**
+ * Media Blocks - For multimedia content
+ * Lazy loaded when needed
+ */
+
+// Media blocks are built-in to WordPress
+// This module is for future custom media blocks
+
+export function registerMediaBlocks() {
+  if (!window.wp?.blocks) {
+    console.warn('WordPress blocks API not available');
+    return;
+  }
+
+  // Media blocks like gallery, video, audio, file
+  // are registered automatically by WordPress
+  console.log('Media blocks loaded');
+}
+
+export default registerMediaBlocks;
