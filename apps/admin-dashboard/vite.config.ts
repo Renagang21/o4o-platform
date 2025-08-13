@@ -157,12 +157,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
                   id.includes('image-editor')) {
                 return 'wp-block-editor-media';
               }
-              // 컬러 및 테마
+              // 컬러 및 테마 - 다른 모듈과 병합하여 초기화 문제 해결
               if (id.includes('colors') || 
                   id.includes('color-palette') ||
                   id.includes('color-picker') ||
                   id.includes('gradient')) {
-                return 'wp-block-editor-colors';
+                return 'wp-block-editor-misc';  // colors를 misc에 병합
               }
               // 타이포그래피
               if (id.includes('font') || 
