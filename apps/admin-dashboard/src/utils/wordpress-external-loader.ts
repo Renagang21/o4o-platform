@@ -208,6 +208,44 @@ function initializeWordPressPolyfill() {
       }
     };
   }
+
+  // privateApis polyfill - WordPress의 private API 시스템
+  if (!window.wp.privateApis) {
+    window.wp.privateApis = {
+      lock: (key: string, module: string) => {
+        // Private API lock 메커니즘
+        return (target: any) => target;
+      },
+      unlock: (key: string) => {
+        // Private API unlock 메커니즘
+        return (target: any) => target;
+      }
+    };
+  }
+
+  // compose polyfill
+  if (!window.wp.compose) {
+    window.wp.compose = {
+      compose: (...funcs: Function[]) => (component: any) => 
+        funcs.reduceRight((acc, func) => func(acc), component),
+      withState: () => (component: any) => component,
+      withInstanceId: () => (component: any) => component,
+      createHigherOrderComponent: (mapComponent: Function) => mapComponent,
+    };
+  }
+
+  // apiFetch polyfill
+  if (!window.wp.apiFetch) {
+    window.wp.apiFetch = (options: any) => {
+      return fetch(options.url || options.path, {
+        method: options.method || 'GET',
+        headers: options.headers || {},
+        body: options.body ? JSON.stringify(options.body) : undefined,
+      }).then(res => res.json());
+    };
+    window.wp.apiFetch.use = () => {};
+    window.wp.apiFetch.setFetchHandler = () => {};
+  }
 }
 
 /**

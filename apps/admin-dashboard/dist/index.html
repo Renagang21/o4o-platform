@@ -22,6 +22,14 @@
       window.wp.blocks = window.wp.blocks || {};
       window.wp.components = window.wp.components || {};
       window.wp.blockEditor = window.wp.blockEditor || {};
+      window.wp.privateApis = window.wp.privateApis || {};
+      window.wp.compose = window.wp.compose || {};
+      window.wp.apiFetch = window.wp.apiFetch || function() { return Promise.resolve(); };
+      
+      // Initialize private APIs to prevent initialization errors
+      window.wp.privateApis.lock = () => {};
+      window.wp.privateApis.unlock = () => {};
+      
       window.wp.domReady = window.wp.domReady || function(fn) {
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', fn);
@@ -30,11 +38,11 @@
         }
       };
     </script>
-    <script type="module" crossorigin src="/assets/index-CrAP9qP2.js"></script>
+    <script type="module" crossorigin src="/assets/index-BeB3M7dW.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-ui-BkLtITBR.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-monaco-cpVGocfO.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-k21L8gyu.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-query-D5rBm9N_.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CFXBKh8N.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-query-D0j4d4-i.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-utils-DQ8F5vJI.js">
   </head>
   <body>

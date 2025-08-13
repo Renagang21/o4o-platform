@@ -22,6 +22,14 @@
       window.wp.blocks = window.wp.blocks || {};
       window.wp.components = window.wp.components || {};
       window.wp.blockEditor = window.wp.blockEditor || {};
+      window.wp.privateApis = window.wp.privateApis || {};
+      window.wp.compose = window.wp.compose || {};
+      window.wp.apiFetch = window.wp.apiFetch || function() { return Promise.resolve(); };
+      
+      // Initialize private APIs to prevent initialization errors
+      window.wp.privateApis.lock = () => {};
+      window.wp.privateApis.unlock = () => {};
+      
       window.wp.domReady = window.wp.domReady || function(fn) {
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', fn);

@@ -101,30 +101,38 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           if (id.includes('node_modules')) {
             // WordPress 패키지들을 개별 청크로 더 세분화
             if (id.includes('@wordpress')) {
-              // 핵심 WordPress 패키지들
-              if (id.includes('@wordpress/element') || id.includes('@wordpress/hooks')) {
+              // 가장 기본이 되는 패키지들 - 다른 모든 WP 패키지가 의존
+              if (id.includes('@wordpress/element') || 
+                  id.includes('@wordpress/hooks') || 
+                  id.includes('@wordpress/compose') ||
+                  id.includes('@wordpress/private-apis')) {
                 return 'wp-core';
               }
-              // i18n 관련
+              // i18n은 독립적
               if (id.includes('@wordpress/i18n')) {
                 return 'wp-i18n';
               }
-              // 블록 에디터 관련 - 더 세분화
-              if (id.includes('@wordpress/block-editor')) {
-                return 'wp-block-editor';
+              // data는 core에 의존하지만 독립적으로 로드 가능
+              if (id.includes('@wordpress/data') || id.includes('@wordpress/redux-routine')) {
+                return 'wp-data';
               }
+              // api-fetch는 data와 분리
+              if (id.includes('@wordpress/api-fetch')) {
+                return 'wp-api';
+              }
+              // 블록 관련 - data에 의존
               if (id.includes('@wordpress/blocks')) {
                 return 'wp-blocks-core';
               }
-              // 컴포넌트 관련
+              // 컴포넌트 관련 - element/hooks에 의존
               if (id.includes('@wordpress/components')) {
                 return 'wp-components';
               }
-              // 데이터 관련
-              if (id.includes('@wordpress/data') || id.includes('@wordpress/api-fetch')) {
-                return 'wp-data';
+              // 블록 에디터 - 모든 것에 의존
+              if (id.includes('@wordpress/block-editor')) {
+                return 'wp-block-editor';
               }
-              // 기타 WordPress 패키지
+              // 기타 WordPress 패키지들
               return 'wp-misc';
             }
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
