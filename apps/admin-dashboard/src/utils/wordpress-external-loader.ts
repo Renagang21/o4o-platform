@@ -18,6 +18,27 @@ let wordPressLoadPromise: Promise<void> | null = null;
 let isWordPressLoaded = false;
 
 /**
+ * React가 로드될 때까지 대기
+ */
+async function waitForReact(): Promise<void> {
+  // React가 이미 로드되었는지 확인
+  if (window.React?.createElement && window.React?.createContext) {
+    return;
+  }
+
+  // React 로드 대기 (최대 5초)
+  const maxAttempts = 50;
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    if (window.React?.createElement && window.React?.createContext) {
+      return;
+    }
+  }
+
+  console.warn('React not loaded after 5 seconds, WordPress polyfill may not work correctly');
+}
+
+/**
  * WordPress 스크립트 동적 로드
  */
 export async function loadWordPressScripts(): Promise<void> {
@@ -30,7 +51,10 @@ export async function loadWordPressScripts(): Promise<void> {
     return Promise.resolve();
   }
 
-  wordPressLoadPromise = new Promise((resolve) => {
+  wordPressLoadPromise = new Promise(async (resolve) => {
+    // React 로드 대기
+    await waitForReact();
+
     // WordPress가 이미 로드되었는지 확인
     if (window.wp?.element && window.wp?.blocks) {
       isWordPressLoaded = true;
@@ -61,17 +85,18 @@ function initializeWordPressPolyfill() {
 
   // React 19와 호환되는 element polyfill
   if (!window.wp.element) {
+    // React가 로드될 때까지 지연된 접근자 사용
     window.wp.element = {
-      createElement: window.React?.createElement,
-      createContext: window.React?.createContext,
-      useContext: window.React?.useContext,
-      useState: window.React?.useState,
-      useEffect: window.React?.useEffect,
-      useCallback: window.React?.useCallback,
-      useMemo: window.React?.useMemo,
-      useRef: window.React?.useRef,
-      Component: window.React?.Component,
-      Fragment: window.React?.Fragment,
+      get createElement() { return window.React?.createElement; },
+      get createContext() { return window.React?.createContext; },
+      get useContext() { return window.React?.useContext; },
+      get useState() { return window.React?.useState; },
+      get useEffect() { return window.React?.useEffect; },
+      get useCallback() { return window.React?.useCallback; },
+      get useMemo() { return window.React?.useMemo; },
+      get useRef() { return window.React?.useRef; },
+      get Component() { return window.React?.Component; },
+      get Fragment() { return window.React?.Fragment; },
     };
   }
 

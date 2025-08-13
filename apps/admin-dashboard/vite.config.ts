@@ -76,8 +76,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       resolveDependencies: (filename, deps, { hostId, hostType }) => {
         // WordPress 관련 청크는 modulepreload에서 제외
         return deps.filter(dep => 
-          !dep.includes('wp-all') && 
-          !dep.includes('wp-lazy') && 
+          !dep.includes('wp-') && 
           !dep.includes('page-gutenberg') &&
           !dep.includes('@wordpress')
         )
@@ -93,9 +92,30 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           if (sharedChunk) return sharedChunk;
           
           if (id.includes('node_modules')) {
-            // WordPress 패키지들을 별도 청크로 분리 (초기 로드에서 제외)
+            // WordPress 패키지들을 개별 청크로 더 세분화
             if (id.includes('@wordpress')) {
-              return 'wp-lazy'; // 지연 로드용 청크
+              // 핵심 WordPress 패키지들
+              if (id.includes('@wordpress/element') || id.includes('@wordpress/hooks')) {
+                return 'wp-core';
+              }
+              // i18n 관련
+              if (id.includes('@wordpress/i18n')) {
+                return 'wp-i18n';
+              }
+              // 블록 에디터 관련
+              if (id.includes('@wordpress/block-editor') || id.includes('@wordpress/blocks')) {
+                return 'wp-blocks';
+              }
+              // 컴포넌트 관련
+              if (id.includes('@wordpress/components')) {
+                return 'wp-components';
+              }
+              // 데이터 관련
+              if (id.includes('@wordpress/data') || id.includes('@wordpress/api-fetch')) {
+                return 'wp-data';
+              }
+              // 기타 WordPress 패키지
+              return 'wp-misc';
             }
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {
