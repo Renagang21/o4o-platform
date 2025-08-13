@@ -51,24 +51,24 @@ export async function loadWordPressScripts(): Promise<void> {
     return Promise.resolve();
   }
 
-  wordPressLoadPromise = new Promise(async (resolve) => {
-    // React 로드 대기
-    await waitForReact();
+  wordPressLoadPromise = new Promise((resolve) => {
+    // React 로드 대기 후 WordPress 초기화
+    waitForReact().then(() => {
+      // WordPress가 이미 로드되었는지 확인
+      if (window.wp?.element && window.wp?.blocks) {
+        isWordPressLoaded = true;
+        resolve();
+        return;
+      }
 
-    // WordPress가 이미 로드되었는지 확인
-    if (window.wp?.element && window.wp?.blocks) {
+      // WordPress polyfill 초기화
+      initializeWordPressPolyfill();
+
+      // 실제 WordPress 사용 시에는 CDN이나 로컬 스크립트 로드
+      // 현재는 polyfill만 사용
       isWordPressLoaded = true;
       resolve();
-      return;
-    }
-
-    // WordPress polyfill 초기화
-    initializeWordPressPolyfill();
-
-    // 실제 WordPress 사용 시에는 CDN이나 로컬 스크립트 로드
-    // 현재는 polyfill만 사용
-    isWordPressLoaded = true;
-    resolve();
+    });
   });
 
   return wordPressLoadPromise;
