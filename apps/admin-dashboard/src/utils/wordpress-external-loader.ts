@@ -212,11 +212,11 @@ function initializeWordPressPolyfill() {
   // privateApis polyfill - WordPress의 private API 시스템
   if (!window.wp.privateApis) {
     window.wp.privateApis = {
-      lock: (key: string, module: string) => {
+      lock: (_key: string, _module: string) => {
         // Private API lock 메커니즘
         return (target: any) => target;
       },
-      unlock: (key: string) => {
+      unlock: (_key: string) => {
         // Private API unlock 메커니즘
         return (target: any) => target;
       }
