@@ -51,29 +51,6 @@ const blockStyles = `
     }
   }
   
-  /* Cover Block Styles */
-  .o4o-cover-block {
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  
-  .o4o-cover-block.is-dark {
-    color: #ffffff;
-  }
-  
-  .o4o-cover-block.is-light {
-    color: #000000;
-  }
-  
-  .o4o-cover-block__overlay {
-    transition: opacity 0.3s ease;
-  }
-  
-  .o4o-cover-block__content {
-    text-align: center;
-  }
-  
   /* InnerBlocks Styles */
   .block-editor-inner-blocks {
     height: 100%;
@@ -124,8 +101,7 @@ export function initializeCustomBlocks() {
     // console.log('Custom blocks initialized:', [
     //   'o4o/group',
     //   'o4o/columns',
-    //   'o4o/column',
-    //   'o4o/cover'
+    //   'o4o/column'
     // ]);
   });
 }
@@ -133,6 +109,5 @@ export function initializeCustomBlocks() {
 // Export block names for use in allowed blocks lists
 export const CUSTOM_BLOCKS = [
   'o4o/group',
-  'o4o/columns',
-  'o4o/cover'
+  'o4o/columns'
 ];

@@ -8,8 +8,7 @@
 // Map of block names to their import functions
 const blockImportMap = {
   'o4o/group': () => import('./group'),
-  'o4o/columns': () => import('./columns'),
-  'o4o/cover': () => import('./cover')
+  'o4o/columns': () => import('./columns')
 };
 
 // Track loaded blocks

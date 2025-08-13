@@ -60,7 +60,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/auth-client', 
       '@o4o/auth-context'
     ],
-    exclude: [],
+    exclude: [
+      '@wordpress/blocks',
+      '@wordpress/block-editor',
+      '@wordpress/components',
+      '@wordpress/element',
+      '@wordpress/data',
+      '@wordpress/i18n'
+    ],
     esbuildOptions: {
       define: {
         global: 'globalThis',
@@ -102,9 +109,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
               if (id.includes('@wordpress/i18n')) {
                 return 'wp-i18n';
               }
-              // 블록 에디터 관련
-              if (id.includes('@wordpress/block-editor') || id.includes('@wordpress/blocks')) {
-                return 'wp-blocks';
+              // 블록 에디터 관련 - 더 세분화
+              if (id.includes('@wordpress/block-editor')) {
+                return 'wp-block-editor';
+              }
+              if (id.includes('@wordpress/blocks')) {
+                return 'wp-blocks-core';
               }
               // 컴포넌트 관련
               if (id.includes('@wordpress/components')) {
@@ -129,6 +139,20 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             if (id.includes('socket.io')) {
               return 'vendor-socket';
             }
+          }
+          
+          // 블록별 청크 분리 - Cover, Group, Columns 등 큰 블록들
+          if (id.includes('blocks/cover')) {
+            return 'block-cover';
+          }
+          if (id.includes('blocks/group')) {
+            return 'block-group';
+          }
+          if (id.includes('blocks/columns')) {
+            return 'block-columns';
+          }
+          if (id.includes('blocks/cpt-acf-loop')) {
+            return 'block-cpt-loop';
           }
           
           // 페이지별 청크 분리
