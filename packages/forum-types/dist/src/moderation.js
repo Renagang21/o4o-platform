@@ -1,0 +1,19 @@
+export var ModerationType;
+(function (ModerationType) {
+    // Post/Comment actions
+    ModerationType["APPROVE"] = "approve";
+    ModerationType["REJECT"] = "reject";
+    ModerationType["LOCK"] = "lock";
+    ModerationType["UNLOCK"] = "unlock";
+    ModerationType["PIN"] = "pin";
+    ModerationType["UNPIN"] = "unpin";
+    ModerationType["DELETE"] = "delete";
+    ModerationType["RESTORE"] = "restore";
+    ModerationType["EDIT"] = "edit";
+    // User actions
+    ModerationType["WARN"] = "warn";
+    ModerationType["MUTE"] = "mute";
+    ModerationType["UNMUTE"] = "unmute";
+    ModerationType["BAN"] = "ban";
+    ModerationType["UNBAN"] = "unban";
+})(ModerationType || (ModerationType = {}));

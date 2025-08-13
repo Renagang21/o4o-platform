@@ -3,6 +3,13 @@
  * Import and register all custom blocks for the WordPress editor
  */
 
+// Global interface declaration for WordPress
+declare global {
+  interface Window {
+    wp?: any;
+  }
+}
+
 // Custom block types are dynamically loaded via lazy.ts to improve performance
 
 // Additional block styles

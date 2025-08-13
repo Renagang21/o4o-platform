@@ -31,6 +31,23 @@ declare global {
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION__?: any
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: any
+    React?: any;
+    wp?: {
+      [key: string]: any;
+      element?: any;
+      blocks?: any;
+      blockEditor?: any;
+      components?: any;
+      i18n?: any;
+      hooks?: any;
+      data?: any;
+      compose?: any;
+      keycodes?: any;
+      domReady?: ((callback: () => void) => void) | undefined;
+      richText?: any;
+      formatLibrary?: any;
+      editor?: any;
+    };
   }
 }
 

@@ -35,7 +35,6 @@
   },
   "include": [
     "src",
-    "vite-env.d.ts",
     "../../packages/auth-context/src/**/*",
     "../../packages/auth-client/src/**/*",
     "../../packages/types/src/**/*",

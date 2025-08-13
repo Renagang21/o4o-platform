@@ -6,6 +6,13 @@
  * This prevents circular dependency issues.
  */
 
+// Global interface declaration for WordPress
+declare global {
+  interface Window {
+    wp?: any;
+  }
+}
+
 // Create a simple hooks implementation to avoid circular dependencies
 const createHooks = () => {
   const filters: Record<string, any[]> = {};

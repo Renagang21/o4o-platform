@@ -48,7 +48,7 @@ interface EcommerceTemplateProps {
 }
 
 // Product Card Template - Modern ecommerce card
-// @ts-ignore: Unused parameters are prefixed with underscore intentionally
+// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductCardTemplate = ({
   post,
   showAddToCart = true,
@@ -93,15 +93,7 @@ export const ProductCardTemplate = ({
           
           {/* Quick Actions */}
           <div className="o4o-product-card__actions">
-            {false && (
-              <button
-                className="o4o-product-card__action o4o-product-card__action--quickview"
-                onClick={() => {/* TODO: Implement quick view */}}
-                aria-label={'Quick View'}
-              >
-                👁️
-              </button>
-            )}
+            {/* TODO: Implement quick view functionality */}
           </div>
         </div>
 
@@ -185,7 +177,7 @@ export const ProductCardTemplate = ({
 };
 
 // Product Grid Template - Compact grid layout
-// @ts-ignore: Unused parameters are prefixed with underscore intentionally
+// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductGridTemplate = ({
   post,
   showAddToCart = true,
@@ -263,7 +255,7 @@ export const ProductGridTemplate = ({
 };
 
 // Product List Template - Detailed list view
-// @ts-ignore: Unused parameters are prefixed with underscore intentionally
+// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductListTemplate = ({
   post,
   showAddToCart = true,
@@ -378,14 +370,7 @@ export const ProductListTemplate = ({
           </div>
 
           <div className="o4o-product-list__buttons">
-            {false && (
-              <button
-                className="o4o-product-list__button o4o-product-list__button--quickview"
-                onClick={() => {/* TODO: Implement quick view */}}
-              >
-                {'Quick View'}
-              </button>
-            )}
+            {/* TODO: Implement quick view functionality */}
             
             {showAddToCart && (
               <button
@@ -405,7 +390,7 @@ export const ProductListTemplate = ({
 };
 
 // Product Showcase Template - Premium display
-// @ts-ignore: Unused parameters are prefixed with underscore intentionally
+// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductShowcaseTemplate = ({
   post,
   showAddToCart = true,

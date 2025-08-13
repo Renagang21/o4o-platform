@@ -8,6 +8,13 @@ import metadata from './block.json';
 import Edit from './edit';
 import save from './save';
 
+// Global interface declaration for WordPress
+declare global {
+  interface Window {
+    wp?: any;
+  }
+}
+
 // Lazy registration to ensure WordPress polyfill is loaded
 export const registerCPTACFLoop = () => {
   // Wait for WordPress to be available

@@ -5,6 +5,13 @@
 
 import { Group } from 'lucide-react';
 
+// Global interface declaration for WordPress
+declare global {
+  interface Window {
+    wp?: any;
+  }
+}
+
 // Block attributes
 interface GroupBlockAttributes {
   align?: 'left' | 'center' | 'right' | 'wide' | 'full';

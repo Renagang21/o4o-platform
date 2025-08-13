@@ -5,23 +5,11 @@
  * CDN이나 로컬 스크립트로 WordPress 모듈을 로드
  */
 
+// Global interface declaration for WordPress
 declare global {
   interface Window {
-    wp: {
-      element?: any;
-      blocks?: any;
-      blockEditor?: any;
-      components?: any;
-      i18n?: any;
-      hooks?: any;
-      data?: any;
-      compose?: any;
-      keycodes?: any;
-      domReady?: any;
-      richText?: any;
-      formatLibrary?: any;
-      editor?: any;
-    };
+    wp?: any;
+    React?: any;
   }
 }
 
@@ -42,7 +30,7 @@ export async function loadWordPressScripts(): Promise<void> {
     return Promise.resolve();
   }
 
-  wordPressLoadPromise = new Promise((resolve, reject) => {
+  wordPressLoadPromise = new Promise((resolve) => {
     // WordPress가 이미 로드되었는지 확인
     if (window.wp?.element && window.wp?.blocks) {
       isWordPressLoaded = true;
@@ -111,7 +99,7 @@ function initializeWordPressPolyfill() {
     const actions: Record<string, Function[]> = {};
     
     window.wp.hooks = {
-      addFilter: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+      addFilter: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
         filters[hookName] = filters[hookName] || [];
         filters[hookName].push(callback);
       },
@@ -119,7 +107,7 @@ function initializeWordPressPolyfill() {
         const callbacks = filters[hookName] || [];
         return callbacks.reduce((val, callback) => callback(val, ...args), value);
       },
-      addAction: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+      addAction: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
         actions[hookName] = actions[hookName] || [];
         actions[hookName].push(callback);
       },

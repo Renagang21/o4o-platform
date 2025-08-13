@@ -5,6 +5,13 @@
  * WordPress 패키지들이 기대하는 전역 객체들을 미리 설정
  */
 
+// Global interface declaration for WordPress
+declare global {
+  interface Window {
+    wp?: any;
+  }
+}
+
 // WordPress i18n polyfill - 다국어 지원
 export function initWordPressI18n() {
   if (typeof window === 'undefined') return;
@@ -143,22 +150,6 @@ export function initWordPress() {
   // console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
 }
 
-// TypeScript 타입 정의
-declare global {
-  interface Window {
-    wp: {
-      i18n?: any;
-      data?: any;
-      hooks?: any;
-      domReady?: (callback: () => void) => void;
-      element?: any;
-      blocks?: any;
-      blockEditor?: any;
-      components?: any;
-      compose?: any;
-      [key: string]: any;
-    };
-  }
-}
+// TypeScript types for Window.wp are defined in vite-env.d.ts
 
 export default initWordPress;

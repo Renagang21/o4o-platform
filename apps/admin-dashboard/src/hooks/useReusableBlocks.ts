@@ -5,6 +5,13 @@
 
 import { useState, useCallback } from 'react';
 
+// Global interface declaration for WordPress
+declare global {
+  interface Window {
+    wp?: any;
+  }
+}
+
 interface ReusableBlock {
   id: string;
   title: string;
