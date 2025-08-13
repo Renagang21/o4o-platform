@@ -48,7 +48,6 @@ interface EcommerceTemplateProps {
 }
 
 // Product Card Template - Modern ecommerce card
-// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductCardTemplate = ({
   post,
   showAddToCart = true,
@@ -177,7 +176,6 @@ export const ProductCardTemplate = ({
 };
 
 // Product Grid Template - Compact grid layout
-// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductGridTemplate = ({
   post,
   showAddToCart = true,
@@ -255,7 +253,6 @@ export const ProductGridTemplate = ({
 };
 
 // Product List Template - Detailed list view
-// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductListTemplate = ({
   post,
   showAddToCart = true,
@@ -390,7 +387,6 @@ export const ProductListTemplate = ({
 };
 
 // Product Showcase Template - Premium display
-// @ts-expect-error: Unused parameters are prefixed with underscore intentionally
 export const ProductShowcaseTemplate = ({
   post,
   showAddToCart = true,
