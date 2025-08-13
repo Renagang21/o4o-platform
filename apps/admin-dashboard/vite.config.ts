@@ -71,6 +71,18 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     ...sharedViteConfig.build,
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
+    // modulepreload 설정 추가 - WordPress 청크 제외
+    modulePreload: {
+      resolveDependencies: (filename, deps, { hostId, hostType }) => {
+        // WordPress 관련 청크는 modulepreload에서 제외
+        return deps.filter(dep => 
+          !dep.includes('wp-all') && 
+          !dep.includes('wp-lazy') && 
+          !dep.includes('page-gutenberg') &&
+          !dep.includes('@wordpress')
+        )
+      }
+    },
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
       output: {
@@ -81,10 +93,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           if (sharedChunk) return sharedChunk;
           
           if (id.includes('node_modules')) {
-            // WordPress 패키지들을 하나의 청크로 묶어서 순환 참조 방지
+            // WordPress 패키지들을 별도 청크로 분리 (초기 로드에서 제외)
             if (id.includes('@wordpress')) {
-              // 모든 WordPress 패키지를 하나의 청크로 통합
-              return 'wp-all';
+              return 'wp-lazy'; // 지연 로드용 청크
             }
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {
