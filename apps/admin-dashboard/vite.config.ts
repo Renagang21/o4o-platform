@@ -84,7 +84,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
+        // Remove console methods in production
+        pure_funcs: ['console' + '.log', 'console' + '.info'],
       },
       mangle: {
         safari10: true,
