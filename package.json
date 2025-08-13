@@ -115,7 +115,6 @@
   "author": "O4O Platform Team",
   "license": "MIT",
   "dependencies": {
-    "2": "3.0.0",
     "@mui/icons-material": "7.3.1",
     "@mui/material": "7.3.1",
     "@radix-ui/react-alert-dialog": "1.1.14",
