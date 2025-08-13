@@ -93,11 +93,9 @@ class BlockManager {
           break;
         case 'widgets':
           // Widgets blocks will be implemented later
-          console.log('Widget blocks not yet implemented');
           break;
         case 'embeds':
           // Embed blocks will be implemented later
-          console.log('Embed blocks not yet implemented');
           break;
       }
 

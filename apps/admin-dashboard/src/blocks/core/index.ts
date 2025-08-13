@@ -14,7 +14,6 @@ export function registerCoreBlocks() {
 
   // Core blocks like paragraph, heading, list, image, quote
   // are registered automatically by WordPress
-  console.log('Core blocks loaded');
 }
 
 export default registerCoreBlocks;

@@ -14,7 +14,6 @@ export function registerMediaBlocks() {
 
   // Media blocks like gallery, video, audio, file
   // are registered automatically by WordPress
-  console.log('Media blocks loaded');
 }
 
 export default registerMediaBlocks;

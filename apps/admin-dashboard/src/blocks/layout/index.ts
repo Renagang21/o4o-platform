@@ -14,7 +14,6 @@ export function registerLayoutBlocks() {
 
   // Layout blocks like columns, group, separator, spacer
   // are registered automatically by WordPress
-  console.log('Layout blocks loaded');
 }
 
 export default registerLayoutBlocks;
