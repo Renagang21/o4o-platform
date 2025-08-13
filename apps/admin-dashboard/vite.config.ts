@@ -93,6 +93,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       ...sharedViteConfig.build?.rollupOptions,
       output: {
         ...sharedViteConfig.build?.rollupOptions?.output,
+        // Ensure proper loading order for WordPress modules
+        inlineDynamicImports: false,
         manualChunks: (id) => {
           // 공통 설정 먼저 적용
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);

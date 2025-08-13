@@ -9,6 +9,53 @@
       // React 19 Compatibility - Initialize global React before any modules load
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || {};
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled = false;
+      
+      // Pre-initialize React placeholders for WordPress
+      // This ensures WordPress modules don't fail when accessing React before it's loaded
+      window.React = window.React || {
+        createElement: function() { 
+          console.warn('React.createElement called before React loaded');
+          return null;
+        },
+        createContext: function(defaultValue) {
+          console.warn('React.createContext called before React loaded');
+          const context = { 
+            _currentValue: defaultValue,
+            Provider: function(props) { return props.children || null; }, 
+            Consumer: function(props) { return props.children ? props.children(defaultValue) : null; },
+            displayName: 'Context'
+          };
+          return context;
+        },
+        Component: function() {},
+        PureComponent: function() {},
+        Fragment: Symbol.for('react.fragment'),
+        StrictMode: Symbol.for('react.strict_mode'),
+        useState: function() { return [null, function() {}]; },
+        useEffect: function() {},
+        useContext: function() { return null; },
+        useCallback: function(fn) { return fn; },
+        useMemo: function(fn) { return fn(); },
+        useRef: function() { return { current: null }; },
+        forwardRef: function(fn) { return fn; },
+        memo: function(fn) { return fn; },
+        lazy: function(fn) { return fn; },
+        Suspense: function() { return null; },
+        Children: {
+          map: function() { return []; },
+          forEach: function() {},
+          count: function() { return 0; },
+          toArray: function() { return []; },
+          only: function(c) { return c; }
+        }
+      };
+      
+      window.ReactDOM = window.ReactDOM || {
+        render: function() {},
+        createRoot: function() { return { render: function() {} }; },
+        unmountComponentAtNode: function() {},
+        findDOMNode: function() { return null; }
+      };
     </script>
     <script>
       // Initialize WordPress global object BEFORE page load
@@ -38,12 +85,12 @@
         }
       };
     </script>
-    <script type="module" crossorigin src="/assets/index-BeB3M7dW.js"></script>
+    <script type="module" crossorigin src="/assets/index-CPWclHhy.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-ui-BkLtITBR.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-D_7XgcHg.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-monaco-cpVGocfO.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CFXBKh8N.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-query-D0j4d4-i.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-utils-DQ8F5vJI.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-CPLvoCm3.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-query-BtistrhA.js">
   </head>
   <body>
     <div id="root"></div>

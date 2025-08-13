@@ -94,7 +94,7 @@ const RolePermissions = lazy(() => import('@/pages/users/RolePermissions'));
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 const GutenbergPage = lazy(() => 
-  import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPage')
+  import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPageWrapped')
 );
 const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 

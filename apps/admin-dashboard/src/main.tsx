@@ -2,11 +2,33 @@ import './react-shim'; // React 19 compatibility - MUST be first
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import * as ReactDOMClient from 'react-dom/client'
+import * as ReactAll from 'react';
 
-// Make React globally available for WordPress modules
+// Replace placeholder React with real React
 if (typeof window !== 'undefined') {
-  window.React = React;
+  // Ensure React has all necessary properties
+  const ReactWithAll = Object.assign({}, React, ReactAll);
+  
+  // Override the placeholder with real React
+  window.React = ReactWithAll;
   window.ReactDOM = ReactDOMClient as any;
+  
+  // Also update wp.element if it exists
+  if (window.wp?.element) {
+    Object.assign(window.wp.element, {
+      createElement: ReactWithAll.createElement,
+      createContext: ReactWithAll.createContext,
+      useContext: ReactWithAll.useContext,
+      useState: ReactWithAll.useState,
+      useEffect: ReactWithAll.useEffect,
+      useCallback: ReactWithAll.useCallback,
+      useMemo: ReactWithAll.useMemo,
+      useRef: ReactWithAll.useRef,
+      Component: ReactWithAll.Component,
+      Fragment: ReactWithAll.Fragment,
+      Children: ReactWithAll.Children,
+    });
+  }
 }
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
