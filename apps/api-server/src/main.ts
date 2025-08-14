@@ -235,7 +235,7 @@ app.use(compression({
     return compression.filter(req, res);
   },
   level: 6, // Compression level (0-9, where 9 is best compression but slowest)
-}));
+}) as any);
 
 // CORS configuration for multiple origins
 const corsOptions: CorsOptions = {
@@ -370,7 +370,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Apply rate limiting to specific endpoints  
-app.use('/api/v1/auth/sso/check', ssoCheckLimiter);
+app.use('/api/v1/accounts/sso/check', ssoCheckLimiter);
 app.use('/api/public', publicLimiter);
 
 // API 라우트 - auth routes MUST be before general rate limiter

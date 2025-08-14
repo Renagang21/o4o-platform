@@ -372,7 +372,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 // Apply rate limiting to specific endpoints  
-app.use('/api/v1/auth/sso/check', ssoCheckLimiter);
+app.use('/api/v1/accounts/sso/check', ssoCheckLimiter);
 app.use('/api/public', publicLimiter);
 // API 라우트 - auth routes MUST be before general rate limiter
 // IMPORTANT: Basic auth routes must come FIRST before any other auth-related routes
