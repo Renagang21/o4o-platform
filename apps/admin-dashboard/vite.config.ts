@@ -128,86 +128,55 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
               id.includes('WordPressEditor') ||
               id.includes('GutenbergEditor') ||
               id.includes('blocks/') && !id.includes('node_modules')) {
-            // WordPress Block Editor - 단순화된 청킹 전략으로 초기화 문제 해결
+            
+            // WordPress 핵심 모듈들 (data, core, blocks)을 하나로 통합
+            // 이들은 서로 강하게 의존하므로 함께 로드되어야 초기화 문제가 없음
+            if (id.includes('@wordpress/data') ||
+                id.includes('@wordpress/redux-routine') ||
+                id.includes('@wordpress/element') || 
+                id.includes('@wordpress/hooks') || 
+                id.includes('@wordpress/compose') ||
+                id.includes('@wordpress/private-apis') ||
+                id.includes('@wordpress/blocks') ||
+                id.includes('@wordpress/api-fetch')) {
+              return 'wp-foundation';  // 핵심 기반 모듈 통합
+            }
+            
+            // UI 컴포넌트는 별도 청크로 유지 (크기가 크고 독립적)
+            if (id.includes('@wordpress/components')) {
+              return 'wp-components';
+            }
+            
+            // Block Editor도 별도 유지 (가장 크고 복잡함)
             if (id.includes('@wordpress/block-editor')) {
-              // Store와 핵심 상태 관리는 최우선
+              // Store와 utils는 분리 유지
               if (id.includes('store') || 
                   id.includes('reducer') || 
                   id.includes('actions') ||
                   id.includes('selectors')) {
                 return 'wp-block-editor-store';
               }
-              // 유틸리티와 기본 기능들은 두 번째 우선순위
               if (id.includes('utils') || 
                   id.includes('hooks') || 
                   id.includes('higher-order') ||
                   id.includes('hoc')) {
                 return 'wp-block-editor-utils';
               }
-              // 나머지 모든 블록 에디터 모듈을 하나로 통합
-              // 이렇게 하면 모듈 간 의존성과 초기화 순서 문제가 해결됨
               return 'wp-block-editor-main';
             }
-            if (id.includes('@wordpress/blocks')) {
-              return 'wp-blocks-core';
-            }
-            if (id.includes('@wordpress/components')) {
-              return 'wp-components';
-            }
-            if (id.includes('@wordpress/data')) {
-              return 'wp-data';
-            }
-            if (id.includes('@wordpress/element') || 
-                id.includes('@wordpress/hooks') || 
-                id.includes('@wordpress/compose')) {
-              return 'wp-core';
-            }
+            
+            // i18n은 작고 독립적이므로 별도 유지
             if (id.includes('@wordpress/i18n')) {
               return 'wp-i18n';
             }
-            if (id.includes('@wordpress/api-fetch')) {
-              return 'wp-api';
-            }
+            
+            // 기타 WordPress 패키지들
             return 'wp-misc';
           }
           
           if (id.includes('node_modules')) {
-            // WordPress 패키지들을 개별 청크로 더 세분화
-            if (id.includes('@wordpress')) {
-              // 가장 기본이 되는 패키지들 - 다른 모든 WP 패키지가 의존
-              if (id.includes('@wordpress/element') || 
-                  id.includes('@wordpress/hooks') || 
-                  id.includes('@wordpress/compose') ||
-                  id.includes('@wordpress/private-apis')) {
-                return 'wp-core';
-              }
-              // i18n은 독립적
-              if (id.includes('@wordpress/i18n')) {
-                return 'wp-i18n';
-              }
-              // data는 core에 의존하지만 독립적으로 로드 가능
-              if (id.includes('@wordpress/data') || id.includes('@wordpress/redux-routine')) {
-                return 'wp-data';
-              }
-              // api-fetch는 data와 분리
-              if (id.includes('@wordpress/api-fetch')) {
-                return 'wp-api';
-              }
-              // 블록 관련 - data에 의존
-              if (id.includes('@wordpress/blocks')) {
-                return 'wp-blocks-core';
-              }
-              // 컴포넌트 관련 - element/hooks에 의존
-              if (id.includes('@wordpress/components')) {
-                return 'wp-components';
-              }
-              // 블록 에디터 - 모든 것에 의존
-              if (id.includes('@wordpress/block-editor')) {
-                return 'wp-block-editor';
-              }
-              // 기타 WordPress 패키지들
-              return 'wp-misc';
-            }
+            // WordPress 패키지들은 위에서 이미 처리됨
+            // 중복 정의 제거
             // Tiptap 에디터 - 모든 Tiptap 패키지 분리
             if (id.includes('@tiptap')) {
               return 'vendor-tiptap';
