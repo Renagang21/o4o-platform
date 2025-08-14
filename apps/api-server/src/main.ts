@@ -261,6 +261,7 @@ const corsOptions: CorsOptions = {
       "https://signage.neture.co.kr",
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
+      "https://api.neture.co.kr", // API server itself
       // Add environment-defined origins
       ...envOrigins
     ];
@@ -271,18 +272,33 @@ const corsOptions: CorsOptions = {
       return;
     }
     
+    // Debug logging in development
+    if (process.env.NODE_ENV !== 'production' || process.env.DEBUG_CORS === 'true') {
+      console.log(`[CORS] Request from origin: ${origin}`);
+      console.log(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
+    }
+    
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.error(`[CORS] Blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+  maxAge: 86400, // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
+// Apply CORS before any other middleware
 app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
 
 // Add performance monitoring middleware early in the chain
 app.use(performanceMonitor);

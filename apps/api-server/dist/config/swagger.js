@@ -278,7 +278,7 @@ const options = {
 const swaggerSpec = (0, swagger_jsdoc_1.default)(options);
 const setupSwagger = (app) => {
     // Serve API docs
-    app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, {
+    app.use('/api-docs', ...swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, {
         customCss: '.swagger-ui .topbar { display: none }',
         customSiteTitle: 'O4O Platform API Documentation'
     }));

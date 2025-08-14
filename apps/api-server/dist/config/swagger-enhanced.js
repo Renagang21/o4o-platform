@@ -515,7 +515,7 @@ const setupSwagger = (app) => {
         // Add error codes documentation
         swaggerSpec['x-error-codes'] = errorCodes;
         // Serve Swagger UI
-        app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, swaggerUiOptions));
+        app.use('/api-docs', ...swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, swaggerUiOptions));
         // Serve OpenAPI JSON spec
         app.get('/api-docs.json', (req, res) => {
             res.setHeader('Content-Type', 'application/json');
