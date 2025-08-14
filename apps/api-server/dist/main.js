@@ -376,6 +376,15 @@ const ssoCheckLimiter = (0, express_rate_limit_1.default)({
     }
 });
 // 헬스체크 엔드포인트 (rate limit 전에 위치해야 함)
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        environment: process.env.NODE_ENV || 'development',
+        service: 'api-server'
+    });
+});
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
@@ -383,6 +392,21 @@ app.get('/api/health', (req, res) => {
         version: '1.0.0',
         environment: process.env.NODE_ENV || 'development',
         service: 'api-server'
+    });
+});
+// Additional health endpoints for specific services
+app.get('/api/auth/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        service: 'auth',
+        timestamp: new Date().toISOString()
+    });
+});
+app.get('/api/ecommerce/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        service: 'ecommerce',
+        timestamp: new Date().toISOString()
     });
 });
 // Apply rate limiting to specific endpoints  

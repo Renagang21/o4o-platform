@@ -1,1 +1,0 @@
-{"version":3,"file":"create-email-tokens-tables.d.ts","sourceRoot":"","sources":["../../src/migrations/create-email-tokens-tables.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,WAAW,EAAS,MAAM,SAAS,CAAC;AAEjE,qBAAa,oCAAqC,YAAW,kBAAkB;IAC7E,IAAI,SAA0C;IAEjC,EAAE,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;IAyG3C,IAAI,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;CAmB3D"}

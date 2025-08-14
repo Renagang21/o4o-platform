@@ -1,1 +1,0 @@
-{"version":3,"file":"formula.d.ts","sourceRoot":"","sources":["../../src/utils/formula.ts"],"names":[],"mappings":"AAGA,wBAAgB,gBAAgB,CAAC,OAAO,EAAE,MAAM,EAAE,IAAI,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,GAAG,MAAM,CAoCnF;AAGD,eAAO,MAAM,gBAAgB;qBAEV,MAAM,EAAE;qBAGR,MAAM,EAAE;qBAMR,MAAM,EAAE;qBAGR,MAAM,EAAE;mBAGV,MAAM,aAAY,MAAM;oBAMvB,OAAO,aAAa,MAAM,cAAc,MAAM;CAG/D,CAAC"}
