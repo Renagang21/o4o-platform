@@ -129,20 +129,11 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
               id.includes('GutenbergEditor') ||
               id.includes('blocks/') && !id.includes('node_modules')) {
             
-            // 모든 WordPress 패키지를 두 그룹으로만 분리:
-            // 1. wp-components - UI 컴포넌트 (독립적이고 크기가 큼)
-            // 2. wp-foundation - 나머지 모든 WordPress 모듈 (초기화 문제 해결)
-            
-            // UI 컴포넌트만 별도 유지
-            if (id.includes('@wordpress/components')) {
-              return 'wp-components';
-            }
-            
-            // 나머지 모든 WordPress 모듈을 하나로 통합
-            // block-editor, data, core, blocks, i18n, misc 등 모두 포함
-            // 이렇게 하면 모든 초기화 순서 문제가 해결됨
+            // 모든 WordPress 패키지를 단일 번들로 통합
+            // 초기화 순서 문제를 완전히 해결하기 위한 최종 솔루션
+            // components, block-editor, data, core, blocks, i18n 등 모든 것 포함
             if (id.includes('@wordpress')) {
-              return 'wp-foundation';
+              return 'wp-all';  // 모든 WordPress 모듈을 하나로
             }
           }
           
