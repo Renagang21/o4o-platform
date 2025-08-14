@@ -276,10 +276,10 @@ const swaggerSpec = swaggerJsdoc(options);
 
 export const setupSwagger = (app: Application) => {
   // Serve API docs
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  app.use('/api-docs', ...(swaggerUi.serve as any[]), swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'O4O Platform API Documentation'
-  }));
+  }) as any);
 
   // Serve OpenAPI JSON spec
   app.get('/api-docs.json', (req, res) => {

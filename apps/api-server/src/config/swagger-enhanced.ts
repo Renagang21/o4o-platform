@@ -538,8 +538,8 @@ export const setupSwagger = (app: Application) => {
     
     // Serve Swagger UI
     app.use('/api-docs', 
-      swaggerUi.serve, 
-      swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+      ...(swaggerUi.serve as any[]), 
+      swaggerUi.setup(swaggerSpec, swaggerUiOptions) as any
     );
     
     // Serve OpenAPI JSON spec

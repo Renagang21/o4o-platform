@@ -14,10 +14,10 @@ export function createTestApp(): express.Application {
     contentSecurityPolicy: false
   }));
   app.use(cors());
-  app.use(compression());
+  app.use(compression() as any);
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-  app.use(cookieParser());
+  app.use(cookieParser() as any);
 
   // Mock routes for testing
   app.get('/api/v1/content/posts', (req, res) => {
