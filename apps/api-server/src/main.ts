@@ -32,7 +32,7 @@ for (const envPath of possiblePaths) {
 }
 
 if (!envLoaded) {
-  console.warn('⚠️ No .env file found, using system environment variables');
+  // Warning: No .env file found, using system environment variables
 }
 
 // 환경변수 검증
@@ -51,6 +51,7 @@ import passport from './config/passport';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
+import logger from './utils/logger';
 
 // Database connection
 import { AppDataSource } from './database/connection';
@@ -60,7 +61,6 @@ import { errorHandler } from './middleware/errorHandler';
 import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
 import { startCrowdfundingSchedules } from './schedules/crowdfundingSchedule';
-import logger from './utils/simpleLogger';
 
 // Monitoring services
 import { backupService } from './services/BackupService';
@@ -274,14 +274,14 @@ const corsOptions: CorsOptions = {
     
     // Debug logging in development
     if (process.env.NODE_ENV !== 'production' || process.env.DEBUG_CORS === 'true') {
-      console.log(`[CORS] Request from origin: ${origin}`);
-      console.log(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
+      logger.debug(`[CORS] Request from origin: ${origin}`);
+      logger.debug(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
     }
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error(`[CORS] Blocked origin: ${origin}`);
+      logger.warn(`[CORS] Blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -459,7 +459,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    logger.error('Error fetching posts:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch posts'

@@ -68,7 +68,7 @@ for (const envPath of possiblePaths) {
     }
 }
 if (!envLoaded) {
-    console.warn('⚠️ No .env file found, using system environment variables');
+    // Warning: No .env file found, using system environment variables
 }
 // 환경변수 검증
 // console.log('🔧 Environment Configuration:');
@@ -85,6 +85,7 @@ const passport_1 = __importDefault(require("./config/passport"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const ioredis_1 = __importDefault(require("ioredis"));
+const logger_1 = __importDefault(require("./utils/logger"));
 // Database connection
 const connection_1 = require("./database/connection");
 const sessionSyncService_1 = require("./services/sessionSyncService");
@@ -93,7 +94,6 @@ const errorHandler_1 = require("./middleware/errorHandler");
 const performanceMonitor_1 = require("./middleware/performanceMonitor");
 const securityMiddleware_1 = require("./middleware/securityMiddleware");
 const crowdfundingSchedule_1 = require("./schedules/crowdfundingSchedule");
-const simpleLogger_1 = __importDefault(require("./utils/simpleLogger"));
 // Monitoring services
 const BackupService_1 = require("./services/BackupService");
 const ErrorAlertService_1 = require("./services/ErrorAlertService");
@@ -288,14 +288,14 @@ const corsOptions = {
         }
         // Debug logging in development
         if (process.env.NODE_ENV !== 'production' || process.env.DEBUG_CORS === 'true') {
-            console.log(`[CORS] Request from origin: ${origin}`);
-            console.log(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
+            logger_1.default.debug(`[CORS] Request from origin: ${origin}`);
+            logger_1.default.debug(`[CORS] Allowed: ${allowedOrigins.includes(origin)}`);
         }
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         }
         else {
-            console.error(`[CORS] Blocked origin: ${origin}`);
+            logger_1.default.warn(`[CORS] Blocked origin: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
@@ -453,7 +453,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error fetching posts:', error);
+        logger_1.default.error('Error fetching posts:', error);
         res.status(500).json({
             success: false,
             error: 'Failed to fetch posts'
@@ -598,7 +598,7 @@ const startServer = async () => {
             try {
                 const { trackingUpdaterJob } = await Promise.resolve().then(() => __importStar(require('./jobs/trackingUpdater')));
                 trackingUpdaterJob.start();
-                simpleLogger_1.default.info('Tracking updater job started');
+                logger_1.default.info('Tracking updater job started');
             }
             catch (jobError) {
                 console.error('⚠️  Failed to start tracking updater job:', jobError);
@@ -608,17 +608,17 @@ const startServer = async () => {
                 await email_service_1.emailService.initialize();
                 const status = email_service_1.emailService.getServiceStatus();
                 if (status.available) {
-                    simpleLogger_1.default.info('Email service initialized successfully');
+                    logger_1.default.info('Email service initialized successfully');
                 }
                 else if (status.enabled && !status.available) {
-                    simpleLogger_1.default.warn('Email service enabled but not available (check SMTP config)');
+                    logger_1.default.warn('Email service enabled but not available (check SMTP config)');
                 }
                 else {
-                    simpleLogger_1.default.info('Email service disabled');
+                    logger_1.default.info('Email service disabled');
                 }
             }
             catch (emailError) {
-                simpleLogger_1.default.error('Failed to initialize email service:', {
+                logger_1.default.error('Failed to initialize email service:', {
                     error: emailError.message || emailError,
                     hint: 'Email functionality will be disabled. Set EMAIL_SERVICE_ENABLED=false to suppress this error.'
                 });
