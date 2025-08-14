@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
-import MonacoEditor from '@monaco-editor/react';
+// import MonacoEditor from '@monaco-editor/react';
+const MonacoEditor = () => <div>Monaco Editor temporarily disabled</div>;
 
 interface FileNode {
   name: string;
