@@ -129,49 +129,21 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
               id.includes('GutenbergEditor') ||
               id.includes('blocks/') && !id.includes('node_modules')) {
             
-            // WordPress 핵심 모듈들 (data, core, blocks)을 하나로 통합
-            // 이들은 서로 강하게 의존하므로 함께 로드되어야 초기화 문제가 없음
-            if (id.includes('@wordpress/data') ||
-                id.includes('@wordpress/redux-routine') ||
-                id.includes('@wordpress/element') || 
-                id.includes('@wordpress/hooks') || 
-                id.includes('@wordpress/compose') ||
-                id.includes('@wordpress/private-apis') ||
-                id.includes('@wordpress/blocks') ||
-                id.includes('@wordpress/api-fetch')) {
-              return 'wp-foundation';  // 핵심 기반 모듈 통합
-            }
+            // 모든 WordPress 패키지를 두 그룹으로만 분리:
+            // 1. wp-components - UI 컴포넌트 (독립적이고 크기가 큼)
+            // 2. wp-foundation - 나머지 모든 WordPress 모듈 (초기화 문제 해결)
             
-            // UI 컴포넌트는 별도 청크로 유지 (크기가 크고 독립적)
+            // UI 컴포넌트만 별도 유지
             if (id.includes('@wordpress/components')) {
               return 'wp-components';
             }
             
-            // Block Editor도 별도 유지 (가장 크고 복잡함)
-            if (id.includes('@wordpress/block-editor')) {
-              // Store와 utils는 분리 유지
-              if (id.includes('store') || 
-                  id.includes('reducer') || 
-                  id.includes('actions') ||
-                  id.includes('selectors')) {
-                return 'wp-block-editor-store';
-              }
-              if (id.includes('utils') || 
-                  id.includes('hooks') || 
-                  id.includes('higher-order') ||
-                  id.includes('hoc')) {
-                return 'wp-block-editor-utils';
-              }
-              return 'wp-block-editor-main';
+            // 나머지 모든 WordPress 모듈을 하나로 통합
+            // block-editor, data, core, blocks, i18n, misc 등 모두 포함
+            // 이렇게 하면 모든 초기화 순서 문제가 해결됨
+            if (id.includes('@wordpress')) {
+              return 'wp-foundation';
             }
-            
-            // i18n은 작고 독립적이므로 별도 유지
-            if (id.includes('@wordpress/i18n')) {
-              return 'wp-i18n';
-            }
-            
-            // 기타 WordPress 패키지들
-            return 'wp-misc';
           }
           
           if (id.includes('node_modules')) {
