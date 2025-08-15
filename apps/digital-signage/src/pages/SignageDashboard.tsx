@@ -76,7 +76,6 @@ const SignageDashboard: FC = () => {
     setDisplayStatus('playing');
     
     // 실제로는 여기서 TV 디스플레이 업데이트 API 호출
-    // console.log('🖥️ TV 디스플레이 업데이트:', content.title);
   };
 
   return (

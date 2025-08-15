@@ -158,7 +158,6 @@ const TaxonomyManager: FC = () => {
       };
 
       // API 호출 (Mock)
-      // console.log('Creating taxonomy:', taxonomyData);
       
       await loadTaxonomies();
       resetForm();
@@ -175,7 +174,6 @@ const TaxonomyManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      // console.log('Deleting taxonomy:', slug);
       
       setTaxonomies((prev: any) => prev.filter((tax: any) => tax.slug !== slug));
       alert('✅ Taxonomy가 삭제되었습니다.');
@@ -212,7 +210,6 @@ const TaxonomyManager: FC = () => {
 
   const addTerm = (taxonomySlug: string) => {
     // Term 추가 로직 (나중에 구현)
-    // console.log('Adding term to:', taxonomySlug, newTerm);
   };
 
   const renderTermHierarchy = (terms: TaxonomyTerm[], parentId?: string, level = 0) => {

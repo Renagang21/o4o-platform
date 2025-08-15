@@ -65,7 +65,6 @@ const ContentManager: FC = () => {
       // 실제로는 파일 업로드 API 호출
       await new Promise(resolve => setTimeout(resolve, 2000)); // 모의 업로드 지연
       
-      // console.log('업로드 완료:', {
       //   title: newContent.title,
       //   type: newContent.type,
       //   file: newContent.file.name

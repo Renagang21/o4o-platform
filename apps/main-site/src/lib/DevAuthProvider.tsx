@@ -32,7 +32,6 @@ export const DevAuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         }
       }));
 
-      // console.log('개발 모드: 자동 로그인 활성화', mockUser);
     }
   }, [setUser]);
 

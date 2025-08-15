@@ -208,7 +208,6 @@ const RelationsManager: FC = () => {
       };
 
       // API 호출 (Mock)
-      // console.log('Creating relation:', relationData);
       
       await loadRelations();
       resetForm();
@@ -225,7 +224,6 @@ const RelationsManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      // console.log('Deleting relation:', id);
       
       setRelations((prev: any) => prev.filter((rel: any) => rel.id !== id));
       alert('✅ 관계가 삭제되었습니다.');

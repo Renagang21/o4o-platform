@@ -7,8 +7,6 @@ const TestPage: FC = () => {
   const [showGutenbergEditor, setShowGutenbergEditor] = useState(false);
 
   const handleSave = (content: string, json: Record<string, unknown>) => {
-    // console.log('💾 저장된 콘텐츠:', content);
-    // console.log('💾 저장된 JSON:', json);
   };
 
   const handleBack = () => {

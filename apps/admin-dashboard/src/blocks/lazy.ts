@@ -31,7 +31,6 @@ export async function loadBlock(blockName: string): Promise<void> {
   try {
     await importFn();
     loadedBlocks.add(blockName);
-    // Removed console.log
   } catch (error) {
     // Error logging - use proper error handler
   }

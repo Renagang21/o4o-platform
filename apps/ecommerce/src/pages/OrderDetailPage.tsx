@@ -136,7 +136,6 @@ export function OrderDetailPage() {
 
   const handleDownloadInvoice = () => {
     // TODO: Implement invoice download
-    // console.log('Download invoice');
   };
 
   const getStatusIndex = (status: string) => {

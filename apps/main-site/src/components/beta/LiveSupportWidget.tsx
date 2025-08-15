@@ -81,13 +81,11 @@ export const LiveSupportWidget: FC<LiveSupportWidgetProps> = ({
 
     // Connection handlers
     socketInstance.on('connect', () => {
-      // console.log('Connected to live support');
       setIsConnected(true);
       setConnectionStatus('connected');
     });
 
     socketInstance.on('disconnect', () => {
-      // console.log('Disconnected from live support');
       setIsConnected(false);
       setConnectionStatus('disconnected');
     });

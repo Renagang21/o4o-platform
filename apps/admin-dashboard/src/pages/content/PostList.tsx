@@ -105,7 +105,6 @@ const PostList: FC = () => {
     }
     
     // TODO: 일괄 작업 구현
-    // console.log('Bulk action:', action, selectedPosts)
   }
 
   const posts = data?.posts || []

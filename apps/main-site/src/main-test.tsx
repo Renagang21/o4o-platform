@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client';
 import TestApp from './TestApp';
 
 // 콘솔에 디버그 메시지 출력
-    // Removed console.log
 
 try {
   const rootElement = document.getElementById('root');
@@ -13,10 +12,8 @@ try {
     throw new Error('Root element not found');
   }
   
-    // Removed console.log
   
   const root = ReactDOM.createRoot(rootElement);
-    // Removed console.log
   
   root.render(
     <StrictMode>
@@ -24,7 +21,6 @@ try {
     </StrictMode>
   );
   
-    // Removed console.log
 } catch (error: any) {
     // Error logging - use proper error handler
   // 에러 발생 시 간단한 HTML 표시

@@ -108,7 +108,6 @@ export function initWordPressHooks() {
 
 // WordPress 전체 초기화
 export function initWordPress() {
-  // console.log('[WordPress Polyfill] Initializing WordPress global objects...');
   
   // Only initialize if not already present (hooks-shim may have already done this)
   if (!window.wp?.i18n) {
@@ -147,7 +146,6 @@ export function initWordPress() {
     setCategories: (_categories: any[]) => {},
   };
   
-  // console.log('[WordPress Polyfill] WordPress global objects initialized:', window.wp);
 }
 
 // TypeScript types for Window.wp are defined in vite-env.d.ts

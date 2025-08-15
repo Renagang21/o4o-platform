@@ -287,7 +287,6 @@ const ViewsManager: FC = () => {
       };
 
       // API 호출 (Mock)
-      // console.log('Creating view:', viewData);
       
       await loadViews();
       resetForm();
@@ -304,7 +303,6 @@ const ViewsManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      // console.log('Deleting view:', id);
       
       setViews((prev: any) => prev.filter((view: any) => view.id !== id));
       alert('✅ View가 삭제되었습니다.');

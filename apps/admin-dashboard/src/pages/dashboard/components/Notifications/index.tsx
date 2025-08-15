@@ -56,12 +56,10 @@ const Notifications: FC<NotificationsProps> = ({
 
   const handleMarkAllRead = () => {
     // 실제 구현에서는 API 호출
-    // console.log('Mark all notifications as read');
   };
 
   const handleClearAll = () => {
     // 실제 구현에서는 API 호출
-    // console.log('Clear all notifications');
   };
 
   if (isLoading) {

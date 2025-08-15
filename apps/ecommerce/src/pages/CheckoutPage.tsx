@@ -84,7 +84,6 @@ export function CheckoutPage() {
       // });
       // return response.data;
       // TODO: Log order creation for debugging
-      // console.log('Create order:', data);
       return { id: '12345' }; // Mock order ID
     },
     onSuccess: (data) => {

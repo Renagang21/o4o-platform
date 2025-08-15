@@ -117,7 +117,6 @@ const ProductCard: FC<{ product: Product }> = ({ product }) => {
                   onClick={(e: any) => {
                     e.preventDefault();
                     // TODO: Add to cart functionality
-                    // console.log('Add to cart:', product.id);
                   }}
                   className="p-2 bg-blue-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   title="장바구니에 담기"

@@ -11,7 +11,6 @@ const HomeEditorPage: FC = () => {
   const handleSave = () => {
     // TODO: API call to save home content
     setIsEditing(false);
-    // console.log('Saving home content:', homeContent);
   };
 
   return (

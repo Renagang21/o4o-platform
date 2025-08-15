@@ -233,7 +233,6 @@ const CustomFieldsManager: FC = () => {
       };
 
       // API 호출 (Mock)
-      // console.log('Creating field group:', groupData);
       
       await loadFieldGroups();
       resetForm();
@@ -250,7 +249,6 @@ const CustomFieldsManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      // console.log('Deleting field group:', id);
       
       setFieldGroups((prev: any) => prev.filter((group: any) => group.id !== id));
       alert('✅ 필드 그룹이 삭제되었습니다.');

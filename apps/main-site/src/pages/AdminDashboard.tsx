@@ -76,7 +76,6 @@ const AdminDashboard: FC = () => {
 
   const loadUsers = (page: number = 1) => {
     // Mock function for pagination
-    // console.log(`Loading users for page ${page}`);
   };
 
   const getActionButtons = (user: User) => {

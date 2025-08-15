@@ -44,7 +44,6 @@ class UnifiedApiClient {
         
         // Dev environment logging
         // if (import.meta.env.DEV) {
-        //   console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, config.data);
         // }
         
         return config;
@@ -58,7 +57,6 @@ class UnifiedApiClient {
     this.client.interceptors.response.use(
       (response) => {
         // if (import.meta.env.DEV) {
-        //   console.log(`[API Response] ${response.config.url}`, response.data);
         // }
         return response;
       },

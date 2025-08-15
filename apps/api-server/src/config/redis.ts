@@ -32,7 +32,6 @@ export const redisSub = new Redis({
 
 // Handle connection events
 redis.on('connect', () => {
-  // console.log('Redis client connected');
 });
 
 redis.on('error', (err) => {
@@ -40,7 +39,6 @@ redis.on('error', (err) => {
 });
 
 redisSub.on('connect', () => {
-  // console.log('Redis subscriber connected');
 });
 
 redisSub.on('error', (err) => {

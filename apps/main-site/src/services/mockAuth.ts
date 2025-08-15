@@ -87,7 +87,6 @@ export const mockAuthService = {
     
     // 실제로는 이메일 발송 (개발 환경에서는 로그로 표시)
     if (import.meta.env.DEV && import.meta.env.VITE_ENABLE_DEBUG_MODE === 'true') {
-      // console.log(`[모의 이메일 발송] 비밀번호 재설정 링크 발송 처리됨`);
     }
     
     return {

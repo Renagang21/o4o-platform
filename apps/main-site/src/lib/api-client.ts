@@ -15,7 +15,6 @@ apiClient.interceptors.request.use(
   (config) => {
     // Log request in development
     // if (import.meta.env.DEV) {
-    //   console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, config.data);
     // }
     return config;
   },
@@ -30,7 +29,6 @@ apiClient.interceptors.response.use(
   (response) => {
     // Log response in development
     // if (import.meta.env.DEV) {
-    //   console.log(`[API] Response:`, response.data);
     // }
     return response;
   },

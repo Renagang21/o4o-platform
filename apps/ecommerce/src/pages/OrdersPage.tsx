@@ -189,7 +189,6 @@ export function OrdersPage() {
       // const response = await authClient.api.post(`/api/v1/orders/${orderId}/cancel`);
       // return response.data;
       // TODO: Log order cancellation for debugging
-      // console.log('Cancel order:', orderId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });

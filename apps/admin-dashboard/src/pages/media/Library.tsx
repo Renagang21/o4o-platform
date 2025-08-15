@@ -174,7 +174,6 @@ const Library: FC = () => {
 
   const handleUploadComplete = (_files: File[]) => {
     // 업로드 처리 로직
-    // console.log('Uploaded files:', files)
     setUploadDialogOpen(false)
   }
 

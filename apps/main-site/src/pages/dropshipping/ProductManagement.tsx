@@ -145,7 +145,6 @@ const ProductManagement: FC = () => {
   };
 
   const handleProductSave = (data: any) => {
-    // console.log('제품 데이터 저장:', data);
     setShowProductInfoHub(false);
     setSelectedProduct(null);
     // 실제로는 API 호출하여 저장

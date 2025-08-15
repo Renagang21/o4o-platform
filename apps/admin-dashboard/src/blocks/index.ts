@@ -98,7 +98,6 @@ export function initializeCustomBlocks() {
     styleElement.textContent = blockStyles;
     document.head.appendChild(styleElement);
     
-    // console.log('Custom blocks initialized:', [
     //   'o4o/group',
     //   'o4o/columns',
     //   'o4o/column'

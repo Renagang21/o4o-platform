@@ -7,12 +7,10 @@ const CustomerManagement: FC = () => {
   const [customerType, setCustomerType] = useState('b2c');
 
   const handleTierUpdate = (customerId: string, newTier: string) => {
-    // console.log('고객 등급 업데이트:', { customerId, newTier });
     // 실제로는 API 호출하여 등급 업데이트
   };
 
   const handleCustomerAction = (customerId: string, action: string) => {
-    // console.log('고객 액션:', { customerId, action });
     // 실제로는 각 액션에 따른 처리 (이메일 발송, 서비스 제공 등)
   };
 

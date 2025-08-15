@@ -152,7 +152,6 @@ export function CartPage() {
   const updateQuantityMutation = useMutation({
     mutationFn: async (_: { itemId: string; quantity: number }) => {
       // TODO: Replace with actual API call
-      // console.log('Update quantity:', itemId, quantity);
       // const response = await authClient.patch(`/api/v1/cart/items/${itemId}`, { quantity });
       // return response.data;
     },
@@ -168,7 +167,6 @@ export function CartPage() {
       // const response = await authClient.api.delete(`/api/v1/cart/items/${itemId}`);
       // return response.data;
       // TODO: Log item removal for debugging
-      // console.log('Remove item:', itemId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -182,7 +180,6 @@ export function CartPage() {
       // const response = await authClient.api.delete('/api/v1/cart');
       // return response.data;
       // TODO: Log cart clearing for debugging
-      // console.log('Clear cart');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });

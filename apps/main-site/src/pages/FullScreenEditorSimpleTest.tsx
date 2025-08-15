@@ -2,18 +2,15 @@ import { FullScreenEditor } from '@o4o/ui/editor/fullscreen';
 
 export function FullScreenEditorSimpleTest() {
   const handleSave = async (content: string) => {
-    // console.log('저장된 콘텐츠:', content);
     // 실제 저장 로직
     return new Promise((resolve) => {
       setTimeout(() => {
-        // console.log('저장 완료!');
         resolve(void 0);
       }, 1000);
     });
   };
 
   const handlePreview = () => {
-    // console.log('미리보기 열기');
     // 미리보기 모달 또는 새 탭 열기
     window.open('/preview', '_blank');
   };

@@ -72,7 +72,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   }
   }));
 } else {
-  // console.log('⚠️  Google OAuth not configured - skipping strategy initialization');
 }
 
 // Kakao OAuth Strategy - Only initialize if credentials are provided
@@ -129,7 +128,6 @@ if (process.env.KAKAO_CLIENT_ID) {
   }
   }));
 } else {
-  // console.log('⚠️  Kakao OAuth not configured - skipping strategy initialization');
 }
 
 // Naver OAuth Strategy - Only initialize if credentials are provided
@@ -186,7 +184,6 @@ if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
   }
   }));
 } else {
-  // console.log('⚠️  Naver OAuth not configured - skipping strategy initialization');
 }
 
 export default passport;

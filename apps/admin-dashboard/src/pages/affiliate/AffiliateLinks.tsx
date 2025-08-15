@@ -113,7 +113,6 @@ const AffiliateLinks = () => {
   const handleCopyLink = (shortUrl: string) => {
     navigator.clipboard.writeText(shortUrl);
     // TODO: Show toast notification
-    // console.log('Link copied:', shortUrl);
   };
 
   const getStatusBadge = (status: string) => {
@@ -163,7 +162,6 @@ const AffiliateLinks = () => {
         <button
           onClick={() => {
             // TODO: Implement create modal
-            // console.log('Create new link');
           }}
           className="px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors flex items-center gap-2"
         >
@@ -360,7 +358,6 @@ const AffiliateLinks = () => {
             <button
               onClick={() => {
                 // TODO: Implement create modal
-                // console.log('Create first link');
               }}
               className="mt-4 px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors"
             >

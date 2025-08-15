@@ -361,7 +361,6 @@ const ContentManagement: FC = () => {
         c.id === selectedContent.id ? updatedContent : c
       ));
       
-      // console.log('저장 완료:', selectedContent.id);
     } catch (error: any) {
     // Error logging - use proper error handler
     } finally {
@@ -537,7 +536,6 @@ const ContentManagement: FC = () => {
                             localStorage.setItem(`content_${selectedContent.id}`, JSON.stringify(updatedContent));
                             
                             // 실제 구현에서는 API 호출
-                            // console.log('자동 저장됨:', selectedContent.id);
                             return true;
                           } catch (error: any) {
     // Error logging - use proper error handler

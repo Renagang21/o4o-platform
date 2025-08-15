@@ -66,7 +66,6 @@ const TheDANGStyleEditorPage: FC = () => {
   const handleSave = async () => {
     try {
       // Here you would typically save to your API
-      // console.log('Saving content:', savedContent);
       
       // For now, just show a success message
       alert('Content saved successfully!');

@@ -613,7 +613,6 @@ const EnhancedViewsManager: FC = () => {
 
   const createView = async () => {
     try {
-      // console.log('Creating view:', newView);
       // API call would go here
       
       await loadViews();
@@ -630,7 +629,6 @@ const EnhancedViewsManager: FC = () => {
     if (!confirm('Are you sure you want to delete this view?')) return;
     
     try {
-      // console.log('Deleting view:', id);
       setViews((prev: any) => prev.filter((view: any) => view.id !== id));
       alert('✅ View deleted successfully');
     } catch (error: any) {

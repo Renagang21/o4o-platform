@@ -47,7 +47,6 @@ export class PerformanceMonitoringInitializer {
     }
 
     try {
-      // console.log('🚀 Initializing performance monitoring services...');
 
       // Redis 연결 확인
       await this.verifyRedisConnection();
@@ -71,7 +70,6 @@ export class PerformanceMonitoringInitializer {
       this.isInitialized = true;
       await this.recordInitializationComplete();
 
-      // console.log('✅ All performance monitoring services initialized successfully');
 
     } catch (error) {
       console.error('❌ Failed to initialize performance monitoring services:', error);
@@ -86,7 +84,6 @@ export class PerformanceMonitoringInitializer {
   private async verifyRedisConnection(): Promise<void> {
     try {
       await this.redis.ping();
-      // console.log('✅ Redis connection verified');
     } catch (error) {
       console.error('❌ Redis connection failed:', error);
       throw new Error('Redis connection required for performance monitoring');
@@ -98,11 +95,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializeAnalyticsService(): Promise<void> {
     try {
-      // console.log('🔄 Initializing Analytics Service...');
       const analyticsService = new AnalyticsService();
       this.services.set('analytics', analyticsService as unknown as MonitoringService);
       this.serviceStatus.set('analytics', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ Analytics Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize Analytics Service:', error);
       this.serviceStatus.set('analytics', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -115,11 +110,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializePerformanceOptimizationService(): Promise<void> {
     try {
-      // console.log('🔄 Initializing Performance Optimization Service...');
       const performanceService = new PerformanceOptimizationService();
       this.services.set('performance', performanceService as unknown as MonitoringService);
       this.serviceStatus.set('performance', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ Performance Optimization Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize Performance Optimization Service:', error);
       this.serviceStatus.set('performance', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -132,11 +125,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializeDatabaseOptimizationService(): Promise<void> {
     try {
-      // console.log('🔄 Initializing Database Optimization Service...');
       const databaseService = new DatabaseOptimizationService();
       this.services.set('database', databaseService as unknown as MonitoringService);
       this.serviceStatus.set('database', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ Database Optimization Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize Database Optimization Service:', error);
       this.serviceStatus.set('database', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -149,11 +140,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializeCDNOptimizationService(): Promise<void> {
     try {
-      // console.log('🔄 Initializing CDN Optimization Service...');
       const cdnService = new CDNOptimizationService();
       this.services.set('cdn', cdnService as unknown as MonitoringService);
       this.serviceStatus.set('cdn', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ CDN Optimization Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize CDN Optimization Service:', error);
       this.serviceStatus.set('cdn', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -166,11 +155,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializeAutoScalingService(): Promise<void> {
     try {
-      // console.log('🔄 Initializing Auto Scaling Service...');
       const scalingService = new AutoScalingService();
       this.services.set('scaling', scalingService as unknown as MonitoringService);
       this.serviceStatus.set('scaling', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ Auto Scaling Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize Auto Scaling Service:', error);
       this.serviceStatus.set('scaling', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -183,11 +170,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializeOperationsMonitoring(): Promise<void> {
     try {
-      // console.log('🔄 Initializing Operations Monitoring Service...');
       const operationsService = new OperationsMonitoringService();
       this.services.set('operations', operationsService as unknown as MonitoringService);
       this.serviceStatus.set('operations', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ Operations Monitoring Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize Operations Monitoring Service:', error);
       this.serviceStatus.set('operations', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -200,11 +185,9 @@ export class PerformanceMonitoringInitializer {
    */
   private async initializeDeploymentMonitoring(): Promise<void> {
     try {
-      // console.log('🔄 Initializing Deployment Monitoring Service...');
       const deploymentService = new DeploymentMonitoringService();
       this.services.set('deployment', deploymentService as unknown as MonitoringService);
       this.serviceStatus.set('deployment', { status: 'running', lastCheck: new Date() });
-      // console.log('✅ Deployment Monitoring Service initialized');
     } catch (error) {
       console.error('❌ Failed to initialize Deployment Monitoring Service:', error);
       this.serviceStatus.set('deployment', { status: 'failed', lastCheck: new Date(), error: error as Error });
@@ -217,7 +200,6 @@ export class PerformanceMonitoringInitializer {
    */
   private async configureServiceIntegration(): Promise<void> {
     try {
-      // console.log('🔄 Configuring service integration...');
 
       // 서비스 간 이벤트 통합 설정
       const integrationConfig = {
@@ -250,7 +232,6 @@ export class PerformanceMonitoringInitializer {
       // 크로스 서비스 메시징 설정
       await this.setupCrossServiceMessaging();
 
-      // console.log('✅ Service integration configured');
 
     } catch (error) {
       console.error('❌ Failed to configure service integration:', error);
@@ -293,7 +274,6 @@ export class PerformanceMonitoringInitializer {
    * 크로스 서비스 메시지 처리
    */
   private async handleCrossServiceMessage(channel: string, message: CrossServiceMessage): Promise<void> {
-    // console.log(`📨 Received cross-service message on ${channel}:`, message);
 
     // 채널별 메시지 처리
     switch (channel) {
@@ -391,7 +371,6 @@ export class PerformanceMonitoringInitializer {
       await this.performHealthCheck();
     }, 60000); // 1분마다 헬스 체크
 
-    // console.log('✅ Health checking started');
   }
 
   /**
@@ -521,7 +500,6 @@ export class PerformanceMonitoringInitializer {
       JSON.stringify(initRecord)
     );
 
-    // console.log('📝 Initialization record saved');
   }
 
   /**
@@ -654,7 +632,6 @@ export class PerformanceMonitoringInitializer {
    */
   async shutdown(): Promise<void> {
     try {
-      // console.log('🔄 Shutting down performance monitoring services...');
 
       // 헬스 체크 중지
       if (this.healthCheckInterval) {
@@ -666,7 +643,6 @@ export class PerformanceMonitoringInitializer {
         try {
           if (typeof service.shutdown === 'function') {
             await service.shutdown();
-            // console.log(`✅ ${serviceName} service shutdown completed`);
           }
         } catch (error) {
           console.error(`❌ Failed to shutdown ${serviceName} service:`, error);
@@ -677,7 +653,6 @@ export class PerformanceMonitoringInitializer {
       await this.redis.disconnect();
 
       // 종료 기록
-      // console.log('✅ Performance monitoring system shutdown completed');
       this.isInitialized = false;
 
     } catch (error) {

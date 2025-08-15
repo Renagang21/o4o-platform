@@ -61,7 +61,6 @@ export class KoreanPostConnector {
 
   async cancelLabel(trackingNumber: string): Promise<boolean> {
     // TODO: Replace with proper logger
-    // console.log(`Cancelling Korean Post shipment: ${trackingNumber}`);
     return true;
   }
 

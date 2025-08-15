@@ -42,7 +42,6 @@ export { ReactNamespace as React, ReactDOMExports as ReactDOM };
 
 // Log for debugging
 // if (typeof window !== 'undefined' && import.meta.env.DEV) {
-//   console.log('React shim loaded:', {
 //     hasChildren: 'Children' in ReactNamespace,
 //     hasCreateElement: 'createElement' in ReactNamespace,
 //     hasFragment: 'Fragment' in ReactNamespace,

@@ -119,7 +119,6 @@ const PageList: FC = () => {
     }
     
     // TODO: 일괄 작업 구현
-    // console.log('Bulk action:', action, selectedPages)
   }
 
   const pages = data?.posts || []

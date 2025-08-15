@@ -38,7 +38,6 @@ const ForgotPassword: FC = () => {
           throw new Error(errorData.message || '비밀번호 재설정 요청에 실패했습니다.');
         }
       } catch (apiError: any) {
-        // console.log('API 서버 연결 실패, 모의 서비스 사용');
         await mockAuthService.forgotPassword(email);
       }
 

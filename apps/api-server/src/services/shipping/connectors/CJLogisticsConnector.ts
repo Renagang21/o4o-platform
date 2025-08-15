@@ -137,7 +137,6 @@ export class CJLogisticsConnector {
     try {
       // In production, call CJ's cancellation API
       // TODO: Replace with proper logger
-      // console.log(`Cancelling CJ shipment: ${trackingNumber}`);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));

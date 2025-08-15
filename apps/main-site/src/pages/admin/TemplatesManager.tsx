@@ -323,7 +323,6 @@ const TemplatesManager: FC = () => {
       };
 
       // API 호출 (Mock)
-      // console.log('Creating template:', templateData);
       
       await loadTemplates();
       resetForm();
@@ -340,7 +339,6 @@ const TemplatesManager: FC = () => {
 
     try {
       // API 호출 (Mock)
-      // console.log('Deleting template:', id);
       
       setTemplates((prev: any) => prev.filter((template: any) => template.id !== id));
       alert('✅ Template이 삭제되었습니다.');

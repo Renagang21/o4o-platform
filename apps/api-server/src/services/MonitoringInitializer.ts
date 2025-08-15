@@ -13,7 +13,6 @@ export class MonitoringInitializer {
   }
 
   async initialize(): Promise<void> {
-    // console.log('🚀 Initializing 24/7 Operations Monitoring System...');
 
     try {
       // Initialize default status page components
@@ -28,7 +27,6 @@ export class MonitoringInitializer {
       // Set up health check intervals
       await this.setupHealthCheckSchedules();
 
-      // console.log('✅ 24/7 Operations Monitoring System initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize monitoring system:', error);
       throw error;
@@ -36,12 +34,10 @@ export class MonitoringInitializer {
   }
 
   async shutdown(): Promise<void> {
-    // console.log('🛑 Shutting down 24/7 Operations Monitoring System...');
 
     try {
       await this.operationsService.stopMonitoring();
       await autoRecoveryService.stopAutoRecovery();
-      // console.log('✅ 24/7 Operations Monitoring System shutdown complete');
     } catch (error) {
       console.error('❌ Error during monitoring system shutdown:', error);
       throw error;
@@ -49,7 +45,6 @@ export class MonitoringInitializer {
   }
 
   private async initializeStatusPageComponents(): Promise<void> {
-    // console.log('📊 Setting up status page components...');
 
     const defaultComponents = [
       {
@@ -95,22 +90,18 @@ export class MonitoringInitializer {
       if (!existingNames.includes(componentData.name)) {
         try {
           await this.statusPageService.createComponent(componentData);
-          // console.log(`✅ Created status page component: ${componentData.name}`);
         } catch (error) {
           console.error(`❌ Failed to create component ${componentData.name}:`, error);
         }
       } else {
-        // console.log(`⏭️  Component already exists: ${componentData.name}`);
       }
     }
   }
 
   private async initializeAutoRecoverySystem(): Promise<void> {
-    // console.log('🔄 Initializing Auto-Recovery and Incident Response System...');
     
     try {
       await autoRecoveryService.startAutoRecovery();
-      // console.log('✅ Auto-Recovery System initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize Auto-Recovery System:', error);
       // Don't throw error - allow system to continue without auto-recovery
@@ -118,7 +109,6 @@ export class MonitoringInitializer {
   }
 
   private async setupHealthCheckSchedules(): Promise<void> {
-    // console.log('🔍 Setting up health check schedules...');
 
     // Schedule regular health checks for status page
     setInterval(async () => {
@@ -133,13 +123,11 @@ export class MonitoringInitializer {
     setInterval(async () => {
       try {
         const systemStatus = await this.operationsService.getSystemStatus();
-        // console.log(`System Status: ${systemStatus.overallStatus} - ${systemStatus.services.length} services monitored`);
       } catch (error) {
         console.error('System status check failed:', error);
       }
     }, 300000); // Every 5 minutes
 
-    // console.log('✅ Health check schedules configured');
   }
 
   // Utility method to check if monitoring is running
@@ -204,7 +192,6 @@ export class MonitoringInitializer {
 
     try {
       const incident = await this.statusPageService.createIncident(sampleIncident);
-      // console.log(`📝 Created sample incident: ${incident.id}`);
       
       // Auto-resolve after 5 minutes for demonstration
       setTimeout(async () => {
@@ -214,7 +201,6 @@ export class MonitoringInitializer {
             message: 'Performance has returned to normal levels. Monitoring continues.',
             updatedBy: 'system'
           });
-          // console.log(`✅ Auto-resolved sample incident: ${incident.id}`);
         } catch (error) {
           console.error('Failed to auto-resolve sample incident:', error);
         }
@@ -252,7 +238,6 @@ export class MonitoringInitializer {
 
     try {
       const maintenance = await this.statusPageService.scheduleMaintenance(sampleMaintenance);
-      // console.log(`🔧 Created sample maintenance: ${maintenance.id}`);
     } catch (error) {
       console.error('Failed to create sample maintenance:', error);
     }
@@ -271,7 +256,6 @@ export class MonitoringInitializer {
       return;
     }
 
-    // console.log('📈 Populating sample metrics...');
 
     // Generate sample uptime and response time data for the last 24 hours
     const now = new Date();
@@ -298,7 +282,6 @@ export class MonitoringInitializer {
       }
     }
 
-    // console.log('✅ Sample metrics populated');
   }
 
   // Development helper methods
@@ -308,7 +291,6 @@ export class MonitoringInitializer {
       return;
     }
 
-    // console.log('🛠️  Setting up development environment...');
 
     try {
       await this.populateSampleMetrics();
@@ -319,7 +301,6 @@ export class MonitoringInitializer {
         await this.createSampleIncident();
       }, 5000);
 
-      // console.log('✅ Development environment setup complete');
     } catch (error) {
       console.error('❌ Failed to setup development environment:', error);
     }

@@ -9,7 +9,6 @@ const TipTapEditorPage: FC = () => {
   const navigate = useNavigate();
 
   const handleSave = (content: string) => {
-    // console.log('페이지 저장:', pageId, content);
   };
 
   const handleBack = () => {

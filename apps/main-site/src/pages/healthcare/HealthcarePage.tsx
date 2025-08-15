@@ -24,14 +24,12 @@ const HealthcarePage: FC = () => {
     setIsEditing(!isEditing);
     if (isEditing && hasChanges) {
       // Simulate saving changes
-      // console.log('Saving changes...');
       setHasChanges(false);
     }
   };
 
   const handleSaveChanges = () => {
     // Simulate API call to save changes
-    // console.log('Saving changes...');
     setHasChanges(false);
     
     // Show success message (you can implement toast notifications)

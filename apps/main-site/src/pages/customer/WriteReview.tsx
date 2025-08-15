@@ -21,7 +21,6 @@ const WriteReview: FC = () => {
   const onSubmit = async (data: ReviewForm) => {
     setIsSubmitting(true);
     try {
-      // console.log('Review submitted:', { ...data, rating });
       // TODO: API call to submit review
       navigate('/customer/reviews');
     } catch (error: any) {

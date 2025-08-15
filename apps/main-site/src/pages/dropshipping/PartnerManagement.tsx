@@ -140,12 +140,10 @@ const PartnerManagement: FC = () => {
   };
 
   const handleCommissionApprove = (requestId: string, rate: number, conditions?: string) => {
-    // console.log('수수료 승인:', { requestId, rate, conditions });
     // 실제로는 API 호출
   };
 
   const handleCommissionReject = (requestId: string, reason: string) => {
-    // console.log('수수료 거절:', { requestId, reason });
     // 실제로는 API 호출
   };
 
