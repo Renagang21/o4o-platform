@@ -11,7 +11,7 @@ export declare const config: {
     app: {
         name: string;
         url: string;
-        env: string;
+        env: "production" | "development" | "test";
     };
 };
 //# sourceMappingURL=config.d.ts.map

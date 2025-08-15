@@ -1,13 +1,13 @@
 import { validateTossPaymentsConfig } from './config/toss-payments';
-import { AppDataSource } from './database/data-source';
+import AppDataSource from './database/data-source';
 import { validateDatabaseConnection } from './config/database-validation';
+import logger from './utils/logger';
 
 /**
  * Run all startup validations
  */
 export async function runStartupValidations(): Promise<void> {
-  console.log('🚀 Running startup validations...
-');
+  logger.info('🚀 Running startup validations...');
   
   // 1. Environment variables
   const requiredEnvVars = [
@@ -33,10 +33,10 @@ export async function runStartupValidations(): Promise<void> {
   // 4. Check for shipments table
   try {
     await AppDataSource.query('SELECT 1 FROM shipments LIMIT 1');
-    console.log('✅ Shipments table exists');
+    logger.info('✅ Shipments table exists');
   } catch (error) {
     console.warn('⚠️  Shipments table not found. Run migrations: npm run migration:run');
   }
   
-  console.log('\n✅ Startup validations complete\n');
+  logger.info('\n✅ Startup validations complete\n');
 }

@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import logger from '../utils/logger';
 
 /**
  * Validate database connection
@@ -12,7 +13,7 @@ export async function validateDatabaseConnection(dataSource: DataSource): Promis
     
     // Test query
     await dataSource.query('SELECT 1');
-    console.log('✅ Database connection validated');
+    logger.info('✅ Database connection validated');
     return true;
   } catch (error) {
     console.error('❌ Database connection validation failed:', error);
@@ -37,14 +38,14 @@ export async function retryDatabaseConnection(
       }
       
       await dataSource.query('SELECT 1');
-      console.log('✅ Database connected successfully');
+      logger.info('✅ Database connected successfully');
       return true;
     } catch (error) {
       retries++;
       console.warn(`⚠️  Database connection attempt ${retries}/${maxRetries} failed`);
       
       if (retries < maxRetries) {
-        console.log(`Retrying in ${delay/1000} seconds...`);
+        logger.info(`Retrying in ${delay/1000} seconds...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }

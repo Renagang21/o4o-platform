@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from 'dotenv';
+import logger from '../utils/logger';
 
 config();
 
@@ -37,7 +38,7 @@ export const tossPaymentsClient = axios.create({
 tossPaymentsClient.interceptors.request.use(
   (config) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[TossPayments Request]', {
+      logger.debug('[TossPayments Request]', {
         method: config.method,
         url: config.url,
         data: config.data,
@@ -55,7 +56,7 @@ tossPaymentsClient.interceptors.request.use(
 tossPaymentsClient.interceptors.response.use(
   (response) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[TossPayments Response]', {
+      logger.debug('[TossPayments Response]', {
         status: response.status,
         data: response.data,
       });
@@ -136,14 +137,14 @@ export function validateTossPaymentsConfig(): void {
   }
   
   if (tossPaymentsConfig.isTestMode) {
-    console.log('⚠️  TossPayments is running in TEST MODE');
+    logger.warn('⚠️  TossPayments is running in TEST MODE');
   }
   
   if (warnings.length > 0) {
     console.warn('⚠️  TossPayments configuration warnings:');
     warnings.forEach(warning => console.warn(`   - ${warning}`));
   } else {
-    console.log('✅ TossPayments configuration validated successfully');
+    logger.info('✅ TossPayments configuration validated successfully');
   }
 }
 

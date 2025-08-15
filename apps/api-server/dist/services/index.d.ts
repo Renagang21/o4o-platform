@@ -1,6 +1,3 @@
-// Auto-generated index file for services
-
-// Export all service files
 export * from './AnalyticsService';
 export * from './AuthService';
 export * from './AuthServiceV2';
@@ -58,14 +55,11 @@ export * from './signageService';
 export * from './socialAuthService';
 export * from './unified-auth.service';
 export * from './webhookService';
-
-// Export crowdfunding services
 export * from './crowdfunding/BackingService';
 export * from './crowdfunding/FundingProjectService';
-
-// Export shipping services
 export * from './shipping/ShippingService';
 export * from './shipping/connectors/CJLogisticsConnector';
 export * from './shipping/connectors/HanjinConnector';
 export * from './shipping/connectors/KoreanPostConnector';
 export * from './shipping/connectors/LogenConnector';
+//# sourceMappingURL=index.d.ts.map

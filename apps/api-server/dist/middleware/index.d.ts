@@ -1,6 +1,3 @@
-// Auto-generated index file for middleware
-
-// Export only non-conflicting middleware
 export * from './errorHandler';
 export * from './performanceMonitor';
 export * from './rateLimiter';
@@ -11,3 +8,4 @@ export * from './sso';
 export * from './validateDto';
 export * from './validateRequest';
 export * from './validation';
+//# sourceMappingURL=index.d.ts.map

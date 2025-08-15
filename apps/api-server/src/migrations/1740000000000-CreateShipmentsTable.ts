@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class CreateShipmentsTable1740000000000 implements MigrationInterface {
   name = 'CreateShipmentsTable1740000000000';
@@ -196,41 +196,41 @@ export class CreateShipmentsTable1740000000000 implements MigrationInterface {
     // Create indexes
     await queryRunner.createIndex(
       'shipments',
-      new Index({
+      new TableIndex({
         name: 'IDX_SHIPMENT_ORDER',
-        columnNames: ['order_id'],
+        columnNames: ['order_id']
       })
     );
 
     await queryRunner.createIndex(
       'shipments',
-      new Index({
+      new TableIndex({
         name: 'IDX_SHIPMENT_STATUS',
-        columnNames: ['status'],
+        columnNames: ['status']
       })
     );
 
     await queryRunner.createIndex(
       'shipments',
-      new Index({
+      new TableIndex({
         name: 'IDX_SHIPMENT_TRACKING',
-        columnNames: ['tracking_number'],
+        columnNames: ['tracking_number']
       })
     );
 
     await queryRunner.createIndex(
       'shipments',
-      new Index({
+      new TableIndex({
         name: 'IDX_SHIPMENT_CARRIER',
-        columnNames: ['carrier'],
+        columnNames: ['carrier']
       })
     );
 
     await queryRunner.createIndex(
       'shipments',
-      new Index({
+      new TableIndex({
         name: 'IDX_SHIPMENT_CREATED',
-        columnNames: ['created_at'],
+        columnNames: ['created_at']
       })
     );
 
@@ -285,17 +285,17 @@ export class CreateShipmentsTable1740000000000 implements MigrationInterface {
 
     await queryRunner.createIndex(
       'shipment_tracking_history',
-      new Index({
+      new TableIndex({
         name: 'IDX_TRACKING_HISTORY_SHIPMENT',
-        columnNames: ['shipment_id'],
+        columnNames: ['shipment_id']
       })
     );
 
     await queryRunner.createIndex(
       'shipment_tracking_history',
-      new Index({
+      new TableIndex({
         name: 'IDX_TRACKING_HISTORY_TIME',
-        columnNames: ['tracking_time'],
+        columnNames: ['tracking_time']
       })
     );
 
