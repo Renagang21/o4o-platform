@@ -116,7 +116,7 @@ const OrderStatusManagement: FC = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
-      const response = await authClient.api.get(`/v1/ecommerce/orders?${params.toString() as any}`);
+      const response = await authClient.api.get(`/ecommerce/orders?${params.toString() as any}`);
       return response.data;
     }
   });
@@ -126,7 +126,7 @@ const OrderStatusManagement: FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['order-stats'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/ecommerce/orders/stats');
+      const response = await authClient.api.get('/ecommerce/orders/stats');
       return response.data;
     }
   });
@@ -135,7 +135,7 @@ const OrderStatusManagement: FC = () => {
   // Status change mutation
   const changeStatusMutation = useMutation({
     mutationFn: async (data: StatusChangeData) => {
-      const response = await authClient.api.put(`/v1/ecommerce/orders/${data.orderId}/status`, data);
+      const response = await authClient.api.put(`/ecommerce/orders/${data.orderId}/status`, data);
       return response.data;
     },
     onSuccess: () => {

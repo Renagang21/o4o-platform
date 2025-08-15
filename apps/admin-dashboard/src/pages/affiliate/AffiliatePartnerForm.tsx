@@ -65,7 +65,7 @@ const AffiliatePartnerForm: FC = () => {
   const { data: partnerData, isLoading } = useQuery({
     queryKey: ['affiliate-partner', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/affiliate/partners/${id}`);
+      const response = await authClient.api.get(`/affiliate/partners/${id}`);
       return response.data;
     },
     enabled: isEditMode
@@ -75,7 +75,7 @@ const AffiliatePartnerForm: FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: AffiliatePartnerFormData) => {
-      const response = await authClient.api.post('/v1/affiliate/partners', data);
+      const response = await authClient.api.post('/affiliate/partners', data);
       return response.data;
     },
     onSuccess: () => {
@@ -91,7 +91,7 @@ const AffiliatePartnerForm: FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: AffiliatePartnerFormData) => {
-      const response = await authClient.api.put(`/v1/affiliate/partners/${id}`, data);
+      const response = await authClient.api.put(`/affiliate/partners/${id}`, data);
       return response.data;
     },
     onSuccess: () => {

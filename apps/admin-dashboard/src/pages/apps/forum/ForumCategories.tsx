@@ -49,7 +49,7 @@ const ForumCategories: FC = () => {
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ['forum-categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/forum/categories');
+      const response = await authClient.api.get('/forum/categories');
       return response.data.data;
     }
   });
@@ -57,7 +57,7 @@ const ForumCategories: FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: CategoryFormData) => {
-      const response = await authClient.api.post('/v1/forum/categories', data);
+      const response = await authClient.api.post('/forum/categories', data);
       return response.data;
     },
     onSuccess: () => {
@@ -70,7 +70,7 @@ const ForumCategories: FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: CategoryFormData }) => {
-      const response = await authClient.api.put(`/v1/forum/categories/${id}`, data);
+      const response = await authClient.api.put(`/forum/categories/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -83,7 +83,7 @@ const ForumCategories: FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await authClient.api.delete(`/v1/forum/categories/${id}`);
+      const response = await authClient.api.delete(`/forum/categories/${id}`);
       return response.data;
     },
     onSuccess: () => {
@@ -95,7 +95,7 @@ const ForumCategories: FC = () => {
   // Reorder mutation (commented out for future implementation)
   // const reorderMutation = useMutation({
   //   mutationFn: async (orderedIds: string[]) => {
-  //     const response = await authClient.api.post('/v1/forum/categories/reorder', { orderedIds });
+  //     const response = await authClient.api.post('/forum/categories/reorder', { orderedIds });
   //     return response.data;
   //   },
   //   onSuccess: () => {

@@ -16,7 +16,7 @@ interface CopyVideoResponse {
  */
 export async function copyVideoToMyList(params: CopyVideoParams): Promise<CopyVideoResponse> {
   try {
-    const response = await authClient.api.post('/v1/signage/copy-video', {
+    const response = await authClient.api.post('/signage/copy-video', {
       postId: params.postId,
       postType: params.postType || 'signage_video',
     });
@@ -44,7 +44,7 @@ export async function copyVideoToMyList(params: CopyVideoParams): Promise<CopyVi
  */
 export async function checkVideoInMyList(postId: string): Promise<boolean> {
   try {
-    const response = await authClient.api.get(`/v1/signage/check-video/${postId}`);
+    const response = await authClient.api.get(`/signage/check-video/${postId}`);
     return response.data.exists || false;
   } catch (error: any) {
     // Error logging - use proper error handler
@@ -69,7 +69,7 @@ export async function getMyVideoList(params?: {
     if (params?.search) queryParams.append('search', params.search);
     if (params?.category) queryParams.append('category', params.category);
 
-    const response = await authClient.api.get(`/v1/signage/my-videos?${queryParams.toString() as any}`);
+    const response = await authClient.api.get(`/signage/my-videos?${queryParams.toString() as any}`);
     return response.data;
   } catch (error: any) {
     // Error logging - use proper error handler
@@ -100,7 +100,7 @@ export async function updateVideoInfo(postId: string, data: {
   };
 }) {
   try {
-    const response = await authClient.api.put(`/v1/signage/videos/${postId}`, data);
+    const response = await authClient.api.put(`/signage/videos/${postId}`, data);
     return response.data;
   } catch (error: any) {
     // Error logging - use proper error handler

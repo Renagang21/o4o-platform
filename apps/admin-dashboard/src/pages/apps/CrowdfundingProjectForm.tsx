@@ -32,7 +32,7 @@ const CrowdfundingProjectForm: FC = () => {
   const { data: projectData, isLoading } = useQuery({
     queryKey: ['crowdfunding-project', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/crowdfunding-simple/projects/${id}`);
+      const response = await authClient.api.get(`/crowdfunding-simple/projects/${id}`);
       return response.data;
     },
     enabled: isEditMode
@@ -41,7 +41,7 @@ const CrowdfundingProjectForm: FC = () => {
   // 프로젝트 생성 mutation
   const createMutation = useMutation({
     mutationFn: async (data: CrowdfundingProjectFormData) => {
-      const response = await authClient.api.post('/v1/crowdfunding-simple/projects', data);
+      const response = await authClient.api.post('/crowdfunding-simple/projects', data);
       return response.data;
     },
     onSuccess: () => {
@@ -57,7 +57,7 @@ const CrowdfundingProjectForm: FC = () => {
   // 프로젝트 수정 mutation
   const updateMutation = useMutation({
     mutationFn: async (data: CrowdfundingProjectFormData) => {
-      const response = await authClient.api.put(`/v1/crowdfunding-simple/projects/${id}`, data);
+      const response = await authClient.api.put(`/crowdfunding-simple/projects/${id}`, data);
       return response.data;
     },
     onSuccess: () => {

@@ -66,7 +66,7 @@ const AppsManager: FC = () => {
   const { data: appsData, isLoading } = useQuery({
     queryKey: ['platform-apps'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/platform/apps');
+      const response = await authClient.api.get('/platform/apps');
       return response.data;
     }
   });
@@ -76,7 +76,7 @@ const AppsManager: FC = () => {
   const { data: metricsData } = useQuery({
     queryKey: ['platform-metrics'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/platform/metrics');
+      const response = await authClient.api.get('/platform/metrics');
       return response.data;
     }
   });
@@ -85,7 +85,7 @@ const AppsManager: FC = () => {
   // Toggle app status
   const toggleAppMutation = useMutation({
     mutationFn: async ({ appId, status }: { appId: string; status: string }) => {
-      const response = await authClient.api.patch(`/v1/platform/apps/${appId}/status`, { status });
+      const response = await authClient.api.patch(`/platform/apps/${appId}/status`, { status });
       return response.data;
     },
     onSuccess: (_, variables) => {
@@ -100,7 +100,7 @@ const AppsManager: FC = () => {
   // Update app settings
   const updateSettingsMutation = useMutation({
     mutationFn: async (settings: AppSettings) => {
-      const response = await authClient.api.put(`/v1/platform/apps/${settings.appId}/settings`, settings);
+      const response = await authClient.api.put(`/platform/apps/${settings.appId}/settings`, settings);
       return response.data;
     },
     onSuccess: () => {
@@ -118,7 +118,7 @@ const AppsManager: FC = () => {
   // TODO: Implement bulk operations feature
   // const bulkOperationMutation = useMutation({
   //   mutationFn: async ({ appIds, operation }: { appIds: string[]; operation: string }) => {
-  //     const response = await authClient.api.post('/v1/platform/apps/bulk', { appIds, operation });
+  //     const response = await authClient.api.post('/platform/apps/bulk', { appIds, operation });
   //     return response.data;
   //   },
   //   onSuccess: (_, variables) => {

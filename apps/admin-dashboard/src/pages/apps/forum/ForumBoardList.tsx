@@ -52,7 +52,7 @@ const ForumBoardList: FC = () => {
   const { data: categoriesData } = useQuery({
     queryKey: ['forum-categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/forum/categories');
+      const response = await authClient.api.get('/forum/categories');
       return response.data;
     }
   });
@@ -67,7 +67,7 @@ const ForumBoardList: FC = () => {
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (searchTerm) params.append('search', searchTerm);
 
-      const response = await authClient.api.get(`/v1/forum/posts?${params.toString() as any}`);
+      const response = await authClient.api.get(`/forum/posts?${params.toString() as any}`);
       return response.data;
     }
   });

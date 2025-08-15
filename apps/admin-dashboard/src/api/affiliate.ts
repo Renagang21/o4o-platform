@@ -14,7 +14,7 @@ import type {
  */
 export async function createAffiliate(data: CreateAffiliateRequest): Promise<CreateAffiliateResponse> {
   try {
-    const response = await authClient.api.post('/v1/affiliate/create', data);
+    const response = await authClient.api.post('/affiliate/create', data);
     return response.data;
   } catch (error: any) {
     // Error logging - use proper error handler
@@ -30,7 +30,7 @@ export async function createAffiliate(data: CreateAffiliateRequest): Promise<Cre
  */
 export async function getAffiliateUser(userId?: string): Promise<AffiliateUser | null> {
   try {
-    const response = await authClient.api.get(`/v1/affiliate/user${userId ? `/${userId}` : ''}`);
+    const response = await authClient.api.get(`/affiliate/user${userId ? `/${userId}` : ''}`);
     return response.data;
   } catch (error: any) {
     // Error logging - use proper error handler
@@ -49,7 +49,7 @@ export async function getAffiliateStats(params: GetAffiliateStatsRequest) {
   if (params.startDate) queryParams.append('startDate', params.startDate);
   if (params.endDate) queryParams.append('endDate', params.endDate);
 
-  const response = await authClient.api.get(`/v1/affiliate/stats?${queryParams.toString() as any}`);
+  const response = await authClient.api.get(`/affiliate/stats?${queryParams.toString() as any}`);
   return response.data;
 }
 
@@ -73,7 +73,7 @@ export async function getCommissionHistory(params: {
   if (params.startDate) queryParams.append('startDate', params.startDate);
   if (params.endDate) queryParams.append('endDate', params.endDate);
 
-  const response = await authClient.api.get(`/v1/affiliate/commissions?${queryParams.toString() as any}`);
+  const response = await authClient.api.get(`/affiliate/commissions?${queryParams.toString() as any}`);
   return response.data;
 }
 
@@ -81,7 +81,7 @@ export async function getCommissionHistory(params: {
  * 커미션 승인/거절/지급 처리 (관리자)
  */
 export async function processCommissions(request: ProcessCommissionRequest) {
-  const response = await authClient.api.post('/v1/affiliate/commissions/process', request);
+  const response = await authClient.api.post('/affiliate/commissions/process', request);
   return response.data;
 }
 
@@ -91,7 +91,7 @@ export async function processCommissions(request: ProcessCommissionRequest) {
 export async function generateReferralLink(
   request: GenerateReferralLinkRequest
 ): Promise<GenerateReferralLinkResponse> {
-  const response = await authClient.api.post('/v1/affiliate/generate-link', request);
+  const response = await authClient.api.post('/affiliate/generate-link', request);
   return response.data;
 }
 
@@ -106,7 +106,7 @@ export async function trackReferralClick(data: {
   userAgent?: string;
   referer?: string;
 }) {
-  const response = await authClient.api.post('/v1/affiliate/track-click', data);
+  const response = await authClient.api.post('/affiliate/track-click', data);
   return response.data;
 }
 
@@ -118,7 +118,7 @@ export async function trackReferralConversion(data: {
   referralCode: string;
   conversionType: 'signup' | 'purchase';
 }) {
-  const response = await authClient.api.post('/v1/affiliate/track-conversion', data);
+  const response = await authClient.api.post('/affiliate/track-conversion', data);
   return response.data;
 }
 
@@ -130,7 +130,7 @@ export async function validateReferralRelationship(
   referredId: string
 ): Promise<{ valid: boolean; reason?: string }> {
   try {
-    const response = await authClient.api.post('/v1/affiliate/validate-referral', {
+    const response = await authClient.api.post('/affiliate/validate-referral', {
       referrerId,
       referredId
     });
@@ -160,7 +160,7 @@ export async function getAffiliateList(params?: {
   if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
   if (params?.search) queryParams.append('search', params.search);
 
-  const response = await authClient.api.get(`/v1/affiliate/users?${queryParams.toString() as any}`);
+  const response = await authClient.api.get(`/affiliate/users?${queryParams.toString() as any}`);
   return response.data;
 }
 
@@ -172,7 +172,7 @@ export async function updateAffiliateStatus(
   status: 'active' | 'inactive' | 'suspended',
   reason?: string
 ) {
-  const response = await authClient.api.patch(`/v1/affiliate/users/${affiliateId}/status`, {
+  const response = await authClient.api.patch(`/affiliate/users/${affiliateId}/status`, {
     status,
     reason
   });
@@ -183,6 +183,6 @@ export async function updateAffiliateStatus(
  * 제휴 정책 조회
  */
 export async function getAffiliatePolicy() {
-  const response = await authClient.api.get('/v1/affiliate/policy');
+  const response = await authClient.api.get('/affiliate/policy');
   return response.data;
 }

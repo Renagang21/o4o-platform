@@ -104,7 +104,7 @@ const MenuBuilder: FC = () => {
   const { data: menu, isLoading: isLoadingMenu } = useQuery({
     queryKey: ['menu', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/menus/${id}`)
+      const response = await authClient.api.get(`/menus/${id}`)
       return response.data
     },
     enabled: isEditMode
@@ -114,7 +114,7 @@ const MenuBuilder: FC = () => {
   const { data: pages = [] } = useQuery({
     queryKey: ['pages-for-menu'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/posts?type=page&status=published')
+      const response = await authClient.api.get('/posts?type=page&status=published')
       return response.data.posts || []
     }
   })
@@ -123,7 +123,7 @@ const MenuBuilder: FC = () => {
   const { data: posts = [] } = useQuery({
     queryKey: ['posts-for-menu'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/posts?type=post&status=published&limit=50')
+      const response = await authClient.api.get('/posts?type=post&status=published&limit=50')
       return response.data.posts || []
     }
   })
@@ -132,7 +132,7 @@ const MenuBuilder: FC = () => {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories-for-menu'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/categories')
+      const response = await authClient.api.get('/categories')
       return response.data
     }
   })
@@ -140,7 +140,7 @@ const MenuBuilder: FC = () => {
   // Create menu mutation
   const createMutation = useMutation({
     mutationFn: async (data: CreateMenuDto) => {
-      const response = await authClient.api.post('/v1/menus', data)
+      const response = await authClient.api.post('/menus', data)
       return response.data
     },
     onSuccess: () => {
@@ -156,7 +156,7 @@ const MenuBuilder: FC = () => {
   // Update menu mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateMenuDto) => {
-      const response = await authClient.api.put(`/v1/menus/${id}`, data)
+      const response = await authClient.api.put(`/menus/${id}`, data)
       return response.data
     },
     onSuccess: () => {

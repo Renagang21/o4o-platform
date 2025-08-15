@@ -75,7 +75,7 @@ const FeeManagement: FC = () => {
   const { data: policiesData, isLoading } = useQuery({
     queryKey: ['fee-policies'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/settlements/fee-policies');
+      const response = await authClient.api.get('/settlements/fee-policies');
       return response.data;
     }
   });
@@ -85,7 +85,7 @@ const FeeManagement: FC = () => {
   const { data: calculationData } = useQuery({
     queryKey: ['fee-calculation', testAmount],
     queryFn: async () => {
-      const response = await authClient.api.post('/v1/settlements/calculate-fee', {
+      const response = await authClient.api.post('/settlements/calculate-fee', {
         orderAmount: testAmount,
         categoryId: 'cat-1',
         vendorTier: 'standard',
@@ -100,7 +100,7 @@ const FeeManagement: FC = () => {
   // Create policy mutation
   const createPolicyMutation = useMutation({
     mutationFn: async (data: Partial<FeePolicy>) => {
-      const response = await authClient.api.post('/v1/settlements/fee-policies', data);
+      const response = await authClient.api.post('/settlements/fee-policies', data);
       return response.data;
     },
     onSuccess: () => {
@@ -114,7 +114,7 @@ const FeeManagement: FC = () => {
   // Update policy mutation
   const updatePolicyMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<FeePolicy> }) => {
-      const response = await authClient.api.put(`/v1/settlements/fee-policies/${id}`, data);
+      const response = await authClient.api.put(`/settlements/fee-policies/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -128,7 +128,7 @@ const FeeManagement: FC = () => {
   // Delete policy mutation
   const deletePolicyMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await authClient.api.delete(`/v1/settlements/fee-policies/${id}`);
+      const response = await authClient.api.delete(`/settlements/fee-policies/${id}`);
       return response.data;
     },
     onSuccess: () => {
@@ -140,7 +140,7 @@ const FeeManagement: FC = () => {
   // Toggle policy status mutation
   const togglePolicyMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const response = await authClient.api.patch(`/v1/settlements/fee-policies/${id}/toggle`, { isActive });
+      const response = await authClient.api.patch(`/settlements/fee-policies/${id}/toggle`, { isActive });
       return response.data;
     },
     onSuccess: () => {

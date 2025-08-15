@@ -82,7 +82,7 @@ const InventoryManagement: FC = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
-      const response = await authClient.api.get(`/v1/inventory?${params.toString() as any}`);
+      const response = await authClient.api.get(`/inventory?${params.toString() as any}`);
       return response.data;
     }
   });
@@ -93,7 +93,7 @@ const InventoryManagement: FC = () => {
     queryKey: ['stock-movements', selectedInventoryItem?.id],
     queryFn: async () => {
       if (!selectedInventoryItem?.id) return { data: [] };
-      const response = await authClient.api.get(`/v1/inventory/${selectedInventoryItem.id}/movements`);
+      const response = await authClient.api.get(`/inventory/${selectedInventoryItem.id}/movements`);
       return response.data;
     },
     enabled: !!selectedInventoryItem?.id && isMovementHistoryOpen
@@ -104,7 +104,7 @@ const InventoryManagement: FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['inventory-stats'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/inventory/stats');
+      const response = await authClient.api.get('/inventory/stats');
       return response.data;
     }
   });
@@ -113,7 +113,7 @@ const InventoryManagement: FC = () => {
   // Stock adjustment mutation
   const adjustStockMutation = useMutation({
     mutationFn: async (data: StockAdjustmentFormData) => {
-      const response = await authClient.api.post('/v1/inventory/adjust', data);
+      const response = await authClient.api.post('/inventory/adjust', data);
       return response.data;
     },
     onSuccess: () => {
@@ -134,7 +134,7 @@ const InventoryManagement: FC = () => {
   // Bulk reorder mutation
   const bulkReorderMutation = useMutation({
     mutationFn: async (itemIds: string[]) => {
-      const response = await authClient.api.post('/v1/inventory/bulk-reorder', { itemIds });
+      const response = await authClient.api.post('/inventory/bulk-reorder', { itemIds });
       return response.data;
     },
     onSuccess: () => {

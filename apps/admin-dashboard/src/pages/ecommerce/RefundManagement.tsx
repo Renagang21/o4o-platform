@@ -84,7 +84,7 @@ const RefundManagement: FC = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
 
-      const response = await authClient.api.get(`/v1/payments/refunds?${params.toString() as any}`);
+      const response = await authClient.api.get(`/payments/refunds?${params.toString() as any}`);
       return response.data;
     }
   });
@@ -94,7 +94,7 @@ const RefundManagement: FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['refund-stats'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/payments/refunds/stats');
+      const response = await authClient.api.get('/payments/refunds/stats');
       return response.data;
     }
   });
@@ -103,7 +103,7 @@ const RefundManagement: FC = () => {
   // Process refund mutation
   const processRefundMutation = useMutation({
     mutationFn: async (data: RefundProcessData) => {
-      const response = await authClient.api.post(`/v1/payments/refunds/${data.refundId}/process`, data);
+      const response = await authClient.api.post(`/payments/refunds/${data.refundId}/process`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -124,7 +124,7 @@ const RefundManagement: FC = () => {
   // Retry failed refund mutation
   const retryRefundMutation = useMutation({
     mutationFn: async (refundId: string) => {
-      const response = await authClient.api.post(`/v1/payments/refunds/${refundId}/retry`);
+      const response = await authClient.api.post(`/payments/refunds/${refundId}/retry`);
       return response.data;
     },
     onSuccess: () => {

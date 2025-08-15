@@ -118,7 +118,7 @@ const ProductCategories: FC = () => {
   const { data: categoriesData, isLoading } = useQuery({
     queryKey: ['product-categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/ecommerce/categories/tree');
+      const response = await authClient.api.get('/ecommerce/categories/tree');
       return response.data;
     }
   });
@@ -127,7 +127,7 @@ const ProductCategories: FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: CategoryFormData) => {
-      const response = await authClient.api.post('/v1/ecommerce/categories', data);
+      const response = await authClient.api.post('/ecommerce/categories', data);
       return response.data;
     },
     onSuccess: () => {
@@ -140,7 +140,7 @@ const ProductCategories: FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: CategoryFormData }) => {
-      const response = await authClient.api.put(`/v1/ecommerce/categories/${id}`, data);
+      const response = await authClient.api.put(`/ecommerce/categories/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -153,7 +153,7 @@ const ProductCategories: FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await authClient.api.delete(`/v1/ecommerce/categories/${id}`);
+      const response = await authClient.api.delete(`/ecommerce/categories/${id}`);
       return response.data;
     },
     onSuccess: () => {

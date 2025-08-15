@@ -36,7 +36,7 @@ const CrowdfundingProjects: FC = () => {
         }, {} as Record<string, string>)
       ).toString() as any;
 
-      const response = await authClient.api.get(`/v1/crowdfunding-simple/projects?${queryString}`);
+      const response = await authClient.api.get(`/crowdfunding-simple/projects?${queryString}`);
       return response.data;
     }
   });
@@ -48,7 +48,7 @@ const CrowdfundingProjects: FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['crowdfunding-stats'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/crowdfunding-simple/dashboard/stats');
+      const response = await authClient.api.get('/crowdfunding-simple/dashboard/stats');
       return response.data;
     }
   });

@@ -63,7 +63,7 @@ const ProductForm: FC = () => {
   const { data: categoriesData } = useQuery({
     queryKey: ['product-categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/ecommerce/categories/tree');
+      const response = await authClient.api.get('/ecommerce/categories/tree');
       return response.data;
     }
   });

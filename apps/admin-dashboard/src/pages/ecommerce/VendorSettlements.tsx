@@ -67,7 +67,7 @@ const VendorSettlements: FC = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
       
-      const response = await authClient.api.get(`/v1/settlements/vendors?${params}`);
+      const response = await authClient.api.get(`/settlements/vendors?${params}`);
       return response.data;
     }
   });
@@ -76,7 +76,7 @@ const VendorSettlements: FC = () => {
   // Bulk approve settlements
   const approveSettlementsMutation = useMutation({
     mutationFn: async (data: SettlementApproval) => {
-      const response = await authClient.api.post('/v1/settlements/vendors/approve-bulk', data);
+      const response = await authClient.api.post('/settlements/vendors/approve-bulk', data);
       return response.data;
     },
     onSuccess: () => {
@@ -94,7 +94,7 @@ const VendorSettlements: FC = () => {
   // Individual settlement action
   const settlementActionMutation = useMutation({
     mutationFn: async ({ id, action, memo }: { id: string; action: string; memo?: string }) => {
-      const response = await authClient.api.post(`/v1/settlements/vendors/${id}/${action}`, { memo });
+      const response = await authClient.api.post(`/settlements/vendors/${id}/${action}`, { memo });
       return response.data;
     },
     onSuccess: (_, variables) => {
@@ -108,7 +108,7 @@ const VendorSettlements: FC = () => {
   // Export settlements
   const exportMutation = useMutation({
     mutationFn: async (settlementIds: string[]) => {
-      const response = await authClient.api.post('/v1/settlements/vendors/export', 
+      const response = await authClient.api.post('/settlements/vendors/export', 
         { settlementIds },
         { responseType: 'blob' }
       );

@@ -26,7 +26,7 @@ export async function getSupplierProducts(params?: {
   if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
   if (params?.search) queryParams.append('search', params.search);
 
-  const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
+  const response = await authClient.api.get(`/vendor/products?${queryParams.toString() as any}`);
   return response.data;
 }
 
@@ -34,7 +34,7 @@ export async function getSupplierProducts(params?: {
  * 제품 상세 조회
  */
 export async function getVendorProduct(productId: string) {
-  const response = await authClient.api.get(`/v1/vendor/products/${productId}`);
+  const response = await authClient.api.get(`/vendor/products/${productId}`);
   return response.data;
 }
 
@@ -42,7 +42,7 @@ export async function getVendorProduct(productId: string) {
  * 제품 등록 (공급자)
  */
 export async function createVendorProduct(data: Partial<VendorProduct>) {
-  const response = await authClient.api.post('/v1/vendor/products', data);
+  const response = await authClient.api.post('/vendor/products', data);
   return response.data;
 }
 
@@ -50,7 +50,7 @@ export async function createVendorProduct(data: Partial<VendorProduct>) {
  * 제품 수정 (공급자)
  */
 export async function updateVendorProduct(productId: string, data: Partial<VendorProduct>) {
-  const response = await authClient.api.put(`/v1/vendor/products/${productId}`, data);
+  const response = await authClient.api.put(`/vendor/products/${productId}`, data);
   return response.data;
 }
 
@@ -59,7 +59,7 @@ export async function updateVendorProduct(productId: string, data: Partial<Vendo
  */
 export async function approveProducts(request: ProductApprovalRequest): Promise<ProductApprovalResponse> {
   try {
-    const response = await authClient.api.post('/v1/vendor/products/approve', request);
+    const response = await authClient.api.post('/vendor/products/approve', request);
     return response.data;
   } catch (error: any) {
     // Error logging - use proper error handler
@@ -78,7 +78,7 @@ export async function approveProducts(request: ProductApprovalRequest): Promise<
  * 재고 업데이트
  */
 export async function updateStock(request: StockUpdateRequest) {
-  const response = await authClient.api.post('/v1/vendor/products/stock', request);
+  const response = await authClient.api.post('/vendor/products/stock', request);
   return response.data;
 }
 
@@ -114,7 +114,7 @@ export async function getApprovedProducts(params?: {
   if (params?.limit) queryParams.append('limit', params.limit.toString() as any);
   if (params?.search) queryParams.append('search', params.search);
 
-  const response = await authClient.api.get(`/v1/vendor/products?${queryParams.toString() as any}`);
+  const response = await authClient.api.get(`/vendor/products?${queryParams.toString() as any}`);
   return response.data;
 }
 
@@ -125,7 +125,7 @@ export async function updateProductStatus(
   productId: string, 
   status: 'draft' | 'active' | 'inactive' | 'soldout'
 ) {
-  const response = await authClient.api.patch(`/v1/vendor/products/${productId}/status`, { status });
+  const response = await authClient.api.patch(`/vendor/products/${productId}/status`, { status });
   return response.data;
 }
 
@@ -133,6 +133,6 @@ export async function updateProductStatus(
  * 제품 삭제 (소프트 삭제)
  */
 export async function deleteVendorProduct(productId: string) {
-  const response = await authClient.api.delete(`/v1/vendor/products/${productId}`);
+  const response = await authClient.api.delete(`/vendor/products/${productId}`);
   return response.data;
 }

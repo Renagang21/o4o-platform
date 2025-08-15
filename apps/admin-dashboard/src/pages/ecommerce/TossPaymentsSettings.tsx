@@ -77,7 +77,7 @@ const TossPaymentsSettings: FC = () => {
   const { data: configData } = useQuery({
     queryKey: ['toss-payments-config'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/payments/toss/config');
+      const response = await authClient.api.get('/payments/toss/config');
       return response.data;
     }
   });
@@ -87,7 +87,7 @@ const TossPaymentsSettings: FC = () => {
   const { data: testsData } = useQuery({
     queryKey: ['toss-payments-tests'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/payments/toss/tests');
+      const response = await authClient.api.get('/payments/toss/tests');
       return response.data;
     }
   });
@@ -97,7 +97,7 @@ const TossPaymentsSettings: FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['toss-payments-stats'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/payments/toss/stats');
+      const response = await authClient.api.get('/payments/toss/stats');
       return response.data;
     }
   });
@@ -106,7 +106,7 @@ const TossPaymentsSettings: FC = () => {
   // Update configuration mutation
   const updateConfigMutation = useMutation({
     mutationFn: async (data: Partial<TossPaymentsConfig>) => {
-      const response = await authClient.api.put('/v1/payments/toss/config', data);
+      const response = await authClient.api.put('/payments/toss/config', data);
       return response.data;
     },
     onSuccess: () => {
@@ -118,7 +118,7 @@ const TossPaymentsSettings: FC = () => {
   // Test connection mutation
   const testConnectionMutation = useMutation({
     mutationFn: async (testType: string) => {
-      const response = await authClient.api.post('/v1/payments/toss/test', { testType });
+      const response = await authClient.api.post('/payments/toss/test', { testType });
       return response.data;
     },
     onSuccess: (data) => {

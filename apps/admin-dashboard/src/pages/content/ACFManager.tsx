@@ -35,7 +35,7 @@ const ACFManager: FC = () => {
   const { data: fieldGroups = [], isLoading } = useQuery({
     queryKey: ['acf-field-groups'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/acf/field-groups')
+      const response = await authClient.api.get('/acf/field-groups')
       return response.data
     }
   })
@@ -43,7 +43,7 @@ const ACFManager: FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/v1/acf/field-groups/${id}`)
+      return authClient.api.delete(`/acf/field-groups/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['acf-field-groups'] })
@@ -57,7 +57,7 @@ const ACFManager: FC = () => {
   // Duplicate mutation
   const duplicateMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.post(`/v1/acf/field-groups/${id}/duplicate`)
+      return authClient.api.post(`/acf/field-groups/${id}/duplicate`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['acf-field-groups'] })

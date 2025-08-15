@@ -46,7 +46,7 @@ const ForumPostForm: FC = () => {
   const { data: categoriesData } = useQuery({
     queryKey: ['forum-categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/forum/categories');
+      const response = await authClient.api.get('/forum/categories');
       return response.data;
     }
   });
@@ -56,7 +56,7 @@ const ForumPostForm: FC = () => {
   const { data: post, isLoading } = useQuery({
     queryKey: ['forum-post', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/forum/posts/${id}`);
+      const response = await authClient.api.get(`/forum/posts/${id}`);
       return response.data.data;
     },
     enabled: isEditMode
@@ -65,7 +65,7 @@ const ForumPostForm: FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: ForumPostFormData) => {
-      const response = await authClient.api.post('/v1/forum/posts', data);
+      const response = await authClient.api.post('/forum/posts', data);
       return response.data;
     },
     onSuccess: () => {
@@ -81,7 +81,7 @@ const ForumPostForm: FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: ForumPostFormData) => {
-      const response = await authClient.api.put(`/v1/forum/posts/${id}`, data);
+      const response = await authClient.api.put(`/forum/posts/${id}`, data);
       return response.data;
     },
     onSuccess: () => {

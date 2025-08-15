@@ -85,7 +85,7 @@ const CPTForm: FC = () => {
   const { data: cpt, isLoading: isLoadingCPT } = useQuery({
     queryKey: ['custom-post-type', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/platform/custom-post-types/${id}`)
+      const response = await authClient.api.get(`/platform/custom-post-types/${id}`)
       return response.data
     },
     enabled: isEditMode
@@ -106,7 +106,7 @@ const CPTForm: FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: CreateCustomPostTypeDto) => {
-      const response = await authClient.api.post('/v1/platform/custom-post-types', data)
+      const response = await authClient.api.post('/platform/custom-post-types', data)
       return response.data
     },
     onSuccess: () => {
@@ -122,7 +122,7 @@ const CPTForm: FC = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: UpdateCustomPostTypeDto) => {
-      const response = await authClient.api.put(`/v1/platform/custom-post-types/${id}`, data)
+      const response = await authClient.api.put(`/platform/custom-post-types/${id}`, data)
       return response.data
     },
     onSuccess: () => {

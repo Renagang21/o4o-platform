@@ -24,7 +24,7 @@ const CrowdfundingApp: FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['crowdfunding-stats'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/crowdfunding-simple/dashboard/stats');
+      const response = await authClient.api.get('/crowdfunding-simple/dashboard/stats');
       return response.data;
     }
   });
@@ -35,7 +35,7 @@ const CrowdfundingApp: FC = () => {
   const { data: recentProjectsData } = useQuery({
     queryKey: ['crowdfunding-recent'],
     queryFn: async () => {
-      const response = await authClient.api.get('/v1/crowdfunding-simple/projects?limit=4&status=recruiting');
+      const response = await authClient.api.get('/crowdfunding-simple/projects?limit=4&status=recruiting');
       return response.data;
     }
   });
