@@ -95,7 +95,7 @@
     "winston": "^3.8.2",
     "xml2js": "0.6.2",
     "zod": "4.0.17",
-    "rate-limit-redis": "^3.0.1",
+    "rate-limit-redis": "^4.2.0",
     "tail": "^2.2.6"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import rateLimit from 'express-rate-limit';
-import { RedisStore } from 'rate-limit-redis';
+import RedisStore from 'rate-limit-redis';
 import { Redis } from 'ioredis';
 import { Request, Response } from 'express';
 
@@ -18,8 +18,8 @@ export const defaultLimiter = rateLimit({
   message: '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
   standardHeaders: true,
   legacyHeaders: false,
-  store: new (RedisStore as any)({
-    sendCommand: (...args: string[]) => (redisClient as any).call(...args),
+  store: new RedisStore({
+    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
     prefix: 'rl:default:',
   }),
 });
@@ -32,8 +32,8 @@ export const strictLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true, // 성공한 요청은 카운트하지 않음
-  store: new (RedisStore as any)({
-    sendCommand: (...args: string[]) => (redisClient as any).call(...args),
+  store: new RedisStore({
+    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
     prefix: 'rl:strict:',
   }),
 });
@@ -48,8 +48,8 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  store: new (RedisStore as any)({
-    sendCommand: (...args: string[]) => (redisClient as any).call(...args),
+  store: new RedisStore({
+    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
     prefix: 'rl:api:',
   }),
   keyGenerator: (req: Request) => {
@@ -64,8 +64,8 @@ export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간
   max: 20, // 시간당 20개 파일
   message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
-  store: new (RedisStore as any)({
-    sendCommand: (...args: string[]) => (redisClient as any).call(...args),
+  store: new RedisStore({
+    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
     prefix: 'rl:upload:',
   }),
 });
@@ -84,8 +84,8 @@ export const dynamicLimiter = (tier: 'free' | 'basic' | 'premium' = 'free') => {
     windowMs: config.windowMs,
     max: config.max,
     message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
-    store: new (RedisStore as any)({
-      sendCommand: (...args: string[]) => (redisClient as any).call(...args),
+    store: new RedisStore({
+      sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
       prefix: `rl:${tier}:`,
     }),
     keyGenerator: (req: Request) => {
