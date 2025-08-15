@@ -7,7 +7,6 @@ export declare class DropshippingController {
     private supplierInfoRepository;
     private productRepository;
     private vendorInfoRepository;
-    private supplierManager;
     /**
      * Get dropshipping settings
      */

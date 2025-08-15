@@ -22,7 +22,10 @@ exports.defaultLimiter = (0, express_rate_limit_1.default)({
     standardHeaders: true,
     legacyHeaders: false,
     store: new rate_limit_redis_1.default({
-        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
+        sendCommand: async (...args) => {
+            const result = await redisClient.call.apply(redisClient, args);
+            return result;
+        },
         prefix: 'rl:default:',
     }),
 });
@@ -35,7 +38,10 @@ exports.strictLimiter = (0, express_rate_limit_1.default)({
     legacyHeaders: false,
     skipSuccessfulRequests: true, // 성공한 요청은 카운트하지 않음
     store: new rate_limit_redis_1.default({
-        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
+        sendCommand: async (...args) => {
+            const result = await redisClient.call.apply(redisClient, args);
+            return result;
+        },
         prefix: 'rl:strict:',
     }),
 });
@@ -50,7 +56,10 @@ exports.apiLimiter = (0, express_rate_limit_1.default)({
     standardHeaders: true,
     legacyHeaders: false,
     store: new rate_limit_redis_1.default({
-        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
+        sendCommand: async (...args) => {
+            const result = await redisClient.call.apply(redisClient, args);
+            return result;
+        },
         prefix: 'rl:api:',
     }),
     keyGenerator: (req) => {
@@ -66,7 +75,10 @@ exports.uploadLimiter = (0, express_rate_limit_1.default)({
     max: 20, // 시간당 20개 파일
     message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
     store: new rate_limit_redis_1.default({
-        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
+        sendCommand: async (...args) => {
+            const result = await redisClient.call.apply(redisClient, args);
+            return result;
+        },
         prefix: 'rl:upload:',
     }),
 });
@@ -83,7 +95,10 @@ const dynamicLimiter = (tier = 'free') => {
         max: config.max,
         message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
         store: new rate_limit_redis_1.default({
-            sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
+            sendCommand: async (...args) => {
+                const result = await redisClient.call.apply(redisClient, args);
+                return result;
+            },
             prefix: `rl:${tier}:`,
         }),
         keyGenerator: (req) => {

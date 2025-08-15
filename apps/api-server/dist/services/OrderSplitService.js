@@ -11,7 +11,6 @@ const OrderItem_1 = require("../entities/OrderItem");
 const Product_1 = require("../entities/Product");
 const VendorOrderItem_1 = require("../entities/VendorOrderItem");
 const User_1 = require("../entities/User");
-const supplier_connector_1 = require("@o4o/supplier-connector");
 class OrderSplitService {
     constructor() {
         this.orderRepository = connection_1.AppDataSource.getRepository(Order_1.Order);
@@ -19,38 +18,43 @@ class OrderSplitService {
         this.productRepository = connection_1.AppDataSource.getRepository(Product_1.Product);
         this.vendorOrderItemRepository = connection_1.AppDataSource.getRepository(VendorOrderItem_1.VendorOrderItem);
         this.userRepository = connection_1.AppDataSource.getRepository(User_1.User);
-        this.supplierManager = new supplier_connector_1.SupplierManager();
-        this.initializeSuppliers();
+        // this.supplierManager = new SupplierManager(); // Commented out until package is available
+        // this.initializeSuppliers(); // Commented out until package is available
     }
     /**
      * Initialize supplier connectors
      */
     async initializeSuppliers() {
+        // Supplier initialization commented out until package is available
+        /*
         // Load supplier configurations from database or config
         // For now, we'll use sample configurations
+        
         // Add domestic API supplier
         this.supplierManager.addSupplier('domestic-api', {
-            type: 'api',
-            credentials: {
-                apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
-                endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
-            },
-            options: {
-                rateLimit: 10,
-                timeout: 30000,
-                retryAttempts: 3
-            }
-        });
+          type: 'api',
+          credentials: {
+            apiKey: process.env.DOMESTIC_SUPPLIER_API_KEY,
+            endpoint: process.env.DOMESTIC_SUPPLIER_ENDPOINT
+          },
+          options: {
+            rateLimit: 10,
+            timeout: 30000,
+            retryAttempts: 3
+          }
+        } as any);
+    
         // Add CSV catalog supplier
         this.supplierManager.addSupplier('csv-catalog', {
-            type: 'csv',
-            options: {
-                webhookUrl: './catalogs/supplier-products.csv',
-                rateLimit: 10,
-                timeout: 30000,
-                retryAttempts: 3
-            }
-        });
+          type: 'csv',
+          options: {
+            webhookUrl: './catalogs/supplier-products.csv',
+            rateLimit: 10,
+            timeout: 30000,
+            retryAttempts: 3
+          }
+        } as any);
+        */
     }
     /**
      * Split order by supplier
@@ -99,7 +103,8 @@ class OrderSplitService {
             const vendorId = product.vendorId || product.userId;
             // If product doesn't have supplier info, find best supplier
             if (!product.supplierId) {
-                const bestSupplier = await this.supplierManager.findBestSupplier(product.sku);
+                // const bestSupplier = await this.supplierManager.findBestSupplier(product.sku); // Commented out until package is available
+                const bestSupplier = null;
                 if (bestSupplier) {
                     supplierId = bestSupplier;
                 }
@@ -118,7 +123,8 @@ class OrderSplitService {
     async forwardToSuppliers(order, splitOrders) {
         const forwardPromises = splitOrders.map(async (splitOrder) => {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-            const supplier = this.supplierManager.getSupplier(splitOrder.supplierId);
+            // const supplier = this.supplierManager.getSupplier(splitOrder.supplierId); // Commented out until package is available
+            const supplier = null;
             if (!supplier) {
                 console.error(`Supplier ${splitOrder.supplierId} not found`);
                 return;
@@ -153,8 +159,9 @@ class OrderSplitService {
                 notes: `Order from O4O Platform - ${order.id}`
             };
             try {
-                // Create order with supplier
-                const response = await supplier.createOrder(supplierOrder);
+                // Create order with supplier - commented out until package is available
+                // const response = await supplier.createOrder(supplierOrder) as any;
+                const response = null;
                 if (response && response.success && response.data) {
                     // Update order item with supplier order ID
                     for (const item of splitOrder.items) {
@@ -261,11 +268,13 @@ class OrderSplitService {
         }
         // Find the supplier for this order
         const [supplierId] = supplierOrderId.split('-');
-        const supplier = this.supplierManager.getSupplier(supplierId);
+        // const supplier = this.supplierManager.getSupplier(supplierId); // Commented out until package is available
+        const supplier = null;
         if (!supplier) {
             return null;
         }
-        return await supplier.getOrderStatus(supplierOrderId);
+        // return await supplier.getOrderStatus(supplierOrderId); // Commented out until package is available
+        return null;
     }
 }
 exports.OrderSplitService = OrderSplitService;

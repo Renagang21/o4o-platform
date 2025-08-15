@@ -9,14 +9,13 @@ const connection_1 = require("../database/connection");
 const SupplierInfo_1 = require("../entities/SupplierInfo");
 const Product_1 = require("../entities/Product");
 const VendorInfo_1 = require("../entities/VendorInfo");
-const supplier_connector_1 = require("@o4o/supplier-connector");
 class DropshippingController {
     constructor() {
         this.supplierInfoRepository = connection_1.AppDataSource.getRepository(SupplierInfo_1.SupplierInfo);
         this.productRepository = connection_1.AppDataSource.getRepository(Product_1.Product);
         this.vendorInfoRepository = connection_1.AppDataSource.getRepository(VendorInfo_1.VendorInfo);
-        this.supplierManager = new supplier_connector_1.SupplierManager();
     }
+    // private supplierManager = new SupplierManager(); // Commented out until package is available
     /**
      * Get dropshipping settings
      */

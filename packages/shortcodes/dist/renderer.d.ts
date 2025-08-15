@@ -22,7 +22,7 @@ export declare class DefaultShortcodeRenderer implements ShortcodeRenderer {
  * 컴포넌트에서 숏코드를 쉽게 사용할 수 있도록 하는 Hook
  */
 export declare function useShortcodes(parser: ShortcodeParser, registry: ShortcodeRegistry): {
-    render: (content: string, context?: any) => ReactElement<unknown, string | import("react").JSXElementConstructor<any>> | null;
-    renderShortcode: (shortcode: ParsedShortcode, context?: any) => ReactElement<unknown, string | import("react").JSXElementConstructor<any>> | null;
+    render: (content: string, context?: any) => ReactElement<any, string | import("react").JSXElementConstructor<any>> | null;
+    renderShortcode: (shortcode: ParsedShortcode, context?: any) => ReactElement<any, string | import("react").JSXElementConstructor<any>> | null;
 };
 //# sourceMappingURL=renderer.d.ts.map

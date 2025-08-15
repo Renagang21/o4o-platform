@@ -123,6 +123,7 @@
     "postcss": "^8.4.49",
     "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^4.1.0",
+    "terser": "5.43.1",
     "typescript": "~5.9.2",
     "vite": "7.0.6",
     "vitest": "3.2.4"

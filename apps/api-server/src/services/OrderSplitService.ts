@@ -9,7 +9,7 @@ import { OrderItem } from '../entities/OrderItem';
 import { Product } from '../entities/Product';
 import { VendorOrderItem } from '../entities/VendorOrderItem';
 import { User } from '../entities/User';
-import { SupplierManager, SupplierOrder } from '@o4o/supplier-connector';
+// import { SupplierManager, SupplierOrder } from '@o4o/supplier-connector'; // Commented out until package is available
 
 interface SplitOrder {
   supplierId: string;
@@ -26,17 +26,19 @@ export class OrderSplitService {
   private productRepository = AppDataSource.getRepository(Product);
   private vendorOrderItemRepository = AppDataSource.getRepository(VendorOrderItem);
   private userRepository = AppDataSource.getRepository(User);
-  private supplierManager: SupplierManager;
+  private supplierManager: any; // Changed from SupplierManager until package is available
 
   constructor() {
-    this.supplierManager = new SupplierManager();
-    this.initializeSuppliers();
+    // this.supplierManager = new SupplierManager(); // Commented out until package is available
+    // this.initializeSuppliers(); // Commented out until package is available
   }
 
   /**
    * Initialize supplier connectors
    */
   private async initializeSuppliers() {
+    // Supplier initialization commented out until package is available
+    /*
     // Load supplier configurations from database or config
     // For now, we'll use sample configurations
     
@@ -64,6 +66,7 @@ export class OrderSplitService {
         retryAttempts: 3
       }
     } as any);
+    */
   }
 
   /**
@@ -134,7 +137,8 @@ export class OrderSplitService {
       
       // If product doesn't have supplier info, find best supplier
       if (!product.supplierId) {
-        const bestSupplier = await this.supplierManager.findBestSupplier(product.sku);
+        // const bestSupplier = await this.supplierManager.findBestSupplier(product.sku); // Commented out until package is available
+        const bestSupplier = null;
         
         if (bestSupplier) {
           supplierId = bestSupplier as any;
@@ -161,7 +165,8 @@ export class OrderSplitService {
     splitOrders: SplitOrder[]
   ): Promise<void> {
     const forwardPromises = splitOrders.map(async (splitOrder) => {
-      const supplier = this.supplierManager.getSupplier(splitOrder.supplierId);
+      // const supplier = this.supplierManager.getSupplier(splitOrder.supplierId); // Commented out until package is available
+      const supplier = null;
       
       if (!supplier) {
         console.error(`Supplier ${splitOrder.supplierId} not found`);
@@ -199,8 +204,9 @@ export class OrderSplitService {
       };
 
       try {
-        // Create order with supplier
-        const response = await supplier.createOrder(supplierOrder) as any;
+        // Create order with supplier - commented out until package is available
+        // const response = await supplier.createOrder(supplierOrder) as any;
+        const response = null;
         
         if (response && (response as any).success && (response as any).data) {
           // Update order item with supplier order ID
@@ -332,12 +338,14 @@ export class OrderSplitService {
     
     // Find the supplier for this order
     const [supplierId] = supplierOrderId.split('-');
-    const supplier = this.supplierManager.getSupplier(supplierId);
+    // const supplier = this.supplierManager.getSupplier(supplierId); // Commented out until package is available
+    const supplier = null;
     
     if (!supplier) {
       return null;
     }
     
-    return await supplier.getOrderStatus(supplierOrderId);
+    // return await supplier.getOrderStatus(supplierOrderId); // Commented out until package is available
+    return null;
   }
 }

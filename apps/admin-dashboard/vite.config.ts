@@ -35,10 +35,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
       'react/jsx-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-runtime'),
-      'react/jsx-dev-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-dev-runtime')
+      'react/jsx-dev-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-dev-runtime'),
+      // Force date-fns to use v2
+      'date-fns': path.resolve(__dirname, './node_modules/date-fns')
     },
-    // Dedupe React to prevent multiple versions
-    dedupe: ['react', 'react-dom']
+    // Dedupe React and date-fns to prevent multiple versions
+    dedupe: ['react', 'react-dom', 'date-fns']
   },
   server: {
     port: 3001,
@@ -65,7 +67,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/utils', 
       '@o4o/ui', 
       '@o4o/auth-client', 
-      '@o4o/auth-context'
+      '@o4o/auth-context',
+      'date-fns'
     ],
     exclude: [
       '@wordpress/blocks',

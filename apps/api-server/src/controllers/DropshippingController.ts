@@ -8,7 +8,7 @@ import { AppDataSource } from '../database/connection';
 import { SupplierInfo } from '../entities/SupplierInfo';
 import { Product, ProductType } from '../entities/Product';
 import { VendorInfo } from '../entities/VendorInfo';
-import { SupplierManager } from '@o4o/supplier-connector';
+// import { SupplierManager } from '@o4o/supplier-connector';  // Commented out until package is available
 
 // Using global Express.Request extension instead
 
@@ -38,7 +38,7 @@ export class DropshippingController {
   private supplierInfoRepository = AppDataSource.getRepository(SupplierInfo);
   private productRepository = AppDataSource.getRepository(Product);
   private vendorInfoRepository = AppDataSource.getRepository(VendorInfo);
-  private supplierManager = new SupplierManager();
+  // private supplierManager = new SupplierManager(); // Commented out until package is available
 
   /**
    * Get dropshipping settings
