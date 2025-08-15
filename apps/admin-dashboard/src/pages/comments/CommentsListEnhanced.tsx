@@ -219,7 +219,7 @@ export default function CommentsListEnhanced() {
         }
       ]),
       { label: 'Reply', href: `/comments/${comment.id}/reply` },
-      { label: 'Quick Edit', onClick: () => {/* console.log('Quick edit', comment.id) */} },
+      { label: 'Quick Edit', onClick: () => {/* Quick edit action */} },
       { label: 'Edit', href: `/comments/${comment.id}/edit` },
       ...(comment.status !== 'spam' ? [
         { 
