@@ -72,7 +72,15 @@ export class Post {
   })
   status!: string
 
-  // Post-specific fields (removed generic 'type' field)
+  // Post type field for supporting custom post types
+  @Column({ 
+    type: 'varchar',
+    length: 50,
+    default: 'post'
+  })
+  type!: string
+
+  // Post format (WordPress-style)
   @Column({ 
     type: 'enum',
     enum: ['standard', 'aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat'],

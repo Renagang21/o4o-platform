@@ -155,7 +155,18 @@ router.get('/',
       if (!repos) {
         // Return mock data when database is not available
         const postType = post_type || type || 'post';
-        let filteredPosts = postType === 'page' ? mockPages : mockPosts;
+        
+        // Handle custom post types
+        let filteredPosts;
+        if (postType === 'page') {
+          filteredPosts = mockPages;
+        } else if (postType === 'post') {
+          filteredPosts = mockPosts;
+        } else {
+          // For custom post types, return empty array or mock data
+          filteredPosts = [];
+        }
+        
         filteredPosts = filteredPosts.filter(p => p.type === postType);
         
         if (status && status !== 'all') {
@@ -184,10 +195,17 @@ router.get('/',
       }
 
       const { postRepository } = repos;
+      
+      // Handle post type filter
+      const postType = post_type || type || 'post';
+      
       const queryBuilder = postRepository.createQueryBuilder('post')
         .leftJoinAndSelect('post.author', 'author')
         .leftJoinAndSelect('post.categories', 'categories')
         .leftJoinAndSelect('post.lastModifier', 'lastModifier');
+
+      // Type filter
+      queryBuilder.andWhere('post.type = :type', { type: postType });
 
       // Status filter
       if (status) {
@@ -228,7 +246,7 @@ router.get('/',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: post_type || type || 'post',
+        type: post.type || 'post',
         link: `/posts/${post.slug}`,
         title: { rendered: post.title },
         content: { 
@@ -297,7 +315,7 @@ router.get('/:id',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: 'post',
+        type: post.type || 'post',
         link: `/posts/${post.slug}`,
         title: { rendered: post.title },
         content: { 
@@ -431,6 +449,7 @@ router.post('/',
         title,
         content: { blocks: [] }, // TODO: Parse content into blocks format
         status,
+        type: req.body.type || req.body.post_type || 'post',
         slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
         excerpt: extractContent(excerpt),
         tags: tags || [],
@@ -452,7 +471,7 @@ router.post('/',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: 'post',
+        type: post.type || 'post',
         link: `/posts/${post.slug}`,
         title: { 
           raw: post.title,
@@ -576,6 +595,7 @@ router.put('/:id',
         title: title || existingPost.title,
         content: content ? { blocks: [] } : existingPost.content, // TODO: Parse content into blocks format
         status: status || existingPost.status,
+        type: req.body.type || req.body.post_type || existingPost.type,
         slug: slug || existingPost.slug,
         excerpt: excerpt !== undefined ? extractContent(excerpt) : existingPost.excerpt,
         tags: tags || existingPost.tags,
@@ -597,7 +617,7 @@ router.put('/:id',
         modified_gmt: updatedPost.updatedAt,
         slug: updatedPost.slug,
         status: updatedPost.status,
-        type: 'post',
+        type: updatedPost.type || 'post',
         link: `/posts/${updatedPost.slug}`,
         title: { 
           raw: updatedPost.title,

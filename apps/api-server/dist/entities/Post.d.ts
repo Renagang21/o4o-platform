@@ -49,6 +49,7 @@ export declare class Post {
     };
     excerpt: string;
     status: string;
+    type: string;
     format: string;
     template: string;
     categories: Category[];

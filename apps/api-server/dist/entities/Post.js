@@ -46,6 +46,14 @@ __decorate([
 ], Post.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.Column)({
+        type: 'varchar',
+        length: 50,
+        default: 'post'
+    }),
+    __metadata("design:type", String)
+], Post.prototype, "type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
         type: 'enum',
         enum: ['standard', 'aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat'],
         default: 'standard'
