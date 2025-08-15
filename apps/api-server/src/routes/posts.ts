@@ -51,6 +51,30 @@ const mockPosts: any[] = [
   }
 ];
 
+// Mock data for pages
+const mockPages: any[] = [
+  {
+    id: '1',
+    title: 'About Us',
+    slug: 'about',
+    content: '<p>About Neture Platform</p>',
+    excerpt: 'Learn more about Neture',
+    status: 'published',
+    type: 'page',
+    author: {
+      id: '1',
+      name: 'Admin',
+      email: 'admin@neture.co.kr'
+    },
+    template: 'default',
+    parent: null,
+    menuOrder: 0,
+    publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
 // Helper to extract content from Gutenberg format
 const extractContent = (content: any): string => {
   if (typeof content === 'string') {
@@ -131,7 +155,8 @@ router.get('/',
       if (!repos) {
         // Return mock data when database is not available
         const postType = post_type || type || 'post';
-        let filteredPosts = mockPosts.filter(p => p.type === postType);
+        let filteredPosts = postType === 'page' ? mockPages : mockPosts;
+        filteredPosts = filteredPosts.filter(p => p.type === postType);
         
         if (status && status !== 'all') {
           filteredPosts = filteredPosts.filter(p => p.status === status);
@@ -203,7 +228,7 @@ router.get('/',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: 'post',
+        type: post_type || type || 'post',
         link: `/posts/${post.slug}`,
         title: { rendered: post.title },
         content: { 
@@ -244,7 +269,8 @@ router.get('/:id',
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
-        const mockPost = mockPosts.find(p => p.id === id);
+        // Check both posts and pages
+        const mockPost = mockPosts.find(p => p.id === id) || mockPages.find(p => p.id === id);
         if (!mockPost) {
           return res.status(404).json({ error: 'Post not found' });
         }
@@ -303,7 +329,16 @@ router.get('/:id',
 
 // POST /api/posts - Create post (Gutenberg compatible)
 router.post('/',
-  authenticateToken,
+  // Conditionally apply auth - allow auto-draft without auth
+  async (req: Request, res: Response, next: any) => {
+    if (req.body.status === 'auto-draft') {
+      // Skip auth for auto-draft
+      next();
+    } else {
+      // Require auth for other statuses
+      authenticateToken(req, res, next);
+    }
+  },
   // Make title and content optional for auto-save support
   body('title').optional(),
   body('content').optional(),

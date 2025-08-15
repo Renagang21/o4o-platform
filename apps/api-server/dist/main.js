@@ -128,6 +128,7 @@ const block_patterns_routes_1 = __importDefault(require("./routes/block-patterns
 const template_parts_routes_1 = __importDefault(require("./routes/template-parts.routes"));
 const categories_1 = __importDefault(require("./routes/categories"));
 const custom_post_types_1 = __importDefault(require("./routes/custom-post-types"));
+const menus_1 = __importDefault(require("./routes/menus"));
 // Import v1 API routes
 const content_routes_1 = __importDefault(require("./routes/v1/content.routes"));
 const platform_routes_1 = __importDefault(require("./routes/v1/platform.routes"));
@@ -501,6 +502,7 @@ app.use('/api/content', content_1.default); // Content routes - moved to specifi
 app.use('/api/v1/posts', posts_1.default); // Posts routes (WordPress-compatible)
 app.use('/api/v1/categories', categories_1.default); // Categories routes (fixed)
 app.use('/api/v1/custom-post-types', custom_post_types_1.default); // Custom post types (fixed)
+app.use('/api/v1/menus', menus_1.default); // Menus routes
 app.use('/api/v1/content', content_routes_1.default);
 app.use('/api/v1/platform', platform_routes_1.default);
 app.use('/api/v1/ecommerce', ecommerce_routes_1.default);
@@ -516,6 +518,7 @@ app.use('/api/v1', product_variation_routes_1.default); // 상품 변형 라우�
 app.use('/api/v1', toss_payments_routes_1.default); // 토스페이먼츠 결제 라우트
 // Admin routes with correct paths
 app.use('/api/admin', admin_routes_1.default);
+app.use('/api/admin', admin_1.default); // Add original admin routes for backwards compatibility
 app.use('/api/settings', settingsRoutes_1.default);
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {

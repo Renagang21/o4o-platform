@@ -99,6 +99,7 @@ import blockPatternsRoutes from './routes/block-patterns.routes';
 import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
 import customPostTypesRoutes from './routes/custom-post-types';
+import menusRoutes from './routes/menus';
 
 // Import v1 API routes
 import contentV1Routes from './routes/v1/content.routes';
@@ -513,6 +514,7 @@ app.use('/api/content', contentRoutes); // Content routes - moved to specific pa
 app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
+app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
@@ -529,6 +531,7 @@ app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
+app.use('/api/admin', adminRoutes); // Add original admin routes for backwards compatibility
 app.use('/api/settings', settingsRoutes);
 
 // 루트 접근 시 API 서버임을 알림
