@@ -71,7 +71,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     done(error as Error, undefined);
   }
   }));
-} else {
 }
 
 // Kakao OAuth Strategy - Only initialize if credentials are provided
@@ -127,7 +126,6 @@ if (process.env.KAKAO_CLIENT_ID) {
     done(error as Error, undefined);
   }
   }));
-} else {
 }
 
 // Naver OAuth Strategy - Only initialize if credentials are provided
@@ -183,7 +181,6 @@ if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
     done(error as Error, undefined);
   }
   }));
-} else {
 }
 
 export default passport;

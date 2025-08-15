@@ -93,7 +93,6 @@ export class MonitoringInitializer {
         } catch (error) {
           console.error(`❌ Failed to create component ${componentData.name}:`, error);
         }
-      } else {
       }
     }
   }

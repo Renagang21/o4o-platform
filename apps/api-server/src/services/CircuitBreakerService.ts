@@ -307,8 +307,6 @@ export class CircuitBreakerService {
 
   removeCircuit(id: string): boolean {
     const removed = this.circuits.delete(id);
-    if (removed) {
-    }
     return removed;
   }
 
