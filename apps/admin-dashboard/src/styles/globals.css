@@ -1,6 +1,9 @@
 /* Import all theme variations - must come first */
 @import './themes/index.css';
 
+/* Import admin UI improvements */
+@import './admin-improvements.css';
+
 @import "tailwindcss";
 
 @layer base {

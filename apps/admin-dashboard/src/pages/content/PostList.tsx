@@ -116,7 +116,7 @@ const PostList: FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">게시글</h1>
           <p className="text-gray-600 mt-1">블로그 게시글을 관리합니다</p>
         </div>
-        <Button onClick={() => navigate('/content/posts/new')}>
+        <Button onClick={() => navigate('/admin/posts/new')}>
           <Plus className="w-4 h-4 mr-2" />
           새 게시글
         </Button>

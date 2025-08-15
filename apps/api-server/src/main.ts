@@ -6,8 +6,12 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// 환경변수 로드 (우선순위: .env.production > .env)
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+// 환경변수 로드 (우선순위: .env.production > .env.development > .env)
+const envFile = process.env.NODE_ENV === 'production' 
+  ? '.env.production' 
+  : process.env.NODE_ENV === 'development' 
+    ? '.env.development' 
+    : '.env';
 
 // Try multiple paths for .env file
 const possiblePaths = [
@@ -504,6 +508,9 @@ app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (W
 app.use('/api/content', contentRoutes); // Content routes - moved to specific path to avoid conflicts
 
 // V1 API routes (new standardized endpoints)
+app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
+app.use('/api/v1/categories', contentRoutes); // Categories routes
+app.use('/api/v1/custom-post-types', cptRoutes); // Custom post types
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
