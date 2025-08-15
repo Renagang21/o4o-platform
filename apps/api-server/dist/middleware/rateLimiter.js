@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.smartLimiter = exports.SmartRateLimiter = exports.dynamicLimiter = exports.uploadLimiter = exports.apiLimiter = exports.strictLimiter = exports.defaultLimiter = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
-const rate_limit_redis_1 = require("rate-limit-redis");
+const rate_limit_redis_1 = __importDefault(require("rate-limit-redis"));
 const ioredis_1 = require("ioredis");
 // Redis 클라이언트 (기존 redis 설정 사용)
 const redisClient = new ioredis_1.Redis({
@@ -21,8 +21,8 @@ exports.defaultLimiter = (0, express_rate_limit_1.default)({
     message: '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
     standardHeaders: true,
     legacyHeaders: false,
-    store: new rate_limit_redis_1.RedisStore({
-        sendCommand: (...args) => redisClient.call(...args),
+    store: new rate_limit_redis_1.default({
+        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
         prefix: 'rl:default:',
     }),
 });
@@ -34,8 +34,8 @@ exports.strictLimiter = (0, express_rate_limit_1.default)({
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true, // 성공한 요청은 카운트하지 않음
-    store: new rate_limit_redis_1.RedisStore({
-        sendCommand: (...args) => redisClient.call(...args),
+    store: new rate_limit_redis_1.default({
+        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
         prefix: 'rl:strict:',
     }),
 });
@@ -49,8 +49,8 @@ exports.apiLimiter = (0, express_rate_limit_1.default)({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    store: new rate_limit_redis_1.RedisStore({
-        sendCommand: (...args) => redisClient.call(...args),
+    store: new rate_limit_redis_1.default({
+        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
         prefix: 'rl:api:',
     }),
     keyGenerator: (req) => {
@@ -65,8 +65,8 @@ exports.uploadLimiter = (0, express_rate_limit_1.default)({
     windowMs: 60 * 60 * 1000, // 1시간
     max: 20, // 시간당 20개 파일
     message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
-    store: new rate_limit_redis_1.RedisStore({
-        sendCommand: (...args) => redisClient.call(...args),
+    store: new rate_limit_redis_1.default({
+        sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
         prefix: 'rl:upload:',
     }),
 });
@@ -82,8 +82,8 @@ const dynamicLimiter = (tier = 'free') => {
         windowMs: config.windowMs,
         max: config.max,
         message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
-        store: new rate_limit_redis_1.RedisStore({
-            sendCommand: (...args) => redisClient.call(...args),
+        store: new rate_limit_redis_1.default({
+            sendCommand: async (...args) => redisClient.call.apply(redisClient, args),
             prefix: `rl:${tier}:`,
         }),
         keyGenerator: (req) => {
