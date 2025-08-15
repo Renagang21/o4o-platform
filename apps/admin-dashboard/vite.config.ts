@@ -144,10 +144,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             if (id.includes('@tiptap')) {
               return 'vendor-tiptap';
             }
-            // Monaco 에디터
-            if (id.includes('monaco-editor')) {
-              return 'vendor-monaco';
-            }
+            // Monaco editor removed - using Gutenberg instead
             // 기타 큰 라이브러리들
             if (id.includes('socket.io')) {
               return 'vendor-socket';
