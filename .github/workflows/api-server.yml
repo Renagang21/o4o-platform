@@ -146,7 +146,11 @@ jobs:
         # Install dependencies and restart
         ssh ubuntu@${{ env.SERVER_IP }} "
           cd /home/ubuntu/o4o-platform/apps/api-server
-          npm install --production
+          # Clean npm cache and temporary files to prevent ENOTEMPTY errors
+          npm cache clean --force
+          rm -rf node_modules/.uuid-* node_modules/.tmp-* node_modules/.staging
+          # Install dependencies
+          npm ci --production || npm install --production
           npm run migration:run
           pm2 restart ${{ env.PM2_NAME }} || pm2 start npm --name ${{ env.PM2_NAME }} -- start
           pm2 save
