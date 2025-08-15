@@ -47,7 +47,7 @@ export const EmailVerificationSuccess: FC = () => {
 
   const verifyEmail = async () => {
     try {
-      const response = await apiClient.get<VerifyResponse>(`/v1/auth/v2/verify-email?token=${token}`);
+      const response = await apiClient.get<VerifyResponse>(`/auth/v2/verify-email?token=${token}`);
 
       if (response.data.success) {
         setVerified(true);

@@ -38,7 +38,7 @@ export const ForgotPassword: FC = () => {
     
     try {
       const response = await apiClient.post<ForgotPasswordResponse>(
-        '/v1/auth/v2/forgot-password',
+        '/auth/v2/forgot-password',
         data
       );
       

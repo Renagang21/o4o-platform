@@ -50,7 +50,7 @@ export const SessionManager = () => {
   const { data, isLoading, error } = useQuery<SessionsResponse>({
     queryKey: ['sessions'],
     queryFn: async () => {
-      const response = await apiClient.get('/v1/sessions/my-sessions');
+      const response = await apiClient.get('/sessions/my-sessions');
       return response.data;
     },
     refetchInterval: 30000 // Refresh every 30 seconds
@@ -59,7 +59,7 @@ export const SessionManager = () => {
   // Logout from specific session
   const logoutSessionMutation = useMutation({
     mutationFn: async (sessionId: string) => {
-      const response = await apiClient.post(`/v1/sessions/logout/${sessionId}`);
+      const response = await apiClient.post(`/sessions/logout/${sessionId}`);
       return response.data;
     },
     onSuccess: () => {
@@ -72,7 +72,7 @@ export const SessionManager = () => {
   // Logout from all devices
   const logoutAllMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post('/v1/sessions/logout-all');
+      const response = await apiClient.post('/sessions/logout-all');
       return response.data;
     },
     onSuccess: () => {

@@ -37,7 +37,7 @@ export const EmailVerificationPending: FC = () => {
     setResendSuccess(false);
 
     try {
-      const response = await apiClient.post<ResendResponse>('/v1/auth/v2/resend-verification', {
+      const response = await apiClient.post<ResendResponse>('/auth/v2/resend-verification', {
         email
       });
 

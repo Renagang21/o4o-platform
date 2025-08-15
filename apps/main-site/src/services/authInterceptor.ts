@@ -60,7 +60,7 @@ export const setupAuthInterceptor = () => {
 
         try {
           // Call refresh endpoint - cookies will be sent automatically
-          await apiClient.post('/v1/auth/v2/refresh');
+          await apiClient.post('/auth/v2/refresh');
           
           // Retry all queued requests
           processQueue(null);

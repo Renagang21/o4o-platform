@@ -82,7 +82,7 @@ export const OAuthCallback: FC = () => {
 
       // 백엔드에 인가 코드 전송하여 토큰 교환
       const response = await apiClient.post<OAuthCallbackResponse>(
-        `/v1/auth/oauth/${provider}/callback`,
+        `/auth/oauth/${provider}/callback`,
         { 
           code,
           state,

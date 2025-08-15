@@ -30,7 +30,7 @@ const CrowdfundingProjectDetail = () => {
   const { data: projectData, isLoading } = useQuery({
     queryKey: ['crowdfunding-project', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/crowdfunding-simple/projects/${id}`);
+      const response = await authClient.api.get(`/crowdfunding-simple/projects/${id}`);
       return response.data;
     },
     enabled: !!id
@@ -42,7 +42,7 @@ const CrowdfundingProjectDetail = () => {
   const { data: participationData } = useQuery({
     queryKey: ['crowdfunding-participation', id],
     queryFn: async () => {
-      const response = await authClient.api.get(`/v1/crowdfunding-simple/projects/${id}/participation-status`);
+      const response = await authClient.api.get(`/crowdfunding-simple/projects/${id}/participation-status`);
       return response.data;
     },
     enabled: !!id
@@ -53,7 +53,7 @@ const CrowdfundingProjectDetail = () => {
   // 참여하기 mutation
   const joinMutation = useMutation({
     mutationFn: async () => {
-      const response = await authClient.api.post(`/v1/crowdfunding-simple/projects/${id}/join`);
+      const response = await authClient.api.post(`/crowdfunding-simple/projects/${id}/join`);
       return response.data;
     },
     onSuccess: () => {
@@ -69,7 +69,7 @@ const CrowdfundingProjectDetail = () => {
   // 참여 취소 mutation
   const cancelMutation = useMutation({
     mutationFn: async () => {
-      const response = await authClient.api.post(`/v1/crowdfunding-simple/projects/${id}/cancel`);
+      const response = await authClient.api.post(`/crowdfunding-simple/projects/${id}/cancel`);
       return response.data;
     },
     onSuccess: () => {

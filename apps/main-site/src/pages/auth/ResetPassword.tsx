@@ -71,7 +71,7 @@ export const ResetPassword: FC = () => {
     
     try {
       const response = await apiClient.post<ResetPasswordResponse>(
-        '/v1/auth/v2/reset-password',
+        '/auth/v2/reset-password',
         {
           token,
           password: data.password

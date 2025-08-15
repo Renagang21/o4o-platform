@@ -58,7 +58,7 @@ const MenuList: FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/v1/menus/${id}`)
+      return authClient.api.delete(`/menus/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menus'] })
@@ -72,7 +72,7 @@ const MenuList: FC = () => {
   // Toggle active mutation
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return authClient.api.patch(`/v1/menus/${id}/active`, { isActive })
+      return authClient.api.patch(`/menus/${id}/active`, { isActive })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menus'] })

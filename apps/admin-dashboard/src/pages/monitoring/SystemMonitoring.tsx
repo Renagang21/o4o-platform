@@ -54,7 +54,7 @@ const SystemMonitoring: FC = () => {
   const { data: systemHealth } = useQuery<SystemHealth>({
     queryKey: ['system-health'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/monitoring/health');
+      const response = await apiClient.get('/monitoring/health');
       return response.data;
     },
     refetchInterval: autoRefresh ? 10000 : false // 10초마다 갱신
@@ -64,7 +64,7 @@ const SystemMonitoring: FC = () => {
   const { data: performanceMetrics } = useQuery<PerformanceMetric[]>({
     queryKey: ['performance-metrics', timeRange],
     queryFn: async () => {
-      const response = await apiClient.get(`/api/v1/monitoring/performance?range=${timeRange}`);
+      const response = await apiClient.get(`/monitoring/performance?range=${timeRange}`);
       return response.data;
     },
     refetchInterval: autoRefresh ? 30000 : false // 30초마다 갱신
@@ -74,7 +74,7 @@ const SystemMonitoring: FC = () => {
   const { data: errorLogs } = useQuery<ErrorLog[]>({
     queryKey: ['error-logs'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/monitoring/errors?limit=50');
+      const response = await apiClient.get('/monitoring/errors?limit=50');
       return response.data;
     },
     refetchInterval: autoRefresh ? 60000 : false // 1분마다 갱신
