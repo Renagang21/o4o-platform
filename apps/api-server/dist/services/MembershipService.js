@@ -486,11 +486,11 @@ class MembershipService extends events_1.EventEmitter {
         // 실제로는 DB 업데이트
         const user = await this.userRepository.findOne({ where: { id: userId } });
         if (user) {
-            user.metadata = {
-                ...user.metadata,
-                pointBalance: newBalance
-            };
-            await this.userRepository.save(user);
+            // user.metadata = {
+            //   ...user.metadata,
+            //   pointBalance: newBalance
+            // };
+            // await this.userRepository.save(user);
         }
     }
     /**

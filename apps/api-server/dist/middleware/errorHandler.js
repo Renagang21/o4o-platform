@@ -92,12 +92,31 @@ const errorHandler = (err, req, res, _next) => {
     });
     // Set CORS headers for error responses
     const origin = req.headers.origin;
-    const corsOrigins = ((_a = process.env.CORS_ORIGIN) === null || _a === void 0 ? void 0 : _a.split(',')) || [];
-    if (origin && corsOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+    const allowedOrigins = [
+        'https://neture.co.kr',
+        'https://www.neture.co.kr',
+        'https://admin.neture.co.kr',
+        'https://shop.neture.co.kr',
+        'https://forum.neture.co.kr',
+        'https://signage.neture.co.kr',
+        'https://funding.neture.co.kr',
+        'https://auth.neture.co.kr',
+        'https://api.neture.co.kr',
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://localhost:3003',
+        'http://13.125.144.8:3000',
+        'http://13.125.144.8:3001'
+    ];
+    // Add environment-defined origins
+    const envOrigins = ((_a = process.env.CORS_ORIGIN) === null || _a === void 0 ? void 0 : _a.split(',').map(o => o.trim())) || [];
+    allowedOrigins.push(...envOrigins);
+    if (!origin || allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin || '*');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     }
     // Send error response
     res.status(statusCode).json(errorResponse);

@@ -270,4 +270,4 @@ router.get('/categories/tree', async (req, res) => {
     });
 });
 exports.default = router;
-//# sourceMappingURL=ecommerce.js.map
+//# sourceMappingURL=ecommerce-safe.js.map

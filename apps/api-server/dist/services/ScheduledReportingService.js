@@ -26,24 +26,19 @@ class ScheduledReportingService {
     }
     start() {
         if (this.isRunning) {
-            // console.log('Scheduled reporting service is already running');
             return;
         }
-        // console.log('Starting scheduled reporting service...');
         this.isRunning = true;
         // Daily reports at 6:00 AM
         node_cron_1.default.schedule('0 6 * * *', async () => {
-            // console.log('Generating daily reports...');
             await this.generateDailyReports();
         });
         // Weekly reports on Mondays at 7:00 AM
         node_cron_1.default.schedule('0 7 * * 1', async () => {
-            // console.log('Generating weekly reports...');
             await this.generateWeeklyReports();
         });
         // Monthly reports on the 1st at 8:00 AM
         node_cron_1.default.schedule('0 8 1 * *', async () => {
-            // console.log('Generating monthly reports...');
             await this.generateMonthlyReports();
         });
         // Real-time monitoring every 5 minutes
@@ -62,18 +57,14 @@ class ScheduledReportingService {
         node_cron_1.default.schedule('0 */4 * * *', async () => {
             await this.generateBetaProgramInsights();
         });
-        // console.log('Scheduled reporting service started successfully');
     }
     stop() {
         if (!this.isRunning) {
-            // console.log('Scheduled reporting service is not running');
             return;
         }
-        // console.log('Stopping scheduled reporting service...');
         this.isRunning = false;
         // Note: node-cron doesn't provide a clean way to stop all tasks
         // In a production environment, you might want to keep references to tasks
-        // console.log('Scheduled reporting service stopped');
     }
     // Report Generation Methods
     async generateDailyReports() {
@@ -85,7 +76,6 @@ class ScheduledReportingService {
                 this.analyticsService.generateReport(AnalyticsReport_1.ReportType.DAILY, AnalyticsReport_1.ReportCategory.SYSTEM_PERFORMANCE, yesterday, yesterday),
                 this.analyticsService.generateReport(AnalyticsReport_1.ReportType.DAILY, AnalyticsReport_1.ReportCategory.CONTENT_USAGE, yesterday, yesterday)
             ]);
-            // console.log(`Generated ${reports.length} daily reports for ${yesterday.toDateString()}`);
             // Send notifications for daily reports
             await this.sendDailyReportNotification(reports);
         }
@@ -105,7 +95,6 @@ class ScheduledReportingService {
                 this.analyticsService.generateReport(AnalyticsReport_1.ReportType.WEEKLY, AnalyticsReport_1.ReportCategory.FEEDBACK_ANALYSIS, weekStart, weekEnd),
                 this.analyticsService.generateReport(AnalyticsReport_1.ReportType.WEEKLY, AnalyticsReport_1.ReportCategory.BUSINESS_METRICS, weekStart, weekEnd)
             ]);
-            // console.log(`Generated ${reports.length} weekly reports for week ${weekStart.toDateString()} - ${weekEnd.toDateString()}`);
             // Send notifications for weekly reports
             await this.sendWeeklyReportNotification(reports);
         }
@@ -121,7 +110,6 @@ class ScheduledReportingService {
         const monthEnd = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
         try {
             const report = await this.analyticsService.generateReport(AnalyticsReport_1.ReportType.MONTHLY, AnalyticsReport_1.ReportCategory.COMPREHENSIVE, monthStart, monthEnd);
-            // console.log(`Generated monthly report for ${monthStart.toDateString()} - ${monthEnd.toDateString()}`);
             // Send notifications for monthly report
             await this.sendMonthlyReportNotification(report);
         }
@@ -211,7 +199,6 @@ class ScheduledReportingService {
             else if (overview.systemHealth === 'warning') {
                 await this.analyticsService.createAlert(Alert_1.AlertType.SYSTEM, Alert_1.AlertSeverity.MEDIUM, 'System Health Warning', `System health is degraded. Error rate: ${overview.errorRate}%, Avg response time: ${overview.avgResponseTime}ms`, 'system_health', 0, 1, { errorRate: overview.errorRate, avgResponseTime: overview.avgResponseTime });
             }
-            // console.log(`System health check completed. Status: ${overview.systemHealth}`);
         }
         catch (error) {
             console.error('Error in system health check:', error);
@@ -237,7 +224,6 @@ class ScheduledReportingService {
             if (insights.lowEngagementUsers > insights.activeUsers * 0.5) {
                 await this.analyticsService.createAlert(Alert_1.AlertType.BUSINESS, Alert_1.AlertSeverity.MEDIUM, 'High Number of Low Engagement Users', `${insights.lowEngagementUsers} beta users have low engagement`, 'low_engagement_users', insights.lowEngagementUsers, insights.activeUsers * 0.3, insights);
             }
-            // console.log('Beta program insights generated and analyzed');
         }
         catch (error) {
             console.error('Error generating beta program insights:', error);
@@ -286,7 +272,6 @@ class ScheduledReportingService {
     }
     async sendEmailNotification(title, message, urgent) {
         // Implementation depends on email service (nodemailer, SendGrid, etc.)
-        // console.log(`EMAIL NOTIFICATION: ${title}\n${message}`);
     }
     async sendSlackNotification(title, message, urgent) {
         var _a;

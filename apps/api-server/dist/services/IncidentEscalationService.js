@@ -69,21 +69,17 @@ class IncidentEscalationService {
         this.webhookService = new webhookService_1.WebhookService();
     }
     async initialize() {
-        // console.log('📢 Initializing Incident Escalation Service...');
         await this.loadEscalationRules();
         await this.loadOnCallSchedules();
         await this.startEscalationMonitoring();
-        // console.log('✅ Incident Escalation Service initialized');
     }
     async shutdown() {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
         }
-        // console.log('📢 Incident Escalation Service shut down');
     }
     // Main escalation logic
     async escalateAlert(alert, context) {
-        // console.log(`⬆️ Escalating alert: ${alert.title} (ID: ${alert.id})`);
         const businessImpact = await this.assessBusinessImpact(alert);
         const initialLevel = this.determineInitialEscalationLevel(alert, businessImpact);
         const escalation = {
@@ -105,7 +101,6 @@ class IncidentEscalationService {
         return escalation;
     }
     async escalateToLevel(escalation, level, trigger) {
-        // console.log(`📊 Escalating to level: ${level} (Trigger: ${trigger})`);
         const onCallTeam = await this.getOnCallTeamForLevel(level);
         if (!onCallTeam) {
             console.error(`❌ No on-call team found for level: ${level}`);
@@ -190,7 +185,6 @@ class IncidentEscalationService {
                     break;
             }
             entry.status = 'delivered';
-            // console.log(`📧 Notification sent to ${contact.name} via ${contact.preferredNotification}`);
         }
         catch (error) {
             entry.status = 'failed';
@@ -212,7 +206,6 @@ class IncidentEscalationService {
                 console.error('Escalation monitoring failed:', error);
             }
         }, 60000); // Every minute
-        // console.log('📊 Escalation monitoring started');
     }
     async checkEscalationTimeouts() {
         for (const escalation of this.activeEscalations.values()) {
@@ -223,7 +216,6 @@ class IncidentEscalationService {
                 if (timeSinceEscalation > timeoutMinutes * 60 * 1000) {
                     const nextLevel = this.getNextEscalationLevel(escalation.currentLevel);
                     if (nextLevel) {
-                        // console.log(`⏰ Escalation timeout reached for ${escalation.id}, escalating to ${nextLevel}`);
                         await this.escalateToLevel(escalation, nextLevel, EscalationTrigger.TIME_THRESHOLD);
                     }
                 }
@@ -271,12 +263,10 @@ class IncidentEscalationService {
     async sendEmailNotification(contact, message, level) {
         const subject = `[${level.toUpperCase()}] Incident Escalation Required`;
         // Implementation would use actual email service
-        // console.log(`📧 Email sent to ${contact.email}: ${subject}`);
     }
     async sendSMSNotification(contact, message, level) {
         const smsMessage = `[${level.toUpperCase()}] ${message.substring(0, 140)}...`;
         // Implementation would use SMS service like Twilio
-        // console.log(`📱 SMS sent to ${contact.phone}: ${smsMessage}`);
     }
     async sendSlackNotification(contact, message, level) {
         if (!contact.slack)
@@ -292,15 +282,12 @@ class IncidentEscalationService {
                 }]
         };
         // Implementation would use Slack API
-        // console.log(`💬 Slack message sent to ${contact.slack}`);
     }
     async initiatePhoneCall(contact, message, level) {
         // Implementation would use voice service like Twilio
-        // console.log(`📞 Phone call initiated to ${contact.phone} for ${level} escalation`);
     }
     // Team notification methods
     async notifyTeam(target, parameters) {
-        // console.log(`📢 Notifying team: ${target}`);
         const team = this.onCallSchedules.get(target);
         if (!team) {
             throw new Error(`Team not found: ${target}`);
@@ -515,19 +502,15 @@ Please acknowledge and take appropriate action immediately.
     }
     async createExternalIncident(escalation, parameters) {
         // Implementation would integrate with external incident management system
-        // console.log(`🎫 Creating external incident for escalation ${escalation.id}`);
     }
     async startConferenceBridge(escalation, parameters) {
         // Implementation would start a conference call/bridge
-        // console.log(`📞 Starting conference bridge for escalation ${escalation.id}`);
     }
     async updateStatusPage(escalation, parameters) {
         // Implementation would update public status page
-        // console.log(`📊 Updating status page for escalation ${escalation.id}`);
     }
     async createJiraTicket(escalation, parameters) {
         // Implementation would create JIRA ticket
-        // console.log(`🎫 Creating JIRA ticket for escalation ${escalation.id}`);
     }
     // Data loading and management
     async loadEscalationRules() {
@@ -581,7 +564,6 @@ Please acknowledge and take appropriate action immediately.
         rules.forEach((rule) => {
             this.escalationRules.set(rule.id, rule);
         });
-        // console.log(`📋 Loaded ${rules.length} escalation rules`);
     }
     async loadOnCallSchedules() {
         const schedules = [
@@ -662,7 +644,6 @@ Please acknowledge and take appropriate action immediately.
         schedules.forEach((schedule) => {
             this.onCallSchedules.set(schedule.teamId, schedule);
         });
-        // console.log(`👥 Loaded ${schedules.length} on-call schedules`);
     }
     // Metrics and monitoring
     async recordEscalationEvent(event, escalation) {
@@ -719,7 +700,6 @@ Please acknowledge and take appropriate action immediately.
             }
             this.activeEscalations.delete(escalation.alertId);
             await this.recordEscalationEvent('resolved', escalation);
-            // console.log(`✅ Escalation resolved: ${escalationId} by ${resolvedBy}`);
             return true;
         }
         return false;
@@ -734,7 +714,6 @@ Please acknowledge and take appropriate action immediately.
                 lastStep.acknowledgedBy = acknowledgedBy;
                 lastStep.acknowledgedAt = new Date();
                 lastStep.notes = notes;
-                // console.log(`✅ Escalation acknowledged: ${escalationId} by ${acknowledgedBy}`);
                 return true;
             }
         }

@@ -90,16 +90,13 @@ class DeploymentMonitoringService {
         };
     }
     async initialize() {
-        // console.log('🚀 Initializing Deployment Monitoring Service...');
         await this.detectCurrentDeployment();
         await this.startDeploymentMonitoring();
-        // console.log('✅ Deployment Monitoring Service initialized');
     }
     async shutdown() {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
         }
-        // console.log('🚀 Deployment Monitoring Service shut down');
     }
     // Deployment tracking and monitoring
     async trackDeployment(deploymentInfo) {
@@ -119,13 +116,11 @@ class DeploymentMonitoringService {
             ...deploymentInfo
         };
         this.activeDeployments.set(deployment.id, deployment);
-        // console.log(`📦 Tracking deployment: ${deployment.version} (ID: ${deployment.id})`);
         // Start monitoring this deployment
         await this.startDeploymentTracking(deployment);
         return deployment;
     }
     async startDeploymentTracking(deployment) {
-        // console.log(`🔍 Starting deployment monitoring for ${deployment.id}`);
         // Collect baseline metrics
         deployment.metrics = await this.collectBaselineMetrics();
         // Update status
@@ -147,7 +142,6 @@ class DeploymentMonitoringService {
         const stabilizationTime = this.validationRules.timeBasedRules.stabilizationPeriod * 60 * 1000;
         // Wait for stabilization period before starting validation
         if (timeSinceStart < stabilizationTime) {
-            // console.log(`⏳ Deployment ${deployment.id} still in stabilization period`);
             return;
         }
         // Run health checks
@@ -157,7 +151,6 @@ class DeploymentMonitoringService {
         // Validate deployment health
         const validationResult = await this.validateDeployment(deployment);
         if (!validationResult.isHealthy) {
-            // console.log(`❌ Deployment ${deployment.id} failed validation: ${validationResult.reason}`);
             if (this.autoRollbackEnabled && validationResult.shouldRollback) {
                 await this.initiateAutomaticRollback(deployment, validationResult.reason);
             }
@@ -220,7 +213,6 @@ class DeploymentMonitoringService {
         ];
     }
     async runHealthChecks(deployment) {
-        // console.log(`🏥 Running health checks for deployment ${deployment.id}`);
         const healthCheckPromises = deployment.healthChecks.map(async (check) => {
             check.status = 'running';
             check.lastRun = new Date();
@@ -244,7 +236,6 @@ class DeploymentMonitoringService {
         });
         await Promise.all(healthCheckPromises);
         const failedChecks = deployment.healthChecks.filter((check) => check.status === 'failed');
-        // console.log(`🏥 Health checks completed: ${deployment.healthChecks.length - failedChecks.length}/${deployment.healthChecks.length} passed`);
     }
     async executeHealthCheck(check) {
         const startTime = Date.now();
@@ -391,7 +382,6 @@ class DeploymentMonitoringService {
         };
     }
     async collectBaselineMetrics() {
-        // console.log('📊 Collecting baseline metrics...');
         const metrics = this.initializeMetrics();
         // Collect metrics from the last 30 minutes before deployment
         const endTime = new Date();
@@ -404,7 +394,6 @@ class DeploymentMonitoringService {
         return metrics;
     }
     async collectDeploymentMetrics(deployment) {
-        // console.log(`📊 Collecting deployment metrics for ${deployment.id}`);
         // Collect current metrics
         const endTime = new Date();
         const startTime = new Date(deployment.startTime.getTime());
@@ -593,7 +582,6 @@ class DeploymentMonitoringService {
     }
     // Rollback functionality
     async rollbackDeployment(target, parameters) {
-        // console.log(`🔄 Rolling back deployment: ${target}`);
         let deployment;
         if (target === 'latest') {
             // Find the latest active deployment
@@ -611,7 +599,6 @@ class DeploymentMonitoringService {
         return { output: `Rollback initiated for deployment ${deployment.id} (Rollback ID: ${rollbackInfo.id})` };
     }
     async initiateAutomaticRollback(deployment, reason) {
-        // console.log(`🚨 Initiating automatic rollback for deployment ${deployment.id}: ${reason}`);
         await this.executeRollback(deployment, 'automatic', reason);
     }
     async executeRollback(deployment, triggeredBy, reason) {
@@ -636,7 +623,6 @@ class DeploymentMonitoringService {
             await this.verifyRollback(rollbackInfo);
             rollbackInfo.status = 'success';
             rollbackInfo.endTime = new Date();
-            // console.log(`✅ Rollback completed successfully: ${rollbackInfo.id}`);
             // Create success alert
             await this.createRollbackAlert(deployment, rollbackInfo, true);
         }
@@ -698,7 +684,6 @@ class DeploymentMonitoringService {
         return steps;
     }
     async executeRollbackStep(step, deployment) {
-        // console.log(`🔧 Executing rollback step: ${step.name}`);
         step.status = 'in_progress';
         step.startTime = new Date();
         try {
@@ -726,7 +711,6 @@ class DeploymentMonitoringService {
             }
             step.status = 'completed';
             step.endTime = new Date();
-            // console.log(`✅ Rollback step completed: ${step.name}`);
         }
         catch (error) {
             step.status = 'failed';
@@ -747,14 +731,12 @@ class DeploymentMonitoringService {
     }
     async executeServiceRestart(target) {
         // In a real implementation, this would restart the actual service
-        // console.log(`Restarting service: ${target}`);
         // Simulate service restart delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         return `Service ${target} restarted successfully`;
     }
     async executeCacheClear(target) {
         // Clear application caches
-        // console.log(`Clearing cache: ${target}`);
         return `Cache ${target} cleared successfully`;
     }
     async executeDatabaseRollback(command) {
@@ -768,7 +750,6 @@ class DeploymentMonitoringService {
     }
     async executeConfigRestore(target) {
         // Restore configuration from backup
-        // console.log(`Restoring configuration: ${target}`);
         return `Configuration ${target} restored successfully`;
     }
     async executeCustomScript(command, parameters) {
@@ -781,7 +762,6 @@ class DeploymentMonitoringService {
         }
     }
     async verifyRollback(rollbackInfo) {
-        // console.log(`🔍 Verifying rollback: ${rollbackInfo.id}`);
         // Run verification health checks
         for (const check of rollbackInfo.verificationChecks) {
             check.status = 'running';
@@ -803,13 +783,11 @@ class DeploymentMonitoringService {
         if (failedChecks.length > 0) {
             throw new Error(`Rollback verification failed: ${failedChecks.map((c) => c.name).join(', ')}`);
         }
-        // console.log(`✅ Rollback verification successful: ${rollbackInfo.id}`);
     }
     // Deployment status management
     async markDeploymentSuccessful(deployment) {
         deployment.status = DeploymentStatus.SUCCESS;
         deployment.endTime = new Date();
-        // console.log(`✅ Deployment marked as successful: ${deployment.id}`);
         // Update current version
         this.currentVersion = deployment.version;
         // Move to history
@@ -821,7 +799,6 @@ class DeploymentMonitoringService {
     async markDeploymentFailed(deployment, reason) {
         deployment.status = DeploymentStatus.FAILED;
         deployment.endTime = new Date();
-        // console.log(`❌ Deployment marked as failed: ${deployment.id} - ${reason}`);
         // Create failure alert
         await this.createDeploymentAlert(deployment, false, reason);
         // Record failure event
@@ -839,7 +816,6 @@ class DeploymentMonitoringService {
                 console.error('Deployment monitoring failed:', error);
             }
         }, 60000); // Every minute
-        // console.log('📊 Deployment monitoring started');
     }
     async detectCurrentDeployment() {
         try {
@@ -848,7 +824,6 @@ class DeploymentMonitoringService {
             const packageContent = await fs.readFile(packagePath, 'utf-8');
             const packageJson = JSON.parse(packageContent);
             this.currentVersion = packageJson.version || '1.0.0';
-            // console.log(`📦 Current version detected: ${this.currentVersion}`);
         }
         catch (error) {
             console.warn('Failed to detect current version:', error);
@@ -945,15 +920,12 @@ class DeploymentMonitoringService {
     }
     async enableAutoRollback() {
         this.autoRollbackEnabled = true;
-        // console.log('✅ Auto-rollback enabled');
     }
     async disableAutoRollback() {
         this.autoRollbackEnabled = false;
-        // console.log('⏸️ Auto-rollback disabled');
     }
     async updateValidationRules(rules) {
         this.validationRules = { ...this.validationRules, ...rules };
-        // console.log('✅ Deployment validation rules updated');
     }
 }
 exports.DeploymentMonitoringService = DeploymentMonitoringService;

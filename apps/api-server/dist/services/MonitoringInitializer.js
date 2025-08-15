@@ -11,7 +11,6 @@ class MonitoringInitializer {
         this.statusPageService = new StatusPageService_1.StatusPageService();
     }
     async initialize() {
-        // console.log('🚀 Initializing 24/7 Operations Monitoring System...');
         try {
             // Initialize default status page components
             await this.initializeStatusPageComponents();
@@ -21,7 +20,6 @@ class MonitoringInitializer {
             await this.initializeAutoRecoverySystem();
             // Set up health check intervals
             await this.setupHealthCheckSchedules();
-            // console.log('✅ 24/7 Operations Monitoring System initialized successfully');
         }
         catch (error) {
             console.error('❌ Failed to initialize monitoring system:', error);
@@ -29,11 +27,9 @@ class MonitoringInitializer {
         }
     }
     async shutdown() {
-        // console.log('🛑 Shutting down 24/7 Operations Monitoring System...');
         try {
             await this.operationsService.stopMonitoring();
             await AutoRecoveryService_1.autoRecoveryService.stopAutoRecovery();
-            // console.log('✅ 24/7 Operations Monitoring System shutdown complete');
         }
         catch (error) {
             console.error('❌ Error during monitoring system shutdown:', error);
@@ -41,7 +37,6 @@ class MonitoringInitializer {
         }
     }
     async initializeStatusPageComponents() {
-        // console.log('📊 Setting up status page components...');
         const defaultComponents = [
             {
                 name: 'API Server',
@@ -84,22 +79,16 @@ class MonitoringInitializer {
             if (!existingNames.includes(componentData.name)) {
                 try {
                     await this.statusPageService.createComponent(componentData);
-                    // console.log(`✅ Created status page component: ${componentData.name}`);
                 }
                 catch (error) {
                     console.error(`❌ Failed to create component ${componentData.name}:`, error);
                 }
             }
-            else {
-                // console.log(`⏭️  Component already exists: ${componentData.name}`);
-            }
         }
     }
     async initializeAutoRecoverySystem() {
-        // console.log('🔄 Initializing Auto-Recovery and Incident Response System...');
         try {
             await AutoRecoveryService_1.autoRecoveryService.startAutoRecovery();
-            // console.log('✅ Auto-Recovery System initialized successfully');
         }
         catch (error) {
             console.error('❌ Failed to initialize Auto-Recovery System:', error);
@@ -107,7 +96,6 @@ class MonitoringInitializer {
         }
     }
     async setupHealthCheckSchedules() {
-        // console.log('🔍 Setting up health check schedules...');
         // Schedule regular health checks for status page
         setInterval(async () => {
             try {
@@ -121,13 +109,11 @@ class MonitoringInitializer {
         setInterval(async () => {
             try {
                 const systemStatus = await this.operationsService.getSystemStatus();
-                // console.log(`System Status: ${systemStatus.overallStatus} - ${systemStatus.services.length} services monitored`);
             }
             catch (error) {
                 console.error('System status check failed:', error);
             }
         }, 300000); // Every 5 minutes
-        // console.log('✅ Health check schedules configured');
     }
     // Utility method to check if monitoring is running
     async getMonitoringStatus() {
@@ -178,7 +164,6 @@ class MonitoringInitializer {
         };
         try {
             const incident = await this.statusPageService.createIncident(sampleIncident);
-            // console.log(`📝 Created sample incident: ${incident.id}`);
             // Auto-resolve after 5 minutes for demonstration
             setTimeout(async () => {
                 try {
@@ -187,7 +172,6 @@ class MonitoringInitializer {
                         message: 'Performance has returned to normal levels. Monitoring continues.',
                         updatedBy: 'system'
                     });
-                    // console.log(`✅ Auto-resolved sample incident: ${incident.id}`);
                 }
                 catch (error) {
                     console.error('Failed to auto-resolve sample incident:', error);
@@ -223,7 +207,6 @@ class MonitoringInitializer {
         };
         try {
             const maintenance = await this.statusPageService.scheduleMaintenance(sampleMaintenance);
-            // console.log(`🔧 Created sample maintenance: ${maintenance.id}`);
         }
         catch (error) {
             console.error('Failed to create sample maintenance:', error);
@@ -240,7 +223,6 @@ class MonitoringInitializer {
             console.warn('No components available for sample metrics');
             return;
         }
-        // console.log('📈 Populating sample metrics...');
         // Generate sample uptime and response time data for the last 24 hours
         const now = new Date();
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -262,7 +244,6 @@ class MonitoringInitializer {
                 }
             }
         }
-        // console.log('✅ Sample metrics populated');
     }
     // Development helper methods
     async setupDevelopmentEnvironment() {
@@ -270,7 +251,6 @@ class MonitoringInitializer {
             console.warn('Skipping development environment setup in production');
             return;
         }
-        // console.log('🛠️  Setting up development environment...');
         try {
             await this.populateSampleMetrics();
             await this.createSampleMaintenance();
@@ -278,7 +258,6 @@ class MonitoringInitializer {
             setTimeout(async () => {
                 await this.createSampleIncident();
             }, 5000);
-            // console.log('✅ Development environment setup complete');
         }
         catch (error) {
             console.error('❌ Failed to setup development environment:', error);

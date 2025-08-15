@@ -169,7 +169,6 @@ class OrderSplitService {
                         await this.orderItemRepository.save(item);
                     }
                     // TODO: Replace with proper logger
-                    // console.log(`Order forwarded to supplier ${splitOrder.supplierId}: ${(response as any).data.supplierOrderId}`);
                 }
                 else {
                     console.error(`Failed to forward order to supplier ${splitOrder.supplierId}`);

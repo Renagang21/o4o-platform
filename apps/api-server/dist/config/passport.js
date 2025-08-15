@@ -71,9 +71,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         }
     }));
 }
-else {
-    // console.log('⚠️  Google OAuth not configured - skipping strategy initialization');
-}
 // Kakao OAuth Strategy - Only initialize if credentials are provided
 if (process.env.KAKAO_CLIENT_ID) {
     passport_1.default.use(new passport_kakao_1.Strategy({
@@ -122,9 +119,6 @@ if (process.env.KAKAO_CLIENT_ID) {
         }
     }));
 }
-else {
-    // console.log('⚠️  Kakao OAuth not configured - skipping strategy initialization');
-}
 // Naver OAuth Strategy - Only initialize if credentials are provided
 if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
     passport_1.default.use(new passport_naver_v2_1.Strategy({
@@ -171,9 +165,6 @@ if (process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET) {
             done(error, undefined);
         }
     }));
-}
-else {
-    // console.log('⚠️  Naver OAuth not configured - skipping strategy initialization');
 }
 exports.default = passport_1.default;
 //# sourceMappingURL=passport.js.map

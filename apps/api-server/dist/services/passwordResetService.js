@@ -23,7 +23,6 @@ class PasswordResetService {
         const user = await userRepo.findOne({ where: { email } });
         // Always return true to prevent email enumeration
         if (!user) {
-            // console.log(`Password reset requested for non-existent email: ${email}`);
             return true;
         }
         // Invalidate any existing tokens

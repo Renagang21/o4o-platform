@@ -35,13 +35,11 @@ exports.redisSub = new ioredis_1.default({
 });
 // Handle connection events
 exports.redis.on('connect', () => {
-    // console.log('Redis client connected');
 });
 exports.redis.on('error', (err) => {
     console.error('Redis client error:', err);
 });
 exports.redisSub.on('connect', () => {
-    // console.log('Redis subscriber connected');
 });
 exports.redisSub.on('error', (err) => {
     console.error('Redis subscriber error:', err);

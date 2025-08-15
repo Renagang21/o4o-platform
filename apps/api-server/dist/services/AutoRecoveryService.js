@@ -39,7 +39,6 @@ class AutoRecoveryService {
         this.initializeRecoveryActions();
     }
     async startAutoRecovery() {
-        // console.log('🔄 Starting Auto-Recovery and Incident Response System...');
         // Start all sub-services
         await Promise.all([
             this.circuitBreaker.initialize(),
@@ -54,15 +53,12 @@ class AutoRecoveryService {
         await this.startHealthMonitoring();
         // Start deployment monitoring
         await this.startDeploymentMonitoring();
-        // console.log('✅ Auto-Recovery System is now active and monitoring');
     }
     async stopAutoRecovery() {
-        // console.log('🛑 Stopping Auto-Recovery System...');
         this.isEnabled = false;
         // Stop all monitoring intervals
         this.recoveryIntervals.forEach((interval, name) => {
             clearInterval(interval);
-            // console.log(`Stopped ${name} monitoring`);
         });
         // Stop sub-services
         await Promise.all([
@@ -73,34 +69,28 @@ class AutoRecoveryService {
             this.deploymentMonitoring.shutdown()
         ]);
         this.recoveryIntervals.clear();
-        // console.log('✅ Auto-Recovery System stopped');
     }
     // Main recovery orchestration
     async handleAlert(alert) {
         if (!this.isEnabled)
             return;
-        // console.log(`🚨 Auto-Recovery evaluating alert: ${alert.title}`);
         // Check if already being recovered
         if (this.activeRecoveries.has(alert.id)) {
-            // console.log(`⏳ Recovery already in progress for alert ${alert.id}`);
             return;
         }
         // Check global cooldown
         if (this.isInGlobalCooldown()) {
-            // console.log(`❄️ Global recovery cooldown active, skipping automatic recovery`);
             await this.escalateToManualIntervention(alert, 'global_cooldown');
             return;
         }
         // Check concurrent recovery limit
         if (this.activeRecoveries.size >= this.maxConcurrentRecoveries) {
-            // console.log(`⚠️ Maximum concurrent recoveries reached, queuing for later`);
             await this.queueRecoveryAttempt(alert);
             return;
         }
         // Find applicable recovery action
         const action = await this.findApplicableRecoveryAction(alert);
         if (!action) {
-            // console.log(`❌ No applicable recovery action found for alert ${alert.id}`);
             await this.escalateToManualIntervention(alert, 'no_action_found');
             return;
         }
@@ -124,11 +114,9 @@ class AutoRecoveryService {
         };
         this.recoveryAttempts.set(attemptId, attempt);
         this.activeRecoveries.set(alert.id, attemptId);
-        // console.log(`🔄 Starting recovery attempt ${attemptId} for alert ${alert.id}`);
         try {
             // Execute immediate actions
             if (action.actions.immediate) {
-                // console.log(`⚡ Executing immediate recovery actions...`);
                 const success = await this.executeRecoverySteps(attempt, action.actions.immediate, 'immediate');
                 if (success) {
                     await this.validateRecovery(attempt, alert);
@@ -137,7 +125,6 @@ class AutoRecoveryService {
             }
             // Execute fallback actions if immediate failed
             if (action.actions.fallback) {
-                // console.log(`🔄 Executing fallback recovery actions...`);
                 const success = await this.executeRecoverySteps(attempt, action.actions.fallback, 'fallback');
                 if (success) {
                     await this.validateRecovery(attempt, alert);
@@ -145,7 +132,6 @@ class AutoRecoveryService {
                 }
             }
             // If all automated recovery failed, escalate
-            // console.log(`⬆️ Automated recovery failed, escalating...`);
             await this.executeRecoverySteps(attempt, action.actions.escalation || [], 'escalation');
             await this.escalateToManualIntervention(alert, 'automated_recovery_failed', attempt);
         }
@@ -165,7 +151,6 @@ class AutoRecoveryService {
         }
     }
     async executeRecoverySteps(attempt, steps, phase) {
-        // console.log(`🛠️ Executing ${steps.length} recovery steps for phase: ${phase}`);
         for (const step of steps) {
             const stepExecution = {
                 step,
@@ -175,19 +160,16 @@ class AutoRecoveryService {
                 error: ''
             };
             try {
-                // console.log(`🔧 Executing step: ${step.type} on ${step.target}`);
                 const result = await this.executeRecoveryStep(step);
                 stepExecution.status = 'success';
                 stepExecution.output = result.output || '';
                 stepExecution.endTime = new Date();
-                // console.log(`✅ Step completed successfully: ${step.type}`);
                 // Check success condition if provided
                 if (step.successCondition) {
                     const conditionMet = await this.checkSuccessCondition(step.successCondition);
                     if (!conditionMet) {
                         stepExecution.status = 'failed';
                         stepExecution.error = 'Success condition not met';
-                        // console.log(`❌ Success condition failed for step: ${step.type}`);
                     }
                 }
             }
@@ -266,7 +248,6 @@ class AutoRecoveryService {
         }
     }
     async validateRecovery(attempt, alert) {
-        // console.log(`🔍 Validating recovery for alert ${alert.id}...`);
         // Wait a bit for systems to stabilize
         await new Promise(resolve => setTimeout(resolve, 10000)); // 10 seconds
         // Check if the original issue is resolved
@@ -278,7 +259,6 @@ class AutoRecoveryService {
         };
         if (isResolved) {
             attempt.status = 'success';
-            // console.log(`✅ Recovery successful for alert ${alert.id}`);
             // Update alert status
             alert.resolve('auto-recovery-system', 'Issue resolved by automated recovery', 'auto_recovery');
             await this.alertRepo.save(alert);
@@ -287,7 +267,6 @@ class AutoRecoveryService {
         }
         else {
             attempt.status = 'failed';
-            // console.log(`❌ Recovery validation failed for alert ${alert.id}`);
             // Try escalation if available
             await this.escalateToManualIntervention(alert, 'recovery_validation_failed', attempt);
         }
@@ -536,7 +515,6 @@ class AutoRecoveryService {
         actions.forEach((action) => {
             this.recoveryActions.set(action.id, action);
         });
-        // console.log(`📋 Initialized ${actions.length} recovery actions`);
     }
     // Monitoring and health checks
     async startRecoveryMonitoring() {
@@ -551,7 +529,6 @@ class AutoRecoveryService {
             }
         }, 30000); // Every 30 seconds
         this.recoveryIntervals.set('recovery-monitoring', interval);
-        // console.log('🔍 Recovery monitoring started');
     }
     async startHealthMonitoring() {
         const interval = setInterval(async () => {
@@ -565,7 +542,6 @@ class AutoRecoveryService {
             }
         }, 60000); // Every minute
         this.recoveryIntervals.set('health-monitoring', interval);
-        // console.log('❤️ Health monitoring started');
     }
     async startDeploymentMonitoring() {
         const interval = setInterval(async () => {
@@ -578,7 +554,6 @@ class AutoRecoveryService {
             }
         }, 120000); // Every 2 minutes
         this.recoveryIntervals.set('deployment-monitoring', interval);
-        // console.log('🚀 Deployment monitoring started');
     }
     // Helper methods
     async findApplicableRecoveryAction(alert) {
@@ -598,7 +573,6 @@ class AutoRecoveryService {
             const timeSinceLastAttempt = Date.now() - lastAttempt.startTime.getTime();
             const cooldownMs = action.cooldownPeriod * 60 * 1000;
             if (timeSinceLastAttempt < cooldownMs) {
-                // console.log(`⏳ Action ${action.id} is in cooldown`);
                 return false;
             }
         }
@@ -629,7 +603,6 @@ class AutoRecoveryService {
         return timeSinceLastRecovery < (this.globalCooldown * 1000);
     }
     async escalateToManualIntervention(alert, reason, attempt) {
-        // console.log(`⬆️ Escalating alert ${alert.id} to manual intervention: ${reason}`);
         await this.incidentEscalation.escalateAlert(alert, {
             reason,
             autoRecoveryAttempt: attempt ? 1 : 0,
@@ -639,7 +612,6 @@ class AutoRecoveryService {
     }
     async queueRecoveryAttempt(alert) {
         // Implementation for queuing recovery attempts when at capacity
-        // console.log(`📝 Queuing recovery attempt for alert ${alert.id}`);
     }
     async monitorActiveAlerts() {
         const activeAlerts = await this.alertRepo.find({
@@ -781,27 +753,22 @@ class AutoRecoveryService {
     }
     async enableAutoRecovery() {
         this.isEnabled = true;
-        // console.log('✅ Auto-recovery enabled');
     }
     async disableAutoRecovery() {
         this.isEnabled = false;
-        // console.log('⏸️ Auto-recovery disabled');
     }
     async updateRecoveryAction(actionId, updates) {
         const action = this.recoveryActions.get(actionId);
         if (action) {
             Object.assign(action, updates);
             this.recoveryActions.set(actionId, action);
-            // console.log(`✅ Updated recovery action: ${actionId}`);
         }
     }
     async addRecoveryAction(action) {
         this.recoveryActions.set(action.id, action);
-        // console.log(`✅ Added recovery action: ${action.id}`);
     }
     async removeRecoveryAction(actionId) {
         this.recoveryActions.delete(actionId);
-        // console.log(`✅ Removed recovery action: ${actionId}`);
     }
     async testRecoveryAction(actionId, alertId) {
         const action = this.recoveryActions.get(actionId);
@@ -812,7 +779,6 @@ class AutoRecoveryService {
         if (!alert) {
             throw new Error(`Alert not found: ${alertId}`);
         }
-        // console.log(`🧪 Testing recovery action ${actionId} for alert ${alertId}`);
         // Create a test attempt (won't affect production)
         await this.executeRecovery(alert, action);
         const attemptId = this.activeRecoveries.get(alertId);

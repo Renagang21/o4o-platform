@@ -246,7 +246,7 @@ router.get('/',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: post.type || 'post',
+        type: 'post',
         link: `/posts/${post.slug}`,
         title: { rendered: post.title },
         content: { 
@@ -262,7 +262,7 @@ router.get('/',
         tags: post.tags || [],
         sticky: post.sticky || false,
         format: post.format || 'standard',
-        meta: post.meta || {},
+        meta: post.postMeta || {},
         _embedded: {
           author: post.author ? [{
             id: post.author.id,
@@ -333,7 +333,7 @@ router.get('/:id',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: post.type || 'post',
+        type: 'post',
         link: `/posts/${post.slug}`,
         title: { rendered: post.title },
         content: { 
@@ -349,7 +349,7 @@ router.get('/:id',
         tags: post.tags || [],
         sticky: post.sticky || false,
         format: post.format || 'standard',
-        meta: post.meta || {},
+        meta: post.postMeta || {},
         _embedded: {
           author: post.author ? [{
             id: post.author.id,
@@ -428,17 +428,16 @@ router.post('/',
 
       const post = await postRepository.save({
         title,
-        content,
+        content: { blocks: [] }, // TODO: Parse content into blocks format
         status: status || 'draft',
         slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
         excerpt,
         tags: tags || [],
         format: format || 'standard',
         sticky: sticky || false,
-        meta: meta || {},
+        postMeta: meta || {},
         authorId: userId,
         categories,
-        type: 'post',
         publishedAt: status === 'published' ? new Date() : null
       });
 
@@ -501,14 +500,14 @@ router.put('/:id',
       const updatedPost = await postRepository.save({
         ...existingPost,
         title: title || existingPost.title,
-        content: content || existingPost.content,
+        content: content ? { blocks: [] } : existingPost.content, // TODO: Parse content into blocks format
         status: status || existingPost.status,
         slug: slug || existingPost.slug,
         excerpt: excerpt !== undefined ? excerpt : existingPost.excerpt,
         tags: tags || existingPost.tags,
         format: format || existingPost.format,
         sticky: sticky !== undefined ? sticky : existingPost.sticky,
-        meta: meta || existingPost.meta,
+        postMeta: meta || existingPost.postMeta,
         categories,
         lastModifierId: userId,
         publishedAt: status === 'published' && !existingPost.publishedAt ? new Date() : existingPost.publishedAt

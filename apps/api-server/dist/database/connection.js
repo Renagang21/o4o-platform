@@ -149,14 +149,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
 /*
 AppDataSource.initialize()
   .then(() => {
-    // console.log('📊 Database Configuration:');
-    // console.log(`   Host: ${DB_HOST}:${DB_PORT}`);
-    // console.log(`   Database: ${DB_NAME}`);
-    // console.log(`   Username: ${DB_USERNAME}`);
-    // console.log(`   Environment: ${NODE_ENV}`);
-    // console.log(`   Synchronize: ${NODE_ENV === 'development'}`);
-    // console.log(`   Connection Pool: min ${5}, max ${20}`);
-    // console.log('✅ Database initialized successfully');
   })
   .catch((error) => {
     console.error('❌ Database initialization failed:', error);
@@ -194,7 +186,6 @@ async function closeDatabaseConnection() {
     try {
         if (exports.AppDataSource.isInitialized) {
             await exports.AppDataSource.destroy();
-            // console.log('✅ Database connection closed gracefully');
         }
     }
     catch (error) {

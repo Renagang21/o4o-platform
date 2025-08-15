@@ -531,7 +531,6 @@ const setupSwagger = (app) => {
             const postmanCollection = convertToPostman(swaggerSpec);
             res.json(postmanCollection);
         });
-        // console.log('📚 API Documentation available at /api-docs');
     }
     catch (error) {
         console.error('Failed to setup Swagger:', error);

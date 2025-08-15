@@ -272,7 +272,6 @@ class WebhookService {
     async postPaymentSuccess(payment, webhookData) {
         try {
             // 이메일 발송, 알림 등 비동기 처리
-            // console.log(`Payment success notification for payment: ${payment.id}`);
             // 실제 구현에서는 이메일 서비스, 알림 서비스 등을 호출
             // await emailService.sendPaymentConfirmation(payment);
             // await notificationService.sendPushNotification(payment.userId, 'Payment successful');
@@ -287,7 +286,6 @@ class WebhookService {
     async postPaymentFailure(payment, webhookData) {
         try {
             // 결제 실패 알림 등 비동기 처리
-            // console.log(`Payment failure notification for payment: ${payment.id}`);
             // 실제 구현에서는 알림 서비스 등을 호출
             // await notificationService.sendPaymentFailureNotification(payment.userId, webhookData.metadata);
         }
@@ -308,7 +306,6 @@ class WebhookService {
                 return { success: false, message: 'Payment not found' };
             }
             // 실제 구현에서는 각 결제 게이트웨이의 API를 호출하여 상태를 확인
-            // console.log(`Retrying webhook processing for payment: ${paymentId}`);
             return { success: true, message: 'Webhook retry completed' };
         }
         catch (error) {
@@ -332,7 +329,6 @@ class WebhookService {
             if (!response.ok) {
                 throw new Error(`Webhook failed with status ${response.status}: ${response.statusText}`);
             }
-            // console.log(`Webhook sent successfully to ${url}`);
         }
         catch (error) {
             console.error(`Failed to send webhook to ${url}:`, error);

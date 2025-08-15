@@ -30,7 +30,6 @@ class CircuitBreaker {
                 this.state = CircuitState.HALF_OPEN;
                 this.stateChangeTime = new Date();
                 this.halfOpenTests = 0;
-                // console.log(`🔄 Circuit ${this.id} transitioning to HALF_OPEN`);
             }
             else {
                 throw new Error(`Circuit breaker ${this.id} is OPEN - rejecting request`);
@@ -85,7 +84,6 @@ class CircuitBreaker {
             this.halfOpenTests++;
             if (this.halfOpenTests >= this.config.successThreshold) {
                 this.reset();
-                // console.log(`✅ Circuit ${this.id} recovered and reset to CLOSED`);
             }
         }
     }
@@ -95,11 +93,9 @@ class CircuitBreaker {
         this.lastFailureTime = call.endTime;
         if (this.state === CircuitState.HALF_OPEN) {
             this.trip();
-            // console.log(`❌ Circuit ${this.id} failed in HALF_OPEN, returning to OPEN`);
         }
         else if (this.shouldTrip()) {
             this.trip();
-            // console.log(`⚡ Circuit ${this.id} tripped due to failures`);
         }
     }
     shouldTrip() {
@@ -169,11 +165,9 @@ class CircuitBreaker {
         };
     }
     reset_manual() {
-        // console.log(`🔧 Manually resetting circuit ${this.id}`);
         this.reset();
     }
     force_open() {
-        // console.log(`🚫 Manually opening circuit ${this.id}`);
         this.trip();
     }
 }
@@ -194,26 +188,22 @@ class CircuitBreakerService {
         };
     }
     async initialize() {
-        // console.log('🔌 Initializing Circuit Breaker Service...');
         // Initialize default circuits for critical services
         await this.createDefaultCircuits();
         // Start monitoring
         await this.startMonitoring();
-        // console.log('✅ Circuit Breaker Service initialized');
     }
     async shutdown() {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
         }
         this.circuits.clear();
-        // console.log('🔌 Circuit Breaker Service shut down');
     }
     // Circuit management
     createCircuit(id, serviceName, config) {
         const finalConfig = { ...this.defaultConfig, ...config };
         const circuit = new CircuitBreaker(id, serviceName, finalConfig);
         this.circuits.set(id, circuit);
-        // console.log(`🔌 Created circuit breaker: ${id} for service: ${serviceName}`);
         return circuit;
     }
     getCircuit(id) {
@@ -228,9 +218,6 @@ class CircuitBreakerService {
     }
     removeCircuit(id) {
         const removed = this.circuits.delete(id);
-        if (removed) {
-            // console.log(`🗑️ Removed circuit breaker: ${id}`);
-        }
         return removed;
     }
     // Execution wrappers
@@ -274,7 +261,6 @@ class CircuitBreakerService {
                 console.error('Circuit breaker monitoring failed:', error);
             }
         }, 30000); // Every 30 seconds
-        // console.log('📊 Circuit breaker monitoring started');
     }
     async collectCircuitMetrics() {
         for (const circuit of this.circuits.values()) {
@@ -379,7 +365,6 @@ class CircuitBreakerService {
             slowCallThreshold: 5000,
             errorThreshold: 40
         });
-        // console.log(`🔌 Created ${this.circuits.size} default circuit breakers`);
     }
     // Management API
     getAllCircuits() {
@@ -414,7 +399,6 @@ class CircuitBreakerService {
                 resetType: 'bulk'
             }));
         }
-        // console.log(`🔄 Reset ${resetCount} circuit breakers`);
         return resetCount;
     }
     async forceOpenCircuit(circuitId) {
@@ -461,7 +445,6 @@ class CircuitBreakerService {
             return await this.executeWithCircuitBreaker(circuitId, serviceName, primaryOperation);
         }
         catch (error) {
-            // console.log(`🔄 Primary operation failed, using fallback for ${serviceName}`);
             return await fallbackOperation();
         }
     }
@@ -474,7 +457,6 @@ class CircuitBreakerService {
             catch (error) {
                 lastError = error instanceof Error ? error : new Error('Unknown error');
                 if (attempt < maxRetries) {
-                    // console.log(`🔄 Attempt ${attempt} failed for ${serviceName}, retrying in ${backoffMs}ms`);
                     await new Promise(resolve => setTimeout(resolve, backoffMs * attempt));
                 }
             }

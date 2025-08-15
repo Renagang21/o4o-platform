@@ -44,8 +44,12 @@ const helmet_1 = __importDefault(require("helmet"));
 const compression_1 = __importDefault(require("compression"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
-// 환경변수 로드 (우선순위: .env.production > .env)
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+// 환경변수 로드 (우선순위: .env.production > .env.development > .env)
+const envFile = process.env.NODE_ENV === 'production'
+    ? '.env.production'
+    : process.env.NODE_ENV === 'development'
+        ? '.env.development'
+        : '.env';
 // Try multiple paths for .env file
 const possiblePaths = [
     path_1.default.resolve(__dirname, '..', envFile), // apps/api-server/.env
@@ -58,7 +62,6 @@ for (const envPath of possiblePaths) {
     try {
         const result = dotenv_1.default.config({ path: envPath });
         if (!result.error) {
-            // console.log(`✅ Successfully loaded env from: ${envPath}`);
             envLoaded = true;
             break;
         }
@@ -71,12 +74,6 @@ if (!envLoaded) {
     // Warning: No .env file found, using system environment variables
 }
 // 환경변수 검증
-// console.log('🔧 Environment Configuration:');
-// console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
-// console.log(`   Config file: ${envFile}`);
-// console.log(`   DB_HOST: ${process.env.DB_HOST || 'NOT SET'}`);
-// console.log(`   DB_PORT: ${process.env.DB_PORT || 'NOT SET'}`);
-// console.log(`   DB_NAME: ${process.env.DB_NAME || 'NOT SET'}`);
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const express_session_1 = __importDefault(require("express-session"));
@@ -129,6 +126,8 @@ const posts_1 = __importDefault(require("./routes/posts"));
 const reusable_blocks_routes_1 = __importDefault(require("./routes/reusable-blocks.routes"));
 const block_patterns_routes_1 = __importDefault(require("./routes/block-patterns.routes"));
 const template_parts_routes_1 = __importDefault(require("./routes/template-parts.routes"));
+const categories_1 = __importDefault(require("./routes/categories"));
+const custom_post_types_1 = __importDefault(require("./routes/custom-post-types"));
 // Import v1 API routes
 const content_routes_1 = __importDefault(require("./routes/v1/content.routes"));
 const platform_routes_1 = __importDefault(require("./routes/v1/platform.routes"));
@@ -150,7 +149,6 @@ const app = (0, express_1.default)();
 // This must be done before any middleware that uses req.ip
 if (process.env.NODE_ENV === 'production') {
     app.set('trust proxy', true);
-    // console.log('✅ Trust proxy enabled for production environment');
 }
 const httpServer = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(httpServer, {
@@ -185,7 +183,6 @@ const io = new socket_io_1.Server(httpServer, {
 });
 exports.io = io;
 const port = process.env.PORT || 4000;
-// console.log('🚀 Starting server on port:', port);
 // Rate limiting for authenticated endpoints
 const limiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000, // 15분
@@ -317,8 +314,8 @@ app.use(performanceMonitor_1.performanceMonitor);
 app.use(securityMiddleware_1.securityMiddleware);
 app.use(securityMiddleware_1.sqlInjectionDetection);
 app.use((0, cookie_parser_1.default)());
-app.use(express_1.default.json({ limit: '10mb' }));
-app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express_1.default.json({ limit: '50mb' }));
+app.use(express_1.default.urlencoded({ extended: true, limit: '50mb' }));
 // Configure session store
 let sessionConfig = {
     secret: process.env.SESSION_SECRET || 'o4o-platform-session-secret',
@@ -501,6 +498,9 @@ app.use('/api/block-patterns', block_patterns_routes_1.default); // Block patter
 app.use('/api/template-parts', template_parts_routes_1.default); // Template parts routes (WordPress FSE)
 app.use('/api/content', content_1.default); // Content routes - moved to specific path to avoid conflicts
 // V1 API routes (new standardized endpoints)
+app.use('/api/v1/posts', posts_1.default); // Posts routes (WordPress-compatible)
+app.use('/api/v1/categories', categories_1.default); // Categories routes (fixed)
+app.use('/api/v1/custom-post-types', custom_post_types_1.default); // Custom post types (fixed)
 app.use('/api/v1/content', content_routes_1.default);
 app.use('/api/v1/platform', platform_routes_1.default);
 app.use('/api/v1/ecommerce', ecommerce_routes_1.default);
@@ -545,10 +545,8 @@ app.get('/', (req, res) => {
 });
 // Socket.IO 연결 처리 (기존 기능 유지)
 io.on('connection', (socket) => {
-    // console.log('Client connected:', socket.id);
     socket.on('join_admin', () => {
         socket.join('admin_notifications');
-        // console.log('Admin joined notifications room');
     });
     socket.on('new_user_registered', (data) => {
         io.to('admin_notifications').emit('new_registration', {
@@ -558,7 +556,6 @@ io.on('connection', (socket) => {
         });
     });
     socket.on('disconnect', () => {
-        // console.log('Client disconnected:', socket.id);
     });
 });
 // 중앙화된 에러 핸들러 (모든 라우트 뒤에 위치해야 함)
@@ -580,10 +577,8 @@ const startServer = async () => {
     try {
         // 데이터베이스 초기화 전 상태 확인
         if (connection_1.AppDataSource.isInitialized) {
-            // console.log('✅ Database already initialized');
         }
         else {
-            // console.log('🔄 Initializing database connection...');
             // 환경변수 재확인
             const dbConfig = {
                 host: process.env.DB_HOST || 'localhost',
@@ -592,28 +587,23 @@ const startServer = async () => {
                 password: process.env.DB_PASSWORD || '',
                 database: process.env.DB_NAME || 'o4o_platform'
             };
-            // console.log('📊 Database config:', {
             //   ...dbConfig,
             //   password: dbConfig.password ? '***' : 'NOT SET'
             // });
             // 데이터베이스 초기화
             await connection_1.AppDataSource.initialize();
-            // console.log('✅ Database connection established');
             // 마이그레이션 실행 (프로덕션 환경)
             if (process.env.NODE_ENV === 'production') {
                 try {
                     await connection_1.AppDataSource.runMigrations();
-                    // console.log('✅ Database migrations completed');
                 }
                 catch (migrationError) {
-                    // console.log('⚠️  Migration error:', (migrationError as Error).message);
                 }
             }
             // Initialize monitoring services
             try {
                 await BackupService_1.backupService.initialize();
                 await ErrorAlertService_1.errorAlertService.initialize();
-                // console.log('✅ Monitoring services initialized');
             }
             catch (serviceError) {
                 console.error('⚠️  Failed to initialize monitoring services:', serviceError);
@@ -652,7 +642,6 @@ const startServer = async () => {
     }
     catch (dbError) {
         console.error('❌ Database connection failed:', dbError);
-        // console.log('📌 Check your database configuration and ensure PostgreSQL is running');
         // 프로덕션에서는 종료, 개발에서는 계속 실행
         if (process.env.NODE_ENV === 'production') {
             process.exit(1);
@@ -667,33 +656,21 @@ const startServer = async () => {
             password: process.env.REDIS_PASSWORD
         });
         redisClient.on('connect', () => {
-            // console.log('✅ Redis connected');
         });
         redisClient.on('error', (err) => {
-            // console.log('⚠️  Redis connection error:', err.message);
         });
         // Initialize SessionSyncService
         sessionSyncService_1.SessionSyncService.initialize(redisClient);
         // Initialize WebSocket session sync if enabled
         if (process.env.SESSION_SYNC_ENABLED === 'true') {
             webSocketSessionSync = new sessionSync_1.WebSocketSessionSync(io);
-            // console.log('✅ WebSocket session sync initialized');
         }
         // Start crowdfunding schedules
         (0, crowdfundingSchedule_1.startCrowdfundingSchedules)();
     }
     catch (redisError) {
-        // console.log('⚠️  Redis initialization failed:', (redisError as Error).message);
-        // console.log('📌 Running without session synchronization');
     }
     httpServer.listen(port, () => {
-        // console.log(`🚀 Neture API Server running on port ${port}`);
-        // console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
-        // console.log(`🌐 API Base URL: http://localhost:${port}/api`);
-        // console.log(`🎨 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3011'}`);
-        // console.log(`📡 Health check: http://localhost:${port}/api/health`);
-        // console.log(`🍪 Cookie Domain: ${process.env.COOKIE_DOMAIN || 'none (default)'}`);
-        // console.log(`🔄 Session Sync: ${process.env.SESSION_SYNC_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
     });
 };
 startServer().catch(console.error);

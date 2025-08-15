@@ -25,11 +25,9 @@ class GracefulDegradationService {
         this.alertRepo = connection_1.AppDataSource.getRepository(Alert_1.Alert);
     }
     async initialize() {
-        // console.log('🛡️ Initializing Graceful Degradation Service...');
         await this.initializeDegradationRules();
         await this.initializeFeatureStates();
         await this.startMonitoring();
-        // console.log('✅ Graceful Degradation Service initialized');
     }
     async shutdown() {
         if (this.monitoringInterval) {
@@ -37,7 +35,6 @@ class GracefulDegradationService {
         }
         // Revert all active degradations
         await this.revertAllDegradations();
-        // console.log('🛡️ Graceful Degradation Service shut down');
     }
     // Main degradation logic
     async evaluateDegradationNeeds() {
@@ -140,7 +137,6 @@ class GracefulDegradationService {
     }
     // Degradation activation and management
     async activateDegradation(rule) {
-        // console.log(`🛡️ Activating degradation rule: ${rule.name} (Level: ${rule.level})`);
         const degradation = {
             id: `degradation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             ruleId: rule.id,
@@ -159,7 +155,6 @@ class GracefulDegradationService {
             try {
                 await this.applyDegradationAction(action, degradation);
                 degradation.actionsApplied.push(action.type);
-                // console.log(`✅ Applied degradation action: ${action.type} on ${action.target}`);
             }
             catch (error) {
                 console.error(`❌ Failed to apply degradation action: ${action.type}`, error);
@@ -211,7 +206,6 @@ class GracefulDegradationService {
             feature.degradationLevel = degradation.level;
             feature.currentState = { ...feature.currentState, enabled: false };
             degradation.affectedFeatures.push(featureId);
-            // console.log(`🚫 Disabled feature: ${featureId}`);
         }
     }
     async reduceFunctionality(featureId, parameters, degradation) {
@@ -222,7 +216,6 @@ class GracefulDegradationService {
             feature.degradationLevel = degradation.level;
             feature.currentState = { ...feature.currentState, functionality: (_a = parameters.features) === null || _a === void 0 ? void 0 : _a.reduce((acc, feat) => ({ ...acc, [feat]: false }), feature.currentState.functionality || {}) };
             degradation.affectedFeatures.push(featureId);
-            // console.log(`⬇️ Reduced functionality for: ${featureId}`);
         }
     }
     async enableCacheFallback(target, parameters, degradation) {
@@ -236,7 +229,6 @@ class GracefulDegradationService {
         };
         // Use direct redis access through cacheService
         await CacheService_1.cacheService.set(cacheKey, cacheData, undefined, { ttl: parameters.ttl || 3600 });
-        // console.log(`🗄️ Enabled cache fallback for: ${target}`);
     }
     async enableStaticContent(target, parameters, degradation) {
         // Switch to static content delivery for the target
@@ -248,7 +240,6 @@ class GracefulDegradationService {
             degradationLevel: degradation.level
         };
         await CacheService_1.cacheService.set(staticKey, staticData, undefined, { ttl: parameters.expiryTime || 7200 });
-        // console.log(`📄 Enabled static content for: ${target}`);
     }
     async enableSimplifiedUI(target, parameters, degradation) {
         // Enable simplified UI mode
@@ -263,7 +254,6 @@ class GracefulDegradationService {
             degradationLevel: degradation.level
         };
         await CacheService_1.cacheService.set(uiKey, uiData, undefined, { ttl: 3600 });
-        // console.log(`🎨 Enabled simplified UI for: ${target}`);
     }
     async enableRateLimit(target, parameters, degradation) {
         // Implement rate limiting for the target
@@ -277,7 +267,6 @@ class GracefulDegradationService {
             degradationLevel: degradation.level
         };
         await CacheService_1.cacheService.set(rateLimitKey, rateLimitData, undefined, { ttl: 1800 });
-        // console.log(`🚦 Enabled rate limiting for: ${target} (${parameters.requestsPerMinute} req/min)`);
     }
     async enableRequestQueuing(target, parameters, degradation) {
         // Enable request queuing for the target
@@ -291,7 +280,6 @@ class GracefulDegradationService {
             degradationLevel: degradation.level
         };
         await CacheService_1.cacheService.set(queueKey, queueData, undefined, { ttl: 1800 });
-        // console.log(`📥 Enabled request queuing for: ${target} (max: ${parameters.maxQueueSize || 1000})`);
     }
     async redirectTraffic(target, parameters, degradation) {
         // Implement traffic redirection
@@ -306,7 +294,6 @@ class GracefulDegradationService {
             degradationLevel: degradation.level
         };
         await CacheService_1.cacheService.set(redirectKey, redirectData, undefined, { ttl: 1800 });
-        // console.log(`🔀 Enabled traffic redirection for: ${target} to ${parameters.targetUrl || parameters.targetServer}`);
     }
     // Degradation reversion
     async checkRevertConditions(rule) {
@@ -354,7 +341,6 @@ class GracefulDegradationService {
         const degradation = this.activeDegradations.get(ruleId);
         if (!degradation)
             return;
-        // console.log(`🔄 Reverting degradation: ${ruleId}`);
         // Revert affected features
         for (const featureId of degradation.affectedFeatures) {
             const feature = this.featureStates.get(featureId);
@@ -362,7 +348,6 @@ class GracefulDegradationService {
                 feature.isDegraded = false;
                 feature.degradationLevel = DegradationLevel.NONE;
                 feature.currentState = { ...feature.normalState };
-                // console.log(`✅ Restored feature: ${featureId}`);
             }
         }
         // Clear degradation caches
@@ -376,25 +361,20 @@ class GracefulDegradationService {
         ];
         for (const prefix of cacheKeys) {
             // Clear related cache entries (simplified - would need actual cache key management)
-            // console.log(`🗑️ Cleared degradation cache: ${prefix}`);
         }
         degradation.endTime = new Date();
         this.activeDegradations.delete(ruleId);
         // Record reversion event
         await this.recordDegradationEvent('reverted', degradation);
-        // console.log(`✅ Successfully reverted degradation: ${ruleId}`);
     }
     async revertAllDegradations() {
-        // console.log('🔄 Reverting all active degradations...');
         const activeRuleIds = Array.from(this.activeDegradations.keys());
         for (const ruleId of activeRuleIds) {
             await this.revertDegradation(ruleId);
         }
-        // console.log(`✅ Reverted ${activeRuleIds.length} degradations`);
     }
     // Component isolation
     async isolateComponent(componentId, parameters) {
-        // console.log(`🔒 Isolating component: ${componentId}`);
         const isolationRule = {
             id: `isolation_${componentId}_${Date.now()}`,
             name: `Emergency Isolation: ${componentId}`,
@@ -439,7 +419,6 @@ class GracefulDegradationService {
                 console.error('Graceful degradation monitoring failed:', error);
             }
         }, 30000); // Every 30 seconds
-        // console.log('📊 Graceful degradation monitoring started');
     }
     async recordDegradationMetrics() {
         const activeDegradationCount = this.activeDegradations.size;
@@ -610,7 +589,6 @@ class GracefulDegradationService {
         rules.forEach((rule) => {
             this.degradationRules.set(rule.id, rule);
         });
-        // console.log(`📋 Initialized ${rules.length} degradation rules`);
     }
     async initializeFeatureStates() {
         const features = [
@@ -648,7 +626,6 @@ class GracefulDegradationService {
         features.forEach((feature) => {
             this.featureStates.set(feature.featureId, feature);
         });
-        // console.log(`🎛️ Initialized ${features.length} feature states`);
     }
     getUserImpactSeverity(level) {
         switch (level) {
@@ -729,12 +706,10 @@ class GracefulDegradationService {
     }
     async enable() {
         this.isEnabled = true;
-        // console.log('✅ Graceful degradation enabled');
     }
     async disable() {
         this.isEnabled = false;
         await this.revertAllDegradations();
-        // console.log('⏸️ Graceful degradation disabled');
     }
 }
 exports.GracefulDegradationService = GracefulDegradationService;

@@ -513,4 +513,4 @@ router.delete('/:id', auth_1.authenticateToken, (0, express_validator_1.param)('
     }
 });
 exports.default = router;
-//# sourceMappingURL=posts.js.map
+//# sourceMappingURL=posts-complete.js.map

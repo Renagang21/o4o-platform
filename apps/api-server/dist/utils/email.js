@@ -32,7 +32,6 @@ async function sendEmail(options) {
             attachments: options.attachments
         };
         await transporter.sendMail(mailOptions);
-        // console.log('Email sent successfully to:', options.to);
     }
     catch (error) {
         console.error('Failed to send email:', error);
@@ -43,7 +42,6 @@ async function sendEmail(options) {
 async function verifyEmailConnection() {
     try {
         await transporter.verify();
-        // console.log('SMTP connection verified');
         return true;
     }
     catch (error) {

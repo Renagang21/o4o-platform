@@ -16,7 +16,6 @@ class RealtimeFeedbackService {
     }
     setupSocketHandlers() {
         this.io.on('connection', (socket) => {
-            // console.log('Client connected:', socket.id);
             // Admin join handler
             socket.on('admin:join', async (data) => {
                 try {
@@ -89,7 +88,6 @@ class RealtimeFeedbackService {
             });
             // Disconnect handler
             socket.on('disconnect', () => {
-                // console.log('Client disconnected:', socket.id);
                 this.handleDisconnect(socket);
             });
         });
@@ -110,7 +108,6 @@ class RealtimeFeedbackService {
         // Send pending notifications
         const pendingNotifications = await this.getPendingNotifications(userId);
         socket.emit('admin:pending_notifications', pendingNotifications);
-        // console.log(`Admin ${userId} joined with socket ${socket.id}`);
     }
     async handleUserJoin(socket, betaUserId, email) {
         // Verify beta user
@@ -133,7 +130,6 @@ class RealtimeFeedbackService {
         // Send user's active conversations
         const conversations = await this.getUserConversations(betaUserId);
         socket.emit('user:conversations', conversations);
-        // console.log(`Beta user ${betaUserId} joined with socket ${socket.id}`);
     }
     async handleConversationJoin(socket, conversationId) {
         const conversationRepo = connection_1.AppDataSource.getRepository(FeedbackConversation_1.FeedbackConversation);
@@ -153,7 +149,6 @@ class RealtimeFeedbackService {
         // Send conversation history
         const messages = await this.getConversationMessages(conversationId);
         socket.emit('conversation:history', messages);
-        // console.log(`Socket ${socket.id} joined conversation ${conversationId}`);
     }
     async handleSendMessage(socket, data) {
         const messageRepo = connection_1.AppDataSource.getRepository(FeedbackConversation_1.ConversationMessage);
@@ -206,7 +201,6 @@ class RealtimeFeedbackService {
                 conversationId: data.conversationId
             });
         }
-        // console.log(`Message sent in conversation ${data.conversationId}`);
     }
     async handleMarkMessageRead(messageId) {
         const messageRepo = connection_1.AppDataSource.getRepository(FeedbackConversation_1.ConversationMessage);

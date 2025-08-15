@@ -554,30 +554,22 @@ class StatusPageService {
     }
     async recordStatusChange(component, oldStatus, newStatus) {
         // Could record status change events in a separate table for audit trail
-        // console.log(`Component ${component.name} status changed from ${oldStatus} to ${newStatus}`);
     }
     // Notification methods (stubs - implement based on your notification preferences)
     async notifyStatusChange(component, oldStatus, newStatus) {
         // Implementation depends on notification system
-        // console.log(`Status change notification: ${component.name} ${oldStatus} -> ${newStatus}`);
     }
     async notifyIncidentCreated(incident) {
-        // console.log(`Incident created notification: ${incident.title}`);
     }
     async notifyIncidentUpdated(incident) {
-        // console.log(`Incident updated notification: ${incident.title} - ${incident.status}`);
     }
     async notifyMaintenanceScheduled(maintenance) {
-        // console.log(`Maintenance scheduled notification: ${maintenance.title}`);
     }
     async notifyMaintenanceStarted(maintenance) {
-        // console.log(`Maintenance started notification: ${maintenance.title}`);
     }
     async notifyMaintenanceCompleted(maintenance) {
-        // console.log(`Maintenance completed notification: ${maintenance.title}`);
     }
     async sendConfirmationEmail(subscriber) {
-        // console.log(`Confirmation email sent to: ${subscriber.email}`);
     }
 }
 exports.StatusPageService = StatusPageService;

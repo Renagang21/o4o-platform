@@ -130,7 +130,6 @@ class DatabaseOptimizationService {
             await this.analyzeQueryPatterns();
             // 캐시 히트율 분석
             await this.analyzeCacheHitRates();
-            // console.log('✅ Query performance analysis completed');
         }
         catch (error) {
             console.error('Failed to analyze query performance:', error);
@@ -402,7 +401,6 @@ class DatabaseOptimizationService {
                 recommendations,
                 analyzedAt: new Date().toISOString()
             }));
-            // console.log('✅ Index usage analysis completed');
         }
         catch (error) {
             console.error('Failed to analyze index usage:', error);
@@ -745,14 +743,12 @@ class DatabaseOptimizationService {
      */
     async runAutoOptimization() {
         try {
-            // console.log('🔄 Running automatic database optimization...');
             // 통계 업데이트
             await this.updateTableStatistics();
             // 백그라운드 작업 실행
             await this.runMaintenanceTasks();
             // 인덱스 권장사항 적용 (자동 적용 가능한 것만)
             await this.applyAutoIndexOptimizations();
-            // console.log('✅ Automatic database optimization completed');
         }
         catch (error) {
             console.error('❌ Automatic database optimization failed:', error);
@@ -765,7 +761,6 @@ class DatabaseOptimizationService {
         try {
             // 모든 테이블의 통계 업데이트
             await connection_1.AppDataSource.query('ANALYZE');
-            // console.log('✅ Table statistics updated');
         }
         catch (error) {
             console.error('Failed to update table statistics:', error);
@@ -780,7 +775,6 @@ class DatabaseOptimizationService {
             await this.cleanupOldData();
             // 연결 풀 최적화
             await this.optimizeConnectionPool();
-            // console.log('✅ Maintenance tasks completed');
         }
         catch (error) {
             console.error('Failed to run maintenance tasks:', error);
@@ -804,7 +798,6 @@ class DatabaseOptimizationService {
         DELETE FROM user_session 
         WHERE updated_at < $1
       `, [cutoffDate]);
-            // console.log('✅ Old data cleanup completed');
         }
         catch (error) {
             console.error('Failed to cleanup old data:', error);
@@ -829,7 +822,6 @@ class DatabaseOptimizationService {
                     }
                 }
             }
-            // console.log('✅ Connection pool optimized');
         }
         catch (error) {
             console.error('Failed to optimize connection pool:', error);
@@ -849,7 +841,6 @@ class DatabaseOptimizationService {
                 if (recommendation.type === 'drop_unused' && recommendation.priority === 'medium') {
                     try {
                         await connection_1.AppDataSource.query(recommendation.action);
-                        // console.log(`✅ Applied optimization: ${recommendation.action}`);
                     }
                     catch (error) {
                         console.warn(`Failed to apply optimization: ${recommendation.action}`, error);
@@ -1088,7 +1079,6 @@ class DatabaseOptimizationService {
     async shutdown() {
         try {
             await this.redis.disconnect();
-            // console.log('✅ Database optimization service shutdown completed');
         }
         catch (error) {
             console.error('❌ Database optimization service shutdown failed:', error);

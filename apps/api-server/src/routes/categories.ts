@@ -55,7 +55,7 @@ router.get('/', async (req: Request, res: Response) => {
       categories = categories.filter(cat => cat.parent === parent);
     }
 
-    if (hide_empty === 'true' || hide_empty === true) {
+    if (hide_empty === 'true' || hide_empty === '1') {
       categories = categories.filter(cat => cat.count > 0);
     }
 

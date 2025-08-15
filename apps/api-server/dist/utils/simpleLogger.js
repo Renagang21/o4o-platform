@@ -35,7 +35,6 @@ class SimpleLogger {
                 }
                 break;
             default:
-            // console.log(formattedMessage);
         }
     }
     error(message, meta) {

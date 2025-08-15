@@ -282,11 +282,9 @@ class AutoScalingService {
         const increasingTrends = Object.values(trends).filter((t) => t === 'increasing').length;
         const decreasingTrends = Object.values(trends).filter((t) => t === 'decreasing').length;
         if (increasingTrends >= 2) {
-            // console.log('📈 Increasing trend detected - preparing for scale up');
             await this.prepareForScaleUp();
         }
         else if (decreasingTrends >= 3) {
-            // console.log('📉 Decreasing trend detected - preparing for scale down');
             await this.prepareForScaleDown();
         }
     }
@@ -398,7 +396,6 @@ class AutoScalingService {
      */
     async executeScalingAction(action) {
         try {
-            // console.log(`🔄 Executing scaling action: ${action.type} - ${action.reason}`);
             if (action.type === 'scale_up') {
                 await this.scaleUp(action.step);
             }
@@ -424,7 +421,6 @@ class AutoScalingService {
         for (let i = this.currentInstances.size; i < targetInstances; i++) {
             await this.createNewInstance();
         }
-        // console.log(`✅ Scaled up to ${targetInstances} instances`);
     }
     /**
      * 스케일 다운 실행
@@ -438,7 +434,6 @@ class AutoScalingService {
         for (let i = 0; i < instancesToRemove; i++) {
             await this.removeInstance(sortedInstances[i].id);
         }
-        // console.log(`✅ Scaled down to ${targetInstances} instances`);
     }
     /**
      * 새 인스턴스 생성
@@ -461,7 +456,6 @@ class AutoScalingService {
             instance.processId = processId;
             instance.status = 'running';
             instance.healthStatus = 'healthy';
-            // console.log(`✅ New instance created: ${instanceId} on port ${instance.port}`);
             // 로드 밸런서에 인스턴스 등록
             await this.registerInstanceToLoadBalancer(instance);
         }
@@ -485,7 +479,6 @@ class AutoScalingService {
             await this.gracefulShutdown(instance);
             // 인스턴스 목록에서 제거
             this.currentInstances.delete(instanceId);
-            // console.log(`✅ Instance removed: ${instanceId}`);
         }
         catch (error) {
             console.error(`Failed to remove instance ${instanceId}:`, error);
@@ -531,21 +524,18 @@ class AutoScalingService {
             status: 'active'
         };
         await this.redis.hset('load_balancer_instances', instance.id, JSON.stringify(lbConfig));
-        // console.log(`📊 Instance registered to load balancer: ${instance.id}`);
     }
     /**
      * 로드 밸런서에서 인스턴스 제거
      */
     async unregisterInstanceFromLoadBalancer(instance) {
         await this.redis.hdel('load_balancer_instances', instance.id);
-        // console.log(`📊 Instance unregistered from load balancer: ${instance.id}`);
     }
     /**
      * 그레이스풀 셧다운
      */
     async gracefulShutdown(instance) {
         // 실제로는 SIGTERM 신호를 보내고 응답 대기
-        // console.log(`🔄 Gracefully shutting down instance: ${instance.id}`);
         // 현재 연결 완료 대기 (시뮬레이션)
         await new Promise(resolve => setTimeout(resolve, 5000));
         if (instance.processId) {
@@ -562,7 +552,6 @@ class AutoScalingService {
      */
     async prepareForScaleUp() {
         // 리소스 예약, 이미지 pre-pull 등
-        // console.log('📋 Preparing for scale up...');
         // 예: 다음 인스턴스를 위한 포트 예약
         const nextPort = this.getAvailablePort();
         await this.redis.setex(`reserved_port_${nextPort}`, 300, '1');
@@ -572,7 +561,6 @@ class AutoScalingService {
      */
     async prepareForScaleDown() {
         // 연결 드레이닝, 세션 이전 등
-        // console.log('📋 Preparing for scale down...');
         // 예: 제거할 인스턴스의 새 연결 차단
         const instanceToRemove = this.findInstanceToRemove();
         if (instanceToRemove) {
@@ -641,7 +629,6 @@ class AutoScalingService {
         // 3번 연속 실패 시 인스턴스 교체
         const failureCount = await this.getInstanceFailureCount(instance.id);
         if (failureCount >= 3) {
-            // console.log(`🔄 Replacing unhealthy instance: ${instance.id}`);
             // 새 인스턴스 생성
             await this.createNewInstance();
             // 기존 인스턴스 제거
@@ -678,7 +665,6 @@ class AutoScalingService {
             // 부하 불균형 감지
             const unbalancedInstances = instances.filter((instance) => Math.abs(instance.currentLoad - avgLoad) > 20);
             if (unbalancedInstances.length > 0) {
-                // console.log('⚖️ Load imbalance detected, rebalancing...');
                 await this.rebalanceLoad(instances);
             }
             // 로드 밸런서 가중치 업데이트
@@ -844,7 +830,6 @@ class AutoScalingService {
                 await this.gracefulShutdown(instance);
             }
             await this.redis.disconnect();
-            // console.log('✅ Auto-scaling service shutdown completed');
         }
         catch (error) {
             console.error('❌ Auto-scaling service shutdown failed:', error);

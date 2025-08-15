@@ -168,17 +168,16 @@ router.post('/',
 
       const post = await postRepository.save({
         title,
-        content,
+        content: { blocks: [] }, // TODO: Parse content into blocks format
         status,
         slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
         excerpt: extractContent(excerpt),
         tags: tags || [],
         format: format || 'standard',
         sticky: sticky || false,
-        meta: meta || {},
+        postMeta: meta || {},
         authorId: userId,
         categories,
-        type: req.body.type || 'post',
         publishedAt: status === 'published' ? new Date() : null
       });
 
@@ -192,7 +191,7 @@ router.post('/',
         modified_gmt: post.updatedAt,
         slug: post.slug,
         status: post.status,
-        type: post.type || 'post',
+        type: 'post',
         link: `/posts/${post.slug}`,
         title: { 
           raw: post.title,
@@ -215,7 +214,7 @@ router.post('/',
         sticky: post.sticky || false,
         template: '',
         format: post.format || 'standard',
-        meta: post.meta || {},
+        meta: post.postMeta || {},
         categories: post.categories?.map(c => c.id) || [],
         tags: post.tags || []
       };
@@ -314,14 +313,14 @@ router.put('/:id',
       const updatedPost = await postRepository.save({
         ...existingPost,
         title: title || existingPost.title,
-        content: content || existingPost.content,
+        content: content ? { blocks: [] } : existingPost.content, // TODO: Parse content into blocks format
         status: status || existingPost.status,
         slug: slug || existingPost.slug,
         excerpt: excerpt !== undefined ? extractContent(excerpt) : existingPost.excerpt,
         tags: tags || existingPost.tags,
         format: format || existingPost.format,
         sticky: sticky !== undefined ? sticky : existingPost.sticky,
-        meta: meta || existingPost.meta,
+        postMeta: meta || existingPost.postMeta,
         categories,
         lastModifierId: userId,
         publishedAt: status === 'published' && !existingPost.publishedAt ? new Date() : existingPost.publishedAt
@@ -337,7 +336,7 @@ router.put('/:id',
         modified_gmt: updatedPost.updatedAt,
         slug: updatedPost.slug,
         status: updatedPost.status,
-        type: updatedPost.type || 'post',
+        type: 'post',
         link: `/posts/${updatedPost.slug}`,
         title: { 
           raw: updatedPost.title,
@@ -360,7 +359,7 @@ router.put('/:id',
         sticky: updatedPost.sticky || false,
         template: '',
         format: updatedPost.format || 'standard',
-        meta: updatedPost.meta || {},
+        meta: updatedPost.postMeta || {},
         categories: updatedPost.categories?.map(c => c.id) || [],
         tags: updatedPost.tags || []
       };

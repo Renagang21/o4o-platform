@@ -56,21 +56,17 @@ class SelfHealingService {
         this.alertRepo = connection_1.AppDataSource.getRepository(Alert_1.Alert);
     }
     async initialize() {
-        // console.log('🔧 Initializing Self-Healing Service...');
         await this.initializeHealingActions();
         await this.startHealthMonitoring();
         await this.initializeServiceTracking();
-        // console.log('✅ Self-Healing Service initialized');
     }
     async shutdown() {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
         }
-        // console.log('🔧 Self-Healing Service shut down');
     }
     // Service restart functionality
     async restartService(serviceName, parameters) {
-        // console.log(`🔄 Restarting service: ${serviceName}`);
         const action = this.healingActions.get('restart-service') || await this.createServiceRestartAction(serviceName, parameters);
         return await this.executeHealingAction(action, { serviceName, ...parameters });
     }
@@ -109,7 +105,6 @@ class SelfHealingService {
     }
     // Cache clearing functionality
     async clearCache(target, parameters) {
-        // console.log(`🗑️ Clearing cache: ${target}`);
         let output = '';
         const cacheTypes = (parameters === null || parameters === void 0 ? void 0 : parameters.cacheTypes) || ['memory', 'redis', 'temp'];
         for (const cacheType of cacheTypes) {
@@ -151,7 +146,6 @@ class SelfHealingService {
         try {
             // Implementation would use actual Redis client
             const pattern = (parameters === null || parameters === void 0 ? void 0 : parameters.pattern) || '*';
-            // console.log(`Clearing Redis cache with pattern: ${pattern}`);
             // Simulate Redis cache clear
             await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -178,7 +172,6 @@ class SelfHealingService {
     }
     // Connection reset functionality
     async resetConnections(target, parameters) {
-        // console.log(`🔌 Resetting connections: ${target}`);
         let output = '';
         try {
             switch (target) {
@@ -226,12 +219,10 @@ class SelfHealingService {
     }
     async resetRedisConnections(parameters) {
         // Implementation would reset Redis connections
-        // console.log('Resetting Redis connections');
         return 'Redis connections reset';
     }
     // Resource scaling functionality
     async scaleResources(target, parameters) {
-        // console.log(`📈 Scaling resources: ${target}`);
         const action = (parameters === null || parameters === void 0 ? void 0 : parameters.action) || 'scale_up';
         const factor = (parameters === null || parameters === void 0 ? void 0 : parameters.factor) || 1.5;
         let output = '';
@@ -257,7 +248,6 @@ class SelfHealingService {
     }
     async scaleApiServer(action, factor) {
         // In a real implementation, this would scale the API server instances
-        // console.log(`Scaling API server: ${action} by factor ${factor}`);
         if (action === 'scale_up') {
             // Increase worker processes, connection limits, etc.
             return `API server scaled up by factor ${factor}`;
@@ -279,7 +269,6 @@ class SelfHealingService {
     }
     async scaleConnectionPools(action, factor) {
         // In a real implementation, this would adjust connection pool sizes
-        // console.log(`Scaling connection pools: ${action} by factor ${factor}`);
         return `Connection pools scaled ${action} by factor ${factor}`;
     }
     // Service status checking
@@ -322,7 +311,6 @@ class SelfHealingService {
                 console.error('Self-healing health monitoring failed:', error);
             }
         }, 60000); // Every minute
-        // console.log('❤️ Self-healing health monitoring started');
     }
     async performHealthCheck() {
         const health = {
@@ -493,14 +481,12 @@ class SelfHealingService {
         const autoHealableIssues = health.issues.filter((issue) => issue.autoHealable);
         for (const issue of autoHealableIssues) {
             if (this.activeAttempts.size >= this.maxConcurrentHealing) {
-                // console.log(`⚠️ Max concurrent healing attempts reached, skipping ${issue.type}`);
                 continue;
             }
             await this.healIssue(issue);
         }
     }
     async healIssue(issue) {
-        // console.log(`🩹 Auto-healing issue: ${issue.type} - ${issue.description}`);
         const suggestedAction = issue.suggestedActions[0];
         try {
             switch (suggestedAction) {
@@ -528,7 +514,6 @@ class SelfHealingService {
                 default:
                     console.warn(`Unknown healing action: ${suggestedAction}`);
             }
-            // console.log(`✅ Auto-healing successful for ${issue.type}`);
         }
         catch (error) {
             console.error(`❌ Auto-healing failed for ${issue.type}:`, error);
@@ -759,7 +744,6 @@ class SelfHealingService {
         actions.forEach((action) => {
             this.healingActions.set(action.id, action);
         });
-        // console.log(`🔧 Initialized ${actions.length} healing actions`);
     }
     async initializeServiceTracking() {
         const services = ['api-server', 'postgresql', 'redis'];
@@ -831,11 +815,9 @@ class SelfHealingService {
     }
     async enable() {
         this.isEnabled = true;
-        // console.log('✅ Self-healing enabled');
     }
     async disable() {
         this.isEnabled = false;
-        // console.log('⏸️ Self-healing disabled');
     }
     async forceHealing(issueType, component) {
         const issue = {

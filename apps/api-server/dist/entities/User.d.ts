@@ -18,7 +18,6 @@ export declare class User {
     role: UserRole;
     roles: string[];
     permissions: string[];
-    metadata?: Record<string, any>;
     isActive: boolean;
     isEmailVerified: boolean;
     refreshTokenFamily?: string;

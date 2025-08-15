@@ -184,7 +184,6 @@ class OperationsMonitoringService {
     }
     // Start all monitoring processes
     async startMonitoring() {
-        // console.log('🔍 Starting 24/7 Operations Monitoring System...');
         // Start health checks
         await this.startHealthChecks();
         // Start metric collection
@@ -195,17 +194,13 @@ class OperationsMonitoringService {
         await this.startUptimeMonitoring();
         // Start cleanup processes
         await this.startCleanupProcesses();
-        // console.log('✅ 24/7 Operations Monitoring System started successfully');
     }
     // Stop all monitoring processes
     async stopMonitoring() {
-        // console.log('🛑 Stopping 24/7 Operations Monitoring System...');
         this.monitoringIntervals.forEach((interval, name) => {
             clearInterval(interval);
-            // console.log(`Stopped ${name} monitoring`);
         });
         this.monitoringIntervals.clear();
-        // console.log('✅ 24/7 Operations Monitoring System stopped');
     }
     // Health Check System
     async startHealthChecks() {
@@ -219,7 +214,6 @@ class OperationsMonitoringService {
             }
         }, this.config.healthCheckInterval * 1000);
         this.monitoringIntervals.set('health-check', interval);
-        // console.log(`Health checks started (interval: ${this.config.healthCheckInterval}s)`);
     }
     async performSystemHealthCheck() {
         const timestamp = new Date();
@@ -462,7 +456,6 @@ class OperationsMonitoringService {
             }
         }, this.config.metricCollectionInterval * 1000);
         this.monitoringIntervals.set('metric-collection', interval);
-        // console.log(`Metric collection started (interval: ${this.config.metricCollectionInterval}s)`);
     }
     async collectSystemMetrics() {
         const timestamp = new Date();
@@ -505,7 +498,6 @@ class OperationsMonitoringService {
             }
         }, this.config.alertCheckInterval * 1000);
         this.monitoringIntervals.set('alert-monitoring', interval);
-        // console.log(`Alert monitoring started (interval: ${this.config.alertCheckInterval}s)`);
     }
     async checkAlertConditions() {
         for (const [ruleId, rule] of this.alertRules) {
@@ -628,7 +620,6 @@ class OperationsMonitoringService {
       Details: ${JSON.stringify(alert.metadata, null, 2)}
     `;
         // Implementation would use nodemailer or similar
-        // console.log(`📧 Email notification sent: ${subject}`);
     }
     async sendSlackNotification(alert) {
         if (!this.config.notifications.slack.enabled)
@@ -671,7 +662,6 @@ class OperationsMonitoringService {
             ]
         };
         // Implementation would use Slack webhook
-        // console.log(`📱 Slack notification sent: ${alert.title}`);
     }
     async sendWebhookNotification(alert) {
         if (!this.config.notifications.webhook.enabled)
@@ -696,7 +686,6 @@ class OperationsMonitoringService {
         await Promise.all(this.config.notifications.webhook.urls.map((url) => this.webhookService.sendWebhook(url, payload)));
     }
     async sendEscalationNotifications(alert) {
-        // console.log(`🔺 Escalating alert: ${alert.title}`);
         await this.sendAlertNotifications(alert);
     }
     // Utility Methods
@@ -789,7 +778,6 @@ class OperationsMonitoringService {
             }
         }, 24 * 60 * 60 * 1000); // 24 hours
         this.monitoringIntervals.set('cleanup', cleanup);
-        // console.log('Cleanup processes started');
     }
     async cleanupOldData() {
         const metricsRetentionDate = new Date();
@@ -805,7 +793,6 @@ class OperationsMonitoringService {
             status: Alert_1.AlertStatus.RESOLVED,
             resolvedAt: (0, typeorm_1.LessThan)(alertsRetentionDate)
         });
-        // console.log('🧹 Old data cleanup completed');
     }
     async startUptimeMonitoring() {
         const interval = setInterval(async () => {
@@ -817,7 +804,6 @@ class OperationsMonitoringService {
             }
         }, this.config.uptimeCheckInterval * 1000);
         this.monitoringIntervals.set('uptime-monitoring', interval);
-        // console.log(`Uptime monitoring started (interval: ${this.config.uptimeCheckInterval}s)`);
     }
     async recordUptimeMetrics() {
         const uptime = process.uptime();
