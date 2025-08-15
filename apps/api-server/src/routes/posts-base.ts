@@ -28,7 +28,7 @@ const getRepositories = () => {
 };
 
 // Mock data for when database is not available
-const mockPosts: any[] = [
+const mockPosts = [
   {
     id: '1',
     title: 'Welcome to Neture Platform',
@@ -48,32 +48,28 @@ const mockPosts: any[] = [
     publishedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
+  },
+  {
+    id: '2',
+    title: 'Getting Started Guide',
+    slug: 'getting-started',
+    content: '<p>Learn how to use the platform effectively.</p>',
+    excerpt: 'Learn how to use the platform effectively.',
+    status: 'published',
+    type: 'post',
+    author: {
+      id: '1',
+      name: 'Admin',
+      email: 'admin@neture.co.kr'
+    },
+    categories: [{ id: '2', name: '가이드', slug: 'guide' }],
+    tags: [],
+    featuredImage: null,
+    publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
-
-// Helper to extract content from Gutenberg format
-const extractContent = (content: any): string => {
-  if (typeof content === 'string') {
-    return content;
-  }
-  if (content && typeof content === 'object') {
-    // Handle Gutenberg format: { raw: "...", rendered: "..." }
-    return content.raw || content.rendered || '';
-  }
-  return '';
-};
-
-// Helper to extract title from Gutenberg format
-const extractTitle = (title: any): string => {
-  if (typeof title === 'string') {
-    return title;
-  }
-  if (title && typeof title === 'object') {
-    // Handle Gutenberg format: { raw: "...", rendered: "..." }
-    return title.raw || title.rendered || '';
-  }
-  return '';
-};
 
 // WordPress-compatible query parameters interface
 interface PostQueryParams {
@@ -99,7 +95,7 @@ interface PostQueryParams {
   format?: string;
 }
 
-// GET /api/posts - List posts
+// GET /api/posts - List posts (WordPress REST API compatible)
 router.get('/', 
   query('page').optional().isInt({ min: 1 }),
   query('per_page').optional().isInt({ min: 1, max: 100 }),
@@ -169,6 +165,53 @@ router.get('/',
         queryBuilder.andWhere('post.status = :status', { status });
       }
 
+      // Search
+      if (search) {
+        queryBuilder.andWhere(
+          '(post.title ILIKE :search OR post.content::text ILIKE :search OR post.excerpt ILIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+
+      // Author filter
+      if (author) {
+        const authorIds = author.split(',');
+        queryBuilder.andWhere('post.authorId IN (:...authorIds)', { authorIds });
+      }
+
+      // Categories filter
+      if (categories) {
+        const categoryIds = categories.split(',');
+        queryBuilder.andWhere('categories.id IN (:...categoryIds)', { categoryIds });
+      }
+
+      // Tags filter
+      if (tags) {
+        const tagList = tags.split(',');
+        queryBuilder.andWhere('post.tags && :tags', { tags: tagList });
+      }
+
+      // Format filter
+      if (format) {
+        queryBuilder.andWhere('post.format = :format', { format });
+      }
+
+      // Sticky filter
+      if (sticky !== undefined) {
+        queryBuilder.andWhere('post.sticky = :sticky', { sticky });
+      }
+
+      // Include/Exclude specific posts
+      if (include) {
+        const includeIds = include.split(',');
+        queryBuilder.andWhere('post.id IN (:...includeIds)', { includeIds });
+      }
+
+      if (exclude) {
+        const excludeIds = exclude.split(',');
+        queryBuilder.andWhere('post.id NOT IN (:...excludeIds)', { excludeIds });
+      }
+
       // Ordering
       let orderByField = 'post.createdAt';
       switch (orderby) {
@@ -219,8 +262,27 @@ router.get('/',
         tags: post.tags || [],
         sticky: post.sticky || false,
         format: post.format || 'standard',
-        meta: post.meta || {}
+        meta: post.meta || {},
+        _embedded: {
+          author: post.author ? [{
+            id: post.author.id,
+            name: post.author.name,
+            link: `/users/${post.author.id}`
+          }] : [],
+          'wp:term': [
+            post.categories?.map(c => ({
+              id: c.id,
+              name: c.name,
+              slug: c.slug,
+              taxonomy: 'category'
+            })) || []
+          ]
+        }
       }));
+
+      // Set pagination headers
+      res.setHeader('X-WP-Total', total.toString());
+      res.setHeader('X-WP-TotalPages', Math.ceil(total / (per_page as number)).toString());
 
       res.json(formattedPosts);
     } catch (error: any) {
@@ -287,7 +349,22 @@ router.get('/:id',
         tags: post.tags || [],
         sticky: post.sticky || false,
         format: post.format || 'standard',
-        meta: post.meta || {}
+        meta: post.meta || {},
+        _embedded: {
+          author: post.author ? [{
+            id: post.author.id,
+            name: post.author.name,
+            link: `/users/${post.author.id}`
+          }] : [],
+          'wp:term': [
+            post.categories?.map(c => ({
+              id: c.id,
+              name: c.name,
+              slug: c.slug,
+              taxonomy: 'category'
+            })) || []
+          ]
+        }
       };
 
       res.json(formattedPost);
@@ -301,84 +378,41 @@ router.get('/:id',
   }
 );
 
-// POST /api/posts - Create post (Gutenberg compatible)
+// POST /api/posts - Create post
 router.post('/',
   authenticateToken,
-  // Make title and content optional for auto-save support
-  body('title').optional(),
-  body('content').optional(),
-  body('status').optional().isIn(['draft', 'publish', 'published', 'private', 'archived', 'scheduled', 'auto-draft']),
+  body('title').notEmpty().withMessage('Title is required'),
+  body('content').notEmpty().withMessage('Content is required'),
+  body('status').optional().isIn(['draft', 'published', 'private', 'archived', 'scheduled']),
   validateDto,
   async (req: Request, res: Response) => {
     try {
+      const { title, content, status, categories: categoryIds, tags, excerpt, slug, format, sticky, meta } = req.body;
       const userId = (req as any).user?.id;
-      
-      // Extract title and content from Gutenberg format
-      const title = extractTitle(req.body.title) || 'Untitled';
-      const content = extractContent(req.body.content) || '';
-      
-      // Map 'publish' to 'published' for compatibility
-      let status = req.body.status || 'draft';
-      if (status === 'publish') {
-        status = 'published';
-      }
-      if (status === 'auto-draft') {
-        status = 'draft';
-      }
-      
-      const { 
-        categories: categoryIds, 
-        tags, 
-        excerpt, 
-        slug, 
-        format, 
-        sticky, 
-        meta,
-        featured_media,
-        comment_status,
-        ping_status
-      } = req.body;
 
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
         const newPost = {
           id: Date.now().toString(),
-          date: new Date().toISOString(),
-          date_gmt: new Date().toISOString(),
-          guid: { rendered: `/posts/${Date.now()}` },
-          modified: new Date().toISOString(),
-          modified_gmt: new Date().toISOString(),
+          title,
           slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
-          status,
-          type: req.body.type || 'post',
-          link: `/posts/${slug || Date.now()}`,
-          title: { 
-            raw: title,
-            rendered: title 
+          content,
+          excerpt: excerpt || '',
+          status: status || 'draft',
+          type: 'post',
+          author: {
+            id: userId || '1',
+            name: 'User',
+            email: 'user@neture.co.kr'
           },
-          content: { 
-            raw: content,
-            rendered: content,
-            protected: false 
-          },
-          excerpt: { 
-            raw: excerpt || '',
-            rendered: excerpt || '',
-            protected: false 
-          },
-          author: userId || '1',
-          featured_media: featured_media || 0,
-          comment_status: comment_status || 'open',
-          ping_status: ping_status || 'open',
-          sticky: sticky || false,
-          template: '',
-          format: format || 'standard',
-          meta: meta || {},
-          categories: categoryIds || [],
-          tags: tags || []
+          categories: [],
+          tags: tags || [],
+          featuredImage: null,
+          publishedAt: status === 'published' ? new Date().toISOString() : null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         };
-        
         mockPosts.push(newPost);
         return res.status(201).json(newPost);
       }
@@ -395,70 +429,31 @@ router.post('/',
       const post = await postRepository.save({
         title,
         content,
-        status,
+        status: status || 'draft',
         slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
-        excerpt: extractContent(excerpt),
+        excerpt,
         tags: tags || [],
         format: format || 'standard',
         sticky: sticky || false,
         meta: meta || {},
         authorId: userId,
         categories,
-        type: req.body.type || 'post',
+        type: 'post',
         publishedAt: status === 'published' ? new Date() : null
       });
 
-      // Format response for Gutenberg
-      const response = {
-        id: post.id,
-        date: post.publishedAt || post.createdAt,
-        date_gmt: post.publishedAt || post.createdAt,
-        guid: { rendered: `/posts/${post.id}` },
-        modified: post.updatedAt,
-        modified_gmt: post.updatedAt,
-        slug: post.slug,
-        status: post.status,
-        type: post.type || 'post',
-        link: `/posts/${post.slug}`,
-        title: { 
-          raw: post.title,
-          rendered: post.title 
-        },
-        content: { 
-          raw: post.content,
-          rendered: post.content,
-          protected: false 
-        },
-        excerpt: { 
-          raw: post.excerpt || '',
-          rendered: post.excerpt || '',
-          protected: false 
-        },
-        author: userId,
-        featured_media: 0,
-        comment_status: 'open',
-        ping_status: 'open',
-        sticky: post.sticky || false,
-        template: '',
-        format: post.format || 'standard',
-        meta: post.meta || {},
-        categories: post.categories?.map(c => c.id) || [],
-        tags: post.tags || []
-      };
-
-      res.status(201).json(response);
+      res.status(201).json(post);
     } catch (error: any) {
       console.error('Error creating post:', error);
       res.status(500).json({ 
-        code: 'rest_cannot_create',
-        message: 'Failed to create post',
-        data: { status: 500 }
+        error: 'Failed to create post',
+        message: error.message 
       });
     }
   }
 );
 
-// PUT /api/posts/:id - Update post (Gutenberg compatible)
+// PUT /api/posts/:id - Update post
 router.put('/:id',
   authenticateToken,
   param('id').notEmpty(),
@@ -466,54 +461,24 @@ router.put('/:id',
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const { title, content, status, categories: categoryIds, tags, excerpt, slug, format, sticky, meta } = req.body;
       const userId = (req as any).user?.id;
-      
-      // Extract title and content from Gutenberg format
-      const title = extractTitle(req.body.title);
-      const content = extractContent(req.body.content);
-      
-      // Map 'publish' to 'published' for compatibility
-      let status = req.body.status;
-      if (status === 'publish') {
-        status = 'published';
-      }
-      
-      const { 
-        categories: categoryIds, 
-        tags, 
-        excerpt, 
-        slug, 
-        format, 
-        sticky, 
-        meta,
-        featured_media,
-        comment_status,
-        ping_status
-      } = req.body;
 
       // Check if database is available
       const repos = getRepositories();
       if (!repos) {
         const postIndex = mockPosts.findIndex(p => p.id === id);
         if (postIndex === -1) {
-          return res.status(404).json({ 
-            code: 'rest_post_invalid_id',
-            message: 'Invalid post ID',
-            data: { status: 404 }
-          });
+          return res.status(404).json({ error: 'Post not found' });
         }
-        
-        const updatedPost = {
+        mockPosts[postIndex] = {
           ...mockPosts[postIndex],
-          title: { raw: title || mockPosts[postIndex].title, rendered: title || mockPosts[postIndex].title },
-          content: { raw: content || mockPosts[postIndex].content, rendered: content || mockPosts[postIndex].content, protected: false },
+          title: title || mockPosts[postIndex].title,
+          content: content || mockPosts[postIndex].content,
           status: status || mockPosts[postIndex].status,
-          modified: new Date().toISOString(),
-          modified_gmt: new Date().toISOString()
+          updatedAt: new Date().toISOString()
         };
-        
-        mockPosts[postIndex] = updatedPost;
-        return res.json(updatedPost);
+        return res.json(mockPosts[postIndex]);
       }
 
       const { postRepository, categoryRepository } = repos;
@@ -523,11 +488,7 @@ router.put('/:id',
       });
 
       if (!existingPost) {
-        return res.status(404).json({ 
-          code: 'rest_post_invalid_id',
-          message: 'Invalid post ID',
-          data: { status: 404 }
-        });
+        return res.status(404).json({ error: 'Post not found' });
       }
 
       let categories = existingPost.categories;
@@ -543,7 +504,7 @@ router.put('/:id',
         content: content || existingPost.content,
         status: status || existingPost.status,
         slug: slug || existingPost.slug,
-        excerpt: excerpt !== undefined ? extractContent(excerpt) : existingPost.excerpt,
+        excerpt: excerpt !== undefined ? excerpt : existingPost.excerpt,
         tags: tags || existingPost.tags,
         format: format || existingPost.format,
         sticky: sticky !== undefined ? sticky : existingPost.sticky,
@@ -553,51 +514,12 @@ router.put('/:id',
         publishedAt: status === 'published' && !existingPost.publishedAt ? new Date() : existingPost.publishedAt
       });
 
-      // Format response for Gutenberg
-      const response = {
-        id: updatedPost.id,
-        date: updatedPost.publishedAt || updatedPost.createdAt,
-        date_gmt: updatedPost.publishedAt || updatedPost.createdAt,
-        guid: { rendered: `/posts/${updatedPost.id}` },
-        modified: updatedPost.updatedAt,
-        modified_gmt: updatedPost.updatedAt,
-        slug: updatedPost.slug,
-        status: updatedPost.status,
-        type: updatedPost.type || 'post',
-        link: `/posts/${updatedPost.slug}`,
-        title: { 
-          raw: updatedPost.title,
-          rendered: updatedPost.title 
-        },
-        content: { 
-          raw: updatedPost.content,
-          rendered: updatedPost.content,
-          protected: false 
-        },
-        excerpt: { 
-          raw: updatedPost.excerpt || '',
-          rendered: updatedPost.excerpt || '',
-          protected: false 
-        },
-        author: userId,
-        featured_media: featured_media || 0,
-        comment_status: comment_status || 'open',
-        ping_status: ping_status || 'open',
-        sticky: updatedPost.sticky || false,
-        template: '',
-        format: updatedPost.format || 'standard',
-        meta: updatedPost.meta || {},
-        categories: updatedPost.categories?.map(c => c.id) || [],
-        tags: updatedPost.tags || []
-      };
-
-      res.json(response);
+      res.json(updatedPost);
     } catch (error: any) {
       console.error('Error updating post:', error);
       res.status(500).json({ 
-        code: 'rest_cannot_update',
-        message: 'Failed to update post',
-        data: { status: 500 }
+        error: 'Failed to update post',
+        message: error.message 
       });
     }
   }

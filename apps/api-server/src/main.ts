@@ -97,6 +97,8 @@ import postsRoutes from './routes/posts';
 import reusableBlocksRoutes from './routes/reusable-blocks.routes';
 import blockPatternsRoutes from './routes/block-patterns.routes';
 import templatePartsRoutes from './routes/template-parts.routes';
+import categoriesRoutes from './routes/categories';
+import customPostTypesRoutes from './routes/custom-post-types';
 
 // Import v1 API routes
 import contentV1Routes from './routes/v1/content.routes';
@@ -303,8 +305,8 @@ app.use(securityMiddleware);
 app.use(sqlInjectionDetection);
 
 app.use(cookieParser() as any);
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Configure session store
 let sessionConfig: any = {
@@ -509,8 +511,8 @@ app.use('/api/content', contentRoutes); // Content routes - moved to specific pa
 
 // V1 API routes (new standardized endpoints)
 app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
-app.use('/api/v1/categories', contentRoutes); // Categories routes
-app.use('/api/v1/custom-post-types', cptRoutes); // Custom post types
+app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
+app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);

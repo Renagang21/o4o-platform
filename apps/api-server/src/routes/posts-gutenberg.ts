@@ -28,7 +28,7 @@ const getRepositories = () => {
 };
 
 // Mock data for when database is not available
-const mockPosts: any[] = [
+const mockPosts = [
   {
     id: '1',
     title: 'Welcome to Neture Platform',
@@ -74,232 +74,6 @@ const extractTitle = (title: any): string => {
   }
   return '';
 };
-
-// WordPress-compatible query parameters interface
-interface PostQueryParams {
-  page?: number;
-  per_page?: number;
-  search?: string;
-  author?: string;
-  author_exclude?: string;
-  before?: string;
-  after?: string;
-  exclude?: string;
-  include?: string;
-  offset?: number;
-  order?: 'asc' | 'desc';
-  orderby?: 'author' | 'date' | 'id' | 'include' | 'modified' | 'parent' | 'relevance' | 'slug' | 'title';
-  slug?: string;
-  status?: string;
-  categories?: string;
-  categories_exclude?: string;
-  tags?: string;
-  tags_exclude?: string;
-  sticky?: boolean;
-  format?: string;
-}
-
-// GET /api/posts - List posts
-router.get('/', 
-  query('page').optional().isInt({ min: 1 }),
-  query('per_page').optional().isInt({ min: 1, max: 100 }),
-  query('search').optional().isString(),
-  query('status').optional().isIn(['draft', 'published', 'private', 'archived', 'scheduled']),
-  validateDto,
-  async (req: Request, res: Response) => {
-    try {
-      const {
-        page = 1,
-        per_page = 10,
-        search,
-        author,
-        exclude,
-        include,
-        order = 'desc',
-        orderby = 'date',
-        status = 'published',
-        categories,
-        tags,
-        sticky,
-        format,
-        type = 'post',
-        post_type
-      } = req.query as PostQueryParams & { type?: string; post_type?: string };
-
-      // Check if database is available
-      const repos = getRepositories();
-      if (!repos) {
-        // Return mock data when database is not available
-        const postType = post_type || type || 'post';
-        let filteredPosts = mockPosts.filter(p => p.type === postType);
-        
-        if (status && status !== 'all') {
-          filteredPosts = filteredPosts.filter(p => p.status === status);
-        }
-        
-        if (search) {
-          const searchLower = search.toString().toLowerCase();
-          filteredPosts = filteredPosts.filter(p => 
-            p.title.toLowerCase().includes(searchLower) ||
-            p.content.toLowerCase().includes(searchLower)
-          );
-        }
-
-        const startIndex = ((page as number) - 1) * (per_page as number);
-        const endIndex = startIndex + (per_page as number);
-        const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
-
-        return res.json({
-          data: paginatedPosts,
-          total: filteredPosts.length,
-          page: page as number,
-          per_page: per_page as number,
-          total_pages: Math.ceil(filteredPosts.length / (per_page as number))
-        });
-      }
-
-      const { postRepository } = repos;
-      const queryBuilder = postRepository.createQueryBuilder('post')
-        .leftJoinAndSelect('post.author', 'author')
-        .leftJoinAndSelect('post.categories', 'categories')
-        .leftJoinAndSelect('post.lastModifier', 'lastModifier');
-
-      // Status filter
-      if (status) {
-        queryBuilder.andWhere('post.status = :status', { status });
-      }
-
-      // Ordering
-      let orderByField = 'post.createdAt';
-      switch (orderby) {
-        case 'date':
-          orderByField = 'post.publishedAt';
-          break;
-        case 'modified':
-          orderByField = 'post.updatedAt';
-          break;
-        case 'title':
-          orderByField = 'post.title';
-          break;
-        case 'id':
-          orderByField = 'post.id';
-          break;
-      }
-      queryBuilder.orderBy(orderByField, order.toUpperCase() as 'ASC' | 'DESC');
-
-      // Pagination
-      const skip = ((page as number) - 1) * (per_page as number);
-      queryBuilder.skip(skip).take(per_page as number);
-
-      const [posts, total] = await queryBuilder.getManyAndCount();
-
-      // Format response to be WordPress-compatible
-      const formattedPosts = posts.map(post => ({
-        id: post.id,
-        date: post.publishedAt,
-        date_gmt: post.publishedAt,
-        guid: { rendered: `/posts/${post.id}` },
-        modified: post.updatedAt,
-        modified_gmt: post.updatedAt,
-        slug: post.slug,
-        status: post.status,
-        type: post.type || 'post',
-        link: `/posts/${post.slug}`,
-        title: { rendered: post.title },
-        content: { 
-          rendered: post.content,
-          protected: false 
-        },
-        excerpt: { 
-          rendered: post.excerpt || '',
-          protected: false 
-        },
-        author: post.author?.id,
-        categories: post.categories?.map(c => c.id) || [],
-        tags: post.tags || [],
-        sticky: post.sticky || false,
-        format: post.format || 'standard',
-        meta: post.meta || {}
-      }));
-
-      res.json(formattedPosts);
-    } catch (error: any) {
-      console.error('Error fetching posts:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch posts',
-        message: error.message 
-      });
-    }
-  }
-);
-
-// GET /api/posts/:id - Get single post
-router.get('/:id',
-  param('id').notEmpty(),
-  validateDto,
-  async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      
-      // Check if database is available
-      const repos = getRepositories();
-      if (!repos) {
-        const mockPost = mockPosts.find(p => p.id === id);
-        if (!mockPost) {
-          return res.status(404).json({ error: 'Post not found' });
-        }
-        return res.json(mockPost);
-      }
-
-      const { postRepository } = repos;
-      const post = await postRepository.findOne({
-        where: { id },
-        relations: ['author', 'categories', 'lastModifier']
-      });
-
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
-      }
-
-      // Format response to be WordPress-compatible
-      const formattedPost = {
-        id: post.id,
-        date: post.publishedAt,
-        date_gmt: post.publishedAt,
-        guid: { rendered: `/posts/${post.id}` },
-        modified: post.updatedAt,
-        modified_gmt: post.updatedAt,
-        slug: post.slug,
-        status: post.status,
-        type: post.type || 'post',
-        link: `/posts/${post.slug}`,
-        title: { rendered: post.title },
-        content: { 
-          rendered: post.content,
-          protected: false 
-        },
-        excerpt: { 
-          rendered: post.excerpt || '',
-          protected: false 
-        },
-        author: post.author?.id,
-        categories: post.categories?.map(c => c.id) || [],
-        tags: post.tags || [],
-        sticky: post.sticky || false,
-        format: post.format || 'standard',
-        meta: post.meta || {}
-      };
-
-      res.json(formattedPost);
-    } catch (error: any) {
-      console.error('Error fetching post:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch post',
-        message: error.message 
-      });
-    }
-  }
-);
 
 // POST /api/posts - Create post (Gutenberg compatible)
 router.post('/',
@@ -379,7 +153,7 @@ router.post('/',
           tags: tags || []
         };
         
-        mockPosts.push(newPost);
+        mockPosts.push(newPost as any);
         return res.status(201).json(newPost);
       }
 
@@ -512,7 +286,7 @@ router.put('/:id',
           modified_gmt: new Date().toISOString()
         };
         
-        mockPosts[postIndex] = updatedPost;
+        mockPosts[postIndex] = updatedPost as any;
         return res.json(updatedPost);
       }
 
@@ -603,42 +377,9 @@ router.put('/:id',
   }
 );
 
-// DELETE /api/posts/:id - Delete post
-router.delete('/:id',
-  authenticateToken,
-  param('id').notEmpty(),
-  validateDto,
-  async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-
-      // Check if database is available
-      const repos = getRepositories();
-      if (!repos) {
-        const postIndex = mockPosts.findIndex(p => p.id === id);
-        if (postIndex === -1) {
-          return res.status(404).json({ error: 'Post not found' });
-        }
-        const deletedPost = mockPosts.splice(postIndex, 1)[0];
-        return res.json({ message: 'Post deleted successfully', post: deletedPost });
-      }
-
-      const { postRepository } = repos;
-      const result = await postRepository.delete(id);
-
-      if (result.affected === 0) {
-        return res.status(404).json({ error: 'Post not found' });
-      }
-
-      res.json({ message: 'Post deleted successfully' });
-    } catch (error: any) {
-      console.error('Error deleting post:', error);
-      res.status(500).json({ 
-        error: 'Failed to delete post',
-        message: error.message 
-      });
-    }
-  }
-);
+// GET routes (reuse from existing posts.ts)
+router.get('/', require('./posts').default);
+router.get('/:id', require('./posts').default);
+router.delete('/:id', require('./posts').default);
 
 export default router;
