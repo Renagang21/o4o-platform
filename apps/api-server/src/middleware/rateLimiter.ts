@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { Store } from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import { Redis } from 'ioredis';
 import { Request, Response } from 'express';
@@ -19,9 +19,12 @@ export const defaultLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
+    sendCommand: async (...args: string[]) => {
+      const result = await redisClient.call.apply(redisClient, args);
+      return result as boolean | number | string | (boolean | number | string)[];
+    },
     prefix: 'rl:default:',
-  }),
+  }) as unknown as Store,
 });
 
 // 엄격한 레이트 리밋 (로그인, 회원가입 등)
@@ -33,9 +36,12 @@ export const strictLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true, // 성공한 요청은 카운트하지 않음
   store: new RedisStore({
-    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
+    sendCommand: async (...args: string[]) => {
+      const result = await redisClient.call.apply(redisClient, args);
+      return result as boolean | number | string | (boolean | number | string)[];
+    },
     prefix: 'rl:strict:',
-  }),
+  }) as unknown as Store,
 });
 
 // API 엔드포인트별 레이트 리밋
@@ -49,9 +55,12 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
+    sendCommand: async (...args: string[]) => {
+      const result = await redisClient.call.apply(redisClient, args);
+      return result as boolean | number | string | (boolean | number | string)[];
+    },
     prefix: 'rl:api:',
-  }),
+  }) as unknown as Store,
   keyGenerator: (req: Request) => {
     // IP + User ID 조합으로 키 생성
     const userId = (req as any).user?.id || 'anonymous';
@@ -65,9 +74,12 @@ export const uploadLimiter = rateLimit({
   max: 20, // 시간당 20개 파일
   message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
   store: new RedisStore({
-    sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
+    sendCommand: async (...args: string[]) => {
+      const result = await redisClient.call.apply(redisClient, args);
+      return result as boolean | number | string | (boolean | number | string)[];
+    },
     prefix: 'rl:upload:',
-  }),
+  }) as unknown as Store,
 });
 
 // 동적 레이트 리밋 (사용자 티어별)
@@ -85,9 +97,12 @@ export const dynamicLimiter = (tier: 'free' | 'basic' | 'premium' = 'free') => {
     max: config.max,
     message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
     store: new RedisStore({
-      sendCommand: async (...args: string[]) => redisClient.call.apply(redisClient, args) as Promise<any>,
+      sendCommand: async (...args: string[]) => {
+        const result = await redisClient.call.apply(redisClient, args);
+        return result as boolean | number | string | (boolean | number | string)[];
+      },
       prefix: `rl:${tier}:`,
-    }),
+    }) as unknown as Store,
     keyGenerator: (req: Request) => {
       const userId = (req as any).user?.id || req.ip;
       return `${userId}`;
