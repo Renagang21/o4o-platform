@@ -2,15 +2,23 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import GutenbergWYSIWYGEditor from '@/components/editor/GutenbergWYSIWYGEditor';
+import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
+
+interface Block {
+  id: string;
+  type: string;
+  content: any;
+  attributes?: any;
+}
 
 interface PageData {
   id?: string;
   title: string;
   content: string;
+  blocks?: Block[];
   slug?: string;
   status: 'draft' | 'published' | 'private';
   template?: string;
@@ -31,7 +39,7 @@ const PageFormWYSIWYG = () => {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [blocks, setBlocks] = useState<any[]>([]);
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const [isDirty, setIsDirty] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
 
@@ -50,6 +58,12 @@ const PageFormWYSIWYG = () => {
     if (page) {
       setTitle(page.title || '');
       setContent(page.content || '');
+      if (page.blocks) {
+        setBlocks(page.blocks);
+      } else if (page.content) {
+        // Convert legacy content to blocks
+        setBlocks([{ id: '1', type: 'paragraph', content: page.content, attributes: {} }]);
+      }
     }
   }, [page]);
 
@@ -86,10 +100,30 @@ const PageFormWYSIWYG = () => {
     }
   });
 
-  // Handle content change
-  const handleContentChange = (newContent: string, newBlocks: any[]) => {
-    setContent(newContent);
+  // Handle blocks change
+  const handleBlocksChange = (newBlocks: Block[]) => {
     setBlocks(newBlocks);
+    // Convert blocks to HTML content for backward compatibility
+    const htmlContent = newBlocks.map(block => {
+      if (block.type === 'paragraph') return `<p>${block.content}</p>`;
+      if (block.type === 'heading') {
+        const level = block.attributes?.level || 2;
+        return `<h${level}>${block.content}</h${level}>`;
+      }
+      if (block.type === 'list') {
+        const items = block.attributes?.items || [];
+        const listItems = items.map((item: any) => `<li>${item.content}</li>`).join('');
+        return block.attributes?.type === 'ordered' ? `<ol>${listItems}</ol>` : `<ul>${listItems}</ul>`;
+      }
+      if (block.type === 'image' && block.attributes?.url) {
+        return `<img src="${block.attributes.url}" alt="${block.attributes.alt || ''}" />`;
+      }
+      if (block.type === 'button' && block.attributes?.text) {
+        return `<a href="${block.attributes.url || '#'}" class="button">${block.attributes.text}</a>`;
+      }
+      return '';
+    }).join('\n');
+    setContent(htmlContent);
     setIsDirty(true);
   };
 
@@ -108,6 +142,7 @@ const PageFormWYSIWYG = () => {
     const pageData: PageData = {
       title,
       content,
+      blocks,
       status: 'draft'
     };
 
@@ -130,6 +165,7 @@ const PageFormWYSIWYG = () => {
     const pageData: PageData = {
       title,
       content,
+      blocks,
       status: 'published'
     };
 
@@ -245,10 +281,10 @@ const PageFormWYSIWYG = () => {
 
       {/* WYSIWYG Editor - Full Height */}
       <div className="flex-1 overflow-hidden">
-        <GutenbergWYSIWYGEditor
-          initialContent={content}
+        <GutenbergBlockEditor
+          initialBlocks={blocks}
           title={title}
-          onChange={handleContentChange}
+          onChange={handleBlocksChange}
           onTitleChange={handleTitleChange}
           onSave={handleAutoSave}
           autoSave={true}
