@@ -90,7 +90,7 @@ const EmailLogs: FC = () => {
 
   const handleRetry = (log: EmailLog) => {
     // TODO: 재발송 API 호출
-    console.log('Retrying email:', log.id);
+    // Retrying email: log.id
   };
 
   const getStatusIcon = (status: string) => {
