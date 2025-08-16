@@ -4,8 +4,8 @@ module.exports = {
       name: 'o4o-api',
       script: './dist/main.js',
       cwd: './apps/api-server',
-      instances: 2,
-      exec_mode: 'cluster',
+      instances: 1,
+      exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
         PORT: 3001
