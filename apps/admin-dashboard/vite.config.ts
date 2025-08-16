@@ -43,9 +43,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     dedupe: ['react', 'react-dom', 'date-fns']
   },
   server: {
-    port: 3001,
+    port: 5173,
     host: '0.0.0.0',
-    strictPort: true,
+    strictPort: false,
     allowedHosts: [
       'admin.neture.co.kr',
       'www.neture.co.kr',
