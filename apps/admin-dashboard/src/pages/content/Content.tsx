@@ -2,8 +2,10 @@ import { FC } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PostListQuickEdit from './PostListQuickEdit'
 import PostForm from './PostForm'
+import PostFormWYSIWYG from './PostFormWYSIWYG'
 import PageList from './PageList'
 import PageForm from './PageForm'
+import PageFormWYSIWYG from './PageFormWYSIWYG'
 import CPTList from './CPTList'
 import CPTForm from './CPTForm'
 import CustomFieldBuilder from './CustomFieldBuilder'
@@ -19,11 +21,11 @@ const Content: FC = () => {
     <Routes>
       <Route path="/" element={<Navigate to="posts" replace />} />
       <Route path="posts" element={<PostListQuickEdit />} />
-      <Route path="posts/new" element={<PostForm />} />
-      <Route path="posts/:id/edit" element={<PostForm />} />
+      <Route path="posts/new" element={<PostFormWYSIWYG />} />
+      <Route path="posts/:id/edit" element={<PostFormWYSIWYG />} />
       <Route path="pages" element={<PageList />} />
-      <Route path="pages/new" element={<PageForm />} />
-      <Route path="pages/:id/edit" element={<PageForm />} />
+      <Route path="pages/new" element={<PageFormWYSIWYG />} />
+      <Route path="pages/:id/edit" element={<PageFormWYSIWYG />} />
       <Route path="cpt" element={<CPTList />} />
       <Route path="cpt/new" element={<CPTForm />} />
       <Route path="cpt/:id/edit" element={<CPTForm />} />
@@ -36,8 +38,8 @@ const Content: FC = () => {
       <Route path="widgets" element={<WidgetManager />} />
       {/* Dynamic routes for custom post types */}
       <Route path=":slug" element={<DynamicContentList />} />
-      <Route path=":slug/new" element={<PostForm />} />
-      <Route path=":slug/:id/edit" element={<PostForm />} />
+      <Route path=":slug/new" element={<PostFormWYSIWYG />} />
+      <Route path=":slug/:id/edit" element={<PostFormWYSIWYG />} />
     </Routes>
   )
 }

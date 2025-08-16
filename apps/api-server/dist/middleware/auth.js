@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.optionalAuth = exports.requireManagerOrAdmin = exports.requireAdmin = exports.requireRole = exports.authenticateToken = void 0;
+exports.authenticate = exports.optionalAuth = exports.requireManagerOrAdmin = exports.requireAdmin = exports.requireRole = exports.authenticateToken = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const connection_1 = require("../database/connection");
 const User_1 = require("../entities/User");
@@ -226,4 +226,6 @@ const optionalAuth = async (req, res, next) => {
     }
 };
 exports.optionalAuth = optionalAuth;
+// Export authenticateToken as authenticate for compatibility
+exports.authenticate = exports.authenticateToken;
 //# sourceMappingURL=auth.js.map

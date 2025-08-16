@@ -44,6 +44,8 @@ import { BlockPattern } from '../entities/BlockPattern';
 import { TemplatePart } from '../entities/TemplatePart';
 import { Shipment } from '../entities/Shipment';
 import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
+import { SmtpSettings } from '../entities/SmtpSettings';
+import { EmailLog } from '../entities/EmailLog';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -128,7 +130,9 @@ export const AppDataSource = new DataSource({
         BlockPattern,
         TemplatePart,
         Shipment,
-        ShipmentTrackingHistory
+        ShipmentTrackingHistory,
+        SmtpSettings,
+        EmailLog
       ],
   
   // 마이그레이션 설정

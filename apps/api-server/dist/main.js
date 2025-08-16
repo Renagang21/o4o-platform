@@ -486,7 +486,9 @@ app.use('/api/settings', settingsRoutes_1.default);
 app.use('/api/settings', settings_routes_1.default);
 // Email settings routes
 const email_settings_routes_1 = __importDefault(require("./routes/email-settings.routes"));
+const smtp_routes_1 = __importDefault(require("./routes/v1/smtp.routes"));
 app.use('/api/v1/settings', email_settings_routes_1.default);
+app.use('/api/v1/smtp', smtp_routes_1.default); // SMTP management routes
 app.use('/api/auth', email_auth_routes_1.default);
 app.use('/api/auth/accounts', account_linking_routes_1.default); // Account linking routes
 app.use('/api/auth/unified', unified_auth_routes_1.default); // Unified auth routes

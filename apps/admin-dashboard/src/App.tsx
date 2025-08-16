@@ -42,6 +42,7 @@ const FeeManagement = lazy(() => import('@/pages/ecommerce/FeeManagement'));
 // const SettlementReports = lazy(() => import('@/pages/ecommerce/SettlementReports'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 const Settings = lazy(() => import('@/pages/settings/Settings'));
+const MailManagement = lazy(() => import('@/pages/mail/MailManagement'));
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
 const Media = lazy(() => import('@/pages/media/Media'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
@@ -705,7 +706,7 @@ function App() {
                     <Route path="/mail/*" element={
                       <AdminProtectedRoute requiredPermissions={['settings:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Settings />
+                          <MailManagement />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

@@ -232,3 +232,6 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     next();
   }
 };
+
+// Export authenticateToken as authenticate for compatibility
+export const authenticate = authenticateToken;
