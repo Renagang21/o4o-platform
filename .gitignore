@@ -98,7 +98,7 @@ CLAUDE.md
 CLAUDE.md.backup*
 
 # Temporary reports in root directory only
-/*_REPORT.md
+# /*_REPORT.md  # Commented out to allow API_SERVER_INVESTIGATION_REPORT.md
 /*_ANALYSIS_REPORT.md
 /CI_CD_FAILURE_INVESTIGATION_REPORT.md
 /O4O_PLATFORM_SERVER_SYNC_ANALYSIS_REPORT.md
