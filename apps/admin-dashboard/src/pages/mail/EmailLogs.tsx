@@ -88,9 +88,9 @@ const EmailLogs: FC = () => {
     loadLogs();
   };
 
-  const handleRetry = (log: EmailLog) => {
+  const handleRetry = (_log: EmailLog) => {
     // TODO: 재발송 API 호출
-    // Retrying email: log.id
+    // Retrying email: _log.id
   };
 
   const getStatusIcon = (status: string) => {
