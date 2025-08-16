@@ -42,6 +42,8 @@ import { Page } from '../entities/Page';
 import { ReusableBlock } from '../entities/ReusableBlock';
 import { BlockPattern } from '../entities/BlockPattern';
 import { TemplatePart } from '../entities/TemplatePart';
+import { Shipment } from '../entities/Shipment';
+import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -124,7 +126,9 @@ export const AppDataSource = new DataSource({
         Page,
         ReusableBlock,
         BlockPattern,
-        TemplatePart
+        TemplatePart,
+        Shipment,
+        ShipmentTrackingHistory
       ],
   
   // 마이그레이션 설정

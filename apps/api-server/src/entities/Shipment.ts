@@ -3,87 +3,105 @@ import { Order } from './Order';
 
 @Entity('shipments')
 export class Shipment {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-  @Column()
-  orderId!: string;
+  @Column({ name: 'order_id' })
+  orderId!: number;
 
   @ManyToOne(() => Order)
-  @JoinColumn({ name: 'orderId' })
+  @JoinColumn({ name: 'order_id' })
   order?: Order;
 
-  @Column()
-  trackingNumber!: string;
+  @Column({ name: 'tracking_number', nullable: true })
+  trackingNumber?: string;
 
   @Column()
-  carrier!: string; // cj, hanjin, logen, koreanpost
+  carrier!: string;
+
+  @Column({ name: 'carrier_code', nullable: true })
+  carrierCode?: string;
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'picked_up', 'in_transit', 'out_for_delivery', 'delivered', 'failed', 'cancelled'],
+    enum: ['pending', 'preparing', 'shipped', 'in_transit', 'out_for_delivery', 'delivered', 'failed', 'returned'],
     default: 'pending'
   })
   status!: string;
 
-  @Column({ type: 'json', nullable: true })
-  shippingAddress?: {
-    name: string;
-    phone: string;
-    address1: string;
-    address2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
+  @Column({ name: 'shipped_at', type: 'timestamp', nullable: true })
+  shippedAt?: Date;
 
-  @Column({ type: 'json', nullable: true })
-  items?: Array<{
-    productId: string;
-    productName: string;
-    quantity: number;
-    weight: number;
-  }>;
+  @Column({ name: 'delivered_at', type: 'timestamp', nullable: true })
+  deliveredAt?: Date;
 
-  @Column({ nullable: true })
-  currentLocation?: string;
+  @Column({ name: 'expected_delivery_date', type: 'date', nullable: true })
+  expectedDeliveryDate?: Date;
 
-  @Column({ nullable: true })
-  labelUrl?: string;
+  @Column({ name: 'sender_name' })
+  senderName!: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ name: 'sender_phone' })
+  senderPhone!: string;
+
+  @Column({ name: 'sender_address', type: 'text' })
+  senderAddress!: string;
+
+  @Column({ name: 'sender_postal_code', nullable: true })
+  senderPostalCode?: string;
+
+  @Column({ name: 'recipient_name' })
+  recipientName!: string;
+
+  @Column({ name: 'recipient_phone' })
+  recipientPhone!: string;
+
+  @Column({ name: 'recipient_address', type: 'text' })
+  recipientAddress!: string;
+
+  @Column({ name: 'recipient_postal_code', nullable: true })
+  recipientPostalCode?: string;
+
+  @Column({ name: 'shipping_cost', type: 'decimal', precision: 10, scale: 2, default: 0 })
   shippingCost!: number;
 
-  @Column({ nullable: true })
-  estimatedDelivery?: Date;
+  @Column({ name: 'insurance_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  insuranceAmount?: number;
 
-  @Column({ nullable: true })
-  actualDelivery?: Date;
+  @Column({ type: 'decimal', precision: 8, scale: 2, nullable: true })
+  weight?: number;
 
   @Column({ type: 'json', nullable: true })
-  trackingEvents?: Array<{
-    timestamp: Date;
-    location: string;
-    status: string;
-    description: string;
-  }>;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+  };
 
-  @Column({ nullable: true })
-  lastUpdated?: Date;
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
 
-  @Column({ nullable: true })
-  cancelledAt?: Date;
+  @Column({ name: 'delivery_message', nullable: true })
+  deliveryMessage?: string;
 
-  @Column({ nullable: true })
-  cancelReason?: string;
+  @Column({ name: 'signature_required', type: 'boolean', default: false })
+  signatureRequired!: boolean;
+
+  @Column({ name: 'signature_image', type: 'text', nullable: true })
+  signatureImage?: string;
+
+  @Column({ name: 'failed_reason', type: 'text', nullable: true })
+  failedReason?: string;
+
+  @Column({ name: 'return_reason', type: 'text', nullable: true })
+  returnReason?: string;
 
   @Column({ type: 'json', nullable: true })
   metadata?: Record<string, any>;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 }

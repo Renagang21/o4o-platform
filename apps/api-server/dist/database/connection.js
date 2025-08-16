@@ -47,6 +47,8 @@ const Page_1 = require("../entities/Page");
 const ReusableBlock_1 = require("../entities/ReusableBlock");
 const BlockPattern_1 = require("../entities/BlockPattern");
 const TemplatePart_1 = require("../entities/TemplatePart");
+const Shipment_1 = require("../entities/Shipment");
+const ShipmentTrackingHistory_1 = require("../entities/ShipmentTrackingHistory");
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
 const DB_PORT = parseInt(process.env.DB_PORT || '5432');
@@ -124,7 +126,9 @@ exports.AppDataSource = new typeorm_1.DataSource({
             Page_1.Page,
             ReusableBlock_1.ReusableBlock,
             BlockPattern_1.BlockPattern,
-            TemplatePart_1.TemplatePart
+            TemplatePart_1.TemplatePart,
+            Shipment_1.Shipment,
+            ShipmentTrackingHistory_1.ShipmentTrackingHistory
         ],
     // 마이그레이션 설정
     migrations: NODE_ENV === 'production'

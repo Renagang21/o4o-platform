@@ -82,28 +82,38 @@ class ShippingService {
         }
         // Create shipment record
         const shipment = new Shipment_1.Shipment();
-        shipment.orderId = orderId;
+        shipment.orderId = parseInt(orderId);
         shipment.carrier = carrierCode;
+        shipment.carrierCode = carrierCode;
         shipment.status = 'pending';
-        shipment.shippingAddress = {
-            name: order.shippingAddress.name,
-            phone: order.shippingAddress.phone,
-            address1: order.shippingAddress.address,
-            address2: order.shippingAddress.addressDetail,
-            city: order.shippingAddress.city,
-            state: order.shippingAddress.state,
-            postalCode: order.shippingAddress.zipCode,
-            country: order.shippingAddress.country
+        // Set sender info (default for now)
+        const senderAddress = await this.getDefaultSenderAddress();
+        shipment.senderName = senderAddress.name;
+        shipment.senderPhone = senderAddress.phone;
+        shipment.senderAddress = `${senderAddress.address1} ${senderAddress.address2 || ''}`;
+        shipment.senderPostalCode = senderAddress.postalCode;
+        // Set recipient info
+        shipment.recipientName = order.shippingAddress.name;
+        shipment.recipientPhone = order.shippingAddress.phone;
+        shipment.recipientAddress = `${order.shippingAddress.address} ${order.shippingAddress.addressDetail || ''}`;
+        shipment.recipientPostalCode = order.shippingAddress.zipCode;
+        // Set metadata for items and address details
+        shipment.metadata = {
+            items: order.items.map(item => {
+                var _a, _b;
+                return ({
+                    productId: item.productId,
+                    productName: ((_a = item.product) === null || _a === void 0 ? void 0 : _a.name) || '',
+                    quantity: item.quantity,
+                    weight: ((_b = item.product) === null || _b === void 0 ? void 0 : _b.weight) || 0
+                });
+            }),
+            shippingAddress: {
+                city: order.shippingAddress.city,
+                state: order.shippingAddress.state,
+                country: order.shippingAddress.country
+            }
         };
-        shipment.items = order.items.map(item => {
-            var _a, _b;
-            return ({
-                productId: item.productId,
-                productName: ((_a = item.product) === null || _a === void 0 ? void 0 : _a.name) || '',
-                quantity: item.quantity,
-                weight: ((_b = item.product) === null || _b === void 0 ? void 0 : _b.weight) || 0
-            });
-        });
         // Convert address format for carrier API
         const receiverAddress = {
             name: order.shippingAddress.name,
@@ -125,8 +135,12 @@ class ShippingService {
             insurance: order.totalAmount > 100000 // Insure high-value orders
         });
         shipment.trackingNumber = labelResponse.trackingNumber;
-        shipment.labelUrl = labelResponse.labelUrl;
-        shipment.estimatedDelivery = labelResponse.estimatedDelivery;
+        shipment.expectedDeliveryDate = labelResponse.estimatedDelivery;
+        // Store label URL in metadata
+        shipment.metadata = {
+            ...shipment.metadata,
+            labelUrl: labelResponse.labelUrl
+        };
         shipment.shippingCost = labelResponse.cost;
         await this.shipmentRepository.save(shipment);
         // Update order status
@@ -160,14 +174,18 @@ class ShippingService {
         const trackingData = await connector.track(trackingNumber);
         // Update shipment status in database
         shipment.status = trackingData.status;
-        shipment.currentLocation = trackingData.currentLocation;
-        shipment.trackingEvents = trackingData.events;
-        shipment.lastUpdated = new Date();
+        // Store tracking details in metadata
+        shipment.metadata = {
+            ...shipment.metadata,
+            currentLocation: trackingData.currentLocation,
+            trackingEvents: trackingData.events,
+            lastUpdated: new Date()
+        };
         await this.shipmentRepository.save(shipment);
         // Update order status if delivered
         if (trackingData.status === 'delivered') {
             const order = await this.orderRepository.findOne({
-                where: { id: shipment.orderId }
+                where: { id: String(shipment.orderId) }
             });
             if (order) {
                 order.status = Order_1.OrderStatus.DELIVERED;
@@ -226,12 +244,15 @@ class ShippingService {
         // Request cancellation from carrier
         const cancelled = await connector.cancelLabel(trackingNumber);
         if (cancelled) {
-            shipment.status = 'cancelled';
-            shipment.cancelledAt = new Date();
+            shipment.status = 'cancelled'; // temporary fix for enum
+            shipment.metadata = {
+                ...shipment.metadata,
+                cancelledAt: new Date()
+            };
             await this.shipmentRepository.save(shipment);
             // Update order
             const order = await this.orderRepository.findOne({
-                where: { id: shipment.orderId }
+                where: { id: String(shipment.orderId) }
             });
             if (order) {
                 order.trackingNumber = null;
@@ -246,7 +267,7 @@ class ShippingService {
      */
     async getShippingHistory(orderId) {
         return await this.shipmentRepository.find({
-            where: { orderId },
+            where: { orderId: parseInt(orderId) },
             order: { createdAt: 'DESC' }
         });
     }
