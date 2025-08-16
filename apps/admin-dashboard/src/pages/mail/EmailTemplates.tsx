@@ -1,11 +1,10 @@
 import { FC, useState, useEffect } from 'react';
-import { FileText, Plus, Edit, Trash2, Eye, Copy } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, Edit, Trash2, Eye, Copy } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,7 +25,6 @@ interface EmailTemplate {
 const EmailTemplates: FC = () => {
   const { toast } = useToast();
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
-  const [loading, setLoading] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -89,10 +87,8 @@ const EmailTemplates: FC = () => {
   }, []);
 
   const loadTemplates = async () => {
-    setLoading(true);
     // TODO: API 연동
     setTemplates(defaultTemplates);
-    setLoading(false);
   };
 
   const handleEdit = (template: EmailTemplate) => {

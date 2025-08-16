@@ -238,7 +238,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
         <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded flex-wrap">
           {/* Style selector */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 <Palette className="h-4 w-4" />
                 {style === 'fill' ? 'Fill' : style === 'outline' ? 'Outline' : 'Text'}
@@ -310,7 +310,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
 
           {/* Link settings */}
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 <Link2 className="h-4 w-4" />
                 Link
@@ -356,7 +356,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
 
           {/* Advanced settings */}
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 <Settings className="h-4 w-4" />
                 Advanced
@@ -395,9 +395,8 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
 
                 {/* Border radius */}
                 <div>
-                  <Label htmlFor="radius">Border Radius: {borderRadius}px</Label>
+                  <Label>Border Radius: {borderRadius}px</Label>
                   <Slider
-                    id="radius"
                     value={[borderRadius]}
                     onValueChange={([v]) => updateAttribute('borderRadius', v)}
                     max={50}

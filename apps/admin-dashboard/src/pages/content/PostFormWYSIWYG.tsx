@@ -118,7 +118,7 @@ const PostFormWYSIWYG = () => {
   };
 
   // Auto-save functionality
-  const handleAutoSave = async (content: string) => {
+  const handleAutoSave = async () => {
     if (!isDirty) return;
     
     setIsAutoSaving(true);
@@ -132,7 +132,11 @@ const PostFormWYSIWYG = () => {
 
     try {
       if (isEditMode && id) {
-        await updateMutation.mutateAsync({ id, data: postData });
+        const updateData: UpdatePostDto = {
+          ...postData,
+          id
+        };
+        await updateMutation.mutateAsync({ id, data: updateData });
       } else if (title || content) {
         // Only create if there's actual content
         const result = await createMutation.mutateAsync(postData);
@@ -154,7 +158,11 @@ const PostFormWYSIWYG = () => {
     };
 
     if (isEditMode && id) {
-      updateMutation.mutate({ id, data: postData });
+      const updateData: UpdatePostDto = {
+        ...postData,
+        id
+      };
+      updateMutation.mutate({ id, data: updateData });
     } else {
       createMutation.mutate(postData);
     }
@@ -244,7 +252,7 @@ const PostFormWYSIWYG = () => {
           title={title}
           onChange={handleBlocksChange}
           onTitleChange={handleTitleChange}
-          onSave={handleAutoSave}
+          onSave={() => handleAutoSave()}
           autoSave={true}
           showInspector={false}
           fullScreen={false}

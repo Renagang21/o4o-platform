@@ -1,10 +1,8 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PostListQuickEdit from './PostListQuickEdit'
-import PostForm from './PostForm'
 import PostFormWYSIWYG from './PostFormWYSIWYG'
 import PageList from './PageList'
-import PageForm from './PageForm'
 import PageFormWYSIWYG from './PageFormWYSIWYG'
 import CPTList from './CPTList'
 import CPTForm from './CPTForm'

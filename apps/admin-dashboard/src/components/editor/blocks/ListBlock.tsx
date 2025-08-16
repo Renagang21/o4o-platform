@@ -325,7 +325,7 @@ const ListBlock: React.FC<ListBlockProps> = ({
         <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded">
           {/* Type selector */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 {getListTypeIcon()}
                 {type === 'ordered' ? 'Ordered' : type === 'checklist' ? 'Checklist' : 'Unordered'}

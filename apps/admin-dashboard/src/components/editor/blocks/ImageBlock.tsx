@@ -14,7 +14,6 @@ import {
   AlignCenter,
   AlignRight,
   Expand,
-  X,
   Edit2,
   Trash2
 } from 'lucide-react';
@@ -34,7 +33,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import BlockWrapper from './BlockWrapper';
 
 interface ImageBlockProps {
@@ -88,9 +86,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
     align = 'center',
     size = 'large',
     linkTo = 'none',
-    linkUrl = '',
-    width,
-    height
+    linkUrl = ''
   } = attributes;
 
   // Sync caption changes
@@ -345,7 +341,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
 
           {/* Settings */}
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 <Settings className="h-4 w-4" />
                 Settings
@@ -515,7 +511,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
                   파일 선택
                 </Button>
                 <Popover>
-                  <PopoverTrigger asChild>
+                  <PopoverTrigger>
                     <Button variant="outline" size="sm">
                       <Link2 className="h-4 w-4 mr-2" />
                       URL 입력

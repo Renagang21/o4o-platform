@@ -370,7 +370,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         <div className="flex items-center gap-2">
           {/* Block inserter */}
           <Popover open={showBlockInserter} onOpenChange={setShowBlockInserter}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button variant="outline" size="sm">
                 <Plus className="h-4 w-4 mr-1" />
                 블록 추가
@@ -394,7 +394,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
           {/* View options */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button variant="ghost" size="sm">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>

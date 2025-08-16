@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
-import { Mail, Search, Filter, AlertCircle, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mail, Search, AlertCircle, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,7 +23,6 @@ interface EmailLog {
 
 const EmailLogs: FC = () => {
   const [logs, setLogs] = useState<EmailLog[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedLog, setSelectedLog] = useState<EmailLog | null>(null);
@@ -81,10 +80,8 @@ const EmailLogs: FC = () => {
   }, []);
 
   const loadLogs = async () => {
-    setLoading(true);
     // TODO: API 연동
     setLogs(sampleLogs);
-    setLoading(false);
   };
 
   const handleRefresh = () => {
@@ -120,7 +117,7 @@ const EmailLogs: FC = () => {
     };
     
     return (
-      <Badge variant={variants[status] || 'default'}>
+      <Badge variant={(variants[status] || 'default') as any}>
         {status === 'sent' && '발송완료'}
         {status === 'failed' && '발송실패'}
         {status === 'pending' && '대기중'}

@@ -14,8 +14,6 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  Palette,
-  Type,
   MoreHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -244,7 +242,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           </Button>
           
           <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button
                 variant="ghost"
                 size="sm"
@@ -326,7 +324,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
           <div className="w-px h-6 bg-gray-300 mx-1" />
           
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button
                 variant="ghost"
                 size="sm"

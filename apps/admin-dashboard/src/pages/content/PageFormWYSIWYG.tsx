@@ -134,7 +134,7 @@ const PageFormWYSIWYG = () => {
   };
 
   // Auto-save functionality
-  const handleAutoSave = async (content: string) => {
+  const handleAutoSave = async () => {
     if (!isDirty) return;
     
     setIsAutoSaving(true);
@@ -286,7 +286,7 @@ const PageFormWYSIWYG = () => {
           title={title}
           onChange={handleBlocksChange}
           onTitleChange={handleTitleChange}
-          onSave={handleAutoSave}
+          onSave={() => handleAutoSave()}
           autoSave={true}
           showInspector={false}
           fullScreen={false}

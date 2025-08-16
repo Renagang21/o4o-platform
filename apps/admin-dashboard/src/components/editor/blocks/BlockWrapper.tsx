@@ -166,7 +166,7 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({
 
           {/* More options */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button
                 variant="ghost"
                 size="sm"

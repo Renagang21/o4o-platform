@@ -70,7 +70,6 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
   attributes = {}
 }) => {
   const [localContent, setLocalContent] = useState(content);
-  const [showToolbar, setShowToolbar] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const contentRef = useRef<HTMLHeadingElement>(null);
 
@@ -194,7 +193,32 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
   };
 
   // Create heading element dynamically
-  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
+  const renderHeading = () => {
+    const props = {
+      ref: contentRef as any,
+      contentEditable: true,
+      suppressContentEditableWarning: true,
+      className: getHeadingClasses(),
+      style: { color: color || undefined },
+      id: anchor || undefined,
+      onInput: handleContentChange,
+      onKeyDown: handleKeyDown,
+      onClick: () => setIsEditing(true),
+      onBlur: () => setIsEditing(false),
+      'data-placeholder': `제목 ${level} 입력...`,
+      children: localContent || `제목 ${level} 입력...`
+    };
+
+    switch (level) {
+      case 1: return <h1 {...props} />;
+      case 2: return <h2 {...props} />;
+      case 3: return <h3 {...props} />;
+      case 4: return <h4 {...props} />;
+      case 5: return <h5 {...props} />;
+      case 6: return <h6 {...props} />;
+      default: return <h2 {...props} />;
+    }
+  };
 
   return (
     <BlockWrapper
@@ -213,7 +237,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
         <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded">
           {/* Level Selector */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 {getHeadingIcon()}
                 <span className="text-xs">H{level}</span>
@@ -269,7 +293,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
 
           {/* Advanced Options */}
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger>
               <Button variant="ghost" size="sm" className="gap-2">
                 <Hash className="h-4 w-4" />
                 Advanced
@@ -313,21 +337,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       )}
 
       {/* Editable Heading */}
-      <HeadingTag
-        ref={contentRef as any}
-        contentEditable
-        suppressContentEditableWarning
-        className={getHeadingClasses()}
-        style={{ color: color || undefined }}
-        id={anchor || undefined}
-        onInput={handleContentChange}
-        onKeyDown={handleKeyDown}
-        onClick={() => setIsEditing(true)}
-        onBlur={() => setIsEditing(false)}
-        data-placeholder={`제목 ${level} 입력...`}
-      >
-        {localContent || `제목 ${level} 입력...`}
-      </HeadingTag>
+      {renderHeading()}
     </BlockWrapper>
   );
 };
