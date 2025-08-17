@@ -1,3 +1,8 @@
+# Environment-specific files (DO NOT SYNC)
+CLAUDE.md
+CLAUDE_*.md
+.claude-startup.sh
+
 # Dependencies
 node_modules/
 npm-debug.log*
