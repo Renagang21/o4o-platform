@@ -8,9 +8,9 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { detectEnvironment } = require('../common/detectEnvironment');
-const { getOrderedWorkspaces, getBuildScript, getEnvironmentStats } = require('../common/workspaceConfig');
-const { parseLoggerFlags } = require('../common/logger');
+const { detectEnvironment } = require('../common/detectEnvironment.cjs');
+const { getOrderedWorkspaces, getBuildScript, getEnvironmentStats } = require('../common/workspaceConfig.cjs');
+const { parseLoggerFlags } = require('../common/logger.cjs');
 
 const logger = parseLoggerFlags();
 
@@ -18,6 +18,11 @@ const logger = parseLoggerFlags();
  * 워크스페이스 빌드
  */
 function buildWorkspace(workspace, options = {}) {
+  // Dry-run 모드
+  if (options.dryRun) {
+    logger.info(`[DRY-RUN] Would build: ${workspace}`);
+    return true;
+  }
   const workspacePath = path.resolve(__dirname, '../../', workspace);
   const workspaceName = workspace.split('/').pop();
   
@@ -233,8 +238,19 @@ if (require.main === module) {
   const options = {
     clean: process.argv.includes('--clean'),
     continueOnError: process.argv.includes('--continue-on-error'),
-    silent: process.argv.includes('--silent')
+    silent: process.argv.includes('--silent'),
+    dryRun: process.argv.includes('--dry-run')
   };
+  
+  // Dry-run 모드
+  if (options.dryRun) {
+    logger.box('DRY RUN MODE - No actual builds will occur', 'warning');
+    const workspaces = getOrderedWorkspaces(environment);
+    logger.info(`Environment: ${environment}`);
+    logger.info(`Workspaces to build: ${workspaces.length}`);
+    logger.list(workspaces);
+    process.exit(0);
+  }
   
   buildAll(environment, options)
     .then(exitCode => process.exit(exitCode))

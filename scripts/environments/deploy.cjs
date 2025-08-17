@@ -8,9 +8,9 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { detectEnvironment, validateEnvironment } = require('../common/detectEnvironment');
-const { getWorkspaces, getEnvironmentStats } = require('../common/workspaceConfig');
-const { parseLoggerFlags } = require('../common/logger');
+const { detectEnvironment, validateEnvironment } = require('../common/detectEnvironment.cjs');
+const { getWorkspaces, getEnvironmentStats } = require('../common/workspaceConfig.cjs');
+const { parseLoggerFlags } = require('../common/logger.cjs');
 
 const logger = parseLoggerFlags();
 

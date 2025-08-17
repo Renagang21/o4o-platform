@@ -10,7 +10,7 @@ const path = require('path');
 
 /**
  * 환경 감지 로직
- * 우선순위: SERVER_TYPE 환경변수 > 파일 존재 여부 > 기본값(local)
+ * 우선순위: SERVER_TYPE 환경변수 > .env 파일 내용 > 파일 존재 여부 > 기본값(local)
  */
 function detectEnvironment() {
   // 1. 환경변수 우선 확인
@@ -23,6 +23,27 @@ function detectEnvironment() {
     }
     
     console.warn(`⚠️  Invalid SERVER_TYPE: ${process.env.SERVER_TYPE}`);
+  }
+  
+  // 1.5. .env 파일에서 SERVER_TYPE 읽기 시도
+  try {
+    const rootDir = path.resolve(__dirname, '../..');
+    const envFiles = ['.env', '.env.local', '.env.webserver', '.env.apiserver'];
+    for (const envFile of envFiles) {
+      const envPath = path.join(rootDir, envFile);
+      if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, 'utf8');
+        const serverTypeMatch = envContent.match(/^SERVER_TYPE=(.+)$/m);
+        if (serverTypeMatch) {
+          const serverType = serverTypeMatch[1].toLowerCase().trim();
+          if (['local', 'webserver', 'apiserver'].includes(serverType)) {
+            return serverType;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    // Silent fail - continue to next detection method
   }
   
   // 2. 환경별 설정 파일 존재 여부 확인

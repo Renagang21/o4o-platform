@@ -8,9 +8,9 @@
 const { execSync, spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { detectEnvironment, getEnvironmentInfo } = require('../common/detectEnvironment');
-const { getWorkspaces } = require('../common/workspaceConfig');
-const { parseLoggerFlags } = require('../common/logger');
+const { detectEnvironment, getEnvironmentInfo } = require('../common/detectEnvironment.cjs');
+const { getWorkspaces } = require('../common/workspaceConfig.cjs');
+const { parseLoggerFlags } = require('../common/logger.cjs');
 
 const logger = parseLoggerFlags();
 
@@ -224,8 +224,20 @@ if (require.main === module) {
     restart: process.argv.includes('--restart') || process.argv.includes('-r'),
     logs: process.argv.includes('--logs') || process.argv.includes('-l'),
     status: process.argv.includes('--status') || process.argv.includes('-s'),
-    silent: process.argv.includes('--silent')
+    silent: process.argv.includes('--silent'),
+    dryRun: process.argv.includes('--dry-run')
   };
+  
+  // Dry-run 모드
+  if (options.dryRun) {
+    const environment = options.env || detectEnvironment();
+    const workspaces = getWorkspaces(environment);
+    logger.box('DRY RUN MODE - Services to start', 'warning');
+    logger.info(`Environment: ${environment}`);
+    logger.info(`Apps: ${workspaces.apps.join(', ')}`);
+    logger.info(`PM2 Config: ecosystem.config.${environment}.cjs`);
+    process.exit(0);
+  }
   
   start(options)
     .then(success => {
