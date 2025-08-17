@@ -41,19 +41,19 @@ Thumbs.db
 *.swo
 *~
 
-# Logs (API서버 강화)
+# Logs
 logs/
 *.log
 *-errors.log
 *-output.log
 ci-*.log
-api-*.log
+# PM2 및 nginx 로그 (웹서버)
+~/.pm2/logs/
+/var/log/nginx/
+pm2-*.log
+nginx-*.log
 access.log
 error.log
-# PM2 로그
-~/.pm2/logs/
-pm2-*.log
-.pm2/
 
 # Coverage reports
 coverage/
@@ -132,48 +132,17 @@ updated_claude_config.json
 *.p12
 test_ssh.bat
 
-# === API서버 전용 추가 제외 항목 ===
-# 데이터베이스 파일
-*.sqlite
-*.sqlite3
-*.db
-*.sql
-data/
-migrations/executed/
-ormconfig.json
+# === 웹서버 전용 추가 제외 항목 ===
+# 정적 파일 빌드 캐시
+.parcel-cache/
+.next/cache/
+.nuxt/
 
-# 업로드 디렉토리
-uploads/
-public/uploads/
-static/uploads/
-temp/uploads/
+# 임시 업로드 디렉토리
+uploads/temp/
+public/uploads/temp/
 
-# API 로그 및 세션
-sessions/
-api-logs/
-*.session
-*.pid
-*.seed
-
-# Redis dump
-dump.rdb
-
-# TypeORM
-ormconfig.json
-ormconfig.js
-
-# API 문서 생성물
-api-docs/
-swagger/
-
-
-# 백엔드 전용 보안 파일
-.env.production
-.env.staging
-.env.development
-!.env.example
-!.env.apiserver.example
-
-# API서버 설정은 추적
-!ecosystem.config.apiserver.cjs
-!.rsyncignore.apiserver
+# 웹서버 설정은 추적 (제외하지 않음)
+!ecosystem.config.webserver.cjs
+!.rsyncignore.webserver
+!.env.webserver.example
