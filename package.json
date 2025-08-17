@@ -32,6 +32,7 @@
     "build": "NODE_OPTIONS='--max-old-space-size=8192' npm run build:packages && NODE_OPTIONS='--max-old-space-size=8192' npm run build:apps",
     "build:packages": "npm run build:types && npm run build:utils && npm run build:ui && npm run build:auth-client && npm run build:auth-context && npm run build:shortcodes",
     "build:apps": "npm run build:main-site && npm run build:admin && npm run build:api",
+    "build:web": "npm run build:packages && npm run build:main-site && npm run build:admin",
     "build:api": "cd apps/api-server && npm run build",
     "build:main-site": "npm run build --workspace=@o4o/main-site",
     "build:admin": "npm run build --workspace=@o4o/admin-dashboard",
