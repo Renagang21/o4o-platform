@@ -1,128 +1,95 @@
-# O4O Platform Scripts
+# 📦 O4O Platform Scripts - 중앙집중화 스크립트 시스템
 
-이 디렉토리에는 O4O Platform 개발, 배포, 운영에 필요한 스크립트들이 포함되어 있습니다.
+## 🎯 개요
+3개 환경(로컬, 웹서버, API서버)을 위한 통합 스크립트 시스템입니다.
+Phase 4.2의 일환으로 환경별 특화된 스크립트를 중앙에서 개발하여 동기화로 배포합니다.
 
-## 📋 스크립트 목록
-
-### 🔧 개발 (Development)
-- **`dev.sh`** - 메인 개발 스크립트
-  ```bash
-  ./scripts/dev.sh lint          # ESLint 실행
-  ./scripts/dev.sh lint:fix      # ESLint 자동 수정
-  ./scripts/dev.sh type-check    # TypeScript 검사
-  ./scripts/dev.sh test          # 테스트 실행
-  ./scripts/dev.sh build         # 전체 빌드
-  ./scripts/dev.sh start         # 개발 서버 시작
-  ./scripts/dev.sh stop          # 개발 서버 중지
-  ```
-
-### 🚀 배포 (Deployment)
-- **`deploy.sh`** - 통합 배포 스크립트
-  ```bash
-  ./scripts/deploy.sh api        # API 서버만 배포
-  ./scripts/deploy.sh web        # 웹 앱만 배포
-  ./scripts/deploy.sh all        # 전체 배포
-  ./scripts/deploy.sh all --emergency  # 긴급 배포 (테스트 스킵)
-  ```
-
-### 🔐 SSL 관리
-- **`ssl-setup.sh`** - SSL 인증서 설정 및 관리
-  ```bash
-  ./scripts/ssl-setup.sh setup        # SSL 초기 설정
-  ./scripts/ssl-setup.sh verify       # SSL 인증서 확인
-  ./scripts/ssl-setup.sh renew        # SSL 인증서 갱신
-  ./scripts/ssl-setup.sh troubleshoot # SSL 문제 해결
-  ```
-
-### 💾 백업/복구
-- **`backup.sh`** - 데이터베이스 및 파일 백업
-- **`restore.sh`** - 백업에서 복구
-- **`backup-monitoring.sh`** - 백업 상태 모니터링
-- **`setup-backup-automation.sh`** - 자동 백업 설정
-
-### 🔍 모니터링/헬스체크
-- **`health-check.sh`** - 서비스 헬스체크
-- **`health-check.js`** - Node.js 헬스체크 스크립트
-- **`server-diagnosis.sh`** - 서버 진단 도구
-
-### 🗄️ 데이터베이스
-- **`init-db.js`** - 데이터베이스 초기화
-- **`test-database.js`** - 데이터베이스 연결 테스트
-
-### 🔧 CI/CD
-- **`ci-install.sh`** - CI/CD용 의존성 설치
-- **`ci-debug.sh`** - CI/CD 디버깅 및 검증
-  ```bash
-  ./scripts/ci-debug.sh setup     # CI 환경 설정
-  ./scripts/ci-debug.sh validate  # 배포 환경 검증
-  ./scripts/ci-debug.sh test      # CI 빌드 테스트
-  ```
-
-### 🛠️ 유틸리티
-- **`validate-dependencies.sh`** - 의존성 유효성 검사
-- **`measure-performance.sh`** - 성능 측정
-- **`production-test.sh`** - 프로덕션 테스트
-- **`quick-setup-server.sh`** - 서버 빠른 설정
-- **`security-audit-fallback.sh`** - 보안 감사 (package-lock.json 없을 때)
-
-## 📝 사용 가이드
-
-### 일반 개발 워크플로우
-```bash
-# 1. 의존성 설치
-npm install
-
-# 2. 패키지 빌드
-./scripts/dev.sh build:packages
-
-# 3. 개발 서버 시작
-./scripts/dev.sh start
-
-# 4. 코드 검사
-./scripts/dev.sh lint
-./scripts/dev.sh type-check
-
-# 5. 개발 서버 중지
-./scripts/dev.sh stop
+## 🏗️ 구조
+```
+scripts/
+├── common/                  # 공통 유틸리티
+│   ├── detectEnvironment.cjs  # 환경 자동 감지
+│   ├── workspaceConfig.cjs    # 워크스페이스 설정
+│   └── logger.cjs             # 통합 로거
+├── environments/            # 환경별 스크립트
+│   ├── build.cjs           # 빌드 스크립트
+│   ├── start.cjs           # 시작 스크립트
+│   └── deploy.cjs          # 배포 스크립트
+└── README.md               # 이 문서
 ```
 
-### 배포 워크플로우
+## 🚀 사용법
+
+### 환경 감지
 ```bash
-# 1. 테스트 및 빌드
-./scripts/dev.sh test
-./scripts/dev.sh build
+# 현재 환경 확인
+node scripts/common/detectEnvironment.cjs
 
-# 2. 배포
-./scripts/deploy.sh all
-
-# 3. 헬스체크
-./scripts/health-check.sh
+# 워크스페이스 구성 확인
+node scripts/common/workspaceConfig.cjs
 ```
 
-### 백업/복구
+### 빌드
 ```bash
-# 백업 생성
-./scripts/backup.sh
+# 현재 환경에 맞게 자동 빌드
+node scripts/environments/build.cjs
 
-# 백업에서 복구
-./scripts/restore.sh /backup/o4o-platform/backup_20250129.tar.gz
+# 특정 환경으로 빌드
+BUILD_ENV=webserver node scripts/environments/build.cjs
 
-# 자동 백업 설정
-sudo ./scripts/setup-backup-automation.sh
+# 클린 빌드
+node scripts/environments/build.cjs --clean
 ```
 
-## ⚠️ 주의사항
+### 시작
+```bash
+# PM2로 시작 (프로덕션)
+node scripts/environments/start.cjs
 
-1. **권한**: 일부 스크립트는 sudo 권한이 필요합니다 (SSL, 백업 자동화 등)
-2. **환경변수**: 배포 스크립트는 SSH_PRIVATE_KEY 환경변수가 필요합니다
-3. **서버별 실행**: 일부 스크립트는 특정 서버에서만 실행해야 합니다
-   - API 서버: `init-db.js`, 데이터베이스 관련 스크립트
-   - 웹 서버: SSL 설정 스크립트
+# 개발 모드로 시작
+node scripts/environments/start.cjs --dev
 
-## 🧹 정리 내역
+# 상태 확인
+node scripts/environments/start.cjs --status
+```
 
-2025년 2월 초 대대적인 스크립트 정리를 통해 51개에서 19개로 줄였습니다:
-- 일회성 수정 스크립트 삭제 (fix-*.sh)
-- 중복 스크립트 통합 (배포, SSL, CI/CD)
-- 임시 해결책 스크립트 제거
-- 기능별 통합 스크립트 생성
+### 배포
+```bash
+# 기본 배포
+node scripts/environments/deploy.cjs
+
+# 강제 배포 (검사 무시)
+node scripts/environments/deploy.cjs --force
+
+# 자동 롤백 활성화
+node scripts/environments/deploy.cjs --auto-rollback
+```
+
+## 🌐 환경별 특징
+
+### 로컬 (local)
+- **워크스페이스**: 13개 (전체)
+- **역할**: 개발 및 소스 제공자
+- **최적화**: 없음 (전체 스택)
+
+### 웹서버 (webserver)
+- **워크스페이스**: 9개
+- **역할**: 프론트엔드 전용
+- **최적화**: 31% 절감
+
+### API서버 (apiserver)
+- **워크스페이스**: 2개
+- **역할**: 백엔드 전용
+- **최적화**: 85% 절감
+
+## 📝 주의사항
+
+1. **package.json 분리 유지**: 환경별 package.json은 독립적으로 유지
+2. **scripts/ 폴더만 동기화**: 스크립트만 중앙 관리
+3. **환경 검증**: 배포 전 항상 환경 확인
+4. **백업 필수**: 중요 변경 시 백업 생성
+
+---
+
+*Phase 4.2 Scripts Centralization*
+*작성일: 2025년 8월*

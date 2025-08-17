@@ -1,0 +1,2241 @@
+{
+  "version": "1.0.0",
+  "name": "o4o-platform",
+  "problems": [
+    "extraneous: @emnapi/runtime@1.4.5 /home/user/o4o-platform/node_modules/@emnapi/runtime",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/admin-dashboard/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/admin-dashboard/node_modules/@types/react",
+    "invalid: date-fns@3.6.0 /home/user/o4o-platform/apps/admin-dashboard/node_modules/date-fns",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/auth-context/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/crowdfunding/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/crowdfunding/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/digital-signage/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/digital-signage/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/ecommerce/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/ecommerce/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/forum/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/forum/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/main-site/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/main-site/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/packages/shortcodes/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/shortcodes/node_modules/@types/react",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/types/node_modules/@types/react",
+    "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/packages/ui/node_modules/@types/react-dom",
+    "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/ui/node_modules/@types/react"
+  ],
+  "dependencies": {
+    "@emnapi/runtime": {
+      "version": "1.4.5",
+      "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.4.5.tgz",
+      "overridden": false,
+      "extraneous": true,
+      "problems": [
+        "extraneous: @emnapi/runtime@1.4.5 /home/user/o4o-platform/node_modules/@emnapi/runtime"
+      ]
+    },
+    "@eslint/js": {
+      "version": "9.33.0",
+      "resolved": "https://registry.npmjs.org/@eslint/js/-/js-9.33.0.tgz",
+      "overridden": false
+    },
+    "@mui/icons-material": {
+      "version": "7.3.1",
+      "resolved": "https://registry.npmjs.org/@mui/icons-material/-/icons-material-7.3.1.tgz",
+      "overridden": false
+    },
+    "@mui/material": {
+      "version": "7.3.1",
+      "resolved": "https://registry.npmjs.org/@mui/material/-/material-7.3.1.tgz",
+      "overridden": false
+    },
+    "@o4o/admin-dashboard": {
+      "version": "1.0.0",
+      "resolved": "file:../../apps/admin-dashboard",
+      "overridden": false,
+      "dependencies": {
+        "@babel/runtime": {
+          "version": "7.28.3",
+          "resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.28.3.tgz",
+          "overridden": false
+        },
+        "@dnd-kit/core": {
+          "version": "6.3.1",
+          "resolved": "https://registry.npmjs.org/@dnd-kit/core/-/core-6.3.1.tgz",
+          "overridden": false
+        },
+        "@dnd-kit/sortable": {
+          "version": "10.0.0",
+          "resolved": "https://registry.npmjs.org/@dnd-kit/sortable/-/sortable-10.0.0.tgz",
+          "overridden": false
+        },
+        "@dnd-kit/utilities": {
+          "version": "3.2.2",
+          "resolved": "https://registry.npmjs.org/@dnd-kit/utilities/-/utilities-3.2.2.tgz",
+          "overridden": false
+        },
+        "@emotion/react": {
+          "version": "11.14.0",
+          "resolved": "https://registry.npmjs.org/@emotion/react/-/react-11.14.0.tgz",
+          "overridden": false
+        },
+        "@emotion/styled": {
+          "version": "11.14.1",
+          "resolved": "https://registry.npmjs.org/@emotion/styled/-/styled-11.14.1.tgz",
+          "overridden": false
+        },
+        "@heroicons/react": {
+          "version": "2.2.0",
+          "resolved": "https://registry.npmjs.org/@heroicons/react/-/react-2.2.0.tgz",
+          "overridden": false
+        },
+        "@hookform/resolvers": {
+          "version": "5.2.1",
+          "resolved": "https://registry.npmjs.org/@hookform/resolvers/-/resolvers-5.2.1.tgz",
+          "overridden": false
+        },
+        "@mui/icons-material": {
+          "version": "7.3.1"
+        },
+        "@mui/material": {
+          "version": "7.3.1"
+        },
+        "@o4o/auth-client": {
+          "version": "1.0.0"
+        },
+        "@o4o/auth-context": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@playwright/test": {
+          "version": "1.54.2",
+          "resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.54.2.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-alert-dialog": {
+          "version": "1.1.15",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-alert-dialog/-/react-alert-dialog-1.1.15.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-avatar": {
+          "version": "1.1.10"
+        },
+        "@radix-ui/react-checkbox": {
+          "version": "1.3.3",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-checkbox/-/react-checkbox-1.3.3.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-collapsible": {
+          "version": "1.1.12",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-collapsible/-/react-collapsible-1.1.12.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-dialog": {
+          "version": "1.1.15",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-dialog/-/react-dialog-1.1.15.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-dropdown-menu": {
+          "version": "2.1.16",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-dropdown-menu/-/react-dropdown-menu-2.1.16.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-label": {
+          "version": "2.1.7",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-label/-/react-label-2.1.7.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-popover": {
+          "version": "1.1.15",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-popover/-/react-popover-1.1.15.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-scroll-area": {
+          "version": "1.2.10",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-scroll-area/-/react-scroll-area-1.2.10.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-select": {
+          "version": "2.2.6",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-select/-/react-select-2.2.6.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-separator": {
+          "version": "1.1.7",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-separator/-/react-separator-1.1.7.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-slot": {
+          "version": "1.2.3",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.2.3.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-switch": {
+          "version": "1.2.6",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-switch/-/react-switch-1.2.6.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-tabs": {
+          "version": "1.1.13",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-tabs/-/react-tabs-1.1.13.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-toast": {
+          "version": "1.2.15",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-toast/-/react-toast-1.2.15.tgz",
+          "overridden": false
+        },
+        "@radix-ui/react-tooltip": {
+          "version": "1.2.8",
+          "resolved": "https://registry.npmjs.org/@radix-ui/react-tooltip/-/react-tooltip-1.2.8.tgz",
+          "overridden": false
+        },
+        "@remix-run/router": {
+          "version": "1.23.0",
+          "resolved": "https://registry.npmjs.org/@remix-run/router/-/router-1.23.0.tgz",
+          "overridden": false
+        },
+        "@tailwindcss/postcss": {
+          "version": "4.1.12"
+        },
+        "@tanstack/react-query": {
+          "version": "5.85.3",
+          "resolved": "https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.85.3.tgz",
+          "overridden": false
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4",
+          "resolved": "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-6.6.4.tgz",
+          "overridden": false
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@testing-library/user-event": {
+          "version": "14.6.1"
+        },
+        "@tiptap/extension-code-block-lowlight": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-code-block-lowlight/-/extension-code-block-lowlight-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-code-block": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-code-block/-/extension-code-block-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-image": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-image/-/extension-image-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-link": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-link/-/extension-link-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-placeholder": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-placeholder/-/extension-placeholder-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-table-cell": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-table-cell/-/extension-table-cell-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-table-header": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-table-header/-/extension-table-header-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-table-row": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-table-row/-/extension-table-row-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/extension-table": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/extension-table/-/extension-table-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/react": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/react/-/react-2.26.1.tgz",
+          "overridden": false
+        },
+        "@tiptap/starter-kit": {
+          "version": "2.26.1",
+          "resolved": "https://registry.npmjs.org/@tiptap/starter-kit/-/starter-kit-2.26.1.tgz",
+          "overridden": false
+        },
+        "@types/js-cookie": {
+          "version": "3.0.6",
+          "resolved": "https://registry.npmjs.org/@types/js-cookie/-/js-cookie-3.0.6.tgz",
+          "overridden": false
+        },
+        "@types/lodash": {
+          "version": "4.17.20",
+          "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.17.20.tgz",
+          "overridden": false
+        },
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from apps/admin-dashboard",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/admin-dashboard/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react-dropzone": {
+          "version": "4.2.2",
+          "resolved": "https://registry.npmjs.org/@types/react-dropzone/-/react-dropzone-4.2.2.tgz",
+          "overridden": false
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from apps/admin-dashboard",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/admin-dashboard/node_modules/@types/react"
+          ]
+        },
+        "@types/socket.io-client": {
+          "version": "1.4.36"
+        },
+        "@types/uuid": {
+          "version": "10.0.0",
+          "resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-10.0.0.tgz",
+          "overridden": false
+        },
+        "@types/wordpress__api-fetch": {
+          "version": "3.2.4",
+          "resolved": "https://registry.npmjs.org/@types/wordpress__api-fetch/-/wordpress__api-fetch-3.2.4.tgz",
+          "overridden": false
+        },
+        "@types/wordpress__block-editor": {
+          "version": "11.5.16",
+          "resolved": "https://registry.npmjs.org/@types/wordpress__block-editor/-/wordpress__block-editor-11.5.16.tgz",
+          "overridden": false
+        },
+        "@types/wordpress__blocks": {
+          "version": "12.5.16",
+          "resolved": "https://registry.npmjs.org/@types/wordpress__blocks/-/wordpress__blocks-12.5.16.tgz",
+          "overridden": false
+        },
+        "@types/wordpress__components": {
+          "version": "23.0.12",
+          "resolved": "https://registry.npmjs.org/@types/wordpress__components/-/wordpress__components-23.0.12.tgz",
+          "overridden": false
+        },
+        "@types/wordpress__element": {
+          "version": "2.4.1",
+          "resolved": "https://registry.npmjs.org/@types/wordpress__element/-/wordpress__element-2.4.1.tgz",
+          "overridden": false
+        },
+        "@types/wordpress__i18n": {
+          "version": "3.4.0",
+          "resolved": "https://registry.npmjs.org/@types/wordpress__i18n/-/wordpress__i18n-3.4.0.tgz",
+          "overridden": false
+        },
+        "@typescript-eslint/eslint-plugin": {
+          "version": "8.39.0"
+        },
+        "@typescript-eslint/parser": {
+          "version": "8.39.0"
+        },
+        "@vitejs/plugin-react": {
+          "version": "4.7.0"
+        },
+        "@wordpress/block-editor": {
+          "version": "14.4.0",
+          "resolved": "https://registry.npmjs.org/@wordpress/block-editor/-/block-editor-14.4.0.tgz",
+          "overridden": false
+        },
+        "@wordpress/blocks": {
+          "version": "13.9.0",
+          "resolved": "https://registry.npmjs.org/@wordpress/blocks/-/blocks-13.9.0.tgz",
+          "overridden": false
+        },
+        "@wordpress/components": {
+          "version": "28.9.0",
+          "resolved": "https://registry.npmjs.org/@wordpress/components/-/components-28.9.0.tgz",
+          "overridden": false
+        },
+        "@wordpress/element": {
+          "version": "6.9.0",
+          "resolved": "https://registry.npmjs.org/@wordpress/element/-/element-6.9.0.tgz",
+          "overridden": false
+        },
+        "@wordpress/i18n": {
+          "version": "5.9.0",
+          "resolved": "https://registry.npmjs.org/@wordpress/i18n/-/i18n-5.9.0.tgz",
+          "overridden": false
+        },
+        "autoprefixer": {
+          "version": "10.4.21"
+        },
+        "axios": {
+          "version": "1.11.0",
+          "resolved": "https://registry.npmjs.org/axios/-/axios-1.11.0.tgz",
+          "overridden": false
+        },
+        "class-variance-authority": {
+          "version": "0.7.1",
+          "resolved": "https://registry.npmjs.org/class-variance-authority/-/class-variance-authority-0.7.1.tgz",
+          "overridden": false
+        },
+        "clsx": {
+          "version": "2.1.1",
+          "resolved": "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz",
+          "overridden": false
+        },
+        "date-fns": {
+          "version": "3.6.0",
+          "resolved": "https://registry.npmjs.org/date-fns/-/date-fns-3.6.0.tgz",
+          "overridden": false,
+          "invalid": "\"2.30.0\" from apps/admin-dashboard",
+          "problems": [
+            "invalid: date-fns@3.6.0 /home/user/o4o-platform/apps/admin-dashboard/node_modules/date-fns"
+          ]
+        },
+        "eslint-plugin-react-hooks": {
+          "version": "5.2.0"
+        },
+        "eslint-plugin-react-refresh": {
+          "version": "0.4.20",
+          "resolved": "https://registry.npmjs.org/eslint-plugin-react-refresh/-/eslint-plugin-react-refresh-0.4.20.tgz",
+          "overridden": false
+        },
+        "eslint": {
+          "version": "9.33.0"
+        },
+        "js-cookie": {
+          "version": "3.0.5",
+          "resolved": "https://registry.npmjs.org/js-cookie/-/js-cookie-3.0.5.tgz",
+          "overridden": false
+        },
+        "jsdom": {
+          "version": "26.1.0",
+          "resolved": "https://registry.npmjs.org/jsdom/-/jsdom-26.1.0.tgz",
+          "overridden": false
+        },
+        "lowlight": {
+          "version": "3.3.0",
+          "resolved": "https://registry.npmjs.org/lowlight/-/lowlight-3.3.0.tgz",
+          "overridden": false
+        },
+        "lucide-react": {
+          "version": "0.523.0",
+          "resolved": "https://registry.npmjs.org/lucide-react/-/lucide-react-0.523.0.tgz",
+          "overridden": false
+        },
+        "msw": {
+          "version": "2.10.5",
+          "resolved": "https://registry.npmjs.org/msw/-/msw-2.10.5.tgz",
+          "overridden": false
+        },
+        "postcss-nested": {
+          "version": "6.2.0",
+          "resolved": "https://registry.npmjs.org/postcss-nested/-/postcss-nested-6.2.0.tgz",
+          "overridden": false
+        },
+        "postcss": {
+          "version": "8.5.6"
+        },
+        "react-dnd-html5-backend": {
+          "version": "16.0.1",
+          "resolved": "https://registry.npmjs.org/react-dnd-html5-backend/-/react-dnd-html5-backend-16.0.1.tgz",
+          "overridden": false
+        },
+        "react-dnd": {
+          "version": "16.0.1",
+          "resolved": "https://registry.npmjs.org/react-dnd/-/react-dnd-16.0.1.tgz",
+          "overridden": false
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react-dropzone": {
+          "version": "14.3.8",
+          "resolved": "https://registry.npmjs.org/react-dropzone/-/react-dropzone-14.3.8.tgz",
+          "overridden": false
+        },
+        "react-hook-form": {
+          "version": "7.62.0",
+          "resolved": "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.62.0.tgz",
+          "overridden": false
+        },
+        "react-hot-toast": {
+          "version": "2.5.2",
+          "resolved": "https://registry.npmjs.org/react-hot-toast/-/react-hot-toast-2.5.2.tgz",
+          "overridden": false
+        },
+        "react-intersection-observer": {
+          "version": "9.16.0",
+          "resolved": "https://registry.npmjs.org/react-intersection-observer/-/react-intersection-observer-9.16.0.tgz",
+          "overridden": false
+        },
+        "react-router-dom": {
+          "version": "7.8.0",
+          "resolved": "https://registry.npmjs.org/react-router-dom/-/react-router-dom-7.8.0.tgz",
+          "overridden": false
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "rollup-plugin-visualizer": {
+          "version": "6.0.3",
+          "resolved": "https://registry.npmjs.org/rollup-plugin-visualizer/-/rollup-plugin-visualizer-6.0.3.tgz",
+          "overridden": false
+        },
+        "socket.io-client": {
+          "version": "4.8.1",
+          "resolved": "https://registry.npmjs.org/socket.io-client/-/socket.io-client-4.8.1.tgz",
+          "overridden": false
+        },
+        "tailwind-merge": {
+          "version": "2.6.0",
+          "resolved": "https://registry.npmjs.org/tailwind-merge/-/tailwind-merge-2.6.0.tgz",
+          "overridden": false
+        },
+        "tailwindcss": {
+          "version": "4.1.12"
+        },
+        "terser": {
+          "version": "5.43.1",
+          "resolved": "https://registry.npmjs.org/terser/-/terser-5.43.1.tgz",
+          "overridden": false
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "uuid": {
+          "version": "9.0.1",
+          "resolved": "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz",
+          "overridden": false
+        },
+        "vite": {
+          "version": "7.0.6",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "zod": {
+          "version": "4.0.17",
+          "resolved": "https://registry.npmjs.org/zod/-/zod-4.0.17.tgz",
+          "overridden": false
+        },
+        "zustand": {
+          "version": "5.0.7",
+          "resolved": "https://registry.npmjs.org/zustand/-/zustand-5.0.7.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "@o4o/api-gateway": {
+      "version": "1.0.0",
+      "resolved": "file:../../apps/api-gateway",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@types/compression": {
+          "version": "1.8.1",
+          "resolved": "https://registry.npmjs.org/@types/compression/-/compression-1.8.1.tgz",
+          "overridden": false
+        },
+        "@types/cors": {
+          "version": "2.8.19",
+          "resolved": "https://registry.npmjs.org/@types/cors/-/cors-2.8.19.tgz",
+          "overridden": false
+        },
+        "@types/express": {
+          "version": "5.0.3",
+          "resolved": "https://registry.npmjs.org/@types/express/-/express-5.0.3.tgz",
+          "overridden": false
+        },
+        "@types/node": {
+          "version": "22.17.1",
+          "overridden": false
+        },
+        "@types/response-time": {
+          "version": "2.3.9",
+          "resolved": "https://registry.npmjs.org/@types/response-time/-/response-time-2.3.9.tgz",
+          "overridden": false
+        },
+        "@vitejs/plugin-react": {
+          "version": "5.0.0",
+          "overridden": false
+        },
+        "@vitest/ui": {
+          "version": "2.1.9",
+          "overridden": false
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "compression": {
+          "version": "1.8.1",
+          "resolved": "https://registry.npmjs.org/compression/-/compression-1.8.1.tgz",
+          "overridden": false
+        },
+        "cookie-parser": {
+          "version": "1.4.7",
+          "resolved": "https://registry.npmjs.org/cookie-parser/-/cookie-parser-1.4.7.tgz",
+          "overridden": false
+        },
+        "cors": {
+          "version": "2.8.5",
+          "resolved": "https://registry.npmjs.org/cors/-/cors-2.8.5.tgz",
+          "overridden": false
+        },
+        "dotenv": {
+          "version": "16.6.1",
+          "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.6.1.tgz",
+          "overridden": false
+        },
+        "express-async-errors": {
+          "version": "3.1.1",
+          "resolved": "https://registry.npmjs.org/express-async-errors/-/express-async-errors-3.1.1.tgz",
+          "overridden": false
+        },
+        "express-rate-limit": {
+          "version": "7.5.1",
+          "resolved": "https://registry.npmjs.org/express-rate-limit/-/express-rate-limit-7.5.1.tgz",
+          "overridden": false
+        },
+        "express": {
+          "version": "4.21.2",
+          "resolved": "https://registry.npmjs.org/express/-/express-4.21.2.tgz",
+          "overridden": false
+        },
+        "helmet": {
+          "version": "8.1.0",
+          "resolved": "https://registry.npmjs.org/helmet/-/helmet-8.1.0.tgz",
+          "overridden": false
+        },
+        "http-proxy-middleware": {
+          "version": "3.0.5",
+          "resolved": "https://registry.npmjs.org/http-proxy-middleware/-/http-proxy-middleware-3.0.5.tgz",
+          "overridden": false
+        },
+        "ioredis": {
+          "version": "5.7.0",
+          "resolved": "https://registry.npmjs.org/ioredis/-/ioredis-5.7.0.tgz",
+          "overridden": false
+        },
+        "joi": {
+          "version": "17.13.3",
+          "resolved": "https://registry.npmjs.org/joi/-/joi-17.13.3.tgz",
+          "overridden": false
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "jsonwebtoken": {
+          "version": "9.0.2"
+        },
+        "nodemon": {
+          "version": "3.1.10",
+          "resolved": "https://registry.npmjs.org/nodemon/-/nodemon-3.1.10.tgz",
+          "overridden": false
+        },
+        "rate-limit-redis": {
+          "version": "4.2.2"
+        },
+        "response-time": {
+          "version": "2.3.4",
+          "resolved": "https://registry.npmjs.org/response-time/-/response-time-2.3.4.tgz",
+          "overridden": false
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "vite": {
+          "version": "7.1.1",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "winston": {
+          "version": "3.17.0",
+          "resolved": "https://registry.npmjs.org/winston/-/winston-3.17.0.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "@o4o/api-server": {
+      "version": "1.0.0",
+      "resolved": "file:../../apps/api-server",
+      "overridden": false,
+      "dependencies": {
+        "@eslint/js": {
+          "version": "9.33.0"
+        },
+        "@o4o/auth-client": {
+          "version": "1.0.0"
+        },
+        "@o4o/crowdfunding-types": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@testing-library/dom": {
+          "version": "10.4.1",
+          "resolved": "https://registry.npmjs.org/@testing-library/dom/-/dom-10.4.1.tgz",
+          "overridden": false
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@types/adm-zip": {
+          "version": "0.5.7",
+          "resolved": "https://registry.npmjs.org/@types/adm-zip/-/adm-zip-0.5.7.tgz",
+          "overridden": false
+        },
+        "@types/bcryptjs": {
+          "version": "2.4.6",
+          "resolved": "https://registry.npmjs.org/@types/bcryptjs/-/bcryptjs-2.4.6.tgz",
+          "overridden": false
+        },
+        "@types/compression": {
+          "version": "1.8.1"
+        },
+        "@types/cookie-parser": {
+          "version": "1.4.9",
+          "resolved": "https://registry.npmjs.org/@types/cookie-parser/-/cookie-parser-1.4.9.tgz",
+          "overridden": false
+        },
+        "@types/cors": {
+          "version": "2.8.19"
+        },
+        "@types/exceljs": {
+          "version": "0.5.3",
+          "resolved": "https://registry.npmjs.org/@types/exceljs/-/exceljs-0.5.3.tgz",
+          "overridden": false
+        },
+        "@types/express-session": {
+          "version": "1.18.2",
+          "resolved": "https://registry.npmjs.org/@types/express-session/-/express-session-1.18.2.tgz",
+          "overridden": false
+        },
+        "@types/express": {
+          "version": "4.17.23",
+          "overridden": false
+        },
+        "@types/jest": {
+          "version": "29.5.14"
+        },
+        "@types/js-yaml": {
+          "version": "4.0.9",
+          "resolved": "https://registry.npmjs.org/@types/js-yaml/-/js-yaml-4.0.9.tgz",
+          "overridden": false
+        },
+        "@types/jsonwebtoken": {
+          "version": "9.0.10"
+        },
+        "@types/lru-cache": {
+          "version": "7.10.9",
+          "resolved": "https://registry.npmjs.org/@types/lru-cache/-/lru-cache-7.10.9.tgz",
+          "overridden": false
+        },
+        "@types/multer": {
+          "version": "1.4.13",
+          "resolved": "https://registry.npmjs.org/@types/multer/-/multer-1.4.13.tgz",
+          "overridden": false
+        },
+        "@types/node-cron": {
+          "version": "3.0.11"
+        },
+        "@types/node-fetch": {
+          "version": "2.6.13",
+          "resolved": "https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.6.13.tgz",
+          "overridden": false
+        },
+        "@types/node": {
+          "version": "22.17.2",
+          "resolved": "https://registry.npmjs.org/@types/node/-/node-22.17.2.tgz",
+          "overridden": false
+        },
+        "@types/nodemailer": {
+          "version": "6.4.17"
+        },
+        "@types/passport-google-oauth20": {
+          "version": "2.0.16",
+          "resolved": "https://registry.npmjs.org/@types/passport-google-oauth20/-/passport-google-oauth20-2.0.16.tgz",
+          "overridden": false
+        },
+        "@types/passport": {
+          "version": "1.0.17",
+          "resolved": "https://registry.npmjs.org/@types/passport/-/passport-1.0.17.tgz",
+          "overridden": false
+        },
+        "@types/pg": {
+          "version": "8.15.5",
+          "resolved": "https://registry.npmjs.org/@types/pg/-/pg-8.15.5.tgz",
+          "overridden": false
+        },
+        "@types/supertest": {
+          "version": "6.0.3",
+          "resolved": "https://registry.npmjs.org/@types/supertest/-/supertest-6.0.3.tgz",
+          "overridden": false
+        },
+        "@types/swagger-jsdoc": {
+          "version": "6.0.4",
+          "resolved": "https://registry.npmjs.org/@types/swagger-jsdoc/-/swagger-jsdoc-6.0.4.tgz",
+          "overridden": false
+        },
+        "@types/swagger-ui-express": {
+          "version": "4.1.8",
+          "resolved": "https://registry.npmjs.org/@types/swagger-ui-express/-/swagger-ui-express-4.1.8.tgz",
+          "overridden": false
+        },
+        "@types/uuid": {
+          "version": "10.0.0"
+        },
+        "@typescript-eslint/eslint-plugin": {
+          "version": "8.39.0"
+        },
+        "@typescript-eslint/parser": {
+          "version": "8.39.0"
+        },
+        "@vitejs/plugin-react": {
+          "version": "5.0.0",
+          "overridden": false
+        },
+        "@vitest/ui": {
+          "version": "3.2.4"
+        },
+        "adm-zip": {
+          "version": "0.5.16"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "bcrypt": {
+          "version": "6.0.0"
+        },
+        "bcryptjs": {
+          "version": "2.4.3",
+          "resolved": "https://registry.npmjs.org/bcryptjs/-/bcryptjs-2.4.3.tgz",
+          "overridden": false
+        },
+        "class-transformer": {
+          "version": "0.5.1",
+          "resolved": "https://registry.npmjs.org/class-transformer/-/class-transformer-0.5.1.tgz",
+          "overridden": false
+        },
+        "class-validator": {
+          "version": "0.14.2"
+        },
+        "compression": {
+          "version": "1.8.1"
+        },
+        "connect-redis": {
+          "version": "9.0.0",
+          "resolved": "https://registry.npmjs.org/connect-redis/-/connect-redis-9.0.0.tgz",
+          "overridden": false
+        },
+        "cookie-parser": {
+          "version": "1.4.7"
+        },
+        "cors": {
+          "version": "2.8.5"
+        },
+        "cron": {
+          "version": "4.3.3"
+        },
+        "dotenv": {
+          "version": "16.6.1"
+        },
+        "eslint-config-prettier": {
+          "version": "9.1.2",
+          "resolved": "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-9.1.2.tgz",
+          "overridden": false
+        },
+        "eslint-plugin-prettier": {
+          "version": "5.5.4",
+          "resolved": "https://registry.npmjs.org/eslint-plugin-prettier/-/eslint-plugin-prettier-5.5.4.tgz",
+          "overridden": false
+        },
+        "eslint": {
+          "version": "9.33.0"
+        },
+        "exceljs": {
+          "version": "4.4.0"
+        },
+        "express-rate-limit": {
+          "version": "6.11.2",
+          "overridden": false
+        },
+        "express-session": {
+          "version": "1.18.2",
+          "resolved": "https://registry.npmjs.org/express-session/-/express-session-1.18.2.tgz",
+          "overridden": false
+        },
+        "express-validator": {
+          "version": "6.15.0",
+          "overridden": false
+        },
+        "express": {
+          "version": "4.21.2"
+        },
+        "helmet": {
+          "version": "6.2.0",
+          "overridden": false
+        },
+        "ioredis": {
+          "version": "5.7.0"
+        },
+        "jest": {
+          "version": "29.7.0"
+        },
+        "js-yaml": {
+          "version": "4.1.0",
+          "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.0.tgz",
+          "overridden": false
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "json2csv": {
+          "version": "6.0.0-alpha.2",
+          "resolved": "https://registry.npmjs.org/json2csv/-/json2csv-6.0.0-alpha.2.tgz",
+          "overridden": false
+        },
+        "jsonwebtoken": {
+          "version": "9.0.2"
+        },
+        "lru-cache": {
+          "version": "11.1.0",
+          "overridden": false
+        },
+        "multer": {
+          "version": "2.0.2",
+          "resolved": "https://registry.npmjs.org/multer/-/multer-2.0.2.tgz",
+          "overridden": false
+        },
+        "node-cache": {
+          "version": "5.1.2"
+        },
+        "node-cron": {
+          "version": "4.2.1",
+          "resolved": "https://registry.npmjs.org/node-cron/-/node-cron-4.2.1.tgz",
+          "overridden": false
+        },
+        "node-fetch": {
+          "version": "2.7.0",
+          "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz",
+          "overridden": false
+        },
+        "nodemailer": {
+          "version": "7.0.5"
+        },
+        "nodemon": {
+          "version": "3.1.10"
+        },
+        "passport-google-oauth20": {
+          "version": "2.0.0",
+          "resolved": "https://registry.npmjs.org/passport-google-oauth20/-/passport-google-oauth20-2.0.0.tgz",
+          "overridden": false
+        },
+        "passport-kakao": {
+          "version": "1.0.1",
+          "resolved": "https://registry.npmjs.org/passport-kakao/-/passport-kakao-1.0.1.tgz",
+          "overridden": false
+        },
+        "passport-naver-v2": {
+          "version": "2.0.8",
+          "resolved": "https://registry.npmjs.org/passport-naver-v2/-/passport-naver-v2-2.0.8.tgz",
+          "overridden": false
+        },
+        "passport": {
+          "version": "0.7.0",
+          "resolved": "https://registry.npmjs.org/passport/-/passport-0.7.0.tgz",
+          "overridden": false
+        },
+        "pg": {
+          "version": "8.16.3",
+          "resolved": "https://registry.npmjs.org/pg/-/pg-8.16.3.tgz",
+          "overridden": false
+        },
+        "prettier": {
+          "version": "3.6.2"
+        },
+        "rate-limit-redis": {
+          "version": "4.2.2"
+        },
+        "redis-cache-express": {
+          "version": "1.3.1",
+          "resolved": "https://registry.npmjs.org/redis-cache-express/-/redis-cache-express-1.3.1.tgz",
+          "overridden": false
+        },
+        "reflect-metadata": {
+          "version": "0.1.14",
+          "resolved": "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.1.14.tgz",
+          "overridden": false
+        },
+        "sharp": {
+          "version": "0.34.3",
+          "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.34.3.tgz",
+          "overridden": false
+        },
+        "slugify": {
+          "version": "1.6.6"
+        },
+        "socket.io": {
+          "version": "4.8.1",
+          "resolved": "https://registry.npmjs.org/socket.io/-/socket.io-4.8.1.tgz",
+          "overridden": false
+        },
+        "supertest": {
+          "version": "7.1.4",
+          "resolved": "https://registry.npmjs.org/supertest/-/supertest-7.1.4.tgz",
+          "overridden": false
+        },
+        "swagger-jsdoc": {
+          "version": "6.2.8"
+        },
+        "swagger-ui-express": {
+          "version": "5.0.1"
+        },
+        "tail": {
+          "version": "2.2.6",
+          "resolved": "https://registry.npmjs.org/tail/-/tail-2.2.6.tgz",
+          "overridden": false
+        },
+        "ts-jest": {
+          "version": "29.4.1"
+        },
+        "ts-node": {
+          "version": "10.9.2",
+          "resolved": "https://registry.npmjs.org/ts-node/-/ts-node-10.9.2.tgz",
+          "overridden": false
+        },
+        "typeorm": {
+          "version": "0.3.25",
+          "resolved": "https://registry.npmjs.org/typeorm/-/typeorm-0.3.25.tgz",
+          "overridden": false
+        },
+        "typescript-eslint": {
+          "version": "8.39.1",
+          "resolved": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.39.1.tgz",
+          "overridden": false
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "ua-parser-js": {
+          "version": "2.0.4",
+          "resolved": "https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-2.0.4.tgz",
+          "overridden": false
+        },
+        "uuid": {
+          "version": "11.1.0",
+          "overridden": false
+        },
+        "vite": {
+          "version": "7.1.1",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "winston": {
+          "version": "3.17.0"
+        },
+        "xml2js": {
+          "version": "0.6.2"
+        },
+        "zod": {
+          "version": "4.0.17"
+        }
+      }
+    },
+    "@o4o/auth-client": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/auth-client",
+      "overridden": false,
+      "dependencies": {
+        "@types/js-cookie": {
+          "version": "3.0.6"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "js-cookie": {
+          "version": "3.0.5"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/auth-context": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/auth-context",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/auth-client": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from packages/auth-context",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/auth-context/node_modules/@types/react"
+          ]
+        },
+        "@types/socket.io-client": {
+          "version": "1.4.36"
+        },
+        "react-router-dom": {
+          "version": "7.8.0"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "socket.io-client": {
+          "version": "4.8.1"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/crowdfunding-types": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/crowdfunding-types",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "tsup": {
+          "version": "8.5.0",
+          "resolved": "https://registry.npmjs.org/tsup/-/tsup-8.5.0.tgz",
+          "overridden": false
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/crowdfunding": {
+      "version": "0.0.1",
+      "resolved": "file:../../apps/crowdfunding",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/auth-client": {
+          "version": "1.0.0"
+        },
+        "@o4o/auth-context": {
+          "version": "1.0.0"
+        },
+        "@o4o/crowdfunding-types": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/ui": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@tanstack/react-query": {
+          "version": "5.85.3"
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@types/node": {
+          "version": "22.17.1",
+          "overridden": false
+        },
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from apps/crowdfunding",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/crowdfunding/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from apps/crowdfunding",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/crowdfunding/node_modules/@types/react"
+          ]
+        },
+        "@typescript-eslint/eslint-plugin": {
+          "version": "8.39.0"
+        },
+        "@typescript-eslint/parser": {
+          "version": "8.39.0"
+        },
+        "@vitejs/plugin-react": {
+          "version": "4.7.0"
+        },
+        "autoprefixer": {
+          "version": "10.4.21"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "clsx": {
+          "version": "2.1.1"
+        },
+        "date-fns": {
+          "version": "3.6.0",
+          "overridden": false
+        },
+        "eslint-plugin-react-hooks": {
+          "version": "5.2.0"
+        },
+        "eslint-plugin-react-refresh": {
+          "version": "0.4.20"
+        },
+        "eslint": {
+          "version": "9.33.0"
+        },
+        "framer-motion": {
+          "version": "10.18.0",
+          "overridden": false
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "lucide-react": {
+          "version": "0.523.0"
+        },
+        "postcss": {
+          "version": "8.5.6"
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react-hook-form": {
+          "version": "7.62.0"
+        },
+        "react-router-dom": {
+          "version": "7.8.0"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "tailwindcss": {
+          "version": "4.1.12"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "vite": {
+          "version": "7.1.1",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "zustand": {
+          "version": "5.0.7"
+        }
+      }
+    },
+    "@o4o/digital-signage": {
+      "version": "1.0.0",
+      "resolved": "file:../../apps/digital-signage",
+      "overridden": false,
+      "dependencies": {
+        "@hookform/resolvers": {
+          "version": "3.10.0",
+          "overridden": false
+        },
+        "@o4o/auth-context": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/ui": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@tanstack/react-query": {
+          "version": "5.85.3"
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from apps/digital-signage",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/digital-signage/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from apps/digital-signage",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/digital-signage/node_modules/@types/react"
+          ]
+        },
+        "@typescript-eslint/eslint-plugin": {
+          "version": "8.39.0"
+        },
+        "@typescript-eslint/parser": {
+          "version": "8.39.0"
+        },
+        "@vitejs/plugin-react": {
+          "version": "4.7.0"
+        },
+        "autoprefixer": {
+          "version": "10.4.21"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "clsx": {
+          "version": "2.1.1"
+        },
+        "date-fns": {
+          "version": "3.6.0",
+          "overridden": false
+        },
+        "eslint-plugin-react-hooks": {
+          "version": "5.2.0"
+        },
+        "eslint-plugin-react-refresh": {
+          "version": "0.4.20"
+        },
+        "eslint": {
+          "version": "9.33.0"
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "lucide-react": {
+          "version": "0.523.0"
+        },
+        "postcss": {
+          "version": "8.5.6"
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react-hook-form": {
+          "version": "7.62.0"
+        },
+        "react-router-dom": {
+          "version": "7.8.0"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "socket.io-client": {
+          "version": "4.8.1"
+        },
+        "tailwind-merge": {
+          "version": "2.6.0"
+        },
+        "tailwindcss": {
+          "version": "4.1.12"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "vite": {
+          "version": "7.1.1",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "zod": {
+          "version": "3.25.76",
+          "overridden": false
+        },
+        "zustand": {
+          "version": "5.0.7"
+        }
+      }
+    },
+    "@o4o/ecommerce": {
+      "version": "0.0.1",
+      "resolved": "file:../../apps/ecommerce",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/auth-client": {
+          "version": "1.0.0"
+        },
+        "@o4o/auth-context": {
+          "version": "1.0.0"
+        },
+        "@o4o/shortcodes": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/ui": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@tanstack/react-query": {
+          "version": "5.85.3"
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@types/node": {
+          "version": "22.17.1",
+          "overridden": false
+        },
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from apps/ecommerce",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/ecommerce/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from apps/ecommerce",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/ecommerce/node_modules/@types/react"
+          ]
+        },
+        "@vitejs/plugin-react": {
+          "version": "4.7.0"
+        },
+        "autoprefixer": {
+          "version": "10.4.21"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "framer-motion": {
+          "version": "10.18.0",
+          "overridden": false
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "lucide-react": {
+          "version": "0.523.0"
+        },
+        "postcss": {
+          "version": "8.5.6"
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react-hook-form": {
+          "version": "7.62.0"
+        },
+        "react-router-dom": {
+          "version": "7.8.0"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "slugify": {
+          "version": "1.6.6"
+        },
+        "sonner": {
+          "version": "2.0.7",
+          "resolved": "https://registry.npmjs.org/sonner/-/sonner-2.0.7.tgz",
+          "overridden": false
+        },
+        "tailwindcss": {
+          "version": "4.1.12"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "vite": {
+          "version": "7.1.1",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "zustand": {
+          "version": "5.0.7"
+        }
+      }
+    },
+    "@o4o/forum-types": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/forum-types",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@types/node": {
+          "version": "24.2.1",
+          "resolved": "https://registry.npmjs.org/@types/node/-/node-24.2.1.tgz",
+          "overridden": false
+        },
+        "eslint": {
+          "version": "9.33.0"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/forum": {
+      "version": "0.0.1",
+      "resolved": "file:../../apps/forum",
+      "overridden": false,
+      "dependencies": {
+        "@o4o/auth-client": {
+          "version": "1.0.0"
+        },
+        "@o4o/auth-context": {
+          "version": "1.0.0"
+        },
+        "@o4o/forum-types": {
+          "version": "1.0.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/ui": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@tanstack/react-query-devtools": {
+          "version": "5.85.3",
+          "resolved": "https://registry.npmjs.org/@tanstack/react-query-devtools/-/react-query-devtools-5.85.3.tgz",
+          "overridden": false
+        },
+        "@tanstack/react-query": {
+          "version": "5.85.3"
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@types/dompurify": {
+          "version": "3.0.5",
+          "resolved": "https://registry.npmjs.org/@types/dompurify/-/dompurify-3.0.5.tgz",
+          "overridden": false
+        },
+        "@types/marked": {
+          "version": "5.0.2",
+          "resolved": "https://registry.npmjs.org/@types/marked/-/marked-5.0.2.tgz",
+          "overridden": false
+        },
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from apps/forum",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/forum/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from apps/forum",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/forum/node_modules/@types/react"
+          ]
+        },
+        "@vitejs/plugin-react": {
+          "version": "4.7.0"
+        },
+        "autoprefixer": {
+          "version": "10.4.21"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "clsx": {
+          "version": "2.1.1"
+        },
+        "date-fns": {
+          "version": "3.6.0",
+          "overridden": false
+        },
+        "dompurify": {
+          "version": "3.2.6",
+          "resolved": "https://registry.npmjs.org/dompurify/-/dompurify-3.2.6.tgz",
+          "overridden": false
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "lucide-react": {
+          "version": "0.523.0"
+        },
+        "marked": {
+          "version": "12.0.2",
+          "resolved": "https://registry.npmjs.org/marked/-/marked-12.0.2.tgz",
+          "overridden": false
+        },
+        "postcss": {
+          "version": "8.5.6"
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react-hook-form": {
+          "version": "7.62.0"
+        },
+        "react-router-dom": {
+          "version": "7.8.0"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "tailwindcss": {
+          "version": "4.1.12"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "vite": {
+          "version": "7.1.1",
+          "overridden": false
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "zustand": {
+          "version": "5.0.7"
+        }
+      }
+    },
+    "@o4o/main-site": {
+      "version": "1.0.0",
+      "resolved": "file:../../apps/main-site",
+      "overridden": false,
+      "dependencies": {
+        "@eslint/js": {
+          "version": "9.33.0"
+        },
+        "@o4o/types": {
+          "version": "1.0.0"
+        },
+        "@o4o/ui": {
+          "version": "1.0.0"
+        },
+        "@o4o/utils": {
+          "version": "1.0.0"
+        },
+        "@playwright/test": {
+          "version": "1.54.2"
+        },
+        "@rollup/rollup-linux-x64-gnu": {
+          "version": "4.46.2",
+          "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.46.2.tgz",
+          "overridden": false
+        },
+        "@tanstack/react-query": {
+          "version": "5.85.3"
+        },
+        "@testing-library/dom": {
+          "version": "10.4.1"
+        },
+        "@testing-library/jest-dom": {
+          "version": "6.6.4"
+        },
+        "@testing-library/react": {
+          "version": "16.3.0"
+        },
+        "@testing-library/user-event": {
+          "version": "14.6.1"
+        },
+        "@types/dompurify": {
+          "version": "3.0.5"
+        },
+        "@types/js-cookie": {
+          "version": "3.0.6"
+        },
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from apps/main-site",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/main-site/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from apps/main-site",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/apps/main-site/node_modules/@types/react"
+          ]
+        },
+        "@vitejs/plugin-react": {
+          "version": "4.7.0"
+        },
+        "@vitest/coverage-v8": {
+          "version": "2.1.9",
+          "resolved": "https://registry.npmjs.org/@vitest/coverage-v8/-/coverage-v8-2.1.9.tgz",
+          "overridden": false
+        },
+        "@vitest/ui": {
+          "version": "2.1.9",
+          "overridden": false
+        },
+        "@wordpress/block-editor": {
+          "version": "14.4.0"
+        },
+        "@wordpress/blocks": {
+          "version": "13.9.0"
+        },
+        "@wordpress/components": {
+          "version": "28.9.0"
+        },
+        "@wordpress/element": {
+          "version": "6.9.0"
+        },
+        "@wordpress/i18n": {
+          "version": "5.9.0"
+        },
+        "autoprefixer": {
+          "version": "10.4.21"
+        },
+        "axios": {
+          "version": "1.11.0"
+        },
+        "clsx": {
+          "version": "2.1.1"
+        },
+        "date-fns": {
+          "version": "3.6.0",
+          "overridden": false
+        },
+        "dompurify": {
+          "version": "3.2.6"
+        },
+        "eslint-config-prettier": {
+          "version": "9.1.2"
+        },
+        "eslint-plugin-prettier": {
+          "version": "5.5.4"
+        },
+        "eslint-plugin-react-hooks": {
+          "version": "5.2.0"
+        },
+        "eslint-plugin-react-refresh": {
+          "version": "0.4.20"
+        },
+        "eslint": {
+          "version": "9.33.0"
+        },
+        "framer-motion": {
+          "version": "10.18.0",
+          "overridden": false
+        },
+        "globals": {
+          "version": "16.3.0",
+          "overridden": false
+        },
+        "js-cookie": {
+          "version": "3.0.5"
+        },
+        "jsdom": {
+          "version": "26.1.0"
+        },
+        "lightningcss": {
+          "version": "1.30.1",
+          "resolved": "https://registry.npmjs.org/lightningcss/-/lightningcss-1.30.1.tgz",
+          "overridden": false
+        },
+        "lucide-react": {
+          "version": "0.523.0"
+        },
+        "msw": {
+          "version": "2.10.5"
+        },
+        "postcss": {
+          "version": "8.5.6"
+        },
+        "prettier": {
+          "version": "3.6.2"
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react-dropzone": {
+          "version": "14.3.8"
+        },
+        "react-hook-form": {
+          "version": "7.62.0"
+        },
+        "react-hot-toast": {
+          "version": "2.5.2"
+        },
+        "react-icons": {
+          "version": "5.5.0",
+          "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-5.5.0.tgz",
+          "overridden": false
+        },
+        "react-router-dom": {
+          "version": "7.8.0"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "socket.io-client": {
+          "version": "4.8.1"
+        },
+        "tailwind-merge": {
+          "version": "2.6.0"
+        },
+        "tailwindcss": {
+          "version": "4.1.12"
+        },
+        "terser": {
+          "version": "5.43.1"
+        },
+        "typescript-eslint": {
+          "version": "8.39.1"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        },
+        "vite": {
+          "version": "5.4.19"
+        },
+        "vitest": {
+          "version": "3.2.4"
+        },
+        "zustand": {
+          "version": "5.0.7"
+        }
+      }
+    },
+    "@o4o/shortcodes": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/shortcodes",
+      "overridden": false,
+      "dependencies": {
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"^18.3.1\" from packages/shortcodes",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/packages/shortcodes/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from packages/shortcodes",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/shortcodes/node_modules/@types/react"
+          ]
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/supplier-connector": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/supplier-connector",
+      "overridden": false,
+      "dependencies": {
+        "csv-parse": {
+          "version": "6.1.0",
+          "resolved": "https://registry.npmjs.org/csv-parse/-/csv-parse-6.1.0.tgz",
+          "overridden": false
+        }
+      }
+    },
+    "@o4o/types": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/types",
+      "overridden": false,
+      "dependencies": {
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"^18.3.12\" from packages/types",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/types/node_modules/@types/react"
+          ]
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/ui": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/ui",
+      "overridden": false,
+      "dependencies": {
+        "@types/react-dom": {
+          "version": "19.1.7",
+          "overridden": false,
+          "invalid": "\"18.3.7\" from packages/ui",
+          "problems": [
+            "invalid: @types/react-dom@19.1.7 /home/user/o4o-platform/packages/ui/node_modules/@types/react-dom"
+          ]
+        },
+        "@types/react": {
+          "version": "19.1.10",
+          "overridden": false,
+          "invalid": "\"18.3.23\" from packages/ui",
+          "problems": [
+            "invalid: @types/react@19.1.10 /home/user/o4o-platform/packages/ui/node_modules/@types/react"
+          ]
+        },
+        "react-dom": {
+          "version": "18.3.1"
+        },
+        "react": {
+          "version": "18.3.1"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@o4o/utils": {
+      "version": "1.0.0",
+      "resolved": "file:../../packages/utils",
+      "overridden": false,
+      "dependencies": {
+        "@types/node": {
+          "version": "22.17.1",
+          "overridden": false
+        },
+        "clsx": {
+          "version": "2.1.1"
+        },
+        "tailwind-merge": {
+          "version": "2.6.0"
+        },
+        "typescript": {
+          "version": "5.9.2"
+        }
+      }
+    },
+    "@radix-ui/react-alert-dialog": {
+      "version": "1.1.14",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-alert-dialog/-/react-alert-dialog-1.1.14.tgz",
+      "overridden": false
+    },
+    "@radix-ui/react-avatar": {
+      "version": "1.1.10",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-avatar/-/react-avatar-1.1.10.tgz",
+      "overridden": false
+    },
+    "@radix-ui/react-toast": {
+      "version": "1.2.14",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-toast/-/react-toast-1.2.14.tgz",
+      "overridden": false
+    },
+    "@tailwindcss/postcss": {
+      "version": "4.1.12",
+      "resolved": "https://registry.npmjs.org/@tailwindcss/postcss/-/postcss-4.1.12.tgz",
+      "overridden": false
+    },
+    "@testing-library/react": {
+      "version": "16.3.0",
+      "resolved": "https://registry.npmjs.org/@testing-library/react/-/react-16.3.0.tgz",
+      "overridden": false
+    },
+    "@testing-library/user-event": {
+      "version": "14.6.1",
+      "resolved": "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.6.1.tgz",
+      "overridden": false
+    },
+    "@tosspayments/payment-sdk": {
+      "version": "1.9.1",
+      "resolved": "https://registry.npmjs.org/@tosspayments/payment-sdk/-/payment-sdk-1.9.1.tgz",
+      "overridden": false
+    },
+    "@types/axios": {
+      "version": "0.9.36",
+      "resolved": "https://registry.npmjs.org/@types/axios/-/axios-0.9.36.tgz",
+      "overridden": false
+    },
+    "@types/bcrypt": {
+      "version": "6.0.0",
+      "resolved": "https://registry.npmjs.org/@types/bcrypt/-/bcrypt-6.0.0.tgz",
+      "overridden": false
+    },
+    "@types/cron": {
+      "version": "2.0.1",
+      "resolved": "https://registry.npmjs.org/@types/cron/-/cron-2.0.1.tgz",
+      "overridden": false
+    },
+    "@types/jest": {
+      "version": "29.5.14",
+      "resolved": "https://registry.npmjs.org/@types/jest/-/jest-29.5.14.tgz",
+      "overridden": false
+    },
+    "@types/jsonwebtoken": {
+      "version": "9.0.10",
+      "resolved": "https://registry.npmjs.org/@types/jsonwebtoken/-/jsonwebtoken-9.0.10.tgz",
+      "overridden": false
+    },
+    "@types/node-cron": {
+      "version": "3.0.11",
+      "resolved": "https://registry.npmjs.org/@types/node-cron/-/node-cron-3.0.11.tgz",
+      "overridden": false
+    },
+    "@types/nodemailer": {
+      "version": "6.4.17",
+      "resolved": "https://registry.npmjs.org/@types/nodemailer/-/nodemailer-6.4.17.tgz",
+      "overridden": false
+    },
+    "@types/react-dom": {
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.1.tgz",
+      "overridden": true
+    },
+    "@types/react": {
+      "version": "18.3.12",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-18.3.12.tgz",
+      "overridden": true
+    },
+    "@types/socket.io-client": {
+      "version": "1.4.36",
+      "resolved": "https://registry.npmjs.org/@types/socket.io-client/-/socket.io-client-1.4.36.tgz",
+      "overridden": false
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "version": "8.39.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.39.0.tgz",
+      "overridden": false
+    },
+    "@typescript-eslint/parser": {
+      "version": "8.39.0",
+      "resolved": "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-8.39.0.tgz",
+      "overridden": false
+    },
+    "@vitejs/plugin-react": {
+      "version": "4.7.0",
+      "resolved": "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-4.7.0.tgz",
+      "overridden": false
+    },
+    "@vitest/ui": {
+      "version": "3.2.4",
+      "resolved": "https://registry.npmjs.org/@vitest/ui/-/ui-3.2.4.tgz",
+      "overridden": false
+    },
+    "adm-zip": {
+      "version": "0.5.16",
+      "resolved": "https://registry.npmjs.org/adm-zip/-/adm-zip-0.5.16.tgz",
+      "overridden": false
+    },
+    "autoprefixer": {
+      "version": "10.4.21",
+      "resolved": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.21.tgz",
+      "overridden": false
+    },
+    "bcrypt": {
+      "version": "6.0.0",
+      "resolved": "https://registry.npmjs.org/bcrypt/-/bcrypt-6.0.0.tgz",
+      "overridden": false
+    },
+    "class-validator": {
+      "version": "0.14.2",
+      "resolved": "https://registry.npmjs.org/class-validator/-/class-validator-0.14.2.tgz",
+      "overridden": false
+    },
+    "concurrently": {
+      "version": "7.6.0",
+      "resolved": "https://registry.npmjs.org/concurrently/-/concurrently-7.6.0.tgz",
+      "overridden": false
+    },
+    "cron": {
+      "version": "4.3.3",
+      "resolved": "https://registry.npmjs.org/cron/-/cron-4.3.3.tgz",
+      "overridden": false
+    },
+    "eslint-plugin-react-hooks": {
+      "version": "5.2.0",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-5.2.0.tgz",
+      "overridden": false
+    },
+    "eslint-plugin-react": {
+      "version": "7.37.5",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-7.37.5.tgz",
+      "overridden": false
+    },
+    "eslint": {
+      "version": "9.33.0",
+      "resolved": "https://registry.npmjs.org/eslint/-/eslint-9.33.0.tgz",
+      "overridden": false
+    },
+    "exceljs": {
+      "version": "4.4.0",
+      "resolved": "https://registry.npmjs.org/exceljs/-/exceljs-4.4.0.tgz",
+      "overridden": false
+    },
+    "express-validator": {
+      "version": "7.2.1",
+      "resolved": "https://registry.npmjs.org/express-validator/-/express-validator-7.2.1.tgz",
+      "overridden": false
+    },
+    "jest": {
+      "version": "29.7.0",
+      "resolved": "https://registry.npmjs.org/jest/-/jest-29.7.0.tgz",
+      "overridden": false
+    },
+    "jsonwebtoken": {
+      "version": "9.0.2",
+      "resolved": "https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-9.0.2.tgz",
+      "overridden": false
+    },
+    "node-cache": {
+      "version": "5.1.2",
+      "resolved": "https://registry.npmjs.org/node-cache/-/node-cache-5.1.2.tgz",
+      "overridden": false
+    },
+    "nodemailer": {
+      "version": "7.0.5",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-7.0.5.tgz",
+      "overridden": false
+    },
+    "postcss": {
+      "version": "8.5.6",
+      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.6.tgz",
+      "overridden": false
+    },
+    "prettier": {
+      "version": "3.6.2",
+      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.6.2.tgz",
+      "overridden": false
+    },
+    "rate-limit-redis": {
+      "version": "4.2.2",
+      "resolved": "https://registry.npmjs.org/rate-limit-redis/-/rate-limit-redis-4.2.2.tgz",
+      "overridden": false
+    },
+    "react-dom": {
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz",
+      "overridden": true
+    },
+    "react": {
+      "version": "18.3.1",
+      "resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
+      "overridden": true
+    },
+    "slugify": {
+      "version": "1.6.6",
+      "resolved": "https://registry.npmjs.org/slugify/-/slugify-1.6.6.tgz",
+      "overridden": false
+    },
+    "swagger-jsdoc": {
+      "version": "6.2.8",
+      "resolved": "https://registry.npmjs.org/swagger-jsdoc/-/swagger-jsdoc-6.2.8.tgz",
+      "overridden": false
+    },
+    "swagger-ui-express": {
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/swagger-ui-express/-/swagger-ui-express-5.0.1.tgz",
+      "overridden": false
+    },
+    "tailwindcss": {
+      "version": "4.1.12",
+      "resolved": "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.12.tgz",
+      "overridden": false
+    },
+    "ts-jest": {
+      "version": "29.4.1",
+      "resolved": "https://registry.npmjs.org/ts-jest/-/ts-jest-29.4.1.tgz",
+      "overridden": false
+    },
+    "typescript": {
+      "version": "5.9.2",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.2.tgz",
+      "overridden": false
+    },
+    "vite": {
+      "version": "5.4.19",
+      "resolved": "https://registry.npmjs.org/vite/-/vite-5.4.19.tgz",
+      "overridden": false
+    },
+    "vitest": {
+      "version": "3.2.4",
+      "resolved": "https://registry.npmjs.org/vitest/-/vitest-3.2.4.tgz",
+      "overridden": false
+    },
+    "xml2js": {
+      "version": "0.6.2",
+      "resolved": "https://registry.npmjs.org/xml2js/-/xml2js-0.6.2.tgz",
+      "overridden": false
+    }
+  },
+  "error": {
+    "code": "ELSPROBLEMS",
+    "summary": "extraneous: @emnapi/runtime@1.4.5 /home/user/o4o-platform/node_modules/@emnapi/runtime\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/admin-dashboard/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/apps/admin-dashboard/node_modules/@types/react\ninvalid: date-fns@3.6.0 /home/user/o4o-platform/apps/admin-dashboard/node_modules/date-fns\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/packages/auth-context/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/crowdfunding/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/apps/crowdfunding/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/digital-signage/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/apps/digital-signage/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/ecommerce/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/apps/ecommerce/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/forum/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/apps/forum/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/apps/main-site/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/apps/main-site/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/packages/shortcodes/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/packages/shortcodes/node_modules/@types/react\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/packages/types/node_modules/@types/react\ninvalid: @types/react-dom@19.1.7 /home/user/o4o-platform/packages/ui/node_modules/@types/react-dom\ninvalid: @types/react@19.1.10 /home/user/o4o-platform/packages/ui/node_modules/@types/react",
+    "detail": ""
+  }
+}

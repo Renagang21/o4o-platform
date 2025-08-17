@@ -2,7 +2,7 @@
 
 ## 📋 현재 .gitignore 분석 결과
 
-### 현재 구조 (145줄)
+### 현재 구조 (127줄)
 1. **의존성 관리** (6줄): node_modules, npm/yarn/pnpm 디버그 로그
 2. **빌드 결과물** (6줄): dist/, build, .next, out, *.map, .vite
 3. **환경 변수** (14줄): .env 및 관련 파일들 (example 제외)
@@ -15,7 +15,7 @@
 10. **프로젝트 특화** (다수): CLAUDE.md, 리포트 파일들
 
 ### 발견된 문제점
-- ❌ 프론트엔드 앱들이 Git에서 제외됨 (apps/main-site/ 등)
+- ✅ dist/ 폴더가 적절히 제외됨
 - ⚠️ 일부 패턴이 중복됨 (.env.* 와 개별 .env.xxx 파일)
 - ⚠️ 환경별 특화 규칙 부재
 - ⚠️ 백업 파일 패턴이 여러 곳에 분산
@@ -203,7 +203,6 @@ scratch/
 *.xlsx
 
 # 백업 디렉토리
-.backup/
 backups/
 backup/
 ```
@@ -277,4 +276,4 @@ git commit -m "chore: 통합 .gitignore 적용"
 ---
 
 *제안일: 2025-08-17*
-*작성 환경: 웹서버(o4o-webserver)*
+*작성 환경: 로컬 개발 환경*

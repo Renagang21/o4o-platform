@@ -12,6 +12,7 @@ pnpm-debug.log*
 
 # Production builds
 dist/
+**/dist/
 build/
 *.map
 
@@ -20,15 +21,7 @@ build/
 .env.*
 !.env.example
 !.env.*.example
-.env.local
-.env.development
-.env.development.local
-.env.test
-.env.test.local
-.env.production
-.env.production.local
-*.env.backup.*
-.env.backup.*
+*.env.backup*
 
 # OS generated files
 .DS_Store
@@ -90,16 +83,19 @@ temp/
 *.backup
 *.backup.*
 *.bak
-*.backup-*
+*.old
+*.orig
+*.save
 *DESKTOP-*.ts
 *DESKTOP-*.tsx
-*.md.backup.*
 
 # AWS
 .aws/
 
 # Local development
 *.local
+scratch/
+.sandbox/
 
 # Claude Code specific files - DO NOT SYNC
 CLAUDE.md
@@ -136,18 +132,4 @@ updated_claude_config.json
 *.ppk
 *.p12
 test_ssh.bat
-
-# === 웹서버 전용 추가 제외 항목 ===
-# 정적 파일 빌드 캐시
-.parcel-cache/
-.next/cache/
-.nuxt/
-
-# 임시 업로드 디렉토리
-uploads/temp/
-public/uploads/temp/
-
-# 웹서버 설정은 추적 (제외하지 않음)
-!ecosystem.config.webserver.cjs
-!.rsyncignore.webserver
-!.env.webserver.example
+LOCAL_ENVIRONMENT_REPORT.md
