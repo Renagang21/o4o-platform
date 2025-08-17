@@ -84,7 +84,7 @@ jobs:
     - name: TypeScript type check (API Server only)
       run: |
         echo "Type checking API server..."
-        npm run type-check --workspace=packages/supplier-connector
+        # supplier-connector는 JavaScript 패키지라 type-check 불필요
         npm run type-check --workspace=@o4o/api-server
         
     - name: Run tests
