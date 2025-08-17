@@ -27,6 +27,7 @@ env:
   PM2_APP_NAME: api-server
   DEPLOY_PATH: /home/ubuntu/o4o-platform
   NODE_VERSION: '22.18.0'
+  SERVER_TYPE: apiserver  # API서버 환경 명시
 
 jobs:
   # 단계 1: 빌드 및 테스트
@@ -57,10 +58,11 @@ jobs:
     - name: Install dependencies
       run: npm install --prefer-offline
     
-    - name: Build shared packages
+    - name: Build API server dependencies only
       run: |
-        echo "Building shared packages first..."
-        bash scripts/dev.sh build:packages
+        echo "Building API server specific packages..."
+        # API서버는 supplier-connector만 필요
+        npm run build --workspace=packages/supplier-connector
         
     - name: Install API server dependencies
       working-directory: apps/api-server
