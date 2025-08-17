@@ -6,12 +6,9 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Production builds
-# dist/  # Temporarily commented out to include dist folders in git
+dist/
 build/
-.next/
-out/
 *.map
-.vite/
 
 # Environment variables
 .env
@@ -44,12 +41,19 @@ Thumbs.db
 *.swo
 *~
 
-# Logs
+# Logs (API서버 강화)
 logs/
 *.log
 *-errors.log
 *-output.log
 ci-*.log
+api-*.log
+access.log
+error.log
+# PM2 로그
+~/.pm2/logs/
+pm2-*.log
+.pm2/
 
 # Coverage reports
 coverage/
@@ -57,8 +61,7 @@ coverage/
 
 # Test results
 test-results/
-playwright-report/
-playwright/.cache/
+*.test.js.map
 
 # TypeScript
 *.tsbuildinfo
@@ -128,3 +131,49 @@ updated_claude_config.json
 *.ppk
 *.p12
 test_ssh.bat
+
+# === API서버 전용 추가 제외 항목 ===
+# 데이터베이스 파일
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+data/
+migrations/executed/
+ormconfig.json
+
+# 업로드 디렉토리
+uploads/
+public/uploads/
+static/uploads/
+temp/uploads/
+
+# API 로그 및 세션
+sessions/
+api-logs/
+*.session
+*.pid
+*.seed
+
+# Redis dump
+dump.rdb
+
+# TypeORM
+ormconfig.json
+ormconfig.js
+
+# API 문서 생성물
+api-docs/
+swagger/
+
+
+# 백엔드 전용 보안 파일
+.env.production
+.env.staging
+.env.development
+!.env.example
+!.env.apiserver.example
+
+# API서버 설정은 추적
+!ecosystem.config.apiserver.cjs
+!.rsyncignore.apiserver
