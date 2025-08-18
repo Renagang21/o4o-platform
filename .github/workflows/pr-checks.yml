@@ -167,13 +167,13 @@ jobs:
         run: npm ci
       
       - name: Build packages
-        run: ./scripts/dev.sh build:packages
+        run: ./scripts/development/dev.sh build:packages
       
       - name: Run linting
-        run: ./scripts/dev.sh lint
+        run: ./scripts/development/dev.sh lint
       
       - name: Run type checking
-        run: ./scripts/dev.sh type-check
+        run: ./scripts/development/dev.sh type-check
       
       - name: Check for console.log
         run: |
@@ -216,7 +216,7 @@ jobs:
         run: npm ci
       
       - name: Build packages
-        run: ./scripts/dev.sh build:packages
+        run: ./scripts/development/dev.sh build:packages
       
       - name: Setup test environment
         run: |
@@ -253,7 +253,7 @@ jobs:
         run: npm ci
       
       - name: Build packages
-        run: ./scripts/dev.sh build:packages
+        run: ./scripts/development/dev.sh build:packages
       
       - name: Build ${{ matrix.app }}
         run: npm run build --workspace=@o4o/${{ matrix.app }}

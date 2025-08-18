@@ -55,7 +55,7 @@ jobs:
     - name: Build shared packages
       run: |
         echo "📦 Building shared packages..."
-        ./scripts/dev.sh build:packages
+        ./scripts/development/dev.sh build:packages
         
     - name: Create production environment
       run: |

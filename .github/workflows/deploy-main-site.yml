@@ -52,7 +52,7 @@ jobs:
     - name: Build shared packages
       run: |
         echo "Building shared packages first..."
-        bash scripts/dev.sh build:packages
+        bash scripts/development/dev.sh build:packages
     
     - name: Type check
       run: npm run type-check
@@ -89,7 +89,7 @@ jobs:
     - name: Build shared packages
       run: |
         echo "Building shared packages first..."
-        bash scripts/dev.sh build:packages
+        bash scripts/development/dev.sh build:packages
         
     - name: TypeScript type check
       run: |
@@ -103,7 +103,7 @@ jobs:
         
     - name: Build packages
       run: |
-        bash scripts/dev.sh build:packages
+        bash scripts/development/dev.sh build:packages
         
     - name: Create production environment file
       run: |

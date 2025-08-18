@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          bash scripts/ci-install.sh
+          bash scripts/archive/ci-install.sh
       
       - name: Fix PostCSS configuration
         run: |
@@ -103,7 +103,7 @@ jobs:
           # Check if packages are built
           if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            bash scripts/dev.sh build:packages
+            bash scripts/development/dev.sh build:packages
           else
             echo "Packages already built (from cache)"
           fi
@@ -147,7 +147,7 @@ jobs:
           # Check if packages are built
           if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            bash scripts/dev.sh build:packages
+            bash scripts/development/dev.sh build:packages
           else
             echo "Packages already built (from cache)"
           fi
@@ -194,7 +194,7 @@ jobs:
           # Check if packages are built
           if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            bash scripts/dev.sh build:packages
+            bash scripts/development/dev.sh build:packages
           else
             echo "Packages already built (from cache)"
           fi
@@ -239,7 +239,7 @@ jobs:
       - name: Build shared packages
         run: |
           # Always build packages in the build job to ensure they're fresh
-          bash scripts/dev.sh build:packages
+          bash scripts/development/dev.sh build:packages
       
       - name: Build ${{ matrix.app }}
         run: npm run build:${{ matrix.app == 'api-server' && 'api' || (matrix.app == 'main-site' && 'web' || 'admin') }}
@@ -289,7 +289,7 @@ jobs:
           # Check if packages are built
           if [ ! -d "packages/types/dist" ] || [ ! -d "packages/auth-context/dist" ]; then
             echo "Building packages..."
-            bash scripts/dev.sh build:packages
+            bash scripts/development/dev.sh build:packages
           else
             echo "Packages already built (from cache)"
           fi
