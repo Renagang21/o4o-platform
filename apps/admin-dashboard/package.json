@@ -68,7 +68,7 @@
     "@types/socket.io-client": "^1.4.36",
     "@types/uuid": "10.0.0",
     "@wordpress/block-editor": "14.4.0",
-    "@wordpress/blocks": "13.9.0",
+    "@wordpress/blocks": "15.1.0",
     "@wordpress/components": "28.9.0",
     "@wordpress/element": "6.9.0",
     "@wordpress/i18n": "5.9.0",
