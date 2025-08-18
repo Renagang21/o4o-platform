@@ -33,9 +33,18 @@ o4o-platform/
 │   ├── types/             # 공통 타입 정의
 │   ├── ui/                # UI 컴포넌트
 │   └── utils/             # 유틸리티 함수
-└── scripts/               # 환경별 스크립트 (Phase 4)
-    ├── common/            # 공통 유틸리티
-    └── environments/      # 환경별 스크립트
+├── scripts/               # 빌드 및 배포 스크립트
+│   ├── development/       # 개발 도구
+│   ├── deployment/        # 배포 스크립트
+│   └── testing/          # 테스트 도구
+├── config/               # 설정 템플릿
+│   ├── env-templates/    # 환경변수 템플릿
+│   ├── pm2-templates/    # PM2 설정 템플릿
+│   └── systemd/          # systemd 서비스
+└── docs/                 # 프로젝트 문서
+    ├── guides/           # 가이드 문서
+    ├── reports/          # 분석 보고서
+    └── setup/            # 설정 문서
 ```
 
 ### 환경별 워크스페이스 최적화

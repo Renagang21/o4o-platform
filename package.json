@@ -44,10 +44,10 @@
     "build:shortcodes": "npm run build --workspace=@o4o/shortcodes",
     
     "// === 테스트 & 린트 ===": "",
-    "type-check": "./scripts/dev.sh type-check",
-    "lint": "./scripts/dev.sh lint",
-    "lint:fix": "./scripts/dev.sh lint:fix",
-    "test": "./scripts/dev.sh test",
+    "type-check": "./scripts/development/dev.sh type-check",
+    "lint": "./scripts/development/dev.sh lint",
+    "lint:fix": "./scripts/development/dev.sh lint:fix",
+    "test": "./scripts/development/dev.sh test",
     
     "// === 정리 스크립트 ===": "",
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/*/dist packages/*/dist",
