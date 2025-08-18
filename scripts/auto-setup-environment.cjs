@@ -109,10 +109,35 @@ class EnvironmentSetup {
   async applyTemplate() {
     log.section('Applying Package.json Template');
     
-    const templateScript = path.join(this.scriptsDir, 'apply-apiserver-template.js');
+    // Use the correct .cjs extension
+    const templateScript = path.join(this.scriptsDir, 'apply-apiserver-template.cjs');
     
     if (!fs.existsSync(templateScript)) {
-      log.warning('Template script not found, skipping...');
+      log.warning('Template script not found, applying directly...');
+      
+      // Direct template application if script not found
+      const templatePath = path.join(this.templatesDir, 'package.apiserver.scripts.json');
+      if (fs.existsSync(templatePath)) {
+        try {
+          log.task('Applying template directly...');
+          const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+          const packagePath = path.join(this.apiServerDir, 'package.json');
+          const currentPackage = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+          
+          // Merge scripts
+          currentPackage.scripts = {
+            ...currentPackage.scripts,
+            ...template.scripts
+          };
+          
+          fs.writeFileSync(packagePath, JSON.stringify(currentPackage, null, 2) + '\n');
+          log.success('Template applied directly');
+          return true;
+        } catch (error) {
+          log.error(`Direct template application failed: ${error.message}`);
+          return false;
+        }
+      }
       return false;
     }
     
@@ -222,6 +247,23 @@ PM2_APP_NAME=o4o-api-${this.serverType}
   // Install dependencies
   async installDependencies() {
     log.section('Installing Dependencies');
+    
+    // Check and install NestJS CLI if missing
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(path.join(this.apiServerDir, 'package.json'), 'utf8'));
+      const hasNestCli = packageJson.devDependencies && packageJson.devDependencies['@nestjs/cli'];
+      
+      if (!hasNestCli) {
+        log.warning('NestJS CLI not found, installing...');
+        execSync('npm install --save-dev @nestjs/cli', {
+          cwd: this.apiServerDir,
+          stdio: 'inherit'
+        });
+        log.success('NestJS CLI installed');
+      }
+    } catch (error) {
+      log.warning('Could not check/install NestJS CLI');
+    }
     
     return new Promise((resolve) => {
       log.task('Running npm install...');
