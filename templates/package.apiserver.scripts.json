@@ -8,6 +8,7 @@
     "start:dev": "NODE_ENV=development nodemon --watch src --exec npm run dev",
     "dev": "NODE_ENV=development nest start --watch",
     "build": "npm run clean:dist && nest build",
+    "build:optimized": "bash ../../scripts/build-api-optimized.sh",
     "build:prod": "NODE_ENV=production npm run build",
     "clean": "rimraf dist",
     "clean:dist": "rimraf dist",

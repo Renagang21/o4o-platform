@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "npm run clean:dist && nest build",
+    "build:optimized": "bash ../../scripts/build-api-optimized.sh",
     "build:prod": "NODE_ENV=production npm run build",
     "build:watch": "npx tsc -p tsconfig.build.json --watch",
     "clean": "rimraf dist",
