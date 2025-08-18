@@ -210,10 +210,31 @@ jobs:
         
     - name: Deploy application files
       run: |
+        # Deploy API server files
         rsync -avz --delete \
           -e "ssh" \
           apps/api-server/ \
           ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:${{ env.DEPLOY_PATH }}/apps/api-server/
+        
+        # Deploy scripts directory (critical for PM2 management)
+        rsync -avz \
+          -e "ssh" \
+          scripts/ \
+          ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:${{ env.DEPLOY_PATH }}/scripts/
+        
+        # Deploy ecosystem config files
+        rsync -avz \
+          -e "ssh" \
+          ecosystem.config.*.cjs \
+          ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:${{ env.DEPLOY_PATH }}/
+        
+        # Deploy templates if exists
+        if [ -d "templates" ]; then
+          rsync -avz \
+            -e "ssh" \
+            templates/ \
+            ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:${{ env.DEPLOY_PATH }}/templates/
+        fi
           
     - name: Install production dependencies
       run: |
@@ -320,18 +341,38 @@ jobs:
           mkdir -p ${{ env.DEPLOY_PATH }}/logs
         "
         
-    - name: Deploy with PM2 (Zero-downtime)
+    - name: Deploy with PM2 (Zero-downtime with Safety Check)
       run: |
         ssh ${{ secrets.API_USER }}@${{ secrets.API_HOST }} "
           cd ${{ env.DEPLOY_PATH }}
           
+          # 환경 검증 스크립트 실행
+          if [ -x scripts/pm2-env-validator.sh ]; then
+            echo '🔍 Running environment validation...'
+            scripts/pm2-env-validator.sh ecosystem.config.apiserver.cjs || {
+              echo '⚠️  Environment validation failed, using legacy config'
+            }
+          fi
+          
           # PM2 프로세스 존재 여부 확인
           if pm2 describe ${{ env.PM2_APP_NAME }} > /dev/null 2>&1; then
             echo 'Reloading existing PM2 process...'
-            pm2 reload ecosystem.config.js --update-env
+            # API서버용 설정 파일 사용
+            if [ -f ecosystem.config.apiserver.cjs ]; then
+              pm2 reload ecosystem.config.apiserver.cjs --update-env
+            else
+              pm2 reload ecosystem.config.js --update-env
+            fi
           else
             echo 'Starting new PM2 process...'
-            pm2 start ecosystem.config.js
+            # 안전 시작 스크립트 사용 (있는 경우)
+            if [ -x scripts/pm2-safe-start.sh ] && [ -f ecosystem.config.apiserver.cjs ]; then
+              scripts/pm2-safe-start.sh ecosystem.config.apiserver.cjs
+            elif [ -f ecosystem.config.apiserver.cjs ]; then
+              pm2 start ecosystem.config.apiserver.cjs
+            else
+              pm2 start ecosystem.config.js
+            fi
           fi
           
           # PM2 상태 저장
@@ -341,6 +382,12 @@ jobs:
           echo '🔍 Checking PM2 process status...'
           pm2 list
           pm2 describe ${{ env.PM2_APP_NAME }} || echo '⚠️  PM2 process not found'
+          
+          # 모니터링 스크립트 실행 (환경 검증)
+          if [ -x scripts/pm2-monitor.sh ]; then
+            echo '🔍 Running environment monitoring...'
+            scripts/pm2-monitor.sh --once || echo '⚠️  Monitoring detected issues'
+          fi
         "
 
   # 단계 3: 배포 후 헬스체크
