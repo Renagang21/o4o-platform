@@ -54,7 +54,7 @@ test.describe('Admin Dashboard 보안 기능', () => {
     ];
     
     for (const item of adminMenuItems) {
-      console.log(`Testing access to ${item.name}`);
+      // console.log(`Testing access to ${item.name}`);
       
       // 메뉴 항목 클릭
       const menuElement = page.locator(item.selector).first();
@@ -239,7 +239,7 @@ test.describe('Admin Dashboard 보안 기능', () => {
       
       for (const header of securityHeaders) {
         if (headers[header]) {
-          console.log(`Security header ${header}: ${headers[header]}`);
+          // console.log(`Security header ${header}: ${headers[header]}`);
         }
       }
     }
@@ -259,7 +259,7 @@ test.describe('Admin Dashboard 보안 기능', () => {
         }
       } catch (error: any) {
         // HTTP 접근이 차단되는 경우도 정상
-        console.log('HTTP access blocked (expected in production)');
+        // console.log('HTTP access blocked (expected in production)');
       }
     } else {
       test.skip(true, 'HTTPS redirect test only runs in production');
@@ -316,7 +316,7 @@ test.describe('Admin Dashboard 보안 기능', () => {
           return await response.json();
         }
       } catch (error: any) {
-        console.log('Audit logs endpoint not available');
+        // console.log('Audit logs endpoint not available');
       }
       return null;
     });

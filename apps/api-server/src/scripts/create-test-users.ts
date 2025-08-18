@@ -85,12 +85,12 @@ async function createTestUsers() {
     // Initialize database connection
     if (!AppDataSource.isInitialized) {
       await AppDataSource.initialize();
-      console.log('✅ Database connected');
+      // // console.log('✅ Database connected');
     }
 
     const userRepository = AppDataSource.getRepository(User);
 
-    console.log('🔍 Checking existing users...');
+    // // console.log('🔍 Checking existing users...');
     
     for (const testUser of TEST_USERS) {
       // Check if user already exists
@@ -99,7 +99,7 @@ async function createTestUsers() {
       });
 
       if (existingUser) {
-        console.log(`⏭️  User ${testUser.email} already exists, skipping...`);
+        // // console.log(`⏭️  User ${testUser.email} already exists, skipping...`);
         continue;
       }
 
@@ -123,25 +123,25 @@ async function createTestUsers() {
       });
 
       await userRepository.save(user);
-      console.log(`✅ Created user: ${testUser.email} (${testUser.role})`);
+      // // console.log(`✅ Created user: ${testUser.email} (${testUser.role})`);
     }
 
-    console.log('\n📋 Test Users Summary:');
-    console.log('=======================');
+    // // console.log('\n📋 Test Users Summary:');
+    // // console.log('=======================');
     TEST_USERS.forEach((user: any) => {
-      console.log(`👤 ${user.role}: ${user.email}`);
+      // // console.log(`👤 ${user.role}: ${user.email}`);
     });
-    console.log('\n🔑 Common password: password123');
-    console.log('=======================\n');
+    // // console.log('\n🔑 Common password: password123');
+    // // console.log('=======================\n');
 
-    console.log('✅ All test users processed successfully!');
+    // // console.log('✅ All test users processed successfully!');
 
   } catch (error) {
     console.error('❌ Error creating test users:', error);
     process.exit(1);
   } finally {
     await AppDataSource.destroy();
-    console.log('👋 Database connection closed');
+    // // console.log('👋 Database connection closed');
   }
 }
 

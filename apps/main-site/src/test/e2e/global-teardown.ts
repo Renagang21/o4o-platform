@@ -5,7 +5,7 @@ import { chromium } from '@playwright/test';
  * 테스트 후 정리 작업
  */
 async function globalTeardown() {
-  console.log('🧹 E2E 테스트 환경 정리 시작...');
+  // console.log('🧹 E2E 테스트 환경 정리 시작...');
   
   try {
     const browser = await chromium.launch();
@@ -16,7 +16,7 @@ async function globalTeardown() {
     
     await browser.close();
     
-    console.log('✅ E2E 테스트 환경 정리 완료!');
+    // console.log('✅ E2E 테스트 환경 정리 완료!');
     
   } catch (error: any) {
     console.error('⚠️ E2E 테스트 환경 정리 중 오류:', error);
