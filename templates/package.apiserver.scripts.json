@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Optimized npm scripts for API server - 85% performance improvement",
   "scripts": {
-    "start": "node scripts/load-apiserver-env.js && node --max-old-space-size=1024 dist/main",
-    "start:prod": "node scripts/load-apiserver-env.js production && node --max-old-space-size=1024 dist/main",
+    "start": "node --max-old-space-size=1024 dist/main",
+    "start:prod": "NODE_ENV=production node --max-old-space-size=1024 dist/main",
     "start:dev": "NODE_ENV=development nodemon --watch src --exec npm run dev",
     "dev": "NODE_ENV=development nest start --watch",
     "build": "npm run clean:dist && nest build",
@@ -32,9 +32,9 @@
     "migration:show": "npm run typeorm -- migration:show",
     "migration:drop": "npm run typeorm -- schema:drop",
     "migration:sync": "npm run typeorm -- schema:sync",
-    "typeorm": "node scripts/load-apiserver-env.js && npx typeorm-ts-node-commonjs -d src/database/data-source.ts",
+    "typeorm": "npx typeorm-ts-node-commonjs -d src/database/data-source.ts",
     
-    "db:seed": "node scripts/load-apiserver-env.js && ts-node src/database/seeds/index.ts",
+    "db:seed": "ts-node src/database/seeds/index.ts",
     "db:reset": "npm run migration:drop && npm run migration:run && npm run db:seed",
     "db:setup": "npm run migration:run && npm run db:seed",
     
