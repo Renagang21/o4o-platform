@@ -48,9 +48,7 @@
     "pm2:start": "pm2 start ecosystem.config.apiserver.cjs",
     "pm2:status": "pm2 status",
     "pm2:stop": "pm2 stop ecosystem.config.apiserver.cjs",
-    "postinstall": "npm run build",
     "preinstall": "npx only-allow npm",
-    "prepare": "husky install",
     "prettier:check": "prettier --check src/**/*.ts",
     "prettier:fix": "prettier --write src/**/*.ts",
     "setup:apiserver": "node scripts/auto-setup-environment.js",
@@ -133,6 +131,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.33.0",
+    "@nestjs/cli": "11.0.10",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.6.4",
     "@testing-library/react": "16.3.0",
