@@ -41,18 +41,16 @@ jobs:
         cd ../..
     
     - name: Deploy to API server
-      env:
-        SSH_USER: ubuntu
-        SSH_HOST: 43.202.242.215
-        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
         echo "🚀 Deploying to API server..."
         
         # Setup SSH
         mkdir -p ~/.ssh
-        echo "$SSH_KEY" > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
-        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H api.neture.co.kr >> ~/.ssh/known_hosts
+        ssh-keyscan -H 43.202.242.215 >> ~/.ssh/known_hosts
         
         # Create deployment package
         cd apps/api-server
@@ -60,10 +58,10 @@ jobs:
         cd ../..
         
         # Transfer files
-        scp -i ~/.ssh/deploy_key api-dist.tar.gz $SSH_USER@$SSH_HOST:/tmp/
+        scp -i ~/.ssh/id_rsa api-dist.tar.gz ${{ secrets.API_USER }}@${{ secrets.API_HOST }}:/tmp/
         
         # Deploy and restart
-        ssh -i ~/.ssh/deploy_key $SSH_USER@$SSH_HOST << 'ENDSSH'
+        ssh -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} << 'ENDSSH'
           set -e
           
           # Backup current version
@@ -89,7 +87,7 @@ jobs:
         
         # Cleanup local files
         rm api-dist.tar.gz
-        rm ~/.ssh/deploy_key
+        rm ~/.ssh/id_rsa
     
     - name: Test CORS headers
       run: |
