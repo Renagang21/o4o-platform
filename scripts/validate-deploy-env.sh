@@ -68,7 +68,19 @@ check_env_var "DB_NAME"
 
 # JWT Secrets
 check_env_var "JWT_SECRET" true
-check_env_var "JWT_REFRESH_SECRET" true
+
+# JWT_REFRESH_SECRET - Optional, falls back to JWT_SECRET if not set
+if [ -z "$JWT_REFRESH_SECRET" ]; then
+    if [ -n "$JWT_SECRET" ]; then
+        export JWT_REFRESH_SECRET="$JWT_SECRET"
+        echo -e "${YELLOW}⚠ JWT_REFRESH_SECRET not set, using JWT_SECRET as fallback${NC}"
+    else
+        echo -e "${RED}❌ Missing required environment variable: JWT_REFRESH_SECRET (and JWT_SECRET is also missing)${NC}"
+        ERRORS=$((ERRORS + 1))
+    fi
+else
+    echo -e "${GREEN}✓ JWT_REFRESH_SECRET is set (hidden)${NC}"
+fi
 
 # Port configuration
 check_env_var "PORT"
