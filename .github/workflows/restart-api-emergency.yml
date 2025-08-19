@@ -1,0 +1,107 @@
+name: 🚨 Emergency API Server Restart
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/restart-api-emergency.yml'
+
+jobs:
+  restart-api:
+    name: Emergency Restart API Server
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Restart API Server via SSH
+      run: |
+        echo "🚨 Emergency API Server Restart"
+        
+        # Setup SSH
+        mkdir -p ~/.ssh
+        echo "${{ secrets.API_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.API_HOST }} >> ~/.ssh/known_hosts
+        
+        # Execute restart commands
+        ssh -i ~/.ssh/id_rsa ${{ secrets.API_USER }}@${{ secrets.API_HOST }} << 'ENDSSH'
+          set -e
+          echo "📍 Current directory: $(pwd)"
+          
+          # Navigate to project
+          cd /home/ubuntu/o4o-platform || {
+            echo "❌ Project directory not found"
+            exit 1
+          }
+          
+          # Pull latest code
+          echo "📥 Pulling latest code..."
+          git pull origin main
+          
+          # Build API server
+          echo "🔨 Building API server..."
+          cd apps/api-server
+          npm install
+          npm run build
+          
+          # Check if PM2 process exists
+          echo "🔍 Checking PM2 processes..."
+          if pm2 describe o4o-api > /dev/null 2>&1; then
+            echo "♻️ Restarting existing process..."
+            pm2 restart o4o-api --update-env
+          else
+            echo "🚀 Starting new process..."
+            pm2 start dist/main.js --name o4o-api \
+              --instances max \
+              --exec-mode cluster \
+              --merge-logs \
+              --log-date-format "YYYY-MM-DD HH:mm:ss Z"
+          fi
+          
+          # Save PM2 configuration
+          pm2 save
+          
+          # Show status
+          echo "📊 PM2 Status:"
+          pm2 status
+          
+          # Check logs
+          echo "📜 Recent logs:"
+          pm2 logs o4o-api --lines 10 --nostream
+          
+          # Health check
+          echo "🏥 Health check:"
+          sleep 3
+          curl -f http://localhost:3001/health || {
+            echo "❌ Health check failed"
+            pm2 logs o4o-api --err --lines 20 --nostream
+            exit 1
+          }
+          
+          echo "✅ API Server restarted successfully!"
+        ENDSSH
+        
+        # Cleanup
+        rm ~/.ssh/id_rsa
+    
+    - name: Verify API is accessible
+      run: |
+        echo "🧪 Testing API accessibility..."
+        sleep 5
+        
+        # Test health endpoint
+        curl -f https://api.neture.co.kr/health || {
+          echo "❌ API is not accessible from outside"
+          exit 1
+        }
+        
+        # Test CORS headers
+        echo "🔍 Testing CORS headers..."
+        curl -I -X OPTIONS https://api.neture.co.kr/api/v1/auth/login \
+          -H 'Origin: https://admin.neture.co.kr' \
+          -H 'Access-Control-Request-Method: POST' | grep -i "access-control" || {
+          echo "⚠️ CORS headers not found"
+        }
+        
+        echo "✅ API Server is running and accessible!"
