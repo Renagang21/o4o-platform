@@ -78,17 +78,14 @@ async function createTestUsers() {
         // Initialize database connection
         if (!connection_1.AppDataSource.isInitialized) {
             await connection_1.AppDataSource.initialize();
-            console.log('✅ Database connected');
         }
         const userRepository = connection_1.AppDataSource.getRepository(User_1.User);
-        console.log('🔍 Checking existing users...');
         for (const testUser of TEST_USERS) {
             // Check if user already exists
             const existingUser = await userRepository.findOne({
                 where: { email: testUser.email }
             });
             if (existingUser) {
-                console.log(`⏭️  User ${testUser.email} already exists, skipping...`);
                 continue;
             }
             // Hash password
@@ -109,16 +106,9 @@ async function createTestUsers() {
                 loginAttempts: 0,
             });
             await userRepository.save(user);
-            console.log(`✅ Created user: ${testUser.email} (${testUser.role})`);
         }
-        console.log('\n📋 Test Users Summary:');
-        console.log('=======================');
         TEST_USERS.forEach((user) => {
-            console.log(`👤 ${user.role}: ${user.email}`);
         });
-        console.log('\n🔑 Common password: password123');
-        console.log('=======================\n');
-        console.log('✅ All test users processed successfully!');
     }
     catch (error) {
         console.error('❌ Error creating test users:', error);
@@ -126,7 +116,6 @@ async function createTestUsers() {
     }
     finally {
         await connection_1.AppDataSource.destroy();
-        console.log('👋 Database connection closed');
     }
 }
 // Run the script

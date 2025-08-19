@@ -161,15 +161,23 @@ const io = new socket_io_1.Server(httpServer, {
                 "http://localhost:3001", // admin dashboard
                 "http://localhost:3002", // ecommerce
                 "http://localhost:3003", // crowdfunding
+                // Web server IPs
+                "http://13.125.144.8:3000", // web server main-site
+                "http://13.125.144.8:3001", // web server admin-dashboard
+                "http://13.125.144.8", // web server direct IP
+                "https://13.125.144.8", // web server direct IP (https)
                 // Production domains
                 "https://neture.co.kr",
                 "https://www.neture.co.kr",
                 "https://admin.neture.co.kr",
+                "http://admin.neture.co.kr", // Allow both http and https for admin
                 "https://shop.neture.co.kr",
                 "https://forum.neture.co.kr",
                 "https://signage.neture.co.kr",
                 "https://funding.neture.co.kr",
-                "https://auth.neture.co.kr"
+                "https://auth.neture.co.kr",
+                "https://api.neture.co.kr",
+                "http://api.neture.co.kr"
             ];
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
@@ -266,16 +274,20 @@ const corsOptions = {
             // Web server IPs
             "http://13.125.144.8:3000", // web server main-site
             "http://13.125.144.8:3001", // web server admin-dashboard
+            "http://13.125.144.8", // web server direct IP
+            "https://13.125.144.8", // web server direct IP (https)
             // Production domains
             "https://neture.co.kr",
             "https://www.neture.co.kr",
             "https://admin.neture.co.kr",
+            "http://admin.neture.co.kr", // Allow both http and https for admin
             "https://shop.neture.co.kr",
             "https://forum.neture.co.kr",
             "https://signage.neture.co.kr",
             "https://funding.neture.co.kr",
             "https://auth.neture.co.kr",
             "https://api.neture.co.kr", // API server itself
+            "http://api.neture.co.kr", // API server (http)
             // Add environment-defined origins
             ...envOrigins
         ];

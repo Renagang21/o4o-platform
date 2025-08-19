@@ -114,18 +114,22 @@ export const errorHandler = (
     'https://neture.co.kr',
     'https://www.neture.co.kr',
     'https://admin.neture.co.kr',
+    'http://admin.neture.co.kr', // Allow both http and https for admin
     'https://shop.neture.co.kr',
     'https://forum.neture.co.kr',
     'https://signage.neture.co.kr',
     'https://funding.neture.co.kr',
     'https://auth.neture.co.kr',
     'https://api.neture.co.kr',
+    'http://api.neture.co.kr', // Allow both http and https for API
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
     'http://localhost:3003',
     'http://13.125.144.8:3000',
-    'http://13.125.144.8:3001'
+    'http://13.125.144.8:3001',
+    'http://13.125.144.8', // Direct IP access
+    'https://13.125.144.8' // Direct IP access (https)
   ];
   
   // Add environment-defined origins

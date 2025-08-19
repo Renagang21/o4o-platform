@@ -138,15 +138,23 @@ const io = new Server(httpServer, {
         "http://localhost:3001", // admin dashboard
         "http://localhost:3002", // ecommerce
         "http://localhost:3003", // crowdfunding
+        // Web server IPs
+        "http://13.125.144.8:3000", // web server main-site
+        "http://13.125.144.8:3001", // web server admin-dashboard
+        "http://13.125.144.8", // web server direct IP
+        "https://13.125.144.8", // web server direct IP (https)
         // Production domains
         "https://neture.co.kr",
         "https://www.neture.co.kr",
         "https://admin.neture.co.kr",
+        "http://admin.neture.co.kr", // Allow both http and https for admin
         "https://shop.neture.co.kr",
         "https://forum.neture.co.kr",
         "https://signage.neture.co.kr",
         "https://funding.neture.co.kr",
-        "https://auth.neture.co.kr"
+        "https://auth.neture.co.kr",
+        "https://api.neture.co.kr",
+        "http://api.neture.co.kr"
       ];
       
       if (!origin || allowedOrigins.includes(origin)) {
@@ -250,16 +258,20 @@ const corsOptions: CorsOptions = {
       // Web server IPs
       "http://13.125.144.8:3000", // web server main-site
       "http://13.125.144.8:3001", // web server admin-dashboard
+      "http://13.125.144.8", // web server direct IP
+      "https://13.125.144.8", // web server direct IP (https)
       // Production domains
       "https://neture.co.kr",
       "https://www.neture.co.kr",
       "https://admin.neture.co.kr",
+      "http://admin.neture.co.kr", // Allow both http and https for admin
       "https://shop.neture.co.kr",
       "https://forum.neture.co.kr",
       "https://signage.neture.co.kr",
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
       "https://api.neture.co.kr", // API server itself
+      "http://api.neture.co.kr", // API server (http)
       // Add environment-defined origins
       ...envOrigins
     ];
@@ -605,6 +617,7 @@ const startServer = async () => {
   try {
     // 데이터베이스 초기화 전 상태 확인
     if (AppDataSource.isInitialized) {
+      logger.info('Database already initialized');
     } else {
       
       // 환경변수 재확인
@@ -628,6 +641,7 @@ const startServer = async () => {
         try {
           await AppDataSource.runMigrations();
         } catch (migrationError) {
+          logger.warn('Migration error (non-critical):', migrationError);
         }
       }
 
@@ -686,9 +700,11 @@ const startServer = async () => {
     });
 
     redisClient.on('connect', () => {
+      logger.info('Redis connected');
     });
 
     redisClient.on('error', (err) => {
+      logger.error('Redis error:', err);
     });
 
     // Initialize SessionSyncService
@@ -702,9 +718,11 @@ const startServer = async () => {
     // Start crowdfunding schedules
     startCrowdfundingSchedules();
   } catch (redisError) {
+    logger.warn('Redis connection failed (non-critical):', redisError);
   }
   
   httpServer.listen(port, () => {
+    logger.info(`🚀 API Server running on port ${port}`);
   });
 };
 
