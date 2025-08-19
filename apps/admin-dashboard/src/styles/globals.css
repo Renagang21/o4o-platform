@@ -8,112 +8,114 @@
 
 @layer base {
   :root {
-    /* Primary Colors - Modern Blue/Purple Gradient */
-    --primary-50: #e8f2ff;
-    --primary-100: #c4deff;
-    --primary-200: #9cc9ff;
-    --primary-300: #72b4ff;
-    --primary-400: #4ea3ff;
-    --primary-500: #2693ff; /* Main Primary */
-    --primary-600: #1a85f0;
-    --primary-700: #0073df;
-    --primary-800: #0062c7;
-    --primary-900: #0045a1;
+    /* Primary Colors - Clean Modern Blue */
+    --primary-50: #eff6ff;
+    --primary-100: #dbeafe;
+    --primary-200: #bfdbfe;
+    --primary-300: #93c5fd;
+    --primary-400: #60a5fa;
+    --primary-500: #3b82f6; /* Main Primary */
+    --primary-600: #2563eb;
+    --primary-700: #1d4ed8;
+    --primary-800: #1e40af;
+    --primary-900: #1e3a8a;
 
-    /* Secondary - Modern Purple */
-    --secondary-50: #f3e8ff;
-    --secondary-100: #e2c6ff;
-    --secondary-200: #d1a3ff;
-    --secondary-300: #c180ff;
-    --secondary-400: #b264ff;
-    --secondary-500: #a548ff; /* Main Secondary */
-    --secondary-600: #9836f2;
-    --secondary-700: #8620e0;
-    --secondary-800: #7400cd;
-    --secondary-900: #5500aa;
+    /* Secondary - Modern Teal */
+    --secondary-50: #f0fdfa;
+    --secondary-100: #ccfbf1;
+    --secondary-200: #99f6e4;
+    --secondary-300: #5eead4;
+    --secondary-400: #2dd4bf;
+    --secondary-500: #14b8a6; /* Main Secondary */
+    --secondary-600: #0d9488;
+    --secondary-700: #0f766e;
+    --secondary-800: #115e59;
+    --secondary-900: #134e4a;
 
-    /* Neutral Colors - For Light Mode */
+    /* Neutral Colors - Optimized for Readability */
     --gray-0: #ffffff;
-    --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-400: #94a3b8;
-    --gray-500: #64748b;
-    --gray-600: #475569;
-    --gray-700: #334155;
-    --gray-800: #1e293b;
-    --gray-900: #0f172a;
-    --gray-950: #020617;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --gray-950: #030712;
 
-    /* Success Colors */
-    --success-50: #e6fbf3;
-    --success-100: #c1f5df;
-    --success-200: #97eec9;
-    --success-300: #66e5af;
-    --success-400: #2dda8f;
-    --success-500: #00cc6a; /* Main Success */
-    --success-600: #00b85f;
-    --success-700: #00a352;
-    --success-800: #008e45;
-    --success-900: #007336;
+    /* Success Colors - Modern Green */
+    --success-50: #f0fdf4;
+    --success-100: #dcfce7;
+    --success-200: #bbf7d0;
+    --success-300: #86efac;
+    --success-400: #4ade80;
+    --success-500: #22c55e; /* Main Success */
+    --success-600: #16a34a;
+    --success-700: #15803d;
+    --success-800: #166534;
+    --success-900: #14532d;
 
-    /* Warning Colors */
-    --warning-50: #fffbea;
-    --warning-100: #fff5c4;
-    --warning-200: #ffec99;
-    --warning-300: #ffe066;
-    --warning-400: #ffd133;
-    --warning-500: #ffc107; /* Main Warning */
-    --warning-600: #f5b800;
-    --warning-700: #e0a800;
-    --warning-800: #cc9900;
-    --warning-900: #a67c00;
+    /* Warning Colors - Amber */
+    --warning-50: #fffbeb;
+    --warning-100: #fef3c7;
+    --warning-200: #fde68a;
+    --warning-300: #fcd34d;
+    --warning-400: #fbbf24;
+    --warning-500: #f59e0b; /* Main Warning */
+    --warning-600: #d97706;
+    --warning-700: #b45309;
+    --warning-800: #92400e;
+    --warning-900: #78350f;
 
-    /* Error Colors */
-    --error-50: #ffebe9;
-    --error-100: #ffccc7;
-    --error-200: #ffa8a0;
-    --error-300: #ff8176;
-    --error-400: #ff5449;
-    --error-500: #ff1e1e; /* Main Error */
-    --error-600: #f50014;
-    --error-700: #e00013;
-    --error-800: #cc0012;
-    --error-900: #a60010;
+    /* Error Colors - Modern Red */
+    --error-50: #fef2f2;
+    --error-100: #fee2e2;
+    --error-200: #fecaca;
+    --error-300: #fca5a5;
+    --error-400: #f87171;
+    --error-500: #ef4444; /* Main Error */
+    --error-600: #dc2626;
+    --error-700: #b91c1c;
+    --error-800: #991b1b;
+    --error-900: #7f1d1d;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
-    --gradient-dark: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-950) 100%);
-    --gradient-light: linear-gradient(135deg, var(--gray-0) 0%, var(--gray-100) 100%);
+    /* Gradients - Subtle and Modern */
+    --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+    --gradient-dark: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
+    --gradient-light: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
 
-    /* Semantic Colors - Light Mode */
+    /* Semantic Colors - Clean Light Mode */
     --bg-primary: var(--gray-0);
     --bg-secondary: var(--gray-50);
     --bg-tertiary: var(--gray-100);
     --bg-inverse: var(--gray-900);
     
     --text-primary: var(--gray-900);
-    --text-secondary: var(--gray-600);
-    --text-tertiary: var(--gray-500);
+    --text-secondary: var(--gray-700);
+    --text-tertiary: var(--gray-600);
     --text-inverse: var(--gray-0);
     
     --border-primary: var(--gray-200);
     --border-secondary: var(--gray-300);
     --border-focus: var(--primary-500);
     
-    /* Admin Bar - Modern Dark */
-    --admin-bar-bg: var(--gray-950);
+    /* Admin Bar - Clean Dark */
+    --admin-bar-bg: var(--gray-900);
     --admin-bar-text: var(--gray-100);
-    --admin-bar-hover: rgba(255, 255, 255, 0.1);
-    --admin-bar-active: rgba(255, 255, 255, 0.2);
+    --admin-bar-hover: var(--gray-800);
+    --admin-bar-active: var(--gray-700);
     
-    /* Sidebar */
-    --sidebar-bg: var(--gray-50);
+    /* Sidebar - Modern Clean */
+    --sidebar-bg: var(--gray-0);
     --sidebar-text: var(--gray-700);
-    --sidebar-hover: var(--gray-100);
-    --sidebar-active-bg: var(--primary-500);
-    --sidebar-active-text: var(--gray-0);
+    --sidebar-hover: var(--gray-50);
+    --sidebar-active-bg: var(--primary-50);
+    --sidebar-active-text: var(--primary-600);
+    --sidebar-border: var(--gray-200);
     
     /* Components */
     --card-bg: var(--gray-0);
@@ -121,11 +123,12 @@
     --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     
-    /* Buttons */
+    /* Buttons - Consistent Modern Style */
     --btn-primary-bg: var(--primary-500);
     --btn-primary-text: var(--gray-0);
     --btn-primary-hover: var(--primary-600);
     --btn-primary-active: var(--primary-700);
+    --btn-primary-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     
     --btn-secondary-bg: var(--gray-0);
     --btn-secondary-text: var(--gray-700);
@@ -133,18 +136,27 @@
     --btn-secondary-hover: var(--gray-50);
     --btn-secondary-active: var(--gray-100);
     
-    /* Forms */
+    --btn-success-bg: var(--success-500);
+    --btn-success-text: var(--gray-0);
+    --btn-danger-bg: var(--error-500);
+    --btn-danger-text: var(--gray-0);
+    
+    /* Forms - Improved Readability */
     --input-bg: var(--gray-0);
     --input-border: var(--gray-300);
     --input-focus-border: var(--primary-500);
+    --input-focus-ring: rgba(59, 130, 246, 0.15);
     --input-text: var(--gray-900);
     --input-placeholder: var(--gray-500);
+    --input-disabled-bg: var(--gray-50);
     
-    /* Tables */
+    /* Tables - Clean Modern */
     --table-bg: var(--gray-0);
-    --table-hover: var(--gray-50);
+    --table-hover: var(--primary-50);
     --table-stripe: var(--gray-50);
     --table-border: var(--gray-200);
+    --table-header-bg: var(--gray-50);
+    --table-header-text: var(--gray-900);
     
     /* Transitions */
     --transition-fast: 150ms ease-in-out;

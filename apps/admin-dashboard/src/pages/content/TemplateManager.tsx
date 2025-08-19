@@ -78,7 +78,7 @@ const TemplateManager: FC = () => {
       if (selectedType !== 'all') params.append('type', selectedType)
       if (selectedStatus !== 'all') params.append('status', selectedStatus)
 
-      const response = await authClient.api.get(`/templates?${params}`)
+      const response = await authClient.api.get(`/content/admin/templates?${params}`)
       return response.data
     }
   })
@@ -86,7 +86,7 @@ const TemplateManager: FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/templates/${id}`)
+      return authClient.api.delete(`/content/admin/templates/${id}`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] })
@@ -100,7 +100,7 @@ const TemplateManager: FC = () => {
   // Duplicate mutation
   const duplicateMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.post(`/templates/${id}/duplicate`)
+      return authClient.api.post(`/content/admin/templates/${id}/duplicate`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] })

@@ -110,6 +110,12 @@ const ThemeEditor = lazy(() =>
 );
 const ThemePreview = lazy(() => import('@/pages/themes/ThemePreview'));
 
+// Plugin Management
+const WordPressPluginManager = lazy(() => import('@/pages/apps/WordPressPluginManager'));
+
+// Shortcode Management
+const ShortcodeManagement = lazy(() => import('@/pages/shortcodes/ShortcodeManagement'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -119,7 +125,7 @@ const PageLoader = () => (
 
 // SSO 클라이언트 인스턴스 생성
 const ssoClient = new AuthClient(
-  import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1'
+  import.meta.env.VITE_API_URL || 'https://api.neture.co.kr'
 );
 
 /**
@@ -378,6 +384,23 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['templates:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <ThemeMarketplace />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* 플러그인 관리 */}
+                    <Route path="/plugins" element={
+                      <AdminProtectedRoute requiredPermissions={['apps:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <WordPressPluginManager />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/plugins/add" element={
+                      <AdminProtectedRoute requiredPermissions={['apps:manage']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <WordPressPluginManager />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -783,6 +806,14 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['tools:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <ToolsPage />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/tools/shortcodes" element={
+                      <AdminProtectedRoute requiredPermissions={['tools:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ShortcodeManagement />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

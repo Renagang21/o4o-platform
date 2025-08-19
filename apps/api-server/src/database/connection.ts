@@ -46,6 +46,12 @@ import { Shipment } from '../entities/Shipment';
 import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
 import { SmtpSettings } from '../entities/SmtpSettings';
 import { EmailLog } from '../entities/EmailLog';
+import { Shortcode } from '../entities/Shortcode';
+// Dropshipping entities
+import { Supplier } from '../entities/dropshipping/Supplier';
+import { Seller } from '../entities/dropshipping/Seller';
+import { Affiliate } from '../entities/dropshipping/Affiliate';
+import { DropshippingProduct } from '../entities/dropshipping/DropshippingProduct';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -132,7 +138,13 @@ export const AppDataSource = new DataSource({
         Shipment,
         ShipmentTrackingHistory,
         SmtpSettings,
-        EmailLog
+        EmailLog,
+        Shortcode,
+        // Dropshipping entities
+        Supplier,
+        Seller,
+        Affiliate,
+        DropshippingProduct
       ],
   
   // 마이그레이션 설정

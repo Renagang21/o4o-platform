@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
  */
 class UnifiedApiClient {
   private client: AxiosInstance;
-  private baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1';
+  private baseURL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
   private version = 'v1';
 
   constructor() {

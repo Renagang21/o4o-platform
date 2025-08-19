@@ -130,7 +130,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: CreateTemplateDto) => {
-      return authClient.api.post('/templates', data)
+      return authClient.api.post('/content/admin/templates', data)
     },
     onSuccess: () => {
       toast.success('템플릿이 생성되었습니다')
@@ -145,7 +145,7 @@ const TemplateBuilder: FC<TemplateBuilderProps> = ({
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: { id: string; updates: UpdateTemplateDto }) => {
-      return authClient.api.put(`/templates/${data.id}`, data.updates)
+      return authClient.api.put(`/content/admin/templates/${data.id}`, data.updates)
     },
     onSuccess: () => {
       toast.success('템플릿이 저장되었습니다')

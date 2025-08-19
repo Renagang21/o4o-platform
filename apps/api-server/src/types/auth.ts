@@ -13,8 +13,10 @@ export enum UserRole {
   MODERATOR = 'moderator',
   PARTNER = 'partner',
   BETA_USER = 'beta_user',
+  // Dropshipping roles
+  SUPPLIER = 'supplier',  // 공급자: 상품 제공, 재고 관리
+  AFFILIATE = 'affiliate', // 제휴자: 제휴 마케팅, 커미션
   // Legacy roles kept for backward compatibility
-  SUPPLIER = 'supplier',
   MANAGER = 'manager'
 }
 

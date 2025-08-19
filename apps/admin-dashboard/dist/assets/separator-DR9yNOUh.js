@@ -1,2 +1,0 @@
-import{r,j as o}from"./vendor-react-40ZmJ4HC.js";import{c as a}from"./page-gutenberg-CxDN_6a_.js";const e=r.forwardRef(({className:r,orientation:e="horizontal",decorative:s=!0,...i},t)=>o.jsxDEV("div",{ref:t,role:s?"none":"separator","aria-orientation":e,className:a("shrink-0 bg-border","horizontal"===e?"h-[1px] w-full":"h-full w-[1px]",r),...i},void 0,!1,{fileName:"/home/user/o4o-platform/apps/admin-dashboard/src/components/ui/separator.tsx",lineNumber:11,columnNumber:5},void 0));e.displayName="Separator";export{e as S};
-//# sourceMappingURL=separator-DR9yNOUh.js.map

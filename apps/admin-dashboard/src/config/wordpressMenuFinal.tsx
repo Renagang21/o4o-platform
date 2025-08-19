@@ -31,7 +31,10 @@ import {
   Layout,
   FolderTree,
   Activity,
-  Shield
+  Shield,
+  Puzzle,
+  Plus,
+  Code
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -103,6 +106,17 @@ export const wordpressMenuItems: MenuItem[] = [
     label: '',
     icon: <></>,
     separator: true
+  },
+  // 플러그인
+  {
+    id: 'plugins',
+    label: '플러그인',
+    icon: <Puzzle className="w-5 h-5" />,
+    children: [
+      { id: 'plugins-installed', label: '설치된 플러그인', icon: <Puzzle className="w-4 h-4" />, path: '/plugins' },
+      { id: 'plugins-add', label: '새로 추가', icon: <Plus className="w-4 h-4" />, path: '/plugins/add' },
+      { id: 'plugins-editor', label: '플러그인 편집기', icon: <Code className="w-4 h-4" />, path: '/plugins/editor' }
+    ]
   },
   {
     id: 'ecommerce',
@@ -237,7 +251,12 @@ export const wordpressMenuItems: MenuItem[] = [
     id: 'tools',
     label: '도구',
     icon: <Wrench className="w-5 h-5" />,
-    path: '/tools'
+    children: [
+      { id: 'tools-available', label: '사용 가능한 도구', icon: <Wrench className="w-4 h-4" />, path: '/tools' },
+      { id: 'tools-shortcodes', label: 'Shortcode 관리', icon: <Code className="w-4 h-4" />, path: '/tools/shortcodes' },
+      { id: 'tools-import', label: '가져오기', icon: <FileText className="w-4 h-4" />, path: '/tools/import' },
+      { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
+    ]
   },
   {
     id: 'apps',

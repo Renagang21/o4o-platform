@@ -111,12 +111,14 @@ import mediaV1Routes from './routes/v1/media.routes';
 import couponRoutes from './routes/v1/coupon.routes';
 import themeRoutes from './routes/v1/theme.routes';
 import appsV1Routes from './routes/v1/apps.routes';
+import pluginsV1Routes from './routes/v1/plugins.routes';
 import couponV1Routes from './routes/v1/coupon.routes';
 import exportV1Routes from './routes/v1/export.routes';
 import shippingV1Routes from './routes/v1/shipping.routes';
 import dropshippingV1Routes from './routes/v1/dropshipping.routes';
 import productVariationRoutes from './routes/v1/product-variation.routes';
 import tossPaymentsRoutes from './routes/v1/toss-payments.routes';
+import settingsV1Routes from './routes/v1/settings.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -535,6 +537,7 @@ app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes);
 app.use('/api/v1/apps', appsV1Routes);
+app.use('/api/v1/apps/plugins', pluginsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);
 app.use('/api/v1/themes', themeRoutes);
 app.use('/api/v1/export', exportV1Routes);
@@ -542,6 +545,7 @@ app.use('/api/v1/shipping', shippingV1Routes);
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
 app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
+app.use('/api/v1/settings', settingsV1Routes); // 설정 라우트
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
