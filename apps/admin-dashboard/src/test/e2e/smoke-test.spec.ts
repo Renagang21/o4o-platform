@@ -17,7 +17,6 @@ test.describe('Smoke Test', () => {
     // HTML 구조가 있는지 확인
     await expect(page.locator('body')).toBeVisible();
     
-    // console.log('✅ Admin Dashboard 기본 로딩 성공');
   });
 
   test('로그인 페이지 접근 확인', async ({ page }) => {
@@ -28,7 +27,6 @@ test.describe('Smoke Test', () => {
     const loginForm = page.locator('form, [data-testid="login-form"], input[type="email"], input[name="email"]');
     await expect(loginForm.first()).toBeVisible({ timeout: 5000 });
     
-    // console.log('✅ 로그인 페이지 접근 성공');
   });
 
   test('네트워크 응답 확인', async ({ page }) => {
@@ -45,8 +43,6 @@ test.describe('Smoke Test', () => {
     const successResponses = responses.filter(r => r.startsWith('200'));
     expect(successResponses.length).toBeGreaterThan(0);
     
-    // console.log('✅ 네트워크 응답 확인 완료');
-    // console.log('응답 목록:', responses.slice(0, 5)); // 처음 5개만 로깅
   });
 
 });
