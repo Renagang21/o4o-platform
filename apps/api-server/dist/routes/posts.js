@@ -361,7 +361,7 @@ async (req, res, next) => {
             type: req.body.type || req.body.post_type || 'post',
             slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
             excerpt: extractContent(excerpt),
-            tags: tags || [],
+            tags: Array.isArray(tags) ? tags : (tags ? [tags] : []),
             format: format || 'standard',
             sticky: sticky || false,
             postMeta: meta || {},

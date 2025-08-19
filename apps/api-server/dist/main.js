@@ -594,6 +594,7 @@ const startServer = async () => {
     try {
         // 데이터베이스 초기화 전 상태 확인
         if (connection_1.AppDataSource.isInitialized) {
+            logger_1.default.info('Database already initialized');
         }
         else {
             // 환경변수 재확인
@@ -615,6 +616,7 @@ const startServer = async () => {
                     await connection_1.AppDataSource.runMigrations();
                 }
                 catch (migrationError) {
+                    logger_1.default.warn('Migration error (non-critical):', migrationError);
                 }
             }
             // Initialize monitoring services
@@ -673,8 +675,10 @@ const startServer = async () => {
             password: process.env.REDIS_PASSWORD
         });
         redisClient.on('connect', () => {
+            logger_1.default.info('Redis connected');
         });
         redisClient.on('error', (err) => {
+            logger_1.default.error('Redis error:', err);
         });
         // Initialize SessionSyncService
         sessionSyncService_1.SessionSyncService.initialize(redisClient);
@@ -686,8 +690,10 @@ const startServer = async () => {
         (0, crowdfundingSchedule_1.startCrowdfundingSchedules)();
     }
     catch (redisError) {
+        logger_1.default.warn('Redis connection failed (non-critical):', redisError);
     }
     httpServer.listen(port, () => {
+        logger_1.default.info(`🚀 API Server running on port ${port}`);
     });
 };
 startServer().catch(console.error);
