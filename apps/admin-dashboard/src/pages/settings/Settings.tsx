@@ -1,10 +1,13 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Palette, Users, Mail, Link as LinkIcon, BookOpen, Key } from 'lucide-react'
+import { Settings as SettingsIcon, Palette, Mail, Link as LinkIcon, BookOpen, Key, FileText, MessageSquare, Image, Shield } from 'lucide-react'
 import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
+import WritingSettings from './WritingSettings'
+import DiscussionSettings from './DiscussionSettings'
+import EmailSettings from './EmailSettings'
 
 const UserSettings: FC = () => (
   <div className="wp-card">
@@ -16,7 +19,35 @@ const UserSettings: FC = () => (
   </div>
 )
 
-import EmailSettings from './EmailSettings'
+const MediaSettings: FC = () => (
+  <div className="wp-card">
+    <div className="wp-card-body">
+      <div className="text-center py-12 text-wp-text-secondary">
+        <p>미디어 설정 페이지는 개발 중입니다.</p>
+      </div>
+    </div>
+  </div>
+)
+
+const PermalinksSettings: FC = () => (
+  <div className="wp-card">
+    <div className="wp-card-body">
+      <div className="text-center py-12 text-wp-text-secondary">
+        <p>고유주소 설정 페이지는 개발 중입니다.</p>
+      </div>
+    </div>
+  </div>
+)
+
+const PrivacySettings: FC = () => (
+  <div className="wp-card">
+    <div className="wp-card-body">
+      <div className="text-center py-12 text-wp-text-secondary">
+        <p>개인정보 설정 페이지는 개발 중입니다.</p>
+      </div>
+    </div>
+  </div>
+)
 
 const IntegrationSettings: FC = () => (
   <div className="wp-card">
@@ -29,13 +60,16 @@ const IntegrationSettings: FC = () => (
 )
 
 const settingsTabs = [
-  { id: 'general', label: '일반 설정', icon: <SettingsIcon className="w-4 h-4" />, path: '' },
-  { id: 'reading', label: '읽기 설정', icon: <BookOpen className="w-4 h-4" />, path: 'reading' },
-  { id: 'theme', label: '테마 설정', icon: <Palette className="w-4 h-4" />, path: 'theme' },
-  { id: 'oauth', label: 'OAuth 설정', icon: <Key className="w-4 h-4" />, path: 'oauth' },
-  { id: 'users', label: '사용자 설정', icon: <Users className="w-4 h-4" />, path: 'users' },
-  { id: 'email', label: '이메일 설정', icon: <Mail className="w-4 h-4" />, path: 'email' },
-  { id: 'integrations', label: '연동 설정', icon: <LinkIcon className="w-4 h-4" />, path: 'integrations' }
+  { id: 'general', label: '일반', icon: <SettingsIcon className="w-4 h-4" />, path: '' },
+  { id: 'writing', label: '쓰기', icon: <FileText className="w-4 h-4" />, path: 'writing' },
+  { id: 'reading', label: '읽기', icon: <BookOpen className="w-4 h-4" />, path: 'reading' },
+  { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: 'discussion' },
+  { id: 'media', label: '미디어', icon: <Image className="w-4 h-4" />, path: 'media' },
+  { id: 'permalinks', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: 'permalinks' },
+  { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: 'privacy' },
+  { id: 'theme', label: '테마', icon: <Palette className="w-4 h-4" />, path: 'theme' },
+  { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: 'oauth' },
+  { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: 'email' }
 ]
 
 const Settings: FC = () => {
@@ -77,7 +111,12 @@ const Settings: FC = () => {
       {/* Settings Content */}
       <Routes>
         <Route index element={<GeneralSettings />} />
+        <Route path="writing" element={<WritingSettings />} />
         <Route path="reading" element={<ReadingSettings />} />
+        <Route path="discussion" element={<DiscussionSettings />} />
+        <Route path="media" element={<MediaSettings />} />
+        <Route path="permalinks" element={<PermalinksSettings />} />
+        <Route path="privacy" element={<PrivacySettings />} />
         <Route path="theme" element={<ThemeSettingsWithAuth />} />
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />
