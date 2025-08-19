@@ -50,11 +50,15 @@ jobs:
     - name: Validate environment
       env:
         NODE_ENV: production
+        SERVER_TYPE: apiserver
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
         DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_NAME: ${{ secrets.DB_NAME }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+        PORT: 3001
       run: bash scripts/validate-deploy-env.sh
       
     - name: Install dependencies (Optimized for API Server)
