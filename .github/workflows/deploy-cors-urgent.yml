@@ -1,0 +1,118 @@
+name: 🚨 Urgent CORS Fix Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api-server/src/main.ts'
+      - 'apps/api-server/src/middleware/errorHandler.ts'
+      - '.github/workflows/deploy-cors-urgent.yml'
+
+env:
+  NODE_VERSION: '22.18.0'
+
+jobs:
+  deploy-cors-fix:
+    name: Deploy CORS Fix to API Server
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci --prefer-offline
+        npm install --workspace=packages/supplier-connector
+    
+    - name: Build API server
+      run: |
+        echo "🔨 Building API server with updated CORS settings..."
+        cd apps/api-server
+        npm run build
+        cd ../..
+    
+    - name: Deploy to API server
+      env:
+        SSH_USER: ubuntu
+        SSH_HOST: 43.202.242.215
+        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        echo "🚀 Deploying to API server..."
+        
+        # Setup SSH
+        mkdir -p ~/.ssh
+        echo "$SSH_KEY" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        
+        # Create deployment package
+        cd apps/api-server
+        tar -czf ../../api-dist.tar.gz dist package.json
+        cd ../..
+        
+        # Transfer files
+        scp -i ~/.ssh/deploy_key api-dist.tar.gz $SSH_USER@$SSH_HOST:/tmp/
+        
+        # Deploy and restart
+        ssh -i ~/.ssh/deploy_key $SSH_USER@$SSH_HOST << 'ENDSSH'
+          set -e
+          
+          # Backup current version
+          if [ -d "/home/ubuntu/o4o-platform/apps/api-server/dist" ]; then
+            cp -r /home/ubuntu/o4o-platform/apps/api-server/dist /home/ubuntu/o4o-platform/apps/api-server/dist.backup
+          fi
+          
+          # Extract new build
+          cd /home/ubuntu/o4o-platform/apps/api-server
+          tar -xzf /tmp/api-dist.tar.gz
+          
+          # Restart PM2
+          pm2 restart o4o-api --update-env || pm2 start dist/main.js --name o4o-api
+          
+          # Show status
+          pm2 status o4o-api
+          
+          # Cleanup
+          rm /tmp/api-dist.tar.gz
+          
+          echo "✅ Deployment complete!"
+        ENDSSH
+        
+        # Cleanup local files
+        rm api-dist.tar.gz
+        rm ~/.ssh/deploy_key
+    
+    - name: Test CORS headers
+      run: |
+        echo "🧪 Testing CORS configuration..."
+        sleep 10
+        
+        # Test OPTIONS request
+        echo "Testing OPTIONS request..."
+        curl -I -X OPTIONS http://api.neture.co.kr/api/v1/auth/login \
+          -H 'Origin: https://admin.neture.co.kr' \
+          -H 'Access-Control-Request-Method: POST' \
+          -H 'Access-Control-Request-Headers: Content-Type' || true
+        
+        echo ""
+        echo "Testing direct GET request..."
+        curl -I http://api.neture.co.kr/api/health \
+          -H 'Origin: https://admin.neture.co.kr' || true
+    
+    - name: Send notification
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ CORS fix deployed successfully!"
+        else
+          echo "❌ CORS fix deployment failed!"
+        fi
