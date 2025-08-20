@@ -238,7 +238,7 @@ const PostFormWYSIWYG = () => {
               if (isEditMode && id) {
                 window.open(`/preview/post/${id}`, '_blank');
               } else {
-                toast.info('Save the post first to preview');
+                toast('Save the post first to preview');
               }
             }}
             disabled={!isEditMode}

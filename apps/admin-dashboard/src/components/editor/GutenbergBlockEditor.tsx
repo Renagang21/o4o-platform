@@ -4,13 +4,8 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { cn } from '@/lib/utils';
 import { 
   Plus,
-  Save,
-  Eye,
-  Maximize2,
-  Settings,
   Type,
   Heading1,
   Image,
@@ -22,21 +17,12 @@ import {
   Columns,
   FileText,
   MousePointer,
-  MinusSquare,
-  MoreHorizontal
+  MinusSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
 } from '@/components/ui/popover';
 
 // Import block components
@@ -71,8 +57,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onTitleChange,
   onSave,
   autoSave = true,
-  showInspector = false,
-  fullScreen = false
+  showInspector = false
 }) => {
   const [blocks, setBlocks] = useState<Block[]>(
     initialBlocks.length > 0 ? initialBlocks : [
@@ -81,12 +66,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   );
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [showBlockInserter, setShowBlockInserter] = useState(false);
-  const [inserterPosition, setInserterPosition] = useState<{ x: number; y: number } | null>(null);
   const [inserterTargetId, setInserterTargetId] = useState<string | null>(null);
   const [inserterTargetPosition, setInserterTargetPosition] = useState<'before' | 'after'>('after');
   const [documentTitle, setDocumentTitle] = useState(title);
-  const [isFullScreen, setIsFullScreen] = useState(fullScreen);
-  const [showSettings, setShowSettings] = useState(showInspector);
+  const [showSettings] = useState(showInspector);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Auto-save timer
@@ -215,9 +198,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     setInserterTargetId(targetId);
     setInserterTargetPosition(position);
     
+    // Position is handled by Popover component
     if (event) {
-      const rect = (event.target as HTMLElement).getBoundingClientRect();
-      setInserterPosition({ x: rect.left, y: rect.bottom + 5 });
+      // Event position can be used for future positioning logic
     }
     
     setShowBlockInserter(true);
@@ -433,7 +416,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                         setInserterTargetPosition('after');
                         setShowBlockInserter(true);
                       } else {
-                        addBlock('paragraph', 'after', null);
+                        addBlock('paragraph', 'after', undefined);
                       }
                     }}
                     className="flex items-center gap-2 px-4 py-2 border-2 border-gray-900 rounded hover:bg-gray-900 hover:text-white transition-colors"

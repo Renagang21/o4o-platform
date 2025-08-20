@@ -45,7 +45,7 @@ export class AuthClient {
     // Remove /api/v1 prefix from baseURL for auth endpoints
     const authUrl = this.baseURL.replace('/api/v1', '/api');
     const response = await axios.post(`${authUrl}/auth/login`, credentials);
-    return response.data;
+    return response.data as AuthResponse;
   }
 
   async logout(): Promise<void> {

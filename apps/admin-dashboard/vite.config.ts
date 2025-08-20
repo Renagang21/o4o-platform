@@ -8,6 +8,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default defineConfig(mergeConfig(sharedViteConfig, {
+  // 빌드 캐시 디렉토리 설정
+  cacheDir: '.vite-cache',
   plugins: [
     visualizer({
       open: false,
@@ -87,9 +89,15 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
   build: {
     ...sharedViteConfig.build,
     outDir: 'dist',
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 2000, // 경고 제한 증가
+    // 빌드 캐시 활성화로 속도 개선
+    cache: true,
+    // 워커 스레드 활용
+    workers: true,
+    // 소스맵 비활성화 옵션 (프로덕션)
+    sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
     // 최적화 설정 추가
-    minify: 'terser',
+    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
     terserOptions: {
       compress: {
         drop_console: true,

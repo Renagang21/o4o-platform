@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -264,7 +264,7 @@ const PageFormWYSIWYG = () => {
               if (isEditMode && id) {
                 window.open(`/preview/page/${id}`, '_blank');
               } else {
-                toast.info('Save the page first to preview');
+                toast('Save the page first to preview');
               }
             }}
             disabled={!isEditMode}
