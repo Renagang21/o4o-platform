@@ -1,14 +1,14 @@
 import { FC } from 'react';
 import { Routes, Route } from 'react-router-dom'
-import MenuList from './MenuList'
-import MenuBuilder from './MenuBuilder'
+import WordPressMenuList from './WordPressMenuList'
+import WordPressMenuEditor from './WordPressMenuEditor'
 
 const Menus: FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<MenuList />} />
-      <Route path="/new" element={<MenuBuilder />} />
-      <Route path="/:id/edit" element={<MenuBuilder />} />
+      <Route path="/" element={<WordPressMenuList />} />
+      <Route path="/new" element={<WordPressMenuEditor />} />
+      <Route path="/:id/edit" element={<WordPressMenuEditor />} />
     </Routes>
   )
 }

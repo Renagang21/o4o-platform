@@ -58,7 +58,7 @@ const Coupons: FC = () => {
         ...(statusFilter !== 'all' && { status: statusFilter })
       });
 
-      const response = await api.get(`/v1/coupons?${params}`);
+      const response = await api.get(`/coupons?${params}`);
       setCoupons(response.data.data || []);
       setTotalPages(response.data.pagination?.totalPages || 1);
     } catch (error) {
@@ -134,7 +134,7 @@ const Coupons: FC = () => {
     }
 
     try {
-      await api.delete(`/v1/coupons/${id}`);
+      await api.delete(`/coupons/${id}`);
       toast.success('Coupon deleted successfully');
       fetchCoupons();
     } catch (error) {
@@ -147,7 +147,7 @@ const Coupons: FC = () => {
   const handleDuplicate = async (coupon: Coupon) => {
     try {
       const newCode = `${coupon.code}_COPY_${Date.now()}`;
-      await api.post('/v1/coupons', {
+      await api.post('/coupons', {
         ...coupon,
         id: undefined,
         code: newCode,

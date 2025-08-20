@@ -62,7 +62,7 @@ const CouponForm: FC = () => {
   const fetchCoupon = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/v1/coupons/${id}`);
+      const response = await api.get(`/coupons/${id}`);
       const coupon = response.data.data;
       
       setFormData({
@@ -109,10 +109,10 @@ const CouponForm: FC = () => {
       };
 
       if (isEditing) {
-        await api.put(`/v1/coupons/${id}`, dataToSend);
+        await api.put(`/coupons/${id}`, dataToSend);
         toast.success('쿠폰이 수정되었습니다');
       } else {
-        await api.post('/v1/coupons', dataToSend);
+        await api.post('/coupons', dataToSend);
         toast.success('쿠폰이 생성되었습니다');
       }
 
