@@ -1,0 +1,79 @@
+import React from 'react';
+import { BlockDefinition } from '@o4o/block-core';
+
+const Edit: React.FC<any> = ({ attributes }) => {
+  const { iconColor, iconBackgroundColor } = attributes;
+  
+  const classNames = [
+    'wp-block-social-links',
+    iconColor && `has-${iconColor}-icon-color`,
+    iconBackgroundColor && `has-${iconBackgroundColor}-icon-background-color`,
+  ].filter(Boolean).join(' ');
+  
+  return (
+    <ul className={classNames}>
+      <li className="wp-social-link wp-social-link-facebook">
+        <a href="#" aria-label="Facebook">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.5 2 2 6.5 2 12c0 5 3.7 9.1 8.4 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7C18.3 21.1 22 17 22 12c0-5.5-4.5-10-10-10z"/>
+          </svg>
+        </a>
+      </li>
+      <li className="wp-social-link wp-social-link-twitter">
+        <a href="#" aria-label="Twitter">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22.23 5.924c-.736.326-1.527.547-2.357.646.847-.508 1.498-1.312 1.804-2.27-.793.47-1.671.812-2.606.996C18.325 4.498 17.258 4 16.078 4c-2.266 0-4.103 1.837-4.103 4.103 0 .322.036.635.106.935-3.409-.171-6.433-1.805-8.457-4.287-.353.607-.556 1.312-.556 2.064 0 1.424.724 2.679 1.825 3.415-.673-.021-1.305-.206-1.859-.514v.052c0 1.988 1.414 3.647 3.292 4.023-.344.094-.707.145-1.081.145-.264 0-.522-.026-.773-.074.522 1.63 2.038 2.817 3.833 2.85-1.404 1.1-3.174 1.756-5.096 1.756-.331 0-.658-.019-.98-.057 1.816 1.164 3.973 1.843 6.29 1.843 7.547 0 11.675-6.252 11.675-11.675 0-.178-.004-.355-.012-.531.802-.578 1.497-1.301 2.047-2.124z"/>
+          </svg>
+        </a>
+      </li>
+      <li className="wp-social-link wp-social-link-instagram">
+        <a href="#" aria-label="Instagram">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 4.622c2.403 0 2.688.009 3.637.052.877.04 1.354.187 1.671.31.42.163.72.358 1.035.673.315.315.51.615.673 1.035.123.317.27.794.31 1.671.043.949.052 1.234.052 3.637s-.009 2.688-.052 3.637c-.04.877-.187 1.354-.31 1.671-.163.42-.358.72-.673 1.035-.315.315-.615.51-1.035.673-.317.123-.794.27-1.671.31-.949.043-1.234.052-3.637.052s-2.688-.009-3.637-.052c-.877-.04-1.354-.187-1.671-.31-.42-.163-.72-.358-1.035-.673-.315-.315-.51-.615-.673-1.035-.123-.317-.27-.794-.31-1.671-.043-.949-.052-1.234-.052-3.637s.009-2.688.052-3.637c.04-.877.187-1.354.31-1.671.163-.42.358-.72.673-1.035.315-.315.615-.51 1.035-.673.317-.123.794-.27 1.671-.31.949-.043 1.234-.052 3.637-.052M12 3c-2.444 0-2.75.01-3.71.054-.959.044-1.613.196-2.185.418-.592.23-1.094.538-1.594 1.038-.5.5-.809 1.002-1.039 1.594-.222.572-.374 1.226-.418 2.185C3.01 9.25 3 9.556 3 12s.01 2.75.054 3.71c.044.959.196 1.613.418 2.185.23.592.538 1.094 1.039 1.594.5.5 1.002.809 1.594 1.039.572.222 1.226.374 2.185.418.96.044 1.266.054 3.71.054s2.75-.01 3.71-.054c.959-.044 1.613-.196 2.185-.418.592-.23 1.094-.538 1.594-1.039.5-.5.809-1.002 1.039-1.594.222-.572.374-1.226.418-2.185.044-.96.054-1.266.054-3.71s-.01-2.75-.054-3.71c-.044-.959-.196-1.613-.418-2.185-.23-.592-.538-1.094-1.039-1.594-.5-.5-1.002-.809-1.594-1.039-.572-.222-1.226-.374-2.185-.418C14.75 3.01 14.444 3 12 3zm0 4.378c-2.552 0-4.622 2.069-4.622 4.622s2.069 4.622 4.622 4.622 4.622-2.069 4.622-4.622S14.552 7.378 12 7.378zM12 15c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm4.804-8.884c-.596 0-1.08.484-1.08 1.08s.484 1.08 1.08 1.08 1.08-.484 1.08-1.08-.483-1.08-1.08-1.08z"/>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  );
+};
+
+const Save: React.FC<any> = ({ attributes }) => {
+  const { iconColor, iconBackgroundColor } = attributes;
+  
+  const classNames = [
+    'wp-block-social-links',
+    iconColor && `has-${iconColor}-icon-color`,
+    iconBackgroundColor && `has-${iconBackgroundColor}-icon-background-color`,
+  ].filter(Boolean).join(' ');
+  
+  return <ul className={classNames} />;
+};
+
+const SocialLinksBlock: BlockDefinition = {
+  name: 'o4o/social-links',
+  title: 'Social Links',
+  category: 'interactive',
+  icon: 'share',
+  description: 'Display links to social media profiles.',
+  keywords: ['social', 'links', 'share'],
+  
+  attributes: {
+    iconColor: {
+      type: 'string'
+    },
+    iconBackgroundColor: {
+      type: 'string'
+    }
+  },
+  
+  supports: {
+    align: ['left', 'center', 'right'],
+    anchor: true,
+    className: true
+  },
+  
+  edit: Edit,
+  save: Save
+};
+
+export default SocialLinksBlock;

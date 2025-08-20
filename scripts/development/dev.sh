@@ -58,10 +58,19 @@ run_type_check() {
     
     # Build packages first
     echo "Building packages..."
-    for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes; do
+    for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes block-core; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
             (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
+        fi
+    done
+    
+    # Build block plugins
+    echo "Building block plugins..."
+    for pkg in text-content layout-media interactive dynamic; do
+        if [ -d "packages/blocks/$pkg" ]; then
+            echo "  - Building @o4o/$pkg-blocks"
+            (cd "packages/blocks/$pkg" && npx tsc --noEmit 2>/dev/null) || true
         fi
     done
     
