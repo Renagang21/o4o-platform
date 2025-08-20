@@ -35,10 +35,10 @@ jobs:
           ${{ runner.os }}-node-${{ matrix.node-version }}-
           ${{ runner.os }}-node-
     
-    - name: Install dependencies (split method)
+    - name: Install dependencies
       run: |
-        chmod +x ./scripts/ci-parallel.sh
-        ./scripts/ci-parallel.sh
+        chmod +x ./scripts/install.sh
+        ./scripts/install.sh ci
       timeout-minutes: 15
     
     - name: Build packages
