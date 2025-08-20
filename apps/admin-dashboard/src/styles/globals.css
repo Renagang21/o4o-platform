@@ -421,10 +421,21 @@
     @apply block w-full px-3 py-2 text-sm border border-gray-200 rounded;
     @apply focus:outline-none focus:ring-2 focus:border-transparent;
     @apply transition-colors duration-200;
+    /* 일관된 높이와 정렬을 위한 추가 스타일 */
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
   }
   
   .wp-input:focus {
     --tw-ring-color: var(--wp-admin-blue);
+  }
+  
+  /* 로그인 폼 전용 스타일 개선 */
+  .wp-input.h-12 {
+    height: 48px !important;
+    padding-top: 0;
+    padding-bottom: 0;
   }
   
   .wp-textarea {
@@ -713,10 +724,134 @@
     @apply font-medium;
   }
   
+  /* Posts table specific column widths */
+  .wp-list-table.posts .column-title {
+    width: 35%;
+    min-width: 200px;
+  }
+  
+  .wp-list-table.posts .column-author {
+    width: 12%;
+    min-width: 100px;
+  }
+  
+  .wp-list-table.posts .column-categories {
+    width: 15%;
+    min-width: 120px;
+  }
+  
+  .wp-list-table.posts .column-tags {
+    width: 15%;
+    min-width: 120px;
+  }
+  
+  .wp-list-table.posts .column-comments {
+    width: 8%;
+    min-width: 60px;
+    text-align: center;
+  }
+  
+  .wp-list-table.posts .column-date {
+    width: 15%;
+    min-width: 120px;
+  }
+  
+  /* Fix alignment and spacing */
+  .wp-list-table tbody td {
+    vertical-align: middle;
+  }
+  
+  .wp-list-table .column-comments .comment-count {
+    display: inline-block;
+    padding: 0 6px;
+    background: #dcdcde;
+    border-radius: 11px;
+    font-size: 11px;
+    line-height: 20px;
+    min-width: 24px;
+    text-align: center;
+  }
+  
+  /* Bulk Actions styling */
+  .tablenav {
+    @apply flex items-center justify-between mb-2 mt-2;
+    height: 40px;
+  }
+  
+  .tablenav .alignleft {
+    @apply float-left;
+  }
+  
+  .tablenav .actions {
+    @apply flex items-center gap-2;
+  }
+  
+  .tablenav select {
+    @apply px-3 py-1.5 text-sm border border-gray-300 rounded;
+    height: 32px;
+    min-width: 150px;
+    background: white;
+  }
+  
+  .tablenav .button {
+    @apply px-3 py-1.5 text-sm;
+    height: 32px;
+    line-height: 1;
+  }
+  
+  .tablenav .selected-count {
+    @apply ml-3 text-sm text-gray-600;
+    line-height: 32px;
+  }
+  
   /* Sorting */
   .wp-list-table th.sortable,
   .wp-list-table th.sorted {
     @apply cursor-pointer;
+  }
+  
+  /* Row Actions styling */
+  .wp-list-table .row-actions {
+    @apply text-xs mt-1;
+    color: #646970;
+    visibility: hidden;
+  }
+  
+  .wp-list-table tbody tr:hover .row-actions {
+    visibility: visible;
+  }
+  
+  .wp-list-table .row-actions span {
+    @apply inline-block;
+    margin: 0;
+  }
+  
+  .wp-list-table .row-actions span:after {
+    content: " | ";
+    color: #c3c4c7;
+  }
+  
+  .wp-list-table .row-actions span:last-child:after {
+    content: "";
+  }
+  
+  .wp-list-table .row-actions a {
+    @apply text-xs;
+    color: #2271b1;
+    text-decoration: none;
+  }
+  
+  .wp-list-table .row-actions a:hover {
+    color: #135e96;
+    text-decoration: underline;
+  }
+  
+  .wp-list-table .row-actions a.text-red-600 {
+    color: #d63638;
+  }
+  
+  .wp-list-table .row-actions a.text-red-600:hover {
+    color: #b32d2e;
   }
   
   .column-sort-button {
@@ -1387,5 +1522,57 @@
   [data-theme="dark"] .glass {
     background: rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Blob animation for login page */
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+  
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+  
+  /* Enhanced focus states for login form */
+  .login-input-focus {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .login-input-focus:focus {
+    @apply ring-4 ring-blue-100 border-blue-500 bg-white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Smooth loading state */
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  .pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }

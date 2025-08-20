@@ -159,33 +159,35 @@ const Pages: FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">페이지 관리</h1>
-            <p className="text-gray-600 mt-1">웹사이트의 정적 페이지를 관리합니다</p>
+            <h1 className="text-3xl font-bold text-gray-900">페이지</h1>
+            <p className="text-gray-600 mt-2">웹사이트의 정적 페이지를 관리합니다</p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <Link
               to="/pages/pattern-builder"
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 flex items-center space-x-2 shadow-sm transition-all duration-200 transform hover:scale-105"
             >
-              <Layers className="w-4 h-4" />
-              <span>패턴 빌더</span>
+              <Layers className="w-5 h-5" />
+              <span className="font-medium">패턴 빌더</span>
             </Link>
             <Link
               to="/pages/new"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center space-x-2 shadow-sm transition-all duration-200 transform hover:scale-105"
             >
-              <Plus className="w-4 h-4" />
-              <span>새 페이지</span>
+              <Plus className="w-5 h-5" />
+              <span className="font-medium">새 페이지 추가</span>
             </Link>
           </div>
         </div>
+      </div>
 
-        {/* 필터 및 검색 */}
+      {/* 필터 및 검색 */}
+      <div className="px-8 py-4 bg-white border-b border-gray-100">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -216,7 +218,7 @@ const Pages: FC = () => {
 
         {/* 일괄 작업 */}
         {selectedPages.length > 0 && (
-          <div className="mt-4 flex items-center space-x-3">
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-center space-x-3">
             <select
               value={bulkAction}
               onChange={(e) => setBulkAction(e.target.value)}
@@ -242,7 +244,8 @@ const Pages: FC = () => {
       </div>
 
       {/* 페이지 목록 */}
-      {isLoading ? (
+      <div className="px-8 py-6">
+        {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
@@ -261,11 +264,11 @@ const Pages: FC = () => {
             새 페이지 만들기
           </Link>
         </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <table className="min-w-full">
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                <tr>
                 <th className="w-12 px-6 py-3">
                   <input
                     type="checkbox"
@@ -274,29 +277,29 @@ const Pages: FC = () => {
                     className="rounded border-gray-300"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  제목
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  작성자
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  조회수
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  날짜
-                </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    제목
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    작성자
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    상태
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    조회수
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    날짜
+                  </th>
                 <th className="relative px-6 py-3">
                   <span className="sr-only">액션</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {pages.map((page: Page) => (
-                <tr key={page.id} className="hover:bg-gray-50">
+              <tbody className="bg-white divide-y divide-gray-100">
+                {pages.map((page: Page) => (
+                  <tr key={page.id} className="hover:bg-blue-50/30 transition-colors duration-150">
                   <td className="px-6 py-4">
                     <input
                       type="checkbox"
@@ -311,67 +314,74 @@ const Pages: FC = () => {
                       className="rounded border-gray-300"
                     />
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-start">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2">
-                          <Link
-                            to={`/pages/${page.id}/edit`}
-                            className="text-sm font-medium text-gray-900 hover:text-blue-600 truncate"
-                          >
-                            {page.title}
-                          </Link>
-                          {page.isHomepage && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                              <Home className="w-3 h-3 mr-1" />
-                              홈
-                            </span>
-                          )}
+                    <td className="px-6 py-5">
+                      <div className="flex items-start">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2">
+                            <Link
+                              to={`/pages/${page.id}/edit`}
+                              className="text-base font-semibold text-gray-900 hover:text-blue-600 truncate transition-colors duration-200"
+                            >
+                              {page.title}
+                            </Link>
+                            {page.isHomepage && (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200">
+                                <Home className="w-3 h-3 mr-1" />
+                                홈
+                              </span>
+                            )}
                         </div>
                         {page.parent && (
                           <div className="text-xs text-gray-500 mt-1">
                             상위: {page.parent.title}
                           </div>
                         )}
-                        <div className="flex items-center space-x-3 mt-1">
-                          <a
-                            href={`/${page.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-gray-500 hover:text-blue-600"
-                          >
-                            보기
-                          </a>
-                          <Link
-                            to={`/pages/${page.id}/edit`}
-                            className="text-xs text-gray-500 hover:text-blue-600"
-                          >
-                            편집
-                          </Link>
-                          <button
-                            onClick={() => cloneMutation.mutate(page.id)}
-                            className="text-xs text-gray-500 hover:text-blue-600"
-                          >
-                            복제
-                          </button>
-                        </div>
+                          <div className="flex items-center space-x-1 mt-2">
+                            <a
+                              href={`/${page.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-600 hover:text-blue-700 px-2 py-0.5 hover:bg-blue-50 rounded transition-colors duration-200"
+                            >
+                              보기
+                            </a>
+                            <span className="text-gray-300">|</span>
+                            <Link
+                              to={`/pages/${page.id}/edit`}
+                              className="text-xs text-blue-600 hover:text-blue-700 px-2 py-0.5 hover:bg-blue-50 rounded transition-colors duration-200"
+                            >
+                              편집
+                            </Link>
+                            <span className="text-gray-300">|</span>
+                            <button
+                              onClick={() => cloneMutation.mutate(page.id)}
+                              className="text-xs text-blue-600 hover:text-blue-700 px-2 py-0.5 hover:bg-blue-50 rounded transition-colors duration-200"
+                            >
+                              복제
+                            </button>
+                          </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <User className="w-4 h-4 text-gray-400 mr-2" />
-                      <div className="text-sm text-gray-900">{page.author.name}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(page.status)}`}>
-                      {getStatusLabel(page.status)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {page.views.toLocaleString()}
-                  </td>
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-white text-xs font-medium mr-3">
+                          {page.author.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">{page.author.name}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(page.status)} shadow-sm`}>
+                        {getStatusLabel(page.status)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <div className="flex items-center space-x-1">
+                        <Eye className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-700">{page.views.toLocaleString()}</span>
+                      </div>
+                    </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
                       {page.publishedAt 
@@ -386,35 +396,35 @@ const Pages: FC = () => {
                       }
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end space-x-2">
-                      <a
-                        href={`/${page.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-gray-600"
-                        title="보기"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </a>
-                      <Link
-                        to={`/pages/${page.id}/edit`}
-                        className="text-gray-400 hover:text-gray-600"
-                        title="편집"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Link>
-                      <button
-                        onClick={() => {
-                          if (confirm('이 페이지를 삭제하시겠습니까?')) {
-                            deleteMutation.mutate(page.id);
-                          }
-                        }}
-                        className="text-gray-400 hover:text-red-600"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-1">
+                        <a
+                          href={`/${page.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                          title="보기"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </a>
+                        <Link
+                          to={`/pages/${page.id}/edit`}
+                          className="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-all duration-200"
+                          title="편집"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Link>
+                        <button
+                          onClick={() => {
+                            if (confirm('이 페이지를 삭제하시겠습니까?')) {
+                              deleteMutation.mutate(page.id);
+                            }
+                          }}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                     </div>
                   </td>
                 </tr>
@@ -448,7 +458,8 @@ const Pages: FC = () => {
             </div>
           )}
         </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

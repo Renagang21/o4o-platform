@@ -13,12 +13,13 @@ import ACFFieldGroupForm from './ACFFieldGroupForm'
 import MediaLibrary from './MediaLibrary'
 import TemplateManager from './TemplateManager'
 import WidgetManager from './WidgetManager'
+import NewPost from '../posts/NewPost'
 
 const Content: FC = () => {
   return (
     <Routes>
       <Route path="/" element={<PostListQuickEdit />} />
-      <Route path="new" element={<PostFormWYSIWYG />} />
+      <Route path="new" element={<NewPost />} />
       <Route path=":id/edit" element={<PostFormWYSIWYG />} />
       <Route path="pages" element={<PageList />} />
       <Route path="pages/new" element={<PageFormWYSIWYG />} />

@@ -92,54 +92,88 @@ const Login: FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-wp-bg-secondary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 relative">
+        {/* Background decoration */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+          <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        </div>
         {/* 헤더 */}
-        <div>
-          <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center">
-            <Lock className="h-8 w-8 text-white" />
+        <div className="relative">
+          <div className="mx-auto h-20 w-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            <Lock className="h-10 w-10 text-white" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-wp-text-primary">
+          <h2 className="mt-6 text-center text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             O4O Admin
           </h2>
-          <p className="mt-2 text-center text-sm text-wp-text-secondary">
+          <p className="mt-2 text-center text-sm text-gray-600">
             관리자 계정으로 로그인하세요
           </p>
         </div>
 
         {/* SSO 시스템 안내 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Shield className="h-4 w-4 text-blue-600" />
-            <p className="text-blue-800 text-sm font-medium">새로운 SSO 인증 시스템</p>
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-xl p-5 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Shield className="h-5 w-5 text-blue-600" />
+            </div>
+            <p className="text-blue-800 text-sm font-semibold">새로운 SSO 인증 시스템</p>
           </div>
-          <div className="text-blue-700 text-xs space-y-1">
-            <div>🔐 관리자 전용 보안 강화</div>
-            <div>⚡ 자동 토큰 갱신 (15분 Access + 7일 Refresh)</div>
-            <div>🛡️ 역할 기반 접근 제어</div>
-            <div>📊 실시간 세션 모니터링</div>
+          <div className="text-blue-700 text-xs space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-blue-500">🔐</span>
+              <span>관리자 전용 보안 강화</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-500">⚡</span>
+              <span>자동 토큰 갱신 (15분 Access + 7일 Refresh)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-green-500">🛡️</span>
+              <span>역할 기반 접근 제어</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-purple-500">📊</span>
+              <span>실시간 세션 모니터링</span>
+            </div>
           </div>
         </div>
 
         {/* 테스트 계정 정보 */}
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Shield className="h-4 w-4 text-amber-600" />
-            <p className="text-amber-800 text-sm font-medium">테스트 계정 정보</p>
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-xl p-5 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-amber-100 rounded-lg">
+              <Shield className="h-5 w-5 text-amber-600" />
+            </div>
+            <p className="text-amber-800 text-sm font-semibold">테스트 계정 정보</p>
           </div>
           <div className="text-amber-700 text-sm space-y-2">
             <div>
-              <strong>관리자 계정:</strong>
-              <div className="mt-1 bg-white rounded px-2 py-1 font-mono text-xs">
-                이메일: admin@neture.co.kr<br />
-                비밀번호: Test@1234
+              <strong className="text-amber-900">관리자 계정:</strong>
+              <div className="mt-1 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 font-mono text-xs border border-amber-100">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3 w-3 text-amber-600" />
+                  <span>admin@neture.co.kr</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Lock className="h-3 w-3 text-amber-600" />
+                  <span>Test@1234</span>
+                </div>
               </div>
             </div>
             <div>
-              <strong>일반 관리자:</strong>
-              <div className="mt-1 bg-white rounded px-2 py-1 font-mono text-xs">
-                이메일: manager@neture.co.kr<br />
-                비밀번호: Test@1234
+              <strong className="text-amber-900">일반 관리자:</strong>
+              <div className="mt-1 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 font-mono text-xs border border-amber-100">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3 w-3 text-amber-600" />
+                  <span>manager@neture.co.kr</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Lock className="h-3 w-3 text-amber-600" />
+                  <span>Test@1234</span>
+                </div>
               </div>
             </div>
             <div className="text-xs text-amber-600 mt-2">
@@ -148,14 +182,14 @@ const Login: FC = () => {
           </div>
           
           {/* 빠른 로그인 버튼 */}
-          <div className="mt-3 flex gap-2">
+          <div className="mt-4 flex gap-2">
             <button
               type="button"
               onClick={() => {
                 setEmail('admin@neture.co.kr');
                 setPassword('Test@1234');
               }}
-              className="flex-1 text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 transition-colors"
+              className="flex-1 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-2 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
             >
               관리자로 로그인
             </button>
@@ -165,7 +199,7 @@ const Login: FC = () => {
                 setEmail('manager@neture.co.kr');
                 setPassword('Test@1234');
               }}
-              className="flex-1 text-xs bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700 transition-colors"
+              className="flex-1 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-2 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
             >
               일반 관리자로 로그인
             </button>
@@ -183,16 +217,16 @@ const Login: FC = () => {
         )}
 
         {/* 로그인 폼 */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+        <form className="mt-8 space-y-6 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100" onSubmit={handleSubmit}>
+          <div className="space-y-5">
             {/* 이메일 입력 */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-wp-text-primary mb-2">
                 이메일 주소
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-wp-text-secondary" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                  <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="email"
@@ -202,9 +236,10 @@ const Login: FC = () => {
                   required
                   value={email}
                   onChange={(e: any) => setEmail(e.target.value)}
-                  className="wp-input pl-10 pr-3"
+                  className="wp-input h-12 pl-10 pr-3 bg-gray-50 border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   placeholder="admin@neture.co.kr"
                   disabled={isLoading}
+                  style={{ lineHeight: '1.5' }}
                 />
               </div>
             </div>
@@ -215,8 +250,8 @@ const Login: FC = () => {
                 비밀번호
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-wp-text-secondary" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                  <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="password"
@@ -226,20 +261,21 @@ const Login: FC = () => {
                   required
                   value={password}
                   onChange={(e: any) => setPassword(e.target.value)}
-                  className="wp-input pl-10 pr-10"
+                  className="wp-input h-12 pl-10 pr-10 bg-gray-50 border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   placeholder="비밀번호를 입력하세요"
                   disabled={isLoading}
+                  style={{ lineHeight: '1.5' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
                   disabled={isLoading}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-wp-text-secondary hover:text-wp-text-primary" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors duration-200" />
                   ) : (
-                    <Eye className="h-5 w-5 text-wp-text-secondary hover:text-wp-text-primary" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors duration-200" />
                   )}
                 </button>
               </div>
@@ -255,7 +291,7 @@ const Login: FC = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e: any) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border border-gray-200 rounded"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border border-gray-300 rounded cursor-pointer"
                 disabled={isLoading}
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-wp-text-primary">
@@ -266,7 +302,7 @@ const Login: FC = () => {
             <div className="text-sm">
               <Link 
                 to="/forgot-password" 
-                className="font-medium text-blue-600 hover:text-blue-700"
+                className="font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
               >
                 비밀번호를 잊으셨나요?
               </Link>
@@ -278,7 +314,7 @@ const Login: FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -318,13 +354,28 @@ const Login: FC = () => {
         </form>
 
         {/* 보안 정보 */}
-        <div className="mt-8 p-4 bg-wp-bg-tertiary rounded-lg border">
-          <h3 className="text-sm font-medium text-wp-text-primary mb-2">🔒 보안 안내</h3>
-          <ul className="text-xs text-wp-text-secondary space-y-1">
-            <li>• 세션은 8시간 후 자동 만료됩니다</li>
-            <li>• 비정상적인 접근 시 계정이 자동으로 잠길 수 있습니다</li>
-            <li>• 모든 관리자 활동은 로그로 기록됩니다</li>
-            <li>• 다른 기기에서 로그인 시 기존 세션이 종료됩니다</li>
+        <div className="mt-8 p-5 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200/50 backdrop-blur-sm shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <span className="text-lg">🔒</span>
+            보안 안내
+          </h3>
+          <ul className="text-xs text-gray-600 space-y-2">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500 mt-0.5">•</span>
+              <span>세션은 8시간 후 자동 만료됩니다</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500 mt-0.5">•</span>
+              <span>비정상적인 접근 시 계정이 자동으로 잠길 수 있습니다</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500 mt-0.5">•</span>
+              <span>모든 관리자 활동은 로그로 기록됩니다</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500 mt-0.5">•</span>
+              <span>다른 기기에서 로그인 시 기존 세션이 종료됩니다</span>
+            </li>
           </ul>
         </div>
       </div>
