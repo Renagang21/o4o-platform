@@ -42,16 +42,30 @@ export class AuthClient {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Remove /api/v1 prefix from baseURL for auth endpoints
-    const authUrl = this.baseURL.replace('/api/v1', '/api');
-    const response = await axios.post(`${authUrl}/auth/login`, credentials);
+    // For production API server, use the correct auth endpoint
+    let authUrl: string;
+    if (this.baseURL.includes('api.neture.co.kr')) {
+      // Production API server - use /api/auth/login
+      authUrl = 'https://api.neture.co.kr/api/auth/login';
+    } else {
+      // Development - remove /api/v1 prefix for auth endpoints
+      authUrl = `${this.baseURL.replace('/api/v1', '/api')}/auth/login`;
+    }
+    const response = await axios.post(authUrl, credentials);
     return response.data as AuthResponse;
   }
 
   async logout(): Promise<void> {
-    // Remove /api/v1 prefix from baseURL for auth endpoints
-    const authUrl = this.baseURL.replace('/api/v1', '/api');
-    await axios.post(`${authUrl}/auth/logout`);
+    // For production API server, use the correct auth endpoint
+    let authUrl: string;
+    if (this.baseURL.includes('api.neture.co.kr')) {
+      // Production API server - use /api/auth/logout
+      authUrl = 'https://api.neture.co.kr/api/auth/logout';
+    } else {
+      // Development - remove /api/v1 prefix for auth endpoints
+      authUrl = `${this.baseURL.replace('/api/v1', '/api')}/auth/logout`;
+    }
+    await axios.post(authUrl);
   }
 
   async checkSession(): Promise<{ isAuthenticated: boolean; user?: any }> {
