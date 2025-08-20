@@ -1,0 +1,89 @@
+declare module 'lucide-react' {
+  import { FC, SVGProps } from 'react';
+  
+  export interface IconProps extends SVGProps<SVGSVGElement> {
+    size?: string | number;
+    absoluteStrokeWidth?: boolean;
+  }
+  
+  export type Icon = FC<IconProps>;
+  
+  // 모든 아이콘을 export
+  export const Activity: Icon;
+  export const AlertCircle: Icon;
+  export const AlertTriangle: Icon;
+  export const ArrowLeft: Icon;
+  export const ArrowRight: Icon;
+  export const BarChart: Icon;
+  export const BarChart2: Icon;
+  export const BarChart3: Icon;
+  export const Bell: Icon;
+  export const Calendar: Icon;
+  export const Check: Icon;
+  export const CheckCircle: Icon;
+  export const ChevronDown: Icon;
+  export const ChevronLeft: Icon;
+  export const ChevronRight: Icon;
+  export const ChevronUp: Icon;
+  export const Clock: Icon;
+  export const Download: Icon;
+  export const Edit: Icon;
+  export const Edit2: Icon;
+  export const Edit3: Icon;
+  export const ExternalLink: Icon;
+  export const Eye: Icon;
+  export const EyeOff: Icon;
+  export const FileText: Icon;
+  export const FileVideo: Icon;
+  export const Filter: Icon;
+  export const Home: Icon;
+  export const Image: Icon;
+  export const Layers: Icon;
+  export const Layout: Icon;
+  export const Link: Icon;
+  export const List: Icon;
+  export const LogOut: Icon;
+  export const Mail: Icon;
+  export const Maximize: Icon;
+  export const Maximize2: Icon;
+  export const Menu: Icon;
+  export const Minimize: Icon;
+  export const Minimize2: Icon;
+  export const Monitor: Icon;
+  export const Moon: Icon;
+  export const MoreHorizontal: Icon;
+  export const MoreVertical: Icon;
+  export const Package: Icon;
+  export const PauseCircle: Icon;
+  export const Play: Icon;
+  export const PlayCircle: Icon;
+  export const Plus: Icon;
+  export const PlusCircle: Icon;
+  export const RefreshCw: Icon;
+  export const Save: Icon;
+  export const Search: Icon;
+  export const Settings: Icon;
+  export const ShoppingBag: Icon;
+  export const ShoppingCart: Icon;
+  export const SkipForward: Icon;
+  export const Star: Icon;
+  export const Store: Icon;
+  export const Sun: Icon;
+  export const Tag: Icon;
+  export const Trash: Icon;
+  export const Trash2: Icon;
+  export const TrendingUp: Icon;
+  export const Tv: Icon;
+  export const Upload: Icon;
+  export const User: Icon;
+  export const Users: Icon;
+  export const Video: Icon;
+  export const Volume2: Icon;
+  export const VolumeX: Icon;
+  export const Wifi: Icon;
+  export const WifiOff: Icon;
+  export const X: Icon;
+  export const XCircle: Icon;
+  export const Youtube: Icon;
+  export const Zap: Icon;
+}

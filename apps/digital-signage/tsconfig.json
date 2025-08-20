@@ -24,7 +24,7 @@
       "@o4o/auth-context": ["../../packages/auth-context/src"]
     }
   },
-  "include": ["src", "vite-env.d.ts", "../../types/**/*.d.ts"],
+  "include": ["src", "vite-env.d.ts", "types/**/*.d.ts", "../../types/**/*.d.ts"],
   "references": [
     { "path": "../../packages/types" },
     { "path": "../../packages/utils" },

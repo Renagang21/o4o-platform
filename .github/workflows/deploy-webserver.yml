@@ -62,7 +62,20 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+          
+          # Add host to known_hosts (with error handling)
+          if [ -n "$SERVER_HOST" ]; then
+            ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts 2>/dev/null || {
+              echo "Warning: Could not scan SSH host key for $SERVER_HOST"
+              # Try with IP if hostname fails
+              if [ -n "${{ secrets.WEB_SERVER_IP }}" ]; then
+                ssh-keyscan -H ${{ secrets.WEB_SERVER_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+              fi
+            }
+          else
+            echo "Error: SERVER_HOST is not set"
+            exit 1
+          fi
 
           # Deploy Main Site
           if [[ "${{ github.event.inputs.deploy_target }}" == "all" || "${{ github.event.inputs.deploy_target }}" == "main-site" ]]; then
