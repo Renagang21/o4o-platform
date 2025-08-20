@@ -187,11 +187,13 @@ const Login: FC = () => {
           <div className="space-y-4">
             {/* 이메일 입력 */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-wp-text-primary mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-wp-text-primary mb-2">
                 이메일 주소
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-wp-text-secondary" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-wp-text-secondary" />
+                </div>
                 <input
                   id="email"
                   name="email"
@@ -200,7 +202,7 @@ const Login: FC = () => {
                   required
                   value={email}
                   onChange={(e: any) => setEmail(e.target.value)}
-                  className="wp-input pl-10"
+                  className="wp-input pl-10 pr-3"
                   placeholder="admin@neture.co.kr"
                   disabled={isLoading}
                 />
@@ -209,11 +211,13 @@ const Login: FC = () => {
 
             {/* 비밀번호 입력 */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-wp-text-primary mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-wp-text-primary mb-2">
                 비밀번호
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-wp-text-secondary" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-wp-text-secondary" />
+                </div>
                 <input
                   id="password"
                   name="password"
@@ -229,13 +233,13 @@ const Login: FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-wp-text-secondary hover:text-wp-text-primary"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   disabled={isLoading}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
+                    <EyeOff className="h-5 w-5 text-wp-text-secondary hover:text-wp-text-primary" />
                   ) : (
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-5 w-5 text-wp-text-secondary hover:text-wp-text-primary" />
                   )}
                 </button>
               </div>

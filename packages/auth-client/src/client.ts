@@ -42,12 +42,16 @@ export class AuthClient {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await this.api.post('/auth/login', credentials);
+    // Remove /api/v1 prefix from baseURL for auth endpoints
+    const authUrl = this.baseURL.replace('/api/v1', '/api');
+    const response = await axios.post(`${authUrl}/auth/login`, credentials);
     return response.data;
   }
 
   async logout(): Promise<void> {
-    await this.api.post('/auth/logout');
+    // Remove /api/v1 prefix from baseURL for auth endpoints
+    const authUrl = this.baseURL.replace('/api/v1', '/api');
+    await axios.post(`${authUrl}/auth/logout`);
   }
 
   async checkSession(): Promise<{ isAuthenticated: boolean; user?: any }> {

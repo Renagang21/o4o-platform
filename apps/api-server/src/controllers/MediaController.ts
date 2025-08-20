@@ -65,12 +65,12 @@ const upload = multer({
 });
 
 export class MediaController {
-  private mediaRepository: Repository<MediaFile>;
-  private folderRepository: Repository<MediaFolder>;
+  private get mediaRepository(): Repository<MediaFile> {
+    return AppDataSource.getRepository(MediaFile);
+  }
 
-  constructor() {
-    this.mediaRepository = AppDataSource.getRepository(MediaFile);
-    this.folderRepository = AppDataSource.getRepository(MediaFolder);
+  private get folderRepository(): Repository<MediaFolder> {
+    return AppDataSource.getRepository(MediaFolder);
   }
 
   /**
@@ -87,7 +87,7 @@ export class MediaController {
           });
         }
 
-        const { folderId, alt, caption, description } = req.body;
+        const { folderId, altText, caption, description } = req.body;
         const userId = (req as any).user?.id;
 
         // Generate URL path
@@ -118,7 +118,7 @@ export class MediaController {
           size: req.file.size,
           folderId: folderId || null,
           uploadedBy: userId,
-          altText: alt,
+          altText: altText,
           caption,
           description,
           metadata
@@ -264,7 +264,7 @@ export class MediaController {
 
       if (search) {
         queryBuilder.andWhere(
-          '(media.name ILIKE :search OR media.originalName ILIKE :search OR media.alt ILIKE :search)',
+          '(media.filename ILIKE :search OR media.originalName ILIKE :search OR media.altText ILIKE :search)',
           { search: `%${search}%` }
         );
       }
@@ -340,7 +340,7 @@ export class MediaController {
   updateMedia = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { alt, caption, description, folderId } = req.body;
+      const { altText, caption, description, folderId } = req.body;
 
       const media = await this.mediaRepository.findOne({ where: { id } });
 
@@ -352,7 +352,7 @@ export class MediaController {
       }
 
       // Update fields
-      if (alt !== undefined) media.altText = alt;
+      if (altText !== undefined) media.altText = altText;
       if (caption !== undefined) media.caption = caption;
       if (description !== undefined) media.description = description;
       if (folderId !== undefined) media.folderId = folderId;

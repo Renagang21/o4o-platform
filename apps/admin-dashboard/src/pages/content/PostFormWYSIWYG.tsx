@@ -60,7 +60,7 @@ const PostFormWYSIWYG = () => {
     onSuccess: (data) => {
       toast.success('Post created successfully');
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      navigate(`/content/posts/${data.id}/edit`);
+      navigate(`/posts/${data.id}/edit`);
     },
     onError: () => {
       toast.error('Failed to create post');
@@ -141,7 +141,7 @@ const PostFormWYSIWYG = () => {
         // Only create if there's actual content
         const result = await createMutation.mutateAsync(postData);
         // Update URL to edit mode after first save
-        window.history.replaceState(null, '', `/content/posts/${result.id}/edit`);
+        window.history.replaceState(null, '', `/posts/${result.id}/edit`);
       }
     } finally {
       setIsAutoSaving(false);
@@ -174,7 +174,7 @@ const PostFormWYSIWYG = () => {
       const confirmed = window.confirm('You have unsaved changes. Are you sure you want to leave?');
       if (!confirmed) return;
     }
-    navigate('/content/posts');
+    navigate('/posts');
   };
 
   // Prevent accidental navigation
@@ -199,44 +199,69 @@ const PostFormWYSIWYG = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white">
-      {/* Minimal Header */}
-      <div className="border-b px-4 py-2 flex items-center justify-between bg-white">
-        <div className="flex items-center gap-4">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+      {/* Gutenberg-style Top Bar */}
+      <div className="h-14 border-b bg-white flex items-center justify-between px-4 shadow-sm">
+        {/* Left side */}
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={handleBack}
-            className="gap-2"
+            className="h-9 w-9"
+            title="Back to posts"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Posts
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           
+          <div className="w-px h-6 bg-gray-300 mx-1" />
+          
+          <span className="text-sm font-medium text-gray-700">
+            {isEditMode ? 'Edit Post' : 'Add New Post'}
+          </span>
+          
           {isAutoSaving && (
-            <span className="text-sm text-gray-500">Auto-saving...</span>
+            <span className="text-xs text-gray-500 ml-2">Saving...</span>
           )}
           
           {!isAutoSaving && !isDirty && isEditMode && (
-            <span className="text-sm text-green-600">Saved</span>
+            <span className="text-xs text-green-600 ml-2">✓ Saved</span>
           )}
         </div>
 
+        {/* Right side */}
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            onClick={() => window.open(`/preview/post/${id}`, '_blank')}
+            onClick={() => {
+              if (isEditMode && id) {
+                window.open(`/preview/post/${id}`, '_blank');
+              } else {
+                toast.info('Save the post first to preview');
+              }
+            }}
             disabled={!isEditMode}
+            className="text-gray-600"
           >
             Preview
           </Button>
           
           <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleAutoSave}
+            disabled={!isDirty || isAutoSaving}
+            className="text-gray-600"
+          >
+            Save draft
+          </Button>
+          
+          <Button
             size="sm"
             onClick={handlePublish}
-            disabled={createMutation.isPending || updateMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={createMutation.isPending || updateMutation.isPending || !title}
+            className="bg-[#007cba] hover:bg-[#006ba1] text-white px-4"
           >
             {createMutation.isPending || updateMutation.isPending
               ? 'Publishing...'
@@ -245,7 +270,7 @@ const PostFormWYSIWYG = () => {
         </div>
       </div>
 
-      {/* WYSIWYG Editor - Full Height */}
+      {/* Full Screen Editor */}
       <div className="flex-1 overflow-hidden">
         <GutenbergBlockEditor
           initialBlocks={blocks}
@@ -254,8 +279,8 @@ const PostFormWYSIWYG = () => {
           onTitleChange={handleTitleChange}
           onSave={() => handleAutoSave()}
           autoSave={true}
-          showInspector={false}
-          fullScreen={false}
+          showInspector={true}
+          fullScreen={true}
         />
       </div>
     </div>

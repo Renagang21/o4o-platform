@@ -214,63 +214,80 @@ const PageFormWYSIWYG = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white">
-      {/* Minimal Header - WordPress Style */}
-      <div className="border-b px-4 py-2 flex items-center justify-between bg-white">
-        <div className="flex items-center gap-4">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+      {/* Gutenberg-style Top Bar */}
+      <div className="h-14 border-b bg-white flex items-center justify-between px-4 shadow-sm">
+        {/* Left side */}
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={handleBack}
-            className="gap-2"
+            className="h-9 w-9"
+            title="Back to pages"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Pages
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <FileText className="h-4 w-4" />
-            <span>{isEditMode ? 'Edit Page' : 'Add New Page'}</span>
-          </div>
+          <div className="w-px h-6 bg-gray-300 mx-1" />
+          
+          <span className="text-sm font-medium text-gray-700">
+            {isEditMode ? 'Edit Page' : 'Add New Page'}
+          </span>
           
           {isAutoSaving && (
-            <span className="text-sm text-gray-500">Auto-saving...</span>
+            <span className="text-xs text-gray-500 ml-2">Saving...</span>
           )}
           
           {!isAutoSaving && !isDirty && isEditMode && (
-            <span className="text-sm text-green-600">✓ Saved</span>
+            <span className="text-xs text-green-600 ml-2">✓ Saved</span>
           )}
         </div>
 
+        {/* Right side */}
         <div className="flex items-center gap-2">
           {isEditMode && (
             <Button
               variant="ghost"
               size="sm"
               onClick={handleView}
+              className="text-gray-600"
             >
               View Page
             </Button>
           )}
           
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => {
-              if (id) {
+              if (isEditMode && id) {
                 window.open(`/preview/page/${id}`, '_blank');
+              } else {
+                toast.info('Save the page first to preview');
               }
             }}
             disabled={!isEditMode}
+            className="text-gray-600"
           >
             Preview
           </Button>
           
           <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleAutoSave}
+            disabled={!isDirty || isAutoSaving}
+            className="text-gray-600"
+          >
+            Save draft
+          </Button>
+          
+          <Button
             size="sm"
             onClick={handlePublish}
-            disabled={createMutation.isPending || updateMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={createMutation.isPending || updateMutation.isPending || !title}
+            className="bg-[#007cba] hover:bg-[#006ba1] text-white px-4"
           >
             {createMutation.isPending || updateMutation.isPending
               ? 'Publishing...'
@@ -279,7 +296,7 @@ const PageFormWYSIWYG = () => {
         </div>
       </div>
 
-      {/* WYSIWYG Editor - Full Height */}
+      {/* Full Screen Editor */}
       <div className="flex-1 overflow-hidden">
         <GutenbergBlockEditor
           initialBlocks={blocks}
@@ -288,8 +305,8 @@ const PageFormWYSIWYG = () => {
           onTitleChange={handleTitleChange}
           onSave={() => handleAutoSave()}
           autoSave={true}
-          showInspector={false}
-          fullScreen={false}
+          showInspector={true}
+          fullScreen={true}
         />
       </div>
     </div>

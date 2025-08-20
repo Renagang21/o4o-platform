@@ -17,10 +17,9 @@ import WidgetManager from './WidgetManager'
 const Content: FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="posts" replace />} />
-      <Route path="posts" element={<PostListQuickEdit />} />
-      <Route path="posts/new" element={<PostFormWYSIWYG />} />
-      <Route path="posts/:id/edit" element={<PostFormWYSIWYG />} />
+      <Route path="/" element={<PostListQuickEdit />} />
+      <Route path="new" element={<PostFormWYSIWYG />} />
+      <Route path=":id/edit" element={<PostFormWYSIWYG />} />
       <Route path="pages" element={<PageList />} />
       <Route path="pages/new" element={<PageFormWYSIWYG />} />
       <Route path="pages/:id/edit" element={<PageFormWYSIWYG />} />

@@ -347,122 +347,138 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   };
 
   return (
-    <div className={cn(
-      'gutenberg-editor flex flex-col h-full bg-white',
-      isFullScreen && 'fixed inset-0 z-50'
-    )}>
-      {/* Editor Header */}
-      <div className="border-b px-4 py-2 flex items-center justify-between bg-white">
-        <div className="flex items-center gap-4 flex-1">
-          {/* Title input */}
-          <input
-            type="text"
-            value={documentTitle}
-            onChange={(e) => {
-              setDocumentTitle(e.target.value);
-              onTitleChange?.(e.target.value);
-            }}
-            placeholder="제목 입력..."
-            className="text-2xl font-bold outline-none flex-1"
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Block inserter */}
-          <Popover open={showBlockInserter} onOpenChange={setShowBlockInserter}>
-            <PopoverTrigger>
-              <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-1" />
-                블록 추가
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-0 w-auto">
-              <BlockInserterMenu />
-            </PopoverContent>
-          </Popover>
-
-          {/* Save button */}
-          <Button
-            variant="default"
-            size="sm"
-            onClick={onSave}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Save className="h-4 w-4 mr-1" />
-            저장
-          </Button>
-
-          {/* View options */}
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost" size="sm">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsFullScreen(!isFullScreen)}>
-                <Maximize2 className="h-4 w-4 mr-2" />
-                {isFullScreen ? '전체화면 종료' : '전체화면'}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowSettings(!showSettings)}>
-                <Settings className="h-4 w-4 mr-2" />
-                {showSettings ? '설정 숨기기' : '설정 보기'}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Eye className="h-4 w-4 mr-2" />
-                미리보기
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Editor Content */}
-      <div className="flex-1 overflow-auto">
-        <div 
-          ref={editorRef}
-          className="max-w-4xl mx-auto p-8"
-          onClick={(e) => {
-            // Deselect block if clicking on empty space
-            if (e.target === e.currentTarget) {
-              setSelectedBlockId(null);
-            }
-          }}
-        >
-          {/* Blocks */}
-          <div className="space-y-4">
-            {blocks.map((block) => (
-              <div key={block.id} className="block-container">
-                {renderBlock(block)}
-              </div>
-            ))}
-          </div>
-
-          {/* Add block button at the end */}
-          <div className="mt-8 flex justify-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => addBlock('paragraph', 'after', blocks[blocks.length - 1]?.id)}
-              className="opacity-50 hover:opacity-100 transition-opacity"
+    <div className="gutenberg-editor flex h-full bg-[#f0f0f0]">
+      {/* Main Editor Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Editor Content */}
+        <div className="flex-1 overflow-auto bg-[#f0f0f0]">
+          <div className="min-h-full py-8">
+            <div 
+              ref={editorRef}
+              className="max-w-[840px] mx-auto bg-white shadow-sm"
+              style={{ minHeight: 'calc(100vh - 120px)' }}
             >
-              <Plus className="h-4 w-4 mr-1" />
-              블록 추가
-            </Button>
+              {/* Title Area */}
+              <div className="px-20 pt-16 pb-8">
+                <input
+                  type="text"
+                  value={documentTitle}
+                  onChange={(e) => {
+                    setDocumentTitle(e.target.value);
+                    onTitleChange?.(e.target.value);
+                  }}
+                  placeholder="Add title"
+                  className="text-5xl font-light w-full outline-none border-0 focus:ring-0 placeholder-gray-400"
+                  style={{ lineHeight: '1.2' }}
+                />
+              </div>
+
+              {/* Blocks Area */}
+              <div 
+                className="px-20 pb-20"
+                onClick={(e) => {
+                  // Deselect block if clicking on empty space
+                  if (e.target === e.currentTarget) {
+                    setSelectedBlockId(null);
+                  }
+                }}
+              >
+                <div className="space-y-1">
+                  {blocks.map((block, index) => (
+                    <div key={block.id} className="block-container group relative">
+                      {/* Block toolbar on hover */}
+                      <div className="absolute -left-12 top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
+                            setInserterTargetId(block.id);
+                            setInserterTargetPosition('before');
+                            setShowBlockInserter(true);
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      {renderBlock(block)}
+                      
+                      {/* Add block button between blocks */}
+                      {index < blocks.length - 1 && (
+                        <div className="relative h-4 -my-2 group/add">
+                          <button
+                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/add:opacity-100 transition-opacity bg-blue-600 text-white rounded-full p-1 hover:bg-blue-700"
+                            onClick={() => {
+                              setInserterTargetId(block.id);
+                              setInserterTargetPosition('after');
+                              setShowBlockInserter(true);
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add block button at the end */}
+                <div className="mt-8 flex justify-center">
+                  <button
+                    onClick={() => {
+                      const lastBlockId = blocks[blocks.length - 1]?.id;
+                      if (lastBlockId) {
+                        setInserterTargetId(lastBlockId);
+                        setInserterTargetPosition('after');
+                        setShowBlockInserter(true);
+                      } else {
+                        addBlock('paragraph', 'after', null);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-gray-900 rounded hover:bg-gray-900 hover:text-white transition-colors"
+                  >
+                    <Plus className="h-5 w-5" />
+                    <span className="font-medium">Add block</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Block inserter popover */}
-      {showBlockInserter && inserterPosition && (
-        <div
-          className="fixed z-50"
-          style={{ left: inserterPosition.x, top: inserterPosition.y }}
-        >
-          <BlockInserterMenu />
+      {/* Settings Sidebar (optional) */}
+      {showSettings && (
+        <div className="w-80 bg-white border-l flex flex-col">
+          <div className="p-4 border-b">
+            <h3 className="font-semibold">Block Settings</h3>
+          </div>
+          <div className="flex-1 p-4">
+            {selectedBlockId ? (
+              <div>
+                <p className="text-sm text-gray-600">
+                  Selected block: {blocks.find(b => b.id === selectedBlockId)?.type}
+                </p>
+                {/* Add block-specific settings here */}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Select a block to see its settings</p>
+            )}
+          </div>
         </div>
       )}
+
+      {/* Block inserter modal */}
+      <Popover open={showBlockInserter} onOpenChange={setShowBlockInserter}>
+        <PopoverContent 
+          className="p-0 w-auto"
+          side="bottom"
+          align="start"
+        >
+          <BlockInserterMenu />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
