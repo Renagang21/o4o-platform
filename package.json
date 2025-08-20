@@ -7,7 +7,6 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "packages/blocks/*",
     "!apps/*.backup",
     "!packages/*.backup"
   ],
@@ -31,7 +30,7 @@
     
     "// === 빌드 스크립트 ===": "",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' npm run build:packages && NODE_OPTIONS='--max-old-space-size=8192' npm run build:apps",
-    "build:packages": "npm run build:types && npm run build:utils && npm run build:ui && npm run build:auth-client && npm run build:auth-context && npm run build:shortcodes && npm run build:all-blocks",
+    "build:packages": "npm run build:types && npm run build:utils && npm run build:ui && npm run build:auth-client && npm run build:auth-context && npm run build:shortcodes",
     "build:apps": "npm run build:main-site && npm run build:admin && npm run build:api",
     "build:web": "npm run build:packages && npm run build:main-site && npm run build:admin",
     "build:api": "cd apps/api-server && npm run build",
@@ -44,16 +43,9 @@
     "build:auth-context": "npm run build --workspace=@o4o/auth-context",
     "build:shortcodes": "npm run build --workspace=@o4o/shortcodes",
     
-    "// === 블록 플러그인 빌드 ===": "",
-    "build:blocks": "webpack --config webpack.blocks.config.js",
-    "build:blocks:watch": "webpack --config webpack.blocks.config.js --watch",
-    "build:blocks:analyze": "ANALYZE=true webpack --config webpack.blocks.config.js",
-    "build:block-core": "npm run build --workspace=@o4o/block-core",
-    "build:text-content-blocks": "npm run build --workspace=@o4o/text-content-blocks",
-    "build:layout-media-blocks": "npm run build --workspace=@o4o/layout-media-blocks",
-    "build:interactive-blocks": "npm run build --workspace=@o4o/interactive-blocks",
-    "build:dynamic-blocks": "npm run build --workspace=@o4o/dynamic-blocks",
-    "build:all-blocks": "npm run build:block-core && npm run build:text-content-blocks && npm run build:layout-media-blocks && npm run build:interactive-blocks && npm run build:dynamic-blocks",
+    "// === 블록 플러그인 빌드 (별도 설치 필요) ===": "",
+    "build:blocks": "cd packages/block-core && npm run build && cd ../blocks/text-content && npm run build && cd ../layout-media && npm run build && cd ../interactive && npm run build && cd ../dynamic && npm run build",
+    "install:blocks": "cd packages/block-core && npm install && cd ../blocks/text-content && npm install && cd ../layout-media && npm install && cd ../interactive && npm install && cd ../dynamic && npm install",
     
     "// === 테스트 & 린트 ===": "",
     "type-check": "./scripts/development/dev.sh type-check",
@@ -62,9 +54,13 @@
     "test": "./scripts/development/dev.sh test",
     
     "// === 정리 스크립트 ===": "",
-    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/*/dist packages/*/dist",
-    "clean:dist": "rm -rf apps/*/dist packages/*/dist",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules packages/blocks/*/node_modules apps/*/dist packages/*/dist packages/blocks/*/dist",
+    "clean:dist": "rm -rf apps/*/dist packages/*/dist packages/blocks/*/dist",
     "install:all": "npm install && npm run build",
+    "install:split": "./scripts/install-split.sh",
+    "ci:split": "./scripts/install-split.sh",
+    "ci:parallel": "./scripts/ci-parallel.sh",
+    "preinstall": "echo 'Use npm run install:split or ci:parallel for faster installation'",
     
     "// === PM2 관리 ===": "",
     "pm2:start:local": "pm2 start ecosystem.config.local.cjs",
