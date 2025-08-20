@@ -1,6 +1,6 @@
 import { FC, useState  } from 'react';
 import { ShortcodeProps } from '@o4o/shortcodes';
-import { CreditCard, Smartphone, Banknote, Building } from 'lucide-react';
+import { CreditCard, Smartphone, DollarSign, Building } from 'lucide-react';
 
 /**
  * [payment-methods] 숏코드 컴포넌트
@@ -53,7 +53,7 @@ export const PaymentMethods: FC<ShortcodeProps> = ({ attributes }) => {
       id: 'virtual',
       name: '가상계좌',
       description: '입금 확인 후 주문 처리',
-      icon: Banknote,
+      icon: DollarSign,
       badge: null
     }
   ];

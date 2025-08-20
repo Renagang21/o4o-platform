@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@o4o/
 import { Alert, AlertDescription } from '@o4o/ui';
 import { Skeleton } from '@o4o/ui';
 import { 
-  Store, 
+  Building, 
   Upload, 
   Save, 
   AlertCircle, 
@@ -342,7 +342,7 @@ export function SupplierStoreSettings() {
                   </div>
                 ) : (
                   <div className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                    <Store className="w-8 h-8 text-gray-400" />
+                    <Building className="w-8 h-8 text-gray-400" />
                   </div>
                 )}
                 <div className="flex-1">

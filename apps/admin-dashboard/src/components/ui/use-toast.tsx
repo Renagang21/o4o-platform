@@ -20,12 +20,12 @@ export function useToast() {
   const context = React.useContext(ToastContext)
   if (!context) {
     return {
-      toast: (toast: Omit<Toast, "id">) => {
-        console.log("Toast:", toast)
+      toast: (_toast: Omit<Toast, "id">) => {
+        // No-op when context is not available
       },
       toasts: [],
-      dismiss: (toastId?: string) => {
-        console.log("Dismiss toast:", toastId)
+      dismiss: (_toastId?: string) => {
+        // No-op when context is not available
       }
     }
   }

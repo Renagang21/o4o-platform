@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { 
-  Store, 
+  Building, 
   Bell, 
   CreditCard, 
   Truck,
@@ -61,7 +61,7 @@ export default function VendorSettings() {
   const [saving, setSaving] = useState(false);
 
   const tabs = [
-    { id: 'store', name: '스토어 정보', icon: Store },
+    { id: 'store', name: '스토어 정보', icon: Building },
     { id: 'payment', name: '정산 정보', icon: CreditCard },
     { id: 'shipping', name: '배송 설정', icon: Truck },
     { id: 'notifications', name: '알림 설정', icon: Bell },

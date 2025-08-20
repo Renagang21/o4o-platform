@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
+  Layout, 
   Package, 
   ShoppingCart, 
   BarChart3, 
@@ -11,7 +11,7 @@ import {
   Bell,
   User,
   LogOut,
-  Store,
+  Building,
   TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
@@ -24,7 +24,7 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-  { name: '대시보드', href: '/vendor', icon: LayoutDashboard },
+  { name: '대시보드', href: '/vendor', icon: Layout },
   { name: '상품 관리', href: '/vendor/products', icon: Package },
   { name: '주문 관리', href: '/vendor/orders', icon: ShoppingCart, badge: 5 },
   { name: '매출 분석', href: '/vendor/analytics', icon: BarChart3 },
@@ -60,7 +60,7 @@ export default function VendorLayout() {
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-6 border-b">
             <div className="flex items-center">
-              <Store className="h-8 w-8 text-blue-600" />
+              <Building className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold">Vendor Portal</span>
             </div>
             <button

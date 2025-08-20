@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@o4o/ui';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@o4o/ui';
 import { Alert, AlertDescription } from '@o4o/ui';
 import { Skeleton } from '@o4o/ui';
-import { PenSquare, AlertCircle } from 'lucide-react';
+import { Edit2, AlertCircle } from 'lucide-react';
 import {
   useProductReviews,
   useProductReviewStats,
@@ -115,7 +115,7 @@ export function ProductReviewSection({ product, className }: ProductReviewSectio
         <h2 className="text-2xl font-bold">리뷰</h2>
         {user && canReviewData?.canReview && (
           <Button onClick={() => setShowReviewForm(true)}>
-            <PenSquare className="w-4 h-4 mr-2" />
+            <Edit2 className="w-4 h-4 mr-2" />
             리뷰 작성
           </Button>
         )}

@@ -16,7 +16,7 @@ import {
   Share2, 
   Package, 
   Shield, 
-  TruckIcon,
+  Truck,
   AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -243,7 +243,7 @@ export function ProductDetail() {
           {/* Benefits */}
           <div className="grid grid-cols-3 gap-4 pt-6 border-t">
             <div className="text-center">
-              <TruckIcon className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+              <Truck className="w-8 h-8 mx-auto mb-2 text-gray-600" />
               <p className="text-sm">무료 배송</p>
               <p className="text-xs text-gray-500">5만원 이상</p>
             </div>

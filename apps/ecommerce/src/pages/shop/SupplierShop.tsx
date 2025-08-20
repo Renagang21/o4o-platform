@@ -9,7 +9,7 @@ import { Badge } from '@o4o/ui';
 import { Skeleton } from '@o4o/ui';
 import { Alert, AlertDescription } from '@o4o/ui';
 import { 
-  Store, 
+  Building, 
   Package, 
   Truck, 
   Shield, 
@@ -91,7 +91,7 @@ export function SupplierShop() {
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-lg border-4 border-white bg-white flex items-center justify-center">
-                    <Store className="w-12 h-12 text-gray-400" />
+                    <Building className="w-12 h-12 text-gray-400" />
                   </div>
                 )}
               </div>

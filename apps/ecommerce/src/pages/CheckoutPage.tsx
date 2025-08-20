@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { Button, Input, Card, Label, RadioGroup, RadioGroupItem, Textarea, Checkbox } from '@o4o/ui';
-import { CreditCard, Smartphone, Building, Wallet, AlertCircle } from 'lucide-react';
+import { CreditCard, Smartphone, Building, DollarSign, AlertCircle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import { formatCurrency } from '@o4o/utils';
 
@@ -28,7 +28,7 @@ const paymentMethods = [
   { value: 'kakao_pay', label: '카카오페이', icon: Smartphone },
   { value: 'naver_pay', label: '네이버페이', icon: Smartphone },
   { value: 'virtual_account', label: '가상계좌', icon: Building },
-  { value: 'bank_transfer', label: '무통장입금', icon: Wallet }
+  { value: 'bank_transfer', label: '무통장입금', icon: DollarSign }
 ];
 
 const deliveryRequests = [

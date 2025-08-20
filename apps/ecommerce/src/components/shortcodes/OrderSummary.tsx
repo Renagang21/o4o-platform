@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { ShortcodeProps } from '@o4o/shortcodes';
 import { useCartStore } from '@/stores/useCartStore';
 import { formatPrice } from '@o4o/utils';
-import { ShoppingCart, Tag, Truck, Receipt } from 'lucide-react';
+import { ShoppingCart, Tag, Truck, FileText } from 'lucide-react';
 
 /**
  * [order-summary] 숏코드 컴포넌트
@@ -52,7 +52,7 @@ export const OrderSummary: FC<ShortcodeProps> = ({ attributes }) => {
     {
       label: '세금',
       value: summary.tax,
-      icon: Receipt,
+      icon: FileText,
       show: summary.tax > 0
     }
   ];

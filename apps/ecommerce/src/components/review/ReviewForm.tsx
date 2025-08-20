@@ -8,7 +8,7 @@ import { Button } from '@o4o/ui';
 import { Textarea } from '@o4o/ui';
 import { Input } from '@o4o/ui';
 import { Label } from '@o4o/ui';
-import { ImagePlus, X } from 'lucide-react';
+import { Image, X } from 'lucide-react';
 import { cn } from '@o4o/utils';
 
 const reviewSchema = z.object({
@@ -186,7 +186,7 @@ export function ReviewForm({
                 onClick={() => fileInputRef.current?.click()}
                 className="w-20 h-20 border-2 border-dashed border-gray-300 rounded hover:border-gray-400 flex items-center justify-center"
               >
-                <ImagePlus className="w-6 h-6 text-gray-400" />
+                <Image className="w-6 h-6 text-gray-400" />
               </button>
             )}
           </div>

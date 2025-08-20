@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Card, Badge } from '@o4o/ui';
-import { ArrowLeft, MapPin, CreditCard, Download, Printer } from 'lucide-react';
+import { ChevronLeft, MapPin, CreditCard, Download, Printer } from 'lucide-react';
 import { Order } from '@o4o/types';
 import { formatCurrency, formatDate } from '@o4o/utils';
 import { useAuth } from '@o4o/auth-context';
@@ -162,7 +162,7 @@ export function OrderDetailPage() {
             size="sm"
             onClick={() => navigate('/orders')}
           >
-            <ArrowLeft className="h-4 w-4 mr-1" />
+            <ChevronLeft className="h-4 w-4 mr-1" />
             주문 목록
           </Button>
           <div>
