@@ -138,14 +138,25 @@ function App() {
   
   // Initialize SSO on app start
   useEffect(() => {
-    // Initial SSO session check
-    checkSSOSession().catch(() => {
-      // SSO session check failed - clear local storage
-      localStorage.removeItem('auth-storage');
-      localStorage.removeItem('authToken');
-    });
+    // 앱 시작 시 즉시 토큰 복원 시도
+    const initializeAuth = async () => {
+      try {
+        // 먼저 저장된 인증 정보로 상태 복원
+        await checkSSOSession();
+      } catch (error) {
+        // SSO session check failed - clear local storage only if it's a 401 error
+        if ((error as any)?.response?.status === 401) {
+          localStorage.removeItem('auth-storage');
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('accessToken');
+        }
+      }
+    };
+
+    // 즉시 초기화 실행
+    initializeAuth();
     
-    // Start SSO session monitoring
+    // Start SSO session monitoring (덜 빈번한 체크로 성능 개선)
     ssoService.startSessionCheck((isAuthenticated) => {
       if (!isAuthenticated) {
         toast.error('Session expired. Please log in again.');
@@ -839,6 +850,55 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['admin']}>
                         <Suspense fallback={<PageLoader />}>
                           <AppSettings />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/apps/marketplace" element={
+                      <AdminProtectedRoute requiredPermissions={['apps:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <AppsManager />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Shortcode 관리 */}
+                    <Route path="/shortcodes" element={
+                      <AdminProtectedRoute requiredPermissions={['shortcodes:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ShortcodeManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/shortcodes/by-app" element={
+                      <AdminProtectedRoute requiredPermissions={['shortcodes:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ShortcodeManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/shortcodes/by-category" element={
+                      <AdminProtectedRoute requiredPermissions={['shortcodes:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ShortcodeManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/shortcodes/stats" element={
+                      <AdminProtectedRoute requiredPermissions={['shortcodes:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ShortcodeManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/shortcodes/settings" element={
+                      <AdminProtectedRoute requiredPermissions={['shortcodes:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ShortcodeManagement />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

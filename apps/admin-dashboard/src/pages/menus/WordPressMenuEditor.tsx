@@ -361,49 +361,6 @@ const WordPressMenuEditor: FC = () => {
     setIsDragging(false);
   };
 
-  // Make item a child of another item
-  // const _makeChild = (parentId: string, childId: string) => {
-  //   let childItem: MenuItem | null = null;
-  //   
-  //   // Remove child from its current position
-  //   const removeChild = (items: MenuItem[]): MenuItem[] => {
-  //     return items.filter(item => {
-  //       if (item.id === childId) {
-  //         childItem = item;
-  //         return false;
-  //       }
-  //       if (item.children) {
-  //         item.children = removeChild(item.children);
-  //       }
-  //       return true;
-  //     });
-  //   };
-  //   
-  //   // Add child to parent
-  //   const addToParent = (items: MenuItem[]): MenuItem[] => {
-  //     return items.map(item => {
-  //       if (item.id === parentId && childItem) {
-  //         return {
-  //           ...item,
-  //           children: [...(item.children || []), childItem]
-  //         };
-  //       }
-  //       if (item.children) {
-  //         return {
-  //           ...item,
-  //           children: addToParent(item.children)
-  //         };
-  //       }
-  //       return item;
-  //     });
-  //   };
-  //   
-  //   let newItems = removeChild([...menuItems]);
-  //   if (childItem) {
-  //     newItems = addToParent(newItems);
-  //     setMenuItems(newItems);
-  //   }
-  // };
 
   // Save menu
   const saveMenu = async () => {

@@ -15,34 +15,59 @@ export const AdminProtectedRoute = ({ children, requiredRoles = [], requiredPerm
     const navigate = useNavigate();
     const location = useLocation();
     useEffect(() => {
-        // 로딩 중이 아니고 인증되지 않은 경우 로그인 페이지로 리다이렉트
+        // 로딩이 완전히 완료되고 인증되지 않은 경우에만 리다이렉트
+        // 추가적인 지연을 두어 토큰 복원 프로세스가 완료될 시간을 확보
+        let timeoutId;
         if (!isLoading && !isAuthenticated) {
-            navigate('/login', {
-                replace: true,
-                state: { from: location.pathname }
-            });
+            timeoutId = window.setTimeout(() => {
+                // 한 번 더 확인 후 리다이렉트
+                if (!isAuthenticated) {
+                    navigate('/login', {
+                        replace: true,
+                        state: { from: location.pathname }
+                    });
+                }
+            }, 100); // 100ms 지연으로 토큰 복원 완료 대기
         }
+        return () => {
+            if (timeoutId)
+                clearTimeout(timeoutId);
+        };
     }, [isAuthenticated, isLoading, navigate, location]);
-    // 로딩 중인 경우
+    // 로딩 중인 경우 - 더 나은 UX를 위한 로딩 화면
     if (isLoading) {
         return (_jsx("div", { style: {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '100vh'
+                height: '100vh',
+                backgroundColor: '#f8fafc'
             }, children: _jsxs("div", { style: { textAlign: 'center' }, children: [_jsx("div", { style: {
                             width: '48px',
                             height: '48px',
-                            border: '4px solid #f3f4f6',
+                            border: '4px solid #e2e8f0',
                             borderTop: '4px solid #3b82f6',
                             borderRadius: '50%',
                             animation: 'spin 1s linear infinite',
                             margin: '0 auto 16px'
-                        } }), _jsx("p", { style: { color: '#6b7280' }, children: "\uC778\uC99D \uD655\uC778 \uC911..." })] }) }));
+                        } }), _jsx("p", { style: { color: '#64748b', fontSize: '14px' }, children: "\uC778\uC99D \uC0C1\uD0DC \uD655\uC778 \uC911..." })] }) }));
     }
-    // 인증되지 않은 경우 (리다이렉트 전 잠시 표시)
+    // 토큰 복원 중이거나 인증되지 않은 경우 잠시 대기
     if (!isAuthenticated || !user) {
-        return null;
+        // 인증 상태가 불분명한 경우 짧은 로딩 표시
+        return (_jsx("div", { style: {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '200px'
+            }, children: _jsx("div", { style: {
+                    width: '24px',
+                    height: '24px',
+                    border: '2px solid #e2e8f0',
+                    borderTop: '2px solid #6366f1',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                } }) }));
     }
     // 역할 기반 접근 제어
     if (requiredRoles.length > 0) {

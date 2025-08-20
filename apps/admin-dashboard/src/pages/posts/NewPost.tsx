@@ -41,46 +41,6 @@ interface Block {
   attributes?: any;
 }
 
-/*
-interface HeadingBlock extends Block {
-  type: 'heading';
-  content: string;
-  attributes: {
-    level: 1 | 2 | 3 | 4 | 5 | 6;
-    align?: 'left' | 'center' | 'right';
-  };
-}
-
-interface ParagraphBlock extends Block {
-  type: 'paragraph';
-  content: string;
-  attributes: {
-    align?: 'left' | 'center' | 'right' | 'justify';
-    dropCap?: boolean;
-  };
-}
-
-interface ListBlock extends Block {
-  type: 'list';
-  content: string[];
-  attributes: {
-    ordered: boolean;
-  };
-}
-
-interface ImageBlock extends Block {
-  type: 'image';
-  content: {
-    url: string;
-    alt: string;
-    caption?: string;
-  };
-  attributes: {
-    align?: 'left' | 'center' | 'right' | 'wide' | 'full';
-    size?: 'thumbnail' | 'medium' | 'large' | 'full';
-  };
-}
-*/
 
 const NewPost: FC = () => {
   const navigate = useNavigate();
@@ -106,7 +66,6 @@ const NewPost: FC = () => {
   const [sidebarTab, setSidebarTab] = useState<'document' | 'block'>('document');
   
   // Document settings
-  // const [status, setStatus] = useState<'draft' | 'publish' | 'private' | 'scheduled'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'password'>('public');
   const [publishDate, setPublishDate] = useState(new Date().toISOString().slice(0, 16));
   const [category, setCategory] = useState('');

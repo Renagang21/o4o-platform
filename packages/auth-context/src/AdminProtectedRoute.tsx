@@ -43,43 +43,73 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   const location = useLocation();
 
   useEffect(() => {
-    // 로딩 중이 아니고 인증되지 않은 경우 로그인 페이지로 리다이렉트
+    // 로딩이 완전히 완료되고 인증되지 않은 경우에만 리다이렉트
+    // 추가적인 지연을 두어 토큰 복원 프로세스가 완료될 시간을 확보
+    let timeoutId: number | undefined;
+    
     if (!isLoading && !isAuthenticated) {
-      navigate('/login', {
-        replace: true,
-        state: { from: location.pathname }
-      });
+      timeoutId = window.setTimeout(() => {
+        // 한 번 더 확인 후 리다이렉트
+        if (!isAuthenticated) {
+          navigate('/login', {
+            replace: true,
+            state: { from: location.pathname }
+          });
+        }
+      }, 100); // 100ms 지연으로 토큰 복원 완료 대기
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isAuthenticated, isLoading, navigate, location]);
 
-  // 로딩 중인 경우
+  // 로딩 중인 경우 - 더 나은 UX를 위한 로딩 화면
   if (isLoading) {
     return (
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        height: '100vh' 
+        height: '100vh',
+        backgroundColor: '#f8fafc'
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ 
             width: '48px', 
             height: '48px', 
-            border: '4px solid #f3f4f6', 
+            border: '4px solid #e2e8f0', 
             borderTop: '4px solid #3b82f6', 
             borderRadius: '50%', 
             animation: 'spin 1s linear infinite',
             margin: '0 auto 16px'
           }} />
-          <p style={{ color: '#6b7280' }}>인증 확인 중...</p>
+          <p style={{ color: '#64748b', fontSize: '14px' }}>인증 상태 확인 중...</p>
         </div>
       </div>
     );
   }
 
-  // 인증되지 않은 경우 (리다이렉트 전 잠시 표시)
+  // 토큰 복원 중이거나 인증되지 않은 경우 잠시 대기
   if (!isAuthenticated || !user) {
-    return null;
+    // 인증 상태가 불분명한 경우 짧은 로딩 표시
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '200px'
+      }}>
+        <div style={{ 
+          width: '24px', 
+          height: '24px', 
+          border: '2px solid #e2e8f0', 
+          borderTop: '2px solid #6366f1', 
+          borderRadius: '50%', 
+          animation: 'spin 1s linear infinite'
+        }} />
+      </div>
+    );
   }
 
   // 역할 기반 접근 제어

@@ -30,7 +30,6 @@ interface MenuData {
 }
 
 const WordPressMenuList: FC = () => {
-  // const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);

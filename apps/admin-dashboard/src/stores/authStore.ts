@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true, // 초기 로딩 상태를 true로 설정
 
       login: (user: User, token: string) => {
         set({
@@ -44,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
         
         // localStorage에도 토큰 저장 (호환성을 위해)
         localStorage.setItem('authToken', token)
+        localStorage.setItem('accessToken', token)
         
         // Set SSO cookie for cross-domain authentication
         ssoService.setCrossDomainCookie(token)
@@ -56,6 +57,11 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false
         })
+        
+        // localStorage 정리
+        localStorage.removeItem('auth-storage')
+        localStorage.removeItem('authToken')
+        localStorage.removeItem('accessToken')
         
         // Clear SSO cookie
         ssoService.clearCrossDomainCookie()
@@ -76,11 +82,36 @@ export const useAuthStore = create<AuthState>()(
       
       checkSSOSession: async () => {
         try {
+          // 페이지 새로고침 시 저장된 토큰으로 먼저 인증 상태 복원 시도
+          const storedAuth = localStorage.getItem('auth-storage')
+          if (storedAuth) {
+            try {
+              const parsedAuth = JSON.parse(storedAuth)
+              const storedState = parsedAuth.state
+              if (storedState?.token && storedState?.user && storedState?.isAuthenticated) {
+                // 저장된 상태로 임시 복원
+                set({
+                  user: storedState.user,
+                  token: storedState.token,
+                  isAuthenticated: true,
+                  isLoading: true
+                })
+                
+                // localStorage에도 토큰 설정
+                localStorage.setItem('authToken', storedState.token)
+                localStorage.setItem('accessToken', storedState.token)
+              }
+            } catch (parseError) {
+              // Parse 오류 시 로컬 스토리지 정리
+              localStorage.removeItem('auth-storage')
+            }
+          }
+          
           set({ isLoading: true })
           const response = await ssoService.checkSession()
           
           if (response.isAuthenticated && response.user) {
-            // Get token from cookie or generate a temporary one
+            // Get token from cookie or use stored token
             const token = ssoService.getTokenFromCookie() || get().token || 'sso-token'
             
             set({
@@ -95,6 +126,10 @@ export const useAuthStore = create<AuthState>()(
               isAuthenticated: true,
               isLoading: false
             })
+            
+            // localStorage 동기화
+            localStorage.setItem('authToken', token)
+            localStorage.setItem('accessToken', token)
           } else {
             set({
               user: null,
@@ -102,9 +137,14 @@ export const useAuthStore = create<AuthState>()(
               isAuthenticated: false,
               isLoading: false
             })
+            
+            // localStorage 정리
+            localStorage.removeItem('auth-storage')
+            localStorage.removeItem('authToken')
+            localStorage.removeItem('accessToken')
           }
         } catch (error: any) {
-    // Error logging - use proper error handler
+          // Error logging - use proper error handler
           // 401 에러 시 자동 로그아웃
           if (error?.response?.status === 401) {
             set({
@@ -116,6 +156,7 @@ export const useAuthStore = create<AuthState>()(
             // localStorage 정리
             localStorage.removeItem('auth-storage')
             localStorage.removeItem('authToken')
+            localStorage.removeItem('accessToken')
           } else {
             set({ isLoading: false })
           }
@@ -128,7 +169,20 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated
-      })
+      }),
+      // 저장/복원 시 추가 처리
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // 복원 후 로딩 상태 해제
+          state.isLoading = false
+          
+          // 복원된 토큰을 localStorage에도 설정
+          if (state.token && state.isAuthenticated) {
+            localStorage.setItem('authToken', state.token)
+            localStorage.setItem('accessToken', state.token)
+          }
+        }
+      }
     }
   )
 )

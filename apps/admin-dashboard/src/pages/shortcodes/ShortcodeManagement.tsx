@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Code, Search, Copy, Eye, Plus,
   Package, Hash, FileText, CheckCircle, XCircle,
-  Sparkles, BookOpen
+  Sparkles, BookOpen, BarChart3, FolderTree, Settings
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -83,6 +84,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function ShortcodeManagement() {
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedApp, setSelectedApp] = useState<string>('all');
@@ -90,6 +92,52 @@ export default function ShortcodeManagement() {
   const [selectedShortcode, setSelectedShortcode] = useState<Shortcode | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Determine current view based on route
+  const currentView = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes('/by-app')) return 'by-app';
+    if (path.includes('/by-category')) return 'by-category';
+    if (path.includes('/stats')) return 'stats';
+    if (path.includes('/settings')) return 'settings';
+    return 'all';
+  }, [location.pathname]);
+
+  // Page titles and descriptions based on view
+  const pageInfo = useMemo(() => {
+    switch (currentView) {
+      case 'by-app':
+        return {
+          title: '앱별 Shortcode 관리',
+          description: '각 앱에서 제공하는 Shortcode들을 앱별로 분류하여 관리합니다.',
+          icon: <Package className="w-6 h-6" />
+        };
+      case 'by-category':
+        return {
+          title: '카테고리별 Shortcode 관리',
+          description: 'Shortcode들을 기능별 카테고리로 분류하여 관리합니다.',
+          icon: <FolderTree className="w-6 h-6" />
+        };
+      case 'stats':
+        return {
+          title: 'Shortcode 사용 통계',
+          description: 'Shortcode 사용량과 성능 지표를 확인합니다.',
+          icon: <BarChart3 className="w-6 h-6" />
+        };
+      case 'settings':
+        return {
+          title: 'Shortcode 설정',
+          description: 'Shortcode 시스템의 전역 설정을 관리합니다.',
+          icon: <Settings className="w-6 h-6" />
+        };
+      default:
+        return {
+          title: 'Shortcode 통합 관리',
+          description: '모든 앱의 Shortcode를 통합적으로 관리하고 사용할 수 있습니다.',
+          icon: <Code className="w-6 h-6" />
+        };
+    }
+  }, [currentView]);
 
   // Fetch shortcodes
   const { data: shortcodes = [], isLoading } = useQuery({
@@ -283,9 +331,12 @@ export default function ShortcodeManagement() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Shortcode 관리</h1>
-          <p className="text-gray-600 mt-1">
-            앱에서 제공하는 shortcode를 관리하고 사용법을 확인합니다
+          <div className="flex items-center gap-3 mb-2">
+            {pageInfo.icon}
+            <h1 className="text-3xl font-bold">{pageInfo.title}</h1>
+          </div>
+          <p className="text-gray-600">
+            {pageInfo.description}
           </p>
         </div>
         <Button>

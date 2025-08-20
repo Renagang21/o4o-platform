@@ -268,6 +268,18 @@ export const wordpressMenuItems: MenuItem[] = [
     ]
   },
   {
+    id: 'shortcodes',
+    label: 'Shortcodes',
+    icon: <Code className="w-5 h-5" />,
+    children: [
+      { id: 'shortcodes-all', label: '모든 Shortcodes', icon: <Code className="w-4 h-4" />, path: '/shortcodes' },
+      { id: 'shortcodes-by-app', label: '앱별 분류', icon: <Package className="w-4 h-4" />, path: '/shortcodes/by-app' },
+      { id: 'shortcodes-by-category', label: '카테고리별', icon: <FolderTree className="w-4 h-4" />, path: '/shortcodes/by-category' },
+      { id: 'shortcodes-stats', label: '사용 통계', icon: <BarChart3 className="w-4 h-4" />, path: '/shortcodes/stats' },
+      { id: 'shortcodes-settings', label: 'Shortcode 설정', icon: <Settings className="w-4 h-4" />, path: '/shortcodes/settings' }
+    ]
+  },
+  {
     id: 'monitoring',
     label: '시스템 모니터링',
     icon: <Activity className="w-5 h-5" />,

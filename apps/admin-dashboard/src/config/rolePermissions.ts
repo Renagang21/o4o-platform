@@ -300,6 +300,60 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['tools:read']
   },
 
+  // Apps Management - Admin, Manager
+  {
+    menuId: 'apps',
+    roles: ['admin', 'manager'],
+    permissions: ['apps:read']
+  },
+  {
+    menuId: 'apps-installed',
+    roles: ['admin', 'manager'],
+    permissions: ['apps:read']
+  },
+  {
+    menuId: 'apps-settings',
+    roles: ['admin'],
+    permissions: ['apps:write']
+  },
+  {
+    menuId: 'apps-marketplace',
+    roles: ['admin', 'manager'],
+    permissions: ['apps:read']
+  },
+
+  // Shortcode Management - Admin, Manager, Business
+  {
+    menuId: 'shortcodes',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['shortcodes:read']
+  },
+  {
+    menuId: 'shortcodes-all',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['shortcodes:read']
+  },
+  {
+    menuId: 'shortcodes-by-app',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['shortcodes:read']
+  },
+  {
+    menuId: 'shortcodes-by-category',
+    roles: ['admin', 'manager', 'business'],
+    permissions: ['shortcodes:read']
+  },
+  {
+    menuId: 'shortcodes-stats',
+    roles: ['admin', 'manager'],
+    permissions: ['shortcodes:read']
+  },
+  {
+    menuId: 'shortcodes-settings',
+    roles: ['admin'],
+    permissions: ['shortcodes:write']
+  },
+
   // Settings - Admin only
   {
     menuId: 'settings',
@@ -379,13 +433,15 @@ export const roleCapabilities: Record<UserRole, string[]> = {
     '콘텐츠 관리',
     '주문 관리',
     '제휴사 관리',
-    '보고서 확인'
+    '보고서 확인',
+    'Shortcode 관리'
   ],
   business: [
     '상품 관리',
     '주문 확인',
     '콘텐츠 작성',
-    '디지털 사이니지'
+    '디지털 사이니지',
+    'Shortcode 관리'
   ],
   seller: [
     '상품 등록',
