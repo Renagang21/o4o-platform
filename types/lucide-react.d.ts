@@ -14,10 +14,13 @@ declare module 'lucide-react' {
   export const AlertTriangle: Icon;
   export const ArrowLeft: Icon;
   export const ArrowRight: Icon;
+  export const Award: Icon;
   export const BarChart: Icon;
   export const BarChart2: Icon;
   export const BarChart3: Icon;
   export const Bell: Icon;
+  export const Bookmark: Icon;
+  export const BookOpen: Icon;
   export const Building: Icon;
   export const Calendar: Icon;
   export const Check: Icon;
@@ -46,6 +49,7 @@ declare module 'lucide-react' {
   export const Grid3X3: Icon;
   export const Heading1: Icon;
   export const Heart: Icon;
+  export const HelpCircle: Icon;
   export const Home: Icon;
   export const Image: Icon;
   export const Layers: Icon;
@@ -54,6 +58,7 @@ declare module 'lucide-react' {
   export const Link: Icon;
   export const List: Icon;
   export const Lock: Icon;
+  export const LogIn: Icon;
   export const LogOut: Icon;
   export const Mail: Icon;
   export const MapPin: Icon;
@@ -65,6 +70,7 @@ declare module 'lucide-react' {
   export const MessageSquare: Icon;
   export const Minimize: Icon;
   export const Minimize2: Icon;
+  export const Minus: Icon;
   export const MinusSquare: Icon;
   export const Monitor: Icon;
   export const Moon: Icon;

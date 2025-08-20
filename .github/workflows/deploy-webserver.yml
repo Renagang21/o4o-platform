@@ -60,8 +60,16 @@ jobs:
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          chmod 700 ~/.ssh
+          
+          # Write SSH key with proper handling
+          if [ -n "$SSH_PRIVATE_KEY" ]; then
+            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+          else
+            echo "Error: SSH_PRIVATE_KEY is not set"
+            exit 1
+          fi
           
           # Add host to known_hosts (with error handling)
           if [ -n "$SERVER_HOST" ]; then
@@ -111,8 +119,16 @@ jobs:
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          chmod 700 ~/.ssh
+          
+          # Write SSH key with proper handling
+          if [ -n "$SSH_PRIVATE_KEY" ]; then
+            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+          else
+            echo "Error: SSH_PRIVATE_KEY is not set"
+            exit 1
+          fi
           
           # Stop and remove API server if running
           ssh ${SERVER_USER}@${SERVER_HOST} << 'EOF'
