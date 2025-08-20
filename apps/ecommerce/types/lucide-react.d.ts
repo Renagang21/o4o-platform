@@ -86,7 +86,4 @@ declare module 'lucide-react' {
   export const XCircle: Icon;
   export const Youtube: Icon;
   export const Zap: Icon;
-  export const SlidersHorizontal: Icon;
-  export const Grid3X3: Icon;
-  export const Pin: Icon;
 }

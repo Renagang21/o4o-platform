@@ -73,20 +73,22 @@ cd ../..
 echo "✅ Main site build completed!"
 echo ""
 
-# 3. Admin dashboard 빌드 (시간 제한 및 메모리 최적화)
-echo "🏗️ Building admin-dashboard (5분 제한)..."
+# 3. Admin dashboard 빌드 (최적화 레벨 조정)
+echo "🏗️ Building admin-dashboard (Optimized for Server)..."
 echo "------------------------"
 cd apps/admin-dashboard
 
 # 빌드 전 캐시 정리
 rm -rf .vite-cache node_modules/.vite 2>/dev/null
 
-# 타임아웃과 메모리 설정으로 빌드 시도
+# 프로덕션 빌드 (최적화 레벨 조정)
 timeout 300 bash -c "
-    export NODE_OPTIONS='--max-old-space-size=4096'
+    export NODE_OPTIONS='--max-old-space-size=3072'
+    export NODE_ENV=production
     export GENERATE_SOURCEMAP=false
     export INLINE_RUNTIME_CHUNK=false
-    npx vite build --mode production
+    # esbuild 사용 (terser보다 빠름)
+    npx vite build --mode production --minify esbuild
 " && {
     echo "✅ Admin dashboard build completed!"
 } || {

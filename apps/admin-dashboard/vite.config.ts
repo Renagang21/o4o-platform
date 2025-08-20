@@ -96,8 +96,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     workers: true,
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
-    // 최적화 설정 추가
-    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
+    // 최적화 설정 추가 (esbuild 우선, terser는 fallback)
+    minify: process.env.VITE_BUILD_MINIFY || (process.env.NODE_ENV === 'production' ? 'esbuild' : false),
     terserOptions: {
       compress: {
         drop_console: true,

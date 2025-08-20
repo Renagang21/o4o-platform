@@ -55,8 +55,8 @@ jobs:
       - name: Deploy to Web Server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.WEB_HOST }}
+          SERVER_USER: ${{ secrets.WEB_USER }}
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
@@ -68,12 +68,22 @@ jobs:
             ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts 2>/dev/null || {
               echo "Warning: Could not scan SSH host key for $SERVER_HOST"
               # Try with IP if hostname fails
-              if [ -n "${{ secrets.WEB_SERVER_IP }}" ]; then
-                ssh-keyscan -H ${{ secrets.WEB_SERVER_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+              if [ -n "${{ secrets.WEB_HOST_IP }}" ]; then
+                ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+              fi
+            }
+          elif [ -n "${{ secrets.WEB_HOST }}" ]; then
+            # Fallback to direct secret access
+            ssh-keyscan -H ${{ secrets.WEB_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || {
+              echo "Warning: Could not scan SSH host key"
+              if [ -n "${{ secrets.WEB_HOST_IP }}" ]; then
+                ssh-keyscan -H ${{ secrets.WEB_HOST_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
               fi
             }
           else
-            echo "Error: SERVER_HOST is not set"
+            echo "Error: Neither SERVER_HOST nor WEB_HOST is set"
+            echo "Available environment variables:"
+            env | grep -E "(HOST|SERVER)" || true
             exit 1
           fi
 
@@ -82,7 +92,7 @@ jobs:
             echo "Deploying Main Site..."
             rsync -avz --delete \
               apps/main-site/dist/ \
-              $SERVER_USER@$SERVER_HOST:/var/www/o4o-platform/apps/main-site/dist/
+              ${SERVER_USER}@${SERVER_HOST}:/var/www/o4o-platform/apps/main-site/dist/
           fi
 
           # Deploy Admin Dashboard
@@ -90,14 +100,14 @@ jobs:
             echo "Deploying Admin Dashboard..."
             rsync -avz --delete \
               apps/admin-dashboard/dist/ \
-              $SERVER_USER@$SERVER_HOST:/var/www/o4o-platform/apps/admin-dashboard/dist/
+              ${SERVER_USER}@${SERVER_HOST}:/var/www/o4o-platform/apps/admin-dashboard/dist/
           fi
 
       - name: Ensure API server is not running
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.WEB_HOST }}
+          SERVER_USER: ${{ secrets.WEB_USER }}
         run: |
           # Setup SSH
           mkdir -p ~/.ssh
@@ -105,7 +115,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           
           # Stop and remove API server if running
-          ssh $SERVER_USER@$SERVER_HOST << 'EOF'
+          ssh ${SERVER_USER}@${SERVER_HOST} << 'EOF'
             echo "Checking for API server..."
             
             # Check if API server is running
