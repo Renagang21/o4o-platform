@@ -182,16 +182,17 @@ const Login: FC = () => {
           </div>
           
           {/* 빠른 로그인 버튼 */}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => {
                 setEmail('admin@neture.co.kr');
                 setPassword('Test@1234');
               }}
-              className="flex-1 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-2 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+              className="flex items-center justify-center gap-2 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-3 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 font-medium"
             >
-              관리자로 로그인
+              <Shield className="h-3 w-3" />
+              <span>관리자로 로그인</span>
             </button>
             <button
               type="button"
@@ -199,9 +200,10 @@ const Login: FC = () => {
                 setEmail('manager@neture.co.kr');
                 setPassword('Test@1234');
               }}
-              className="flex-1 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-2 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+              className="flex items-center justify-center gap-2 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-3 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 font-medium"
             >
-              일반 관리자로 로그인
+              <Shield className="h-3 w-3" />
+              <span>일반 관리자로 로그인</span>
             </button>
           </div>
         </div>
@@ -217,15 +219,15 @@ const Login: FC = () => {
         )}
 
         {/* 로그인 폼 */}
-        <form className="mt-8 space-y-6 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100" onSubmit={handleSubmit}>
-          <div className="space-y-5">
+        <form className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100" onSubmit={handleSubmit}>
+          <div className="space-y-6">
             {/* 이메일 입력 */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-wp-text-primary mb-2">
+            <div className="form-group">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-3">
                 이메일 주소
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
@@ -236,21 +238,20 @@ const Login: FC = () => {
                   required
                   value={email}
                   onChange={(e: any) => setEmail(e.target.value)}
-                  className="wp-input h-12 pl-10 pr-3 bg-gray-50 border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  className="login-input w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm"
                   placeholder="admin@neture.co.kr"
                   disabled={isLoading}
-                  style={{ lineHeight: '1.5' }}
                 />
               </div>
             </div>
 
             {/* 비밀번호 입력 */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-wp-text-primary mb-2">
+            <div className="form-group">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-3">
                 비밀번호
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
@@ -261,15 +262,14 @@ const Login: FC = () => {
                   required
                   value={password}
                   onChange={(e: any) => setPassword(e.target.value)}
-                  className="wp-input h-12 pl-10 pr-10 bg-gray-50 border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  className="login-input w-full h-12 pl-12 pr-12 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm"
                   placeholder="비밀번호를 입력하세요"
                   disabled={isLoading}
-                  style={{ lineHeight: '1.5' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center z-10 hover:bg-gray-100/50 rounded-r-lg transition-colors duration-200"
                   disabled={isLoading}
                 >
                   {showPassword ? (
@@ -283,7 +283,7 @@ const Login: FC = () => {
           </div>
 
           {/* 옵션 */}
-          <div className="flex items-center justify-between">
+          <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center">
               <input
                 id="remember-me"
@@ -291,10 +291,10 @@ const Login: FC = () => {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e: any) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border border-gray-300 rounded cursor-pointer"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
                 disabled={isLoading}
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-wp-text-primary">
+              <label htmlFor="remember-me" className="ml-3 text-sm text-gray-600">
                 30일간 로그인 상태 유지
               </label>
             </div>
@@ -310,22 +310,22 @@ const Login: FC = () => {
           </div>
 
           {/* 로그인 버튼 */}
-          <div>
+          <div className="mt-8">
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="w-full flex justify-center items-center gap-2 py-3 px-4 text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {isLoading ? (
-                <div className="flex items-center gap-2">
+                <>
                   <div className="loading-spinner" />
                   <span>로그인 중...</span>
-                </div>
+                </>
               ) : (
-                <div className="flex items-center gap-2">
+                <>
                   <Shield className="h-4 w-4" />
                   <span>관리자 로그인</span>
-                </div>
+                </>
               )}
             </button>
           </div>

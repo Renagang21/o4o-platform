@@ -20,22 +20,22 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
     const pathSegments = location.pathname.split('/').filter(Boolean)
     
     const breadcrumbs: BreadcrumbItem[] = [
-      { label: '대시보드', path: '/admin' }
+      { label: 'Admin', path: '/admin' }
     ]
     
     // 경로별 라벨 매핑
     const labelMap: Record<string, string> = {
-      'users': '사용자 관리',
-      'content': '콘텐츠 관리',
-      'products': '상품 관리',
-      'orders': '주문 관리',
-      'analytics': '분석 & 리포트',
+      'users': '사용자',
+      'content': '콘텐츠',
+      'products': '상품',
+      'orders': '주문',
+      'analytics': '분석',
       'settings': '설정',
       'media': '미디어',
       'pending': '승인 대기',
       'business': '사업자 회원',
       'affiliates': '파트너 회원',
-      'posts': '게시글',
+      'posts': '글',
       'pages': '페이지',
       'cpt': 'CPT 관리',
       'categories': '카테고리',
@@ -53,12 +53,21 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
       'email': '이메일',
       'integrations': '연동',
       'shortcodes': 'Shortcodes',
-      'apps': '앱 관리',
+      'apps': 'Apps',
       'by-app': '앱별 분류',
       'by-category': '카테고리별',
       'stats': '사용 통계',
       'installed': '설치된 앱',
-      'marketplace': '마켓플레이스'
+      'marketplace': '마켓플레이스',
+      'all': '모든 글',
+      'new': '새 글 추가',
+      'tags': '태그',
+      'comments': '댓글',
+      'themes': '테마',
+      'ecommerce': '전자상거래',
+      'customize': '사용자 정의하기',
+      'menus': '메뉴',
+      'library': '라이브러리'
     }
 
     // 특별한 페이지들 처리 (설정, shortcodes 등)
@@ -89,7 +98,8 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
     pathSegments.forEach((segment: string, index: number) => {
       currentPath += `/${segment}`
       
-      if (segment !== 'dashboard') {
+      // admin과 dashboard 세그먼트는 무시 (이미 Admin으로 추가됨)
+      if (segment !== 'admin' && segment !== 'dashboard') {
         breadcrumbs.push({
           label: labelMap[segment] || segment,
           path: index === pathSegments.length - 1 ? undefined : currentPath

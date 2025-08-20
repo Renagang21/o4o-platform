@@ -366,3 +366,114 @@ a.add-new-item-btn[href="#"] {
   transform: scale(1.05) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
+
+/* 16. Login Form Improvements - 로그인 화면 정렬 개선 */
+.login-input {
+  height: 48px !important;
+  box-sizing: border-box !important;
+  line-height: 1.4 !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 로그인 폼 컨테이너 정렬 */
+.login-form {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 폼 그룹 일관된 간격 */
+.form-group {
+  margin-bottom: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.form-group label {
+  margin-bottom: 12px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+}
+
+/* 입력 필드 컨테이너 정렬 */
+.form-group .relative {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 아이콘 위치 정렬 */
+.form-group .relative .absolute {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 48px !important;
+  width: 48px !important;
+}
+
+/* 빠른 로그인 버튼 정렬 */
+.quick-login-buttons {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+}
+
+.quick-login-btn {
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+/* 로그인 메인 버튼 정렬 */
+.login-submit-btn {
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin-top: 32px !important;
+}
+
+/* 체크박스 및 링크 정렬 */
+.login-options {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-top: 24px !important;
+  margin-bottom: 8px !important;
+}
+
+.login-options .checkbox-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 640px) {
+  .quick-login-buttons {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  
+  .login-options {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  
+  .form-group {
+    margin-bottom: 20px !important;
+  }
+}

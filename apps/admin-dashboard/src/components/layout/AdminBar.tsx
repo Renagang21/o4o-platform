@@ -12,8 +12,8 @@ const AdminBar: FC<AdminBarProps> = ({ onLogout }) => {
   const { user } = useAuth();
 
   return (
-    <div className="admin-bar fixed top-0 left-0 right-0 h-8 text-[13px] z-50">
-      <div className="h-full flex items-center px-4">
+    <div className="wordpress-admin-bar fixed top-0 left-0 right-0 h-[46px] text-[13px] z-[99999] bg-[#23282d] text-[#ccc]">
+      <div className="h-full flex items-center justify-between px-4">
         {/* Left side */}
         <div className="flex items-center gap-4 flex-1">
           {/* WordPress Logo */}
@@ -42,8 +42,8 @@ const AdminBar: FC<AdminBarProps> = ({ onLogout }) => {
             </button>
             
             {/* Dropdown menu */}
-            <div className="absolute top-full left-0 mt-0 w-48 bg-[#32373c] border border-[#444] opacity-0 invisible 
-                          group-hover:opacity-100 group-hover:visible transition-opacity">
+            <div className="absolute top-full left-0 mt-1 w-48 bg-[#32373c] border border-[#444] opacity-0 invisible 
+                          group-hover:opacity-100 group-hover:visible transition-opacity shadow-lg z-[100000]">
               <Link to="/posts/new" className="block px-4 py-2 hover:bg-[#00b9eb] hover:text-white">
                 글
               </Link>
@@ -84,12 +84,26 @@ const AdminBar: FC<AdminBarProps> = ({ onLogout }) => {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative">
           <ThemeToggle />
-          <span className="text-[#ccc]">안녕하세요, {user?.name || 'Admin'}님</span>
-          <button onClick={onLogout} className="hover:text-[#00b9eb]">
-            로그아웃
-          </button>
+          <div className="relative group">
+            <button className="flex items-center gap-1 hover:text-[#00b9eb] cursor-pointer">
+              <span className="text-[#ccc]">안녕하세요, {user?.name || 'Admin'}님</span>
+              <span className="text-xs">▼</span>
+            </button>
+            
+            {/* User dropdown menu */}
+            <div className="absolute top-full right-0 mt-1 w-48 bg-[#32373c] border border-[#444] opacity-0 invisible 
+                          group-hover:opacity-100 group-hover:visible transition-opacity shadow-lg z-[100000]">
+              <Link to="/users/profile" className="block px-4 py-2 hover:bg-[#00b9eb] hover:text-white">
+                프로필 편집
+              </Link>
+              <div className="border-t border-[#444]"></div>
+              <button onClick={onLogout} className="block w-full text-left px-4 py-2 hover:bg-[#00b9eb] hover:text-white">
+                로그아웃
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

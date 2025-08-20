@@ -23,17 +23,20 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 32px;
+  min-height: 46px; /* Increased height for better visibility */
+  height: 46px;
   background-color: #23282d;
   z-index: 99999; /* Highest z-index */
   display: flex;
   align-items: center;
+  padding: 0 20px; /* Added padding for content */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 /* Sidebar - Fixed positioning */
 .admin-sidebar {
   position: fixed;
-  top: 32px; /* Below admin bar */
+  top: 46px; /* Below admin bar - updated height */
   left: 0;
   bottom: 0;
   width: 160px;
@@ -54,8 +57,9 @@
 .wordpress-admin-content {
   position: relative;
   margin-left: 160px; /* Offset by sidebar width */
-  margin-top: 32px; /* Offset by admin bar height */
-  min-height: calc(100vh - 32px);
+  margin-top: 46px; /* Offset by admin bar height - updated */
+  padding-top: 0; /* Remove any additional top padding */
+  min-height: calc(100vh - 46px);
   width: calc(100% - 160px);
   background-color: #f1f1f1;
   transition: margin-left 0.3s ease, width 0.3s ease;
@@ -153,9 +157,7 @@
 
 /* Small Mobile (< 600px) */
 @media (max-width: 599px) {
-  .wordpress-admin-bar {
-    height: 46px;
-  }
+  /* Admin bar already 46px, no change needed */
   
   .admin-sidebar {
     top: 46px;
@@ -282,4 +284,30 @@
 .wordpress-admin-content main > * {
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+/* Admin Bar User Menu Fixes */
+.wordpress-admin-bar .group:hover .group-hover\:visible {
+  visibility: visible !important;
+}
+
+.wordpress-admin-bar .group:hover .group-hover\:opacity-100 {
+  opacity: 1 !important;
+}
+
+/* Ensure dropdowns appear above everything */
+.wordpress-admin-bar .absolute {
+  z-index: 100000 !important;
+}
+
+/* Fix body positioning to prevent content from going under admin bar */
+body {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Ensure admin container starts below admin bar */
+.wordpress-admin {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
