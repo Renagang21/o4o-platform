@@ -20,7 +20,7 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
     const pathSegments = location.pathname.split('/').filter(Boolean)
     
     const breadcrumbs: BreadcrumbItem[] = [
-      { label: '대시보드', path: '/dashboard' }
+      { label: '대시보드', path: '/admin' }
     ]
     
     // 경로별 라벨 매핑
@@ -42,12 +42,49 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
       'inventory': '재고 관리',
       'sales': '매출 분석',
       'overview': '전체 개요',
-      'general': '일반 설정',
-      'theme': '테마 설정',
-      'email': '이메일 설정',
-      'integrations': '연동 설정'
+      'general': '일반',
+      'writing': '쓰기',
+      'reading': '읽기',
+      'discussion': '토론',
+      'permalinks': '고유주소',
+      'privacy': '개인정보',
+      'theme': '테마',
+      'oauth': 'OAuth',
+      'email': '이메일',
+      'integrations': '연동',
+      'shortcodes': 'Shortcodes',
+      'apps': '앱 관리',
+      'by-app': '앱별 분류',
+      'by-category': '카테고리별',
+      'stats': '사용 통계',
+      'installed': '설치된 앱',
+      'marketplace': '마켓플레이스'
+    }
+
+    // 특별한 페이지들 처리 (설정, shortcodes 등)
+    const specialPages = ['settings', 'shortcodes', 'apps']
+    const mainPage = pathSegments[0]
+    
+    if (specialPages.includes(mainPage)) {
+      // 메인 페이지 추가
+      breadcrumbs.push({
+        label: labelMap[mainPage] || mainPage,
+        path: pathSegments.length === 1 ? undefined : `/${mainPage}`
+      })
+      
+      // 하위 페이지가 있는 경우만 현재 탭 표시
+      if (pathSegments.length > 1) {
+        const subPage = pathSegments[pathSegments.length - 1]
+        breadcrumbs.push({
+          label: labelMap[subPage] || subPage,
+          path: undefined // 현재 페이지는 링크 없음
+        })
+      }
+      
+      return breadcrumbs
     }
     
+    // 일반적인 경우 처리
     let currentPath = ''
     pathSegments.forEach((segment: string, index: number) => {
       currentPath += `/${segment}`

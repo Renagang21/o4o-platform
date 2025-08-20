@@ -60,21 +60,20 @@ const IntegrationSettings: FC = () => (
 )
 
 const settingsTabs = [
-  { id: 'general', label: '일반', icon: <SettingsIcon className="w-4 h-4" />, path: '' },
-  { id: 'writing', label: '쓰기', icon: <FileText className="w-4 h-4" />, path: 'writing' },
-  { id: 'reading', label: '읽기', icon: <BookOpen className="w-4 h-4" />, path: 'reading' },
-  { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: 'discussion' },
-  { id: 'media', label: '미디어', icon: <Image className="w-4 h-4" />, path: 'media' },
-  { id: 'permalinks', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: 'permalinks' },
-  { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: 'privacy' },
-  { id: 'theme', label: '테마', icon: <Palette className="w-4 h-4" />, path: 'theme' },
-  { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: 'oauth' },
-  { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: 'email' }
+  { id: 'general', label: '일반', icon: <SettingsIcon className="w-4 h-4" />, path: '/settings' },
+  { id: 'writing', label: '쓰기', icon: <FileText className="w-4 h-4" />, path: '/settings/writing' },
+  { id: 'reading', label: '읽기', icon: <BookOpen className="w-4 h-4" />, path: '/settings/reading' },
+  { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: '/settings/discussion' },
+  { id: 'media', label: '미디어', icon: <Image className="w-4 h-4" />, path: '/settings/media' },
+  { id: 'permalinks', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: '/settings/permalinks' },
+  { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: '/settings/privacy' },
+  { id: 'theme', label: '테마', icon: <Palette className="w-4 h-4" />, path: '/settings/theme' },
+  { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
+  { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: '/settings/email' }
 ]
 
 const Settings: FC = () => {
   const location = useLocation()
-  const currentPath = location.pathname.split('/').pop() || ''
 
   return (
     <div className="space-y-6">
@@ -87,7 +86,7 @@ const Settings: FC = () => {
       <div className="border-b border-gray-300">
         <nav className="-mb-px flex space-x-8">
           {settingsTabs.map((tab) => {
-            const isActive = tab.path === currentPath || (tab.path === '' && currentPath === 'settings')
+            const isActive = location.pathname === tab.path
             return (
               <Link
                 key={tab.id}

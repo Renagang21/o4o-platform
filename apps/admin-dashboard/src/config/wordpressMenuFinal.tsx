@@ -14,7 +14,6 @@ import {
   Palette,
   UserCheck,
   Share2,
-  Mail,
   Monitor,
   DollarSign,
   FileCode,
@@ -208,16 +207,6 @@ export const wordpressMenuItems: MenuItem[] = [
     label: '',
     icon: <></>,
     separator: true
-  },
-  {
-    id: 'mail',
-    label: '메일 관리',
-    icon: <Mail className="w-5 h-5" />,
-    children: [
-      { id: 'mail-templates', label: '이메일 템플릿', icon: <FileText className="w-4 h-4" />, path: '/mail/templates' },
-      { id: 'mail-smtp', label: 'SMTP 설정', icon: <Settings className="w-4 h-4" />, path: '/mail/smtp' },
-      { id: 'mail-logs', label: '발송 기록', icon: <ClipboardList className="w-4 h-4" />, path: '/mail/logs' }
-    ]
   },
   {
     id: 'cpt-acf',
