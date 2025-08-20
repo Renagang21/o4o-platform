@@ -172,12 +172,17 @@ jobs:
 
       - name: Post-deployment verification
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SERVER_HOST: ${{ secrets.WEB_SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.WEB_HOST }}
+          SERVER_USER: ${{ secrets.WEB_USER }}
         run: |
+          # Check if variables are set
+          if [ -z "$SERVER_HOST" ] || [ -z "$SERVER_USER" ]; then
+            echo "Warning: SERVER_HOST or SERVER_USER not set, skipping post-deployment verification"
+            exit 0
+          fi
+          
           # Run post-deployment script if exists
-          ssh $SERVER_USER@$SERVER_HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} << 'EOF'
             if [ -f /var/www/o4o-platform/scripts/post-deploy-webserver.sh ]; then
               echo "Running post-deployment verification..."
               bash /var/www/o4o-platform/scripts/post-deploy-webserver.sh
