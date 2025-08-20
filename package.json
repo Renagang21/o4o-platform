@@ -60,7 +60,6 @@
     "install:split": "./scripts/install-split.sh",
     "ci:split": "./scripts/install-split.sh",
     "ci:parallel": "./scripts/ci-parallel.sh",
-    "preinstall": "echo 'Use npm run install:split or ci:parallel for faster installation'",
     
     "// === PM2 관리 ===": "",
     "pm2:start:local": "pm2 start ecosystem.config.local.cjs",
