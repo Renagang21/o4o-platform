@@ -54,7 +54,7 @@ jobs:
 
       - name: Deploy to Web Server
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ secrets.WEB_SSH_KEY }}
           SERVER_HOST: ${{ secrets.WEB_HOST }}
           SERVER_USER: ${{ secrets.WEB_USER }}
         run: |
@@ -63,11 +63,12 @@ jobs:
           chmod 700 ~/.ssh
           
           # Write SSH key with proper handling
-          if [ -n "$SSH_PRIVATE_KEY" ]; then
-            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          if [ -n "$SSH_KEY" ]; then
+            echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
           else
-            echo "Error: SSH_PRIVATE_KEY is not set"
+            echo "Error: WEB_SSH_KEY is not set in GitHub secrets"
+            echo "Please add WEB_SSH_KEY to your repository secrets"
             exit 1
           fi
           
@@ -113,7 +114,7 @@ jobs:
 
       - name: Ensure API server is not running
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KEY: ${{ secrets.WEB_SSH_KEY }}
           SERVER_HOST: ${{ secrets.WEB_HOST }}
           SERVER_USER: ${{ secrets.WEB_USER }}
         run: |
@@ -122,11 +123,12 @@ jobs:
           chmod 700 ~/.ssh
           
           # Write SSH key with proper handling
-          if [ -n "$SSH_PRIVATE_KEY" ]; then
-            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          if [ -n "$SSH_KEY" ]; then
+            echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
           else
-            echo "Error: SSH_PRIVATE_KEY is not set"
+            echo "Error: WEB_SSH_KEY is not set in GitHub secrets"
+            echo "Please add WEB_SSH_KEY to your repository secrets"
             exit 1
           fi
           
