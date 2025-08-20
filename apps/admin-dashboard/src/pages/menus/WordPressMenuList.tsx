@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Menu,
   Plus,
@@ -11,10 +11,8 @@ import {
   ChevronRight,
   Search,
   Filter,
-  MoreVertical,
   Check,
   X,
-  Globe,
   Smartphone,
   Monitor,
   Users
@@ -32,7 +30,7 @@ interface MenuData {
 }
 
 const WordPressMenuList: FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
@@ -77,7 +75,7 @@ const WordPressMenuList: FC = () => {
     }
   ]);
   
-  const menuLocations = {
+  const menuLocations: Record<string, { name: string; icon: any; color: 'blue' | 'gray' | 'green' | 'purple' }> = {
     primary: { name: '주 메뉴', icon: Monitor, color: 'blue' },
     footer: { name: '푸터 메뉴', icon: MapPin, color: 'gray' },
     mobile: { name: '모바일 메뉴', icon: Smartphone, color: 'green' },
@@ -91,7 +89,7 @@ const WordPressMenuList: FC = () => {
   );
   
   // Delete menu
-  const deleteMenu = (menuId: string) => {
+  const deleteMenu = (_menuId: string) => {
     if (confirm('이 메뉴를 삭제하시겠습니까?')) {
       toast.success('메뉴가 삭제되었습니다');
     }
@@ -128,7 +126,7 @@ const WordPressMenuList: FC = () => {
   const getLocationStyle = (location?: string) => {
     if (!location || !menuLocations[location]) return null;
     const loc = menuLocations[location];
-    const colors = {
+    const colors: Record<'blue' | 'gray' | 'green' | 'purple', string> = {
       blue: 'bg-blue-100 text-blue-700 border-blue-200',
       gray: 'bg-gray-100 text-gray-700 border-gray-200',
       green: 'bg-green-100 text-green-700 border-green-200',

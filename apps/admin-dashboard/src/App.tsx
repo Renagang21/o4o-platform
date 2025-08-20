@@ -36,6 +36,7 @@ const TossPaymentsSettings = lazy(() => import('@/pages/ecommerce/TossPaymentsSe
 const RefundManagement = lazy(() => import('@/pages/ecommerce/RefundManagement'));
 const Coupons = lazy(() => import('@/pages/ecommerce/Coupons'));
 const CouponForm = lazy(() => import('@/pages/ecommerce/CouponForm'));
+const EcommerceSettings = lazy(() => import('@/pages/ecommerce/EcommerceSettings'));
 // const SettlementDashboard = lazy(() => import('@/pages/ecommerce/SettlementDashboard'));
 const VendorSettlements = lazy(() => import('@/pages/ecommerce/VendorSettlements'));
 const FeeManagement = lazy(() => import('@/pages/ecommerce/FeeManagement'));
@@ -601,6 +602,14 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['analytics:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Analytics />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    <Route path="/ecommerce/settings" element={
+                      <AdminProtectedRoute requiredPermissions={['settings:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <EcommerceSettings />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

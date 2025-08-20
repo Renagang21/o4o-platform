@@ -60,7 +60,7 @@ export default function UserForm() {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/v1/users/${id}`);
+      const response = await api.get(`/users/${id}`);
       
       if (response.data.success) {
         const userData = response.data.data;
@@ -96,11 +96,11 @@ export default function UserForm() {
           delete payload.password;
         }
         
-        await api.put(`/v1/users/${id}`, payload);
+        await api.put(`/users/${id}`, payload);
         
         toast.success('User updated successfully');
       } else {
-        await api.post('/v1/users', payload);
+        await api.post('/users', payload);
         
         toast.success('User created successfully');
       }

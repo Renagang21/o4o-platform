@@ -66,7 +66,7 @@ export default function UserList() {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/v1/users?${params}`);
+      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/users?${params}`);
       
       if (response.data.success) {
         setUsers(response.data.data.users);
@@ -108,7 +108,7 @@ export default function UserList() {
     if (selectedUsers.length === 0) return;
 
     try {
-      await api.post('/v1/users/bulk-approve', {
+      await api.post('/users/bulk-approve', {
         userIds: selectedUsers,
         notes: 'Bulk approved via admin dashboard',
       });
@@ -128,7 +128,7 @@ export default function UserList() {
     if (selectedUsers.length === 0) return;
 
     try {
-      await api.post('/v1/users/bulk-reject', {
+      await api.post('/users/bulk-reject', {
         userIds: selectedUsers,
         notes: 'Bulk rejected via admin dashboard',
       });
@@ -146,7 +146,7 @@ export default function UserList() {
   // Handle individual approve
   const handleApprove = async (userId: string) => {
     try {
-      await api.post(`/v1/users/${userId}/approve`);
+      await api.post(`/users/${userId}/approve`);
       
       toast.success('User approved successfully');
 
@@ -160,7 +160,7 @@ export default function UserList() {
   // Handle individual reject
   const handleReject = async (userId: string) => {
     try {
-      await api.post(`/v1/users/${userId}/reject`);
+      await api.post(`/users/${userId}/reject`);
       
       toast.success('User rejected successfully');
 
@@ -179,7 +179,7 @@ export default function UserList() {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get(`/v1/users/export/csv?${params}`, {
+      const response = await api.get(`/users/export/csv?${params}`, {
         responseType: 'blob',
       });
 

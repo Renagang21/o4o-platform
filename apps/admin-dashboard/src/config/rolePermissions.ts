@@ -110,11 +110,6 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['orders:read']
   },
   {
-    menuId: 'customers',
-    roles: ['admin', 'manager', 'business'],
-    permissions: ['customers:read']
-  },
-  {
     menuId: 'coupons',
     roles: ['admin', 'manager', 'business'],
     permissions: ['coupons:read']

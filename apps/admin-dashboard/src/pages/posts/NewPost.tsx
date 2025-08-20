@@ -1,26 +1,13 @@
 import { FC, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Bold,
-  Italic,
-  Underline,
-  Link2,
   List,
   ListOrdered,
   Quote,
-  Code,
   Image,
-  Video,
   FileText,
   Heading1,
-  Heading2,
-  Heading3,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Plus,
-  MoreVertical,
   Move,
   Copy,
   Trash2,
@@ -34,21 +21,13 @@ import {
   Redo,
   Table,
   Columns,
-  Music,
-  Map,
   Code2,
-  MessageSquare,
-  Palette,
   Type,
-  Hash,
-  Calendar,
-  Users,
-  Folder,
-  Tag,
   Globe,
-  Lock,
-  Clock,
-  Check
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -62,6 +41,7 @@ interface Block {
   attributes?: any;
 }
 
+/*
 interface HeadingBlock extends Block {
   type: 'heading';
   content: string;
@@ -100,6 +80,7 @@ interface ImageBlock extends Block {
     size?: 'thumbnail' | 'medium' | 'large' | 'full';
   };
 }
+*/
 
 const NewPost: FC = () => {
   const navigate = useNavigate();
@@ -125,7 +106,7 @@ const NewPost: FC = () => {
   const [sidebarTab, setSidebarTab] = useState<'document' | 'block'>('document');
   
   // Document settings
-  const [status, setStatus] = useState<'draft' | 'publish' | 'private' | 'scheduled'>('draft');
+  // const [status, setStatus] = useState<'draft' | 'publish' | 'private' | 'scheduled'>('draft');
   const [visibility, setVisibility] = useState<'public' | 'private' | 'password'>('public');
   const [publishDate, setPublishDate] = useState(new Date().toISOString().slice(0, 16));
   const [category, setCategory] = useState('');
@@ -277,21 +258,19 @@ const NewPost: FC = () => {
   // Save post
   const savePost = async (publish = false) => {
     try {
-      const postData = {
-        title,
-        excerpt,
-        content: JSON.stringify(blocks),
-        status: publish ? 'publish' : 'draft',
-        visibility,
-        publishDate,
-        category,
-        tags,
-        featuredImage,
-        allowComments
-      };
-
-      // Here you would call your API to save the post
-      console.log('Saving post:', postData);
+      // TODO: Implement API call to save post
+      // const postData = {
+      //   title,
+      //   excerpt,
+      //   content: JSON.stringify(blocks),
+      //   status: publish ? 'publish' : 'draft',
+      //   visibility,
+      //   publishDate,
+      //   category,
+      //   tags,
+      //   featuredImage,
+      //   allowComments
+      // };
       
       toast.success(publish ? '게시물이 발행되었습니다!' : '초안이 저장되었습니다!');
       
@@ -346,7 +325,7 @@ const NewPost: FC = () => {
       
       case 'heading':
         const HeadingTag = `h${block.attributes?.level || 2}` as keyof JSX.IntrinsicElements;
-        const headingClasses = {
+        const headingClasses: Record<number, string> = {
           1: 'text-4xl font-bold',
           2: 'text-3xl font-bold',
           3: 'text-2xl font-semibold',

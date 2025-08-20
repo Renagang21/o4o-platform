@@ -127,7 +127,6 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'products', label: '상품 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/products' },
       { id: 'categories', label: '카테고리', icon: <FolderTree className="w-4 h-4" />, path: '/ecommerce/categories' },
       { id: 'orders', label: '주문 관리', icon: <ClipboardList className="w-4 h-4" />, path: '/ecommerce/orders' },
-      { id: 'customers', label: '고객 관리', icon: <Users className="w-4 h-4" />, path: '/ecommerce/customers' },
       { id: 'inventory', label: '재고 관리', icon: <Package className="w-4 h-4" />, path: '/ecommerce/inventory' },
       { id: 'coupons', label: '쿠폰 관리', icon: <CreditCard className="w-4 h-4" />, path: '/ecommerce/coupons' },
       { id: 'refunds', label: '환불/교환', icon: <RefreshCw className="w-4 h-4" />, path: '/ecommerce/refunds' },

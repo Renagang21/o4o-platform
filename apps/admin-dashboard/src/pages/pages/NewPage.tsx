@@ -1,26 +1,13 @@
 import { FC, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Bold,
-  Italic,
-  Underline,
-  Link2,
   List,
-  ListOrdered,
   Quote,
-  Code,
   Image,
   Video,
   FileText,
   Heading1,
-  Heading2,
-  Heading3,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Plus,
-  MoreVertical,
   Move,
   Copy,
   Trash2,
@@ -32,27 +19,17 @@ import {
   X,
   Undo,
   Redo,
-  Table,
   Columns,
   Layout,
   Grid,
   Box,
   Zap,
   Type,
-  Hash,
-  Calendar,
-  Users,
-  Folder,
-  Globe,
-  Lock,
-  Clock,
-  Check,
-  Layers,
-  Archive,
   BookOpen,
   Map,
   Navigation,
-  Home
+  Code,
+  Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -347,25 +324,23 @@ const NewPage: FC = () => {
   // Save page
   const savePage = async (publish = false) => {
     try {
-      const pageData = {
-        title,
-        slug,
-        content: JSON.stringify(blocks),
-        status: publish ? 'published' : 'draft',
-        template,
-        parentPage,
-        menuOrder,
-        showInMenu,
-        isHomepage,
-        publishDate,
-        featuredImage,
-        metaTitle: metaTitle || title,
-        metaDescription,
-        metaKeywords
-      };
-
-      // Here you would call your API to save the page
-      console.log('Saving page:', pageData);
+      // TODO: Implement API call to save page
+      // const pageData = {
+      //   title,
+      //   slug,
+      //   content: JSON.stringify(blocks),
+      //   status: publish ? 'published' : 'draft',
+      //   template,
+      //   parentPage,
+      //   menuOrder,
+      //   showInMenu,
+      //   isHomepage,
+      //   publishDate,
+      //   featuredImage,
+      //   metaTitle: metaTitle || title,
+      //   metaDescription,
+      //   metaKeywords
+      // };
       
       toast.success(publish ? '페이지가 게시되었습니다!' : '초안이 저장되었습니다!');
       
@@ -420,7 +395,7 @@ const NewPage: FC = () => {
       
       case 'heading':
         const HeadingTag = `h${block.attributes?.level || 2}` as keyof JSX.IntrinsicElements;
-        const headingClasses = {
+        const headingClasses: Record<number, string> = {
           1: 'text-4xl font-bold',
           2: 'text-3xl font-bold',
           3: 'text-2xl font-semibold',

@@ -8,7 +8,6 @@ import {
   Eye,
   FileText,
   Home,
-  User,
   Layers
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

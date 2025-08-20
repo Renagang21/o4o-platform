@@ -7,30 +7,16 @@ import {
   Save,
   ChevronDown,
   ChevronRight,
-  ChevronUp,
   Link2,
   FileText,
   Folder,
   Tag,
-  Home,
-  Settings,
   Move,
   Edit2,
   X,
   Search,
-  Globe,
-  Lock,
-  Eye,
-  EyeOff,
   ExternalLink,
-  Hash,
-  Calendar,
-  User,
-  Archive,
-  Layers,
-  Grid3x3,
   Type,
-  Image as ImageIcon,
   AlertCircle,
   Check
 } from 'lucide-react';
@@ -320,7 +306,7 @@ const WordPressMenuEditor: FC = () => {
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragEnter = (e: React.DragEvent, item: MenuItem) => {
+  const handleDragEnter = (_e: React.DragEvent, item: MenuItem) => {
     dragOverItem.current = item;
   };
 
@@ -338,7 +324,7 @@ const WordPressMenuEditor: FC = () => {
             return { items, removed };
           }
           if (items[i].children) {
-            const result = removeItem(items[i].children);
+            const result = removeItem(items[i].children!);
             if (result.removed) {
               return { items, removed: result.removed };
             }
@@ -356,7 +342,7 @@ const WordPressMenuEditor: FC = () => {
             return items;
           }
           if (items[i].children) {
-            items[i].children = insertItem(items[i].children, itemToInsert, targetId);
+            items[i].children = insertItem(items[i].children!, itemToInsert, targetId);
           }
         }
         return items;
@@ -376,48 +362,48 @@ const WordPressMenuEditor: FC = () => {
   };
 
   // Make item a child of another item
-  const makeChild = (parentId: string, childId: string) => {
-    let childItem: MenuItem | null = null;
-    
-    // Remove child from its current position
-    const removeChild = (items: MenuItem[]): MenuItem[] => {
-      return items.filter(item => {
-        if (item.id === childId) {
-          childItem = item;
-          return false;
-        }
-        if (item.children) {
-          item.children = removeChild(item.children);
-        }
-        return true;
-      });
-    };
-    
-    // Add child to parent
-    const addToParent = (items: MenuItem[]): MenuItem[] => {
-      return items.map(item => {
-        if (item.id === parentId && childItem) {
-          return {
-            ...item,
-            children: [...(item.children || []), childItem]
-          };
-        }
-        if (item.children) {
-          return {
-            ...item,
-            children: addToParent(item.children)
-          };
-        }
-        return item;
-      });
-    };
-    
-    let newItems = removeChild([...menuItems]);
-    if (childItem) {
-      newItems = addToParent(newItems);
-      setMenuItems(newItems);
-    }
-  };
+  // const _makeChild = (parentId: string, childId: string) => {
+  //   let childItem: MenuItem | null = null;
+  //   
+  //   // Remove child from its current position
+  //   const removeChild = (items: MenuItem[]): MenuItem[] => {
+  //     return items.filter(item => {
+  //       if (item.id === childId) {
+  //         childItem = item;
+  //         return false;
+  //       }
+  //       if (item.children) {
+  //         item.children = removeChild(item.children);
+  //       }
+  //       return true;
+  //     });
+  //   };
+  //   
+  //   // Add child to parent
+  //   const addToParent = (items: MenuItem[]): MenuItem[] => {
+  //     return items.map(item => {
+  //       if (item.id === parentId && childItem) {
+  //         return {
+  //           ...item,
+  //           children: [...(item.children || []), childItem]
+  //         };
+  //       }
+  //       if (item.children) {
+  //         return {
+  //           ...item,
+  //           children: addToParent(item.children)
+  //         };
+  //       }
+  //       return item;
+  //     });
+  //   };
+  //   
+  //   let newItems = removeChild([...menuItems]);
+  //   if (childItem) {
+  //     newItems = addToParent(newItems);
+  //     setMenuItems(newItems);
+  //   }
+  // };
 
   // Save menu
   const saveMenu = async () => {
@@ -427,14 +413,13 @@ const WordPressMenuEditor: FC = () => {
     }
     
     try {
-      const menuData = {
-        name: menuName,
-        slug: menuSlug,
-        location: selectedLocation,
-        items: menuItems
-      };
-      
-      console.log('Saving menu:', menuData);
+      // TODO: Implement API call to save menu
+      // const menuData = {
+      //   name: menuName,
+      //   slug: menuSlug,
+      //   location: selectedLocation,
+      //   items: menuItems
+      // };
       toast.success('메뉴가 저장되었습니다!');
       
       if (!id) {
