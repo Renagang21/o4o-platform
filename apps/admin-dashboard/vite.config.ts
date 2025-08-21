@@ -39,8 +39,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react/jsx-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-runtime'),
       'react/jsx-dev-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-dev-runtime'),
       // Force date-fns to use v3.6.0 with proper ESM support
-      'date-fns': path.resolve(__dirname, '../../node_modules/date-fns/index.js'),
-      'date-fns/locale': path.resolve(__dirname, '../../node_modules/date-fns/locale/index.js')
+      'date-fns': path.resolve(__dirname, '../../node_modules/date-fns'),
+      'date-fns/locale': path.resolve(__dirname, '../../node_modules/date-fns/locale')
     },
     // Dedupe React and date-fns to prevent multiple versions
     dedupe: ['react', 'react-dom', 'date-fns']
