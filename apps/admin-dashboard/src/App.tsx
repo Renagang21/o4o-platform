@@ -157,17 +157,17 @@ function App() {
     // 즉시 초기화 실행
     initializeAuth();
     
-    // Start SSO session monitoring (덜 빈번한 체크로 성능 개선)
-    ssoService.startSessionCheck((isAuthenticated) => {
-      if (!isAuthenticated) {
-        toast.error('Session expired. Please log in again.');
-        // Update auth store when session expires
-        checkSSOSession();
-      }
-    });
+    // SSO 세션 모니터링 비활성화 (SSO 엔드포인트가 구현되지 않음)
+    // TODO: SSO 엔드포인트 구현 후 활성화
+    // ssoService.startSessionCheck((isAuthenticated) => {
+    //   if (!isAuthenticated) {
+    //     toast.error('Session expired. Please log in again.');
+    //     checkSSOSession();
+    //   }
+    // });
     
     return () => {
-      ssoService.stopSessionCheck();
+      // ssoService.stopSessionCheck();
     };
   }, [checkSSOSession]);
   

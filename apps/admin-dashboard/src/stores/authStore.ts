@@ -89,17 +89,20 @@ export const useAuthStore = create<AuthState>()(
               const parsedAuth = JSON.parse(storedAuth)
               const storedState = parsedAuth.state
               if (storedState?.token && storedState?.user && storedState?.isAuthenticated) {
-                // 저장된 상태로 임시 복원
+                // 저장된 상태로 복원하고 SSO 체크는 스킵
                 set({
                   user: storedState.user,
                   token: storedState.token,
                   isAuthenticated: true,
-                  isLoading: true
+                  isLoading: false
                 })
                 
                 // localStorage에도 토큰 설정
                 localStorage.setItem('authToken', storedState.token)
                 localStorage.setItem('accessToken', storedState.token)
+                
+                // 이미 인증된 상태이므로 SSO 체크 스킵
+                return
               }
             } catch (parseError) {
               // Parse 오류 시 로컬 스토리지 정리
