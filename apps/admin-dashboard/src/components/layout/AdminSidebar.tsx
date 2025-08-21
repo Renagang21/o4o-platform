@@ -38,7 +38,8 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ onClose }) => {
     'signage:read', 'crowdfunding:read', 'mail:read', 'mail:write',
     'custom_fields:write', 'templates:read', 'templates:write',
     'menus:write', 'users:read', 'users:create', 'users:update',
-    'tools:read', 'settings:read'
+    'tools:read', 'settings:read', 'shortcodes:read', 'shortcodes:write',
+    'apps:manage', 'apps:read'
   ] : [] // Other roles need proper permissions
   const menuItems = filterMenuByRole(dynamicMenuItems, userRole, userPermissions)
   

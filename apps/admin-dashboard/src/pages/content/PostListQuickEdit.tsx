@@ -519,14 +519,6 @@ const PostListQuickEdit: FC = () => {
         </table>
       )}
 
-      {/* Bulk Actions - Bottom */}
-      <BulkActionBar
-        actions={bulkActions}
-        selectedCount={selectedCount}
-        onActionExecute={executeBulkAction}
-        isProcessing={isProcessing}
-        position="bottom"
-      />
 
       {/* Pagination */}
       <div className="tablenav bottom">
