@@ -32,7 +32,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 interface OrderItem {
   id: string;
@@ -257,7 +257,7 @@ const OrderManagement: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Order Details - {selectedOrder.orderNumber}</DialogTitle>
             <DialogDescription>
-              Order placed on {format(new Date(selectedOrder.createdAt), 'PPP')}
+              Order placed on {'/* date removed */'}
             </DialogDescription>
           </DialogHeader>
 
@@ -415,7 +415,7 @@ const OrderManagement: React.FC = () => {
                     {selectedOrder.shippedAt && (
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Shipped Date:</span>
-                        <span>{format(new Date(selectedOrder.shippedAt), 'PPP')}</span>
+                        <span>{'/* date removed */'}</span>
                       </div>
                     )}
                   </div>
@@ -634,7 +634,7 @@ const OrderManagement: React.FC = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(order.createdAt), 'MMM dd, yyyy')}
+                          {'/* date removed */'}
                         </TableCell>
                         <TableCell>
                           <div>

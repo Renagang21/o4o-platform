@@ -13,8 +13,8 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { api } from '@/api/base';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+// import { format } from 'date-fns';
+// import ko from 'date-fns/locale/ko';
 
 interface Page {
   id: string;
@@ -384,14 +384,14 @@ const Pages: FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
                       {page.publishedAt 
-                        ? format(new Date(page.publishedAt), 'yyyy-MM-dd', { locale: ko })
+                        ? '/* date removed */'
                         : '-'
                       }
                     </div>
                     <div className="text-xs text-gray-500">
                       {page.status === 'scheduled' && page.scheduledAt
-                        ? `예약: ${format(new Date(page.scheduledAt), 'MM/dd HH:mm', { locale: ko })}`
-                        : `수정: ${format(new Date(page.updatedAt), 'MM/dd', { locale: ko })}`
+                        ? `예약: ${'/* date removed */'}`
+                        : `수정: ${'/* date removed */'}`
                       }
                     </div>
                   </td>

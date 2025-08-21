@@ -18,8 +18,8 @@ import {
 } from 'lucide-react';
 import { useOrder, useUpdateOrderStatus, useRefundOrder } from '@/hooks/useOrders';
 import { formatCurrency } from '@/lib/utils';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+// import { format } from 'date-fns';
+// import ko from 'date-fns/locale/ko';
 
 const OrderDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -119,7 +119,7 @@ const OrderDetail: FC = () => {
               주문 #{order.orderNumber}
             </h1>
             <p className="text-gray-600 mt-1">
-              {format(new Date(order.createdAt), 'yyyy년 MM월 dd일 HH:mm', { locale: ko })}
+              {'/* date removed */'}
             </p>
           </div>
         </div>

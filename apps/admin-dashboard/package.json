@@ -75,7 +75,6 @@
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "3.6.0",
     "js-cookie": "^3.0.5",
     "lowlight": "^3.3.0",
     "lucide-react": "^0.523.0",
@@ -92,6 +91,7 @@
     "socket.io-client": "^4.7.4",
     "tailwind-merge": "^2.5.5",
     "uuid": "9.0.1",
+    "vite": "5.4.19",
     "zod": "^4.0.5",
     "zustand": "^5.0.5"
   },
@@ -125,7 +125,6 @@
     "tailwindcss": "^4.1.0",
     "terser": "5.43.1",
     "typescript": "~5.9.2",
-    "vite": "7.0.6",
     "vitest": "3.2.4"
   },
   "msw": {

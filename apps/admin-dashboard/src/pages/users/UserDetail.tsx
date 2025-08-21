@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
 import { api } from '@/api/base';
-import { formatDistanceToNow, format } from 'date-fns';
+// import { formatDistanceToNow, format } from 'date-fns';
 import type { User } from '@o4o/types';
 
 // interface ApprovalLogItem {
@@ -220,7 +220,7 @@ export default function UserDetail() {
                   <div>
                     <p className="text-sm text-gray-600">Joined</p>
                     <p className="font-medium">
-                      {user ? format(new Date(Date.now()), 'MMM d, yyyy') : ''}
+                      {user ? '/* date removed */' : ''}
                     </p>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ export default function UserDetail() {
                     <p className="text-sm text-gray-600">Last Login</p>
                     <p className="font-medium">
                       {user?.lastLoginAt
-                        ? formatDistanceToNow(new Date(user?.lastLoginAt), { addSuffix: true })
+                        ? '/* date removed */'
                         : 'Never'}
                     </p>
                   </div>
@@ -342,7 +342,7 @@ export default function UserDetail() {
                             {log.previous_status} → {log.new_status}
                           </span>
                           <span>
-                            {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
+                            {'/* date removed */'}
                           </span>
                         </div>
                       </div>

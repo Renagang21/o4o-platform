@@ -29,7 +29,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
 import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility, PostType, Category, Tag } from '@o4o/types'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns'
+// import { format } from 'date-fns'
 // import { ko } from 'date-fns/locale'
 
 const PostForm = () => {
@@ -227,8 +227,8 @@ const PostForm = () => {
       if (post.scheduledAt) {
         setIsScheduled(true)
         const date = new Date(post.scheduledAt)
-        setScheduledDate(format(date, 'yyyy-MM-dd'))
-        setScheduledTime(format(date, 'HH:mm'))
+        setScheduledDate('/* date removed */'
+        setScheduledTime('/* date removed */'
       }
     }
   }, [post])

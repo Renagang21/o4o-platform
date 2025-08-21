@@ -53,7 +53,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Form, FormSubmission } from '@o4o/types';
 import toast from 'react-hot-toast';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 const FormSubmissions: FC = () => {
   const navigate = useNavigate();
@@ -131,7 +131,7 @@ const FormSubmissions: FC = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `submissions-${form?.name}-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+      link.setAttribute('download', `submissions-${form?.name}-${'/* date removed */';
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -370,10 +370,10 @@ const FormSubmissions: FC = () => {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        {format(new Date(submission.submittedAt), 'yyyy-MM-dd')}
+                        {'/* date removed */'}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {format(new Date(submission.submittedAt), 'HH:mm:ss')}
+                        {'/* date removed */'}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -460,7 +460,7 @@ const FormSubmissions: FC = () => {
                   <div>
                     <span className="text-gray-500">제출일시:</span>
                     <span className="ml-2">
-                      {format(new Date(viewingSubmission.submittedAt), 'yyyy-MM-dd HH:mm:ss')}
+                      {'/* date removed */'}
                     </span>
                   </div>
                   <div>

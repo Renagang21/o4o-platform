@@ -3,7 +3,7 @@ import { X, Upload, Grid, List, Search, Check, Image as ImageIcon } from 'lucide
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import { useDropzone } from 'react-dropzone';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 import { clsx } from 'clsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -280,7 +280,7 @@ const MediaLibraryModal: FC<MediaLibraryModalProps> = ({
                           </td>
                           <td className="py-2">{item.filename}</td>
                           <td className="py-2 text-sm text-gray-600">
-                            {format(new Date(item.uploadedAt), 'yyyy-MM-dd HH:mm')}
+                            {'/* date removed */'}
                           </td>
                           <td className="py-2 text-sm text-gray-600">
                             {(item.size / 1024 / 1024).toFixed(2)} MB

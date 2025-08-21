@@ -39,8 +39,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Form } from '@o4o/types';
 import toast from 'react-hot-toast';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+// import { format } from 'date-fns';
+// import ko from 'date-fns/locale/ko';
 
 const FormList: FC = () => {
   const navigate = useNavigate();
@@ -267,7 +267,7 @@ const FormList: FC = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-500">마지막 제출</span>
                       <span className="font-medium">
-                        {format(new Date(form.lastSubmission), 'MM/dd HH:mm', { locale: ko })}
+                        {'/* date removed */'}
                       </span>
                     </div>
                   )}
@@ -277,7 +277,7 @@ const FormList: FC = () => {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-gray-400" />
                     <span className="text-xs text-gray-500">
-                      {format(new Date(form.createdAt), 'yyyy.MM.dd', { locale: ko })}
+                      {'/* date removed */'}
                     </span>
                   </div>
                   

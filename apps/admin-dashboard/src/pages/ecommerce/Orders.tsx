@@ -17,8 +17,8 @@ import {
 import { useOrders, useBulkOrderAction, useUpdateOrderStatus } from '@/hooks/useOrders';
 import { OrderStatus } from '@/types/ecommerce';  // OrderFilters is unused
 import { formatCurrency } from '@/lib/utils';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+// import { format } from 'date-fns';
+// import ko from 'date-fns/locale/ko';
 
 const Orders: FC = () => {
   const navigate = useNavigate();
@@ -366,7 +366,7 @@ const Orders: FC = () => {
                       </a>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {format(new Date(order.createdAt), 'yyyy-MM-dd HH:mm', { locale: ko })}
+                      {'/* date removed */'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.text}`}>

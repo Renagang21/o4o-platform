@@ -13,7 +13,7 @@ import {
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useDashboardData } from './hooks/useDashboardData';
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 import { ScreenMeta } from '@/components/common/ScreenMeta';
 import { DashboardHelp } from '@/components/help/DashboardHelp';
 
@@ -195,7 +195,7 @@ const DashboardSimple: FC = () => {
                     )}
                   </div>
                   <div className="activity-time">
-                    {formatDistanceToNow(item.date, { addSuffix: true })}
+                    {'/* date removed */'}
                   </div>
                 </div>
                 <div className="activity-actions">

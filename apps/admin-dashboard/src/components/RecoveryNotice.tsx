@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
-import { format } from 'date-fns';
+// date-fns removed
 import { Button } from '@/components/ui/button';
 
 interface RecoveryNoticeProps {
@@ -23,7 +23,7 @@ const RecoveryNotice: FC<RecoveryNoticeProps> = ({
             저장되지 않은 변경사항이 있습니다
           </h4>
           <p className="text-sm text-yellow-700 mt-1">
-            {format(timestamp, 'yyyy년 MM월 dd일 HH:mm')}에 작성한 내용이 임시 저장되어 있습니다.
+            작성한 내용이 임시 저장되어 있습니다.
             복구하시겠습니까?
           </p>
           <div className="flex gap-2 mt-3">

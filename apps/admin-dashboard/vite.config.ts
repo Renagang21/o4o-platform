@@ -37,13 +37,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
       'react/jsx-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-runtime'),
-      'react/jsx-dev-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-dev-runtime'),
-      // Force date-fns to use v3.6.0 with proper ESM support
-      'date-fns': path.resolve(__dirname, '../../node_modules/date-fns'),
-      'date-fns/locale': path.resolve(__dirname, '../../node_modules/date-fns/locale')
+      'react/jsx-dev-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-dev-runtime')
     },
-    // Dedupe React and date-fns to prevent multiple versions
-    dedupe: ['react', 'react-dom', 'date-fns']
+    // Dedupe React to prevent multiple versions
+    dedupe: ['react', 'react-dom']
   },
   server: {
     port: 5173,
@@ -72,11 +69,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/auth-client', 
       '@o4o/auth-context',
       'date-fns',
-      'date-fns/locale',
-      'date-fns/locale/en-US',
-      'react-day-picker'
-    ],
-    exclude: [
       '@wordpress/blocks',
       '@wordpress/block-editor',
       '@wordpress/components',
@@ -99,8 +91,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     // 워커 스레드 활용
     workers: true,
     commonjsOptions: {
-      transformMixedEsModules: true,
-      esmExternals: true
+      transformMixedEsModules: true
     },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
@@ -130,10 +121,34 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
-      external: [],
+      // WordPress 패키지를 external로 처리하여 빌드에서 제외
+      external: (id) => {
+        // WordPress 패키지는 모두 external로 처리
+        if (id.startsWith('@wordpress/')) {
+          return true;
+        }
+        return false;
+      },
       plugins: [],
       output: {
         ...sharedViteConfig.build?.rollupOptions?.output,
+        // WordPress 패키지를 전역 변수로 매핑
+        globals: {
+          '@wordpress/blocks': 'wp.blocks',
+          '@wordpress/block-editor': 'wp.blockEditor',
+          '@wordpress/components': 'wp.components',
+          '@wordpress/element': 'wp.element',
+          '@wordpress/data': 'wp.data',
+          '@wordpress/i18n': 'wp.i18n',
+          '@wordpress/hooks': 'wp.hooks',
+          '@wordpress/compose': 'wp.compose',
+          '@wordpress/keycodes': 'wp.keycodes',
+          '@wordpress/rich-text': 'wp.richText',
+          '@wordpress/format-library': 'wp.formatLibrary',
+          '@wordpress/editor': 'wp.editor',
+          '@wordpress/core-data': 'wp.coreData',
+          '@wordpress/dom-ready': 'wp.domReady'
+        },
         // Ensure proper loading order for WordPress modules
         inlineDynamicImports: false,
         manualChunks: (id) => {

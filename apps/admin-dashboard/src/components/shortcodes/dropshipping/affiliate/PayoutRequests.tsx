@@ -32,7 +32,7 @@ import {
   Copy
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 interface PayoutAccount {
   id: string;
@@ -695,7 +695,7 @@ const PayoutRequests: React.FC = () => {
           <Clock className="h-4 w-4" />
           <AlertTitle>Next Scheduled Payout</AlertTitle>
           <AlertDescription>
-            Your next automatic payout is scheduled for {format(new Date(summary.nextPayoutDate), 'MMMM dd, yyyy')}
+            Your next automatic payout is scheduled for {'/* date removed */'}
             {summary.payoutSchedule !== 'on_demand' && ` (${summary.payoutSchedule} schedule)`}
           </AlertDescription>
         </Alert>
@@ -754,7 +754,7 @@ const PayoutRequests: React.FC = () => {
                           {request.requestNumber}
                         </TableCell>
                         <TableCell>
-                          {format(new Date(request.requestedAt), 'MMM dd, yyyy')}
+                          {'/* date removed */'}
                         </TableCell>
                         <TableCell>${request.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-red-600">

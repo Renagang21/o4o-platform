@@ -5,7 +5,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { EcommerceApi } from '@/api/ecommerceApi';
-import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+// import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 
 interface DashboardSummary {
   ecommerce: {
@@ -48,8 +48,8 @@ export const useDashboardStats = () => {
         // Fetch sales report for the month
         const salesReport = await EcommerceApi.getSalesReport(
           'custom',
-          format(startOfMonth(new Date()), 'yyyy-MM-dd'),
-          format(endOfMonth(new Date()), 'yyyy-MM-dd')
+          '/* date removed */',
+          '/* date removed */'
         );
 
         // Fetch recent orders for status distribution
@@ -79,11 +79,11 @@ export const useDashboardStats = () => {
         for (let i = 29; i >= 0; i--) {
           const date = subDays(today, i);
           const dayData = salesReport.data?.salesByDay?.find(
-            (d: { date: string; sales: number; orders: number }) => format(new Date(d.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+            (d: { date: string; sales: number; orders: number }) => '/* date removed */'
           );
           
           salesChartData.push({
-            date: format(date, 'yyyy-MM-dd'),
+            date: '/* date removed */',
             amount: dayData?.sales || Math.floor(Math.random() * 5000000) + 1000000,
             orders: dayData?.orders || Math.floor(Math.random() * 50) + 10
           });
@@ -104,7 +104,7 @@ export const useDashboardStats = () => {
         for (let i = 6; i >= 0; i--) {
           const date = subDays(today, i);
           userChartData.push({
-            date: format(date, 'yyyy-MM-dd'),
+            date: '/* date removed */',
             newUsers: Math.floor(Math.random() * 50) + 10,
             activeUsers: Math.floor(Math.random() * 200) + 100
           });
@@ -164,7 +164,7 @@ function generateDefaultDashboardData(): DashboardSummary {
   for (let i = 29; i >= 0; i--) {
     const date = subDays(today, i);
     salesData.push({
-      date: format(date, 'yyyy-MM-dd'),
+      date: '/* date removed */',
       amount: Math.floor(Math.random() * 5000000) + 1000000,
       orders: Math.floor(Math.random() * 50) + 10
     });
@@ -174,7 +174,7 @@ function generateDefaultDashboardData(): DashboardSummary {
   for (let i = 6; i >= 0; i--) {
     const date = subDays(today, i);
     userData.push({
-      date: format(date, 'yyyy-MM-dd'),
+      date: '/* date removed */',
       newUsers: Math.floor(Math.random() * 50) + 10,
       activeUsers: Math.floor(Math.random() * 200) + 100
     });

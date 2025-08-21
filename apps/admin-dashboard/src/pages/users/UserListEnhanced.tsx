@@ -13,7 +13,7 @@ import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { api } from '@/api/base';
 import { UserRole } from '@o4o/types';
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 
 interface User {
   id: string;
@@ -237,9 +237,9 @@ export default function UserListEnhanced() {
       status: getStatusBadge(user.status),
       posts: <span className="text-center">0</span>,
       lastLogin: user.lastLoginAt
-        ? formatDistanceToNow(new Date(user.lastLoginAt), { addSuffix: true })
+        ? '/* date removed */'
         : 'Never',
-      registered: formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })
+      registered: '/* date removed */'
     },
     actions: [
       { label: 'Edit', href: `/users/${user.id}/edit` },

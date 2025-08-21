@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 import { FileText, MessageSquare, User } from 'lucide-react';
 
 interface ActivityItem {
@@ -87,7 +87,7 @@ const ActivityWidget: FC<ActivityWidgetProps> = ({
               <li key={item.id}>
                 <span className="activity-icon">{getIcon(item.type)}</span>
                 <span>
-                  {formatDistanceToNow(item.date, { addSuffix: true })},{' '}
+                  {'/* date removed */'},{' '}
                   <a href={`/posts/${item.id}/edit`}>{item.title}</a>
                 </span>
               </li>
@@ -149,7 +149,7 @@ const ActivityWidget: FC<ActivityWidgetProps> = ({
                   {item.title}: <strong>{item.author}</strong>
                   {' '}
                   <span className="activity-time">
-                    {formatDistanceToNow(item.date, { addSuffix: true })}
+                    {'/* date removed */'}
                   </span>
                 </span>
               </li>

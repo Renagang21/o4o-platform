@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 // Chart components will be available when recharts is installed
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 interface CommissionSummary {
   totalEarned: number;
@@ -413,7 +413,7 @@ const CommissionDashboard: React.FC = () => {
                   {commissions.slice(0, 5).map((commission) => (
                     <TableRow key={commission.id}>
                       <TableCell>
-                        {format(new Date(commission.orderDate), 'MMM dd, yyyy')}
+                        {'/* date removed */'}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
@@ -473,7 +473,7 @@ const CommissionDashboard: React.FC = () => {
                         {commission.orderId}
                       </TableCell>
                       <TableCell>
-                        {format(new Date(commission.orderDate), 'MMM dd')}
+                        {'/* date removed */'}
                       </TableCell>
                       <TableCell>
                         <div className="max-w-[200px]">

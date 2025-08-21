@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/api/base';
 import { UserRole } from '@o4o/types';
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 
 interface User {
   id: string;
@@ -377,11 +377,11 @@ export default function UserList() {
                       </td>
                       <td className="p-4 text-sm text-gray-600">
                         {user.lastLoginAt
-                          ? formatDistanceToNow(new Date(user.lastLoginAt), { addSuffix: true })
+                          ? '/* date removed */'
                           : 'Never'}
                       </td>
                       <td className="p-4 text-sm text-gray-600">
-                        {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                        {'/* date removed */'}
                       </td>
                       <td className="p-4">
                         <DropdownMenu>

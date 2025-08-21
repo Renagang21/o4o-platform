@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { AlertCircle, Loader2, Cloud, CloudOff } from 'lucide-react';
-import { format } from 'date-fns';
+// date-fns removed
 import { clsx } from 'clsx';
 
 interface AutoSaveIndicatorProps {
@@ -36,8 +36,7 @@ const AutoSaveIndicator: FC<AutoSaveIndicatorProps> = ({
       return '저장 중...';
     }
     if (lastSaved) {
-      const timeAgo = format(lastSaved, 'HH:mm');
-      return `${timeAgo}에 저장됨`;
+      return '저장됨';
     }
     if (hasUnsavedChanges && savedInLocalStorage) {
       return '로컬에 임시 저장됨';
