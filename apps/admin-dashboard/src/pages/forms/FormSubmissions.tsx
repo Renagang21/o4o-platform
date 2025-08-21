@@ -131,7 +131,7 @@ const FormSubmissions: FC = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `submissions-${form?.name}-${'/* date removed */';
+      link.setAttribute('download', `submissions-${form?.name}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();

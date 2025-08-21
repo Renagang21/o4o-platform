@@ -227,8 +227,8 @@ const PostForm = () => {
       if (post.scheduledAt) {
         setIsScheduled(true)
         const date = new Date(post.scheduledAt)
-        setScheduledDate('/* date removed */'
-        setScheduledTime('/* date removed */'
+        setScheduledDate('/* date removed */')
+        setScheduledTime('/* date removed */')
       }
     }
   }, [post])
