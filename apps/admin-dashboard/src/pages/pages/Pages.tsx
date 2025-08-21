@@ -14,7 +14,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { api } from '@/api/base';
 import { format } from 'date-fns';
-import { ko } from 'date-fns/locale/ko';
+import { ko } from 'date-fns/locale';
 
 interface Page {
   id: string;

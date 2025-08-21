@@ -18,7 +18,7 @@ import { useOrders, useBulkOrderAction, useUpdateOrderStatus } from '@/hooks/use
 import { OrderStatus } from '@/types/ecommerce';  // OrderFilters is unused
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
-import { ko } from 'date-fns/locale/ko';
+import { ko } from 'date-fns/locale';
 
 const Orders: FC = () => {
   const navigate = useNavigate();

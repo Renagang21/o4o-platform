@@ -19,7 +19,7 @@ import {
 import { useOrder, useUpdateOrderStatus, useRefundOrder } from '@/hooks/useOrders';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
-import { ko } from 'date-fns/locale/ko';
+import { ko } from 'date-fns/locale';
 
 const OrderDetail: FC = () => {
   const { id } = useParams<{ id: string }>();

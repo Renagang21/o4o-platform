@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npx vite --port 3001",
-    "build": "NODE_OPTIONS='--max-old-space-size=8192' npx vite build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' ./node_modules/.bin/vite build",
     "build:with-typecheck": "bash -c 'tsc && NODE_OPTIONS=\"--max-old-space-size=8192\" npx vite build'",
     "preview": "npx vite preview",
     "type-check": "bash -c 'tsc --noEmit'",
