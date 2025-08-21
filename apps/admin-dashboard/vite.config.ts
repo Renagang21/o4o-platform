@@ -71,7 +71,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/ui', 
       '@o4o/auth-client', 
       '@o4o/auth-context',
-      'date-fns'
+      'date-fns',
+      'date-fns/locale',
+      'date-fns/locale/en-US',
+      'react-day-picker'
     ],
     exclude: [
       '@wordpress/blocks',
@@ -95,6 +98,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     cache: true,
     // 워커 스레드 활용
     workers: true,
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      esmExternals: true
+    },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
     // 최적화 설정 추가 (esbuild 우선, terser는 fallback)
@@ -123,6 +130,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
+      external: [],
+      plugins: [],
       output: {
         ...sharedViteConfig.build?.rollupOptions?.output,
         // Ensure proper loading order for WordPress modules
