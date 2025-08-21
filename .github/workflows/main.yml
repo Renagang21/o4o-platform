@@ -27,7 +27,7 @@ jobs:
         cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
-      run: npm install
+      run: bash scripts/archive/ci-install.sh
     
     - name: Build packages first
       run: npm run build:packages
@@ -81,7 +81,7 @@ jobs:
         cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
-      run: npm install
+      run: bash scripts/archive/ci-install.sh
     
     - name: Build packages
       run: npm run build:packages

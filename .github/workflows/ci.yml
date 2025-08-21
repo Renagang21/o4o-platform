@@ -95,7 +95,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm install
+            bash scripts/archive/ci-install.sh
           fi
       
       - name: Build packages if not cached
@@ -139,7 +139,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm install
+            bash scripts/archive/ci-install.sh
           fi
       
       - name: Build packages if not cached
@@ -186,7 +186,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm install
+            bash scripts/archive/ci-install.sh
           fi
       
       - name: Build packages if not cached
@@ -233,7 +233,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm install
+            bash scripts/archive/ci-install.sh
           fi
       
       - name: Build shared packages
@@ -281,7 +281,7 @@ jobs:
       - name: Install dependencies if not cached
         run: |
           if [ ! -d "node_modules" ]; then
-            npm install
+            bash scripts/archive/ci-install.sh
           fi
       
       - name: Build packages if not cached
