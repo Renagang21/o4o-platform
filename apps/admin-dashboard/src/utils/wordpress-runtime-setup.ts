@@ -47,11 +47,8 @@ export const initializeWordPressRuntime = async () => {
   
   // 이미 WordPress가 로드되어 있으면 스킵
   if (window.wp && window.wp.blocks) {
-    console.log('WordPress runtime already initialized');
     return;
   }
-
-  console.log('Initializing WordPress runtime environment...');
 
   // 기본 wp 객체 생성
   window.wp = window.wp || {};
@@ -83,8 +80,6 @@ export const initializeWordPressRuntime = async () => {
 
     // 기본 블록 등록
     registerDefaultBlocks();
-    
-    console.log('WordPress runtime initialized successfully');
   } catch (error) {
     console.error('Failed to initialize WordPress runtime:', error);
     
@@ -350,8 +345,6 @@ const createMinimalMockWp = () => {
       TAB: 9,
     },
   };
-
-  console.log('Minimal WordPress mock created');
 };
 
 /**

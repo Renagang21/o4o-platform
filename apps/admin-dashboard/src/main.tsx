@@ -40,9 +40,7 @@ const queryClient = new QueryClient({
 })
 
 // WordPress 런타임 환경 초기화
-setupWordPressEnvironment().then((isAvailable) => {
-  console.log('WordPress environment available:', isAvailable);
-}).catch((error) => {
+setupWordPressEnvironment().catch((error) => {
   console.error('Failed to setup WordPress environment:', error);
 });
 
