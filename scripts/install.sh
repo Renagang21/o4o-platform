@@ -131,10 +131,12 @@ install_blocks() {
 install_ci() {
     echo -e "${YELLOW}🔧 CI installation...${NC}"
     
-    # GitHub Actions 환경 체크
+    # GitHub Actions 환경에서는 devDependencies도 설치
     if [ "$CI" = "true" ]; then
         echo "Detected CI environment"
-        install_parallel
+        # CI 환경에서는 devDependencies를 포함한 전체 설치
+        npm ci --legacy-peer-deps --no-audit --no-fund || \
+        npm install --legacy-peer-deps --no-audit --no-fund
     else
         install_quick
     fi

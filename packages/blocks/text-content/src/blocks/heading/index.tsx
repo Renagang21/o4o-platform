@@ -4,9 +4,9 @@ import { BlockDefinition } from '@o4o/block-core';
 // Edit Component
 const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
   const { content, level, align, textColor } = attributes;
-  const Tag = `h${level || 2}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level || 2}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   
-  const handleContentChange = (e: React.ChangeEvent<HTMLDivElement>) => {
+  const handleContentChange = (e: React.FocusEvent<HTMLHeadingElement>) => {
     setAttributes({ content: e.currentTarget.innerHTML });
   };
   
@@ -49,7 +49,7 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
 // Save Component
 const Save: React.FC<any> = ({ attributes }) => {
   const { content, level, align, textColor } = attributes;
-  const Tag = `h${level || 2}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level || 2}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   
   const classNames = [
     'wp-block-heading',

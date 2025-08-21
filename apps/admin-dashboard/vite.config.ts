@@ -38,8 +38,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
       'react/jsx-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-runtime'),
       'react/jsx-dev-runtime': path.resolve(__dirname, '../../node_modules/react/jsx-dev-runtime'),
-      // Force date-fns to use v2
-      'date-fns': path.resolve(__dirname, './node_modules/date-fns')
+      // Force date-fns to use v3.6.0
+      'date-fns': path.resolve(__dirname, '../../node_modules/date-fns')
     },
     // Dedupe React and date-fns to prevent multiple versions
     dedupe: ['react', 'react-dom', 'date-fns']
