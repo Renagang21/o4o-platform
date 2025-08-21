@@ -997,3 +997,5 @@ function App() {
 }
 
 export default App;
+
+// Deployment trigger: 2025-08-21 11:28 UTC - Force rebuild for production
