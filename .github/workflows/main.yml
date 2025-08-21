@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -71,7 +71,7 @@ jobs:
         app: [api-server, main-site, admin-dashboard, ecommerce, forum, digital-signage, crowdfunding]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -106,7 +106,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.build.result == 'success'
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Download API build
       uses: actions/download-artifact@v4
@@ -176,7 +176,7 @@ jobs:
             path: /var/www/funding.neture.co.kr
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     
     - name: Download ${{ matrix.app }} build
       uses: actions/download-artifact@v4
