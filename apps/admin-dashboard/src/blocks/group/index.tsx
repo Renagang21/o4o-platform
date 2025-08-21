@@ -5,12 +5,7 @@
 
 import { Group } from 'lucide-react';
 
-// Global interface declaration for WordPress
-declare global {
-  interface Window {
-    wp?: any;
-  }
-}
+// Type declaration is in wordpress-runtime-setup.ts
 
 // Block attributes
 interface GroupBlockAttributes {

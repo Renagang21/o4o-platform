@@ -5,12 +5,7 @@
  * WordPress 패키지들이 기대하는 전역 객체들을 미리 설정
  */
 
-// Global interface declaration for WordPress
-declare global {
-  interface Window {
-    wp?: any;
-  }
-}
+// Type declaration is in wordpress-runtime-setup.ts
 
 // WordPress i18n polyfill - 다국어 지원
 export function initWordPressI18n() {

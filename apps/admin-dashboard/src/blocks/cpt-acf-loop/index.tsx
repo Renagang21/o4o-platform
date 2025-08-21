@@ -8,12 +8,7 @@ import metadata from './block.json';
 import Edit from './edit';
 import save from './save';
 
-// Global interface declaration for WordPress
-declare global {
-  interface Window {
-    wp?: any;
-  }
-}
+// Type declaration is in wordpress-runtime-setup.ts
 
 // Lazy registration to ensure WordPress polyfill is loaded
 export const registerCPTACFLoop = () => {

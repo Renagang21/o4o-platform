@@ -4,13 +4,11 @@ import { AlertTriangle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface RecoveryNoticeProps {
-  timestamp: Date;
   onRecover: () => void;
   onDiscard: () => void;
 }
 
 const RecoveryNotice: FC<RecoveryNoticeProps> = ({
-  timestamp,
   onRecover,
   onDiscard
 }) => {

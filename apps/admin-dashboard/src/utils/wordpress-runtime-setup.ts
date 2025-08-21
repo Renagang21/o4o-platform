@@ -7,7 +7,7 @@
 // WordPress 전역 객체 타입 정의
 declare global {
   interface Window {
-    wp: {
+    wp?: {
       blocks?: any;
       blockEditor?: any;
       components?: any;
@@ -23,6 +23,10 @@ declare global {
       coreData?: any;
       domReady?: any;
       apiFetch?: any;
+      icons?: any;
+      privateApis?: any;
+      _initialized?: boolean;
+      [key: string]: any;
     };
   }
 }
@@ -318,12 +322,12 @@ const createMinimalMockWp = () => {
       _x: (text: string) => text,
       _n: (single: string) => single,
       _nx: (single: string) => single,
-      sprintf: (format: string, ...args: any[]) => format,
+      sprintf: (format: string, ..._args: any[]) => format,
     },
     hooks: {
       addFilter: () => {},
       removeFilter: () => {},
-      applyFilters: (name: string, value: any) => value,
+      applyFilters: (_name: string, value: any) => value,
       addAction: () => {},
       removeAction: () => {},
       doAction: () => {},

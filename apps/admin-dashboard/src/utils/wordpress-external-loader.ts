@@ -5,13 +5,7 @@
  * CDN이나 로컬 스크립트로 WordPress 모듈을 로드
  */
 
-// Global interface declaration for WordPress
-declare global {
-  interface Window {
-    wp?: any;
-    React?: any;
-  }
-}
+// Type declaration is in wordpress-runtime-setup.ts and vite-env.d.ts
 
 // WordPress 모듈 로드 상태 관리
 let wordPressLoadPromise: Promise<void> | null = null;
@@ -22,7 +16,7 @@ let isWordPressLoaded = false;
  */
 async function waitForReact(): Promise<void> {
   // React가 이미 로드되었는지 확인
-  if (window.React?.createElement && window.React?.createContext) {
+  if (window.React && typeof window.React.createElement === 'function' && typeof window.React.createContext === 'function') {
     return;
   }
 
@@ -30,7 +24,7 @@ async function waitForReact(): Promise<void> {
   const maxAttempts = 50;
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(resolve => setTimeout(resolve, 100));
-    if (window.React?.createElement && window.React?.createContext) {
+    if (window.React && typeof window.React.createElement === 'function' && typeof window.React.createContext === 'function') {
       return;
     }
   }

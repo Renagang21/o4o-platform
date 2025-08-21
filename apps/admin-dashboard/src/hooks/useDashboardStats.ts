@@ -74,12 +74,12 @@ export const useDashboardStats = () => {
 
         // Process sales data for chart (last 30 days)
         const salesChartData = [];
-        const today = new Date();
+        // const today = new Date();
         
         for (let i = 29; i >= 0; i--) {
-          const date = subDays(today, i);
+          // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
           const dayData = salesReport.data?.salesByDay?.find(
-            (d: { date: string; sales: number; orders: number }) => '/* date removed */'
+            (_d: { date: string; sales: number; orders: number }) => '/* date removed */'
           );
           
           salesChartData.push({
@@ -102,7 +102,7 @@ export const useDashboardStats = () => {
         // Generate user activity data (mock for now)
         const userChartData = [];
         for (let i = 6; i >= 0; i--) {
-          const date = subDays(today, i);
+          // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
           userChartData.push({
             date: '/* date removed */',
             newUsers: Math.floor(Math.random() * 50) + 10,
@@ -159,10 +159,10 @@ export const useDashboardStats = () => {
 // Generate default dashboard data
 function generateDefaultDashboardData(): DashboardSummary {
   const salesData = [];
-  const today = new Date();
+  // const today = new Date();
   
   for (let i = 29; i >= 0; i--) {
-    const date = subDays(today, i);
+    // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
     salesData.push({
       date: '/* date removed */',
       amount: Math.floor(Math.random() * 5000000) + 1000000,
@@ -172,7 +172,7 @@ function generateDefaultDashboardData(): DashboardSummary {
 
   const userData = [];
   for (let i = 6; i >= 0; i--) {
-    const date = subDays(today, i);
+    // const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
     userData.push({
       date: '/* date removed */',
       newUsers: Math.floor(Math.random() * 50) + 10,

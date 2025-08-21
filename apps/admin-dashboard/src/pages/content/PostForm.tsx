@@ -226,7 +226,7 @@ const PostForm = () => {
       
       if (post.scheduledAt) {
         setIsScheduled(true)
-        const date = new Date(post.scheduledAt)
+        // const date = new Date(post.scheduledAt)
         setScheduledDate('/* date removed */')
         setScheduledTime('/* date removed */')
       }
@@ -286,7 +286,6 @@ const PostForm = () => {
       {/* 복구 알림 */}
       {showRecoveryNotice && recoveryData && (
         <RecoveryNotice
-          timestamp={recoveryData.timestamp}
           onRecover={handleRecover}
           onDiscard={handleDiscardRecovery}
         />

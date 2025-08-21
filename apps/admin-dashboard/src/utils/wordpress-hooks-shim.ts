@@ -6,12 +6,7 @@
  * This prevents circular dependency issues.
  */
 
-// Global interface declaration for WordPress
-declare global {
-  interface Window {
-    wp?: any;
-  }
-}
+// Type declaration is now in wordpress-runtime-setup.ts
 
 // Create a simple hooks implementation to avoid circular dependencies
 const createHooks = () => {

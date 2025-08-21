@@ -235,7 +235,6 @@ const PageForm: FC = () => {
       {/* 복구 알림 */}
       {showRecoveryNotice && recoveryData && (
         <RecoveryNotice
-          timestamp={recoveryData.timestamp}
           onRecover={handleRecover}
           onDiscard={handleDiscardRecovery}
         />

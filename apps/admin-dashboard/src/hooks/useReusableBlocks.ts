@@ -5,12 +5,7 @@
 
 import { useState, useCallback } from 'react';
 
-// Global interface declaration for WordPress
-declare global {
-  interface Window {
-    wp?: any;
-  }
-}
+// Type declaration is in wordpress-runtime-setup.ts
 
 interface ReusableBlock {
   id: string;
