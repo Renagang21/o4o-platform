@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
+import { setupWordPressEnvironment } from '@/utils/wordpress-runtime-setup'
 import App from './App'
 import './styles/globals.css'
 // WordPress styles will be loaded only when needed
@@ -38,8 +39,12 @@ const queryClient = new QueryClient({
   },
 })
 
-// WordPress initialization removed from main bundle
-// WordPress will only be loaded on editor pages via lazy loading
+// WordPress 런타임 환경 초기화
+setupWordPressEnvironment().then((isAvailable) => {
+  console.log('WordPress environment available:', isAvailable);
+}).catch((error) => {
+  console.error('Failed to setup WordPress environment:', error);
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -46,6 +46,17 @@ const AllPosts: FC = () => {
     dateTo: '',
     type: 'post' as PostType
   })
+  
+  // Temporary filters (before applying)
+  const [tempFilters, setTempFilters] = useState({
+    searchTerm: '',
+    status: '',
+    category: '',
+    author: '',
+    dateFrom: '',
+    dateTo: '',
+    type: 'post' as PostType
+  })
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
   const [categories, setCategories] = useState<Array<{id: string, name: string}>>([])
@@ -159,15 +170,19 @@ const AllPosts: FC = () => {
     setFilteredPosts(filtered)
   }
 
-  const updateFilter = (key: string, value: string) => {
-    setFilters((prev: any) => ({
+  const updateTempFilter = (key: string, value: string) => {
+    setTempFilters((prev: any) => ({
       ...prev,
       [key]: value
     }))
   }
+  
+  const applyFiltersClick = () => {
+    setFilters(tempFilters)
+  }
 
   const clearFilters = () => {
-    setFilters({
+    const clearedFilters = {
       searchTerm: '',
       status: '',
       category: '',
@@ -175,7 +190,9 @@ const AllPosts: FC = () => {
       dateFrom: '',
       dateTo: '',
       type: filters.type
-    })
+    }
+    setFilters(clearedFilters)
+    setTempFilters(clearedFilters)
   }
 
   const handleSelectPost = (postId: string) => {
@@ -405,7 +422,10 @@ const AllPosts: FC = () => {
             {postTypes.map((type: any) => (
               <button
                 key={type.value}
-                onClick={() => updateFilter('type', type.value)}
+                onClick={() => {
+                  updateTempFilter('type', type.value)
+                  setFilters((prev: any) => ({...prev, type: type.value}))
+                }}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 ${
                   filters.type === type.value
                     ? 'text-admin-blue border-admin-blue bg-blue-50'
@@ -431,8 +451,8 @@ const AllPosts: FC = () => {
                   <input
                     type="text"
                     placeholder="제목, 내용, 작성자로 검색..."
-                    value={filters.searchTerm}
-                    onChange={(e: any) => updateFilter('searchTerm', e.target.value)}
+                    value={tempFilters.searchTerm}
+                    onChange={(e: any) => updateTempFilter('searchTerm', e.target.value)}
                     className="wp-input pl-10"
                   />
                 </div>
@@ -440,8 +460,8 @@ const AllPosts: FC = () => {
 
               <div className="flex flex-wrap gap-2">
                 <select
-                  value={filters.status}
-                  onChange={(e: any) => updateFilter('status', e.target.value)}
+                  value={tempFilters.status}
+                  onChange={(e: any) => updateTempFilter('status', e.target.value)}
                   className="wp-select min-w-[120px]"
                 >
                   <option value="">전체 상태</option>
@@ -452,8 +472,8 @@ const AllPosts: FC = () => {
                 </select>
 
                 <select
-                  value={filters.category}
-                  onChange={(e: any) => updateFilter('category', e.target.value)}
+                  value={tempFilters.category}
+                  onChange={(e: any) => updateTempFilter('category', e.target.value)}
                   className="wp-select min-w-[120px]"
                 >
                   <option value="">전체 카테고리</option>
@@ -463,6 +483,13 @@ const AllPosts: FC = () => {
                     </option>
                   ))}
                 </select>
+
+                <button
+                  onClick={applyFiltersClick}
+                  className="wp-button-primary"
+                >
+                  적용
+                </button>
 
                 <button
                   onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
@@ -481,8 +508,8 @@ const AllPosts: FC = () => {
                 <div>
                   <label className="wp-label">작성자</label>
                   <select
-                    value={filters.author}
-                    onChange={(e: any) => updateFilter('author', e.target.value)}
+                    value={tempFilters.author}
+                    onChange={(e: any) => updateTempFilter('author', e.target.value)}
                     className="wp-select"
                   >
                     <option value="">전체 작성자</option>
@@ -497,8 +524,8 @@ const AllPosts: FC = () => {
                   <label className="wp-label">시작일</label>
                   <input
                     type="date"
-                    value={filters.dateFrom}
-                    onChange={(e: any) => updateFilter('dateFrom', e.target.value)}
+                    value={tempFilters.dateFrom}
+                    onChange={(e: any) => updateTempFilter('dateFrom', e.target.value)}
                     className="wp-input"
                   />
                 </div>
@@ -506,8 +533,8 @@ const AllPosts: FC = () => {
                   <label className="wp-label">종료일</label>
                   <input
                     type="date"
-                    value={filters.dateTo}
-                    onChange={(e: any) => updateFilter('dateTo', e.target.value)}
+                    value={tempFilters.dateTo}
+                    onChange={(e: any) => updateTempFilter('dateTo', e.target.value)}
                     className="wp-input"
                   />
                 </div>

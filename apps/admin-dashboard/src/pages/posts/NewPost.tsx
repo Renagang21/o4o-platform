@@ -726,7 +726,24 @@ const NewPost: FC = () => {
                       </button>
                     </div>
                   ) : (
-                    <button className="w-full py-8 border-2 border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:border-gray-400">
+                    <button 
+                      onClick={() => {
+                        // 임시로 파일 선택 다이얼로그 열기
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e: any) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            // 임시로 로컬 URL 생성
+                            const url = URL.createObjectURL(file);
+                            setFeaturedImage(url);
+                            toast.success('대표 이미지가 설정되었습니다');
+                          }
+                        };
+                        input.click();
+                      }}
+                      className="w-full py-8 border-2 border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:border-gray-400">
                       대표 이미지 설정
                     </button>
                   )}

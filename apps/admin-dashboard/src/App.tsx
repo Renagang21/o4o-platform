@@ -51,6 +51,7 @@ const ReusableBlocksPage = lazy(() =>
   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
 );
 const Categories = lazy(() => import('@/pages/categories/Categories'));
+const Tags = lazy(() => import('@/pages/posts/Tags'));
 const HomepageEditor = lazy(() => 
   import(/* webpackChunkName: "homepage-editor" */ '@/pages/templates/HomepageEditor')
 );
@@ -336,7 +337,7 @@ function App() {
                     <Route path="/posts/tags" element={
                       <AdminProtectedRoute requiredPermissions={['categories:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Categories />
+                          <Tags />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
