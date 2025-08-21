@@ -31,7 +31,6 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
       'orders': '주문',
       'analytics': '분석',
       'settings': '설정',
-      'media': '미디어',
       'pending': '승인 대기',
       'business': '사업자 회원',
       'affiliates': '파트너 회원',
@@ -83,11 +82,22 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
       
       // 하위 페이지가 있는 경우만 현재 탭 표시
       if (pathSegments.length > 1) {
-        const subPage = pathSegments[pathSegments.length - 1]
-        breadcrumbs.push({
-          label: labelMap[subPage] || subPage,
-          path: undefined // 현재 페이지는 링크 없음
-        })
+        const subPage = pathSegments[1] // 마지막이 아닌 두 번째 세그먼트 사용
+        // 유효한 설정 탭인지 확인
+        const validSettingsTabs = ['general', 'writing', 'reading', 'discussion', 'privacy', 'oauth', 'email']
+        if (mainPage === 'settings' && validSettingsTabs.includes(subPage)) {
+          breadcrumbs.push({
+            label: labelMap[subPage] || subPage,
+            path: undefined // 현재 페이지는 링크 없음
+          })
+        } else if (mainPage !== 'settings') {
+          // 설정이 아닌 다른 특별한 페이지의 경우
+          const lastSegment = pathSegments[pathSegments.length - 1]
+          breadcrumbs.push({
+            label: labelMap[lastSegment] || lastSegment,
+            path: undefined
+          })
+        }
       }
       
       return breadcrumbs

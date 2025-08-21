@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Settings as SettingsIcon, Palette, Mail, Link as LinkIcon, BookOpen, Key, FileText, MessageSquare, Image, Shield } from 'lucide-react'
-import ThemeSettingsWithAuth from './ThemeSettingsWithAuth'
+import { Settings as SettingsIcon, Mail, BookOpen, Key, FileText, MessageSquare, Shield } from 'lucide-react'
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
@@ -14,26 +13,6 @@ const UserSettings: FC = () => (
     <div className="wp-card-body">
       <div className="text-center py-12 text-wp-text-secondary">
         <p>사용자 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
-
-const MediaSettings: FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-wp-text-secondary">
-        <p>미디어 설정 페이지는 개발 중입니다.</p>
-      </div>
-    </div>
-  </div>
-)
-
-const PermalinksSettings: FC = () => (
-  <div className="wp-card">
-    <div className="wp-card-body">
-      <div className="text-center py-12 text-wp-text-secondary">
-        <p>고유주소 설정 페이지는 개발 중입니다.</p>
       </div>
     </div>
   </div>
@@ -64,10 +43,7 @@ const settingsTabs = [
   { id: 'writing', label: '쓰기', icon: <FileText className="w-4 h-4" />, path: '/settings/writing' },
   { id: 'reading', label: '읽기', icon: <BookOpen className="w-4 h-4" />, path: '/settings/reading' },
   { id: 'discussion', label: '토론', icon: <MessageSquare className="w-4 h-4" />, path: '/settings/discussion' },
-  { id: 'media', label: '미디어', icon: <Image className="w-4 h-4" />, path: '/settings/media' },
-  { id: 'permalinks', label: '고유주소', icon: <LinkIcon className="w-4 h-4" />, path: '/settings/permalinks' },
   { id: 'privacy', label: '개인정보', icon: <Shield className="w-4 h-4" />, path: '/settings/privacy' },
-  { id: 'theme', label: '테마', icon: <Palette className="w-4 h-4" />, path: '/settings/theme' },
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings/oauth' },
   { id: 'email', label: '이메일', icon: <Mail className="w-4 h-4" />, path: '/settings/email' }
 ]
@@ -113,10 +89,7 @@ const Settings: FC = () => {
         <Route path="writing" element={<WritingSettings />} />
         <Route path="reading" element={<ReadingSettings />} />
         <Route path="discussion" element={<DiscussionSettings />} />
-        <Route path="media" element={<MediaSettings />} />
-        <Route path="permalinks" element={<PermalinksSettings />} />
         <Route path="privacy" element={<PrivacySettings />} />
-        <Route path="theme" element={<ThemeSettingsWithAuth />} />
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />
         <Route path="email" element={<EmailSettings />} />

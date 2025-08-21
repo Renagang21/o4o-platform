@@ -55,8 +55,9 @@ export const useDynamicMenu = () => {
       const coreMenus = [
         'dashboard', 'users', 'posts', 'pages', 'media', 
         'theme', 'themes', 'settings', 'tools', 'apps', 
-        'monitoring', 'mail', 'cpt-acf', 'collapse',
-        'shortcodes' // Shortcode 메뉴 추가
+        'monitoring', 'cpt-acf', 'collapse',
+        'shortcodes', // Shortcode 메뉴 추가
+        'plugins' // 플러그인 메뉴 추가 (apps 관리 포함)
       ];
       if (coreMenus.includes(item.id)) {
         return true;

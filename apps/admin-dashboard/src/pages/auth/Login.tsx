@@ -93,7 +93,7 @@ const Login: FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 relative">
+      <div className="w-full max-w-md mx-auto space-y-8 relative">
         {/* Background decoration */}
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
@@ -219,15 +219,15 @@ const Login: FC = () => {
         )}
 
         {/* 로그인 폼 */}
-        <form className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100" onSubmit={handleSubmit}>
+        <form className="mt-8 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100 w-full" onSubmit={handleSubmit}>
           <div className="space-y-6">
             {/* 이메일 입력 */}
-            <div className="form-group">
+            <div className="w-full">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-3">
                 이메일 주소
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <div className="relative w-full">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
@@ -238,7 +238,7 @@ const Login: FC = () => {
                   required
                   value={email}
                   onChange={(e: any) => setEmail(e.target.value)}
-                  className="w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm"
+                  className="block w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm"
                   placeholder="admin@neture.co.kr"
                   disabled={isLoading}
                 />
@@ -246,12 +246,12 @@ const Login: FC = () => {
             </div>
 
             {/* 비밀번호 입력 */}
-            <div className="form-group">
+            <div className="w-full">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-3">
                 비밀번호
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <div className="relative w-full">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
@@ -262,14 +262,14 @@ const Login: FC = () => {
                   required
                   value={password}
                   onChange={(e: any) => setPassword(e.target.value)}
-                  className="w-full h-12 pl-12 pr-12 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm"
+                  className="block w-full h-12 pl-12 pr-12 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-all duration-200 text-sm"
                   placeholder="비밀번호를 입력하세요"
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-gray-100/50 rounded-r-lg transition-colors duration-200"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-gray-100/50 rounded-r-lg transition-colors duration-200 z-10"
                   disabled={isLoading}
                 >
                   {showPassword ? (

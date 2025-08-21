@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
         })
         
         // localStorage 정리
-        localStorage.removeItem('auth-storage')
+        localStorage.removeItem('admin-auth-storage')
         localStorage.removeItem('authToken')
         localStorage.removeItem('accessToken')
         
@@ -83,7 +83,7 @@ export const useAuthStore = create<AuthState>()(
       checkSSOSession: async () => {
         try {
           // 페이지 새로고침 시 저장된 토큰으로 먼저 인증 상태 복원 시도
-          const storedAuth = localStorage.getItem('auth-storage')
+          const storedAuth = localStorage.getItem('admin-auth-storage')
           if (storedAuth) {
             try {
               const parsedAuth = JSON.parse(storedAuth)
@@ -106,7 +106,7 @@ export const useAuthStore = create<AuthState>()(
               }
             } catch (parseError) {
               // Parse 오류 시 로컬 스토리지 정리
-              localStorage.removeItem('auth-storage')
+              localStorage.removeItem('admin-auth-storage')
             }
           }
           
@@ -167,7 +167,7 @@ export const useAuthStore = create<AuthState>()(
       }
     }),
     {
-      name: 'auth-storage',
+      name: 'admin-auth-storage',
       partialize: (state) => ({
         user: state.user,
         token: state.token,

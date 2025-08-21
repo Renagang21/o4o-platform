@@ -19,9 +19,9 @@ export class AuthClient {
       // Check multiple possible token locations
       let token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
       
-      // Also check auth-storage for token
+      // Also check admin-auth-storage for token
       if (!token) {
-        const authStorage = localStorage.getItem('auth-storage');
+        const authStorage = localStorage.getItem('admin-auth-storage');
         if (authStorage) {
           try {
             const parsed = JSON.parse(authStorage);

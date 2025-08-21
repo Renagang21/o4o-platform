@@ -146,7 +146,7 @@ function App() {
       } catch (error) {
         // SSO session check failed - clear local storage only if it's a 401 error
         if ((error as any)?.response?.status === 401) {
-          localStorage.removeItem('auth-storage');
+          localStorage.removeItem('admin-auth-storage');
           localStorage.removeItem('authToken');
           localStorage.removeItem('accessToken');
         }

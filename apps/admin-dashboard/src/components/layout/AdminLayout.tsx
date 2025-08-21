@@ -14,15 +14,21 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false) // Default to closed on mobile
-  const [isMobile, setIsMobile] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    // Initialize based on screen size
+    return window.innerWidth >= 1024
+  })
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
-      // Auto-open sidebar on desktop
-      if (window.innerWidth >= 1024) {
+      const isCurrentlyMobile = window.innerWidth < 1024
+      setIsMobile(isCurrentlyMobile)
+      // Auto-open sidebar on desktop, close on mobile
+      if (!isCurrentlyMobile) {
         setSidebarOpen(true)
+      } else {
+        setSidebarOpen(false)
       }
     }
     
