@@ -488,7 +488,7 @@ const AllPosts: FC = () => {
                   onClick={applyFiltersClick}
                   className="wp-button-primary"
                 >
-                  적용
+                  필터 적용
                 </button>
 
                 <button
@@ -555,19 +555,20 @@ const AllPosts: FC = () => {
 
       {/* Bulk Actions */}
       {selectedPosts.length > 0 && (
-        <div className="wp-card border-l-4 border-l-blue-500">
+        <div className="wp-card bg-blue-50 border-l-4 border-l-blue-500">
           <div className="wp-card-body">
             <div className="flex items-center justify-between">
-              <span className="text-blue-700">
+              <span className="text-blue-700 font-medium">
                 {selectedPosts.length}개 게시물이 선택되었습니다
               </span>
               <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-600 mr-2">일괄 작업:</label>
                 <select
                   onChange={(e: any) => e.target.value && handleBulkAction(e.target.value)}
                   className="wp-select"
                   value=""
                 >
-                  <option value="">일괄 작업 선택</option>
+                  <option value="">작업 선택...</option>
                   <option value="publish">발행</option>
                   <option value="draft">초안으로 변경</option>
                   <option value="archive">보관</option>
