@@ -8,11 +8,11 @@ import {
   ChevronDown,
   Repeat
 } from 'lucide-react';
-import { ParagraphBlock } from '../blocks/ParagraphBlock';
-import { HeadingBlock } from '../blocks/HeadingBlock';
-import { ImageBlock } from '../blocks/ImageBlock';
-import { ListBlock } from '../blocks/ListBlock';
-import { ButtonBlock } from '../blocks/ButtonBlock';
+import ParagraphBlock from '../blocks/ParagraphBlock';
+import HeadingBlock from '../blocks/HeadingBlock';
+import ImageBlock from '../blocks/ImageBlock';
+import ListBlock from '../blocks/ListBlock';
+import ButtonBlock from '../blocks/ButtonBlock';
 import { QuoteBlock } from '../blocks/QuoteBlock';
 import { useBlockTransform } from '../hooks/useBlockTransform';
 import type { Block, ThemeConfig } from '../types';
@@ -72,9 +72,9 @@ export const BlockWrapper: FC<BlockWrapperProps> = ({
       onDuplicate,
       onMoveUp,
       onMoveDown,
-      onAddBlock: (position: 'before' | 'after') => {
+      onAddBlock: (_position: 'before' | 'after') => {
         // Add block logic would go here
-        console.log('Add block', position);
+        // Position: before or after current block
       }
     };
 
@@ -84,11 +84,11 @@ export const BlockWrapper: FC<BlockWrapperProps> = ({
       case 'heading':
         return <HeadingBlock {...oldStyleProps} />;
       case 'image':
-        return <ImageBlock {...newStyleProps} />;
+        return <ImageBlock {...oldStyleProps} />;
       case 'list':
-        return <ListBlock {...newStyleProps} />;
+        return <ListBlock {...oldStyleProps} />;
       case 'button':
-        return <ButtonBlock {...newStyleProps} />;
+        return <ButtonBlock {...oldStyleProps} />;
       case 'quote':
         return <QuoteBlock {...newStyleProps} />;
       default:

@@ -64,7 +64,8 @@ const Tags: FC = () => {
       const response = await ContentApi.getTags()
       // Ensure response.data is an array
       const tagsData = Array.isArray(response.data) ? response.data : 
-                      (response.data?.tags ? response.data.tags : [])
+                      (response.data && typeof response.data === 'object' && 'tags' in response.data ? 
+                       (response.data as any).tags : [])
       setTags(tagsData)
     } catch (error: any) {
     // Error logging - use proper error handler
