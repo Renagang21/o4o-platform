@@ -1,0 +1,261 @@
+/**
+ * RichText Component
+ * 구텐베르그 스타일 리치 텍스트 에디터
+ * WordPress Gutenberg RichText 완전 모방
+ */
+
+import React, { FC, useRef, useState, useEffect, KeyboardEvent } from 'react';
+import { cn } from '@/lib/utils';
+
+interface RichTextProps {
+  tagName?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  onSplit?: (value: string, isOriginal?: boolean) => void;
+  onMerge?: () => void;
+  onReplace?: (blocks: any[]) => void;
+  onRemove?: () => void;
+  placeholder?: string;
+  allowedFormats?: string[];
+  identifier?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  multiline?: boolean | string;
+}
+
+export const RichText: FC<RichTextProps> = ({
+  tagName = 'div',
+  value = '',
+  onChange,
+  onSplit,
+  onReplace,
+  onRemove,
+  placeholder = 'Start writing or type / to choose a block',
+  allowedFormats = ['core/bold', 'core/italic', 'core/link'],
+  className,
+  style,
+  multiline = false,
+}) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [isEmpty, setIsEmpty] = useState(!value || value === '');
+
+  // 초기값 설정 및 변경 감지
+  useEffect(() => {
+    if (editorRef.current && value !== editorRef.current.innerHTML) {
+      // 커서 위치 저장
+      const selection = window.getSelection();
+      const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+      const startOffset = range?.startOffset || 0;
+      
+      // 내용 업데이트
+      editorRef.current.innerHTML = value || '';
+      
+      // 커서 위치 복원
+      if (range && editorRef.current.firstChild) {
+        try {
+          const newRange = document.createRange();
+          newRange.setStart(editorRef.current.firstChild, Math.min(startOffset, editorRef.current.textContent?.length || 0));
+          newRange.collapse(true);
+          selection?.removeAllRanges();
+          selection?.addRange(newRange);
+        } catch (e) {
+          // 커서 복원 실패 시 무시
+        }
+      }
+    }
+    setIsEmpty(!value || value === '' || value === '<p></p>' || value === '<br>');
+  }, [value]);
+
+  // 포맷 적용 함수
+  const applyFormat = (format: string) => {
+    if (!allowedFormats.includes(format)) return;
+
+    const formatMap: { [key: string]: string } = {
+      'core/bold': 'bold',
+      'core/italic': 'italic',
+      'core/link': 'createLink',
+      'core/strikethrough': 'strikeThrough',
+      'core/code': 'code',
+    };
+
+    const command = formatMap[format];
+    if (command) {
+      if (command === 'createLink') {
+        const url = prompt('Enter URL:');
+        if (url) {
+          document.execCommand(command, false, url);
+        }
+      } else {
+        document.execCommand(command, false);
+      }
+      
+      if (editorRef.current) {
+        onChange?.(editorRef.current.innerHTML);
+      }
+    }
+  };
+
+  // 키보드 이벤트 처리
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    // Ctrl/Cmd + B (Bold)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      e.preventDefault();
+      applyFormat('core/bold');
+    }
+    
+    // Ctrl/Cmd + I (Italic)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+      e.preventDefault();
+      applyFormat('core/italic');
+    }
+    
+    // Ctrl/Cmd + K (Link)
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      applyFormat('core/link');
+    }
+
+    // Enter 키 처리
+    if (e.key === 'Enter' && !e.shiftKey) {
+      if (multiline) {
+        // 멀티라인 모드에서는 새 줄 추가
+        if (multiline === 'p') {
+          e.preventDefault();
+          document.execCommand('insertParagraph', false);
+          if (editorRef.current) {
+            onChange?.(editorRef.current.innerHTML);
+          }
+        }
+      } else {
+        // 싱글라인 모드에서는 블록 분할
+        e.preventDefault();
+        if (onSplit && editorRef.current) {
+          const content = editorRef.current.innerHTML;
+          onSplit(content, true);
+        }
+      }
+    }
+
+    // Backspace 처리 (빈 블록 제거)
+    if (e.key === 'Backspace' && isEmpty && onRemove) {
+      e.preventDefault();
+      onRemove();
+    }
+
+    // Delete 처리
+    if (e.key === 'Delete' && isEmpty && onRemove) {
+      e.preventDefault();
+      onRemove();
+    }
+
+    // '/' 입력 감지 (블록 선택기 트리거)
+    if (e.key === '/' && isEmpty && onReplace) {
+      // 블록 선택기를 트리거하는 로직
+      // 실제 구현에서는 블록 선택 UI를 표시
+    }
+  };
+
+  // 입력 처리
+  const handleInput = () => {
+    if (editorRef.current) {
+      const newValue = editorRef.current.innerHTML;
+      onChange?.(newValue);
+      setIsEmpty(!newValue || newValue === '' || newValue === '<br>');
+    }
+  };
+
+  // 포커스 처리
+  const handleFocus = () => {
+    // Handle focus
+  };
+
+  // 블러 처리
+  const handleBlur = () => {
+    // Handle blur
+  };
+
+  // 붙여넣기 처리
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+    if (editorRef.current) {
+      onChange?.(editorRef.current.innerHTML);
+    }
+  };
+
+  // Create the appropriate element based on tagName
+  
+  // For specific tags that need special handling
+  if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || 
+      tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
+    return React.createElement(
+      tagName,
+      {
+        ref: editorRef,
+        contentEditable: true,
+        suppressContentEditableWarning: true,
+        className: cn('rich-text', 'outline-none', 'min-h-[1.8em]', isEmpty && 'empty', className),
+        style,
+        onInput: handleInput,
+        onKeyDown: handleKeyDown,
+        onFocus: handleFocus,
+        onBlur: handleBlur,
+        onPaste: handlePaste,
+        'data-placeholder': isEmpty ? placeholder : undefined,
+        role: 'textbox',
+        'aria-label': placeholder,
+        'aria-multiline': multiline ? 'true' : 'false',
+        dangerouslySetInnerHTML: { __html: value }
+      }
+    );
+  }
+  
+  // For p, div, figcaption, and other simple elements
+  return (
+    <div
+      ref={editorRef}
+      contentEditable
+      suppressContentEditableWarning
+      className={cn(
+        'rich-text',
+        'outline-none',
+        'min-h-[1.8em]',
+        isEmpty && 'empty',
+        className
+      )}
+      style={style}
+      onInput={handleInput}
+      onKeyDown={handleKeyDown}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onPaste={handlePaste}
+      data-placeholder={isEmpty ? placeholder : undefined}
+      role="textbox"
+      aria-label={placeholder}
+      aria-multiline={multiline ? 'true' : 'false'}
+      dangerouslySetInnerHTML={{ __html: value }}
+    />
+  );
+};
+
+// 플레인 텍스트 컴포넌트 (제목 등에 사용)
+export const PlainText: FC<{
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+}> = ({ value = '', onChange, placeholder, className }) => {
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => onChange?.(e.target.value)}
+      placeholder={placeholder}
+      className={cn(
+        'w-full outline-none bg-transparent',
+        className
+      )}
+    />
+  );
+};

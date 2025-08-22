@@ -1,0 +1,396 @@
+/**
+ * Gutenberg Editor Styles
+ * WordPress Gutenberg 패턴 완전 모방
+ */
+
+/* Editor Container */
+.gutenberg-editor {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Block Base Styles */
+.wp-block {
+  position: relative;
+  clear: both;
+}
+
+.wp-block + .wp-block {
+  margin-top: 28px;
+}
+
+/* Paragraph Block */
+.wp-block-paragraph {
+  margin-bottom: 28px;
+}
+
+.wp-block-paragraph.has-drop-cap:first-letter {
+  font-size: 3.375em;
+  line-height: 0.75;
+  font-weight: bold;
+  margin: 0.05em 0.1em 0 0;
+  text-transform: uppercase;
+  font-style: normal;
+  float: left;
+}
+
+/* Heading Block */
+.wp-block-heading {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.wp-block-heading-h1 { font-size: 2.5rem; }
+.wp-block-heading-h2 { font-size: 2rem; }
+.wp-block-heading-h3 { font-size: 1.75rem; }
+.wp-block-heading-h4 { font-size: 1.5rem; }
+.wp-block-heading-h5 { font-size: 1.25rem; }
+.wp-block-heading-h6 { font-size: 1rem; }
+
+/* Image Block */
+.wp-block-image {
+  margin-bottom: 1.5em;
+}
+
+.wp-block-image img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.wp-block-image.alignleft {
+  float: left;
+  margin-right: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.wp-block-image.alignright {
+  float: right;
+  margin-left: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.wp-block-image.aligncenter {
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wp-block-image.alignwide {
+  width: calc(100% + 120px);
+  max-width: calc(100% + 120px);
+  margin-left: -60px;
+  margin-right: -60px;
+}
+
+.wp-block-image.alignfull {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.wp-element-caption {
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+  color: #555;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Button Block */
+.wp-block-button {
+  margin-bottom: 1.5em;
+}
+
+.wp-block-button__link {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #007cba;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 2px;
+  font-size: 16px;
+  line-height: 1.5;
+  transition: background-color 0.2s ease;
+}
+
+.wp-block-button__link:hover {
+  background-color: #005a87;
+}
+
+.wp-block-button.is-style-outline .wp-block-button__link {
+  background-color: transparent;
+  border: 2px solid currentColor;
+  color: #007cba;
+}
+
+.wp-block-button.is-style-outline .wp-block-button__link:hover {
+  background-color: #007cba;
+  color: #fff;
+}
+
+/* List Block */
+.wp-block-list {
+  margin-bottom: 1.5em;
+  padding-left: 1.3em;
+}
+
+.wp-block-list li {
+  margin-bottom: 0.5em;
+}
+
+/* Rich Text Editor */
+.rich-text {
+  position: relative;
+  outline: none;
+}
+
+.rich-text:focus {
+  outline: none;
+}
+
+.rich-text.empty::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  pointer-events: none;
+  color: #949494;
+  opacity: 0.62;
+}
+
+/* Block Controls (Toolbar) */
+.block-editor-block-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.block-editor-block-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0;
+}
+
+/* Toolbar Groups */
+.block-editor-block-toolbar > div {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.block-editor-block-toolbar > div:not(:last-child) {
+  border-right: 1px solid #ddd;
+}
+
+/* Toolbar Buttons */
+.block-editor-block-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  min-width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.block-editor-block-toolbar button:hover {
+  background-color: #f0f0f0;
+}
+
+.block-editor-block-toolbar button.is-active {
+  background-color: #e0e0e0;
+}
+
+/* Inspector Controls (Sidebar) */
+.block-editor-inspector-controls {
+  background-color: #fff;
+  border-left: 1px solid #e0e0e0;
+}
+
+.components-panel__body {
+  border-bottom: 1px solid #e0e0e0;
+  margin: 0;
+}
+
+.components-panel__body-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.components-panel__body-toggle:hover {
+  background-color: #f0f0f0;
+}
+
+.components-panel__body-content {
+  padding: 16px;
+}
+
+/* Toggle Control */
+.components-toggle-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* Range Control */
+.components-range-control {
+  margin-bottom: 16px;
+}
+
+.components-range-control input[type="range"] {
+  width: 100%;
+}
+
+/* Color Palette */
+.components-color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Block Wrapper States */
+.block-wrapper {
+  position: relative;
+  transition: outline 0.1s ease;
+}
+
+.block-wrapper.is-selected {
+  outline: 1px solid #007cba;
+  outline-offset: -1px;
+}
+
+.block-wrapper:hover:not(.is-selected) {
+  outline: 1px solid #ddd;
+  outline-offset: -1px;
+}
+
+/* Block Mover */
+.block-mover {
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.block-wrapper:hover .block-mover,
+.block-wrapper.is-selected .block-mover {
+  opacity: 1;
+}
+
+/* Block Inserter */
+.block-inserter {
+  position: relative;
+  height: 24px;
+  margin: -12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.block-inserter:hover {
+  opacity: 1;
+}
+
+.block-inserter button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background-color: #007cba;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.block-inserter button:hover {
+  transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.block-wrapper.is-new {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .wp-block-image.alignwide {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .wp-block-image.alignfull {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .block-editor-block-controls {
+    background-color: #1e1e1e;
+    border-color: #3a3a3a;
+  }
+  
+  .block-editor-block-toolbar button:hover {
+    background-color: #2a2a2a;
+  }
+  
+  .block-editor-block-toolbar button.is-active {
+    background-color: #3a3a3a;
+  }
+  
+  .block-editor-inspector-controls {
+    background-color: #1e1e1e;
+    border-color: #3a3a3a;
+  }
+  
+  .components-panel__body {
+    border-color: #3a3a3a;
+  }
+  
+  .components-panel__body-toggle:hover {
+    background-color: #2a2a2a;
+  }
+}

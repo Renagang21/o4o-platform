@@ -1,23 +1,19 @@
 /**
  * HeadingBlock Component
- * Inline editable heading block with H1-H6 level switching
+ * Gutenberg-style heading block with RichText, BlockControls, and InspectorControls
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { 
-  Type,
-  Hash,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  ChevronDown,
   Heading1,
   Heading2,
   Heading3,
   Heading4,
   Heading5,
-  Heading6
+  Heading6,
+  Hash,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,15 +22,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import BlockWrapper from './BlockWrapper';
+import { RichText } from '../gutenberg/RichText';
+import { BlockControls, ToolbarGroup, ToolbarButton, AlignmentToolbar } from '../gutenberg/BlockControls';
+import { 
+  InspectorControls, 
+  PanelBody, 
+  ToggleControl,
+  ColorPalette,
+  RangeControl
+} from '../gutenberg/InspectorControls';
 
 interface HeadingBlockProps {
   id: string;
@@ -52,7 +50,9 @@ interface HeadingBlockProps {
     align?: 'left' | 'center' | 'right';
     anchor?: string;
     isTableOfContents?: boolean;
-    color?: string;
+    textColor?: string;
+    backgroundColor?: string;
+    fontSize?: number;
   };
 }
 
@@ -70,15 +70,15 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
   attributes = {}
 }) => {
   const [localContent, setLocalContent] = useState(content);
-  const [isEditing, setIsEditing] = useState(false);
-  const contentRef = useRef<HTMLHeadingElement>(null);
 
   const {
     level = 2,
     align = 'left',
     anchor = '',
-    isTableOfContents = false,
-    color = ''
+    isTableOfContents = true,
+    textColor = '',
+    backgroundColor = '',
+    fontSize = 0
   } = attributes;
 
   // Sync content changes
@@ -86,71 +86,24 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     setLocalContent(content);
   }, [content]);
 
-  // Focus on edit
-  useEffect(() => {
-    if (isEditing && contentRef.current) {
-      contentRef.current.focus();
-      // Select all text for easy replacement
-      const range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-    }
-  }, [isEditing]);
-
   // Handle content change
-  const handleContentChange = () => {
-    if (!contentRef.current) return;
-    const newContent = contentRef.current.innerText;
+  const handleContentChange = (newContent: string) => {
     setLocalContent(newContent);
     onChange(newContent, attributes);
   };
 
-  // Handle level change
-  const handleLevelChange = (newLevel: 1 | 2 | 3 | 4 | 5 | 6) => {
-    onChange(localContent, { ...attributes, level: newLevel });
+  // Update attribute
+  const updateAttribute = (key: string, value: any) => {
+    onChange(localContent, { ...attributes, [key]: value });
   };
 
-  // Handle alignment change
-  const handleAlignmentChange = (newAlign: 'left' | 'center' | 'right') => {
-    onChange(localContent, { ...attributes, align: newAlign });
-  };
-
-  // Handle anchor change
-  const handleAnchorChange = (newAnchor: string) => {
-    onChange(localContent, { ...attributes, anchor: newAnchor });
-  };
-
-  // Toggle table of contents
-  const toggleTableOfContents = () => {
-    onChange(localContent, { ...attributes, isTableOfContents: !isTableOfContents });
-  };
-
-  // Handle keyboard shortcuts
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Enter to finish editing
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      setIsEditing(false);
-      contentRef.current?.blur();
-      onAddBlock?.('after');
+  // Handle Enter key for block split
+  const handleSplit = (value: string, isOriginal?: boolean) => {
+    if (isOriginal) {
+      onChange(value, attributes);
     }
-    // Escape to cancel editing
-    if (e.key === 'Escape') {
-      setIsEditing(false);
-      contentRef.current?.blur();
-    }
-    // Tab to change level
-    if (e.key === 'Tab' && !e.shiftKey && level < 6) {
-      e.preventDefault();
-      handleLevelChange((level + 1) as 1 | 2 | 3 | 4 | 5 | 6);
-    }
-    // Shift+Tab to change level
-    if (e.key === 'Tab' && e.shiftKey && level > 1) {
-      e.preventDefault();
-      handleLevelChange((level - 1) as 1 | 2 | 3 | 4 | 5 | 6);
-    }
+    // Create new paragraph block after heading
+    onAddBlock?.('after');
   };
 
   // Get heading icon based on level
@@ -162,183 +115,218 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       case 4: return <Heading4 className="h-4 w-4" />;
       case 5: return <Heading5 className="h-4 w-4" />;
       case 6: return <Heading6 className="h-4 w-4" />;
-      default: return <Type className="h-4 w-4" />;
+      default: return <Heading2 className="h-4 w-4" />;
     }
   };
 
-  // Get heading classes based on level
-  const getHeadingClasses = () => {
-    const baseClasses = 'outline-none transition-all';
-    const alignClasses = {
-      left: 'text-left',
-      center: 'text-center',
-      right: 'text-right'
+  // Get default font size based on level
+  const getDefaultFontSize = () => {
+    const sizes = {
+      1: 36,
+      2: 30,
+      3: 24,
+      4: 20,
+      5: 18,
+      6: 16
     };
-    const levelClasses = {
-      1: 'text-4xl font-bold',
-      2: 'text-3xl font-bold',
-      3: 'text-2xl font-semibold',
-      4: 'text-xl font-semibold',
-      5: 'text-lg font-medium',
-      6: 'text-base font-medium'
-    };
-    
-    return cn(
-      baseClasses,
-      alignClasses[align],
-      levelClasses[level],
-      isEditing && 'ring-2 ring-blue-500 ring-offset-2 rounded px-2',
-      !localContent && 'text-gray-400'
-    );
+    return fontSize || sizes[level];
   };
 
-  // Create heading element dynamically
-  const renderHeading = () => {
-    const props = {
-      ref: contentRef as any,
-      contentEditable: true,
-      suppressContentEditableWarning: true,
-      className: getHeadingClasses(),
-      style: { color: color || undefined },
-      id: anchor || undefined,
-      onInput: handleContentChange,
-      onKeyDown: handleKeyDown,
-      onClick: () => setIsEditing(true),
-      onBlur: () => setIsEditing(false),
-      'data-placeholder': `제목 ${level} 입력...`,
-      children: localContent || `제목 ${level} 입력...`
-    };
-
-    switch (level) {
-      case 1: return <h1 {...props} />;
-      case 2: return <h2 {...props} />;
-      case 3: return <h3 {...props} />;
-      case 4: return <h4 {...props} />;
-      case 5: return <h5 {...props} />;
-      case 6: return <h6 {...props} />;
-      default: return <h2 {...props} />;
-    }
-  };
+  // Level selector dropdown for toolbar
+  const LevelSelector = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Button variant="ghost" size="sm" className="h-9 px-2">
+          {getHeadingIcon()}
+          <span className="ml-1 text-xs">H{level}</span>
+          <ChevronDown className="ml-1 h-3 w-3" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {[1, 2, 3, 4, 5, 6].map((l) => {
+          const Icon = [Heading1, Heading2, Heading3, Heading4, Heading5, Heading6][l - 1];
+          return (
+            <DropdownMenuItem
+              key={l}
+              onClick={() => updateAttribute('level', l)}
+              className={level === l ? 'bg-gray-100' : ''}
+            >
+              <Icon className="mr-2 h-4 w-4" />
+              <span>Heading {l}</span>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
-    <BlockWrapper
-      id={id}
-      type="heading"
-      isSelected={isSelected}
-      onSelect={onSelect}
-      onDelete={onDelete}
-      onDuplicate={onDuplicate}
-      onMoveUp={onMoveUp}
-      onMoveDown={onMoveDown}
-      onAddBlock={onAddBlock}
-    >
-      {/* Inline Toolbar - shows when block is selected */}
+    <>
+      {/* Block Controls - Floating Toolbar */}
       {isSelected && (
-        <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded">
+        <BlockControls>
           {/* Level Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost" size="sm" className="gap-2">
-                {getHeadingIcon()}
-                <span className="text-xs">H{level}</span>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {[1, 2, 3, 4, 5, 6].map((l) => (
-                <DropdownMenuItem
-                  key={l}
-                  onClick={() => handleLevelChange(l as 1 | 2 | 3 | 4 | 5 | 6)}
-                  className={level === l ? 'bg-gray-100' : ''}
-                >
-                  <span className={`font-${l <= 2 ? 'bold' : l <= 4 ? 'semibold' : 'medium'}`}>
-                    Heading {l}
-                  </span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <div className="w-px h-6 bg-gray-300" />
+          <ToolbarGroup>
+            <LevelSelector />
+          </ToolbarGroup>
 
           {/* Alignment */}
-          <div className="flex gap-1">
-            <Button
-              variant={align === 'left' ? 'default' : 'ghost'}
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => handleAlignmentChange('left')}
-            >
-              <AlignLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={align === 'center' ? 'default' : 'ghost'}
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => handleAlignmentChange('center')}
-            >
-              <AlignCenter className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={align === 'right' ? 'default' : 'ghost'}
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => handleAlignmentChange('right')}
-            >
-              <AlignRight className="h-4 w-4" />
-            </Button>
-          </div>
+          <AlignmentToolbar
+            value={align}
+            onChange={(newAlign) => updateAttribute('align', newAlign)}
+          />
 
-          <div className="w-px h-6 bg-gray-300" />
-
-          {/* Advanced Options */}
-          <Popover>
-            <PopoverTrigger>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Hash className="h-4 w-4" />
-                Advanced
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-4">
-                {/* HTML Anchor */}
-                <div>
-                  <Label htmlFor="anchor">HTML Anchor</Label>
-                  <Input
-                    id="anchor"
-                    value={anchor}
-                    onChange={(e) => handleAnchorChange(e.target.value)}
-                    placeholder="heading-anchor"
-                    className="mt-1"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Used for linking directly to this heading
-                  </p>
-                </div>
-
-                {/* Table of Contents */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="toc">Include in Table of Contents</Label>
-                    <p className="text-xs text-gray-500">
-                      Show this heading in auto-generated TOC
-                    </p>
-                  </div>
-                  <Switch
-                    id="toc"
-                    checked={isTableOfContents}
-                    onCheckedChange={toggleTableOfContents}
-                  />
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+          {/* HTML Anchor */}
+          <ToolbarGroup>
+            <ToolbarButton
+              icon={<Hash className="h-4 w-4" />}
+              label="HTML Anchor"
+              onClick={() => {
+                const newAnchor = prompt('Enter HTML anchor (ID):', anchor);
+                if (newAnchor !== null) {
+                  updateAttribute('anchor', newAnchor);
+                }
+              }}
+            />
+          </ToolbarGroup>
+        </BlockControls>
       )}
 
-      {/* Editable Heading */}
-      {renderHeading()}
-    </BlockWrapper>
+      {/* Inspector Controls - Sidebar Settings */}
+      {isSelected && (
+        <InspectorControls>
+          {/* Settings Panel */}
+          <PanelBody title="Heading Settings" initialOpen={true}>
+            {/* Level Selector */}
+            <div className="mb-4">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Heading Level
+              </label>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-sm"
+                value={level}
+                onChange={(e) => updateAttribute('level', parseInt(e.target.value))}
+              >
+                {[1, 2, 3, 4, 5, 6].map((l) => (
+                  <option key={l} value={l}>
+                    H{l} - Heading {l}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* HTML Anchor */}
+            <div className="mb-4">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                HTML Anchor
+              </label>
+              <Input
+                value={anchor}
+                onChange={(e) => updateAttribute('anchor', e.target.value)}
+                placeholder="heading-anchor"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter an ID for direct linking to this heading
+              </p>
+            </div>
+
+            {/* Table of Contents */}
+            <ToggleControl
+              label="Include in Table of Contents"
+              help="Show this heading in auto-generated TOC"
+              checked={isTableOfContents}
+              onChange={(checked) => updateAttribute('isTableOfContents', checked)}
+            />
+          </PanelBody>
+
+          {/* Typography Panel */}
+          <PanelBody title="Typography" initialOpen={false}>
+            <RangeControl
+              label="Font Size"
+              value={getDefaultFontSize()}
+              onChange={(value) => updateAttribute('fontSize', value)}
+              min={12}
+              max={100}
+              step={1}
+              help="Adjust the heading font size (px)"
+            />
+          </PanelBody>
+
+          {/* Color Settings */}
+          <PanelBody title="Color Settings" initialOpen={false}>
+            <div className="mb-4">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Text Color
+              </label>
+              <ColorPalette
+                value={textColor}
+                onChange={(color) => updateAttribute('textColor', color)}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Background Color
+              </label>
+              <ColorPalette
+                value={backgroundColor}
+                onChange={(color) => updateAttribute('backgroundColor', color)}
+              />
+            </div>
+          </PanelBody>
+        </InspectorControls>
+      )}
+
+      {/* Block Content */}
+      <BlockWrapper
+        id={id}
+        type="heading"
+        isSelected={isSelected}
+        onSelect={onSelect}
+        onDelete={onDelete}
+        onDuplicate={onDuplicate}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        onAddBlock={onAddBlock}
+        className={`wp-block wp-block-heading wp-block-heading-h${level}`}
+      >
+        <div
+          id={anchor || undefined}
+          style={{
+            backgroundColor: backgroundColor || undefined
+          }}
+        >
+          <RichText
+            tagName={`h${level}`}
+            value={localContent}
+            onChange={handleContentChange}
+            onSplit={handleSplit}
+            placeholder={`Heading ${level}`}
+            className={cn(
+              'heading-text',
+              align === 'center' && 'text-center',
+              align === 'right' && 'text-right',
+              level === 1 && 'text-4xl font-bold',
+              level === 2 && 'text-3xl font-bold',
+              level === 3 && 'text-2xl font-semibold',
+              level === 4 && 'text-xl font-semibold',
+              level === 5 && 'text-lg font-medium',
+              level === 6 && 'text-base font-medium'
+            )}
+            style={{
+              color: textColor || undefined,
+              fontSize: fontSize ? `${fontSize}px` : undefined
+            }}
+            allowedFormats={[
+              'core/bold',
+              'core/italic',
+              'core/link',
+              'core/strikethrough'
+            ]}
+          />
+        </div>
+      </BlockWrapper>
+    </>
   );
 };
 

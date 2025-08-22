@@ -25,12 +25,16 @@ import {
   PopoverContent,
 } from '@/components/ui/popover';
 
+// Import Gutenberg styles
+import './styles/gutenberg.css';
+
 // Import block components
 import ParagraphBlock from './blocks/ParagraphBlock';
 import HeadingBlock from './blocks/HeadingBlock';
 import ImageBlock from './blocks/ImageBlock';
 import ButtonBlock from './blocks/ButtonBlock';
 import ListBlock from './blocks/ListBlock';
+import ColumnsBlock from './blocks/ColumnsBlock';
 
 interface Block {
   id: string;
@@ -137,6 +141,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return { text: '버튼 텍스트', url: '#', style: 'fill', size: 'medium' };
       case 'image':
         return { align: 'center', size: 'large' };
+      case 'columns':
+        return { 
+          columns: [
+            { id: '1', width: 50, content: [] },
+            { id: '2', width: 50, content: [] }
+          ],
+          columnCount: 2,
+          verticalAlignment: 'top',
+          isStackedOnMobile: true,
+          gap: 20
+        };
       default:
         return {};
     }
@@ -275,6 +290,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       case 'list':
         return (
           <ListBlock
+            {...commonProps}
+            attributes={block.attributes}
+          />
+        );
+      
+      case 'columns':
+        return (
+          <ColumnsBlock
             {...commonProps}
             attributes={block.attributes}
           />
