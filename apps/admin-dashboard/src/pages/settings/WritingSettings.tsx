@@ -50,7 +50,7 @@ export default function WritingSettings() {
   const { isLoading } = useQuery({
     queryKey: ['settings', 'writing'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/settings/writing');
+      const response = await apiClient.get('/v1/settings/writing');
       const data = response.data.data;
       if (data) {
         setSettings(data);
@@ -62,7 +62,7 @@ export default function WritingSettings() {
   // Save settings mutation
   const saveMutation = useMutation({
     mutationFn: async (data: WritingSettingsData) => {
-      return apiClient.put('/api/v1/settings/writing', data);
+      return apiClient.put('/v1/settings/writing', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'writing'] });

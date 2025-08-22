@@ -58,7 +58,7 @@ export default function DiscussionSettings() {
   const { isLoading } = useQuery({
     queryKey: ['settings', 'discussion'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/v1/settings/discussion');
+      const response = await apiClient.get('/v1/settings/discussion');
       const data = response.data.data;
       if (data) {
         setSettings(data);
@@ -77,7 +77,7 @@ export default function DiscussionSettings() {
         moderationKeywords: moderationText.split('\n').filter(Boolean),
         blacklistKeywords: blacklistText.split('\n').filter(Boolean)
       };
-      return apiClient.put('/api/v1/settings/discussion', payload);
+      return apiClient.put('/v1/settings/discussion', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'discussion'] });
