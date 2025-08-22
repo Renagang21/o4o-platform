@@ -81,8 +81,8 @@ export const initializeWordPressRuntime = async () => {
     window.wp.keycodes = modules[8];
     */
 
-    // 기본 블록 등록
-    registerDefaultBlocks();
+    // 기본 블록 등록 - WordPress 패키지가 없으면 실행 불가
+    // registerDefaultBlocks();
   } catch (error) {
     console.error('Failed to initialize WordPress runtime:', error);
     
