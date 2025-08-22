@@ -55,6 +55,8 @@ export const initializeWordPressRuntime = async () => {
 
   try {
     // WordPress 패키지들을 동적으로 import
+    // Commented out as WordPress packages are not installed
+    /*
     const modules = await Promise.all([
       import('@wordpress/blocks'),
       import('@wordpress/block-editor'),
@@ -77,6 +79,7 @@ export const initializeWordPressRuntime = async () => {
     window.wp.hooks = modules[6];
     window.wp.compose = modules[7];
     window.wp.keycodes = modules[8];
+    */
 
     // 기본 블록 등록
     registerDefaultBlocks();

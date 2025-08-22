@@ -304,18 +304,18 @@ export class EcommerceApi {
     pendingOrders: number
     totalCustomers: number
   }>> {
-    const response = await unifiedApi.raw.get('/ecommerce/dashboard/stats')
+    const response = await unifiedApi.raw.get('/api/ecommerce/dashboard/stats')
     return response.data
   }
 
   // Settings
   static async getSettings(): Promise<ApiResponse<EcommerceSettings>> {
-    const response = await unifiedApi.raw.get('/ecommerce/settings')
+    const response = await unifiedApi.raw.get('/api/ecommerce/settings')
     return response.data
   }
 
   static async updateSettings(settings: Partial<EcommerceSettings>): Promise<ApiResponse<EcommerceSettings>> {
-    const response = await unifiedApi.raw.put('/ecommerce/settings', settings)
+    const response = await unifiedApi.raw.put('/api/ecommerce/settings', settings)
     return response.data
   }
 

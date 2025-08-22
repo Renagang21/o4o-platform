@@ -40,25 +40,28 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
     }
 
     // Load core modules first (smaller chunks)
-    const [
-      blocks,
-      components,
-      element,
-      data,
-      i18n,
-      hooks,
-      compose,
-      apiFetch
-    ] = await Promise.all([
-      import(/* webpackChunkName: "wp-blocks" */ '@wordpress/blocks'),
-      import(/* webpackChunkName: "wp-components" */ '@wordpress/components'),
-      import(/* webpackChunkName: "wp-element" */ '@wordpress/element'),
-      import(/* webpackChunkName: "wp-data" */ '@wordpress/data'),
-      import(/* webpackChunkName: "wp-i18n" */ '@wordpress/i18n'),
-      import(/* webpackChunkName: "wp-hooks" */ '@wordpress/hooks'),
-      import(/* webpackChunkName: "wp-compose" */ '@wordpress/compose'),
-      import(/* webpackChunkName: "wp-api-fetch" */ '@wordpress/api-fetch')
-    ]);
+    // Commented out as WordPress packages are not installed
+    // const [
+    //   blocks,
+    //   components,
+    //   element,
+    //   data,
+    //   i18n,
+    //   hooks,
+    //   compose,
+    //   apiFetch
+    // ] = await Promise.all([
+    //   import('@wordpress/blocks'),
+    //   import('@wordpress/components'),
+    //   import('@wordpress/element'),
+    //   import('@wordpress/data'),
+    //   import('@wordpress/i18n'),
+    //   import('@wordpress/hooks'),
+    //   import('@wordpress/compose'),
+    //   import('@wordpress/api-fetch')
+    // ]);
+    const blocks = null, components = null, element = null, data = null,
+          i18n = null, hooks = null, compose = null, apiFetch = null;
 
     // Load block editor separately using optimized loader
     const { loadMinimalBlockEditor } = await import('./wordpress-block-loader');

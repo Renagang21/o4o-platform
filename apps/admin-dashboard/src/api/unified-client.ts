@@ -138,7 +138,7 @@ class UnifiedApiClient {
 
   // Versioned API methods
   private v1(path: string): string {
-    return `/${this.version}${path}`;
+    return `/api/${this.version}${path}`;
   }
 
   // Content API
