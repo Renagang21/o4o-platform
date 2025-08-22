@@ -506,8 +506,9 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
   }
 });
 
-app.use('/api/settings', settingsRoutes);
+// OAuth routes must be registered BEFORE general settings routes
 app.use('/api/settings', oauthSettingsRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Email settings routes
 import emailSettingsRoutes from './routes/email-settings.routes';
@@ -550,7 +551,7 @@ app.use('/api/v1/settings', settingsV1Routes); // 설정 라우트
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
 app.use('/api/admin', adminRoutes); // Add original admin routes for backwards compatibility
-app.use('/api/settings', settingsRoutes);
+// Settings routes already registered above
 
 // 루트 접근 시 API 서버임을 알림
 app.get('/', (req, res) => {
