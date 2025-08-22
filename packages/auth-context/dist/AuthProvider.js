@@ -22,7 +22,13 @@ export const AuthProvider = ({ children, ssoClient, onAuthError }) => {
         return null;
     };
     const [user, setUser] = useState(getInitialState());
-    const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태를 true로 설정
+    // 저장된 사용자 정보가 있으면 로딩을 false로, 없으면 true로 설정
+    const [isLoading, setIsLoading] = useState(() => {
+        const storedUser = getInitialState();
+        const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        // 저장된 인증 정보가 있으면 즉시 사용 가능하도록 false 반환
+        return !(storedUser && storedToken);
+    });
     const [error, setError] = useState(null);
     const authClient = ssoClient || new AuthClient(typeof window !== 'undefined' && window.import?.meta?.env?.VITE_API_BASE_URL || '');
     // 초기 인증 상태 확인
@@ -32,44 +38,43 @@ export const AuthProvider = ({ children, ssoClient, onAuthError }) => {
                 const storedUser = getInitialState();
                 const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
                 if (storedUser && storedToken) {
-                    // 저장된 사용자 정보가 있으면 유효성 검증
-                    setUser(storedUser);
-                    // SSO 세션 확인
+                    // 저장된 사용자 정보가 있으면 즉시 사용
+                    // 이미 useState 초기값으로 설정되어 있으므로 setUser 호출 불필요
+                    // SSO 세션 확인은 백그라운드에서 수행 (옵션)
                     if (ssoClient && typeof window !== 'undefined') {
-                        try {
-                            const sessionData = await authClient.checkSession();
+                        // SSO 체크는 비동기로 수행하되, 실패해도 로컬 세션 유지
+                        authClient.checkSession().then(sessionData => {
                             if (!sessionData.isAuthenticated) {
-                                // SSO 세션이 유효하지 않으면 로그아웃
-                                setUser(null);
-                                localStorage.removeItem('admin-auth-storage');
-                                localStorage.removeItem('accessToken');
-                                localStorage.removeItem('refreshToken');
-                                localStorage.removeItem('token');
-                                localStorage.removeItem('authToken');
-                                localStorage.removeItem('user');
+                                console.warn('SSO session invalid, but keeping local session');
+                                // SSO 세션이 없어도 로컬 세션은 유지 (토큰이 유효한 경우)
                             }
-                        }
-                        catch (error) {
-                            console.error('SSO session check failed:', error);
+                        }).catch(error => {
+                            console.warn('SSO session check failed, keeping local session:', error);
                             // SSO 체크 실패 시에도 기존 세션 유지
-                        }
+                        });
+                    }
+                    // 이미 로딩이 false로 설정되어 있으므로 추가 작업 불필요
+                    if (isLoading) {
+                        setIsLoading(false);
                     }
                 }
                 else {
                     // 저장된 인증 정보가 없으면 null 설정
                     setUser(null);
+                    setIsLoading(false);
                 }
             }
             catch (error) {
                 console.error('Initial auth check failed:', error);
                 setUser(null);
-            }
-            finally {
                 setIsLoading(false);
             }
         };
-        checkInitialAuth();
-    }, [authClient, ssoClient]);
+        // 로딩 중일 때만 초기 인증 체크 수행
+        if (isLoading) {
+            checkInitialAuth();
+        }
+    }, [authClient, ssoClient, isLoading]);
     const login = async (credentials) => {
         try {
             setIsLoading(true);

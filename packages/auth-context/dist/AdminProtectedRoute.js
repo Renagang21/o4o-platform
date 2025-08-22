@@ -16,18 +16,27 @@ export const AdminProtectedRoute = ({ children, requiredRoles = [], requiredPerm
     const location = useLocation();
     useEffect(() => {
         // 로딩이 완전히 완료되고 인증되지 않은 경우에만 리다이렉트
-        // 추가적인 지연을 두어 토큰 복원 프로세스가 완료될 시간을 확보
+        // localStorage에 저장된 토큰이 있는지 먼저 확인
+        const hasStoredAuth = () => {
+            const token = localStorage.getItem('accessToken') ||
+                localStorage.getItem('token') ||
+                localStorage.getItem('authToken');
+            const adminStorage = localStorage.getItem('admin-auth-storage');
+            return !!(token || adminStorage);
+        };
         let timeoutId;
         if (!isLoading && !isAuthenticated) {
+            // 저장된 인증 정보가 있으면 더 기다림
+            const delay = hasStoredAuth() ? 500 : 100;
             timeoutId = window.setTimeout(() => {
-                // 한 번 더 확인 후 리다이렉트
-                if (!isAuthenticated) {
+                // 다시 한 번 인증 상태와 저장된 토큰 확인
+                if (!isAuthenticated && !hasStoredAuth()) {
                     navigate('/login', {
                         replace: true,
                         state: { from: location.pathname }
                     });
                 }
-            }, 100); // 100ms 지연으로 토큰 복원 완료 대기
+            }, delay);
         }
         return () => {
             if (timeoutId)
