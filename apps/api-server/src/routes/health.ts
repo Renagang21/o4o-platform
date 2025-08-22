@@ -113,6 +113,21 @@ router.get('/system', async (req: Request, res: Response) => {
   }
 });
 
+// Redis health check endpoint
+router.get('/redis', async (req: Request, res: Response) => {
+  try {
+    const redisHealth = await checkRedisHealth();
+    res.status(redisHealth.status === 'healthy' ? 200 : 503).json(redisHealth);
+  } catch (error: any) {
+    res.status(503).json({
+      component: 'redis',
+      status: 'unhealthy',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Helper functions
 interface HealthCheckResponse {
   status: string;
@@ -380,6 +395,50 @@ async function checkDiskHealth(): Promise<HealthComponent> {
       component: 'disk',
       status: 'unknown',
       error: 'Unable to check disk usage',
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+async function checkRedisHealth(): Promise<HealthComponent> {
+  const start = Date.now();
+  
+  try {
+    // Check if Redis environment variables are configured
+    const redisHost = process.env.REDIS_HOST;
+    const redisPort = process.env.REDIS_PORT;
+    
+    if (!redisHost || !redisPort) {
+      return {
+        component: 'redis',
+        status: 'not_configured',
+        responseTime: Date.now() - start,
+        details: {
+          message: 'Redis is not configured. Set REDIS_HOST and REDIS_PORT environment variables.'
+        },
+        timestamp: new Date().toISOString()
+      };
+    }
+    
+    // For now, return not configured status since Redis is optional
+    // When Redis is implemented, add actual connection check here
+    return {
+      component: 'redis',
+      status: 'not_configured',
+      responseTime: Date.now() - start,
+      details: {
+        host: redisHost,
+        port: redisPort,
+        message: 'Redis connection not implemented yet'
+      },
+      timestamp: new Date().toISOString()
+    };
+  } catch (error: any) {
+    return {
+      component: 'redis',
+      status: 'unhealthy',
+      responseTime: Date.now() - start,
+      error: error instanceof Error ? error.message : 'Redis check failed',
       timestamp: new Date().toISOString()
     };
   }

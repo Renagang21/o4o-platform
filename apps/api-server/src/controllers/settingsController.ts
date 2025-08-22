@@ -80,6 +80,25 @@ export class SettingsController {
     }
   }
 
+  // GET /api/settings/general (public endpoint for frontend)
+  async getGeneralSettings(req: Request, res: Response) {
+    try {
+      const settings = await settingsService.getSettings('general');
+
+      res.json({
+        success: true,
+        data: settings
+      });
+    } catch (error) {
+      console.error('Error fetching general settings:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch general settings',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
   // POST /api/settings/initialize (admin only)
   async initializeSettings(req: Request, res: Response) {
     try {

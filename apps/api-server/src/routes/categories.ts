@@ -69,11 +69,8 @@ router.get('/', async (req: Request, res: Response) => {
         : b.name.localeCompare(a.name);
     });
 
-    res.json({
-      success: true,
-      data: categories,
-      total: categories.length
-    });
+    // Return array directly for WordPress compatibility
+    res.json(categories);
   } catch (error: any) {
     console.error('Error fetching categories:', error);
     res.status(500).json({
@@ -97,10 +94,8 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
-      success: true,
-      data: category
-    });
+    // Return category object directly for WordPress compatibility
+    res.json(category);
   } catch (error: any) {
     console.error('Error fetching category:', error);
     res.status(500).json({
@@ -136,11 +131,8 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
 
     mockCategories.push(newCategory);
 
-    res.status(201).json({
-      success: true,
-      data: newCategory,
-      message: 'Category created successfully'
-    });
+    // Return created category directly for WordPress compatibility
+    res.status(201).json(newCategory);
   } catch (error: any) {
     console.error('Error creating category:', error);
     res.status(500).json({
@@ -174,11 +166,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
       parent: parent !== undefined ? parent : mockCategories[categoryIndex].parent
     };
 
-    res.json({
-      success: true,
-      data: mockCategories[categoryIndex],
-      message: 'Category updated successfully'
-    });
+    // Return updated category directly for WordPress compatibility
+    res.json(mockCategories[categoryIndex]);
   } catch (error: any) {
     console.error('Error updating category:', error);
     res.status(500).json({
@@ -204,11 +193,8 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response) => 
 
     const deletedCategory = mockCategories.splice(categoryIndex, 1)[0];
 
-    res.json({
-      success: true,
-      data: deletedCategory,
-      message: 'Category deleted successfully'
-    });
+    // Return deleted category directly for WordPress compatibility
+    res.json(deletedCategory);
   } catch (error: any) {
     console.error('Error deleting category:', error);
     res.status(500).json({

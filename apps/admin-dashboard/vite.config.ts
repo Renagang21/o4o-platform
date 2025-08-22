@@ -1,6 +1,6 @@
 import { defineConfig, mergeConfig } from 'vite'
 import path from 'path'
-import { visualizer } from 'rollup-plugin-visualizer'
+// import { visualizer } from 'rollup-plugin-visualizer'
 import { fileURLToPath } from 'url'
 import { sharedViteConfig } from '../../vite.config.shared'
 
@@ -11,12 +11,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
   // 빌드 캐시 디렉토리 설정
   cacheDir: '.vite-cache',
   plugins: [
-    visualizer({
-      open: false,
-      filename: 'dist/bundle-analysis.html',
-      gzipSize: true,
-      brotliSize: true,
-    })
+    // visualizer({
+    //   open: false,
+    //   filename: 'dist/bundle-analysis.html',
+    //   gzipSize: true,
+    //   brotliSize: true,
+    // })
   ],
   resolve: {
     alias: {

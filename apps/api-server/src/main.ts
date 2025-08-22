@@ -118,6 +118,7 @@ import shippingV1Routes from './routes/v1/shipping.routes';
 import dropshippingV1Routes from './routes/v1/dropshipping.routes';
 import productVariationRoutes from './routes/v1/product-variation.routes';
 import tossPaymentsRoutes from './routes/v1/toss-payments.routes';
+import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
@@ -397,15 +398,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
-    service: 'api-server'
-  });
-});
+// Use the health router for comprehensive health checks
+app.use('/api/health', healthRoutes);
 
 // Additional health endpoints for specific services
 app.get('/api/auth/health', (req, res) => {
@@ -426,7 +420,13 @@ app.get('/api/ecommerce/health', (req, res) => {
 
 // Apply rate limiting to specific endpoints  
 app.use('/api/v1/accounts/sso/check', ssoCheckLimiter);
+app.use('/accounts/sso/check', ssoCheckLimiter); // Direct route for frontend
 app.use('/api/public', publicLimiter);
+
+// Direct frontend routes (without /api prefix)
+app.use('/accounts', linkedAccountsRoutes);
+app.use('/settings', settingsRoutes);
+app.use('/v1/content', contentV1Routes);
 
 // API 라우트 - auth routes MUST be before general rate limiter
 // IMPORTANT: Basic auth routes must come FIRST before any other auth-related routes
@@ -725,8 +725,10 @@ const startServer = async () => {
     logger.warn('Redis connection failed (non-critical):', redisError);
   }
   
-  httpServer.listen(port, () => {
-    logger.info(`🚀 API Server running on port ${port}`);
+  // Bind to IPv4 explicitly (0.0.0.0) to avoid IPv6 issues
+  const host = process.env.HOST || '0.0.0.0';
+  httpServer.listen(port as number, host as string, () => {
+    logger.info(`🚀 API Server running on ${host}:${port}`);
   });
 };
 

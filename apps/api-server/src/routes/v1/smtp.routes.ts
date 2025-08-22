@@ -1,9 +1,10 @@
 import { Router } from 'express';
+import type { Router as RouterType } from 'express';
 import { smtpController } from '../../controllers/SmtpController';
 import { authenticate } from '../../middleware/auth';
 import { authorize } from '../../middleware/authorize';
 
-const router = Router();
+const router: RouterType = Router();
 
 // All routes require authentication
 router.use(authenticate);

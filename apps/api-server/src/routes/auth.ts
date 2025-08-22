@@ -174,4 +174,52 @@ router.post('/logout', authenticateToken, (req: AuthRequest, res) => {
   });
 });
 
+// 인증 상태 확인
+router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        authenticated: false,
+        message: 'Not authenticated'
+      });
+    }
+
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+      where: { id: req.user.id },
+      select: ['id', 'email', 'name', 'role', 'status', 'createdAt', 'lastLoginAt']
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        authenticated: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      authenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        status: user.status,
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt
+      },
+      tokenInfo: {
+        issuedAt: (req.user as any).iat ? new Date((req.user as any).iat * 1000).toISOString() : null,
+        expiresAt: (req.user as any).exp ? new Date((req.user as any).exp * 1000).toISOString() : null
+      }
+    });
+  } catch (error: any) {
+    console.error('Auth status error:', error);
+    res.status(500).json({
+      authenticated: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
 export default router;

@@ -467,21 +467,17 @@ export class ContentController {
   getTags = async (req: Request, res: Response) => {
     try {
       if (!AppDataSource.isInitialized) {
-        return res.json({
-          status: 'success',
-          data: [
-            { id: '1', name: 'JavaScript', slug: 'javascript', count: 10 },
-            { id: '2', name: 'React', slug: 'react', count: 8 },
-            { id: '3', name: 'Node.js', slug: 'nodejs', count: 5 }
-          ]
-        });
+        // Return array directly for WordPress compatibility
+        return res.json([
+          { id: '1', name: 'JavaScript', slug: 'javascript', count: 10 },
+          { id: '2', name: 'React', slug: 'react', count: 8 },
+          { id: '3', name: 'Node.js', slug: 'nodejs', count: 5 }
+        ]);
       }
 
       // Real implementation would query tags table
-      return res.json({
-        status: 'success',
-        data: []
-      });
+      // Return empty array directly for WordPress compatibility
+      return res.json([]);
     } catch (error) {
       return res.status(500).json({
         status: 'error',
@@ -491,10 +487,8 @@ export class ContentController {
   };
 
   getTag = async (req: Request, res: Response) => {
-    return res.json({
-      status: 'success',
-      data: { id: req.params.id, name: 'Sample Tag', slug: 'sample-tag' }
-    });
+    // Return tag object directly for WordPress compatibility
+    return res.json({ id: req.params.id, name: 'Sample Tag', slug: 'sample-tag' });
   };
 
   createTag = async (req: Request, res: Response) => {

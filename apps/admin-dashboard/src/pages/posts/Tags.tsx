@@ -62,7 +62,10 @@ const Tags: FC = () => {
     try {
       setLoading(true)
       const response = await ContentApi.getTags()
-      setTags(response.data)
+      // Ensure response.data is an array
+      const tagsData = Array.isArray(response.data) ? response.data : 
+                      (response.data?.tags ? response.data.tags : [])
+      setTags(tagsData)
     } catch (error: any) {
     // Error logging - use proper error handler
       toast.error('태그를 불러오는데 실패했습니다.')
@@ -72,6 +75,11 @@ const Tags: FC = () => {
   }
 
   const applyFilters = () => {
+    // Ensure tags is an array before spreading
+    if (!Array.isArray(tags)) {
+      setFilteredTags([])
+      return
+    }
     let filtered = [...tags]
 
     // Search filter
