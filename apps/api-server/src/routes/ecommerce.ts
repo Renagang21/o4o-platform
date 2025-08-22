@@ -300,4 +300,77 @@ router.get('/categories/tree', async (req: Request, res: Response) => {
   });
 });
 
+// Settings routes (mock implementation)
+router.get('/settings', authenticateToken, async (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: {
+      general: {
+        storeName: 'O4O Store',
+        storeEmail: 'store@o4o.com',
+        currency: 'KRW',
+        weightUnit: 'kg',
+        dimensionUnit: 'cm'
+      },
+      checkout: {
+        enableGuestCheckout: true,
+        requireTermsAcceptance: true,
+        enableCoupons: true
+      },
+      shipping: {
+        enableCalculator: true,
+        freeShippingThreshold: 50000,
+        defaultShippingFee: 3000
+      },
+      payment: {
+        enabledMethods: ['card', 'bank_transfer', 'virtual_account'],
+        testMode: false
+      },
+      tax: {
+        enableTax: true,
+        taxRate: 10,
+        pricesIncludeTax: true
+      }
+    }
+  });
+});
+
+router.put('/settings', authenticateToken, async (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: 'Settings updated successfully',
+    data: req.body
+  });
+});
+
+// Dashboard stats route
+router.get('/dashboard/stats', authenticateToken, async (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: {
+      todaySales: 1250000,
+      todayOrders: 15,
+      totalProducts: 128,
+      lowStockProducts: 5,
+      pendingOrders: 3,
+      totalCustomers: 456
+    }
+  });
+});
+
+// Reports route
+router.get('/reports/sales', authenticateToken, async (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: {
+      summary: {
+        totalSales: 15000000,
+        totalOrders: 150,
+        averageOrderValue: 100000
+      },
+      chartData: []
+    }
+  });
+});
+
 export default router;

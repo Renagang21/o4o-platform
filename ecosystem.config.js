@@ -17,7 +17,8 @@
       min_uptime: '10s',
       kill_timeout: 30000,
       wait_ready: true,
-      listen_timeout: 10000
+      listen_timeout: 10000,
+      health_check_grace_period: 30000
     }]
   };
   EOF
