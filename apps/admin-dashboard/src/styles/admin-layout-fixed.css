@@ -39,36 +39,34 @@
   top: 46px; /* Below admin bar - updated height */
   left: 0;
   bottom: 0;
-  width: 160px;
+  width: 240px;
   background-color: #23282d;
   z-index: 9998; /* Below admin bar */
   overflow-y: auto;
   overflow-x: hidden;
-  transition: width 0.3s ease, transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
-/* Sidebar expanded state */
-.admin-sidebar.expanded,
-.admin-sidebar.open {
-  width: 240px;
+/* Desktop mode - sidebar always visible */
+.admin-sidebar.desktop-mode {
+  transform: translateX(0);
 }
 
 /* Main Content Area - Properly offset */
 .wordpress-admin-content {
   position: relative;
-  margin-left: 160px; /* Offset by sidebar width */
+  margin-left: 0;
   margin-top: 46px; /* Offset by admin bar height - updated */
   padding-top: 0; /* Remove any additional top padding */
   min-height: calc(100vh - 46px);
-  width: calc(100% - 160px);
+  width: 100%;
   background-color: #f1f1f1;
   transition: margin-left 0.3s ease, width 0.3s ease;
   overflow: visible; /* Ensure content is not clipped */
 }
 
-/* Adjust content when sidebar is expanded */
-.admin-sidebar.expanded ~ .wordpress-admin-content,
-.admin-sidebar.open ~ .wordpress-admin-content {
+/* Desktop mode - content offset for sidebar */
+.wordpress-admin-content.with-sidebar {
   margin-left: 240px;
   width: calc(100% - 240px);
 }
@@ -87,30 +85,31 @@
   z-index: 1;
 }
 
-/* Desktop Large Screens (> 1280px) */
-@media (min-width: 1280px) {
+/* Desktop (>= 1024px) */
+@media (min-width: 1024px) {
   .admin-sidebar {
-    width: 240px;
+    transform: translateX(0) !important;
   }
   
   .wordpress-admin-content {
-    margin-left: 240px;
-    width: calc(100% - 240px);
+    margin-left: 240px !important;
+    width: calc(100% - 240px) !important;
   }
 }
 
 /* Tablet and Mobile (< 1024px) */
 @media (max-width: 1023px) {
-  /* Sidebar becomes overlay */
+  /* Sidebar hidden by default */
   .admin-sidebar {
     transform: translateX(-100%);
-    width: 240px;
+    width: 280px;
     z-index: 10000; /* Above content on mobile */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
   }
   
+  /* Sidebar visible when open */
   .admin-sidebar.open {
     transform: translateX(0);
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
   }
   
   /* Full width content on mobile */
@@ -135,23 +134,28 @@
     display: block;
   }
   
-  /* Mobile menu toggle button */
+  /* Mobile menu toggle button - top left corner */
   .admin-sidebar-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background-color: #0073aa;
+    top: 56px; /* Just below admin bar */
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: #23282d;
     color: #fff;
-    border-radius: 50%;
-    border: none;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.2);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     z-index: 10001;
     cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .admin-sidebar-toggle:hover {
+    background-color: #0073aa;
   }
 }
 

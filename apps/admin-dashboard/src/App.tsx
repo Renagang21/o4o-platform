@@ -997,3 +997,5 @@ function App() {
 }
 
 export default App;
+
+// Deployment trigger: 2025-08-21 20:45 UTC - Trigger after PM2 cleanup on webserver

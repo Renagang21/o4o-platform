@@ -121,34 +121,17 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
-      // WordPress 패키지를 external로 처리하여 빌드에서 제외
-      external: (id) => {
-        // WordPress 패키지는 모두 external로 처리
-        if (id.startsWith('@wordpress/')) {
-          return true;
-        }
-        return false;
-      },
+      // WordPress 패키지를 번들에 포함 (external 제거)
+      // external: (id) => {
+      //   // WordPress 패키지는 모두 external로 처리
+      //   if (id.startsWith('@wordpress/')) {
+      //     return true;
+      //   }
+      //   return false;
+      // },
       plugins: [],
       output: {
         ...sharedViteConfig.build?.rollupOptions?.output,
-        // WordPress 패키지를 전역 변수로 매핑
-        globals: {
-          '@wordpress/blocks': 'wp.blocks',
-          '@wordpress/block-editor': 'wp.blockEditor',
-          '@wordpress/components': 'wp.components',
-          '@wordpress/element': 'wp.element',
-          '@wordpress/data': 'wp.data',
-          '@wordpress/i18n': 'wp.i18n',
-          '@wordpress/hooks': 'wp.hooks',
-          '@wordpress/compose': 'wp.compose',
-          '@wordpress/keycodes': 'wp.keycodes',
-          '@wordpress/rich-text': 'wp.richText',
-          '@wordpress/format-library': 'wp.formatLibrary',
-          '@wordpress/editor': 'wp.editor',
-          '@wordpress/core-data': 'wp.coreData',
-          '@wordpress/dom-ready': 'wp.domReady'
-        },
         // Ensure proper loading order for WordPress modules
         inlineDynamicImports: false,
         manualChunks: (id) => {

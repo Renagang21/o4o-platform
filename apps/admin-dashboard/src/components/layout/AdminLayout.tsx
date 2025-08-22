@@ -14,20 +14,15 @@ interface AdminLayoutProps {
 }
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    // Initialize based on screen size
-    return window.innerWidth >= 1024
-  })
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
 
   useEffect(() => {
     const checkMobile = () => {
       const isCurrentlyMobile = window.innerWidth < 1024
       setIsMobile(isCurrentlyMobile)
-      // Auto-open sidebar on desktop, close on mobile
-      if (!isCurrentlyMobile) {
-        setSidebarOpen(true)
-      } else {
+      // Auto-close sidebar when switching to mobile
+      if (isCurrentlyMobile && sidebarOpen) {
         setSidebarOpen(false)
       }
     }
@@ -35,7 +30,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  }, [sidebarOpen])
   const { logout } = useAuth()
 
   const handleLogout = async () => {
@@ -57,12 +52,12 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       <AdminBar onLogout={handleLogout} />
       
       {/* Sidebar with proper classes */}
-      <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'expanded' : ''}`}>
+      <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`}>
         <AdminSidebar _isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       </div>
       
       {/* Main content wrapper with proper positioning */}
-      <div className="wordpress-admin-content">
+      <div className={`wordpress-admin-content ${!isMobile ? 'with-sidebar' : ''}`}>
         {/* Header - only show menu button on mobile */}
         {isMobile && <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />}
         
@@ -81,10 +76,10 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       />
       
       {/* Mobile menu toggle button */}
-      {isMobile && (
+      {isMobile && !sidebarOpen && (
         <button
           className="admin-sidebar-toggle"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen(true)}
           aria-label="Toggle menu"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
