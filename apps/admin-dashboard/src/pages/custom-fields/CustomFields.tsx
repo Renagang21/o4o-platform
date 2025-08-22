@@ -49,7 +49,9 @@ const CustomFields: FC = () => {
     queryKey: ['custom-field-groups'],
     queryFn: async () => {
       const response = await api.get('/admin/custom-field-groups');
-      return response.data;
+      // Ensure we always return an array
+      return Array.isArray(response.data) ? response.data : 
+             (response.data?.groups || response.data?.data || []);
     }
   });
 
@@ -84,10 +86,12 @@ const CustomFields: FC = () => {
   });
 
   // 필터링된 필드 그룹
-  const filteredGroups = fieldGroups?.filter((group: CustomFieldGroup) =>
-    group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    group.key.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredGroups = Array.isArray(fieldGroups) 
+    ? fieldGroups.filter((group: CustomFieldGroup) =>
+        group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        group.key.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
 
   return (
