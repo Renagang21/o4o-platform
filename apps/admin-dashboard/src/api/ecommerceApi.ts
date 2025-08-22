@@ -278,7 +278,7 @@ export class EcommerceApi {
     if (startDate) params.append('startDate', startDate)
     if (endDate) params.append('endDate', endDate)
 
-    const response = await unifiedApi.raw.get(`/ecommerce/reports/sales?${params}`)
+    const response = await unifiedApi.raw.get(`/api/ecommerce/reports/sales?${params}`)
     return response.data
   }
 

@@ -284,7 +284,7 @@ export const dashboardApi = {
   // 알림 데이터 조회
   async getNotifications() {
     try {
-      const response = await unifiedApi.raw.get('/admin/notifications?limit=20');
+      const response = await unifiedApi.raw.get('/api/admin/notifications?limit=20');
       const notifications = response.data.notifications || [];
 
       // 알림 타입별 카운트
@@ -311,7 +311,7 @@ export const dashboardApi = {
   // 최근 활동 조회
   async getRecentActivities() {
     try {
-      const response = await unifiedApi.raw.get('/admin/activities?limit=15');
+      const response = await unifiedApi.raw.get('/api/admin/activities?limit=15');
       return response.data.activities || this.getDefaultActivities();
     } catch (error: any) {
     // Error logging - use proper error handler
@@ -322,7 +322,7 @@ export const dashboardApi = {
   // 시스템 상태 조회
   async getSystemHealth() {
     try {
-      const response = await unifiedApi.raw.get('/system/health');
+      const response = await unifiedApi.raw.get('/api/system/health');
       return response.data;
     } catch (error: any) {
     // Error logging - use proper error handler
