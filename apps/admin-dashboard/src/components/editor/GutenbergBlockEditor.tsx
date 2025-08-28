@@ -50,7 +50,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   );
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState('Untitled');
-  const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(false);
+  const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true); // 기본적으로 열림
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [history, setHistory] = useState<Block[][]>([blocks]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -316,7 +316,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
       {/* Header */}
       <EditorHeader
         onSave={handleSave}
@@ -335,7 +335,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       />
 
       {/* Main Layout */}
-      <div className="flex relative">
+      <div className="flex-1 flex relative overflow-hidden">
         {/* Block Inserter */}
         <BlockInserter
           isOpen={isBlockInserterOpen}
@@ -348,7 +348,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           className={`flex-1 transition-all duration-300 ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
           } mr-80`}
-          style={{ paddingTop: '60px' }}
+          style={{ paddingTop: '10px' }}
         >
           <div className="max-w-4xl mx-auto p-8">
             {/* Title */}

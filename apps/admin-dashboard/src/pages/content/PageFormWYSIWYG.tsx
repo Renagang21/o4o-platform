@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
@@ -41,7 +39,7 @@ const PageFormWYSIWYG = () => {
   const [content, setContent] = useState('');
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [isDirty, setIsDirty] = useState(false);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [, setIsAutoSaving] = useState(false);
 
   // Fetch page data if editing
   const { data: page, isLoading } = useQuery({
@@ -176,21 +174,20 @@ const PageFormWYSIWYG = () => {
     }
   };
 
-  // Handle back navigation with unsaved changes warning
-  const handleBack = () => {
-    if (isDirty) {
-      const confirmed = window.confirm('You have unsaved changes. Are you sure you want to leave?');
-      if (!confirmed) return;
-    }
-    navigate('/content/pages');
-  };
+  // Unused handlers - kept for potential future use
+  // const handleBack = () => {
+  //   if (isDirty) {
+  //     const confirmed = window.confirm('You have unsaved changes. Are you sure you want to leave?');
+  //     if (!confirmed) return;
+  //   }
+  //   navigate('/content/pages');
+  // };
 
-  // View page
-  const handleView = () => {
-    if (id) {
-      window.open(`/page/${page?.slug || id}`, '_blank');
-    }
-  };
+  // const handleView = () => {
+  //   if (id) {
+  //     window.open(`/page/${page?.slug || id}`, '_blank');
+  //   }
+  // };
 
   // Prevent accidental navigation
   useEffect(() => {
@@ -214,98 +211,12 @@ const PageFormWYSIWYG = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
-      {/* Gutenberg-style Top Bar */}
-      <div className="h-14 border-b bg-white flex items-center justify-between px-4 shadow-sm">
-        {/* Left side */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBack}
-            className="h-9 w-9"
-            title="Back to pages"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-          
-          <span className="text-sm font-medium text-gray-700">
-            {isEditMode ? 'Edit Page' : 'Add New Page'}
-          </span>
-          
-          {isAutoSaving && (
-            <span className="text-xs text-gray-500 ml-2">Saving...</span>
-          )}
-          
-          {!isAutoSaving && !isDirty && isEditMode && (
-            <span className="text-xs text-green-600 ml-2">✓ Saved</span>
-          )}
-        </div>
-
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {isEditMode && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleView}
-              className="text-gray-600"
-            >
-              View Page
-            </Button>
-          )}
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              if (isEditMode && id) {
-                window.open(`/preview/page/${id}`, '_blank');
-              } else {
-                toast('Save the page first to preview');
-              }
-            }}
-            disabled={!isEditMode}
-            className="text-gray-600"
-          >
-            Preview
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleAutoSave}
-            disabled={!isDirty || isAutoSaving}
-            className="text-gray-600"
-          >
-            Save draft
-          </Button>
-          
-          <Button
-            size="sm"
-            onClick={handlePublish}
-            disabled={createMutation.isPending || updateMutation.isPending || !title}
-            className="bg-[#007cba] hover:bg-[#006ba1] text-white px-4"
-          >
-            {createMutation.isPending || updateMutation.isPending
-              ? 'Publishing...'
-              : isEditMode ? 'Update' : 'Publish'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Full Screen Editor */}
-      <div className="flex-1 overflow-hidden">
-        <GutenbergBlockEditor
-          initialBlocks={blocks}
-          onChange={handleBlocksChange}
-          onSave={() => handleAutoSave()}
-          onPublish={handlePublish}
-        />
-      </div>
-    </div>
+    <GutenbergBlockEditor
+      initialBlocks={blocks}
+      onChange={handleBlocksChange}
+      onSave={() => handleAutoSave()}
+      onPublish={handlePublish}
+    />
   );
 };
 
