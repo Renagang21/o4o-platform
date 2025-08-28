@@ -24,7 +24,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
-import GutenbergEditor from '@/components/editor/GutenbergEditor'
+import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
 import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility, PostType, Category, Tag } from '@o4o/types'
@@ -313,9 +313,9 @@ const PostForm = () => {
             <div className="wp-card-body">
               <Label>내용</Label>
               <div className="mt-2">
-                <GutenbergEditor
-                  content={formData.content}
-                  onContentChange={(content) => setFormData({ ...formData, content })}
+                <GutenbergBlockEditor
+                  initialBlocks={[]}
+                  onChange={(blocks) => setFormData({ ...formData, content: JSON.stringify(blocks) })}
                 />
               </div>
             </div>

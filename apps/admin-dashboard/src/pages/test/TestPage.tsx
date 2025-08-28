@@ -1,6 +1,6 @@
 import { useState, FC } from 'react';
 import { Wrench, Palette, Layout } from 'lucide-react';
-import GutenbergEditor from '@/components/editor/GutenbergEditor';
+import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import ApiConnectionTest from '@/components/test/ApiConnectionTest';
 import AuthFlowTest from '@/components/test/AuthFlowTest';
 
@@ -75,7 +75,7 @@ const TestPage: FC = () => {
                 </p>
               </div>
             </div>
-            <GutenbergEditor />
+            <GutenbergBlockEditor />
           </div>
         )}
 

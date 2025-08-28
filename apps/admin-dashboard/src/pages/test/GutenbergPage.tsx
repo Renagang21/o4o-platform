@@ -25,7 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 // import { cn } from '@/lib/utils'; // No longer needed
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
-import GutenbergEditor from '@/components/editor/GutenbergEditor';
+import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 // import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock'; // Handled by GutenbergEditor
 import '@/styles/paragraph-test-block.css';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
@@ -388,7 +388,7 @@ const GutenbergPage: FC = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Editor */}
         <div className="flex-1 overflow-auto">
-          <GutenbergEditor
+          <GutenbergBlockEditor
             initialBlocks={blocks}
             onChange={setBlocks}
           />

@@ -22,7 +22,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import GutenbergStyleEditor from '@/components/editor/GutenbergStyleEditor'
+import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@o4o/auth-client'
 import type { CreatePostDto, UpdatePostDto, PostStatus, PostVisibility } from '@o4o/types'
@@ -262,10 +262,9 @@ const PageForm: FC = () => {
             <div className="wp-card-body">
               <Label>내용</Label>
               <div className="mt-2">
-                <GutenbergStyleEditor
-                  content={formData.content}
-                  onContentChange={(content) => setFormData({ ...formData, content })}
-                  onSave={() => handleSubmit(formData.status)}
+                <GutenbergBlockEditor
+                  initialBlocks={[]}
+                  onChange={(blocks) => setFormData({ ...formData, content: JSON.stringify(blocks) })}
                 />
               </div>
             </div>
