@@ -23,28 +23,28 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils'; // No longer needed
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import GutenbergEditor from '@/components/editor/GutenbergEditor';
-import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock';
+// import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock'; // Handled by GutenbergEditor
 import '@/styles/paragraph-test-block.css';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaLibrary from '@/components/media/MediaLibrary';
 import ContentTemplates from '@/components/editor/ContentTemplates';
-import { 
-  CTABlock, 
-  PricingTableBlock, 
-  TestimonialBlock, 
-  StarRatingBlock,
-  InfoBoxBlock 
-} from '@/components/editor/blocks/SpectraBlocks';
+// import { 
+//   CTABlock, 
+//   PricingTableBlock, 
+//   TestimonialBlock, 
+//   StarRatingBlock,
+//   InfoBoxBlock 
+// } from '@/components/editor/blocks/SpectraBlocks'; // No longer used
 import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
 
-// Enhanced block component with Spectra blocks
-const EnhancedBlockItem: FC<{
+// Enhanced block component with Spectra blocks - no longer used
+/* const EnhancedBlockItem: FC<{
   block: any;
   isEditing: boolean;
   onUpdate: (content: any) => void;
@@ -64,14 +64,14 @@ const EnhancedBlockItem: FC<{
     default:
       return null;
   }
-};
+}; */
 
 const GutenbergPage: FC = () => {
   const navigate = useNavigate();
   const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
+  const [activeTab] = useState<'document' | 'block'>('document'); // Only reading, not setting
   const [selectedBlock, setSelectedBlock] = useState<any>(null);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -149,8 +149,8 @@ const GutenbergPage: FC = () => {
     setShowMediaLibrary(false);
   };
 
-  // Custom block renderer
-  const renderBlock = (block: any) => {
+  // Custom block renderer - no longer used since GutenbergEditor handles rendering
+  /* const renderBlock = (block: any) => {
     // Handle the new ParagraphTestBlock
     if (block.type === 'core/paragraph-test') {
       return (
@@ -248,7 +248,7 @@ const GutenbergPage: FC = () => {
     }
     
     return null;
-  };
+  }; */
 
   // WordPress가 로드되지 않았으면 로딩 표시
   if (!isWordPressReady) {

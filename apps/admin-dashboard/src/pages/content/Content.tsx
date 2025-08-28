@@ -13,7 +13,7 @@ import ACFFieldGroupForm from './ACFFieldGroupForm'
 import MediaLibrary from './MediaLibrary'
 import TemplateManager from './TemplateManager'
 import WidgetManager from './WidgetManager'
-import NewPost from '../posts/NewPost'
+// import NewPost from '../posts/NewPost' // No longer needed, redirecting to editor
 
 const Content: FC = () => {
   // 편집기로 리다이렉트하는 함수를 활성화
