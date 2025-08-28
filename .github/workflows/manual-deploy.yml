@@ -70,13 +70,25 @@ jobs:
           sudo chown -R ubuntu:ubuntu /var/www/admin.neture.co.kr
         "
         
-        # Deploy files
-        rsync -avz --delete \
+        # Check index.html before deployment
+        echo "📝 Checking index.html before deployment:"
+        LOCAL_HASH=$(grep -oE 'index-[a-zA-Z0-9]+\.js' apps/admin-dashboard/dist/index.html | head -1)
+        echo "Local build hash: $LOCAL_HASH"
+        
+        # Deploy ALL files including index.html
+        echo "🔄 Syncing all files..."
+        rsync -avz --delete --stats \
           -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/dist/ \
           ubuntu@13.125.144.8:/var/www/admin.neture.co.kr/
+        
+        # Specifically ensure index.html is copied
+        echo "📋 Ensuring index.html is updated..."
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa \
+          apps/admin-dashboard/dist/index.html \
+          ubuntu@13.125.144.8:/var/www/admin.neture.co.kr/index.html
           
-        echo "✅ Files deployed!"
+        echo "✅ Files deployed with index.html!"
         
     - name: Verify Deployment
       run: |
