@@ -7,11 +7,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
-  ArrowLeft,
   Undo,
   Redo,
   Maximize2,
@@ -22,11 +20,12 @@ import {
   Code,
   Settings,
   Save,
+  Info,
+  Keyboard,
+  Trash2,
 } from 'lucide-react';
 
 interface EditorHeaderProps {
-  title: string;
-  onTitleChange: (title: string) => void;
   onSave: () => void;
   onPublish: () => void;
   onBack?: () => void;
@@ -41,11 +40,10 @@ interface EditorHeaderProps {
   onToggleListView?: () => void;
   onToggleCodeView?: () => void;
   isCodeView?: boolean;
+  postStatus?: string;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
-  title,
-  onTitleChange,
   onSave,
   onPublish,
   onBack,
@@ -60,6 +58,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onToggleListView,
   onToggleCodeView,
   isCodeView = false,
+  postStatus = 'draft',
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -71,29 +70,28 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-2">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between">
         {/* Left Section */}
-        <div className="flex items-center gap-2">
-          {onBack && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onBack}
-              className="h-8 w-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
+        <div className="flex items-center gap-3">
+          {/* WordPress Logo / Back Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="h-9 w-9 hover:bg-gray-100"
+            title="Back to Dashboard"
+          >
+            <div className="text-2xl font-bold text-blue-600">W</div>
+          </Button>
           
-          <div className="text-2xl font-bold text-blue-600">W</div>
-          
+          {/* Undo/Redo */}
           <div className="flex items-center border rounded-md">
             <Button
               variant="ghost"
               size="icon"
               onClick={onUndo}
               disabled={!canUndo}
-              className="h-8 w-8 rounded-r-none"
+              className="h-8 w-8 rounded-r-none hover:bg-gray-100"
               title="Undo (Ctrl+Z)"
             >
               <Undo className="h-4 w-4" />
@@ -103,19 +101,20 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               size="icon"
               onClick={onRedo}
               disabled={!canRedo}
-              className="h-8 w-8 rounded-l-none border-l"
+              className="h-8 w-8 rounded-l-none border-l hover:bg-gray-100"
               title="Redo (Ctrl+Shift+Z)"
             >
               <Redo className="h-4 w-4" />
             </Button>
           </div>
 
+          {/* View Options */}
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggleListView}
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-gray-100"
               title="List View"
             >
               <ListTree className="h-4 w-4" />
@@ -124,58 +123,75 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               variant={isCodeView ? "secondary" : "ghost"}
               size="icon"
               onClick={onToggleCodeView}
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-gray-100"
               title={isCodeView ? "Visual Editor" : "Code Editor"}
             >
               <Code className="h-4 w-4" />
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-gray-100"
+              title="Document Overview"
+            >
+              <Info className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        {/* Center Section - Title */}
-        <div className="flex-1 max-w-2xl">
-          <Input
-            value={title}
-            onChange={(e) => onTitleChange(e.target.value)}
-            placeholder="Add title"
-            className="text-xl font-medium text-center border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
+        {/* Center Section - Status Badge */}
+        <div className="flex items-center gap-2">
+          <Badge 
+            variant={postStatus === 'published' ? 'default' : 'secondary'}
+            className="text-xs"
+          >
+            {postStatus === 'published' ? 'Published' : 'Draft'}
+          </Badge>
+          {isDirty && (
+            <span className="text-xs text-orange-500">• Unsaved changes</span>
+          )}
         </div>
 
-        {/* Right Section */}
+        {/* Right Section - Actions */}
         <div className="flex items-center gap-2">
+          {/* Preview */}
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8"
+            size="sm"
+            className="h-8 px-3 hover:bg-gray-100"
             title="Preview"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-4 w-4 mr-1" />
+            Preview
           </Button>
 
+          {/* Save Draft */}
           <Button
             variant="outline"
             size="sm"
             onClick={handleSave}
-            disabled={isSaving}
-            className={cn(isDirty && "border-orange-500")}
+            disabled={isSaving || !isDirty}
+            className={cn(
+              "h-8 px-3",
+              isDirty && "border-orange-500 hover:bg-orange-50"
+            )}
           >
             {isSaving ? (
               "Saving..."
-            ) : isDirty ? (
+            ) : (
               <>
                 <Save className="h-3 w-3 mr-1" />
-                Save Draft
+                Save draft
               </>
-            ) : (
-              "Saved"
             )}
           </Button>
 
+          {/* Publish/Update */}
           <Button
             size="sm"
             onClick={onPublish}
             className={cn(
+              "h-8 px-3",
               isPublished 
                 ? "bg-green-600 hover:bg-green-700" 
                 : "bg-blue-600 hover:bg-blue-700"
@@ -184,18 +200,19 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             {isPublished ? "Update" : "Publish"}
           </Button>
 
+          {/* Settings Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-100">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem className="text-sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Preferences
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onToggleFullscreen}>
+              <DropdownMenuItem onClick={onToggleFullscreen} className="text-sm">
                 {isFullscreen ? (
                   <>
                     <Minimize2 className="h-4 w-4 mr-2" />
@@ -209,25 +226,23 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Keyboard shortcuts</DropdownMenuItem>
-              <DropdownMenuItem>Help</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm">
+                <Keyboard className="h-4 w-4 mr-2" />
+                Keyboard shortcuts
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-sm">
+                <Info className="h-4 w-4 mr-2" />
+                Help
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-sm text-red-600">
+                <Trash2 className="h-4 w-4 mr-2" />
                 Move to trash
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
-
-      {/* Status Bar */}
-      {isDirty && (
-        <div className="absolute top-full left-4 mt-1">
-          <Badge variant="secondary" className="bg-orange-100 text-orange-800 text-xs">
-            Unsaved changes
-          </Badge>
-        </div>
-      )}
     </div>
   );
 };

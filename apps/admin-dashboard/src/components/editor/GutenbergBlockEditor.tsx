@@ -4,8 +4,10 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { EditorHeader } from './EditorHeader';
 import BlockInserter from './BlockInserter';
+import InspectorPanel from './InspectorPanel';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import HeadingBlock from './blocks/HeadingBlock';
 import ListBlock from './blocks/ListBlock';
@@ -54,6 +56,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [historyIndex, setHistoryIndex] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
   const [isCodeView, setIsCodeView] = useState(false);
+  const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
+  const navigate = useNavigate();
 
   // Update blocks and history
   const updateBlocks = useCallback(
@@ -197,6 +201,22 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     setIsCodeView(!isCodeView);
   }, [isCodeView]);
 
+  // Switch to block tab when a block is selected
+  useEffect(() => {
+    if (selectedBlockId) {
+      setActiveTab('block');
+    }
+  }, [selectedBlockId]);
+
+  // Handle navigation with unsaved changes warning
+  const handleNavigation = useCallback(() => {
+    if (isDirty) {
+      const confirmLeave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
+      if (!confirmLeave) return;
+    }
+    navigate('/admin');
+  }, [isDirty, navigate]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -299,10 +319,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <EditorHeader
-        title={documentTitle}
-        onTitleChange={setDocumentTitle}
         onSave={handleSave}
         onPublish={handlePublish}
+        onBack={handleNavigation}
         canUndo={historyIndex > 0}
         canRedo={historyIndex < history.length - 1}
         onUndo={handleUndo}
@@ -328,7 +347,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         <div
           className={`flex-1 transition-all duration-300 ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
-          } mr-72`}
+          } mr-80`}
           style={{ paddingTop: '60px' }}
         >
           <div className="max-w-4xl mx-auto p-8">
@@ -377,17 +396,27 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
 
-        {/* Inspector Panel - Simple placeholder */}
-        <div className="fixed right-0 top-14 bottom-0 w-72 bg-white border-l border-gray-200 z-30 p-4">
-          <h3 className="font-semibold mb-4">Block Settings</h3>
-          {selectedBlockId ? (
-            <p className="text-sm text-gray-600">
-              Selected block: {blocks.find(b => b.id === selectedBlockId)?.type}
-            </p>
-          ) : (
-            <p className="text-sm text-gray-500">Select a block to see its settings</p>
-          )}
-        </div>
+        {/* Inspector Panel with Document/Block tabs */}
+        <InspectorPanel
+          selectedBlock={selectedBlockId ? blocks.find(b => b.id === selectedBlockId) : undefined}
+          documentSettings={{
+            visibility: 'public',
+            publishDate: '',
+            categories: [],
+            tags: [],
+            featuredImage: '',
+            excerpt: '',
+            allowComments: true,
+            allowPingbacks: true
+          }}
+          activeTab={activeTab}
+          onUpdateBlock={(updates) => {
+            if (selectedBlockId) {
+              handleBlockUpdate(selectedBlockId, blocks.find(b => b.id === selectedBlockId)?.content, updates);
+            }
+          }}
+          onUpdateDocument={() => {}}
+        />
       </div>
     </div>
   );

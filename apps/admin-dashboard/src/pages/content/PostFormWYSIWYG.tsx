@@ -276,6 +276,7 @@ const PostFormWYSIWYG = () => {
           initialBlocks={blocks}
           onChange={handleBlocksChange}
           onSave={() => handleAutoSave()}
+          onPublish={handlePublish}
         />
       </div>
     </div>
