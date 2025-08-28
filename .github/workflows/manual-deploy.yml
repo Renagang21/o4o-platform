@@ -1,0 +1,116 @@
+name: Manual Deploy Admin Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_message:
+        description: 'Deployment message'
+        required: false
+        default: 'Manual deployment trigger'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+        cache: 'npm'
+        
+    - name: Install and Build
+      run: |
+        echo "📦 Installing dependencies..."
+        npm install
+        
+        echo "🔨 Building packages..."
+        npm run build:packages
+        
+        echo "🏗️ Building admin dashboard..."
+        cd apps/admin-dashboard
+        npm run build
+        
+        echo "✅ Build complete!"
+        BUILD_HASH=$(grep -oE 'index-[a-zA-Z0-9]+\.js' dist/index.html | head -1)
+        echo "📝 Build hash: $BUILD_HASH"
+        
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.WEB_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # Add known hosts
+        ssh-keyscan -H 13.125.144.8 >> ~/.ssh/known_hosts 2>/dev/null || true
+        ssh-keyscan -H admin.neture.co.kr >> ~/.ssh/known_hosts 2>/dev/null || true
+        
+    - name: Test SSH Connection
+      run: |
+        echo "🔗 Testing SSH connection..."
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.125.144.8 "
+          echo '✅ SSH connection successful!'
+          echo 'Server info:'
+          uname -a
+          echo ''
+          echo 'Checking deployment directory:'
+          ls -la /var/www/ | grep admin || echo 'Directory not found'
+        "
+        
+    - name: Deploy to Server
+      run: |
+        echo "📤 Deploying to server..."
+        
+        # Create directory if needed
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.125.144.8 "
+          sudo mkdir -p /var/www/admin.neture.co.kr
+          sudo chown -R ubuntu:ubuntu /var/www/admin.neture.co.kr
+        "
+        
+        # Deploy files
+        rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
+          apps/admin-dashboard/dist/ \
+          ubuntu@13.125.144.8:/var/www/admin.neture.co.kr/
+          
+        echo "✅ Files deployed!"
+        
+    - name: Verify Deployment
+      run: |
+        echo "🔍 Verifying deployment..."
+        
+        # Check deployed files
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.125.144.8 "
+          echo 'Files in /var/www/admin.neture.co.kr:'
+          ls -la /var/www/admin.neture.co.kr/ | head -10
+          echo ''
+          echo 'Build hash on server:'
+          grep -oE 'index-[a-zA-Z0-9]+\.js' /var/www/admin.neture.co.kr/index.html | head -1
+        "
+        
+        # Reload Nginx
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.125.144.8 "
+          sudo nginx -t && sudo systemctl reload nginx
+          echo '✅ Nginx reloaded'
+        "
+        
+        # Check production
+        echo ""
+        echo "🌐 Checking production site..."
+        sleep 5
+        PROD_HASH=$(curl -s https://admin.neture.co.kr/ | grep -oE 'index-[a-zA-Z0-9]+\.js' | head -1)
+        echo "Production build hash: $PROD_HASH"
+        
+    - name: Final Status
+      run: |
+        echo "🎉 Deployment Complete!"
+        echo "📍 URL: https://admin.neture.co.kr"
+        echo "📝 Message: ${{ github.event.inputs.deploy_message }}"
+        echo ""
+        echo "✨ Features deployed:"
+        echo "- ParagraphTestBlock (Gutenberg-level editor)"
+        echo "- StandaloneEditor (Fullscreen mode)"
+        echo "- Enhanced block system"
