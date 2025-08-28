@@ -104,6 +104,7 @@ const StandaloneEditor = lazy(() =>
 );
 const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
+const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
 
 // Apps Manager
 const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
@@ -1001,6 +1002,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['content:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <ParagraphTestDemo />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Direct ParagraphTestBlock Test */}
+                    <Route path="/paragraph-test-direct" element={
+                      <AdminProtectedRoute requiredPermissions={['content:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ParagraphTestDirect />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
