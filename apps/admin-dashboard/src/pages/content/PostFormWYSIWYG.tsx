@@ -112,10 +112,10 @@ const PostFormWYSIWYG = () => {
   };
 
   // Handle title change
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    setIsDirty(true);
-  };
+  // const handleTitleChange = (newTitle: string) => {
+  //   setTitle(newTitle);
+  //   setIsDirty(true);
+  // };
 
   // Auto-save functionality
   const handleAutoSave = async () => {
@@ -274,13 +274,8 @@ const PostFormWYSIWYG = () => {
       <div className="flex-1 overflow-hidden">
         <GutenbergBlockEditor
           initialBlocks={blocks}
-          title={title}
           onChange={handleBlocksChange}
-          onTitleChange={handleTitleChange}
           onSave={() => handleAutoSave()}
-          autoSave={true}
-          showInspector={true}
-          fullScreen={true}
         />
       </div>
     </div>

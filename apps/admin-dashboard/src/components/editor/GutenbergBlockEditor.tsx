@@ -1,39 +1,17 @@
 /**
  * GutenbergBlockEditor Component
- * Complete WYSIWYG editor with inline editing for all blocks
+ * Enhanced WordPress Gutenberg-like editor with 3-column layout
  */
 
-import { useState, useRef, useEffect } from 'react';
-import { 
-  Plus,
-  Type,
-  Heading1,
-  Image,
-  List,
-  Code,
-  Quote,
-  Video,
-  Table,
-  Columns,
-  FileText,
-  MousePointer,
-  MinusSquare
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Popover,
-  PopoverContent,
-} from '@/components/ui/popover';
-
-// Import Gutenberg styles
-import './styles/gutenberg.css';
-
-// Import block components
+import React, { useState, useCallback, useEffect } from 'react';
+import { EditorHeader } from './EditorHeader';
+import BlockInserter from './BlockInserter';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import HeadingBlock from './blocks/HeadingBlock';
-import ImageBlock from './blocks/ImageBlock';
-import ButtonBlock from './blocks/ButtonBlock';
 import ListBlock from './blocks/ListBlock';
+import ImageBlock from './blocks/ImageBlock';
+// import { QuoteBlock } from './blocks/QuoteBlock'; // TODO: Fix QuoteBlock interface
+import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 
 interface Block {
@@ -45,446 +23,372 @@ interface Block {
 
 interface GutenbergBlockEditorProps {
   initialBlocks?: Block[];
-  title?: string;
   onChange?: (blocks: Block[]) => void;
-  onTitleChange?: (title: string) => void;
   onSave?: () => void;
-  autoSave?: boolean;
-  showInspector?: boolean;
-  fullScreen?: boolean;
+  onPublish?: () => void;
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   initialBlocks = [],
-  title = '',
   onChange,
-  onTitleChange,
   onSave,
-  autoSave = true,
-  showInspector = false
+  onPublish,
 }) => {
   const [blocks, setBlocks] = useState<Block[]>(
-    initialBlocks.length > 0 ? initialBlocks : [
-      { id: '1', type: 'paragraph', content: '', attributes: {} }
-    ]
+    initialBlocks.length > 0
+      ? initialBlocks
+      : [
+          {
+            id: `block-${Date.now()}`,
+            type: 'core/paragraph',
+            content: { text: '' },
+            attributes: {},
+          },
+        ]
   );
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
-  const [showBlockInserter, setShowBlockInserter] = useState(false);
-  const [inserterTargetId, setInserterTargetId] = useState<string | null>(null);
-  const [inserterTargetPosition, setInserterTargetPosition] = useState<'before' | 'after'>('after');
-  const [documentTitle, setDocumentTitle] = useState(title);
-  const [showSettings] = useState(showInspector);
-  const editorRef = useRef<HTMLDivElement>(null);
+  const [documentTitle, setDocumentTitle] = useState('Untitled');
+  const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [history, setHistory] = useState<Block[][]>([blocks]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isCodeView, setIsCodeView] = useState(false);
 
-  // Auto-save timer
-  useEffect(() => {
-    if (!autoSave) return;
+  // Update blocks and history
+  const updateBlocks = useCallback(
+    (newBlocks: Block[]) => {
+      setBlocks(newBlocks);
+      setIsDirty(true);
 
-    const timer = setTimeout(() => {
-      onSave?.();
-    }, 2000);
+      // Add to history
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newBlocks);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
 
-    return () => clearTimeout(timer);
-  }, [blocks, documentTitle, autoSave, onSave]);
+      // Notify parent
+      onChange?.(newBlocks);
+    },
+    [history, historyIndex, onChange]
+  );
 
-  // Update blocks
-  const updateBlock = (blockId: string, content: any, attributes?: any) => {
-    const newBlocks = blocks.map(block =>
-      block.id === blockId
-        ? { ...block, content, attributes: attributes || block.attributes }
-        : block
-    );
-    setBlocks(newBlocks);
-    onChange?.(newBlocks);
-  };
+  // Undo
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setBlocks(history[newIndex]);
+    }
+  }, [history, historyIndex]);
 
-  // Add block
-  const addBlock = (type: string, position: 'before' | 'after', targetId?: string) => {
-    const newBlock: Block = {
-      id: Date.now().toString(),
-      type,
-      content: type === 'image' ? {} : '',
-      attributes: getDefaultAttributes(type)
-    };
+  // Redo
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setBlocks(history[newIndex]);
+    }
+  }, [history, historyIndex]);
 
-    if (targetId) {
-      const index = blocks.findIndex(b => b.id === targetId);
-      const newBlocks = [...blocks];
-      
-      if (position === 'before') {
-        newBlocks.splice(index, 0, newBlock);
-      } else {
-        newBlocks.splice(index + 1, 0, newBlock);
+  // Handle block update
+  const handleBlockUpdate = useCallback(
+    (blockId: string, content: any, attributes?: any) => {
+      const newBlocks = blocks.map((block) =>
+        block.id === blockId
+          ? {
+              ...block,
+              content: typeof content === 'string' ? { text: content } : content,
+              attributes: attributes || block.attributes,
+            }
+          : block
+      );
+      updateBlocks(newBlocks);
+    },
+    [blocks, updateBlocks]
+  );
+
+  // Handle block deletion
+  const handleBlockDelete = useCallback(
+    (blockId: string) => {
+      const newBlocks = blocks.filter((block) => block.id !== blockId);
+      if (newBlocks.length === 0) {
+        // Always keep at least one paragraph block
+        newBlocks.push({
+          id: `block-${Date.now()}`,
+          type: 'core/paragraph',
+          content: { text: '' },
+          attributes: {},
+        });
       }
-      
-      setBlocks(newBlocks);
-      onChange?.(newBlocks);
+      updateBlocks(newBlocks);
+      setSelectedBlockId(null);
+    },
+    [blocks, updateBlocks]
+  );
+
+  // Handle block insertion
+  const handleInsertBlock = useCallback(
+    (blockType: string) => {
+      const newBlock: Block = {
+        id: `block-${Date.now()}`,
+        type: blockType,
+        content: blockType.includes('heading') ? { text: '', level: 2 } : { text: '' },
+        attributes: {},
+      };
+
+      const insertIndex = selectedBlockId
+        ? blocks.findIndex((b) => b.id === selectedBlockId) + 1
+        : blocks.length;
+
+      const newBlocks = [...blocks];
+      newBlocks.splice(insertIndex, 0, newBlock);
+      updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
-    } else {
-      const newBlocks = [...blocks, newBlock];
-      setBlocks(newBlocks);
-      onChange?.(newBlocks);
+      setIsBlockInserterOpen(false);
+    },
+    [blocks, selectedBlockId, updateBlocks]
+  );
+
+  // Handle add block at position
+  const handleAddBlock = useCallback(
+    (blockId: string, position: 'before' | 'after', blockType = 'core/paragraph') => {
+      const index = blocks.findIndex((b) => b.id === blockId);
+      const newBlock: Block = {
+        id: `block-${Date.now()}`,
+        type: blockType,
+        content: { text: '' },
+        attributes: {},
+      };
+
+      const newBlocks = [...blocks];
+      const insertIndex = position === 'after' ? index + 1 : index;
+      newBlocks.splice(insertIndex, 0, newBlock);
+      updateBlocks(newBlocks);
       setSelectedBlockId(newBlock.id);
-    }
+    },
+    [blocks, updateBlocks]
+  );
 
-    setShowBlockInserter(false);
-  };
+  // Handle save
+  const handleSave = useCallback(() => {
+    setIsDirty(false);
+    onSave?.();
+  }, [onSave]);
 
-  // Get default attributes for block type
-  const getDefaultAttributes = (type: string) => {
-    switch (type) {
-      case 'heading':
-        return { level: 2, align: 'left' };
-      case 'list':
-        return { type: 'unordered', items: [{ id: '1', content: '', level: 0 }] };
-      case 'button':
-        return { text: '버튼 텍스트', url: '#', style: 'fill', size: 'medium' };
-      case 'image':
-        return { align: 'center', size: 'large' };
-      case 'columns':
-        return { 
-          columns: [
-            { id: '1', width: 50, content: [] },
-            { id: '2', width: 50, content: [] }
-          ],
-          columnCount: 2,
-          verticalAlignment: 'top',
-          isStackedOnMobile: true,
-          gap: 20
-        };
-      default:
-        return {};
-    }
-  };
+  // Handle publish
+  const handlePublish = useCallback(() => {
+    setIsDirty(false);
+    onPublish?.();
+  }, [onPublish]);
 
-  // Delete block
-  const deleteBlock = (blockId: string) => {
-    if (blocks.length === 1) {
-      // Don't delete the last block, just clear it
-      const newBlocks = [{ id: blockId, type: 'paragraph', content: '', attributes: {} }];
-      setBlocks(newBlocks);
-      onChange?.(newBlocks);
+  // Toggle fullscreen
+  const handleToggleFullscreen = useCallback(() => {
+    setIsFullscreen(!isFullscreen);
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen?.();
     } else {
-      const newBlocks = blocks.filter(b => b.id !== blockId);
-      setBlocks(newBlocks);
-      onChange?.(newBlocks);
+      document.exitFullscreen?.();
     }
-  };
+  }, [isFullscreen]);
 
-  // Duplicate block
-  const duplicateBlock = (blockId: string) => {
-    const blockToDuplicate = blocks.find(b => b.id === blockId);
-    if (!blockToDuplicate) return;
+  // Toggle code view
+  const handleToggleCodeView = useCallback(() => {
+    setIsCodeView(!isCodeView);
+  }, [isCodeView]);
 
-    const newBlock: Block = {
-      ...blockToDuplicate,
-      id: Date.now().toString()
-    };
-
-    const index = blocks.findIndex(b => b.id === blockId);
-    const newBlocks = [...blocks];
-    newBlocks.splice(index + 1, 0, newBlock);
-    
-    setBlocks(newBlocks);
-    onChange?.(newBlocks);
-    setSelectedBlockId(newBlock.id);
-  };
-
-  // Move block
-  const moveBlock = (blockId: string, direction: 'up' | 'down') => {
-    const index = blocks.findIndex(b => b.id === blockId);
-    if (
-      (direction === 'up' && index === 0) ||
-      (direction === 'down' && index === blocks.length - 1)
-    ) {
-      return;
-    }
-
-    const newBlocks = [...blocks];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    [newBlocks[index], newBlocks[targetIndex]] = [newBlocks[targetIndex], newBlocks[index]];
-    
-    setBlocks(newBlocks);
-    onChange?.(newBlocks);
-  };
-
-  // Open block inserter
-  const openBlockInserter = (targetId: string, position: 'before' | 'after', event?: React.MouseEvent) => {
-    setInserterTargetId(targetId);
-    setInserterTargetPosition(position);
-    
-    // Position is handled by Popover component
-    if (event) {
-      // Event position can be used for future positioning logic
-    }
-    
-    setShowBlockInserter(true);
-  };
-
-  // Handle slash command
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === '/' && selectedBlockId) {
-        const block = blocks.find(b => b.id === selectedBlockId);
-        if (block && block.type === 'paragraph' && !block.content) {
-          e.preventDefault();
-          openBlockInserter(selectedBlockId, 'after');
-        }
+      // Save: Ctrl/Cmd + S
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+      // Undo: Ctrl/Cmd + Z
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+      // Redo: Ctrl/Cmd + Shift + Z
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+        e.preventDefault();
+        handleRedo();
+      }
+      // Toggle block inserter: /
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        setIsBlockInserterOpen(!isBlockInserterOpen);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [selectedBlockId, blocks]);
+  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen]);
 
   // Render block component
   const renderBlock = (block: Block) => {
     const commonProps = {
       id: block.id,
+      content: typeof block.content === 'string' ? block.content : block.content?.text || '',
+      onChange: (content: any, attributes?: any) =>
+        handleBlockUpdate(block.id, content, attributes),
+      onDelete: () => handleBlockDelete(block.id),
+      onDuplicate: () => {
+        const newBlock = { ...block, id: `block-${Date.now()}` };
+        const index = blocks.findIndex((b) => b.id === block.id);
+        const newBlocks = [...blocks];
+        newBlocks.splice(index + 1, 0, newBlock);
+        updateBlocks(newBlocks);
+      },
+      onMoveUp: () => {
+        const index = blocks.findIndex((b) => b.id === block.id);
+        if (index > 0) {
+          const newBlocks = [...blocks];
+          [newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]];
+          updateBlocks(newBlocks);
+        }
+      },
+      onMoveDown: () => {
+        const index = blocks.findIndex((b) => b.id === block.id);
+        if (index < blocks.length - 1) {
+          const newBlocks = [...blocks];
+          [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+          updateBlocks(newBlocks);
+        }
+      },
+      onAddBlock: (position: 'before' | 'after', type?: string) =>
+        handleAddBlock(block.id, position, type),
       isSelected: selectedBlockId === block.id,
       onSelect: () => setSelectedBlockId(block.id),
-      onDelete: () => deleteBlock(block.id),
-      onDuplicate: () => duplicateBlock(block.id),
-      onMoveUp: () => moveBlock(block.id, 'up'),
-      onMoveDown: () => moveBlock(block.id, 'down'),
-      onAddBlock: (position: 'before' | 'after') => openBlockInserter(block.id, position),
-      onChange: (content: any, attributes?: any) => updateBlock(block.id, content, attributes)
+      attributes: block.attributes || {},
     };
 
     switch (block.type) {
-      case 'paragraph':
-        return (
-          <ParagraphBlock
-            {...commonProps}
-            content={block.content}
-            attributes={block.attributes}
-          />
-        );
-      
-      case 'heading':
+      case 'core/paragraph':
+        return <ParagraphBlock key={block.id} {...commonProps} />;
+      case 'core/heading':
         return (
           <HeadingBlock
+            key={block.id}
             {...commonProps}
-            content={block.content}
-            attributes={block.attributes}
+            attributes={{ level: block.content?.level || 2 }}
           />
         );
-      
-      case 'image':
-        return (
-          <ImageBlock
-            {...commonProps}
-            attributes={block.attributes}
-          />
-        );
-      
-      case 'button':
-        return (
-          <ButtonBlock
-            {...commonProps}
-            content={block.content}
-            attributes={block.attributes}
-          />
-        );
-      
-      case 'list':
-        return (
-          <ListBlock
-            {...commonProps}
-            attributes={block.attributes}
-          />
-        );
-      
-      case 'columns':
-        return (
-          <ColumnsBlock
-            {...commonProps}
-            attributes={block.attributes}
-          />
-        );
-      
+      case 'core/list':
+        return <ListBlock key={block.id} {...commonProps} />;
+      case 'core/quote':
+        // TODO: Fix QuoteBlock interface
+        return <ParagraphBlock key={block.id} {...commonProps} />;
+      case 'core/image':
+        return <ImageBlock key={block.id} {...commonProps} />;
+      case 'core/button':
+        return <ButtonBlock key={block.id} {...commonProps} />;
+      case 'core/columns':
+        return <ColumnsBlock key={block.id} {...commonProps} />;
       default:
         return (
-          <div className="p-4 border border-gray-300 rounded bg-gray-50">
-            Unknown block type: {block.type}
+          <div key={block.id} className="p-4 border border-dashed border-gray-300">
+            <span className="text-gray-500">Unsupported block type: {block.type}</span>
           </div>
         );
     }
   };
 
-  // Block inserter menu
-  const BlockInserterMenu = () => {
-    const blockTypes = [
-      { type: 'paragraph', icon: Type, label: '문단' },
-      { type: 'heading', icon: Heading1, label: '제목' },
-      { type: 'image', icon: Image, label: '이미지' },
-      { type: 'button', icon: MousePointer, label: '버튼' },
-      { type: 'list', icon: List, label: '리스트' },
-      { type: 'quote', icon: Quote, label: '인용구' },
-      { type: 'code', icon: Code, label: '코드' },
-      { type: 'table', icon: Table, label: '표' },
-      { type: 'columns', icon: Columns, label: '컬럼' },
-      { type: 'separator', icon: MinusSquare, label: '구분선' },
-      { type: 'video', icon: Video, label: '비디오' },
-      { type: 'file', icon: FileText, label: '파일' }
-    ];
-
-    return (
-      <div className="bg-white rounded-lg shadow-lg border p-2 w-64 max-h-96 overflow-y-auto">
-        <div className="text-xs text-gray-500 mb-2 px-2">블록 선택</div>
-        <div className="grid grid-cols-2 gap-1">
-          {blockTypes.map(({ type, icon: Icon, label }) => (
-            <button
-              key={type}
-              className="flex flex-col items-center justify-center p-3 hover:bg-gray-100 rounded transition-colors"
-              onClick={() => {
-                if (inserterTargetId) {
-                  addBlock(type, inserterTargetPosition, inserterTargetId);
-                }
-              }}
-            >
-              <Icon className="h-6 w-6 mb-1 text-gray-600" />
-              <span className="text-xs text-gray-700">{label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="gutenberg-editor flex h-full bg-[#f0f0f0]">
-      {/* Main Editor Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Editor Content */}
-        <div className="flex-1 overflow-auto bg-[#f0f0f0]">
-          <div className="min-h-full py-8">
-            <div 
-              ref={editorRef}
-              className="max-w-[840px] mx-auto bg-white shadow-sm"
-              style={{ minHeight: 'calc(100vh - 120px)' }}
-            >
-              {/* Title Area */}
-              <div className="px-20 pt-16 pb-8">
-                <input
-                  type="text"
-                  value={documentTitle}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <EditorHeader
+        title={documentTitle}
+        onTitleChange={setDocumentTitle}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={handleToggleFullscreen}
+        isDirty={isDirty}
+        onToggleListView={() => {}}
+        onToggleCodeView={handleToggleCodeView}
+        isCodeView={isCodeView}
+      />
+
+      {/* Main Layout */}
+      <div className="flex relative">
+        {/* Block Inserter */}
+        <BlockInserter
+          isOpen={isBlockInserterOpen}
+          onClose={() => setIsBlockInserterOpen(false)}
+          onInsertBlock={handleInsertBlock}
+        />
+
+        {/* Editor Canvas */}
+        <div
+          className={`flex-1 transition-all duration-300 ${
+            isBlockInserterOpen ? 'ml-80' : 'ml-0'
+          } mr-72`}
+          style={{ paddingTop: '60px' }}
+        >
+          <div className="max-w-4xl mx-auto p-8">
+            {/* Title */}
+            <div className="mb-8">
+              <input
+                type="text"
+                value={documentTitle}
+                onChange={(e) => setDocumentTitle(e.target.value)}
+                placeholder="Add title"
+                className="w-full text-4xl font-bold border-none outline-none bg-transparent focus:ring-0"
+              />
+            </div>
+
+            {/* Blocks */}
+            {isCodeView ? (
+              <div>
+                <textarea
+                  value={JSON.stringify(blocks, null, 2)}
                   onChange={(e) => {
-                    setDocumentTitle(e.target.value);
-                    onTitleChange?.(e.target.value);
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setBlocks(parsed);
+                    } catch (error) {
+                      console.error('Invalid JSON');
+                    }
                   }}
-                  placeholder="Add title"
-                  className="text-5xl font-light w-full outline-none border-0 focus:ring-0 placeholder-gray-400"
-                  style={{ lineHeight: '1.2' }}
+                  className="w-full min-h-[500px] font-mono text-sm p-4 border border-gray-300 rounded"
                 />
               </div>
-
-              {/* Blocks Area */}
-              <div 
-                className="px-20 pb-20"
-                onClick={(e) => {
-                  // Deselect block if clicking on empty space
-                  if (e.target === e.currentTarget) {
-                    setSelectedBlockId(null);
-                  }
-                }}
-              >
-                <div className="space-y-1">
-                  {blocks.map((block, index) => (
-                    <div key={block.id} className="block-container group relative">
-                      {/* Block toolbar on hover */}
-                      <div className="absolute -left-12 top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => {
-                            setInserterTargetId(block.id);
-                            setInserterTargetPosition('before');
-                            setShowBlockInserter(true);
-                          }}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      
-                      {renderBlock(block)}
-                      
-                      {/* Add block button between blocks */}
-                      {index < blocks.length - 1 && (
-                        <div className="relative h-4 -my-2 group/add">
-                          <button
-                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/add:opacity-100 transition-opacity bg-blue-600 text-white rounded-full p-1 hover:bg-blue-700"
-                            onClick={() => {
-                              setInserterTargetId(block.id);
-                              setInserterTargetPosition('after');
-                              setShowBlockInserter(true);
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Add block button at the end */}
-                <div className="mt-8 flex justify-center">
-                  <button
-                    onClick={() => {
-                      const lastBlockId = blocks[blocks.length - 1]?.id;
-                      if (lastBlockId) {
-                        setInserterTargetId(lastBlockId);
-                        setInserterTargetPosition('after');
-                        setShowBlockInserter(true);
-                      } else {
-                        addBlock('paragraph', 'after', undefined);
-                      }
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-gray-900 rounded hover:bg-gray-900 hover:text-white transition-colors"
-                  >
-                    <Plus className="h-5 w-5" />
-                    <span className="font-medium">Add block</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Settings Sidebar (optional) */}
-      {showSettings && (
-        <div className="w-80 bg-white border-l flex flex-col">
-          <div className="p-4 border-b">
-            <h3 className="font-semibold">Block Settings</h3>
-          </div>
-          <div className="flex-1 p-4">
-            {selectedBlockId ? (
-              <div>
-                <p className="text-sm text-gray-600">
-                  Selected block: {blocks.find(b => b.id === selectedBlockId)?.type}
-                </p>
-                {/* Add block-specific settings here */}
-              </div>
             ) : (
-              <p className="text-sm text-gray-500">Select a block to see its settings</p>
+              blocks.map(renderBlock)
+            )}
+
+            {/* Add block button */}
+            {!isCodeView && (
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => setIsBlockInserterOpen(true)}
+                  className="px-6 py-3 border-2 border-dashed border-gray-300 rounded hover:border-gray-400 hover:bg-gray-50 text-gray-600 text-sm transition-colors"
+                >
+                  + Add Block
+                </button>
+              </div>
             )}
           </div>
         </div>
-      )}
 
-      {/* Block inserter modal */}
-      <Popover open={showBlockInserter} onOpenChange={setShowBlockInserter}>
-        <PopoverContent 
-          className="p-0 w-auto"
-          side="bottom"
-          align="start"
-        >
-          <BlockInserterMenu />
-        </PopoverContent>
-      </Popover>
+        {/* Inspector Panel - Simple placeholder */}
+        <div className="fixed right-0 top-14 bottom-0 w-72 bg-white border-l border-gray-200 z-30 p-4">
+          <h3 className="font-semibold mb-4">Block Settings</h3>
+          {selectedBlockId ? (
+            <p className="text-sm text-gray-600">
+              Selected block: {blocks.find(b => b.id === selectedBlockId)?.type}
+            </p>
+          ) : (
+            <p className="text-sm text-gray-500">Select a block to see its settings</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
