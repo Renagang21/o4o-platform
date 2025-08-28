@@ -313,12 +313,7 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
         return { text: 'Start writing or type / to choose a block' };
       case 'core/paragraph-test':
         return { 
-          content: '', 
-          attributes: {
-            fontSize: 'medium',
-            textAlign: 'left',
-            dropCap: false
-          }
+          text: ''  // text 필드를 사용해야 함, content가 아님
         };
       case 'core/heading':
         return { text: 'Heading', level: 2 };

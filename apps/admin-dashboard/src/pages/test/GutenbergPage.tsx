@@ -393,10 +393,7 @@ const GutenbergPage: FC = () => {
             onChange={setBlocks}
           />
           
-          {/* Render custom Spectra blocks */}
-          <div className="max-w-4xl mx-auto px-12 pb-8">
-            {blocks.map((block: any) => renderBlock(block))}
-          </div>
+          {/* Custom blocks are now handled by GutenbergEditor itself */}
         </div>
         
         {/* Sidebar */}
