@@ -25,7 +25,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
-import GutenbergEditor from '@/components/editor/GutenbergEditor';
+import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaLibrary from '@/components/media/MediaLibrary';
 import ContentTemplates from '@/components/editor/ContentTemplates';
@@ -546,13 +546,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
           isEntering && "editor-canvas-enter"
         )}>
           <div className="min-h-full">
-            <GutenbergEditor
+            <GutenbergBlockEditor
               initialBlocks={blocks}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);
                 setIsDirty(true);
               }}
-              // readOnly={isPreviewMode}  // TODO: Add readOnly prop to GutenbergEditor
+              // readOnly={isPreviewMode}  // TODO: Add readOnly prop to GutenbergBlockEditor
             />
           </div>
         </div>
@@ -582,11 +582,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlock}
-              onPostSettingsChange={(settings) => {
+              onPostSettingsChange={(settings: any) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 setIsDirty(true);
               }}
-              onBlockSettingsChange={(settings) => {
+              onBlockSettingsChange={(settings: any) => {
                 if (selectedBlock) {
                   const updated = { ...selectedBlock, ...settings };
                   setBlocks(blocks.map(block => 
