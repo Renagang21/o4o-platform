@@ -979,11 +979,11 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* Gutenberg Editor */}
+                    {/* Gutenberg Editor - Using Standalone Full Screen Editor */}
                     <Route path="/gutenberg" element={
                       <AdminProtectedRoute requiredPermissions={['content:write']}>
                         <Suspense fallback={<PageLoader />}>
-                          <GutenbergPage />
+                          <StandaloneEditor mode="post" />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

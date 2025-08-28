@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import { Routes, Route } from 'react-router-dom'
+import { FC, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import PostListQuickEdit from './PostListQuickEdit'
 import PostFormWYSIWYG from './PostFormWYSIWYG'
 import PageList from './PageList'
@@ -16,17 +16,20 @@ import WidgetManager from './WidgetManager'
 import NewPost from '../posts/NewPost'
 
 const Content: FC = () => {
-  // 편집기로 리다이렉트하는 함수 (나중에 사용할 예정)
-  // const navigate = useNavigate();
-  // const openInEditor = (type: 'post' | 'page', id?: string) => {
-  //   const path = id ? `/editor/${type}s/${id}` : `/editor/${type}s/new`;
-  //   navigate(path);
-  // };
+  // 편집기로 리다이렉트하는 함수를 활성화
+  const navigate = useNavigate();
+  
+  // content/new로 접근 시 전체 화면 편집기로 리다이렉트
+  useEffect(() => {
+    if (window.location.pathname === '/content/new') {
+      navigate('/editor/posts/new');
+    }
+  }, [navigate]);
   
   return (
     <Routes>
       <Route path="/" element={<PostListQuickEdit />} />
-      <Route path="new" element={<NewPost />} />
+      <Route path="new" element={<Navigate to="/editor/posts/new" replace />} />
       <Route path=":id/edit" element={<PostFormWYSIWYG />} />
       <Route path="pages" element={<PageList />} />
       <Route path="pages/new" element={<PageFormWYSIWYG />} />

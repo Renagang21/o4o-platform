@@ -410,7 +410,7 @@ const PostListQuickEdit: FC = () => {
       <ScreenMeta />
       
       <h1 className="wp-heading-inline">Posts</h1>
-      <Link to="/posts/new" className="page-title-action">
+      <Link to="/editor/posts/new" className="page-title-action">
         Add New
       </Link>
       <hr className="wp-header-end" />
