@@ -34,6 +34,7 @@ import ImageBlockSettings from '@/components/editor/ImageBlockSettings';
 import GalleryBlockSettings from '@/components/editor/GalleryBlockSettings';
 import CoverBlockSettings from '@/components/editor/CoverBlockSettings';
 import ButtonBlockSettings from '@/components/editor/ButtonBlockSettings';
+import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock';
 
 // Spectra block types
 const SPECTRA_BLOCKS = [
@@ -311,7 +312,14 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
       case 'core/paragraph':
         return { text: 'Start writing or type / to choose a block' };
       case 'core/paragraph-test':
-        return { text: '' };
+        return { 
+          content: '', 
+          attributes: {
+            fontSize: 'medium',
+            textAlign: 'left',
+            dropCap: false
+          }
+        };
       case 'core/heading':
         return { text: 'Heading', level: 2 };
       case 'uagb/advanced-heading':
