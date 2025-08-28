@@ -5,16 +5,29 @@ import { Button } from '@/components/ui/button';
 import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock';
 import '@/styles/paragraph-test-block.css';
 
+interface BlockAttributes {
+  fontSize?: number;
+  align?: 'left' | 'right' | 'center' | 'justify';
+  dropCap?: boolean;
+}
+
+interface Block {
+  id: string;
+  type: string;
+  content: { text: string };
+  attributes: BlockAttributes;
+}
+
 const ParagraphTestDirect = () => {
   const navigate = useNavigate();
-  const [blocks, setBlocks] = useState([
+  const [blocks, setBlocks] = useState<Block[]>([
     {
       id: 'block-1',
       type: 'core/paragraph-test',
       content: { text: 'This is the ParagraphTestBlock with all Gutenberg features!' },
       attributes: {
-        fontSize: 'medium',
-        textAlign: 'left',
+        fontSize: 16,
+        align: 'left',
         dropCap: false
       }
     }
@@ -72,11 +85,15 @@ const ParagraphTestDirect = () => {
               onMoveUp={() => {}}
               onMoveDown={() => {}}
               onAddBlock={() => {
-                const newBlock = {
+                const newBlock: Block = {
                   id: `block-${Date.now()}`,
                   type: 'core/paragraph-test',
                   content: { text: '' },
-                  attributes: {}
+                  attributes: {
+                    fontSize: 16,
+                    align: 'left',
+                    dropCap: false
+                  }
                 };
                 setBlocks([...blocks, newBlock]);
               }}
