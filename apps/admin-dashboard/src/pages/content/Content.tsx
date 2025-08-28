@@ -16,6 +16,13 @@ import WidgetManager from './WidgetManager'
 import NewPost from '../posts/NewPost'
 
 const Content: FC = () => {
+  // 편집기로 리다이렉트하는 함수 (나중에 사용할 예정)
+  // const navigate = useNavigate();
+  // const openInEditor = (type: 'post' | 'page', id?: string) => {
+  //   const path = id ? `/editor/${type}s/${id}` : `/editor/${type}s/new`;
+  //   navigate(path);
+  // };
+  
   return (
     <Routes>
       <Route path="/" element={<PostListQuickEdit />} />

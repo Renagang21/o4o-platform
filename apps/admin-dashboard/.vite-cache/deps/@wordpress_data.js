@@ -1,29 +1,26 @@
-import "./chunk-TYICW4ZW.js";
-import {
-  _defineProperty
-} from "./chunk-LNM6CY6U.js";
 import {
   isPromise,
   rememo_default,
   require_cjs,
-  require_dist,
-  require_equivalent_key_map
-} from "./chunk-LLCGJ2GL.js";
-import {
   require_clipboard,
+  require_dist,
+  require_equivalent_key_map,
   require_mousetrap,
   require_requestidlecallback
-} from "./chunk-MIUGM4IY.js";
-import "./chunk-RHY2OXSA.js";
-import "./chunk-VCN4ELHL.js";
+} from "./chunk-HOFISRPD.js";
+import {
+  Tannin,
+  memize,
+  require_sprintf
+} from "./chunk-HELTMWAY.js";
 import {
   isPlainObject,
   pascalCase
-} from "./chunk-NKPOOWK7.js";
+} from "./chunk-LYSEHU5L.js";
+import "./chunk-6CO5EZY2.js";
 import {
   require_client
 } from "./chunk-YS4MI3ZJ.js";
-import "./chunk-6CO5EZY2.js";
 import {
   require_react_dom
 } from "./chunk-ZIK3TCYH.js";
@@ -331,6 +328,44 @@ function deprecated(feature, options = {}) {
   logged[message] = true;
 }
 
+// ../../node_modules/@babel/runtime/helpers/esm/typeof.js
+function _typeof(o) {
+  "@babel/helpers - typeof";
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o2) {
+    return typeof o2;
+  } : function(o2) {
+    return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
+  }, _typeof(o);
+}
+
+// ../../node_modules/@babel/runtime/helpers/esm/toPrimitive.js
+function toPrimitive(t, r) {
+  if ("object" != _typeof(t) || !t) return t;
+  var e = t[Symbol.toPrimitive];
+  if (void 0 !== e) {
+    var i = e.call(t, r || "default");
+    if ("object" != _typeof(i)) return i;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return ("string" === r ? String : Number)(t);
+}
+
+// ../../node_modules/@babel/runtime/helpers/esm/toPropertyKey.js
+function toPropertyKey(t) {
+  var i = toPrimitive(t, "string");
+  return "symbol" == _typeof(i) ? i : i + "";
+}
+
+// ../../node_modules/@babel/runtime/helpers/esm/defineProperty.js
+function _defineProperty(e, r, t) {
+  return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+    value: t,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  }) : e[r] = t, e;
+}
+
 // ../../node_modules/@babel/runtime/helpers/esm/objectSpread2.js
 function ownKeys(e, r) {
   var t = Object.keys(e);
@@ -455,7 +490,7 @@ function createStore(reducer, preloadedState, enhancer) {
     }
     return currentState;
   }
-  function subscribe2(listener2) {
+  function subscribe3(listener2) {
     if (typeof listener2 !== "function") {
       throw new Error(false ? formatProdErrorMessage(4) : "Expected the listener to be a function. Instead, received: '" + kindOf(listener2) + "'");
     }
@@ -513,7 +548,7 @@ function createStore(reducer, preloadedState, enhancer) {
   }
   function observable() {
     var _ref;
-    var outerSubscribe = subscribe2;
+    var outerSubscribe = subscribe3;
     return _ref = {
       /**
        * The minimal observable subscription method.
@@ -523,7 +558,7 @@ function createStore(reducer, preloadedState, enhancer) {
        * be used to unsubscribe the observable from the store, and prevent further
        * emission of values from the observable.
        */
-      subscribe: function subscribe3(observer) {
+      subscribe: function subscribe4(observer) {
         if (typeof observer !== "object" || observer === null) {
           throw new Error(false ? formatProdErrorMessage(11) : "Expected the observer to be an object. Instead, received: '" + kindOf(observer) + "'");
         }
@@ -547,7 +582,7 @@ function createStore(reducer, preloadedState, enhancer) {
   });
   return _ref2 = {
     dispatch: dispatch3,
-    subscribe: subscribe2,
+    subscribe: subscribe3,
     getState,
     replaceReducer
   }, _ref2[$$observable] = observable, _ref2;
@@ -1002,6 +1037,612 @@ var import_clipboard = __toESM(require_clipboard());
 
 // ../../node_modules/@wordpress/data/node_modules/@wordpress/compose/build-module/hooks/use-copy-to-clipboard/index.js
 var import_clipboard2 = __toESM(require_clipboard());
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/i18n/build-module/sprintf.js
+var import_sprintf_js = __toESM(require_sprintf());
+var logErrorOnce = memize(console.error);
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/i18n/build-module/create-i18n.js
+var DEFAULT_LOCALE_DATA = {
+  "": {
+    /** @param {number} n */
+    plural_forms(n) {
+      return n === 1 ? 0 : 1;
+    }
+  }
+};
+var I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
+var createI18n = (initialData, initialDomain, hooks) => {
+  const tannin = new Tannin({});
+  const listeners = /* @__PURE__ */ new Set();
+  const notifyListeners = () => {
+    listeners.forEach((listener2) => listener2());
+  };
+  const subscribe3 = (callback) => {
+    listeners.add(callback);
+    return () => listeners.delete(callback);
+  };
+  const getLocaleData2 = (domain = "default") => tannin.data[domain];
+  const doSetLocaleData = (data, domain = "default") => {
+    var _a;
+    tannin.data[domain] = {
+      ...tannin.data[domain],
+      ...data
+    };
+    tannin.data[domain][""] = {
+      ...DEFAULT_LOCALE_DATA[""],
+      ...(_a = tannin.data[domain]) == null ? void 0 : _a[""]
+    };
+    delete tannin.pluralForms[domain];
+  };
+  const setLocaleData2 = (data, domain) => {
+    doSetLocaleData(data, domain);
+    notifyListeners();
+  };
+  const addLocaleData = (data, domain = "default") => {
+    var _a;
+    tannin.data[domain] = {
+      ...tannin.data[domain],
+      ...data,
+      // Populate default domain configuration (supported locale date which omits
+      // a plural forms expression).
+      "": {
+        ...DEFAULT_LOCALE_DATA[""],
+        ...(_a = tannin.data[domain]) == null ? void 0 : _a[""],
+        ...data == null ? void 0 : data[""]
+      }
+    };
+    delete tannin.pluralForms[domain];
+    notifyListeners();
+  };
+  const resetLocaleData2 = (data, domain) => {
+    tannin.data = {};
+    tannin.pluralForms = {};
+    setLocaleData2(data, domain);
+  };
+  const dcnpgettext = (domain = "default", context, single, plural, number) => {
+    if (!tannin.data[domain]) {
+      doSetLocaleData(void 0, domain);
+    }
+    return tannin.dcnpgettext(domain, context, single, plural, number);
+  };
+  const getFilterDomain = (domain = "default") => domain;
+  const __2 = (text, domain) => {
+    let translation = dcnpgettext(domain, void 0, text);
+    if (!hooks) {
+      return translation;
+    }
+    translation = /** @type {string} */
+    /** @type {*} */
+    hooks.applyFilters("i18n.gettext", translation, text, domain);
+    return (
+      /** @type {string} */
+      /** @type {*} */
+      hooks.applyFilters("i18n.gettext_" + getFilterDomain(domain), translation, text, domain)
+    );
+  };
+  const _x2 = (text, context, domain) => {
+    let translation = dcnpgettext(domain, context, text);
+    if (!hooks) {
+      return translation;
+    }
+    translation = /** @type {string} */
+    /** @type {*} */
+    hooks.applyFilters("i18n.gettext_with_context", translation, text, context, domain);
+    return (
+      /** @type {string} */
+      /** @type {*} */
+      hooks.applyFilters("i18n.gettext_with_context_" + getFilterDomain(domain), translation, text, context, domain)
+    );
+  };
+  const _n2 = (single, plural, number, domain) => {
+    let translation = dcnpgettext(domain, void 0, single, plural, number);
+    if (!hooks) {
+      return translation;
+    }
+    translation = /** @type {string} */
+    /** @type {*} */
+    hooks.applyFilters("i18n.ngettext", translation, single, plural, number, domain);
+    return (
+      /** @type {string} */
+      /** @type {*} */
+      hooks.applyFilters("i18n.ngettext_" + getFilterDomain(domain), translation, single, plural, number, domain)
+    );
+  };
+  const _nx2 = (single, plural, number, context, domain) => {
+    let translation = dcnpgettext(domain, context, single, plural, number);
+    if (!hooks) {
+      return translation;
+    }
+    translation = /** @type {string} */
+    /** @type {*} */
+    hooks.applyFilters("i18n.ngettext_with_context", translation, single, plural, number, context, domain);
+    return (
+      /** @type {string} */
+      /** @type {*} */
+      hooks.applyFilters("i18n.ngettext_with_context_" + getFilterDomain(domain), translation, single, plural, number, context, domain)
+    );
+  };
+  const isRTL3 = () => {
+    return "rtl" === _x2("ltr", "text direction");
+  };
+  const hasTranslation2 = (single, context, domain) => {
+    var _a, _b;
+    const key = context ? context + "" + single : single;
+    let result = !!((_b = (_a = tannin.data) == null ? void 0 : _a[domain !== null && domain !== void 0 ? domain : "default"]) == null ? void 0 : _b[key]);
+    if (hooks) {
+      result = /** @type { boolean } */
+      /** @type {*} */
+      hooks.applyFilters("i18n.has_translation", result, single, context, domain);
+      result = /** @type { boolean } */
+      /** @type {*} */
+      hooks.applyFilters("i18n.has_translation_" + getFilterDomain(domain), result, single, context, domain);
+    }
+    return result;
+  };
+  if (initialData) {
+    setLocaleData2(initialData, initialDomain);
+  }
+  if (hooks) {
+    const onHookAddedOrRemoved = (hookName) => {
+      if (I18N_HOOK_REGEXP.test(hookName)) {
+        notifyListeners();
+      }
+    };
+    hooks.addAction("hookAdded", "core/i18n", onHookAddedOrRemoved);
+    hooks.addAction("hookRemoved", "core/i18n", onHookAddedOrRemoved);
+  }
+  return {
+    getLocaleData: getLocaleData2,
+    setLocaleData: setLocaleData2,
+    addLocaleData,
+    resetLocaleData: resetLocaleData2,
+    subscribe: subscribe3,
+    __: __2,
+    _x: _x2,
+    _n: _n2,
+    _nx: _nx2,
+    isRTL: isRTL3,
+    hasTranslation: hasTranslation2
+  };
+};
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/validateNamespace.js
+function validateNamespace2(namespace) {
+  if ("string" !== typeof namespace || "" === namespace) {
+    console.error("The namespace must be a non-empty string.");
+    return false;
+  }
+  if (!/^[a-zA-Z][a-zA-Z0-9_.\-\/]*$/.test(namespace)) {
+    console.error("The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.");
+    return false;
+  }
+  return true;
+}
+var validateNamespace_default2 = validateNamespace2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/validateHookName.js
+function validateHookName2(hookName) {
+  if ("string" !== typeof hookName || "" === hookName) {
+    console.error("The hook name must be a non-empty string.");
+    return false;
+  }
+  if (/^__/.test(hookName)) {
+    console.error("The hook name cannot begin with `__`.");
+    return false;
+  }
+  if (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {
+    console.error("The hook name can only contain numbers, letters, dashes, periods and underscores.");
+    return false;
+  }
+  return true;
+}
+var validateHookName_default2 = validateHookName2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createAddHook.js
+function createAddHook2(hooks, storeKey) {
+  return function addHook(hookName, namespace, callback, priority = 10) {
+    const hooksStore = hooks[storeKey];
+    if (!validateHookName_default2(hookName)) {
+      return;
+    }
+    if (!validateNamespace_default2(namespace)) {
+      return;
+    }
+    if ("function" !== typeof callback) {
+      console.error("The hook callback must be a function.");
+      return;
+    }
+    if ("number" !== typeof priority) {
+      console.error("If specified, the hook priority must be a number.");
+      return;
+    }
+    const handler = {
+      callback,
+      priority,
+      namespace
+    };
+    if (hooksStore[hookName]) {
+      const handlers = hooksStore[hookName].handlers;
+      let i;
+      for (i = handlers.length; i > 0; i--) {
+        if (priority >= handlers[i - 1].priority) {
+          break;
+        }
+      }
+      if (i === handlers.length) {
+        handlers[i] = handler;
+      } else {
+        handlers.splice(i, 0, handler);
+      }
+      hooksStore.__current.forEach((hookInfo) => {
+        if (hookInfo.name === hookName && hookInfo.currentIndex >= i) {
+          hookInfo.currentIndex++;
+        }
+      });
+    } else {
+      hooksStore[hookName] = {
+        handlers: [handler],
+        runs: 0
+      };
+    }
+    if (hookName !== "hookAdded") {
+      hooks.doAction("hookAdded", hookName, namespace, callback, priority);
+    }
+  };
+}
+var createAddHook_default2 = createAddHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createRemoveHook.js
+function createRemoveHook2(hooks, storeKey, removeAll = false) {
+  return function removeHook(hookName, namespace) {
+    const hooksStore = hooks[storeKey];
+    if (!validateHookName_default2(hookName)) {
+      return;
+    }
+    if (!removeAll && !validateNamespace_default2(namespace)) {
+      return;
+    }
+    if (!hooksStore[hookName]) {
+      return 0;
+    }
+    let handlersRemoved = 0;
+    if (removeAll) {
+      handlersRemoved = hooksStore[hookName].handlers.length;
+      hooksStore[hookName] = {
+        runs: hooksStore[hookName].runs,
+        handlers: []
+      };
+    } else {
+      const handlers = hooksStore[hookName].handlers;
+      for (let i = handlers.length - 1; i >= 0; i--) {
+        if (handlers[i].namespace === namespace) {
+          handlers.splice(i, 1);
+          handlersRemoved++;
+          hooksStore.__current.forEach((hookInfo) => {
+            if (hookInfo.name === hookName && hookInfo.currentIndex >= i) {
+              hookInfo.currentIndex--;
+            }
+          });
+        }
+      }
+    }
+    if (hookName !== "hookRemoved") {
+      hooks.doAction("hookRemoved", hookName, namespace);
+    }
+    return handlersRemoved;
+  };
+}
+var createRemoveHook_default2 = createRemoveHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createHasHook.js
+function createHasHook2(hooks, storeKey) {
+  return function hasHook(hookName, namespace) {
+    const hooksStore = hooks[storeKey];
+    if ("undefined" !== typeof namespace) {
+      return hookName in hooksStore && hooksStore[hookName].handlers.some((hook) => hook.namespace === namespace);
+    }
+    return hookName in hooksStore;
+  };
+}
+var createHasHook_default2 = createHasHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createRunHook.js
+function createRunHook2(hooks, storeKey, returnFirstArg = false) {
+  return function runHooks(hookName, ...args) {
+    const hooksStore = hooks[storeKey];
+    if (!hooksStore[hookName]) {
+      hooksStore[hookName] = {
+        handlers: [],
+        runs: 0
+      };
+    }
+    hooksStore[hookName].runs++;
+    const handlers = hooksStore[hookName].handlers;
+    if (true) {
+      if ("hookAdded" !== hookName && hooksStore.all) {
+        handlers.push(...hooksStore.all.handlers);
+      }
+    }
+    if (!handlers || !handlers.length) {
+      return returnFirstArg ? args[0] : void 0;
+    }
+    const hookInfo = {
+      name: hookName,
+      currentIndex: 0
+    };
+    hooksStore.__current.push(hookInfo);
+    while (hookInfo.currentIndex < handlers.length) {
+      const handler = handlers[hookInfo.currentIndex];
+      const result = handler.callback.apply(null, args);
+      if (returnFirstArg) {
+        args[0] = result;
+      }
+      hookInfo.currentIndex++;
+    }
+    hooksStore.__current.pop();
+    if (returnFirstArg) {
+      return args[0];
+    }
+    return void 0;
+  };
+}
+var createRunHook_default2 = createRunHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createCurrentHook.js
+function createCurrentHook2(hooks, storeKey) {
+  return function currentHook() {
+    var _a;
+    var _hooksStore$__current;
+    const hooksStore = hooks[storeKey];
+    return (_hooksStore$__current = (_a = hooksStore.__current[hooksStore.__current.length - 1]) == null ? void 0 : _a.name) !== null && _hooksStore$__current !== void 0 ? _hooksStore$__current : null;
+  };
+}
+var createCurrentHook_default2 = createCurrentHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createDoingHook.js
+function createDoingHook2(hooks, storeKey) {
+  return function doingHook(hookName) {
+    const hooksStore = hooks[storeKey];
+    if ("undefined" === typeof hookName) {
+      return "undefined" !== typeof hooksStore.__current[0];
+    }
+    return hooksStore.__current[0] ? hookName === hooksStore.__current[0].name : false;
+  };
+}
+var createDoingHook_default2 = createDoingHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createDidHook.js
+function createDidHook2(hooks, storeKey) {
+  return function didHook(hookName) {
+    const hooksStore = hooks[storeKey];
+    if (!validateHookName_default2(hookName)) {
+      return;
+    }
+    return hooksStore[hookName] && hooksStore[hookName].runs ? hooksStore[hookName].runs : 0;
+  };
+}
+var createDidHook_default2 = createDidHook2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/createHooks.js
+var _Hooks2 = class {
+  constructor() {
+    this.actions = /* @__PURE__ */ Object.create(null);
+    this.actions.__current = [];
+    this.filters = /* @__PURE__ */ Object.create(null);
+    this.filters.__current = [];
+    this.addAction = createAddHook_default2(this, "actions");
+    this.addFilter = createAddHook_default2(this, "filters");
+    this.removeAction = createRemoveHook_default2(this, "actions");
+    this.removeFilter = createRemoveHook_default2(this, "filters");
+    this.hasAction = createHasHook_default2(this, "actions");
+    this.hasFilter = createHasHook_default2(this, "filters");
+    this.removeAllActions = createRemoveHook_default2(this, "actions", true);
+    this.removeAllFilters = createRemoveHook_default2(this, "filters", true);
+    this.doAction = createRunHook_default2(this, "actions");
+    this.applyFilters = createRunHook_default2(this, "filters", true);
+    this.currentAction = createCurrentHook_default2(this, "actions");
+    this.currentFilter = createCurrentHook_default2(this, "filters");
+    this.doingAction = createDoingHook_default2(this, "actions");
+    this.doingFilter = createDoingHook_default2(this, "filters");
+    this.didAction = createDidHook_default2(this, "actions");
+    this.didFilter = createDidHook_default2(this, "filters");
+  }
+};
+function createHooks2() {
+  return new _Hooks2();
+}
+var createHooks_default2 = createHooks2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/index.js
+var defaultHooks2 = createHooks_default2();
+var {
+  addAction: addAction2,
+  addFilter: addFilter2,
+  removeAction: removeAction2,
+  removeFilter: removeFilter2,
+  hasAction: hasAction2,
+  hasFilter: hasFilter2,
+  removeAllActions: removeAllActions2,
+  removeAllFilters: removeAllFilters2,
+  doAction: doAction2,
+  applyFilters: applyFilters2,
+  currentAction: currentAction2,
+  currentFilter: currentFilter2,
+  doingAction: doingAction2,
+  doingFilter: doingFilter2,
+  didAction: didAction2,
+  didFilter: didFilter2,
+  actions: actions2,
+  filters: filters2
+} = defaultHooks2;
+
+// ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/i18n/build-module/default-i18n.js
+var i18n = createI18n(void 0, void 0, defaultHooks2);
+var getLocaleData = i18n.getLocaleData.bind(i18n);
+var setLocaleData = i18n.setLocaleData.bind(i18n);
+var resetLocaleData = i18n.resetLocaleData.bind(i18n);
+var subscribe = i18n.subscribe.bind(i18n);
+var __ = i18n.__.bind(i18n);
+var _x = i18n._x.bind(i18n);
+var _n = i18n._n.bind(i18n);
+var _nx = i18n._nx.bind(i18n);
+var isRTL2 = i18n.isRTL.bind(i18n);
+var hasTranslation = i18n.hasTranslation.bind(i18n);
+
+// ../../node_modules/@wordpress/keycodes/build-module/platform.js
+function isAppleOS(_window = null) {
+  if (!_window) {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    _window = window;
+  }
+  const {
+    platform
+  } = _window.navigator;
+  return platform.indexOf("Mac") !== -1 || ["iPad", "iPhone"].includes(platform);
+}
+
+// ../../node_modules/@wordpress/keycodes/build-module/index.js
+var ALT = "alt";
+var CTRL = "ctrl";
+var COMMAND = "meta";
+var SHIFT = "shift";
+function capitaliseFirstCharacter(string) {
+  return string.length < 2 ? string.toUpperCase() : string.charAt(0).toUpperCase() + string.slice(1);
+}
+function mapValues(object, mapFn) {
+  return Object.fromEntries(Object.entries(object).map(([key, value]) => [key, mapFn(value)]));
+}
+var modifiers = {
+  primary: (_isApple) => _isApple() ? [COMMAND] : [CTRL],
+  primaryShift: (_isApple) => _isApple() ? [SHIFT, COMMAND] : [CTRL, SHIFT],
+  primaryAlt: (_isApple) => _isApple() ? [ALT, COMMAND] : [CTRL, ALT],
+  secondary: (_isApple) => _isApple() ? [SHIFT, ALT, COMMAND] : [CTRL, SHIFT, ALT],
+  access: (_isApple) => _isApple() ? [CTRL, ALT] : [SHIFT, ALT],
+  ctrl: () => [CTRL],
+  alt: () => [ALT],
+  ctrlShift: () => [CTRL, SHIFT],
+  shift: () => [SHIFT],
+  shiftAlt: () => [SHIFT, ALT],
+  undefined: () => []
+};
+var rawShortcut = mapValues(modifiers, (modifier) => {
+  return (
+    /** @type {WPKeyHandler<string>} */
+    (character, _isApple = isAppleOS) => {
+      return [...modifier(_isApple), character.toLowerCase()].join("+");
+    }
+  );
+});
+var displayShortcutList = mapValues(modifiers, (modifier) => {
+  return (
+    /** @type {WPKeyHandler<string[]>} */
+    (character, _isApple = isAppleOS) => {
+      const isApple = _isApple();
+      const replacementKeyMap = {
+        [ALT]: isApple ? "⌥" : "Alt",
+        [CTRL]: isApple ? "⌃" : "Ctrl",
+        // Make sure ⌃ is the U+2303 UP ARROWHEAD unicode character and not the caret character.
+        [COMMAND]: "⌘",
+        [SHIFT]: isApple ? "⇧" : "Shift"
+      };
+      const modifierKeys = modifier(_isApple).reduce(
+        (accumulator, key) => {
+          var _replacementKeyMap$ke;
+          const replacementKey = (_replacementKeyMap$ke = replacementKeyMap[key]) !== null && _replacementKeyMap$ke !== void 0 ? _replacementKeyMap$ke : key;
+          if (isApple) {
+            return [...accumulator, replacementKey];
+          }
+          return [...accumulator, replacementKey, "+"];
+        },
+        /** @type {string[]} */
+        []
+      );
+      return [...modifierKeys, capitaliseFirstCharacter(character)];
+    }
+  );
+});
+var displayShortcut = mapValues(displayShortcutList, (shortcutList) => {
+  return (
+    /** @type {WPKeyHandler<string>} */
+    (character, _isApple = isAppleOS) => shortcutList(character, _isApple).join("")
+  );
+});
+var shortcutAriaLabel = mapValues(modifiers, (modifier) => {
+  return (
+    /** @type {WPKeyHandler<string>} */
+    (character, _isApple = isAppleOS) => {
+      const isApple = _isApple();
+      const replacementKeyMap = {
+        [SHIFT]: "Shift",
+        [COMMAND]: isApple ? "Command" : "Control",
+        [CTRL]: "Control",
+        [ALT]: isApple ? "Option" : "Alt",
+        /* translators: comma as in the character ',' */
+        ",": __("Comma"),
+        /* translators: period as in the character '.' */
+        ".": __("Period"),
+        /* translators: backtick as in the character '`' */
+        "`": __("Backtick"),
+        /* translators: tilde as in the character '~' */
+        "~": __("Tilde")
+      };
+      return [...modifier(_isApple), character].map((key) => {
+        var _replacementKeyMap$ke2;
+        return capitaliseFirstCharacter((_replacementKeyMap$ke2 = replacementKeyMap[key]) !== null && _replacementKeyMap$ke2 !== void 0 ? _replacementKeyMap$ke2 : key);
+      }).join(isApple ? " " : " + ");
+    }
+  );
+});
+function getEventModifiers(event) {
+  return (
+    /** @type {WPModifierPart[]} */
+    [ALT, CTRL, COMMAND, SHIFT].filter((key) => event[
+      /** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */
+      `${key}Key`
+    ])
+  );
+}
+var isKeyboardEvent = mapValues(modifiers, (getModifiers) => {
+  return (
+    /** @type {WPEventKeyHandler} */
+    (event, character, _isApple = isAppleOS) => {
+      const mods = getModifiers(_isApple);
+      const eventMods = getEventModifiers(event);
+      const replacementWithShiftKeyMap = {
+        Comma: ",",
+        Backslash: "\\",
+        // Windows returns `\` for both IntlRo and IntlYen.
+        IntlRo: "\\",
+        IntlYen: "\\"
+      };
+      const modsDiff = mods.filter((mod) => !eventMods.includes(mod));
+      const eventModsDiff = eventMods.filter((mod) => !mods.includes(mod));
+      if (modsDiff.length > 0 || eventModsDiff.length > 0) {
+        return false;
+      }
+      let key = event.key.toLowerCase();
+      if (!character) {
+        return mods.includes(
+          /** @type {WPModifierPart} */
+          key
+        );
+      }
+      if (event.altKey && character.length === 1) {
+        key = String.fromCharCode(event.keyCode).toLowerCase();
+      }
+      if (event.shiftKey && character.length === 1 && replacementWithShiftKeyMap[event.code]) {
+        key = replacementWithShiftKeyMap[event.code];
+      }
+      if (character === "del") {
+        character = "delete";
+      }
+      return key === character.toLowerCase();
+    }
+  );
+});
 
 // ../../node_modules/@wordpress/data/node_modules/@wordpress/compose/build-module/hooks/use-isomorphic-layout-effect/index.js
 var useIsomorphicLayoutEffect = typeof window !== "undefined" ? import_react2.useLayoutEffect : import_react2.useEffect;
@@ -1645,7 +2286,7 @@ var trimUndefinedValues = (array) => {
   }
   return result;
 };
-var mapValues = (obj, callback) => Object.fromEntries(Object.entries(obj !== null && obj !== void 0 ? obj : {}).map(([key, value]) => [key, callback(value, key)]));
+var mapValues2 = (obj, callback) => Object.fromEntries(Object.entries(obj !== null && obj !== void 0 ? obj : {}).map(([key, value]) => [key, callback(value, key)]));
 var devToolsReplacer = (key, state) => {
   if (state instanceof Map) {
     return Object.fromEntries(state);
@@ -1692,8 +2333,8 @@ function createReduxStore(key, options) {
   const privateSelectors = {};
   const privateRegistrationFunctions = {
     privateActions,
-    registerPrivateActions: (actions2) => {
-      Object.assign(privateActions, actions2);
+    registerPrivateActions: (actions3) => {
+      Object.assign(privateActions, actions3);
     },
     privateSelectors,
     registerPrivateSelectors: (selectors) => {
@@ -1723,22 +2364,22 @@ function createReduxStore(key, options) {
       function bindAction(action) {
         return (...args) => Promise.resolve(store.dispatch(action(...args)));
       }
-      const actions2 = {
-        ...mapValues(actions_exports, bindAction),
-        ...mapValues(options.actions, bindAction)
+      const actions3 = {
+        ...mapValues2(actions_exports, bindAction),
+        ...mapValues2(options.actions, bindAction)
       };
       const boundPrivateActions = createBindingCache(bindAction);
       const allActions = new Proxy(() => {
       }, {
         get: (target, prop) => {
           const privateAction = privateActions[prop];
-          return privateAction ? boundPrivateActions.get(privateAction, prop) : actions2[prop];
+          return privateAction ? boundPrivateActions.get(privateAction, prop) : actions3[prop];
         }
       });
       const thunkActions = new Proxy(allActions, {
         apply: (target, thisArg, [action]) => store.dispatch(action)
       });
-      lock2(actions2, allActions);
+      lock2(actions3, allActions);
       const resolvers = options.resolvers ? mapResolvers(options.resolvers) : {};
       function bindSelector(selector, selectorName) {
         if (selector.isRegistrySelector) {
@@ -1776,8 +2417,8 @@ function createReduxStore(key, options) {
         return boundSelector;
       }
       const selectors = {
-        ...mapValues(selectors_exports, bindMetadataSelector),
-        ...mapValues(options.selectors, bindSelector)
+        ...mapValues2(selectors_exports, bindMetadataSelector),
+        ...mapValues2(options.selectors, bindSelector)
       };
       const boundPrivateSelectors = createBindingCache(bindSelector);
       for (const [selectorName, selector] of Object.entries(privateSelectors)) {
@@ -1797,12 +2438,12 @@ function createReduxStore(key, options) {
       const resolveSelectors = mapResolveSelectors(selectors, store);
       const suspendSelectors = mapSuspendSelectors(selectors, store);
       const getSelectors = () => selectors;
-      const getActions = () => actions2;
+      const getActions = () => actions3;
       const getResolveSelectors = () => resolveSelectors;
       const getSuspendSelectors = () => suspendSelectors;
       store.__unstableOriginalGetState = store.getState;
       store.getState = () => store.__unstableOriginalGetState().root;
-      const subscribe2 = store && ((listener2) => {
+      const subscribe3 = store && ((listener2) => {
         listeners.add(listener2);
         return () => listeners.delete(listener2);
       });
@@ -1820,14 +2461,14 @@ function createReduxStore(key, options) {
       return {
         reducer,
         store,
-        actions: actions2,
+        actions: actions3,
         selectors,
         resolvers,
         getSelectors,
         getResolveSelectors,
         getSuspendSelectors,
         getActions,
-        subscribe: subscribe2
+        subscribe: subscribe3
       };
     }
   };
@@ -1839,7 +2480,7 @@ function instantiateReduxStore(key, options, registry, thunkArgs) {
     ...options.controls,
     ...builtinControls
   };
-  const normalizedControls = mapValues(controls2, (control) => control.isRegistryControl ? control(registry) : control);
+  const normalizedControls = mapValues2(controls2, (control) => control.isRegistryControl ? control(registry) : control);
   const middlewares = [resolvers_cache_middleware_default(registry, key), promise_middleware_default, createMiddleware(normalizedControls), createThunkMiddleware(thunkArgs)];
   const enhancers = [applyMiddleware(...middlewares)];
   if (typeof window !== "undefined" && window.__REDUX_DEVTOOLS_EXTENSION__) {
@@ -1877,7 +2518,7 @@ function mapResolveSelectors(selectors, store) {
     countSelectorsByStatus: countSelectorsByStatus2,
     ...storeSelectors
   } = selectors;
-  return mapValues(storeSelectors, (selector, selectorName) => {
+  return mapValues2(storeSelectors, (selector, selectorName) => {
     if (!selector.hasResolver) {
       return async (...args) => selector.apply(null, args);
     }
@@ -1909,7 +2550,7 @@ function mapResolveSelectors(selectors, store) {
   });
 }
 function mapSuspendSelectors(selectors, store) {
-  return mapValues(selectors, (selector, selectorName) => {
+  return mapValues2(selectors, (selector, selectorName) => {
     if (!selector.hasResolver) {
       return selector;
     }
@@ -1933,7 +2574,7 @@ function mapSuspendSelectors(selectors, store) {
   });
 }
 function mapResolvers(resolvers) {
-  return mapValues(resolvers, (resolver) => {
+  return mapValues2(resolvers, (resolver) => {
     if (resolver.fulfill) {
       return resolver;
     }
@@ -2063,7 +2704,7 @@ function createRegistry(storeConfigs = {}, parent = null) {
   function globalListener() {
     emitter.emit();
   }
-  const subscribe2 = (listener2, storeNameOrDescriptor) => {
+  const subscribe3 = (listener2, storeNameOrDescriptor) => {
     if (!storeNameOrDescriptor) {
       return emitter.subscribe(listener2);
     }
@@ -2206,7 +2847,7 @@ function createRegistry(storeConfigs = {}, parent = null) {
     stores,
     namespaces: stores,
     // TODO: Deprecate/remove this.
-    subscribe: subscribe2,
+    subscribe: subscribe3,
     select: select3,
     resolveSelect: resolveSelect3,
     suspendSelect: suspendSelect2,
@@ -2447,7 +3088,7 @@ function Store(registry, suspense) {
   const createSubscriber = (stores) => {
     const activeStores = [...stores];
     const activeSubscriptions = /* @__PURE__ */ new Set();
-    function subscribe2(listener2) {
+    function subscribe3(listener2) {
       if (lastMapResultValid) {
         for (const name of activeStores) {
           if (storeStatesOnMount.get(name) !== getStoreState(name)) {
@@ -2495,7 +3136,7 @@ function Store(registry, suspense) {
       }
     }
     return {
-      subscribe: subscribe2,
+      subscribe: subscribe3,
       updateStores
     };
   };
@@ -2556,10 +3197,10 @@ function useMappingSelect(suspense, mapSelect, deps) {
   const store = (0, import_react2.useMemo)(() => Store(registry, suspense), [registry, suspense]);
   const selector = (0, import_react2.useCallback)(mapSelect, deps);
   const {
-    subscribe: subscribe2,
+    subscribe: subscribe3,
     getValue
   } = store(selector, isAsync);
-  const result = (0, import_react2.useSyncExternalStore)(subscribe2, getValue, getValue);
+  const result = (0, import_react2.useSyncExternalStore)(subscribe3, getValue, getValue);
   (0, import_react2.useDebugValue)(result);
   return result;
 }
@@ -2652,7 +3293,7 @@ function select2(storeNameOrDescriptor) {
 var combineReducers2 = combineReducers;
 var resolveSelect2 = default_registry_default.resolveSelect;
 var suspendSelect = default_registry_default.suspendSelect;
-var subscribe = default_registry_default.subscribe;
+var subscribe2 = default_registry_default.subscribe;
 var registerGenericStore = default_registry_default.registerGenericStore;
 var registerStore = default_registry_default.registerStore;
 var use = default_registry_default.use;
@@ -2675,7 +3316,7 @@ export {
   registerStore,
   resolveSelect2 as resolveSelect,
   select2 as select,
-  subscribe,
+  subscribe2 as subscribe,
   suspendSelect,
   use,
   use_dispatch_default as useDispatch,

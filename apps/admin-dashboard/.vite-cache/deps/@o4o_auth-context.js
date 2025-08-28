@@ -2,7 +2,7 @@ import {
   AuthClient,
   cookieAuthClient,
   ssoClient
-} from "./chunk-WJ6GPZ3W.js";
+} from "./chunk-JBJ5KB4E.js";
 import "./chunk-A5HYYSF6.js";
 import {
   useLocation,
@@ -53,7 +53,11 @@ var AuthProvider = ({ children, ssoClient: ssoClient2, onAuthError }) => {
     return null;
   };
   const [user, setUser] = (0, import_react2.useState)(getInitialState());
-  const [isLoading, setIsLoading] = (0, import_react2.useState)(true);
+  const [isLoading, setIsLoading] = (0, import_react2.useState)(() => {
+    const storedUser = getInitialState();
+    const storedToken = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    return !(storedUser && storedToken);
+  });
   const [error, setError] = (0, import_react2.useState)(null);
   const authClient = ssoClient2 || new AuthClient(typeof window !== "undefined" && ((_c = (_b = (_a = window.import) == null ? void 0 : _a.meta) == null ? void 0 : _b.env) == null ? void 0 : _c.VITE_API_BASE_URL) || "");
   (0, import_react2.useEffect)(() => {
@@ -62,35 +66,32 @@ var AuthProvider = ({ children, ssoClient: ssoClient2, onAuthError }) => {
         const storedUser = getInitialState();
         const storedToken = localStorage.getItem("accessToken") || localStorage.getItem("token");
         if (storedUser && storedToken) {
-          setUser(storedUser);
           if (ssoClient2 && typeof window !== "undefined") {
-            try {
-              const sessionData = await authClient.checkSession();
+            authClient.checkSession().then((sessionData) => {
               if (!sessionData.isAuthenticated) {
-                setUser(null);
-                localStorage.removeItem("admin-auth-storage");
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-                localStorage.removeItem("token");
-                localStorage.removeItem("authToken");
-                localStorage.removeItem("user");
+                console.warn("SSO session invalid, but keeping local session");
               }
-            } catch (error2) {
-              console.error("SSO session check failed:", error2);
-            }
+            }).catch((error2) => {
+              console.warn("SSO session check failed, keeping local session:", error2);
+            });
+          }
+          if (isLoading) {
+            setIsLoading(false);
           }
         } else {
           setUser(null);
+          setIsLoading(false);
         }
       } catch (error2) {
         console.error("Initial auth check failed:", error2);
         setUser(null);
-      } finally {
         setIsLoading(false);
       }
     };
-    checkInitialAuth();
-  }, [authClient, ssoClient2]);
+    if (isLoading) {
+      checkInitialAuth();
+    }
+  }, [authClient, ssoClient2, isLoading]);
   const login = async (credentials) => {
     try {
       setIsLoading(true);
@@ -202,16 +203,22 @@ var AdminProtectedRoute = ({ children, requiredRoles = [], requiredPermissions =
   const navigate = useNavigate();
   const location2 = useLocation();
   (0, import_react4.useEffect)(() => {
+    const hasStoredAuth = () => {
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token") || localStorage.getItem("authToken");
+      const adminStorage = localStorage.getItem("admin-auth-storage");
+      return !!(token || adminStorage);
+    };
     let timeoutId;
     if (!isLoading && !isAuthenticated) {
+      const delay = hasStoredAuth() ? 500 : 100;
       timeoutId = window.setTimeout(() => {
-        if (!isAuthenticated) {
+        if (!isAuthenticated && !hasStoredAuth()) {
           navigate("/login", {
             replace: true,
             state: { from: location2.pathname }
           });
         }
-      }, 100);
+      }, delay);
     }
     return () => {
       if (timeoutId)

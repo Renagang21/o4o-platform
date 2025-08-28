@@ -62,6 +62,7 @@ const O4O_BLOCKS = [
 // Core WordPress blocks
 const CORE_BLOCKS = [
   { id: 'core/paragraph', name: 'Paragraph', icon: Type, category: 'text' },
+  { id: 'core/paragraph-test', name: 'Paragraph (Enhanced)', icon: Type, category: 'text' },
   { id: 'core/heading', name: 'Heading', icon: Type, category: 'text' },
   { id: 'core/list', name: 'List', icon: List, category: 'text' },
   { id: 'core/quote', name: 'Quote', icon: Quote, category: 'text' },
@@ -309,6 +310,8 @@ const GutenbergEditor: FC<GutenbergEditorProps> = ({
     switch (blockType) {
       case 'core/paragraph':
         return { text: 'Start writing or type / to choose a block' };
+      case 'core/paragraph-test':
+        return { text: '' };
       case 'core/heading':
         return { text: 'Heading', level: 2 };
       case 'uagb/advanced-heading':

@@ -12,6 +12,7 @@ import '@/styles/wordpress-sidebar.css';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
+import EditorLayout from '@/layouts/EditorLayout';
 import InitialRedirect from '@/components/InitialRedirect';
 
 // Page Components - Lazy loaded
@@ -98,7 +99,11 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 const GutenbergPage = lazy(() => 
   import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPageWrapped')
 );
+const StandaloneEditor = lazy(() => 
+  import(/* webpackChunkName: "standalone-editor" */ '@/pages/editor/StandaloneEditor')
+);
 const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
+const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
 
 // Apps Manager
 const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
@@ -235,6 +240,49 @@ function App() {
             
             {/* 루트 경로 - 인증 상태에 따라 리다이렉트 */}
             <Route path="/" element={<InitialRedirect />} />
+            
+            {/* 독립형 편집기 라우트 - 관리자 레이아웃 밖에서 실행 */}
+            <Route path="/editor/*" element={
+              <AdminProtectedRoute 
+                requiredRoles={['admin']}
+                requiredPermissions={['content:write']}
+              >
+                <EditorLayout>
+                  <Routes>
+                    <Route path="posts/new" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <StandaloneEditor mode="post" />
+                      </Suspense>
+                    } />
+                    <Route path="posts/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <StandaloneEditor mode="post" />
+                      </Suspense>
+                    } />
+                    <Route path="pages/new" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <StandaloneEditor mode="page" />
+                      </Suspense>
+                    } />
+                    <Route path="pages/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <StandaloneEditor mode="page" />
+                      </Suspense>
+                    } />
+                    <Route path="templates/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <StandaloneEditor mode="template" />
+                      </Suspense>
+                    } />
+                    <Route path="patterns/:id" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <StandaloneEditor mode="pattern" />
+                      </Suspense>
+                    } />
+                  </Routes>
+                </EditorLayout>
+              </AdminProtectedRoute>
+            } />
             
             {/* 보호된 관리자 라우트들 */}
             <Route path="/*" element={
@@ -944,6 +992,15 @@ function App() {
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <LoopBlockTest />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    
+                    {/* Paragraph Test Block Demo */}
+                    <Route path="/paragraph-test" element={
+                      <AdminProtectedRoute requiredPermissions={['content:write']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <ParagraphTestDemo />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

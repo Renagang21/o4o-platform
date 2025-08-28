@@ -26,6 +26,8 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import GutenbergEditor from '@/components/editor/GutenbergEditor';
+import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock';
+import '@/styles/paragraph-test-block.css';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
 import MediaLibrary from '@/components/media/MediaLibrary';
 import ContentTemplates from '@/components/editor/ContentTemplates';
@@ -149,6 +151,74 @@ const GutenbergPage: FC = () => {
 
   // Custom block renderer
   const renderBlock = (block: any) => {
+    // Handle the new ParagraphTestBlock
+    if (block.type === 'core/paragraph-test') {
+      return (
+        <ParagraphTestBlock
+          key={block.id}
+          id={block.id}
+          content={block.content.text || ''}
+          onChange={(content, attrs) => {
+            setBlocks(blocks.map((b: any) => 
+              b.id === block.id 
+                ? { ...b, content: { text: content }, attributes: { ...b.attributes, ...attrs } }
+                : b
+            ));
+          }}
+          onDelete={() => {
+            setBlocks(blocks.filter((b: any) => b.id !== block.id));
+            setSelectedBlock(null);
+          }}
+          onDuplicate={() => {
+            const index = blocks.findIndex((b: any) => b.id === block.id);
+            const newBlock = {
+              ...block,
+              id: `block-${Date.now()}`,
+            };
+            const newBlocks = [...blocks];
+            newBlocks.splice(index + 1, 0, newBlock);
+            setBlocks(newBlocks);
+          }}
+          onMoveUp={() => {
+            const index = blocks.findIndex((b: any) => b.id === block.id);
+            if (index > 0) {
+              const newBlocks = [...blocks];
+              [newBlocks[index - 1], newBlocks[index]] = [newBlocks[index], newBlocks[index - 1]];
+              setBlocks(newBlocks);
+            }
+          }}
+          onMoveDown={() => {
+            const index = blocks.findIndex((b: any) => b.id === block.id);
+            if (index < blocks.length - 1) {
+              const newBlocks = [...blocks];
+              [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+              setBlocks(newBlocks);
+            }
+          }}
+          onAddBlock={(position, type) => {
+            const index = blocks.findIndex((b: any) => b.id === block.id);
+            const newBlock = {
+              id: `block-${Date.now()}`,
+              type: type || 'core/paragraph-test',
+              content: { text: '' },
+              attributes: {}
+            };
+            const newBlocks = [...blocks];
+            const insertIndex = position === 'after' ? index + 1 : index;
+            newBlocks.splice(insertIndex, 0, newBlock);
+            setBlocks(newBlocks);
+            setTimeout(() => setSelectedBlock(newBlock), 100);
+          }}
+          isSelected={selectedBlock?.id === block.id}
+          onSelect={() => {
+            setSelectedBlock(block);
+            setActiveTab('block');
+          }}
+          attributes={block.attributes}
+        />
+      );
+    }
+    
     const isSpectraBlock = ['cta', 'pricing', 'testimonial', 'rating', 'infobox'].includes(block.type);
     
     if (isSpectraBlock) {

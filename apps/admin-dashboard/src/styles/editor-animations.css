@@ -1,0 +1,197 @@
+/* 편집기 진입/종료 애니메이션 */
+
+/* 페이드 인 애니메이션 */
+@keyframes editor-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 슬라이드 업 애니메이션 */
+@keyframes editor-slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 스케일 인 애니메이션 */
+@keyframes editor-scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 편집기 컨테이너 애니메이션 */
+.editor-enter {
+  animation: editor-fade-in 0.3s ease-out, editor-scale-in 0.3s ease-out;
+}
+
+/* 편집기 헤더 애니메이션 */
+.editor-header-enter {
+  animation: editor-slide-up 0.4s ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+/* 편집기 캔버스 애니메이션 */
+.editor-canvas-enter {
+  animation: editor-fade-in 0.5s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* 사이드바 슬라이드 애니메이션 */
+@keyframes sidebar-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sidebar-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.editor-sidebar-enter {
+  animation: sidebar-slide-in 0.3s ease-out;
+}
+
+.editor-sidebar-exit {
+  animation: sidebar-slide-out 0.3s ease-out;
+}
+
+/* 툴바 아이템 페이드 인 */
+.toolbar-item-enter {
+  opacity: 0;
+  animation: editor-fade-in 0.3s ease-out forwards;
+}
+
+.toolbar-item-enter:nth-child(1) { animation-delay: 0.05s; }
+.toolbar-item-enter:nth-child(2) { animation-delay: 0.1s; }
+.toolbar-item-enter:nth-child(3) { animation-delay: 0.15s; }
+.toolbar-item-enter:nth-child(4) { animation-delay: 0.2s; }
+.toolbar-item-enter:nth-child(5) { animation-delay: 0.25s; }
+
+/* 로딩 스피너 */
+.editor-loading-spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #0073aa;
+  border-radius: 50%;
+  animation: editor-spinner 0.8s linear infinite;
+}
+
+@keyframes editor-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 모바일 반응형 애니메이션 */
+@media (max-width: 768px) {
+  @keyframes mobile-editor-slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .editor-enter {
+    animation: mobile-editor-slide-up 0.4s ease-out;
+  }
+  
+  @keyframes mobile-sidebar-slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  .editor-sidebar-enter {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    animation: mobile-sidebar-slide-in 0.3s ease-out;
+    z-index: 50;
+  }
+}
+
+/* 다크모드 지원 */
+@media (prefers-color-scheme: dark) {
+  .editor-loading-spinner {
+    border-color: rgba(255, 255, 255, 0.1);
+    border-top-color: #00a0d2;
+  }
+}
+
+/* 블록 추가 애니메이션 */
+@keyframes block-add {
+  from {
+    transform: scale(0.8) translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.block-enter {
+  animation: block-add 0.3s ease-out;
+}
+
+/* 저장 인디케이터 애니메이션 */
+@keyframes save-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.saving-indicator {
+  animation: save-pulse 1.5s ease-in-out infinite;
+}
+
+/* 트랜지션 클래스 */
+.editor-transition {
+  transition: all 0.3s ease-out;
+}
+
+.editor-transition-fast {
+  transition: all 0.15s ease-out;
+}
+
+.editor-transition-slow {
+  transition: all 0.5s ease-out;
+}
