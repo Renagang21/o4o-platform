@@ -34,7 +34,7 @@ import ImageBlockSettings from '@/components/editor/ImageBlockSettings';
 import GalleryBlockSettings from '@/components/editor/GalleryBlockSettings';
 import CoverBlockSettings from '@/components/editor/CoverBlockSettings';
 import ButtonBlockSettings from '@/components/editor/ButtonBlockSettings';
-import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock';
+// ParagraphTestBlock is handled in GutenbergPage.tsx, not here
 
 // Spectra block types
 const SPECTRA_BLOCKS = [
