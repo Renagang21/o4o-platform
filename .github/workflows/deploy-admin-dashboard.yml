@@ -156,14 +156,33 @@ jobs:
     environment: production
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
+    # 빌드된 artifacts만 필요, checkout 불필요
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
         name: admin-dashboard-build
         path: apps/admin-dashboard/
+        
+    - name: Verify build artifacts
+      run: |
+        echo "📦 Verifying downloaded build artifacts..."
+        if [ ! -d "apps/admin-dashboard/dist" ]; then
+          echo "❌ ERROR: dist directory not found!"
+          exit 1
+        fi
+        echo "✅ dist directory found"
+        echo ""
+        echo "📁 Contents of dist directory:"
+        ls -la apps/admin-dashboard/dist/ | head -10
+        echo ""
+        echo "🔍 Checking index.html:"
+        if [ -f "apps/admin-dashboard/dist/index.html" ]; then
+          BUILD_HASH=$(grep -oE 'index-[a-zA-Z0-9]+\.js' apps/admin-dashboard/dist/index.html | head -1)
+          echo "✅ index.html found with build hash: $BUILD_HASH"
+        else
+          echo "❌ ERROR: index.html not found!"
+          exit 1
+        fi
         
     - name: Setup SSH key
       run: |
@@ -227,11 +246,50 @@ jobs:
     
     - name: Deploy static files to secured directory
       run: |
-        # 관리자 대시보드 정적 파일 배포
+        echo "🔍 Starting deployment to server..."
+        echo "Target: ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}"
+        
+        # 빌드 파일 확인
+        echo "📦 Build files to deploy:"
+        ls -la apps/admin-dashboard/dist/ | head -10
+        
+        # 빌드 해시 확인
+        BUILD_HASH=$(grep -oE 'index-[a-zA-Z0-9]+\.js' apps/admin-dashboard/dist/index.html | head -1)
+        echo "📝 Build hash: $BUILD_HASH"
+        
+        # SSH 연결 테스트
+        echo "🔗 Testing SSH connection..."
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "echo 'SSH connection successful'"
+        
+        # 대상 디렉토리 확인 및 생성
+        echo "📁 Checking target directory..."
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          if [ ! -d /var/www/admin.neture.co.kr ]; then
+            echo 'Creating directory...'
+            sudo mkdir -p /var/www/admin.neture.co.kr
+            sudo chown -R ${{ secrets.WEB_USER }}:${{ secrets.WEB_USER }} /var/www/admin.neture.co.kr
+          fi
+          echo 'Directory ready'
+          ls -la /var/www/ | grep admin
+        "
+        
+        # rsync 실행 (상세 로그)
+        echo "📤 Starting rsync deployment..."
         rsync -avz --delete --no-owner --no-group --no-perms \
+          --stats \
           -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
           apps/admin-dashboard/dist/ \
           ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }}:/var/www/admin.neture.co.kr/
+        
+        # 배포 확인
+        echo "✅ Deployment complete, verifying..."
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.WEB_USER }}@${{ secrets.WEB_HOST }} "
+          echo '📁 Files in /var/www/admin.neture.co.kr:'
+          ls -la /var/www/admin.neture.co.kr/ | head -10
+          echo ''
+          echo '🔍 Checking deployed build hash:'
+          grep -oE 'index-[a-zA-Z0-9]+\.js' /var/www/admin.neture.co.kr/index.html | head -1
+        "
           
     - name: Ensure deployment directory exists with correct permissions
       run: |
