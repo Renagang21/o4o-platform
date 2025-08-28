@@ -286,8 +286,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
     switch (block.type) {
       case 'core/paragraph':
+      case 'paragraph': // Support both formats
         return <ParagraphBlock key={block.id} {...commonProps} />;
       case 'core/heading':
+      case 'heading': // Support both formats
         return (
           <HeadingBlock
             key={block.id}
@@ -296,15 +298,19 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           />
         );
       case 'core/list':
+      case 'list': // Support both formats
         return <ListBlock key={block.id} {...commonProps} />;
       case 'core/quote':
         // TODO: Fix QuoteBlock interface
         return <ParagraphBlock key={block.id} {...commonProps} />;
       case 'core/image':
+      case 'image': // Support both formats
         return <ImageBlock key={block.id} {...commonProps} />;
       case 'core/button':
+      case 'button': // Support both formats
         return <ButtonBlock key={block.id} {...commonProps} />;
       case 'core/columns':
+      case 'columns': // Support both formats
         return <ColumnsBlock key={block.id} {...commonProps} />;
       default:
         return (
