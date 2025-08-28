@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import ParagraphTestBlock from '@/components/editor/blocks/ParagraphTestBlock';
+import ParagraphBlock from '@/components/editor/blocks/ParagraphBlock';
 import '@/styles/paragraph-test-block.css';
 
 interface BlockAttributes {
@@ -61,11 +61,11 @@ const ParagraphTestDirect = () => {
           
           {/* Render ParagraphTestBlock directly */}
           {blocks.map((block) => (
-            <ParagraphTestBlock
+            <ParagraphBlock
               key={block.id}
               id={block.id}
               content={block.content.text}
-              onChange={(content, attrs) => {
+              onChange={(content: string, attrs?: any) => {
                 setBlocks(blocks.map(b => 
                   b.id === block.id 
                     ? { ...b, content: { text: content }, attributes: { ...b.attributes, ...attrs } }
@@ -87,7 +87,7 @@ const ParagraphTestDirect = () => {
               onAddBlock={() => {
                 const newBlock: Block = {
                   id: `block-${Date.now()}`,
-                  type: 'core/paragraph-test',
+                  type: 'core/paragraph',
                   content: { text: '' },
                   attributes: {
                     fontSize: 16,

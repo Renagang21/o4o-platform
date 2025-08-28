@@ -1,10 +1,10 @@
 /**
  * ParagraphTestDemo Component
- * Demo page for testing the new ParagraphTestBlock
+ * Demo page for testing the new ParagraphBlock
  */
 
 import { useState } from 'react';
-import ParagraphTestBlock from '../ParagraphTestBlock';
+import ParagraphBlock from '../ParagraphBlock';
 import '@/styles/paragraph-test-block.css';
 
 const ParagraphTestDemo = () => {
@@ -140,7 +140,7 @@ const ParagraphTestDemo = () => {
             {/* Render blocks */}
             <div className="space-y-4">
               {blocks.map((block) => (
-                <ParagraphTestBlock
+                <ParagraphBlock
                   key={block.id}
                   id={block.id}
                   content={block.content}
