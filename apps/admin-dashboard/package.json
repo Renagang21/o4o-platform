@@ -1,7 +1,7 @@
 {
   "name": "@o4o/admin-dashboard",
   "version": "1.0.0",
-  "description": "WordPress-style Admin Dashboard for O4O Platform",
+  "description": "WordPress-style Admin Dashboard for O4O Platform - with ParagraphTestBlock and StandaloneEditor",
   "type": "module",
   "scripts": {
     "dev": "npx vite --port 3001",
