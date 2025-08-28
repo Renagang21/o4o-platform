@@ -18,24 +18,9 @@ import {
   Replace
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import BlockWrapper from './BlockWrapper';
 import { RichText } from '../gutenberg/RichText';
 import { BlockControls, ToolbarGroup, ToolbarButton } from '../gutenberg/BlockControls';
-import { 
-  InspectorControls, 
-  PanelBody, 
-  ToggleControl,
-  RangeControl
-} from '../gutenberg/InspectorControls';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 interface ImageBlockProps {
   id: string;
@@ -92,8 +77,8 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
     linkUrl = '',
     width,
     height,
-    sizeSlug = 'large',
-    lightbox = false,
+    // sizeSlug = 'large', // Currently unused
+    // lightbox = false,   // Currently unused
     rounded = 0
   } = attributes;
 
@@ -343,125 +328,7 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls - Sidebar Settings */}
-      {isSelected && url && (
-        <InspectorControls>
-          {/* Image Settings */}
-          <PanelBody title="Image Settings" initialOpen={true}>
-            {/* Alt Text */}
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Alt Text (Alternative Text)
-              </label>
-              <Textarea
-                value={alt}
-                onChange={(e) => updateAttribute('alt', e.target.value)}
-                placeholder="Describe the purpose of the image"
-                rows={3}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Leave empty if the image is purely decorative.
-              </p>
-            </div>
-
-            {/* Image Size */}
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Image Size
-              </label>
-              <Select value={sizeSlug} onValueChange={(value) => updateAttribute('sizeSlug', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="thumbnail">Thumbnail</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="large">Large</SelectItem>
-                  <SelectItem value="full">Full Size</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Dimensions */}
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
-                  Width
-                </label>
-                <Input
-                  type="number"
-                  value={width || ''}
-                  onChange={(e) => updateAttribute('width', e.target.value ? parseInt(e.target.value) : undefined)}
-                  placeholder="Auto"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
-                  Height
-                </label>
-                <Input
-                  type="number"
-                  value={height || ''}
-                  onChange={(e) => updateAttribute('height', e.target.value ? parseInt(e.target.value) : undefined)}
-                  placeholder="Auto"
-                />
-              </div>
-            </div>
-
-            {/* Border Radius */}
-            <RangeControl
-              label="Rounded Corners"
-              value={rounded}
-              onChange={(value) => updateAttribute('rounded', value)}
-              min={0}
-              max={50}
-              step={1}
-              help="Add rounded corners to the image"
-            />
-          </PanelBody>
-
-          {/* Link Settings */}
-          <PanelBody title="Link Settings" initialOpen={false}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Link To
-              </label>
-              <Select value={linkTo} onValueChange={(value) => updateAttribute('linkTo', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="media">Media File</SelectItem>
-                  <SelectItem value="attachment">Attachment Page</SelectItem>
-                  <SelectItem value="custom">Custom URL</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {linkTo === 'custom' && (
-              <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  URL
-                </label>
-                <Input
-                  value={linkUrl}
-                  onChange={(e) => updateAttribute('linkUrl', e.target.value)}
-                  placeholder="https://example.com"
-                />
-              </div>
-            )}
-
-            {/* Lightbox */}
-            <ToggleControl
-              label="Open in Lightbox"
-              help="Display image in fullscreen overlay when clicked"
-              checked={lightbox}
-              onChange={(checked) => updateAttribute('lightbox', checked)}
-            />
-          </PanelBody>
-        </InspectorControls>
-      )}
+      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
 
       {/* Block Content */}
       <BlockWrapper

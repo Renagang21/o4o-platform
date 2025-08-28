@@ -12,19 +12,6 @@ import {
 } from 'lucide-react';
 import BlockWrapper from './BlockWrapper';
 import { BlockControls, ToolbarGroup, ToolbarButton } from '../gutenberg/BlockControls';
-import { 
-  InspectorControls, 
-  PanelBody, 
-  RangeControl,
-  ToggleControl
-} from '../gutenberg/InspectorControls';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 interface Column {
   id: string;
@@ -71,7 +58,7 @@ const ColumnsBlock: React.FC<ColumnsBlockProps> = ({
       { id: '1', width: 50, content: [] },
       { id: '2', width: 50, content: [] }
     ],
-    columnCount = 2,
+    // columnCount = 2,  // Currently unused
     verticalAlignment = 'top',
     isStackedOnMobile = true,
     gap = 20,
@@ -135,50 +122,7 @@ const ColumnsBlock: React.FC<ColumnsBlockProps> = ({
     setSelectedColumnId(null);
   };
 
-  // Update column width
-  const updateColumnWidth = (columnId: string, newWidth: number) => {
-    const columnIndex = localColumns.findIndex(col => col.id === columnId);
-    if (columnIndex === -1) return;
 
-    const oldWidth = localColumns[columnIndex].width || 50;
-    const widthDiff = newWidth - oldWidth;
-    
-    // Adjust neighboring column
-    const nextColumnIndex = columnIndex + 1 < localColumns.length ? columnIndex + 1 : columnIndex - 1;
-    if (nextColumnIndex !== columnIndex && nextColumnIndex >= 0) {
-      const updatedColumns = [...localColumns];
-      updatedColumns[columnIndex] = { ...updatedColumns[columnIndex], width: newWidth };
-      const neighborWidth = (updatedColumns[nextColumnIndex].width || 50) - widthDiff;
-      updatedColumns[nextColumnIndex] = { 
-        ...updatedColumns[nextColumnIndex], 
-        width: Math.max(10, Math.min(90, neighborWidth))
-      };
-      updateColumns(updatedColumns);
-    }
-  };
-
-  // Get column layout presets
-  const getLayoutPresets = () => [
-    { label: '50 / 50', value: '50-50', columns: 2, widths: [50, 50] },
-    { label: '33 / 33 / 33', value: '33-33-33', columns: 3, widths: [33.33, 33.33, 33.34] },
-    { label: '25 / 50 / 25', value: '25-50-25', columns: 3, widths: [25, 50, 25] },
-    { label: '25 / 25 / 25 / 25', value: '25-25-25-25', columns: 4, widths: [25, 25, 25, 25] },
-    { label: '30 / 70', value: '30-70', columns: 2, widths: [30, 70] },
-    { label: '70 / 30', value: '70-30', columns: 2, widths: [70, 30] },
-  ];
-
-  // Apply layout preset
-  const applyLayoutPreset = (preset: any) => {
-    const newColumns: Column[] = [];
-    for (let i = 0; i < preset.columns; i++) {
-      newColumns.push({
-        id: Date.now().toString() + i,
-        width: preset.widths[i],
-        content: localColumns[i]?.content || []
-      });
-    }
-    updateColumns(newColumns);
-  };
 
   // Get vertical alignment style
   const getAlignmentStyle = () => {
@@ -234,122 +178,7 @@ const ColumnsBlock: React.FC<ColumnsBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls - Sidebar Settings */}
-      {isSelected && (
-        <InspectorControls>
-          {/* Layout Settings */}
-          <PanelBody title="Layout" initialOpen={true}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Layout Preset
-              </label>
-              <Select onValueChange={(value) => {
-                const preset = getLayoutPresets().find(p => p.value === value);
-                if (preset) applyLayoutPreset(preset);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose layout" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getLayoutPresets().map(preset => (
-                    <SelectItem key={preset.value} value={preset.value}>
-                      {preset.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <RangeControl
-              label="Number of Columns"
-              value={columnCount}
-              onChange={(value) => {
-                if (value > localColumns.length) {
-                  for (let i = localColumns.length; i < value; i++) {
-                    addColumn();
-                  }
-                } else if (value < localColumns.length) {
-                  const newColumns = localColumns.slice(0, value);
-                  updateColumns(newColumns);
-                }
-              }}
-              min={1}
-              max={6}
-              step={1}
-            />
-
-            <ToggleControl
-              label="Stack on mobile"
-              help="Stack columns vertically on small screens"
-              checked={isStackedOnMobile}
-              onChange={(checked) => updateAttribute('isStackedOnMobile', checked)}
-            />
-          </PanelBody>
-
-          {/* Column Settings */}
-          {selectedColumnId && (
-            <PanelBody title="Column Settings" initialOpen={true}>
-              <RangeControl
-                label="Column Width"
-                value={localColumns.find(col => col.id === selectedColumnId)?.width || 50}
-                onChange={(value) => updateColumnWidth(selectedColumnId, value)}
-                min={10}
-                max={90}
-                step={5}
-                help="Width in percentage (%)"
-              />
-            </PanelBody>
-          )}
-
-          {/* Spacing */}
-          <PanelBody title="Spacing" initialOpen={false}>
-            <RangeControl
-              label="Gap Between Columns"
-              value={gap}
-              onChange={(value) => updateAttribute('gap', value)}
-              min={0}
-              max={100}
-              step={5}
-              help="Space between columns (px)"
-            />
-
-            <RangeControl
-              label="Padding"
-              value={padding}
-              onChange={(value) => updateAttribute('padding', value)}
-              min={0}
-              max={100}
-              step={5}
-              help="Inner padding (px)"
-            />
-
-            <RangeControl
-              label="Minimum Height"
-              value={minHeight}
-              onChange={(value) => updateAttribute('minHeight', value)}
-              min={0}
-              max={1000}
-              step={50}
-              help="Minimum column height (px)"
-            />
-          </PanelBody>
-
-          {/* Appearance */}
-          <PanelBody title="Appearance" initialOpen={false}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Background Color
-              </label>
-              <input
-                type="color"
-                value={backgroundColor || '#ffffff'}
-                onChange={(e) => updateAttribute('backgroundColor', e.target.value)}
-                className="w-full h-10 rounded cursor-pointer"
-              />
-            </div>
-          </PanelBody>
-        </InspectorControls>
-      )}
+      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
 
       {/* Block Content */}
       <BlockWrapper

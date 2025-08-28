@@ -22,17 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import BlockWrapper from './BlockWrapper';
 import { RichText } from '../gutenberg/RichText';
 import { BlockControls, ToolbarGroup, ToolbarButton, AlignmentToolbar } from '../gutenberg/BlockControls';
-import { 
-  InspectorControls, 
-  PanelBody, 
-  ToggleControl,
-  ColorPalette,
-  RangeControl
-} from '../gutenberg/InspectorControls';
 
 interface HeadingBlockProps {
   id: string;
@@ -75,7 +67,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     level = 2,
     align = 'left',
     anchor = '',
-    isTableOfContents = true,
+    // isTableOfContents = true,  // Currently unused
     textColor = '',
     backgroundColor = '',
     fontSize = 0
@@ -119,18 +111,6 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     }
   };
 
-  // Get default font size based on level
-  const getDefaultFontSize = () => {
-    const sizes = {
-      1: 36,
-      2: 30,
-      3: 24,
-      4: 20,
-      5: 18,
-      6: 16
-    };
-    return fontSize || sizes[level];
-  };
 
   // Level selector dropdown for toolbar
   const LevelSelector = () => (
@@ -192,90 +172,7 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls - Sidebar Settings */}
-      {isSelected && (
-        <InspectorControls>
-          {/* Settings Panel */}
-          <PanelBody title="Heading Settings" initialOpen={true}>
-            {/* Level Selector */}
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Heading Level
-              </label>
-              <select
-                className="w-full p-2 border border-gray-300 rounded-sm"
-                value={level}
-                onChange={(e) => updateAttribute('level', parseInt(e.target.value))}
-              >
-                {[1, 2, 3, 4, 5, 6].map((l) => (
-                  <option key={l} value={l}>
-                    H{l} - Heading {l}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* HTML Anchor */}
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                HTML Anchor
-              </label>
-              <Input
-                value={anchor}
-                onChange={(e) => updateAttribute('anchor', e.target.value)}
-                placeholder="heading-anchor"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Enter an ID for direct linking to this heading
-              </p>
-            </div>
-
-            {/* Table of Contents */}
-            <ToggleControl
-              label="Include in Table of Contents"
-              help="Show this heading in auto-generated TOC"
-              checked={isTableOfContents}
-              onChange={(checked) => updateAttribute('isTableOfContents', checked)}
-            />
-          </PanelBody>
-
-          {/* Typography Panel */}
-          <PanelBody title="Typography" initialOpen={false}>
-            <RangeControl
-              label="Font Size"
-              value={getDefaultFontSize()}
-              onChange={(value) => updateAttribute('fontSize', value)}
-              min={12}
-              max={100}
-              step={1}
-              help="Adjust the heading font size (px)"
-            />
-          </PanelBody>
-
-          {/* Color Settings */}
-          <PanelBody title="Color Settings" initialOpen={false}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Text Color
-              </label>
-              <ColorPalette
-                value={textColor}
-                onChange={(color) => updateAttribute('textColor', color)}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Background Color
-              </label>
-              <ColorPalette
-                value={backgroundColor}
-                onChange={(color) => updateAttribute('backgroundColor', color)}
-              />
-            </div>
-          </PanelBody>
-        </InspectorControls>
-      )}
+      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
 
       {/* Block Content */}
       <BlockWrapper

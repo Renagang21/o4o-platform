@@ -13,24 +13,9 @@ import {
   AlignRight,
   AlignJustify
 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import BlockWrapper from './BlockWrapper';
 import { RichText } from '../gutenberg/RichText';
 import { BlockControls, ToolbarGroup, ToolbarButton } from '../gutenberg/BlockControls';
-import { 
-  InspectorControls, 
-  PanelBody, 
-  ToggleControl,
-  RangeControl,
-  ColorPalette
-} from '../gutenberg/InspectorControls';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 interface ButtonBlockProps {
   id: string;
@@ -88,7 +73,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
     borderRadius = 2,
     borderWidth = 2,
     linkTarget = '',
-    rel = '',
+    // rel = '',  // Currently unused
     fontSize = 16,
     paddingX = 24,
     paddingY = 12
@@ -213,165 +198,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls - Sidebar Settings */}
-      {isSelected && (
-        <InspectorControls>
-          {/* Link Settings */}
-          <PanelBody title="Link Settings" initialOpen={true}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                URL
-              </label>
-              <Input
-                value={localUrl}
-                onChange={(e) => {
-                  setLocalUrl(e.target.value);
-                  updateAttribute('url', e.target.value);
-                }}
-                placeholder="https://example.com"
-              />
-            </div>
-
-            <ToggleControl
-              label="Open in new tab"
-              checked={linkTarget === '_blank'}
-              onChange={(checked) => {
-                updateAttribute('linkTarget', checked ? '_blank' : '');
-                if (checked) {
-                  updateAttribute('rel', 'noopener noreferrer');
-                } else {
-                  updateAttribute('rel', '');
-                }
-              }}
-            />
-
-            {linkTarget === '_blank' && (
-              <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Link Rel
-                </label>
-                <Input
-                  value={rel}
-                  onChange={(e) => updateAttribute('rel', e.target.value)}
-                  placeholder="noopener noreferrer"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Describes the relationship between the current document and the linked document
-                </p>
-              </div>
-            )}
-          </PanelBody>
-
-          {/* Button Style */}
-          <PanelBody title="Button Style" initialOpen={false}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Button Style
-              </label>
-              <Select value={style} onValueChange={(value) => updateAttribute('style', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fill">Fill</SelectItem>
-                  <SelectItem value="outline">Outline</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <RangeControl
-              label="Border Radius"
-              value={borderRadius}
-              onChange={(value) => updateAttribute('borderRadius', value)}
-              min={0}
-              max={50}
-              step={1}
-              help="Rounded corners (px)"
-            />
-
-            {style === 'outline' && (
-              <RangeControl
-                label="Border Width"
-                value={borderWidth}
-                onChange={(value) => updateAttribute('borderWidth', value)}
-                min={1}
-                max={5}
-                step={1}
-                help="Border thickness (px)"
-              />
-            )}
-
-            <RangeControl
-              label="Button Width"
-              value={width}
-              onChange={(value) => updateAttribute('width', value)}
-              min={0}
-              max={100}
-              step={5}
-              help="0 = auto width, 100 = full width (%)"
-            />
-          </PanelBody>
-
-          {/* Typography */}
-          <PanelBody title="Typography" initialOpen={false}>
-            <RangeControl
-              label="Font Size"
-              value={fontSize}
-              onChange={(value) => updateAttribute('fontSize', value)}
-              min={12}
-              max={48}
-              step={1}
-              help="Text size (px)"
-            />
-          </PanelBody>
-
-          {/* Spacing */}
-          <PanelBody title="Spacing" initialOpen={false}>
-            <RangeControl
-              label="Horizontal Padding"
-              value={paddingX}
-              onChange={(value) => updateAttribute('paddingX', value)}
-              min={0}
-              max={100}
-              step={4}
-              help="Left and right padding (px)"
-            />
-
-            <RangeControl
-              label="Vertical Padding"
-              value={paddingY}
-              onChange={(value) => updateAttribute('paddingY', value)}
-              min={0}
-              max={50}
-              step={2}
-              help="Top and bottom padding (px)"
-            />
-          </PanelBody>
-
-          {/* Color Settings */}
-          <PanelBody title="Color Settings" initialOpen={false}>
-            <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Text Color
-              </label>
-              <ColorPalette
-                value={textColor}
-                onChange={(color) => updateAttribute('textColor', color)}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Background Color
-              </label>
-              <ColorPalette
-                value={backgroundColor}
-                onChange={(color) => updateAttribute('backgroundColor', color)}
-              />
-            </div>
-          </PanelBody>
-        </InspectorControls>
-      )}
+      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
 
       {/* Block Content */}
       <BlockWrapper
