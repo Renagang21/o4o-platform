@@ -3,13 +3,19 @@
 /* Block container styles */
 .blocks-container {
   position: relative;
-  padding: 80px 40px 20px 40px; /* Even more top space for first block toolbar */
+  padding: 70px 40px 20px 40px; /* Balanced top space for first block toolbar */
 }
 
 .block-item {
   position: relative;
-  margin: 45px 0; /* Extra space between blocks for toolbar clearance */
+  margin-top: 50px; /* Space for toolbar above */
+  margin-bottom: 50px; /* Space for next block's toolbar */
   transition: all 0.2s ease;
+}
+
+/* First block doesn't need top margin due to container padding */
+.block-item:first-child {
+  margin-top: 0;
 }
 
 /* Drag and drop visual feedback */
