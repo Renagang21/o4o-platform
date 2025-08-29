@@ -5,27 +5,44 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 export type ToastActionElement = React.ReactElement;
 
-export interface ToastProps {
-  message: string;
+// Legacy Toast interface for compatibility
+export interface Toast {
+  message?: string;
+  onClose?: () => void;
+  title?: string | React.ReactNode;
+  description?: string | React.ReactNode;
+  variant?: 'default' | 'destructive';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export interface ToastProps extends Toast {
   type?: ToastType;
   duration?: number;
-  onClose: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({ 
   message, 
+  title,
+  description,
+  variant,
   type = 'info', 
   duration = 3000,
   onClose 
 }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, duration);
+    if (onClose) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, duration);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, [duration, onClose]);
 
+  // Determine type from variant if not explicitly set
+  const effectiveType = variant === 'destructive' ? 'error' : type;
+  
   const icons = {
     success: <CheckCircle className="h-5 w-5 text-green-500" />,
     error: <XCircle className="h-5 w-5 text-red-500" />,
@@ -42,15 +59,21 @@ const Toast: React.FC<ToastProps> = ({
 
   return (
     <div className={`fixed bottom-4 right-4 z-50 animate-slide-up`}>
-      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${bgColors[type]} bg-white`}>
-        {icons[type]}
-        <p className="text-sm font-medium text-gray-900">{message}</p>
-        <button
-          onClick={onClose}
-          className="ml-4 text-gray-400 hover:text-gray-600"
-        >
-          ×
-        </button>
+      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${bgColors[effectiveType]} bg-white`}>
+        {icons[effectiveType]}
+        <div>
+          {title && <p className="text-sm font-medium text-gray-900">{title}</p>}
+          {description && <p className="text-sm text-gray-600">{description}</p>}
+          {!title && message && <p className="text-sm font-medium text-gray-900">{message}</p>}
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="ml-4 text-gray-400 hover:text-gray-600"
+          >
+            ×
+          </button>
+        )}
       </div>
     </div>
   );
