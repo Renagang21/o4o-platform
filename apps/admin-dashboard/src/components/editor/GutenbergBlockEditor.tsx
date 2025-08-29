@@ -18,6 +18,8 @@ import ImageBlock from './blocks/ImageBlock';
 // import { QuoteBlock } from './blocks/QuoteBlock'; // TODO: Fix QuoteBlock interface
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
+// Toast 기능을 직접 구현
+import { CheckCircle, XCircle, Info } from 'lucide-react';
 
 // Block interface는 이제 @/types/post.types에서 import
 
@@ -34,6 +36,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onSave,
   onPublish,
 }) => {
+  // 임시 토큰 설정 (개발용 - 실제로는 로그인 시 받은 토큰 사용)
+  useEffect(() => {
+    // 토큰이 없으면 더미 토큰 설정
+    if (!localStorage.getItem('authToken')) {
+      localStorage.setItem('authToken', 'dummy-dev-token-replace-with-real');
+    }
+  }, []);
   const [blocks, setBlocks] = useState<Block[]>(
     initialBlocks.length > 0
       ? initialBlocks
@@ -58,7 +67,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const navigate = useNavigate();
+  
+  // Simple toast function
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Update blocks and history
   const updateBlocks = useCallback(
@@ -219,6 +235,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle save
   const handleSave = useCallback(async () => {
     try {
+      showToast('Saving draft...', 'info');
+      
       // API로 저장
       const response = await postApi.saveDraft({
         title: documentTitle,
@@ -229,18 +247,20 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       if (response.success) {
         setIsDirty(false);
         onSave?.();
-        // TODO: Toast 알림 표시 - 'Draft saved successfully'
+        showToast('Draft saved successfully', 'success');
       } else {
-        // TODO: 에러 알림 표시 - response.error
+        showToast(response.error || 'Failed to save draft', 'error');
       }
     } catch (error) {
-      // TODO: 에러 알림 표시 - 'Failed to save draft'
+      showToast('Failed to save draft. Please try again.', 'error');
     }
-  }, [documentTitle, blocks, onSave]);
+  }, [documentTitle, blocks, onSave, showToast]);
 
   // Handle publish
   const handlePublish = useCallback(async () => {
     try {
+      showToast('Publishing post...', 'info');
+      
       // 먼저 게시글 생성/업데이트
       const response = await postApi.create({
         title: documentTitle,
@@ -251,16 +271,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       if (response.success && response.data) {
         setIsDirty(false);
         onPublish?.();
-        // TODO: 성공 알림 표시 - 'Post published successfully'
-        // 발행 후 게시글 페이지로 이동
-        // navigate(`/posts/${response.data.id}`);
+        showToast('Post published successfully!', 'success');
+        // 발행 후 게시글 페이지로 이동 (2초 후)
+        setTimeout(() => {
+          // navigate(`/posts/${response.data.id}`);
+        }, 2000);
       } else {
-        // TODO: 에러 알림 표시 - response.error
+        showToast(response.error || 'Failed to publish post', 'error');
       }
     } catch (error) {
-      // TODO: 에러 알림 표시 - 'Failed to publish'
+      showToast('Failed to publish post. Please try again.', 'error');
     }
-  }, [documentTitle, blocks, onPublish]);
+  }, [documentTitle, blocks, onPublish, showToast]);
 
   // Toggle fullscreen
   const handleToggleFullscreen = useCallback(() => {
@@ -649,6 +671,22 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           onUpdateDocument={() => {}}
         />
       </div>
+      
+      {/* Simple Toast */}
+      {toast && (
+        <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg bg-white ${
+            toast.type === 'success' ? 'border-green-200' :
+            toast.type === 'error' ? 'border-red-200' :
+            'border-blue-200'
+          }`}>
+            {toast.type === 'success' && <CheckCircle className="h-5 w-5 text-green-500" />}
+            {toast.type === 'error' && <XCircle className="h-5 w-5 text-red-500" />}
+            {toast.type === 'info' && <Info className="h-5 w-5 text-blue-500" />}
+            <p className="text-sm font-medium text-gray-900">{toast.message}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,12 +3,12 @@
 /* Block container styles */
 .blocks-container {
   position: relative;
-  padding: 20px 40px; /* Space for toolbar and drag handles */
+  padding: 50px 40px 20px 40px; /* More top space for first block toolbar */
 }
 
 .block-item {
   position: relative;
-  margin: 16px 0; /* More space between blocks for toolbar */
+  margin: 35px 0; /* Much more space between blocks for toolbar */
   transition: all 0.2s ease;
 }
 

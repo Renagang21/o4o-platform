@@ -15,6 +15,7 @@ import {
 
 // API 기본 URL (환경변수에서 가져오기)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const API_V1_URL = `${API_BASE_URL}/v1/content`;
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
@@ -25,8 +26,31 @@ const apiClient = axios.create({
   withCredentials: true, // 쿠키 포함
 });
 
+// V1 API용 Axios 인스턴스
+const apiV1Client = axios.create({
+  baseURL: API_V1_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
 // 요청 인터셉터 (토큰 추가)
 apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// V1 API 요청 인터셉터 (토큰 추가)
+apiV1Client.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -52,14 +76,27 @@ apiClient.interceptors.response.use(
   }
 );
 
+// V1 API 응답 인터셉터
+apiV1Client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // 인증 에러 처리
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 /**
  * 게시글 API
  */
 export const postApi = {
-  // 게시글 생성
+  // 게시글 생성 (V1 API 사용)
   create: async (data: CreatePostRequest): Promise<PostResponse> => {
     try {
-      const response = await apiClient.post('/posts', data);
+      const response = await apiV1Client.post('/posts', data);
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -122,11 +159,11 @@ export const postApi = {
     }
   },
 
-  // 임시 저장
+  // 임시 저장 (V1 API 사용)
   saveDraft: async (data: CreatePostRequest | UpdatePostRequest): Promise<PostResponse> => {
     try {
       const endpoint = 'id' in data ? `/posts/${data.id}/draft` : '/posts/draft';
-      const response = await apiClient.post(endpoint, data);
+      const response = await apiV1Client.post(endpoint, data);
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
