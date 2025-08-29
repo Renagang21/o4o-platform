@@ -23,6 +23,8 @@ interface SimplifiedParagraphBlockProps {
     fontSize?: number;
     textColor?: string;
     backgroundColor?: string;
+    isBold?: boolean;
+    isItalic?: boolean;
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -33,6 +35,7 @@ interface SimplifiedParagraphBlockProps {
   onDragEnd?: () => void;
   onCopy?: () => void;
   onPaste?: () => void;
+  onChangeType?: (newType: string) => void;
 }
 
 const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
@@ -56,10 +59,11 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
   onDragEnd,
   onCopy,
   onPaste,
+  onChangeType,
 }) => {
   const [localContent, setLocalContent] = useState(content);
   const editorRef = useRef<HTMLDivElement>(null);
-  const { align = 'left' } = attributes;
+  const { align = 'left', isBold = false, isItalic = false } = attributes;
 
   // Handle alignment change
   const handleAlignChange = (newAlign: 'left' | 'center' | 'right' | 'justify') => {
