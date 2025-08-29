@@ -66,6 +66,32 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
     onChange(localContent, { ...attributes, align: newAlign });
   };
 
+  // Handle bold toggle
+  const handleToggleBold = () => {
+    const newBold = !isBold;
+    onChange(localContent, { ...attributes, isBold: newBold });
+    if (editorRef.current) {
+      document.execCommand('bold', false);
+    }
+  };
+
+  // Handle italic toggle
+  const handleToggleItalic = () => {
+    const newItalic = !isItalic;
+    onChange(localContent, { ...attributes, isItalic: newItalic });
+    if (editorRef.current) {
+      document.execCommand('italic', false);
+    }
+  };
+
+  // Handle type change (convert to heading or paragraph)
+  const handleChangeType = (newType: string) => {
+    // This will be handled by the parent component to change block type
+    if (onChangeType) {
+      onChangeType(newType);
+    }
+  };
+
   // Sync content
   useEffect(() => {
     setLocalContent(content);
