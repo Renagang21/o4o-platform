@@ -187,15 +187,12 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       if (response.success) {
         setIsDirty(false);
         onSave?.();
-        console.log('Draft saved successfully:', response.data);
-        // TODO: Toast 알림 표시
+        // TODO: Toast 알림 표시 - 'Draft saved successfully'
       } else {
-        console.error('Failed to save draft:', response.error);
-        // TODO: 에러 알림 표시
+        // TODO: 에러 알림 표시 - response.error
       }
     } catch (error) {
-      console.error('Failed to save draft:', error);
-      // TODO: 에러 알림 표시
+      // TODO: 에러 알림 표시 - 'Failed to save draft'
     }
   }, [documentTitle, blocks, onSave]);
 
@@ -212,17 +209,14 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       if (response.success && response.data) {
         setIsDirty(false);
         onPublish?.();
-        console.log('Post published successfully:', response.data);
-        // TODO: 성공 알림 표시
+        // TODO: 성공 알림 표시 - 'Post published successfully'
         // 발행 후 게시글 페이지로 이동
         // navigate(`/posts/${response.data.id}`);
       } else {
-        console.error('Failed to publish:', response.error);
-        // TODO: 에러 알림 표시
+        // TODO: 에러 알림 표시 - response.error
       }
     } catch (error) {
-      console.error('Failed to publish:', error);
-      // TODO: 에러 알림 표시
+      // TODO: 에러 알림 표시 - 'Failed to publish'
     }
   }, [documentTitle, blocks, onPublish]);
 
@@ -554,22 +548,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               if (file) {
                 try {
                   // 업로드 진행률 표시 (선택사항)
-                  const response = await mediaApi.upload(file, (progress) => {
-                    console.log(`Upload progress: ${progress}%`);
-                    // TODO: 프로그레스 바 표시
+                  const response = await mediaApi.upload(file, (_progress) => {
+                    // TODO: 프로그레스 바 표시 - _progress%
                   });
                   
                   if (response.success && response.data) {
-                    console.log('Featured image uploaded:', response.data);
                     // TODO: Featured Image 상태 업데이트
                     // setFeaturedImage(response.data);
                   } else {
-                    console.error('Failed to upload image:', response.error);
-                    // TODO: 에러 알림 표시
+                    // TODO: 에러 알림 표시 - response.error
                   }
                 } catch (error) {
-                  console.error('Upload error:', error);
-                  // TODO: 에러 알림 표시
+                  // TODO: 에러 알림 표시 - 'Upload error'
                 }
               }
             };

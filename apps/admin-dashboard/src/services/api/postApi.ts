@@ -5,7 +5,6 @@
 
 import axios from 'axios';
 import { 
-  Post, 
   CreatePostRequest, 
   UpdatePostRequest, 
   PostResponse, 
@@ -63,7 +62,6 @@ export const postApi = {
       const response = await apiClient.post('/posts', data);
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to create post:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to create post' 
@@ -77,7 +75,6 @@ export const postApi = {
       const response = await apiClient.get(`/posts/${id}`);
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to get post:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to get post' 
@@ -92,7 +89,6 @@ export const postApi = {
       const response = await apiClient.put(`/posts/${id}`, updateData);
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to update post:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to update post' 
@@ -106,7 +102,6 @@ export const postApi = {
       await apiClient.delete(`/posts/${id}`);
       return { success: true };
     } catch (error: any) {
-      console.error('Failed to delete post:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to delete post' 
@@ -120,7 +115,6 @@ export const postApi = {
       const response = await apiClient.post(`/posts/${id}/publish`);
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to publish post:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to publish post' 
@@ -135,7 +129,6 @@ export const postApi = {
       const response = await apiClient.post(endpoint, data);
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to save draft:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to save draft' 
@@ -157,7 +150,6 @@ export const postApi = {
       const response = await apiClient.get('/posts', { params });
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to list posts:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to list posts' 
@@ -172,7 +164,6 @@ export const postApi = {
       return { success: true, data: response.data };
     } catch (error: any) {
       // 자동 저장 실패는 조용히 처리
-      console.warn('Autosave failed:', error);
       return { success: false, error: 'Autosave failed' };
     }
   },
@@ -192,17 +183,16 @@ export const mediaApi = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        onUploadProgress: (progressEvent) => {
+        onUploadProgress: (progressEvent: any) => {
           if (progressEvent.total) {
             const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             onProgress?.(progress);
           }
         },
-      });
+      } as any);
 
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to upload media:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to upload media' 
@@ -220,7 +210,6 @@ export const mediaApi = {
       const response = await apiClient.get('/media', { params });
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to list media:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to list media' 
@@ -234,7 +223,6 @@ export const mediaApi = {
       await apiClient.delete(`/media/${id}`);
       return { success: true };
     } catch (error: any) {
-      console.error('Failed to delete media:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to delete media' 
@@ -253,7 +241,6 @@ export const taxonomyApi = {
       const response = await apiClient.get('/categories');
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to get categories:', error);
       return { success: false, error: error.message };
     }
   },
@@ -264,7 +251,6 @@ export const taxonomyApi = {
       const response = await apiClient.get('/tags');
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to get tags:', error);
       return { success: false, error: error.message };
     }
   },
@@ -275,7 +261,6 @@ export const taxonomyApi = {
       const response = await apiClient.post('/categories', { name, description });
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to create category:', error);
       return { success: false, error: error.message };
     }
   },
@@ -286,7 +271,6 @@ export const taxonomyApi = {
       const response = await apiClient.post('/tags', { name });
       return { success: true, data: response.data };
     } catch (error: any) {
-      console.error('Failed to create tag:', error);
       return { success: false, error: error.message };
     }
   },
