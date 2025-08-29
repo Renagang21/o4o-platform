@@ -41,6 +41,7 @@ interface EditorHeaderProps {
   onToggleCodeView?: () => void;
   isCodeView?: boolean;
   postStatus?: string;
+  onPreview?: () => void;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -59,6 +60,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onToggleCodeView,
   isCodeView = false,
   postStatus = 'draft',
+  onPreview,
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -158,6 +160,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           <Button
             variant="ghost"
             size="sm"
+            onClick={onPreview}
             className="h-8 px-3 hover:bg-gray-100"
             title="Preview"
           >

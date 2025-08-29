@@ -1,0 +1,182 @@
+/* Gutenberg Block Editor Styles */
+
+/* Block container styles */
+.blocks-container {
+  position: relative;
+}
+
+.block-item {
+  position: relative;
+  margin: 8px 0;
+  transition: all 0.2s ease;
+}
+
+/* Drag and drop visual feedback */
+.block-item.drag-over {
+  position: relative;
+}
+
+.block-item.drag-over::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #3b82f6;
+  border-radius: 2px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Block wrapper dragging state */
+.block-wrapper.is-dragging {
+  opacity: 0.4;
+  transform: scale(0.98);
+}
+
+/* Block toolbar positioning */
+.block-wrapper .block-toolbar {
+  position: absolute;
+  top: -38px;
+  left: 0;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+}
+
+.block-wrapper.is-selected .block-toolbar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Block hover effects */
+.block-wrapper:hover {
+  cursor: pointer;
+}
+
+.block-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.block-wrapper:hover::before {
+  border-color: #e5e7eb;
+}
+
+.block-wrapper.is-selected::before {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* Add block button styles */
+.add-block-button {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+}
+
+.block-wrapper:hover .add-block-button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Empty block placeholder */
+.paragraph-editor:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Heading block styles */
+.heading-editor:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Block inserter animation */
+.block-inserter-enter {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.block-inserter-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+.block-inserter-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.block-inserter-exit-active {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.3s ease;
+}
+
+/* Inspector panel animation */
+.inspector-panel-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.inspector-panel-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s ease;
+}
+
+/* Keyboard focus styles */
+.block-wrapper:focus-within {
+  outline: none;
+}
+
+.block-wrapper:focus-within::before {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+/* Toolbar button hover effects */
+.block-toolbar button {
+  transition: all 0.15s ease;
+}
+
+.block-toolbar button:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+.block-toolbar button:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .block-toolbar {
+    scale: 0.9;
+  }
+  
+  .blocks-container {
+    padding: 0 16px;
+  }
+}

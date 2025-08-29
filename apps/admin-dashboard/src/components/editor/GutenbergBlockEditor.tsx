@@ -6,22 +6,20 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EditorHeader } from './EditorHeader';
+import '../../styles/editor.css';
+import { postApi, mediaApi } from '@/services/api/postApi';
+import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
-import ParagraphBlock from './blocks/ParagraphBlock';
-import HeadingBlock from './blocks/HeadingBlock';
+import SimplifiedParagraphBlock from './blocks/SimplifiedParagraphBlock';
+import SimplifiedHeadingBlock from './blocks/SimplifiedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
 import ImageBlock from './blocks/ImageBlock';
 // import { QuoteBlock } from './blocks/QuoteBlock'; // TODO: Fix QuoteBlock interface
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 
-interface Block {
-  id: string;
-  type: string;
-  content: any;
-  attributes?: any;
-}
+// Block interface는 이제 @/types/post.types에서 import
 
 interface GutenbergBlockEditorProps {
   initialBlocks?: Block[];
@@ -57,6 +55,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isDirty, setIsDirty] = useState(false);
   const [isCodeView, setIsCodeView] = useState(false);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
+  const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
+  const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Update blocks and history
@@ -175,16 +175,56 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   );
 
   // Handle save
-  const handleSave = useCallback(() => {
-    setIsDirty(false);
-    onSave?.();
-  }, [onSave]);
+  const handleSave = useCallback(async () => {
+    try {
+      // API로 저장
+      const response = await postApi.saveDraft({
+        title: documentTitle,
+        content: blocks,
+        status: 'draft',
+      });
+      
+      if (response.success) {
+        setIsDirty(false);
+        onSave?.();
+        console.log('Draft saved successfully:', response.data);
+        // TODO: Toast 알림 표시
+      } else {
+        console.error('Failed to save draft:', response.error);
+        // TODO: 에러 알림 표시
+      }
+    } catch (error) {
+      console.error('Failed to save draft:', error);
+      // TODO: 에러 알림 표시
+    }
+  }, [documentTitle, blocks, onSave]);
 
   // Handle publish
-  const handlePublish = useCallback(() => {
-    setIsDirty(false);
-    onPublish?.();
-  }, [onPublish]);
+  const handlePublish = useCallback(async () => {
+    try {
+      // 먼저 게시글 생성/업데이트
+      const response = await postApi.create({
+        title: documentTitle,
+        content: blocks,
+        status: 'published',
+      });
+      
+      if (response.success && response.data) {
+        setIsDirty(false);
+        onPublish?.();
+        console.log('Post published successfully:', response.data);
+        // TODO: 성공 알림 표시
+        // 발행 후 게시글 페이지로 이동
+        // navigate(`/posts/${response.data.id}`);
+      } else {
+        console.error('Failed to publish:', response.error);
+        // TODO: 에러 알림 표시
+      }
+    } catch (error) {
+      console.error('Failed to publish:', error);
+      // TODO: 에러 알림 표시
+    }
+  }, [documentTitle, blocks, onPublish]);
 
   // Toggle fullscreen
   const handleToggleFullscreen = useCallback(() => {
@@ -200,6 +240,69 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const handleToggleCodeView = useCallback(() => {
     setIsCodeView(!isCodeView);
   }, [isCodeView]);
+
+  // Handle drag start
+  const handleDragStart = useCallback((blockId: string) => {
+    setDraggedBlockId(blockId);
+  }, []);
+
+  // Handle drag over
+  const handleDragOver = useCallback((e: React.DragEvent, blockId: string) => {
+    e.preventDefault();
+    setDragOverBlockId(blockId);
+  }, []);
+
+  // Handle drop
+  const handleDrop = useCallback((e: React.DragEvent, targetBlockId: string) => {
+    e.preventDefault();
+    
+    if (!draggedBlockId || draggedBlockId === targetBlockId) {
+      setDraggedBlockId(null);
+      setDragOverBlockId(null);
+      return;
+    }
+
+    const draggedIndex = blocks.findIndex(b => b.id === draggedBlockId);
+    const targetIndex = blocks.findIndex(b => b.id === targetBlockId);
+    
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedBlockId(null);
+      setDragOverBlockId(null);
+      return;
+    }
+
+    const newBlocks = [...blocks];
+    const [draggedBlock] = newBlocks.splice(draggedIndex, 1);
+    
+    // Insert at the correct position
+    const insertIndex = draggedIndex < targetIndex ? targetIndex : targetIndex;
+    newBlocks.splice(insertIndex, 0, draggedBlock);
+    
+    updateBlocks(newBlocks);
+    setDraggedBlockId(null);
+    setDragOverBlockId(null);
+  }, [draggedBlockId, blocks, updateBlocks]);
+
+  // Handle drag end
+  const handleDragEnd = useCallback(() => {
+    setDraggedBlockId(null);
+    setDragOverBlockId(null);
+  }, []);
+
+  // Handle preview
+  const handlePreview = useCallback(() => {
+    // Create preview content
+    const previewContent = {
+      title: documentTitle,
+      blocks: blocks,
+    };
+    
+    // Store in session storage for preview page
+    sessionStorage.setItem('previewContent', JSON.stringify(previewContent));
+    
+    // Open preview in new tab
+    window.open('/preview', '_blank');
+  }, [documentTitle, blocks]);
 
   // Switch to block tab when a block is selected
   useEffect(() => {
@@ -282,18 +385,30 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       isSelected: selectedBlockId === block.id,
       onSelect: () => setSelectedBlockId(block.id),
       attributes: block.attributes || {},
+      isDragging: draggedBlockId === block.id,
+      onDragStart: () => handleDragStart(block.id),
+      onDragOver: (e: React.DragEvent) => handleDragOver(e, block.id),
+      onDrop: (e: React.DragEvent) => handleDrop(e, block.id),
+      onDragEnd: handleDragEnd,
+    };
+
+    const blockIndex = blocks.findIndex((b) => b.id === block.id);
+    const enhancedProps = {
+      ...commonProps,
+      canMoveUp: blockIndex > 0,
+      canMoveDown: blockIndex < blocks.length - 1,
     };
 
     switch (block.type) {
       case 'core/paragraph':
       case 'paragraph': // Support both formats
-        return <ParagraphBlock key={block.id} {...commonProps} />;
+        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} />;
       case 'core/heading':
       case 'heading': // Support both formats
         return (
-          <HeadingBlock
+          <SimplifiedHeadingBlock
             key={block.id}
-            {...commonProps}
+            {...enhancedProps}
             attributes={{ level: block.content?.level || 2 }}
           />
         );
@@ -302,7 +417,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return <ListBlock key={block.id} {...commonProps} />;
       case 'core/quote':
         // TODO: Fix QuoteBlock interface
-        return <ParagraphBlock key={block.id} {...commonProps} />;
+        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} />;
       case 'core/image':
       case 'image': // Support both formats
         return <ImageBlock key={block.id} {...commonProps} />;
@@ -338,6 +453,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         onToggleListView={() => {}}
         onToggleCodeView={handleToggleCodeView}
         isCodeView={isCodeView}
+        onPreview={handlePreview}
       />
 
       {/* Main Layout */}
@@ -385,7 +501,20 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                 />
               </div>
             ) : (
-              blocks.map(renderBlock)
+              <div className="blocks-container">
+                {blocks.map((block) => (
+                  <div
+                    key={block.id}
+                    className={`block-item ${
+                      dragOverBlockId === block.id ? 'drag-over' : ''
+                    }`}
+                    onDragOver={(e) => handleDragOver(e, block.id)}
+                    onDrop={(e) => handleDrop(e, block.id)}
+                  >
+                    {renderBlock(block)}
+                  </div>
+                ))}
+              </div>
             )}
 
             {/* Add block button */}
@@ -414,6 +543,37 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             excerpt: '',
             allowComments: true,
             allowPingbacks: true
+          }}
+          onUploadFeaturedImage={async () => {
+            // 미디어 업로드
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (file) {
+                try {
+                  // 업로드 진행률 표시 (선택사항)
+                  const response = await mediaApi.upload(file, (progress) => {
+                    console.log(`Upload progress: ${progress}%`);
+                    // TODO: 프로그레스 바 표시
+                  });
+                  
+                  if (response.success && response.data) {
+                    console.log('Featured image uploaded:', response.data);
+                    // TODO: Featured Image 상태 업데이트
+                    // setFeaturedImage(response.data);
+                  } else {
+                    console.error('Failed to upload image:', response.error);
+                    // TODO: 에러 알림 표시
+                  }
+                } catch (error) {
+                  console.error('Upload error:', error);
+                  // TODO: 에러 알림 표시
+                }
+              }
+            };
+            input.click();
           }}
           activeTab={activeTab}
           onUpdateBlock={(updates) => {

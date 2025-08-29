@@ -30,6 +30,10 @@ interface BlockWrapperProps {
   canMoveUp?: boolean;
   canMoveDown?: boolean;
   className?: string;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
 }
 
 const BlockWrapper: React.FC<BlockWrapperProps> = ({
@@ -46,7 +50,11 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({
   isDragging = false,
   canMoveUp = true,
   canMoveDown = true,
-  className
+  className,
+  onDragStart,
+  onDragOver: _onDragOver,
+  onDrop: _onDrop,
+  onDragEnd
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const blockRef = useRef<HTMLDivElement>(null);
@@ -192,7 +200,9 @@ const BlockWrapper: React.FC<BlockWrapperProps> = ({
             onDragStart={(e) => {
               e.dataTransfer.effectAllowed = 'move';
               e.dataTransfer.setData('blockId', id);
+              onDragStart?.();
             }}
+            onDragEnd={onDragEnd}
             title="Drag to move block"
           >
             <GripVertical className="h-3 w-3" />

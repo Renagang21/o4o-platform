@@ -26,12 +26,14 @@ interface InspectorPanelProps {
   onUpdateBlock?: (updates: any) => void;
   onUpdateDocument?: (updates: any) => void;
   activeTab?: string;
+  onUploadFeaturedImage?: () => void;
 }
 
 const InspectorPanel: React.FC<InspectorPanelProps> = ({
   selectedBlock,
   documentSettings = {},
   activeTab = 'document',
+  onUploadFeaturedImage,
 }) => {
   // Document settings state
   const [visibility, setVisibility] = useState(documentSettings.visibility || 'public');
@@ -191,7 +193,12 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                   </Button>
                 </div>
               ) : (
-                <Button variant="outline" size="sm" className="w-full">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={onUploadFeaturedImage}
+                >
                   Set Featured Image
                 </Button>
               )}
