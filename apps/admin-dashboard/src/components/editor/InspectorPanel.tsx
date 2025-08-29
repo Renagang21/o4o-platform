@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +34,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
   documentSettings = {},
   activeTab = 'document',
   onUploadFeaturedImage,
+  onUpdateBlock,
 }) => {
   // Document settings state
   const [visibility, setVisibility] = useState(documentSettings.visibility || 'public');
@@ -50,6 +51,60 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
   const [textAlign, setTextAlign] = useState(selectedBlock?.attributes?.align || 'left');
   const [textColor, setTextColor] = useState(selectedBlock?.attributes?.textColor || '#000000');
   const [backgroundColor, setBackgroundColor] = useState(selectedBlock?.attributes?.backgroundColor || '');
+
+  // Sync block settings when selected block changes
+  useEffect(() => {
+    if (selectedBlock) {
+      setFontSize(selectedBlock.attributes?.fontSize || 16);
+      setTextAlign(selectedBlock.attributes?.align || 'left');
+      setTextColor(selectedBlock.attributes?.textColor || '#000000');
+      setBackgroundColor(selectedBlock.attributes?.backgroundColor || '');
+    }
+  }, [selectedBlock?.id]);
+
+  // Update font size
+  const handleFontSizeChange = (value: number) => {
+    setFontSize(value);
+    if (onUpdateBlock && selectedBlock) {
+      onUpdateBlock({
+        ...selectedBlock.attributes,
+        fontSize: value
+      });
+    }
+  };
+
+  // Update text alignment
+  const handleTextAlignChange = (value: string) => {
+    setTextAlign(value);
+    if (onUpdateBlock && selectedBlock) {
+      onUpdateBlock({
+        ...selectedBlock.attributes,
+        align: value
+      });
+    }
+  };
+
+  // Update text color
+  const handleTextColorChange = (value: string) => {
+    setTextColor(value);
+    if (onUpdateBlock && selectedBlock) {
+      onUpdateBlock({
+        ...selectedBlock.attributes,
+        textColor: value
+      });
+    }
+  };
+
+  // Update background color
+  const handleBackgroundColorChange = (value: string) => {
+    setBackgroundColor(value);
+    if (onUpdateBlock && selectedBlock) {
+      onUpdateBlock({
+        ...selectedBlock.attributes,
+        backgroundColor: value
+      });
+    }
+  };
 
   return (
     <div className="fixed right-0 top-14 bottom-0 w-80 bg-white border-l border-gray-200 z-30">
@@ -253,7 +308,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                     <div className="flex items-center gap-2">
                       <Slider
                         value={[fontSize]}
-                        onValueChange={([value]) => setFontSize(value)}
+                        onValueChange={([value]) => handleFontSizeChange(value)}
                         min={12}
                         max={48}
                         step={1}
@@ -270,7 +325,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                         variant={textAlign === 'left' ? 'secondary' : 'ghost'}
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => setTextAlign('left')}
+                        onClick={() => handleTextAlignChange('left')}
                       >
                         <AlignLeft className="h-4 w-4" />
                       </Button>
@@ -278,7 +333,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                         variant={textAlign === 'center' ? 'secondary' : 'ghost'}
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => setTextAlign('center')}
+                        onClick={() => handleTextAlignChange('center')}
                       >
                         <AlignCenter className="h-4 w-4" />
                       </Button>
@@ -286,7 +341,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                         variant={textAlign === 'right' ? 'secondary' : 'ghost'}
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => setTextAlign('right')}
+                        onClick={() => handleTextAlignChange('right')}
                       >
                         <AlignRight className="h-4 w-4" />
                       </Button>
@@ -294,7 +349,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                         variant={textAlign === 'justify' ? 'secondary' : 'ghost'}
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => setTextAlign('justify')}
+                        onClick={() => handleTextAlignChange('justify')}
                       >
                         <AlignJustify className="h-4 w-4" />
                       </Button>
@@ -313,18 +368,18 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                       <input
                         type="color"
                         value={textColor}
-                        onChange={(e) => setTextColor(e.target.value)}
+                        onChange={(e) => handleTextColorChange(e.target.value)}
                         className="h-8 w-8 border rounded cursor-pointer"
                       />
                       <Input
                         value={textColor}
-                        onChange={(e) => setTextColor(e.target.value)}
+                        onChange={(e) => handleTextColorChange(e.target.value)}
                         className="h-8 text-sm"
                       />
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setTextColor('#000000')}
+                        onClick={() => handleTextColorChange('#000000')}
                       >
                         Clear
                       </Button>
@@ -337,19 +392,19 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                       <input
                         type="color"
                         value={backgroundColor || '#ffffff'}
-                        onChange={(e) => setBackgroundColor(e.target.value)}
+                        onChange={(e) => handleBackgroundColorChange(e.target.value)}
                         className="h-8 w-8 border rounded cursor-pointer"
                       />
                       <Input
                         value={backgroundColor}
-                        onChange={(e) => setBackgroundColor(e.target.value)}
+                        onChange={(e) => handleBackgroundColorChange(e.target.value)}
                         placeholder="transparent"
                         className="h-8 text-sm"
                       />
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setBackgroundColor('')}
+                        onClick={() => handleBackgroundColorChange('')}
                       >
                         Clear
                       </Button>

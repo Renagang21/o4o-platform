@@ -20,6 +20,9 @@ interface SimplifiedParagraphBlockProps {
   onSelect: () => void;
   attributes?: {
     align?: 'left' | 'center' | 'right' | 'justify';
+    fontSize?: number;
+    textColor?: string;
+    backgroundColor?: string;
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -156,7 +159,10 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
         data-placeholder="Type / to choose a block"
         style={{
           direction: 'ltr',
-          unicodeBidi: 'normal'
+          unicodeBidi: 'normal',
+          fontSize: attributes?.fontSize ? `${attributes.fontSize}px` : undefined,
+          color: attributes?.textColor || undefined,
+          backgroundColor: attributes?.backgroundColor || undefined
         }}
       />
     </EnhancedBlockWrapper>

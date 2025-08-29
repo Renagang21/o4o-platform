@@ -475,7 +475,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           <EnhancedHeadingBlock
             key={block.id}
             {...enhancedProps}
-            attributes={{ level: block.content?.level || 2 }}
+            attributes={{ 
+              level: block.content?.level || 2,
+              ...block.attributes
+            }}
           />
         );
       case 'core/list':

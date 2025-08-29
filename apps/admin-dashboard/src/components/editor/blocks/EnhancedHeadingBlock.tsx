@@ -21,6 +21,9 @@ interface EnhancedHeadingBlockProps {
   attributes?: {
     level?: 1 | 2 | 3 | 4 | 5 | 6;
     align?: 'left' | 'center' | 'right';
+    fontSize?: number;
+    textColor?: string;
+    backgroundColor?: string;
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -194,7 +197,10 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
         data-placeholder={`Heading ${level}`}
         style={{
           direction: 'ltr',
-          unicodeBidi: 'normal'
+          unicodeBidi: 'normal',
+          fontSize: attributes?.fontSize ? `${attributes.fontSize}px` : undefined,
+          color: attributes?.textColor || undefined,
+          backgroundColor: attributes?.backgroundColor || undefined
         }}
       />
     </EnhancedBlockWrapper>

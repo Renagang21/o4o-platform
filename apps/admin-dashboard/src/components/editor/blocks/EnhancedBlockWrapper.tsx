@@ -204,7 +204,7 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
             {onAlignChange && (
               <>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger>
                     <Button
                       variant="ghost"
                       size="sm"
