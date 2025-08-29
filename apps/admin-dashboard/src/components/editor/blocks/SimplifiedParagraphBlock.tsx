@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import BlockWrapper from './BlockWrapper';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
 
 interface SimplifiedParagraphBlockProps {
@@ -28,6 +28,8 @@ interface SimplifiedParagraphBlockProps {
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
 }
 
 const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
@@ -49,6 +51,8 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
   onDragOver,
   onDrop,
   onDragEnd,
+  onCopy,
+  onPaste,
 }) => {
   const [localContent, setLocalContent] = useState(content);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -97,7 +101,7 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
   };
 
   return (
-    <BlockWrapper
+    <EnhancedBlockWrapper
       id={id}
       type="paragraph"
       isSelected={isSelected}
@@ -114,6 +118,8 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
+      onCopy={onCopy}
+      onPaste={onPaste}
     >
       <div
         ref={editorRef}
@@ -134,7 +140,7 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
           __html: localContent || '<span>Type / to choose a block</span>' 
         }}
       />
-    </BlockWrapper>
+    </EnhancedBlockWrapper>
   );
 };
 

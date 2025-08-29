@@ -57,6 +57,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
+  const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
   const navigate = useNavigate();
 
   // Update blocks and history
@@ -129,6 +130,47 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlockId(null);
     },
     [blocks, updateBlocks]
+  );
+
+  // Handle block copy
+  const handleBlockCopy = useCallback(
+    (blockId: string) => {
+      const block = blocks.find((b) => b.id === blockId);
+      if (block) {
+        setCopiedBlock({ ...block });
+        // 선택사항: 클립보드에도 복사
+        const blockData = JSON.stringify(block);
+        navigator.clipboard.writeText(blockData).catch(() => {
+          // 클립보드 접근 실패 시 내부 상태만 사용
+        });
+      }
+    },
+    [blocks]
+  );
+
+  // Handle block paste
+  const handleBlockPaste = useCallback(
+    (afterBlockId?: string) => {
+      if (copiedBlock) {
+        const newBlock = {
+          ...copiedBlock,
+          id: `block-${Date.now()}`,
+        };
+        
+        if (afterBlockId) {
+          const index = blocks.findIndex((b) => b.id === afterBlockId);
+          const newBlocks = [...blocks];
+          newBlocks.splice(index + 1, 0, newBlock);
+          updateBlocks(newBlocks);
+        } else {
+          // 마지막에 추가
+          updateBlocks([...blocks, newBlock]);
+        }
+        
+        setSelectedBlockId(newBlock.id);
+      }
+    },
+    [blocks, copiedBlock, updateBlocks]
   );
 
   // Handle block insertion
@@ -337,11 +379,39 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         e.preventDefault();
         setIsBlockInserterOpen(!isBlockInserterOpen);
       }
+      // Delete key for block deletion
+      if (e.key === 'Delete' && selectedBlockId && !e.shiftKey) {
+        const target = e.target as HTMLElement;
+        if (!target.isContentEditable && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          handleBlockDelete(selectedBlockId);
+        }
+      }
+      // Tab navigation between blocks
+      if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (selectedBlockId) {
+          const currentIndex = blocks.findIndex(b => b.id === selectedBlockId);
+          if (e.shiftKey) {
+            // Previous block
+            if (currentIndex > 0) {
+              setSelectedBlockId(blocks[currentIndex - 1].id);
+            }
+          } else {
+            // Next block
+            if (currentIndex < blocks.length - 1) {
+              setSelectedBlockId(blocks[currentIndex + 1].id);
+            }
+          }
+        } else if (blocks.length > 0) {
+          setSelectedBlockId(blocks[0].id);
+        }
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen]);
+  }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen, selectedBlockId, blocks, handleBlockDelete]);
 
   // Render block component
   const renderBlock = (block: Block) => {
@@ -384,6 +454,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       onDragOver: (e: React.DragEvent) => handleDragOver(e, block.id),
       onDrop: (e: React.DragEvent) => handleDrop(e, block.id),
       onDragEnd: handleDragEnd,
+      onCopy: () => handleBlockCopy(block.id),
+      onPaste: () => handleBlockPaste(block.id),
     };
 
     const blockIndex = blocks.findIndex((b) => b.id === block.id);

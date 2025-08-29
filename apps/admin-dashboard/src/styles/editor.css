@@ -3,6 +3,7 @@
 /* Block container styles */
 .blocks-container {
   position: relative;
+  padding: 0 40px; /* Space for drag handles */
 }
 
 .block-item {

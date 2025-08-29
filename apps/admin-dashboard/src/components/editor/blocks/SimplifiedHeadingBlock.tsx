@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import BlockWrapper from './BlockWrapper';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
 import { 
   Select, 
@@ -36,6 +36,8 @@ interface SimplifiedHeadingBlockProps {
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
 }
 
 const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
@@ -57,6 +59,8 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
   onDragOver,
   onDrop,
   onDragEnd,
+  onCopy,
+  onPaste,
 }) => {
   const [localContent, setLocalContent] = useState(content);
   const editorRef = useRef<HTMLHeadingElement>(null);
@@ -123,7 +127,7 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
   const HeadingTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
   return (
-    <BlockWrapper
+    <EnhancedBlockWrapper
       id={id}
       type="heading"
       isSelected={isSelected}
@@ -140,6 +144,8 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
+      onCopy={onCopy}
+      onPaste={onPaste}
     >
       <div className="flex items-center gap-2">
         {/* Level selector - show when selected */}
@@ -180,7 +186,7 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
           }}
         />
       </div>
-    </BlockWrapper>
+    </EnhancedBlockWrapper>
   );
 };
 
