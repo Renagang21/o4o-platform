@@ -24,6 +24,8 @@ interface EnhancedHeadingBlockProps {
     fontSize?: number;
     textColor?: string;
     backgroundColor?: string;
+    isBold?: boolean;
+    isItalic?: boolean;
   };
   canMoveUp?: boolean;
   canMoveDown?: boolean;
@@ -34,6 +36,7 @@ interface EnhancedHeadingBlockProps {
   onDragEnd?: () => void;
   onCopy?: () => void;
   onPaste?: () => void;
+  onChangeType?: (newType: string) => void;
 }
 
 const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
@@ -57,10 +60,11 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
   onDragEnd,
   onCopy,
   onPaste,
+  onChangeType,
 }) => {
   const [localContent, setLocalContent] = useState(content);
   const editorRef = useRef<HTMLHeadingElement>(null);
-  const { level = 2, align = 'left' } = attributes;
+  const { level = 2, align = 'left', isBold = false, isItalic = false } = attributes;
 
   // Handle alignment change
   const handleAlignChange = (newAlign: 'left' | 'center' | 'right' | 'justify') => {
@@ -94,6 +98,25 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
   // Handle level change
   const handleLevelChange = (newLevel: number) => {
     onChange(localContent, { ...attributes, level: newLevel as 1 | 2 | 3 | 4 | 5 | 6 });
+  };
+
+  // Handle bold toggle
+  const handleToggleBold = () => {
+    const newBold = !isBold;
+    onChange(localContent, { ...attributes, isBold: newBold });
+  };
+
+  // Handle italic toggle
+  const handleToggleItalic = () => {
+    const newItalic = !isItalic;
+    onChange(localContent, { ...attributes, isItalic: newItalic });
+  };
+
+  // Handle type change
+  const handleChangeType = (newType: string) => {
+    if (onChangeType) {
+      onChangeType(newType);
+    }
   };
 
   // Handle key events
@@ -177,6 +200,12 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
       customToolbarContent={customToolbarContent}
       onAlignChange={handleAlignChange}
       currentAlign={align}
+      onToggleBold={handleToggleBold}
+      onToggleItalic={handleToggleItalic}
+      onChangeType={handleChangeType}
+      currentType={`core/heading-h${level}`}
+      isBold={isBold}
+      isItalic={isItalic}
     >
       {/* 순수한 헤딩 콘텐츠만 - 컨트롤 없음 */}
       <HeadingTag
@@ -189,7 +218,9 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
           sizeClasses[level],
           align === 'center' && 'text-center',
           align === 'right' && 'text-right',
-          !localContent && 'text-gray-400'
+          !localContent && 'text-gray-400',
+          isBold && 'font-bold',
+          isItalic && 'italic'
         )}
         onInput={handleInput}
         onKeyDown={handleKeyDown}

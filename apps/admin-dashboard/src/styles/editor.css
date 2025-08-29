@@ -8,8 +8,8 @@
 
 .block-item {
   position: relative;
-  margin-top: 50px; /* Space for toolbar above */
-  margin-bottom: 50px; /* Space for next block's toolbar */
+  margin-top: 80px; /* Increased space for toolbar above */
+  margin-bottom: 120px; /* Much larger space to prevent toolbar overlap */
   transition: all 0.2s ease;
 }
 

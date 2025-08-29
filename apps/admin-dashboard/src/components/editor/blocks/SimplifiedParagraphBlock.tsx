@@ -92,6 +92,18 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
 
   // Handle key events
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Bold: Ctrl/Cmd + B
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      e.preventDefault();
+      handleToggleBold();
+    }
+    
+    // Italic: Ctrl/Cmd + I
+    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+      e.preventDefault();
+      handleToggleItalic();
+    }
+    
     // Enter key - create new paragraph
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

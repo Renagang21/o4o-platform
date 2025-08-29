@@ -18,7 +18,16 @@ import {
   AlignRight,
   AlignJustify,
   Check,
-  ChevronDown as ChevronDownIcon
+  ChevronDown as ChevronDownIcon,
+  Bold,
+  Italic,
+  Type,
+  Heading1,
+  Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,6 +62,12 @@ interface EnhancedBlockWrapperProps {
   customToolbarContent?: ReactNode;
   onAlignChange?: (align: 'left' | 'center' | 'right' | 'justify') => void;
   currentAlign?: 'left' | 'center' | 'right' | 'justify';
+  onToggleBold?: () => void;
+  onToggleItalic?: () => void;
+  onChangeType?: (newType: string) => void;
+  currentType?: string;
+  isBold?: boolean;
+  isItalic?: boolean;
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -78,7 +93,13 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   onDragEnd,
   customToolbarContent,
   onAlignChange,
-  currentAlign = 'left'
+  currentAlign = 'left',
+  onToggleBold,
+  onToggleItalic,
+  onChangeType,
+  currentType,
+  isBold = false,
+  isItalic = false
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -199,6 +220,128 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
             </div>
             
             <div className="w-px h-5 bg-gray-200" />
+            
+            {/* Block Type Selector (Heading levels, Paragraph) */}
+            {onChangeType && (
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-1.5 gap-0.5 hover:bg-gray-100"
+                      title="Block Type"
+                    >
+                      {currentType === 'core/paragraph' && <Type className="h-4 w-4" />}
+                      {currentType === 'core/heading' && <Heading2 className="h-4 w-4" />}
+                      {(!currentType || currentType === 'core/paragraph') && <Type className="h-4 w-4" />}
+                      <ChevronDownIcon className="h-3 w-3 text-gray-500" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-44">
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/paragraph')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Type className="h-4 w-4" />
+                      <span>Paragraph</span>
+                      {currentType === 'core/paragraph' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/heading-h1')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heading1 className="h-4 w-4" />
+                      <span>Heading 1</span>
+                      {currentType === 'core/heading-h1' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/heading-h2')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heading2 className="h-4 w-4" />
+                      <span>Heading 2</span>
+                      {currentType === 'core/heading-h2' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/heading-h3')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heading3 className="h-4 w-4" />
+                      <span>Heading 3</span>
+                      {currentType === 'core/heading-h3' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/heading-h4')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heading4 className="h-4 w-4" />
+                      <span>Heading 4</span>
+                      {currentType === 'core/heading-h4' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/heading-h5')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heading5 className="h-4 w-4" />
+                      <span>Heading 5</span>
+                      {currentType === 'core/heading-h5' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onChangeType('core/heading-h6')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heading6 className="h-4 w-4" />
+                      <span>Heading 6</span>
+                      {currentType === 'core/heading-h6' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="w-px h-5 bg-gray-200" />
+              </>
+            )}
+            
+            {/* Bold and Italic buttons for text blocks */}
+            {(onToggleBold || onToggleItalic) && (
+              <>
+                {onToggleBold && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 px-2 hover:bg-gray-100",
+                      isBold && "bg-gray-200"
+                    )}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleBold();
+                    }}
+                    title="Bold (Ctrl+B)"
+                  >
+                    <Bold className="h-4 w-4" />
+                  </Button>
+                )}
+                {onToggleItalic && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 px-2 hover:bg-gray-100",
+                      isItalic && "bg-gray-200"
+                    )}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleItalic();
+                    }}
+                    title="Italic (Ctrl+I)"
+                  >
+                    <Italic className="h-4 w-4" />
+                  </Button>
+                )}
+                <div className="w-px h-5 bg-gray-200" />
+              </>
+            )}
             
             {/* Text Alignment Dropdown - only show for text blocks */}
             {onAlignChange && (

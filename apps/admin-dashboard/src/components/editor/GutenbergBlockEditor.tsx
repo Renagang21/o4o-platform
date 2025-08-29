@@ -428,6 +428,38 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleSave, handleUndo, handleRedo, isBlockInserterOpen, selectedBlockId, blocks, handleBlockDelete]);
 
+  // Handle block type change
+  const handleBlockTypeChange = useCallback(
+    (blockId: string, newType: string) => {
+      const newBlocks = blocks.map((block) => {
+        if (block.id === blockId) {
+          // Convert heading types
+          if (newType.startsWith('core/heading-')) {
+            const level = parseInt(newType.replace('core/heading-h', ''));
+            return {
+              ...block,
+              type: 'core/heading',
+              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '', level },
+              attributes: block.attributes || {},
+            };
+          }
+          // Convert to paragraph
+          if (newType === 'core/paragraph') {
+            return {
+              ...block,
+              type: 'core/paragraph',
+              content: { text: typeof block.content === 'string' ? block.content : block.content?.text || '' },
+              attributes: block.attributes || {},
+            };
+          }
+        }
+        return block;
+      });
+      updateBlocks(newBlocks);
+    },
+    [blocks, updateBlocks]
+  );
+
   // Render block component
   const renderBlock = (block: Block) => {
     const commonProps = {
@@ -471,6 +503,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       onDragEnd: handleDragEnd,
       onCopy: () => handleBlockCopy(block.id),
       onPaste: () => handleBlockPaste(block.id),
+      onChangeType: (newType: string) => handleBlockTypeChange(block.id, newType),
     };
 
     const blockIndex = blocks.findIndex((b) => b.id === block.id);
@@ -483,7 +516,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     switch (block.type) {
       case 'core/paragraph':
       case 'paragraph': // Support both formats
-        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} />;
+        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/heading':
       case 'heading': // Support both formats
         return (
@@ -494,6 +527,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               level: block.content?.level || 2,
               ...block.attributes
             }}
+            onChangeType={commonProps.onChangeType}
           />
         );
       case 'core/list':
