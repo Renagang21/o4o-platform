@@ -36,13 +36,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onSave,
   onPublish,
 }) => {
-  // 임시 토큰 설정 (개발용 - 실제로는 로그인 시 받은 토큰 사용)
-  useEffect(() => {
-    // 토큰이 없으면 더미 토큰 설정
-    if (!localStorage.getItem('authToken')) {
-      localStorage.setItem('authToken', 'dummy-dev-token-replace-with-real');
-    }
-  }, []);
   const [blocks, setBlocks] = useState<Block[]>(
     initialBlocks.length > 0
       ? initialBlocks
