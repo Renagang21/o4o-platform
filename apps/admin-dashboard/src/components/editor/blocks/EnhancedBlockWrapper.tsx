@@ -16,7 +16,9 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  AlignJustify
+  AlignJustify,
+  Check,
+  ChevronDown as ChevronDownIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -198,47 +200,59 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
             
             <div className="w-px h-5 bg-gray-200" />
             
-            {/* Text alignment buttons */}
+            {/* Text Alignment Dropdown - only show for text blocks */}
             {onAlignChange && (
               <>
-                <div className="flex items-center gap-0.5 bg-gray-50 rounded p-0.5">
-                  <Button
-                    variant={currentAlign === 'left' ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => onAlignChange('left')}
-                    title="Align left"
-                  >
-                    <AlignLeft className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant={currentAlign === 'center' ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => onAlignChange('center')}
-                    title="Align center"
-                  >
-                    <AlignCenter className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant={currentAlign === 'right' ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => onAlignChange('right')}
-                    title="Align right"
-                  >
-                    <AlignRight className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant={currentAlign === 'justify' ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => onAlignChange('justify')}
-                    title="Justify"
-                  >
-                    <AlignJustify className="h-3 w-3" />
-                  </Button>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-1.5 gap-0.5 hover:bg-gray-100"
+                      title="Text Alignment"
+                    >
+                      {currentAlign === 'center' && <AlignCenter className="h-4 w-4" />}
+                      {currentAlign === 'right' && <AlignRight className="h-4 w-4" />}
+                      {currentAlign === 'justify' && <AlignJustify className="h-4 w-4" />}
+                      {(!currentAlign || currentAlign === 'left') && <AlignLeft className="h-4 w-4" />}
+                      <ChevronDownIcon className="h-3 w-3 text-gray-500" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-44">
+                    <DropdownMenuItem 
+                      onClick={() => onAlignChange('left')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <AlignLeft className="h-4 w-4" />
+                      <span>왼쪽 정렬</span>
+                      {(!currentAlign || currentAlign === 'left') && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onAlignChange('center')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <AlignCenter className="h-4 w-4" />
+                      <span>가운데 정렬</span>
+                      {currentAlign === 'center' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onAlignChange('right')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <AlignRight className="h-4 w-4" />
+                      <span>오른쪽 정렬</span>
+                      {currentAlign === 'right' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => onAlignChange('justify')}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <AlignJustify className="h-4 w-4" />
+                      <span>양쪽 정렬</span>
+                      {currentAlign === 'justify' && <Check className="h-4 w-4 ml-auto" />}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <div className="w-px h-5 bg-gray-200" />
               </>
             )}
