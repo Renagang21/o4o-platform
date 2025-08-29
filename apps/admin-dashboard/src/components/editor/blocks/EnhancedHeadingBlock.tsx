@@ -59,6 +59,11 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
   const editorRef = useRef<HTMLHeadingElement>(null);
   const { level = 2, align = 'left' } = attributes;
 
+  // Handle alignment change
+  const handleAlignChange = (newAlign: 'left' | 'center' | 'right' | 'justify') => {
+    onChange(localContent, { ...attributes, align: newAlign });
+  };
+
   // Sync content
   useEffect(() => {
     setLocalContent(content);
@@ -167,6 +172,8 @@ const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
       onCopy={onCopy}
       onPaste={onPaste}
       customToolbarContent={customToolbarContent}
+      onAlignChange={handleAlignChange}
+      currentAlign={align}
     >
       {/* 순수한 헤딩 콘텐츠만 - 컨트롤 없음 */}
       <HeadingTag

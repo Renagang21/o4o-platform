@@ -12,7 +12,11 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  MoreVertical
+  MoreVertical,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,6 +49,8 @@ interface EnhancedBlockWrapperProps {
   onDrop?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
   customToolbarContent?: ReactNode;
+  onAlignChange?: (align: 'left' | 'center' | 'right' | 'justify') => void;
+  currentAlign?: 'left' | 'center' | 'right' | 'justify';
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -68,7 +74,9 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   onDragOver: _onDragOver,
   onDrop: _onDrop,
   onDragEnd,
-  customToolbarContent
+  customToolbarContent,
+  onAlignChange,
+  currentAlign = 'left'
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -167,32 +175,74 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
         onSelect();
       }}
     >
-      {/* Left side drag handle */}
-      <div
-        className={cn(
-          'absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 transition-opacity',
-          (isHovered || isSelected) && 'opacity-100'
-        )}
-      >
-        <div
-          className="cursor-move p-1 hover:bg-gray-100 rounded"
-          draggable
-          onDragStart={(e) => {
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('blockId', id);
-            onDragStart?.();
-          }}
-          onDragEnd={onDragEnd}
-          title="Drag to move block"
-        >
-          <GripVertical className="h-5 w-5 text-gray-400" />
-        </div>
-      </div>
+      {/* Left side drag handle - removed from here, now in toolbar */}
 
-      {/* Block toolbar - integrated design */}
+      {/* Block toolbar - integrated design with better positioning */}
       {showToolbar && isSelected && (
-        <div className="absolute -top-9 left-0 right-0 flex items-center justify-between z-50">
+        <div className="absolute -top-12 left-0 right-0 flex items-center justify-between z-50" style={{ marginTop: '-4px' }}>
           <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-1 py-1">
+            {/* Drag handle - now in toolbar */}
+            <div
+              className="cursor-move p-1 hover:bg-gray-100 rounded flex items-center"
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('blockId', id);
+                onDragStart?.();
+              }}
+              onDragEnd={onDragEnd}
+              title="Drag to move block"
+            >
+              <GripVertical className="h-4 w-4 text-gray-400" />
+            </div>
+            
+            <div className="w-px h-5 bg-gray-200" />
+            
+            {/* Text alignment buttons */}
+            {onAlignChange && (
+              <>
+                <div className="flex items-center gap-0.5 bg-gray-50 rounded p-0.5">
+                  <Button
+                    variant={currentAlign === 'left' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => onAlignChange('left')}
+                    title="Align left"
+                  >
+                    <AlignLeft className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant={currentAlign === 'center' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => onAlignChange('center')}
+                    title="Align center"
+                  >
+                    <AlignCenter className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant={currentAlign === 'right' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => onAlignChange('right')}
+                    title="Align right"
+                  >
+                    <AlignRight className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant={currentAlign === 'justify' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => onAlignChange('justify')}
+                    title="Justify"
+                  >
+                    <AlignJustify className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="w-px h-5 bg-gray-200" />
+              </>
+            )}
+            
             {/* Custom toolbar content (e.g., heading level selector) */}
             {customToolbarContent}
             

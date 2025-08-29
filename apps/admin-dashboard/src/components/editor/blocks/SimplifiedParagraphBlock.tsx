@@ -58,6 +58,11 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
   const editorRef = useRef<HTMLDivElement>(null);
   const { align = 'left' } = attributes;
 
+  // Handle alignment change
+  const handleAlignChange = (newAlign: 'left' | 'center' | 'right' | 'justify') => {
+    onChange(localContent, { ...attributes, align: newAlign });
+  };
+
   // Sync content
   useEffect(() => {
     setLocalContent(content);
@@ -130,6 +135,8 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
       onDragEnd={onDragEnd}
       onCopy={onCopy}
       onPaste={onPaste}
+      onAlignChange={handleAlignChange}
+      currentAlign={align}
     >
       <div
         ref={editorRef}
