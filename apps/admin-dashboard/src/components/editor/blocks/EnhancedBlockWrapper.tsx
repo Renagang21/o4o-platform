@@ -44,6 +44,7 @@ interface EnhancedBlockWrapperProps {
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
+  customToolbarContent?: ReactNode;
 }
 
 const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
@@ -66,7 +67,8 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
   onDragStart,
   onDragOver: _onDragOver,
   onDrop: _onDrop,
-  onDragEnd
+  onDragEnd,
+  customToolbarContent
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -191,6 +193,9 @@ const EnhancedBlockWrapper: React.FC<EnhancedBlockWrapperProps> = ({
       {showToolbar && isSelected && (
         <div className="absolute -top-9 left-0 right-0 flex items-center justify-between z-50">
           <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg shadow-lg px-1 py-1">
+            {/* Custom toolbar content (e.g., heading level selector) */}
+            {customToolbarContent}
+            
             {/* Move buttons */}
             <Button
               variant="ghost"

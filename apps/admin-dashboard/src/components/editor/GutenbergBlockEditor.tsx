@@ -12,7 +12,7 @@ import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
 import SimplifiedParagraphBlock from './blocks/SimplifiedParagraphBlock';
-import SimplifiedHeadingBlock from './blocks/SimplifiedHeadingBlock';
+import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
 import ImageBlock from './blocks/ImageBlock';
 // import { QuoteBlock } from './blocks/QuoteBlock'; // TODO: Fix QuoteBlock interface
@@ -472,7 +472,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       case 'core/heading':
       case 'heading': // Support both formats
         return (
-          <SimplifiedHeadingBlock
+          <EnhancedHeadingBlock
             key={block.id}
             {...enhancedProps}
             attributes={{ level: block.content?.level || 2 }}

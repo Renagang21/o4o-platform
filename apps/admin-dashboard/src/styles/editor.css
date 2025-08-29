@@ -104,12 +104,37 @@
   position: absolute;
 }
 
+/* Ensure correct text direction */
+.paragraph-editor {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  text-align: left;
+}
+
+.paragraph-editor.text-center {
+  text-align: center;
+}
+
+.paragraph-editor.text-right {
+  text-align: right;
+}
+
+.paragraph-editor.text-justify {
+  text-align: justify;
+}
+
 /* Heading block styles */
 .heading-editor:empty::before {
   content: attr(data-placeholder);
   color: #9ca3af;
   pointer-events: none;
   position: absolute;
+}
+
+/* Ensure correct text direction for headings */
+.heading-editor {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
 }
 
 /* Block inserter animation */

@@ -1,20 +1,13 @@
 /**
- * SimplifiedHeadingBlock Component
- * 간소화된 헤딩 블록 - BlockWrapper와 통합
+ * EnhancedHeadingBlock Component
+ * 헤딩 블록 - 툴바에 레벨 선택기 통합
  */
 
 import React, { useState, useRef, useEffect } from 'react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { cn } from '@/lib/utils';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 
-interface SimplifiedHeadingBlockProps {
+interface EnhancedHeadingBlockProps {
   id: string;
   content: string;
   onChange: (content: string, attributes?: any) => void;
@@ -40,7 +33,7 @@ interface SimplifiedHeadingBlockProps {
   onPaste?: () => void;
 }
 
-const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
+const EnhancedHeadingBlock: React.FC<EnhancedHeadingBlockProps> = ({
   id,
   content,
   onChange,
@@ -91,9 +84,8 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
   };
 
   // Handle level change
-  const handleLevelChange = (newLevel: string) => {
-    const levelNum = parseInt(newLevel) as 1 | 2 | 3 | 4 | 5 | 6;
-    onChange(localContent, { ...attributes, level: levelNum });
+  const handleLevelChange = (newLevel: number) => {
+    onChange(localContent, { ...attributes, level: newLevel as 1 | 2 | 3 | 4 | 5 | 6 });
   };
 
   // Handle key events
@@ -103,7 +95,7 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
       e.preventDefault();
       // Save current content
       if (editorRef.current) {
-        const currentContent = editorRef.current.innerText || '';
+        const currentContent = editorRef.current.textContent || '';
         onChange(currentContent, attributes);
       }
       // Add new paragraph block after
@@ -136,6 +128,24 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
 
   const HeadingTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
+  // Custom toolbar content for heading block
+  const customToolbarContent = isSelected ? (
+    <div className="flex items-center gap-2 mr-2">
+      <select
+        value={level.toString()}
+        onChange={(e) => handleLevelChange(parseInt(e.target.value))}
+        className="h-7 px-2 text-sm border border-gray-200 rounded hover:border-gray-300 focus:outline-none focus:border-blue-500"
+      >
+        <option value="1">H1</option>
+        <option value="2">H2</option>
+        <option value="3">H3</option>
+        <option value="4">H4</option>
+        <option value="5">H5</option>
+        <option value="6">H6</option>
+      </select>
+    </div>
+  ) : null;
+
   return (
     <EnhancedBlockWrapper
       id={id}
@@ -156,50 +166,32 @@ const SimplifiedHeadingBlock: React.FC<SimplifiedHeadingBlockProps> = ({
       onDragEnd={onDragEnd}
       onCopy={onCopy}
       onPaste={onPaste}
+      customToolbarContent={customToolbarContent}
     >
-      <div className="flex items-center gap-2">
-        {/* Level selector - show when selected */}
-        {isSelected && (
-          <Select value={level.toString()} onValueChange={handleLevelChange}>
-            <SelectTrigger className="w-20 h-8">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">H1</SelectItem>
-              <SelectItem value="2">H2</SelectItem>
-              <SelectItem value="3">H3</SelectItem>
-              <SelectItem value="4">H4</SelectItem>
-              <SelectItem value="5">H5</SelectItem>
-              <SelectItem value="6">H6</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* 순수한 헤딩 콘텐츠만 - 컨트롤 없음 */}
+      <HeadingTag
+        ref={editorRef as any}
+        contentEditable
+        suppressContentEditableWarning
+        className={cn(
+          'heading-editor outline-none w-full',
+          'focus:outline-none',
+          sizeClasses[level],
+          align === 'center' && 'text-center',
+          align === 'right' && 'text-right',
+          !localContent && 'text-gray-400'
         )}
-        
-        {/* Heading content */}
-        <HeadingTag
-          ref={editorRef as any}
-          contentEditable
-          suppressContentEditableWarning
-          className={cn(
-            'heading-editor outline-none flex-1',
-            'focus:outline-none',
-            sizeClasses[level],
-            align === 'center' && 'text-center',
-            align === 'right' && 'text-right',
-            !localContent && 'text-gray-400'
-          )}
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          data-placeholder={`Heading ${level}`}
-          style={{
-            direction: 'ltr',
-            unicodeBidi: 'normal'
-          }}
-        />
-      </div>
+        onInput={handleInput}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        data-placeholder={`Heading ${level}`}
+        style={{
+          direction: 'ltr',
+          unicodeBidi: 'normal'
+        }}
+      />
     </EnhancedBlockWrapper>
   );
 };
 
-export default SimplifiedHeadingBlock;
+export default EnhancedHeadingBlock;

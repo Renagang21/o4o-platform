@@ -61,12 +61,22 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
   // Sync content
   useEffect(() => {
     setLocalContent(content);
+    if (editorRef.current && !editorRef.current.textContent) {
+      editorRef.current.textContent = content;
+    }
   }, [content]);
+
+  // Initialize content on mount
+  useEffect(() => {
+    if (editorRef.current && localContent) {
+      editorRef.current.textContent = localContent;
+    }
+  }, []);
 
   // Handle content change
   const handleInput = () => {
     if (editorRef.current) {
-      const newContent = editorRef.current.innerText || '';
+      const newContent = editorRef.current.textContent || '';
       setLocalContent(newContent);
       onChange(newContent, attributes);
     }
@@ -136,8 +146,10 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
         onInput={handleInput}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
-        dangerouslySetInnerHTML={{ 
-          __html: localContent || '<span>Type / to choose a block</span>' 
+        data-placeholder="Type / to choose a block"
+        style={{
+          direction: 'ltr',
+          unicodeBidi: 'normal'
         }}
       />
     </EnhancedBlockWrapper>
