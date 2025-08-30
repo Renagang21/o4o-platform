@@ -98,7 +98,8 @@ export const RealTimeActivity = ({
         }
       }
     } catch (error) {
-      console.error('Failed to track event:', error);
+      // Silently fail tracking - could be logged to monitoring service in production
+      // TODO: Implement proper error logging service
     }
   };
 
@@ -124,7 +125,8 @@ export const RealTimeActivity = ({
       }, 1000);
 
     } catch (error) {
-      console.error('WebSocket connection failed:', error);
+      // WebSocket connection failed - silently retry
+      // TODO: Implement proper error logging service
       setIsConnected(false);
       
       // Retry connection after 5 seconds

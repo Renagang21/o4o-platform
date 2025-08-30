@@ -459,8 +459,8 @@ const AffiliateDashboard = () => {
               <AffiliateNotifications 
                 referralCode={mockReferralCode}
                 onNotificationClick={(notification) => {
-                  console.log('Notification clicked:', notification);
                   // Handle notification click (e.g., navigate to relevant section)
+                  // TODO: Implement navigation to relevant section based on notification type
                 }}
               />
             </TabsContent>
