@@ -455,6 +455,27 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 
+// Missing dashboard endpoints (temporary)
+app.get('/ecommerce/dashboard/stats', (req, res) => {
+  res.json({ success: true, data: { orders: 0, revenue: 0, products: 0, customers: 0 } });
+});
+
+app.get('/api/users/stats', (req, res) => {
+  res.json({ success: true, data: { total: 0, active: 0, pending: 0, inactive: 0 } });
+});
+
+app.get('/api/admin/notifications', (req, res) => {
+  res.json({ success: true, data: [], total: 0 });
+});
+
+app.get('/api/admin/activities', (req, res) => {
+  res.json({ success: true, data: [], total: 0 });
+});
+
+app.get('/api/system/health', (req, res) => {
+  res.json({ success: true, status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Direct public endpoints for main site
 app.get('/api/posts', publicLimiter, async (req, res) => {
   try {
