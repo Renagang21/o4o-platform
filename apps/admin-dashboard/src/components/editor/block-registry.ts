@@ -57,6 +57,50 @@ class BlockRegistry {
       component: () => import('./blocks/text/StandardHeadingBlock').then(m => ({ default: m.default }))
     })
 
+    this.register({
+      name: 'core/list',
+      title: 'List',
+      category: 'text',
+      icon: 'list',
+      description: 'Create a bulleted or numbered list.',
+      keywords: ['list', 'bullet', 'numbered', 'ordered', 'unordered'],
+      priority: 'high',
+      component: () => import('./blocks/text/StandardListBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/quote',
+      title: 'Quote',
+      category: 'text',
+      icon: 'quote',
+      description: 'Give quoted text visual emphasis. Great for testimonials.',
+      keywords: ['quote', 'blockquote', 'citation', 'testimonial'],
+      priority: 'medium',
+      component: () => import('./blocks/text/StandardQuoteBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/code',
+      title: 'Code',
+      category: 'text',
+      icon: 'code',
+      description: 'Display code with syntax highlighting.',
+      keywords: ['code', 'syntax', 'programming', 'highlight'],
+      priority: 'medium',
+      component: () => import('./blocks/text/StandardCodeBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/preformatted',
+      title: 'Preformatted',
+      category: 'text',
+      icon: 'file-text',
+      description: 'Add text that respects your spacing and tabs.',
+      keywords: ['preformatted', 'pre', 'text', 'whitespace', 'monospace'],
+      priority: 'low',
+      component: () => import('./blocks/text/StandardPreformattedBlock').then(m => ({ default: m.default }))
+    })
+
     // Media blocks
     this.register({
       name: 'core/image',
