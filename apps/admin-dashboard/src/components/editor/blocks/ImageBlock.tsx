@@ -1,6 +1,6 @@
 /**
  * ImageBlock Component
- * Gutenberg-style image block with BlockControls and InspectorControls
+ * Standardized image block using EnhancedBlockWrapper
  */
 
 import { useState, useRef, useEffect } from 'react';
@@ -9,18 +9,19 @@ import {
   Image as ImageIcon,
   Upload,
   Link2,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Expand,
-  Maximize,
-  Edit2,
-  Replace
+  Replace,
+  Edit2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import BlockWrapper from './BlockWrapper';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
-import { BlockControls, ToolbarGroup, ToolbarButton } from '../gutenberg/BlockControls';
 
 interface ImageBlockProps {
   id: string;
@@ -46,6 +47,16 @@ interface ImageBlockProps {
     lightbox?: boolean;
     rounded?: number;
   };
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  isDragging?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
+  onChangeType?: (newType: string) => void;
 }
 
 const ImageBlock: React.FC<ImageBlockProps> = ({
@@ -58,375 +69,278 @@ const ImageBlock: React.FC<ImageBlockProps> = ({
   onAddBlock,
   isSelected,
   onSelect,
-  attributes = {}
+  attributes = {},
+  canMoveUp = true,
+  canMoveDown = true,
+  isDragging = false,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  onCopy,
+  onPaste,
+  onChangeType
 }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [localCaption, setLocalCaption] = useState(attributes.caption || '');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
-
   const {
     url = '',
     alt = '',
     caption = '',
     align = 'none',
-    size = 'large',
+    size = 'full',
     linkTo = 'none',
     linkUrl = '',
     width,
     height,
-    // sizeSlug = 'large', // Currently unused
-    // lightbox = false,   // Currently unused
+    lightbox = false,
     rounded = 0
   } = attributes;
 
-  // Sync caption changes
-  useEffect(() => {
-    setLocalCaption(caption);
-  }, [caption]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showLinkPopover, setShowLinkPopover] = useState(false);
+  const [tempLinkUrl, setTempLinkUrl] = useState(linkUrl);
 
-  // Update attribute
+  // Update attribute helper
   const updateAttribute = (key: string, value: any) => {
-    onChange('', { ...attributes, [key]: value });
+    onChange(url, { ...attributes, [key]: value });
   };
 
-  // Handle caption change
-  const handleCaptionChange = (newCaption: string) => {
-    setLocalCaption(newCaption);
-    updateAttribute('caption', newCaption);
-  };
-
-  // Handle drag events
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.target === dropZoneRef.current) {
-      setIsDragging(false);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const files = Array.from(e.dataTransfer.files);
-    const imageFile = files.find(file => file.type.startsWith('image/'));
-    
-    if (imageFile) {
-      handleFileUpload(imageFile);
-    }
+  // Handle alignment change
+  const handleAlignChange = (newAlign: 'left' | 'center' | 'right' | 'justify') => {
+    const imageAlign = newAlign === 'justify' ? 'center' : newAlign;
+    updateAttribute('align', imageAlign);
   };
 
   // Handle file upload
-  const handleFileUpload = async (file: File) => {
-    setIsUploading(true);
-    setUploadProgress(0);
-
-    // Simulate upload progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 10;
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      // Create object URL for immediate preview
+      const objectUrl = URL.createObjectURL(file);
+      onChange(objectUrl, { 
+        ...attributes, 
+        url: objectUrl,
+        alt: file.name.replace(/\.[^/.]+$/, "")
       });
-    }, 200);
-
-    try {
-      // For demo, use local file URL
-      const fileUrl = URL.createObjectURL(file);
-      
-      // Get image dimensions
-      const img = new Image();
-      img.onload = () => {
-        onChange('', {
-          ...attributes,
-          url: fileUrl,
-          alt: file.name.replace(/\.[^/.]+$/, ''),
-          width: img.width,
-          height: img.height
-        });
-        
-        clearInterval(progressInterval);
-        setUploadProgress(100);
-        setTimeout(() => {
-          setIsUploading(false);
-          setUploadProgress(0);
-        }, 500);
-      };
-      img.src = fileUrl;
-    } catch (error) {
-      console.error('Upload failed:', error);
-      clearInterval(progressInterval);
       setIsUploading(false);
-      setUploadProgress(0);
+      
+      // Here you would typically upload to your server
+      // For now, we'll just use the object URL
     }
   };
 
-  // Handle file selection
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      handleFileUpload(file);
+  // Apply link
+  const applyLink = () => {
+    updateAttribute('linkUrl', tempLinkUrl);
+    updateAttribute('linkTo', tempLinkUrl ? 'custom' : 'none');
+    setShowLinkPopover(false);
+  };
+
+  // Custom toolbar content
+  const customToolbarContent = (
+    <div className="flex items-center gap-1">
+      {url && (
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            className="h-9 px-2"
+          >
+            <Replace className="h-4 w-4 mr-1" />
+            Replace
+          </Button>
+          
+          <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
+            <PopoverTrigger>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 px-2"
+              >
+                <Link2 className="h-4 w-4 mr-1" />
+                Link
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Add Link</h4>
+                <Input
+                  placeholder="https://example.com"
+                  value={tempLinkUrl}
+                  onChange={(e) => setTempLinkUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && applyLink()}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowLinkPopover(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button size="sm" onClick={applyLink}>
+                    Apply
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </>
+      )}
+    </div>
+  );
+
+  // Image placeholder/uploader
+  const ImagePlaceholder = () => (
+    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+      <ImageIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+      <div className="space-y-2">
+        <h3 className="text-lg font-medium text-gray-900">Add an image</h3>
+        <p className="text-sm text-gray-600">Upload an image or drag and drop</p>
+        <Button onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+          <Upload className="mr-2 h-4 w-4" />
+          {isUploading ? 'Uploading...' : 'Upload Image'}
+        </Button>
+      </div>
+    </div>
+  );
+
+  // Main image content
+  const ImageContent = () => {
+    if (!url) {
+      return <ImagePlaceholder />;
     }
-  };
 
-  // Get align class
-  const getAlignClass = () => {
-    switch (align) {
-      case 'left': return 'float-left mr-4';
-      case 'right': return 'float-right ml-4';
-      case 'center': return 'mx-auto';
-      case 'wide': return 'w-full max-w-4xl mx-auto';
-      case 'full': return 'w-full';
-      default: return '';
-    }
-  };
-
-  // Get image size styles
-  const getImageStyles = () => {
-    const styles: React.CSSProperties = {};
-    
-    if (width) styles.width = width;
-    if (height) styles.height = height;
-    if (rounded) styles.borderRadius = `${rounded}px`;
-    
-    return styles;
-  };
-
-  // Render image with link wrapper if needed
-  const renderImage = () => {
-    const img = (
+    const imageElement = (
       <img
         src={url}
         alt={alt}
         className={cn(
-          'block',
-          size === 'thumbnail' && 'max-w-xs',
-          size === 'medium' && 'max-w-md',
-          size === 'large' && 'max-w-2xl',
-          size === 'full' && 'w-full'
+          "max-w-full h-auto",
+          rounded > 0 && `rounded-${rounded === 1 ? 'sm' : rounded === 2 ? 'md' : 'lg'}`
         )}
-        style={getImageStyles()}
+        style={{
+          width: width || undefined,
+          height: height || undefined,
+        }}
+        onLoad={() => {
+          // Auto-set dimensions if not set
+          if (!width || !height) {
+            const img = new Image();
+            img.onload = () => {
+              onChange(url, {
+                ...attributes,
+                width: img.naturalWidth,
+                height: img.naturalHeight
+              });
+            };
+            img.src = url;
+          }
+        }}
       />
     );
 
-    if (linkTo === 'media') {
-      return (
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          {img}
-        </a>
-      );
-    } else if (linkTo === 'custom' && linkUrl) {
-      return (
-        <a href={linkUrl} target="_blank" rel="noopener noreferrer">
-          {img}
-        </a>
-      );
-    }
-    
-    return img;
+    const content = linkTo === 'custom' && linkUrl ? (
+      <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+        {imageElement}
+      </a>
+    ) : (
+      imageElement
+    );
+
+    return (
+      <div 
+        className={cn(
+          "relative",
+          align === 'center' && 'text-center',
+          align === 'right' && 'text-right'
+        )}
+      >
+        {content}
+        {caption && (
+          <RichText
+            tagName="figcaption"
+            placeholder="Write caption..."
+            value={caption}
+            onChange={(value) => updateAttribute('caption', value)}
+            className="mt-2 text-sm text-gray-600 italic text-center"
+          />
+        )}
+      </div>
+    );
   };
 
   return (
-    <>
-      {/* Block Controls - Floating Toolbar */}
-      {isSelected && url && (
-        <BlockControls>
-          {/* Replace Image */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Replace className="h-4 w-4" />}
-              label="Replace"
-              onClick={() => fileInputRef.current?.click()}
-            />
-          </ToolbarGroup>
-
-          {/* Alignment */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<AlignLeft className="h-4 w-4" />}
-              label="Align left"
-              isActive={align === 'left'}
-              onClick={() => updateAttribute('align', align === 'left' ? 'none' : 'left')}
-            />
-            <ToolbarButton
-              icon={<AlignCenter className="h-4 w-4" />}
-              label="Align center"
-              isActive={align === 'center'}
-              onClick={() => updateAttribute('align', align === 'center' ? 'none' : 'center')}
-            />
-            <ToolbarButton
-              icon={<AlignRight className="h-4 w-4" />}
-              label="Align right"
-              isActive={align === 'right'}
-              onClick={() => updateAttribute('align', align === 'right' ? 'none' : 'right')}
-            />
-            <ToolbarButton
-              icon={<Expand className="h-4 w-4" />}
-              label="Wide width"
-              isActive={align === 'wide'}
-              onClick={() => updateAttribute('align', align === 'wide' ? 'none' : 'wide')}
-            />
-            <ToolbarButton
-              icon={<Maximize className="h-4 w-4" />}
-              label="Full width"
-              isActive={align === 'full'}
-              onClick={() => updateAttribute('align', align === 'full' ? 'none' : 'full')}
-            />
-          </ToolbarGroup>
-
-          {/* Edit Alt Text */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Edit2 className="h-4 w-4" />}
-              label="Edit Alt Text"
-              onClick={() => {
-                const newAlt = prompt('Enter alt text:', alt);
-                if (newAlt !== null) {
-                  updateAttribute('alt', newAlt);
-                }
-              }}
-            />
-          </ToolbarGroup>
-
-          {/* Link */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Link2 className="h-4 w-4" />}
-              label="Add Link"
-              isActive={linkTo !== 'none'}
-              onClick={() => {
-                if (linkTo !== 'none') {
-                  updateAttribute('linkTo', 'none');
-                  updateAttribute('linkUrl', '');
-                } else {
-                  const url = prompt('Enter URL:');
-                  if (url) {
-                    updateAttribute('linkTo', 'custom');
-                    updateAttribute('linkUrl', url);
-                  }
-                }
-              }}
-            />
-          </ToolbarGroup>
-        </BlockControls>
-      )}
-
-      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
-
-      {/* Block Content */}
-      <BlockWrapper
-        id={id}
-        type="image"
-        isSelected={isSelected}
-        onSelect={onSelect}
-        onDelete={onDelete}
-        onDuplicate={onDuplicate}
-        onMoveUp={onMoveUp}
-        onMoveDown={onMoveDown}
-        onAddBlock={onAddBlock}
-        className={cn('wp-block wp-block-image', align && `align${align}`)}
-      >
-        {!url ? (
-          // Upload Area
-          <div
-            ref={dropZoneRef}
-            className={cn(
-              'relative border-2 border-dashed rounded-lg p-8 text-center transition-all',
-              isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400',
-              isUploading && 'pointer-events-none opacity-50'
-            )}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileSelect}
-            />
-            
-            {isUploading ? (
-              <div className="space-y-4">
-                <div className="w-16 h-16 mx-auto">
-                  <Upload className="w-full h-full text-gray-400 animate-pulse" />
-                </div>
-                <div className="w-full max-w-xs mx-auto">
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500 transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">Uploading... {uploadProgress}%</p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <ImageIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <p className="text-lg font-medium mb-2">
-                  Drop image here or click to upload
-                </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  JPG, PNG, GIF, WebP • Max 10MB
-                </p>
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mx-auto"
-                >
-                  Select Image
-                </Button>
-              </>
-            )}
-          </div>
-        ) : (
-          // Image Display
-          <figure className={cn('wp-block-image', getAlignClass())}>
-            {renderImage()}
-            
-            {/* Caption */}
-            {(caption || isSelected) && (
-              <RichText
-                tagName="figcaption"
-                value={localCaption}
-                onChange={handleCaptionChange}
-                placeholder="Write caption..."
-                className="wp-element-caption text-center text-sm text-gray-600 mt-2"
-                allowedFormats={['core/bold', 'core/italic', 'core/link']}
-              />
-            )}
-          </figure>
-        )}
-
-        {/* Hidden file input for replace */}
+    <EnhancedBlockWrapper
+      id={id}
+      type="image"
+      isSelected={isSelected}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
+      onCopy={onCopy}
+      onPaste={onPaste}
+      isDragging={isDragging}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      customToolbarContent={customToolbarContent}
+      onAlignChange={handleAlignChange}
+      currentAlign={align === 'none' ? 'left' : align as any}
+      onChangeType={onChangeType}
+      currentType="image"
+    >
+      <div className="w-full">
+        <ImageContent />
+        
+        {/* Hidden file input */}
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          onChange={handleFileUpload}
           className="hidden"
-          onChange={handleFileSelect}
         />
-      </BlockWrapper>
-    </>
+        
+        {/* Alt text input when selected */}
+        {isSelected && url && (
+          <div className="mt-3 space-y-2">
+            <div>
+              <Label htmlFor="alt-text" className="text-sm font-medium">
+                Alt text
+              </Label>
+              <Input
+                id="alt-text"
+                value={alt}
+                onChange={(e) => updateAttribute('alt', e.target.value)}
+                placeholder="Describe the purpose of the image"
+                className="mt-1"
+              />
+            </div>
+            
+            {!caption && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateAttribute('caption', '')}
+                className="w-full"
+              >
+                <Edit2 className="mr-2 h-4 w-4" />
+                Add caption
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </EnhancedBlockWrapper>
   );
 };
 

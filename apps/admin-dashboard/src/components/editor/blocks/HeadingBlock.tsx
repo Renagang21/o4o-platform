@@ -1,6 +1,6 @@
 /**
  * HeadingBlock Component
- * Gutenberg-style heading block with RichText, BlockControls, and InspectorControls
+ * Standardized heading block using EnhancedBlockWrapper
  */
 
 import { useState, useEffect } from 'react';
@@ -12,7 +12,6 @@ import {
   Heading4,
   Heading5,
   Heading6,
-  Hash,
   ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,9 +21,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import BlockWrapper from './BlockWrapper';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
-import { BlockControls, ToolbarGroup, ToolbarButton, AlignmentToolbar } from '../gutenberg/BlockControls';
 
 interface HeadingBlockProps {
   id: string;
@@ -46,6 +44,16 @@ interface HeadingBlockProps {
     backgroundColor?: string;
     fontSize?: number;
   };
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  isDragging?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
+  onChangeType?: (newType: string) => void;
 }
 
 const HeadingBlock: React.FC<HeadingBlockProps> = ({
@@ -59,7 +67,17 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
   onAddBlock,
   isSelected,
   onSelect,
-  attributes = {}
+  attributes = {},
+  canMoveUp = true,
+  canMoveDown = true,
+  isDragging = false,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  onCopy,
+  onPaste,
+  onChangeType
 }) => {
   const [localContent, setLocalContent] = useState(content);
 
@@ -67,7 +85,6 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     level = 2,
     align = 'left',
     anchor = '',
-    // isTableOfContents = true,  // Currently unused
     textColor = '',
     backgroundColor = '',
     fontSize = 0
@@ -89,13 +106,9 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     onChange(localContent, { ...attributes, [key]: value });
   };
 
-  // Handle Enter key for block split
-  const handleSplit = (value: string, isOriginal?: boolean) => {
-    if (isOriginal) {
-      onChange(value, attributes);
-    }
-    // Create new paragraph block after heading
-    onAddBlock?.('after');
+  // Handle alignment change
+  const handleAlignChange = (newAlign: 'left' | 'center' | 'right' | 'justify') => {
+    updateAttribute('align', newAlign);
   };
 
   // Get heading icon based on level
@@ -110,7 +123,6 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
       default: return <Heading2 className="h-4 w-4" />;
     }
   };
-
 
   // Level selector dropdown for toolbar
   const LevelSelector = () => (
@@ -140,90 +152,82 @@ const HeadingBlock: React.FC<HeadingBlockProps> = ({
     </DropdownMenu>
   );
 
+  // Custom toolbar content
+  const customToolbarContent = (
+    <div className="flex items-center gap-1">
+      <LevelSelector />
+    </div>
+  );
+
+  // Get heading element class based on level
+  const getHeadingClass = () => {
+    const baseClass = "block-editor-rich-text__editable outline-none";
+    const levelClasses = {
+      1: "text-4xl font-bold",
+      2: "text-3xl font-bold", 
+      3: "text-2xl font-bold",
+      4: "text-xl font-semibold",
+      5: "text-lg font-semibold",
+      6: "text-base font-semibold"
+    };
+    
+    return cn(
+      baseClass,
+      levelClasses[level as keyof typeof levelClasses],
+      align === 'center' && 'text-center',
+      align === 'right' && 'text-right'
+    );
+  };
+
+  const HeadingElement = `h${level}` as keyof JSX.IntrinsicElements;
+
   return (
-    <>
-      {/* Block Controls - Floating Toolbar */}
-      {isSelected && (
-        <BlockControls>
-          {/* Level Selector */}
-          <ToolbarGroup>
-            <LevelSelector />
-          </ToolbarGroup>
-
-          {/* Alignment */}
-          <AlignmentToolbar
-            value={align}
-            onChange={(newAlign) => updateAttribute('align', newAlign)}
-          />
-
-          {/* HTML Anchor */}
-          <ToolbarGroup>
-            <ToolbarButton
-              icon={<Hash className="h-4 w-4" />}
-              label="HTML Anchor"
-              onClick={() => {
-                const newAnchor = prompt('Enter HTML anchor (ID):', anchor);
-                if (newAnchor !== null) {
-                  updateAttribute('anchor', newAnchor);
-                }
-              }}
-            />
-          </ToolbarGroup>
-        </BlockControls>
-      )}
-
-      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
-
-      {/* Block Content */}
-      <BlockWrapper
-        id={id}
-        type="heading"
-        isSelected={isSelected}
-        onSelect={onSelect}
-        onDelete={onDelete}
-        onDuplicate={onDuplicate}
-        onMoveUp={onMoveUp}
-        onMoveDown={onMoveDown}
-        onAddBlock={onAddBlock}
-        className={`wp-block wp-block-heading wp-block-heading-h${level}`}
+    <EnhancedBlockWrapper
+      id={id}
+      type="heading"
+      isSelected={isSelected}
+      onSelect={onSelect}
+      onDelete={onDelete}
+      onDuplicate={onDuplicate}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
+      onAddBlock={onAddBlock}
+      onCopy={onCopy}
+      onPaste={onPaste}
+      isDragging={isDragging}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      customToolbarContent={customToolbarContent}
+      onAlignChange={handleAlignChange}
+      currentAlign={align}
+      onChangeType={onChangeType}
+      currentType="heading"
+    >
+      <HeadingElement
+        className={getHeadingClass()}
+        style={{
+          color: textColor || undefined,
+          backgroundColor: backgroundColor || undefined,
+          fontSize: fontSize ? `${fontSize}px` : undefined,
+          textAlign: align,
+        }}
+        id={anchor || undefined}
       >
-        <div
-          id={anchor || undefined}
-          style={{
-            backgroundColor: backgroundColor || undefined
-          }}
-        >
-          <RichText
-            tagName={`h${level}`}
-            value={localContent}
-            onChange={handleContentChange}
-            onSplit={handleSplit}
-            placeholder={`Heading ${level}`}
-            className={cn(
-              'heading-text',
-              align === 'center' && 'text-center',
-              align === 'right' && 'text-right',
-              level === 1 && 'text-4xl font-bold',
-              level === 2 && 'text-3xl font-bold',
-              level === 3 && 'text-2xl font-semibold',
-              level === 4 && 'text-xl font-semibold',
-              level === 5 && 'text-lg font-medium',
-              level === 6 && 'text-base font-medium'
-            )}
-            style={{
-              color: textColor || undefined,
-              fontSize: fontSize ? `${fontSize}px` : undefined
-            }}
-            allowedFormats={[
-              'core/bold',
-              'core/italic',
-              'core/link',
-              'core/strikethrough'
-            ]}
-          />
-        </div>
-      </BlockWrapper>
-    </>
+        <RichText
+          tagName={HeadingElement}
+          value={localContent}
+          onChange={handleContentChange}
+          placeholder={`Heading ${level}...`}
+          className="w-full"
+          allowedFormats={['core/bold', 'core/italic', 'core/link']}
+          onSplit={onAddBlock ? () => onAddBlock('after') : undefined}
+        />
+      </HeadingElement>
+    </EnhancedBlockWrapper>
   );
 };
 
