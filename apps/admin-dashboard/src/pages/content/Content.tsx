@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import PostListQuickEdit from './PostListQuickEdit'
 import PostFormWYSIWYG from './PostFormWYSIWYG'
 import PageList from './PageList'
-import PageFormWYSIWYG from './PageFormWYSIWYG'
+// import PageFormWYSIWYG from './PageFormWYSIWYG' // Temporarily commented - using PostFormWYSIWYG for pages
 import CPTList from './CPTList'
 import CPTForm from './CPTForm'
 import CustomFieldBuilder from './CustomFieldBuilder'
@@ -32,8 +32,8 @@ const Content: FC = () => {
       <Route path="new" element={<Navigate to="/editor/posts/new" replace />} />
       <Route path=":id/edit" element={<PostFormWYSIWYG />} />
       <Route path="pages" element={<PageList />} />
-      <Route path="pages/new" element={<PageFormWYSIWYG />} />
-      <Route path="pages/:id/edit" element={<PageFormWYSIWYG />} />
+      <Route path="pages/new" element={<PostFormWYSIWYG />} />
+      <Route path="pages/:id/edit" element={<PostFormWYSIWYG />} />
       <Route path="cpt" element={<CPTList />} />
       <Route path="cpt/new" element={<CPTForm />} />
       <Route path="cpt/:id/edit" element={<CPTForm />} />
