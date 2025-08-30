@@ -490,7 +490,7 @@ export const ThemeApprovals: React.FC = () => {
   const handleApprove = useCallback(async (requestId: string, note?: string) => {
     try {
       // TODO: Implement actual approval API call
-      console.log('Approving request:', requestId, note)
+      // Approving request: requestId, note
       
       setRequests(prev => prev.map(req => 
         req.id === requestId 
@@ -512,7 +512,7 @@ export const ThemeApprovals: React.FC = () => {
   const handleReject = useCallback(async (requestId: string, note: string) => {
     try {
       // TODO: Implement actual rejection API call
-      console.log('Rejecting request:', requestId, note)
+      // Rejecting request: requestId, note
       
       setRequests(prev => prev.map(req => 
         req.id === requestId 

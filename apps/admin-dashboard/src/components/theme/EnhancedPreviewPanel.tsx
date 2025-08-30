@@ -196,7 +196,7 @@ export const EnhancedPreviewPanel: React.FC<EnhancedPreviewPanelProps> = ({
   // Handle WebSocket updates from other sessions
   useEffect(() => {
     const unsubscribe = onUpdate((update: PreviewUpdate) => {
-      console.log('Received preview update:', update)
+      // Received preview update
       
       switch (update.type) {
         case 'customization':

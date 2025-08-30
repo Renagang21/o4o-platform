@@ -252,7 +252,7 @@ export const useThemeCustomization = (
       setIsDirty(false)
 
       // TODO: Send approval request notification to admins
-      console.log('Approval request sent for customization:', pendingCustomization.id)
+      // Approval request sent for customization: pendingCustomization.id
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to request approval')
       throw err
@@ -310,7 +310,7 @@ export const useThemeCustomization = (
     isAutoSaveEnabled.current = true
     if (interval && interval !== autoSaveInterval) {
       // Update auto-save interval if needed (would require state update)
-      console.log(`Auto-save interval updated to ${interval}ms`)
+      // Auto-save interval updated: interval
     }
   }, [autoSaveInterval])
 

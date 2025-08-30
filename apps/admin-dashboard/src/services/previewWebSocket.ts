@@ -52,7 +52,7 @@ class PreviewWebSocketService {
         this.ws = new WebSocket(wsUrl)
         
         this.ws.onopen = () => {
-          console.log('Preview WebSocket connected')
+          // Preview WebSocket connected
           this.reconnectAttempts = 0
           this.startPing()
           this.sendHandshake()
@@ -70,7 +70,7 @@ class PreviewWebSocketService {
         }
 
         this.ws.onclose = (event) => {
-          console.log('Preview WebSocket disconnected', event.code, event.reason)
+          // Preview WebSocket disconnected
           this.stopPing()
           this.notifyConnectionChange(false)
           
@@ -288,7 +288,7 @@ class PreviewWebSocketService {
     
     setTimeout(() => {
       this.reconnectAttempts++
-      console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
+      // Attempting to reconnect
       this.connect().catch(error => {
         console.error('Reconnection failed:', error)
       })
