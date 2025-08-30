@@ -13,7 +13,7 @@ import {
   AlignRight,
   AlignJustify
 } from 'lucide-react';
-import BlockWrapper from './BlockWrapper';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 import { RichText } from '../gutenberg/RichText';
 import { BlockControls, ToolbarGroup, ToolbarButton } from '../gutenberg/BlockControls';
 
@@ -44,6 +44,16 @@ interface ButtonBlockProps {
     paddingX?: number;
     paddingY?: number;
   };
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  isDragging?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  onCopy?: () => void;
+  onPaste?: () => void;
+  onChangeType?: (newType: string) => void;
 }
 
 const ButtonBlock: React.FC<ButtonBlockProps> = ({
@@ -201,7 +211,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
       {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
 
       {/* Block Content */}
-      <BlockWrapper
+      <EnhancedBlockWrapper
         id={id}
         type="button"
         isSelected={isSelected}
@@ -230,7 +240,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
             />
           </div>
         </div>
-      </BlockWrapper>
+      </EnhancedBlockWrapper>
     </>
   );
 };

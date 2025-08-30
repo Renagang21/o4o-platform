@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import BlockWrapper from './BlockWrapper';
+import EnhancedBlockWrapper from './EnhancedBlockWrapper';
 
 interface ListItem {
   id: string;
@@ -309,7 +309,7 @@ const ListBlock: React.FC<ListBlockProps> = ({
   };
 
   return (
-    <BlockWrapper
+    <EnhancedBlockWrapper
       id={id}
       type="list"
       isSelected={isSelected}
@@ -487,7 +487,7 @@ const ListBlock: React.FC<ListBlockProps> = ({
           </div>
         ))}
       </div>
-    </BlockWrapper>
+    </EnhancedBlockWrapper>
   );
 };
 
