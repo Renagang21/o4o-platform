@@ -73,6 +73,7 @@ import authV2Routes from './routes/auth-v2';
 import socialAuthRoutes from './routes/social-auth';
 import userRoutes from './routes/user';
 import userManagementRoutes from './routes/users.routes';
+import usersV1Routes from './routes/v1/users.routes';
 import adminRoutes from './routes/admin';
 import ecommerceRoutes from './routes/ecommerce';
 import cptRoutes from './routes/cpt';
@@ -449,7 +450,7 @@ app.use('/api/', limiter);
 
 // Protected API routes (after rate limiter)
 app.use('/api/users', userRoutes);
-app.use('/api/v1/users', userManagementRoutes); // New user management routes
+app.use('/api/v1/users', usersV1Routes); // V1 user management routes with comprehensive functionality
 app.use('/api/admin', adminRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
 app.use('/api/cpt', cptRoutes);
