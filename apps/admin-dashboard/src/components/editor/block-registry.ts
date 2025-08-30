@@ -213,6 +213,51 @@ class BlockRegistry {
       priority: 'medium',
       component: () => import('./blocks/layout/StandardTableBlock').then(m => ({ default: m.default }))
     })
+
+    // Embed blocks
+    this.register({
+      name: 'core/youtube',
+      title: 'YouTube',
+      category: 'embed',
+      icon: 'youtube',
+      description: 'Embed a YouTube video.',
+      keywords: ['youtube', 'video', 'embed', 'media'],
+      priority: 'high',
+      component: () => import('./blocks/embed/StandardYouTubeBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/facebook',
+      title: 'Facebook',
+      category: 'embed',
+      icon: 'facebook',
+      description: 'Embed a Facebook post, video, or page.',
+      keywords: ['facebook', 'social', 'post', 'video', 'embed'],
+      priority: 'medium',
+      component: () => import('./blocks/embed/StandardFacebookBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/instagram',
+      title: 'Instagram',
+      category: 'embed',
+      icon: 'instagram',
+      description: 'Embed an Instagram post, reel, or IGTV.',
+      keywords: ['instagram', 'social', 'post', 'reel', 'photo', 'embed'],
+      priority: 'medium',
+      component: () => import('./blocks/embed/StandardInstagramBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/embed',
+      title: 'Embed',
+      category: 'embed',
+      icon: 'globe',
+      description: 'Embed external content via URL or HTML.',
+      keywords: ['embed', 'iframe', 'html', 'external', 'widget'],
+      priority: 'low',
+      component: () => import('./blocks/embed/StandardEmbedBlock').then(m => ({ default: m.default }))
+    })
   }
 
   /**
