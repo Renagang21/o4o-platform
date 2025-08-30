@@ -107,7 +107,7 @@ class BlockManager {
         category.loaded = true;
       }
     } catch (error) {
-      console.error(`Failed to load block category ${categoryName}:`, error);
+      // Failed to load block category
     }
   }
 
@@ -178,7 +178,7 @@ class BlockManager {
       }
     }
 
-    console.warn(`Block ${blockName} not found in any category`);
+    // Block not found in any category
     return null;
   }
 

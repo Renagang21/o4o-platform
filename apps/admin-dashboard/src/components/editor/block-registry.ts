@@ -240,7 +240,6 @@ class BlockRegistry {
 
     const block = this.getBlock(name)
     if (!block || !block.component) {
-      console.warn(`Block ${name} not found or has no component`)
       return null
     }
 
@@ -259,7 +258,6 @@ class BlockRegistry {
       this.loadedComponents.set(name, component)
       return component
     } catch (error) {
-      console.error(`Failed to load block component ${name}:`, error)
       return null
     }
   }
