@@ -45,6 +45,7 @@
     "build:blocks": "cd packages/block-core && npm run build && cd ../blocks/text-content && npm run build && cd ../layout-media && npm run build && cd ../interactive && npm run build && cd ../dynamic && npm run build",
     "// === 테스트 & 린트 ===": "",
     "type-check": "./scripts/development/dev.sh type-check",
+    "type-check:frontend": "./scripts/development/dev.sh type-check:frontend",
     "lint": "./scripts/development/dev.sh lint",
     "lint:fix": "./scripts/development/dev.sh lint:fix",
     "test": "./scripts/development/dev.sh test",

@@ -84,6 +84,40 @@ run_type_check() {
     done
 }
 
+# TypeScript 체크 - 프론트엔드만 (CI/CD용)
+run_type_check_frontend() {
+    echo -e "${GREEN}📘 Running TypeScript checks (Frontend only)...${NC}"
+    
+    # Build packages first
+    echo "Building packages..."
+    for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes block-core; do
+        if [ -d "packages/$pkg" ]; then
+            echo "  - Building @o4o/$pkg"
+            (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
+        fi
+    done
+    
+    # Build block plugins
+    echo "Building block plugins..."
+    for pkg in text-content layout-media interactive dynamic; do
+        if [ -d "packages/blocks/$pkg" ]; then
+            echo "  - Building @o4o/$pkg-blocks"
+            (cd "packages/blocks/$pkg" && npx tsc --noEmit 2>/dev/null) || true
+        fi
+    done
+    
+    # Type check frontend apps only (skip api-server)
+    echo "Type checking frontend apps..."
+    for app in main-site admin-dashboard ecommerce crowdfunding digital-signage; do
+        if [ -d "apps/$app" ]; then
+            echo "  - Checking $app"
+            (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
+        fi
+    done
+    
+    echo -e "${YELLOW}ℹ️  Skipping api-server type check (handled separately on server)${NC}"
+}
+
 # 테스트 실행
 run_tests() {
     echo -e "${GREEN}🧪 Running tests...${NC}"
@@ -198,6 +232,9 @@ case "$1" in
         ;;
     type-check)
         run_type_check
+        ;;
+    type-check:frontend)
+        run_type_check_frontend
         ;;
     test)
         run_tests

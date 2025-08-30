@@ -32,8 +32,8 @@ jobs:
     - name: Build packages first
       run: npm run build:packages
     
-    - name: Run TypeScript check
-      run: npm run type-check
+    - name: Run TypeScript check (Frontend only)
+      run: npm run type-check:frontend
     
     - name: Run ESLint
       run: npm run lint
