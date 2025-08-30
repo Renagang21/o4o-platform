@@ -14,9 +14,10 @@ import InspectorPanel from './InspectorPanel';
 import DesignLibraryModal from './DesignLibraryModal';
 import SimplifiedParagraphBlock from './blocks/SimplifiedParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
-import ListBlock from './blocks/ListBlock';
+import SimplifiedListBlock from './blocks/SimplifiedListBlock';
+import CodeBlock from './blocks/CodeBlock';
+import QuoteBlock from './blocks/QuoteBlock';
 import ImageBlock from './blocks/ImageBlock';
-// import { QuoteBlock } from './blocks/QuoteBlock'; // TODO: Fix QuoteBlock interface
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 // Toast 기능을 직접 구현
@@ -545,10 +546,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         );
       case 'core/list':
       case 'list': // Support both formats
-        return <ListBlock key={block.id} {...commonProps} />;
+        return <SimplifiedListBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
+      case 'core/code':
+      case 'code': // Support both formats
+        return <CodeBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/quote':
-        // TODO: Fix QuoteBlock interface
-        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} />;
+      case 'quote': // Support both formats
+        return <QuoteBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/image':
       case 'image': // Support both formats
         return <ImageBlock key={block.id} {...commonProps} />;
@@ -589,7 +593,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       />
 
       {/* Main Layout */}
-      <div className="flex-1 flex relative overflow-hidden">
+      <div className="flex-1 flex relative">
         {/* Block Inserter */}
         <BlockInserter
           isOpen={isBlockInserterOpen}
@@ -599,10 +603,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
         {/* Editor Canvas */}
         <div
-          className={`flex-1 transition-all duration-300 ${
+          className={`flex-1 transition-all duration-300 overflow-y-auto ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
           } mr-80`}
-          style={{ paddingTop: '10px' }}
+          style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 60px)' }}
         >
           <div className="max-w-4xl mx-auto p-8">
             {/* Title Section - WordPress-style two-tier design */}
