@@ -11,6 +11,7 @@ import { postApi, mediaApi } from '@/services/api/postApi';
 import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
+import DesignLibraryModal from './DesignLibraryModal';
 import SimplifiedParagraphBlock from './blocks/SimplifiedParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
@@ -61,6 +62,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const navigate = useNavigate();
   
   // Simple toast function
@@ -460,6 +462,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     [blocks, updateBlocks]
   );
 
+  // Handle template application
+  const handleApplyTemplate = useCallback(
+    (templateBlocks: Block[]) => {
+      // Replace all current blocks with template blocks, preserving document title
+      updateBlocks(templateBlocks);
+      setSelectedBlockId(null);
+      showToast('템플릿이 적용되었습니다!', 'success');
+    },
+    [updateBlocks]
+  );
+
   // Render block component
   const renderBlock = (block: Block) => {
     const commonProps = {
@@ -572,6 +585,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         onToggleCodeView={handleToggleCodeView}
         isCodeView={isCodeView}
         onPreview={handlePreview}
+        onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
       />
 
       {/* Main Layout */}
@@ -737,6 +751,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
       )}
+
+      {/* Design Library Modal */}
+      <DesignLibraryModal
+        isOpen={isDesignLibraryOpen}
+        onClose={() => setIsDesignLibraryOpen(false)}
+        onApplyTemplate={handleApplyTemplate}
+      />
     </div>
   );
 };

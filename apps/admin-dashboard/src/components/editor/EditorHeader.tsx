@@ -23,6 +23,7 @@ import {
   Info,
   Keyboard,
   Trash2,
+  Library,
 } from 'lucide-react';
 
 interface EditorHeaderProps {
@@ -42,6 +43,7 @@ interface EditorHeaderProps {
   isCodeView?: boolean;
   postStatus?: string;
   onPreview?: () => void;
+  onOpenDesignLibrary?: () => void;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -61,6 +63,7 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   isCodeView = false,
   postStatus = 'draft',
   onPreview,
+  onOpenDesignLibrary,
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -139,6 +142,18 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
               <Info className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Design Library */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOpenDesignLibrary}
+            className="h-8 px-3 hover:bg-gray-100 border border-gray-300"
+            title="Design Library - Choose from templates"
+          >
+            <Library className="h-4 w-4 mr-1" />
+            디자인 라이브러리
+          </Button>
         </div>
 
         {/* Center Section - Status Badge */}
