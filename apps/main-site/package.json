@@ -35,7 +35,7 @@
     "@o4o/ui": "file:../../packages/ui",
     "@o4o/utils": "file:../../packages/utils",
     "@tanstack/react-query": "^5.78.2",
-    "@types/dompurify": "^3.0.5",
+    "@types/dompurify": "^3.2.0",
     "@vitejs/plugin-react": "4.7.0",
     "@wordpress/block-editor": "14.4.0",
     "@wordpress/blocks": "13.9.0",
