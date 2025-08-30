@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { X, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Eye, ChevronLeft } from 'lucide-react';
 import { Block } from '@/types/post.types';
 
 interface TemplateCategory {
