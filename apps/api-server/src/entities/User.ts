@@ -160,7 +160,7 @@ export class User {
   adminActions: ApprovalLog[];
 
   // Theme customizations
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'json', nullable: true, name: 'theme_customizations' })
   themeCustomizations?: any
 
   // Password hashing
