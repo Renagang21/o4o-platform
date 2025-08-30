@@ -243,7 +243,7 @@ export class MediaController {
         type,
         folderId,
         search,
-        sortBy = 'createdAt',
+        sortBy = 'uploadedAt',
         sortOrder = 'DESC'
       } = req.query;
 
