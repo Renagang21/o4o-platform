@@ -77,7 +77,7 @@ class BlockRegistry {
       this.aliases.set(withoutCore, block.id)
     }
     
-    console.log(`✅ Block registered: ${block.id} (${block.status})`)
+    // Block registered: ${block.id} (${block.status})
   }
 
   // 블록 가져오기
@@ -397,7 +397,7 @@ blockRegistry.register({
 export function getBlockComponent(blockId: string): ComponentType<any> | null {
   const component = blockRegistry.getComponent(blockId)
   if (!component) {
-    console.warn(`Block component not found for: ${blockId}`)
+    // Block component not found for: ${blockId}
     return null
   }
   return component
@@ -428,6 +428,6 @@ export function getBlockStats() {
 }
 
 // 초기화 시 통계 출력
-console.log('📦 Block Registry Initialized:', getBlockStats())
+// Block Registry Initialized with stats
 
 export default blockRegistry
