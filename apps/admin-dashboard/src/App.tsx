@@ -26,6 +26,8 @@ const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
+const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
+const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
 const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content'));
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
@@ -346,7 +348,14 @@ function App() {
                     <Route path="/users/roles" element={
                       <AdminProtectedRoute requiredPermissions={['users:update']}>
                         <Suspense fallback={<PageLoader />}>
-                          <RolePermissions />
+                          <RoleManagement />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
+                    <Route path="/users/statistics" element={
+                      <AdminProtectedRoute requiredPermissions={['users:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <UserStatistics />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

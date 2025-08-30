@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, UserCheck, UserX, Clock, Shield, Mail, Calendar, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import UserActivityLog from './components/UserActivityLog';
+import BusinessInfoSection from './components/BusinessInfoSection';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
@@ -192,6 +194,12 @@ export default function UserDetail() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          {/* Business Information (for business users) */}
+          <BusinessInfoSection 
+            userId={id!} 
+            userRole={user?.role}
+          />
+          
           {/* User Information */}
           <Card>
             <CardHeader>
@@ -355,19 +363,7 @@ export default function UserDetail() {
         </TabsContent>
 
         <TabsContent value="activity">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
-                User's recent actions and system events
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-center text-gray-500 py-8">
-                Activity tracking coming soon
-              </p>
-            </CardContent>
-          </Card>
+          <UserActivityLog userId={id!} />
         </TabsContent>
       </Tabs>
     </div>

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import BusinessInfoSection from './components/BusinessInfoSection';
 import toast from 'react-hot-toast';
 import { api } from '@/api/base';
 
@@ -60,7 +61,7 @@ export default function UserForm() {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/users/${id}`);
+      const response = await api.get(`/v1/users/${id}`);
       
       if (response.data.success) {
         const userData = response.data.data;
@@ -72,7 +73,7 @@ export default function UserForm() {
         setValue('roles', userData.roles);
         setValue('status', userData.status);
       }
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to load user');
       navigate('/users');
@@ -96,17 +97,17 @@ export default function UserForm() {
           delete payload.password;
         }
         
-        await api.put(`/users/${id}`, payload);
+        await api.put(`/v1/users/${id}`, payload);
         
         toast.success('User updated successfully');
       } else {
-        await api.post('/users', payload);
+        await api.post('/v1/users', payload);
         
         toast.success('User created successfully');
       }
       
       navigate('/users');
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error(error.response?.data?.error || 'Failed to save user');
     } finally {
@@ -119,7 +120,7 @@ export default function UserForm() {
     if (currentRoles.includes(role)) {
       // Don't allow removing the last role
       if (currentRoles.length > 1) {
-        setValue('roles', currentRoles.filter((r: any) => r !== role));
+        setValue('roles', currentRoles.filter((r) => r !== role));
       }
     } else {
       setValue('roles', [...currentRoles, role]);
@@ -216,7 +217,7 @@ export default function UserForm() {
                   <Label htmlFor="status">Status</Label>
                   <Select
                     value={watch('status')}
-                    onValueChange={(value: string) => setValue('status', value as any)}
+                    onValueChange={(value) => setValue('status', value as 'active' | 'pending' | 'approved' | 'rejected')}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
@@ -247,7 +248,7 @@ export default function UserForm() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {roles.map((role: any) => (
+                  {roles.map((role) => (
                     <div
                       key={role.value}
                       className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
@@ -256,7 +257,7 @@ export default function UserForm() {
                       <Checkbox
                         checked={selectedRoles?.includes(role.value) || false}
                         onCheckedChange={() => handleRoleToggle(role.value)}
-                        onClick={(e: any) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
                       />
                       <div className="flex-1">
                         <div className="font-medium">{role.label}</div>
@@ -291,6 +292,11 @@ export default function UserForm() {
               </Button>
             </div>
           </div>
+          
+          {/* Business Information (for business users) */}
+          {isEdit && selectedRoles?.some(role => ['business', 'vendor', 'seller'].includes(role)) && (
+            <BusinessInfoSection userId={id!} userRole={selectedRoles[0]} />
+          )}
         </div>
       </form>
     </div>

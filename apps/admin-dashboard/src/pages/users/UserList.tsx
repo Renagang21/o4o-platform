@@ -1,7 +1,7 @@
 import { roleDisplayNames } from "@/types/user";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Download, UserPlus, UserCheck, UserX, Trash2 } from 'lucide-react';
+import { Search, Download, UserPlus, UserCheck, UserX, Trash2, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -42,9 +42,9 @@ interface UserListResponse {
 
 export default function UserList() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -58,22 +58,22 @@ export default function UserList() {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: page.toString() as any,
-        limit: limit.toString() as any,
+        page: page.toString(),
+        limit: limit.toString(),
       });
       
       if (search) params.append('search', search);
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/users?${params}`);
+      const response = await api.get<{ success: boolean; data: UserListResponse }>(`/v1/users?${params}`);
       
       if (response.data.success) {
         setUsers(response.data.data.users);
         setTotal(response.data.data.pagination.total);
         setTotalPages(response.data.data.pagination.totalPages);
       }
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to load users');
     } finally {
@@ -88,7 +88,7 @@ export default function UserList() {
   // Handle select all
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedUsers(users.map((user: any) => user.id));
+      setSelectedUsers(users.map((user) => user.id));
     } else {
       setSelectedUsers([]);
     }
@@ -99,7 +99,7 @@ export default function UserList() {
     if (checked) {
       setSelectedUsers([...selectedUsers, userId]);
     } else {
-      setSelectedUsers(selectedUsers.filter((id: any) => id !== userId));
+      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
     }
   };
 
@@ -108,7 +108,7 @@ export default function UserList() {
     if (selectedUsers.length === 0) return;
 
     try {
-      await api.post('/users/bulk-approve', {
+      await api.post('/v1/users/bulk-approve', {
         userIds: selectedUsers,
         notes: 'Bulk approved via admin dashboard',
       });
@@ -117,7 +117,7 @@ export default function UserList() {
 
       setSelectedUsers([]);
       fetchUsers();
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to approve users');
     }
@@ -128,7 +128,7 @@ export default function UserList() {
     if (selectedUsers.length === 0) return;
 
     try {
-      await api.post('/users/bulk-reject', {
+      await api.post('/v1/users/bulk-reject', {
         userIds: selectedUsers,
         notes: 'Bulk rejected via admin dashboard',
       });
@@ -137,7 +137,7 @@ export default function UserList() {
 
       setSelectedUsers([]);
       fetchUsers();
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to reject users');
     }
@@ -146,12 +146,12 @@ export default function UserList() {
   // Handle individual approve
   const handleApprove = async (userId: string) => {
     try {
-      await api.post(`/users/${userId}/approve`);
+      await api.post(`/v1/users/${userId}/approve`);
       
       toast.success('User approved successfully');
 
       fetchUsers();
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to approve user');
     }
@@ -160,12 +160,12 @@ export default function UserList() {
   // Handle individual reject
   const handleReject = async (userId: string) => {
     try {
-      await api.post(`/users/${userId}/reject`);
+      await api.post(`/v1/users/${userId}/reject`);
       
       toast.success('User rejected successfully');
 
       fetchUsers();
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to reject user');
     }
@@ -179,7 +179,7 @@ export default function UserList() {
       if (roleFilter) params.append('role', roleFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const response = await api.get(`/users/export/csv?${params}`, {
+      const response = await api.get(`/v1/users/export/csv?${params}`, {
         responseType: 'blob',
       });
 
@@ -190,7 +190,7 @@ export default function UserList() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error: any) {
+    } catch (error) {
     // Error logging - use proper error handler
       toast.error('Failed to export users');
     }
@@ -243,7 +243,7 @@ export default function UserList() {
                 <Input
                   placeholder="Search users..."
                   value={search}
-                  onChange={(e: any) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -337,16 +337,21 @@ export default function UserList() {
                     </td>
                   </tr>
                 ) : (
-                  users.map((user: any) => (
+                  users.map((user) => (
                     <tr key={user.id} className="border-b hover:bg-gray-50">
                       <td className="p-4">
                         <Checkbox
                           checked={selectedUsers.includes(user.id)}
-                          onCheckedChange={(checked: boolean) => handleSelectUser(user.id, checked as boolean)}
+                          onCheckedChange={(checked) => handleSelectUser(user.id, !!checked)}
                         />
                       </td>
                       <td className="p-4">
-                        <div className="font-medium">{user.fullName}</div>
+                        <div className="font-medium flex items-center gap-2">
+                          {user.fullName}
+                          {(['business', 'vendor', 'seller'].includes(user.role)) && (
+                            <Building2 className="h-4 w-4 text-blue-500" title="Business Account" />
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
@@ -360,7 +365,7 @@ export default function UserList() {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-1 flex-wrap">
-                          {user.roles.map((role: any) => (
+                          {user.roles.map((role) => (
                             <Badge
                               key={role}
                               className={`${getRoleBadgeColor(role)} text-white`}

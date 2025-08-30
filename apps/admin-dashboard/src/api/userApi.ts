@@ -9,14 +9,14 @@ export class UserApi {
     filters: UserFilters = {}
   ): Promise<PaginatedResponse<User>> {
     const params = new URLSearchParams({
-      page: page.toString() as any,
-      limit: limit.toString() as any,
+      page: page.toString(),
+      limit: limit.toString(),
       ...Object.fromEntries(
         Object.entries(filters).filter(([_, value]) => value && value !== 'all')
       )
     })
 
-    const response = await unifiedApi.raw.get(`/users?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/users?${params}`)
     return response.data
   }
 
@@ -26,8 +26,8 @@ export class UserApi {
     businessType?: string
   ): Promise<PaginatedResponse<User>> {
     const params = new URLSearchParams({
-      page: page.toString() as any,
-      limit: limit.toString() as any,
+      page: page.toString(),
+      limit: limit.toString(),
       status: 'pending'
     })
 
@@ -35,32 +35,32 @@ export class UserApi {
       params.append('businessType', businessType)
     }
 
-    const response = await unifiedApi.raw.get(`/users?${params}`)
+    const response = await unifiedApi.raw.get(`/v1/users?${params}`)
     return response.data
   }
 
   static async getUser(userId: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.get(`/users/${userId}`)
+    const response = await unifiedApi.raw.get(`/v1/users/${userId}`)
     return response.data
   }
 
   static async createUser(userData: UserFormData): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post('/users', userData)
+    const response = await unifiedApi.raw.post('/v1/users', userData)
     return response.data
   }
 
   static async updateUser(userId: string, userData: Partial<UserFormData>): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.put(`/users/${userId}`, userData)
+    const response = await unifiedApi.raw.put(`/v1/users/${userId}`, userData)
     return response.data
   }
 
   static async approveUser(userId: string, notes?: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post(`/users/${userId}/approve`, { notes })
+    const response = await unifiedApi.raw.post(`/v1/users/${userId}/approve`, { notes })
     return response.data
   }
 
   static async rejectUser(userId: string, reason: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post(`/users/${userId}/reject`, { notes: reason })
+    const response = await unifiedApi.raw.post(`/v1/users/${userId}/reject`, { notes: reason })
     return response.data
   }
 
@@ -76,12 +76,12 @@ export class UserApi {
   // }
 
   static async deleteUser(userId: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete(`/users/${userId}`)
+    const response = await unifiedApi.raw.delete(`/v1/users/${userId}`)
     return response.data
   }
 
   static async bulkAction(action: UserBulkAction): Promise<ApiResponse<void>> {
-    const endpoint = action.action === 'approve' ? '/users/bulk-approve' : '/users/bulk-reject'
+    const endpoint = action.action === 'approve' ? '/v1/users/bulk-approve' : '/v1/users/bulk-reject'
     const response = await unifiedApi.raw.post(endpoint, {
       userIds: action.userIds,
       notes: action.reason || 'Bulk action via admin dashboard'
@@ -90,7 +90,7 @@ export class UserApi {
   }
 
   static async getUserStats(): Promise<ApiResponse<UserStats>> {
-    const response = await unifiedApi.raw.get('/users/statistics')
+    const response = await unifiedApi.raw.get('/v1/users/statistics')
     return response.data
   }
 
@@ -103,14 +103,14 @@ export class UserApi {
       )
     )
 
-    const response = await unifiedApi.raw.get(`/users/export/csv?${params}`, {
+    const response = await unifiedApi.raw.get(`/v1/users/export/csv?${params}`, {
       responseType: 'blob'
     })
     return response.data
   }
 
   static async getUserActivity(userId: string): Promise<ApiResponse<UserActivityLog[]>> {
-    const response = await unifiedApi.raw.get(`/users/${userId}/approval-history`)
+    const response = await unifiedApi.raw.get(`/v1/users/${userId}/approval-history`)
     return response.data
   }
 
