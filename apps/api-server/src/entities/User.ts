@@ -159,6 +159,10 @@ export class User {
   @OneToMany(() => ApprovalLog, log => log.admin)
   adminActions: ApprovalLog[];
 
+  // Theme customizations
+  @Column({ type: 'json', nullable: true })
+  themeCustomizations?: any
+
   // Password hashing
   @BeforeInsert()
   @BeforeUpdate()

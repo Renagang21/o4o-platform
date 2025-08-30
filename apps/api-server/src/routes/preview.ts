@@ -12,7 +12,7 @@ import { Post } from '../entities/Post'
 import fs from 'fs/promises'
 import path from 'path'
 
-const router = Router()
+const router: any = Router()
 
 // Apply authentication to protected routes
 router.use('/ws', authenticateToken)

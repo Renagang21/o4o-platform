@@ -115,7 +115,7 @@ export class ZoneContentAdapter {
           maxNestingLevel: 3
         },
         settings: {
-          position: 'right',
+          position: 'relative',
           width: '300px',
           sticky: true
         }

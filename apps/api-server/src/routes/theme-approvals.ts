@@ -10,9 +10,9 @@ import { authorize } from '../middleware/authorize'
 import AppDataSource from '../database/connection'
 import { User } from '../entities/User'
 import { Post } from '../entities/Post'
-import { simpleLogger } from '../utils/simpleLogger'
+import simpleLogger from '../utils/simpleLogger'
 
-const router = Router()
+const router: any = Router()
 
 // Apply authentication to all routes
 router.use(authenticateToken)
@@ -83,7 +83,7 @@ router.get('/',
       }
 
       // Apply pagination
-      queryBuilder.skip(parseInt(offset)).take(parseInt(limit))
+      queryBuilder.skip(parseInt(String(offset))).take(parseInt(String(limit)))
       queryBuilder.orderBy('customization.updatedAt', 'DESC')
 
       const users = await queryBuilder.getMany()
@@ -132,8 +132,8 @@ router.get('/',
       res.json({
         requests,
         total: requests.length,
-        limit: parseInt(limit),
-        offset: parseInt(offset)
+        limit: parseInt(String(limit)),
+        offset: parseInt(String(offset))
       })
 
     } catch (error) {

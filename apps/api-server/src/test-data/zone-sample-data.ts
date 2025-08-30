@@ -438,7 +438,7 @@ export const twoColumnSample: ZoneBasedContent = {
         maxNestingLevel: 3
       },
       settings: {
-        position: 'right',
+        position: 'relative',
         width: '300px',
         sticky: true,
         stickyOffset: 80,
