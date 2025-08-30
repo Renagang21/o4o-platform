@@ -13,6 +13,7 @@ export * from './media';
 export * from './template';
 export * from './widget';
 export * from './form-builder';
+export * from './zone';
 export * from './ecommerce';
 export * from './pricing';
 export * from './crowdfunding';
