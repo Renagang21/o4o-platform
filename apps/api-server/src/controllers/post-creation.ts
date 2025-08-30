@@ -223,10 +223,10 @@ export const getPostTypeSchema = async (req: Request, res: Response) => {
       data: {
         slug: postType.slug,
         name: postType.name,
-        singularName: postType.singularName,
+        singularName: postType.name,
         description: postType.description,
-        fieldGroups: postType.fieldGroups,
-        settings: postType.settings
+        fieldGroups: [],
+        settings: {}
       }
     });
 
@@ -272,15 +272,8 @@ export const createPostType = async (req: Request, res: Response) => {
     const postType = new CustomPostType();
     postType.slug = slug;
     postType.name = name;
-    postType.singularName = singularName;
+    // singularName, fieldGroups, settings, createdBy removed from schema
     postType.description = description;
-    postType.fieldGroups = fieldGroups || [];
-    postType.settings = settings || {
-      public: true,
-      hasArchive: true,
-      supports: ['title', 'content']
-    };
-    postType.createdBy = createdBy;
 
     const savedPostType = await postTypeRepository.save(postType);
 
@@ -344,7 +337,7 @@ export const getPostById = async (req: Request, res: Response) => {
         postType: {
           slug: post.postType.slug,
           name: post.postType.name,
-          fieldGroups: post.postType.fieldGroups
+          fieldGroups: []
         }
       }
     });
@@ -536,7 +529,7 @@ export const getUserAvailablePostTypes = async (req: Request, res: Response) => 
     
     const postTypes = await postTypeRepository.find({
       where: { active: true },
-      select: ['slug', 'name', 'singularName', 'description', 'settings']
+      select: ['slug', 'name', 'description']
     });
 
     res.json({
@@ -545,9 +538,9 @@ export const getUserAvailablePostTypes = async (req: Request, res: Response) => 
         postTypes: postTypes.map((pt: any) => ({
           slug: pt.slug,
           name: pt.name,
-          singularName: pt.singularName,
+          singularName: pt.name,
           description: pt.description,
-          supports: pt.settings.supports || []
+          supports: []
         }))
       }
     });

@@ -1,6 +1,6 @@
 import { 
   Entity, 
-  PrimaryColumn, 
+  PrimaryGeneratedColumn, 
   Column, 
   CreateDateColumn, 
   UpdateDateColumn, 
@@ -39,41 +39,23 @@ export interface FieldGroup {
 
 @Entity('custom_post_types')
 export class CustomPostType {
-  @PrimaryColumn({ type: 'varchar', length: 50 })
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column({ type: 'varchar', length: 100, unique: true })
   slug!: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 255 })
   name!: string;
-
-  @Column({ type: 'varchar', length: 100 })
-  singularName!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', length: 50, default: '📄' })
+  @Column({ type: 'varchar', length: 50, default: 'file' })
   icon!: string;
-
-  // Field groups stored as JSON
-  @Column({ type: 'json' })
-  fieldGroups!: FieldGroup[];
-
-  // CPT settings
-  @Column({ type: 'json', default: {} })
-  settings!: {
-    public: boolean;
-    hasArchive: boolean;
-    supports: string[]; // ['title', 'content', 'thumbnail']
-    menuIcon?: string;
-    menuPosition?: number;
-    capabilities?: string[];
-  };
 
   @Column({ type: 'boolean', default: true })
   active!: boolean;
-
-  @Column({ type: 'uuid', nullable: true })
-  createdBy?: string;
 
   @OneToMany(() => CustomPost, post => post.postType)
   posts!: CustomPost[];

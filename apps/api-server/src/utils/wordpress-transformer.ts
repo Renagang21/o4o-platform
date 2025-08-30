@@ -138,7 +138,7 @@ export class WordPressTransformer {
 
     // ACF 필드 변환 (fields → acf)
     if (customPost.fields && Object.keys(customPost.fields).length > 0) {
-      wpPost.acf = this.transformACFFields(customPost.fields, customPost.postType?.fieldGroups || []);
+      wpPost.acf = this.transformACFFields(customPost.fields, []);
     }
 
     // _embedded 정보 추가

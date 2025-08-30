@@ -8,6 +8,65 @@ import { WordPressTransformer } from '../utils/wordpress-transformer';
 export class CPTController {
   // ============= Custom Post Type Management =============
 
+  // Alias for getCPTBySlug
+  static async getCPT(req: Request, res: Response) {
+    return CPTController.getCPTBySlug(req, res);
+  }
+
+  // Alias for getPostsByCPT
+  static async getCPTPosts(req: Request, res: Response) {
+    return CPTController.getPostsByCPT(req, res);
+  }
+
+  // Initialize default CPTs
+  static async initializeDefaults(req: Request, res: Response) {
+    try {
+      const cptRepo = AppDataSource.getRepository(CustomPostType);
+      
+      // Check if defaults already exist
+      const existingCount = await cptRepo.count();
+      if (existingCount > 0) {
+        return res.json({
+          success: true,
+          message: 'Default CPTs already initialized'
+        });
+      }
+
+      // Create default CPTs
+      const defaultCPTs = [
+        {
+          slug: 'products',
+          name: 'Products',
+          description: 'Product catalog',
+          icon: 'package',
+          active: true
+        },
+        {
+          slug: 'portfolio',
+          name: 'Portfolio',
+          description: 'Portfolio items',
+          icon: 'briefcase',
+          active: true
+        }
+      ];
+
+      const savedCPTs = await cptRepo.save(defaultCPTs);
+
+      res.json({
+        success: true,
+        data: savedCPTs,
+        message: 'Default CPTs initialized successfully'
+      });
+    } catch (error: any) {
+      console.error('Error initializing default CPTs:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to initialize default CPTs',
+        message: error.message
+      });
+    }
+  }
+
   // Get all CPTs
   static async getAllCPTs(req: Request, res: Response) {
     try {
@@ -84,28 +143,14 @@ export class CPTController {
         });
       }
 
-      // Validate field groups
-      if (!CPTController.validateFieldGroups(fieldGroups)) {
-        return res.status(400).json({
-          success: false,
-          message: '필드 그룹 구조가 올바르지 않습니다.'
-        });
-      }
+      // Field groups validation removed (not in current schema)
 
       const cpt = new CustomPostType();
       cpt.slug = slug;
       cpt.name = name;
-      cpt.singularName = singularName;
       cpt.description = description;
-      cpt.icon = icon || '📄';
-      cpt.fieldGroups = fieldGroups || [];
-      cpt.settings = {
-        public: true,
-        hasArchive: true,
-        supports: ['title'],
-        ...settings
-      };
-      cpt.createdBy = (req as AuthRequest).user?.id || '';
+      cpt.icon = icon || 'file';
+      cpt.active = true;
 
       await cptRepo.save(cpt);
 
@@ -287,7 +332,7 @@ export class CPTController {
       }
 
       // Validate fields against CPT schema
-      const validationResult = CPTController.validatePostFields(fields, cpt.fieldGroups);
+      const validationResult = CPTController.validatePostFields(fields, []);
       if (!validationResult.valid) {
         return res.status(400).json({
           success: false,

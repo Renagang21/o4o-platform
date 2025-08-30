@@ -461,26 +461,15 @@ import shortcodeRoutes from './routes/shortcodes';
 app.use('/admin', acfRoutes);
 app.use('/api/shortcodes', shortcodeRoutes);
 
-// Missing dashboard endpoints (temporary)
-app.get('/ecommerce/dashboard/stats', (req, res) => {
-  res.json({ success: true, data: { orders: 0, revenue: 0, products: 0, customers: 0 } });
-});
-
-app.get('/api/users/stats', (req, res) => {
-  res.json({ success: true, data: { total: 0, active: 0, pending: 0, inactive: 0 } });
-});
-
-app.get('/api/admin/notifications', (req, res) => {
-  res.json({ success: true, data: [], total: 0 });
-});
-
-app.get('/api/admin/activities', (req, res) => {
-  res.json({ success: true, data: [], total: 0 });
-});
-
-app.get('/api/system/health', (req, res) => {
-  res.json({ success: true, status: 'healthy', timestamp: new Date().toISOString() });
-});
+// Dashboard endpoints with real data
+import { DashboardController } from './controllers/dashboardController';
+app.get('/ecommerce/dashboard/stats', DashboardController.getEcommerceStats);
+app.get('/api/users/stats', DashboardController.getUserStats);
+app.get('/api/admin/notifications', DashboardController.getNotifications);
+app.get('/api/admin/activities', DashboardController.getActivities);
+app.get('/api/system/health', DashboardController.getSystemHealth);
+app.get('/api/admin/stats', DashboardController.getContentStats);
+app.get('/api/dashboard/overview', DashboardController.getDashboardOverview);
 
 // Direct public endpoints for main site
 app.get('/api/posts', publicLimiter, async (req, res) => {
