@@ -13,7 +13,7 @@ export class CreatePostsTable1739000000000 implements MigrationInterface {
                     type: "uuid",
                     isPrimary: true,
                     generationStrategy: "uuid",
-                    default: "gen_random_uuid()"
+                    default: "uuid_generate_v4()"
                 },
                 {
                     name: "title",
