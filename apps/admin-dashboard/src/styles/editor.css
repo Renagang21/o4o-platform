@@ -3,19 +3,34 @@
 /* Block container styles */
 .blocks-container {
   position: relative;
-  padding: 70px 40px 20px 40px; /* Balanced top space for first block toolbar */
+  padding: 40px 40px 20px 40px; /* Reduced top padding since first block handles its own spacing */
 }
 
 .block-item {
   position: relative;
-  margin-top: 80px; /* Increased space for toolbar above */
-  margin-bottom: 120px; /* Much larger space to prevent toolbar overlap */
-  transition: all 0.2s ease;
+  margin-top: 20px; /* Minimal spacing between blocks when not selected */
+  margin-bottom: 0; /* No bottom margin needed */
+  transition: all 0.3s ease; /* Smooth transition for spacing changes */
 }
 
-/* First block doesn't need top margin due to container padding */
+/* Dynamic spacing when block is selected */
+.block-item.block-selected {
+  margin-top: 80px; /* Expand top margin for toolbar space when selected */
+}
+
+/* Special handling for consecutive selected blocks */
+.block-item.block-selected + .block-item.block-selected {
+  margin-top: 100px; /* Extra space when previous block is also selected */
+}
+
+/* First block has minimal margin by default */
 .block-item:first-child {
   margin-top: 0;
+}
+
+/* First block when selected needs space for toolbar */
+.block-item:first-child.block-selected {
+  margin-top: 60px; /* Space for toolbar above first block */
 }
 
 /* Drag and drop visual feedback */

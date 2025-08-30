@@ -625,6 +625,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     key={block.id}
                     className={`block-item ${
                       dragOverBlockId === block.id ? 'drag-over' : ''
+                    } ${
+                      selectedBlockId === block.id ? 'block-selected' : ''
                     }`}
                     onDragOver={(e) => handleDragOver(e, block.id)}
                     onDrop={(e) => handleDrop(e, block.id)}
