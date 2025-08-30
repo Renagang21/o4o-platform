@@ -463,7 +463,7 @@ app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 import acfRoutes from './routes/acf';
 import shortcodeRoutes from './routes/shortcodes';
 app.use('/admin', acfRoutes);
-app.use('/api/shortcodes', shortcodeRoutes);
+app.use('/api/v1/shortcodes', shortcodeRoutes);
 
 // Dashboard endpoints with real data
 import { DashboardController } from './controllers/dashboardController';
