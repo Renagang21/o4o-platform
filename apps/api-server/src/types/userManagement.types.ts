@@ -365,6 +365,7 @@ export interface BusinessStatisticsResponse {
 
 // Express Request Extensions
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: {
