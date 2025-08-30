@@ -167,16 +167,16 @@ export class Post {
   revisions!: PostRevision[]
 
   // Zone-based layout fields
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'json', nullable: true, name: 'zones' })
   zones?: any
 
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'json', nullable: true, name: 'theme_customizations' })
   themeCustomizations?: any
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'use_zones' })
   useZones?: boolean
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'layout_type' })
   layoutType?: string
 
   @CreateDateColumn()
