@@ -121,6 +121,8 @@ import tossPaymentsRoutes from './routes/v1/toss-payments.routes';
 import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
 import galleryRoutes from './routes/gallery.routes';
+import acfV1Routes from './routes/v1/acf.routes';
+import shortcodeV1Routes from './routes/v1/shortcodes.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -569,6 +571,8 @@ app.use('/api/v1/dropshipping', dropshippingV1Routes);
 app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 app.use('/api/v1/settings', settingsV1Routes); // 설정 라우트
+app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
+app.use('/api/v1/shortcodes', shortcodeV1Routes); // Shortcode v1 라우트
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
