@@ -364,18 +364,19 @@ export interface BusinessStatisticsResponse {
 }
 
 // Express Request Extensions
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        email: string;
-        role: UserRole;
-        status: UserStatus;
-      };
-    }
-  }
-}
+// Note: This is already declared in auth.ts, so commenting out to avoid conflicts
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: {
+//         id: string;
+//         email: string;
+//         role: UserRole;
+//         status: UserStatus;
+//       };
+//     }
+//   }
+// }
 
 // API Parameter Types
 export interface UserActivityLogParams {

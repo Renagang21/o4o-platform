@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class CreateACFTables1750000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -120,18 +120,18 @@ export class CreateACFTables1750000000000 implements MigrationInterface {
     );
 
     // Create indexes for field groups
-    await queryRunner.createIndex('acf_field_groups', new Index({
+    await queryRunner.createIndex('acf_field_groups', new TableIndex({
       name: 'IDX_acf_field_groups_key',
       columnNames: ['key'],
       isUnique: true
     }));
 
-    await queryRunner.createIndex('acf_field_groups', new Index({
+    await queryRunner.createIndex('acf_field_groups', new TableIndex({
       name: 'IDX_acf_field_groups_isActive',
       columnNames: ['isActive']
     }));
 
-    await queryRunner.createIndex('acf_field_groups', new Index({
+    await queryRunner.createIndex('acf_field_groups', new TableIndex({
       name: 'IDX_acf_field_groups_menuOrder',
       columnNames: ['menuOrder']
     }));
@@ -491,23 +491,23 @@ export class CreateACFTables1750000000000 implements MigrationInterface {
     );
 
     // Create indexes for fields
-    await queryRunner.createIndex('acf_fields', new Index({
+    await queryRunner.createIndex('acf_fields', new TableIndex({
       name: 'IDX_acf_fields_fieldGroupId_order',
       columnNames: ['fieldGroupId', 'order']
     }));
 
-    await queryRunner.createIndex('acf_fields', new Index({
+    await queryRunner.createIndex('acf_fields', new TableIndex({
       name: 'IDX_acf_fields_key',
       columnNames: ['key'],
       isUnique: true
     }));
 
-    await queryRunner.createIndex('acf_fields', new Index({
+    await queryRunner.createIndex('acf_fields', new TableIndex({
       name: 'IDX_acf_fields_name',
       columnNames: ['name']
     }));
 
-    await queryRunner.createIndex('acf_fields', new Index({
+    await queryRunner.createIndex('acf_fields', new TableIndex({
       name: 'IDX_acf_fields_type',
       columnNames: ['type']
     }));
