@@ -158,6 +158,39 @@ class BlockRegistry {
       component: () => import('./blocks/design/StandardSeparatorBlock').then(m => ({ default: m.default }))
     })
 
+    this.register({
+      name: 'core/group',
+      title: 'Group',
+      category: 'design',
+      icon: 'folder',
+      description: 'Gather blocks in a container.',
+      keywords: ['group', 'container', 'wrapper', 'section', 'div'],
+      priority: 'high',
+      component: () => import('./blocks/design/StandardGroupBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/spacer',
+      title: 'Spacer',
+      category: 'design',
+      icon: 'arrows-up-down',
+      description: 'Add white space between blocks.',
+      keywords: ['spacer', 'space', 'gap', 'margin', 'padding'],
+      priority: 'medium',
+      component: () => import('./blocks/design/StandardSpacerBlock').then(m => ({ default: m.default }))
+    })
+
+    this.register({
+      name: 'core/social-share',
+      title: 'Social Share',
+      category: 'design',
+      icon: 'share-2',
+      description: 'Add social media share buttons.',
+      keywords: ['share', 'social', 'facebook', 'twitter', 'kakao'],
+      priority: 'medium',
+      component: () => import('./blocks/design/StandardSocialShareBlock').then(m => ({ default: m.default }))
+    })
+
     // Layout blocks
     this.register({
       name: 'core/columns',
