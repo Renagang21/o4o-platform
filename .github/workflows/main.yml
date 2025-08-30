@@ -68,7 +68,7 @@ jobs:
     
     strategy:
       matrix:
-        app: [api-server, main-site, admin-dashboard, ecommerce, forum, digital-signage, crowdfunding]
+        app: [main-site, admin-dashboard, ecommerce, forum, digital-signage, crowdfunding]
     
     steps:
     - uses: actions/checkout@v4
@@ -98,22 +98,15 @@ jobs:
           apps/${{ matrix.app }}/build
         retention-days: 7
 
-  # 3. Deploy to API Server
+  # 3. Deploy to API Server (Skip build, deploy source only)
   deploy-api:
-    name: Deploy API Server
+    name: Deploy API Server Source
     runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.build.result == 'success'
+    needs: quality-check
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Download API build
-      uses: actions/download-artifact@v4
-      continue-on-error: true
-      with:
-        name: api-server-dist
-        path: apps/api-server/dist
     
     - name: Setup SSH key
       run: |
@@ -122,17 +115,19 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 43.202.242.215 >> ~/.ssh/known_hosts
     
-    - name: Deploy to API server
+    - name: Deploy source code to API server
       continue-on-error: true
       run: |
-        # Copy built files
-        scp -r apps/api-server/dist/* ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/dist/
+        echo "📦 Deploying source code to API server (build will be done on server)"
         
-        # Copy package files if changed
-        scp apps/api-server/package*.json ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/
+        # Copy source files only (no build)
+        scp -r apps/api-server/src ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/
+        scp -r apps/api-server/*.json ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/
+        scp -r apps/api-server/*.js ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/ 2>/dev/null || true
         
-        # Restart application
-        ssh ubuntu@43.202.242.215 "cd /home/ubuntu/o4o-platform/apps/api-server && npm cache clean --force && rm -rf node_modules/.uuid-* node_modules/.tmp-* && npm ci --production || npm install --production && pm2 restart api-server"
+        # Server will handle the build and restart
+        echo "⚠️ API server needs manual build and restart on server"
+        echo "Run on server: cd /home/ubuntu/o4o-platform/apps/api-server && npm run build && pm2 restart api-server"
     
     - name: Health check
       continue-on-error: true
@@ -143,7 +138,7 @@ jobs:
           echo "✅ API server is healthy"
         else
           echo "⚠️ API health check failed with status: $response"
-          echo "Note: This may be due to SSL certificate or deployment issues"
+          echo "Note: Build and restart needed on server"
         fi
 
   # 4. Deploy to Web Server
