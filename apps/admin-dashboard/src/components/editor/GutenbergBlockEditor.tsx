@@ -67,10 +67,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const navigate = useNavigate();
   
   // Simple toast function
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
-  };
+  }, []);
 
   // Update blocks and history
   const updateBlocks = useCallback(
@@ -471,7 +471,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setSelectedBlockId(null);
       showToast('템플릿이 적용되었습니다!', 'success');
     },
-    [updateBlocks]
+    [updateBlocks, showToast]
   );
 
   // Render block component

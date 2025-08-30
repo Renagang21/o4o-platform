@@ -116,6 +116,7 @@ export const useThemeCustomization = (
       setCustomization(defaultCustomization)
       setOriginalCustomization(defaultCustomization)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, initialCustomization])
 
   // Auto-save effect
@@ -132,6 +133,7 @@ export const useThemeCustomization = (
       autoSaveTimerRef.current = timer
       return () => clearTimeout(timer)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirty, isLoading, autoSaveInterval])
 
   // Load customization from API

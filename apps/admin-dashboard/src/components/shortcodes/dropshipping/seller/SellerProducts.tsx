@@ -273,9 +273,9 @@ const SellerProducts: React.FC = () => {
 
   // Pricing Dialog
   const PricingDialog = () => {
+    const [newPrice, setNewPrice] = useState(selectedProduct?.sellingPrice || 0);
+    
     if (!selectedProduct) return null;
-
-    const [newPrice, setNewPrice] = useState(selectedProduct.sellingPrice);
     const newProfit = newPrice - selectedProduct.supplierPrice;
     const newMargin = (newProfit / newPrice) * 100;
 
@@ -351,9 +351,14 @@ const SellerProducts: React.FC = () => {
 
   // Settings Dialog
   const SettingsDialog = () => {
+    const [syncSettings, setSyncSettings] = useState(selectedProduct?.syncSettings || {
+      autoSync: false,
+      syncInventory: false,
+      syncPricing: false,
+      lastSynced: null
+    });
+    
     if (!selectedProduct) return null;
-
-    const [syncSettings, setSyncSettings] = useState(selectedProduct.syncSettings);
 
     return (
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
