@@ -1,0 +1,477 @@
+{
+  "version": "1.0",
+  "theme": "twenty-four",
+  "zones": {
+    "header": {
+      "id": "header",
+      "name": "Header",
+      "description": "Site header with logo and navigation",
+      "type": "header",
+      "maxBlocks": 5,
+      "allowedBlocks": [
+        "core/site-logo",
+        "core/site-title", 
+        "core/site-tagline",
+        "core/navigation",
+        "core/search",
+        "core/social-links",
+        "core/buttons"
+      ],
+      "constraints": {
+        "required": true,
+        "sticky": true,
+        "fullWidth": true
+      },
+      "defaultBlocks": [
+        {
+          "type": "core/site-logo",
+          "attributes": {
+            "width": 60,
+            "isLink": true,
+            "linkTarget": "_self"
+          }
+        },
+        {
+          "type": "core/site-title",
+          "attributes": {
+            "level": 1,
+            "isLink": true,
+            "linkTarget": "_self"
+          }
+        },
+        {
+          "type": "core/navigation",
+          "attributes": {
+            "showSubmenuIcon": true,
+            "openSubmenusOnClick": false
+          }
+        }
+      ],
+      "styles": {
+        "spacing": {
+          "padding": {
+            "top": "var(--wp--preset--spacing--40)",
+            "bottom": "var(--wp--preset--spacing--40)"
+          }
+        },
+        "color": {
+          "background": "var(--wp--preset--color--primary)",
+          "text": "var(--wp--preset--color--contrast)"
+        },
+        "border": {
+          "bottom": "1px solid var(--wp--preset--color--tertiary)"
+        }
+      }
+    },
+    
+    "hero": {
+      "id": "hero",
+      "name": "Hero Section",
+      "description": "Main hero/banner area below header",
+      "type": "hero",
+      "maxBlocks": 3,
+      "allowedBlocks": [
+        "core/heading",
+        "core/paragraph",
+        "core/buttons",
+        "core/image",
+        "core/cover",
+        "core/media-text",
+        "core/columns"
+      ],
+      "constraints": {
+        "required": false,
+        "fullWidth": true,
+        "minHeight": "300px"
+      },
+      "defaultBlocks": [
+        {
+          "type": "core/heading",
+          "attributes": {
+            "level": 1,
+            "content": "Welcome to Our Site",
+            "fontSize": "xx-large",
+            "textAlign": "center"
+          }
+        },
+        {
+          "type": "core/paragraph",
+          "attributes": {
+            "content": "Discover amazing content and services that will transform your experience.",
+            "fontSize": "large",
+            "textAlign": "center"
+          }
+        },
+        {
+          "type": "core/buttons",
+          "attributes": {
+            "layout": {
+              "type": "flex",
+              "justifyContent": "center"
+            }
+          },
+          "innerBlocks": [
+            {
+              "type": "core/button",
+              "attributes": {
+                "text": "Get Started",
+                "url": "#",
+                "className": "is-style-fill"
+              }
+            }
+          ]
+        }
+      ],
+      "styles": {
+        "spacing": {
+          "padding": {
+            "top": "var(--wp--preset--spacing--70)",
+            "bottom": "var(--wp--preset--spacing--70)"
+          }
+        },
+        "color": {
+          "background": "var(--wp--preset--color--secondary)"
+        }
+      }
+    },
+    
+    "main": {
+      "id": "main",
+      "name": "Main Content",
+      "description": "Primary content area",
+      "type": "main",
+      "maxBlocks": 20,
+      "allowedBlocks": [
+        "core/paragraph",
+        "core/heading", 
+        "core/image",
+        "core/gallery",
+        "core/list",
+        "core/quote",
+        "core/pullquote",
+        "core/separator",
+        "core/spacer",
+        "core/columns",
+        "core/group",
+        "core/media-text",
+        "core/video",
+        "core/embed",
+        "core/buttons",
+        "core/table",
+        "core/code",
+        "core/html"
+      ],
+      "constraints": {
+        "required": true,
+        "contentWidth": "620px"
+      },
+      "defaultBlocks": [
+        {
+          "type": "core/heading",
+          "attributes": {
+            "level": 2,
+            "content": "About Us",
+            "fontSize": "x-large"
+          }
+        },
+        {
+          "type": "core/paragraph",
+          "attributes": {
+            "content": "This is the main content area where you can add your story, services, or any information you'd like to share with your visitors."
+          }
+        }
+      ],
+      "styles": {
+        "spacing": {
+          "padding": {
+            "top": "var(--wp--preset--spacing--60)",
+            "bottom": "var(--wp--preset--spacing--60)"
+          }
+        }
+      }
+    },
+    
+    "sidebar": {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "description": "Secondary content area",
+      "type": "sidebar",
+      "maxBlocks": 10,
+      "allowedBlocks": [
+        "core/heading",
+        "core/paragraph",
+        "core/image",
+        "core/list",
+        "core/separator",
+        "core/spacer",
+        "core/group",
+        "core/buttons",
+        "core/social-links",
+        "core/search",
+        "core/latest-posts",
+        "core/tag-cloud",
+        "core/categories"
+      ],
+      "constraints": {
+        "required": false,
+        "width": "300px"
+      },
+      "defaultBlocks": [
+        {
+          "type": "core/heading",
+          "attributes": {
+            "level": 3,
+            "content": "Quick Links",
+            "fontSize": "large"
+          }
+        },
+        {
+          "type": "core/list",
+          "attributes": {
+            "values": "<li>About Us</li><li>Services</li><li>Contact</li>"
+          }
+        }
+      ],
+      "styles": {
+        "spacing": {
+          "padding": {
+            "top": "var(--wp--preset--spacing--40)",
+            "bottom": "var(--wp--preset--spacing--40)",
+            "left": "var(--wp--preset--spacing--40)"
+          }
+        },
+        "color": {
+          "background": "var(--wp--preset--color--tertiary)"
+        }
+      }
+    },
+    
+    "features": {
+      "id": "features",
+      "name": "Features Section",
+      "description": "Highlight key features or services",
+      "type": "features",
+      "maxBlocks": 8,
+      "allowedBlocks": [
+        "core/heading",
+        "core/paragraph",
+        "core/columns",
+        "core/group",
+        "core/image",
+        "core/media-text",
+        "core/buttons"
+      ],
+      "constraints": {
+        "required": false,
+        "fullWidth": true
+      },
+      "defaultBlocks": [
+        {
+          "type": "core/heading",
+          "attributes": {
+            "level": 2,
+            "content": "Our Features",
+            "fontSize": "x-large",
+            "textAlign": "center"
+          }
+        },
+        {
+          "type": "core/columns",
+          "attributes": {
+            "columns": 3
+          },
+          "innerBlocks": [
+            {
+              "type": "core/column",
+              "innerBlocks": [
+                {
+                  "type": "core/heading",
+                  "attributes": {
+                    "level": 3,
+                    "content": "Feature One",
+                    "textAlign": "center"
+                  }
+                },
+                {
+                  "type": "core/paragraph",
+                  "attributes": {
+                    "content": "Description of your first amazing feature.",
+                    "textAlign": "center"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "core/column",
+              "innerBlocks": [
+                {
+                  "type": "core/heading",
+                  "attributes": {
+                    "level": 3,
+                    "content": "Feature Two",
+                    "textAlign": "center"
+                  }
+                },
+                {
+                  "type": "core/paragraph",
+                  "attributes": {
+                    "content": "Description of your second amazing feature.",
+                    "textAlign": "center"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "core/column",
+              "innerBlocks": [
+                {
+                  "type": "core/heading",
+                  "attributes": {
+                    "level": 3,
+                    "content": "Feature Three",
+                    "textAlign": "center"
+                  }
+                },
+                {
+                  "type": "core/paragraph",
+                  "attributes": {
+                    "content": "Description of your third amazing feature.",
+                    "textAlign": "center"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "styles": {
+        "spacing": {
+          "padding": {
+            "top": "var(--wp--preset--spacing--70)",
+            "bottom": "var(--wp--preset--spacing--70)"
+          }
+        },
+        "color": {
+          "background": "var(--wp--preset--color--primary)"
+        }
+      }
+    },
+    
+    "footer": {
+      "id": "footer",
+      "name": "Footer",
+      "description": "Site footer with copyright and links",
+      "type": "footer",
+      "maxBlocks": 6,
+      "allowedBlocks": [
+        "core/paragraph",
+        "core/site-title",
+        "core/site-tagline",
+        "core/navigation",
+        "core/social-links",
+        "core/columns",
+        "core/group",
+        "core/separator"
+      ],
+      "constraints": {
+        "required": true,
+        "fullWidth": true
+      },
+      "defaultBlocks": [
+        {
+          "type": "core/group",
+          "attributes": {
+            "layout": {
+              "type": "flex",
+              "flexWrap": "wrap",
+              "justifyContent": "space-between"
+            }
+          },
+          "innerBlocks": [
+            {
+              "type": "core/site-title",
+              "attributes": {
+                "level": 0,
+                "isLink": false,
+                "fontSize": "medium"
+              }
+            },
+            {
+              "type": "core/navigation",
+              "attributes": {
+                "layout": {
+                  "type": "flex",
+                  "setCascadingProperties": true,
+                  "justifyContent": "right"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "core/separator",
+          "attributes": {
+            "style": {
+              "spacing": {
+                "margin": {
+                  "top": "var(--wp--preset--spacing--40)",
+                  "bottom": "var(--wp--preset--spacing--40)"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "core/paragraph",
+          "attributes": {
+            "content": "© 2024 Your Business Name. All rights reserved.",
+            "fontSize": "small",
+            "textAlign": "center"
+          }
+        }
+      ],
+      "styles": {
+        "spacing": {
+          "padding": {
+            "top": "var(--wp--preset--spacing--50)",
+            "bottom": "var(--wp--preset--spacing--50)"
+          }
+        },
+        "color": {
+          "background": "var(--wp--preset--color--contrast)",
+          "text": "var(--wp--preset--color--primary)"
+        }
+      }
+    }
+  },
+  
+  "layouts": {
+    "single-column": {
+      "name": "Single Column",
+      "zones": ["header", "hero", "main", "footer"],
+      "template": "single-column.html"
+    },
+    "with-sidebar": {
+      "name": "With Sidebar",
+      "zones": ["header", "hero", "main", "sidebar", "footer"],
+      "template": "with-sidebar.html"
+    },
+    "landing-page": {
+      "name": "Landing Page",
+      "zones": ["header", "hero", "features", "main", "footer"],
+      "template": "landing-page.html"
+    },
+    "full-features": {
+      "name": "Full Featured",
+      "zones": ["header", "hero", "main", "features", "sidebar", "footer"],
+      "template": "full-features.html"
+    }
+  },
+  
+  "templates": {
+    "single-column.html": "<!DOCTYPE html><html><head><title>{{site.title}}</title></head><body><div class=\"site\"><div class=\"zone-header\">{{zones.header}}</div><div class=\"zone-hero\">{{zones.hero}}</div><div class=\"zone-main\">{{zones.main}}</div><div class=\"zone-footer\">{{zones.footer}}</div></div></body></html>",
+    "with-sidebar.html": "<!DOCTYPE html><html><head><title>{{site.title}}</title></head><body><div class=\"site\"><div class=\"zone-header\">{{zones.header}}</div><div class=\"zone-hero\">{{zones.hero}}</div><div class=\"content-wrapper\"><div class=\"zone-main\">{{zones.main}}</div><div class=\"zone-sidebar\">{{zones.sidebar}}</div></div><div class=\"zone-footer\">{{zones.footer}}</div></div></body></html>",
+    "landing-page.html": "<!DOCTYPE html><html><head><title>{{site.title}}</title></head><body><div class=\"site\"><div class=\"zone-header\">{{zones.header}}</div><div class=\"zone-hero\">{{zones.hero}}</div><div class=\"zone-features\">{{zones.features}}</div><div class=\"zone-main\">{{zones.main}}</div><div class=\"zone-footer\">{{zones.footer}}</div></div></body></html>",
+    "full-features.html": "<!DOCTYPE html><html><head><title>{{site.title}}</title></head><body><div class=\"site\"><div class=\"zone-header\">{{zones.header}}</div><div class=\"zone-hero\">{{zones.hero}}</div><div class=\"zone-features\">{{zones.features}}</div><div class=\"content-wrapper\"><div class=\"zone-main\">{{zones.main}}</div><div class=\"zone-sidebar\">{{zones.sidebar}}</div></div><div class=\"zone-footer\">{{zones.footer}}</div></div></body></html>"
+  }
+}

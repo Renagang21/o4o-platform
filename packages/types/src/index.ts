@@ -16,6 +16,7 @@ export * from './media';
 export * from './template';
 export * from './widget';
 export * from './form-builder';
+export * from './zone';
 
 // Export ecommerce types
 export * from './ecommerce';
