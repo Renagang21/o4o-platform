@@ -182,6 +182,12 @@ const SimplifiedParagraphBlock: React.FC<SimplifiedParagraphBlockProps> = ({
       onPaste={onPaste}
       onAlignChange={handleAlignChange}
       currentAlign={align}
+      onToggleBold={handleToggleBold}
+      onToggleItalic={handleToggleItalic}
+      onChangeType={handleChangeType}
+      currentType="core/paragraph"
+      isBold={isBold}
+      isItalic={isItalic}
     >
       <div
         ref={editorRef}
