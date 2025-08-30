@@ -124,6 +124,17 @@ class BlockRegistry {
       component: () => import('./blocks/media/StandardVideoBlock').then(m => ({ default: m.default }))
     })
 
+    this.register({
+      name: 'core/gallery',
+      title: 'Gallery',
+      category: 'media',
+      icon: 'layout-grid',
+      description: 'Display multiple images in a gallery layout.',
+      keywords: ['images', 'photos', 'gallery', 'grid', 'masonry', 'carousel'],
+      priority: 'high',
+      component: () => import('./blocks/media/StandardGalleryBlock').then(m => ({ default: m.default }))
+    })
+
     // Design blocks
     this.register({
       name: 'core/button',

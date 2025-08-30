@@ -33,7 +33,7 @@ export interface StandardBlockProps {
 
 export interface StandardBlockConfig {
   type: string;
-  icon: LucideIcon;
+  icon: typeof LucideIcon;
   category: 'text' | 'media' | 'design' | 'layout' | 'embed' | 'commerce' | 'advanced';
   title: string;
   description: string;
