@@ -87,10 +87,15 @@ const CustomFields: FC = () => {
 
   // 필터링된 필드 그룹
   const filteredGroups = Array.isArray(fieldGroups) 
-    ? fieldGroups.filter((group: CustomFieldGroup) =>
-        group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        group.key.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? fieldGroups.filter((group: CustomFieldGroup) => {
+        if (!group || typeof group !== 'object') return false;
+        const searchLower = searchTerm.toLowerCase();
+        const nameMatch = group.name && typeof group.name === 'string' ? 
+          group.name.toLowerCase().includes(searchLower) : false;
+        const keyMatch = group.key && typeof group.key === 'string' ? 
+          group.key.toLowerCase().includes(searchLower) : false;
+        return nameMatch || keyMatch;
+      })
     : [];
 
 
