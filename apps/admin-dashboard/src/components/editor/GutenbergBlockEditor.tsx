@@ -11,11 +11,13 @@ import { postApi, mediaApi } from '@/services/api/postApi';
 import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
+import DesignLibraryModal from './DesignLibraryModal';
 import SimplifiedParagraphBlock from './blocks/SimplifiedParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
-import ListBlock from './blocks/ListBlock';
-import ImageBlock from './blocks/ImageBlock';
-// import { QuoteBlock } from './blocks/QuoteBlock'; // TODO: Fix QuoteBlock interface
+import SimplifiedListBlock from './blocks/SimplifiedListBlock';
+import CodeBlock from './blocks/CodeBlock';
+import QuoteBlock from './blocks/QuoteBlock';
+import EnhancedImageBlock from './blocks/EnhancedImageBlock';
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 // Toast 기능을 직접 구현
@@ -61,6 +63,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   const navigate = useNavigate();
   
   // Simple toast function
@@ -460,6 +463,17 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     [blocks, updateBlocks]
   );
 
+  // Handle template application
+  const handleApplyTemplate = useCallback(
+    (templateBlocks: Block[]) => {
+      // Replace all current blocks with template blocks, preserving document title
+      updateBlocks(templateBlocks);
+      setSelectedBlockId(null);
+      showToast('템플릿이 적용되었습니다!', 'success');
+    },
+    [updateBlocks]
+  );
+
   // Render block component
   const renderBlock = (block: Block) => {
     const commonProps = {
@@ -532,13 +546,16 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         );
       case 'core/list':
       case 'list': // Support both formats
-        return <ListBlock key={block.id} {...commonProps} />;
+        return <SimplifiedListBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
+      case 'core/code':
+      case 'code': // Support both formats
+        return <CodeBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/quote':
-        // TODO: Fix QuoteBlock interface
-        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} />;
+      case 'quote': // Support both formats
+        return <QuoteBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/image':
       case 'image': // Support both formats
-        return <ImageBlock key={block.id} {...commonProps} />;
+        return <EnhancedImageBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/button':
       case 'button': // Support both formats
         return <ButtonBlock key={block.id} {...commonProps} />;
@@ -572,10 +589,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         onToggleCodeView={handleToggleCodeView}
         isCodeView={isCodeView}
         onPreview={handlePreview}
+        onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
       />
 
       {/* Main Layout */}
-      <div className="flex-1 flex relative overflow-hidden">
+      <div className="flex-1 flex relative">
         {/* Block Inserter */}
         <BlockInserter
           isOpen={isBlockInserterOpen}
@@ -585,21 +603,42 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
         {/* Editor Canvas */}
         <div
-          className={`flex-1 transition-all duration-300 ${
+          className={`flex-1 transition-all duration-300 overflow-y-auto ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
           } mr-80`}
-          style={{ paddingTop: '10px' }}
+          style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 60px)' }}
         >
           <div className="max-w-4xl mx-auto p-8">
-            {/* Title */}
-            <div className="mb-8">
-              <input
-                type="text"
-                value={documentTitle}
-                onChange={(e) => setDocumentTitle(e.target.value)}
-                placeholder="Add title"
-                className="w-full text-4xl font-bold border-none outline-none bg-transparent focus:ring-0"
-              />
+            {/* Title Section - WordPress-style two-tier design */}
+            <div className="mb-10">
+              {/* Title Preview Display */}
+              <div className="mb-6">
+                <h1 className="text-4xl font-light text-gray-800 leading-tight">
+                  {documentTitle || 'Untitled Document'}
+                </h1>
+                <div className="mt-2 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+              </div>
+              
+              {/* Title Input Field */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  Document Title
+                </label>
+                <input
+                  type="text"
+                  value={documentTitle}
+                  onChange={(e) => {
+                    setDocumentTitle(e.target.value);
+                    setIsDirty(true);
+                  }}
+                  placeholder="Enter your title here..."
+                  className="w-full px-0 py-1 text-xl font-medium text-gray-900 border-0 border-b-2 border-transparent hover:border-gray-200 focus:border-blue-500 outline-none transition-colors bg-transparent"
+                  autoComplete="off"
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  This title will appear at the top of your page
+                </p>
+              </div>
             </div>
 
             {/* Blocks */}
@@ -625,6 +664,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                     key={block.id}
                     className={`block-item ${
                       dragOverBlockId === block.id ? 'drag-over' : ''
+                    } ${
+                      selectedBlockId === block.id ? 'block-selected' : ''
                     }`}
                     onDragOver={(e) => handleDragOver(e, block.id)}
                     onDrop={(e) => handleDrop(e, block.id)}
@@ -714,6 +755,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
       )}
+
+      {/* Design Library Modal */}
+      <DesignLibraryModal
+        isOpen={isDesignLibraryOpen}
+        onClose={() => setIsDesignLibraryOpen(false)}
+        onApplyTemplate={handleApplyTemplate}
+      />
     </div>
   );
 };

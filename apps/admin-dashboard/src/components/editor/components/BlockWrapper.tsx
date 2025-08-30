@@ -13,7 +13,7 @@ import HeadingBlock from '../blocks/HeadingBlock';
 import ImageBlock from '../blocks/ImageBlock';
 import ListBlock from '../blocks/ListBlock';
 import ButtonBlock from '../blocks/ButtonBlock';
-import { QuoteBlock } from '../blocks/QuoteBlock';
+// import QuoteBlock from '../blocks/QuoteBlock';
 import { useBlockTransform } from '../hooks/useBlockTransform';
 import type { Block, ThemeConfig } from '../types';
 
@@ -51,12 +51,12 @@ export const BlockWrapper: FC<BlockWrapperProps> = ({
 
   // 블록 타입별 컴포넌트 렌더링
   const renderBlock = () => {
-    // Props for new-style components (ImageBlock, ButtonBlock, ListBlock, QuoteBlock)
-    const newStyleProps = {
-      block,
-      updateBlock: onUpdate,
-      isSelected,
-    };
+    // Props for new-style components (ImageBlock, ButtonBlock, ListBlock)
+    // const newStyleProps = {
+    //   block,
+    //   updateBlock: onUpdate,
+    //   isSelected,
+    // };
 
     // Props for old-style components (ParagraphBlock, HeadingBlock)
     const oldStyleProps = {
@@ -90,7 +90,11 @@ export const BlockWrapper: FC<BlockWrapperProps> = ({
       case 'button':
         return <ButtonBlock {...oldStyleProps} />;
       case 'quote':
-        return <QuoteBlock {...newStyleProps} />;
+        return (
+          <div className="p-4 bg-gray-100 rounded text-gray-500">
+            Quote block (legacy component, use new editor instead)
+          </div>
+        );
       default:
         return (
           <div className="p-4 bg-gray-100 rounded text-gray-500">
