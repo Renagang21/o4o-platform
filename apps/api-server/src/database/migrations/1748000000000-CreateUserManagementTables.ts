@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class CreateUserManagementTables1748000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -102,17 +102,17 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
     );
 
     // Create indexes for user_activity_logs
-    await queryRunner.createIndex('user_activity_logs', new Index({
+    await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_userId_activityType_createdAt',
       columnNames: ['userId', 'activityType', 'createdAt']
     }));
 
-    await queryRunner.createIndex('user_activity_logs', new Index({
+    await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_activityCategory_createdAt',
       columnNames: ['activityCategory', 'createdAt']
     }));
 
-    await queryRunner.createIndex('user_activity_logs', new Index({
+    await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_createdAt',
       columnNames: ['createdAt']
     }));
@@ -289,18 +289,18 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
     );
 
     // Create indexes for business_info
-    await queryRunner.createIndex('business_info', new Index({
+    await queryRunner.createIndex('business_info', new TableIndex({
       name: 'IDX_business_info_userId',
       columnNames: ['userId'],
       isUnique: true
     }));
 
-    await queryRunner.createIndex('business_info', new Index({
+    await queryRunner.createIndex('business_info', new TableIndex({
       name: 'IDX_business_info_businessType_industry',
       columnNames: ['businessType', 'industry']
     }));
 
-    await queryRunner.createIndex('business_info', new Index({
+    await queryRunner.createIndex('business_info', new TableIndex({
       name: 'IDX_business_info_businessSize_industry',
       columnNames: ['businessSize', 'industry']
     }));
