@@ -12,9 +12,9 @@ import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
 import DesignLibraryModal from './DesignLibraryModal';
-import SimplifiedParagraphBlock from './blocks/SimplifiedParagraphBlock';
+import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
-import SimplifiedListBlock from './blocks/SimplifiedListBlock';
+import ListBlock from './blocks/ListBlock';
 import CodeBlock from './blocks/CodeBlock';
 import QuoteBlock from './blocks/QuoteBlock';
 import EnhancedImageBlock from './blocks/EnhancedImageBlock';
@@ -530,7 +530,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     switch (block.type) {
       case 'core/paragraph':
       case 'paragraph': // Support both formats
-        return <SimplifiedParagraphBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
+        return <ParagraphBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/heading':
       case 'heading': // Support both formats
         return (
@@ -546,7 +546,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         );
       case 'core/list':
       case 'list': // Support both formats
-        return <SimplifiedListBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
+        return <ListBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/code':
       case 'code': // Support both formats
         return <CodeBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;

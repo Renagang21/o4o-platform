@@ -6,9 +6,10 @@
 // Lazy loading for block components
 
 // Map of block names to their import functions
+// Currently empty as WordPress style blocks have been removed
 const blockImportMap = {
-  'o4o/group': () => import('./group'),
-  'o4o/columns': () => import('./columns')
+  // 'o4o/group': () => import('./group'), // Removed
+  // 'o4o/columns': () => import('./columns') // Removed
 };
 
 // Track loaded blocks
@@ -60,7 +61,8 @@ export async function loadBlocksForContent(content: string): Promise<void> {
  * Preload commonly used blocks
  */
 export async function preloadCommonBlocks(): Promise<void> {
-  const commonBlocks = ['o4o/group', 'o4o/columns'];
+  // Currently no blocks to preload as WordPress style blocks have been removed
+  const commonBlocks: string[] = [];
   await Promise.all(commonBlocks.map(loadBlock));
 }
 

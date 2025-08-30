@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 
 // Import existing block components
-import SimplifiedParagraphBlock from '../blocks/SimplifiedParagraphBlock'
+import ParagraphBlock from '../blocks/ParagraphBlock'
 import EnhancedHeadingBlock from '../blocks/EnhancedHeadingBlock'
 import ListBlock from '../blocks/ListBlock'
 import ImageBlock from '../blocks/ImageBlock'
@@ -45,7 +45,7 @@ const BLOCK_ITEM_TYPE = 'zone-block'
 
 // Block component mapping
 const BLOCK_COMPONENTS = {
-  'core/paragraph': SimplifiedParagraphBlock,
+  'core/paragraph': ParagraphBlock,
   'core/heading': EnhancedHeadingBlock,
   'core/list': ListBlock,
   'core/image': ImageBlock,
