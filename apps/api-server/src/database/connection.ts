@@ -47,6 +47,7 @@ import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
 import { SmtpSettings } from '../entities/SmtpSettings';
 import { EmailLog } from '../entities/EmailLog';
 import { Shortcode } from '../entities/Shortcode';
+import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 // Dropshipping entities
 import { Supplier } from '../entities/dropshipping/Supplier';
 import { Seller } from '../entities/dropshipping/Seller';
@@ -140,6 +141,9 @@ export const AppDataSource = new DataSource({
         SmtpSettings,
         EmailLog,
         Shortcode,
+        FieldGroup,
+        CustomField,
+        CustomFieldValue,
         // Dropshipping entities
         Supplier,
         Seller,

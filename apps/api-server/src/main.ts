@@ -455,6 +455,12 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 
+// ACF and Shortcode routes
+import acfRoutes from './routes/acf';
+import shortcodeRoutes from './routes/shortcodes';
+app.use('/admin', acfRoutes);
+app.use('/api/shortcodes', shortcodeRoutes);
+
 // Missing dashboard endpoints (temporary)
 app.get('/ecommerce/dashboard/stats', (req, res) => {
   res.json({ success: true, data: { orders: 0, revenue: 0, products: 0, customers: 0 } });
