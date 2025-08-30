@@ -31,7 +31,7 @@ export const useDynamicMenu = () => {
     },
     staleTime: 5 * 60 * 1000, // 5분간 캐시
     gcTime: 10 * 60 * 1000, // 10분간 캐시 유지
-    enabled: false, // Disable for now since API doesn't exist
+    enabled: true, // Enable to show app menus
     refetchOnMount: false, // Don't refetch on mount
     refetchOnWindowFocus: false // Don't refetch on window focus
   });
