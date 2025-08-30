@@ -60,6 +60,7 @@ interface EnhancedBlockWrapperProps {
   onDrop?: (e: React.DragEvent) => void;
   onDragEnd?: () => void;
   customToolbarContent?: ReactNode;
+  customSidebarContent?: ReactNode;
   onAlignChange?: (align: 'left' | 'center' | 'right' | 'justify') => void;
   currentAlign?: 'left' | 'center' | 'right' | 'justify';
   onToggleBold?: () => void;

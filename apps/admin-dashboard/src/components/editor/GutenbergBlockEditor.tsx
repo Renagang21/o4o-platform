@@ -17,7 +17,7 @@ import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import SimplifiedListBlock from './blocks/SimplifiedListBlock';
 import CodeBlock from './blocks/CodeBlock';
 import QuoteBlock from './blocks/QuoteBlock';
-import ImageBlock from './blocks/ImageBlock';
+import EnhancedImageBlock from './blocks/EnhancedImageBlock';
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
 // Toast 기능을 직접 구현
@@ -555,7 +555,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         return <QuoteBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/image':
       case 'image': // Support both formats
-        return <ImageBlock key={block.id} {...commonProps} />;
+        return <EnhancedImageBlock key={block.id} {...enhancedProps} onChangeType={commonProps.onChangeType} />;
       case 'core/button':
       case 'button': // Support both formats
         return <ButtonBlock key={block.id} {...commonProps} />;
