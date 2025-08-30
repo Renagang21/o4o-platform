@@ -120,6 +120,7 @@ import productVariationRoutes from './routes/v1/product-variation.routes';
 import tossPaymentsRoutes from './routes/v1/toss-payments.routes';
 import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
+import galleryRoutes from './routes/gallery.routes';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -312,6 +313,9 @@ app.use(cors(corsOptions));
 
 // Handle preflight requests explicitly
 app.options('*', cors(corsOptions));
+
+// Serve static files for uploads (EARLY in middleware chain)
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
 // Add performance monitoring middleware early in the chain
 app.use(performanceMonitor);
@@ -553,6 +557,8 @@ app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes);
+app.use('/api/media/gallery', galleryRoutes); // Gallery-specific routes
+app.use('/api/media', galleryRoutes); // Standard media routes for gallery block
 app.use('/api/v1/apps', appsV1Routes);
 app.use('/api/v1/apps/plugins', pluginsV1Routes);
 app.use('/api/v1/coupons', couponV1Routes);
