@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { Between, MoreThan, LessThan, In } from 'typeorm';
 import { Inventory } from '../entities/inventory/Inventory';
@@ -91,7 +90,7 @@ export class AnalyticsService {
     const cacheKey = `dashboard_analytics:${this.hashFilters(filters)}`;
     const cached = await analyticsCacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     const {
@@ -139,7 +138,7 @@ export class AnalyticsService {
           products: topProducts,
           vendors: vendorRankings,
         },
-        insights: await this.generateInsights(kpiMetrics, salesTrends),
+        insights: await this.generateInsights(kpiMetrics, salesTrends as any),
       };
 
       // Cache for 10 minutes with enhanced caching
@@ -161,7 +160,7 @@ export class AnalyticsService {
     const cacheKey = `inventory_overview:${this.hashFilters(filters)}`;
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -275,7 +274,7 @@ export class AnalyticsService {
     const cacheKey = `sales_trends:${startDate.toISOString()}:${endDate.toISOString()}:${groupBy}`;
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -334,7 +333,7 @@ export class AnalyticsService {
     const cacheKey = `product_performance:${this.hashFilters(filters)}:${limit}`;
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -407,7 +406,7 @@ export class AnalyticsService {
     const cacheKey = `vendor_rankings:${this.hashFilters(filters)}:${limit}`;
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -499,7 +498,7 @@ export class AnalyticsService {
     const cacheKey = 'realtime_metrics';
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {

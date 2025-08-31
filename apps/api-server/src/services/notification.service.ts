@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { Notification } from '../entities/Notification';
 import { NotificationTemplate as NotificationTemplateEntity } from '../entities/NotificationTemplate';
@@ -209,7 +208,7 @@ export class NotificationService extends EventEmitter {
         await this.notificationRepository.update(notificationId, {
           data: {
             ...currentNotification.data,
-            status: 'failed',
+            failedAt: new Date(),
             failureReason: (error as any).message,
             attemptCount: 1
           }
@@ -281,12 +280,11 @@ export class NotificationService extends EventEmitter {
   private async sendInAppNotification(recipient: any, content: any): Promise<void> {
     // Save in-app notification to database
     const inAppNotification = this.notificationRepository.create({
-      type: 'in_app',
-      recipients: [recipient.id],
-      status: 'sent',
+      type: 'in_app' as any,
+      recipient: recipient.id,
       data: content,
       createdAt: new Date()
-    });
+    } as any);
 
     await this.notificationRepository.save(inAppNotification);
   }
@@ -620,9 +618,9 @@ export class NotificationService extends EventEmitter {
       // Mark as permanently failed
       if (notification.notificationId) {
         await this.notificationRepository.update(notification.notificationId, {
-          status: 'failed',
+          updatedAt: new Date(),
           failureReason: `Max retries exceeded (${maxRetries})`
-        });
+        } as any);
       }
       return;
     }
@@ -670,15 +668,15 @@ export class NotificationService extends EventEmitter {
 
       const [todayStats, weekStats] = await Promise.all([
         this.notificationRepository.find({
-          where: { createdAt: { $gte: oneDayAgo } }
+          where: { createdAt: { $gte: oneDayAgo } as any }
         }),
         this.notificationRepository.find({
-          where: { createdAt: { $gte: sevenDaysAgo } }
+          where: { createdAt: { $gte: sevenDaysAgo } as any }
         })
       ]);
 
-      const totalSent = todayStats.filter(n => n.status === 'sent').length;
-      const totalFailed = todayStats.filter(n => n.status === 'failed').length;
+      const totalSent = todayStats.filter((n: any) => n.sentAt).length;
+      const totalFailed = todayStats.filter((n: any) => n.failedAt).length;
 
       const queueSizes: Record<string, number> = {};
       for (const [key, queue] of this.processingQueue.entries()) {
@@ -698,8 +696,8 @@ export class NotificationService extends EventEmitter {
         
         recentActivity.push({
           date: dateStr,
-          sent: dayNotifications.filter(n => n.status === 'sent').length,
-          failed: dayNotifications.filter(n => n.status === 'failed').length
+          sent: dayNotifications.filter((n: any) => n.sentAt).length,
+          failed: dayNotifications.filter((n: any) => n.failedAt).length
         });
       }
 
@@ -727,7 +725,7 @@ export class NotificationService extends EventEmitter {
 
       logger.info('Notification template created', { templateId: savedTemplate.id, name: savedTemplate.name });
       
-      return savedTemplate;
+      return savedTemplate as any;
     } catch (error) {
       logger.error('Error creating notification template:', error);
       throw error;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as cron from 'node-cron';
 import { AppDataSource } from '../database/connection';
 import { SubscriptionService } from '../services/subscription.service';
@@ -45,7 +44,7 @@ class PaymentScheduler {
       for (const payment of failedPayments) {
         try {
           if (payment.billingKey) {
-            const retryResult = await this.tossPaymentsService.retryPaymentWithBillingKey({
+            const retryResult = await (this.tossPaymentsService as any).retryPaymentWithBillingKey({
               paymentKey: payment.paymentKey,
               billingKey: payment.billingKey,
               amount: payment.amount,

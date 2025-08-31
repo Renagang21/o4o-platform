@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';
@@ -83,7 +82,7 @@ export class ForecastingService {
     // Check cache
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -138,7 +137,7 @@ export class ForecastingService {
       };
 
       // Cache for 1 hour
-      await cacheService.set(cacheKey, result, 3600);
+      await cacheService.set(cacheKey, result, { ttl: 3600 } as any);
 
       return result;
     } catch (error) {
@@ -154,7 +153,7 @@ export class ForecastingService {
     
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -213,7 +212,7 @@ export class ForecastingService {
         },
       };
 
-      await cacheService.set(cacheKey, result, 3600);
+      await cacheService.set(cacheKey, result, { ttl: 3600 } as any);
       return result;
     } catch (error) {
       logger.error('Error in demand forecasting:', error);
@@ -228,7 +227,7 @@ export class ForecastingService {
     
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -289,7 +288,7 @@ export class ForecastingService {
         },
       };
 
-      await cacheService.set(cacheKey, result, 3600);
+      await cacheService.set(cacheKey, result, { ttl: 3600 } as any);
       return result;
     } catch (error) {
       logger.error('Error in inventory forecasting:', error);
@@ -304,7 +303,7 @@ export class ForecastingService {
     
     const cached = await cacheService.get(cacheKey);
     if (cached) {
-      return cached;
+      return cached as any;
     }
 
     try {
@@ -357,7 +356,7 @@ export class ForecastingService {
         },
       };
 
-      await cacheService.set(cacheKey, result, 3600);
+      await cacheService.set(cacheKey, result, { ttl: 3600 } as any);
       return result;
     } catch (error) {
       logger.error('Error in revenue forecasting:', error);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../entities/Menu';
@@ -148,7 +147,7 @@ class MenuService {
     const menuItem = this.menuItemRepository.create({
       ...data,
       menu
-    });
+    } as any);
 
     if (data.parent_id) {
       const parent = await this.menuItemRepository.findOne({
@@ -157,10 +156,10 @@ class MenuService {
       if (!parent) {
         throw new Error(`Parent menu item with ID ${data.parent_id} not found`);
       }
-      menuItem.parent = parent;
+      (menuItem as any).parent = parent;
     }
 
-    return this.menuItemRepository.save(menuItem);
+    return this.menuItemRepository.save(menuItem) as any;
   }
 
   async updateMenuItem(
@@ -186,7 +185,7 @@ class MenuService {
     }
 
     Object.assign(menuItem, data);
-    return this.menuItemRepository.save(menuItem);
+    return this.menuItemRepository.save(menuItem) as any;
   }
 
   async deleteMenuItem(id: string): Promise<boolean> {
@@ -242,7 +241,7 @@ class MenuService {
             if (!parent) {
               throw new Error(`Parent menu item with ID ${item.parent_id} not found`);
             }
-            menuItem.parent = parent;
+            (menuItem as any).parent = parent;
           } else {
             menuItem.parent = null;
           }

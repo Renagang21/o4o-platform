@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { RedisService } from './redis.service';
 import logger from '../utils/logger';
 
@@ -43,7 +42,7 @@ export class CacheService {
   private compressionThreshold = 1024; // 1KB
 
   constructor() {
-    this.redis = new RedisService();
+    this.redis = new (RedisService as any)();
   }
 
   // Generic cache methods
@@ -78,7 +77,7 @@ export class CacheService {
         serialized = 'COMPRESSED:' + this.compress(serialized);
       }
 
-      await this.redis.setex(key, ttl, serialized);
+      await (this.redis as any).setex(key, ttl, serialized);
 
       // Store cache tags for invalidation
       if (options.tags && options.tags.length > 0) {
@@ -109,13 +108,13 @@ export class CacheService {
 
   async invalidateByTag(tag: string): Promise<number> {
     try {
-      const keys = await this.redis.smembers(`tag:${tag}`);
+      const keys = await (this.redis as any).smembers(`tag:${tag}`);
       if (keys.length === 0) {
         return 0;
       }
 
       // Delete all keys with this tag
-      await this.redis.del(...keys);
+      await (this.redis as any).del(...(keys as any));
       
       // Clean up tag set
       await this.redis.del(`tag:${tag}`);
@@ -304,8 +303,8 @@ export class CacheService {
   // Cache statistics
   async getCacheStats(): Promise<any> {
     try {
-      const info = await this.redis.info();
-      const keyCount = await this.redis.dbsize();
+      const info = await (this.redis as any).info();
+      const keyCount = await (this.redis as any).dbsize();
       
       return {
         connected: true,

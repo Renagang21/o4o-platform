@@ -1,4 +1,3 @@
-// @ts-nocheck
 import sharp from 'sharp';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -449,7 +448,7 @@ export class ImageProcessingService {
 
       // Remove metadata if requested
       if (options.removeMetadata) {
-        sharpInstance = sharpInstance.withMetadata(false);
+        sharpInstance = sharpInstance.withMetadata(false as any);
       }
 
       // Apply format-specific optimizations

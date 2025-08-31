@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection';
 import { AffiliateUser } from '../../../entities/affiliate/AffiliateUser';
@@ -344,7 +343,7 @@ export class PerformanceOptimizationService {
     // Try database cache
     // @ts-ignore
     const dbCache = await this.analyticsCache.findOne({
-      where: { key }
+      where: { cacheKey: key } as any
     });
 
     if (dbCache && dbCache.expiresAt > new Date()) {
@@ -364,7 +363,7 @@ export class PerformanceOptimizationService {
     
     await this.analyticsCache.upsert(
       {
-        key,
+        cacheKey: key,
         data: data as any,
         expiresAt
       },

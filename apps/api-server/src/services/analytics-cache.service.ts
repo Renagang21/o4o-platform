@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';
 import { EventEmitter } from 'events';
@@ -53,7 +52,7 @@ export class AnalyticsCacheService extends EventEmitter {
       const expiresAt = new Date(now.getTime() + (ttl * 1000));
       
       // Store data in Redis
-      await cacheService.set(key, data, ttl);
+      await cacheService.set(key, data, { ttl } as any);
       
       // Store metadata locally for fast tag-based operations
       this.cacheMetadata.set(key, {
@@ -288,8 +287,8 @@ export class AnalyticsCacheService extends EventEmitter {
     try {
       const tagKey = `tag:${tag}`;
       const existingKeys = await cacheService.get(tagKey) || [];
-      const updatedKeys = Array.from(new Set([...existingKeys, key]));
-      await cacheService.set(tagKey, updatedKeys, 86400); // 24 hours TTL for tag mappings
+      const updatedKeys = Array.from(new Set([...(existingKeys as any), key]));
+      await cacheService.set(tagKey, updatedKeys, { ttl: 86400 } as any); // 24 hours TTL for tag mappings
     } catch (error) {
       logger.error(`Error adding key to tag ${tag}:`, error);
     }
@@ -299,10 +298,10 @@ export class AnalyticsCacheService extends EventEmitter {
     try {
       const tagKey = `tag:${tag}`;
       const existingKeys = await cacheService.get(tagKey) || [];
-      const updatedKeys = existingKeys.filter((k: string) => k !== key);
+      const updatedKeys = (existingKeys as any).filter((k: string) => k !== key);
       
       if (updatedKeys.length > 0) {
-        await cacheService.set(tagKey, updatedKeys, 86400);
+        await cacheService.set(tagKey, updatedKeys, { ttl: 86400 } as any);
       } else {
         await cacheService.delete(tagKey);
       }
@@ -420,7 +419,7 @@ export class AnalyticsCacheService extends EventEmitter {
    */
   destroy(): void {
     if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
+      clearInterval(this.cleanupTimer as any);
       this.cleanupTimer = undefined;
     }
     

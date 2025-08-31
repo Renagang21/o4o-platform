@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as cron from 'node-cron';
 import { AppDataSource } from '../database/connection';
 import { Inventory } from '../entities/inventory/Inventory';
@@ -329,7 +328,7 @@ class InventoryScheduler {
       if (rule.notifyOnTrigger && rule.notificationEmails) {
         const emails = Array.isArray(rule.notificationEmails) 
           ? rule.notificationEmails 
-          : rule.notificationEmails.split(',').map(e => e.trim());
+          : (rule.notificationEmails as any).split(',').map((e: any) => e.trim());
         for (const email of emails) {
           await emailService.sendEmail({
             to: email,

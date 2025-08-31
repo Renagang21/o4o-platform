@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AnalyticsService } from './analytics.service';
 import { ReportingService } from './reporting.service';
 import { ForecastingService } from './forecasting.service';
@@ -387,14 +386,14 @@ export class DashboardAnalyticsIntegrationService {
           },
           {
             name: 'Active Sessions',
-            value: realTimeMetrics.activeSessions || 0,
+            value: (realTimeMetrics as any).activeSessions || 0,
             unit: 'sessions'
           },
           {
             name: 'Cache Hit Rate',
-            value: realTimeMetrics.systemPerformance?.cacheHitRate || 0,
+            value: (realTimeMetrics as any).systemPerformance?.cacheHitRate || 0,
             unit: '%',
-            status: realTimeMetrics.systemPerformance?.cacheHitRate > 80 ? 'good' : 'warning'
+            status: (realTimeMetrics as any).systemPerformance?.cacheHitRate > 80 ? 'good' : 'warning'
           }
         ]
       },

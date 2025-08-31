@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { Order } from '../entities/Order';
 import { OrderItem } from '../entities/OrderItem';
@@ -634,8 +633,8 @@ export class OrderAutomationService {
           entityId: entityData.id,
           ...entityData
         },
-        result: { success: true }
-      });
+        resultData: { success: true }
+      } as any);
 
       await this.logRepository.save(log);
     } catch (error) {

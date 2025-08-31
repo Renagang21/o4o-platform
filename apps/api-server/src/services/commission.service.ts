@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Repository, Between, IsNull, Not, In, LessThanOrEqual } from 'typeorm';
 import { VendorCommission } from '../entities/VendorCommission';
 import { CommissionSettlement } from '../entities/CommissionSettlement';
@@ -11,17 +10,11 @@ import moment from 'moment';
 
 export class CommissionService {
   constructor(
-    @InjectRepository(VendorCommission)
     private vendorCommissionRepository: Repository<VendorCommission>,
-    @InjectRepository(CommissionSettlement)
     private settlementRepository: Repository<CommissionSettlement>,
-    @InjectRepository(VendorInfo)
     private vendorRepository: Repository<VendorInfo>,
-    @InjectRepository(Supplier)
     private supplierRepository: Repository<Supplier>,
-    @InjectRepository(Order)
     private orderRepository: Repository<Order>,
-    @InjectRepository(SupplierProduct)
     private supplierProductRepository: Repository<SupplierProduct>,
     private emailService: EmailService,
   ) {}
@@ -156,7 +149,7 @@ export class CommissionService {
     const netSales = grossSales - refundAmount;
 
     // Calculate commission
-    const commissionRate = vendor.commissionRate || 10; // Default 10%
+    const commissionRate = (vendor as any).commissionRate || 10; // Default 10%
     const baseCommission = (netSales * commissionRate) / 100;
 
     // Calculate bonus commission (example: 2% bonus if sales > 100000)
