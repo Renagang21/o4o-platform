@@ -37,7 +37,7 @@ export class AddPerformanceIndexes1704362400000 implements MigrationInterface {
 
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_search_text" 
-                ON "product" USING gin(to_tsvector('english', "name" || ' ' || COALESCE("description", '')))
+                ON "product" USING gin(to_tsvector('english', "name" || ' ' || COALESCE("description", ''))
             `);
         }
 

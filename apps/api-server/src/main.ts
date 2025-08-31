@@ -58,6 +58,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
 import { startCrowdfundingSchedules } from './schedules/crowdfundingSchedule';
+import { startInventorySchedules } from './schedules/inventorySchedule';
 
 // Monitoring services
 import { backupService } from './services/BackupService';
@@ -91,6 +92,7 @@ import linkedAccountsRoutes from './routes/linked-accounts';
 import accountLinkingRoutes from './routes/account-linking.routes';
 import unifiedAuthRoutes from './routes/unified-auth.routes';
 import vendorRoutes from './routes/vendor';
+import inventoryRoutes from './routes/inventory';
 import formsRoutes from './routes/forms';
 import monitoringRoutes from './routes/monitoring';
 import sessionsRoutes from './routes/sessions';
@@ -124,6 +126,8 @@ import settingsV1Routes from './routes/v1/settings.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
 import shortcodeV1Routes from './routes/v1/shortcodes.routes';
+import { affiliateRoutes, commissionRoutes, phase3Routes } from './modules/affiliate';
+import { AffiliateSocketManager } from './modules/affiliate/websocket/socket.manager';
 
 // 중복 제거 - 이미 상단에서 로드됨
 
@@ -542,6 +546,7 @@ app.use('/api/auth', emailAuthRoutes);
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
+app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
 app.use('/api/posts', postsRoutes); // Posts routes (WordPress-compatible)
@@ -569,6 +574,9 @@ app.use('/api/v1/themes', themeRoutes);
 app.use('/api/v1/export', exportV1Routes);
 app.use('/api/v1/shipping', shippingV1Routes);
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
+app.use('/api/v1/affiliate', affiliateRoutes); // Affiliate Marketing routes
+app.use('/api/v1/affiliate', commissionRoutes); // Affiliate Commission Management routes
+app.use('/api/v1/affiliate', phase3Routes); // Affiliate Phase 3 (Analytics, Notifications) routes
 app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 app.use('/api/v1/settings', settingsV1Routes); // 설정 라우트
@@ -606,6 +614,15 @@ app.get('/', (req, res) => {
     frontend: process.env.FRONTEND_URL || 'http://localhost:3011'
   });
 });
+
+// Initialize Affiliate WebSocket Manager
+let affiliateSocketManager: AffiliateSocketManager | null = null;
+try {
+  affiliateSocketManager = new AffiliateSocketManager(httpServer);
+  logger.info('Affiliate WebSocket Manager initialized');
+} catch (error) {
+  logger.error('Failed to initialize Affiliate WebSocket Manager:', error);
+}
 
 // Socket.IO 연결 처리 (기존 기능 유지)
 io.on('connection', (socket) => {
@@ -749,6 +766,7 @@ const startServer = async () => {
     
     // Start crowdfunding schedules
     startCrowdfundingSchedules();
+    startInventorySchedules();
   } catch (redisError) {
     logger.warn('Redis connection failed (non-critical):', redisError);
   }
@@ -765,4 +783,5 @@ startServer().catch(console.error);
 // Export services for other modules
 export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
 export { io }; // Export io instance for use in other modules
+export { affiliateSocketManager }; // Export affiliate socket manager for services to use
 // Note: realtimeFeedbackService should be initialized after server starts, not here

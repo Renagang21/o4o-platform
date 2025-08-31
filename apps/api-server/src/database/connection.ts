@@ -53,6 +53,13 @@ import { Supplier } from '../entities/dropshipping/Supplier';
 import { Seller } from '../entities/dropshipping/Seller';
 import { Affiliate } from '../entities/dropshipping/Affiliate';
 import { DropshippingProduct } from '../entities/dropshipping/DropshippingProduct';
+// Affiliate Marketing entities
+import { AffiliateUser } from '../entities/affiliate/AffiliateUser';
+import { AffiliateClick } from '../entities/affiliate/AffiliateClick';
+import { AffiliateConversion } from '../entities/affiliate/AffiliateConversion';
+import { AffiliateCommission } from '../entities/affiliate/AffiliateCommission';
+import { AffiliatePayout } from '../entities/affiliate/AffiliatePayout';
+import { AffiliateAuditLog } from '../entities/affiliate/AffiliateAuditLog';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -148,7 +155,14 @@ export const AppDataSource = new DataSource({
         Supplier,
         Seller,
         Affiliate,
-        DropshippingProduct
+        DropshippingProduct,
+        // Affiliate Marketing entities
+        AffiliateUser,
+        AffiliateClick,
+        AffiliateConversion,
+        AffiliateCommission,
+        AffiliatePayout,
+        AffiliateAuditLog
       ],
   
   // 마이그레이션 설정

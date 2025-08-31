@@ -3,6 +3,7 @@ import { authenticateToken as authMiddleware, requireRole } from '../middleware/
 import { VendorStatsController } from '../controllers/vendor/vendorStatsController';
 import { VendorProductController } from '../controllers/vendor/vendorProductController';
 import { VendorOrderController } from '../controllers/vendor/vendorOrderController';
+import { VendorController } from '../controllers/vendor/vendorController';
 import { AuthRequest } from '../types/auth';
 
 const router: Router = Router();
@@ -11,8 +12,29 @@ const router: Router = Router();
 const vendorStatsController = new VendorStatsController();
 const vendorProductController = new VendorProductController();
 const vendorOrderController = new VendorOrderController();
+const vendorController = new VendorController();
 
-// 모든 벤더 라우트는 인증 필요 + 벤더 권한 체크
+// Public vendor management routes (admin/manager only)
+router.get('/', authMiddleware, requireRole(['admin', 'manager']), vendorController.getAllVendors);
+router.get('/pending', authMiddleware, requireRole(['admin', 'manager']), vendorController.getPendingVendors);
+router.get('/statistics', authMiddleware, requireRole(['admin', 'manager']), vendorController.getStatistics);
+
+// Vendor CRUD operations (authenticated users)
+router.post('/', authMiddleware, vendorController.createVendor);
+router.get('/:id', authMiddleware, vendorController.getVendorById);
+router.put('/:id', authMiddleware, vendorController.updateVendor);
+
+// Vendor approval workflow (admin/manager only)
+router.post('/:id/approve', authMiddleware, requireRole(['admin', 'manager']), vendorController.approveVendor);
+router.post('/:id/reject', authMiddleware, requireRole(['admin', 'manager']), vendorController.rejectVendor);
+router.post('/:id/suspend', authMiddleware, requireRole(['admin']), vendorController.suspendVendor);
+
+// Vendor reports and data
+router.get('/:id/commission', authMiddleware, vendorController.getCommissionHistory);
+router.get('/:id/products', authMiddleware, vendorController.getVendorProducts);
+router.get('/:id/sales-report', authMiddleware, vendorController.getSalesReport);
+
+// Existing vendor portal routes (seller/supplier only)
 router.use(authMiddleware);
 router.use(requireRole(['seller', 'supplier']));
 

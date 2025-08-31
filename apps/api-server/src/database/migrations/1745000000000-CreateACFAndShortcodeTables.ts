@@ -496,32 +496,32 @@ export class CreateACFAndShortcodeTables1745000000000 implements MigrationInterf
     await queryRunner.createIndex('shortcodes', new TableIndex({
       name: 'IDX_shortcodes_appId_status',
       columnNames: ['appId', 'status']
-    }));
+    });
 
     await queryRunner.createIndex('shortcodes', new TableIndex({
       name: 'IDX_shortcodes_category_status',
       columnNames: ['category', 'status']
-    }));
+    });
 
     await queryRunner.createIndex('shortcodes', new TableIndex({
       name: 'IDX_shortcodes_name',
       columnNames: ['name']
-    }));
+    });
 
     await queryRunner.createIndex('custom_field_values', new TableIndex({
       name: 'IDX_custom_field_values_entity',
       columnNames: ['entityType', 'entityId']
-    }));
+    });
 
     await queryRunner.createIndex('custom_post_types', new TableIndex({
       name: 'IDX_custom_post_types_slug',
       columnNames: ['slug']
-    }));
+    });
 
     await queryRunner.createIndex('custom_post_types', new TableIndex({
       name: 'IDX_custom_post_types_active',
       columnNames: ['active']
-    }));
+    });
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
