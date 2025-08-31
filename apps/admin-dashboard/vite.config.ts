@@ -44,8 +44,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
   },
   server: {
     port: 5173,
-    host: '0.0.0.0',
+    host: 'localhost',
     strictPort: false,
+    hmr: {
+      port: 5173,
+      host: 'localhost'
+    },
     allowedHosts: [
       'admin.neture.co.kr',
       'www.neture.co.kr',
