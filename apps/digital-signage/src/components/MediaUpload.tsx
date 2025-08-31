@@ -157,7 +157,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
     } finally {
       uploadControllersRef.current.delete(mediaFile.id);
     }
-  }, [onUploadStart, onUploadProgress, onUploadComplete, onUploadError]);
+  }, [uploadEndpoint, onUploadStart, onUploadProgress, onUploadComplete, onUploadError]);
 
   // Handle file selection
   const handleFileSelect = useCallback((selectedFiles: FileList | null) => {
