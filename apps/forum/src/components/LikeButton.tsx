@@ -36,7 +36,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       checkLikeStatus();
     }
     fetchLikeCount();
-  }, [targetId, userId]);
+  }, [targetId, userId, checkLikeStatus, fetchLikeCount]);
 
   const checkLikeStatus = useCallback(async () => {
     try {

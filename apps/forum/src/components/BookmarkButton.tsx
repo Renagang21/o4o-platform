@@ -29,7 +29,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     if (userId) {
       checkBookmarkStatus();
     }
-  }, [postId, userId, showCount]);
+  }, [postId, userId, showCount, fetchBookmarkCount, checkBookmarkStatus]);
 
   const fetchBookmarkCount = useCallback(async () => {
     try {
