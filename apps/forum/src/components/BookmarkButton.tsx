@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { Bookmark, Check } from 'lucide-react';
 
 interface BookmarkButtonProps {
   postId: string;
@@ -29,7 +29,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     if (userId) {
       checkBookmarkStatus();
     }
-  }, [postId, userId, showCount, fetchBookmarkCount, checkBookmarkStatus]);
+  }, [postId, userId, showCount]);
 
   const fetchBookmarkCount = useCallback(async () => {
     try {
@@ -119,7 +119,10 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
       title={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
     >
       {isBookmarked ? (
-        <BookmarkCheck size={iconSize[size]} className="fill-current" />
+        <div className="relative">
+          <Bookmark size={iconSize[size]} className="fill-current" />
+          <Check size={iconSize[size] / 2} className="absolute top-0 left-0 text-white" />
+        </div>
       ) : (
         <Bookmark size={iconSize[size]} />
       )}

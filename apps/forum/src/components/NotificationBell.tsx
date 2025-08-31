@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, MessageCircle, Heart, AtSign, UserPlus, AlertCircle, Check, X } from 'lucide-react';
+import { Bell, MessageCircle, Heart, Tag, User, AlertCircle, Check, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Notification {
@@ -176,8 +176,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId, onNotificat
     switch (type) {
       case 'comment': return <MessageCircle className="w-4 h-4" />;
       case 'like': return <Heart className="w-4 h-4 fill-current" />;
-      case 'mention': return <AtSign className="w-4 h-4" />;
-      case 'follow': return <UserPlus className="w-4 h-4" />;
+      case 'mention': return <Tag className="w-4 h-4" />;
+      case 'follow': return <User className="w-4 h-4" />;
       case 'report_resolved': return <AlertCircle className="w-4 h-4" />;
       default: return <Bell className="w-4 h-4" />;
     }
