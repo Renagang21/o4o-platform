@@ -108,7 +108,7 @@ export const errorHandler = (
     stack: err.stack
   });
 
-  // Set CORS headers for error responses
+  // Preserve CORS headers in error responses
   const origin = req.headers.origin as string | undefined;
   const allowedOrigins = [
     'https://neture.co.kr',
@@ -136,11 +136,13 @@ export const errorHandler = (
   const envOrigins = process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || [];
   allowedOrigins.push(...envOrigins);
   
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  // Always set CORS headers for allowed origins in error responses
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count, X-Page-Count');
   }
 
   // Send error response

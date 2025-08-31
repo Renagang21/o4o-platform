@@ -318,6 +318,40 @@ const corsOptions: CorsOptions = {
   optionsSuccessStatus: 204
 };
 
+// Explicit CORS header handling to ensure headers are always set
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const origin = req.headers.origin as string;
+  const allowedOrigins = [
+    "https://admin.neture.co.kr",
+    "https://shop.neture.co.kr", 
+    "https://neture.co.kr",
+    "https://www.neture.co.kr",
+    "https://api.neture.co.kr",
+    "http://admin.neture.co.kr",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003"
+  ];
+  
+  // Set CORS headers explicitly if origin is allowed
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count, X-Page-Count');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  
+  // Handle OPTIONS preflight requests immediately
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  
+  next();
+});
+
 // Apply CORS before any other middleware
 app.use(cors(corsOptions));
 
