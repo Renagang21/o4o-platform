@@ -74,7 +74,7 @@ export class AuthClient {
 // Use environment variable or default based on hostname
 const getApiUrl = () => {
     // Always use production API server
-    const DEFAULT_API_URL = 'https://api.neture.co.kr/api/v1';
+    const DEFAULT_API_URL = 'https://api.neture.co.kr/api';
     if (typeof window === 'undefined') {
         return DEFAULT_API_URL;
     }

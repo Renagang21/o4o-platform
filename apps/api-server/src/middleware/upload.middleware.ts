@@ -1,4 +1,4 @@
-import * as multer from 'multer';
+import multer from 'multer';
 import { Request, Response, NextFunction } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';

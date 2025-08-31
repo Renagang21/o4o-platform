@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ShortcodeController } from '../controllers/shortcode/ShortcodeController';
-import { authMiddleware } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
 import { checkRole } from '../middleware/checkRole';
 
 const router = Router();
@@ -14,11 +14,11 @@ router.get('/logs', shortcodeController.getExecutionLogs); // Move before :name 
 router.get('/:name', shortcodeController.getShortcode);
 
 // Parse and preview routes (require authentication for security)
-router.post('/parse', authMiddleware, shortcodeController.parseContent);
-router.post('/preview', authMiddleware, shortcodeController.previewShortcode);
+router.post('/parse', authenticateToken, shortcodeController.parseContent);
+router.post('/preview', authenticateToken, shortcodeController.previewShortcode);
 
 // Protected routes - require authentication
-router.use(authMiddleware);
+router.use(authenticateToken);
 
 // Editor routes - for content creators
 router.post('/', checkRole(['admin', 'editor']), shortcodeController.createShortcode);
