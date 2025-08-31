@@ -175,7 +175,7 @@ const Pages: FC = () => {
               <span className="font-medium">패턴 빌더</span>
             </Link>
             <Link
-              to="/pages/new"
+              to="/editor/pages/new"
               className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 flex items-center space-x-2 shadow-sm transition-all duration-200 transform hover:scale-105"
             >
               <Plus className="w-5 h-5" />
@@ -256,7 +256,7 @@ const Pages: FC = () => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">페이지가 없습니다</h3>
           <p className="text-gray-500 mb-4">첫 번째 페이지를 만들어보세요</p>
           <Link
-            to="/pages/new"
+            to="/editor/pages/new"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-flex items-center"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -318,7 +318,7 @@ const Pages: FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2">
                             <Link
-                              to={`/pages/${page.id}/edit`}
+                              to={`/editor/pages/${page.id}`}
                               className="text-base font-semibold text-gray-900 hover:text-blue-600 truncate transition-colors duration-200"
                             >
                               {page.title}
@@ -346,7 +346,7 @@ const Pages: FC = () => {
                             </a>
                             <span className="text-gray-300">|</span>
                             <Link
-                              to={`/pages/${page.id}/edit`}
+                              to={`/editor/pages/${page.id}`}
                               className="text-xs text-blue-600 hover:text-blue-700 px-2 py-0.5 hover:bg-blue-50 rounded transition-colors duration-200"
                             >
                               편집
@@ -407,7 +407,7 @@ const Pages: FC = () => {
                           <Eye className="w-4 h-4" />
                         </a>
                         <Link
-                          to={`/pages/${page.id}/edit`}
+                          to={`/editor/pages/${page.id}`}
                           className="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-all duration-200"
                           title="편집"
                         >
