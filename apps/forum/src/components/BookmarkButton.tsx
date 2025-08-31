@@ -22,15 +22,6 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
   const [bookmarkCount, setBookmarkCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (showCount) {
-      fetchBookmarkCount();
-    }
-    if (userId) {
-      checkBookmarkStatus();
-    }
-  }, [postId, userId, showCount, fetchBookmarkCount, checkBookmarkStatus]);
-
   const fetchBookmarkCount = useCallback(async () => {
     try {
       const response = await fetch(`/api/forum/posts/${postId}/bookmarks/count`);
@@ -54,6 +45,15 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
       // Handle error silently
     }
   }, [postId]);
+
+  useEffect(() => {
+    if (showCount) {
+      fetchBookmarkCount();
+    }
+    if (userId) {
+      checkBookmarkStatus();
+    }
+  }, [postId, userId, showCount, fetchBookmarkCount, checkBookmarkStatus]);
 
   const handleToggleBookmark = async () => {
     if (!userId) {

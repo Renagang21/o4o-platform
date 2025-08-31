@@ -31,13 +31,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
 
-  useEffect(() => {
-    if (userId) {
-      checkLikeStatus();
-    }
-    fetchLikeCount();
-  }, [targetId, userId, checkLikeStatus, fetchLikeCount]);
-
   const checkLikeStatus = useCallback(async () => {
     try {
       const endpoint = targetType === 'post' 
@@ -69,6 +62,13 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       // Handle error silently
     }
   }, [targetType, targetId]);
+
+  useEffect(() => {
+    if (userId) {
+      checkLikeStatus();
+    }
+    fetchLikeCount();
+  }, [targetId, userId, checkLikeStatus, fetchLikeCount]);
 
   const handleToggleLike = async () => {
     if (!userId) {
