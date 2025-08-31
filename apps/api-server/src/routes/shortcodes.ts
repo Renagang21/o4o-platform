@@ -1,21 +1,33 @@
 import { Router } from 'express';
-import { ShortcodeController } from '../controllers/shortcodeController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { ShortcodeController } from '../controllers/shortcode/ShortcodeController';
+import { authMiddleware } from '../middleware/auth';
+import { checkRole } from '../middleware/checkRole';
 
-const router: Router = Router();
+const router = Router();
+const shortcodeController = new ShortcodeController();
 
-// Public routes
-router.get('/', ShortcodeController.getShortcodes);
-router.get('/categories', ShortcodeController.getCategories);
-router.get('/:id', ShortcodeController.getShortcode);
-router.post('/render', ShortcodeController.renderShortcode);
+// Public routes - available to everyone
+router.get('/', shortcodeController.getShortcodes);
+router.get('/statistics', shortcodeController.getStatistics);
+router.get('/export', shortcodeController.exportShortcodes);
+router.get('/logs', shortcodeController.getExecutionLogs); // Move before :name to avoid conflict
+router.get('/:name', shortcodeController.getShortcode);
 
-// Admin routes
-router.post('/', authenticateToken, requireAdmin, ShortcodeController.createShortcode);
-router.put('/:id', authenticateToken, requireAdmin, ShortcodeController.updateShortcode);
-router.delete('/:id', authenticateToken, requireAdmin, ShortcodeController.deleteShortcode);
+// Parse and preview routes (require authentication for security)
+router.post('/parse', authMiddleware, shortcodeController.parseContent);
+router.post('/preview', authMiddleware, shortcodeController.previewShortcode);
 
-// Initialize default shortcodes
-router.post('/init-defaults', authenticateToken, requireAdmin, ShortcodeController.createDefaultShortcodes);
+// Protected routes - require authentication
+router.use(authMiddleware);
+
+// Editor routes - for content creators
+router.post('/', checkRole(['admin', 'editor']), shortcodeController.createShortcode);
+router.put('/:name', checkRole(['admin', 'editor']), shortcodeController.updateShortcode);
+
+// Admin only routes - for system management
+router.delete('/:name', checkRole(['admin']), shortcodeController.deleteShortcode);
+router.post('/cache/clear', checkRole(['admin']), shortcodeController.clearCache);
+router.put('/bulk/status', checkRole(['admin']), shortcodeController.bulkUpdateStatus);
+router.post('/import', checkRole(['admin']), shortcodeController.importShortcodes);
 
 export default router;

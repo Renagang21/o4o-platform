@@ -47,6 +47,7 @@ import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
 import { SmtpSettings } from '../entities/SmtpSettings';
 import { EmailLog } from '../entities/EmailLog';
 import { Shortcode } from '../entities/Shortcode';
+import { ShortcodeExecution } from '../entities/ShortcodeExecution';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 // Dropshipping entities
 import { Supplier } from '../entities/dropshipping/Supplier';
@@ -60,6 +61,10 @@ import { AffiliateConversion } from '../entities/affiliate/AffiliateConversion';
 import { AffiliateCommission } from '../entities/affiliate/AffiliateCommission';
 import { AffiliatePayout } from '../entities/affiliate/AffiliatePayout';
 import { AffiliateAuditLog } from '../entities/affiliate/AffiliateAuditLog';
+// Menu System entities
+import { Menu } from '../entities/Menu';
+import { MenuItem } from '../entities/MenuItem';
+import { MenuLocation } from '../entities/MenuLocation';
 
 // 환경변수 기본값 설정
 const DB_HOST = process.env.DB_HOST || 'localhost';
@@ -148,6 +153,7 @@ export const AppDataSource = new DataSource({
         SmtpSettings,
         EmailLog,
         Shortcode,
+        ShortcodeExecution,
         FieldGroup,
         CustomField,
         CustomFieldValue,
@@ -162,7 +168,11 @@ export const AppDataSource = new DataSource({
         AffiliateConversion,
         AffiliateCommission,
         AffiliatePayout,
-        AffiliateAuditLog
+        AffiliateAuditLog,
+        // Menu System entities
+        Menu,
+        MenuItem,
+        MenuLocation
       ],
   
   // 마이그레이션 설정

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinColumn, JoinTable } from 'typeorm'
 import { User } from './User'
 import { Category } from './Category'
+import { PostTag } from './PostTag'
 
 export interface Block {
   id: string
@@ -100,8 +101,13 @@ export class Post {
   })
   categories!: Category[]
 
-  @Column({ type: 'simple-array', nullable: true })
-  tags!: string[]
+  @ManyToMany(() => PostTag, tag => tag.posts, { nullable: true })
+  @JoinTable({
+    name: 'post_tag_relationships',
+    joinColumn: { name: 'postId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' }
+  })
+  tags!: PostTag[]
 
   @Column({ type: 'json', nullable: true })
   seo!: SEOMetadata

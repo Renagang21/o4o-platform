@@ -1,0 +1,17 @@
+import { Router } from 'express';
+import { MenuController } from '../controllers/menu/MenuController';
+import { authMiddleware } from '../middleware/auth';
+import { checkRole } from '../middleware/checkRole';
+
+const router = Router();
+const menuController = new MenuController();
+
+// All menu item routes require authentication
+router.use(authMiddleware);
+
+// Admin and Editor routes
+router.post('/', checkRole(['admin', 'editor']), menuController.addMenuItem);
+router.put('/:id', checkRole(['admin', 'editor']), menuController.updateMenuItem);
+router.delete('/:id', checkRole(['admin', 'editor']), menuController.deleteMenuItem);
+
+export default router;

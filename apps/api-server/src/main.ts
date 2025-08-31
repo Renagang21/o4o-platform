@@ -82,6 +82,7 @@ import postCreationRoutes from './routes/post-creation';
 import servicesRoutes from './routes/services';
 import signageRoutes from './routes/signage';
 import contentRoutes from './routes/content';
+import cmsRoutes from './routes/content/index';
 import publicRoutes from './routes/public';
 import settingsRoutes from './routes/settingsRoutes';
 import oauthSettingsRoutes from './routes/settings.routes';
@@ -103,6 +104,7 @@ import templatePartsRoutes from './routes/template-parts.routes';
 import categoriesRoutes from './routes/categories';
 import customPostTypesRoutes from './routes/custom-post-types';
 import menusRoutes from './routes/menus';
+import menuItemsRoutes from './routes/menu-items';
 
 // Import v1 API routes
 import contentV1Routes from './routes/v1/content.routes';
@@ -554,12 +556,14 @@ app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes
 app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
 app.use('/api/content', contentRoutes); // Content routes - moved to specific path to avoid conflicts
+app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full features)
 
 // V1 API routes (new standardized endpoints)
 app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
 app.use('/api/v1/menus', menusRoutes); // Menus routes
+app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
@@ -771,6 +775,15 @@ const startServer = async () => {
     logger.warn('Redis connection failed (non-critical):', redisError);
   }
   
+  // Initialize image processing folders
+  try {
+    const { imageProcessingService } = await import('./services/image-processing.service');
+    await imageProcessingService.initializeFolders();
+    logger.info('✅ Image processing folders initialized');
+  } catch (folderError) {
+    logger.warn('Failed to initialize image processing folders:', folderError);
+  }
+
   // Bind to IPv4 explicitly (0.0.0.0) to avoid IPv6 issues
   const host = process.env.HOST || '0.0.0.0';
   httpServer.listen(port as number, host as string, () => {
