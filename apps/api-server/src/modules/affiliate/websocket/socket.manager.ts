@@ -78,7 +78,7 @@ export class AffiliateSocketManager {
    */
   private setupEventHandlers(): void {
     this.io.on('connection', async (socket: AuthenticatedSocket) => {
-      console.log(`Client connected: ${socket.id}, User: ${socket.userId}, Role: ${socket.role}`);
+      // Client connected - tracking socket connection
 
       // Join appropriate rooms based on role
       if (socket.role === 'admin') {
@@ -117,7 +117,7 @@ export class AffiliateSocketManager {
 
       // Handle disconnect
       socket.on('disconnect', async () => {
-        console.log(`Client disconnected: ${socket.id}`);
+        // Client disconnected - cleaning up connection
         
         if (socket.affiliateId) {
           this.removeClientConnection(socket.affiliateId, socket.id);

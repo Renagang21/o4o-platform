@@ -75,7 +75,7 @@ export const useWebSocket = (
 
     // Connection events
     socket.on('connect', () => {
-      console.log('[WebSocket] Connected to signage server');
+      // Connected to signage server
       setIsConnected(true);
       setConnectionError(null);
       setReconnectAttempt(0);
@@ -89,7 +89,7 @@ export const useWebSocket = (
     });
 
     socket.on('disconnect', () => {
-      console.log('[WebSocket] Disconnected from signage server');
+      // Disconnected from signage server
       setIsConnected(false);
       events.onDisconnect?.();
     });
@@ -101,49 +101,49 @@ export const useWebSocket = (
     });
 
     socket.on('reconnect_attempt', (attemptNumber) => {
-      console.log(`[WebSocket] Reconnection attempt ${attemptNumber}`);
+      // Reconnection attempt in progress
       setReconnectAttempt(attemptNumber);
     });
 
     // Signage-specific events
     socket.on('content-updated', (data) => {
-      console.log('[WebSocket] Content updated:', data);
+      // Content updated
       setLastMessage({ type: 'content-updated', data, timestamp: new Date() });
       events.onContentChange?.(data);
     });
 
     socket.on('playlist-updated', (data) => {
-      console.log('[WebSocket] Playlist updated:', data);
+      // Playlist updated
       setLastMessage({ type: 'playlist-updated', data, timestamp: new Date() });
       events.onPlaylistChange?.(data);
     });
 
     socket.on('schedule-updated', (data) => {
-      console.log('[WebSocket] Schedule updated:', data);
+      // Schedule updated
       setLastMessage({ type: 'schedule-updated', data, timestamp: new Date() });
       events.onScheduleChange?.(data);
     });
 
     socket.on('playback-status', (status: PlaybackStatus) => {
-      console.log('[WebSocket] Playback status:', status);
+      // Playback status received
       setPlaybackStatus(status);
       events.onPlaybackStatusChange?.(status);
     });
 
     socket.on('control-command', (command) => {
-      console.log('[WebSocket] Control command received:', command);
+      // Control command received
       setLastMessage({ type: 'control-command', data: command, timestamp: new Date() });
       events.onControlCommand?.(command);
     });
 
     // Store-specific events
     socket.on('store-config-updated', (config) => {
-      console.log('[WebSocket] Store config updated:', config);
+      // Store config updated
       setLastMessage({ type: 'store-config-updated', data: config, timestamp: new Date() });
     });
 
     socket.on('emergency-broadcast', (message) => {
-      console.log('[WebSocket] Emergency broadcast:', message);
+      // Emergency broadcast received
       setLastMessage({ type: 'emergency-broadcast', data: message, timestamp: new Date() });
     });
 

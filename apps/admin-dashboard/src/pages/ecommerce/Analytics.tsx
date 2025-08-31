@@ -155,7 +155,7 @@ const EcommerceAnalytics: FC = () => {
 
   const exportReport = () => {
     // Export functionality would be implemented here
-    console.log('Exporting report...');
+    // TODO: Implement report export functionality
   };
 
   return (
