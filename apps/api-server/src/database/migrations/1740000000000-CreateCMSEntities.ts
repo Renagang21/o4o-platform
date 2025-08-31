@@ -457,11 +457,11 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
           EXECUTE FUNCTION update_updated_at_column();
     `);
 
-    console.log('✅ CMS entities migration completed successfully');
-    console.log('📊 Created tables: post_tags, post_revisions, page_revisions, post_tag_relationships');
-    console.log('📈 Created indexes for optimal performance');
-    console.log('🔗 Created foreign key constraints');
-    console.log('⚡ Created database triggers for automatic timestamps');
+    // ✅ CMS entities migration completed successfully
+    // 📊 Created tables: post_tags, post_revisions, page_revisions, post_tag_relationships
+    // 📈 Created indexes for optimal performance
+    // 🔗 Created foreign key constraints
+    // ⚡ Created database triggers for automatic timestamps
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -532,6 +532,6 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
       }
     }
 
-    console.log('✅ CMS entities migration rollback completed');
+    // ✅ CMS entities migration rollback completed
   }
 }

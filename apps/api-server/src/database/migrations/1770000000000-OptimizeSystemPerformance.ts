@@ -330,7 +330,7 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
                 await queryRunner.query(`DROP INDEX IF EXISTS "${indexName}"`);
             } catch (error) {
                 // Index might not exist, continue
-                console.log(`Index ${indexName} not found, skipping...`);
+                // Index not found, skipping...
             }
         }
     }

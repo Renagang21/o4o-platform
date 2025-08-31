@@ -81,27 +81,27 @@ export class CommissionSchedule {
     );
     this.jobs.push(autoApprove);
 
-    console.log('Commission schedule started with', this.jobs.length, 'jobs');
+    // Commission schedule started
   }
 
   stop() {
     this.jobs.forEach(job => job.stop());
-    console.log('Commission schedule stopped');
+    // Commission schedule stopped
   }
 
   async processMonthlySettlements() {
-    console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Starting monthly commission processing...`);
+    // Starting monthly commission processing...
     
     try {
       await this.commissionService.processMonthlySettlements();
-      console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Monthly commission processing completed successfully`);
+      // Monthly commission processing completed successfully
     } catch (error) {
       console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error in monthly commission processing:`, error);
     }
   }
 
   async sendPaymentReminders() {
-    console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Sending payment reminders...`);
+    // Sending payment reminders...
     
     try {
       const [pendingVendorCommissions, pendingSupplierSettlements] = await Promise.all([
@@ -109,24 +109,24 @@ export class CommissionSchedule {
         this.commissionService.getPendingSupplierSettlements(),
       ]);
 
-      console.log(`Found ${pendingVendorCommissions.length} pending vendor commissions`);
-      console.log(`Found ${pendingSupplierSettlements.length} pending supplier settlements`);
+      // Found pending vendor commissions
+      // Found pending supplier settlements
 
       // TODO: Implement email reminders for pending payments
       
-      console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Payment reminders sent successfully`);
+      // Payment reminders sent successfully
     } catch (error) {
       console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error sending payment reminders:`, error);
     }
   }
 
   async generateInterimReports() {
-    console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Generating interim commission reports...`);
+    // Generating interim commission reports...
     
     try {
       const statistics = await this.commissionService.getCommissionStatistics();
       
-      console.log('Commission Statistics:', {
+      // Commission Statistics: {
         vendorCommissions: statistics.vendorCommissions,
         supplierSettlements: statistics.supplierSettlements,
         totalPending: statistics.totalPending,
@@ -134,32 +134,32 @@ export class CommissionSchedule {
 
       // TODO: Send weekly report to admin
       
-      console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Interim reports generated successfully`);
+      // Interim reports generated successfully
     } catch (error) {
       console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error generating interim reports:`, error);
     }
   }
 
   async checkDisputedSettlements() {
-    console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Checking for disputed settlements...`);
+    // Checking for disputed settlements...
     
     try {
       // TODO: Implement dispute checking and escalation logic
       
-      console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Dispute check completed`);
+      // Dispute check completed
     } catch (error) {
       console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error checking disputes:`, error);
     }
   }
 
   async autoApproveCommissions() {
-    console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Auto-approving eligible commissions...`);
+    // Auto-approving eligible commissions...
     
     try {
       // TODO: Implement auto-approval logic based on business rules
       // Example: Auto-approve if amount < $1000 and vendor/supplier is trusted
       
-      console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Auto-approval completed`);
+      // Auto-approval completed
     } catch (error) {
       console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error in auto-approval:`, error);
     }

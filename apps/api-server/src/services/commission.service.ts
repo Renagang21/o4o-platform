@@ -27,7 +27,7 @@ export class CommissionService {
 
   // Monthly settlement - should be called from cron scheduler
   async processMonthlySettlements() {
-    console.log('Starting monthly settlement processing...');
+    // Starting monthly settlement processing...
     
     const previousMonth = moment().subtract(1, 'month');
     const period = previousMonth.format('YYYY-MM');
@@ -41,7 +41,7 @@ export class CommissionService {
       // Process supplier settlements
       await this.processAllSupplierSettlements(period, startDate, endDate);
       
-      console.log(`Monthly settlement completed for period: ${period}`);
+      // Monthly settlement completed for period
     } catch (error) {
       console.error('Error processing monthly settlements:', error);
       // Send alert to admin
@@ -93,7 +93,7 @@ export class CommissionService {
     });
 
     if (existingCommission && existingCommission.status !== 'draft') {
-      console.log(`Commission already processed for vendor ${vendorId} in period ${period}`);
+      // Commission already processed for vendor in period
       return existingCommission;
     }
 
@@ -230,7 +230,7 @@ export class CommissionService {
     // Send notification to vendor
     if (this.emailService) {
       // TODO: Implement email notification
-      console.log(`Commission calculated for vendor ${vendorId} - Period: ${period}, Total: ${totalPayable}`);
+      // Commission calculated for vendor
     }
 
     return savedCommission;
@@ -248,7 +248,7 @@ export class CommissionService {
     });
 
     if (existingSettlement && existingSettlement.status !== 'draft') {
-      console.log(`Settlement already processed for supplier ${supplierId} in period ${period}`);
+      // Settlement already processed for supplier in period
       return existingSettlement;
     }
 
@@ -417,7 +417,7 @@ export class CommissionService {
     // Send notification to supplier
     if (this.emailService) {
       // TODO: Implement email notification  
-      console.log(`Settlement calculated for supplier ${supplierId} - Period: ${period}, Total: ${totalPayable}`);
+      // Settlement calculated for supplier
     }
 
     return savedSettlement;
@@ -478,7 +478,7 @@ export class CommissionService {
     // Send approval notification
     if (this.emailService && commission.vendor) {
       // TODO: Implement email notification
-      console.log(`Commission approved for vendor ${commissionId} - Amount: ${commission.totalPayable}`);
+      // Commission approved for vendor
     }
 
     return savedCommission;
@@ -505,7 +505,7 @@ export class CommissionService {
     // Send approval notification
     if (this.emailService && settlement.supplier) {
       // TODO: Implement email notification
-      console.log(`Settlement approved for supplier ${settlementId} - Amount: ${settlement.totalPayable}`);
+      // Settlement approved for supplier
     }
 
     return savedSettlement;
