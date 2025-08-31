@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface {
@@ -25,7 +26,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"hero-preview">Hero Section</div>"}',
+                '{"html": "<div class=\\\\"hero-preview\\">Hero Section</div>"}',
                 '{"keywords": ["hero", "cta", "header"], "viewportWidth": 1200}'
             ),
             (
@@ -38,7 +39,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"hero-split-preview">Split Hero</div>"}',
+                '{"html": "<div class=\\hero-split-preview">Split Hero</div>"}',
                 '{"keywords": ["hero", "split", "image"], "viewportWidth": 1200}'
             );
         `);
@@ -57,7 +58,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<header class=\"header-preview">Navigation Header</header>"}',
+                '{"html": "<header class=\\header-preview">Navigation Header</header>"}',
                 '{"keywords": ["header", "navigation", "menu"], "viewportWidth": 1200}'
             ),
             (
@@ -70,7 +71,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<header class=\"header-cta-preview">Header with CTA</header>"}',
+                '{"html": "<header class=\\header-cta-preview">Header with CTA</header>"}',
                 '{"keywords": ["header", "navigation", "cta"], "viewportWidth": 1200}'
             );
         `);
@@ -89,7 +90,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"columns-preview">Two Columns</div>"}',
+                '{"html": "<div class=\\columns-preview">Two Columns</div>"}',
                 '{"keywords": ["columns", "layout", "two-column"], "viewportWidth": 1200}'
             ),
             (
@@ -102,7 +103,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"cover-hero-preview">Cover Hero</div>"}',
+                '{"html": "<div class=\\cover-hero-preview">Cover Hero</div>"}',
                 '{"keywords": ["hero", "cover", "background"], "viewportWidth": 1200}'
             ),
             (
@@ -115,7 +116,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"group-feature-preview">Feature Box</div>"}',
+                '{"html": "<div class=\\group-feature-preview">Feature Box</div>"}',
                 '{"keywords": ["group", "feature", "box"], "viewportWidth": 400}'
             );
         `);
@@ -134,7 +135,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"features-preview">Three Features</div>"}',
+                '{"html": "<div class=\\features-preview">Three Features</div>"}',
                 '{"keywords": ["features", "columns", "services"], "viewportWidth": 1200}'
             ),
             (
@@ -147,7 +148,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"feature-grid-preview">Feature Grid</div>"}',
+                '{"html": "<div class=\\feature-grid-preview">Feature Grid</div>"}',
                 '{"keywords": ["features", "grid", "boxes"], "viewportWidth": 1200}'
             );
         `);
@@ -166,7 +167,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"cta-preview">Call to Action</div>"}',
+                '{"html": "<div class=\\cta-preview">Call to Action</div>"}',
                 '{"keywords": ["cta", "call to action", "conversion"], "viewportWidth": 1200}'
             ),
             (
@@ -179,7 +180,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"cta-bg-preview">CTA with Background</div>"}',
+                '{"html": "<div class=\\cta-bg-preview">CTA with Background</div>"}',
                 '{"keywords": ["cta", "background", "overlay"], "viewportWidth": 1200}'
             );
         `);
@@ -198,7 +199,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<footer class=\"footer-preview">Simple Footer</footer>"}',
+                '{"html": "<footer class=\\footer-preview">Simple Footer</footer>"}',
                 '{"keywords": ["footer", "copyright", "links"], "viewportWidth": 1200}'
             ),
             (
@@ -211,7 +212,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<footer class=\"footer-columns-preview">Column Footer</footer>"}',
+                '{"html": "<footer class=\\footer-columns-preview">Column Footer</footer>"}',
                 '{"keywords": ["footer", "columns", "social"], "viewportWidth": 1200}'
             );
         `);
@@ -230,7 +231,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"testimonials-preview">Testimonials</div>"}',
+                '{"html": "<div class=\\testimonials-preview">Testimonials</div>"}',
                 '{"keywords": ["testimonials", "reviews", "social proof"], "viewportWidth": 1200}'
             );
         `);
@@ -249,7 +250,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
                 true,
                 'public',
                 '${userId}',
-                '{"html": "<div class=\"pricing-preview">Pricing Table</div>"}',
+                '{"html": "<div class=\\pricing-preview">Pricing Table</div>"}',
                 '{"keywords": ["pricing", "plans", "table"], "viewportWidth": 1200}'
             );
         `);
