@@ -19,10 +19,18 @@ export interface ReportOptions {
     supplierIds?: string[];
     categories?: string[];
     productIds?: string[];
+    warehouseIds?: string[];
+    stockLevels?: string[];
+    includeInactive?: boolean;
+    status?: string[];
   };
   groupBy?: 'day' | 'week' | 'month' | 'quarter';
   includeCharts?: boolean;
   includeSummary?: boolean;
+  includeImages?: boolean;
+  includeDetails?: boolean;
+  reportType?: string;
+  customConfig?: any;
 }
 
 export interface ReportData {
@@ -40,6 +48,7 @@ export interface ReportData {
     recordCount: number;
     fileSize?: number;
     filters?: any;
+    totalRecords?: number;
   };
 }
 

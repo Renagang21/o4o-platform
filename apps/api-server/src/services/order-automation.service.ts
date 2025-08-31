@@ -11,7 +11,7 @@ import { analyticsCacheService } from './analytics-cache.service';
 import logger from '../utils/logger';
 
 export interface AutomationCondition {
-  type: 'order_status' | 'payment_status' | 'inventory_level' | 'time_elapsed';
+  type: 'order_status' | 'payment_status' | 'inventory_level' | 'time_elapsed' | 'vendor_id';
   operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains';
   value: any;
   field?: string;

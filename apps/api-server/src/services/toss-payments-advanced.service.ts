@@ -494,7 +494,6 @@ export class TossPaymentsAdvancedService {
       }
 
       // 수수료 서비스 연동 - 에스크로 정산 처리
-      const { AppDataSource } = await import('../database/connection');
       const escrowSettlementRepository = AppDataSource.getRepository('EscrowSettlement');
       
       const settlement = escrowSettlementRepository.create({

@@ -7,6 +7,7 @@ export enum UserRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
   VENDOR = 'vendor',
+  VENDOR_MANAGER = 'vendor_manager',
   SELLER = 'seller',
   CUSTOMER = 'customer',
   BUSINESS = 'business',
@@ -50,6 +51,8 @@ export interface AuthRequest extends Request {
   user?: User & {
     id: string;
     role: UserRole;
+    vendorId?: string;
+    supplierId?: string;
   };
 }
 

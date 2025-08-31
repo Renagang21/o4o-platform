@@ -151,7 +151,7 @@ export class SubscriptionService {
       // 셋업 비용이 있는 경우 즉시 결제
       if (plan.setupFee && plan.setupFee > 0) {
         try {
-          await this.processSetupFeePayment(savedSubscription, plan);
+          await this.processSetupFeePayment(savedSubscription as Subscription, plan);
         } catch (error) {
           // 셋업 비용 결제 실패 시 구독 취소
           await this.cancelSubscription(savedSubscription.id, 'setup_payment_failed');
@@ -184,7 +184,7 @@ export class SubscriptionService {
       const cacheKey = `subscription:${subscriptionId}`;
       const cached = await cacheService.get(cacheKey);
       if (cached) {
-        return cached;
+        return cached as Subscription;
       }
 
       const { AppDataSource } = await import('../database/connection');
@@ -197,10 +197,10 @@ export class SubscriptionService {
 
       if (subscription) {
         // 캐시에 저장 (5분)
-        await cacheService.set(cacheKey, subscription, 300);
+        await cacheService.set(cacheKey, subscription, { ttl: 300 });
       }
 
-      return subscription;
+      return subscription as Subscription | null;
     } catch (error) {
       logger.error('Error fetching subscription:', error);
       throw error;
@@ -221,7 +221,7 @@ export class SubscriptionService {
         order: { createdAt: 'DESC' }
       });
 
-      return subscriptions;
+      return subscriptions as Subscription[];
     } catch (error) {
       logger.error('Error fetching customer subscriptions:', error);
       throw error;
@@ -396,7 +396,7 @@ export class SubscriptionService {
 
       for (const subscription of subscriptionsToCharge) {
         try {
-          await this.processSubscriptionPayment(subscription);
+          await this.processSubscriptionPayment(subscription as Subscription);
         } catch (error) {
           logger.error(`Failed to process subscription payment ${subscription.id}:`, error);
         }
@@ -644,7 +644,7 @@ export class SubscriptionService {
       const currentPeriod = moment().format('YYYY-MM');
       return await usageRepository.findOne({
         where: { subscriptionId, period: currentPeriod }
-      });
+      }) as SubscriptionUsage | null;
     } catch (error) {
       logger.error('Error fetching subscription usage:', error);
       return null;

@@ -12,6 +12,7 @@ export interface ForecastOptions {
     supplierIds?: string[];
     categories?: string[];
     productIds?: string[];
+    warehouseIds?: string[];
     startDate?: Date;
     endDate?: Date;
   };

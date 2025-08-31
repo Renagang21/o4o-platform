@@ -1,6 +1,14 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../types/auth';
-import { ReportingService, ReportOptions, CustomReportConfig } from '../../services/reporting.service';
+import { ReportingService, ReportOptions } from '../../services/reporting.service';
+
+// Define CustomReportConfig locally if not exported
+interface CustomReportConfig {
+  metrics?: string[];
+  dimensions?: string[];
+  filters?: any;
+  aggregations?: any;
+}
 import { asyncHandler, createForbiddenError, createValidationError, createNotFoundError } from '../../middleware/errorHandler.middleware';
 import { cacheService } from '../../services/cache.service';
 import logger from '../../utils/logger';
@@ -20,6 +28,8 @@ export class ReportingController {
     const currentUser = req.user;
     const {
       format = 'json',
+      startDate,
+      endDate,
       includeImages = 'false',
       supplierIds,
       categories,
@@ -39,9 +49,19 @@ export class ReportingController {
       throw createValidationError(`Invalid format. Must be one of: ${validFormats.join(', ')}`);
     }
 
+    // Parse dates
+    const start = startDate 
+      ? moment(startDate).toDate()
+      : moment().subtract(30, 'days').toDate();
+    const end = endDate 
+      ? moment(endDate).toDate() 
+      : new Date();
+
     // Build report options
     const options: ReportOptions = {
       format: format as 'json' | 'csv' | 'excel' | 'pdf',
+      startDate: start,
+      endDate: end,
       includeImages: includeImages === 'true',
       filters: {}
     };
@@ -136,32 +156,32 @@ export class ReportingController {
       : new Date();
 
     // Build report options
-    const options: ReportOptions = {
+    const options: ReportOptions & { period: string } = {
       format: format as 'json' | 'csv' | 'excel' | 'pdf',
+      startDate: start,
+      endDate: end,
       includeCharts: includeCharts === 'true',
-      filters: {
-        startDate: start,
-        endDate: end,
-      },
-      groupBy: groupBy as 'day' | 'week' | 'month'
+      filters: {},
+      groupBy: groupBy as 'day' | 'week' | 'month',
+      period: groupBy || 'day'
     };
 
     // Role-based filtering
     if (currentUser?.role === 'vendor') {
       const vendorData = await this.getVendorByUserId(currentUser.id);
       if (vendorData) {
-        options.filters.vendorIds = [vendorData.id];
+        options.filters!.vendorIds = [vendorData.id];
       }
     } else if (vendorIds) {
-      options.filters.vendorIds = Array.isArray(vendorIds) ? vendorIds : [vendorIds];
+      options.filters!.vendorIds = Array.isArray(vendorIds) ? vendorIds : [vendorIds];
     }
 
     if (supplierIds) {
-      options.filters.supplierIds = Array.isArray(supplierIds) ? supplierIds : [supplierIds];
+      options.filters!.supplierIds = Array.isArray(supplierIds) ? supplierIds : [supplierIds];
     }
 
     if (categories) {
-      options.filters.categories = Array.isArray(categories) ? categories : [categories];
+      options.filters!.categories = Array.isArray(categories) ? categories : [categories];
     }
 
     try {
@@ -234,11 +254,10 @@ export class ReportingController {
     // Build report options
     const options: ReportOptions = {
       format: format as 'json' | 'csv' | 'excel' | 'pdf',
+      startDate: start,
+      endDate: end,
       includeDetails: includeDetails === 'true',
-      filters: {
-        startDate: start,
-        endDate: end,
-      },
+      filters: {},
       reportType
     };
 
@@ -336,12 +355,14 @@ export class ReportingController {
     // Build report options
     const options: ReportOptions = {
       format: format as 'json' | 'csv' | 'excel' | 'pdf',
+      startDate: config.startDate ? new Date(config.startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      endDate: config.endDate ? new Date(config.endDate) : new Date(),
       customConfig: config as CustomReportConfig,
       filters: config.filters || {}
     };
 
     try {
-      const report = await this.reportingService.generateCustomReport(options);
+      const report = await this.reportingService.generateCustomReport('custom', options);
 
       logger.info('Custom report generated successfully', {
         userId: currentUser?.id,
@@ -380,7 +401,7 @@ export class ReportingController {
     }
 
     try {
-      const reportData = await this.reportingService.getReportById(reportId);
+      const reportData = await this.reportingService.getReport(reportId);
       
       if (!reportData) {
         throw createNotFoundError('Report not found');

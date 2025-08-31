@@ -119,11 +119,11 @@ export class AnalyticsController {
         filters.supplierIds = [supplierData.id];
       }
     } else if (supplierIds) {
-      filters.supplierIds = Array.isArray(supplierIds) ? supplierIds : [supplierIds as string];
+      filters.supplierIds = Array.isArray(supplierIds) ? (supplierIds as string[]) : [supplierIds as string];
     }
 
     if (warehouseIds) {
-      filters.warehouseIds = Array.isArray(warehouseIds) ? warehouseIds : [warehouseIds as string];
+      filters.warehouseIds = Array.isArray(warehouseIds) ? (warehouseIds as string[]) : [warehouseIds as string];
     }
 
     try {
@@ -183,7 +183,7 @@ export class AnalyticsController {
         filters.vendorIds = [vendorData.id];
       }
     } else if (vendorIds) {
-      filters.vendorIds = Array.isArray(vendorIds) ? vendorIds : [vendorIds as string];
+      filters.vendorIds = Array.isArray(vendorIds) ? vendorIds.map(id => String(id)) : [String(vendorIds)];
     }
 
     if (categories) {
@@ -195,7 +195,7 @@ export class AnalyticsController {
         start, 
         end, 
         groupBy as 'day' | 'week' | 'month'
-      );
+      ) || [];
 
       let comparison = null;
       if (compareWithPrevious === 'true') {
@@ -216,13 +216,13 @@ export class AnalyticsController {
           current: trends,
           previous: comparison,
           summary: {
-            totalRevenue: trends.reduce((sum, t) => sum + t.totalRevenue, 0),
-            totalOrders: trends.reduce((sum, t) => sum + t.orderCount, 0),
-            averageOrderValue: trends.length > 0 
-              ? trends.reduce((sum, t) => sum + t.averageOrderValue, 0) / trends.length 
+            totalRevenue: (trends as any[]).reduce((sum: number, t: any) => sum + t.totalRevenue, 0),
+            totalOrders: (trends as any[]).reduce((sum: number, t: any) => sum + t.orderCount, 0),
+            averageOrderValue: (trends as any[]).length > 0 
+              ? (trends as any[]).reduce((sum: number, t: any) => sum + t.averageOrderValue, 0) / (trends as any[]).length 
               : 0,
-            growthRate: trends.length > 1 
-              ? ((trends[trends.length - 1].totalRevenue - trends[0].totalRevenue) / trends[0].totalRevenue) * 100 
+            growthRate: (trends as any[]).length > 1 
+              ? (((trends as any[])[(trends as any[]).length - 1].totalRevenue - (trends as any[])[0].totalRevenue) / (trends as any[])[0].totalRevenue) * 100 
               : 0,
           },
         },
@@ -289,7 +289,7 @@ export class AnalyticsController {
         filters.supplierIds = [supplierData.id];
       }
     } else if (supplierIds) {
-      filters.supplierIds = Array.isArray(supplierIds) ? supplierIds : [supplierIds as string];
+      filters.supplierIds = Array.isArray(supplierIds) ? (supplierIds as string[]) : [supplierIds as string];
     }
 
     try {

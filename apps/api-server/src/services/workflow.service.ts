@@ -4,7 +4,7 @@ import { WorkflowTransition } from '../entities/WorkflowTransition';
 import { WorkflowState } from '../entities/WorkflowState';
 import { analyticsCacheService } from './analytics-cache.service';
 import { notificationService } from './notification.service';
-import { paymentSystemIntegrationService as paymentSystemIntegration } from './payment-system-integration.service';
+import { paymentSystemIntegration } from './payment-system-integration.service';
 import { inventoryService } from './inventoryService';
 import logger from '../utils/logger';
 

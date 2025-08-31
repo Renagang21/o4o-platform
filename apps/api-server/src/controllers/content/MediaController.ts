@@ -7,7 +7,7 @@ import { Like } from 'typeorm';
 import * as multer from 'multer';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 export class MediaController {
   private mediaRepository = AppDataSource.getRepository(Media);
@@ -90,7 +90,7 @@ export class MediaController {
             filename: fileName,
             originalFilename: file.originalname,
             url: `/uploads/${fileCategory}/${fileName}`,
-            thumbnailUrl: variants.thumbnail || null,
+            thumbnailUrl: (variants as any).thumbnail || null,
             mimeType: file.mimetype,
             size: stats.size,
             width,

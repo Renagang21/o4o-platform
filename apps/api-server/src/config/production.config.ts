@@ -64,7 +64,11 @@ export const rateLimitConfig = {
 };
 
 // Security configuration
-export const securityConfig = {
+export const securityConfig: {
+  helmet: ReturnType<typeof helmet>;
+  cors: any;
+  compression: ReturnType<typeof compression>;
+} = {
   helmet: helmet({
     contentSecurityPolicy: {
       directives: {
@@ -86,6 +90,13 @@ export const securityConfig = {
       preload: true,
     },
   }),
+  
+  cors: {
+    origin: process.env.FRONTEND_URLS?.split(',') || ['http://localhost:5173', 'http://localhost:5174'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  },
   
   compression: compression({
     filter: (req, res) => {
@@ -332,11 +343,13 @@ export const setupGracefulShutdown = (server: any) => {
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 };
 
-export default {
+const config = {
   rateLimitConfig,
   securityConfig,
   performanceConfig,
   monitoringConfig,
   setupProductionMiddleware,
   setupGracefulShutdown,
-};
+} as const;
+
+export default config;

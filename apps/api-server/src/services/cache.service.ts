@@ -101,6 +101,11 @@ export class CacheService {
     }
   }
 
+  // Alias for del method to match expected interface
+  async delete(key: string): Promise<boolean> {
+    return this.del(key);
+  }
+
   async invalidateByTag(tag: string): Promise<number> {
     try {
       const keys = await this.redis.smembers(`tag:${tag}`);

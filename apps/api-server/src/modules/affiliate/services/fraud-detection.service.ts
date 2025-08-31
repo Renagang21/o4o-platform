@@ -91,7 +91,7 @@ export class FraudDetectionService {
     // Check referrer spam
     if (clickData.referrerUrl) {
       const referrerScore = this.checkReferrerSpam(clickData.referrerUrl);
-      if (referrerScore > 0) {
+      if (referrerScore) {
         indicators.push(referrerScore);
         totalScore += referrerScore.score;
       }
@@ -100,7 +100,7 @@ export class FraudDetectionService {
     // Check geo anomalies
     if (clickData.country) {
       const geoScore = await this.checkGeoAnomalies(clickData.affiliateUserId, clickData.country);
-      if (geoScore > 0) {
+      if (geoScore) {
         indicators.push(geoScore);
         totalScore += geoScore.score;
       }
@@ -148,7 +148,7 @@ export class FraudDetectionService {
     // Check rapid conversion
     if (conversionData.timeFromClick) {
       const rapidScore = this.checkRapidConversion(conversionData.timeFromClick);
-      if (rapidScore > 0) {
+      if (rapidScore) {
         indicators.push(rapidScore);
         totalScore += rapidScore.score;
       }
@@ -159,7 +159,7 @@ export class FraudDetectionService {
       conversionData.affiliateUserId,
       conversionData.amount
     );
-    if (patternScore > 0) {
+    if (patternScore) {
       indicators.push(patternScore);
       totalScore += patternScore.score;
     }

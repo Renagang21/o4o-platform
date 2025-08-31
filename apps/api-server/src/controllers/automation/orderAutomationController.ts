@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthRequest } from '../../types/auth';
+import { AuthRequest, UserRole } from '../../types/auth';
 import { orderAutomationService, AutomationRuleConfig } from '../../services/order-automation.service';
 import { validateRequiredFields, createValidationError, createNotFoundError, createInternalServerError } from '../../utils/errorUtils';
 import { asyncHandler } from '../../utils/asyncHandler';
@@ -16,11 +16,11 @@ export class OrderAutomationController {
       // Validate rule configuration
       const validation = await orderAutomationService.validateRuleConfiguration(ruleData);
       if (!validation.valid) {
-        throw createValidationError('Invalid automation rule configuration', validation.errors);
+        throw createValidationError(`Invalid automation rule configuration: ${JSON.stringify(validation.errors)}`);
       }
 
       // Vendors can only create rules for their own orders
-      if (req.user?.role === 'vendor_manager') {
+      if (req.user?.role === UserRole.VENDOR_MANAGER) {
         const vendorFilter = {
           type: 'vendor_id' as const,
           operator: 'equals' as const,
@@ -104,7 +104,7 @@ export class OrderAutomationController {
       if (updates.conditions || updates.actions) {
         const validation = await orderAutomationService.validateRuleConfiguration(updates as AutomationRuleConfig);
         if (!validation.valid) {
-          throw createValidationError('Invalid automation rule configuration', validation.errors);
+          throw createValidationError(`Invalid automation rule configuration: ${JSON.stringify(validation.errors)}`);
         }
       }
 
