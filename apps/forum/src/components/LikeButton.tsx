@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Heart, ThumbsUp } from 'lucide-react';
 
 interface LikeButtonProps {
@@ -36,9 +36,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       checkLikeStatus();
     }
     fetchLikeCount();
-  }, [targetId, userId]);
+  }, [targetId, userId, checkLikeStatus, fetchLikeCount]);
 
-  const checkLikeStatus = async () => {
+  const checkLikeStatus = useCallback(async () => {
     try {
       const endpoint = targetType === 'post' 
         ? `/api/forum/posts/${targetId}/likes/check`
@@ -54,9 +54,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     } catch (error) {
       // Handle error silently
     }
-  };
+  }, [targetType, targetId]);
 
-  const fetchLikeCount = async () => {
+  const fetchLikeCount = useCallback(async () => {
     try {
       const endpoint = targetType === 'post'
         ? `/api/forum/posts/${targetId}/likes/count`
@@ -68,7 +68,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     } catch (error) {
       // Handle error silently
     }
-  };
+  }, [targetType, targetId]);
 
   const handleToggleLike = async () => {
     if (!userId) {

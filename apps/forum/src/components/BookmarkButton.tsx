@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 
 interface BookmarkButtonProps {
@@ -29,9 +29,9 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     if (userId) {
       checkBookmarkStatus();
     }
-  }, [postId, userId]);
+  }, [postId, userId, showCount, fetchBookmarkCount, checkBookmarkStatus]);
 
-  const fetchBookmarkCount = async () => {
+  const fetchBookmarkCount = useCallback(async () => {
     try {
       const response = await fetch(`/api/forum/posts/${postId}/bookmarks/count`);
       const data = await response.json();
@@ -39,9 +39,9 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     } catch (error) {
       // Handle error silently
     }
-  };
+  }, [postId]);
 
-  const checkBookmarkStatus = async () => {
+  const checkBookmarkStatus = useCallback(async () => {
     try {
       const response = await fetch(`/api/forum/posts/${postId}/bookmarks/check`, {
         headers: {
@@ -53,7 +53,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
     } catch (error) {
       // Handle error silently
     }
-  };
+  }, [postId]);
 
   const handleToggleBookmark = async () => {
     if (!userId) {

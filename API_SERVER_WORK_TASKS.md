@@ -149,7 +149,7 @@ apps/api-server/src/entities/
 │   ├── □ Supplier.ts
 │   ├── □ VendorCommission.ts
 │   └── □ CommissionSettlement.ts
-├── ecommerce/
+├── e-commerce/
 │   ├── □ Inventory.ts
 │   ├── □ StockMovement.ts
 │   ├── □ ReorderRule.ts

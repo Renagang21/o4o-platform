@@ -77,6 +77,91 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadControllersRef = useRef<Map<string, AbortController>>(new Map());
 
+  // Upload file to server
+  const uploadFile = useCallback(async (mediaFile: MediaFile) => {
+    const controller = new AbortController();
+    uploadControllersRef.current.set(mediaFile.id, controller);
+
+    // Update status to uploading
+    setFiles(prev => prev.map(f => 
+      f.id === mediaFile.id ? { ...f, status: 'uploading' } : f
+    ));
+    onUploadStart?.(mediaFile);
+
+    const formData = new FormData();
+    formData.append('file', mediaFile.file);
+    formData.append('type', mediaFile.type);
+    formData.append('name', mediaFile.name);
+
+    try {
+      const xhr = new XMLHttpRequest();
+
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setFiles(prev => prev.map(f => 
+            f.id === mediaFile.id ? { ...f, progress } : f
+          ));
+          onUploadProgress?.(mediaFile, progress);
+        }
+      });
+
+      // Handle completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          
+          setFiles(prev => prev.map(f => 
+            f.id === mediaFile.id ? {
+              ...f,
+              status: 'completed',
+              progress: 100,
+              url: response.url,
+              thumbnailUrl: response.thumbnailUrl,
+              metadata: response.metadata
+            } : f
+          ));
+
+          const completedFile = {
+            ...mediaFile,
+            status: 'completed' as const,
+            url: response.url,
+            thumbnailUrl: response.thumbnailUrl,
+            metadata: response.metadata
+          };
+          
+          onUploadComplete?.(completedFile);
+        } else {
+          throw new Error(`Upload failed with status ${xhr.status}`);
+        }
+      });
+
+      // Handle errors
+      xhr.addEventListener('error', () => {
+        throw new Error('Network error occurred');
+      });
+
+      // Set abort handler
+      controller.signal.addEventListener('abort', () => {
+        xhr.abort();
+      });
+
+      // Send request
+      xhr.open('POST', uploadUrl);
+      xhr.send(formData);
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+      setFiles(prev => prev.map(f => 
+        f.id === mediaFile.id ? { ...f, status: 'error', error: errorMessage } : f
+      ));
+      onUploadError?.(mediaFile, errorMessage);
+    } finally {
+      uploadControllersRef.current.delete(mediaFile.id);
+    }
+  }, [onUploadStart, onUploadProgress, onUploadComplete, onUploadError]);
+
   // Handle file selection
   const handleFileSelect = useCallback((selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
@@ -143,92 +228,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
     if (autoUpload) {
       newFiles.forEach(file => uploadFile(file));
     }
-  }, [files, acceptedTypes, maxFileSize, maxFiles, autoUpload, onFilesChange]);
-
-  // Upload file to server
-  const uploadFile = async (mediaFile: MediaFile) => {
-    const controller = new AbortController();
-    uploadControllersRef.current.set(mediaFile.id, controller);
-
-    // Update status to uploading
-    setFiles(prev => prev.map(f => 
-      f.id === mediaFile.id ? { ...f, status: 'uploading' } : f
-    ));
-    onUploadStart?.(mediaFile);
-
-    const formData = new FormData();
-    formData.append('file', mediaFile.file);
-    formData.append('type', mediaFile.type);
-    formData.append('name', mediaFile.name);
-
-    try {
-      const xhr = new XMLHttpRequest();
-
-      // Track upload progress
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          setFiles(prev => prev.map(f => 
-            f.id === mediaFile.id ? { ...f, progress } : f
-          ));
-          onUploadProgress?.(mediaFile, progress);
-        }
-      });
-
-      // Handle completion
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          
-          setFiles(prev => prev.map(f => 
-            f.id === mediaFile.id ? {
-              ...f,
-              status: 'completed',
-              progress: 100,
-              url: response.url,
-              thumbnailUrl: response.thumbnailUrl,
-              metadata: response.metadata
-            } : f
-          ));
-
-          const completedFile = {
-            ...mediaFile,
-            status: 'completed' as const,
-            url: response.url,
-            thumbnailUrl: response.thumbnailUrl,
-            metadata: response.metadata
-          };
-          
-          onUploadComplete?.(completedFile);
-        } else {
-          throw new Error(`Upload failed with status ${xhr.status}`);
-        }
-      });
-
-      // Handle errors
-      xhr.addEventListener('error', () => {
-        const error = 'Network error occurred during upload';
-        setFiles(prev => prev.map(f => 
-          f.id === mediaFile.id ? { ...f, status: 'error', error } : f
-        ));
-        onUploadError?.(mediaFile, error);
-      });
-
-      // Send request
-      xhr.open('POST', uploadEndpoint);
-      xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('token')}`);
-      xhr.send(formData);
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
-      setFiles(prev => prev.map(f => 
-        f.id === mediaFile.id ? { ...f, status: 'error', error: errorMessage } : f
-      ));
-      onUploadError?.(mediaFile, errorMessage);
-    } finally {
-      uploadControllersRef.current.delete(mediaFile.id);
-    }
-  };
+  }, [files, acceptedTypes, maxFileSize, maxFiles, autoUpload, onFilesChange, uploadFile]);
 
   // Cancel upload
   const cancelUpload = (fileId: string) => {
