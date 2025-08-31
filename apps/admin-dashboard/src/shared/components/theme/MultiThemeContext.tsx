@@ -1,5 +1,8 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useState } from 'react';
 
+// React Refresh를 위한 주석
+/* @refresh reload */
+
 interface ThemeContextType {
   theme: string
   setTheme: (theme: string) => void

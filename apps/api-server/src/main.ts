@@ -93,6 +93,7 @@ import linkedAccountsRoutes from './routes/linked-accounts';
 import accountLinkingRoutes from './routes/account-linking.routes';
 import unifiedAuthRoutes from './routes/unified-auth.routes';
 import vendorRoutes from './routes/vendor';
+import supplierRoutes from './routes/supplier';
 import inventoryRoutes from './routes/inventory';
 import formsRoutes from './routes/forms';
 import monitoringRoutes from './routes/monitoring';
@@ -548,6 +549,7 @@ app.use('/api/auth', emailAuthRoutes);
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
 app.use('/api/auth/unified', unifiedAuthRoutes); // Unified auth routes
 app.use('/api/vendor', vendorRoutes); // Vendor management routes
+app.use('/api/suppliers', supplierRoutes); // Supplier management routes
 app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes

@@ -64,7 +64,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <FileText className="w-5 h-5" />,
     children: [
       { id: 'posts-all', label: '모든 글', icon: <FileText className="w-4 h-4" />, path: '/posts' },
-      { id: 'posts-new', label: '새 글 추가', icon: <FileText className="w-4 h-4" />, path: '/posts/new' },
+      { id: 'posts-new', label: '새 글 추가', icon: <FileText className="w-4 h-4" />, path: '/editor/posts/new' },
       { id: 'posts-categories', label: '카테고리', icon: <Tag className="w-4 h-4" />, path: '/posts/categories' },
       { id: 'posts-tags', label: '태그', icon: <Tag className="w-4 h-4" />, path: '/posts/tags' }
     ]
@@ -84,7 +84,7 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <FileTextIcon className="w-5 h-5" />,
     children: [
       { id: 'pages-all', label: '모든 페이지', icon: <FileTextIcon className="w-4 h-4" />, path: '/pages' },
-      { id: 'pages-new', label: '새 페이지 추가', icon: <FileTextIcon className="w-4 h-4" />, path: '/pages/new' }
+      { id: 'pages-new', label: '새 페이지 추가', icon: <FileTextIcon className="w-4 h-4" />, path: '/editor/pages/new' }
     ]
   },
   {

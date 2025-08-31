@@ -13,7 +13,13 @@ export const sharedViteConfig: UserConfig = {
   plugins: [
     react({
       jsxRuntime: 'automatic',
-      jsxImportSource: 'react'
+      jsxImportSource: 'react',
+      // React Refresh 설정 개선
+      fastRefresh: process.env.NODE_ENV === 'development',
+      // React DevTools 호환성을 위한 설정
+      babel: {
+        plugins: process.env.NODE_ENV === 'development' ? ['react-refresh/babel'] : []
+      }
     })
   ],
   resolve: {

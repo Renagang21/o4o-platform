@@ -11,7 +11,7 @@ import { postApi, mediaApi } from '@/services/api/postApi';
 import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
-import DesignLibraryModal from './DesignLibraryModal';
+import DesignLibraryModalImproved from './DesignLibraryModalImproved';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
 import ListBlock from './blocks/ListBlock';
@@ -757,7 +757,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       )}
 
       {/* Design Library Modal */}
-      <DesignLibraryModal
+      <DesignLibraryModalImproved
         isOpen={isDesignLibraryOpen}
         onClose={() => setIsDesignLibraryOpen(false)}
         onApplyTemplate={handleApplyTemplate}
