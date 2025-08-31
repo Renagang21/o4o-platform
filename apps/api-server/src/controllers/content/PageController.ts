@@ -681,7 +681,7 @@ export class PageController {
   }
 
   private formatPageResponse(page: any, includeChildren: boolean = false): any {
-    const response = {
+    const response: any = {
       id: page.id,
       title: page.title,
       slug: page.slug,

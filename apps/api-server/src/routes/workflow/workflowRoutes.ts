@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { WorkflowController } from '../../controllers/workflow/workflowController';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
 const router = Router();
@@ -10,7 +10,7 @@ const workflowController = new WorkflowController();
 router.use(authMiddleware);
 
 // Apply rate limiting for workflow operations
-router.use(rateLimitConfig.workflow || rateLimitConfig.general);
+router.use((rateLimitConfig as any).workflow || rateLimitConfig.general);
 
 // Workflow Management APIs (4 endpoints)
 router.get('/order-status', workflowController.getOrderStatusWorkflow);

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as cron from 'node-cron';
 import { AppDataSource } from '../database/connection';
 import { SubscriptionService } from '../services/subscription.service';

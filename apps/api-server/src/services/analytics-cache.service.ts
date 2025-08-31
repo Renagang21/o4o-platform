@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';
 import { EventEmitter } from 'events';

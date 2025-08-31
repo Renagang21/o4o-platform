@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PaymentWebhookController } from '../../controllers/payments/paymentWebhookController';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
 const router = Router();

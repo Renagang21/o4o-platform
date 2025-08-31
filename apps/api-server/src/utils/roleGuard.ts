@@ -1,25 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { createForbiddenError, createUnauthorizedError } from './errorUtils';
-
-export enum UserRole {
-  ADMIN = 'admin',
-  MANAGER = 'manager',
-  VENDOR = 'vendor',
-  VENDOR_MANAGER = 'vendor_manager',
-  SUPPLIER = 'supplier',
-  CUSTOMER = 'customer',
-  USER = 'user'
-}
-
-export interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    role: UserRole | string;
-    vendorId?: string;
-    supplierId?: string;
-    [key: string]: any;
-  };
-}
+import { AuthRequest, UserRole } from '../types/auth';
 
 /**
  * Role-based access control middleware
@@ -72,7 +53,7 @@ export function isSupplier(user: any): boolean {
  * Check if user is customer or regular user
  */
 export function isCustomer(user: any): boolean {
-  return [UserRole.CUSTOMER, UserRole.USER].includes(user?.role);
+  return [UserRole.CUSTOMER, 'user'].includes(user?.role);
 }
 
 /**

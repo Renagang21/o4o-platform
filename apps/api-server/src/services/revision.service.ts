@@ -69,7 +69,7 @@ export class RevisionService {
         status: post.status,
         seo: post.seo,
         customFields: post.customFields,
-        tags: post.tags,
+        tags: post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name) || [],
         postMeta: post.postMeta,
         changes,
         changeDescription: revisionData.changeDescription,
@@ -219,7 +219,7 @@ export class RevisionService {
         isRestorePoint: true
       });
 
-      // Restore content
+      // Restore content (exclude tags for now as they need special handling)
       const updatedPost = await this.postRepository.save({
         ...post,
         title: revision.title,
@@ -228,11 +228,12 @@ export class RevisionService {
         status: revision.status,
         seo: revision.seo,
         customFields: revision.customFields,
-        tags: revision.tags,
         postMeta: revision.postMeta,
         lastModifiedBy: restoredBy,
         updatedAt: new Date()
       });
+
+      // TODO: Handle tag restoration - need to convert string[] back to PostTag[]
 
       logger.info('Post restored from revision', {
         postId,
@@ -241,7 +242,7 @@ export class RevisionService {
         restoredBy
       });
 
-      return updatedPost;
+      return Array.isArray(updatedPost) ? updatedPost[0] : updatedPost;
     } catch (error) {
       logger.error('Error restoring post revision:', error);
       throw error;

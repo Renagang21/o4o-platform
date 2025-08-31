@@ -126,11 +126,12 @@ export class CommissionSchedule {
     try {
       const statistics = await this.commissionService.getCommissionStatistics();
       
-      // Commission Statistics: {
+      // Commission Statistics logged
+      const stats = {
         vendorCommissions: statistics.vendorCommissions,
         supplierSettlements: statistics.supplierSettlements,
         totalPending: statistics.totalPending,
-      });
+      };
 
       // TODO: Send weekly report to admin
       

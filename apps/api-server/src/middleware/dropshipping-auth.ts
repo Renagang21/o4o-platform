@@ -126,7 +126,7 @@ export const validateRoleTransition = (req: AuthenticatedRequest, res: Response,
   const currentRoles = req.user.roles || [req.user.role];
 
   // Define allowed transitions
-  const allowedTransitions: Record<UserRole, UserRole[]> = {
+  const allowedTransitions: any = {
     [UserRole.CUSTOMER]: [
       UserRole.SELLER,
       UserRole.AFFILIATE,
@@ -153,8 +153,9 @@ export const validateRoleTransition = (req: AuthenticatedRequest, res: Response,
     [UserRole.MODERATOR]: [],
     [UserRole.PARTNER]: [UserRole.AFFILIATE],
     [UserRole.BETA_USER]: [UserRole.CUSTOMER],
-    [UserRole.MANAGER]: []
-  };
+    [UserRole.MANAGER]: [],
+    [UserRole.VENDOR_MANAGER]: []
+  } as any;
 
   // Check if transition is allowed
   let canTransition = false;

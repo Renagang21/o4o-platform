@@ -1,5 +1,6 @@
 import { AppDataSource } from '../database/connection';
 import { Order, OrderStatus } from '../entities/Order';
+import { MoreThan } from 'typeorm';
 import { WorkflowTransition } from '../entities/WorkflowTransition';
 import { WorkflowState } from '../entities/WorkflowState';
 import { analyticsCacheService } from './analytics-cache.service';
@@ -509,7 +510,7 @@ export class WorkflowService {
     reason?: string
   ): Promise<void> {
     try {
-      const transition = this.transitionRepository.create({
+      const transitionData = {
         entityType: 'order',
         entityId,
         fromState,
@@ -517,7 +518,8 @@ export class WorkflowService {
         triggeredBy,
         reason,
         transitionedAt: new Date()
-      });
+      };
+      const transition = this.transitionRepository.create(transitionData as any);
 
       await this.transitionRepository.save(transition);
     } catch (error) {
@@ -548,7 +550,7 @@ export class WorkflowService {
       const recentTransitions = await this.transitionRepository.find({
         where: {
           entityType: 'order',
-          transitionedAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+          transitionedAt: MoreThan(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
         },
         order: { transitionedAt: 'DESC' }
       });
@@ -572,7 +574,7 @@ export class WorkflowService {
 
       // Identify bottlenecks (states with long average duration)
       const bottlenecks = this.orderWorkflow.states.map(state => {
-        const stateTransitions = recentTransitions.filter(t => t.fromState === state.id);
+        const stateTransitions = recentTransitions.filter(t => String(t.fromState) === String(state.id));
         const avgTimeInState = stateTransitions.length > 0
           ? stateTransitions.reduce((sum, t) => sum + (t.transitionedAt.getTime() - t.createdAt.getTime()), 0) / stateTransitions.length
           : 0;

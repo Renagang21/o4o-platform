@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AnalyticsController } from '../../controllers/analytics/analyticsController';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 
 const router = Router();
 const analyticsController = new AnalyticsController();

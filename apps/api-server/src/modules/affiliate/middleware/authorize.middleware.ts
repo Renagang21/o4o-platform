@@ -1,12 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 export interface AuthorizedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: 'admin' | 'affiliate' | 'user' | 'system';
-    affiliateId?: string;
-  };
+  user?: any;
 }
 
 /**

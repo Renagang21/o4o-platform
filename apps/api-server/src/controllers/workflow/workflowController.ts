@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../../types/auth';
 import { workflowService } from '../../services/workflow.service';
-import { validateRequiredFields, createValidationError, createNotFoundError } from '../../utils/errorUtils';
+import { validateRequiredFields, createValidationError, createNotFoundError, createInternalServerError } from '../../utils/errorUtils';
 import { asyncHandler } from '../../utils/asyncHandler';
 import { roleGuard } from '../../utils/roleGuard';
 import logger from '../../utils/logger';
@@ -54,7 +54,7 @@ export class WorkflowController {
       // Validate transition is allowed
       const validation = await workflowService.validateWorkflowTransition('order', fromStatus, toStatus);
       if (!validation.valid) {
-        throw createValidationError('Invalid status transition', [validation.reason || 'Unknown validation error']);
+        throw createValidationError(`Invalid status transition: ${validation.reason || 'Unknown validation error'}`);
       }
 
       const result = await workflowService.transitionOrderStatus(
@@ -66,7 +66,7 @@ export class WorkflowController {
       );
 
       if (!result.success) {
-        throw createValidationError('Status transition failed', [result.error || 'Unknown error']);
+        throw createValidationError(`Status transition failed: ${result.error || 'Unknown error'}`);
       }
 
       logger.info('Order status transition completed', {
@@ -313,21 +313,21 @@ export class WorkflowController {
   });
 
   private calculateEfficiency(orderWorkflow: any): number {
-    const totalOrders = Object.values(orderWorkflow.stateDistribution).reduce((sum: number, count: any) => sum + count, 0);
-    const completedOrders = orderWorkflow.stateDistribution.completed || 0;
+    const totalOrders = Object.values(orderWorkflow.stateDistribution).reduce((sum: number, count: unknown) => sum + (typeof count === 'number' ? count : 0), 0) as number;
+    const completedOrders = typeof orderWorkflow.stateDistribution.completed === 'number' ? orderWorkflow.stateDistribution.completed : 0;
     
-    return totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
+    return (totalOrders as number) > 0 ? ((completedOrders as number) / (totalOrders as number)) * 100 : 0;
   }
 
   private calculateAlertResponse(inventoryWorkflow: any): number {
-    const totalAlerts = inventoryWorkflow.activeAlerts + inventoryWorkflow.autoResolvedAlerts;
+    const totalAlerts = (inventoryWorkflow.activeAlerts as number) + (inventoryWorkflow.autoResolvedAlerts as number);
     
-    return totalAlerts > 0 ? (inventoryWorkflow.autoResolvedAlerts / totalAlerts) * 100 : 100;
+    return (totalAlerts as number) > 0 ? ((inventoryWorkflow.autoResolvedAlerts as number) / (totalAlerts as number)) * 100 : 100;
   }
 
   private calculateProcessingSpeed(commissionWorkflow: any): number {
-    const totalCommissions = commissionWorkflow.autoApprovedCount + commissionWorkflow.manualReviewCount;
+    const totalCommissions = (commissionWorkflow.autoApprovedCount as number) + (commissionWorkflow.manualReviewCount as number);
     
-    return totalCommissions > 0 ? (commissionWorkflow.autoApprovedCount / totalCommissions) * 100 : 0;
+    return (totalCommissions as number) > 0 ? ((commissionWorkflow.autoApprovedCount as number) / (totalCommissions as number)) * 100 : 0;
   }
 }

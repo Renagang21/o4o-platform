@@ -73,7 +73,7 @@ export class PayoutService {
       metadata: {
         createdBy: adminId,
         commissionCount: commissionIds.length
-      }
+      } as any
     });
 
     // Update commissions with payout ID

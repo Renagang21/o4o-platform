@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';

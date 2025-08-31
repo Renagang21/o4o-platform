@@ -10,85 +10,85 @@ const commissionController = new CommissionController();
 // Commission endpoints
 router.get(
   '/commissions',
-  authenticate,
-  requireAdminOrAffiliate,
-  commissionController.getCommissions
+  authenticate as any,
+  requireAdminOrAffiliate as any,
+  (commissionController.getCommissions as any).bind(commissionController)
 );
 
 router.post(
   '/commissions/calculate',
-  authenticate,
-  requireSystem,
+  authenticate as any,
+  requireSystem as any,
   rateLimitMiddleware({ windowMs: 60000, max: 100 }),
-  commissionController.calculateCommission
+  (commissionController.calculateCommission as any).bind(commissionController)
 );
 
 router.post(
   '/commissions/process',
-  authenticate,
-  requireAdmin,
+  authenticate as any,
+  requireAdmin as any,
   rateLimitMiddleware({ windowMs: 60000, max: 20 }),
-  commissionController.processCommissions
+  (commissionController.processCommissions as any).bind(commissionController)
 );
 
 // Affiliate user management (admin)
 router.get(
   '/users',
-  authenticate,
-  requireAdmin,
-  commissionController.getAffiliateUsers
+  authenticate as any,
+  requireAdmin as any,
+  (commissionController.getAffiliateUsers as any).bind(commissionController)
 );
 
 router.patch(
   '/users/:id/status',
-  authenticate,
-  requireAdmin,
+  authenticate as any,
+  requireAdmin as any,
   rateLimitMiddleware({ windowMs: 60000, max: 20 }),
-  commissionController.updateAffiliateStatus
+  (commissionController.updateAffiliateStatus as any).bind(commissionController)
 );
 
 // Payout endpoints
 router.get(
   '/payouts',
-  authenticate,
-  requireAdminOrAffiliate,
+  authenticate as any,
+  requireAdminOrAffiliate as any,
   commissionController.getPayouts
 );
 
 router.post(
   '/payouts',
-  authenticate,
-  requireAdmin,
+  authenticate as any,
+  requireAdmin as any,
   rateLimitMiddleware({ windowMs: 60000, max: 10 }),
   commissionController.createPayout
 );
 
 router.get(
   '/payouts/calculate/:affiliateUserId',
-  authenticate,
-  requireAdminOrAffiliate,
+  authenticate as any,
+  requireAdminOrAffiliate as any,
   commissionController.calculatePayoutSummary
 );
 
 router.get(
   '/payouts/:id',
-  authenticate,
-  requireAdminOrAffiliate,
+  authenticate as any,
+  requireAdminOrAffiliate as any,
   commissionController.getPayoutDetails
 );
 
 router.patch(
   '/payouts/:id/process',
-  authenticate,
-  requireAdmin,
+  authenticate as any,
+  requireAdmin as any,
   rateLimitMiddleware({ windowMs: 60000, max: 10 }),
   commissionController.processPayout
 );
 
 router.delete(
   '/payouts/:id',
-  authenticate,
-  requireAdmin,
+  authenticate as any,
+  requireAdmin as any,
   rateLimitMiddleware({ windowMs: 60000, max: 10 }),
   commissionController.cancelPayout
 );
@@ -96,8 +96,8 @@ router.delete(
 // Admin dashboard
 router.get(
   '/admin/dashboard',
-  authenticate,
-  requireAdmin,
+  authenticate as any,
+  requireAdmin as any,
   commissionController.getAdminDashboard
 );
 

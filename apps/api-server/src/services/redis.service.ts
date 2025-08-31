@@ -138,6 +138,24 @@ export class RedisService {
     }
   }
 
+  async sadd(key: string, member: string): Promise<number> {
+    try {
+      return await this.redis.sadd(key, member);
+    } catch (error) {
+      console.error(`Redis SADD error for key ${key}:`, error);
+      return 0;
+    }
+  }
+
+  async scard(key: string): Promise<number> {
+    try {
+      return await this.redis.scard(key);
+    } catch (error) {
+      console.error(`Redis SCARD error for key ${key}:`, error);
+      return 0;
+    }
+  }
+
   async flushdb(): Promise<void> {
     try {
       await this.redis.flushdb();

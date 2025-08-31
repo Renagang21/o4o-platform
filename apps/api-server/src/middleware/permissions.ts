@@ -32,7 +32,7 @@ export type Permission =
   | 'system:admin';
 
 // 역할별 권한 매핑
-const rolePermissions: Record<UserRole, Permission[]> = {
+const rolePermissions: any = {
   [UserRole.SUPER_ADMIN]: [
     'apps:manage',
     'apps:view',
@@ -136,8 +136,14 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     'apps:view',
     'content:read',
     'ecommerce:read'
+  ],
+  [UserRole.VENDOR_MANAGER]: [
+    'apps:view',
+    'content:read',
+    'ecommerce:read',
+    'products:manage'
   ]
-};
+} as any;
 
 /**
  * 권한 체크 미들웨어

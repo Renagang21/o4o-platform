@@ -565,10 +565,11 @@ export class ReportingService {
 
   private async generateSalesTrends(options: ReportOptions) {
     // Use existing analytics service to get trends
+    const groupBy = options.groupBy === 'quarter' ? 'month' : (options.groupBy || 'day');
     return await this.analyticsService.getSalesTrends(
       options.startDate,
       options.endDate,
-      options.groupBy || 'day'
+      groupBy as 'day' | 'week' | 'month'
     );
   }
 
@@ -646,7 +647,8 @@ export class ReportingService {
   }
 
   private async generatePDFFile(filePath: string, report: ReportData, data: any): Promise<void> {
-    const doc = new PDFKit();
+    const PDFDocument = (PDFKit as any).default || PDFKit;
+    const doc = new PDFDocument();
     const stream = fs.createWriteStream(filePath);
     
     doc.pipe(stream);

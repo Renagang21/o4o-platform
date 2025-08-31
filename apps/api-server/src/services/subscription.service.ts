@@ -151,7 +151,7 @@ export class SubscriptionService {
       // 셋업 비용이 있는 경우 즉시 결제
       if (plan.setupFee && plan.setupFee > 0) {
         try {
-          await this.processSetupFeePayment(savedSubscription as Subscription, plan);
+          await this.processSetupFeePayment(savedSubscription as Subscription, plan as any);
         } catch (error) {
           // 셋업 비용 결제 실패 시 구독 취소
           await this.cancelSubscription(savedSubscription.id, 'setup_payment_failed');

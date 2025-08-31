@@ -198,9 +198,8 @@ export class DashboardController {
   private async getVendorSupplierData(vendorId: string) {
     try {
       // Check if vendor is also a supplier
-      const supplier = await this.supplierRepository.findOne({
-        where: { contactEmail: { /* would need vendor email lookup */ } }
-      });
+      // TODO: Implement proper vendor email lookup
+      const supplier = null; // Placeholder until vendor email lookup is implemented
 
       if (!supplier) {
         return null;

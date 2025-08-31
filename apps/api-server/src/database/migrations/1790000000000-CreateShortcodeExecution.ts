@@ -89,8 +89,8 @@ export class CreateShortcodeExecution1790000000000 implements MigrationInterface
           {"name": "link", "type": "select", "required": false, "default": "none", "options": ["none", "file", "post"], "description": "Link type"}
         ]'::jsonb,
         '[
-          {"title": "Basic Gallery", "code": "[gallery ids=\"1,2,3,4\" columns=\"4\"]", "description": "4-column gallery with specific images"},
-          {"title": "Two Column Gallery", "code": "[gallery columns=\"2\" size=\"large\"]", "description": "2-column gallery with large images"}
+          {"title": "Basic Gallery", "code": "[gallery ids="1,2,3,4" columns="4"]", "description": "4-column gallery with specific images"},
+          {"title": "Two Column Gallery", "code": "[gallery columns="2" size="large"]", "description": "2-column gallery with large images"}
         ]'::jsonb,
         null,
         '["media", "images", "gallery", "photos"]'::jsonb
@@ -115,8 +115,8 @@ export class CreateShortcodeExecution1790000000000 implements MigrationInterface
           {"name": "icon", "type": "string", "required": false, "description": "Icon class"}
         ]'::jsonb,
         '[
-          {"title": "Primary Button", "code": "[button url=\"/contact\" style=\"primary\"]Contact Us[/button]", "description": "Primary styled button"},
-          {"title": "Large Success Button", "code": "[button url=\"/signup\" style=\"success\" size=\"large\"]Sign Up Now[/button]", "description": "Large green button"}
+          {"title": "Primary Button", "code": "[button url="/contact" style="primary"]Contact Us[/button]", "description": "Primary styled button"},
+          {"title": "Large Success Button", "code": "[button url="/signup" style="success" size="large"]Sign Up Now[/button]", "description": "Large green button"}
         ]'::jsonb,
         'Click Here',
         '["button", "link", "cta", "action"]'::jsonb
@@ -140,8 +140,8 @@ export class CreateShortcodeExecution1790000000000 implements MigrationInterface
           {"name": "align", "type": "select", "required": false, "default": "left", "options": ["left", "center", "right"], "description": "Text alignment"}
         ]'::jsonb,
         '[
-          {"title": "Simple Quote", "code": "[quote author=\"Albert Einstein\"]Imagination is more important than knowledge.[/quote]", "description": "Quote with author"},
-          {"title": "Pullquote", "code": "[quote style=\"pullquote\" align=\"center\"]This is a highlighted quote[/quote]", "description": "Centered pullquote"}
+          {"title": "Simple Quote", "code": "[quote author="Albert Einstein"]Imagination is more important than knowledge.[/quote]", "description": "Quote with author"},
+          {"title": "Pullquote", "code": "[quote style="pullquote" align="center"]This is a highlighted quote[/quote]", "description": "Centered pullquote"}
         ]'::jsonb,
         'Enter your quote here',
         '["quote", "blockquote", "citation", "testimonial"]'::jsonb
@@ -167,8 +167,8 @@ export class CreateShortcodeExecution1790000000000 implements MigrationInterface
           {"name": "loop", "type": "boolean", "required": false, "default": false, "description": "Loop video"}
         ]'::jsonb,
         '[
-          {"title": "YouTube Video", "code": "[video url=\"https://youtube.com/watch?v=dQw4w9WgXcQ\"]", "description": "Embed YouTube video"},
-          {"title": "Autoplay Video", "code": "[video url=\"video.mp4\" autoplay=\"true\" loop=\"true\"]", "description": "Autoplay looped video"}
+          {"title": "YouTube Video", "code": "[video url="https://youtube.com/watch?v=dQw4w9WgXcQ"]", "description": "Embed YouTube video"},
+          {"title": "Autoplay Video", "code": "[video url="video.mp4" autoplay="true" loop="true"]", "description": "Autoplay looped video"}
         ]'::jsonb,
         null,
         '["video", "youtube", "vimeo", "embed", "media"]'::jsonb
@@ -192,8 +192,8 @@ export class CreateShortcodeExecution1790000000000 implements MigrationInterface
           {"name": "class", "type": "string", "required": false, "description": "Additional CSS classes"}
         ]'::jsonb,
         '[
-          {"title": "Primary Menu", "code": "[menu location=\"primary\"]", "description": "Display primary navigation"},
-          {"title": "Vertical Footer Menu", "code": "[menu location=\"footer\" style=\"vertical\"]", "description": "Vertical footer menu"}
+          {"title": "Primary Menu", "code": "[menu location="primary"]", "description": "Display primary navigation"},
+          {"title": "Vertical Footer Menu", "code": "[menu location="footer" style="vertical"]", "description": "Vertical footer menu"}
         ]'::jsonb,
         null,
         '["menu", "navigation", "nav", "links"]'::jsonb
@@ -217,8 +217,8 @@ export class CreateShortcodeExecution1790000000000 implements MigrationInterface
           {"name": "button_text", "type": "string", "required": false, "default": "Send Message", "description": "Submit button text"}
         ]'::jsonb,
         '[
-          {"title": "Basic Contact Form", "code": "[contact to=\"info@example.com\"]", "description": "Simple contact form"},
-          {"title": "Custom Contact Form", "code": "[contact to=\"sales@example.com\" subject=\"Sales Inquiry\" button_text=\"Request Quote\"]", "description": "Customized form"}
+          {"title": "Basic Contact Form", "code": "[contact to="info@example.com"]", "description": "Simple contact form"},
+          {"title": "Custom Contact Form", "code": "[contact to="sales@example.com" subject="Sales Inquiry" button_text="Request Quote"]", "description": "Customized form"}
         ]'::jsonb,
         null,
         '["contact", "form", "email", "message"]'::jsonb

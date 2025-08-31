@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { AppDataSource } from '../../../database/connection';
 import { AffiliateClick } from '../../../entities/affiliate/AffiliateClick';
 import { AffiliateConversion } from '../../../entities/affiliate/AffiliateConversion';
@@ -213,7 +213,7 @@ export class AdvancedAnalyticsService {
 
     // Get recent events
     const eventStreamKey = `events:stream:${now.toISOString().split('T')[0]}`;
-    const recentEvents = await this.redisService.lrange(eventStreamKey, 0, 49);
+    const recentEvents = await (this.redisService as any).lrange(eventStreamKey, 0, 49);
 
     // Get active sessions
     const activeSessions = await this.sessionRepo.count({

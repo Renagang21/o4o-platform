@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index, ForeignKey } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableColumn, Index, ForeignKey } from 'typeorm';
 
 export class CreateCMSEntities1740000000000 implements MigrationInterface {
   name = 'CreateCMSEntities1740000000000';
@@ -368,76 +368,109 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
       for (const columnDef of columnsToAdd) {
         const existingColumn = postsTable.columns.find(col => col.name === columnDef.name);
         if (!existingColumn) {
-          await queryRunner.addColumn('posts', {
+          await queryRunner.addColumn('posts', new TableColumn({
             name: columnDef.name,
             type: columnDef.type,
             length: columnDef.length,
             default: columnDef.default,
             isNullable: columnDef.isNullable || false,
             comment: columnDef.comment
-          });
+          }));
         }
       }
     }
 
     // Create indexes for better performance
-    await queryRunner.createIndex('post_tags', new Index('IDX_post_tags_name', ['name']));
-    await queryRunner.createIndex('post_tags', new Index('IDX_post_tags_slug', ['slug']));
+    await queryRunner.createIndex('post_tags', {
+      name: 'IDX_post_tags_name',
+      columnNames: ['name']
+    } as any);
+    await queryRunner.createIndex('post_tags', {
+      name: 'IDX_post_tags_slug',
+      columnNames: ['slug']
+    } as any);
     
-    await queryRunner.createIndex('post_revisions', new Index('IDX_post_revisions_post_created', ['postId', 'createdAt']));
-    await queryRunner.createIndex('post_revisions', new Index('IDX_post_revisions_post_revision', ['postId', 'revisionNumber']));
-    await queryRunner.createIndex('post_revisions', new Index('IDX_post_revisions_author', ['authorId']));
+    await queryRunner.createIndex('post_revisions', {
+      name: 'IDX_post_revisions_post_created',
+      columnNames: ['postId', 'createdAt']
+    } as any);
+    await queryRunner.createIndex('post_revisions', {
+      name: 'IDX_post_revisions_post_revision',
+      columnNames: ['postId', 'revisionNumber']
+    } as any);
+    await queryRunner.createIndex('post_revisions', {
+      name: 'IDX_post_revisions_author',
+      columnNames: ['authorId']
+    } as any);
     
-    await queryRunner.createIndex('page_revisions', new Index('IDX_page_revisions_page_created', ['pageId', 'createdAt']));
-    await queryRunner.createIndex('page_revisions', new Index('IDX_page_revisions_page_revision', ['pageId', 'revisionNumber']));
-    await queryRunner.createIndex('page_revisions', new Index('IDX_page_revisions_author', ['authorId']));
+    await queryRunner.createIndex('page_revisions', {
+      name: 'IDX_page_revisions_page_created',
+      columnNames: ['pageId', 'createdAt']
+    } as any);
+    await queryRunner.createIndex('page_revisions', {
+      name: 'IDX_page_revisions_page_revision',
+      columnNames: ['pageId', 'revisionNumber']
+    } as any);
+    await queryRunner.createIndex('page_revisions', {
+      name: 'IDX_page_revisions_author',
+      columnNames: ['authorId']
+    } as any);
 
-    await queryRunner.createIndex('media', new Index('IDX_media_user', ['userId']));
-    await queryRunner.createIndex('media', new Index('IDX_media_folder', ['folderPath']));
-    await queryRunner.createIndex('media', new Index('IDX_media_created', ['createdAt']));
+    await queryRunner.createIndex('media', {
+      name: 'IDX_media_user',
+      columnNames: ['userId']
+    } as any);
+    await queryRunner.createIndex('media', {
+      name: 'IDX_media_folder',
+      columnNames: ['folderPath']
+    } as any);
+    await queryRunner.createIndex('media', {
+      name: 'IDX_media_created',
+      columnNames: ['createdAt']
+    } as any);
 
     // Create foreign keys
-    await queryRunner.createForeignKey('post_revisions', new ForeignKey({
+    await queryRunner.createForeignKey('post_revisions', {
       columnNames: ['postId'],
       referencedTableName: 'posts',
       referencedColumnNames: ['id'],
       onDelete: 'CASCADE'
-    }));
+    } as any);
 
-    await queryRunner.createForeignKey('post_revisions', new ForeignKey({
+    await queryRunner.createForeignKey('post_revisions', {
       columnNames: ['authorId'],
       referencedTableName: 'users',
       referencedColumnNames: ['id'],
       onDelete: 'RESTRICT'
-    }));
+    } as any);
 
-    await queryRunner.createForeignKey('page_revisions', new ForeignKey({
+    await queryRunner.createForeignKey('page_revisions', {
       columnNames: ['pageId'],
       referencedTableName: 'pages',
       referencedColumnNames: ['id'],
       onDelete: 'CASCADE'
-    }));
+    } as any);
 
-    await queryRunner.createForeignKey('page_revisions', new ForeignKey({
+    await queryRunner.createForeignKey('page_revisions', {
       columnNames: ['authorId'],
       referencedTableName: 'users',
       referencedColumnNames: ['id'],
       onDelete: 'RESTRICT'
-    }));
+    } as any);
 
-    await queryRunner.createForeignKey('post_tag_relationships', new ForeignKey({
+    await queryRunner.createForeignKey('post_tag_relationships', {
       columnNames: ['postId'],
       referencedTableName: 'posts',
       referencedColumnNames: ['id'],
       onDelete: 'CASCADE'
-    }));
+    } as any);
 
-    await queryRunner.createForeignKey('post_tag_relationships', new ForeignKey({
+    await queryRunner.createForeignKey('post_tag_relationships', {
       columnNames: ['tagId'],
       referencedTableName: 'post_tags',
       referencedColumnNames: ['id'],
       onDelete: 'CASCADE'
-    }));
+    } as any);
 
     // Create triggers for automatic updated_at timestamp updates
     await queryRunner.query(`
@@ -516,11 +549,11 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     // Restore old tags column in posts table if needed
     const postsTable = await queryRunner.getTable('posts');
     if (postsTable) {
-      await queryRunner.addColumn('posts', {
+      await queryRunner.addColumn('posts', new TableColumn({
         name: 'tags',
         type: 'simple-array',
         isNullable: true
-      });
+      }));
 
       // Remove columns that were added in this migration
       const columnsToRemove = ['type', 'format', 'readingTime'];

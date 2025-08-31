@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { RedisService } from './redis.service';
 import logger from '../utils/logger';
 

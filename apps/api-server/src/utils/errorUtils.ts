@@ -118,7 +118,7 @@ export function validateEmail(email: string): boolean {
  * Validate phone number format (basic validation)
  */
 export function validatePhoneNumber(phone: string): boolean {
-  const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
+  const phoneRegex = /^\+?[\d\s\-()]{10,}$/;
   return phoneRegex.test(phone);
 }
 

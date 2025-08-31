@@ -207,9 +207,9 @@ export class AffiliateEventService {
     const key = `stats:daily:${affiliateUserId}:${today}`;
 
     if (type === 'clicks') {
-      await this.redisService.hincrby(key, 'clicks', 1);
+      await (this.redisService as any).hincrby(key, 'clicks', 1);
     } else if (type === 'conversions') {
-      await this.redisService.hincrby(key, 'conversions', 1);
+      await (this.redisService as any).hincrby(key, 'conversions', 1);
       if (amount) {
         const currentRevenue = await this.redisService.hget(key, 'revenue');
         const newRevenue = (parseFloat(currentRevenue || '0') + amount).toFixed(2);
@@ -265,7 +265,7 @@ export class AffiliateEventService {
 
         // Emit milestone event
         if (this.socketManager) {
-          this.socketManager.emitToAffiliate(affiliateUserId, 'milestone', {
+          (this.socketManager as any).emitToAffiliate(affiliateUserId, 'milestone', {
             type,
             count: milestone
           });
@@ -284,8 +284,8 @@ export class AffiliateEventService {
       timestamp: new Date().toISOString()
     };
 
-    await this.redisService.lpush(streamKey, JSON.stringify(event));
-    await this.redisService.ltrim(streamKey, 0, 9999); // Keep last 10000 events
+    await (this.redisService as any).lpush(streamKey, JSON.stringify(event));
+    await (this.redisService as any).ltrim(streamKey, 0, 9999); // Keep last 10000 events
     await this.redisService.expire(streamKey, 86400 * 3); // Keep for 3 days
   }
 
@@ -308,7 +308,7 @@ export class AffiliateEventService {
     // Get today's events from stream
     const today = new Date().toISOString().split('T')[0];
     const streamKey = `events:stream:${today}`;
-    const recentEvents = await this.redisService.lrange(streamKey, 0, 19);
+    const recentEvents = await (this.redisService as any).lrange(streamKey, 0, 19);
 
     // Get aggregated stats from all affiliates
     const stats = {
@@ -320,7 +320,7 @@ export class AffiliateEventService {
     };
 
     // Aggregate today's stats (implement based on your needs)
-    const statsKeys = await this.redisService.keys(`stats:daily:*:${today}`);
+    const statsKeys = await (this.redisService as any).keys(`stats:daily:*:${today}`);
     for (const key of statsKeys) {
       const dayStats = await this.redisService.hgetall(key);
       if (dayStats) {

@@ -43,9 +43,9 @@ const renderGallery: ShortcodeHandler = async ({ attributes }) => {
   let html = `<div class="shortcode-gallery gallery-columns-${columns} gallery-size-${size}">`;
   
   for (const image of images) {
-    const imageUrl = image.url || image.filePath;
-    const thumbnailUrl = image.thumbnailUrl || imageUrl;
-    const altText = image.altText || image.title || '';
+    const imageUrl = image.url || image.path;
+    const thumbnailUrl = image.sizes?.thumbnail?.url || imageUrl;
+    const altText = image.altText || image.originalName || '';
     
     html += '<figure class="gallery-item">';
     

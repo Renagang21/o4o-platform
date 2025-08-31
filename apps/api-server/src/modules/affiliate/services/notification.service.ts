@@ -234,7 +234,7 @@ export class NotificationService {
     const cacheKey = `notifications:unread:${affiliateUserId}`;
     const current = await this.redisService.get(cacheKey);
     if (current && parseInt(current) > 0) {
-      await this.redisService.decr(cacheKey);
+      await (this.redisService as any).decr(cacheKey);
     }
   }
 
@@ -250,10 +250,10 @@ export class NotificationService {
     const cacheKey = `notifications:recent:${affiliateUserId}`;
     
     // Add to list (newest first)
-    await this.redisService.lpush(cacheKey, JSON.stringify(notification));
+    await (this.redisService as any).lpush(cacheKey, JSON.stringify(notification));
     
     // Keep only last 10
-    await this.redisService.ltrim(cacheKey, 0, 9);
+    await (this.redisService as any).ltrim(cacheKey, 0, 9);
     
     // Set TTL
     await this.redisService.expire(cacheKey, 3600); // 1 hour
@@ -264,7 +264,7 @@ export class NotificationService {
     limit: number = 5
   ): Promise<AffiliateNotification[]> {
     const cacheKey = `notifications:recent:${affiliateUserId}`;
-    const cached = await this.redisService.lrange(cacheKey, 0, limit - 1);
+    const cached = await (this.redisService as any).lrange(cacheKey, 0, limit - 1);
 
     if (cached && cached.length > 0) {
       return cached.map(item => JSON.parse(item));
@@ -281,7 +281,7 @@ export class NotificationService {
     if (notifications.length > 0) {
       await Promise.all(
         notifications.map(n => 
-          this.redisService.rpush(cacheKey, JSON.stringify(n))
+          (this.redisService as any).rpush(cacheKey, JSON.stringify(n))
         )
       );
       await this.redisService.expire(cacheKey, 3600);

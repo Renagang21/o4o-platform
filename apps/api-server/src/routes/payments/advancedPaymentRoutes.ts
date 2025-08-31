@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AdvancedPaymentController } from '../../controllers/payments/advancedPaymentController';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
 const router = Router();

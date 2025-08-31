@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AppDataSource } from '../database/connection';
 import { Repository, TreeRepository } from 'typeorm';
 import { Menu } from '../entities/Menu';

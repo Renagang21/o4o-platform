@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { OrderAutomationController } from '../../controllers/automation/orderAutomationController';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
 const router = Router();
@@ -10,7 +10,7 @@ const orderAutomationController = new OrderAutomationController();
 router.use(authMiddleware);
 
 // Apply rate limiting for automation operations
-router.use(rateLimitConfig.automation || rateLimitConfig.general);
+router.use((rateLimitConfig as any).automation || rateLimitConfig.general);
 
 // Order Automation APIs (5 endpoints)
 router.post('/rules', orderAutomationController.createAutomationRule);

@@ -159,7 +159,6 @@ export class PaymentSystemIntegrationService {
       }
 
       // 수수료 서비스 연동 - 실시간 커미션 생성
-      const { AppDataSource } = await import('../database/connection');
       const paymentCommissionRepository = AppDataSource.getRepository('PaymentCommission');
       
       const commission = paymentCommissionRepository.create({

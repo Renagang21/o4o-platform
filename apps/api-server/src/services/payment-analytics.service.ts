@@ -98,8 +98,8 @@ export class PaymentAnalyticsService {
   async getPaymentOverview(filters: PaymentAnalyticsFilter = {}): Promise<PaymentOverview> {
     const cacheKey = `payment_overview:${this.hashFilters(filters)}`;
     const cached = await cacheService.get(cacheKey);
-    if (cached) {
-      return cached;
+    if (cached && typeof cached === 'object' && Object.keys(cached).length > 0) {
+      return cached as PaymentOverview;
     }
 
     try {
@@ -223,7 +223,7 @@ export class PaymentAnalyticsService {
       };
 
       // 캐시 저장 (10분)
-      await cacheService.set(cacheKey, overview, 600);
+      await cacheService.set(cacheKey, overview, { ttl: 600 });
       
       return overview;
     } catch (error) {
@@ -238,8 +238,8 @@ export class PaymentAnalyticsService {
   async getPaymentMethodAnalysis(filters: PaymentAnalyticsFilter = {}): Promise<PaymentMethodAnalysis[]> {
     const cacheKey = `payment_methods:${this.hashFilters(filters)}`;
     const cached = await cacheService.get(cacheKey);
-    if (cached) {
-      return cached;
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      return cached as PaymentMethodAnalysis[];
     }
 
     try {
@@ -294,7 +294,7 @@ export class PaymentAnalyticsService {
       }
 
       // 캐시 저장 (15분)
-      await cacheService.set(cacheKey, analysisResults, 900);
+      await cacheService.set(cacheKey, analysisResults, { ttl: 900 });
       
       return analysisResults;
     } catch (error) {
@@ -314,8 +314,8 @@ export class PaymentAnalyticsService {
   ): Promise<PaymentTrend[]> {
     const cacheKey = `payment_trends:${startDate.getTime()}:${endDate.getTime()}:${groupBy}:${this.hashFilters(filters)}`;
     const cached = await cacheService.get(cacheKey);
-    if (cached) {
-      return cached;
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      return cached as PaymentTrend[];
     }
 
     try {
@@ -377,7 +377,7 @@ export class PaymentAnalyticsService {
       });
 
       // 캐시 저장 (30분)
-      await cacheService.set(cacheKey, trendResults, 1800);
+      await cacheService.set(cacheKey, trendResults, { ttl: 1800 });
       
       return trendResults;
     } catch (error) {
@@ -392,8 +392,8 @@ export class PaymentAnalyticsService {
   async getSubscriptionAnalytics(filters: PaymentAnalyticsFilter = {}): Promise<SubscriptionAnalytics> {
     const cacheKey = `subscription_analytics:${this.hashFilters(filters)}`;
     const cached = await cacheService.get(cacheKey);
-    if (cached) {
-      return cached;
+    if (cached && typeof cached === 'object' && Object.keys(cached).length > 0) {
+      return cached as SubscriptionAnalytics;
     }
 
     try {
@@ -457,7 +457,7 @@ export class PaymentAnalyticsService {
       };
 
       // 캐시 저장 (20분)
-      await cacheService.set(cacheKey, analytics, 1200);
+      await cacheService.set(cacheKey, analytics, { ttl: 1200 });
       
       return analytics;
     } catch (error) {

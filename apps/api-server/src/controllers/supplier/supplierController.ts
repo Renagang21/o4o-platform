@@ -170,8 +170,9 @@ export class SupplierController {
 
       const savedSupplier = await this.supplierRepository.save(supplier);
 
-      // Send welcome email to supplier
-      await this.sendSupplierWelcomeEmail(savedSupplier);
+      // Send welcome email to supplier - ensure we handle single supplier
+      const supplierEntity = Array.isArray(savedSupplier) ? savedSupplier[0] : savedSupplier;
+      await this.sendSupplierWelcomeEmail(supplierEntity);
 
       res.status(201).json({
         success: true,

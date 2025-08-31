@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { AppDataSource } from '../../../database/connection';
 import { AffiliateClick } from '../../../entities/affiliate/AffiliateClick';
 import { AffiliateConversion } from '../../../entities/affiliate/AffiliateConversion';
@@ -69,21 +69,21 @@ export class FraudDetectionService {
 
     // Check click flooding
     const clickFloodScore = await this.checkClickFlooding(clickData.affiliateUserId, clickData.ipAddress);
-    if (clickFloodScore > 0) {
+    if (clickFloodScore && clickFloodScore.score > 0) {
       indicators.push(clickFloodScore);
       totalScore += clickFloodScore.score;
     }
 
     // Check IP patterns
     const ipPatternScore = await this.checkIPPatterns(clickData.ipAddress, clickData.affiliateUserId);
-    if (ipPatternScore > 0) {
+    if (ipPatternScore && ipPatternScore.score > 0) {
       indicators.push(ipPatternScore);
       totalScore += ipPatternScore.score;
     }
 
     // Check bot activity
     const botScore = this.checkBotActivity(clickData.userAgent);
-    if (botScore > 0) {
+    if (botScore && botScore.score > 0) {
       indicators.push(botScore);
       totalScore += botScore.score;
     }
@@ -170,7 +170,7 @@ export class FraudDetectionService {
         conversionData.ipAddress,
         conversionData.affiliateUserId
       );
-      if (ipConversionScore > 0) {
+      if (ipConversionScore && ipConversionScore.score > 0) {
         indicators.push(ipConversionScore);
         totalScore += ipConversionScore.score;
       }
@@ -178,7 +178,7 @@ export class FraudDetectionService {
 
     // Check device consistency
     const deviceScore = await this.checkDeviceConsistency(conversionData.sessionId);
-    if (deviceScore > 0) {
+    if (deviceScore && deviceScore.score > 0) {
       indicators.push(deviceScore);
       totalScore += deviceScore.score;
     }
@@ -417,7 +417,7 @@ export class FraudDetectionService {
 
     // Check for rapid country changes
     const geoKey = `fraud:geo:${affiliateUserId}`;
-    const recentCountries = await this.redisService.smembers(geoKey);
+    const recentCountries = await (this.redisService as any).smembers(geoKey);
     
     await this.redisService.sadd(geoKey, country);
     await this.redisService.expire(geoKey, 3600); // 1 hour
@@ -571,8 +571,8 @@ export class FraudDetectionService {
 
     // Store in history
     const historyKey = `fraud:history:${result.affiliateUserId}`;
-    await this.redisService.lpush(historyKey, JSON.stringify(result));
-    await this.redisService.ltrim(historyKey, 0, 99); // Keep last 100
+    await (this.redisService as any).lpush(historyKey, JSON.stringify(result));
+    await (this.redisService as any).ltrim(historyKey, 0, 99); // Keep last 100
     await this.redisService.expire(historyKey, 86400 * 7); // 7 days
   }
 
@@ -764,7 +764,7 @@ export class FraudDetectionService {
    * Check if an affiliate is blocked
    */
   async isAffiliateBlocked(affiliateUserId: string): Promise<boolean> {
-    return await this.redisService.sismember('fraud:blocked:affiliates', affiliateUserId);
+    return await (this.redisService as any).sismember('fraud:blocked:affiliates', affiliateUserId);
   }
 
   /**
@@ -772,7 +772,7 @@ export class FraudDetectionService {
    */
   async getFraudHistory(affiliateUserId: string): Promise<FraudAnalysisResult[]> {
     const historyKey = `fraud:history:${affiliateUserId}`;
-    const history = await this.redisService.lrange(historyKey, 0, -1);
+    const history = await (this.redisService as any).lrange(historyKey, 0, -1);
     return history.map(h => JSON.parse(h));
   }
 }
