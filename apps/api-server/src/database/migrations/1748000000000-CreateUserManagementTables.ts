@@ -105,17 +105,17 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
     await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_userId_activityType_createdAt',
       columnNames: ['userId', 'activityType', 'createdAt']
-    });
+    }));
 
     await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_activityCategory_createdAt',
       columnNames: ['activityCategory', 'createdAt']
-    });
+    }));
 
     await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_createdAt',
       columnNames: ['createdAt']
-    });
+    }));
 
     // Create business_info table
     await queryRunner.createTable(
@@ -293,17 +293,17 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
       name: 'IDX_business_info_userId',
       columnNames: ['userId'],
       isUnique: true
-    });
+    }));
 
     await queryRunner.createIndex('business_info', new TableIndex({
       name: 'IDX_business_info_businessType_industry',
       columnNames: ['businessType', 'industry']
-    });
+    }));
 
     await queryRunner.createIndex('business_info', new TableIndex({
       name: 'IDX_business_info_businessSize_industry',
       columnNames: ['businessSize', 'industry']
-    });
+    }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

@@ -141,8 +141,8 @@ export const monitoringConfig = {
 // Production middleware setup
 export const setupProductionMiddleware = (app: Express) => {
   // Security middleware
-  app.use(securityConfig.helmet);
-  app.use(securityConfig.compression);
+  app.use(securityConfig.helmet as any);
+  app.use(securityConfig.compression as any);
 
   // Performance monitoring
   app.use(performanceMiddleware);
@@ -157,11 +157,12 @@ export const setupProductionMiddleware = (app: Express) => {
 
   // API Documentation (only in development or with specific flag)
   if (process.env.NODE_ENV === 'development' || process.env.ENABLE_DOCS === 'true') {
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+    app.use('/api-docs', swaggerUi.serve as any);
+    app.get('/api-docs', swaggerUi.setup(specs, {
       explorer: true,
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: 'O4O Platform API Documentation',
-    }));
+    }) as any);
   }
 
   // Health check endpoint

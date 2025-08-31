@@ -57,15 +57,15 @@ export class AnalyticsController {
     } else {
       // Admin/Manager can filter by specific vendors/suppliers
       if (vendorIds) {
-        filters.vendorIds = Array.isArray(vendorIds) ? vendorIds : [vendorIds as string];
+        filters.vendorIds = Array.isArray(vendorIds) ? (vendorIds as string[]) : [vendorIds as string];
       }
       if (supplierIds) {
-        filters.supplierIds = Array.isArray(supplierIds) ? supplierIds : [supplierIds as string];
+        filters.supplierIds = Array.isArray(supplierIds) ? (supplierIds as string[]) : [supplierIds as string];
       }
     }
 
     if (categories) {
-      filters.categories = Array.isArray(categories) ? categories : [categories as string];
+      filters.categories = Array.isArray(categories) ? (categories as string[]) : [categories as string];
     }
 
     try {
@@ -109,7 +109,7 @@ export class AnalyticsController {
     const filters: AnalyticsFilter = {};
     
     if (categories) {
-      filters.categories = Array.isArray(categories) ? categories : [categories as string];
+      filters.categories = Array.isArray(categories) ? (categories as string[]) : [categories as string];
     }
 
     // Role-based filtering
@@ -187,7 +187,7 @@ export class AnalyticsController {
     }
 
     if (categories) {
-      filters.categories = Array.isArray(categories) ? categories : [categories as string];
+      filters.categories = Array.isArray(categories) ? (categories as string[]) : [categories as string];
     }
 
     try {
@@ -279,7 +279,7 @@ export class AnalyticsController {
     }
 
     if (categories) {
-      filters.categories = Array.isArray(categories) ? categories : [categories as string];
+      filters.categories = Array.isArray(categories) ? (categories as string[]) : [categories as string];
     }
 
     // Role-based filtering

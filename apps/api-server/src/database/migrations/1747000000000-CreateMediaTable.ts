@@ -105,17 +105,17 @@ export class CreateMediaTable1747000000000 implements MigrationInterface {
     await queryRunner.createIndex('media', new TableIndex({
       name: 'IDX_media_user_id',
       columnNames: ['user_id']
-    });
+    }));
 
     await queryRunner.createIndex('media', new TableIndex({
       name: 'IDX_media_folder_path',
       columnNames: ['folder_path']
-    });
+    }));
 
     await queryRunner.createIndex('media', new TableIndex({
       name: 'IDX_media_created_at',
       columnNames: ['created_at']
-    });
+    }));
 
     // Add foreign key for user_id
     await queryRunner.createForeignKey('media', new TableForeignKey({
@@ -123,7 +123,7 @@ export class CreateMediaTable1747000000000 implements MigrationInterface {
       referencedColumnNames: ['id'],
       referencedTableName: 'users',
       onDelete: 'SET NULL'
-    });
+    }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

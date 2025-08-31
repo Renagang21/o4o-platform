@@ -7,7 +7,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         // Check tables and create indexes only if they exist
         
         // User 테이블 인덱스
-        if (await queryRunner.hasTable('users') {
+        if (await queryRunner.hasTable('users')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_user_email" ON "users" ("email")
             `);
@@ -23,7 +23,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         }
 
         // RefreshToken 테이블 인덱스
-        if (await queryRunner.hasTable('refresh_token') {
+        if (await queryRunner.hasTable('refresh_token')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_refresh_token_user_id" ON "refresh_token" ("userId")
             `);
@@ -33,7 +33,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         }
 
         // Product 테이블 인덱스
-        if (await queryRunner.hasTable('product') {
+        if (await queryRunner.hasTable('product')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_status" ON "product" ("status")
             `);
@@ -46,7 +46,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_price" ON "product" ("price")
             `);
-        } else if (await queryRunner.hasTable('products') {
+        } else if (await queryRunner.hasTable('products')) {
             // Some systems might use plural
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_status" ON "products" ("status")
@@ -63,7 +63,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         }
 
         // Order 테이블 인덱스
-        if (await queryRunner.hasTable('order') {
+        if (await queryRunner.hasTable('order')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_user_id" ON "order" ("userId")
             `);
@@ -76,7 +76,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_payment_status" ON "order" ("paymentStatus")
             `);
-        } else if (await queryRunner.hasTable('orders') {
+        } else if (await queryRunner.hasTable('orders')) {
             // Some systems might use plural
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_user_id" ON "orders" ("userId")
@@ -93,7 +93,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         }
 
         // ForumPost 테이블 인덱스
-        if (await queryRunner.hasTable('forum_post') {
+        if (await queryRunner.hasTable('forum_post')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_author_id" ON "forum_post" ("authorId")
             `);
@@ -106,7 +106,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_created_at" ON "forum_post" ("createdAt")
             `);
-        } else if (await queryRunner.hasTable('forum_posts') {
+        } else if (await queryRunner.hasTable('forum_posts')) {
             // Some systems might use plural
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_author_id" ON "forum_posts" ("authorId")
@@ -123,7 +123,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         }
 
         // FundingProject 테이블 인덱스
-        if (await queryRunner.hasTable('funding_project') {
+        if (await queryRunner.hasTable('funding_project')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_funding_project_creator_id" ON "funding_project" ("creatorId")
             `);
@@ -133,7 +133,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_funding_project_end_date" ON "funding_project" ("endDate")
             `);
-        } else if (await queryRunner.hasTable('funding_projects') {
+        } else if (await queryRunner.hasTable('funding_projects')) {
             // Some systems might use plural
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_funding_project_creator_id" ON "funding_projects" ("creatorId")
@@ -147,27 +147,27 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         }
 
         // Composite indexes for common queries - check tables before creating
-        if (await queryRunner.hasTable('users') {
+        if (await queryRunner.hasTable('users')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_user_email_status" ON "users" ("email", "status")
             `);
         }
         
-        if (await queryRunner.hasTable('order') {
+        if (await queryRunner.hasTable('order')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_user_status_created" ON "order" ("userId", "status", "createdAt")
             `);
-        } else if (await queryRunner.hasTable('orders') {
+        } else if (await queryRunner.hasTable('orders')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_user_status_created" ON "orders" ("userId", "status", "createdAt")
             `);
         }
         
-        if (await queryRunner.hasTable('product') {
+        if (await queryRunner.hasTable('product')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_status_created" ON "product" ("status", "createdAt")
             `);
-        } else if (await queryRunner.hasTable('products') {
+        } else if (await queryRunner.hasTable('products')) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_status_created" ON "products" ("status", "createdAt")
             `);

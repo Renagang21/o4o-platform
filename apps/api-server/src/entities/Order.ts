@@ -141,6 +141,15 @@ export class Order {
   trackingNumber?: string;
 
   @Column({ nullable: true })
+  carrierName?: string;
+
+  @Column({ nullable: true })
+  customerId?: string;
+
+  @Column({ nullable: true })
+  paymentKey?: string;
+
+  @Column({ nullable: true })
   shippedAt?: Date;
 
   @Column({ nullable: true })
