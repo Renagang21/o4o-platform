@@ -2,12 +2,9 @@ import React, { useState, useCallback, useRef } from 'react';
 import { 
   Upload, 
   X, 
-  FileVideo, 
-  FileImage, 
-  FileText, 
   AlertCircle,
   CheckCircle,
-  Loader2,
+  RefreshCw,
   Image,
   Video,
   File,
@@ -148,7 +145,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
       });
 
       // Send request
-      xhr.open('POST', uploadUrl);
+      xhr.open('POST', uploadEndpoint);
       xhr.send(formData);
 
     } catch (error) {
@@ -431,7 +428,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
                   {/* Status */}
                   {file.status === 'processing' && (
                     <div className="mt-2 flex items-center text-sm text-gray-500">
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                       처리 중...
                     </div>
                   )}

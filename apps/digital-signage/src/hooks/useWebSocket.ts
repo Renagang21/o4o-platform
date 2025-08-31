@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { io, Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 
 interface WebSocketOptions {
   url?: string;
@@ -51,7 +51,7 @@ export const useWebSocket = (
     reconnectionDelay = 1000
   } = options;
 
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<any>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus | null>(null);
@@ -94,31 +94,31 @@ export const useWebSocket = (
       events.onDisconnect?.();
     });
 
-    socket.on('connect_error', (error) => {
+    socket.on('connect_error', (error: Error) => {
       console.error('[WebSocket] Connection error:', error);
       setConnectionError(error.message);
       events.onError?.(error);
     });
 
-    socket.on('reconnect_attempt', (attemptNumber) => {
+    socket.on('reconnect_attempt', (attemptNumber: number) => {
       // Reconnection attempt in progress
       setReconnectAttempt(attemptNumber);
     });
 
     // Signage-specific events
-    socket.on('content-updated', (data) => {
+    socket.on('content-updated', (data: any) => {
       // Content updated
       setLastMessage({ type: 'content-updated', data, timestamp: new Date() });
       events.onContentChange?.(data);
     });
 
-    socket.on('playlist-updated', (data) => {
+    socket.on('playlist-updated', (data: any) => {
       // Playlist updated
       setLastMessage({ type: 'playlist-updated', data, timestamp: new Date() });
       events.onPlaylistChange?.(data);
     });
 
-    socket.on('schedule-updated', (data) => {
+    socket.on('schedule-updated', (data: any) => {
       // Schedule updated
       setLastMessage({ type: 'schedule-updated', data, timestamp: new Date() });
       events.onScheduleChange?.(data);
@@ -130,19 +130,19 @@ export const useWebSocket = (
       events.onPlaybackStatusChange?.(status);
     });
 
-    socket.on('control-command', (command) => {
+    socket.on('control-command', (command: any) => {
       // Control command received
       setLastMessage({ type: 'control-command', data: command, timestamp: new Date() });
       events.onControlCommand?.(command);
     });
 
     // Store-specific events
-    socket.on('store-config-updated', (config) => {
+    socket.on('store-config-updated', (config: any) => {
       // Store config updated
       setLastMessage({ type: 'store-config-updated', data: config, timestamp: new Date() });
     });
 
-    socket.on('emergency-broadcast', (message) => {
+    socket.on('emergency-broadcast', (message: any) => {
       // Emergency broadcast received
       setLastMessage({ type: 'emergency-broadcast', data: message, timestamp: new Date() });
     });
