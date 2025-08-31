@@ -135,7 +135,7 @@ export class SlugService {
     }
 
     // Check format
-    if (!/^[a-z0-9\-]+$/.test(slug)) {
+    if (!/^[a-z0-9-]+$/.test(slug)) {
       errors.push('Slug can only contain lowercase letters, numbers, and hyphens');
     }
 

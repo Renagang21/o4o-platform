@@ -97,7 +97,7 @@ class ShortcodeParserService {
     
     // Regular expression patterns for shortcodes
     // Match both self-closing and enclosing shortcodes
-    const shortcodePattern = /\[([a-zA-Z0-9_-]+)([^\]]*?)(?:\]([^\[]*?)\[\/\1\]|\s*\/?\])/g;
+    const shortcodePattern = /\[([a-zA-Z0-9_-]+)([^\]]*?)(?:\]([^[]*?)\[\/\1\]|\s*\/?\])/g;
     
     let result = content;
     let match;
@@ -318,7 +318,7 @@ class ShortcodeParserService {
 
     // Include any extra attributes not in definitions
     for (const key in provided) {
-      if (!validated.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(validated, key)) {
         validated[key] = provided[key];
       }
     }
