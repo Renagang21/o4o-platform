@@ -2,7 +2,6 @@ import { FC, Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// import { Badge } from '@/components/ui/badge'; // Not used in quick edit view
 import { 
   Select,
   SelectContent,
@@ -18,7 +17,6 @@ import toast from 'react-hot-toast';
 import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuickEdit } from '@/hooks/useQuickEdit';
 import { BulkActionBar } from '@/components/common/BulkActionBar';
-// import { SelectableTable } from '@/components/common/SelectableTable'; // Not used
 import { RowActions } from '@/components/common/RowActions';
 import { PostQuickEdit } from '@/components/content/PostQuickEdit';
 import { ScreenMeta } from '@/components/common/ScreenMeta';

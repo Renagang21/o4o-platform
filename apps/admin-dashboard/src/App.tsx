@@ -21,7 +21,6 @@ const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const WordPressDashboard = lazy(() => import('@/pages/WordPressDashboard'));
-// const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard')); // Not used
 const DashboardSimple = lazy(() => import('@/pages/dashboard/DashboardSimple'));
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
