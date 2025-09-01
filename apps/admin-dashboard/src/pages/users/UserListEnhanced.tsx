@@ -1,13 +1,10 @@
 import { roleDisplayNames } from "@/types/user";
 import { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom'; // Not used
-// import { UserPlus } from 'lucide-react'; // Not used
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
-// import { RowAction } from '@/components/common/RowActions'; // Type is exported from WordPressTable
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
