@@ -182,7 +182,7 @@ const PageList: FC = () => {
       },
       {
         label: 'Quick Edit',
-        onClick: () => console.log('Quick edit page:', page.id)
+        onClick: () => {/* TODO: Implement quick edit */}
       },
       {
         label: 'Trash',

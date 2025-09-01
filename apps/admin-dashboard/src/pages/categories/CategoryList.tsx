@@ -164,7 +164,7 @@ const CategoryList: FC = () => {
       },
       {
         label: 'Quick Edit',
-        onClick: () => console.log('Quick edit category:', category.id)
+        onClick: () => {/* TODO: Implement quick edit */}
       },
       {
         label: 'Delete',

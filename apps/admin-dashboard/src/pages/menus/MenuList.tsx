@@ -219,7 +219,7 @@ const MenuList: FC = () => {
       },
       {
         label: 'Duplicate',
-        onClick: () => console.log('Duplicate menu:', menu.id)
+        onClick: () => {/* TODO: Implement duplicate menu */}
       },
       {
         label: 'Delete',
