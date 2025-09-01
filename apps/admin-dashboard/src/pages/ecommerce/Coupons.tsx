@@ -20,8 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
-import { WordPressTable, WordPressTableColumn } from '@/components/wordpress-table';
-import { BulkActionBar } from '@/components/bulk-action-bar';
+import { WordPressTable, WordPressTableColumn } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
 
 interface Coupon {
   id: string;

@@ -5,6 +5,8 @@ import {
 // ../../packages/auth-client/dist/client.js
 var AuthClient = class {
   constructor(baseURL) {
+    this.isRefreshing = false;
+    this.refreshSubscribers = [];
     this.baseURL = baseURL;
     this.api = axios_default.create({
       baseURL: this.baseURL,
@@ -31,6 +33,61 @@ var AuthClient = class {
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
+    });
+    this.api.interceptors.response.use((response) => response, async (error) => {
+      var _a;
+      const originalRequest = error.config;
+      if (((_a = error.response) == null ? void 0 : _a.status) === 401 && !originalRequest._retry) {
+        if (this.isRefreshing) {
+          return new Promise((resolve) => {
+            this.refreshSubscribers.push((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(this.api.request(originalRequest));
+            });
+          });
+        }
+        originalRequest._retry = true;
+        this.isRefreshing = true;
+        try {
+          const refreshToken = localStorage.getItem("refreshToken");
+          if (refreshToken) {
+            const refreshUrl = this.baseURL.includes("api.neture.co.kr") ? "https://api.neture.co.kr/api/auth/refresh" : `${this.baseURL}/auth/refresh`;
+            const response = await axios_default.post(refreshUrl, { refreshToken });
+            const { accessToken, refreshToken: newRefreshToken } = response.data;
+            localStorage.setItem("accessToken", accessToken);
+            if (newRefreshToken) {
+              localStorage.setItem("refreshToken", newRefreshToken);
+            }
+            const authStorage = localStorage.getItem("admin-auth-storage");
+            if (authStorage) {
+              try {
+                const parsed = JSON.parse(authStorage);
+                if (parsed.state) {
+                  parsed.state.token = accessToken;
+                  localStorage.setItem("admin-auth-storage", JSON.stringify(parsed));
+                }
+              } catch {
+              }
+            }
+            this.refreshSubscribers.forEach((callback) => callback(accessToken));
+            this.refreshSubscribers = [];
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            return this.api.request(originalRequest);
+          }
+        } catch (refreshError) {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("admin-auth-storage");
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+          return Promise.reject(refreshError);
+        } finally {
+          this.isRefreshing = false;
+        }
+      }
+      return Promise.reject(error);
     });
   }
   async login(credentials) {
@@ -131,7 +188,7 @@ var CookieAuthClient = class {
     try {
       await this.api.post("/auth/v2/logout");
     } catch (error) {
-      // Error log removed
+      console.error("Logout error:", error);
     } finally {
       this.currentToken = null;
     }
@@ -272,7 +329,7 @@ var SSOClient = class {
         return null;
       }
     } catch (error) {
-      // Error log removed
+      console.error("Session check error:", error);
       (_c = this.onSessionChange) == null ? void 0 : _c.call(this, null);
       return null;
     }
@@ -333,4 +390,4 @@ export {
   SSOClient,
   ssoClient
 };
-//# sourceMappingURL=chunk-SZHEMHVR.js.map
+//# sourceMappingURL=chunk-5J7LQEDE.js.map

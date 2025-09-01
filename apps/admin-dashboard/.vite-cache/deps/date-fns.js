@@ -34,8 +34,8 @@ function toDate(argument) {
     return new Date(argument);
   } else {
     if ((typeof argument === "string" || argStr === "[object String]") && typeof console !== "undefined") {
-      // Warning log removed
-      // Warning log removed
+      console.warn("Starting with v2.0.0-beta.1 date-fns doesn't accept strings as date arguments. Please use `parseISO` to parse strings. See: https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#string-arguments");
+      console.warn(new Error().stack);
     }
     return /* @__PURE__ */ new Date(NaN);
   }

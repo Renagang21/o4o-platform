@@ -9911,7 +9911,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
     } else if (this.target === "draft-4") {
       result.$schema = "http://json-schema.org/draft-04/schema#";
     } else {
-      // Warning log removed
+      console.warn(`Invalid target: ${this.target}`);
     }
     if ((_d = params.external) == null ? void 0 : _d.uri) {
       const id = (_e = params.external.registry.get(schema)) == null ? void 0 : _e.id;

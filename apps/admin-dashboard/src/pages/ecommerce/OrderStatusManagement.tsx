@@ -16,8 +16,8 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { WordPressTable, WordPressTableColumn } from '@/components/wordpress-table';
-import { BulkActionBar } from '@/components/bulk-action-bar';
+import { WordPressTable, WordPressTableColumn } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
 import toast from 'react-hot-toast';
 
 type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'completed' | 'cancelled' | 'refunded';

@@ -1649,11 +1649,11 @@ function pickerOptionsFromAccept(accept) {
       var _ref3 = _slicedToArray(_ref2, 2), mimeType = _ref3[0], ext = _ref3[1];
       var ok = true;
       if (!isMIMEType(mimeType)) {
-        // Warning log removed
+        console.warn('Skipped "'.concat(mimeType, '" because it is not a valid MIME type. Check https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types for a list of valid MIME types.'));
         ok = false;
       }
       if (!Array.isArray(ext) || !ext.every(isExt)) {
-        // Warning log removed
+        console.warn('Skipped "'.concat(mimeType, '" because an invalid file extension was provided.'));
         ok = false;
       }
       return ok;
@@ -2094,7 +2094,7 @@ function useDropzone() {
     if (onError) {
       onError(e);
     } else {
-      // Error log removed
+      console.error(e);
     }
   }, [onError]);
   var onDragEnterCb = (0, import_react.useCallback)(function(event) {

@@ -2,7 +2,7 @@ import {
   AuthClient,
   cookieAuthClient,
   ssoClient
-} from "./chunk-SZHEMHVR.js";
+} from "./chunk-5J7LQEDE.js";
 import "./chunk-A5HYYSF6.js";
 import {
   useLocation,
@@ -47,7 +47,7 @@ var AuthProvider = ({ children, ssoClient: ssoClient2, onAuthError }) => {
           return parsed.state.user;
         }
       } catch (e) {
-        // Error log removed
+        console.error("Failed to parse auth storage:", e);
       }
     }
     return null;
@@ -69,10 +69,10 @@ var AuthProvider = ({ children, ssoClient: ssoClient2, onAuthError }) => {
           if (ssoClient2 && typeof window !== "undefined") {
             authClient.checkSession().then((sessionData) => {
               if (!sessionData.isAuthenticated) {
-                // Warning log removed
+                console.warn("SSO session invalid, but keeping local session");
               }
             }).catch((error2) => {
-              // Warning log removed
+              console.warn("SSO session check failed, keeping local session:", error2);
             });
           }
           if (isLoading) {
@@ -83,7 +83,7 @@ var AuthProvider = ({ children, ssoClient: ssoClient2, onAuthError }) => {
           setIsLoading(false);
         }
       } catch (error2) {
-        // Error log removed
+        console.error("Initial auth check failed:", error2);
         setUser(null);
         setIsLoading(false);
       }
@@ -2500,11 +2500,11 @@ var Socket2 = class extends Emitter {
    * const socket = io();
    *
    * socket.on("connect", () => {
-   *   // Log removed // false
+   *   console.log(socket.disconnected); // false
    * });
    *
    * socket.on("disconnect", () => {
-   *   // Log removed // true
+   *   console.log(socket.disconnected); // true
    * });
    */
   get disconnected() {
@@ -2532,15 +2532,15 @@ var Socket2 = class extends Emitter {
    * @example
    * const socket = io();
    *
-   * // Log removed // true
+   * console.log(socket.active); // true
    *
    * socket.on("disconnect", (reason) => {
    *   if (reason === "io server disconnect") {
    *     // the disconnection was initiated by the server, you need to manually reconnect
-   *     // Log removed // false
+   *     console.log(socket.active); // false
    *   }
    *   // else the socket will automatically try to reconnect
-   *   // Log removed // true
+   *   console.log(socket.active); // true
    * });
    */
   get active() {
@@ -2996,7 +2996,7 @@ var Socket2 = class extends Emitter {
    * const socket = io();
    *
    * socket.on("disconnect", (reason) => {
-   *   // // Log removed prints "io client disconnect"
+   *   // console.log(reason); prints "io client disconnect"
    * });
    *
    * socket.disconnect();
@@ -3070,7 +3070,7 @@ var Socket2 = class extends Emitter {
    *
    * @example
    * socket.onAny((event, ...args) => {
-   *   // Log removed
+   *   console.log(`got ${event}`);
    * });
    *
    * @param listener
@@ -3086,7 +3086,7 @@ var Socket2 = class extends Emitter {
    *
    * @example
    * socket.prependAny((event, ...args) => {
-   *   // Log removed
+   *   console.log(`got event ${event}`);
    * });
    *
    * @param listener
@@ -3101,7 +3101,7 @@ var Socket2 = class extends Emitter {
    *
    * @example
    * const catchAllListener = (event, ...args) => {
-   *   // Log removed
+   *   console.log(`got event ${event}`);
    * }
    *
    * socket.onAny(catchAllListener);
@@ -3146,7 +3146,7 @@ var Socket2 = class extends Emitter {
    *
    * @example
    * socket.onAnyOutgoing((event, ...args) => {
-   *   // Log removed
+   *   console.log(`sent event ${event}`);
    * });
    *
    * @param listener
@@ -3164,7 +3164,7 @@ var Socket2 = class extends Emitter {
    *
    * @example
    * socket.prependAnyOutgoing((event, ...args) => {
-   *   // Log removed
+   *   console.log(`sent event ${event}`);
    * });
    *
    * @param listener
@@ -3179,7 +3179,7 @@ var Socket2 = class extends Emitter {
    *
    * @example
    * const catchAllListener = (event, ...args) => {
-   *   // Log removed
+   *   console.log(`sent event ${event}`);
    * }
    *
    * socket.onAnyOutgoing(catchAllListener);
@@ -3707,7 +3707,7 @@ var WebSocketSessionClient = class {
     this.socket.on("disconnect", (_reason) => {
     });
     this.socket.on("connect_error", (error) => {
-      // Error log removed
+      console.error("[Session Sync] Connection error:", error.message);
     });
     this.socket.on("session:status", (_data) => {
     });
@@ -3915,7 +3915,7 @@ var CookieAuthProvider = ({ children, onAuthChange, enableSessionSync = true, se
       onAuthChange == null ? void 0 : onAuthChange(null);
       (_a = wsClientRef.current) == null ? void 0 : _a.disconnect();
     } catch (err) {
-      // Error log removed
+      console.error("Logout error:", err);
     } finally {
       setLoading(false);
     }
@@ -3929,7 +3929,7 @@ var CookieAuthProvider = ({ children, onAuthChange, enableSessionSync = true, se
       onAuthChange == null ? void 0 : onAuthChange(null);
       (_a = wsClientRef.current) == null ? void 0 : _a.disconnect();
     } catch (err) {
-      // Error log removed
+      console.error("Logout all error:", err);
     } finally {
       setLoading(false);
     }

@@ -160,7 +160,7 @@ For more information, see https://radix-ui.com/primitives/docs/components/alert-
     const hasDescription = document.getElementById(
       (_a = contentRef.current) == null ? void 0 : _a.getAttribute("aria-describedby")
     );
-    if (!hasDescription) // Warning log removed
+    if (!hasDescription) console.warn(MESSAGE);
   }, [MESSAGE, contentRef]);
   return null;
 };
