@@ -1,6 +1,4 @@
-import { UnifiedApiClient } from './UnifiedApiClient';
-
-const unifiedApi = new UnifiedApiClient();
+import { unifiedApi } from './unified-client';
 
 export interface MenuLocation {
   id: string;

@@ -22,9 +22,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import MenuApi, { MenuItem as MenuItemType, MenuLocation as MenuLocationType } from '../../api/menuApi';
-import { UnifiedApiClient } from '../../api/UnifiedApiClient';
-
-const unifiedApi = new UnifiedApiClient();
+import { unifiedApi } from '../../api/unified-client';
 
 // Types
 interface MenuItem {
