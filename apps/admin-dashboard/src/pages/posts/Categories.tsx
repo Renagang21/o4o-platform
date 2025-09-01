@@ -427,22 +427,26 @@ const Categories: FC = () => {
 
       {/* Category Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-md w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 border border-gray-200">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-gray-900">
                   {modalMode === 'create' ? '카테고리 추가' : '카테고리 수정'}
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 p-1 rounded-full transition-colors"
+                  title="닫기"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
+            </div>
+            
+            <div className="p-6">
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
                   <label className="wp-label">카테고리 이름 *</label>
                   <input
@@ -545,17 +549,20 @@ const Categories: FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 mt-6">
+            </div>
+            
+            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg">
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  className="wp-button-secondary"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                 >
                   취소
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="wp-button-primary"
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {saving ? (
                     <>

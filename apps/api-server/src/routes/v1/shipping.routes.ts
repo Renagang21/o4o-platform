@@ -7,7 +7,7 @@ import { Router } from 'express';
 import { ShippingController } from '../../controllers/ShippingController';
 import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router: any = Router();
+const router: Router = Router();
 const shippingController = new ShippingController();
 
 // Public webhook endpoint (no auth required for carrier callbacks)

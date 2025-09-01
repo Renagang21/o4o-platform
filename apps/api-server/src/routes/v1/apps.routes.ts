@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router: any = Router();
+const router: Router = Router();
 
 // In-memory storage for app states (replace with database in production)
 const appStates = new Map<string, boolean>([

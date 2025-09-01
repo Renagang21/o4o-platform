@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router: any = Router();
+const router: Router = Router();
 
 // Admin pages endpoint
 router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {

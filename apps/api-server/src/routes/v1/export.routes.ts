@@ -7,7 +7,7 @@ import { Router } from 'express';
 import { ExportController } from '../../controllers/ExportController';
 import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router: any = Router();
+const router: Router = Router();
 const exportController = new ExportController();
 
 // Apply authentication to all export routes

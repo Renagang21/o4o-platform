@@ -77,6 +77,7 @@ import userManagementRoutes from './routes/users.routes';
 import usersV1Routes from './routes/v1/users.routes';
 import adminRoutes from './routes/admin';
 import ecommerceRoutes from './routes/ecommerce';
+import ecommerceSettingsRoutes from './routes/ecommerce/settingsRoutes';
 import cptRoutes from './routes/cpt';
 import postCreationRoutes from './routes/post-creation';
 import servicesRoutes from './routes/services';
@@ -496,6 +497,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/v1/users', usersV1Routes); // V1 user management routes with comprehensive functionality
 app.use('/api/admin', adminRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
+app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
 app.use('/api/cpt', cptRoutes);
 app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
@@ -509,6 +511,12 @@ app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 import acfRoutes from './routes/acf';
 import shortcodeRoutes from './routes/shortcodes';
 app.use('/admin', acfRoutes);
+
+// API v1 compatibility for media routes
+app.use('/api/v1/media/folders', (req: Request, res: Response, next: NextFunction) => {
+  req.url = '/folders';
+  acfRoutes(req, res, next);
+});
 app.use('/api/v1/shortcodes', shortcodeRoutes);
 
 // Dashboard endpoints with real data
@@ -600,8 +608,21 @@ app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full
 app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
+
+// Tag routes
+import tagRoutes from './routes/content/tagRoutes';
+app.use('/api', tagRoutes); // Tags at /api/tags
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
+app.use('/api/v1/media', contentRoutes); // Media routes (v1 API compatibility)
+
+// Advanced menu features (Phase 2)
+import menuAdvancedRoutes from './routes/menu-advanced';
+app.use('/api/v1', menuAdvancedRoutes); // Advanced menu APIs
+
+// Menu Phase 3 features (Caching, Analytics, Widgets)
+import menuPhase3Routes from './routes/menu-phase3';
+app.use('/api/v1', menuPhase3Routes); // Phase 3 menu APIs
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);

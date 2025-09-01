@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authenticateToken } from '../../middleware/auth';
 import { MediaController } from '../../controllers/MediaController';
 
-const router: any = Router();
+const router: Router = Router();
 const mediaController = new MediaController();
 
 // Apply authentication to all routes

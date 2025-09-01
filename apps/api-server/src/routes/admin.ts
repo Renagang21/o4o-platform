@@ -38,28 +38,28 @@ router.get('/users', getAllUsers);
 
 // 사용자 승인
 router.post('/users/:userId/approve', 
-  param('userId').isMongoId().withMessage('Valid user ID is required'),
+  param('userId').isUUID().withMessage('Valid user ID is required'),
   body('notes').optional().isString().trim(),
   approveUser
 );
 
 // 사용자 거부
 router.post('/users/:userId/reject',
-  param('userId').isMongoId().withMessage('Valid user ID is required'),
+  param('userId').isUUID().withMessage('Valid user ID is required'),
   body('reason').isLength({ min: 10 }).withMessage('Rejection reason is required (minimum 10 characters)').trim(),
   rejectUser
 );
 
 // 사용자 정지
 router.post('/users/:userId/suspend',
-  param('userId').isMongoId().withMessage('Valid user ID is required'),
+  param('userId').isUUID().withMessage('Valid user ID is required'),
   body('reason').isLength({ min: 10 }).withMessage('Suspension reason is required (minimum 10 characters)').trim(),
   suspendUser
 );
 
 // 사용자 재활성화
 router.post('/users/:userId/reactivate',
-  param('userId').isMongoId().withMessage('Valid user ID is required'),
+  param('userId').isUUID().withMessage('Valid user ID is required'),
   reactivateUser
 );
 

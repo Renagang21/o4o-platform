@@ -39,9 +39,7 @@ const Tags: FC = () => {
 
   const [formData, setFormData] = useState<Partial<Tag>>({
     name: '',
-    slug: '',
-    description: '',
-    color: '#3b82f6'
+    description: ''
   })
 
   // Pagination
@@ -88,8 +86,7 @@ const Tags: FC = () => {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter((tag: any) => 
         tag.name.toLowerCase().includes(term) ||
-        tag.description?.toLowerCase().includes(term) ||
-        tag.slug.toLowerCase().includes(term)
+        tag.description?.toLowerCase().includes(term)
       )
     }
 
@@ -124,9 +121,7 @@ const Tags: FC = () => {
       setSelectedTag(null)
       setFormData({
         name: '',
-        slug: '',
-        description: '',
-        color: '#3b82f6'
+        description: ''
       })
     }
     setShowModal(true)
@@ -147,11 +142,6 @@ const Tags: FC = () => {
         return
       }
 
-      // Auto-generate slug if not provided
-      if (!formData.slug?.trim()) {
-        const slugResponse = await ContentApi.generateSlug(formData.name, 'tag')
-        formData.slug = slugResponse.data.slug
-      }
 
       if (modalMode === 'create') {
         await ContentApi.createTag(formData as Tag)
@@ -198,12 +188,9 @@ const Tags: FC = () => {
     if (!quickTagName.trim()) return
 
     try {
-      const slugResponse = await ContentApi.generateSlug(quickTagName, 'tag')
       await ContentApi.createTag({
         name: quickTagName.trim(),
-        slug: slugResponse.data.slug,
-        description: '',
-        color: '#3b82f6'
+        description: ''
       } as Tag)
       
       toast.success('태그가 추가되었습니다.')
@@ -400,7 +387,7 @@ const Tags: FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="태그 이름, 설명, 슬러그로 검색..."
+                  placeholder="태그 이름, 설명으로 검색..."
                   value={searchTerm}
                   onChange={(e: any) => setSearchTerm(e.target.value)}
                   className="wp-input pl-10"
@@ -486,7 +473,6 @@ const Tags: FC = () => {
                       />
                     </th>
                     <th>이름</th>
-                    <th>슬러그</th>
                     <th>설명</th>
                     <th>사용횟수</th>
                     <th>생성일</th>
@@ -506,17 +492,8 @@ const Tags: FC = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
-                          <div
-                            className="w-3 h-3 rounded-full border border-gray-300"
-                            style={{ backgroundColor: tag.color }}
-                          />
                           <span className="font-medium text-gray-900">{tag.name}</span>
                         </div>
-                      </td>
-                      <td>
-                        <code className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                          {tag.slug}
-                        </code>
                       </td>
                       <td>
                         <div className="max-w-48 truncate text-sm text-gray-600">
@@ -661,19 +638,6 @@ const Tags: FC = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="wp-label">슬러그</label>
-                  <input
-                    type="text"
-                    value={formData.slug || ''}
-                    onChange={(e: any) => updateFormData('slug', e.target.value)}
-                    className="wp-input"
-                    placeholder="자동 생성됩니다"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    URL에 사용될 고유한 식별자입니다
-                  </p>
-                </div>
 
                 <div>
                   <label className="wp-label">설명</label>
@@ -685,24 +649,6 @@ const Tags: FC = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="wp-label">색상</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={formData.color || '#3b82f6'}
-                      onChange={(e: any) => updateFormData('color', e.target.value)}
-                      className="w-10 h-10 rounded border border-gray-300"
-                    />
-                    <input
-                      type="text"
-                      value={formData.color || '#3b82f6'}
-                      onChange={(e: any) => updateFormData('color', e.target.value)}
-                      className="wp-input flex-1"
-                      placeholder="#3b82f6"
-                    />
-                  </div>
-                </div>
               </div>
 
               <div className="flex justify-end gap-2 mt-6">
@@ -761,10 +707,6 @@ const Tags: FC = () => {
                   <label className="wp-label">병합할 태그 (삭제됨)</label>
                   <div className="p-3 border border-gray-300 rounded bg-gray-50">
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full border border-gray-300"
-                        style={{ backgroundColor: mergeFromTag?.color }}
-                      />
                       <span className="font-medium">{mergeFromTag?.name}</span>
                       <span className="text-sm text-gray-600">
                         ({mergeFromTag?.postCount}개 게시물)
