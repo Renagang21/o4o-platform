@@ -73,7 +73,7 @@ export class AuthClient {
                 : `${this.baseURL}/auth/refresh`;
                 
               const response = await axios.post(refreshUrl, { refreshToken });
-              const { accessToken, refreshToken: newRefreshToken } = response.data;
+              const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken: string; refreshToken?: string };
               
               // Update tokens
               localStorage.setItem('accessToken', accessToken);
