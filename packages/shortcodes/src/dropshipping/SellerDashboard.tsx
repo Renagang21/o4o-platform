@@ -21,7 +21,7 @@ const useAuth = () => ({ user: { id: 'seller-1', role: 'seller' } });
 
 // Mock API
 const api = {
-  get: async (url: string): Promise<{ data: any }> => {
+  get: async (_url: string): Promise<{ data: any }> => {
     // API call to fetch data
     return { data: { orders: [], products: [] } };
   }

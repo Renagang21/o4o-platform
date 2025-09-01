@@ -36,7 +36,7 @@ export function registerDropshippingShortcodes() {
         component: AffiliateDashboard,
         description: 'Affiliate dashboard for commission tracking'
     });
-    console.log('Dropshipping shortcodes registered successfully');
+    // Dropshipping shortcodes registered successfully
 }
 // Export components for direct use
 export { SellerDashboard } from './SellerDashboard';

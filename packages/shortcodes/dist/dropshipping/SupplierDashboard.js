@@ -9,8 +9,8 @@ const Card = ({ className = '', children }) => (_jsx("div", { className: `bg-whi
 const useAuth = () => ({ user: { id: 'supplier-1', role: 'supplier' } });
 // Mock API
 const api = {
-    get: async (url) => {
-        console.log('API call:', url);
+    get: async (_url) => {
+        // API call to fetch data
         return { data: { orders: [], products: [] } };
     }
 };
