@@ -4,15 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
+import { useBulkActions } from '@/hooks/useBulkActions';
+import { ScreenMeta } from '@/components/common/ScreenMeta';
+import { UsersHelp } from '@/components/help/UsersHelp';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { useBulkActions } from '@/hooks/useBulkActions';
-import { BulkActionBar } from '@/components/common/BulkActionBar';
-import { SelectableTable } from '@/components/common/SelectableTable';
-import { RowActions } from '@/components/common/RowActions';
-import { ScreenMeta } from '@/components/common/ScreenMeta';
-import { UsersHelp } from '@/components/help/UsersHelp';
 
 interface User {
   id: string;
@@ -28,12 +27,14 @@ interface User {
 
 /**
  * WordPress-style Users list with bulk actions
+ * Standardized with WordPressTable component
  */
 const UsersListBulk: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   // Users query
   const { data: users = [], isLoading, error } = useQuery({
@@ -61,6 +62,7 @@ const UsersListBulk: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('Selected users deleted successfully');
+      setSelectedRows([]);
     },
     onError: () => {
       toast.error('Failed to delete some users');
@@ -77,6 +79,7 @@ const UsersListBulk: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User roles updated successfully');
+      setSelectedRows([]);
     },
     onError: () => {
       toast.error('Failed to update some users');
@@ -148,28 +151,49 @@ const UsersListBulk: FC = () => {
   ];
 
   const {
-    // selectedIds, // Not used directly
     selectedCount,
-    isAllSelected,
-    isSomeSelected,
     isProcessing,
-    toggleAll,
-    toggleItem,
-    executeBulkAction,
-    isSelected
+    executeBulkAction
   } = useBulkActions({
     items: users,
     idField: 'id',
-    actions: bulkActions
+    actions: bulkActions,
+    selectedIds: selectedRows
   });
 
-  // Table columns
-  const columns = [
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
     {
-      key: 'username',
+      id: 'username',
       label: 'Username',
-      sortable: true,
-      render: (user: User) => (
+      sortable: true
+    },
+    {
+      id: 'name',
+      label: 'Name'
+    },
+    {
+      id: 'email',
+      label: 'Email'
+    },
+    {
+      id: 'role',
+      label: 'Role',
+      width: '120px'
+    },
+    {
+      id: 'posts',
+      label: 'Posts',
+      width: '80px',
+      align: 'center'
+    }
+  ];
+
+  // Transform users to table rows
+  const rows: WordPressTableRow[] = users.map((user: User) => ({
+    id: user.id,
+    data: {
+      username: (
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.avatar} alt={user.name} />
@@ -181,57 +205,26 @@ const UsersListBulk: FC = () => {
             </Link>
           </div>
         </div>
-      )
-    },
-    {
-      key: 'name',
-      label: 'Name',
-      render: (user: User) => user.name
-    },
-    {
-      key: 'email',
-      label: 'Email',
-      render: (user: User) => (
+      ),
+      name: user.name,
+      email: (
         <a href={`mailto:${user.email}`} className="text-blue-600 hover:text-blue-800">
           {user.email}
         </a>
-      )
-    },
-    {
-      key: 'role',
-      label: 'Role',
-      render: (user: User) => (
+      ),
+      role: (
         <Badge variant="secondary">{user.role}</Badge>
+      ),
+      posts: (
+        <a href={`/posts?author=${user.id}`} className="text-blue-600 hover:text-blue-800">
+          {user.posts || 0}
+        </a>
       )
     },
-    {
-      key: 'posts',
-      label: 'Posts',
-      render: (user: User) => (
-        <div className="text-center">
-          <a href={`/posts?author=${user.id}`} className="text-blue-600 hover:text-blue-800">
-            {user.posts || 0}
-          </a>
-        </div>
-      )
-    }
-  ];
-
-  // Row actions
-  const getRowActions = (user: User) => {
-    const actions = [
+    actions: [
       {
         label: 'Edit',
         onClick: () => navigate(`/users/${user.id}/edit`)
-      },
-      {
-        label: 'Delete',
-        onClick: async () => {
-          if (confirm(`Delete user ${user.name}?`)) {
-            await bulkDeleteMutation.mutateAsync([user.id]);
-          }
-        },
-        className: 'text-red-600'
       },
       {
         label: 'View',
@@ -242,10 +235,34 @@ const UsersListBulk: FC = () => {
         onClick: async () => {
           await sendPasswordResetMutation.mutateAsync([user.id]);
         }
+      },
+      {
+        label: 'Delete',
+        onClick: async () => {
+          if (confirm(`Delete user ${user.name}?`)) {
+            await bulkDeleteMutation.mutateAsync([user.id]);
+          }
+        },
+        className: 'text-red-600'
       }
-    ];
+    ]
+  }));
 
-    return <RowActions actions={actions} />;
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
+    }
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(users.map((u: User) => u.id));
+    } else {
+      setSelectedRows([]);
+    }
   };
 
   // Role stats
@@ -272,32 +289,56 @@ const UsersListBulk: FC = () => {
       {/* Role filter tabs */}
       <ul className="subsubsub">
         <li className="all">
-          <a href="#" className={roleFilter === 'all' ? 'current' : ''} onClick={() => setRoleFilter('all')}>
+          <a 
+            href="#" 
+            className={roleFilter === 'all' ? 'current' : ''} 
+            onClick={(e) => { e.preventDefault(); setRoleFilter('all'); }}
+          >
             All <span className="count">({roleStats.all})</span>
           </a> |
         </li>
         <li className="administrator">
-          <a href="#" className={roleFilter === 'administrator' ? 'current' : ''} onClick={() => setRoleFilter('administrator')}>
+          <a 
+            href="#" 
+            className={roleFilter === 'administrator' ? 'current' : ''} 
+            onClick={(e) => { e.preventDefault(); setRoleFilter('administrator'); }}
+          >
             Administrator <span className="count">({roleStats.administrator})</span>
           </a> |
         </li>
         <li className="editor">
-          <a href="#" className={roleFilter === 'editor' ? 'current' : ''} onClick={() => setRoleFilter('editor')}>
+          <a 
+            href="#" 
+            className={roleFilter === 'editor' ? 'current' : ''} 
+            onClick={(e) => { e.preventDefault(); setRoleFilter('editor'); }}
+          >
             Editor <span className="count">({roleStats.editor})</span>
           </a> |
         </li>
         <li className="author">
-          <a href="#" className={roleFilter === 'author' ? 'current' : ''} onClick={() => setRoleFilter('author')}>
+          <a 
+            href="#" 
+            className={roleFilter === 'author' ? 'current' : ''} 
+            onClick={(e) => { e.preventDefault(); setRoleFilter('author'); }}
+          >
             Author <span className="count">({roleStats.author})</span>
           </a> |
         </li>
         <li className="contributor">
-          <a href="#" className={roleFilter === 'contributor' ? 'current' : ''} onClick={() => setRoleFilter('contributor')}>
+          <a 
+            href="#" 
+            className={roleFilter === 'contributor' ? 'current' : ''} 
+            onClick={(e) => { e.preventDefault(); setRoleFilter('contributor'); }}
+          >
             Contributor <span className="count">({roleStats.contributor})</span>
           </a> |
         </li>
         <li className="subscriber">
-          <a href="#" className={roleFilter === 'subscriber' ? 'current' : ''} onClick={() => setRoleFilter('subscriber')}>
+          <a 
+            href="#" 
+            className={roleFilter === 'subscriber' ? 'current' : ''} 
+            onClick={(e) => { e.preventDefault(); setRoleFilter('subscriber'); }}
+          >
             Subscriber <span className="count">({roleStats.subscriber})</span>
           </a>
         </li>
@@ -326,25 +367,17 @@ const UsersListBulk: FC = () => {
         position="top"
       />
 
-      {/* Users Table */}
-      {isLoading ? (
-        <div className="text-center py-8">Loading users...</div>
-      ) : error ? (
-        <div className="text-center py-8 text-red-600">Error loading users</div>
-      ) : (
-        <SelectableTable
-          columns={columns}
-          data={users}
-          idField="id"
-          isAllSelected={isAllSelected}
-          isSomeSelected={isSomeSelected}
-          onToggleAll={toggleAll}
-          onToggleItem={toggleItem}
-          isSelected={isSelected}
-          rowActions={getRowActions}
-          emptyMessage="No users found"
-        />
-      )}
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        loading={isLoading}
+        emptyMessage="No users found. Add your first user!"
+      />
 
       {/* Bulk Actions - Bottom */}
       <BulkActionBar
@@ -354,6 +387,20 @@ const UsersListBulk: FC = () => {
         isProcessing={isProcessing}
         position="bottom"
       />
+
+      {/* Pagination */}
+      <div className="tablenav bottom">
+        <div className="tablenav-pages">
+          <span className="displaying-num">{users.length} items</span>
+          {/* TODO: Add pagination controls */}
+        </div>
+      </div>
+
+      {error && (
+        <div className="notice notice-error">
+          <p>Error loading users. Please try again.</p>
+        </div>
+      )}
     </div>
   );
 };

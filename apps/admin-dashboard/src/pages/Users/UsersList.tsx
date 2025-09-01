@@ -1,36 +1,32 @@
 /**
  * Users List Page - 사용자 목록 조회, 검색, 필터링, 페이지네이션
  * WordPress 스타일 사용자 관리 인터페이스
+ * Standardized with WordPressTable component
  */
 
-import { useState, useMemo, FC } from 'react';
+import { FC, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
+import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import apiClient from '../../api/base';
 import toast from 'react-hot-toast';
-import {
-  Search,
-  Filter,
-  Plus,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  Eye,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Download,
-  RefreshCw,
-  Shield
-} from 'lucide-react';
-
-import AdminLayout from '../../components/layout/AdminLayout';
-import PageHeader from '../../components/common/PageHeader';
-import DataTable from '../../components/common/DataTable';
+import { User, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '../../types/user';
+import { Shield, Download, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
 import UserDeleteModal from '../../components/users/UserDeleteModal';
 import UserRoleChangeModal from '../../components/users/UserRoleChangeModal';
-import { User, UserFilters, UserRole, UserStatus, ROLE_LABELS, STATUS_LABELS } from '../../types/user';
-import apiClient from '../../api/base';
 
 // API 응답 타입 정의
 interface UsersResponse {
@@ -45,7 +41,6 @@ interface UsersResponse {
       hasNext: boolean;
       hasPrev: boolean;
     };
-    filters: UserFilters;
   };
   message: string;
 }
@@ -53,19 +48,13 @@ interface UsersResponse {
 const UsersList: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
-  // 상태 관리
-  const [filters, setFilters] = useState({
-    role: 'all',
-    status: 'all',
-    search: '',
-    dateFrom: '',
-    dateTo: ''
-  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<UserStatus | 'all'>('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
-  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
-  
+
   // 모달 상태
   const [deleteModal, setDeleteModal] = useState<{
     _isOpen: boolean;
@@ -84,606 +73,410 @@ const UsersList: FC = () => {
   });
 
   // 사용자 목록 조회
-  const {
-    data: usersData,
-    isLoading,
-    error,
-    refetch
-  } = useQuery<UsersResponse>({
-    queryKey: ['users', page, limit, filters],
+  const { data: usersData, isLoading, error, refetch } = useQuery<UsersResponse>({
+    queryKey: ['users', page, limit, roleFilter, statusFilter, searchQuery],
     queryFn: async () => {
       const params = new URLSearchParams({
-        page: page.toString() as any,
-        limit: limit.toString() as any
+        page: page.toString(),
+        limit: limit.toString()
       });
 
-      if (filters.role && filters.role !== 'all') {
-        params.append('role', filters.role);
+      if (roleFilter && roleFilter !== 'all') {
+        params.append('role', roleFilter);
       }
-      if (filters.status && filters.status !== 'all') {
-        params.append('status', filters.status);
+      if (statusFilter && statusFilter !== 'all') {
+        params.append('status', statusFilter);
       }
-      if (filters.search) {
-        params.append('search', filters.search);
-      }
-      if (filters.dateFrom) {
-        params.append('dateFrom', filters.dateFrom);
-      }
-      if (filters.dateTo) {
-        params.append('dateTo', filters.dateTo);
+      if (searchQuery) {
+        params.append('search', searchQuery);
       }
 
-      const response = await apiClient.get(`/users?${params}`);
+      const response = await apiClient.get(`/v1/users?${params}`);
       return response.data;
-    },
-    staleTime: 30 * 1000, // 30초
+    }
   });
 
-  // 필터 핸들러
-  const handleFilterChange = (newFilters: Partial<UserFilters>) => {
-    setFilters((prev: any) => ({ ...prev, ...newFilters }));
-    setPage(1); // 첫 페이지로 리셋
-  };
+  const users = usersData?.data?.users || [];
+  const pagination = usersData?.data?.pagination;
 
-  const handleSearch = (searchTerm: string) => {
-    handleFilterChange({ search: searchTerm });
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      role: 'all',
-      status: 'all',
-      search: '',
-      dateFrom: '',
-      dateTo: ''
-    });
-    setPage(1);
-  };
-
-  // 사용자 삭제 뮤테이션
-  const deleteUsersMutation = useMutation({
+  // 사용자 삭제 mutation
+  const deleteMutation = useMutation({
     mutationFn: async (userIds: string[]) => {
-      if (userIds.length === 1) {
-        const response = await apiClient.delete(`/users/${userIds[0]}`);
-        return response.data;
-      } else {
-        const response = await apiClient.delete('/users', { data: { userIds } });
-        return response.data;
-      }
+      await Promise.all(userIds.map(id => apiClient.delete(`/v1/users/${id}`)));
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      setSelectedUsers([]);
-      setDeleteModal({ _isOpen: false, users: [] as User[] });
-      
-      toast.success(
-        <div className="flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-          {data.message || '사용자가 성공적으로 삭제되었습니다.'}
-        </div>
-      );
+      toast.success('Users deleted successfully');
+      setSelectedRows([]);
+      setDeleteModal({ _isOpen: false, users: [] });
     },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : '사용자 삭제 중 오류가 발생했습니다.';
-      toast.error(
-        <div className="flex items-center">
-          <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-          {message}
-        </div>
-      );
+    onError: () => {
+      toast.error('Failed to delete users');
     }
   });
 
-  // 사용자 역할 변경 뮤테이션
-  const changeUserRolesMutation = useMutation({
-    mutationFn: async ({ userIds, newRole }: { userIds: string[]; newRole: UserRole }) => {
-      const response = await apiClient.put('/users/roles', { userIds, role: newRole });
-      return response.data;
+  // 역할 변경 mutation
+  const roleChangeMutation = useMutation({
+    mutationFn: async ({ userIds, role }: { userIds: string[], role: UserRole }) => {
+      await Promise.all(userIds.map(id => 
+        apiClient.patch(`/v1/users/${id}`, { role })
+      ));
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      setSelectedUsers([]);
+      toast.success('User roles updated successfully');
+      setSelectedRows([]);
       setRoleChangeModal({ _isOpen: false, users: [] });
-      
-      toast.success(
-        <div className="flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-          {data.message || '사용자 역할이 성공적으로 변경되었습니다.'}
-        </div>
-      );
     },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : '역할 변경 중 오류가 발생했습니다.';
-      toast.error(
-        <div className="flex items-center">
-          <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-          {message}
-        </div>
-      );
+    onError: () => {
+      toast.error('Failed to update user roles');
     }
   });
 
-  // 상태별 아이콘 매핑
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'pending':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
-      case 'rejected':
-        return <XCircle className="w-4 h-4 text-red-600" />;
-      case 'suspended':
-        return <AlertTriangle className="w-4 h-4 text-orange-600" />;
-      default:
-        return <Clock className="w-4 h-4 text-gray-400" />;
+  // CSV 내보내기
+  const handleExport = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (roleFilter !== 'all') params.append('role', roleFilter);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (searchQuery) params.append('search', searchQuery);
+
+      const response = await apiClient.get(`/v1/users/export/csv?${params}`, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `users-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      toast.error('Failed to export users');
     }
   };
 
-  // 역할별 배지 색상
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-purple-100 text-purple-800';
-      case 'business':
-        return 'bg-blue-100 text-blue-800';
-      case 'affiliate':
-        return 'bg-green-100 text-green-800';
-      case 'customer':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-600';
-    }
-  };
-
-  // 테이블 컬럼 정의
-  const columns = useMemo(() => [
+  // Bulk actions configuration
+  const bulkActions = [
     {
-      id: 'select',
-      label: '',
-      accessor: (user: User) => (
-        <input
-          type="checkbox"
-          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          checked={selectedUsers.includes(user.id)}
-          onChange={(e: any) => handleSelectUser(user.id, e.target.checked)}
-        />
-      ),
-      width: '50px',
-      align: 'center' as const
+      value: 'delete',
+      label: 'Delete',
+      action: async (ids: string[]) => {
+        const selectedUsers = users.filter(u => ids.includes(u.id));
+        setDeleteModal({ _isOpen: true, users: selectedUsers });
+      },
+      isDestructive: true
     },
     {
-      id: 'user',
-      label: '사용자',
-      accessor: (user: User) => (
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-            {user.profileImage ? (
-              <img src={user.profileImage} alt={user.name} className="w-8 h-8 rounded-full" />
-            ) : (
-              <span className="text-sm font-medium text-gray-600">
-                {user.name.charAt(0)}
-              </span>
-            )}
-          </div>
-          <div>
-            <div className="font-medium text-gray-900">{user.name}</div>
-            <div className="text-sm text-gray-500">{user.email}</div>
-          </div>
-        </div>
-      ),
+      value: 'change-role',
+      label: 'Change Role',
+      action: async (ids: string[]) => {
+        const selectedUsers = users.filter(u => ids.includes(u.id));
+        setRoleChangeModal({ _isOpen: true, users: selectedUsers });
+      }
+    }
+  ];
+
+  const {
+    selectedCount,
+    isProcessing,
+    executeBulkAction
+  } = useBulkActions({
+    items: users,
+    idField: 'id',
+    actions: bulkActions,
+    selectedIds: selectedRows
+  });
+
+  // Get role badge style
+  const getRoleBadgeVariant = (role: UserRole): any => {
+    const variants: Record<UserRole, any> = {
+      super_admin: 'destructive',
+      admin: 'destructive',
+      vendor: 'default',
+      seller: 'secondary',
+      customer: 'outline',
+      business: 'secondary',
+      moderator: 'default',
+      partner: 'secondary'
+    };
+    return variants[role] || 'outline';
+  };
+
+  // Get status badge style
+  const getStatusBadgeVariant = (status: UserStatus): any => {
+    const variants: Record<UserStatus, any> = {
+      active: 'default',
+      inactive: 'secondary',
+      pending: 'outline',
+      suspended: 'destructive'
+    };
+    return variants[status] || 'outline';
+  };
+
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
+    {
+      id: 'name',
+      label: 'Name',
       sortable: true
     },
     {
+      id: 'email',
+      label: 'Email'
+    },
+    {
       id: 'role',
-      label: '역할',
-      accessor: (user: User) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
-          {ROLE_LABELS[user.role]}
-        </span>
-      ),
-      width: '100px'
+      label: 'Role',
+      width: '120px'
     },
     {
       id: 'status',
-      label: '상태',
-      accessor: (user: User) => (
-        <div className="flex items-center space-x-2">
-          {getStatusIcon(user.status)}
-          <span className="text-sm text-gray-900">
-            {STATUS_LABELS[user.status]}
-          </span>
-        </div>
-      ),
-      width: '120px'
+      label: 'Status',
+      width: '100px'
     },
     {
-      id: 'businessInfo',
-      label: '사업자 정보',
-      accessor: (user: User) => (
-        user.businessInfo ? (
-          <div>
-            <div className="text-sm font-medium text-gray-900">
-              {user.businessInfo.businessName}
-            </div>
-            <div className="text-xs text-gray-500">
-              {user.businessInfo.businessType}
-            </div>
-          </div>
-        ) : (
-          <span className="text-sm text-gray-400">-</span>
-        )
-      ),
-      width: '150px'
+      id: 'posts',
+      label: 'Posts',
+      width: '80px',
+      align: 'center'
     },
     {
-      id: 'createdAt',
-      label: '가입일',
-      accessor: (user: User) => (
-        <div className="text-sm text-gray-900">
-          {new Date(user.createdAt).toLocaleDateString('ko-KR')}
-        </div>
-      ),
+      id: 'registered',
+      label: 'Registered',
       sortable: true,
-      width: '120px'
-    },
-    {
-      id: 'lastLoginAt',
-      label: '최종 로그인',
-      accessor: (user: User) => (
-        <div className="text-sm text-gray-900">
-          {user.lastLoginAt ? 
-            new Date(user.lastLoginAt).toLocaleDateString('ko-KR') : 
-            <span className="text-gray-400">-</span>
-          }
+      width: '150px'
+    }
+  ];
+
+  // Transform users to table rows
+  const rows: WordPressTableRow[] = users.map((user: User) => ({
+    id: user.id,
+    data: {
+      name: (
+        <div>
+          <Link to={`/users/${user.id}`} className="font-medium text-blue-600 hover:text-blue-800">
+            {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
+          </Link>
+          {user.isSuperAdmin && (
+            <Shield className="inline-block ml-2 h-4 w-4 text-red-500" title="Super Admin" />
+          )}
         </div>
       ),
-      width: '120px'
-    },
-    {
-      id: 'actions',
-      label: '작업',
-      accessor: (user: User) => (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => navigate(`/users/${user.id}`)}
-            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-            title="사용자 상세"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => navigate(`/users/${user.id}/edit`)}
-            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-            title="사용자 수정"
-          >
-            <Edit className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleSingleUserDelete(user)}
-            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-            title="사용자 삭제"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          <button
-            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-            title="더 보기"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
+      email: (
+        <div className="flex items-center gap-2">
+          <a href={`mailto:${user.email}`} className="text-blue-600 hover:text-blue-800">
+            {user.email}
+          </a>
+          {user.emailVerified ? (
+            <CheckCircle className="w-4 h-4 text-green-500" title="Email Verified" />
+          ) : (
+            <XCircle className="w-4 h-4 text-gray-400" title="Email Not Verified" />
+          )}
         </div>
       ),
-      width: '120px'
-    }
-  ], [navigate]);
-
-  // 핸들러 함수들
-  const handleSingleUserDelete = (user: User) => {
-    setDeleteModal({
-      _isOpen: true,
-      users: user
-    });
-  };
-
-  const handleBulkDelete = () => {
-    const usersToDelete = usersData?.data.users.filter((user: any) => 
-      selectedUsers.includes(user.id)
-    ) || [];
-    
-    if (usersToDelete.length > 0) {
-      setDeleteModal({
-        _isOpen: true,
-        users: usersToDelete
-      });
-    }
-  };
-
-  const handleBulkRoleChange = () => {
-    const usersToChange = usersData?.data.users.filter((user: any) => 
-      selectedUsers.includes(user.id)
-    ) || [];
-    
-    if (usersToChange.length > 0) {
-      setRoleChangeModal({
-        _isOpen: true,
-        users: usersToChange
-      });
-    }
-  };
-
-  const handleDeleteConfirm = () => {
-    const users = Array.isArray(deleteModal.users) ? deleteModal.users : [deleteModal.users];
-    const userIds = users.map((user: any) => user.id);
-    deleteUsersMutation.mutate(userIds);
-  };
-
-  const handleRoleChangeConfirm = (newRole: UserRole) => {
-    changeUserRolesMutation.mutate({
-      userIds: selectedUsers,
-      newRole
-    });
-  };
-
-  const handleSelectUser = (userId: string, isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedUsers((prev: any) => [...prev, userId]);
-    } else {
-      setSelectedUsers((prev: any) => prev.filter((id: any) => id !== userId));
-    }
-  };
-
-  const handleSelectAll = (isSelected: boolean) => {
-    if (isSelected && usersData?.data.users) {
-      setSelectedUsers(usersData.data.users.map((user: any) => user.id));
-    } else {
-      setSelectedUsers([]);
-    }
-  };
-
-  if (error) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              사용자 데이터 로드 실패
-            </h3>
-            <p className="text-gray-600 mb-4">
-              사용자 목록을 불러오는 중 오류가 발생했습니다.
-            </p>
-            <button
-              onClick={() => refetch()}
-              className="wp-button wp-button-primary"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              다시 시도
-            </button>
-          </div>
+      role: (
+        <Badge variant={getRoleBadgeVariant(user.role)}>
+          {ROLE_LABELS[user.role]}
+        </Badge>
+      ),
+      status: (
+        <Badge variant={getStatusBadgeVariant(user.status)}>
+          {STATUS_LABELS[user.status]}
+        </Badge>
+      ),
+      posts: (
+        <span className="text-center block">{user.postCount || 0}</span>
+      ),
+      registered: (
+        <div className="text-sm text-gray-600">
+          {formatDate(user.createdAt)}
         </div>
-      </AdminLayout>
-    );
-  }
+      )
+    },
+    actions: [
+      {
+        label: 'View',
+        onClick: () => navigate(`/users/${user.id}`)
+      },
+      {
+        label: 'Edit',
+        onClick: () => navigate(`/users/${user.id}/edit`)
+      },
+      {
+        label: 'Delete',
+        onClick: () => setDeleteModal({ _isOpen: true, users: user }),
+        className: 'text-red-600'
+      }
+    ]
+  }));
+
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
+    }
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(users.map(u => u.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* 페이지 헤더 */}
-        <PageHeader
-          title="사용자 관리"
-          subtitle="플랫폼 사용자들을 관리하고 모니터링합니다"
-          actions={[
-            {
-              id: 'add-user',
-              label: '새 사용자 추가',
-              icon: <Plus className="w-4 h-4" />,
-              onClick: () => navigate('/users/new'),
-              variant: 'primary'
-            }
-          ]}
-        />
+    <div className="wrap">
+      <h1 className="wp-heading-inline">Users</h1>
+      <Link to="/users/new" className="page-title-action">
+        Add New
+      </Link>
+      <hr className="wp-header-end" />
 
-        {/* 필터 및 검색 */}
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              {/* 검색 */}
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="사용자 이름 또는 이메일 검색..."
-                    className="wp-input-field pl-10"
-                    value={filters.search}
-                    onChange={(e: any) => handleSearch(e.target.value)}
-                  />
-                </div>
-              </div>
+      {/* Filters */}
+      <div className="wp-filter">
+        <div className="filter-items">
+          <Select value={roleFilter} onValueChange={(value: string) => setRoleFilter(value as UserRole | 'all')}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              {/* 필터 */}
-              <div className="flex items-center space-x-4">
-                <select
-                  value={filters.role}
-                  onChange={(e: any) => handleFilterChange({ role: e.target.value as UserRole | 'all' })}
-                  className="wp-input-field"
-                >
-                  <option value="all">모든 역할</option>
-                  <option value="admin">관리자</option>
-                  <option value="business">사업자</option>
-                  <option value="affiliate">파트너</option>
-                  <option value="customer">일반회원</option>
-                </select>
-
-                <select
-                  value={filters.status}
-                  onChange={(e: any) => handleFilterChange({ status: e.target.value as UserStatus | 'all' })}
-                  className="wp-input-field"
-                >
-                  <option value="all">모든 상태</option>
-                  <option value="approved">승인됨</option>
-                  <option value="pending">승인대기</option>
-                  <option value="rejected">거부됨</option>
-                  <option value="suspended">정지됨</option>
-                </select>
-
-                <button
-                  onClick={clearFilters}
-                  className="wp-button wp-button-secondary"
-                >
-                  <Filter className="w-4 h-4 mr-2" />
-                  필터 초기화
-                </button>
-
-                <button
-                  onClick={() => refetch()}
-                  className="wp-button wp-button-secondary"
-                  disabled={isLoading}
-                >
-                  <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 선택된 사용자 일괄 작업 */}
-        {selectedUsers.length > 0 && (
-          <div className="wp-card border-blue-200 bg-blue-50">
-            <div className="wp-card-body">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm font-medium text-blue-900">
-                    {selectedUsers.length}명의 사용자가 선택됨
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleBulkRoleChange}
-                    className="wp-button wp-button-secondary wp-button-sm"
-                    disabled={changeUserRolesMutation.isPending}
-                  >
-                    <Shield className="w-4 h-4 mr-1" />
-                    역할 변경
-                  </button>
-                  <button
-                    onClick={handleBulkDelete}
-                    className="wp-button wp-button-danger wp-button-sm"
-                    disabled={deleteUsersMutation.isPending}
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    일괄 삭제
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 통계 요약 */}
-        {usersData && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="wp-card">
-              <div className="wp-card-body text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {usersData.data.pagination.totalItems}
-                </div>
-                <div className="text-sm text-gray-600">전체 사용자</div>
-              </div>
-            </div>
-            <div className="wp-card">
-              <div className="wp-card-body text-center">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {usersData.data.users.filter((u: any) => u.status === 'pending').length}
-                </div>
-                <div className="text-sm text-gray-600">승인 대기</div>
-              </div>
-            </div>
-            <div className="wp-card">
-              <div className="wp-card-body text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {usersData.data.users.filter((u: any) => u.status === 'approved').length}
-                </div>
-                <div className="text-sm text-gray-600">승인됨</div>
-              </div>
-            </div>
-            <div className="wp-card">
-              <div className="wp-card-body text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {usersData.data.users.filter((u: any) => u.role === 'business').length}
-                </div>
-                <div className="text-sm text-gray-600">사업자</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 사용자 테이블 */}
-        <div className="wp-card">
-          <div className="wp-card-body">
-            {/* 테이블 헤더 with 전체 선택 */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  checked={selectedUsers.length > 0 && usersData?.data.users && selectedUsers.length === usersData.data.users.length}
-                  onChange={(e: any) => handleSelectAll(e.target.checked)}
-                />
-                <span className="text-sm text-gray-600">
-                  전체 선택 ({usersData?.data.users?.length || 0}명)
-                </span>
-              </div>
-            </div>
-            <DataTable
-              data={usersData?.data.users || []}
-              columns={columns}
-              loading={isLoading}
-              pagination={{
-                page: usersData?.data.pagination.current || 1,
-                total: usersData?.data.pagination.total || 1,
-                pageSize: limit,
-                onPageChange: setPage,
-                onPageSizeChange: () => {} // TODO: implement page size change
-              }}
-              emptyMessage="조건에 맞는 사용자가 없습니다."
+          <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as UserStatus | 'all')}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <div className="search-box">
+            <Input
+              type="search"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
+              className="w-[300px]"
             />
+            <Button variant="secondary">
+              Search Users
+            </Button>
           </div>
-        </div>
 
-        {/* 내보내기 및 추가 액션 */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-500">
-            {usersData?.data.pagination.totalItems || 0}명 중{' '}
-            {usersData?.data.pagination.count || 0}명 표시
-          </div>
-          <div className="flex items-center space-x-2">
-            <button className="wp-button wp-button-secondary wp-button-sm">
-              <Download className="w-4 h-4 mr-2" />
-              CSV 내보내기
-            </button>
-          </div>
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
         </div>
       </div>
 
-      {/* 사용자 삭제 모달 */}
-      <UserDeleteModal
-        _isOpen={deleteModal._isOpen}
-        onClose={() => setDeleteModal({ _isOpen: false, users: [] as User[] })}
-        onConfirm={handleDeleteConfirm}
-        users={deleteModal.users}
-        isLoading={deleteUsersMutation.isPending}
+      {/* Bulk Actions - Top */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedCount}
+        onActionExecute={executeBulkAction}
+        isProcessing={isProcessing}
+        position="top"
       />
 
-      {/* 사용자 역할 변경 모달 */}
-      <UserRoleChangeModal
-        isOpen={roleChangeModal._isOpen}
-        onClose={() => setRoleChangeModal({ _isOpen: false, users: [] })}
-        onConfirm={handleRoleChangeConfirm}
-        users={roleChangeModal.users}
-        isLoading={changeUserRolesMutation.isPending}
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        loading={isLoading}
+        emptyMessage="No users found. Add your first user!"
       />
-    </AdminLayout>
+
+      {/* Bulk Actions - Bottom */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedCount}
+        onActionExecute={executeBulkAction}
+        isProcessing={isProcessing}
+        position="bottom"
+      />
+
+      {/* Pagination */}
+      {pagination && (
+        <div className="tablenav bottom">
+          <div className="tablenav-pages">
+            <span className="displaying-num">{pagination.totalItems} items</span>
+            <span className="pagination-links">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPage(page - 1)}
+                disabled={!pagination.hasPrev}
+              >
+                ‹ Previous
+              </Button>
+              
+              <span className="paging-input">
+                <span className="current-page">{pagination.current}</span> of{' '}
+                <span className="total-pages">{pagination.total}</span>
+              </span>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPage(page + 1)}
+                disabled={!pagination.hasNext}
+              >
+                Next ›
+              </Button>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="notice notice-error">
+          <p>Error loading users. Please try again.</p>
+        </div>
+      )}
+
+      {/* Modals */}
+      {deleteModal._isOpen && (
+        <UserDeleteModal
+          isOpen={deleteModal._isOpen}
+          onClose={() => setDeleteModal({ _isOpen: false, users: [] })}
+          users={deleteModal.users}
+          onConfirm={(userIds) => deleteMutation.mutate(userIds)}
+        />
+      )}
+
+      {roleChangeModal._isOpen && (
+        <UserRoleChangeModal
+          isOpen={roleChangeModal._isOpen}
+          onClose={() => setRoleChangeModal({ _isOpen: false, users: [] })}
+          users={roleChangeModal.users}
+          onConfirm={(userIds, role) => roleChangeMutation.mutate({ userIds, role })}
+        />
+      )}
+    </div>
   );
 };
 
