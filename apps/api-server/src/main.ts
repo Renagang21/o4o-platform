@@ -614,6 +614,7 @@ import tagRoutes from './routes/content/tagRoutes';
 app.use('/api', tagRoutes); // Tags at /api/tags
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
+app.use('/api/v1/media', contentRoutes); // Media routes (v1 API compatibility)
 
 // Advanced menu features (Phase 2)
 import menuAdvancedRoutes from './routes/menu-advanced';

@@ -38,6 +38,7 @@ import { PlaylistItem } from '../entities/PlaylistItem';
 import { ScreenTemplate } from '../entities/ScreenTemplate';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
 import { Post } from '../entities/Post';
+import { PostTag } from '../entities/PostTag';
 import { Page } from '../entities/Page';
 import { ReusableBlock } from '../entities/ReusableBlock';
 import { BlockPattern } from '../entities/BlockPattern';
@@ -144,6 +145,7 @@ export const AppDataSource = new DataSource({
         ContentUsageLog,
         // Content entities
         Post,
+        PostTag,
         Page,
         ReusableBlock,
         BlockPattern,

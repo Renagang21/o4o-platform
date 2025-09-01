@@ -53,9 +53,9 @@ router.put('/admin/media/:id', mediaController.updateMedia.bind(mediaController)
 router.delete('/admin/media/:id', mediaController.deleteMedia.bind(mediaController));
 
 // Media folders
-router.get('/admin/media/folders', mediaController.getFolders.bind(mediaController));
-router.post('/admin/media/folders', mediaController.createFolder.bind(mediaController));
-router.delete('/admin/media/folders/:id', mediaController.deleteFolder.bind(mediaController));
+router.get('/folders', mediaController.getFolders.bind(mediaController));
+router.post('/folders', mediaController.createFolder.bind(mediaController));
+router.delete('/folders/:id', mediaController.deleteFolder.bind(mediaController));
 
 // ============================================================================
 // TEMPLATES ROUTES
