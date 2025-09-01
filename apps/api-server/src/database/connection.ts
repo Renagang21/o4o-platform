@@ -205,7 +205,7 @@ AppDataSource.initialize()
   .then(() => {
   })
   .catch((error) => {
-    console.error('❌ Database initialization failed:', error);
+    // Error log removed
   });
 */
 
@@ -244,7 +244,7 @@ export async function closeDatabaseConnection() {
       await AppDataSource.destroy();
     }
   } catch (error: any) {
-    console.error('❌ Error closing database connection:', error);
+    // Error log removed
   }
 }
 

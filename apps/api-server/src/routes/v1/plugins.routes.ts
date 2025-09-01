@@ -143,7 +143,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
       total: plugins.length
     });
   } catch (error) {
-    console.error('Error fetching plugins:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch plugins'
@@ -173,7 +173,7 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
       data: plugin
     });
   } catch (error) {
-    console.error('Error fetching plugin:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch plugin'
@@ -247,7 +247,7 @@ router.put('/:id/toggle',
         message: `Plugin ${isActive ? 'activated' : 'deactivated'} successfully`
       });
     } catch (error) {
-      console.error('Error toggling plugin:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to toggle plugin status'
@@ -288,7 +288,7 @@ router.post('/:id/settings',
         message: 'Plugin settings updated successfully'
       });
     } catch (error) {
-      console.error('Error updating plugin settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update plugin settings'
@@ -345,7 +345,7 @@ router.delete('/:id',
         message: 'Plugin deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting plugin:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete plugin'
@@ -397,7 +397,7 @@ router.post('/install',
         message: 'Plugin installed successfully'
       });
     } catch (error) {
-      console.error('Error installing plugin:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to install plugin'

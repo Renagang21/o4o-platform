@@ -58,7 +58,7 @@ export class CPTController {
         message: 'Default CPTs initialized successfully'
       });
     } catch (error: any) {
-      console.error('Error initializing default CPTs:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to initialize default CPTs',
@@ -81,7 +81,7 @@ export class CPTController {
         data: cpts
       });
     } catch (error) {
-      console.error('Error fetching CPTs:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'CPT 목록을 가져오는데 실패했습니다.'
@@ -111,7 +111,7 @@ export class CPTController {
         data: cpt
       });
     } catch (error) {
-      console.error('Error fetching CPT:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'CPT를 가져오는데 실패했습니다.'
@@ -160,7 +160,7 @@ export class CPTController {
         data: cpt
       });
     } catch (error) {
-      console.error('Error creating CPT:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'CPT 생성에 실패했습니다.'
@@ -201,7 +201,7 @@ export class CPTController {
         data: cpt
       });
     } catch (error) {
-      console.error('Error updating CPT:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'CPT 수정에 실패했습니다.'
@@ -231,7 +231,7 @@ export class CPTController {
         message: 'CPT가 성공적으로 삭제되었습니다.'
       });
     } catch (error) {
-      console.error('Error deleting CPT:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'CPT 삭제에 실패했습니다.'
@@ -304,7 +304,7 @@ export class CPTController {
 
       res.json(wpPosts);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      // Error log removed
       res.status(500).json({
         code: 'rest_posts_error',
         message: '포스트 목록을 가져오는데 실패했습니다.',
@@ -363,7 +363,7 @@ export class CPTController {
         data: post
       });
     } catch (error) {
-      console.error('Error creating post:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: '포스트 생성에 실패했습니다.'
@@ -457,7 +457,7 @@ export class CPTController {
 
       res.json(wpPost);
     } catch (error) {
-      console.error('Error fetching post:', error);
+      // Error log removed
       res.status(500).json({
         code: 'rest_post_error',
         message: '포스트를 가져오는데 실패했습니다.',
@@ -493,7 +493,7 @@ export class CPTController {
         data: post
       });
     } catch (error) {
-      console.error('Error updating post:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: '포스트 수정에 실패했습니다.'
@@ -524,7 +524,7 @@ export class CPTController {
         message: '포스트가 성공적으로 삭제되었습니다.'
       });
     } catch (error) {
-      console.error('Error deleting post:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: '포스트 삭제에 실패했습니다.'
@@ -590,7 +590,7 @@ export class CPTController {
 
       res.json(wpPosts);
     } catch (error) {
-      console.error('Error fetching public posts:', error);
+      // Error log removed
       res.status(500).json({
         code: 'rest_posts_error',
         message: '공개 포스트를 가져오는데 실패했습니다.',

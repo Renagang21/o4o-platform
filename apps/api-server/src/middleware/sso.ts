@@ -59,7 +59,7 @@ export const validateSSOSession = async (
 
     next();
   } catch (error: any) {
-    console.error('SSO session validation error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Session validation failed',
       code: 'SESSION_ERROR'

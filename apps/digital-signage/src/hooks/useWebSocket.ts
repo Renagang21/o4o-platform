@@ -95,7 +95,7 @@ export const useWebSocket = (
     });
 
     socket.on('connect_error', (error: Error) => {
-      console.error('[WebSocket] Connection error:', error);
+      // Error log removed
       setConnectionError(error.message);
       events.onError?.(error);
     });

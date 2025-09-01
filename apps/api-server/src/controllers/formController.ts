@@ -56,7 +56,7 @@ export const formController = {
         form
       });
     } catch (error) {
-      console.error('Error creating form:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to create form' });
     }
   },
@@ -89,7 +89,7 @@ export const formController = {
         form
       });
     } catch (error) {
-      console.error('Error updating form:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update form' });
     }
   },
@@ -119,7 +119,7 @@ export const formController = {
         totalPages: Math.ceil(total / Number(limit))
       });
     } catch (error) {
-      console.error('Error fetching forms:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch forms' });
     }
   },
@@ -140,7 +140,7 @@ export const formController = {
 
       res.json(form);
     } catch (error) {
-      console.error('Error fetching form:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch form' });
     }
   },
@@ -158,7 +158,7 @@ export const formController = {
 
       res.json({ message: 'Form deleted successfully' });
     } catch (error) {
-      console.error('Error deleting form:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to delete form' });
     }
   },
@@ -345,7 +345,7 @@ export const formController = {
             bcc: notification.bcc ? notification.bcc.split(',').map((e: any) => e.trim()).filter(Boolean) : undefined
           });
         } catch (emailError) {
-          console.error('Failed to send notification email:', emailError);
+          // Error log removed
         }
       }
 
@@ -372,7 +372,7 @@ export const formController = {
         }
       });
     } catch (error) {
-      console.error('Error submitting form:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to submit form' });
     }
   },
@@ -409,7 +409,7 @@ export const formController = {
         totalPages: Math.ceil(total / Number(limit))
       });
     } catch (error) {
-      console.error('Error fetching submissions:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch submissions' });
     }
   },
@@ -437,7 +437,7 @@ export const formController = {
         submission
       });
     } catch (error) {
-      console.error('Error updating submission:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update submission' });
     }
   },
@@ -455,7 +455,7 @@ export const formController = {
 
       res.json({ message: 'Submission deleted successfully' });
     } catch (error) {
-      console.error('Error deleting submission:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to delete submission' });
     }
   },
@@ -576,7 +576,7 @@ export const formController = {
 
       res.json(report);
     } catch (error) {
-      console.error('Error generating form report:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to generate form report' });
     }
   }

@@ -251,7 +251,7 @@ export class AuthServiceV2 {
         expiresIn: 15 * 60
       };
     } catch (error) {
-      console.error('Token refresh error:', error);
+      // Error log removed
       return null;
     }
   }

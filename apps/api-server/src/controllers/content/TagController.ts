@@ -42,7 +42,7 @@ export class TagController {
         }
       });
     } catch (error: any) {
-      console.error('Get tags error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -78,7 +78,7 @@ export class TagController {
         data: tag
       });
     } catch (error: any) {
-      console.error('Get tag error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -133,7 +133,7 @@ export class TagController {
         message: 'Tag created successfully'
       });
     } catch (error: any) {
-      console.error('Create tag error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -192,7 +192,7 @@ export class TagController {
         message: 'Tag updated successfully'
       });
     } catch (error: any) {
-      console.error('Update tag error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -247,7 +247,7 @@ export class TagController {
         message: 'Tag deleted successfully'
       });
     } catch (error: any) {
-      console.error('Delete tag error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -285,7 +285,7 @@ export class TagController {
         message: `Successfully merged tags. ${result.postsUpdated} posts updated.`
       });
     } catch (error: any) {
-      console.error('Merge tags error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -321,7 +321,7 @@ export class TagController {
         data: stats
       });
     } catch (error: any) {
-      console.error('Get tag stats error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -346,7 +346,7 @@ export class TagController {
         data: tags
       });
     } catch (error: any) {
-      console.error('Get popular tags error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {

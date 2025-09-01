@@ -108,7 +108,7 @@ const StandardPreformattedBlock: React.FC<PreformattedBlockProps> = (props) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text:', err);
+      // Error log removed
     }
   };
 

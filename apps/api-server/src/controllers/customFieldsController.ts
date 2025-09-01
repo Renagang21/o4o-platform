@@ -37,7 +37,7 @@ export class CustomFieldsController {
         data: fieldGroups
       });
     } catch (error) {
-      console.error('Error fetching field groups:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch field groups',
@@ -68,7 +68,7 @@ export class CustomFieldsController {
         data: fieldGroup
       });
     } catch (error) {
-      console.error('Error fetching field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch field group',
@@ -148,7 +148,7 @@ export class CustomFieldsController {
         message: 'Field group created successfully'
       });
     } catch (error) {
-      console.error('Error creating field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to create field group',
@@ -231,7 +231,7 @@ export class CustomFieldsController {
         message: 'Field group updated successfully'
       });
     } catch (error) {
-      console.error('Error updating field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update field group',
@@ -269,7 +269,7 @@ export class CustomFieldsController {
         message: 'Field group deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete field group',
@@ -299,7 +299,7 @@ export class CustomFieldsController {
         data: fields
       });
     } catch (error) {
-      console.error('Error fetching custom fields:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch custom fields',
@@ -330,7 +330,7 @@ export class CustomFieldsController {
         data: field
       });
     } catch (error) {
-      console.error('Error fetching custom field:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch custom field',
@@ -429,7 +429,7 @@ export class CustomFieldsController {
         message: 'Custom field created successfully'
       });
     } catch (error) {
-      console.error('Error creating custom field:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to create custom field',
@@ -465,7 +465,7 @@ export class CustomFieldsController {
         message: 'Custom field updated successfully'
       });
     } catch (error) {
-      console.error('Error updating custom field:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update custom field',
@@ -498,7 +498,7 @@ export class CustomFieldsController {
         message: 'Custom field deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting custom field:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete custom field',
@@ -559,7 +559,7 @@ export class CustomFieldsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching custom field values:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch custom field values',
@@ -622,7 +622,7 @@ export class CustomFieldsController {
         savedCount: valuesToSave.length
       });
     } catch (error) {
-      console.error('Error saving custom field values:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to save custom field values',
@@ -687,7 +687,7 @@ export class CustomFieldsController {
         }
       });
     } catch (error) {
-      console.error('Error exporting field groups:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to export field groups',
@@ -747,7 +747,7 @@ export class CustomFieldsController {
           });
 
         } catch (error) {
-          console.error(`Error importing field group ${groupData.title}:`, error);
+          // Error log removed
           results.push({
             title: groupData.title,
             success: false,
@@ -765,7 +765,7 @@ export class CustomFieldsController {
         data: results
       });
     } catch (error) {
-      console.error('Error importing field groups:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to import field groups',

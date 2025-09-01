@@ -16,12 +16,12 @@ export const updateSessionActivity = async (
     if (sessionId && typeof sessionId === 'string') {
       // Update session activity in background (non-blocking)
       SessionSyncService.updateSessionActivity(sessionId).catch(err => {
-        console.error('Failed to update session activity:', err);
+        // Error log removed
       });
     }
   } catch (error) {
     // Don't block the request if session update fails
-    console.error('Session activity middleware error:', error);
+    // Error log removed
   }
   
   next();
@@ -59,7 +59,7 @@ export const validateSession = async (
     
     next();
   } catch (error) {
-    console.error('Session validation error:', error);
+    // Error log removed
     next(); // Continue without session validation
   }
 };

@@ -3198,7 +3198,7 @@ function useQuery(options, queryClient) {
 function useSuspenseQuery(options, queryClient) {
   if (true) {
     if (options.queryFn === skipToken) {
-      console.error("skipToken is not allowed for useSuspenseQuery");
+      // Error log removed
     }
   }
   return useBaseQuery(
@@ -3218,7 +3218,7 @@ function useSuspenseQuery(options, queryClient) {
 function useSuspenseInfiniteQuery(options, queryClient) {
   if (true) {
     if (options.queryFn === skipToken) {
-      console.error("skipToken is not allowed for useSuspenseInfiniteQuery");
+      // Error log removed
     }
   }
   return useBaseQuery(
@@ -3241,7 +3241,7 @@ function useSuspenseQueries(options, queryClient) {
       queries: options.queries.map((query) => {
         if (true) {
           if (query.queryFn === skipToken) {
-            console.error("skipToken is not allowed for useSuspenseQueries");
+            // Error log removed
           }
         }
         return {

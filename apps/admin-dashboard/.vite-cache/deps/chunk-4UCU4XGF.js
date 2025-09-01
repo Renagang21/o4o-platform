@@ -268,7 +268,7 @@ var require_checkPropTypes = __commonJS({
       printWarning = function(text) {
         var message = "Warning: " + text;
         if (typeof console !== "undefined") {
-          console.error(message);
+          // Error log removed
         }
         try {
           throw new Error(message);
@@ -336,7 +336,7 @@ var require_factoryWithTypeCheckers = __commonJS({
       printWarning = function(text) {
         var message = "Warning: " + text;
         if (typeof console !== "undefined") {
-          console.error(message);
+          // Error log removed
         }
         try {
           throw new Error(message);

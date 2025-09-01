@@ -34,7 +34,7 @@ router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {
       total: pages.length
     });
   } catch (error) {
-    console.error('Error fetching pages:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch pages'
@@ -65,7 +65,7 @@ router.get('/custom-field-groups', authenticateToken, requireAdmin, async (req, 
       total: fieldGroups.length
     });
   } catch (error) {
-    console.error('Error fetching custom field groups:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch custom field groups'

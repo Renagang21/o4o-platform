@@ -136,7 +136,7 @@ export class PerformanceOptimizationService {
       const cached = await this.redis.get(`query:${cacheKey}`);
       return cached ? JSON.parse(cached) as T[] : null;
     } catch (error) {
-      console.warn('Failed to get cached query result:', error);
+      // Warning log removed
       return null;
     }
   }
@@ -152,7 +152,7 @@ export class PerformanceOptimizationService {
         JSON.stringify(result)
       );
     } catch (error) {
-      console.warn('Failed to cache query result:', error);
+      // Warning log removed
     }
   }
 
@@ -179,7 +179,7 @@ export class PerformanceOptimizationService {
       details: { query: queryInfo.query }
     });
 
-    console.warn(`Slow query detected: ${executionTime}ms`, queryInfo);
+    // Warning log removed
   }
 
   /**
@@ -259,7 +259,7 @@ export class PerformanceOptimizationService {
         headers: this.generateCacheHeaders(data)
       };
     } catch (error) {
-      console.error('API response optimization failed:', error);
+      // Error log removed
       return {
         data,
         cached: false,
@@ -380,7 +380,7 @@ export class PerformanceOptimizationService {
       const totalRequests = keyspaceHits + keyspaceMisses;
       return totalRequests > 0 ? (keyspaceHits / totalRequests) * 100 : 0;
     } catch (error) {
-      console.warn('Failed to calculate cache hit rate:', error);
+      // Warning log removed
       return 0;
     }
   }
@@ -459,7 +459,7 @@ export class PerformanceOptimizationService {
       await this.updatePerformanceStats();
 
     } catch (error) {
-      console.error('❌ Auto-optimization failed:', error);
+      // Error log removed
       await this.createPerformanceAlert('auto_optimization_failed', {
         metric: 'optimization_status',
         currentValue: 0,
@@ -537,7 +537,7 @@ export class PerformanceOptimizationService {
       await AppDataSource.query('ANALYZE');
       
     } catch (error) {
-      console.warn('Database optimization failed:', error);
+      // Warning log removed
     }
   }
 
@@ -567,7 +567,7 @@ export class PerformanceOptimizationService {
       const info = await this.redis.info('all');
       return this.convertToCacheMetrics(info);
     } catch (error) {
-      console.warn('Failed to get cache stats:', error);
+      // Warning log removed
       return {
         hits: 0,
         misses: 0,
@@ -665,7 +665,7 @@ export class PerformanceOptimizationService {
       const queries = await this.redis.lrange('slow_queries', 0, -1);
       return queries.map((q: any) => JSON.parse(q) as SlowQueryInfo);
     } catch (error) {
-      console.warn('Failed to get slow queries:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -678,7 +678,7 @@ export class PerformanceOptimizationService {
       const alerts = await this.redis.lrange('performance_alerts', 0, -1);
       return alerts.map((a: any) => JSON.parse(a) as PerformanceAlert);
     } catch (error) {
-      console.warn('Failed to get performance alerts:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -811,7 +811,7 @@ export class PerformanceOptimizationService {
     try {
       await this.redis.disconnect();
     } catch (error) {
-      console.error('❌ Performance optimization service shutdown failed:', error);
+      // Error log removed
     }
   }
 }

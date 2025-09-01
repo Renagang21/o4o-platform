@@ -155,7 +155,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         ...data.settings
       }));
     } catch (error) {
-      console.error('Failed to load post:', error);
+      // Error log removed
       toast.error('Failed to load post data');
     }
   };
@@ -192,7 +192,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         toast.success(publish ? 'Published successfully!' : 'Saved as draft');
       }
     } catch (error) {
-      console.error('Save failed:', error);
+      // Error log removed
       toast.error('Failed to save');
     } finally {
       setIsSaving(false);

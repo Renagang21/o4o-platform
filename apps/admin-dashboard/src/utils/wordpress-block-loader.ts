@@ -39,7 +39,7 @@ export async function loadBlockEditorCore() {
     blockEditorCache.core = module;
     return module;
   } catch (error) {
-    console.error('Failed to load block editor core:', error);
+    // Error log removed
     throw error;
   }
 }
@@ -68,7 +68,7 @@ export async function loadBlockEditorUI() {
     blockEditorCache.ui = module;
     return module;
   } catch (error) {
-    console.error('Failed to load block editor UI:', error);
+    // Error log removed
     throw error;
   }
 }
@@ -98,7 +98,7 @@ export async function loadBlockEditorFormats() {
     blockEditorCache.formats = module;
     return module;
   } catch (error) {
-    console.error('Failed to load block editor formats:', error);
+    // Error log removed
     throw error;
   }
 }
@@ -124,7 +124,7 @@ export async function loadBlockEditorMedia() {
     blockEditorCache.media = module;
     return module;
   } catch (error) {
-    console.error('Failed to load block editor media:', error);
+    // Error log removed
     throw error;
   }
 }

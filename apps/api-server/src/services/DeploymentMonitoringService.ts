@@ -338,7 +338,7 @@ export class DeploymentMonitoringService {
         check.status = result.success ? 'passed' : 'failed';
 
         if (!result.success) {
-          console.warn(`❌ Health check failed: ${check.name} - ${result.error}`);
+          // Warning log removed
         }
       } catch (error) {
         check.status = 'failed';
@@ -347,7 +347,7 @@ export class DeploymentMonitoringService {
           responseTime: 0,
           error: error instanceof Error ? error.message : 'Unknown error'
         };
-        console.error(`❌ Health check error: ${check.name}`, error);
+        // Error log removed
       }
     });
 
@@ -442,7 +442,7 @@ export class DeploymentMonitoringService {
         }
       } catch (error) {
         // Non-critical error reading response body
-        console.warn('Failed to read response body:', error);
+        // Warning log removed
       }
 
       return {
@@ -580,7 +580,7 @@ export class DeploymentMonitoringService {
 
       return metrics.map((metric: any) => parseFloat(metric.value.toString()));
     } catch (error) {
-      console.warn(`Failed to collect ${metricName} metrics:`, error);
+      // Warning log removed
       return [];
     }
   }
@@ -858,7 +858,7 @@ export class DeploymentMonitoringService {
       rollbackInfo.endTime = new Date();
       deployment.status = DeploymentStatus.ROLLBACK_FAILED;
 
-      console.error(`❌ Rollback failed: ${rollbackInfo.id}`, error);
+      // Error log removed
 
       // Create failure alert
       await this.createRollbackAlert(deployment, rollbackInfo, false);
@@ -966,7 +966,7 @@ export class DeploymentMonitoringService {
       step.endTime = new Date();
       step.error = error instanceof Error ? error.message : 'Unknown error';
 
-      console.error(`❌ Rollback step failed: ${step.name}`, error);
+      // Error log removed
       throw error;
     }
   }
@@ -1081,7 +1081,7 @@ export class DeploymentMonitoringService {
         await this.validateDeploymentHealth();
         await this.updateDeploymentMetrics();
       } catch (error) {
-        console.error('Deployment monitoring failed:', error);
+        // Error log removed
       }
     }, 60000); // Every minute
 
@@ -1096,7 +1096,7 @@ export class DeploymentMonitoringService {
       this.currentVersion = packageJson.version || '1.0.0';
 
     } catch (error) {
-      console.warn('Failed to detect current version:', error);
+      // Warning log removed
       this.currentVersion = '1.0.0';
     }
   }

@@ -41,7 +41,7 @@ export class EcommerceSettingsController {
         data: defaultSettings
       });
     } catch (error: any) {
-      console.error('Get settings error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -69,7 +69,7 @@ export class EcommerceSettingsController {
         message: 'Settings updated successfully'
       });
     } catch (error: any) {
-      console.error('Update settings error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {

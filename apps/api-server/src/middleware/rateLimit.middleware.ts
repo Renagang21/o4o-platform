@@ -54,7 +54,7 @@ export function rateLimitMiddleware(options: RateLimitOptions) {
       next();
     } catch (error) {
       // If Redis fails, allow the request but log the error
-      console.error('Rate limit middleware error:', error);
+      // Error log removed
       next();
     }
   };

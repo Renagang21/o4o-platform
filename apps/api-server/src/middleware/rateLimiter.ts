@@ -145,7 +145,7 @@ export class SmartRateLimiter {
       if (recentRequests.length > 100) {
         // 1분에 100개 이상 요청 시 의심
         this.suspiciousIPs.add(ip);
-        console.warn(`🚨 Suspicious activity detected from IP: ${ip}`);
+        // Warning log removed
         
         // 30분 후 자동 해제
         setTimeout(() => {

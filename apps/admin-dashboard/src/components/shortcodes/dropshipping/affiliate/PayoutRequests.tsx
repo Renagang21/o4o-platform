@@ -153,7 +153,7 @@ const PayoutRequests: React.FC = () => {
         setHistory(data);
       }
     } catch (error) {
-      console.error('Error fetching payout data:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch payout data',
@@ -227,7 +227,7 @@ const PayoutRequests: React.FC = () => {
         fetchPayoutData();
       }
     } catch (error) {
-      console.error('Error requesting payout:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to submit payout request',
@@ -257,7 +257,7 @@ const PayoutRequests: React.FC = () => {
         fetchPayoutData();
       }
     } catch (error) {
-      console.error('Error adding account:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to add payout account',
@@ -285,7 +285,7 @@ const PayoutRequests: React.FC = () => {
         fetchPayoutData();
       }
     } catch (error) {
-      console.error('Error cancelling request:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to cancel payout request',

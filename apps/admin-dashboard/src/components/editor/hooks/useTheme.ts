@@ -78,7 +78,7 @@ export const useTheme = () => {
       // CSS 변수 적용
       applyThemeStyles(defaultTheme);
     } catch (error) {
-      console.error('Failed to load theme:', error);
+      // Error log removed
       setTheme(defaultTheme);
     } finally {
       setLoading(false);

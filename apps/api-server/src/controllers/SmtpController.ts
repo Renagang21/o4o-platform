@@ -52,7 +52,7 @@ export class SmtpController {
 
       res.json(response);
     } catch (error) {
-      console.error('Failed to get SMTP settings:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to get SMTP settings' });
     }
   };
@@ -146,7 +146,7 @@ export class SmtpController {
         message: 'SMTP settings updated successfully'
       });
     } catch (error) {
-      console.error('Failed to update SMTP settings:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update SMTP settings' });
     }
   };
@@ -292,7 +292,7 @@ export class SmtpController {
         throw error;
       }
     } catch (error: any) {
-      console.error('SMTP test failed:', error);
+      // Error log removed
       res.status(500).json({ 
         error: 'SMTP 테스트 실패',
         details: error.message 
@@ -353,7 +353,7 @@ export class SmtpController {
         }
       });
     } catch (error) {
-      console.error('Failed to get email logs:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to get email logs' });
     }
   };
@@ -381,7 +381,7 @@ export class SmtpController {
         logId: id 
       });
     } catch (error) {
-      console.error('Failed to resend email:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to resend email' });
     }
   };
@@ -444,7 +444,7 @@ export class SmtpController {
         stats: formattedStats
       });
     } catch (error) {
-      console.error('Failed to get email statistics:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to get email statistics' });
     }
   };

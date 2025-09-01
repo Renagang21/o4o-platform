@@ -121,7 +121,7 @@ const OrderManagement: React.FC = () => {
         setStats(data.stats || null);
       }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch orders',
@@ -151,7 +151,7 @@ const OrderManagement: React.FC = () => {
         fetchOrders();
       }
     } catch (error) {
-      console.error('Error updating order status:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to update order status',
@@ -183,7 +183,7 @@ const OrderManagement: React.FC = () => {
         fetchOrders();
       }
     } catch (error) {
-      console.error('Error shipping order:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to ship order',
@@ -206,7 +206,7 @@ const OrderManagement: React.FC = () => {
         window.open(url);
       }
     } catch (error) {
-      console.error('Error printing label:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to generate shipping label',

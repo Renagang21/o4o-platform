@@ -35,7 +35,7 @@ export class CouponController {
         }
       });
     } catch (error) {
-      console.error('Error fetching coupons:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch coupons'
@@ -64,7 +64,7 @@ export class CouponController {
         data: coupon
       });
     } catch (error) {
-      console.error('Error fetching coupon:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch coupon'
@@ -145,7 +145,7 @@ export class CouponController {
         message: 'Coupon created successfully'
       });
     } catch (error) {
-      console.error('Error creating coupon:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to create coupon'
@@ -190,7 +190,7 @@ export class CouponController {
         message: 'Coupon updated successfully'
       });
     } catch (error) {
-      console.error('Error updating coupon:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update coupon'
@@ -211,7 +211,7 @@ export class CouponController {
         message: 'Coupon deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting coupon:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete coupon'
@@ -260,7 +260,7 @@ export class CouponController {
         } : null
       });
     } catch (error) {
-      console.error('Error validating coupon:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to validate coupon'
@@ -290,7 +290,7 @@ export class CouponController {
         data: coupons
       });
     } catch (error) {
-      console.error('Error fetching customer coupons:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch available coupons'
@@ -311,7 +311,7 @@ export class CouponController {
         data: usages
       });
     } catch (error) {
-      console.error('Error fetching usage history:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch usage history'
@@ -354,7 +354,7 @@ export class CouponController {
         message: `${coupons.length} coupons generated successfully`
       });
     } catch (error) {
-      console.error('Error generating coupons:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to generate coupons'

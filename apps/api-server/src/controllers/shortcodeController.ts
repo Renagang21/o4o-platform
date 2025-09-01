@@ -45,7 +45,7 @@ export class ShortcodeController {
         total: shortcodes.length
       });
     } catch (error: any) {
-      console.error('Error fetching shortcodes:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch shortcodes',
@@ -85,7 +85,7 @@ export class ShortcodeController {
         data: shortcode
       });
     } catch (error: any) {
-      console.error('Error fetching shortcode:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch shortcode',
@@ -130,7 +130,7 @@ export class ShortcodeController {
         message: 'Shortcode created successfully'
       });
     } catch (error: any) {
-      console.error('Error creating shortcode:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create shortcode',
@@ -172,7 +172,7 @@ export class ShortcodeController {
         message: 'Shortcode updated successfully'
       });
     } catch (error: any) {
-      console.error('Error updating shortcode:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update shortcode',
@@ -203,7 +203,7 @@ export class ShortcodeController {
         message: 'Shortcode deleted successfully'
       });
     } catch (error: any) {
-      console.error('Error deleting shortcode:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete shortcode',
@@ -294,7 +294,7 @@ export class ShortcodeController {
         }
       });
     } catch (error: any) {
-      console.error('Error rendering shortcode:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to render shortcode',
@@ -316,7 +316,7 @@ export class ShortcodeController {
         data: categories
       });
     } catch (error: any) {
-      console.error('Error fetching categories:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch categories',
@@ -425,7 +425,7 @@ export class ShortcodeController {
         message: `Created ${created.length} default shortcodes`
       });
     } catch (error: any) {
-      console.error('Error creating default shortcodes:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create default shortcodes',

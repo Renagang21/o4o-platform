@@ -249,7 +249,7 @@ export class AutoRecoveryService {
       await this.escalateToManualIntervention(alert, 'automated_recovery_failed', attempt);
 
     } catch (error) {
-      console.error(`❌ Recovery attempt ${attemptId} failed with error:`, error);
+      // Error log removed
       attempt.status = 'failed';
       await this.escalateToManualIntervention(alert, 'recovery_error', attempt);
     } finally {
@@ -309,7 +309,7 @@ export class AutoRecoveryService {
         stepExecution.error = error instanceof Error ? error.message : 'Unknown error';
         stepExecution.endTime = new Date();
         
-        console.error(`❌ Step failed: ${step.type} - ${stepExecution.error}`);
+        // Error log removed
       }
 
       attempt.stepsExecuted.push(stepExecution);
@@ -395,7 +395,7 @@ export class AutoRecoveryService {
       
       return true;
     } catch (error) {
-      console.error('Success condition check failed:', error);
+      // Error log removed
       return false;
     }
   }
@@ -460,7 +460,7 @@ export class AutoRecoveryService {
       
       return false;
     } catch (error) {
-      console.error('Error checking alert resolution:', error);
+      // Error log removed
       return false;
     }
   }
@@ -692,7 +692,7 @@ export class AutoRecoveryService {
         await this.processRecoveryQueue();
         await this.performHealthSelfCheck();
       } catch (error) {
-        console.error('Recovery monitoring failed:', error);
+        // Error log removed
       }
     }, 30000); // Every 30 seconds
 
@@ -706,7 +706,7 @@ export class AutoRecoveryService {
         await this.updateRecoveryMetrics();
         await this.cleanupOldAttempts();
       } catch (error) {
-        console.error('Health monitoring failed:', error);
+        // Error log removed
       }
     }, 60000); // Every minute
 
@@ -719,7 +719,7 @@ export class AutoRecoveryService {
         await this.deploymentMonitoring.checkActiveDeployments();
         await this.deploymentMonitoring.validateDeploymentHealth();
       } catch (error) {
-        console.error('Deployment monitoring failed:', error);
+        // Error log removed
       }
     }, 120000); // Every 2 minutes
 
@@ -833,7 +833,7 @@ export class AutoRecoveryService {
     
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        console.error(`❌ Auto-recovery component ${index} failed health check:`, result.reason);
+        // Error log removed
       }
     });
   }

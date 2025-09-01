@@ -120,7 +120,7 @@ const SellerProducts: React.FC = () => {
         setProducts(data.products || []);
       }
     } catch (error) {
-      console.error('Error fetching seller products:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch products',
@@ -150,7 +150,7 @@ const SellerProducts: React.FC = () => {
         fetchSellerProducts();
       }
     } catch (error) {
-      console.error('Error updating pricing:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to update pricing',
@@ -192,7 +192,7 @@ const SellerProducts: React.FC = () => {
         fetchSellerProducts();
       }
     } catch (error) {
-      console.error('Error bulk updating pricing:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to update pricing',
@@ -218,7 +218,7 @@ const SellerProducts: React.FC = () => {
         fetchSellerProducts();
       }
     } catch (error) {
-      console.error('Error syncing product:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to sync product',
@@ -248,7 +248,7 @@ const SellerProducts: React.FC = () => {
         fetchSellerProducts();
       }
     } catch (error) {
-      console.error('Error toggling product status:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to update product status',

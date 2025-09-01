@@ -169,7 +169,7 @@ export class OrderSplitService {
       const supplier = null;
       
       if (!supplier) {
-        console.error(`Supplier ${splitOrder.supplierId} not found`);
+        // Error log removed
         return;
       }
 
@@ -217,10 +217,10 @@ export class OrderSplitService {
           
           // TODO: Replace with proper logger
         } else {
-          console.error(`Failed to forward order to supplier ${splitOrder.supplierId}`);
+          // Error log removed
         }
       } catch (error) {
-        console.error(`Error forwarding order to supplier ${splitOrder.supplierId}:`, error);
+        // Error log removed
       }
     });
     
@@ -298,7 +298,7 @@ export class OrderSplitService {
     });
     
     if (!orderItem) {
-      console.error(`Order item with supplier order ID ${supplierOrderId} not found`);
+      // Error log removed
       return;
     }
     

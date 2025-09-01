@@ -62,7 +62,7 @@ const Coupons: FC = () => {
       setCoupons(response.data.data || []);
       setTotalPages(response.data.pagination?.totalPages || 1);
     } catch (error) {
-      console.error('Error fetching coupons:', error);
+      // Error log removed
       toast.error('Failed to load coupons');
       
       // Use mock data for development
@@ -138,7 +138,7 @@ const Coupons: FC = () => {
       toast.success('Coupon deleted successfully');
       fetchCoupons();
     } catch (error) {
-      console.error('Error deleting coupon:', error);
+      // Error log removed
       toast.error('Failed to delete coupon');
     }
   };
@@ -156,7 +156,7 @@ const Coupons: FC = () => {
       toast.success('Coupon duplicated successfully');
       fetchCoupons();
     } catch (error) {
-      console.error('Error duplicating coupon:', error);
+      // Error log removed
       toast.error('Failed to duplicate coupon');
     }
   };

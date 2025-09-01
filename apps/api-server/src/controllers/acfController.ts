@@ -19,7 +19,7 @@ export class ACFController {
         total: fieldGroups.length
       });
     } catch (error: any) {
-      console.error('Error fetching field groups:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch field groups',
@@ -50,7 +50,7 @@ export class ACFController {
         data: fieldGroup
       });
     } catch (error: any) {
-      console.error('Error fetching field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch field group',
@@ -110,7 +110,7 @@ export class ACFController {
         message: 'Field group created successfully'
       });
     } catch (error: any) {
-      console.error('Error creating field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create field group',
@@ -171,7 +171,7 @@ export class ACFController {
         message: 'Field group updated successfully'
       });
     } catch (error: any) {
-      console.error('Error updating field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update field group',
@@ -201,7 +201,7 @@ export class ACFController {
         message: 'Field group deleted successfully'
       });
     } catch (error: any) {
-      console.error('Error deleting field group:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete field group',
@@ -232,7 +232,7 @@ export class ACFController {
         data: result
       });
     } catch (error: any) {
-      console.error('Error fetching field values:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch field values',
@@ -275,7 +275,7 @@ export class ACFController {
         message: 'Field values saved successfully'
       });
     } catch (error: any) {
-      console.error('Error saving field values:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to save field values',
@@ -308,7 +308,7 @@ export class ACFController {
         }
       });
     } catch (error: any) {
-      console.error('Error exporting field groups:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to export field groups',
@@ -361,7 +361,7 @@ export class ACFController {
         message: `Successfully imported ${importedGroups.length} field groups`
       });
     } catch (error: any) {
-      console.error('Error importing field groups:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to import field groups',

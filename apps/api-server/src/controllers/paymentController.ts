@@ -141,7 +141,7 @@ export class PaymentController {
         }
       });
     } catch (error) {
-      console.error('Error creating payment request:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create payment request'
@@ -238,7 +238,7 @@ export class PaymentController {
         await queryRunner.release();
       }
     } catch (error) {
-      console.error('Error processing payment completion:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to process payment completion'
@@ -391,7 +391,7 @@ export class PaymentController {
         await queryRunner.release();
       }
     } catch (error) {
-      console.error('Error processing refund:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to process refund'
@@ -463,7 +463,7 @@ export class PaymentController {
         }
       });
     } catch (error) {
-      console.error('Error fetching payment history:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch payment history'
@@ -506,7 +506,7 @@ export class PaymentController {
         data: paymentMethods
       });
     } catch (error) {
-      console.error('Error fetching payment methods:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch payment methods'

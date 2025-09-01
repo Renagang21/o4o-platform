@@ -47,7 +47,7 @@ tossPaymentsClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('[TossPayments Request Error]', error);
+    // Error log removed
     return Promise.reject(error);
   }
 );
@@ -78,7 +78,7 @@ tossPaymentsClient.interceptors.response.use(
       throw customError;
     }
     
-    console.error('[TossPayments Network Error]', error.message);
+    // Error log removed
     throw error;
   }
 );
@@ -141,8 +141,8 @@ export function validateTossPaymentsConfig(): void {
   }
   
   if (warnings.length > 0) {
-    console.warn('⚠️  TossPayments configuration warnings:');
-    warnings.forEach(warning => console.warn(`   - ${warning}`));
+    // Warning log removed
+    warnings.forEach(warning => // Warning log removed
   } else {
     logger.info('✅ TossPayments configuration validated successfully');
   }
@@ -157,7 +157,7 @@ export async function confirmPayment(paymentKey: string, orderId: string, amount
     });
     return response.data;
   } catch (error) {
-    console.error('Payment confirmation failed:', error);
+    // Error log removed
     throw error;
   }
 }
@@ -169,7 +169,7 @@ export async function cancelPayment(paymentKey: string, cancelReason: string) {
     });
     return response.data;
   } catch (error) {
-    console.error('Payment cancellation failed:', error);
+    // Error log removed
     throw error;
   }
 }
@@ -179,7 +179,7 @@ export async function getPayment(paymentKey: string) {
     const response = await tossPaymentsClient.get(`/payments/${paymentKey}`);
     return response.data;
   } catch (error) {
-    console.error('Failed to get payment:', error);
+    // Error log removed
     throw error;
   }
 }

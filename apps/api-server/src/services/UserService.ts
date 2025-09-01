@@ -14,7 +14,7 @@ export class UserService {
     try {
       return await this.userRepository.findOne({ where: { id } });
     } catch (error) {
-      console.error('Error getting user by id:', error);
+      // Error log removed
       return null;
     }
   }
@@ -26,7 +26,7 @@ export class UserService {
     try {
       return await this.userRepository.findOne({ where: { email } });
     } catch (error) {
-      console.error('Error getting user by email:', error);
+      // Error log removed
       return null;
     }
   }
@@ -114,7 +114,7 @@ export class UserService {
         select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
       });
     } catch (error) {
-      console.error('Error getting users by role:', error);
+      // Error log removed
       return [];
     }
   }
@@ -129,7 +129,7 @@ export class UserService {
         select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
       });
     } catch (error) {
-      console.error('Error getting users by status:', error);
+      // Error log removed
       return [];
     }
   }
@@ -204,7 +204,7 @@ export class UserService {
         order: { lockedUntil: 'DESC' }
       });
     } catch (error) {
-      console.error('Error getting locked accounts:', error);
+      // Error log removed
       return [];
     }
   }

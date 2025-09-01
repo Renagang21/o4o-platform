@@ -124,11 +124,11 @@ export class WebhookService {
           return signature === expectedSignature;
 
         default:
-          console.warn(`Unknown payment provider for signature verification: ${provider}`);
+          // Warning log removed
           return false;
       }
     } catch (error) {
-      console.error('Webhook signature verification failed:', error);
+      // Error log removed
       return false;
     }
   }
@@ -318,7 +318,7 @@ export class WebhookService {
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('Error processing webhook:', error);
+      // Error log removed
       return { 
         success: false, 
         message: 'Failed to process webhook' 
@@ -360,7 +360,7 @@ export class WebhookService {
             inventoryItems
           );
         } catch (error) {
-          console.error('Failed to confirm inventory reservation:', error);
+          // Error log removed
           // 재고 확정 실패 시 알림 처리 (관리자 알림 등)
         }
       }, 0);
@@ -396,7 +396,7 @@ export class WebhookService {
         try {
           await inventoryService.restoreInventory(inventoryItems);
         } catch (error) {
-          console.error('Failed to restore inventory after payment failure:', error);
+          // Error log removed
         }
       }, 0);
     }
@@ -416,7 +416,7 @@ export class WebhookService {
       // await emailService.sendPaymentConfirmation(payment);
       // await notificationService.sendPushNotification(payment.userId, 'Payment successful');
     } catch (error) {
-      console.error('Error in post-payment success processing:', error);
+      // Error log removed
     }
   }
 
@@ -430,7 +430,7 @@ export class WebhookService {
       // 실제 구현에서는 알림 서비스 등을 호출
       // await notificationService.sendPaymentFailureNotification(payment.userId, webhookData.metadata);
     } catch (error) {
-      console.error('Error in post-payment failure processing:', error);
+      // Error log removed
     }
   }
 
@@ -455,7 +455,7 @@ export class WebhookService {
       
       return { success: true, message: 'Webhook retry completed' };
     } catch (error) {
-      console.error('Error retrying webhook:', error);
+      // Error log removed
       return { success: false, message: 'Webhook retry failed' };
     }
   }
@@ -479,7 +479,7 @@ export class WebhookService {
       }
 
     } catch (error) {
-      console.error(`Failed to send webhook to ${url}:`, error);
+      // Error log removed
       throw error;
     }
   }

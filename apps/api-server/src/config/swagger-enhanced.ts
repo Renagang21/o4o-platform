@@ -562,7 +562,7 @@ export const setupSwagger = (app: Application) => {
     
     
   } catch (error) {
-    console.error('Failed to setup Swagger:', error);
+    // Error log removed
   }
 };
 

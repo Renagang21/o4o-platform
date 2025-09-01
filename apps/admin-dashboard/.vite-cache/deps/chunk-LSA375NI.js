@@ -189,11 +189,11 @@ var createI18n = (initialData, initialDomain, hooks) => {
 // ../../node_modules/@wordpress/hooks/build-module/validateNamespace.js
 function validateNamespace(namespace) {
   if ("string" !== typeof namespace || "" === namespace) {
-    console.error("The namespace must be a non-empty string.");
+    // Error log removed
     return false;
   }
   if (!/^[a-zA-Z][a-zA-Z0-9_.\-\/]*$/.test(namespace)) {
-    console.error("The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.");
+    // Error log removed
     return false;
   }
   return true;
@@ -203,15 +203,15 @@ var validateNamespace_default = validateNamespace;
 // ../../node_modules/@wordpress/hooks/build-module/validateHookName.js
 function validateHookName(hookName) {
   if ("string" !== typeof hookName || "" === hookName) {
-    console.error("The hook name must be a non-empty string.");
+    // Error log removed
     return false;
   }
   if (/^__/.test(hookName)) {
-    console.error("The hook name cannot begin with `__`.");
+    // Error log removed
     return false;
   }
   if (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {
-    console.error("The hook name can only contain numbers, letters, dashes, periods and underscores.");
+    // Error log removed
     return false;
   }
   return true;
@@ -229,11 +229,11 @@ function createAddHook(hooks, storeKey) {
       return;
     }
     if ("function" !== typeof callback) {
-      console.error("The hook callback must be a function.");
+      // Error log removed
       return;
     }
     if ("number" !== typeof priority) {
-      console.error("If specified, the hook priority must be a number.");
+      // Error log removed
       return;
     }
     const handler = {

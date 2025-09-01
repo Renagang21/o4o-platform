@@ -651,7 +651,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                       const parsed = JSON.parse(e.target.value);
                       setBlocks(parsed);
                     } catch (error) {
-                      console.error('Invalid JSON');
+                      // Error log removed
                     }
                   }}
                   className="w-full min-h-[500px] font-mono text-sm p-4 border border-gray-300 rounded"

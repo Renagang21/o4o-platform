@@ -377,7 +377,7 @@ export class CircuitBreakerService {
         await this.checkCircuitHealth();
         await this.cleanupOldData();
       } catch (error) {
-        console.error('Circuit breaker monitoring failed:', error);
+        // Error log removed
       }
     }, 30000); // Every 30 seconds
 

@@ -18,7 +18,7 @@ export function calculateFormula(formula: string, data: Record<string, any>): nu
     
     // Only allow safe math operations
     if (!/^[\d\s+\-*/().,]+$/.test(processedFormula)) {
-      console.warn('Invalid formula characters:', processedFormula);
+      // Warning log removed
       return 0;
     }
     
@@ -30,11 +30,11 @@ export function calculateFormula(formula: string, data: Record<string, any>): nu
       const result = func();
       return isNaN(result) ? 0 : Number(result);
     } catch (error: any) {
-      console.error('Formula evaluation error:', error);
+      // Error log removed
       return 0;
     }
   } catch (error: any) {
-    console.error('Formula calculation error:', error);
+    // Error log removed
     return 0;
   }
 }

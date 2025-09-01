@@ -43,7 +43,7 @@ router.get('/sso/check', async (req: Request, res: Response) => {
       sessionId: sessionId
     });
   } catch (error: any) {
-    console.error('SSO check error:', error);
+    // Error log removed
     res.status(500).json({
       authenticated: false,
       error: 'Failed to check SSO status'
@@ -83,7 +83,7 @@ router.get('/linked-accounts', authenticateToken, async (req: AuthRequest, res: 
       accounts
     });
   } catch (error: any) {
-    console.error('Failed to get linked accounts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve linked accounts'
@@ -105,7 +105,7 @@ router.get('/sessions', authenticateToken, async (req: AuthRequest, res: Respons
       activeSessions: sessions.length
     });
   } catch (error: any) {
-    console.error('Failed to get sessions:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve sessions'
@@ -128,7 +128,7 @@ router.delete('/sessions/:sessionId', authenticateToken, async (req: AuthRequest
       message: 'Session removed successfully'
     });
   } catch (error: any) {
-    console.error('Failed to remove session:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to remove session'
@@ -150,7 +150,7 @@ router.post('/logout-all-devices', authenticateToken, async (req: AuthRequest, r
       message: 'Logged out from all devices'
     });
   } catch (error: any) {
-    console.error('Failed to logout all devices:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to logout from all devices'

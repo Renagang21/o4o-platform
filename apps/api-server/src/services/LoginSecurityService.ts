@@ -143,7 +143,7 @@ export class LoginSecurityService {
    */
   static async handleSuspiciousIp(ipAddress: string): Promise<void> {
     // Log the suspicious IP (could be sent to a monitoring service)
-    console.warn(`Suspicious activity detected from IP: ${ipAddress}`);
+    // Warning log removed
     
     // In production, you might want to:
     // 1. Add to temporary IP blacklist
@@ -167,7 +167,7 @@ export class LoginSecurityService {
         }
       });
     } catch (error) {
-      console.error('Failed to send security alert:', error);
+      // Error log removed
     }
   }
 

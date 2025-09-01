@@ -49,7 +49,7 @@ const QuickDraftWidget: FC = () => {
         error(response.message || '초안 저장 중 오류가 발생했습니다.');
       }
     } catch (err: any) {
-      console.error('Error saving draft:', err);
+      // Error log removed
       
       // Show user-friendly message for development environment
       if (err.code === 'ECONNREFUSED' || err.message?.includes('Network Error')) {

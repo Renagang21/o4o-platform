@@ -229,7 +229,7 @@ export class GracefulDegradationService {
           return false;
       }
     } catch (error) {
-      console.error(`Service health check failed for ${trigger.service}:`, error);
+      // Error log removed
       return true; // Service unavailable
     }
   }
@@ -279,7 +279,7 @@ export class GracefulDegradationService {
         await this.applyDegradationAction(action, degradation);
         degradation.actionsApplied.push(action.type);
       } catch (error) {
-        console.error(`❌ Failed to apply degradation action: ${action.type}`, error);
+        // Error log removed
       }
     }
 
@@ -329,7 +329,7 @@ export class GracefulDegradationService {
         break;
       
       default:
-        console.warn(`Unknown degradation action type: ${action.type}`);
+        // Warning log removed
     }
   }
 
@@ -590,7 +590,7 @@ export class GracefulDegradationService {
         await this.recordDegradationMetrics();
         await this.checkDegradationHealth();
       } catch (error) {
-        console.error('Graceful degradation monitoring failed:', error);
+        // Error log removed
       }
     }, 30000); // Every 30 seconds
 
@@ -632,7 +632,7 @@ export class GracefulDegradationService {
       });
 
     if (longRunningDegradations.length > 0) {
-      console.warn(`⚠️ ${longRunningDegradations.length} degradations have been active for over 30 minutes`);
+      // Warning log removed
     }
   }
 

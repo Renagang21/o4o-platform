@@ -65,7 +65,7 @@ export async function getGeoLocation(ip: string): Promise<GeoLocation | null> {
     
     // Check if we got an error response
     if (data.error || data.reason === 'RateLimited') {
-      console.warn(`Geo location API error for ${cleanIp}:`, data.reason || data.error);
+      // Warning log removed
       geoCache.set(cleanIp, null);
       cacheTimestamps.set(cleanIp, Date.now());
       return null;
@@ -86,7 +86,7 @@ export async function getGeoLocation(ip: string): Promise<GeoLocation | null> {
     return location;
   } catch (error) {
     // Silently fail - geo location is optional
-    console.debug(`Failed to get geo location for ${cleanIp}:`, error);
+    // Debug log removed
     
     // Cache null to avoid repeated failures
     geoCache.set(cleanIp, null);

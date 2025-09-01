@@ -289,7 +289,7 @@ const renderMenu: ShortcodeHandler = async ({ attributes }) => {
       </nav>
     `;
   } catch (error) {
-    console.error('Error rendering menu shortcode:', error);
+    // Error log removed
     return `<div class="shortcode-menu error">Error loading menu</div>`;
   }
 };

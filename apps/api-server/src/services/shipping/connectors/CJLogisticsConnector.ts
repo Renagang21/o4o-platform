@@ -93,7 +93,7 @@ export class CJLogisticsConnector {
         cost: response.cost
       };
     } catch (error) {
-      console.error('CJ Logistics label creation failed:', error);
+      // Error log removed
       throw new Error('Failed to create shipping label');
     }
   }
@@ -125,7 +125,7 @@ export class CJLogisticsConnector {
         }))
       };
     } catch (error) {
-      console.error('CJ tracking failed:', error);
+      // Error log removed
       throw new Error('Failed to track shipment');
     }
   }
@@ -143,7 +143,7 @@ export class CJLogisticsConnector {
       
       return true;
     } catch (error) {
-      console.error('CJ cancellation failed:', error);
+      // Error log removed
       return false;
     }
   }

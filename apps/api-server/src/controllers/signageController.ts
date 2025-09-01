@@ -93,7 +93,7 @@ export class SignageController {
         }
       });
     } catch (error) {
-      console.error('Error fetching contents:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch contents' }
@@ -130,7 +130,7 @@ export class SignageController {
 
       res.json({ success: true, data: content });
     } catch (error) {
-      console.error('Error fetching content:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch content' }
@@ -195,7 +195,7 @@ export class SignageController {
         data: savedContent
       });
     } catch (error) {
-      console.error('Error creating content:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to create content' }
@@ -237,7 +237,7 @@ export class SignageController {
 
       res.json({ success: true, data: updatedContent });
     } catch (error) {
-      console.error('Error updating content:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update content' }
@@ -268,7 +268,7 @@ export class SignageController {
       await this.contentRepository.remove(content);
       res.json({ success: true, message: 'Content deleted successfully' });
     } catch (error) {
-      console.error('Error deleting content:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to delete content' }
@@ -309,7 +309,7 @@ export class SignageController {
       const updatedContent = await this.contentRepository.save(content);
       res.json({ success: true, data: updatedContent });
     } catch (error) {
-      console.error('Error approving/rejecting content:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to process approval' }
@@ -341,7 +341,7 @@ export class SignageController {
 
       res.json({ success: true, data: { stores } });
     } catch (error) {
-      console.error('Error fetching stores:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch stores' }
@@ -364,7 +364,7 @@ export class SignageController {
 
       res.status(201).json({ success: true, data: savedStore });
     } catch (error) {
-      console.error('Error creating store:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to create store' }
@@ -404,7 +404,7 @@ export class SignageController {
 
       res.json({ success: true, data: updatedStore });
     } catch (error) {
-      console.error('Error updating store:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update store' }
@@ -435,7 +435,7 @@ export class SignageController {
       await this.storeRepository.remove(store);
       res.json({ success: true, message: 'Store deleted successfully' });
     } catch (error) {
-      console.error('Error deleting store:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to delete store' }

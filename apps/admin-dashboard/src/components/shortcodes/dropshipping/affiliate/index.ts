@@ -140,7 +140,7 @@ export const checkAffiliateAppConnection = async (): Promise<boolean> => {
 
     return response.ok;
   } catch (error) {
-    console.error('AFFILIATE app connection error:', error);
+    // Error log removed
     return false;
   }
 };

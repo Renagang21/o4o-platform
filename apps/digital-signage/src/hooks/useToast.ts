@@ -4,7 +4,7 @@ export const useToast = () => {
   };
 
   const error = (_message: string) => {
-    // console.error('Error:', message);
+    // // Error log removed
     // TODO: Implement actual toast notification
   };
 

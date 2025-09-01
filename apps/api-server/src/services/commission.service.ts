@@ -48,12 +48,12 @@ export class CommissionService {
       
       // Monthly settlement completed for period
     } catch (error) {
-      console.error('Error processing monthly settlements:', error);
+      // Error log removed
       // Send alert to admin
       // Send alert to admin
       if (this.emailService) {
         // TODO: Implement admin alert
-        console.error(`Monthly settlement failed for period ${period}: ${error.message}`);
+        // Error log removed
       }
     }
   }
@@ -67,7 +67,7 @@ export class CommissionService {
       try {
         await this.calculateVendorCommission(vendor.id, period, startDate, endDate);
       } catch (error) {
-        console.error(`Failed to process commission for vendor ${vendor.id}:`, error);
+        // Error log removed
       }
     }
   }
@@ -81,7 +81,7 @@ export class CommissionService {
       try {
         await this.calculateSupplierSettlement(supplier.id, period, startDate, endDate);
       } catch (error) {
-        console.error(`Failed to process settlement for supplier ${supplier.id}:`, error);
+        // Error log removed
       }
     }
   }

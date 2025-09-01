@@ -36,7 +36,7 @@ export class DropshippingController {
 
       return res.json({ success: true, data: dashboardData });
     } catch (error) {
-      console.error('Dashboard error:', error);
+      // Error log removed
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
@@ -206,7 +206,7 @@ export class DropshippingController {
 
       return res.json({ success: true, status, formData });
     } catch (error) {
-      console.error('Verification status error:', error);
+      // Error log removed
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
@@ -262,7 +262,7 @@ export class DropshippingController {
 
       return res.json({ success: true, message: 'Verification submitted successfully' });
     } catch (error) {
-      console.error('Verification submission error:', error);
+      // Error log removed
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
   }
@@ -362,7 +362,7 @@ export class DropshippingController {
         message: 'Document uploaded successfully' 
       });
     } catch (error) {
-      console.error('Document upload error:', error);
+      // Error log removed
       return res.status(500).json({ success: false, message: 'Upload failed' });
     }
   }

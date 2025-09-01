@@ -90,7 +90,7 @@ export class GalleryController {
         
         variants[size.name] = `/uploads/gallery/${size.name}/${variantFilename}`;
       } catch (error) {
-        console.error(`Error generating ${size.name} variant:`, error);
+        // Error log removed
       }
     }
 
@@ -123,7 +123,7 @@ export class GalleryController {
             const metadata = await sharp(file.path).metadata();
             dimensions = { width: metadata.width || 0, height: metadata.height || 0 };
           } catch (error) {
-            console.error('Error getting image dimensions:', error);
+            // Error log removed
           }
 
           // Generate thumbnails and variants
@@ -175,7 +175,7 @@ export class GalleryController {
           data: uploadedImages
         });
       } catch (error: any) {
-        console.error('Gallery upload error:', error);
+        // Error log removed
         res.status(500).json({
           success: false,
           error: 'Failed to upload gallery images',
@@ -259,7 +259,7 @@ export class GalleryController {
         }
       });
     } catch (error: any) {
-      console.error('Get gallery images error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch gallery images',
@@ -303,7 +303,7 @@ export class GalleryController {
         }
       });
     } catch (error: any) {
-      console.error('Update gallery image error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update image',
@@ -353,7 +353,7 @@ export class GalleryController {
           }
         }
       } catch (error) {
-        console.error('Error deleting physical files:', error);
+        // Error log removed
       }
 
       // Delete from database
@@ -364,7 +364,7 @@ export class GalleryController {
         message: 'Image deleted successfully'
       });
     } catch (error: any) {
-      console.error('Delete gallery image error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete image',

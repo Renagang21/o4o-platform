@@ -43,7 +43,7 @@ export const useAutoSave = (
         throw new Error('Failed to save draft');
       }
     } catch (error) {
-      console.error('Auto-save error:', error);
+      // Auto-save failed
       onStatusChange('error');
     } finally {
       isSavingRef.current = false;
@@ -86,11 +86,11 @@ export const useAutoSave = (
         
         // Only use draft if it's less than an hour old
         if (parsed.timestamp > hourAgo) {
-          // You might want to prompt user to restore draft
-          console.log('Draft available from', new Date(parsed.timestamp));
+          // Draft available - could prompt user to restore
+          // Draft timestamp: new Date(parsed.timestamp)
         }
       } catch (error) {
-        console.error('Failed to parse draft:', error);
+        // Failed to parse draft - invalid format
       }
     }
   }, []);

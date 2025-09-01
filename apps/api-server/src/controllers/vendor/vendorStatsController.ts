@@ -93,7 +93,7 @@ export class VendorStatsController {
         growthRate: parseFloat(String(growthRate))
       });
     } catch (error) {
-      console.error('Error fetching vendor stats:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch vendor statistics' });
     }
   }
@@ -162,7 +162,7 @@ export class VendorStatsController {
 
       res.json(chartData);
     } catch (error) {
-      console.error('Error fetching sales chart data:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch sales data' });
     }
   }
@@ -211,7 +211,7 @@ export class VendorStatsController {
 
       res.json(formattedOrders);
     } catch (error) {
-      console.error('Error fetching recent orders:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch recent orders' });
     }
   }
@@ -251,7 +251,7 @@ export class VendorStatsController {
         revenue: parseFloat(p.totalRevenue)
       })));
     } catch (error) {
-      console.error('Error fetching top products:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch top products' });
     }
   }

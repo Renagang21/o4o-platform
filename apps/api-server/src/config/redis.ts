@@ -35,14 +35,14 @@ redis.on('connect', () => {
 });
 
 redis.on('error', (err) => {
-  console.error('Redis client error:', err);
+  // Error log removed
 });
 
 redisSub.on('connect', () => {
 });
 
 redisSub.on('error', (err) => {
-  console.error('Redis subscriber error:', err);
+  // Error log removed
 });
 
 // Graceful shutdown

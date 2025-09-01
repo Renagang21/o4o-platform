@@ -89,7 +89,7 @@ export class ExportController {
         return this.exportToCSV(exportData, res, 'transactions');
       }
     } catch (error) {
-      console.error('Export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to export transactions'
@@ -141,7 +141,7 @@ export class ExportController {
 
       return this.exportToCSV(exportData, res, 'sales-summary');
     } catch (error) {
-      console.error('Export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to export sales summary'
@@ -241,7 +241,7 @@ export class ExportController {
 
       return this.exportToExcel(exportData, res, 'vendor-settlements');
     } catch (error) {
-      console.error('Export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to export vendor settlements'
@@ -290,7 +290,7 @@ export class ExportController {
 
       return this.exportToCSV(exportData, res, 'inventory');
     } catch (error) {
-      console.error('Export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to export inventory'
@@ -354,7 +354,7 @@ export class ExportController {
 
       return this.exportToCSV(exportData, res, 'affiliate-commissions');
     } catch (error) {
-      console.error('Export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to export affiliate commissions'
@@ -383,7 +383,7 @@ export class ExportController {
       
       return res.send(csv);
     } catch (error) {
-      console.error('CSV export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to generate CSV'
@@ -443,7 +443,7 @@ export class ExportController {
       await workbook.xlsx.write(res);
       return res.end();
     } catch (error) {
-      console.error('Excel export error:', error);
+      // Error log removed
       return res.status(500).json({
         success: false,
         message: 'Failed to generate Excel file'

@@ -84,7 +84,7 @@ export const createPost = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Create post error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to create post',
       code: 'CREATE_POST_ERROR'
@@ -190,7 +190,7 @@ export const getArchiveData = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get archive data error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to get archive data',
       code: 'GET_ARCHIVE_ERROR'
@@ -231,7 +231,7 @@ export const getPostTypeSchema = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get post type schema error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to get post type schema',
       code: 'GET_SCHEMA_ERROR'
@@ -287,7 +287,7 @@ export const createPostType = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Create post type error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to create post type',
       code: 'CREATE_POST_TYPE_ERROR'
@@ -343,7 +343,7 @@ export const getPostById = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get post by ID error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to get post',
       code: 'GET_POST_ERROR'
@@ -401,7 +401,7 @@ export const updatePost = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Update post error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to update post',
       code: 'UPDATE_POST_ERROR'
@@ -435,7 +435,7 @@ export const deletePost = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Delete post error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to delete post',
       code: 'DELETE_POST_ERROR'
@@ -512,7 +512,7 @@ export const getUserStats = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get user stats error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to get user statistics',
       code: 'GET_USER_STATS_ERROR'
@@ -546,7 +546,7 @@ export const getUserAvailablePostTypes = async (req: Request, res: Response) => 
     });
 
   } catch (error) {
-    console.error('Get available post types error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Failed to get available post types',
       code: 'GET_POST_TYPES_ERROR'

@@ -62,7 +62,7 @@ export const BackgroundImageSection: React.FC<BackgroundImageSectionProps> = ({
       onChange({ url: data.url });
       toast.success('Background image uploaded successfully');
     } catch (error) {
-      console.error('Image upload error:', error);
+      // Image upload error
       toast.error('Failed to upload image');
     } finally {
       setUploading(false);

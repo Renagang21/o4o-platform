@@ -132,7 +132,7 @@ router.get('/:section', authenticateToken, async (req: Request, res: Response) =
       data: settings
     });
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch settings'
@@ -173,7 +173,7 @@ router.put('/:section',
         message: 'Settings updated successfully'
       });
     } catch (error) {
-      console.error('Error updating settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update settings'
@@ -203,7 +203,7 @@ router.get('/',
         data: allSettings
       });
     } catch (error) {
-      console.error('Error fetching all settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch settings'
@@ -260,7 +260,7 @@ router.post('/reset/:section',
         message: 'Settings reset to default successfully'
       });
     } catch (error) {
-      console.error('Error resetting settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to reset settings'

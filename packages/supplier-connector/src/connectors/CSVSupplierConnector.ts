@@ -216,8 +216,8 @@ export class CSVSupplierConnector extends BaseSupplierConnector {
   }
 
   async cancelOrder(orderId: string, reason?: string): Promise<boolean> {
-    // For CSV supplier, we'll log cancellation request
-    console.log(`Order ${orderId} cancellation requested: ${reason}`);
+    // For CSV supplier, cancellation request is processed
+    // Order cancellation requested with reason
     return true;
   }
 

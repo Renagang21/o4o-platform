@@ -79,7 +79,7 @@ export class BusinessInfoController {
         }
       });
     } catch (error) {
-      console.error('Error fetching business info:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -182,7 +182,7 @@ export class BusinessInfoController {
         message: 'Business information created successfully'
       });
     } catch (error) {
-      console.error('Error creating business info:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -281,7 +281,7 @@ export class BusinessInfoController {
         message: 'Business information updated successfully'
       });
     } catch (error) {
-      console.error('Error updating business info:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -325,7 +325,7 @@ export class BusinessInfoController {
         message: 'Business information deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting business info:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -379,7 +379,7 @@ export class BusinessInfoController {
         message: 'Business information verified successfully'
       });
     } catch (error) {
-      console.error('Error verifying business info:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -401,7 +401,7 @@ export class BusinessInfoController {
         data: businessTypes
       });
     } catch (error) {
-      console.error('Error fetching business types:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -426,7 +426,7 @@ export class BusinessInfoController {
         data: businessSizes
       });
     } catch (error) {
-      console.error('Error fetching business sizes:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -449,7 +449,7 @@ export class BusinessInfoController {
         data: industries
       });
     } catch (error) {
-      console.error('Error fetching industries:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -524,7 +524,7 @@ export class BusinessInfoController {
         }
       });
     } catch (error) {
-      console.error('Error fetching business statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'

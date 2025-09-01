@@ -28,7 +28,7 @@ router.get('/google/callback',
       await SocialAuthService.completeSocialLogin(user, res);
       res.redirect(getRedirectUrls().success);
     } catch (error: any) {
-      console.error('Google auth callback error:', error);
+      // Error log removed
       res.redirect(getRedirectUrls().failure);
     }
   }
@@ -49,7 +49,7 @@ router.get('/kakao/callback',
       await SocialAuthService.completeSocialLogin(user, res);
       res.redirect(getRedirectUrls().success);
     } catch (error: any) {
-      console.error('Kakao auth callback error:', error);
+      // Error log removed
       res.redirect(getRedirectUrls().failure);
     }
   }
@@ -70,7 +70,7 @@ router.get('/naver/callback',
       await SocialAuthService.completeSocialLogin(user, res);
       res.redirect(getRedirectUrls().success);
     } catch (error: any) {
-      console.error('Naver auth callback error:', error);
+      // Error log removed
       res.redirect(getRedirectUrls().failure);
     }
   }
@@ -113,7 +113,7 @@ router.post('/link/:provider', authenticateCookie, async (req: AuthRequest, res)
       }
     });
   } catch (error: any) {
-    console.error('Social account linking error:', error);
+    // Error log removed
     res.status(400).json({
       error: error.message || 'Failed to link social account',
       code: 'LINK_FAILED'
@@ -137,7 +137,7 @@ router.delete('/unlink', authenticateCookie, async (req: AuthRequest, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Social account unlinking error:', error);
+    // Error log removed
     res.status(400).json({
       error: error.message || 'Failed to unlink social account',
       code: 'UNLINK_FAILED'
@@ -155,7 +155,7 @@ router.get('/linked-accounts', authenticateCookie, async (req: AuthRequest, res)
       accounts
     });
   } catch (error: any) {
-    console.error('Get linked accounts error:', error);
+    // Error log removed
     res.status(400).json({
       error: error.message || 'Failed to get linked accounts',
       code: 'GET_LINKED_FAILED'

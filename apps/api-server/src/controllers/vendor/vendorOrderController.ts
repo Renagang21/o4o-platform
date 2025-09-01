@@ -104,7 +104,7 @@ export class VendorOrderController {
         }
       });
     } catch (error) {
-      console.error('Error fetching vendor orders:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch orders' });
     }
   }
@@ -176,7 +176,7 @@ export class VendorOrderController {
         updatedAt: order.updatedAt
       });
     } catch (error) {
-      console.error('Error fetching order:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch order' });
     }
   }
@@ -242,7 +242,7 @@ export class VendorOrderController {
         }
       });
     } catch (error) {
-      console.error('Error updating order status:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update order status' });
     }
   }
@@ -284,7 +284,7 @@ export class VendorOrderController {
 
       res.json(stats);
     } catch (error) {
-      console.error('Error fetching order stats:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch order statistics' });
     }
   }
@@ -319,7 +319,7 @@ export class VendorOrderController {
         updatedCount: result.affected
       });
     } catch (error) {
-      console.error('Error bulk updating orders:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update orders' });
     }
   }

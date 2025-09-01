@@ -34,7 +34,7 @@ export class DashboardController {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching user stats:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch user statistics',
@@ -100,7 +100,7 @@ export class DashboardController {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching ecommerce stats:', error);
+      // Error log removed
       res.status(500).json({
         success: true, // Keep success true to avoid breaking dashboard
         data: { orders: 0, revenue: 0, products: 0, customers: 0 }
@@ -131,7 +131,7 @@ export class DashboardController {
         unread: notifications.filter(n => !n.read).length
       });
     } catch (error: any) {
-      console.error('Error fetching notifications:', error);
+      // Error log removed
       res.status(500).json({
         success: true,
         data: [],
@@ -162,7 +162,7 @@ export class DashboardController {
         total: activities.length
       });
     } catch (error: any) {
-      console.error('Error fetching activities:', error);
+      // Error log removed
       res.status(500).json({
         success: true,
         data: [],
@@ -204,7 +204,7 @@ export class DashboardController {
         }
       });
     } catch (error: any) {
-      console.error('Error checking system health:', error);
+      // Error log removed
       res.status(500).json({
         success: true,
         status: 'error',
@@ -255,7 +255,7 @@ export class DashboardController {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching content stats:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch content statistics',
@@ -283,7 +283,7 @@ export class DashboardController {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching dashboard overview:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch dashboard data',

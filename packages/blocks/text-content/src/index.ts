@@ -43,7 +43,7 @@ class TextContentBlocksPlugin implements BlockPlugin {
    * Activate the plugin
    */
   async activate(): Promise<void> {
-    console.log('✅ Text Content Blocks Plugin activated');
+    // Text Content Blocks Plugin activated
     
     // Load any required styles
     this.loadStyles();
@@ -56,7 +56,7 @@ class TextContentBlocksPlugin implements BlockPlugin {
    * Deactivate the plugin
    */
   async deactivate(): Promise<void> {
-    console.log('Text Content Blocks Plugin deactivated');
+    // Text Content Blocks Plugin deactivated
     
     // Clean up styles
     this.removeStyles();
@@ -66,14 +66,14 @@ class TextContentBlocksPlugin implements BlockPlugin {
    * Plugin loaded hook
    */
   onLoad(): void {
-    console.log('Text Content Blocks Plugin loaded');
+    // Text Content Blocks Plugin loaded
   }
   
   /**
    * Plugin unloaded hook
    */
   onUnload(): void {
-    console.log('Text Content Blocks Plugin unloaded');
+    // Text Content Blocks Plugin unloaded
   }
   
   /**

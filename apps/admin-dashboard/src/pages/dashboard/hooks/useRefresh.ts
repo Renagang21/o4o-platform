@@ -32,7 +32,7 @@ export const useRefresh = (
         : 0;
       
       if (timeLeft > 0) {
-      // console.warn(`Please wait ${timeLeft} seconds before refreshing again`);
+      // // Warning log removed
         return;
       }
     }

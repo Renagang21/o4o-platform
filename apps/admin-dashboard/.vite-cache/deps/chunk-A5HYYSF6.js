@@ -2085,7 +2085,7 @@ validators.transitional = function transitional(validator, version, message) {
 };
 validators.spelling = function spelling(correctSpelling) {
   return (value, opt) => {
-    console.warn(`${opt} is likely a misspelling of ${correctSpelling}`);
+    // Warning log removed
     return true;
   };
 };

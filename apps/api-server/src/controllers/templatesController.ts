@@ -62,7 +62,7 @@ export class TemplatesController {
         data: allTemplates
       });
     } catch (error) {
-      console.error('Error fetching templates:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch templates',
@@ -98,7 +98,7 @@ export class TemplatesController {
         data: template
       });
     } catch (error) {
-      console.error('Error fetching template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch template',
@@ -134,7 +134,7 @@ export class TemplatesController {
         });
       }
     } catch (error) {
-      console.error('Error fetching system template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch system template',
@@ -221,7 +221,7 @@ export class TemplatesController {
         message: 'Template created successfully'
       });
     } catch (error) {
-      console.error('Error creating template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to create template',
@@ -296,7 +296,7 @@ export class TemplatesController {
         message: 'Template updated successfully'
       });
     } catch (error) {
-      console.error('Error updating template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update template',
@@ -338,7 +338,7 @@ export class TemplatesController {
         message: 'Template deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete template',
@@ -424,7 +424,7 @@ export class TemplatesController {
         message: 'Template imported successfully'
       });
     } catch (error) {
-      console.error('Error importing template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to import template',
@@ -474,7 +474,7 @@ export class TemplatesController {
         data: exportData
       });
     } catch (error) {
-      console.error('Error exporting template:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to export template',
@@ -520,7 +520,7 @@ export class TemplatesController {
               ...template
             };
           } catch (error) {
-            console.warn(`Failed to load system template ${file}:`, error);
+            // Warning log removed
             return null;
           }
         })
@@ -528,7 +528,7 @@ export class TemplatesController {
 
       return systemTemplates.filter((template: any) => template !== null);
     } catch (error) {
-      console.error('Error loading system templates:', error);
+      // Error log removed
       return [];
     }
   }

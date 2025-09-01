@@ -69,7 +69,7 @@ export const TossPaymentButton: React.FC<TossPaymentButtonProps> = ({
         const toss = await loadTossPayments(clientKey);
         setTossPayments(toss);
       } catch (error) {
-        console.error('Failed to load TossPayments SDK:', error);
+        // Error log removed
         setError('결제 시스템 초기화 실패');
       }
     };
@@ -217,7 +217,7 @@ export const TossPaymentButton: React.FC<TossPaymentButtonProps> = ({
       // 실패 시 fail URL로 리다이렉트됨
       
     } catch (error: any) {
-      console.error('Payment failed:', error);
+      // Error log removed
       setError(error.message || '결제 처리 중 오류가 발생했습니다');
       
       if (onFail) {

@@ -31,13 +31,13 @@ class DynamicBlocksPlugin implements BlockPlugin {
   };
   
   async activate(): Promise<void> {
-    console.log('✅ Dynamic Blocks Plugin activated');
+    // Dynamic Blocks Plugin activated
     this.loadStyles();
     this.initializeAPIs();
   }
   
   async deactivate(): Promise<void> {
-    console.log('Dynamic Blocks Plugin deactivated');
+    // Dynamic Blocks Plugin deactivated
     this.removeStyles();
     this.cleanupAPIs();
   }
@@ -187,12 +187,12 @@ class DynamicBlocksPlugin implements BlockPlugin {
   private initializeAPIs(): void {
     // Initialize any required APIs or connections
     // For ACF integration, REST API setup, etc.
-    console.log('Dynamic blocks APIs initialized');
+    // Dynamic blocks APIs initialized
   }
   
   private cleanupAPIs(): void {
     // Clean up API connections
-    console.log('Dynamic blocks APIs cleaned up');
+    // Dynamic blocks APIs cleaned up
   }
 }
 

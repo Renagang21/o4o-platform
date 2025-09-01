@@ -36,7 +36,7 @@ export class ThemeController {
         count: themes.length
       });
     } catch (error: any) {
-      console.error('Error fetching themes:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch themes',
@@ -65,7 +65,7 @@ export class ThemeController {
         data: theme
       });
     } catch (error: any) {
-      console.error('Error fetching theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch theme',
@@ -96,7 +96,7 @@ export class ThemeController {
         data: installation
       });
     } catch (error: any) {
-      console.error('Error installing theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to install theme',
@@ -137,7 +137,7 @@ export class ThemeController {
           data: installation
         });
       } catch (error: any) {
-        console.error('Error uploading theme:', error);
+        // Error log removed
         res.status(500).json({
           success: false,
           message: 'Failed to upload theme',
@@ -169,7 +169,7 @@ export class ThemeController {
         message: 'Theme activated successfully'
       });
     } catch (error: any) {
-      console.error('Error activating theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to activate theme',
@@ -200,7 +200,7 @@ export class ThemeController {
         message: 'Theme deactivated successfully'
       });
     } catch (error: any) {
-      console.error('Error deactivating theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to deactivate theme',
@@ -231,7 +231,7 @@ export class ThemeController {
         message: 'Theme uninstalled successfully'
       });
     } catch (error: any) {
-      console.error('Error uninstalling theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to uninstall theme',
@@ -263,7 +263,7 @@ export class ThemeController {
         data: theme
       });
     } catch (error: any) {
-      console.error('Error updating theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update theme',
@@ -285,7 +285,7 @@ export class ThemeController {
         data: preview
       });
     } catch (error: any) {
-      console.error('Error getting theme preview:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get theme preview',
@@ -316,7 +316,7 @@ export class ThemeController {
         message: 'Customizations saved successfully'
       });
     } catch (error: any) {
-      console.error('Error saving customizations:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to save customizations',
@@ -346,7 +346,7 @@ export class ThemeController {
         data: theme
       });
     } catch (error: any) {
-      console.error('Error getting active theme:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get active theme',
@@ -378,7 +378,7 @@ export class ThemeController {
         count: themes.length
       });
     } catch (error: any) {
-      console.error('Error searching marketplace:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to search marketplace',
@@ -408,7 +408,7 @@ export class ThemeController {
         message: `Hook ${hookName} executed successfully`
       });
     } catch (error: any) {
-      console.error('Error executing hook:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to execute hook',

@@ -12,7 +12,7 @@ async function runMigration() {
     await AppDataSource.destroy();
     // Data source closed successfully
   } catch (error) {
-    console.error('❌ Error during migration:', error);
+    // Error log removed
     process.exit(1);
   }
 }

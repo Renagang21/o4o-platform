@@ -136,7 +136,7 @@ export class CDNOptimizationService {
         try {
           return await this.optimizeAsset(asset);
         } catch (error) {
-          console.error(`Failed to optimize asset ${asset.path}:`, error);
+          // Error log removed
           return null;
         }
       });
@@ -150,7 +150,7 @@ export class CDNOptimizationService {
       await this.saveOptimizationResults(results);
 
     } catch (error) {
-      console.error('❌ Asset optimization failed:', error);
+      // Error log removed
     }
   }
 
@@ -170,7 +170,7 @@ export class CDNOptimizationService {
 
       return assetsToOptimize;
     } catch (error) {
-      console.error('Failed to scan assets:', error);
+      // Error log removed
       return [];
     }
   }
@@ -204,7 +204,7 @@ export class CDNOptimizationService {
         }
       }
     } catch (error) {
-      console.warn(`Failed to scan directory ${dirPath}:`, error);
+      // Warning log removed
     }
   }
 
@@ -228,7 +228,7 @@ export class CDNOptimizationService {
       const content = await fs.readFile(filePath);
       return crypto.createHash('md5').update(content).digest('hex');
     } catch (error) {
-      console.warn(`Failed to calculate hash for ${filePath}:`, error);
+      // Warning log removed
       return '';
     }
   }
@@ -603,7 +603,7 @@ export class CDNOptimizationService {
       }
 
     } catch (error) {
-      console.error('Failed to monitor CDN cache:', error);
+      // Error log removed
     }
   }
 
@@ -650,7 +650,7 @@ export class CDNOptimizationService {
       }));
 
     } catch (error) {
-      console.error('Failed to analyze asset usage:', error);
+      // Error log removed
     }
   }
 
@@ -690,7 +690,7 @@ export class CDNOptimizationService {
       }));
 
     } catch (error) {
-      console.error(`Failed to deploy asset to CDN: ${asset.path}`, error);
+      // Error log removed
     }
   }
 
@@ -807,7 +807,7 @@ export class CDNOptimizationService {
       await this.redis.ltrim('cdn_invalidations', 0, 99);
 
     } catch (error) {
-      console.error('Failed to invalidate CDN cache:', error);
+      // Error log removed
     }
   }
 
@@ -851,7 +851,7 @@ export class CDNOptimizationService {
         totalSavings: 0
       };
     } catch (error) {
-      console.warn('Failed to get optimization stats:', error);
+      // Warning log removed
       return {
         successful: 0,
         failed: 0,
@@ -892,7 +892,7 @@ export class CDNOptimizationService {
     try {
       await this.redis.disconnect();
     } catch (error) {
-      console.error('❌ CDN optimization service shutdown failed:', error);
+      // Error log removed
     }
   }
 }

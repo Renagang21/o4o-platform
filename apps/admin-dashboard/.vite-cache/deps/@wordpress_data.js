@@ -38,11 +38,11 @@ import {
 // ../../node_modules/@wordpress/data/node_modules/@wordpress/hooks/build-module/validateNamespace.js
 function validateNamespace(namespace) {
   if ("string" !== typeof namespace || "" === namespace) {
-    console.error("The namespace must be a non-empty string.");
+    // Error log removed
     return false;
   }
   if (!/^[a-zA-Z][a-zA-Z0-9_.\-\/]*$/.test(namespace)) {
-    console.error("The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.");
+    // Error log removed
     return false;
   }
   return true;
@@ -52,15 +52,15 @@ var validateNamespace_default = validateNamespace;
 // ../../node_modules/@wordpress/data/node_modules/@wordpress/hooks/build-module/validateHookName.js
 function validateHookName(hookName) {
   if ("string" !== typeof hookName || "" === hookName) {
-    console.error("The hook name must be a non-empty string.");
+    // Error log removed
     return false;
   }
   if (/^__/.test(hookName)) {
-    console.error("The hook name cannot begin with `__`.");
+    // Error log removed
     return false;
   }
   if (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {
-    console.error("The hook name can only contain numbers, letters, dashes, periods and underscores.");
+    // Error log removed
     return false;
   }
   return true;
@@ -78,11 +78,11 @@ function createAddHook(hooks, storeKey) {
       return;
     }
     if ("function" !== typeof callback) {
-      console.error("The hook callback must be a function.");
+      // Error log removed
       return;
     }
     if ("number" !== typeof priority) {
-      console.error("If specified, the hook priority must be a number.");
+      // Error log removed
       return;
     }
     const handler = {
@@ -327,7 +327,7 @@ function deprecated(feature, options = {}) {
     return;
   }
   doAction("deprecated", feature, options, message);
-  console.warn(message);
+  // Warning log removed
   logged[message] = true;
 }
 
@@ -1175,11 +1175,11 @@ var createI18n = (initialData, initialDomain, hooks) => {
 // ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/validateNamespace.js
 function validateNamespace2(namespace) {
   if ("string" !== typeof namespace || "" === namespace) {
-    console.error("The namespace must be a non-empty string.");
+    // Error log removed
     return false;
   }
   if (!/^[a-zA-Z][a-zA-Z0-9_.\-\/]*$/.test(namespace)) {
-    console.error("The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.");
+    // Error log removed
     return false;
   }
   return true;
@@ -1189,15 +1189,15 @@ var validateNamespace_default2 = validateNamespace2;
 // ../../node_modules/@wordpress/keycodes/node_modules/@wordpress/hooks/build-module/validateHookName.js
 function validateHookName2(hookName) {
   if ("string" !== typeof hookName || "" === hookName) {
-    console.error("The hook name must be a non-empty string.");
+    // Error log removed
     return false;
   }
   if (/^__/.test(hookName)) {
-    console.error("The hook name cannot begin with `__`.");
+    // Error log removed
     return false;
   }
   if (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {
-    console.error("The hook name can only contain numbers, letters, dashes, periods and underscores.");
+    // Error log removed
     return false;
   }
   return true;
@@ -1215,11 +1215,11 @@ function createAddHook2(hooks, storeKey) {
       return;
     }
     if ("function" !== typeof callback) {
-      console.error("The hook callback must be a function.");
+      // Error log removed
       return;
     }
     if ("number" !== typeof priority) {
-      console.error("If specified, the hook priority must be a number.");
+      // Error log removed
       return;
     }
     const handler = {
@@ -2739,7 +2739,7 @@ function createRegistry(storeConfigs = {}, parent = null) {
   }
   function registerStoreInstance(name, createStore2) {
     if (stores[name]) {
-      console.error('Store "' + name + '" is already registered.');
+      // Error log removed
       return stores[name];
     }
     const store = createStore2();
@@ -3118,7 +3118,7 @@ function Store(registry, suspense) {
         if (!didWarnUnstableReference) {
           const secondMapResult = mapSelect(select3, registry);
           if (!isShallowEqual(mapResult, secondMapResult)) {
-            console.warn(`The 'useSelect' hook returns different values when called with the same state and parameters. This can lead to unnecessary rerenders.`);
+            // Warning log removed
             didWarnUnstableReference = true;
           }
         }
@@ -3217,7 +3217,7 @@ var useDispatchWithMap = (dispatchMap, deps) => {
     const currentDispatchProps = currentDispatchMap.current(registry.dispatch, registry);
     return Object.fromEntries(Object.entries(currentDispatchProps).map(([propName, dispatcher]) => {
       if (typeof dispatcher !== "function") {
-        console.warn(`Property ${propName} returned from dispatchMap in useDispatchWithMap must be a function.`);
+        // Warning log removed
       }
       return [propName, (...args) => currentDispatchMap.current(registry.dispatch, registry)[propName](...args)];
     }));

@@ -124,7 +124,7 @@ const AffiliateLinkGenerator: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('AFFILIATE app connection error:', error);
+      // Error log removed
     }
   };
 
@@ -142,7 +142,7 @@ const AffiliateLinkGenerator: React.FC = () => {
         setLinks(data.links || []);
       }
     } catch (error) {
-      console.error('Error fetching affiliate links:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch affiliate links',
@@ -166,7 +166,7 @@ const AffiliateLinkGenerator: React.FC = () => {
         setProducts(data.products || []);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      // Error log removed
     }
   };
 
@@ -198,7 +198,7 @@ const AffiliateLinkGenerator: React.FC = () => {
         fetchAffiliateLinks();
       }
     } catch (error) {
-      console.error('Error creating affiliate link:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to create affiliate link',
@@ -227,7 +227,7 @@ const AffiliateLinkGenerator: React.FC = () => {
         })
       });
     } catch (error) {
-      console.error('Error syncing with AFFILIATE app:', error);
+      // Error log removed
     }
   };
 
@@ -260,7 +260,7 @@ const AffiliateLinkGenerator: React.FC = () => {
         fetchAffiliateLinks();
       }
     } catch (error) {
-      console.error('Error deleting affiliate link:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to delete affiliate link',

@@ -33,7 +33,7 @@ export class FundingProjectController {
       const result = await this.projectService.getProjects(filters);
       res.json(result);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch projects' });
     }
   }
@@ -47,7 +47,7 @@ export class FundingProjectController {
       }
       res.json(project);
     } catch (error) {
-      console.error('Error fetching project:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch project' });
     }
   }
@@ -63,7 +63,7 @@ export class FundingProjectController {
       const project = await this.projectService.createProject(req.body, userId);
       res.status(201).json(project);
     } catch (error) {
-      console.error('Error creating project:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to create project' });
     }
   }
@@ -83,7 +83,7 @@ export class FundingProjectController {
       );
       res.json(project);
     } catch (error) {
-      console.error('Error updating project:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update project' });
     }
   }
@@ -105,7 +105,7 @@ export class FundingProjectController {
       const result = await this.projectService.getProjects(filters);
       res.json(result);
     } catch (error) {
-      console.error('Error fetching user projects:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch user projects' });
     }
   }
@@ -137,7 +137,7 @@ export class FundingProjectController {
 
       res.json(stats);
     } catch (error) {
-      console.error('Error fetching project stats:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch project stats' });
     }
   }

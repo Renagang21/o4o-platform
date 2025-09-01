@@ -38,7 +38,7 @@ class ResponseTimeMonitor {
       metricsToWrite.map(m => JSON.stringify(m)).join('\n') + '\n',
       (err) => {
         if (err) {
-          console.error('Failed to write metrics:', err);
+          // Error log removed
         }
       }
     );
@@ -48,9 +48,9 @@ class ResponseTimeMonitor {
     const slowRequests = metricsToWrite.filter(m => m.responseTime > 1000);
     
     if (slowRequests.length > 0) {
-      console.warn(`[MONITOR] ${slowRequests.length} slow requests detected (>1000ms)`);
+      // Warning log removed
       slowRequests.forEach(req => {
-        console.warn(`[MONITOR] Slow: ${req.method} ${req.endpoint} - ${req.responseTime}ms`);
+        // Warning log removed
       });
     }
 
@@ -92,7 +92,7 @@ class ResponseTimeMonitor {
         
         // Log slow requests immediately
         if (responseTime > 1000) {
-          console.warn(`[SLOW REQUEST] ${req.method} ${req.path} took ${responseTime}ms`);
+          // Warning log removed
         }
         
         // Add response time header

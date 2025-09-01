@@ -213,7 +213,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
     });
 
     if (errors.length > 0) {
-      console.error('File validation errors:', errors);
+      // Error log removed
       // Show errors to user
     }
 

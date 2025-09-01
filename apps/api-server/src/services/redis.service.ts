@@ -24,7 +24,7 @@ export class RedisService {
     });
 
     this.redis.on('error', (error) => {
-      console.error('Redis connection error:', error);
+      // Error log removed
     });
 
     this.redis.on('connect', () => {
@@ -43,7 +43,7 @@ export class RedisService {
     try {
       return await this.redis.get(key);
     } catch (error) {
-      console.error(`Redis GET error for key ${key}:`, error);
+      // Error log removed
       return null;
     }
   }
@@ -57,7 +57,7 @@ export class RedisService {
       }
       return true;
     } catch (error) {
-      console.error(`Redis SET error for key ${key}:`, error);
+      // Error log removed
       return false;
     }
   }
@@ -67,7 +67,7 @@ export class RedisService {
       await this.redis.del(key);
       return true;
     } catch (error) {
-      console.error(`Redis DEL error for key ${key}:`, error);
+      // Error log removed
       return false;
     }
   }
@@ -77,7 +77,7 @@ export class RedisService {
       const result = await this.redis.exists(key);
       return result === 1;
     } catch (error) {
-      console.error(`Redis EXISTS error for key ${key}:`, error);
+      // Error log removed
       return false;
     }
   }
@@ -87,7 +87,7 @@ export class RedisService {
       const result = await this.redis.expire(key, seconds);
       return result === 1;
     } catch (error) {
-      console.error(`Redis EXPIRE error for key ${key}:`, error);
+      // Error log removed
       return false;
     }
   }
@@ -96,7 +96,7 @@ export class RedisService {
     try {
       return await this.redis.hget(key, field);
     } catch (error) {
-      console.error(`Redis HGET error for key ${key}, field ${field}:`, error);
+      // Error log removed
       return null;
     }
   }
@@ -106,7 +106,7 @@ export class RedisService {
       await this.redis.hset(key, field, value);
       return true;
     } catch (error) {
-      console.error(`Redis HSET error for key ${key}, field ${field}:`, error);
+      // Error log removed
       return false;
     }
   }
@@ -115,7 +115,7 @@ export class RedisService {
     try {
       return await this.redis.hgetall(key);
     } catch (error) {
-      console.error(`Redis HGETALL error for key ${key}:`, error);
+      // Error log removed
       return null;
     }
   }
@@ -124,7 +124,7 @@ export class RedisService {
     try {
       return await this.redis.incr(key);
     } catch (error) {
-      console.error(`Redis INCR error for key ${key}:`, error);
+      // Error log removed
       return 0;
     }
   }
@@ -133,7 +133,7 @@ export class RedisService {
     try {
       return await this.redis.incrby(key, increment);
     } catch (error) {
-      console.error(`Redis INCRBY error for key ${key}:`, error);
+      // Error log removed
       return 0;
     }
   }
@@ -142,7 +142,7 @@ export class RedisService {
     try {
       return await this.redis.sadd(key, member);
     } catch (error) {
-      console.error(`Redis SADD error for key ${key}:`, error);
+      // Error log removed
       return 0;
     }
   }
@@ -151,7 +151,7 @@ export class RedisService {
     try {
       return await this.redis.scard(key);
     } catch (error) {
-      console.error(`Redis SCARD error for key ${key}:`, error);
+      // Error log removed
       return 0;
     }
   }
@@ -160,7 +160,7 @@ export class RedisService {
     try {
       await this.redis.flushdb();
     } catch (error) {
-      console.error('Redis FLUSHDB error:', error);
+      // Error log removed
     }
   }
 

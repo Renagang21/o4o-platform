@@ -58,7 +58,7 @@ export class VideoHelper {
         return await this.getVimeoInfo(videoId);
       }
     } catch (error: any) {
-      console.error(`Error fetching ${type} video info:`, error);
+      // Error log removed
     }
     
     return null;
@@ -67,7 +67,7 @@ export class VideoHelper {
   private static async getYouTubeInfo(videoId: string): Promise<VideoInfo | null> {
     const apiKey = process.env.YOUTUBE_API_KEY;
     if (!apiKey) {
-      console.warn('YouTube API key not configured');
+      // Warning log removed
       return null;
     }
 
@@ -93,7 +93,7 @@ export class VideoHelper {
         publishedAt: video.snippet?.publishedAt
       };
     } catch (error: any) {
-      console.error('YouTube API error:', error);
+      // Error log removed
       return null;
     }
   }
@@ -115,7 +115,7 @@ export class VideoHelper {
         publishedAt: video.upload_date
       };
     } catch (error: any) {
-      console.error('Vimeo API error:', error);
+      // Error log removed
       return null;
     }
   }

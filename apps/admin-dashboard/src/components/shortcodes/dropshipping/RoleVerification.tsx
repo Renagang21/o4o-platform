@@ -43,7 +43,7 @@ const RoleVerification: React.FC<RoleVerificationProps> = ({ type }) => {
         setFormData(data.formData || {});
       }
     } catch (error) {
-      console.error('Error fetching verification status:', error);
+      // Error log removed
     }
   };
 
@@ -71,7 +71,7 @@ const RoleVerification: React.FC<RoleVerificationProps> = ({ type }) => {
         setDocuments({ ...documents, [field]: data.url });
       }
     } catch (error) {
-      console.error('Error uploading document:', error);
+      // Error log removed
     }
   };
 
@@ -95,7 +95,7 @@ const RoleVerification: React.FC<RoleVerificationProps> = ({ type }) => {
         setErrors(error.errors || {});
       }
     } catch (error) {
-      console.error('Error submitting verification:', error);
+      // Error log removed
     } finally {
       setLoading(false);
     }

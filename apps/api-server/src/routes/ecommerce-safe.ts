@@ -96,7 +96,7 @@ router.get('/products', async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching products:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch products',
@@ -115,7 +115,7 @@ router.get('/products/featured', async (req: Request, res: Response) => {
       data: featuredProducts
     });
   } catch (error: any) {
-    console.error('Error fetching featured products:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch featured products',
@@ -142,7 +142,7 @@ router.get('/products/:id', async (req: Request, res: Response) => {
       data: product
     });
   } catch (error: any) {
-    console.error('Error fetching product:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch product',
@@ -169,7 +169,7 @@ router.post('/products', authenticateToken, async (req: Request, res: Response) 
       message: 'Product created successfully'
     });
   } catch (error: any) {
-    console.error('Error creating product:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to create product',
@@ -204,7 +204,7 @@ router.put('/products/:id', authenticateToken, async (req: Request, res: Respons
       message: 'Product updated successfully'
     });
   } catch (error: any) {
-    console.error('Error updating product:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to update product',
@@ -234,7 +234,7 @@ router.delete('/products/:id', authenticateToken, async (req: Request, res: Resp
       message: 'Product deleted successfully'
     });
   } catch (error: any) {
-    console.error('Error deleting product:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to delete product',

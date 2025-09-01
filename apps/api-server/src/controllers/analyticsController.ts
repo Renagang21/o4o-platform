@@ -40,7 +40,7 @@ export class AnalyticsController {
         data: overview
       });
     } catch (error) {
-      console.error('Error getting analytics overview:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get analytics overview',
@@ -148,7 +148,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting user analytics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get user analytics',
@@ -207,7 +207,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting system analytics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get system analytics',
@@ -227,7 +227,7 @@ export class AnalyticsController {
         data: contentMetrics
       });
     } catch (error) {
-      console.error('Error getting content analytics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get content analytics',
@@ -314,7 +314,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting user actions:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get user actions',
@@ -379,7 +379,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting reports:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get reports',
@@ -416,7 +416,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error generating report:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to generate report',
@@ -467,7 +467,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting report:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get report',
@@ -543,7 +543,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting alerts:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get alerts',
@@ -580,7 +580,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error acknowledging alert:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to acknowledge alert',
@@ -618,7 +618,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error resolving alert:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to resolve alert',
@@ -670,7 +670,7 @@ export class AnalyticsController {
         }
       });
     } catch (error) {
-      console.error('Error getting real-time metrics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to get real-time metrics',

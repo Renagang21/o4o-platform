@@ -35,12 +35,12 @@ class InteractiveBlocksPlugin implements BlockPlugin {
   };
   
   async activate(): Promise<void> {
-    console.log('✅ Interactive Blocks Plugin activated');
+    // Interactive Blocks Plugin activated
     this.loadStyles();
   }
   
   async deactivate(): Promise<void> {
-    console.log('Interactive Blocks Plugin deactivated');
+    // Interactive Blocks Plugin deactivated
     this.removeStyles();
   }
   

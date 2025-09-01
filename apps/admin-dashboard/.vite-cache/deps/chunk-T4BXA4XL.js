@@ -981,7 +981,7 @@ var correctTargets = function(parent, targets) {
     if (correctedTarget && parent.contains(correctedTarget)) {
       return correctedTarget;
     }
-    console.error("aria-hidden", target, "in not contained inside", parent, ". Doing nothing");
+    // Error log removed
     return null;
   }).filter(function(x) {
     return Boolean(x);
@@ -1030,7 +1030,7 @@ var applyAttributeToOthers = function(originalTarget, parentNode, markerName, co
             node.setAttribute(controlAttribute, "true");
           }
         } catch (e) {
-          console.error("aria-hidden: cannot operate on ", node, e);
+          // Error log removed
         }
       }
     });
@@ -1359,7 +1359,7 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
   React12.useEffect(() => {
     if (titleId) {
       const hasTitle = document.getElementById(titleId);
-      if (!hasTitle) console.error(MESSAGE);
+      if (!hasTitle) // Error log removed
     }
   }, [MESSAGE, titleId]);
   return null;
@@ -1373,7 +1373,7 @@ var DescriptionWarning = ({ contentRef, descriptionId }) => {
     const describedById = (_a = contentRef.current) == null ? void 0 : _a.getAttribute("aria-describedby");
     if (descriptionId && describedById) {
       const hasDescription = document.getElementById(descriptionId);
-      if (!hasDescription) console.warn(MESSAGE);
+      if (!hasDescription) // Warning log removed
     }
   }, [MESSAGE, contentRef, descriptionId]);
   return null;

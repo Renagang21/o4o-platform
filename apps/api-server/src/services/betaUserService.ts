@@ -306,7 +306,7 @@ export class BetaUserService {
       //   await realtimeFeedbackService.notifyNewFeedback(feedbackWithUser);
       // }
     } catch (error) {
-      console.error('Failed to send real-time notification:', error);
+      // Error log removed
       // Don't fail the feedback submission if notification fails
     }
 
@@ -607,7 +607,7 @@ export class BetaUserService {
       //   await realtimeFeedbackService.notifyFeedbackUpdate(feedback, updateType);
       // }
     } catch (error) {
-      console.error('Failed to send real-time notification:', error);
+      // Error log removed
     }
   }
 

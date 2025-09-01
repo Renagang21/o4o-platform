@@ -131,7 +131,7 @@ var CookieAuthClient = class {
     try {
       await this.api.post("/auth/v2/logout");
     } catch (error) {
-      console.error("Logout error:", error);
+      // Error log removed
     } finally {
       this.currentToken = null;
     }
@@ -272,7 +272,7 @@ var SSOClient = class {
         return null;
       }
     } catch (error) {
-      console.error("Session check error:", error);
+      // Error log removed
       (_c = this.onSessionChange) == null ? void 0 : _c.call(this, null);
       return null;
     }

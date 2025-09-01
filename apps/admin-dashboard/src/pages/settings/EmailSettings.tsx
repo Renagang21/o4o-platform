@@ -33,7 +33,7 @@ const EmailSettings: FC = () => {
         setTestEmail(data.fromEmail);
       }
     } catch (error) {
-      console.error('Failed to load email settings:', error);
+      // Error log removed
       // 에러 시 기본값 유지
     } finally {
       setLoading(false);

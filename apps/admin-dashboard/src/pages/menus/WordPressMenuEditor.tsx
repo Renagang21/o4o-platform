@@ -146,7 +146,7 @@ const WordPressMenuEditor: FC = () => {
         })));
       }
     } catch (error) {
-      console.error('Error loading available items:', error);
+      // Error log removed
     }
   };
 
@@ -162,7 +162,7 @@ const WordPressMenuEditor: FC = () => {
         })));
       }
     } catch (error) {
-      console.error('Error loading menu locations:', error);
+      // Error log removed
       // Use default locations as fallback
       setMenuLocations([
         { id: 'primary', key: 'primary', name: '주 메뉴', description: '사이트 상단에 표시되는 메인 메뉴' },
@@ -191,7 +191,7 @@ const WordPressMenuEditor: FC = () => {
         }
       }
     } catch (error) {
-      console.error('Error loading menu:', error);
+      // Error log removed
       toast.error('메뉴를 불러오는데 실패했습니다');
     } finally {
       setIsLoading(false);
@@ -489,7 +489,7 @@ const WordPressMenuEditor: FC = () => {
         navigate('/menus');
       }
     } catch (error) {
-      console.error('Error saving menu:', error);
+      // Error log removed
       toast.error('메뉴 저장 중 오류가 발생했습니다');
     } finally {
       setIsSaving(false);

@@ -50,7 +50,7 @@ router.get('/templates/homepage', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching homepage template:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch homepage template'
@@ -111,7 +111,7 @@ router.get('/pages/:slug', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching page:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch page'
@@ -155,7 +155,7 @@ router.get('/templates/:type', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching template:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch template'
@@ -205,7 +205,7 @@ router.get('/posts/:type/:slug', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching post:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch post'
@@ -299,7 +299,7 @@ router.get('/products', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching products:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch products'
@@ -366,7 +366,7 @@ router.get('/products/:idOrSlug', async (req, res) => {
       data: transformedProduct
     });
   } catch (error: any) {
-    console.error('Error fetching product:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch product'
@@ -417,7 +417,7 @@ router.get('/posts', async (req, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Error fetching posts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch posts'
@@ -473,7 +473,7 @@ router.get('/featured-products', async (req, res) => {
       data: transformedProducts
     });
   } catch (error: any) {
-    console.error('Error fetching featured products:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch featured products'

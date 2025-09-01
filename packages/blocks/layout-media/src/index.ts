@@ -85,12 +85,12 @@ class LayoutMediaBlocksPlugin implements BlockPlugin {
   };
   
   async activate(): Promise<void> {
-    console.log('✅ Layout & Media Blocks Plugin activated');
+    // Layout & Media Blocks Plugin activated
     this.loadStyles();
   }
   
   async deactivate(): Promise<void> {
-    console.log('Layout & Media Blocks Plugin deactivated');
+    // Layout & Media Blocks Plugin deactivated
     this.removeStyles();
   }
   

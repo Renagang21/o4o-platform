@@ -112,7 +112,7 @@ export class UserRoleController {
         data: roles
       });
     } catch (error) {
-      console.error('Error fetching roles:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -153,7 +153,7 @@ export class UserRoleController {
         data: userRole
       });
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -256,7 +256,7 @@ export class UserRoleController {
         message: 'User role updated successfully'
       });
     } catch (error) {
-      console.error('Error updating user role:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -301,7 +301,7 @@ export class UserRoleController {
         }
       });
     } catch (error) {
-      console.error('Error fetching permissions:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -347,7 +347,7 @@ export class UserRoleController {
         }
       });
     } catch (error) {
-      console.error('Error checking user permission:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -386,7 +386,7 @@ export class UserRoleController {
         }
       });
     } catch (error) {
-      console.error('Error fetching role statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'

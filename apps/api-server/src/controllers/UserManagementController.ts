@@ -171,7 +171,7 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      console.error('Error getting users:', error);
+      // Error log removed
       
       // Return empty list instead of error for better UX
       res.json({
@@ -199,7 +199,7 @@ export class UserManagementController {
         data: statistics
       });
     } catch (error) {
-      console.error('Error getting user statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to get user statistics'
@@ -232,7 +232,7 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      console.error('Error getting pending users:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to get pending users'
@@ -263,7 +263,7 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      console.error('Error getting user:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to get user'
@@ -304,7 +304,7 @@ export class UserManagementController {
         data: savedUser.toPublicData()
       });
     } catch (error) {
-      console.error('Error creating user:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create user'
@@ -344,7 +344,7 @@ export class UserManagementController {
         data: updatedUser.toPublicData()
       });
     } catch (error) {
-      console.error('Error updating user:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update user'
@@ -373,7 +373,7 @@ export class UserManagementController {
         message: 'User deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting user:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete user'
@@ -403,7 +403,7 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      console.error('Error approving user:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to approve user'
@@ -433,7 +433,7 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      console.error('Error rejecting user:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to reject user'
@@ -464,7 +464,7 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      console.error('Error bulk approving users:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to bulk approve users'
@@ -495,7 +495,7 @@ export class UserManagementController {
         }
       });
     } catch (error) {
-      console.error('Error bulk rejecting users:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to bulk reject users'
@@ -516,7 +516,7 @@ export class UserManagementController {
         data: user.toPublicData()
       });
     } catch (error) {
-      console.error('Error updating user roles:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update user roles'
@@ -541,7 +541,7 @@ export class UserManagementController {
         data: logs
       });
     } catch (error) {
-      console.error('Error getting approval history:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to get approval history'
@@ -587,7 +587,7 @@ export class UserManagementController {
 
       res.send(csv);
     } catch (error) {
-      console.error('Error exporting users:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to export users'

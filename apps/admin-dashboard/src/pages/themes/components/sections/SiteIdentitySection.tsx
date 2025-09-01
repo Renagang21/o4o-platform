@@ -66,7 +66,7 @@ export const SiteIdentitySection: React.FC<SiteIdentitySectionProps> = ({
       onChange({ logo: data.url });
       toast.success('Logo uploaded successfully');
     } catch (error) {
-      console.error('Logo upload error:', error);
+      // Logo upload error
       toast.error('Failed to upload logo');
     } finally {
       setUploadingLogo(false);
@@ -111,7 +111,7 @@ export const SiteIdentitySection: React.FC<SiteIdentitySectionProps> = ({
       onChange({ favicon: data.url });
       toast.success('Favicon uploaded successfully');
     } catch (error) {
-      console.error('Favicon upload error:', error);
+      // Favicon upload error
       toast.error('Failed to upload favicon');
     } finally {
       setUploadingFavicon(false);

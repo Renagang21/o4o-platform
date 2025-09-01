@@ -66,7 +66,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Beta user registration error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('already registered')) {
         return res.status(409).json({
@@ -126,7 +126,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Check registration status error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -211,7 +211,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Submit feedback error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -262,7 +262,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get beta users error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -305,7 +305,7 @@ export class BetaUserController {
         data: betaUser
       });
     } catch (error) {
-      console.error('Get beta user by ID error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -340,7 +340,7 @@ export class BetaUserController {
         data: betaUser
       });
     } catch (error) {
-      console.error('Approve beta user error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('not found')) {
         return res.status(404).json({
@@ -396,7 +396,7 @@ export class BetaUserController {
         data: betaUser
       });
     } catch (error) {
-      console.error('Update beta user status error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('not found')) {
         return res.status(404).json({
@@ -461,7 +461,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get feedback error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -504,7 +504,7 @@ export class BetaUserController {
         data: feedback
       });
     } catch (error) {
-      console.error('Get feedback by ID error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -539,7 +539,7 @@ export class BetaUserController {
         data: feedback
       });
     } catch (error) {
-      console.error('Assign feedback error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('not found')) {
         return res.status(404).json({
@@ -595,7 +595,7 @@ export class BetaUserController {
         data: feedback
       });
     } catch (error) {
-      console.error('Respond to feedback error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('not found')) {
         return res.status(404).json({
@@ -661,7 +661,7 @@ export class BetaUserController {
         data: feedback
       });
     } catch (error) {
-      console.error('Update feedback status error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('not found')) {
         return res.status(404).json({
@@ -717,7 +717,7 @@ export class BetaUserController {
         data: feedback
       });
     } catch (error) {
-      console.error('Update feedback priority error:', error);
+      // Error log removed
       
       if (error instanceof Error && error.message.includes('not found')) {
         return res.status(404).json({
@@ -766,7 +766,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get beta analytics error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -802,7 +802,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get high priority feedback error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -838,7 +838,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get unassigned feedback error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -883,7 +883,7 @@ export class BetaUserController {
         data: { conversation }
       });
     } catch (error) {
-      console.error('Create conversation error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -934,7 +934,7 @@ export class BetaUserController {
         data: { conversation }
       });
     } catch (error) {
-      console.error('Get conversation error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -996,7 +996,7 @@ export class BetaUserController {
         data: { message }
       });
     } catch (error) {
-      console.error('Send message error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -1044,7 +1044,7 @@ export class BetaUserController {
         data: { conversation }
       });
     } catch (error) {
-      console.error('Update conversation status error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -1085,7 +1085,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get user conversations error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -1143,7 +1143,7 @@ export class BetaUserController {
         message: 'Live support started'
       });
     } catch (error) {
-      console.error('Start live support error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -1190,7 +1190,7 @@ export class BetaUserController {
         data: { feedback }
       });
     } catch (error) {
-      console.error('Mark feedback viewed error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -1251,7 +1251,7 @@ export class BetaUserController {
         data: { stats }
       });
     } catch (error) {
-      console.error('Get realtime stats error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {
@@ -1308,7 +1308,7 @@ export class BetaUserController {
         }
       });
     } catch (error) {
-      console.error('Get pending notifications error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: {

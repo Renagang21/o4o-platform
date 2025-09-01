@@ -762,7 +762,7 @@ const startServer = async () => {
         await backupService.initialize();
         await errorAlertService.initialize();
       } catch (serviceError) {
-        console.error('⚠️  Failed to initialize monitoring services:', serviceError);
+        // Error log removed
       }
 
       // Initialize tracking updater job
@@ -771,7 +771,7 @@ const startServer = async () => {
         trackingUpdaterJob.start();
         logger.info('Tracking updater job started');
       } catch (jobError) {
-        console.error('⚠️  Failed to start tracking updater job:', jobError);
+        // Error log removed
       }
 
       // Initialize email service (graceful, non-blocking)
@@ -794,7 +794,7 @@ const startServer = async () => {
       }
     }
   } catch (dbError) {
-    console.error('❌ Database connection failed:', dbError);
+    // Error log removed
     
     // 프로덕션에서는 종료, 개발에서는 계속 실행
     if (process.env.NODE_ENV === 'production') {

@@ -72,7 +72,7 @@ router.get('/', async (req: Request, res: Response) => {
     // Return array directly for WordPress compatibility
     res.json(categories);
   } catch (error: any) {
-    console.error('Error fetching categories:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch categories',
@@ -97,7 +97,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     // Return category object directly for WordPress compatibility
     res.json(category);
   } catch (error: any) {
-    console.error('Error fetching category:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch category',
@@ -134,7 +134,7 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
     // Return created category directly for WordPress compatibility
     res.status(201).json(newCategory);
   } catch (error: any) {
-    console.error('Error creating category:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to create category',
@@ -169,7 +169,7 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
     // Return updated category directly for WordPress compatibility
     res.json(mockCategories[categoryIndex]);
   } catch (error: any) {
-    console.error('Error updating category:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to update category',
@@ -196,7 +196,7 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response) => 
     // Return deleted category directly for WordPress compatibility
     res.json(deletedCategory);
   } catch (error: any) {
-    console.error('Error deleting category:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to delete category',

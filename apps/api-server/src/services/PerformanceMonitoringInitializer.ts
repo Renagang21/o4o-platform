@@ -42,7 +42,7 @@ export class PerformanceMonitoringInitializer {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      console.warn('⚠️ Performance monitoring services are already initialized');
+      // Warning log removed
       return;
     }
 
@@ -72,7 +72,7 @@ export class PerformanceMonitoringInitializer {
 
 
     } catch (error) {
-      console.error('❌ Failed to initialize performance monitoring services:', error);
+      // Error log removed
       await this.handleInitializationFailure(error as Error);
       throw error;
     }
@@ -85,7 +85,7 @@ export class PerformanceMonitoringInitializer {
     try {
       await this.redis.ping();
     } catch (error) {
-      console.error('❌ Redis connection failed:', error);
+      // Error log removed
       throw new Error('Redis connection required for performance monitoring');
     }
   }
@@ -99,7 +99,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('analytics', analyticsService as unknown as MonitoringService);
       this.serviceStatus.set('analytics', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize Analytics Service:', error);
+      // Error log removed
       this.serviceStatus.set('analytics', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -114,7 +114,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('performance', performanceService as unknown as MonitoringService);
       this.serviceStatus.set('performance', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize Performance Optimization Service:', error);
+      // Error log removed
       this.serviceStatus.set('performance', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -129,7 +129,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('database', databaseService as unknown as MonitoringService);
       this.serviceStatus.set('database', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize Database Optimization Service:', error);
+      // Error log removed
       this.serviceStatus.set('database', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -144,7 +144,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('cdn', cdnService as unknown as MonitoringService);
       this.serviceStatus.set('cdn', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize CDN Optimization Service:', error);
+      // Error log removed
       this.serviceStatus.set('cdn', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -159,7 +159,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('scaling', scalingService as unknown as MonitoringService);
       this.serviceStatus.set('scaling', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize Auto Scaling Service:', error);
+      // Error log removed
       this.serviceStatus.set('scaling', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -174,7 +174,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('operations', operationsService as unknown as MonitoringService);
       this.serviceStatus.set('operations', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize Operations Monitoring Service:', error);
+      // Error log removed
       this.serviceStatus.set('operations', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -189,7 +189,7 @@ export class PerformanceMonitoringInitializer {
       this.services.set('deployment', deploymentService as unknown as MonitoringService);
       this.serviceStatus.set('deployment', { status: 'running', lastCheck: new Date() });
     } catch (error) {
-      console.error('❌ Failed to initialize Deployment Monitoring Service:', error);
+      // Error log removed
       this.serviceStatus.set('deployment', { status: 'failed', lastCheck: new Date(), error: error as Error });
       throw error;
     }
@@ -234,7 +234,7 @@ export class PerformanceMonitoringInitializer {
 
 
     } catch (error) {
-      console.error('❌ Failed to configure service integration:', error);
+      // Error log removed
       throw error;
     }
   }
@@ -265,7 +265,7 @@ export class PerformanceMonitoringInitializer {
       try {
         await this.handleCrossServiceMessage(channel, JSON.parse(message));
       } catch (error) {
-        console.error('Failed to handle cross-service message:', error);
+        // Error log removed
       }
     });
   }
@@ -419,7 +419,7 @@ export class PerformanceMonitoringInitializer {
         }
 
       } catch (error) {
-        console.error(`Health check failed for ${serviceName}:`, error);
+        // Error log removed
         
         healthStatus.services[serviceName] = {
           status: 'error',
@@ -523,7 +523,7 @@ export class PerformanceMonitoringInitializer {
         JSON.stringify(failureRecord)
       );
     } catch (redisError) {
-      console.error('Failed to record initialization failure:', redisError);
+      // Error log removed
     }
   }
 
@@ -645,7 +645,7 @@ export class PerformanceMonitoringInitializer {
             await service.shutdown();
           }
         } catch (error) {
-          console.error(`❌ Failed to shutdown ${serviceName} service:`, error);
+          // Error log removed
         }
       }
 
@@ -656,7 +656,7 @@ export class PerformanceMonitoringInitializer {
       this.isInitialized = false;
 
     } catch (error) {
-      console.error('❌ Failed to shutdown performance monitoring system:', error);
+      // Error log removed
       throw error;
     }
   }

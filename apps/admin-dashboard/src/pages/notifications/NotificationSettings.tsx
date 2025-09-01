@@ -31,7 +31,7 @@ const NotificationSettings: FC = () => {
         const data = await notificationApi.getSettings();
         setSettings(data);
       } catch (error) {
-        console.error('Failed to load settings:', error);
+        // Error log removed
         toast.error('설정을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -77,7 +77,7 @@ const NotificationSettings: FC = () => {
       setHasChanges(false);
       toast.success('알림 설정이 저장되었습니다.');
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      // Error log removed
       toast.error('설정 저장에 실패했습니다.');
     } finally {
       setIsSaving(false);

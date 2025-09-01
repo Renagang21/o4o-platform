@@ -13,7 +13,7 @@ export class BlockRegistry {
    */
   register(blockName: string, definition: BlockDefinition): void {
     if (this.blocks.has(blockName)) {
-      console.warn(`Block ${blockName} is already registered, overwriting...`);
+      // Block is already registered, overwriting
     }
 
     // Store block definition
@@ -30,7 +30,7 @@ export class BlockRegistry {
     // Register with WordPress if available
     this.registerWithWordPress(blockName, definition);
 
-    console.log(`Block registered: ${blockName}`);
+    // Block registered
   }
 
   /**
@@ -40,7 +40,7 @@ export class BlockRegistry {
     const block = this.blocks.get(blockName);
     
     if (!block) {
-      console.warn(`Block ${blockName} is not registered`);
+      // Block is not registered
       return;
     }
 
@@ -58,7 +58,7 @@ export class BlockRegistry {
     // Remove block definition
     this.blocks.delete(blockName);
 
-    console.log(`Block unregistered: ${blockName}`);
+    // Block unregistered
   }
 
   /**

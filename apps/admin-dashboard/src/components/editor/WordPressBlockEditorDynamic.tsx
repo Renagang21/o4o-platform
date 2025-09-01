@@ -144,7 +144,7 @@ export default function WordPressBlockEditorDynamic({
         
         setIsWordPressReady(true);
       } catch (error) {
-        console.error('Failed to load WordPress modules:', error);
+        // Error log removed
       }
     };
     
@@ -178,7 +178,7 @@ export default function WordPressBlockEditorDynamic({
           }
         }
       } catch (error) {
-        console.error('Failed to initialize editor:', error);
+        // Error log removed
       } finally {
         setIsInitializing(false);
       }
@@ -223,7 +223,7 @@ export default function WordPressBlockEditorDynamic({
           const serializedContent = wpModules.serialize(newBlocks);
           onChange(serializedContent, newBlocks);
         } catch (error) {
-          console.error('Failed to serialize blocks:', error);
+          // Error log removed
         }
       }
     });
@@ -239,7 +239,7 @@ export default function WordPressBlockEditorDynamic({
         setShowReusableBlocksBrowser(false);
       }
     } catch (error) {
-      console.error('Failed to insert reusable block:', error);
+      // Error log removed
     }
   };
 
@@ -253,7 +253,7 @@ export default function WordPressBlockEditorDynamic({
         setShowBlockPatternsBrowser(false);
       }
     } catch (error) {
-      console.error('Failed to insert block pattern:', error);
+      // Error log removed
     }
   };
 

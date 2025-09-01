@@ -54,7 +54,7 @@ const UserDashboard: React.FC<DashboardProps> = ({ role }) => {
         setDashboardData(data);
       }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      // Error log removed
     } finally {
       setLoading(false);
     }

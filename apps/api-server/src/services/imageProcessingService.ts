@@ -159,7 +159,7 @@ export class ImageProcessingService {
       };
 
     } catch (error) {
-      console.error('Error processing image:', error);
+      // Error log removed
       throw new Error(`Image processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -272,7 +272,7 @@ export class ImageProcessingService {
         try {
           await fs.unlink(tempPath);
         } catch (error) {
-          console.warn(`Failed to cleanup temp file ${tempPath}:`, error);
+          // Warning log removed
         }
       })
     );

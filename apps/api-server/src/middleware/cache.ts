@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'production' && process.env.REDIS_HOST) {
   });
 
   redisClient.on('error', (err) => {
-    console.error('Redis cache error:', err);
+    // Error log removed
     // Fallback to memory cache if Redis fails
     redisClient = null;
   });
@@ -84,7 +84,7 @@ export const cache = (options: CacheOptions = {}) => {
 
           if (redisClient) {
             redisClient.setex(cacheKey, ttl, dataToCache).catch(err => {
-              console.error('Failed to cache in Redis:', err);
+              // Error log removed
             });
           } else {
             memoryCache.set(cacheKey, dataToCache, ttl);
@@ -96,7 +96,7 @@ export const cache = (options: CacheOptions = {}) => {
 
       next();
     } catch (error) {
-      console.error('Cache middleware error:', error);
+      // Error log removed
       next();
     }
   };

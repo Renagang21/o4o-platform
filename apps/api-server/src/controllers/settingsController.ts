@@ -22,7 +22,7 @@ export class SettingsController {
         data: settings
       });
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch settings',
@@ -52,7 +52,7 @@ export class SettingsController {
         message: 'Settings updated successfully'
       });
     } catch (error) {
-      console.error('Error updating settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update settings',
@@ -71,7 +71,7 @@ export class SettingsController {
         data: settings
       });
     } catch (error) {
-      console.error('Error fetching homepage settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch homepage settings',
@@ -90,7 +90,7 @@ export class SettingsController {
         data: settings
       });
     } catch (error) {
-      console.error('Error fetching general settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch general settings',
@@ -109,7 +109,7 @@ export class SettingsController {
         message: 'Settings initialized successfully'
       });
     } catch (error) {
-      console.error('Error initializing settings:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to initialize settings',

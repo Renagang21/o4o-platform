@@ -82,11 +82,11 @@ router.post('/login',
         }
       });
     } catch (error: any) {
-      console.error('Login error:', error);
+      // Error log removed
       
       // PostgreSQL 권한 에러 체크
       if (error instanceof Error && error.message.includes('aclcheck_error')) {
-        console.error('Database permission error - check PostgreSQL user permissions');
+        // Error log removed
         return res.status(500).json({
           error: 'Database access error',
           code: 'DATABASE_PERMISSION_ERROR'
@@ -146,7 +146,7 @@ router.post('/register',
         }
       });
     } catch (error: any) {
-      console.error('Registration error:', error);
+      // Error log removed
       res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_SERVER_ERROR'
@@ -214,7 +214,7 @@ router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
       }
     });
   } catch (error: any) {
-    console.error('Auth status error:', error);
+    // Error log removed
     res.status(500).json({
       authenticated: false,
       error: 'Internal server error'

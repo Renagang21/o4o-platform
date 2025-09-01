@@ -7,7 +7,7 @@ import logger from '../utils/logger';
 export async function validateDatabaseConnection(dataSource: DataSource): Promise<boolean> {
   try {
     if (!dataSource.isInitialized) {
-      console.warn('⚠️  Database connection not initialized');
+      // Warning log removed
       return false;
     }
     
@@ -16,7 +16,7 @@ export async function validateDatabaseConnection(dataSource: DataSource): Promis
     logger.info('✅ Database connection validated');
     return true;
   } catch (error) {
-    console.error('❌ Database connection validation failed:', error);
+    // Error log removed
     return false;
   }
 }
@@ -42,7 +42,7 @@ export async function retryDatabaseConnection(
       return true;
     } catch (error) {
       retries++;
-      console.warn(`⚠️  Database connection attempt ${retries}/${maxRetries} failed`);
+      // Warning log removed
       
       if (retries < maxRetries) {
         logger.info(`Retrying in ${delay/1000} seconds...`);
@@ -51,6 +51,6 @@ export async function retryDatabaseConnection(
     }
   }
   
-  console.error('❌ Failed to connect to database after maximum retries');
+  // Error log removed
   return false;
 }

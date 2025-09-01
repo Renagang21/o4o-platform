@@ -22,7 +22,7 @@ const getRepositories = () => {
       categoryRepository: AppDataSource.getRepository(Category)
     };
   } catch (error) {
-    console.error('Failed to get repositories:', error);
+    // Error log removed
     return null;
   }
 };
@@ -286,7 +286,7 @@ router.get('/',
 
       res.json(formattedPosts);
     } catch (error: any) {
-      console.error('Error fetching posts:', error);
+      // Error log removed
       res.status(500).json({ 
         error: 'Failed to fetch posts',
         message: error.message 
@@ -369,7 +369,7 @@ router.get('/:id',
 
       res.json(formattedPost);
     } catch (error: any) {
-      console.error('Error fetching post:', error);
+      // Error log removed
       res.status(500).json({ 
         error: 'Failed to fetch post',
         message: error.message 
@@ -443,7 +443,7 @@ router.post('/',
 
       res.status(201).json(post);
     } catch (error: any) {
-      console.error('Error creating post:', error);
+      // Error log removed
       res.status(500).json({ 
         error: 'Failed to create post',
         message: error.message 
@@ -515,7 +515,7 @@ router.put('/:id',
 
       res.json(updatedPost);
     } catch (error: any) {
-      console.error('Error updating post:', error);
+      // Error log removed
       res.status(500).json({ 
         error: 'Failed to update post',
         message: error.message 
@@ -553,7 +553,7 @@ router.delete('/:id',
 
       res.json({ message: 'Post deleted successfully' });
     } catch (error: any) {
-      console.error('Error deleting post:', error);
+      // Error log removed
       res.status(500).json({ 
         error: 'Failed to delete post',
         message: error.message 

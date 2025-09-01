@@ -450,7 +450,7 @@ export class StatusPageService {
 
         await this.recordUptimeCheck(component.id, isUp, responseTime);
       } catch (error) {
-        console.error(`Health check failed for ${component.name}:`, error);
+        // Error log removed
         await this.recordUptimeCheck(component.id, false);
       }
     });

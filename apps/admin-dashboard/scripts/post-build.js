@@ -105,8 +105,8 @@ if (fs.existsSync(indexHtmlPath)) {
   );
   
   fs.writeFileSync(indexHtmlPath, html, 'utf-8');
-  console.log('✅ WordPress polyfill script added to dist/index.html');
+  // Log removed
 } else {
-  console.error('❌ dist/index.html not found');
+  // Error log removed
   process.exit(1);
 }

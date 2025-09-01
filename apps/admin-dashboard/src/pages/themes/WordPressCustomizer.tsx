@@ -131,7 +131,7 @@ export const WordPressCustomizer: React.FC = () => {
     } catch (error) {
       setSaveStatus('error');
       toast.error('Failed to publish changes');
-      console.error('Publish error:', error);
+      // Publish error
     } finally {
       setIsPublishing(false);
     }

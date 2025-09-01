@@ -105,7 +105,7 @@ export const DropshippingSettings: React.FC = () => {
         setStatistics(statisticsData.data);
       }
     } catch (error) {
-      console.error('Failed to fetch dropshipping data:', error);
+      // Error log removed
     } finally {
       setLoading(false);
     }
@@ -125,7 +125,7 @@ export const DropshippingSettings: React.FC = () => {
         setSettings(prev => ({ ...prev!, ...updatedSettings }));
       }
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      // Error log removed
     }
   };
 
@@ -142,7 +142,7 @@ export const DropshippingSettings: React.FC = () => {
         alert('연결 테스트 실패');
       }
     } catch (error) {
-      console.error('Connection test failed:', error);
+      // Error log removed
       alert('연결 테스트 중 오류 발생');
     }
   };

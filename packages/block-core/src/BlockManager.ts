@@ -34,7 +34,7 @@ export class BlockManager {
   async loadPlugin(pluginId: string, options?: LoadOptions): Promise<void> {
     // Check if already loaded
     if (this.plugins.has(pluginId)) {
-      console.log(`Plugin ${pluginId} is already loaded`);
+      // Plugin is already loaded
       return;
     }
 
@@ -99,7 +99,7 @@ export class BlockManager {
         status: 'loaded'
       });
       
-      console.log(`✅ Plugin ${pluginId} loaded in ${loadTime.toFixed(2)}ms`);
+      // Plugin loaded successfully
       
     } catch (error) {
       // Update metadata with error
@@ -111,7 +111,7 @@ export class BlockManager {
         error: error as Error
       });
       
-      console.error(`❌ Failed to load plugin ${pluginId}:`, error);
+      // Failed to load plugin
       throw error;
     }
   }
@@ -161,7 +161,7 @@ export class BlockManager {
     const plugin = this.plugins.get(pluginId);
     
     if (!plugin) {
-      console.warn(`Plugin ${pluginId} is not loaded`);
+      // Plugin is not loaded
       return;
     }
     
@@ -177,7 +177,7 @@ export class BlockManager {
     this.plugins.delete(pluginId);
     this.metadata.delete(pluginId);
     
-    console.log(`Plugin ${pluginId} unloaded`);
+    // Plugin unloaded
   }
 
   /**
@@ -226,7 +226,7 @@ export class BlockManager {
    * Initialize with essential plugins
    */
   async initialize(): Promise<void> {
-    console.log('Initializing Block Manager...');
+    // Initializing Block Manager
     
     // Load essential plugins immediately
     await this.loadPlugin('text-content-blocks', {

@@ -320,7 +320,7 @@ export class OperationsMonitoringService {
         const systemStatus = await this.performSystemHealthCheck();
         await this.processHealthCheckResults(systemStatus);
       } catch (error) {
-        console.error('Health check failed:', error);
+        // Error log removed
       }
     }, this.config.healthCheckInterval * 1000);
 
@@ -594,7 +594,7 @@ export class OperationsMonitoringService {
       try {
         await this.collectSystemMetrics();
       } catch (error) {
-        console.error('Metric collection failed:', error);
+        // Error log removed
       }
     }, this.config.metricCollectionInterval * 1000);
 
@@ -689,7 +689,7 @@ export class OperationsMonitoringService {
         )
       );
     } catch (error) {
-      console.error('Database metrics collection failed:', error);
+      // Error log removed
     }
   }
 
@@ -700,7 +700,7 @@ export class OperationsMonitoringService {
         await this.checkAlertConditions();
         await this.processEscalations();
       } catch (error) {
-        console.error('Alert monitoring failed:', error);
+        // Error log removed
       }
     }, this.config.alertCheckInterval * 1000);
 
@@ -827,7 +827,7 @@ export class OperationsMonitoringService {
       alert.markNotificationSent();
       await this.alertRepo.save(alert);
     } catch (error) {
-      console.error('Failed to send alert notifications:', error);
+      // Error log removed
       alert.incrementNotificationRetries();
       await this.alertRepo.save(alert);
     }
@@ -1014,7 +1014,7 @@ export class OperationsMonitoringService {
       try {
         await this.cleanupOldData();
       } catch (error) {
-        console.error('Cleanup process failed:', error);
+        // Error log removed
       }
     }, 24 * 60 * 60 * 1000); // 24 hours
 
@@ -1046,7 +1046,7 @@ export class OperationsMonitoringService {
       try {
         await this.recordUptimeMetrics();
       } catch (error) {
-        console.error('Uptime monitoring failed:', error);
+        // Error log removed
       }
     }, this.config.uptimeCheckInterval * 1000);
 

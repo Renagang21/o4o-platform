@@ -22,10 +22,10 @@ export const logError = (error: Error, context?: string) => {
   };
   
   if (process.env.NODE_ENV === 'development') {
-    console.error('[ERROR]', errorLog);
+    // Error log removed
   } else {
     // In production, could send to monitoring service
-    console.error(`[${timestamp}] ${context || 'Unknown'}: ${error.message}`);
+    // Error log removed
   }
 };
 

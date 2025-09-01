@@ -107,7 +107,7 @@ const EcommerceIntegration: React.FC = () => {
         setStatus(data);
       }
     } catch (error) {
-      console.error('Error fetching integration status:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch integration status',
@@ -129,7 +129,7 @@ const EcommerceIntegration: React.FC = () => {
         setSyncLogs(data.logs || []);
       }
     } catch (error) {
-      console.error('Error fetching sync logs:', error);
+      // Error log removed
     }
   };
 
@@ -153,7 +153,7 @@ const EcommerceIntegration: React.FC = () => {
         await fetchSyncLogs();
       }
     } catch (error) {
-      console.error(`Error syncing ${type}:`, error);
+      // Error log removed
       toast({
         title: 'Error',
         description: `Failed to sync ${type}`,
@@ -185,7 +185,7 @@ const EcommerceIntegration: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error updating settings:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to update settings',

@@ -111,7 +111,7 @@ export class OrdersController {
         }
       });
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch orders'
@@ -161,7 +161,7 @@ export class OrdersController {
         data: orderWithItems
       });
     } catch (error) {
-      console.error('Error fetching order:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch order'
@@ -320,7 +320,7 @@ export class OrdersController {
         await queryRunner.release();
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create order'
@@ -398,7 +398,7 @@ export class OrdersController {
         await queryRunner.release();
       }
     } catch (error) {
-      console.error('Error cancelling order:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to cancel order'

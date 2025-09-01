@@ -159,7 +159,7 @@ export class ScheduledReportingService {
       // Send notifications for daily reports
       await this.sendDailyReportNotification(reports);
     } catch (error) {
-      console.error('Error generating daily reports:', error);
+      // Error log removed
       await this.sendErrorNotification('Daily Report Generation Failed', error);
     }
   }
@@ -196,7 +196,7 @@ export class ScheduledReportingService {
       // Send notifications for weekly reports
       await this.sendWeeklyReportNotification(reports);
     } catch (error) {
-      console.error('Error generating weekly reports:', error);
+      // Error log removed
       await this.sendErrorNotification('Weekly Report Generation Failed', error);
     }
   }
@@ -219,7 +219,7 @@ export class ScheduledReportingService {
       // Send notifications for monthly report
       await this.sendMonthlyReportNotification(report);
     } catch (error) {
-      console.error('Error generating monthly report:', error);
+      // Error log removed
       await this.sendErrorNotification('Monthly Report Generation Failed', error);
     }
   }
@@ -290,7 +290,7 @@ export class ScheduledReportingService {
       await this.analyticsService.recordUsageMetric('active_sessions', activeSessions, 'count');
       
     } catch (error) {
-      console.error('Error in real-time monitoring:', error);
+      // Error log removed
     }
   }
 
@@ -310,7 +310,7 @@ export class ScheduledReportingService {
         }
       }
     } catch (error) {
-      console.error('Error checking alert escalation:', error);
+      // Error log removed
     }
   }
 
@@ -354,7 +354,7 @@ export class ScheduledReportingService {
       }
 
     } catch (error) {
-      console.error('Error in system health check:', error);
+      // Error log removed
     }
   }
 
@@ -401,7 +401,7 @@ export class ScheduledReportingService {
       }
 
     } catch (error) {
-      console.error('Error generating beta program insights:', error);
+      // Error log removed
     }
   }
 
@@ -448,7 +448,7 @@ export class ScheduledReportingService {
         await this.sendWebhookNotification(title, message, urgent);
       }
     } catch (error) {
-      console.error('Error sending notifications:', error);
+      // Error log removed
     }
   }
 
@@ -474,10 +474,10 @@ export class ScheduledReportingService {
       });
 
       if (!response.ok) {
-        console.error('Failed to send Slack notification:', response.statusText);
+        // Error log removed
       }
     } catch (error) {
-      console.error('Error sending Slack notification:', error);
+      // Error log removed
     }
   }
 
@@ -503,10 +503,10 @@ export class ScheduledReportingService {
       });
 
       if (!response.ok) {
-        console.error('Failed to send webhook notification:', response.statusText);
+        // Error log removed
       }
     } catch (error) {
-      console.error('Error sending webhook notification:', error);
+      // Error log removed
     }
   }
 

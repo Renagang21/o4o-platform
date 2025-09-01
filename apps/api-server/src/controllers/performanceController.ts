@@ -166,7 +166,7 @@ export const getPerformanceDashboard = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get performance dashboard:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get performance dashboard'
@@ -191,7 +191,7 @@ export const getOptimizationStatus = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get optimization status:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get optimization status'
@@ -216,7 +216,7 @@ export const getScalingStatus = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get scaling status:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get scaling status'
@@ -241,7 +241,7 @@ export const getCDNStatus = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get CDN status:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get CDN status'
@@ -266,7 +266,7 @@ export const getDatabaseStatus = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get database status:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get database status'
@@ -310,7 +310,7 @@ export const runOptimization = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to run optimization:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to run optimization'
@@ -365,7 +365,7 @@ export const runScaling = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to run scaling:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to run scaling'
@@ -443,7 +443,7 @@ export const generateReports = async (req: Request, res: Response) => {
     }
 
   } catch (error) {
-    console.error('Failed to generate reports:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to generate reports'
@@ -497,7 +497,7 @@ export const updatePerformanceSettings = async (req: Request, res: Response) => 
     });
 
   } catch (error) {
-    console.error('Failed to update performance settings:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to update performance settings'
@@ -533,7 +533,7 @@ export const getRealtimeMetrics = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get realtime metrics:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get realtime metrics'
@@ -591,7 +591,7 @@ export const getPerformanceAlerts = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Failed to get performance alerts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to get performance alerts'

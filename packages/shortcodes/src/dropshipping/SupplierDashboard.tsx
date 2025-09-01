@@ -22,7 +22,7 @@ const useAuth = () => ({ user: { id: 'supplier-1', role: 'supplier' } });
 // Mock API
 const api = {
   get: async (url: string): Promise<{ data: any }> => {
-    console.log('API call:', url);
+    // API call to fetch data
     return { data: { orders: [], products: [] } };
   }
 };

@@ -255,7 +255,7 @@ class AuthService {
     try {
       return await this.userRepository.findOne({ where: { id } });
     } catch (error) {
-      console.error('Error getting user by id:', error);
+      // Error log removed
       return null;
     }
   }
@@ -300,7 +300,7 @@ class AuthService {
         select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
       });
     } catch (error) {
-      console.error('Error getting users by role:', error);
+      // Error log removed
       return [];
     }
   }

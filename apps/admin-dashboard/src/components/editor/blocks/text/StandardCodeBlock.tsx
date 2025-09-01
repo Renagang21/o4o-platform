@@ -146,7 +146,7 @@ const StandardCodeBlock: React.FC<CodeBlockProps> = (props) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy code:', err);
+      // Error log removed
     }
   };
 

@@ -28,7 +28,7 @@ export class ShippingController {
         data: rates
       });
     } catch (error: any) {
-      console.error('Get shipping rates error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to get shipping rates'
@@ -58,7 +58,7 @@ export class ShippingController {
         data: label
       });
     } catch (error: any) {
-      console.error('Create shipping label error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to create shipping label'
@@ -85,7 +85,7 @@ export class ShippingController {
         data: tracking
       });
     } catch (error: any) {
-      console.error('Track shipment error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to track shipment'
@@ -108,7 +108,7 @@ export class ShippingController {
         data: { cancelled }
       });
     } catch (error: any) {
-      console.error('Cancel shipment error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to cancel shipment'
@@ -131,7 +131,7 @@ export class ShippingController {
         data: history
       });
     } catch (error: any) {
-      console.error('Get shipping history error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to get shipping history'
@@ -153,7 +153,7 @@ export class ShippingController {
       // Most carriers expect a simple 200 OK response
       res.status(200).send('OK');
     } catch (error: any) {
-      console.error('Carrier webhook error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Webhook processing failed'
@@ -174,7 +174,7 @@ export class ShippingController {
         data: carriers
       });
     } catch (error: any) {
-      console.error('Get carriers error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to get carriers'
@@ -230,7 +230,7 @@ export class ShippingController {
         }
       });
     } catch (error: any) {
-      console.error('Bulk create labels error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to create labels'
@@ -251,7 +251,7 @@ export class ShippingController {
         message: 'Tracking update initiated'
       });
     } catch (error: any) {
-      console.error('Update tracking error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to update tracking'
@@ -321,7 +321,7 @@ export class ShippingController {
         }
       });
     } catch (error: any) {
-      console.error('Get shipment stats error:', error);
+      // Error log removed
       res.status(400).json({
         success: false,
         message: error.message || 'Failed to get statistics'

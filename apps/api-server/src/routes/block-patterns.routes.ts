@@ -125,7 +125,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     })));
 
   } catch (error: any) {
-    console.error('Error fetching block patterns:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to fetch block patterns',
       message: error.message 
@@ -167,7 +167,7 @@ router.get('/categories', async (req: AuthRequest, res: Response) => {
     res.json(categoriesWithCounts);
 
   } catch (error: any) {
-    console.error('Error fetching pattern categories:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to fetch categories',
       message: error.message 
@@ -234,7 +234,7 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error: any) {
-    console.error('Error fetching block pattern:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to fetch block pattern',
       message: error.message 
@@ -328,7 +328,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error: any) {
-    console.error('Error creating block pattern:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to create block pattern',
       message: error.message 
@@ -428,7 +428,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     });
 
   } catch (error: any) {
-    console.error('Error updating block pattern:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to update block pattern',
       message: error.message 
@@ -466,7 +466,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     });
 
   } catch (error: any) {
-    console.error('Error deleting block pattern:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to delete block pattern',
       message: error.message 
@@ -556,7 +556,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     });
 
   } catch (error: any) {
-    console.error('Error duplicating block pattern:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to duplicate block pattern',
       message: error.message 

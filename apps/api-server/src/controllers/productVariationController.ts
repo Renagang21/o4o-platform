@@ -74,7 +74,7 @@ export class ProductVariationController {
         data: savedAttribute
       });
     } catch (error) {
-      console.error('Error adding product attribute:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: '속성 추가 실패'
@@ -163,7 +163,7 @@ export class ProductVariationController {
         message: `${createdVariations.length}개의 변형이 생성되었습니다`
       });
     } catch (error) {
-      console.error('Error creating product variations:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: '변형 생성 실패'
@@ -267,7 +267,7 @@ export class ProductVariationController {
         message: `${createdVariations.length}개의 변형이 자동 생성되었습니다`
       });
     } catch (error) {
-      console.error('Error generating variations:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: '변형 자동 생성 실패'
@@ -338,7 +338,7 @@ export class ProductVariationController {
         data: variations
       });
     } catch (error) {
-      console.error('Error fetching variations:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: '변형 조회 실패'
@@ -395,7 +395,7 @@ export class ProductVariationController {
         }
       });
     } catch (error) {
-      console.error('Error updating variation stock:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: '재고 업데이트 실패'
@@ -453,7 +453,7 @@ export class ProductVariationController {
         }))
       });
     } catch (error) {
-      console.error('Error bulk updating prices:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: '가격 일괄 업데이트 실패'

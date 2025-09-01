@@ -90,7 +90,7 @@ export class VendorProductController {
         }
       });
     } catch (error) {
-      console.error('Error fetching vendor products:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch products' });
     }
   }
@@ -117,7 +117,7 @@ export class VendorProductController {
 
       res.json(product);
     } catch (error) {
-      console.error('Error fetching product:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch product' });
     }
   }
@@ -170,7 +170,7 @@ export class VendorProductController {
         product: savedProduct
       });
     } catch (error) {
-      console.error('Error creating product:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to create product' });
     }
   }
@@ -229,7 +229,7 @@ export class VendorProductController {
         product: updatedProduct
       });
     } catch (error) {
-      console.error('Error updating product:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update product' });
     }
   }
@@ -257,7 +257,7 @@ export class VendorProductController {
 
       res.json({ message: 'Product deleted successfully' });
     } catch (error) {
-      console.error('Error deleting product:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to delete product' });
     }
   }
@@ -283,7 +283,7 @@ export class VendorProductController {
         totalSales: parseInt(r.totalSales)
       }));
     } catch (error) {
-      console.error('Error fetching product sales stats:', error);
+      // Error log removed
       return [];
     }
   }
@@ -298,7 +298,7 @@ export class VendorProductController {
 
       res.json(categories);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch categories' });
     }
   }

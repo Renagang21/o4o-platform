@@ -8,7 +8,7 @@
 
 export function registerLayoutBlocks() {
   if (!window.wp?.blocks) {
-    console.warn('WordPress blocks API not available');
+    // Warning log removed
     return;
   }
 

@@ -416,7 +416,7 @@ export class PricingService {
       // 역할 기반 정책인 경우 해당 역할의 모든 캐시 무효화는
       // 성능상 부담이 클 수 있으므로 TTL에 의존
     } catch (error) {
-      console.warn('Failed to invalidate pricing cache:', error);
+      // Warning log removed
     }
   }
 }

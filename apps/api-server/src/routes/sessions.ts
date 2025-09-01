@@ -42,7 +42,7 @@ router.get('/my-sessions', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching user sessions:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch sessions'
@@ -83,7 +83,7 @@ router.post('/logout/:sessionId', async (req: Request, res: Response) => {
       message: 'Session terminated successfully'
     });
   } catch (error) {
-    console.error('Error terminating session:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to terminate session'
@@ -112,7 +112,7 @@ router.post('/logout-all', async (req: Request, res: Response) => {
       message: 'Logged out from all devices successfully'
     });
   } catch (error) {
-    console.error('Error logging out from all devices:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to logout from all devices'
@@ -162,7 +162,7 @@ router.get('/stats', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching session stats:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch session statistics'

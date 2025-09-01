@@ -72,7 +72,7 @@ export class HanjinConnector {
         cost: response.cost
       };
     } catch (error) {
-      console.error('Hanjin label creation failed:', error);
+      // Error log removed
       throw new Error('Failed to create shipping label');
     }
   }
@@ -103,7 +103,7 @@ export class HanjinConnector {
         }))
       };
     } catch (error) {
-      console.error('Hanjin tracking failed:', error);
+      // Error log removed
       throw new Error('Failed to track shipment');
     }
   }
@@ -117,7 +117,7 @@ export class HanjinConnector {
       await new Promise(resolve => setTimeout(resolve, 1000));
       return true;
     } catch (error) {
-      console.error('Hanjin cancellation failed:', error);
+      // Error log removed
       return false;
     }
   }

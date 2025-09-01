@@ -63,7 +63,7 @@ export async function approveProducts(request: ProductApprovalRequest): Promise<
     return response.data;
   } catch (error: any) {
     // Error logging - use proper error handler
-    // console.error('Product approval error:', error);
+    // // Error log removed
     return {
       success: false,
       approved: [],

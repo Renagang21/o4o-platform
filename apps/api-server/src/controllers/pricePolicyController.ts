@@ -80,7 +80,7 @@ export class PricePolicyController {
         }
       });
     } catch (error) {
-      console.error('Error fetching price policies:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch price policies'
@@ -110,7 +110,7 @@ export class PricePolicyController {
         data: policy
       });
     } catch (error) {
-      console.error('Error fetching price policy:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch price policy'
@@ -165,7 +165,7 @@ export class PricePolicyController {
         data: savedPolicy
       });
     } catch (error) {
-      console.error('Error creating price policy:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create price policy'
@@ -216,7 +216,7 @@ export class PricePolicyController {
         data: updatedPolicy
       });
     } catch (error) {
-      console.error('Error updating price policy:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update price policy'
@@ -254,7 +254,7 @@ export class PricePolicyController {
         message: 'Price policy deactivated successfully'
       });
     } catch (error) {
-      console.error('Error deleting price policy:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete price policy'
@@ -328,7 +328,7 @@ export class PricePolicyController {
         }
       });
     } catch (error) {
-      console.error('Error simulating price:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to simulate price'
@@ -356,7 +356,7 @@ export class PricePolicyController {
         data: policies
       });
     } catch (error) {
-      console.error('Error fetching user policies:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch user policies'
@@ -380,7 +380,7 @@ export class PricePolicyController {
         data: policies
       });
     } catch (error) {
-      console.error('Error fetching product policies:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product policies'
@@ -445,7 +445,7 @@ export class PricePolicyController {
         }
       });
     } catch (error) {
-      console.error('Error fetching policy statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch policy statistics'

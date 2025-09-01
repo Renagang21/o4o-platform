@@ -168,7 +168,7 @@ const AppsManagerV2: FC = () => {
         }))
       );
     } catch (error) {
-      console.error('Failed to load app states:', error);
+      // Error log removed
     }
   };
 

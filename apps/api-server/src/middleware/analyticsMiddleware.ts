@@ -46,7 +46,7 @@ export class AnalyticsMiddleware {
             }
           });
         } catch (error: any) {
-          console.error('Analytics tracking error:', error);
+          // Error log removed
         }
       }
 
@@ -88,7 +88,7 @@ export class AnalyticsMiddleware {
               );
             }
           } catch (error: any) {
-            console.error('Performance tracking error:', error);
+            // Error log removed
           }
         });
 
@@ -121,7 +121,7 @@ export class AnalyticsMiddleware {
               );
             }
           } catch (error: any) {
-            console.error('Performance tracking error:', error);
+            // Error log removed
           }
         });
 
@@ -159,7 +159,7 @@ export class AnalyticsMiddleware {
           });
         }
       } catch (error: any) {
-        console.error('Action tracking error:', error);
+        // Error log removed
       }
 
       next();
@@ -197,7 +197,7 @@ export class AnalyticsMiddleware {
             }
           });
         } catch (trackingError) {
-          console.error('Error tracking error:', trackingError);
+          // Error log removed
         }
       }
 
@@ -232,7 +232,7 @@ export class AnalyticsMiddleware {
           });
         }
       } catch (error: any) {
-        console.error('Session management error:', error);
+        // Error log removed
       }
 
       next();
@@ -260,7 +260,7 @@ export class AnalyticsMiddleware {
               }
             });
           } catch (error: any) {
-            console.error('Login tracking error:', error);
+            // Error log removed
           }
         }
       };
@@ -307,7 +307,7 @@ export class AnalyticsMiddleware {
               feedbackSubmitted: 1
             });
           } catch (error: any) {
-            console.error('Feedback tracking error:', error);
+            // Error log removed
           }
         }
       };
@@ -357,7 +357,7 @@ export class AnalyticsMiddleware {
               });
             }
           } catch (error: any) {
-            console.error('Content usage tracking error:', error);
+            // Error log removed
           }
         }
       };

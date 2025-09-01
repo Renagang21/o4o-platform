@@ -130,7 +130,7 @@ export class RefreshTokenService {
         family: payload.tokenFamily
       };
     } catch (error) {
-      console.error('Token rotation error:', error);
+      // Error log removed
       return null;
     }
   }

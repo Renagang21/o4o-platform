@@ -19,7 +19,7 @@ export class BackingController {
       const backing = await this.backingService.createBacking(req.body, userId);
       res.status(201).json(backing);
     } catch (error) {
-      console.error('Error creating backing:', error);
+      // Error log removed
       res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to create backing' });
     }
   }
@@ -36,7 +36,7 @@ export class BackingController {
       await this.backingService.updatePaymentStatus(backingId, paymentId, status);
       res.json({ success: true });
     } catch (error) {
-      console.error('Error updating payment status:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to update payment status' });
     }
   }
@@ -56,7 +56,7 @@ export class BackingController {
       );
       res.json({ success: true });
     } catch (error) {
-      console.error('Error cancelling backing:', error);
+      // Error log removed
       res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to cancel backing' });
     }
   }
@@ -73,7 +73,7 @@ export class BackingController {
       const backings = await this.backingService.getUserBackings(userId, status);
       res.json(backings);
     } catch (error) {
-      console.error('Error fetching user backings:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch backings' });
     }
   }
@@ -93,7 +93,7 @@ export class BackingController {
       );
       res.json(result);
     } catch (error) {
-      console.error('Error fetching project backers:', error);
+      // Error log removed
       res.status(500).json({ error: 'Failed to fetch backers' });
     }
   }

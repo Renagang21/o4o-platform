@@ -41,7 +41,7 @@ export class UserController {
         }
       });
     } catch (error) {
-      console.error('Get profile error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Internal server error'
@@ -76,7 +76,7 @@ export class UserController {
         message: `User role updated to ${role}`
       });
     } catch (error) {
-      console.error('Update user role error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Internal server error'
@@ -119,7 +119,7 @@ export class UserController {
         message: 'Business information updated successfully'
       });
     } catch (error) {
-      console.error('Update business info error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -149,7 +149,7 @@ export class UserController {
         total: users.length
       });
     } catch (error) {
-      console.error('Get users error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -176,7 +176,7 @@ export class UserController {
         message: 'User suspended successfully'
       });
     } catch (error) {
-      console.error('Suspend user error:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'

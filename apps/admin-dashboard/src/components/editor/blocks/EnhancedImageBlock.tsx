@@ -125,12 +125,12 @@ const EnhancedImageBlock: React.FC<EnhancedImageBlockProps> = ({
   // Handle file upload
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      console.error('Invalid file type. Please select an image.');
+      // Error log removed
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      console.error('File size too large. Maximum size is 10MB.');
+      // Error log removed
       return;
     }
 
@@ -157,10 +157,10 @@ const EnhancedImageBlock: React.FC<EnhancedImageBlockProps> = ({
         };
         img.src = result.data.url;
       } else {
-        console.error('Upload failed:', result.error);
+        // Error log removed
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      // Error log removed
     } finally {
       setIsUploading(false);
       setUploadProgress(0);

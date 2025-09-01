@@ -66,7 +66,7 @@ export const useCustomizerState = () => {
         }
       }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      // Failed to load settings
       // Use defaults
     }
   }, []);
@@ -129,7 +129,7 @@ export const useCustomizerState = () => {
       }
       return false;
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      // Failed to save settings
       return false;
     }
   }, [settings]);

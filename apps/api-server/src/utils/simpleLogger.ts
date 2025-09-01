@@ -27,14 +27,14 @@ class SimpleLogger {
     
     switch (level) {
       case LogLevel.ERROR:
-        console.error(formattedMessage);
+        // Error log removed
         break;
       case LogLevel.WARN:
-        console.warn(formattedMessage);
+        // Warning log removed
         break;
       case LogLevel.DEBUG:
         if (this.isDevelopment) {
-          console.debug(formattedMessage);
+          // Debug log removed
         }
         break;
       default:

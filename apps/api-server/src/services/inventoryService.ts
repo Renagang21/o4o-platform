@@ -116,7 +116,7 @@ export class InventoryService {
 
       return { success: true, reservationId };
     } catch (error) {
-      console.error('Error reserving inventory:', error);
+      // Error log removed
       await this.releaseReservation(reservationId);
       return { 
         success: false, 
@@ -135,7 +135,7 @@ export class InventoryService {
       // 현재는 간단히 개별 상품별로 해제하는 방식을 사용
       // 실제 구현에서는 예약 정보를 별도로 저장하여 관리하는 것이 좋습니다.
     } catch (error) {
-      console.error('Error releasing reservation:', error);
+      // Error log removed
     }
   }
 
@@ -193,7 +193,7 @@ export class InventoryService {
       return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('Error confirming reservation:', error);
+      // Error log removed
       return { 
         success: false, 
         errors: ['Failed to confirm inventory reservation'] 
@@ -247,7 +247,7 @@ export class InventoryService {
       return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('Error restoring inventory:', error);
+      // Error log removed
       return { 
         success: false, 
         errors: ['Failed to restore inventory'] 
@@ -354,7 +354,7 @@ export class InventoryService {
       return { success: true };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('Error performing inventory adjustment:', error);
+      // Error log removed
       return { 
         success: false, 
         errors: ['Failed to perform inventory adjustment'] 

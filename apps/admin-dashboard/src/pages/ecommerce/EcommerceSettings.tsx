@@ -183,7 +183,7 @@ const EcommerceSettings: FC = () => {
         setSettings(response.data as any);
       }
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      // Error log removed
       // Use default settings if fetch fails
     } finally {
       setLoading(false);
@@ -196,7 +196,7 @@ const EcommerceSettings: FC = () => {
       await EcommerceApi.updateSettings(settings as any);
       toast.success('설정이 저장되었습니다');
     } catch (error) {
-      console.error('Error saving settings:', error);
+      // Error log removed
       toast.error('설정 저장에 실패했습니다');
     } finally {
       setSaving(false);

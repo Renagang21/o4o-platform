@@ -61,7 +61,7 @@ export class RealtimeFeedbackService {
             await this.handleAdminJoin(socket, data.userId);
           }
         } catch (error) {
-          console.error('Error handling admin join:', error);
+          // Error log removed
           socket.emit('error', { message: 'Failed to join admin room' });
         }
       });
@@ -71,7 +71,7 @@ export class RealtimeFeedbackService {
         try {
           await this.handleUserJoin(socket, data.betaUserId, data.email);
         } catch (error) {
-          console.error('Error handling user join:', error);
+          // Error log removed
           socket.emit('error', { message: 'Failed to join user room' });
         }
       });
@@ -81,7 +81,7 @@ export class RealtimeFeedbackService {
         try {
           await this.handleConversationJoin(socket, data.conversationId);
         } catch (error) {
-          console.error('Error joining conversation:', error);
+          // Error log removed
           socket.emit('error', { message: 'Failed to join conversation' });
         }
       });
@@ -97,7 +97,7 @@ export class RealtimeFeedbackService {
         try {
           await this.handleSendMessage(socket, data);
         } catch (error) {
-          console.error('Error sending message:', error);
+          // Error log removed
           socket.emit('error', { message: 'Failed to send message' });
         }
       });
@@ -107,7 +107,7 @@ export class RealtimeFeedbackService {
         try {
           await this.handleMarkMessageRead(data.messageId);
         } catch (error) {
-          console.error('Error marking message as read:', error);
+          // Error log removed
         }
       });
 
@@ -116,7 +116,7 @@ export class RealtimeFeedbackService {
         try {
           await this.handleFeedbackViewed(data.feedbackId, data.viewedBy);
         } catch (error) {
-          console.error('Error marking feedback as viewed:', error);
+          // Error log removed
         }
       });
 
@@ -125,7 +125,7 @@ export class RealtimeFeedbackService {
         try {
           await this.handleStartLiveSupport(data.feedbackId);
         } catch (error) {
-          console.error('Error starting live support:', error);
+          // Error log removed
           socket.emit('error', { message: 'Failed to start live support' });
         }
       });

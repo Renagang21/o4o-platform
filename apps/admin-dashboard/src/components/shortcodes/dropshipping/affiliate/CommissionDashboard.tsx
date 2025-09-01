@@ -153,7 +153,7 @@ const CommissionDashboard: React.FC = () => {
         setTierInfo(data);
       }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch dashboard data',
@@ -184,7 +184,7 @@ const CommissionDashboard: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error exporting data:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to export data',

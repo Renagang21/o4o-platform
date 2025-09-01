@@ -71,7 +71,7 @@ export class SocialAuthService {
     try {
       await emailService.sendWelcomeEmail(user.email, user.name || user.email);
     } catch (error) {
-      console.error('Failed to send welcome email:', error);
+      // Error log removed
     }
 
     return user;

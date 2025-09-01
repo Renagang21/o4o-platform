@@ -116,7 +116,7 @@ export class UserActivityController {
         }
       });
     } catch (error) {
-      console.error('Error fetching user activity log:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -203,7 +203,7 @@ export class UserActivityController {
         message: 'Activity logged successfully'
       });
     } catch (error) {
-      console.error('Error creating user activity:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -223,7 +223,7 @@ export class UserActivityController {
         data: categories
       });
     } catch (error) {
-      console.error('Error fetching activity categories:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -294,7 +294,7 @@ export class UserActivityController {
         data: typesWithLabels
       });
     } catch (error) {
-      console.error('Error fetching activity types:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -359,7 +359,7 @@ export class UserActivityController {
         data: summary
       });
     } catch (error) {
-      console.error('Error fetching activity summary:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'

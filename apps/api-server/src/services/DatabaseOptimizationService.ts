@@ -132,7 +132,7 @@ export class DatabaseOptimizationService {
 
 
     } catch (error) {
-      console.error('Failed to analyze query performance:', error);
+      // Error log removed
     }
   }
 
@@ -170,7 +170,7 @@ export class DatabaseOptimizationService {
       }));
 
     } catch (error) {
-      console.warn('Failed to get slow queries (pg_stat_statements may not be enabled):', error);
+      // Warning log removed
       return [];
     }
   }
@@ -216,7 +216,7 @@ export class DatabaseOptimizationService {
       }
 
     } catch (error) {
-      console.error('Failed to analyze slow query:', error);
+      // Error log removed
     }
   }
 
@@ -235,7 +235,7 @@ export class DatabaseOptimizationService {
         executionTime: queryPlan['Execution Time'] || 0
       };
     } catch (error) {
-      console.warn('Failed to get execution plan:', error);
+      // Warning log removed
       return {
         plan: null,
         totalCost: 0,
@@ -338,7 +338,7 @@ export class DatabaseOptimizationService {
       }
 
     } catch (error) {
-      console.error('Failed to analyze query patterns:', error);
+      // Error log removed
     }
   }
 
@@ -372,7 +372,7 @@ export class DatabaseOptimizationService {
       }
 
     } catch (error) {
-      console.warn('Failed to identify query patterns:', error);
+      // Warning log removed
     }
 
     return patterns;
@@ -409,7 +409,7 @@ export class DatabaseOptimizationService {
       await this.redis.hset('db_cache_stats', 'tables', JSON.stringify(cacheStats));
 
     } catch (error) {
-      console.error('Failed to analyze cache hit rates:', error);
+      // Error log removed
     }
   }
 
@@ -447,7 +447,7 @@ export class DatabaseOptimizationService {
 
 
     } catch (error) {
-      console.error('Failed to analyze index usage:', error);
+      // Error log removed
     }
   }
 
@@ -480,7 +480,7 @@ export class DatabaseOptimizationService {
       }));
 
     } catch (error) {
-      console.warn('Failed to find unused indexes:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -509,7 +509,7 @@ export class DatabaseOptimizationService {
       }));
 
     } catch (error) {
-      console.warn('Failed to find duplicate indexes:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -546,7 +546,7 @@ export class DatabaseOptimizationService {
       }));
 
     } catch (error) {
-      console.warn('Failed to get index usage stats:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -664,7 +664,7 @@ export class DatabaseOptimizationService {
       }
 
     } catch (error) {
-      console.error('Failed to monitor connection pool:', error);
+      // Error log removed
     }
   }
 
@@ -703,7 +703,7 @@ export class DatabaseOptimizationService {
       await this.redis.ltrim('db_stats_history', 0, 99);
 
     } catch (error) {
-      console.error('Failed to collect database stats:', error);
+      // Error log removed
     }
   }
 
@@ -736,7 +736,7 @@ export class DatabaseOptimizationService {
       }));
 
     } catch (error) {
-      console.warn('Failed to get table sizes:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -751,7 +751,7 @@ export class DatabaseOptimizationService {
       `);
       return result[0].size;
     } catch (error) {
-      console.warn('Failed to get database size:', error);
+      // Warning log removed
       return 'Unknown';
     }
   }
@@ -789,7 +789,7 @@ export class DatabaseOptimizationService {
       }));
 
     } catch (error) {
-      console.warn('Failed to get active connections:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -824,7 +824,7 @@ export class DatabaseOptimizationService {
       };
 
     } catch (error) {
-      console.warn('Failed to get lock stats:', error);
+      // Warning log removed
       return {
         lockModes: [],
         waitingLocks: 0
@@ -849,7 +849,7 @@ export class DatabaseOptimizationService {
 
 
     } catch (error) {
-      console.error('❌ Automatic database optimization failed:', error);
+      // Error log removed
     }
   }
 
@@ -861,7 +861,7 @@ export class DatabaseOptimizationService {
       // 모든 테이블의 통계 업데이트
       await AppDataSource.query('ANALYZE');
     } catch (error) {
-      console.error('Failed to update table statistics:', error);
+      // Error log removed
     }
   }
 
@@ -877,7 +877,7 @@ export class DatabaseOptimizationService {
       await this.optimizeConnectionPool();
       
     } catch (error) {
-      console.error('Failed to run maintenance tasks:', error);
+      // Error log removed
     }
   }
 
@@ -903,7 +903,7 @@ export class DatabaseOptimizationService {
       `, [cutoffDate]);
 
     } catch (error) {
-      console.error('Failed to cleanup old data:', error);
+      // Error log removed
     }
   }
 
@@ -936,7 +936,7 @@ export class DatabaseOptimizationService {
       }
 
     } catch (error) {
-      console.error('Failed to optimize connection pool:', error);
+      // Error log removed
     }
   }
 
@@ -956,13 +956,13 @@ export class DatabaseOptimizationService {
           try {
             await AppDataSource.query(recommendation.action);
           } catch (error) {
-            console.warn(`Failed to apply optimization: ${recommendation.action}`, error);
+            // Warning log removed
           }
         }
       }
 
     } catch (error) {
-      console.error('Failed to apply auto index optimizations:', error);
+      // Error log removed
     }
   }
 
@@ -1225,7 +1225,7 @@ export class DatabaseOptimizationService {
     try {
       await this.redis.disconnect();
     } catch (error) {
-      console.error('❌ Database optimization service shutdown failed:', error);
+      // Error log removed
     }
   }
 }

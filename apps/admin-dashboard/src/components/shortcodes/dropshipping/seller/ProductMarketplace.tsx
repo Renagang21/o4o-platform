@@ -113,7 +113,7 @@ const ProductMarketplace: React.FC = () => {
         setProducts(data.products || []);
       }
     } catch (error) {
-      console.error('Error fetching marketplace products:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch marketplace products',
@@ -148,7 +148,7 @@ const ProductMarketplace: React.FC = () => {
         setSelectedProduct(null);
       }
     } catch (error) {
-      console.error('Error importing product:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to import product',

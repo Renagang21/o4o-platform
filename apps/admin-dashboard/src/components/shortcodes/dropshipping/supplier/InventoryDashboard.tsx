@@ -81,7 +81,7 @@ const InventoryDashboard: React.FC = () => {
         setStats(data.stats || null);
       }
     } catch (error) {
-      console.error('Error fetching inventory:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch inventory data',
@@ -111,7 +111,7 @@ const InventoryDashboard: React.FC = () => {
         fetchInventoryData();
       }
     } catch (error) {
-      console.error('Error restocking item:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to restock item',
@@ -149,7 +149,7 @@ const InventoryDashboard: React.FC = () => {
         fetchInventoryData();
       }
     } catch (error) {
-      console.error('Error bulk restocking:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to restock items',

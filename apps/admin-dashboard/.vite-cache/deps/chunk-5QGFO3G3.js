@@ -529,7 +529,7 @@ function invariant(value, message) {
 }
 function warning(cond, message) {
   if (!cond) {
-    if (typeof console !== "undefined") console.warn(message);
+    if (typeof console !== "undefined") // Warning log removed
     try {
       throw new Error(message);
     } catch (e) {
@@ -5980,7 +5980,7 @@ var alreadyWarned2 = {};
 function warnOnce(condition, message) {
   if (!condition && !alreadyWarned2[message]) {
     alreadyWarned2[message] = true;
-    console.warn(message);
+    // Warning log removed
   }
 }
 function mapRouteProperties(route) {
@@ -7877,7 +7877,7 @@ async function loadRouteModule(route, routeModulesCache) {
     console.error(
       `Error loading route module \`${route.module}\`, reloading page...`
     );
-    console.error(error);
+    // Error log removed
     if (window.__reactRouterContext && window.__reactRouterContext.isSpaMode && // @ts-expect-error
     import.meta.hot) {
       throw error;
@@ -8198,14 +8198,14 @@ function preventInvalidServerHandlerCall(type, route) {
   if (type === "loader" && !route.hasLoader || type === "action" && !route.hasAction) {
     let fn = type === "action" ? "serverAction()" : "serverLoader()";
     let msg = `You are trying to call ${fn} on a route that does not have a server ${type} (routeId: "${route.id}")`;
-    console.error(msg);
+    // Error log removed
     throw new ErrorResponseImpl(400, "Bad Request", new Error(msg), true);
   }
 }
 function noActionDefinedError(type, routeId) {
   let article = type === "clientAction" ? "a" : "an";
   let msg = `Route "${routeId}" does not have ${article} ${type}, but you are trying to submit to it. To fix this, please add ${article} \`${type}\` function to the route`;
-  console.error(msg);
+  // Error log removed
   throw new ErrorResponseImpl(405, "Method Not Allowed", new Error(msg), true);
 }
 function createClientRoutes(manifest, routeModulesCache, initialState, ssr, isSpaMode, parentId = "", routesByParentId = groupRoutesByParentId(manifest), needsRevalidation) {
@@ -8610,7 +8610,7 @@ function useFogOFWarDiscovery(router2, manifest, routeModules, ssr, routeDiscove
           router2.patchRoutes
         );
       } catch (e) {
-        console.error("Failed to fetch manifest patches", e);
+        // Error log removed
       }
     }
     let debouncedFetchPatches = debounce(fetchPatches, 100);
@@ -8666,7 +8666,7 @@ async function fetchAndApplyManifestPatches(paths, errorReloadPath, manifest, ro
       }
       sessionStorage.setItem(MANIFEST_VERSION_STORAGE_KEY, manifest.version);
       window.location.href = errorReloadPath;
-      console.warn("Detected manifest version mismatch, reloading...");
+      // Warning log removed
       await new Promise(() => {
       });
     } else if (res.status >= 400) {
@@ -9265,7 +9265,7 @@ function RemixRootDefaultErrorBoundary({
   error,
   isOutsideRemixApp
 }) {
-  console.error(error);
+  // Error log removed
   let heyDeveloper = React9.createElement(
     "script",
     {
@@ -9736,7 +9736,7 @@ function ScrollRestoration({
         window.scrollTo(0, storedY);
       }
     } catch (error) {
-      console.error(error);
+      // Error log removed
       sessionStorage.removeItem(storageKey2);
     }
   }).toString();
@@ -12132,7 +12132,7 @@ function RSCDefaultRootErrorBoundaryImpl({
   error,
   renderAppShell
 }) {
-  console.error(error);
+  // Error log removed
   let heyDeveloper = import_react.default.createElement(
     "script",
     {
@@ -12639,7 +12639,7 @@ function RSCHydratedRouter({
           fetchImplementation
         );
       } catch (e) {
-        console.error("Failed to fetch manifest patches", e);
+        // Error log removed
       }
     }
     let debouncedFetchPatches = debounce2(fetchPatches, 100);
@@ -12767,7 +12767,7 @@ function preventInvalidServerHandlerCall2(type, routeId, hasHandler) {
   if (!hasHandler) {
     let fn = type === "action" ? "serverAction()" : "serverLoader()";
     let msg = `You are trying to call ${fn} on a route that does not have a server ${type} (routeId: "${routeId}")`;
-    console.error(msg);
+    // Error log removed
     throw new ErrorResponseImpl(400, "Bad Request", new Error(msg), true);
   }
 }
@@ -13188,7 +13188,7 @@ function initSsrInfo() {
             importMap.textContent
           ).integrity;
         } catch (err) {
-          console.error("Failed to parse import map", err);
+          // Error log removed
         }
       }
     }

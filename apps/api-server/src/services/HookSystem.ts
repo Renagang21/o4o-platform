@@ -88,7 +88,7 @@ export class HookSystem extends EventEmitter {
       try {
         await (hook.callback as HookCallback)(...args);
       } catch (error) {
-        console.error(`Error in action hook ${hookName}:`, error);
+        // Error log removed
         this.emit('hook:error', { type: 'action', hookName, error });
       }
     }
@@ -111,7 +111,7 @@ export class HookSystem extends EventEmitter {
       try {
         filtered = await filter.callback(filtered, ...args);
       } catch (error) {
-        console.error(`Error in filter hook ${filterName}:`, error);
+        // Error log removed
         this.emit('hook:error', { type: 'filter', filterName, error });
       }
     }

@@ -22,7 +22,7 @@ export class OperationsController {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Failed to get system status:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve system status',
@@ -49,7 +49,7 @@ export class OperationsController {
 
       res.json(healthStatus);
     } catch (error) {
-      console.error('Health check failed:', error);
+      // Error log removed
       res.status(503).json({
         status: 'unhealthy',
         error: 'Health check failed',
@@ -77,7 +77,7 @@ export class OperationsController {
         }
       });
     } catch (error) {
-      console.error('Failed to get service health:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve service health',
@@ -119,7 +119,7 @@ export class OperationsController {
         }
       });
     } catch (error) {
-      console.error('Failed to get infrastructure metrics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve infrastructure metrics',
@@ -161,7 +161,7 @@ export class OperationsController {
         }
       });
     } catch (error) {
-      console.error('Failed to get performance metrics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve performance metrics',
@@ -245,7 +245,7 @@ export class OperationsController {
         }
       });
     } catch (error) {
-      console.error('Failed to get alerts:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve alerts',
@@ -267,7 +267,7 @@ export class OperationsController {
         message: 'Alert acknowledged successfully'
       });
     } catch (error) {
-      console.error('Failed to acknowledge alert:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to acknowledge alert',
@@ -289,7 +289,7 @@ export class OperationsController {
         message: 'Alert resolved successfully'
       });
     } catch (error) {
-      console.error('Failed to resolve alert:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to resolve alert',
@@ -314,7 +314,7 @@ export class OperationsController {
         }
       });
     } catch (error) {
-      console.error('Failed to get alert rules:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve alert rules',
@@ -345,7 +345,7 @@ export class OperationsController {
         message: 'Alert rule created successfully'
       });
     } catch (error) {
-      console.error('Failed to create alert rule:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create alert rule',
@@ -366,7 +366,7 @@ export class OperationsController {
         message: 'Alert rule updated successfully'
       });
     } catch (error) {
-      console.error('Failed to update alert rule:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update alert rule',
@@ -386,7 +386,7 @@ export class OperationsController {
         message: 'Alert rule deleted successfully'
       });
     } catch (error) {
-      console.error('Failed to delete alert rule:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete alert rule',
@@ -405,7 +405,7 @@ export class OperationsController {
         data: config
       });
     } catch (error) {
-      console.error('Failed to get monitoring config:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve monitoring configuration',
@@ -425,7 +425,7 @@ export class OperationsController {
         message: 'Monitoring configuration updated successfully'
       });
     } catch (error) {
-      console.error('Failed to update monitoring config:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update monitoring configuration',
@@ -477,7 +477,7 @@ export class OperationsController {
         data: dashboardData
       });
     } catch (error) {
-      console.error('Failed to get dashboard data:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve dashboard data',
@@ -506,7 +506,7 @@ export class OperationsController {
 
       res.json(statusPage);
     } catch (error) {
-      console.error('Failed to get status page data:', error);
+      // Error log removed
       res.status(500).json({
         status: 'error',
         message: 'Unable to retrieve system status',

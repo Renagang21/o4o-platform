@@ -42,7 +42,7 @@ export function registerDropshippingShortcodes() {
     description: 'Affiliate dashboard for commission tracking'
   });
 
-  console.log('Dropshipping shortcodes registered successfully');
+  // Dropshipping shortcodes registered successfully
 }
 
 // Export components for direct use

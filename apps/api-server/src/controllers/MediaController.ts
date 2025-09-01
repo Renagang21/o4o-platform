@@ -132,14 +132,14 @@ export class MediaController {
           data: savedFile
         });
       } catch (error: any) {
-        console.error('Error uploading file:', error);
+        // Error log removed
         
         // Clean up uploaded file on error
         if (req.file) {
           try {
             await fs.unlink(req.file.path);
           } catch (unlinkError) {
-            console.error('Error deleting file:', unlinkError);
+            // Error log removed
           }
         }
 
@@ -209,7 +209,7 @@ export class MediaController {
           data: uploadedFiles
         });
       } catch (error: any) {
-        console.error('Error uploading files:', error);
+        // Error log removed
 
         // Clean up uploaded files on error
         if (req.files) {
@@ -218,7 +218,7 @@ export class MediaController {
             try {
               await fs.unlink(file.path);
             } catch (unlinkError) {
-              console.error('Error deleting file:', unlinkError);
+              // Error log removed
             }
           }
         }
@@ -292,7 +292,7 @@ export class MediaController {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching media:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch media',
@@ -325,7 +325,7 @@ export class MediaController {
         data: media
       });
     } catch (error: any) {
-      console.error('Error fetching media:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch media',
@@ -365,7 +365,7 @@ export class MediaController {
         data: updatedMedia
       });
     } catch (error: any) {
-      console.error('Error updating media:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update media',
@@ -407,7 +407,7 @@ export class MediaController {
           await fs.unlink(mediumPath);
         }
       } catch (error) {
-        console.error('Error deleting physical file:', error);
+        // Error log removed
       }
 
       // Delete database record
@@ -418,7 +418,7 @@ export class MediaController {
         message: 'Media deleted successfully'
       });
     } catch (error: any) {
-      console.error('Error deleting media:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete media',
@@ -481,7 +481,7 @@ export class MediaController {
         data: savedFolder
       });
     } catch (error: any) {
-      console.error('Error creating folder:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to create folder',
@@ -515,7 +515,7 @@ export class MediaController {
         total: folders.length
       });
     } catch (error: any) {
-      console.error('Error fetching folders:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch folders',
@@ -558,7 +558,7 @@ export class MediaController {
         message: 'Folder deleted successfully'
       });
     } catch (error: any) {
-      console.error('Error deleting folder:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete folder',

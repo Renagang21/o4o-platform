@@ -29,7 +29,7 @@ async function waitForReact(): Promise<void> {
     }
   }
 
-  console.warn('React not loaded after 5 seconds, WordPress polyfill may not work correctly');
+  // Warning log removed
 }
 
 /**

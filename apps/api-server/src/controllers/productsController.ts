@@ -124,7 +124,7 @@ export class ProductsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching products:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch products'
@@ -170,7 +170,7 @@ export class ProductsController {
         data: productWithUserPrice
       });
     } catch (error) {
-      console.error('Error fetching product:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product'
@@ -216,7 +216,7 @@ export class ProductsController {
         data: savedProduct
       });
     } catch (error) {
-      console.error('Error creating product:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create product'
@@ -269,7 +269,7 @@ export class ProductsController {
         data: updatedProduct
       });
     } catch (error) {
-      console.error('Error updating product:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update product'
@@ -307,7 +307,7 @@ export class ProductsController {
         message: 'Product deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting product:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to delete product'
@@ -345,7 +345,7 @@ export class ProductsController {
         data: productsWithUserPrice
       });
     } catch (error) {
-      console.error('Error fetching featured products:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch featured products'

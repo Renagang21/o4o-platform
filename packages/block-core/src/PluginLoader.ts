@@ -51,7 +51,7 @@ export class PluginLoader {
    * Actual loading logic
    */
   private async doLoad(pluginId: string, options?: LoadOptions): Promise<BlockPlugin> {
-    console.log(`Loading plugin: ${pluginId}`);
+    // Loading plugin
 
     try {
       // Dynamic import based on plugin ID
@@ -68,7 +68,7 @@ export class PluginLoader {
       return plugin as BlockPlugin;
       
     } catch (error) {
-      console.error(`Failed to load plugin ${pluginId}:`, error);
+      // Failed to load plugin
       throw error;
     }
   }
@@ -133,7 +133,7 @@ export class PluginLoader {
       try {
         await this.load(pluginId, { preload: true, priority: 'high' });
       } catch (error) {
-        console.error(`Failed to preload essential plugin ${pluginId}:`, error);
+        // Failed to preload essential plugin
       }
     }
   }
@@ -168,9 +168,9 @@ export class PluginLoader {
     try {
       // Just trigger the import to cache the module
       await this.dynamicImport(pluginId, { prefetch: true });
-      console.log(`Prefetched plugin: ${pluginId}`);
+      // Prefetched plugin
     } catch (error) {
-      console.warn(`Failed to prefetch plugin ${pluginId}:`, error);
+      // Failed to prefetch plugin
     }
   }
 

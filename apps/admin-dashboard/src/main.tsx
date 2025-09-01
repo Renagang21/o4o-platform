@@ -41,7 +41,7 @@ const queryClient = new QueryClient({
 // WordPress 런타임 환경 초기화
 // Deploy trigger: ParagraphTestBlock and StandaloneEditor updates - v2
 setupWordPressEnvironment().catch((error) => {
-  console.error('Failed to setup WordPress environment:', error);
+  // Error log removed
 });
 
 createRoot(document.getElementById('root')!).render(

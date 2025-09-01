@@ -606,7 +606,7 @@ function deprecated(feature, options = {}) {
     return;
   }
   doAction("deprecated", feature, options, message);
-  console.warn(message);
+  // Warning log removed
   logged[message] = true;
 }
 
@@ -4814,7 +4814,7 @@ function createRegistry(storeConfigs = {}, parent = null) {
   }
   function registerStoreInstance(name, createStore2) {
     if (stores[name]) {
-      console.error('Store "' + name + '" is already registered.');
+      // Error log removed
       return stores[name];
     }
     const store2 = createStore2();
@@ -7920,7 +7920,7 @@ function warning(message) {
   if (logged2.has(message)) {
     return;
   }
-  console.warn(message);
+  // Warning log removed
   try {
     throw Error(message);
   } catch (x2) {

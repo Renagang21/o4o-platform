@@ -81,7 +81,7 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
 
     return wpModulesCache;
   } catch (error) {
-    console.error('Failed to load WordPress modules:', error);
+    // Error log removed
     throw error;
   }
 }

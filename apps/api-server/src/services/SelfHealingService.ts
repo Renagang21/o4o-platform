@@ -265,7 +265,7 @@ export class SelfHealingService {
       // Simulate Redis cache clear
       await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error) {
-      console.error('Failed to clear Redis cache:', error);
+      // Error log removed
       throw error;
     }
   }
@@ -278,7 +278,7 @@ export class SelfHealingService {
         await execAsync(`find ${tempDir} -type f -name "*.tmp" -mtime +1 -delete 2>/dev/null || true`);
         await execAsync(`find ${tempDir} -type f -name "*.log" -mtime +7 -delete 2>/dev/null || true`);
       } catch (error) {
-        console.warn(`Failed to clear temp files in ${tempDir}:`, error);
+        // Warning log removed
       }
     }
   }
@@ -430,7 +430,7 @@ export class SelfHealingService {
           }
       }
     } catch (error) {
-      console.error(`Service status check failed for ${serviceName}:`, error);
+      // Error log removed
       return 'error';
     }
   }
@@ -443,7 +443,7 @@ export class SelfHealingService {
         await this.detectAndHealIssues();
         await this.updateHealthMetrics();
       } catch (error) {
-        console.error('Self-healing health monitoring failed:', error);
+        // Error log removed
       }
     }, 60000); // Every minute
 
@@ -545,7 +545,7 @@ export class SelfHealingService {
       const dbResult = await AppDataSource.query('SELECT count(*) FROM pg_stat_activity');
       connections.database = parseInt(dbResult[0].count);
     } catch (error) {
-      console.warn('Failed to get database connection count:', error);
+      // Warning log removed
     }
     
     return connections;
@@ -684,12 +684,12 @@ export class SelfHealingService {
           break;
         
         default:
-          console.warn(`Unknown healing action: ${suggestedAction}`);
+          // Warning log removed
       }
       
       
     } catch (error) {
-      console.error(`❌ Auto-healing failed for ${issue.type}:`, error);
+      // Error log removed
     }
   }
 
@@ -703,7 +703,7 @@ export class SelfHealingService {
         // Compress logs older than 1 day
         await execAsync(`find ${logDir} -type f -name "*.log" -mtime +1 -exec gzip {} \\; 2>/dev/null || true`);
       } catch (error) {
-        console.warn(`Failed to cleanup logs in ${logDir}:`, error);
+        // Warning log removed
       }
     }
   }

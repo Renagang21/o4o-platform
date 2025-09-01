@@ -24,7 +24,7 @@ router.get('/states', authenticateToken, requireAdmin, (req, res) => {
       data: states
     });
   } catch (error) {
-    console.error('Error fetching app states:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       message: 'Failed to fetch app states'
@@ -53,7 +53,7 @@ router.get('/states/:appId', authenticateToken, requireAdmin, (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching app state:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       message: 'Failed to fetch app state'
@@ -123,7 +123,7 @@ router.put('/states/:appId', authenticateToken, requireAdmin, (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error updating app state:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       message: 'Failed to update app state'
@@ -161,7 +161,7 @@ router.post('/states/batch', authenticateToken, requireAdmin, (req, res) => {
       data: results
     });
   } catch (error) {
-    console.error('Error batch updating app states:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       message: 'Failed to batch update app states'

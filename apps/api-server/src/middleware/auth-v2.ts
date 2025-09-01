@@ -70,7 +70,7 @@ export const authenticateCookie = async (
     } as any;
     next();
   } catch (error: any) {
-    console.error('Auth middleware error:', error);
+    // Error log removed
     authService.clearAuthCookies(res);
     res.status(401).json({
       error: 'Authentication failed',

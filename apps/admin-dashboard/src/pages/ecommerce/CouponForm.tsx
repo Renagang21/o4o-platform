@@ -71,7 +71,7 @@ const CouponForm: FC = () => {
         validUntil: coupon.validUntil ? coupon.validUntil.split('T')[0] : ''
       });
     } catch (error) {
-      console.error('Error fetching coupon:', error);
+      // Error log removed
       toast.error('Failed to load coupon');
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ const CouponForm: FC = () => {
 
       navigate('/ecommerce/coupons');
     } catch (error: any) {
-      console.error('Error saving coupon:', error);
+      // Error log removed
       const message = error.response?.data?.message || 'Failed to save coupon';
       toast.error(message);
     } finally {

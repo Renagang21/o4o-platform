@@ -131,7 +131,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     })));
 
   } catch (error: any) {
-    console.error('Error fetching reusable blocks:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to fetch reusable blocks',
       message: error.message 
@@ -197,7 +197,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     });
 
   } catch (error: any) {
-    console.error('Error fetching reusable block:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to fetch reusable block',
       message: error.message 
@@ -284,7 +284,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error: any) {
-    console.error('Error creating reusable block:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to create reusable block',
       message: error.message 
@@ -396,7 +396,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     });
 
   } catch (error: any) {
-    console.error('Error updating reusable block:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to update reusable block',
       message: error.message 
@@ -434,7 +434,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     });
 
   } catch (error: any) {
-    console.error('Error deleting reusable block:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to delete reusable block',
       message: error.message 
@@ -519,7 +519,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     });
 
   } catch (error: any) {
-    console.error('Error duplicating reusable block:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to duplicate reusable block',
       message: error.message 
@@ -548,7 +548,7 @@ router.get('/categories', authenticateToken, async (req: AuthRequest, res: Respo
     res.json(categoryList);
 
   } catch (error: any) {
-    console.error('Error fetching block categories:', error);
+    // Error log removed
     res.status(500).json({ 
       error: 'Failed to fetch categories',
       message: error.message 

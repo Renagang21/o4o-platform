@@ -123,7 +123,7 @@ export class PagesController {
         }
       });
     } catch (error) {
-      console.error('Error fetching pages:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch pages',
@@ -168,7 +168,7 @@ export class PagesController {
         }
       });
     } catch (error) {
-      console.error('Error fetching page:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch page',
@@ -274,7 +274,7 @@ export class PagesController {
         message: 'Page created successfully'
       });
     } catch (error) {
-      console.error('Error creating page:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to create page',
@@ -370,7 +370,7 @@ export class PagesController {
         message: 'Page updated successfully'
       });
     } catch (error) {
-      console.error('Error updating page:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to update page',
@@ -418,7 +418,7 @@ export class PagesController {
         message: 'Page deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting page:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to delete page',
@@ -496,7 +496,7 @@ export class PagesController {
         message: 'Page cloned successfully'
       });
     } catch (error) {
-      console.error('Error cloning page:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to clone page',
@@ -531,7 +531,7 @@ export class PagesController {
         message: 'Draft saved successfully'
       });
     } catch (error) {
-      console.error('Error saving draft:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to save draft',
@@ -566,7 +566,7 @@ export class PagesController {
         updatedCount: ids.length
       });
     } catch (error) {
-      console.error('Error bulk updating pages:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to bulk update pages',
@@ -617,7 +617,7 @@ export class PagesController {
         deletedCount: result.affected || 0
       });
     } catch (error) {
-      console.error('Error bulk deleting pages:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to bulk delete pages',
@@ -655,7 +655,7 @@ export class PagesController {
         }
       });
     } catch (error) {
-      console.error('Error generating preview:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to generate preview',
@@ -695,7 +695,7 @@ export class PagesController {
         data: revisionsWithAuthors.reverse() // Most recent first
       });
     } catch (error) {
-      console.error('Error fetching revisions:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch revisions',
@@ -757,7 +757,7 @@ export class PagesController {
         message: 'Page restored from revision successfully'
       });
     } catch (error) {
-      console.error('Error restoring revision:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to restore revision',
@@ -792,7 +792,7 @@ export class PagesController {
         data: tree
       });
     } catch (error) {
-      console.error('Error fetching page tree:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Failed to fetch page tree',

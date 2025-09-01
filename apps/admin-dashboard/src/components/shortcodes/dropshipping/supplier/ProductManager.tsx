@@ -83,7 +83,7 @@ const ProductManager: React.FC = () => {
         setProducts(data.products || []);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to fetch products',
@@ -122,7 +122,7 @@ const ProductManager: React.FC = () => {
         fetchProducts();
       }
     } catch (error) {
-      console.error('Error saving product:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to save product',
@@ -150,7 +150,7 @@ const ProductManager: React.FC = () => {
         fetchProducts();
       }
     } catch (error) {
-      console.error('Error deleting product:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to delete product',
@@ -191,7 +191,7 @@ const ProductManager: React.FC = () => {
         fetchProducts();
       }
     } catch (error) {
-      console.error('Error performing bulk action:', error);
+      // Error log removed
       toast({
         title: 'Error',
         description: 'Failed to perform bulk action',

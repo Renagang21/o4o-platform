@@ -149,7 +149,7 @@ export class SupplierManager {
         inventoryMap.set(supplierId, inventory);
       } catch (error) {
         // SKU might not exist for this supplier
-        console.log(`SKU ${sku} not found for supplier ${supplierId}`);
+        // SKU not found for this supplier
       }
     }
     

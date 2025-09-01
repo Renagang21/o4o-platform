@@ -24,7 +24,7 @@ router.get('/metrics', async (req: Request, res: Response) => {
       timeframe: `${hours} hours`
     });
   } catch (error: any) {
-    console.error('Error fetching security metrics:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch security metrics'
@@ -48,7 +48,7 @@ router.get('/login-attempts/:email', async (req: Request, res: Response) => {
       count: attempts.length
     });
   } catch (error: any) {
-    console.error('Error fetching login attempts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch login attempts'
@@ -73,7 +73,7 @@ router.get('/login-attempts-by-ip/:ip', async (req: Request, res: Response) => {
       timeframe: `${hours} hours`
     });
   } catch (error: any) {
-    console.error('Error fetching login attempts by IP:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch login attempts'
@@ -102,7 +102,7 @@ router.post('/unlock-account', async (req: Request, res: Response) => {
       message: 'Account unlocked successfully'
     });
   } catch (error: any) {
-    console.error('Error unlocking account:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to unlock account'
@@ -131,7 +131,7 @@ router.post('/lock-account', async (req: Request, res: Response) => {
       message: `Account locked for ${minutes || 30} minutes`
     });
   } catch (error: any) {
-    console.error('Error locking account:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to lock account'
@@ -160,7 +160,7 @@ router.post('/reset-login-attempts', async (req: Request, res: Response) => {
       message: 'Login attempts reset successfully'
     });
   } catch (error: any) {
-    console.error('Error resetting login attempts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to reset login attempts'
@@ -188,7 +188,7 @@ router.get('/locked-accounts', async (req: Request, res: Response) => {
       count: users.length
     });
   } catch (error: any) {
-    console.error('Error fetching locked accounts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to fetch locked accounts'
@@ -212,7 +212,7 @@ router.post('/clean-login-attempts', async (req: Request, res: Response) => {
       daysKept: days
     });
   } catch (error: any) {
-    console.error('Error cleaning login attempts:', error);
+    // Error log removed
     res.status(500).json({
       success: false,
       error: 'Failed to clean login attempts'

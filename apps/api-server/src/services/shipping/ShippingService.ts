@@ -97,7 +97,7 @@ export class ShippingService {
           });
         }
       } catch (error) {
-        console.error(`Failed to get rate from ${carrierCode}:`, error);
+        // Error log removed
       }
     }
 
@@ -284,7 +284,7 @@ export class ShippingService {
       try {
         await this.trackShipment(shipment.trackingNumber, shipment.carrier);
       } catch (error) {
-        console.error(`Failed to update tracking for ${shipment.trackingNumber}:`, error);
+        // Error log removed
       }
     }
   }

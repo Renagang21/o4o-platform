@@ -68,7 +68,7 @@ router.post('/login',
         }
       });
     } catch (error) {
-      console.error('Login error:', error);
+      // Error log removed
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       
       if (errorMessage.includes('Account is')) {
@@ -129,7 +129,7 @@ router.post('/register',
       try {
         await PasswordResetService.requestEmailVerification(user.id);
       } catch (error) {
-        console.error('Failed to send verification email:', error);
+        // Error log removed
         // Don't fail registration if email fails
       }
 
@@ -145,7 +145,7 @@ router.post('/register',
         }
       });
     } catch (error) {
-      console.error('Registration error:', error);
+      // Error log removed
       res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_SERVER_ERROR'
@@ -185,7 +185,7 @@ router.post('/refresh', async (req, res) => {
       message: 'Token refreshed successfully'
     });
   } catch (error) {
-    console.error('Token refresh error:', error);
+    // Error log removed
     authService.clearAuthCookies(res);
     res.status(500).json({
       error: 'Internal server error',
@@ -224,7 +224,7 @@ router.post('/logout', async (req, res) => {
       message: 'Logout successful'
     });
   } catch (error) {
-    console.error('Logout error:', error);
+    // Error log removed
     // Still clear cookies even if error occurs
     authService.clearAuthCookies(res);
     res.clearCookie('sessionId', {
@@ -258,7 +258,7 @@ router.get('/me', authenticateCookie, async (req: AuthRequest, res) => {
       user
     });
   } catch (error) {
-    console.error('Get user error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR'
@@ -293,7 +293,7 @@ router.post('/logout-all', authenticateCookie, async (req: AuthRequest, res) => 
       message: 'Logged out from all devices'
     });
   } catch (error) {
-    console.error('Logout all error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'INTERNAL_SERVER_ERROR'
@@ -321,7 +321,7 @@ router.post('/forgot-password',
         message: 'If an account exists with this email, a password reset link has been sent.'
       });
     } catch (error) {
-      console.error('Password reset request error:', error);
+      // Error log removed
       res.status(500).json({
         error: 'Failed to process password reset request',
         code: 'RESET_REQUEST_FAILED'
@@ -350,7 +350,7 @@ router.post('/reset-password',
         message: 'Password has been reset successfully'
       });
     } catch (error) {
-      console.error('Password reset error:', error);
+      // Error log removed
       res.status(400).json({
         error: error instanceof Error ? error.message : 'Failed to reset password',
         code: 'RESET_FAILED'
@@ -376,7 +376,7 @@ router.post('/resend-verification-auth', authenticateCookie, async (req: AuthReq
       message: 'Verification email has been sent'
     });
   } catch (error) {
-    console.error('Email verification request error:', error);
+    // Error log removed
     res.status(400).json({
       error: error instanceof Error ? error.message : 'Failed to send verification email',
       code: 'VERIFICATION_REQUEST_FAILED'
@@ -420,7 +420,7 @@ router.post('/resend-verification',
       try {
         await PasswordResetService.requestEmailVerification(user.id);
       } catch (error) {
-        console.error('Failed to send verification email:', error);
+        // Error log removed
         return res.status(500).json({
           error: 'Failed to send verification email',
           code: 'EMAIL_SEND_FAILED'
@@ -432,7 +432,7 @@ router.post('/resend-verification',
         message: 'Verification email has been sent'
       });
     } catch (error) {
-      console.error('Email verification request error:', error);
+      // Error log removed
       res.status(500).json({
         error: 'Internal server error',
         code: 'INTERNAL_SERVER_ERROR'
@@ -460,7 +460,7 @@ router.post('/verify-email',
         message: 'Email has been verified successfully'
       });
     } catch (error) {
-      console.error('Email verification error:', error);
+      // Error log removed
       res.status(400).json({
         error: error instanceof Error ? error.message : 'Failed to verify email',
         code: 'VERIFICATION_FAILED'
@@ -488,7 +488,7 @@ router.get('/verify-email', async (req, res) => {
       message: 'Email has been verified successfully'
     });
   } catch (error) {
-    console.error('Email verification error:', error);
+    // Error log removed
     
     // Provide specific error codes based on error message
     const errorMessage = error instanceof Error ? error.message : '';

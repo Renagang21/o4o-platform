@@ -22,7 +22,7 @@ const getRepositories = () => {
       categoryRepository: AppDataSource.getRepository(Category)
     };
   } catch (error) {
-    console.error('Failed to get repositories:', error);
+    // Error log removed
     return null;
   }
 };
@@ -221,7 +221,7 @@ router.post('/',
 
       res.status(201).json(response);
     } catch (error: any) {
-      console.error('Error creating post:', error);
+      // Error log removed
       res.status(500).json({ 
         code: 'rest_cannot_create',
         message: 'Failed to create post',
@@ -366,7 +366,7 @@ router.put('/:id',
 
       res.json(response);
     } catch (error: any) {
-      console.error('Error updating post:', error);
+      // Error log removed
       res.status(500).json({ 
         code: 'rest_cannot_update',
         message: 'Failed to update post',

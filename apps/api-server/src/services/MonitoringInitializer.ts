@@ -28,7 +28,7 @@ export class MonitoringInitializer {
       await this.setupHealthCheckSchedules();
 
     } catch (error) {
-      console.error('❌ Failed to initialize monitoring system:', error);
+      // Error log removed
       throw error;
     }
   }
@@ -39,7 +39,7 @@ export class MonitoringInitializer {
       await this.operationsService.stopMonitoring();
       await autoRecoveryService.stopAutoRecovery();
     } catch (error) {
-      console.error('❌ Error during monitoring system shutdown:', error);
+      // Error log removed
       throw error;
     }
   }
@@ -91,7 +91,7 @@ export class MonitoringInitializer {
         try {
           await this.statusPageService.createComponent(componentData);
         } catch (error) {
-          console.error(`❌ Failed to create component ${componentData.name}:`, error);
+          // Error log removed
         }
       }
     }
@@ -102,7 +102,7 @@ export class MonitoringInitializer {
     try {
       await autoRecoveryService.startAutoRecovery();
     } catch (error) {
-      console.error('❌ Failed to initialize Auto-Recovery System:', error);
+      // Error log removed
       // Don't throw error - allow system to continue without auto-recovery
     }
   }
@@ -114,7 +114,7 @@ export class MonitoringInitializer {
       try {
         await this.statusPageService.performHealthChecks();
       } catch (error) {
-        console.error('Health check failed:', error);
+        // Error log removed
       }
     }, 60000); // Every minute
 
@@ -123,7 +123,7 @@ export class MonitoringInitializer {
       try {
         const systemStatus = await this.operationsService.getSystemStatus();
       } catch (error) {
-        console.error('System status check failed:', error);
+        // Error log removed
       }
     }, 300000); // Every 5 minutes
 
@@ -171,13 +171,13 @@ export class MonitoringInitializer {
   // Method to create sample incidents for testing
   async createSampleIncident(): Promise<void> {
     if (process.env.NODE_ENV === 'production') {
-      console.warn('Skipping sample incident creation in production');
+      // Warning log removed
       return;
     }
 
     const components = await this.statusPageService.getComponents();
     if (components.length === 0) {
-      console.warn('No components available for sample incident');
+      // Warning log removed
       return;
     }
 
@@ -201,24 +201,24 @@ export class MonitoringInitializer {
             updatedBy: 'system'
           });
         } catch (error) {
-          console.error('Failed to auto-resolve sample incident:', error);
+          // Error log removed
         }
       }, 5 * 60 * 1000); // 5 minutes
     } catch (error) {
-      console.error('Failed to create sample incident:', error);
+      // Error log removed
     }
   }
 
   // Method to create sample maintenance for testing
   async createSampleMaintenance(): Promise<void> {
     if (process.env.NODE_ENV === 'production') {
-      console.warn('Skipping sample maintenance creation in production');
+      // Warning log removed
       return;
     }
 
     const components = await this.statusPageService.getComponents();
     if (components.length === 0) {
-      console.warn('No components available for sample maintenance');
+      // Warning log removed
       return;
     }
 
@@ -238,20 +238,20 @@ export class MonitoringInitializer {
     try {
       const maintenance = await this.statusPageService.scheduleMaintenance(sampleMaintenance);
     } catch (error) {
-      console.error('Failed to create sample maintenance:', error);
+      // Error log removed
     }
   }
 
   // Method to populate sample metrics
   async populateSampleMetrics(): Promise<void> {
     if (process.env.NODE_ENV === 'production') {
-      console.warn('Skipping sample metrics population in production');
+      // Warning log removed
       return;
     }
 
     const components = await this.statusPageService.getComponents();
     if (components.length === 0) {
-      console.warn('No components available for sample metrics');
+      // Warning log removed
       return;
     }
 
@@ -276,7 +276,7 @@ export class MonitoringInitializer {
         try {
           await this.statusPageService.recordUptimeCheck(component.id, isUp, Math.round(responseTime));
         } catch (error) {
-          console.error(`Failed to record sample metric for ${component.name}:`, error);
+          // Error log removed
         }
       }
     }
@@ -286,7 +286,7 @@ export class MonitoringInitializer {
   // Development helper methods
   async setupDevelopmentEnvironment(): Promise<void> {
     if (process.env.NODE_ENV === 'production') {
-      console.warn('Skipping development environment setup in production');
+      // Warning log removed
       return;
     }
 
@@ -301,7 +301,7 @@ export class MonitoringInitializer {
       }, 5000);
 
     } catch (error) {
-      console.error('❌ Failed to setup development environment:', error);
+      // Error log removed
     }
   }
 }

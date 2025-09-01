@@ -53,7 +53,7 @@ export const getPendingUsers = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get pending users error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'FETCH_PENDING_USERS_FAILED'
@@ -140,7 +140,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get all users error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'FETCH_USERS_FAILED'
@@ -204,7 +204,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Approve user error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'APPROVE_USER_FAILED'
@@ -267,7 +267,7 @@ export const rejectUser = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Reject user error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'REJECT_USER_FAILED'
@@ -321,7 +321,7 @@ export const suspendUser = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Suspend user error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'SUSPEND_USER_FAILED'
@@ -374,7 +374,7 @@ export const reactivateUser = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Reactivate user error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'REACTIVATE_USER_FAILED'
@@ -433,7 +433,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Get dashboard stats error:', error);
+    // Error log removed
     res.status(500).json({
       error: 'Internal server error',
       code: 'DASHBOARD_STATS_FAILED'

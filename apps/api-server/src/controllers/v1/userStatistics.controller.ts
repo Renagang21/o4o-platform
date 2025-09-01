@@ -99,7 +99,7 @@ export class UserStatisticsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching user statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -351,7 +351,7 @@ export class UserStatisticsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching user growth trend:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -409,7 +409,7 @@ export class UserStatisticsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching retention statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         message: 'Internal server error'

@@ -169,7 +169,7 @@ export class AutoScalingService {
       await this.analyzeMetricTrends(metrics);
 
     } catch (error) {
-      console.error('Failed to collect scaling metrics:', error);
+      // Error log removed
     }
   }
 
@@ -232,7 +232,7 @@ export class AutoScalingService {
 
       return recentRequests.length;
     } catch (error) {
-      console.warn('Failed to get request rate:', error);
+      // Warning log removed
       return 0;
     }
   }
@@ -248,7 +248,7 @@ export class AutoScalingService {
       const times = responseTimes.map((t: any) => parseFloat(t));
       return times.reduce((sum, time) => sum + time, 0) / times.length;
     } catch (error) {
-      console.warn('Failed to get average response time:', error);
+      // Warning log removed
       return 0;
     }
   }
@@ -276,7 +276,7 @@ export class AutoScalingService {
       await this.makePredictiveScalingDecision(trends);
 
     } catch (error) {
-      console.error('Failed to analyze metric trends:', error);
+      // Error log removed
     }
   }
 
@@ -375,7 +375,7 @@ export class AutoScalingService {
       }
 
     } catch (error) {
-      console.error('Failed to evaluate scaling decisions:', error);
+      // Error log removed
     }
   }
 
@@ -389,7 +389,7 @@ export class AutoScalingService {
         return JSON.parse(cached);
       }
     } catch (error) {
-      console.warn('Failed to get cached metrics:', error);
+      // Warning log removed
     }
 
     return await this.gatherSystemMetrics();
@@ -489,7 +489,7 @@ export class AutoScalingService {
       await this.sendScalingNotification(action);
 
     } catch (error) {
-      console.error('Failed to execute scaling action:', error);
+      // Error log removed
       await this.recordScalingError(action, error as Error);
     }
   }
@@ -559,7 +559,7 @@ export class AutoScalingService {
       await this.registerInstanceToLoadBalancer(instance);
 
     } catch (error) {
-      console.error(`Failed to create instance ${instanceId}:`, error);
+      // Error log removed
       instance.status = 'failed';
       instance.healthStatus = 'unhealthy';
     }
@@ -584,7 +584,7 @@ export class AutoScalingService {
 
 
     } catch (error) {
-      console.error(`Failed to remove instance ${instanceId}:`, error);
+      // Error log removed
     }
   }
 
@@ -660,7 +660,7 @@ export class AutoScalingService {
       try {
         process.kill(instance.processId, 'SIGTERM');
       } catch (error) {
-        console.warn(`Failed to kill process ${instance.processId}:`, error);
+        // Warning log removed
       }
     }
   }
@@ -720,7 +720,7 @@ export class AutoScalingService {
           await this.handleUnhealthyInstance(instance);
         }
       } catch (error) {
-        console.error(`Failed to check health for instance ${instance.id}:`, error);
+        // Error log removed
         instance.healthStatus = 'unknown';
       }
     }
@@ -756,7 +756,7 @@ export class AutoScalingService {
    * 비정상 인스턴스 처리
    */
   private async handleUnhealthyInstance(instance: ServiceInstance): Promise<void> {
-    console.warn(`⚠️ Unhealthy instance detected: ${instance.id}`);
+    // Warning log removed
 
     // 3번 연속 실패 시 인스턴스 교체
     const failureCount = await this.getInstanceFailureCount(instance.id);
@@ -812,7 +812,7 @@ export class AutoScalingService {
       await this.updateLoadBalancerWeights(instances);
 
     } catch (error) {
-      console.error('Failed to optimize load balancing:', error);
+      // Error log removed
     }
   }
 
@@ -956,7 +956,7 @@ export class AutoScalingService {
       const events = await this.redis.lrange('scaling_events', 0, 19);
       return events.map((e: any) => JSON.parse(e));
     } catch (error) {
-      console.warn('Failed to get recent scaling events:', error);
+      // Warning log removed
       return [];
     }
   }
@@ -994,7 +994,7 @@ export class AutoScalingService {
 
       await this.redis.disconnect();
     } catch (error) {
-      console.error('❌ Auto-scaling service shutdown failed:', error);
+      // Error log removed
     }
   }
 }

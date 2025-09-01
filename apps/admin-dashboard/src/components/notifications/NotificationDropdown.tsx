@@ -55,7 +55,7 @@ export const NotificationDropdown: FC<NotificationDropdownProps> = ({
       setCount(newCount);
       onCountChange?.(newCount);
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      // Error log removed
       toast.error('알림을 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);
@@ -74,7 +74,7 @@ export const NotificationDropdown: FC<NotificationDropdownProps> = ({
         onCountChange?.(Math.max(0, count - 1));
       }
     } catch (error) {
-      console.error('Failed to mark as read:', error);
+      // Error log removed
     }
   };
 
@@ -94,7 +94,7 @@ export const NotificationDropdown: FC<NotificationDropdownProps> = ({
         toast.success(response.message || '모든 알림을 읽음 처리했습니다.');
       }
     } catch (error) {
-      console.error('Failed to mark all as read:', error);
+      // Error log removed
       toast.error('알림 처리에 실패했습니다.');
     }
   };
@@ -116,7 +116,7 @@ export const NotificationDropdown: FC<NotificationDropdownProps> = ({
         toast.success('알림이 삭제되었습니다.');
       }
     } catch (error) {
-      console.error('Failed to delete notification:', error);
+      // Error log removed
       toast.error('알림 삭제에 실패했습니다.');
     }
   };

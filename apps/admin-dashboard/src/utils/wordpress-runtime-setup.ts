@@ -84,7 +84,7 @@ export const initializeWordPressRuntime = async () => {
     // 기본 블록 등록 - WordPress 패키지가 없으면 실행 불가
     // registerDefaultBlocks();
   } catch (error) {
-    console.error('Failed to initialize WordPress runtime:', error);
+    // Error log removed
     
     // Fallback: 최소한의 mock 객체 제공
     createMinimalMockWp();

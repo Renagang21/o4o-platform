@@ -107,7 +107,7 @@ export class CommissionSchedule {
       await this.commissionService.processMonthlySettlements();
       // Monthly commission processing completed successfully
     } catch (error) {
-      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error in monthly commission processing:`, error);
+      // Error log removed
     }
   }
 
@@ -127,7 +127,7 @@ export class CommissionSchedule {
       
       // Payment reminders sent successfully
     } catch (error) {
-      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error sending payment reminders:`, error);
+      // Error log removed
     }
   }
 
@@ -148,7 +148,7 @@ export class CommissionSchedule {
       
       // Interim reports generated successfully
     } catch (error) {
-      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error generating interim reports:`, error);
+      // Error log removed
     }
   }
 
@@ -160,7 +160,7 @@ export class CommissionSchedule {
       
       // Dispute check completed
     } catch (error) {
-      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error checking disputes:`, error);
+      // Error log removed
     }
   }
 
@@ -173,7 +173,7 @@ export class CommissionSchedule {
       
       // Auto-approval completed
     } catch (error) {
-      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error in auto-approval:`, error);
+      // Error log removed
     }
   }
 }

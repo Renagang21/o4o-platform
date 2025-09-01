@@ -197,7 +197,7 @@ export class IncidentEscalationService {
 
     const onCallTeam = await this.getOnCallTeamForLevel(level);
     if (!onCallTeam) {
-      console.error(`❌ No on-call team found for level: ${level}`);
+      // Error log removed
       return;
     }
 
@@ -304,7 +304,7 @@ export class IncidentEscalationService {
     } catch (error) {
       entry.status = 'failed';
       entry.metadata!.error = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`❌ Failed to notify ${contact.name}:`, error);
+      // Error log removed
     }
 
     return entry;
@@ -319,7 +319,7 @@ export class IncidentEscalationService {
         await this.evaluateEscalationRules();
         await this.updateEscalationMetrics();
       } catch (error) {
-        console.error('Escalation monitoring failed:', error);
+        // Error log removed
       }
     }, 60000); // Every minute
 
@@ -460,7 +460,7 @@ export class IncidentEscalationService {
           await this.sendNotification(contact, message, level as EscalationLevel, 'primary');
           notificationCount++;
         } catch (error) {
-          console.error(`Failed to notify ${contact.name}:`, error);
+          // Error log removed
         }
       }
     }
@@ -668,7 +668,7 @@ Please acknowledge and take appropriate action immediately.
       try {
         await this.executeEscalationAction(escalation, action);
       } catch (error) {
-        console.error(`Failed to execute escalation action ${action.type}:`, error);
+        // Error log removed
       }
     }
   }
@@ -696,7 +696,7 @@ Please acknowledge and take appropriate action immediately.
         break;
       
       default:
-        console.warn(`Unknown escalation action type: ${action.type}`);
+        // Warning log removed
     }
   }
 

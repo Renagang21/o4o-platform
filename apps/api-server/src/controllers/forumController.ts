@@ -16,7 +16,7 @@ export class ForumController {
         data: categories
       });
     } catch (error) {
-      console.error('Error fetching forum categories:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch forum categories'
@@ -42,7 +42,7 @@ export class ForumController {
         data: category
       });
     } catch (error) {
-      console.error('Error fetching category:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch category'
@@ -70,7 +70,7 @@ export class ForumController {
         data: category
       });
     } catch (error) {
-      console.error('Error creating category:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create category'
@@ -106,7 +106,7 @@ export class ForumController {
         data: category
       });
     } catch (error) {
-      console.error('Error updating category:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update category'
@@ -144,7 +144,7 @@ export class ForumController {
         data: result
       });
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch posts'
@@ -179,7 +179,7 @@ export class ForumController {
         data: post
       });
     } catch (error) {
-      console.error('Error fetching post:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch post'
@@ -214,7 +214,7 @@ export class ForumController {
         data: post
       });
     } catch (error) {
-      console.error('Error fetching post:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch post'
@@ -244,7 +244,7 @@ export class ForumController {
         data: post
       });
     } catch (error) {
-      console.error('Error creating post:', (error as Error).message);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: (error as Error).message || 'Failed to create post'
@@ -280,7 +280,7 @@ export class ForumController {
         data: post
       });
     } catch (error) {
-      console.error('Error updating post:', (error as Error).message);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: (error as Error).message || 'Failed to update post'
@@ -302,7 +302,7 @@ export class ForumController {
         data: result
       });
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch comments'
@@ -329,7 +329,7 @@ export class ForumController {
         data: comment
       });
     } catch (error) {
-      console.error('Error creating comment:', (error as Error).message);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: (error as Error).message || 'Failed to create comment'
@@ -357,7 +357,7 @@ export class ForumController {
         data: statistics
       });
     } catch (error) {
-      console.error('Error fetching forum statistics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch forum statistics'
@@ -395,7 +395,7 @@ export class ForumController {
         data: result
       });
     } catch (error) {
-      console.error('Error searching posts:', (error as Error).message);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to search posts'
@@ -424,7 +424,7 @@ export class ForumController {
         data: result
       });
     } catch (error) {
-      console.error('Error fetching trending posts:', (error as Error).message);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch trending posts'
@@ -450,7 +450,7 @@ export class ForumController {
         data: result
       });
     } catch (error) {
-      console.error('Error fetching popular posts:', (error as Error).message);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to fetch popular posts'

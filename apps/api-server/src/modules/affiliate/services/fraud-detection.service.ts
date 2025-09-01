@@ -591,7 +591,7 @@ export class FraudDetectionService {
     });
 
     // Log the action
-    console.error(`Affiliate ${affiliateUserId} blocked for fraud:`, result);
+    // Error log removed
   }
 
   private async flagForReview(affiliateUserId: string, result: FraudAnalysisResult): Promise<void> {

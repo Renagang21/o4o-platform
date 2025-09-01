@@ -20,7 +20,7 @@ export class StatusPageController {
         data: statusData
       });
     } catch (error) {
-      console.error('Failed to get public status:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve status data',
@@ -44,7 +44,7 @@ export class StatusPageController {
         data: uptimeData
       });
     } catch (error) {
-      console.error('Failed to get component uptime:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve uptime data',
@@ -79,7 +79,7 @@ export class StatusPageController {
         }
       });
     } catch (error) {
-      console.error('Failed to get incidents:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve incidents',
@@ -110,7 +110,7 @@ export class StatusPageController {
         data: incident
       });
     } catch (error) {
-      console.error('Failed to get incident:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve incident',
@@ -148,7 +148,7 @@ export class StatusPageController {
         message: 'Subscription created. Please check your email to confirm.'
       });
     } catch (error) {
-      console.error('Failed to create subscription:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create subscription',
@@ -175,7 +175,7 @@ export class StatusPageController {
         });
       }
     } catch (error) {
-      console.error('Failed to confirm subscription:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to confirm subscription',
@@ -202,7 +202,7 @@ export class StatusPageController {
         });
       }
     } catch (error) {
-      console.error('Failed to unsubscribe:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to unsubscribe',
@@ -221,7 +221,7 @@ export class StatusPageController {
         data: components
       });
     } catch (error) {
-      console.error('Failed to get components:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve components',
@@ -256,7 +256,7 @@ export class StatusPageController {
         message: 'Component created successfully'
       });
     } catch (error) {
-      console.error('Failed to create component:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create component',
@@ -285,7 +285,7 @@ export class StatusPageController {
         message: 'Component status updated successfully'
       });
     } catch (error) {
-      console.error('Failed to update component status:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update component status',
@@ -329,7 +329,7 @@ export class StatusPageController {
         message: 'Incident created successfully'
       });
     } catch (error) {
-      console.error('Failed to create incident:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to create incident',
@@ -372,7 +372,7 @@ export class StatusPageController {
         message: 'Incident updated successfully'
       });
     } catch (error) {
-      console.error('Failed to update incident:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to update incident',
@@ -409,7 +409,7 @@ export class StatusPageController {
         message: 'Maintenance scheduled successfully'
       });
     } catch (error) {
-      console.error('Failed to schedule maintenance:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to schedule maintenance',
@@ -429,7 +429,7 @@ export class StatusPageController {
         message: 'Maintenance started successfully'
       });
     } catch (error) {
-      console.error('Failed to start maintenance:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to start maintenance',
@@ -449,7 +449,7 @@ export class StatusPageController {
         message: 'Maintenance completed successfully'
       });
     } catch (error) {
-      console.error('Failed to complete maintenance:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to complete maintenance',
@@ -467,7 +467,7 @@ export class StatusPageController {
         message: 'Health checks performed successfully'
       });
     } catch (error) {
-      console.error('Failed to perform health checks:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to perform health checks',
@@ -501,7 +501,7 @@ export class StatusPageController {
         message: 'Metric recorded successfully'
       });
     } catch (error) {
-      console.error('Failed to record metric:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to record metric',
@@ -552,7 +552,7 @@ export class StatusPageController {
         data: analytics
       });
     } catch (error) {
-      console.error('Failed to get status analytics:', error);
+      // Error log removed
       res.status(500).json({
         success: false,
         error: 'Failed to retrieve status analytics',
