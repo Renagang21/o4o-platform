@@ -19,23 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart
-} from 'recharts';
+import { Badge } from '@/components/ui/badge';
 
 interface AnalyticsData {
   revenue: {
@@ -99,34 +83,34 @@ const EcommerceAnalytics: FC = () => {
     },
     orders: {
       total: 324,
-      completed: 287,
-      pending: 23,
-      cancelled: 14,
-      averageValue: 3858,
-      chart: Array.from({ length: 30 }, (_, i) => ({
-        date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-        count: Math.floor(Math.random() * 20 + 5),
-        value: Math.floor(Math.random() * 5000 + 2000)
+      completed: 280,
+      pending: 32,
+      cancelled: 12,
+      averageValue: 85000,
+      chart: Array.from({ length: 7 }, (_, i) => ({
+        date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        count: Math.floor(Math.random() * 50 + 30),
+        value: Math.floor(Math.random() * 100000 + 50000)
       }))
     },
     products: {
       topSelling: [
-        { id: '1', name: '프리미엄 헤드폰', sales: 89, revenue: 4450000 },
-        { id: '2', name: '무선 키보드', sales: 67, revenue: 2010000 },
-        { id: '3', name: '스마트 워치', sales: 54, revenue: 2700000 },
-        { id: '4', name: 'USB-C 허브', sales: 48, revenue: 720000 },
-        { id: '5', name: '웹캠 HD', sales: 42, revenue: 1260000 }
+        { id: '1', name: '프리미엄 노트북 스탠드', sales: 89, revenue: 2670000 },
+        { id: '2', name: '무선 충전 패드', sales: 76, revenue: 1520000 },
+        { id: '3', name: '블루투스 이어폰', sales: 64, revenue: 1920000 },
+        { id: '4', name: '스마트워치 스트랩', sales: 52, revenue: 520000 },
+        { id: '5', name: 'USB-C 허브', sales: 48, revenue: 1440000 }
       ],
       lowStock: [
-        { id: '1', name: '프리미엄 헤드폰', stock: 12, reorderPoint: 20 },
-        { id: '2', name: '무선 마우스', stock: 8, reorderPoint: 15 },
-        { id: '3', name: '노트북 스탠드', stock: 5, reorderPoint: 10 }
+        { id: '1', name: '프리미엄 노트북 스탠드', stock: 5, reorderPoint: 20 },
+        { id: '2', name: '무선 충전 패드', stock: 8, reorderPoint: 15 },
+        { id: '3', name: '블루투스 이어폰', stock: 3, reorderPoint: 25 }
       ],
       categories: [
-        { name: '전자제품', sales: 145, percentage: 44.8 },
-        { name: '액세서리', sales: 89, percentage: 27.5 },
-        { name: '소프트웨어', sales: 56, percentage: 17.3 },
-        { name: '기타', sales: 34, percentage: 10.5 }
+        { name: '전자제품', sales: 450, percentage: 45 },
+        { name: '액세서리', sales: 280, percentage: 28 },
+        { name: '가전제품', sales: 180, percentage: 18 },
+        { name: '기타', sales: 90, percentage: 9 }
       ]
     },
     customers: {
@@ -134,60 +118,64 @@ const EcommerceAnalytics: FC = () => {
       new: 234,
       returning: 1000,
       churnRate: 5.2,
-      lifetime: 125000,
+      lifetime: 520000,
       segments: [
-        { segment: 'VIP', count: 123, value: 500000 },
-        { segment: '일반', count: 789, value: 300000 },
-        { segment: '신규', count: 322, value: 100000 }
+        { segment: 'VIP', count: 123, value: 1560000 },
+        { segment: '일반', count: 890, value: 890000 },
+        { segment: '신규', count: 221, value: 221000 }
       ]
     },
     inventory: {
       totalValue: 8900000,
       turnoverRate: 4.2,
-      deadStock: 340000,
+      deadStock: 120000,
       avgDaysToSell: 18
     }
   };
 
   const data = analyticsData || mockData;
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
-  const exportReport = () => {
-    // Export functionality would be implemented here
-    // TODO: Implement report export functionality
-  };
+  // Calculate max values for chart scaling
+  const maxRevenue = Math.max(...data.revenue.chart.map(d => d.value));
+  const maxOrderCount = Math.max(...data.orders.chart.map(d => d.count));
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">E-commerce 분석</h1>
-          <p className="text-muted-foreground mt-1">실시간 판매 및 재고 분석</p>
+          <h1 className="text-3xl font-bold">E-Commerce Analytics</h1>
+          <p className="text-muted-foreground">실시간 판매 분석 및 인사이트</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="today">오늘</SelectItem>
+              <SelectItem value="day">오늘</SelectItem>
               <SelectItem value="week">이번 주</SelectItem>
               <SelectItem value="month">이번 달</SelectItem>
-              <SelectItem value="quarter">분기</SelectItem>
               <SelectItem value="year">올해</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={exportReport}>
+          <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
-            보고서 내보내기
+            보고서 다운로드
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">총 매출</CardTitle>
@@ -195,7 +183,7 @@ const EcommerceAnalytics: FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₩{data.revenue.current.toLocaleString()}</div>
-            <div className="flex items-center text-xs text-muted-foreground">
+            <div className="flex items-center text-xs">
               {data.revenue.growth > 0 ? (
                 <>
                   <ArrowUpRight className="h-4 w-4 text-green-500" />
@@ -269,15 +257,30 @@ const EcommerceAnalytics: FC = () => {
               <CardDescription>일별 매출 변화</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={data.revenue.chart}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
-                </AreaChart>
-              </ResponsiveContainer>
+              {/* Text-based area chart */}
+              <div className="space-y-4">
+                <div className="flex items-end gap-1 h-48">
+                  {data.revenue.chart.slice(-14).map((item, index) => {
+                    const heightPercent = (item.value / maxRevenue) * 100;
+                    return (
+                      <div
+                        key={index}
+                        className="flex-1 bg-gradient-to-t from-blue-500 to-blue-300 hover:from-blue-600 hover:to-blue-400 transition-colors relative group"
+                        style={{ height: `${heightPercent}%` }}
+                        title={`${item.date}: ₩${item.value.toLocaleString()}`}
+                      >
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                          ₩{(item.value / 1000).toFixed(0)}k
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>{data.revenue.chart[0]?.date}</span>
+                  <span>{data.revenue.chart[data.revenue.chart.length - 1]?.date}</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -287,29 +290,53 @@ const EcommerceAnalytics: FC = () => {
                 <CardTitle>주문 상태별 분포</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <RePieChart>
-                    <Pie
-                      data={[
-                        { name: '완료', value: data.orders.completed },
-                        { name: '진행중', value: data.orders.pending },
-                        { name: '취소', value: data.orders.cancelled }
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {[0, 1, 2].map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </RePieChart>
-                </ResponsiveContainer>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">완료</span>
+                      <span className="text-sm font-medium">{data.orders.completed}건</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="h-2 bg-green-500 rounded-full"
+                        style={{ width: `${(data.orders.completed / data.orders.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">진행중</span>
+                      <span className="text-sm font-medium">{data.orders.pending}건</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="h-2 bg-yellow-500 rounded-full"
+                        style={{ width: `${(data.orders.pending / data.orders.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">취소</span>
+                      <span className="text-sm font-medium">{data.orders.cancelled}건</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="h-2 bg-red-500 rounded-full"
+                        style={{ width: `${(data.orders.cancelled / data.orders.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2 border-t">
+                    <div className="flex justify-between font-medium">
+                      <span>총 주문</span>
+                      <span>{data.orders.total}건</span>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -318,15 +345,21 @@ const EcommerceAnalytics: FC = () => {
                 <CardTitle>일별 주문 추이</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={data.orders.chart.slice(-7)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#82ca9d" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="space-y-2">
+                  {data.orders.chart.slice(-7).map((item, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 w-20">{item.date}</span>
+                      <div className="flex-1 bg-gray-200 rounded-full h-6">
+                        <div
+                          className="h-6 bg-green-500 rounded-full flex items-center justify-end pr-2"
+                          style={{ width: `${(item.count / maxOrderCount) * 100}%` }}
+                        >
+                          <span className="text-xs text-white font-medium">{item.count}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -366,25 +399,28 @@ const EcommerceAnalytics: FC = () => {
                 <CardTitle>카테고리별 판매</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <RePieChart>
-                    <Pie
-                      data={data.products.categories}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percentage }) => `${name} ${percentage.toFixed(1)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="sales"
-                    >
-                      {data.products.categories.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </RePieChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {data.products.categories.map((category, index) => {
+                    const colors = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500'];
+                    return (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">{category.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">{category.sales}개</span>
+                            <Badge variant="outline">{category.percentage}%</Badge>
+                          </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${colors[index % colors.length]}`}
+                            style={{ width: `${category.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -400,13 +436,14 @@ const EcommerceAnalytics: FC = () => {
                   <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
                       <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-muted-foreground">재주문점: {product.reorderPoint}개</p>
+                      <p className="text-sm text-muted-foreground">
+                        재주문 기준: {product.reorderPoint}개
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={product.stock < 10 ? "destructive" : "warning"}>
+                    <div className="text-right">
+                      <Badge variant={product.stock < 5 ? 'destructive' : 'outline'}>
                         재고: {product.stock}개
                       </Badge>
-                      <Button size="sm" variant="outline">재주문</Button>
                     </div>
                   </div>
                 ))}
@@ -418,117 +455,110 @@ const EcommerceAnalytics: FC = () => {
         {/* Customers Analysis */}
         <TabsContent value="customers" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {data.customers.segments.map((segment) => (
-              <Card key={segment.segment}>
-                <CardHeader>
-                  <CardTitle className="text-base">{segment.segment} 고객</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold">{segment.count}명</div>
-                    <div className="text-sm text-muted-foreground">
-                      평균 구매액: ₩{(segment.value / segment.count).toLocaleString()}
+            <Card>
+              <CardHeader>
+                <CardTitle>고객 세그먼트</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {data.customers.segments.map((segment) => (
+                    <div key={segment.segment} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{segment.segment}</span>
+                        <span className="text-sm text-gray-600">{segment.count}명</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        평균 구매액: ₩{Math.floor(segment.value / segment.count).toLocaleString()}
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      총 매출: ₩{segment.value.toLocaleString()}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>고객 지표</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">이탈률</p>
-                  <p className="text-2xl font-bold">{data.customers.churnRate}%</p>
+            <Card>
+              <CardHeader>
+                <CardTitle>고객 지표</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">이탈률</span>
+                    <span className="font-medium">{data.customers.churnRate}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">생애가치</span>
+                    <span className="font-medium">₩{data.customers.lifetime.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">재구매율</span>
+                    <span className="font-medium">
+                      {((data.customers.returning / data.customers.total) * 100).toFixed(1)}%
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">재구매율</p>
-                  <p className="text-2xl font-bold">
-                    {((data.customers.returning / data.customers.total) * 100).toFixed(1)}%
-                  </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>신규 vs 재구매</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold">{data.customers.new}</div>
+                    <div className="text-sm text-muted-foreground">신규 고객</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold">{data.customers.returning}</div>
+                    <div className="text-sm text-muted-foreground">재구매 고객</div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">신규 고객</p>
-                  <p className="text-2xl font-bold">{data.customers.new}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">LTV</p>
-                  <p className="text-2xl font-bold">₩{data.customers.lifetime.toLocaleString()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Inventory Analysis */}
         <TabsContent value="inventory" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-sm">총 재고 가치</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">₩{data.inventory.totalValue.toLocaleString()}</div>
               </CardContent>
             </Card>
+
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-sm">재고 회전율</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{data.inventory.turnoverRate}x</div>
               </CardContent>
             </Card>
+
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">데드스톡</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">사재고 가치</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₩{data.inventory.deadStock.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-red-600">₩{data.inventory.deadStock.toLocaleString()}</div>
               </CardContent>
             </Card>
+
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">평균 판매일</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">평균 판매 소요일</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{data.inventory.avgDaysToSell}일</div>
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>재고 최적화 제안</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>데드스톡 처리 필요</AlertTitle>
-                  <AlertDescription>
-                    3개월 이상 판매되지 않은 상품이 ₩{data.inventory.deadStock.toLocaleString()} 어치 있습니다.
-                    할인 프로모션을 고려해보세요.
-                  </AlertDescription>
-                </Alert>
-                <Alert>
-                  <TrendingUp className="h-4 w-4" />
-                  <AlertTitle>재고 회전율 개선</AlertTitle>
-                  <AlertDescription>
-                    현재 회전율 {data.inventory.turnoverRate}x는 업계 평균보다 낮습니다.
-                    재주문 주기를 조정하여 회전율을 높이세요.
-                  </AlertDescription>
-                </Alert>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>
@@ -536,7 +566,3 @@ const EcommerceAnalytics: FC = () => {
 };
 
 export default EcommerceAnalytics;
-
-// Import Alert components
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
