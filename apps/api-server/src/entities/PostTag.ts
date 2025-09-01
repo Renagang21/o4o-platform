@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from 'typeorm';
+import { Post } from './Post';
 
 @Entity('post_tags')
 export class PostTag {
@@ -31,8 +32,8 @@ export class PostTag {
   metaDescription?: string;
 
   // Relations
-  @OneToMany('PostTagRelation', 'tag')
-  posts!: any[];
+  @ManyToMany(() => Post, post => post.tags)
+  posts!: Post[];
 
   @CreateDateColumn()
   createdAt!: Date;
