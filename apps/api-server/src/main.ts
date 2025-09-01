@@ -600,6 +600,10 @@ app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full
 app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
+
+// Tag routes
+import tagRoutes from './routes/content/tagRoutes';
+app.use('/api', tagRoutes); // Tags at /api/tags
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
 app.use('/api/v1/content', contentV1Routes);
