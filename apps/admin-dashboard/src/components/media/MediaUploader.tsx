@@ -75,7 +75,7 @@ export default function MediaUploader({
         }
       };
 
-      const response = await apiClient.post('/api/media/upload', formData, {
+      const response = await apiClient.post('/api/v1/media/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         ...config
       });

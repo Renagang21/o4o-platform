@@ -68,10 +68,10 @@ export const apiLimiter = rateLimit({
   },
 });
 
-// 파일 업로드 레이트 리밋
+// 파일 업로드 레이트 리밋 (미디어 업로드 지원을 위해 증가)
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간
-  max: 20, // 시간당 20개 파일
+  max: 100, // 시간당 100개 파일로 증가
   message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
   store: new RedisStore({
     sendCommand: async (...args: string[]) => {

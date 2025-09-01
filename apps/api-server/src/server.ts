@@ -58,9 +58,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Body 파싱
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body 파싱 (미디어 업로드 지원을 위해 50MB로 통일)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // 쿠키 파싱
 app.use(cookieParser() as any);
