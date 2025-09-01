@@ -618,6 +618,10 @@ app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
 // Advanced menu features (Phase 2)
 import menuAdvancedRoutes from './routes/menu-advanced';
 app.use('/api/v1', menuAdvancedRoutes); // Advanced menu APIs
+
+// Menu Phase 3 features (Caching, Analytics, Widgets)
+import menuPhase3Routes from './routes/menu-phase3';
+app.use('/api/v1', menuPhase3Routes); // Phase 3 menu APIs
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
