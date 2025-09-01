@@ -466,18 +466,50 @@ export class ContentController {
   // Tags Management
   getTags = async (req: Request, res: Response) => {
     try {
+      const { search } = req.query;
+      
       if (!AppDataSource.isInitialized) {
-        // Return array directly for WordPress compatibility
-        return res.json([
-          { id: '1', name: 'JavaScript', slug: 'javascript', count: 10 },
-          { id: '2', name: 'React', slug: 'react', count: 8 },
-          { id: '3', name: 'Node.js', slug: 'nodejs', count: 5 }
-        ]);
+        // Return mock data for development
+        return res.json({
+          status: 'success',
+          data: [
+            { id: '1', name: 'JavaScript', slug: 'javascript', description: 'JavaScript programming', postCount: 10 },
+            { id: '2', name: 'React', slug: 'react', description: 'React framework', postCount: 8 },
+            { id: '3', name: 'Node.js', slug: 'nodejs', description: 'Node.js runtime', postCount: 5 }
+          ]
+        });
       }
 
-      // Real implementation would query tags table
-      // Return empty array directly for WordPress compatibility
-      return res.json([]);
+      const tagRepository = AppDataSource.getRepository('PostTag');
+      let query = tagRepository.createQueryBuilder('tag')
+        .where('tag.isActive = :isActive', { isActive: true })
+        .orderBy('tag.name', 'ASC');
+
+      if (search) {
+        query = query.andWhere(
+          '(tag.name LIKE :search OR tag.description LIKE :search)',
+          { search: `%${search}%` }
+        );
+      }
+
+      const tags = await query.getMany();
+      
+      // Format response with postCount instead of usageCount for frontend compatibility
+      const formattedTags = tags.map((tag: any) => ({
+        id: tag.id,
+        name: tag.name,
+        slug: tag.slug,
+        description: tag.description,
+        postCount: tag.usageCount || 0,
+        createdAt: tag.createdAt,
+        updatedAt: tag.updatedAt
+      }));
+
+      return res.json({
+        status: 'success',
+        data: formattedTags,
+        tags: formattedTags // Also include in 'tags' key for compatibility
+      });
     } catch (error) {
       return res.status(500).json({
         status: 'error',
@@ -487,29 +519,197 @@ export class ContentController {
   };
 
   getTag = async (req: Request, res: Response) => {
-    // Return tag object directly for WordPress compatibility
-    return res.json({ id: req.params.id, name: 'Sample Tag', slug: 'sample-tag' });
+    try {
+      const { id } = req.params;
+      
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          status: 'success',
+          data: { id, name: 'Sample Tag', slug: 'sample-tag', description: 'Sample description' }
+        });
+      }
+
+      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tag = await tagRepository.findOne({ where: { id } });
+
+      if (!tag) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Tag not found'
+        });
+      }
+
+      return res.json({
+        status: 'success',
+        data: {
+          id: tag.id,
+          name: tag.name,
+          slug: tag.slug,
+          description: tag.description,
+          postCount: tag.usageCount || 0,
+          createdAt: tag.createdAt,
+          updatedAt: tag.updatedAt
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to fetch tag'
+      });
+    }
   };
 
   createTag = async (req: Request, res: Response) => {
-    return res.json({
-      status: 'success',
-      data: { id: Date.now().toString(), ...req.body }
-    });
+    try {
+      const { name, description, slug } = req.body;
+      
+      if (!name) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Tag name is required'
+        });
+      }
+
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          status: 'success',
+          data: {
+            id: Date.now().toString(),
+            name,
+            slug: slug || name.toLowerCase().replace(/[^a-z0-9가-힣]/g, '-'),
+            description,
+            postCount: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      const tagRepository = AppDataSource.getRepository('PostTag');
+      
+      // Check if tag with same slug already exists
+      const finalSlug = slug || name.toLowerCase().replace(/[^a-z0-9가-힣]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      const existingTag = await tagRepository.findOne({ where: { slug: finalSlug } });
+      
+      if (existingTag) {
+        return res.status(409).json({
+          status: 'error',
+          message: 'Tag with this slug already exists'
+        });
+      }
+
+      const newTag = tagRepository.create({
+        name,
+        slug: finalSlug,
+        description,
+        isActive: true,
+        usageCount: 0
+      });
+
+      const savedTag = await tagRepository.save(newTag);
+
+      return res.json({
+        status: 'success',
+        data: {
+          id: savedTag.id,
+          name: savedTag.name,
+          slug: savedTag.slug,
+          description: savedTag.description,
+          postCount: 0,
+          createdAt: savedTag.createdAt,
+          updatedAt: savedTag.updatedAt
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to create tag'
+      });
+    }
   };
 
   updateTag = async (req: Request, res: Response) => {
-    return res.json({
-      status: 'success',
-      data: { id: req.params.id, ...req.body }
-    });
+    try {
+      const { id } = req.params;
+      const { name, description, slug } = req.body;
+      
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          status: 'success',
+          data: { id, name, slug, description, updatedAt: new Date().toISOString() }
+        });
+      }
+
+      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tag = await tagRepository.findOne({ where: { id } });
+
+      if (!tag) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Tag not found'
+        });
+      }
+
+      // Update tag fields
+      if (name) tag.name = name;
+      if (description !== undefined) tag.description = description;
+      if (slug) tag.slug = slug;
+
+      const updatedTag = await tagRepository.save(tag);
+
+      return res.json({
+        status: 'success',
+        data: {
+          id: updatedTag.id,
+          name: updatedTag.name,
+          slug: updatedTag.slug,
+          description: updatedTag.description,
+          postCount: updatedTag.usageCount || 0,
+          createdAt: updatedTag.createdAt,
+          updatedAt: updatedTag.updatedAt
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to update tag'
+      });
+    }
   };
 
   deleteTag = async (req: Request, res: Response) => {
-    return res.json({
-      status: 'success',
-      message: 'Tag deleted successfully'
-    });
+    try {
+      const { id } = req.params;
+      
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          status: 'success',
+          message: 'Tag deleted successfully'
+        });
+      }
+
+      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tag = await tagRepository.findOne({ where: { id } });
+
+      if (!tag) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Tag not found'
+        });
+      }
+
+      await tagRepository.remove(tag);
+
+      return res.json({
+        status: 'success',
+        message: 'Tag deleted successfully'
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to delete tag'
+      });
+    }
   };
 
   // Pages Management

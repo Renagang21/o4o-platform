@@ -123,7 +123,7 @@ export class CustomizerController {
     };
 
     // Cache for 5 minutes
-    await cacheService.set(cacheKey, settings, 300);
+    await cacheService.set(cacheKey, settings, { ttl: 300 });
 
     logger.info('Customizer settings retrieved', { userId, themeId });
     res.json(settings);
@@ -248,7 +248,7 @@ export class CustomizerController {
 
     // Cache draft for 1 hour
     const cacheKey = `customizer:draft:${userId}:${themeId}`;
-    await cacheService.set(cacheKey, draft, 3600);
+    await cacheService.set(cacheKey, draft, { ttl: 3600 });
 
     logger.info('Customizer draft saved', { userId, themeId, draftId: draft.id });
     
@@ -368,7 +368,7 @@ export class CustomizerController {
       version: '1.0.0',
       exportedAt: dayjs().toISOString(),
       themeId,
-      settings: settings.settings,
+      settings: (settings as any).settings,
       metadata: {
         exportedBy: userId,
         platform: 'O4O Platform',
