@@ -1,5 +1,7 @@
 import { FC, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ContentApi } from '@/api/contentApi';
+import { Post, PostStatus } from '@/types/content';
 import {
   List,
   ListOrdered,
@@ -217,27 +219,47 @@ const NewPost: FC = () => {
   // Save post
   const savePost = async (publish = false) => {
     try {
-      // TODO: Implement API call to save post
-      // const postData = {
-      //   title,
-      //   excerpt,
-      //   content: JSON.stringify(blocks),
-      //   status: publish ? 'publish' : 'draft',
-      //   visibility,
-      //   publishDate,
-      //   category,
-      //   tags,
-      //   featuredImage,
-      //   allowComments
-      // };
+      // Prepare post data
+      const postData: Partial<Post> = {
+        title,
+        excerpt,
+        content: JSON.stringify(blocks), // Save blocks as JSON string
+        status: publish ? PostStatus.PUBLISHED : PostStatus.DRAFT,
+        visibility: visibility as 'public' | 'private' | 'password',
+        publishedAt: publishDate ? new Date(publishDate) : undefined,
+        categoryId: category || undefined,
+        tags: tags.map(tag => ({ name: tag })) as any, // Will be handled by backend
+        featuredImageId: featuredImage || undefined,
+        allowComments,
+        postType: 'post' as any,
+        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        authorId: 'current-user' // Will be set by backend from JWT
+      };
       
-      toast.success(publish ? '게시물이 발행되었습니다!' : '초안이 저장되었습니다!');
+      // Call API to create post
+      const response = await ContentApi.createPost(postData);
       
-      if (publish) {
-        navigate('/posts');
+      if (response.success) {
+        toast.success(publish ? '게시물이 발행되었습니다!' : '초안이 저장되었습니다!');
+        
+        if (publish) {
+          navigate('/posts');
+        } else {
+          // Navigate to edit page for draft
+          navigate(`/posts/edit/${response.data.id}`);
+        }
+      } else {
+        toast.error(response.message || '저장 중 오류가 발생했습니다');
       }
-    } catch (error) {
-      toast.error('저장 중 오류가 발생했습니다');
+    } catch (error: any) {
+      console.error('Error saving post:', error);
+      
+      // Show different error messages based on error type
+      if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error')) {
+        toast.error('현재 API 서버가 개발 중입니다. 담당 개발자에게 문의해주세요.');
+      } else {
+        toast.error(error.response?.data?.message || '저장 중 오류가 발생했습니다. API 서버 연결을 확인해주세요.');
+      }
     }
   };
 
@@ -444,7 +466,37 @@ const NewPost: FC = () => {
             초안 저장
           </button>
           
-          <button className="px-4 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50">
+          <button 
+            onClick={async () => {
+              try {
+                // Save as draft first to get ID
+                const postData: Partial<Post> = {
+                  title: title || '제목 없음',
+                  excerpt,
+                  content: JSON.stringify(blocks),
+                  status: PostStatus.DRAFT,
+                  slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+                  postType: 'post' as any
+                };
+                
+                const response = await ContentApi.createPost(postData);
+                if (response.success && response.data?.id) {
+                  // Open preview in new tab
+                  const previewUrl = `/preview/post/${response.data.id}`;
+                  window.open(previewUrl, '_blank');
+                } else {
+                  toast.error('미리보기를 생성할 수 없습니다');
+                }
+              } catch (error: any) {
+                console.error('Error creating preview:', error);
+                if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error')) {
+                  toast.error('현재 API 서버가 개발 중입니다. 담당 개발자에게 문의해주세요.');
+                } else {
+                  toast.error('미리보기 생성 중 오류가 발생했습니다');
+                }
+              }
+            }}
+            className="px-4 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50">
             <Eye className="w-4 h-4 inline mr-2" />
             미리보기
           </button>

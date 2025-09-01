@@ -281,8 +281,8 @@ export class MenuCacheController {
         url: item.url,
         type: item.type,
         target: item.target,
-        cssClasses: item.css_classes,
-        description: item.description,
+        cssClasses: item.css_class,
+        description: (item as any).description || '',
         metadata: item.metadata,
         children: []
       });

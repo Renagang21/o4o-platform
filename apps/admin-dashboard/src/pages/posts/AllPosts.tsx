@@ -88,12 +88,30 @@ const AllPosts: FC = () => {
         pageSize, 
         { type: filters.type }
       )
-      setPosts(response.data)
-      setTotalItems(response.pagination?.totalItems || 0)
-      calculateStats(response.data)
+      
+      if (response.success) {
+        setPosts(response.data)
+        setTotalItems(response.pagination?.totalItems || 0)
+        calculateStats(response.data)
+      } else {
+        // API returned error response
+        setPosts([])
+        setTotalItems(0)
+        toast.error(response.message || '게시물을 불러오는데 실패했습니다.')
+      }
     } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('게시물을 불러오는데 실패했습니다.')
+      console.error('Error loading posts:', error)
+      
+      // Set empty data for better UX
+      setPosts([])
+      setTotalItems(0)
+      
+      // Show user-friendly message based on error type
+      if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error')) {
+        toast.error('현재 API 서버가 개발 중입니다. 담당 개발자에게 문의해주세요.')
+      } else {
+        toast.error('게시물을 불러오는데 실패했습니다.')
+      }
     } finally {
       setLoading(false)
     }
