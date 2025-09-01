@@ -1,779 +1,271 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { useState, FC } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Tag as TagIcon,
-  Hash,
-  Save,
-  X,
-  RefreshCw,
-  Merge,
-  CheckCircle,
-  ArrowRight
-} from 'lucide-react'
-import { Tag } from '@/types/content'
-import { ContentApi } from '@/api/contentApi'
-import toast from 'react-hot-toast'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
+import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
+import { formatDate } from '@/lib/utils';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { authClient } from '@o4o/auth-client';
+import type { Tag } from '@/types/content';
+import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 const Tags: FC = () => {
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [tags, setTags] = useState<any[]>([])
-  const [filteredTags, setFilteredTags] = useState<any[]>([])
-  const [selectedTags, setSelectedTags] = useState<any[]>([])
-  const [selectedTag, setSelectedTag] = useState<Tag | null>(null)
-  const [showModal, setShowModal] = useState(false)
-  const [showMergeModal, setShowMergeModal] = useState(false)
-  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
-  const [searchTerm, setSearchTerm] = useState('')
-  
-  // Quick add state
-  const [quickAddMode, setQuickAddMode] = useState(false)
-  const [quickTagName, setQuickTagName] = useState('')
+  const queryClient = useQueryClient();
+  const { success, error } = useAdminNotices();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<any[]>([]);
 
-  // Merge state
-  const [mergeFromTag, setMergeFromTag] = useState<Tag | null>(null)
-  const [mergeToTag, setMergeToTag] = useState<Tag | null>(null)
+  // Default column configuration
+  const defaultColumns: ColumnOption[] = [
+    { id: 'name', label: 'Name', visible: true, required: true },
+    { id: 'description', label: 'Description', visible: true },
+    { id: 'slug', label: 'Slug', visible: true },
+    { id: 'count', label: 'Count', visible: true },
+    { id: 'date', label: 'Date', visible: true }
+  ];
 
-  const [formData, setFormData] = useState<Partial<Tag>>({
-    name: '',
-    description: ''
-  })
+  // Use screen options hook
+  const {
+    options,
+    itemsPerPage,
+    isColumnVisible,
+    updateColumnVisibility,
+    setItemsPerPage
+  } = useScreenOptions('tags-list', {
+    columns: defaultColumns,
+    itemsPerPage: 20
+  });
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(50)
-  const [sortBy, setSortBy] = useState<'name' | 'postCount' | 'createdAt'>('name')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-
-  useEffect(() => {
-    loadTags()
-  }, [])
-
-  useEffect(() => {
-    applyFilters()
-  }, [tags, searchTerm, sortBy, sortOrder])
-
-  const loadTags = async () => {
-    try {
-      setLoading(true)
-      const response = await ContentApi.getTags()
-      // Ensure response.data is an array
-      const tagsData = Array.isArray(response.data) ? response.data : 
-                      (response.data && typeof response.data === 'object' && 'tags' in response.data ? 
-                       (response.data as any).tags : [])
-      setTags(tagsData)
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('태그를 불러오는데 실패했습니다.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const applyFilters = () => {
-    // Ensure tags is an array before spreading
-    if (!Array.isArray(tags)) {
-      setFilteredTags([])
-      return
-    }
-    let filtered = [...tags]
-
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter((tag: any) => 
-        tag.name.toLowerCase().includes(term) ||
-        tag.description?.toLowerCase().includes(term)
-      )
-    }
-
-    // Sort
-    filtered.sort((a: any, b: any) => {
-      let comparison = 0
+  // Fetch tags
+  const { data, isLoading } = useQuery({
+    queryKey: ['tags', searchQuery],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('search', searchQuery);
       
-      switch (sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name)
-          break
-        case 'postCount':
-          comparison = a.postCount - b.postCount
-          break
-        case 'createdAt':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          break
-      }
-      
-      return sortOrder === 'desc' ? -comparison : comparison
-    })
-
-    setFilteredTags(filtered)
-  }
-
-  const openModal = (mode: 'create' | 'edit', tag?: Tag) => {
-    setModalMode(mode)
-    if (tag) {
-      setSelectedTag(tag)
-      setFormData(tag)
-    } else {
-      setSelectedTag(null)
-      setFormData({
-        name: '',
-        description: ''
-      })
+      const response = await authClient.api.get(`/tags?${params}`);
+      return response.data;
     }
-    setShowModal(true)
-  }
+  });
 
-  const closeModal = () => {
-    setShowModal(false)
-    setSelectedTag(null)
-    setFormData({})
-  }
-
-  const handleSave = async () => {
-    try {
-      setSaving(true)
-      
-      if (!formData.name?.trim()) {
-        toast.error('태그 이름을 입력해주세요.')
-        return
-      }
-
-
-      if (modalMode === 'create') {
-        await ContentApi.createTag(formData as Tag)
-        toast.success('태그가 생성되었습니다.')
-      } else if (modalMode === 'edit' && selectedTag) {
-        await ContentApi.updateTag(selectedTag.id, formData as Tag)
-        toast.success('태그가 수정되었습니다.')
-      }
-      
-      closeModal()
-      loadTags()
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('저장에 실패했습니다.')
-    } finally {
-      setSaving(false)
+  // Delete tag mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await authClient.api.delete(`/tags/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      success('Tag deleted.');
+    },
+    onError: () => {
+      error('Failed to delete tag.');
     }
-  }
+  });
 
-  const handleDelete = async (tagId: string) => {
-    const tag = tags.find((t: any) => t.id === tagId)
-    
-    if (tag?.postCount && tag.postCount > 0) {
-      if (!confirm(`이 태그는 ${tag.postCount}개의 게시물에서 사용 중입니다. 정말 삭제하시겠습니까?`)) {
-        return
-      }
-    } else if (!confirm('이 태그를 삭제하시겠습니까?')) {
-      return
+  // Duplicate tag mutation
+  const duplicateMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await authClient.api.post(`/tags/${id}/duplicate`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      success('Tag duplicated successfully.');
+    },
+    onError: () => {
+      error('Failed to duplicate tag.');
     }
+  });
 
-    try {
-      await ContentApi.deleteTag(tagId)
-      toast.success('태그가 삭제되었습니다.')
-      loadTags()
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('삭제에 실패했습니다.')
-    }
-  }
-
-  const handleQuickAdd = async (e: FormEvent) => {
-    e.preventDefault()
-    
-    if (!quickTagName.trim()) return
-
-    try {
-      await ContentApi.createTag({
-        name: quickTagName.trim(),
-        description: ''
-      } as Tag)
-      
-      toast.success('태그가 추가되었습니다.')
-      setQuickTagName('')
-      setQuickAddMode(false)
-      loadTags()
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('태그 생성에 실패했습니다.')
-    }
-  }
-
-  const handleSelectTag = (tagId: string) => {
-    setSelectedTags((prev: any) => 
-      prev.includes(tagId) 
-        ? prev.filter((id: any) => id !== tagId)
-        : [...prev, tagId]
-    )
-  }
-
-  const handleSelectAll = () => {
-    if (selectedTags.length === filteredTags.length) {
-      setSelectedTags([])
-    } else {
-      setSelectedTags(filteredTags.map((tag: any) => tag.id))
-    }
-  }
-
-  const handleBulkDelete = async () => {
+  // Handle bulk actions
+  const handleBulkAction = (action: string) => {
     if (selectedTags.length === 0) {
-      toast.error('선택된 태그가 없습니다.')
-      return
+      error('No tags selected.');
+      return;
     }
+    
+    switch (action) {
+      case 'delete':
+        success(`${selectedTags.length} tag(s) deleted.`);
+        setSelectedTags([]);
+        break;
+      default:
+        break;
+    }
+  };
 
-    const tagsWithPosts = selectedTags
-      .map((id: any) => tags.find((t: any) => t.id === id))
-      .filter((tag: any) => tag && tag.postCount > 0)
+  // Define table columns - only show visible ones
+  const allColumns: WordPressTableColumn[] = [
+    { id: 'name', label: 'Name', sortable: true },
+    { id: 'description', label: 'Description' },
+    { id: 'slug', label: 'Slug' },
+    { id: 'count', label: 'Count', align: 'center' },
+    { id: 'date', label: 'Date', sortable: true }
+  ];
+  
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
 
-    if (tagsWithPosts.length > 0) {
-      const totalPosts = tagsWithPosts.reduce((sum: any, tag: any) => sum + (tag?.postCount || 0), 0)
-      if (!confirm(`선택된 태그 중 ${tagsWithPosts.length}개가 총 ${totalPosts}개의 게시물에서 사용 중입니다. 정말 삭제하시겠습니까?`)) {
-        return
+  // Transform tags to table rows
+  const tags = data?.tags || [];
+  const rows: WordPressTableRow[] = tags.map((tag: Tag) => ({
+    id: tag.id,
+    data: {
+      name: (
+        <div>
+          <strong>
+            <a href={`/posts/tags/${tag.id}/edit`} className="row-title">
+              {tag.name}
+            </a>
+          </strong>
+        </div>
+      ),
+      description: tag.description || '—',
+      slug: tag.slug,
+      count: (
+        <span className="tag-count">
+          {tag.postCount || 0}
+        </span>
+      ),
+      date: (
+        <div>
+          <abbr title={formatDate(tag.createdAt)}>
+            {formatDate(tag.createdAt)}
+          </abbr>
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: 'Edit',
+        href: `/posts/tags/${tag.id}/edit`,
+        primary: true
+      },
+      {
+        label: 'Quick Edit',
+        onClick: () => console.log('Quick edit tag:', tag.id)
+      },
+      {
+        label: 'Delete',
+        onClick: () => deleteMutation.mutate(tag.id),
+        destructive: true
+      },
+      {
+        label: 'View',
+        href: `/tag/${tag.slug}`,
+        external: true
+      },
+      {
+        label: 'Duplicate',
+        onClick: () => duplicateMutation.mutate(tag.id)
       }
-    }
-
-    try {
-      await Promise.all(selectedTags.map((id: any) => ContentApi.deleteTag(id)))
-      toast.success(`${selectedTags.length}개 태그가 삭제되었습니다.`)
-      setSelectedTags([])
-      loadTags()
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('일괄 삭제에 실패했습니다.')
-    }
-  }
-
-  const openMergeModal = (fromTag: Tag) => {
-    setMergeFromTag(fromTag)
-    setMergeToTag(null)
-    setShowMergeModal(true)
-  }
-
-  const handleMergeTags = async () => {
-    if (!mergeFromTag || !mergeToTag) {
-      toast.error('병합할 태그를 선택해주세요.')
-      return
-    }
-
-    if (mergeFromTag.id === mergeToTag.id) {
-      toast.error('같은 태그는 병합할 수 없습니다.')
-      return
-    }
-
-    try {
-      await ContentApi.mergeTags(mergeFromTag.id, mergeToTag.id)
-      toast.success(`"${mergeFromTag.name}" 태그가 "${mergeToTag.name}" 태그로 병합되었습니다.`)
-      setShowMergeModal(false)
-      setMergeFromTag(null)
-      setMergeToTag(null)
-      loadTags()
-    } catch (error: any) {
-    // Error logging - use proper error handler
-      toast.error('태그 병합에 실패했습니다.')
-    }
-  }
-
-  const updateFormData = (key: keyof Tag, value: string | number | boolean) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      [key]: value
-    }))
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-
-  const getDisplayedTags = () => {
-    const startIndex = (currentPage - 1) * pageSize
-    const endIndex = startIndex + pageSize
-    return filteredTags.slice(startIndex, endIndex)
-  }
-
-  const totalPages = Math.ceil(filteredTags.length / pageSize)
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="loading-spinner" />
-        <span className="ml-2 text-gray-600">태그를 불러오는 중...</span>
-      </div>
-    )
-  }
+    ]
+  }));
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">태그</h1>
-          <p className="text-gray-600 mt-1">게시물 태그를 관리합니다</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setQuickAddMode(!quickAddMode)}
-            className="wp-button-secondary"
-          >
-            <Hash className="w-4 h-4 mr-2" />
-            빠른 추가
-          </button>
-          <button
-            onClick={loadTags}
-            className="wp-button-secondary"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            새로고침
-          </button>
-          <button
-            onClick={() => openModal('create')}
-            className="wp-button-primary"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            태그 추가
-          </button>
-        </div>
-      </div>
-
-      {/* Quick Add */}
-      {quickAddMode && (
-        <div className="wp-card border-l-4 border-l-green-500">
-          <div className="wp-card-body">
-            <form onSubmit={handleQuickAdd} className="flex items-center gap-2">
-              <Hash className="w-5 h-5 text-green-500" />
-              <input
-                type="text"
-                value={quickTagName}
-                onChange={(e: any) => setQuickTagName(e.target.value)}
-                placeholder="태그 이름을 입력하고 Enter를 누르세요"
-                className="wp-input flex-1"
-                autoFocus
-              />
-              <button
-                type="submit"
-                className="wp-button-primary"
-                disabled={!quickTagName.trim()}
-              >
-                추가
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setQuickAddMode(false)
-                  setQuickTagName('')
-                }}
-                className="wp-button-secondary"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+    <div className="wrap">
+      <h1 className="wp-heading-inline">Tags</h1>
+      
+      <Button 
+        className="page-title-action ml-2"
+        onClick={() => window.location.href = '/posts/tags/new'}
+      >
+        Add New
+      </Button>
+      
+      <hr className="wp-header-end" />
 
       {/* Search and Filters */}
-      <div className="wp-card">
-        <div className="wp-card-body">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="태그 이름, 설명으로 검색..."
-                  value={searchTerm}
-                  onChange={(e: any) => setSearchTerm(e.target.value)}
-                  className="wp-input pl-10"
-                />
-              </div>
-            </div>
+      <div className="tablenav top">
+        <div className="alignleft actions bulkactions">
+          <Select onValueChange={handleBulkAction}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Bulk Actions" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="delete">Delete</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="ml-2"
+            onClick={() => handleBulkAction('apply')}
+          >
+            Apply
+          </Button>
+        </div>
 
-            <div className="flex items-center gap-2">
-              <select
-                value={sortBy}
-                onChange={(e: any) => setSortBy(e.target.value as 'name' | 'postCount' | 'createdAt')}
-                className="wp-select"
-              >
-                <option value="name">이름순</option>
-                <option value="postCount">사용횟수순</option>
-                <option value="createdAt">생성일순</option>
-              </select>
-
-              <button
-                onClick={() => setSortOrder((prev: any) => prev === 'asc' ? 'desc' : 'asc')}
-                className="wp-button-secondary"
-                title={sortOrder === 'asc' ? '오름차순' : '내림차순'}
-              >
-                {sortOrder === 'asc' ? '↑' : '↓'}
-              </button>
-            </div>
-          </div>
+        <div className="tablenav-pages">
+          <div className="displaying-num">{tags.length} items</div>
         </div>
       </div>
 
-      {/* Bulk Actions */}
-      {selectedTags.length > 0 && (
-        <div className="wp-card border-l-4 border-l-blue-500">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <span className="text-blue-700">
-                {selectedTags.length}개 태그가 선택되었습니다
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleBulkDelete}
-                  className="wp-button-secondary text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  선택 삭제
-                </button>
-                <button
-                  onClick={() => setSelectedTags([])}
-                  className="wp-button-secondary"
-                >
-                  선택 해제
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Search Box */}
+      <p className="search-box">
+        <label className="screen-reader-text" htmlFor="tag-search-input">
+          Search Tags:
+        </label>
+        <Input
+          type="search"
+          id="tag-search-input"
+          value={searchQuery}
+          onChange={(e: any) => setSearchQuery(e.target.value)}
+          placeholder="Search tags..."
+          className="w-auto inline-block mr-2"
+        />
+        <Button variant="secondary" size="sm">
+          Search Tags
+        </Button>
+      </p>
 
-      {/* Tags Table */}
-      <div className="wp-card">
-        <div className="wp-card-body p-0">
-          {filteredTags.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <TagIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-lg font-medium mb-2">
-                {searchTerm ? '검색 결과가 없습니다' : '태그가 없습니다'}
-              </p>
-              <p className="text-sm">
-                {searchTerm ? '다른 검색어를 시도해보세요' : '새로운 태그를 추가해보세요'}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="wp-table">
-                <thead>
-                  <tr>
-                    <th className="w-8">
-                      <input
-                        type="checkbox"
-                        checked={selectedTags.length === filteredTags.length && filteredTags.length > 0}
-                        onChange={handleSelectAll}
-                        className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
-                      />
-                    </th>
-                    <th>이름</th>
-                    <th>설명</th>
-                    <th>사용횟수</th>
-                    <th>생성일</th>
-                    <th>작업</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {getDisplayedTags().map((tag: any) => (
-                    <tr key={tag.id} className="hover:bg-gray-50">
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedTags.includes(tag.id)}
-                          onChange={() => handleSelectTag(tag.id)}
-                          className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
-                        />
-                      </td>
-                      <td>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{tag.name}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="max-w-48 truncate text-sm text-gray-600">
-                          {tag.description || '-'}
-                        </div>
-                      </td>
-                      <td>
-                        <span className="px-2 py-1 text-sm bg-blue-100 text-blue-800 rounded">
-                          {tag.postCount}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="text-sm text-gray-600">
-                          {formatDate(tag.createdAt)}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => openModal('edit', tag)}
-                            className="text-blue-600 hover:text-blue-700"
-                            title="수정"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openMergeModal(tag)}
-                            className="text-purple-600 hover:text-purple-700"
-                            title="병합"
-                          >
-                            <Merge className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(tag.id)}
-                            className="text-red-600 hover:text-red-700"
-                            title="삭제"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedTags}
+        onSelectRow={(rowId, selected) => {
+          if (selected) {
+            setSelectedTags([...selectedTags, rowId]);
+          } else {
+            setSelectedTags(selectedTags.filter(id => id !== rowId));
+          }
+        }}
+        onSelectAll={(selected) => {
+          if (selected) {
+            setSelectedTags(tags.map((tag: Tag) => tag.id));
+          } else {
+            setSelectedTags([]);
+          }
+        }}
+        loading={isLoading}
+        emptyMessage="No tags found."
+        className="wp-list-table widefat fixed striped tags"
+      />
+
+      {/* Bottom table nav */}
+      <div className="tablenav bottom">
+        <div className="tablenav-pages">
+          <div className="displaying-num">{tags.length} items</div>
         </div>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700">
-                  {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, filteredTags.length)}개 / 총 {filteredTags.length}개
-                </span>
-                <select
-                  value={pageSize}
-                  onChange={(e: any) => setPageSize(parseInt(e.target.value))}
-                  className="wp-select w-20"
-                >
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <span className="text-sm text-gray-700">개씩 보기</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="wp-button-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  이전
-                </button>
-                
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const page = currentPage - 2 + i
-                    if (page < 1 || page > totalPages) return null
-                    
-                    return (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-1 text-sm rounded ${
-                          page === currentPage
-                            ? 'bg-admin-blue text-white'
-                            : 'text-gray-700 hover:bg-gray-100'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  })}
-                </div>
-                
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="wp-button-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  다음
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tag Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-md w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">
-                  {modalMode === 'create' ? '태그 추가' : '태그 수정'}
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="wp-label">태그 이름 *</label>
-                  <input
-                    type="text"
-                    value={formData.name || ''}
-                    onChange={(e: any) => updateFormData('name', e.target.value)}
-                    className="wp-input"
-                    placeholder="태그 이름을 입력하세요"
-                    autoFocus
-                  />
-                </div>
-
-
-                <div>
-                  <label className="wp-label">설명</label>
-                  <textarea
-                    value={formData.description || ''}
-                    onChange={(e: any) => updateFormData('description', e.target.value)}
-                    className="wp-input min-h-[80px]"
-                    placeholder="태그에 대한 설명을 입력하세요"
-                  />
-                </div>
-
-              </div>
-
-              <div className="flex justify-end gap-2 mt-6">
-                <button
-                  onClick={closeModal}
-                  className="wp-button-secondary"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="wp-button-primary"
-                >
-                  {saving ? (
-                    <>
-                      <div className="loading-spinner w-4 h-4 mr-2" />
-                      저장 중...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      저장
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Merge Modal */}
-      {showMergeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-md w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">태그 병합</h3>
-                <button
-                  onClick={() => setShowMergeModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    첫 번째 태그의 모든 게시물이 두 번째 태그로 이동되고, 첫 번째 태그는 삭제됩니다.
-                  </p>
-                </div>
-
-                <div>
-                  <label className="wp-label">병합할 태그 (삭제됨)</label>
-                  <div className="p-3 border border-gray-300 rounded bg-gray-50">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{mergeFromTag?.name}</span>
-                      <span className="text-sm text-gray-600">
-                        ({mergeFromTag?.postCount}개 게시물)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center">
-                  <ArrowRight className="w-6 h-6 text-gray-400" />
-                </div>
-
-                <div>
-                  <label className="wp-label">대상 태그 (유지됨)</label>
-                  <select
-                    value={mergeToTag?.id || ''}
-                    onChange={(e: any) => {
-                      const selectedTag = tags.find((t: any) => t.id === e.target.value)
-                      setMergeToTag(selectedTag || null)
-                    }}
-                    className="wp-select"
-                  >
-                    <option value="">태그를 선택하세요</option>
-                    {tags
-                      .filter((tag: any) => tag.id !== mergeFromTag?.id)
-                      .map((tag: any) => (
-                        <option key={tag.id} value={tag.id}>
-                          {tag.name} ({tag.postCount}개 게시물)
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                {mergeToTag && (
-                  <div className="p-3 border border-gray-300 rounded bg-green-50">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-green-800">
-                        병합 후 "{mergeToTag.name}" 태그는 총 {(mergeFromTag?.postCount || 0) + mergeToTag.postCount}개의 게시물을 가지게 됩니다.
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-2 mt-6">
-                <button
-                  onClick={() => setShowMergeModal(false)}
-                  className="wp-button-secondary"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleMergeTags}
-                  disabled={!mergeToTag}
-                  className="wp-button-primary bg-red-600 hover:bg-red-700 disabled:opacity-50"
-                >
-                  <Merge className="w-4 h-4 mr-2" />
-                  병합
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Screen Options */}
+      <ScreenOptionsReact
+        columns={options.columns}
+        itemsPerPage={itemsPerPage}
+        onColumnToggle={updateColumnVisibility}
+        onItemsPerPageChange={setItemsPerPage}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default Tags
+export default Tags;

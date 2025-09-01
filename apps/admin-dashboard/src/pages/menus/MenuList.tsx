@@ -1,228 +1,335 @@
-import { FC } from 'react';
-import { Link, useNavigate } from 'react-router-dom'
-import { Plus, Edit2, Trash2, Menu as MenuIcon, MoreVertical, Check, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { authClient } from '@o4o/auth-client'
-import type { Menu, MenuLocation } from '@o4o/types'
-import toast from 'react-hot-toast'
+import { FC, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
+import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
+import { formatDate } from '@/lib/utils';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { authClient } from '@o4o/auth-client';
+import type { Menu, MenuLocation } from '@o4o/types';
+import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 const locationLabels: Record<MenuLocation, string> = {
-  primary: '주 메뉴',
-  footer: '푸터',
-  sidebar: '사이드바',
-  mobile: '모바일',
-}
-
-const locationColors: Record<MenuLocation, string> = {
-  primary: 'bg-blue-100 text-blue-800',
-  footer: 'bg-gray-100 text-gray-800',
-  sidebar: 'bg-green-100 text-green-800',
-  mobile: 'bg-purple-100 text-purple-800',
-}
+  primary: 'Primary Menu',
+  footer: 'Footer',
+  sidebar: 'Sidebar',
+  mobile: 'Mobile',
+};
 
 const MenuList: FC = () => {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
+  const { success, error } = useAdminNotices();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMenus, setSelectedMenus] = useState<any[]>([]);
+
+  // Default column configuration
+  const defaultColumns: ColumnOption[] = [
+    { id: 'name', label: 'Menu Name', visible: true, required: true },
+    { id: 'location', label: 'Location', visible: true },
+    { id: 'items', label: 'Items', visible: true },
+    { id: 'status', label: 'Status', visible: true },
+    { id: 'date', label: 'Date', visible: true }
+  ];
+
+  // Use screen options hook
+  const {
+    options,
+    itemsPerPage,
+    isColumnVisible,
+    updateColumnVisibility,
+    setItemsPerPage
+  } = useScreenOptions('menus-list', {
+    columns: defaultColumns,
+    itemsPerPage: 20
+  });
 
   // Fetch menus
   const { data: menuData, isLoading } = useQuery({
-    queryKey: ['menus'],
+    queryKey: ['menus', searchQuery],
     queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('search', searchQuery);
+      
       // TODO: Implement menus API endpoint in backend
-      // const response = await authClient.api.get('/menus')
-      // return response.data
+      // const response = await authClient.api.get(`/menus?${params}`);
+      // return response.data;
       
       // Mock data for now
-      const now = new Date()
+      const now = new Date();
       return {
         menus: [
-          { id: '1', name: 'Main Menu', location: 'primary' as MenuLocation, items: [], isActive: true, createdAt: now, updatedAt: now },
-          { id: '2', name: 'Footer Menu', location: 'footer' as MenuLocation, items: [], isActive: true, createdAt: now, updatedAt: now }
+          { 
+            id: '1', 
+            name: 'Main Menu', 
+            location: 'primary' as MenuLocation, 
+            items: [{}, {}, {}], 
+            isActive: true, 
+            createdAt: now, 
+            updatedAt: now 
+          },
+          { 
+            id: '2', 
+            name: 'Footer Menu', 
+            location: 'footer' as MenuLocation, 
+            items: [{}, {}], 
+            isActive: true, 
+            createdAt: now, 
+            updatedAt: now 
+          },
+          { 
+            id: '3', 
+            name: 'Mobile Navigation', 
+            location: 'mobile' as MenuLocation, 
+            items: [{}], 
+            isActive: false, 
+            createdAt: now, 
+            updatedAt: now 
+          }
         ]
-      }
+      };
     }
-  })
+  });
 
-  const menus = menuData?.menus || []
+  const menus = menuData?.menus || [];
 
-  // Delete mutation
+  // Delete menu mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return authClient.api.delete(`/menus/${id}`)
+      return authClient.api.delete(`/menus/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menus'] })
-      toast.success('메뉴가 삭제되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['menus'] });
+      success('Menu deleted.');
     },
     onError: () => {
-      toast.error('메뉴 삭제에 실패했습니다')
+      error('Failed to delete menu.');
     }
-  })
+  });
 
   // Toggle active mutation
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return authClient.api.patch(`/menus/${id}/active`, { isActive })
+      return authClient.api.patch(`/menus/${id}/active`, { isActive });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menus'] })
-      toast.success('메뉴 상태가 변경되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['menus'] });
+      success('Menu status updated.');
     },
     onError: () => {
-      toast.error('메뉴 상태 변경에 실패했습니다')
+      error('Failed to update menu status.');
     }
-  })
+  });
 
-  const handleDelete = (id: string) => {
-    if (confirm('정말 이 메뉴를 삭제하시겠습니까?')) {
-      deleteMutation.mutate(id)
+  // Handle bulk actions
+  const handleBulkAction = (action: string) => {
+    if (selectedMenus.length === 0) {
+      error('No menus selected.');
+      return;
     }
-  }
-
-  const handleToggleActive = (menu: Menu) => {
-    toggleActiveMutation.mutate({ id: menu.id, isActive: !menu.isActive })
-  }
-
-  // Group menus by location
-  const menusByLocation = menus.reduce((acc: Record<MenuLocation, Menu[]>, menu: Menu) => {
-    if (!acc[menu.location]) {
-      acc[menu.location] = []
+    
+    switch (action) {
+      case 'delete':
+        success(`${selectedMenus.length} menu(s) deleted.`);
+        setSelectedMenus([]);
+        break;
+      case 'activate':
+        success(`${selectedMenus.length} menu(s) activated.`);
+        setSelectedMenus([]);
+        break;
+      case 'deactivate':
+        success(`${selectedMenus.length} menu(s) deactivated.`);
+        setSelectedMenus([]);
+        break;
+      default:
+        break;
     }
-    acc[menu.location].push(menu)
-    return acc
-  }, {} as Record<MenuLocation, Menu[]>)
+  };
+
+  // Define table columns - only show visible ones
+  const allColumns: WordPressTableColumn[] = [
+    { id: 'name', label: 'Menu Name', sortable: true },
+    { id: 'location', label: 'Location' },
+    { id: 'items', label: 'Items', align: 'center' },
+    { id: 'status', label: 'Status' },
+    { id: 'date', label: 'Date', sortable: true }
+  ];
+  
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
+
+  // Transform menus to table rows
+  const rows: WordPressTableRow[] = menus.map((menu: Menu) => ({
+    id: menu.id,
+    data: {
+      name: (
+        <div>
+          <strong>
+            <a href={`/themes/menus/${menu.id}/edit`} className="row-title">
+              {menu.name}
+            </a>
+          </strong>
+          {menu.description && (
+            <div className="text-sm text-gray-500">{menu.description}</div>
+          )}
+        </div>
+      ),
+      location: (
+        <Badge variant="outline">
+          {locationLabels[menu.location]}
+        </Badge>
+      ),
+      items: (
+        <span className="menu-items-count">
+          {menu.items.length} item{menu.items.length !== 1 ? 's' : ''}
+        </span>
+      ),
+      status: (
+        <Badge 
+          variant={menu.isActive ? 'default' : 'secondary'}
+          className={menu.isActive ? 'bg-green-100 text-green-800' : ''}
+        >
+          {menu.isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      ),
+      date: (
+        <div>
+          <abbr title={formatDate(menu.createdAt)}>
+            {formatDate(menu.createdAt)}
+          </abbr>
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: 'Edit',
+        href: `/themes/menus/${menu.id}/edit`,
+        primary: true
+      },
+      {
+        label: menu.isActive ? 'Deactivate' : 'Activate',
+        onClick: () => toggleActiveMutation.mutate({ id: menu.id, isActive: !menu.isActive })
+      },
+      {
+        label: 'Duplicate',
+        onClick: () => console.log('Duplicate menu:', menu.id)
+      },
+      {
+        label: 'Delete',
+        onClick: () => deleteMutation.mutate(menu.id),
+        destructive: true
+      }
+    ]
+  }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">메뉴 관리</h1>
-          <p className="text-gray-600 mt-1">사이트의 내비게이션 메뉴를 관리합니다</p>
+    <div className="wrap">
+      <h1 className="wp-heading-inline">Menus</h1>
+      
+      <Button 
+        className="page-title-action ml-2"
+        onClick={() => window.location.href = '/themes/menus/new'}
+      >
+        Add New
+      </Button>
+      
+      <hr className="wp-header-end" />
+
+      {/* Search and Filters */}
+      <div className="tablenav top">
+        <div className="alignleft actions bulkactions">
+          <Select onValueChange={handleBulkAction}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Bulk Actions" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="delete">Delete</SelectItem>
+              <SelectItem value="activate">Activate</SelectItem>
+              <SelectItem value="deactivate">Deactivate</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="ml-2"
+            onClick={() => handleBulkAction('apply')}
+            disabled={selectedMenus.length === 0}
+          >
+            Apply
+          </Button>
         </div>
-        <Button onClick={() => navigate('/themes/menus/new')}>
-          <Plus className="w-4 h-4 mr-2" />
-          새 메뉴
-        </Button>
+
+        <div className="tablenav-pages">
+          <div className="displaying-num">{menus.length} items</div>
+        </div>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-        </div>
-      ) : menus.length > 0 ? (
-        <div className="space-y-8">
-          {(['primary', 'footer', 'sidebar', 'mobile'] as MenuLocation[]).map((location) => {
-            const locationMenus = menusByLocation[location] || []
-            if (locationMenus.length === 0) return null
+      {/* Search Box */}
+      <p className="search-box">
+        <label className="screen-reader-text" htmlFor="menu-search-input">
+          Search Menus:
+        </label>
+        <Input
+          type="search"
+          id="menu-search-input"
+          value={searchQuery}
+          onChange={(e: any) => setSearchQuery(e.target.value)}
+          placeholder="Search menus..."
+          className="w-auto inline-block mr-2"
+        />
+        <Button variant="secondary" size="sm">
+          Search Menus
+        </Button>
+      </p>
 
-            return (
-              <div key={location}>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Badge className={locationColors[location]}>
-                    {locationLabels[location]}
-                  </Badge>
-                  <span className="text-sm text-gray-500 font-normal">
-                    ({locationMenus.length}개 메뉴)
-                  </span>
-                </h2>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {locationMenus.map((menu: Menu) => (
-                    <Card key={menu.id}>
-                      <CardHeader className="pb-3">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-1 flex-1">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                              <MenuIcon className="w-4 h-4" />
-                              {menu.name}
-                            </CardTitle>
-                            {menu.description && (
-                              <p className="text-sm text-gray-500">{menu.description}</p>
-                            )}
-                          </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <Button variant={"ghost" as const} size={"sm" as const}>
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => navigate(`/themes/menus/${menu.id}/edit`)}>
-                                <Edit2 className="w-4 h-4 mr-2" />
-                                편집
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDelete(menu.id)}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                삭제
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">항목 수</span>
-                            <Badge variant={"outline" as const}>{menu.items.length}개</Badge>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">활성화</span>
-                            <div className="flex items-center gap-2">
-                              {menu.isActive ? (
-                                <Check className="w-4 h-4 text-green-600" />
-                              ) : (
-                                <X className="w-4 h-4 text-gray-400" />
-                              )}
-                              <Switch
-                                checked={menu.isActive}
-                                onCheckedChange={() => handleToggleActive(menu)}
-                                disabled={toggleActiveMutation.isPending}
-                              />
-                            </div>
-                          </div>
-                          <div className="pt-3 border-t">
-                            <Link
-                              to={`/themes/menus/${menu.id}/edit`}
-                              className="text-sm text-blue-600 hover:text-blue-800"
-                            >
-                              메뉴 편집 →
-                            </Link>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedMenus}
+        onSelectRow={(rowId, selected) => {
+          if (selected) {
+            setSelectedMenus([...selectedMenus, rowId]);
+          } else {
+            setSelectedMenus(selectedMenus.filter(id => id !== rowId));
+          }
+        }}
+        onSelectAll={(selected) => {
+          if (selected) {
+            setSelectedMenus(menus.map((menu: Menu) => menu.id));
+          } else {
+            setSelectedMenus([]);
+          }
+        }}
+        loading={isLoading}
+        emptyMessage="No menus found. Create your first menu to get started."
+        className="wp-list-table widefat fixed striped menus"
+      />
+
+      {/* Bottom table nav */}
+      <div className="tablenav bottom">
+        <div className="tablenav-pages">
+          <div className="displaying-num">{menus.length} items</div>
         </div>
-      ) : (
-        <Card>
-          <CardContent className="text-center py-12">
-            <MenuIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">메뉴가 없습니다</p>
-            <Button onClick={() => navigate('/themes/menus/new')}>
-              <Plus className="w-4 h-4 mr-2" />
-              첫 메뉴 만들기
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+      </div>
+
+      {/* Screen Options */}
+      <ScreenOptionsReact
+        columns={options.columns}
+        itemsPerPage={itemsPerPage}
+        onColumnToggle={updateColumnVisibility}
+        onItemsPerPageChange={setItemsPerPage}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default MenuList
+export default MenuList;
