@@ -19,7 +19,7 @@ import {
 import fs from 'fs/promises'
 import path from 'path'
 
-const router: any = Router()
+const router: Router = Router()
 
 // Apply authentication to all routes
 router.use(authenticateToken)

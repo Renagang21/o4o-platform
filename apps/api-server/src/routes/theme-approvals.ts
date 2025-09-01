@@ -12,7 +12,7 @@ import { User } from '../entities/User'
 import { Post } from '../entities/Post'
 import simpleLogger from '../utils/simpleLogger'
 
-const router: any = Router()
+const router: Router = Router()
 
 // Apply authentication to all routes
 router.use(authenticateToken)

@@ -3,7 +3,7 @@ import { ThemeController } from '../../controllers/ThemeController';
 import { authenticateToken } from '../../middleware/auth';
 import { requireAdmin } from '../../middleware/auth';
 
-const router: any = Router();
+const router: Router = Router();
 const themeController = new ThemeController();
 
 // Public routes

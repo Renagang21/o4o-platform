@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { CouponController } from '../../controllers/CouponController';
 import { authenticateToken, requireAdmin, requireManagerOrAdmin } from '../../middleware/auth';
 
-const router: any = Router();
+const router: Router = Router();
 const couponController = new CouponController();
 
 // Public routes - validate coupon (requires authentication)
