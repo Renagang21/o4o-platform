@@ -53,9 +53,6 @@ const ReusableBlocksPage = lazy(() =>
 );
 const Categories = lazy(() => import('@/pages/categories/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
-const HomepageEditor = lazy(() => 
-  import(/* webpackChunkName: "homepage-editor" */ '@/pages/templates/HomepageEditor')
-);
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
@@ -92,8 +89,6 @@ const CrowdfundingProjectDetail = lazy(() => import('@/pages/apps/CrowdfundingPr
 const CrowdfundingProjectForm = lazy(() => import('@/pages/apps/CrowdfundingProjectForm'));
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
 
-// User Management Pages
-const RolePermissions = lazy(() => import('@/pages/users/RolePermissions'));
 
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
@@ -111,12 +106,8 @@ const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'
 const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
 const AppSettings = lazy(() => import('@/pages/apps/AppSettings'));
 
-// Theme Pages
-const ThemeMarketplace = lazy(() => import('@/pages/themes/ThemeMarketplace'));
-const ThemeEditor = lazy(() => 
-  import(/* webpackChunkName: "theme-editor" */ '@/pages/themes/ThemeEditor')
-);
-const ThemePreview = lazy(() => import('@/pages/themes/ThemePreview'));
+// Appearance Pages (WordPress Style)
+const Customize = lazy(() => import('@/pages/appearance/Customize'));
 
 // Plugin Management
 const WordPressPluginManager = lazy(() => import('@/pages/apps/WordPressPluginManager'));
@@ -416,43 +407,19 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 테마 관리 */}
-                    <Route path="/themes/*" element={
+                    {/* 외모 관리 (WordPress Style) */}
+                    <Route path="/customize" element={
                       <AdminProtectedRoute requiredPermissions={['templates:write']}>
                         <Suspense fallback={<PageLoader />}>
-                          <HomepageEditor />
+                          <Customize />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/themes/customize" element={
-                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <HomepageEditor />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/themes/homepage" element={
-                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <HomepageEditor />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/themes/menus/*" element={
+                    <Route path="/appearance/menus/*" element={
                       <AdminProtectedRoute requiredPermissions={['menus:read']}>
                         <Suspense fallback={<PageLoader />}>
                           <Menus />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/themes/marketplace" element={
-                      <AdminProtectedRoute requiredPermissions={['templates:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ThemeMarketplace />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
@@ -474,21 +441,6 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/themes/:id/editor" element={
-                      <AdminProtectedRoute requiredPermissions={['templates:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ThemeEditor />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/themes/:id/preview" element={
-                      <AdminProtectedRoute requiredPermissions={['templates:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ThemePreview />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     
                     {/* Appearance - Template Parts */}
                     <Route path="/appearance/template-parts" element={

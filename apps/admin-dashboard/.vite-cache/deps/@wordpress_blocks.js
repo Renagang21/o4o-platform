@@ -78,9 +78,9 @@ import {
   updateCategory,
   validateBlock,
   withBlockContentContext
-} from "./chunk-RKLTKHCB.js";
+} from "./chunk-AWNBSRQW.js";
 import "./chunk-7ZJJT473.js";
-import "./chunk-JNUZ4ZPW.js";
+import "./chunk-23RLET4W.js";
 import "./chunk-HOFISRPD.js";
 import "./chunk-LSA375NI.js";
 import "./chunk-HELTMWAY.js";

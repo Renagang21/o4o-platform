@@ -88,16 +88,14 @@ export const wordpressMenuItems: MenuItem[] = [
     ]
   },
   {
-    id: 'theme',
-    label: '테마',
+    id: 'appearance',
+    label: '외모',
     icon: <Palette className="w-5 h-5" />,
     children: [
-      { id: 'themes', label: '테마 관리', icon: <Palette className="w-4 h-4" />, path: '/themes' },
-      { id: 'customize', label: '사용자 정의하기', icon: <Palette className="w-4 h-4" />, path: '/themes/customize' },
-      { id: 'homepage', label: '홈페이지 편집', icon: <Layout className="w-4 h-4" />, path: '/themes/homepage' },
-      { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/themes/menus' },
-      { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/appearance/template-parts' },
-      { id: 'marketplace', label: '테마 마켓플레이스', icon: <Store className="w-4 h-4" />, path: '/themes/marketplace' }
+      { id: 'customize', label: '사용자 정의하기', icon: <Palette className="w-4 h-4" />, path: '/admin/customize' },
+      { id: 'menus', label: '메뉴', icon: <MenuIcon className="w-4 h-4" />, path: '/admin/appearance/menus' },
+      { id: 'widgets', label: '위젯', icon: <Layout className="w-4 h-4" />, path: '/admin/appearance/widgets' },
+      { id: 'template-parts', label: '템플릿 파트', icon: <Layout className="w-4 h-4" />, path: '/admin/appearance/template-parts' }
     ]
   },
   {
