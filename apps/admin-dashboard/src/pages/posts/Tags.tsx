@@ -16,12 +16,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Tag } from '@/types/content';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 const Tags: FC = () => {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<any[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: ''
+  });
 
   // Default column configuration
   const defaultColumns: ColumnOption[] = [
@@ -67,6 +74,31 @@ const Tags: FC = () => {
     },
     onError: () => {
       error('Failed to delete tag.');
+    }
+  });
+
+  // Create tag mutation
+  const createMutation = useMutation({
+    mutationFn: async (data: { name: string; description: string }) => {
+      const slug = data.name
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9가-힣]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      
+      await authClient.api.post('/api/v1/tags', {
+        ...data,
+        slug
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      success('Tag created successfully.');
+      setFormData({ name: '', description: '' });
+      setShowAddForm(false);
+    },
+    onError: () => {
+      error('Failed to create tag.');
     }
   });
 
@@ -174,12 +206,93 @@ const Tags: FC = () => {
       
       <Button 
         className="page-title-action ml-2"
-        onClick={() => window.location.href = '/posts/tags/new'}
+        onClick={() => setShowAddForm(!showAddForm)}
       >
         Add New
       </Button>
       
       <hr className="wp-header-end" />
+
+      {/* Add Tag Form - WordPress Style */}
+      {showAddForm && (
+        <div className="wp-tag-form" style={{ 
+          background: '#fff', 
+          border: '1px solid #c3c4c7', 
+          padding: '20px',
+          marginBottom: '20px',
+          boxShadow: '0 1px 1px rgba(0,0,0,.04)'
+        }}>
+          <h2 style={{ marginTop: 0, marginBottom: '1em', fontSize: '1.3em' }}>Add New Tag</h2>
+          
+          <div style={{ marginBottom: '15px' }}>
+            <Label htmlFor="tag-name" style={{ 
+              display: 'block', 
+              marginBottom: '5px', 
+              fontWeight: 600 
+            }}>
+              Name
+            </Label>
+            <Input
+              id="tag-name"
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Enter tag name"
+              style={{ maxWidth: '400px' }}
+              required
+            />
+            <p style={{ 
+              marginTop: '5px', 
+              color: '#646970', 
+              fontSize: '13px' 
+            }}>
+              The name is how it appears on your site.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <Label htmlFor="tag-description" style={{ 
+              display: 'block', 
+              marginBottom: '5px', 
+              fontWeight: 600 
+            }}>
+              Description
+            </Label>
+            <Textarea
+              id="tag-description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Enter tag description (optional)"
+              style={{ maxWidth: '400px', minHeight: '100px' }}
+            />
+            <p style={{ 
+              marginTop: '5px', 
+              color: '#646970', 
+              fontSize: '13px' 
+            }}>
+              The description is not prominent by default; however, some themes may show it.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Button
+              onClick={() => createMutation.mutate(formData)}
+              disabled={!formData.name.trim() || createMutation.isPending}
+            >
+              {createMutation.isPending ? 'Adding...' : 'Add New Tag'}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowAddForm(false);
+                setFormData({ name: '', description: '' });
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="tablenav top">

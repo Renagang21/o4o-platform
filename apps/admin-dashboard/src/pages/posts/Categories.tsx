@@ -425,18 +425,18 @@ const Categories: FC = () => {
         </div>
       </div>
 
-      {/* Category Modal */}
+      {/* Category Modal - WordPress Style with Better Readability */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 border border-gray-200">
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 border border-gray-300">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-300 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold text-gray-900">
                   {modalMode === 'create' ? '카테고리 추가' : '카테고리 수정'}
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 p-1 rounded-full transition-colors"
+                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-200 p-1 rounded-full transition-colors"
                   title="닫기"
                 >
                   <X className="w-5 h-5" />
@@ -444,51 +444,37 @@ const Categories: FC = () => {
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="p-6" style={{ backgroundColor: '#ffffff' }}>
 
               <div className="space-y-5">
                 <div>
-                  <label className="wp-label">카테고리 이름 *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">카테고리 이름 *</label>
                   <input
                     type="text"
                     value={formData.name || ''}
                     onChange={(e: any) => updateFormData('name', e.target.value)}
-                    className="wp-input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                     placeholder="카테고리 이름을 입력하세요"
                     autoFocus
                   />
                 </div>
 
                 <div>
-                  <label className="wp-label">슬러그</label>
-                  <input
-                    type="text"
-                    value={formData.slug || ''}
-                    onChange={(e: any) => updateFormData('slug', e.target.value)}
-                    className="wp-input"
-                    placeholder="자동 생성됩니다"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    URL에 사용될 고유한 식별자입니다
-                  </p>
-                </div>
-
-                <div>
-                  <label className="wp-label">설명</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">설명</label>
                   <textarea
                     value={formData.description || ''}
                     onChange={(e: any) => updateFormData('description', e.target.value)}
-                    className="wp-input min-h-[80px]"
-                    placeholder="카테고리에 대한 설명을 입력하세요"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 min-h-[80px]"
+                    placeholder="카테고리에 대한 설명을 입력하세요 (선택사항)"
                   />
                 </div>
 
                 <div>
-                  <label className="wp-label">상위 카테고리</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">상위 카테고리</label>
                   <select
                     value={formData.parentId || ''}
                     onChange={(e: any) => updateFormData('parentId', e.target.value)}
-                    className="wp-select"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                   >
                     <option value="">최상위 카테고리</option>
                     {categories.map((category: any) => (
@@ -503,66 +489,23 @@ const Categories: FC = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="wp-label">색상</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={formData.color || '#3b82f6'}
-                        onChange={(e: any) => updateFormData('color', e.target.value)}
-                        className="w-10 h-10 rounded border border-gray-300"
-                      />
-                      <input
-                        type="text"
-                        value={formData.color || '#3b82f6'}
-                        onChange={(e: any) => updateFormData('color', e.target.value)}
-                        className="wp-input flex-1"
-                        placeholder="#3b82f6"
-                      />
-                    </div>
-                  </div>
 
-                  <div>
-                    <label className="wp-label">정렬 순서</label>
-                    <input
-                      type="number"
-                      value={formData.order || 0}
-                      onChange={(e: any) => updateFormData('order', parseInt(e.target.value))}
-                      className="wp-input"
-                      min="0"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="isActive"
-                    checked={formData.isActive || false}
-                    onChange={(e: any) => updateFormData('isActive', e.target.checked)}
-                    className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
-                  />
-                  <label htmlFor="isActive" className="text-sm text-gray-700">
-                    카테고리 활성화
-                  </label>
-                </div>
               </div>
 
             </div>
             
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg">
+            <div className="bg-gray-50 px-6 py-4 border-t border-gray-300 rounded-b-lg">
               <div className="flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
                   취소
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {saving ? (
                     <>
