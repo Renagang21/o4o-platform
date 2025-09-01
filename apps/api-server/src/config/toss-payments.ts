@@ -141,10 +141,7 @@ export function validateTossPaymentsConfig(): void {
   }
   
   if (warnings.length > 0) {
-    // Warning log removed
-    warnings.forEach(warning => {
-      // Warning log removed
-    });
+    // Warnings exist but logging removed for production
   } else {
     logger.info('✅ TossPayments configuration validated successfully');
   }
