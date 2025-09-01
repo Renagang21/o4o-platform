@@ -1,58 +1,48 @@
 import { useState, FC } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  Copy,
-  Eye,
-  Download,
-  BarChart,
-  FileText,
-  MoreVertical,
-  Calendar,
-  Users,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  Search
-} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
+import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Form } from '@o4o/types';
 import toast from 'react-hot-toast';
-// import { format } from 'date-fns';
-// import ko from 'date-fns/locale/ko';
+import { formatDate } from '@/lib/utils';
+import { 
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Copy,
+  BarChart,
+  Eye,
+  Download
+} from 'lucide-react';
 
+/**
+ * WordPress-style Forms list
+ * Standardized with WordPressTable component
+ */
 const FormList: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const limit = 20;
 
   // Fetch forms
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['forms', { search, status: statusFilter, page, limit }],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -66,17 +56,20 @@ const FormList: FC = () => {
     }
   });
 
+  const forms = data?.forms || [];
+
   // Delete form mutation
   const deleteMutation = useMutation({
-    mutationFn: async (formId: string) => {
-      await authClient.api.delete(`/forms/${formId}`);
+    mutationFn: async (formIds: string[]) => {
+      await Promise.all(formIds.map(id => authClient.api.delete(`/forms/${id}`)));
     },
     onSuccess: () => {
-      toast.success('양식이 삭제되었습니다');
+      toast.success('Forms deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['forms'] });
+      setSelectedRows([]);
     },
     onError: () => {
-      toast.error('삭제에 실패했습니다');
+      toast.error('Failed to delete some forms');
     }
   });
 
@@ -90,7 +83,7 @@ const FormList: FC = () => {
       const newForm = {
         ...form,
         name: `${form.name}_copy`,
-        title: `${form.title} (복사본)`,
+        title: `${form.title} (Copy)`,
         id: undefined,
         createdAt: undefined,
         updatedAt: undefined,
@@ -101,25 +94,83 @@ const FormList: FC = () => {
       await authClient.api.post('/forms', newForm);
     },
     onSuccess: () => {
-      toast.success('양식이 복제되었습니다');
+      toast.success('Form duplicated successfully');
       queryClient.invalidateQueries({ queryKey: ['forms'] });
     },
     onError: () => {
-      toast.error('복제에 실패했습니다');
+      toast.error('Failed to duplicate form');
     }
   });
 
-  const handleDelete = (formId: string) => {
-    if (confirm('정말 이 양식을 삭제하시겠습니까? 모든 제출 데이터도 함께 삭제됩니다.')) {
-      deleteMutation.mutate(formId);
+  // Status change mutation
+  const statusChangeMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[], status: string }) => {
+      await Promise.all(ids.map(id => 
+        authClient.api.patch(`/forms/${id}`, { status })
+      ));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forms'] });
+      toast.success('Form status updated successfully');
+      setSelectedRows([]);
+    },
+    onError: () => {
+      toast.error('Failed to update form status');
     }
-  };
+  });
+
+  // Bulk actions configuration
+  const bulkActions = [
+    {
+      value: 'delete',
+      label: 'Delete',
+      action: async (ids: string[]) => {
+        if (confirm('Are you sure you want to delete the selected forms? All submission data will also be deleted.')) {
+          await deleteMutation.mutateAsync(ids);
+        }
+      },
+      confirmMessage: 'Are you sure you want to delete {count} form(s)? All submission data will be lost.',
+      isDestructive: true
+    },
+    {
+      value: 'activate',
+      label: 'Activate',
+      action: async (ids: string[]) => {
+        await statusChangeMutation.mutateAsync({ ids, status: 'active' });
+      }
+    },
+    {
+      value: 'deactivate',
+      label: 'Deactivate',
+      action: async (ids: string[]) => {
+        await statusChangeMutation.mutateAsync({ ids, status: 'inactive' });
+      }
+    },
+    {
+      value: 'draft',
+      label: 'Move to Draft',
+      action: async (ids: string[]) => {
+        await statusChangeMutation.mutateAsync({ ids, status: 'draft' });
+      }
+    }
+  ];
+
+  const {
+    selectedCount,
+    isProcessing,
+    executeBulkAction
+  } = useBulkActions({
+    items: forms,
+    idField: 'id',
+    actions: bulkActions,
+    selectedIds: selectedRows
+  });
 
   const getStatusBadge = (status: Form['status']) => {
     const config = {
-      active: { label: '활성', variant: 'default' as const, icon: CheckCircle },
-      inactive: { label: '비활성', variant: 'secondary' as const, icon: Clock },
-      draft: { label: '초안', variant: 'outline' as const, icon: AlertCircle }
+      active: { label: 'Active', variant: 'default' as const, icon: CheckCircle },
+      inactive: { label: 'Inactive', variant: 'secondary' as const, icon: Clock },
+      draft: { label: 'Draft', variant: 'outline' as const, icon: AlertCircle }
     };
     
     const { label, variant, icon: Icon } = config[status];
@@ -132,210 +183,260 @@ const FormList: FC = () => {
     );
   };
 
-  return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
+    {
+      id: 'title',
+      label: 'Form Title',
+      sortable: true
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      width: '120px'
+    },
+    {
+      id: 'fields',
+      label: 'Fields',
+      width: '80px',
+      align: 'center'
+    },
+    {
+      id: 'submissions',
+      label: 'Submissions',
+      sortable: true,
+      width: '100px',
+      align: 'center'
+    },
+    {
+      id: 'lastSubmission',
+      label: 'Last Submission',
+      sortable: true,
+      width: '150px'
+    },
+    {
+      id: 'created',
+      label: 'Created',
+      sortable: true,
+      width: '150px'
+    }
+  ];
+
+  // Transform forms to table rows
+  const rows: WordPressTableRow[] = forms.map((form: Form) => ({
+    id: form.id,
+    data: {
+      title: (
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">양식 관리</h1>
-          <p className="text-gray-600 mt-1">Formidable 스타일의 양식 빌더로 다양한 양식을 만들고 관리하세요</p>
+          <Link to={`/forms/edit/${form.id}`} className="font-medium text-blue-600 hover:text-blue-800">
+            {form.title}
+          </Link>
+          <div className="text-sm text-gray-500 mt-1">
+            /{form.name}
+          </div>
+          {form.description && (
+            <div className="text-sm text-gray-600 mt-1 line-clamp-2">
+              {form.description}
+            </div>
+          )}
         </div>
-        <Button onClick={() => navigate('/forms/new')}>
-          <Plus className="w-4 h-4 mr-2" />
-          새 양식
-        </Button>
-      </div>
+      ),
+      status: getStatusBadge(form.status),
+      fields: (
+        <span className="text-center block font-mono">
+          {form.fields.length}
+        </span>
+      ),
+      submissions: (
+        <Link 
+          to={`/forms/${form.id}/submissions`} 
+          className="text-center block font-mono text-blue-600 hover:text-blue-800"
+        >
+          {form.submissionCount || 0}
+        </Link>
+      ),
+      lastSubmission: form.lastSubmission ? (
+        <div className="text-sm text-gray-600">
+          {formatDate(form.lastSubmission)}
+        </div>
+      ) : (
+        <span className="text-gray-400">—</span>
+      ),
+      created: (
+        <div className="text-sm text-gray-600">
+          {formatDate(form.createdAt)}
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: 'Edit',
+        onClick: () => navigate(`/forms/edit/${form.id}`)
+      },
+      {
+        label: 'View Submissions',
+        onClick: () => navigate(`/forms/${form.id}/submissions`)
+      },
+      {
+        label: 'Reports',
+        onClick: () => navigate(`/forms/${form.id}/report`)
+      },
+      {
+        label: 'Preview',
+        onClick: () => navigate(`/forms/${form.id}/preview`),
+        target: '_blank'
+      },
+      {
+        label: 'Duplicate',
+        onClick: () => duplicateMutation.mutate(form.id)
+      },
+      {
+        label: 'Copy Shortcode',
+        onClick: () => {
+          navigator.clipboard.writeText(form.shortcode || `[form name="${form.name}"]`);
+          toast.success('Shortcode copied to clipboard');
+        }
+      },
+      {
+        label: 'Export',
+        onClick: () => {
+          // TODO: Implement export functionality
+          toast('Export feature coming soon!');
+        }
+      },
+      {
+        label: 'Delete',
+        onClick: () => {
+          if (confirm('Are you sure you want to delete this form? All submission data will be lost.')) {
+            deleteMutation.mutate([form.id]);
+          }
+        },
+        className: 'text-red-600'
+      }
+    ]
+  }));
+
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
+    }
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(forms.map((f: Form) => f.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  return (
+    <div className="wrap">
+      <h1 className="wp-heading-inline">Forms</h1>
+      <Link to="/forms/new" className="page-title-action">
+        Add New
+      </Link>
+      <hr className="wp-header-end" />
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="양식 검색..."
-                value={search}
-                onChange={(e: any) => setSearch(e.target.value)}
-                className="w-full pl-10"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="상태 필터" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">모든 상태</SelectItem>
-                <SelectItem value="active">활성</SelectItem>
-                <SelectItem value="inactive">비활성</SelectItem>
-                <SelectItem value="draft">초안</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Forms Grid */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
-      ) : data?.forms.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">양식이 없습니다</h3>
-            <p className="text-gray-600 mb-4">첫 양식을 만들어보세요</p>
-            <Button onClick={() => navigate('/forms/new')}>
-              <Plus className="w-4 h-4 mr-2" />
-              양식 만들기
+      <div className="wp-filter">
+        <div className="filter-items">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <div className="search-box">
+            <Input
+              type="search"
+              placeholder="Search forms..."
+              value={search}
+              onChange={(e: any) => setSearch(e.target.value)}
+              className="w-[300px]"
+            />
+            <Button variant="secondary">
+              Search Forms
             </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data?.forms.map((form: Form) => (
-            <Card key={form.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 pr-2">
-                    <CardTitle className="text-lg mb-1">{form.title}</CardTitle>
-                    <p className="text-sm text-gray-500">/{form.name}</p>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button variant={"ghost" as const} size={"sm" as const}>
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => navigate(`/forms/edit/${form.id}`)}>
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        편집
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/forms/${form.id}/submissions`)}>
-                        <Eye className="w-4 h-4 mr-2" />
-                        제출 보기
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/forms/${form.id}/report`)}>
-                        <BarChart className="w-4 h-4 mr-2" />
-                        리포트
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => duplicateMutation.mutate(form.id)}>
-                        <Copy className="w-4 h-4 mr-2" />
-                        복제
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Download className="w-4 h-4 mr-2" />
-                        내보내기
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        onClick={() => handleDelete(form.id)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        삭제
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <div className="mt-3">
-                  {getStatusBadge(form.status)}
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                {form.description && (
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                    {form.description}
-                  </p>
-                )}
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">필드</span>
-                    <span className="font-medium">{form.fields.length}개</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">제출</span>
-                    <span className="font-medium">{form.submissionCount || 0}건</span>
-                  </div>
-                  
-                  {form.lastSubmission && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">마지막 제출</span>
-                      <span className="font-medium">
-                        {'/* date removed */'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-xs text-gray-500">
-                      {'/* date removed */'}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant={"ghost" as const}
-                      size={"sm" as const}
-                      onClick={() => navigate(`/forms/${form.id}/submissions`)}
-                    >
-                      <Users className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={"ghost" as const}
-                      size={"sm" as const}
-                      onClick={() => navigate(`/forms/${form.id}/report`)}
-                    >
-                      <BarChart className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant={"ghost" as const}
-                      size={"sm" as const}
-                      onClick={() => {
-                        navigator.clipboard.writeText(form.shortcode || `[form name="${form.name}"]`);
-                        toast.success('숏코드가 복사되었습니다');
-                      }}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* Bulk Actions - Top */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedCount}
+        onActionExecute={executeBulkAction}
+        isProcessing={isProcessing}
+        position="top"
+      />
+
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        loading={isLoading}
+        emptyMessage="No forms found. Create your first form!"
+      />
+
+      {/* Bulk Actions - Bottom */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedCount}
+        onActionExecute={executeBulkAction}
+        isProcessing={isProcessing}
+        position="bottom"
+      />
 
       {/* Pagination */}
       {data && data.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
-          <Button
-            variant={"outline" as const}
-            size={"sm" as const}
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
-          >
-            이전
-          </Button>
-          <span className="text-sm text-gray-600">
-            {page} / {data.totalPages}
-          </span>
-          <Button
-            variant={"outline" as const}
-            size={"sm" as const}
-            onClick={() => setPage(page + 1)}
-            disabled={page === data.totalPages}
-          >
-            다음
-          </Button>
+        <div className="tablenav bottom">
+          <div className="tablenav-pages">
+            <span className="displaying-num">{data.totalItems} items</span>
+            <span className="pagination-links">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+              >
+                ‹ Previous
+              </Button>
+              
+              <span className="paging-input">
+                <span className="current-page">{page}</span> of{' '}
+                <span className="total-pages">{data.totalPages}</span>
+              </span>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPage(page + 1)}
+                disabled={page === data.totalPages}
+              >
+                Next ›
+              </Button>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="notice notice-error">
+          <p>Error loading forms. Please try again.</p>
         </div>
       )}
     </div>

@@ -1,6 +1,14 @@
 import { ChangeEvent, useState } from 'react';
-import { Store, UserCheck, Clock, Ban, Search, Filter, MoreVertical, DollarSign } from 'lucide-react';
+import { Store, UserCheck, Clock, Ban, Search, Filter, MoreVertical, DollarSign, Star, Eye, Edit2, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { formatDate } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 interface Vendor {
   id: string;
@@ -12,6 +20,11 @@ interface Vendor {
   revenue: number;
   commission: number;
   joinedAt: string;
+  lastActivity: string;
+  rating: number;
+  reviewCount: number;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  avatar?: string;
 }
 
 const mockVendors: Vendor[] = [
@@ -24,7 +37,11 @@ const mockVendors: Vendor[] = [
     products: 45,
     revenue: 15000000,
     commission: 1500000,
-    joinedAt: '2024-01-15'
+    joinedAt: '2024-01-15',
+    lastActivity: '2024-03-15T10:30:00',
+    rating: 4.8,
+    reviewCount: 234,
+    tier: 'gold'
   },
   {
     id: '2',
@@ -35,7 +52,11 @@ const mockVendors: Vendor[] = [
     products: 32,
     revenue: 8500000,
     commission: 850000,
-    joinedAt: '2024-02-20'
+    joinedAt: '2024-02-20',
+    lastActivity: '2024-03-14T15:20:00',
+    rating: 4.5,
+    reviewCount: 128,
+    tier: 'silver'
   },
   {
     id: '3',
@@ -46,7 +67,11 @@ const mockVendors: Vendor[] = [
     products: 0,
     revenue: 0,
     commission: 0,
-    joinedAt: '2024-03-10'
+    joinedAt: '2024-03-10',
+    lastActivity: '2024-03-10T09:15:00',
+    rating: 0,
+    reviewCount: 0,
+    tier: 'bronze'
   },
   {
     id: '4',
@@ -57,7 +82,11 @@ const mockVendors: Vendor[] = [
     products: 28,
     revenue: 5200000,
     commission: 520000,
-    joinedAt: '2024-01-05'
+    joinedAt: '2024-01-05',
+    lastActivity: '2024-03-01T12:45:00',
+    rating: 3.2,
+    reviewCount: 89,
+    tier: 'bronze'
   }
 ];
 
@@ -65,220 +94,413 @@ const VendorsList = () => {
   const [vendors] = useState(mockVendors);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [tierFilter, setTierFilter] = useState('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const filteredVendors = vendors.filter((vendor: any) => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || vendor.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesTier = tierFilter === 'all' || vendor.tier === tierFilter;
+    return matchesSearch && matchesStatus && matchesTier;
   });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <Badge variant="default" className="flex items-center gap-1">
             <UserCheck className="w-3 h-3" />
             활성
-          </span>
+          </Badge>
         );
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          <Badge variant="secondary" className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
             승인 대기
-          </span>
+          </Badge>
         );
       case 'suspended':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          <Badge variant="destructive" className="flex items-center gap-1">
             <Ban className="w-3 h-3" />
             정지
-          </span>
+          </Badge>
         );
       default:
         return null;
     }
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-modern-text-primary flex items-center gap-2">
-            <Store className="w-8 h-8 text-modern-primary" />
-            판매자/공급자 관리
-          </h1>
-          <p className="text-modern-text-secondary mt-1">
-            등록된 판매자 및 공급자를 관리하고 승인 상태를 확인하세요.
-          </p>
-        </div>
-        <Link
-          to="/vendors/new"
-          className="px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors"
-        >
-          새 판매자 추가
-        </Link>
-      </div>
+  const getTierBadge = (tier: string) => {
+    const tierConfig = {
+      bronze: { label: '브론즈', className: 'bg-amber-100 text-amber-800' },
+      silver: { label: '실버', className: 'bg-gray-100 text-gray-800' },
+      gold: { label: '골드', className: 'bg-yellow-100 text-yellow-800' },
+      platinum: { label: '플래티넘', className: 'bg-purple-100 text-purple-800' }
+    };
+    
+    const config = tierConfig[tier as keyof typeof tierConfig];
+    if (!config) return null;
+    
+    return (
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.className}`}>
+        {config.label}
+      </span>
+    );
+  };
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">전체 판매자</p>
-                <p className="text-2xl font-bold text-modern-text-primary">{vendors.length}</p>
+  // Bulk actions configuration
+  const bulkActions = [
+    {
+      value: 'approve',
+      label: '승인',
+      action: async (ids: string[]) => {
+        setIsProcessing(true);
+        try {
+          // API call would go here
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          toast.success(`${ids.length}개 판매자가 승인되었습니다.`);
+        } catch (error) {
+          toast.error('승인 처리 중 오류가 발생했습니다.');
+        } finally {
+          setIsProcessing(false);
+          setSelectedRows([]);
+        }
+      }
+    },
+    {
+      value: 'suspend',
+      label: '정지',
+      action: async (ids: string[]) => {
+        if (!confirm(`${ids.length}개 판매자를 정지하시겠습니까?`)) return;
+        setIsProcessing(true);
+        try {
+          // API call would go here
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          toast.success(`${ids.length}개 판매자가 정지되었습니다.`);
+        } catch (error) {
+          toast.error('정지 처리 중 오류가 발생했습니다.');
+        } finally {
+          setIsProcessing(false);
+          setSelectedRows([]);
+        }
+      },
+      confirmMessage: '{count}개 판매자를 정지하시겠습니까?',
+      isDestructive: true
+    },
+    {
+      value: 'export',
+      label: '내보내기',
+      action: async (ids: string[]) => {
+        toast.success('선택한 판매자 정보를 내보내는 중입니다.');
+      }
+    }
+  ];
+
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
+    {
+      id: 'vendor',
+      label: '판매자 정보',
+      sortable: true
+    },
+    {
+      id: 'status',
+      label: '상태',
+      width: '120px'
+    },
+    {
+      id: 'tier',
+      label: '등급',
+      width: '100px'
+    },
+    {
+      id: 'products',
+      label: '상품 수',
+      sortable: true,
+      width: '80px',
+      align: 'center'
+    },
+    {
+      id: 'revenue',
+      label: '매출액',
+      sortable: true,
+      width: '120px'
+    },
+    {
+      id: 'rating',
+      label: '평점',
+      sortable: true,
+      width: '100px',
+      align: 'center'
+    },
+    {
+      id: 'joined',
+      label: '가입일',
+      sortable: true,
+      width: '120px'
+    },
+    {
+      id: 'lastActivity',
+      label: '마지막 활동',
+      sortable: true,
+      width: '120px'
+    }
+  ];
+
+  // Transform vendors to table rows
+  const rows: WordPressTableRow[] = filteredVendors.map((vendor: Vendor) => ({
+    id: vendor.id,
+    data: {
+      vendor: (
+        <div className="flex items-center">
+          <div className="flex-shrink-0 h-10 w-10">
+            {vendor.avatar ? (
+              <img className="h-10 w-10 rounded-full" src={vendor.avatar} alt="" />
+            ) : (
+              <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <Store className="h-5 w-5 text-blue-600" />
               </div>
-              <Store className="w-8 h-8 text-modern-primary opacity-20" />
+            )}
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900">
+              {vendor.businessName}
+            </div>
+            <div className="text-sm text-gray-500">
+              {vendor.name} ({vendor.email})
             </div>
           </div>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">활성 판매자</p>
-                <p className="text-2xl font-bold text-modern-success">
-                  {vendors.filter((v: any) => v.status === 'active').length}
-                </p>
-              </div>
-              <UserCheck className="w-8 h-8 text-modern-success opacity-20" />
-            </div>
-          </div>
+      ),
+      status: getStatusBadge(vendor.status),
+      tier: getTierBadge(vendor.tier),
+      products: (
+        <span className="text-center block font-mono">
+          {vendor.products}
+        </span>
+      ),
+      revenue: (
+        <div className="text-sm">
+          ₩{vendor.revenue.toLocaleString()}
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">승인 대기</p>
-                <p className="text-2xl font-bold text-modern-warning">
-                  {vendors.filter((v: any) => v.status === 'pending').length}
-                </p>
-              </div>
-              <Clock className="w-8 h-8 text-modern-warning opacity-20" />
-            </div>
-          </div>
+      ),
+      rating: vendor.rating > 0 ? (
+        <div className="flex items-center justify-center">
+          <Star className="h-4 w-4 text-yellow-400 fill-current" />
+          <span className="ml-1 text-sm">{vendor.rating}</span>
+          <span className="ml-1 text-xs text-gray-500">({vendor.reviewCount})</span>
         </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">총 수수료</p>
-                <p className="text-2xl font-bold text-modern-text-primary">
-                  ₩{vendors.reduce((sum: any, v: any) => sum + v.commission, 0).toLocaleString()}
-                </p>
-              </div>
-              <DollarSign className="w-8 h-8 text-modern-accent opacity-20" />
-            </div>
-          </div>
+      ) : (
+        <span className="text-gray-400 text-center block">—</span>
+      ),
+      joined: (
+        <div className="text-sm text-gray-600">
+          {formatDate(vendor.joinedAt)}
         </div>
-      </div>
+      ),
+      lastActivity: (
+        <div className="text-sm text-gray-600">
+          {formatDate(vendor.lastActivity)}
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: '상세보기',
+        onClick: () => {
+          // Navigate to vendor detail
+          window.location.href = `/vendors/${vendor.id}`;
+        }
+      },
+      {
+        label: '편집',
+        onClick: () => {
+          // Navigate to vendor edit
+          window.location.href = `/vendors/${vendor.id}/edit`;
+        }
+      },
+      ...(vendor.status === 'pending' ? [
+        {
+          label: '승인',
+          onClick: () => {
+            if (confirm('이 판매자를 승인하시겠습니까?')) {
+              toast.success('판매자가 승인되었습니다.');
+            }
+          }
+        },
+        {
+          label: '거부',
+          onClick: () => {
+            if (confirm('이 판매자 신청을 거부하시겠습니까?')) {
+              toast.success('판매자 신청이 거부되었습니다.');
+            }
+          },
+          className: 'text-red-600'
+        }
+      ] : []),
+      ...(vendor.status === 'active' ? [
+        {
+          label: '정지',
+          onClick: () => {
+            if (confirm('이 판매자를 정지하시겠습니까?')) {
+              toast.success('판매자가 정지되었습니다.');
+            }
+          },
+          className: 'text-red-600'
+        }
+      ] : []),
+      ...(vendor.status === 'suspended' ? [
+        {
+          label: '정지 해제',
+          onClick: () => {
+            if (confirm('이 판매자의 정지를 해제하시겠습니까?')) {
+              toast.success('판매자 정지가 해제되었습니다.');
+            }
+          }
+        }
+      ] : [])
+    ]
+  }));
+
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
+    }
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(filteredVendors.map((v: Vendor) => v.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  return (
+    <div className="wrap">
+      <h1 className="wp-heading-inline">판매자 관리</h1>
+      <Link to="/vendors/new" className="page-title-action">
+        새 판매자 추가
+      </Link>
+      <hr className="wp-header-end" />
+
+      {/* Status Filter Links */}
+      <ul className="subsubsub">
+        <li className="all">
+          <a 
+            href="#" 
+            className={statusFilter === 'all' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('all'); }}
+          >
+            전체 <span className="count">({vendors.length})</span>
+          </a> |
+        </li>
+        <li className="active">
+          <a 
+            href="#" 
+            className={statusFilter === 'active' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('active'); }}
+          >
+            활성 <span className="count">({vendors.filter(v => v.status === 'active').length})</span>
+          </a> |
+        </li>
+        <li className="pending">
+          <a 
+            href="#" 
+            className={statusFilter === 'pending' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('pending'); }}
+          >
+            승인 대기 <span className="count">({vendors.filter(v => v.status === 'pending').length})</span>
+          </a> |
+        </li>
+        <li className="suspended">
+          <a 
+            href="#" 
+            className={statusFilter === 'suspended' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('suspended'); }}
+          >
+            정지 <span className="count">({vendors.filter(v => v.status === 'suspended').length})</span>
+          </a>
+        </li>
+      </ul>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-modern-text-tertiary w-5 h-5" />
-            <input
-              type="text"
-              placeholder="이름, 사업자명, 이메일로 검색..."
+      <div className="wp-filter">
+        <div className="filter-items">
+          <Select value={tierFilter} onValueChange={setTierFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="모든 등급" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">모든 등급</SelectItem>
+              <SelectItem value="bronze">브론즈</SelectItem>
+              <SelectItem value="silver">실버</SelectItem>
+              <SelectItem value="gold">골드</SelectItem>
+              <SelectItem value="platinum">플래티넘</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <div className="search-box">
+            <Input
+              type="search"
+              placeholder="판매자 검색..."
               value={searchTerm}
               onChange={(e: any) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
+              className="w-[300px]"
             />
+            <Button variant="secondary">
+              판매자 검색
+            </Button>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-modern-text-secondary" />
-          <select
-            value={statusFilter}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
-          >
-            <option value="all">모든 상태</option>
-            <option value="active">활성</option>
-            <option value="pending">승인 대기</option>
-            <option value="suspended">정지</option>
-          </select>
         </div>
       </div>
 
-      {/* Vendors Table */}
-      <div className="wp-card">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-modern-bg-tertiary border-b border-modern-border-primary">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  판매자 정보
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  상품 수
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  매출액
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  수수료
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  가입일
-                </th>
-                <th className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-modern-border-primary">
-              {filteredVendors.map((vendor: any) => (
-                <tr key={vendor.id} className="hover:bg-modern-bg-hover">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-modern-primary rounded-full flex items-center justify-center">
-                        <Store className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-modern-text-primary">
-                          {vendor.businessName}
-                        </div>
-                        <div className="text-sm text-modern-text-secondary">
-                          {vendor.name} ({vendor.email})
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(vendor.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
-                    {vendor.products}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
-                    ₩{vendor.revenue.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
-                    ₩{vendor.commission.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-secondary">
-                    {new Date(vendor.joinedAt).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-modern-text-secondary hover:text-modern-text-primary">
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Bulk Actions - Top */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedRows.length}
+        onActionExecute={async (action) => {
+          const actionConfig = bulkActions.find(a => a.value === action);
+          if (actionConfig) {
+            await actionConfig.action(selectedRows);
+          }
+        }}
+        isProcessing={isProcessing}
+        position="top"
+      />
+
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        emptyMessage="등록된 판매자가 없습니다. 새 판매자를 추가해보세요!"
+      />
+
+      {/* Bulk Actions - Bottom */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedRows.length}
+        onActionExecute={async (action) => {
+          const actionConfig = bulkActions.find(a => a.value === action);
+          if (actionConfig) {
+            await actionConfig.action(selectedRows);
+          }
+        }}
+        isProcessing={isProcessing}
+        position="bottom"
+      />
     </div>
   );
 };

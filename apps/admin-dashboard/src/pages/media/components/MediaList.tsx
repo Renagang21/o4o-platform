@@ -1,117 +1,161 @@
 import { FC } from 'react';
-import { MediaFile } from '@/types/content'
-import MediaItem from './MediaItem'
-import { formatFileSize } from '@/utils/format'
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { MediaFile } from '@/types/content';
+import MediaItem from './MediaItem';
+import { formatFileSize } from '@/utils/format';
+import { formatDate } from '@/lib/utils';
 
 interface MediaListProps {
-  files: MediaFile[]
-  selectedFiles: string[]
-  onFileSelect: (fileId: string) => void
-  onSelectAll: () => void
+  files: MediaFile[];
+  selectedFiles: string[];
+  onFileSelect: (fileId: string) => void;
+  onSelectAll: (selected: boolean) => void;
+  onFileAction?: (fileId: string, action: string) => void;
 }
 
+/**
+ * WordPress-style Media list component
+ * Standardized with WordPressTable component
+ */
 const MediaList: FC<MediaListProps> = ({
   files,
   selectedFiles,
   onFileSelect,
-  onSelectAll
+  onSelectAll,
+  onFileAction
 }) => {
-  const allSelected = files.length > 0 && files.every((file: any) => selectedFiles.includes(file.id))
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
+    {
+      id: 'file',
+      label: 'File',
+      sortable: true
+    },
+    {
+      id: 'type',
+      label: 'Type',
+      width: '100px'
+    },
+    {
+      id: 'size',
+      label: 'Size',
+      sortable: true,
+      width: '100px'
+    },
+    {
+      id: 'dimensions',
+      label: 'Dimensions',
+      width: '120px',
+      align: 'center'
+    },
+    {
+      id: 'uploaded',
+      label: 'Uploaded',
+      sortable: true,
+      width: '150px'
+    },
+    {
+      id: 'uploader',
+      label: 'Uploader',
+      width: '120px'
+    }
+  ];
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+  // Transform files to table rows
+  const rows: WordPressTableRow[] = files.map((file: MediaFile) => ({
+    id: file.id,
+    data: {
+      file: (
+        <MediaItem
+          item={file}
+          view="list"
+          isSelected={selectedFiles.includes(file.id)}
+          onSelect={() => onFileSelect(file.id)}
+        />
+      ),
+      type: (
+        <div className="text-sm">
+          <div className="font-medium">
+            {file.mimeType.split('/')[1]?.toUpperCase() || file.type}
+          </div>
+          <div className="text-gray-500 text-xs">{file.mimeType}</div>
+        </div>
+      ),
+      size: (
+        <div className="text-sm font-mono">
+          {formatFileSize(file.size)}
+        </div>
+      ),
+      dimensions: file.dimensions ? (
+        <div className="text-sm text-center">
+          {file.dimensions.width} × {file.dimensions.height}
+        </div>
+      ) : (
+        <div className="text-gray-400 text-center">—</div>
+      ),
+      uploaded: (
+        <div className="text-sm">
+          <div>{formatDate(file.uploadedAt)}</div>
+          <div className="text-gray-500 text-xs">
+            {new Date(file.uploadedAt).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        </div>
+      ),
+      uploader: (
+        <div className="text-sm">
+          {file.uploadedBy}
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: 'Edit',
+        onClick: () => onFileAction?.(file.id, 'edit')
+      },
+      {
+        label: 'View',
+        onClick: () => onFileAction?.(file.id, 'view')
+      },
+      {
+        label: 'Download',
+        onClick: () => onFileAction?.(file.id, 'download')
+      },
+      {
+        label: 'Copy URL',
+        onClick: () => onFileAction?.(file.id, 'copy-url')
+      },
+      {
+        label: 'Delete Permanently',
+        onClick: () => onFileAction?.(file.id, 'delete'),
+        className: 'text-red-600'
+      }
+    ]
+  }));
+
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    onFileSelect(rowId);
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    onSelectAll(selected);
+  };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th className="px-6 py-3 text-left">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={onSelectAll}
-                className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
-              />
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              파일
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              유형
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              크기
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              크기(px)
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              업로드
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              업로더
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {files.map((file: any) => (
-            <tr key={file.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4">
-                <input
-                  type="checkbox"
-                  checked={selectedFiles.includes(file.id)}
-                  onChange={() => onFileSelect(file.id)}
-                  className="rounded border-gray-300 text-admin-blue focus:ring-admin-blue"
-                />
-              </td>
-              <td className="px-6 py-4">
-                <MediaItem
-                  item={file}
-                  view="list"
-                  isSelected={selectedFiles.includes(file.id)}
-                  onSelect={() => onFileSelect(file.id)}
-                />
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-900">
-                {file.mimeType.split('/')[1]?.toUpperCase() || file.type}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-900">
-                {formatFileSize(file.size)}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-900">
-                {file.dimensions ? (
-                  <span>{file.dimensions.width} × {file.dimensions.height}</span>
-                ) : (
-                  <span className="text-gray-400">-</span>
-                )}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-900">
-                {formatDate(file.uploadedAt)}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-900">
-                {file.uploadedBy}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <WordPressTable
+      columns={columns}
+      rows={rows}
+      selectable={true}
+      selectedRows={selectedFiles}
+      onSelectRow={handleSelectRow}
+      onSelectAll={handleSelectAll}
+      emptyMessage="No media files found. Upload your first file!"
+      className="media-list-table"
+    />
+  );
+};
 
-      {/* Empty State */}
-      {files.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          <p>선택된 조건에 맞는 파일이 없습니다.</p>
-        </div>
-      )}
-    </div>
-  )
-}
-
-export default MediaList
+export default MediaList;

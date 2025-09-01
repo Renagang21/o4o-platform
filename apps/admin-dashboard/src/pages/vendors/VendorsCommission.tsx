@@ -1,5 +1,13 @@
 import { ChangeEvent, useState } from 'react';
-import { DollarSign, Percent, Calendar, Download, TrendingUp, TrendingDown, Filter } from 'lucide-react';
+import { DollarSign, Percent, Calendar, Download, TrendingUp, TrendingDown, Filter, Eye, Edit2, CreditCard } from 'lucide-react';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { formatDate } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 interface CommissionData {
   vendorId: string;
@@ -75,11 +83,17 @@ const VendorsCommission = () => {
   const [commissions] = useState(mockCommissionData);
   const [selectedPeriod, setSelectedPeriod] = useState('2024-03');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCommissions = commissions.filter((commission: any) => {
     const matchesPeriod = commission.period === selectedPeriod || selectedPeriod === 'all';
     const matchesStatus = statusFilter === 'all' || commission.status === statusFilter;
-    return matchesPeriod && matchesStatus;
+    const matchesSearch = searchTerm === '' || 
+      commission.vendorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      commission.businessName.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesPeriod && matchesStatus && matchesSearch;
   });
 
   const totalCommission = filteredCommissions.reduce((sum: number, c) => sum + c.commissionAmount, 0);
@@ -94,230 +108,379 @@ const VendorsCommission = () => {
     switch (status) {
       case 'paid':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <Badge variant="default" className="bg-green-100 text-green-800">
             지급완료
-          </span>
+          </Badge>
         );
       case 'pending':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
             대기중
-          </span>
+          </Badge>
         );
       case 'processing':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          <Badge variant="outline" className="bg-blue-100 text-blue-800">
             처리중
-          </span>
+          </Badge>
         );
       default:
         return null;
     }
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+  // Bulk actions configuration
+  const bulkActions = [
+    {
+      value: 'pay',
+      label: '일괄 지급',
+      action: async (ids: string[]) => {
+        if (!confirm(`${ids.length}개 항목을 일괄 지급하시겠습니까?`)) return;
+        setIsProcessing(true);
+        try {
+          // API call would go here
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          toast.success(`${ids.length}개 수수료가 지급되었습니다.`);
+        } catch (error) {
+          toast.error('지급 처리 중 오류가 발생했습니다.');
+        } finally {
+          setIsProcessing(false);
+          setSelectedRows([]);
+        }
+      },
+      confirmMessage: '{count}개 항목을 일괄 지급하시겠습니까?'
+    },
+    {
+      value: 'export',
+      label: '내보내기',
+      action: async (ids: string[]) => {
+        toast.success('선택한 수수료 내역을 내보내는 중입니다.');
+        // Export functionality would go here
+      }
+    },
+    {
+      value: 'calculate',
+      label: '재계산',
+      action: async (ids: string[]) => {
+        setIsProcessing(true);
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          toast.success('수수료가 재계산되었습니다.');
+        } catch (error) {
+          toast.error('재계산 중 오류가 발생했습니다.');
+        } finally {
+          setIsProcessing(false);
+          setSelectedRows([]);
+        }
+      }
+    }
+  ];
+
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
+    {
+      id: 'vendor',
+      label: '판매자 정보',
+      sortable: true
+    },
+    {
+      id: 'period',
+      label: '기간',
+      width: '100px'
+    },
+    {
+      id: 'sales',
+      label: '매출액',
+      sortable: true,
+      width: '120px'
+    },
+    {
+      id: 'rate',
+      label: '수수료율',
+      sortable: true,
+      width: '100px',
+      align: 'center'
+    },
+    {
+      id: 'commission',
+      label: '수수료 금액',
+      sortable: true,
+      width: '120px'
+    },
+    {
+      id: 'status',
+      label: '상태',
+      width: '100px'
+    },
+    {
+      id: 'paidDate',
+      label: '지급일',
+      sortable: true,
+      width: '120px'
+    }
+  ];
+
+  // Transform commissions to table rows
+  const rows: WordPressTableRow[] = filteredCommissions.map((commission: CommissionData) => ({
+    id: `${commission.vendorId}-${commission.period}`,
+    data: {
+      vendor: (
         <div>
-          <h1 className="text-2xl font-bold text-modern-text-primary flex items-center gap-2">
-            <DollarSign className="w-8 h-8 text-modern-accent" />
-            수수료 관리
-          </h1>
-          <p className="text-modern-text-secondary mt-1">
-            판매자별 수수료를 확인하고 정산을 관리하세요.
-          </p>
+          <div className="text-sm font-medium text-gray-900">
+            {commission.businessName}
+          </div>
+          <div className="text-sm text-gray-500">
+            {commission.vendorName}
+          </div>
         </div>
-        <button className="px-4 py-2 bg-modern-primary text-white rounded-lg hover:bg-modern-primary-hover transition-colors flex items-center gap-2">
-          <Download className="w-4 h-4" />
-          수수료 내역 다운로드
-        </button>
-      </div>
+      ),
+      period: (
+        <div className="text-sm text-gray-600">
+          {commission.period}
+        </div>
+      ),
+      sales: (
+        <div className="text-sm font-medium">
+          ₩{commission.sales.toLocaleString()}
+        </div>
+      ),
+      rate: (
+        <div className="text-center">
+          <div className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+            {commission.commissionRate}%
+          </div>
+          {/* Visual progress bar */}
+          <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+            <div 
+              className="bg-blue-600 h-1.5 rounded-full" 
+              style={{ width: `${(commission.commissionRate / 15) * 100}%` }}
+            />
+          </div>
+        </div>
+      ),
+      commission: (
+        <div className="text-sm font-bold text-green-600">
+          ₩{commission.commissionAmount.toLocaleString()}
+        </div>
+      ),
+      status: getStatusBadge(commission.status),
+      paidDate: (
+        <div className="text-sm text-gray-600">
+          {commission.paidDate ? formatDate(commission.paidDate) : '—'}
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: '상세보기',
+        onClick: () => {
+          // Navigate to commission detail
+          window.location.href = `/vendors/${commission.vendorId}/commission/${commission.period}`;
+        }
+      },
+      {
+        label: '내역보기',
+        onClick: () => {
+          // Show commission history
+          toast('수수료 변경 내역을 조회합니다.');
+        }
+      },
+      ...(commission.status === 'pending' ? [
+        {
+          label: '지급하기',
+          onClick: () => {
+            if (confirm('이 수수료를 지급하시겠습니까?')) {
+              toast.success('수수료가 지급되었습니다.');
+            }
+          }
+        }
+      ] : []),
+      ...(commission.status === 'paid' ? [
+        {
+          label: '정산서 보기',
+          onClick: () => {
+            // Show settlement document
+            window.open(`/vendors/${commission.vendorId}/settlement/${commission.period}`);
+          }
+        }
+      ] : []),
+      {
+        label: '수정',
+        onClick: () => {
+          // Edit commission
+          window.location.href = `/vendors/${commission.vendorId}/commission/${commission.period}/edit`;
+        }
+      }
+    ]
+  }));
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">이번 달 총 수수료</p>
-                <p className="text-2xl font-bold text-modern-text-primary">
-                  ₩{totalCommission.toLocaleString()}
-                </p>
-              </div>
-              <DollarSign className="w-8 h-8 text-modern-accent opacity-20" />
-            </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">지급 완료</p>
-                <p className="text-2xl font-bold text-modern-success">
-                  ₩{paidCommission.toLocaleString()}
-                </p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-modern-success opacity-20" />
-            </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">미지급 수수료</p>
-                <p className="text-2xl font-bold text-modern-warning">
-                  ₩{pendingCommission.toLocaleString()}
-                </p>
-              </div>
-              <TrendingDown className="w-8 h-8 text-modern-warning opacity-20" />
-            </div>
-          </div>
-        </div>
-        <div className="wp-card">
-          <div className="wp-card-body">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-modern-text-secondary">평균 수수료율</p>
-                <p className="text-2xl font-bold text-modern-primary">9.5%</p>
-              </div>
-              <Percent className="w-8 h-8 text-modern-primary opacity-20" />
-            </div>
-          </div>
-        </div>
-      </div>
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
+    }
+  };
 
-      {/* Commission Rates */}
-      <div className="wp-card">
-        <div className="wp-card-header">
-          <h2 className="text-lg font-semibold">수수료율 정책</h2>
-        </div>
-        <div className="wp-card-body">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {commissionRates.map((rate, index) => (
-              <div key={index} className="border border-modern-border-primary rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-modern-text-primary">{rate.category}</span>
-                  <span className="text-xl font-bold text-modern-primary">{rate.rate}%</span>
-                </div>
-                {rate.minSales && (
-                  <p className="text-xs text-modern-text-secondary">
-                    최소 매출: ₩{rate.minSales.toLocaleString()}
-                  </p>
-                )}
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(filteredCommissions.map((c: CommissionData) => `${c.vendorId}-${c.period}`));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  return (
+    <div className="wrap">
+      <h1 className="wp-heading-inline">수수료 관리</h1>
+      <Button className="page-title-action" variant="default">
+        <Download className="w-4 h-4 mr-2" />
+        수수료 내역 다운로드
+      </Button>
+      <hr className="wp-header-end" />
+
+      {/* Status Filter Links */}
+      <ul className="subsubsub">
+        <li className="all">
+          <a 
+            href="#" 
+            className={statusFilter === 'all' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('all'); }}
+          >
+            전체 <span className="count">({commissions.length})</span>
+          </a> |
+        </li>
+        <li className="paid">
+          <a 
+            href="#" 
+            className={statusFilter === 'paid' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('paid'); }}
+          >
+            지급완료 <span className="count">({commissions.filter(c => c.status === 'paid').length})</span>
+          </a> |
+        </li>
+        <li className="pending">
+          <a 
+            href="#" 
+            className={statusFilter === 'pending' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('pending'); }}
+          >
+            대기중 <span className="count">({commissions.filter(c => c.status === 'pending').length})</span>
+          </a> |
+        </li>
+        <li className="processing">
+          <a 
+            href="#" 
+            className={statusFilter === 'processing' ? 'current' : ''}
+            onClick={(e) => { e.preventDefault(); setStatusFilter('processing'); }}
+          >
+            처리중 <span className="count">({commissions.filter(c => c.status === 'processing').length})</span>
+          </a>
+        </li>
+      </ul>
+
+      {/* Commission Summary Stats */}
+      <div className="postbox-container">
+        <div className="meta-box-sortables">
+          <div className="postbox">
+            <div className="postbox-header">
+              <h2 className="hndle">수수료 요약</h2>
+            </div>
+            <div className="inside">
+              <div className="main">
+                <ul className="wp-list-table widefat">
+                  <li>
+                    <span className="list-table-label">총 수수료:</span>
+                    <span className="list-table-value">₩{totalCommission.toLocaleString()}</span>
+                  </li>
+                  <li>
+                    <span className="list-table-label">지급 완료:</span>
+                    <span className="list-table-value text-green-600">₩{paidCommission.toLocaleString()}</span>
+                  </li>
+                  <li>
+                    <span className="list-table-label">미지급:</span>
+                    <span className="list-table-value text-yellow-600">₩{pendingCommission.toLocaleString()}</span>
+                  </li>
+                  <li>
+                    <span className="list-table-label">평균 수수료율:</span>
+                    <span className="list-table-value">9.5%</span>
+                  </li>
+                </ul>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-modern-text-secondary" />
-          <select
-            value={selectedPeriod}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedPeriod(e.target.value)}
-            className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
-          >
-            <option value="all">전체 기간</option>
-            <option value="2024-03">2024년 3월</option>
-            <option value="2024-02">2024년 2월</option>
-            <option value="2024-01">2024년 1월</option>
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-modern-text-secondary" />
-          <select
-            value={statusFilter}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-modern-border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-modern-primary"
-          >
-            <option value="all">모든 상태</option>
-            <option value="paid">지급완료</option>
-            <option value="pending">대기중</option>
-            <option value="processing">처리중</option>
-          </select>
+      <div className="wp-filter">
+        <div className="filter-items">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="전체 기간" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체 기간</SelectItem>
+              <SelectItem value="2024-03">2024년 3월</SelectItem>
+              <SelectItem value="2024-02">2024년 2월</SelectItem>
+              <SelectItem value="2024-01">2024년 1월</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <div className="search-box">
+            <Input
+              type="search"
+              placeholder="판매자 검색..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-[300px]"
+            />
+            <Button variant="secondary">
+              판매자 검색
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Commission Table */}
-      <div className="wp-card">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-modern-bg-tertiary border-b border-modern-border-primary">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  판매자 정보
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  기간
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  매출액
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  수수료율
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  수수료
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-modern-text-secondary uppercase tracking-wider">
-                  지급일
-                </th>
-                <th className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-modern-border-primary">
-              {filteredCommissions.map((commission: any) => (
-                <tr key={`${commission.vendorId}-${commission.period}`} className="hover:bg-modern-bg-hover">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-modern-text-primary">
-                        {commission.businessName}
-                      </div>
-                      <div className="text-sm text-modern-text-secondary">
-                        {commission.vendorName}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
-                    {commission.period}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
-                    ₩{commission.sales.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-primary">
-                    {commission.commissionRate}%
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-modern-text-primary">
-                    ₩{commission.commissionAmount.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(commission.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-modern-text-secondary">
-                    {commission.paidDate ? new Date(commission.paidDate).toLocaleDateString('ko-KR') : '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    {commission.status === 'pending' && (
-                      <button className="text-modern-primary hover:text-modern-primary-hover">
-                        지급하기
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Bulk Actions - Top */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedRows.length}
+        onActionExecute={async (action) => {
+          const actionConfig = bulkActions.find(a => a.value === action);
+          if (actionConfig) {
+            await actionConfig.action(selectedRows);
+          }
+        }}
+        isProcessing={isProcessing}
+        position="top"
+      />
+
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        emptyMessage="수수료 내역이 없습니다."
+      />
+
+      {/* Bulk Actions - Bottom */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedRows.length}
+        onActionExecute={async (action) => {
+          const actionConfig = bulkActions.find(a => a.value === action);
+          if (actionConfig) {
+            await actionConfig.action(selectedRows);
+          }
+        }}
+        isProcessing={isProcessing}
+        position="bottom"
+      />
     </div>
   );
 };
