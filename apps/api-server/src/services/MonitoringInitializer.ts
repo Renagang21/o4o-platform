@@ -14,34 +14,23 @@ export class MonitoringInitializer {
 
   async initialize(): Promise<void> {
 
-    try {
-      // Initialize default status page components
-      await this.initializeStatusPageComponents();
+    // Initialize default status page components
+    await this.initializeStatusPageComponents();
 
-      // Start monitoring services
-      await this.operationsService.startMonitoring();
+    // Start monitoring services
+    await this.operationsService.startMonitoring();
 
-      // Initialize auto-recovery system
-      await this.initializeAutoRecoverySystem();
+    // Initialize auto-recovery system
+    await this.initializeAutoRecoverySystem();
 
-      // Set up health check intervals
-      await this.setupHealthCheckSchedules();
-
-    } catch (error) {
-      // Error log removed
-      throw error;
-    }
+    // Set up health check intervals
+    await this.setupHealthCheckSchedules();
   }
 
   async shutdown(): Promise<void> {
 
-    try {
-      await this.operationsService.stopMonitoring();
-      await autoRecoveryService.stopAutoRecovery();
-    } catch (error) {
-      // Error log removed
-      throw error;
-    }
+    await this.operationsService.stopMonitoring();
+    await autoRecoveryService.stopAutoRecovery();
   }
 
   private async initializeStatusPageComponents(): Promise<void> {

@@ -199,7 +199,7 @@ export class PerformanceMonitoringInitializer {
    * 서비스 간 통합 설정
    */
   private async configureServiceIntegration(): Promise<void> {
-    try {
+
 
       // 서비스 간 이벤트 통합 설정
       const integrationConfig = {
@@ -233,10 +233,6 @@ export class PerformanceMonitoringInitializer {
       await this.setupCrossServiceMessaging();
 
 
-    } catch (error) {
-      // Error log removed
-      throw error;
-    }
   }
 
   /**
@@ -631,34 +627,27 @@ export class PerformanceMonitoringInitializer {
    * 시스템 종료
    */
   async shutdown(): Promise<void> {
-    try {
-
-      // 헬스 체크 중지
-      if (this.healthCheckInterval) {
-        clearInterval(this.healthCheckInterval);
-      }
-
-      // 모든 서비스 종료
-      for (const [serviceName, service] of this.services) {
-        try {
-          if (typeof service.shutdown === 'function') {
-            await service.shutdown();
-          }
-        } catch (error) {
-          // Error log removed
-        }
-      }
-
-      // Redis 연결 종료
-      await this.redis.disconnect();
-
-      // 종료 기록
-      this.isInitialized = false;
-
-    } catch (error) {
-      // Error log removed
-      throw error;
+    // 헬스 체크 중지
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
     }
+
+    // 모든 서비스 종료
+    for (const [serviceName, service] of this.services) {
+      try {
+        if (typeof service.shutdown === 'function') {
+          await service.shutdown();
+        }
+      } catch (error) {
+        // Error log removed
+      }
+    }
+
+    // Redis 연결 종료
+    await this.redis.disconnect();
+
+    // 종료 기록
+    this.isInitialized = false;
   }
 }
 

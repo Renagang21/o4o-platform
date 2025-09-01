@@ -30,8 +30,7 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
     return wpModulesCache;
   }
 
-  try {
-    // Initialize WordPress polyfills first
+  // Initialize WordPress polyfills first
     await initializeWordPress();
     
     // Ensure React is ready
@@ -80,10 +79,6 @@ export async function loadWordPressModules(): Promise<WordPressModules> {
     };
 
     return wpModulesCache;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
 }
 
 /**

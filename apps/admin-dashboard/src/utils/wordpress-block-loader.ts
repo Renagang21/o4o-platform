@@ -21,7 +21,6 @@ export async function loadBlockEditorCore() {
     return blockEditorCache.core;
   }
 
-  try {
     // Import only core functionality
     const module = await import(
       /* webpackChunkName: "wp-block-editor-core" */
@@ -38,10 +37,6 @@ export async function loadBlockEditorCore() {
 
     blockEditorCache.core = module;
     return module;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
 }
 
 /**
@@ -52,7 +47,6 @@ export async function loadBlockEditorUI() {
     return blockEditorCache.ui;
   }
 
-  try {
     const module = await import(
       /* webpackChunkName: "wp-block-editor-ui" */
       '@wordpress/block-editor'
@@ -67,10 +61,6 @@ export async function loadBlockEditorUI() {
 
     blockEditorCache.ui = module;
     return module;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
 }
 
 /**
@@ -81,7 +71,6 @@ export async function loadBlockEditorFormats() {
     return blockEditorCache.formats;
   }
 
-  try {
     const module = await import(
       /* webpackChunkName: "wp-block-editor-formats" */
       '@wordpress/block-editor'
@@ -97,10 +86,6 @@ export async function loadBlockEditorFormats() {
 
     blockEditorCache.formats = module;
     return module;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
 }
 
 /**
@@ -111,7 +96,6 @@ export async function loadBlockEditorMedia() {
     return blockEditorCache.media;
   }
 
-  try {
     const module = await import(
       /* webpackChunkName: "wp-block-editor-media" */
       '@wordpress/block-editor'
@@ -123,10 +107,6 @@ export async function loadBlockEditorMedia() {
 
     blockEditorCache.media = module;
     return module;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
 }
 
 /**

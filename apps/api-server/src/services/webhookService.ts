@@ -464,23 +464,17 @@ export class WebhookService {
    * 외부 URL에 웹훅을 전송합니다.
    */
   async sendWebhook(url: string, payload: Record<string, unknown>): Promise<void> {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'O4O-Platform-Webhook/1.0'
-        },
-        body: JSON.stringify(payload)
-      });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'O4O-Platform-Webhook/1.0'
+      },
+      body: JSON.stringify(payload)
+    });
 
-      if (!response.ok) {
-        throw new Error(`Webhook failed with status ${response.status}: ${response.statusText}`);
-      }
-
-    } catch (error) {
-      // Error log removed
-      throw error;
+    if (!response.ok) {
+      throw new Error(`Webhook failed with status ${response.status}: ${response.statusText}`);
     }
   }
 }

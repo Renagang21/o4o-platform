@@ -25,24 +25,19 @@ interface EmailOptions {
 }
 
 export async function sendEmail(options: EmailOptions): Promise<void> {
-  try {
-    const mailOptions = {
-      from: options.from || `${config.smtp.fromName} <${config.smtp.fromEmail}>`,
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
-      subject: options.subject,
-      text: options.text,
-      html: options.html,
-      replyTo: options.replyTo,
-      cc: options.cc?.join(', '),
-      bcc: options.bcc?.join(', '),
-      attachments: options.attachments
-    };
+  const mailOptions = {
+    from: options.from || `${config.smtp.fromName} <${config.smtp.fromEmail}>`,
+    to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+    subject: options.subject,
+    text: options.text,
+    html: options.html,
+    replyTo: options.replyTo,
+    cc: options.cc?.join(', '),
+    bcc: options.bcc?.join(', '),
+    attachments: options.attachments
+  };
 
-    await transporter.sendMail(mailOptions);
-  } catch (error: any) {
-    // Error log removed
-    throw error;
-  }
+  await transporter.sendMail(mailOptions);
 }
 
 // Verify SMTP connection

@@ -258,16 +258,11 @@ export class SelfHealingService {
   }
 
   private async clearRedisCache(parameters?: { pattern?: string }): Promise<void> {
-    try {
-      // Implementation would use actual Redis client
-      const pattern = parameters?.pattern || '*';
-      
-      // Simulate Redis cache clear
-      await new Promise(resolve => setTimeout(resolve, 100));
-    } catch (error) {
-      // Error log removed
-      throw error;
-    }
+    // Implementation would use actual Redis client
+    const pattern = parameters?.pattern || '*';
+    
+    // Simulate Redis cache clear
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   private async clearTempFiles(): Promise<void> {

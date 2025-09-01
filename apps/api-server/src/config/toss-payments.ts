@@ -142,7 +142,9 @@ export function validateTossPaymentsConfig(): void {
   
   if (warnings.length > 0) {
     // Warning log removed
-    warnings.forEach(warning => // Warning log removed
+    warnings.forEach(warning => {
+      // Warning log removed
+    });
   } else {
     logger.info('✅ TossPayments configuration validated successfully');
   }
@@ -150,36 +152,21 @@ export function validateTossPaymentsConfig(): void {
 
 // Export helper functions
 export async function confirmPayment(paymentKey: string, orderId: string, amount: number) {
-  try {
-    const response = await tossPaymentsClient.post(`/payments/${paymentKey}`, {
-      orderId,
-      amount,
-    });
-    return response.data;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
+  const response = await tossPaymentsClient.post(`/payments/${paymentKey}`, {
+    orderId,
+    amount,
+  });
+  return response.data;
 }
 
 export async function cancelPayment(paymentKey: string, cancelReason: string) {
-  try {
-    const response = await tossPaymentsClient.post(`/payments/${paymentKey}/cancel`, {
-      cancelReason,
-    });
-    return response.data;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
+  const response = await tossPaymentsClient.post(`/payments/${paymentKey}/cancel`, {
+    cancelReason,
+  });
+  return response.data;
 }
 
 export async function getPayment(paymentKey: string) {
-  try {
-    const response = await tossPaymentsClient.get(`/payments/${paymentKey}`);
-    return response.data;
-  } catch (error) {
-    // Error log removed
-    throw error;
-  }
+  const response = await tossPaymentsClient.get(`/payments/${paymentKey}`);
+  return response.data;
 }
