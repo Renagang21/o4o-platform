@@ -3,7 +3,18 @@ import { Between, In, MoreThan, LessThan } from 'typeorm';
 import { AnalyticsService } from './analytics.service';
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 import * as XLSX from 'xlsx';
 import * as PDFKit from 'pdfkit';
 import { createObjectCsvWriter } from 'csv-writer';
@@ -116,12 +127,12 @@ export class ReportingService {
       const report: ReportData = {
         id: reportId,
         title: 'Inventory Report',
-        description: `Inventory report for ${moment(options.startDate).format('YYYY-MM-DD')} to ${moment(options.endDate).format('YYYY-MM-DD')}`,
+        description: `Inventory report for ${dayjs(options.startDate).format('YYYY-MM-DD')} to ${dayjs(options.endDate).format('YYYY-MM-DD')}`,
         generatedAt: new Date(),
         format: options.format,
         status: 'generating',
         metadata: {
-          period: `${moment(options.startDate).format('YYYY-MM-DD')} to ${moment(options.endDate).format('YYYY-MM-DD')}`,
+          period: `${dayjs(options.startDate).format('YYYY-MM-DD')} to ${dayjs(options.endDate).format('YYYY-MM-DD')}`,
           recordCount: 0,
           filters: options.filters,
         },
@@ -168,7 +179,7 @@ export class ReportingService {
         format: options.format,
         status: 'failed',
         metadata: {
-          period: `${moment(options.startDate).format('YYYY-MM-DD')} to ${moment(options.endDate).format('YYYY-MM-DD')}`,
+          period: `${dayjs(options.startDate).format('YYYY-MM-DD')} to ${dayjs(options.endDate).format('YYYY-MM-DD')}`,
           recordCount: 0,
         },
       };
@@ -245,12 +256,12 @@ export class ReportingService {
       const report: ReportData = {
         id: reportId,
         title: 'Commission Report',
-        description: `Commission report for ${moment(options.startDate).format('YYYY-MM-DD')} to ${moment(options.endDate).format('YYYY-MM-DD')}`,
+        description: `Commission report for ${dayjs(options.startDate).format('YYYY-MM-DD')} to ${dayjs(options.endDate).format('YYYY-MM-DD')}`,
         generatedAt: new Date(),
         format: options.format,
         status: 'generating',
         metadata: {
-          period: `${moment(options.startDate).format('YYYY-MM-DD')} to ${moment(options.endDate).format('YYYY-MM-DD')}`,
+          period: `${dayjs(options.startDate).format('YYYY-MM-DD')} to ${dayjs(options.endDate).format('YYYY-MM-DD')}`,
           recordCount: 0,
           filters: options.filters,
         },
@@ -313,7 +324,7 @@ export class ReportingService {
         format: options.format,
         status: 'generating',
         metadata: {
-          period: `${moment(options.startDate).format('YYYY-MM-DD')} to ${moment(options.endDate).format('YYYY-MM-DD')}`,
+          period: `${dayjs(options.startDate).format('YYYY-MM-DD')} to ${dayjs(options.endDate).format('YYYY-MM-DD')}`,
           recordCount: 0,
           filters: options.filters,
         },
@@ -396,7 +407,7 @@ export class ReportingService {
   // Clean up old reports (utility method)
   async cleanupOldReports(olderThanDays = 30): Promise<number> {
     try {
-      const cutoffDate = moment().subtract(olderThanDays, 'days').toDate();
+      const cutoffDate = dayjs().subtract(olderThanDays, 'days').toDate();
       const files = fs.readdirSync(this.reportsDir);
       let deletedCount = 0;
 

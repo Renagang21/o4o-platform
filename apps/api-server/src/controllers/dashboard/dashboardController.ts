@@ -9,7 +9,18 @@ import { asyncHandler, createNotFoundError, createForbiddenError } from '../../m
 import { cacheService } from '../../services/cache.service';
 import { CommissionService } from '../../services/commission.service';
 import { getPerformanceStats } from '../../middleware/performance.middleware';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export class DashboardController {
   private vendorRepository = AppDataSource.getRepository(VendorInfo);
@@ -66,11 +77,11 @@ export class DashboardController {
 
     // Get time ranges for analytics
     const now = new Date();
-    const startOfMonth = moment().startOf('month').toDate();
-    const startOfLastMonth = moment().subtract(1, 'month').startOf('month').toDate();
-    const endOfLastMonth = moment().subtract(1, 'month').endOf('month').toDate();
-    const startOfWeek = moment().startOf('week').toDate();
-    const startOfYear = moment().startOf('year').toDate();
+    const startOfMonth = dayjs().startOf('month').toDate();
+    const startOfLastMonth = dayjs().subtract(1, 'month').startOf('month').toDate();
+    const endOfLastMonth = dayjs().subtract(1, 'month').endOf('month').toDate();
+    const startOfWeek = dayjs().startOf('week').toDate();
+    const startOfYear = dayjs().startOf('year').toDate();
 
     // Parallel data fetching
     const [
@@ -166,7 +177,7 @@ export class DashboardController {
       recentActivities: [
         {
           type: 'commission_calculated',
-          description: `Commission calculated for ${moment().format('MMMM YYYY')}`,
+          description: `Commission calculated for ${dayjs().format('MMMM YYYY')}`,
           timestamp: now,
           amount: currentMonthCommission?.totalCommission || 0,
         }

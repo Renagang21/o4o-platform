@@ -6,7 +6,18 @@ import { Supplier } from '../entities/Supplier';
 import { Order } from '../entities/Order';
 import { SupplierProduct } from '../entities/SupplierProduct';
 import { EmailService } from './email.service';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export class CommissionService {
   constructor(
@@ -23,7 +34,7 @@ export class CommissionService {
   async processMonthlySettlements() {
     // Starting monthly settlement processing...
     
-    const previousMonth = moment().subtract(1, 'month');
+    const previousMonth = dayjs().subtract(1, 'month');
     const period = previousMonth.format('YYYY-MM');
     const startDate = previousMonth.startOf('month').toDate();
     const endDate = previousMonth.endOf('month').toDate();
@@ -173,7 +184,7 @@ export class CommissionService {
     const previousCommission = await this.vendorCommissionRepository.findOne({
       where: {
         vendorId,
-        period: moment(period, 'YYYY-MM').subtract(1, 'month').format('YYYY-MM'),
+        period: dayjs(period, 'YYYY-MM').subtract(1, 'month').format('YYYY-MM'),
       },
     });
     const previousBalance = previousCommission?.totalPayable || 0;
@@ -350,7 +361,7 @@ export class CommissionService {
     const previousSettlement = await this.settlementRepository.findOne({
       where: {
         supplierId,
-        period: moment(period, 'YYYY-MM').subtract(1, 'month').format('YYYY-MM'),
+        period: dayjs(period, 'YYYY-MM').subtract(1, 'month').format('YYYY-MM'),
       },
     });
     const previousBalance = previousSettlement?.totalPayable || 0;
@@ -437,7 +448,7 @@ export class CommissionService {
 
   // Get current month's vendor commission
   async getCurrentVendorCommission(vendorId: string): Promise<VendorCommission | null> {
-    const currentPeriod = moment().format('YYYY-MM');
+    const currentPeriod = dayjs().format('YYYY-MM');
     return await this.vendorCommissionRepository.findOne({
       where: { vendorId, period: currentPeriod },
     });
@@ -445,7 +456,7 @@ export class CommissionService {
 
   // Get current month's supplier settlement
   async getCurrentSupplierSettlement(supplierId: string): Promise<CommissionSettlement | null> {
-    const currentPeriod = moment().format('YYYY-MM');
+    const currentPeriod = dayjs().format('YYYY-MM');
     return await this.settlementRepository.findOne({
       where: { supplierId, period: currentPeriod },
     });
@@ -693,8 +704,8 @@ export class CommissionService {
 
   // Get commission statistics
   async getCommissionStatistics() {
-    const currentMonth = moment().format('YYYY-MM');
-    const lastMonth = moment().subtract(1, 'month').format('YYYY-MM');
+    const currentMonth = dayjs().format('YYYY-MM');
+    const lastMonth = dayjs().subtract(1, 'month').format('YYYY-MM');
 
     const [
       currentVendorCommissions,

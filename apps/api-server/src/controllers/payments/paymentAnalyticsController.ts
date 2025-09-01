@@ -3,7 +3,18 @@ import { AuthRequest } from '../../types/auth';
 import { PaymentAnalyticsService, PaymentAnalyticsFilter } from '../../services/payment-analytics.service';
 import { asyncHandler, createForbiddenError, createValidationError } from '../../middleware/errorHandler.middleware';
 import logger from '../../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export class PaymentAnalyticsController {
   private paymentAnalyticsService: PaymentAnalyticsService;
@@ -35,11 +46,11 @@ export class PaymentAnalyticsController {
       const filters: PaymentAnalyticsFilter = {};
 
       if (startDate) {
-        filters.startDate = moment(startDate as string).toDate();
+        filters.startDate = dayjs(startDate as string).toDate();
       }
 
       if (endDate) {
-        filters.endDate = moment(endDate as string).toDate();
+        filters.endDate = dayjs(endDate as string).toDate();
       }
 
       if (paymentMethods) {
@@ -126,11 +137,11 @@ export class PaymentAnalyticsController {
       const filters: PaymentAnalyticsFilter = {};
 
       if (startDate) {
-        filters.startDate = moment(startDate as string).toDate();
+        filters.startDate = dayjs(startDate as string).toDate();
       }
 
       if (endDate) {
-        filters.endDate = moment(endDate as string).toDate();
+        filters.endDate = dayjs(endDate as string).toDate();
       }
 
       if (minAmount) {
@@ -208,10 +219,10 @@ export class PaymentAnalyticsController {
     try {
       // Default date range (last 30 days)
       const start = startDate 
-        ? moment(startDate as string).toDate()
-        : moment().subtract(30, 'days').toDate();
+        ? dayjs(startDate as string).toDate()
+        : dayjs().subtract(30, 'days').toDate();
       const end = endDate 
-        ? moment(endDate as string).toDate() 
+        ? dayjs(endDate as string).toDate() 
         : new Date();
 
       // Build filters
@@ -475,11 +486,11 @@ export class PaymentAnalyticsController {
       const filters: PaymentAnalyticsFilter = {};
 
       if (startDate) {
-        filters.startDate = moment(startDate as string).toDate();
+        filters.startDate = dayjs(startDate as string).toDate();
       }
 
       if (endDate) {
-        filters.endDate = moment(endDate as string).toDate();
+        filters.endDate = dayjs(endDate as string).toDate();
       }
 
       let exportData: any;
@@ -488,24 +499,24 @@ export class PaymentAnalyticsController {
       switch (type) {
         case 'overview':
           exportData = await this.paymentAnalyticsService.getPaymentOverview(filters);
-          filename = `payment-overview-${moment().format('YYYY-MM-DD')}`;
+          filename = `payment-overview-${dayjs().format('YYYY-MM-DD')}`;
           break;
         case 'trends':
           exportData = await this.paymentAnalyticsService.getPaymentTrends(
-            filters.startDate || moment().subtract(30, 'days').toDate(),
+            filters.startDate || dayjs().subtract(30, 'days').toDate(),
             filters.endDate || new Date(),
             'day',
             filters
           );
-          filename = `payment-trends-${moment().format('YYYY-MM-DD')}`;
+          filename = `payment-trends-${dayjs().format('YYYY-MM-DD')}`;
           break;
         case 'methods':
           exportData = await this.paymentAnalyticsService.getPaymentMethodAnalysis(filters);
-          filename = `payment-methods-${moment().format('YYYY-MM-DD')}`;
+          filename = `payment-methods-${dayjs().format('YYYY-MM-DD')}`;
           break;
         case 'subscription':
           exportData = await this.paymentAnalyticsService.getSubscriptionAnalytics(filters);
-          filename = `subscription-analytics-${moment().format('YYYY-MM-DD')}`;
+          filename = `subscription-analytics-${dayjs().format('YYYY-MM-DD')}`;
           break;
         default:
           throw createValidationError('Invalid export type');

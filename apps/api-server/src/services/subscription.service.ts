@@ -2,7 +2,18 @@ import { AppDataSource } from '../database/connection';
 import { TossPaymentsAdvancedService } from './toss-payments-advanced.service';
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export interface CreateSubscriptionRequest {
   customerId: string;
@@ -119,7 +130,7 @@ export class SubscriptionService {
       let status: Subscription['status'] = 'active';
 
       if (trialDays > 0) {
-        trialEnd = moment(startDate).add(trialDays, 'days').toDate();
+        trialEnd = dayjs(startDate).add(trialDays, 'days').toDate();
         nextBillingDate = trialEnd;
         status = 'trial';
       } else {
@@ -380,8 +391,8 @@ export class SubscriptionService {
       const subscriptionRepository = AppDataSource.getRepository('Subscription');
       
       // 오늘 결제해야 할 구독 조회
-      const today = moment().startOf('day');
-      const tomorrow = moment().add(1, 'day').startOf('day');
+      const today = dayjs().startOf('day');
+      const tomorrow = dayjs().add(1, 'day').startOf('day');
 
       const subscriptionsToCharge = await subscriptionRepository
         .createQueryBuilder('subscription')
@@ -592,7 +603,7 @@ export class SubscriptionService {
     interval: string, 
     intervalCount: number
   ): Date {
-    const start = moment(startDate);
+    const start = dayjs(startDate);
     
     switch (interval) {
       case 'daily':
@@ -641,7 +652,7 @@ export class SubscriptionService {
       const { AppDataSource } = await import('../database/connection');
       const usageRepository = AppDataSource.getRepository('SubscriptionUsage');
       
-      const currentPeriod = moment().format('YYYY-MM');
+      const currentPeriod = dayjs().format('YYYY-MM');
       return await usageRepository.findOne({
         where: { subscriptionId, period: currentPeriod }
       }) as SubscriptionUsage | null;

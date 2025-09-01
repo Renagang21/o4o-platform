@@ -4,7 +4,18 @@ import { AnalyticsService, AnalyticsFilter } from '../../services/analytics.serv
 import { asyncHandler, createForbiddenError, createValidationError } from '../../middleware/errorHandler.middleware';
 import { cacheService } from '../../services/cache.service';
 import logger from '../../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export class AnalyticsController {
   private analyticsService: AnalyticsService;
@@ -34,11 +45,11 @@ export class AnalyticsController {
     const filters: AnalyticsFilter = {};
     
     if (startDate) {
-      filters.startDate = moment(startDate as string).toDate();
+      filters.startDate = dayjs(startDate as string).toDate();
     }
     
     if (endDate) {
-      filters.endDate = moment(endDate as string).toDate();
+      filters.endDate = dayjs(endDate as string).toDate();
     }
 
     // Role-based filtering
@@ -168,10 +179,10 @@ export class AnalyticsController {
     }
 
     const start = startDate 
-      ? moment(startDate as string).toDate()
-      : moment().subtract(30, 'days').toDate();
+      ? dayjs(startDate as string).toDate()
+      : dayjs().subtract(30, 'days').toDate();
     const end = endDate 
-      ? moment(endDate as string).toDate() 
+      ? dayjs(endDate as string).toDate() 
       : new Date();
 
     // Role-based filtering
@@ -199,8 +210,8 @@ export class AnalyticsController {
 
       let comparison = null;
       if (compareWithPrevious === 'true') {
-        const periodLength = moment(end).diff(start);
-        const previousStart = moment(start).subtract(periodLength).toDate();
+        const periodLength = dayjs(end).diff(start);
+        const previousStart = dayjs(start).subtract(periodLength).toDate();
         const previousEnd = start;
         
         comparison = await this.analyticsService.getSalesTrends(
@@ -271,11 +282,11 @@ export class AnalyticsController {
     const filters: AnalyticsFilter = {};
     
     if (startDate) {
-      filters.startDate = moment(startDate as string).toDate();
+      filters.startDate = dayjs(startDate as string).toDate();
     }
     
     if (endDate) {
-      filters.endDate = moment(endDate as string).toDate();
+      filters.endDate = dayjs(endDate as string).toDate();
     }
 
     if (categories) {
@@ -361,11 +372,11 @@ export class AnalyticsController {
     const filters: AnalyticsFilter = {};
     
     if (startDate) {
-      filters.startDate = moment(startDate as string).toDate();
+      filters.startDate = dayjs(startDate as string).toDate();
     }
     
     if (endDate) {
-      filters.endDate = moment(endDate as string).toDate();
+      filters.endDate = dayjs(endDate as string).toDate();
     }
 
     try {

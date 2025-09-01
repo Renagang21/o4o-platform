@@ -1,7 +1,18 @@
 import { AppDataSource } from '../database/connection';
 import { cacheService } from './cache.service';
 import logger from '../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export interface PaymentOverview {
   totalPayments: number;
@@ -104,7 +115,7 @@ export class PaymentAnalyticsService {
 
     try {
       const {
-        startDate = moment().subtract(30, 'days').toDate(),
+        startDate = dayjs().subtract(30, 'days').toDate(),
         endDate = new Date(),
       } = filters;
 
@@ -139,8 +150,8 @@ export class PaymentAnalyticsService {
       const currentPeriodPayments = await query.getMany();
       
       // 이전 기간 데이터 (비교용)
-      const periodLength = moment(endDate).diff(startDate);
-      const previousStart = moment(startDate).subtract(periodLength).toDate();
+      const periodLength = dayjs(endDate).diff(startDate);
+      const previousStart = dayjs(startDate).subtract(periodLength).toDate();
       const previousEnd = startDate;
       
       const previousQuery = paymentRepository.createQueryBuilder('payment')
@@ -244,7 +255,7 @@ export class PaymentAnalyticsService {
 
     try {
       const {
-        startDate = moment().subtract(30, 'days').toDate(),
+        startDate = dayjs().subtract(30, 'days').toDate(),
         endDate = new Date(),
       } = filters;
 
@@ -364,7 +375,7 @@ export class PaymentAnalyticsService {
         const totalFees = parseFloat(trend.totalFees) || 0;
 
         return {
-          date: moment(trend.date).format(dateFormat),
+          date: dayjs(trend.date).format(dateFormat),
           totalPayments,
           totalAmount,
           successfulPayments,
@@ -407,7 +418,7 @@ export class PaymentAnalyticsService {
       });
       
       // 이탈률 계산 (지난 30일 기준)
-      const thirtyDaysAgo = moment().subtract(30, 'days').toDate();
+      const thirtyDaysAgo = dayjs().subtract(30, 'days').toDate();
       const churned = await subscriptionRepository.count({
         where: {
           status: 'cancelled',
@@ -493,7 +504,7 @@ export class PaymentAnalyticsService {
         .getRawMany();
 
       return trends.map(trend => ({
-        date: moment(trend.date).format('YYYY-MM-DD'),
+        date: dayjs(trend.date).format('YYYY-MM-DD'),
         count: parseInt(trend.count),
         amount: parseFloat(trend.amount) || 0,
         successRate: parseInt(trend.count) > 0 
@@ -520,8 +531,8 @@ export class PaymentAnalyticsService {
       const growth = [];
       
       for (let i = 11; i >= 0; i--) {
-        const monthStart = moment().subtract(i, 'months').startOf('month');
-        const monthEnd = moment().subtract(i, 'months').endOf('month');
+        const monthStart = dayjs().subtract(i, 'months').startOf('month');
+        const monthEnd = dayjs().subtract(i, 'months').endOf('month');
         
         const newSubs = await subscriptionRepository.count({
           where: {
@@ -620,7 +631,7 @@ export class PaymentAnalyticsService {
     topFailureReasons: Array<{ reason: string; count: number }>;
   }> {
     try {
-      const today = moment().startOf('day').toDate();
+      const today = dayjs().startOf('day').toDate();
       const now = new Date();
 
       const { AppDataSource } = await import('../database/connection');

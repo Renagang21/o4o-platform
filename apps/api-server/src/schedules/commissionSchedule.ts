@@ -1,6 +1,17 @@
 import { CronJob } from 'cron';
 import { CommissionService } from '../services/commission.service';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 import { AppDataSource } from '../database/connection';
 
 export class CommissionSchedule {
@@ -96,7 +107,7 @@ export class CommissionSchedule {
       await this.commissionService.processMonthlySettlements();
       // Monthly commission processing completed successfully
     } catch (error) {
-      console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error in monthly commission processing:`, error);
+      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error in monthly commission processing:`, error);
     }
   }
 
@@ -116,7 +127,7 @@ export class CommissionSchedule {
       
       // Payment reminders sent successfully
     } catch (error) {
-      console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error sending payment reminders:`, error);
+      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error sending payment reminders:`, error);
     }
   }
 
@@ -137,7 +148,7 @@ export class CommissionSchedule {
       
       // Interim reports generated successfully
     } catch (error) {
-      console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error generating interim reports:`, error);
+      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error generating interim reports:`, error);
     }
   }
 
@@ -149,7 +160,7 @@ export class CommissionSchedule {
       
       // Dispute check completed
     } catch (error) {
-      console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error checking disputes:`, error);
+      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error checking disputes:`, error);
     }
   }
 
@@ -162,7 +173,7 @@ export class CommissionSchedule {
       
       // Auto-approval completed
     } catch (error) {
-      console.error(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] Error in auto-approval:`, error);
+      console.error(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] Error in auto-approval:`, error);
     }
   }
 }

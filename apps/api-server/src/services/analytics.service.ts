@@ -13,7 +13,18 @@ import { Order } from '../entities/Order';
 import { cacheService } from './cache.service';
 import { analyticsCacheService } from './analytics-cache.service';
 import logger from '../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export interface AnalyticsFilter {
   startDate?: Date;
@@ -94,7 +105,7 @@ export class AnalyticsService {
     }
 
     const {
-      startDate = moment().subtract(30, 'days').toDate(),
+      startDate = dayjs().subtract(30, 'days').toDate(),
       endDate = new Date(),
     } = filters;
 
@@ -254,7 +265,7 @@ export class AnalyticsService {
           }, {} as Record<string, number>),
         },
         trends: await this.getInventoryTrends(
-          moment().subtract(30, 'days').toDate(),
+          dayjs().subtract(30, 'days').toDate(),
           new Date()
         ),
       };
@@ -308,7 +319,7 @@ export class AnalyticsService {
         .getRawMany();
 
       const trends = salesData.map((data, index) => ({
-        period: moment(data.period).format(dateFormat),
+        period: dayjs(data.period).format(dateFormat),
         orderCount: parseInt(data.orderCount),
         totalRevenue: parseFloat(data.totalRevenue || '0'),
         averageOrderValue: parseFloat(data.averageOrderValue || '0'),
@@ -338,7 +349,7 @@ export class AnalyticsService {
 
     try {
       const {
-        startDate = moment().subtract(30, 'days').toDate(),
+        startDate = dayjs().subtract(30, 'days').toDate(),
         endDate = new Date(),
       } = filters;
 
@@ -372,7 +383,7 @@ export class AnalyticsService {
         .getRawMany();
 
       const products: ProductPerformance[] = performance.map(p => {
-        const daysInStock = moment().diff(moment(p.createdAt), 'days');
+        const daysInStock = dayjs().diff(dayjs(p.createdAt), 'days');
         const turnoverRate = daysInStock > 0 ? (parseFloat(p.totalSales) / daysInStock) * 30 : 0; // Monthly turnover
 
         return {
@@ -411,7 +422,7 @@ export class AnalyticsService {
 
     try {
       const {
-        startDate = moment().subtract(30, 'days').toDate(),
+        startDate = dayjs().subtract(30, 'days').toDate(),
         endDate = new Date(),
       } = filters;
 
@@ -440,7 +451,7 @@ export class AnalyticsService {
         .getRawMany();
 
       // Get previous period for comparison
-      const previousStart = moment(startDate).subtract(moment(endDate).diff(startDate), 'milliseconds').toDate();
+      const previousStart = dayjs(startDate).subtract(dayjs(endDate).diff(startDate), 'milliseconds').toDate();
       const previousEnd = startDate;
 
       const previousRankings = await this.vendorRepository
@@ -503,8 +514,8 @@ export class AnalyticsService {
 
     try {
       const now = new Date();
-      const hourAgo = moment().subtract(1, 'hour').toDate();
-      const dayAgo = moment().subtract(1, 'day').toDate();
+      const hourAgo = dayjs().subtract(1, 'hour').toDate();
+      const dayAgo = dayjs().subtract(1, 'day').toDate();
 
       const [
         recentOrders,
@@ -561,7 +572,7 @@ export class AnalyticsService {
   // Helper methods
   private async calculateKPIMetrics(filters: AnalyticsFilter): Promise<KPIMetrics> {
     const {
-      startDate = moment().subtract(30, 'days').toDate(),
+      startDate = dayjs().subtract(30, 'days').toDate(),
       endDate = new Date(),
     } = filters;
 
@@ -587,7 +598,7 @@ export class AnalyticsService {
       .select('SUM(movement.quantity)', 'totalSold')
       .where('movement.movementType = :type', { type: 'sale' })
       .andWhere('movement.createdAt >= :startDate', { 
-        startDate: moment().subtract(365, 'days').toDate() 
+        startDate: dayjs().subtract(365, 'days').toDate() 
       })
       .getRawOne();
 
@@ -630,7 +641,7 @@ export class AnalyticsService {
       .getRawMany();
 
     return trends.map(trend => ({
-      period: moment(trend.period).format('YYYY-MM'),
+      period: dayjs(trend.period).format('YYYY-MM'),
       totalCommission: parseFloat(trend.totalCommission || '0'),
       commissionCount: parseInt(trend.commissionCount),
     }));
@@ -722,7 +733,7 @@ export class AnalyticsService {
   private async getHourlyOrderTrend() {
     const hours = [];
     for (let i = 23; i >= 0; i--) {
-      const hour = moment().subtract(i, 'hours');
+      const hour = dayjs().subtract(i, 'hours');
       const orders = await this.orderRepository.count({
         where: {
           createdAt: Between(

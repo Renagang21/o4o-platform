@@ -3,7 +3,18 @@ import { AuthRequest } from '../../types/auth';
 import { ForecastingService, ForecastOptions, DemandForecastOptions, InventoryForecastOptions } from '../../services/forecasting.service';
 import { asyncHandler, createForbiddenError, createValidationError } from '../../middleware/errorHandler.middleware';
 import logger from '../../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export class ForecastingController {
   private forecastingService: ForecastingService;
@@ -56,10 +67,10 @@ export class ForecastingController {
 
     // Date range for historical data
     if (startDate) {
-      options.filters!.startDate = moment(startDate).toDate();
+      options.filters!.startDate = dayjs(startDate).toDate();
     }
     if (endDate) {
-      options.filters!.endDate = moment(endDate).toDate();
+      options.filters!.endDate = dayjs(endDate).toDate();
     }
 
     // Role-based filtering
@@ -151,10 +162,10 @@ export class ForecastingController {
 
     // Date range for historical data
     if (startDate) {
-      options.filters!.startDate = moment(startDate).toDate();
+      options.filters!.startDate = dayjs(startDate).toDate();
     }
     if (endDate) {
-      options.filters!.endDate = moment(endDate).toDate();
+      options.filters!.endDate = dayjs(endDate).toDate();
     }
 
     // Role-based filtering
@@ -258,10 +269,10 @@ export class ForecastingController {
 
     // Date range for historical data
     if (startDate) {
-      options.filters!.startDate = moment(startDate).toDate();
+      options.filters!.startDate = dayjs(startDate).toDate();
     }
     if (endDate) {
-      options.filters!.endDate = moment(endDate).toDate();
+      options.filters!.endDate = dayjs(endDate).toDate();
     }
 
     // Role-based filtering
@@ -357,10 +368,10 @@ export class ForecastingController {
 
     // Date range for historical data
     if (startDate) {
-      options.filters!.startDate = moment(startDate).toDate();
+      options.filters!.startDate = dayjs(startDate).toDate();
     }
     if (endDate) {
-      options.filters!.endDate = moment(endDate).toDate();
+      options.filters!.endDate = dayjs(endDate).toDate();
     }
 
     // Role-based filtering

@@ -6,7 +6,20 @@ import { asyncHandler, createForbiddenError } from '../../middleware/errorHandle
 import { cacheService } from '../../services/cache.service';
 import { CommissionService } from '../../services/commission.service';
 import { getPerformanceStats, getErrorAnalytics } from '../../middleware/performance.middleware';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(quarterOfYear);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 
 export class AdminCommissionController {
   private commissionService: CommissionService;
@@ -204,7 +217,7 @@ export class AdminCommissionController {
       // Cache metadata
       generatedAt: new Date().toISOString(),
       timeRange: timeRange,
-      nextUpdate: moment().add(10, 'minutes').toISOString(),
+      nextUpdate: dayjs().add(10, 'minutes').toISOString(),
     };
 
     // Cache for 10 minutes (admin data updates less frequently)
@@ -302,51 +315,51 @@ export class AdminCommissionController {
 
   // Private helper methods
   private getTimeRanges(timeRange: string) {
-    const now = moment();
+    const now = dayjs();
     
     switch (timeRange) {
       case 'week':
         return {
           current: {
-            start: now.clone().startOf('week').toDate(),
-            end: now.clone().endOf('week').toDate(),
+            start: now.startOf('week').toDate(),
+            end: now.endOf('week').toDate(),
           },
           previous: {
-            start: now.clone().subtract(1, 'week').startOf('week').toDate(),
-            end: now.clone().subtract(1, 'week').endOf('week').toDate(),
+            start: now.subtract(1, 'week').startOf('week').toDate(),
+            end: now.subtract(1, 'week').endOf('week').toDate(),
           }
         };
       case 'month':
         return {
           current: {
-            start: now.clone().startOf('month').toDate(),
-            end: now.clone().endOf('month').toDate(),
+            start: now.startOf('month').toDate(),
+            end: now.endOf('month').toDate(),
           },
           previous: {
-            start: now.clone().subtract(1, 'month').startOf('month').toDate(),
-            end: now.clone().subtract(1, 'month').endOf('month').toDate(),
+            start: now.subtract(1, 'month').startOf('month').toDate(),
+            end: now.subtract(1, 'month').endOf('month').toDate(),
           }
         };
       case 'quarter':
         return {
           current: {
-            start: now.clone().startOf('quarter').toDate(),
-            end: now.clone().endOf('quarter').toDate(),
+            start: now.startOf('quarter').toDate(),
+            end: now.endOf('quarter').toDate(),
           },
           previous: {
-            start: now.clone().subtract(1, 'quarter').startOf('quarter').toDate(),
-            end: now.clone().subtract(1, 'quarter').endOf('quarter').toDate(),
+            start: now.subtract(3, 'month').startOf('quarter').toDate(),
+            end: now.subtract(3, 'month').endOf('quarter').toDate(),
           }
         };
       default:
         return {
           current: {
-            start: now.clone().startOf('month').toDate(),
-            end: now.clone().endOf('month').toDate(),
+            start: now.startOf('month').toDate(),
+            end: now.endOf('month').toDate(),
           },
           previous: {
-            start: now.clone().subtract(1, 'month').startOf('month').toDate(),
-            end: now.clone().subtract(1, 'month').endOf('month').toDate(),
+            start: now.subtract(1, 'month').startOf('month').toDate(),
+            end: now.subtract(1, 'month').endOf('month').toDate(),
           }
         };
     }

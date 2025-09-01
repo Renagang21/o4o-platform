@@ -12,7 +12,18 @@ interface CustomReportConfig {
 import { asyncHandler, createForbiddenError, createValidationError, createNotFoundError } from '../../middleware/errorHandler.middleware';
 import { cacheService } from '../../services/cache.service';
 import logger from '../../utils/logger';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isBetween from 'dayjs/plugin/isBetween';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(isBetween);
+dayjs.extend(weekOfYear);
+dayjs.extend(duration);
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -51,10 +62,10 @@ export class ReportingController {
 
     // Parse dates
     const start = startDate 
-      ? moment(startDate).toDate()
-      : moment().subtract(30, 'days').toDate();
+      ? dayjs(startDate).toDate()
+      : dayjs().subtract(30, 'days').toDate();
     const end = endDate 
-      ? moment(endDate).toDate() 
+      ? dayjs(endDate).toDate() 
       : new Date();
 
     // Build report options
@@ -149,10 +160,10 @@ export class ReportingController {
 
     // Default date range (last 30 days)
     const start = startDate 
-      ? moment(startDate).toDate()
-      : moment().subtract(30, 'days').toDate();
+      ? dayjs(startDate).toDate()
+      : dayjs().subtract(30, 'days').toDate();
     const end = endDate 
-      ? moment(endDate).toDate() 
+      ? dayjs(endDate).toDate() 
       : new Date();
 
     // Build report options
@@ -245,11 +256,11 @@ export class ReportingController {
 
     // Default date range (current month)
     const start = startDate 
-      ? moment(startDate).toDate()
-      : moment().startOf('month').toDate();
+      ? dayjs(startDate).toDate()
+      : dayjs().startOf('month').toDate();
     const end = endDate 
-      ? moment(endDate).toDate() 
-      : moment().endOf('month').toDate();
+      ? dayjs(endDate).toDate() 
+      : dayjs().endOf('month').toDate();
 
     // Build report options
     const options: ReportOptions = {
