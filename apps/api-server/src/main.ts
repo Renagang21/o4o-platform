@@ -77,6 +77,7 @@ import userManagementRoutes from './routes/users.routes';
 import usersV1Routes from './routes/v1/users.routes';
 import adminRoutes from './routes/admin';
 import ecommerceRoutes from './routes/ecommerce';
+import ecommerceSettingsRoutes from './routes/ecommerce/settingsRoutes';
 import cptRoutes from './routes/cpt';
 import postCreationRoutes from './routes/post-creation';
 import servicesRoutes from './routes/services';
@@ -496,6 +497,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/v1/users', usersV1Routes); // V1 user management routes with comprehensive functionality
 app.use('/api/admin', adminRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
+app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
 app.use('/api/cpt', cptRoutes);
 app.use('/api/post-creation', postCreationRoutes);
 app.use('/api/services', servicesRoutes);
@@ -509,6 +511,12 @@ app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 import acfRoutes from './routes/acf';
 import shortcodeRoutes from './routes/shortcodes';
 app.use('/admin', acfRoutes);
+
+// API v1 compatibility for media routes
+app.use('/api/v1/media/folders', (req: Request, res: Response, next: NextFunction) => {
+  req.url = '/folders';
+  acfRoutes(req, res, next);
+});
 app.use('/api/v1/shortcodes', shortcodeRoutes);
 
 // Dashboard endpoints with real data
