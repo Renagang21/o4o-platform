@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableIndex } from "typeorm";
 
 export class CreatePostTagTable1725170000000 implements MigrationInterface {
     name = 'CreatePostTagTable1725170000000'
@@ -81,10 +81,22 @@ export class CreatePostTagTable1725170000000 implements MigrationInterface {
         }), true);
 
         // Create indexes for better performance
-        await queryRunner.createIndex("post_tags", new Index("IDX_POST_TAG_NAME", ["name"]));
-        await queryRunner.createIndex("post_tags", new Index("IDX_POST_TAG_SLUG", ["slug"]));
-        await queryRunner.createIndex("post_tags", new Index("IDX_POST_TAG_ACTIVE", ["isActive"]));
-        await queryRunner.createIndex("post_tags", new Index("IDX_POST_TAG_USAGE_COUNT", ["usageCount"]));
+        await queryRunner.createIndex("post_tags", new TableIndex({
+            name: "IDX_POST_TAG_NAME",
+            columnNames: ["name"]
+        }));
+        await queryRunner.createIndex("post_tags", new TableIndex({
+            name: "IDX_POST_TAG_SLUG", 
+            columnNames: ["slug"]
+        }));
+        await queryRunner.createIndex("post_tags", new TableIndex({
+            name: "IDX_POST_TAG_ACTIVE",
+            columnNames: ["isActive"]
+        }));
+        await queryRunner.createIndex("post_tags", new TableIndex({
+            name: "IDX_POST_TAG_USAGE_COUNT",
+            columnNames: ["usageCount"]
+        }));
 
         // Create many-to-many junction table for posts and tags
         await queryRunner.createTable(new Table({
