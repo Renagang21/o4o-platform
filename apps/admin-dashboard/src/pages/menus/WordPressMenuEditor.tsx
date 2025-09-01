@@ -21,6 +21,10 @@ import {
   Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import MenuApi, { MenuItem as MenuItemType, MenuLocation as MenuLocationType } from '../../api/menuApi';
+import { UnifiedApiClient } from '../../api/UnifiedApiClient';
+
+const unifiedApi = new UnifiedApiClient();
 
 // Types
 interface MenuItem {
@@ -34,10 +38,14 @@ interface MenuItem {
   children?: MenuItem[];
   isOpen?: boolean;
   originalId?: string; // For pages/posts/categories
+  menu_id?: string;
+  parent_id?: string;
+  order_num?: number;
 }
 
 interface MenuLocation {
   id: string;
+  key?: string;
   name: string;
   description: string;
 }
@@ -70,92 +78,161 @@ const WordPressMenuEditor: FC = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentMenuId, setCurrentMenuId] = useState<string | null>(null);
   
-  // Available items (mock data)
-  const [pages] = useState<AvailableItem[]>([
-    { id: 'page-1', title: '홈', type: 'page', url: '/' },
-    { id: 'page-2', title: '회사 소개', type: 'page', url: '/about' },
-    { id: 'page-3', title: '서비스', type: 'page', url: '/services' },
-    { id: 'page-4', title: '포트폴리오', type: 'page', url: '/portfolio' },
-    { id: 'page-5', title: '연락처', type: 'page', url: '/contact' },
-    { id: 'page-6', title: '개인정보처리방침', type: 'page', url: '/privacy' },
-    { id: 'page-7', title: '이용약관', type: 'page', url: '/terms' }
-  ]);
-  
-  const [posts] = useState<AvailableItem[]>([
-    { id: 'post-1', title: '최신 뉴스 업데이트', type: 'post', url: '/blog/latest-news' },
-    { id: 'post-2', title: '제품 출시 안내', type: 'post', url: '/blog/product-launch' },
-    { id: 'post-3', title: '이벤트 공지사항', type: 'post', url: '/blog/event-notice' }
-  ]);
-  
-  const [categories] = useState<AvailableItem[]>([
-    { id: 'cat-1', title: '뉴스', type: 'category', url: '/category/news' },
-    { id: 'cat-2', title: '공지사항', type: 'category', url: '/category/notice' },
-    { id: 'cat-3', title: '이벤트', type: 'category', url: '/category/events' }
-  ]);
-  
-  const [tags] = useState<AvailableItem[]>([
-    { id: 'tag-1', title: '중요', type: 'tag', url: '/tag/important' },
-    { id: 'tag-2', title: '신제품', type: 'tag', url: '/tag/new-product' },
-    { id: 'tag-3', title: '업데이트', type: 'tag', url: '/tag/update' }
-  ]);
-  
-  // Menu locations
-  const menuLocations: MenuLocation[] = [
-    { id: 'primary', name: '주 메뉴', description: '사이트 상단에 표시되는 메인 메뉴' },
-    { id: 'footer', name: '푸터 메뉴', description: '사이트 하단에 표시되는 메뉴' },
-    { id: 'mobile', name: '모바일 메뉴', description: '모바일 기기에서 표시되는 메뉴' },
-    { id: 'social', name: '소셜 링크', description: '소셜 미디어 링크 메뉴' }
-  ];
+  // Available items - will be loaded from API
+  const [pages, setPages] = useState<AvailableItem[]>([]);
+  const [posts, setPosts] = useState<AvailableItem[]>([]);
+  const [categories, setCategories] = useState<AvailableItem[]>([]);
+  const [tags, setTags] = useState<AvailableItem[]>([]);
+  const [menuLocations, setMenuLocations] = useState<MenuLocation[]>([]);
+
+  // Load available items and menu locations
+  useEffect(() => {
+    loadAvailableItems();
+    loadMenuLocations();
+  }, []);
 
   // Load menu data if editing
   useEffect(() => {
     if (id) {
-      // Load existing menu data
-      setMenuName('주 메뉴');
-      setMenuSlug('primary-menu');
-      setSelectedLocation('primary');
-      setMenuItems([
-        {
-          id: '1',
-          title: '홈',
-          url: '/',
-          type: 'page',
-          originalId: 'page-1'
-        },
-        {
-          id: '2',
-          title: '회사 소개',
-          url: '/about',
-          type: 'page',
-          originalId: 'page-2',
-          children: [
-            {
-              id: '2-1',
-              title: '연혁',
-              url: '/about/history',
-              type: 'page',
-              originalId: 'page-2-1'
-            },
-            {
-              id: '2-2',
-              title: '팀 소개',
-              url: '/about/team',
-              type: 'page',
-              originalId: 'page-2-2'
-            }
-          ]
-        },
-        {
-          id: '3',
-          title: '서비스',
-          url: '/services',
-          type: 'page',
-          originalId: 'page-3'
-        }
-      ]);
+      loadMenu(id);
     }
   }, [id]);
+
+  const loadAvailableItems = async () => {
+    try {
+      // Load pages
+      const pagesResponse = await unifiedApi.content.pages.list({ limit: 100 });
+      if (pagesResponse.success && pagesResponse.data) {
+        setPages(pagesResponse.data.map((page: any) => ({
+          id: page.id,
+          title: page.title,
+          type: 'page' as const,
+          url: `/${page.slug}`
+        })));
+      }
+
+      // Load posts
+      const postsResponse = await unifiedApi.content.posts.list({ limit: 100 });
+      if (postsResponse.success && postsResponse.data) {
+        setPosts(postsResponse.data.map((post: any) => ({
+          id: post.id,
+          title: post.title,
+          type: 'post' as const,
+          url: `/blog/${post.slug}`
+        })));
+      }
+
+      // Load categories
+      const categoriesResponse = await unifiedApi.content.categories.list({ limit: 100 });
+      if (categoriesResponse.success && categoriesResponse.data) {
+        setCategories(categoriesResponse.data.map((cat: any) => ({
+          id: cat.id,
+          title: cat.name,
+          type: 'category' as const,
+          url: `/category/${cat.slug}`
+        })));
+      }
+
+      // Load tags
+      const tagsResponse = await unifiedApi.raw.get('/api/tags');
+      if (tagsResponse.data.success && tagsResponse.data.data) {
+        setTags(tagsResponse.data.data.map((tag: any) => ({
+          id: tag.id,
+          title: tag.name,
+          type: 'tag' as const,
+          url: `/tag/${tag.slug}`
+        })));
+      }
+    } catch (error) {
+      console.error('Error loading available items:', error);
+    }
+  };
+
+  const loadMenuLocations = async () => {
+    try {
+      const response = await MenuApi.getMenuLocations();
+      if (response.success && response.data) {
+        setMenuLocations(response.data.map((loc: MenuLocationType) => ({
+          id: loc.key || loc.id,
+          key: loc.key,
+          name: loc.name,
+          description: loc.description || ''
+        })));
+      }
+    } catch (error) {
+      console.error('Error loading menu locations:', error);
+      // Use default locations as fallback
+      setMenuLocations([
+        { id: 'primary', key: 'primary', name: '주 메뉴', description: '사이트 상단에 표시되는 메인 메뉴' },
+        { id: 'footer', key: 'footer', name: '푸터 메뉴', description: '사이트 하단에 표시되는 메뉴' },
+        { id: 'mobile', key: 'mobile', name: '모바일 메뉴', description: '모바일 기기에서 표시되는 메뉴' },
+        { id: 'social', key: 'social', name: '소셜 링크', description: '소셜 미디어 링크 메뉴' }
+      ]);
+    }
+  };
+
+  const loadMenu = async (menuId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await MenuApi.getMenu(menuId);
+      if (response.success && response.data) {
+        const menu = response.data;
+        setCurrentMenuId(menu.id);
+        setMenuName(menu.name);
+        setMenuSlug(menu.slug);
+        setSelectedLocation(menu.location || '');
+        
+        // Convert API menu items to component format
+        if (menu.items && menu.items.length > 0) {
+          const convertedItems = convertApiItemsToMenuItems(menu.items);
+          setMenuItems(convertedItems);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading menu:', error);
+      toast.error('메뉴를 불러오는데 실패했습니다');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const convertApiItemsToMenuItems = (apiItems: MenuItemType[]): MenuItem[] => {
+    return apiItems.map(item => ({
+      id: item.id,
+      title: item.title,
+      url: item.url,
+      type: (item.type || 'custom') as any,
+      target: item.target as any,
+      cssClass: item.css_classes,
+      description: item.description,
+      originalId: item.object_id,
+      children: item.children ? convertApiItemsToMenuItems(item.children) : [],
+      menu_id: item.menu_id,
+      order_num: item.order_num
+    }));
+  };
+
+  const convertMenuItemsToApiFormat = (items: MenuItem[], menuId: string, parentId?: string): any[] => {
+    return items.map((item, index) => ({
+      id: item.id.startsWith('new-') ? undefined : item.id,
+      menu_id: menuId,
+      parent_id: parentId,
+      title: item.title,
+      url: item.url,
+      type: item.type,
+      target: item.target || '_self',
+      object_id: item.originalId,
+      css_classes: item.cssClass,
+      description: item.description,
+      order_num: index,
+      is_active: true,
+      children: item.children ? convertMenuItemsToApiFormat(item.children, menuId, item.id) : []
+    }));
+  };
 
   // Generate slug from menu name
   useEffect(() => {
@@ -369,22 +446,93 @@ const WordPressMenuEditor: FC = () => {
       return;
     }
     
+    setIsSaving(true);
     try {
-      // TODO: Implement API call to save menu
-      // const menuData = {
-      //   name: menuName,
-      //   slug: menuSlug,
-      //   location: selectedLocation,
-      //   items: menuItems
-      // };
+      const menuData = {
+        name: menuName,
+        slug: menuSlug || menuName.toLowerCase().replace(/\s+/g, '-'),
+        location: selectedLocation,
+        description: '',
+        is_active: true
+      };
+
+      let savedMenu;
+      if (currentMenuId || id) {
+        // Update existing menu
+        const response = await MenuApi.updateMenu(currentMenuId || id!, menuData);
+        savedMenu = response.data;
+      } else {
+        // Create new menu
+        const response = await MenuApi.createMenu(menuData);
+        savedMenu = response.data;
+        setCurrentMenuId(savedMenu.id);
+      }
+
+      // Save menu items
+      if (savedMenu && menuItems.length > 0) {
+        // First, delete all existing items for this menu
+        if (currentMenuId || id) {
+          // Note: We might need a bulk delete API endpoint
+          // For now, we'll recreate all items
+        }
+
+        // Convert and save menu items
+        const apiItems = convertMenuItemsToApiFormat(menuItems, savedMenu.id);
+        
+        // Create all menu items
+        for (const item of apiItems) {
+          await saveMenuItem(item, savedMenu.id);
+        }
+      }
+
       toast.success('메뉴가 저장되었습니다!');
       
-      if (!id) {
+      if (!id && !currentMenuId) {
         navigate('/menus');
       }
     } catch (error) {
+      console.error('Error saving menu:', error);
       toast.error('메뉴 저장 중 오류가 발생했습니다');
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  // Helper function to save menu item recursively
+  const saveMenuItem = async (item: any, menuId: string, parentId?: string): Promise<string> => {
+    const itemData = {
+      menu_id: menuId,
+      parent_id: parentId,
+      title: item.title,
+      url: item.url,
+      type: item.type,
+      target: item.target,
+      object_id: item.object_id,
+      css_classes: item.css_classes,
+      description: item.description,
+      order_num: item.order_num,
+      is_active: true
+    };
+
+    let savedItemId = item.id;
+    
+    if (!item.id || item.id.startsWith('new-')) {
+      // Create new item
+      const response = await MenuApi.createMenuItem(itemData);
+      savedItemId = response.data.id;
+    } else {
+      // Update existing item
+      await MenuApi.updateMenuItem(item.id, itemData);
+    }
+
+    // Save children recursively
+    if (item.children && item.children.length > 0) {
+      for (const child of item.children) {
+        await saveMenuItem(child, menuId, savedItemId);
+      }
+    }
+
+    return savedItemId;
   };
 
   // Render menu item
