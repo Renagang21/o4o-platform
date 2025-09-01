@@ -3,6 +3,7 @@ import { AppDataSource } from '../../database/connection';
 import { Supplier } from '../../entities/Supplier';
 import { SupplierProduct } from '../../entities/SupplierProduct';
 import { VendorInfo } from '../../entities/VendorInfo';
+import { OrderItem } from '../../entities/OrderItem';
 import { Inventory } from '../../entities/inventory/Inventory';
 import { StockMovement } from '../../entities/inventory/StockMovement';
 import { AuthRequest } from '../../types/auth';
@@ -14,6 +15,7 @@ export class SupplierController {
   private supplierRepository = AppDataSource.getRepository(Supplier);
   private supplierProductRepository = AppDataSource.getRepository(SupplierProduct);
   private vendorRepository = AppDataSource.getRepository(VendorInfo);
+  private orderItemRepository = AppDataSource.getRepository(OrderItem);
   private inventoryRepository = AppDataSource.getRepository(Inventory);
   private stockMovementRepository = AppDataSource.getRepository(StockMovement);
 
@@ -1052,7 +1054,13 @@ export class SupplierController {
   // Helper: Send order notification to supplier
   private async sendOrderNotification(supplier: Supplier, order: any) {
     try {
-      const itemsList = order.items
+      // Fetch order items separately
+      const orderItems = await this.orderItemRepository.find({
+        where: { orderId: order.id },
+        relations: ['product']
+      });
+      
+      const itemsList = orderItems
         .map((item: any) => `
           <tr>
             <td>${item.product.sku}</td>

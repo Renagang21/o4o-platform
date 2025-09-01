@@ -334,7 +334,8 @@ export class InventoryController {
         const vendor = await this.vendorRepository.findOne({
           where: { userId: currentUser.id }
         });
-        if (!vendor || vendor.id !== alert.inventory.vendorId) {
+        const inventory = await alert.inventory;
+        if (!vendor || vendor.id !== inventory.vendorId) {
           return res.status(403).json({
             success: false,
             message: 'You can only acknowledge alerts for your own inventory',
@@ -584,16 +585,19 @@ export class InventoryController {
         },
         totalRules: rules.length,
         activeRules: rules.filter(r => r.isActive).length,
-        rules: rules.map(r => ({
-          id: r.id,
-          inventoryId: r.inventoryId,
-          productName: r.inventory?.productName,
-          sku: r.inventory?.sku,
-          isActive: r.isActive,
-          triggerType: r.triggerType,
-          reorderPoint: r.reorderPoint,
-          reorderQuantity: r.reorderQuantity,
-          leadTimeDays: r.leadTimeDays,
+        rules: await Promise.all(rules.map(async r => {
+          const inventory = await r.inventory;
+          return {
+            id: r.id,
+            inventoryId: r.inventoryId,
+            productName: inventory?.productName,
+            sku: inventory?.sku,
+            isActive: r.isActive,
+            triggerType: r.triggerType,
+            reorderPoint: r.reorderPoint,
+            reorderQuantity: r.reorderQuantity,
+            leadTimeDays: r.leadTimeDays,
+          };
         })),
       };
 
@@ -729,7 +733,8 @@ export class InventoryController {
         const vendor = await this.vendorRepository.findOne({
           where: { userId: currentUser.id }
         });
-        if (!vendor || vendor.id !== rule.inventory.vendorId) {
+        const inventory = await rule.inventory;
+        if (!vendor || vendor.id !== inventory.vendorId) {
           return res.status(403).json({
             success: false,
             message: 'You can only update reorder rules for your own inventory',

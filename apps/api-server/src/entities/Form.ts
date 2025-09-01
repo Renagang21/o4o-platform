@@ -61,8 +61,9 @@ export class Form {
   @Column({ type: 'timestamp', nullable: true })
   lastSubmission: Date;
 
-  @OneToMany(() => FormSubmission, submission => submission.form)
-  submissions: FormSubmission[];
+  // Relations
+  @OneToMany('FormSubmission', 'form')
+  submissions!: FormSubmission[];
 
   // Computed fields
   @Column({ type: 'jsonb', nullable: true })

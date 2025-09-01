@@ -57,7 +57,7 @@ export class OrderAutomationService extends EventEmitter {
       toStatus: 'ready_to_ship',
       condition: (order) => {
         // 모든 상품이 준비되었는지 확인
-        return order.items?.every(item => item.status === 'prepared') || false;
+        return order.items ? order.items.every((item: any) => item.status === 'prepared') : false;
       },
       delayMinutes: 30 // 30분 후 자동 전환
     });
@@ -439,11 +439,11 @@ export class OrderAutomationService extends EventEmitter {
         totalAmount: order.totalAmount,
         trackingNumber: order.shipping?.trackingNumber,
         trackingUrl: order.shipping?.trackingUrl,
-        items: order.items?.map(item => ({
+        items: order.items ? order.items.map((item: any) => ({
           name: item.product?.name,
           quantity: item.quantity,
           price: item.price
-        }))
+        })) : []
       }
     };
   }

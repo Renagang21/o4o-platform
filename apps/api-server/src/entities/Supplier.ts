@@ -263,8 +263,8 @@ export class Supplier {
   updatedAt: Date;
 
   // Relations
-  @OneToMany(() => SupplierProduct, product => product.supplier)
-  products: SupplierProduct[];
+  @OneToMany('SupplierProduct', 'supplier')
+  products!: SupplierProduct[];
 
   @ManyToMany(() => VendorInfo)
   @JoinTable({

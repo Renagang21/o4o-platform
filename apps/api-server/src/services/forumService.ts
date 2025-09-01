@@ -323,18 +323,21 @@ export class ForumService {
   // Comment Methods
   async createComment(data: Partial<ForumComment>, authorId: string): Promise<ForumComment> {
     const post = await this.postRepository.findOne({
-      where: { id: data.postId },
-      relations: ['category']
+      where: { id: data.postId }
     });
 
     if (!post) {
       throw new Error('Post not found');
     }
 
+    // Await the lazy-loaded category to check requireApproval
+    const category = post.category ? await post.category : null;
+    const requireApproval = category?.requireApproval ?? false;
+
     const comment = this.commentRepository.create({
       ...data,
       authorId,
-      status: post.category?.requireApproval ? CommentStatus.PENDING : CommentStatus.PUBLISHED
+      status: requireApproval ? CommentStatus.PENDING : CommentStatus.PUBLISHED
     });
 
     // 멘션 추출

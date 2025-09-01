@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
-import { MediaFile } from './MediaFile'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm'
 
 @Entity('media_folders')
 export class MediaFolder {
@@ -15,15 +14,13 @@ export class MediaFolder {
   @Column({ type: 'uuid', nullable: true })
   parentId!: string
 
-  @ManyToOne(() => MediaFolder, folder => folder.children, { nullable: true })
+  @ManyToOne(() => MediaFolder, { nullable: true, lazy: true })
   @JoinColumn({ name: 'parentId' })
-  parent!: MediaFolder
+  parent!: Promise<MediaFolder>
 
-  @OneToMany(() => MediaFolder, folder => folder.parent)
-  children!: MediaFolder[]
-
-  @OneToMany(() => MediaFile, file => file.folder)
-  files!: MediaFile[]
+  // Note: OneToMany relationships removed to prevent circular dependency
+  // Use MediaFolderRepository.find({ where: { parentId: folder.id } }) to get children
+  // Use MediaFileRepository.find({ where: { folderId: folder.id } }) to get files
 
   @Column({ default: 0 })
   fileCount!: number

@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from './User';
 import { ProductAttribute } from './ProductAttribute';
-import { ProductVariation } from './ProductVariation';
 
 export enum ProductStatus {
   DRAFT = 'draft',
@@ -137,11 +136,8 @@ export class Product {
   @Column({ default: false })
   hasVariations: boolean;
 
-  @OneToMany(() => ProductAttribute, (attribute) => attribute.product, { cascade: true })
-  attributes: ProductAttribute[];
-
-  @OneToMany(() => ProductVariation, variation => variation.product, { cascade: true })
-  variations: ProductVariation[];
+  @OneToMany(() => ProductAttribute, attr => attr.product)
+  attributes!: ProductAttribute[];
 
   // Additional fields for compatibility
   @Column({ type: 'json', nullable: true })

@@ -49,9 +49,9 @@ export class CrowdfundingProject {
   @Column({ name: 'forum_link', length: 500, nullable: true })
   forumLink?: string;
 
-  // 참여자들
-  @OneToMany(() => CrowdfundingParticipation, participation => participation.project, { cascade: true })
-  participations: CrowdfundingParticipation[];
+  // Relations
+  @OneToMany('CrowdfundingParticipation', 'project')
+  participations!: CrowdfundingParticipation[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

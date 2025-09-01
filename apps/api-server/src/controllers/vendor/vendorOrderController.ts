@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { Order } from '../../entities/Order';
+import { OrderItem } from '../../entities/OrderItem';
 import { OrderStatus } from '../../entities/Order';
 import { Between, Like } from 'typeorm';
 import { AuthRequest } from '../../types/auth';
@@ -24,11 +25,11 @@ export class VendorOrderController {
       }
 
       const orderRepository = AppDataSource.getRepository(Order);
+      const orderItemRepository = AppDataSource.getRepository(OrderItem);
+      
       const queryBuilder = orderRepository
         .createQueryBuilder('order')
         .leftJoinAndSelect('order.user', 'user')
-        .leftJoinAndSelect('order.items', 'items')
-        .leftJoinAndSelect('items.product', 'product')
         .where('order.vendorId = :vendorId', { vendorId });
 
       // 상태 필터
@@ -64,25 +65,33 @@ export class VendorOrderController {
 
       const [orders, total] = await queryBuilder.getManyAndCount();
 
-      const formattedOrders = orders.map((order: any) => ({
-        id: order.id,
-        orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
-        customer: {
-          name: order.user.name,
-          email: order.user.email
-        },
-        items: order.items.map((item: any) => ({
-          id: item.id,
-          productName: item.product.name,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        total: order.totalAmount,
-        status: order.status,
-        paymentStatus: order.paymentStatus,
-        shippingAddress: order.shippingAddress,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt
+      const formattedOrders = await Promise.all(orders.map(async (order: any) => {
+        // Fetch order items separately
+        const orderItems = await orderItemRepository.find({
+          where: { orderId: order.id },
+          relations: ['product']
+        });
+        
+        return {
+          id: order.id,
+          orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
+          customer: {
+            name: order.user.name,
+            email: order.user.email
+          },
+          items: orderItems.map((item: any) => ({
+            id: item.id,
+            productName: item.product.name,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          total: order.totalAmount,
+          status: order.status,
+          paymentStatus: order.paymentStatus,
+          shippingAddress: order.shippingAddress,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt
+        };
       }));
 
       res.json({
@@ -111,14 +120,22 @@ export class VendorOrderController {
       }
 
       const orderRepository = AppDataSource.getRepository(Order);
+      const orderItemRepository = AppDataSource.getRepository(OrderItem);
+      
       const order = await orderRepository.findOne({
         where: { id, vendorId },
-        relations: ['user', 'items', 'items.product']
+        relations: ['user']
       });
 
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
+
+      // Fetch order items separately
+      const orderItems = await orderItemRepository.find({
+        where: { orderId: order.id },
+        relations: ['product']
+      });
 
       res.json({
         id: order.id,
@@ -129,7 +146,7 @@ export class VendorOrderController {
           email: order.user.email,
           phone: null // TODO: Add phone to User entity
         },
-        items: order.items.map((item: any) => ({
+        items: orderItems.map((item: any) => ({
           id: item.id,
           productId: item.product.id,
           productName: item.product.name,

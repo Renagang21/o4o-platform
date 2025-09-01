@@ -5,12 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   Index
 } from 'typeorm';
 import { ForumCategory } from './ForumCategory';
-import { ForumComment } from './ForumComment';
 import { User } from './User';
 
 export enum PostStatus {
@@ -99,9 +97,9 @@ export class ForumPost {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => ForumCategory, category => category.posts)
+  @ManyToOne(() => ForumCategory, { lazy: true })
   @JoinColumn({ name: 'categoryId' })
-  category?: ForumCategory;
+  category?: Promise<ForumCategory>;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'authorId' })
@@ -111,8 +109,8 @@ export class ForumPost {
   @JoinColumn({ name: 'lastCommentBy' })
   lastCommenter?: User;
 
-  @OneToMany(() => ForumComment, comment => comment.post)
-  comments?: ForumComment[];
+  // Note: OneToMany relationship with ForumComment removed to prevent circular dependency
+  // Use ForumCommentRepository.find({ where: { postId: post.id } }) to get comments
 
   // Methods
   canUserView(userRole: string): boolean {

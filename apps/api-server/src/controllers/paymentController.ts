@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection';
 import { Payment, PaymentType, PaymentProvider, PaymentGatewayStatus } from '../entities/Payment';
 import { Order, PaymentStatus, OrderStatus, PaymentMethod } from '../entities/Order';
+import { OrderItem } from '../entities/OrderItem';
 import { Product } from '../entities/Product';
 import { AuthRequest } from '../types/auth';
 import { 
@@ -20,6 +21,7 @@ import {
 export class PaymentController {
   private paymentRepository = AppDataSource.getRepository(Payment);
   private orderRepository = AppDataSource.getRepository(Order);
+  private orderItemRepository = AppDataSource.getRepository(OrderItem);
   private productRepository = AppDataSource.getRepository(Product);
 
   // 결제 요청 생성
@@ -37,8 +39,7 @@ export class PaymentController {
 
       // 주문 확인
       const order = await this.orderRepository.findOne({
-        where: { id: orderId, userId },
-        relations: ['items', 'items.product']
+        where: { id: orderId, userId }
       });
 
       if (!order) {
@@ -56,7 +57,12 @@ export class PaymentController {
       }
 
       // 재고 재확인
-      for (const orderItem of order.items) {
+      const orderItems = await this.orderItemRepository.find({
+        where: { orderId: order.id },
+        relations: ['product']
+      });
+      
+      for (const orderItem of orderItems) {
         if (!orderItem.product.isInStock()) {
           return res.status(400).json({
             success: false,
@@ -196,12 +202,16 @@ export class PaymentController {
         } else {
           // 결제 실패 시 재고 복구
           const order = await queryRunner.manager.findOne(Order, {
-            where: { id: payment.orderId },
-            relations: ['items', 'items.product']
+            where: { id: payment.orderId }
           });
 
           if (order) {
-            for (const orderItem of order.items) {
+            const orderItems = await queryRunner.manager.find(OrderItem, {
+              where: { orderId: order.id },
+              relations: ['product']
+            });
+            
+            for (const orderItem of orderItems) {
               if (orderItem.product.manageStock) {
                 await queryRunner.manager.update(Product, orderItem.productId, {
                   stockQuantity: orderItem.product.stockQuantity + orderItem.quantity
@@ -336,12 +346,16 @@ export class PaymentController {
 
             // 재고 복구
             const order = await queryRunner.manager.findOne(Order, {
-              where: { id: originalPayment.orderId },
-              relations: ['items', 'items.product']
+              where: { id: originalPayment.orderId }
             });
 
             if (order) {
-              for (const orderItem of order.items) {
+              const orderItems = await queryRunner.manager.find(OrderItem, {
+                where: { orderId: order.id },
+                relations: ['product']
+              });
+              
+              for (const orderItem of orderItems) {
                 if (orderItem.product.manageStock) {
                   await queryRunner.manager.update(Product, orderItem.productId, {
                     stockQuantity: orderItem.product.stockQuantity + orderItem.quantity

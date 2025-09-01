@@ -16,8 +16,8 @@ export class ProductVariation {
   @Index()
   productId: string;
 
-  @ManyToOne(() => Product, product => product.variations, { onDelete: 'CASCADE' })
-  product: Product;
+  @ManyToOne(() => Product, { onDelete: 'CASCADE', lazy: true })
+  product: Promise<Product>;
 
   @Column({ unique: true })
   sku: string; // 고유 SKU (예: 'SHIRT-RED-L')
@@ -168,7 +168,8 @@ export class ProductVariation {
     }
   }
 
-  getDisplayName(): string {
-    return `${this.product?.name || ''} - ${this.attributeString}`;
+  async getDisplayName(): Promise<string> {
+    const product = await this.product;
+    return `${product?.name || ''} - ${this.attributeString}`;
   }
 }

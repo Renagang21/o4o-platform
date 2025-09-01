@@ -123,11 +123,11 @@ export class BetaUser {
   updatedAt!: Date;
 
   // Relations
-  @OneToMany(() => BetaFeedback, feedback => feedback.betaUser)
-  feedback?: BetaFeedback[];
+  @OneToMany('BetaFeedback', 'betaUser')
+  feedback!: BetaFeedback[];
 
-  @OneToMany(() => FeedbackConversation, conversation => conversation.betaUser)
-  conversations?: FeedbackConversation[];
+  @OneToMany('FeedbackConversation', 'betaUser')
+  conversations!: FeedbackConversation[];
 
   // Methods
   canProvideFeedback(): boolean {

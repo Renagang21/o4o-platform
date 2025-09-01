@@ -22,9 +22,9 @@ export class InventoryAlert {
   @Column('uuid')
   inventoryId: string;
 
-  @ManyToOne(() => Inventory, inventory => inventory.alerts)
+  @ManyToOne(() => Inventory, { lazy: true })
   @JoinColumn({ name: 'inventoryId' })
-  inventory: Inventory;
+  inventory: Promise<Inventory>;
 
   @Column({
     type: 'enum',

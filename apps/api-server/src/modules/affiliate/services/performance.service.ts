@@ -341,9 +341,8 @@ export class PerformanceOptimizationService {
     }
 
     // Try database cache
-    // @ts-expect-error - cacheKey property exists on entity
     const dbCache = await this.analyticsCache.findOne({
-      where: { cacheKey: key } as any
+      where: { cacheKey: key }
     });
 
     if (dbCache && dbCache.expiresAt > new Date()) {

@@ -87,7 +87,6 @@ export class UnifiedAuthService {
       // Log failed attempt
       await activityRepo.save(activityRepo.create({
         userId: user.id,
-        user,
         action: 'failed_link',
         provider: 'email',
         ipAddress,
@@ -113,7 +112,6 @@ export class UnifiedAuthService {
     // Log successful login
     await activityRepo.save(activityRepo.create({
       userId: user.id,
-      user,
       action: 'login',
       provider: 'email',
       ipAddress,
@@ -190,7 +188,6 @@ export class UnifiedAuthService {
       // Log successful login
       await activityRepo.save(activityRepo.create({
         userId: user.id,
-        user,
         action: 'login',
         provider,
         ipAddress,
@@ -244,7 +241,6 @@ export class UnifiedAuthService {
       // Log successful login
       await activityRepo.save(activityRepo.create({
         userId: existingUserByEmail.id,
-        user: existingUserByEmail,
         action: 'login',
         provider,
         ipAddress,
@@ -311,7 +307,6 @@ export class UnifiedAuthService {
     // Log new user creation and login
     await activityRepo.save(activityRepo.create({
       userId: newUser.id,
-      user: newUser,
       action: 'linked',
       provider,
       ipAddress,

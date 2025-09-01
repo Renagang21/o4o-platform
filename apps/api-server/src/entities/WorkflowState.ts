@@ -47,16 +47,12 @@ export class WorkflowState {
   @Column({ type: 'int', default: 0 })
   sortOrder: number;
 
-  // Outgoing transitions from this state
-  @OneToMany(() => WorkflowTransition, transition => transition.fromState, {
-    cascade: true,
-    onDelete: 'CASCADE'
-  })
-  outgoingTransitions: WorkflowTransition[];
+  // Relations
+  @OneToMany('WorkflowTransition', 'fromState')
+  outgoingTransitions!: WorkflowTransition[];
 
-  // Incoming transitions to this state
-  @OneToMany(() => WorkflowTransition, transition => transition.toState)
-  incomingTransitions: WorkflowTransition[];
+  @OneToMany('WorkflowTransition', 'toState')
+  incomingTransitions!: WorkflowTransition[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

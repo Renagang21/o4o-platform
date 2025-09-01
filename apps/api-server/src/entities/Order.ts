@@ -48,6 +48,9 @@ export class Order {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
+  @OneToMany(() => OrderItem, item => item.order)
+  items!: OrderItem[];
+
   // Customer fields for compatibility
   @Column({ nullable: true })
   customerName?: string;
@@ -67,8 +70,8 @@ export class Order {
   @Column({ nullable: true })
   vendorId?: string;
 
-  @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true })
-  items!: OrderItem[];
+  // Note: OneToMany relationship with OrderItem removed to prevent circular dependency
+  // Use OrderItemRepository.find({ where: { orderId: order.id } }) to get order items
 
   // 주문 상태
   @Column({
@@ -236,7 +239,6 @@ export class Order {
            this.paymentStatus === PaymentStatus.PAID;
   }
 
-  getTotalItems(): number {
-    return this.items?.reduce((total, item) => total + item.quantity, 0) || 0;
-  }
+  // Note: Business logic method removed due to items relationship removal
+  // This method should be implemented in a service class that can query OrderItems
 }

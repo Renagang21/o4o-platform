@@ -175,8 +175,11 @@ export class SignageService {
       return playlist;
     }
 
+    // Await the store promise before accessing managerId
+    const store = await playlist.store;
+    
     // Store manager can access their store's playlists
-    if (user.role === 'manager' && playlist.store.managerId === user.id) {
+    if (user.role === 'manager' && store.managerId === user.id) {
       return playlist;
     }
 

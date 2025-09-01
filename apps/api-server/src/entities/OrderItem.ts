@@ -10,9 +10,9 @@ export class OrderItem {
   @Column()
   orderId!: string;
 
-  @ManyToOne(() => Order, order => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Order, { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'orderId' })
-  order!: Order;
+  order!: Promise<Order>;
 
   @Column()
   productId!: string;

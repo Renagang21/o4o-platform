@@ -96,7 +96,7 @@ export class OrderSplitService {
       );
       
       const totalCost = items.reduce((sum, item) => 
-        sum + (item.product.cost * item.quantity), 0
+        sum + ((item.product.cost || 0) * item.quantity), 0
       );
       
       const commission = this.calculateCommission(totalAmount, totalCost);
@@ -307,7 +307,7 @@ export class OrderSplitService {
     await this.orderItemRepository.save(orderItem);
     
     // Check if all items in the order have the same status
-    const order = orderItem.order;
+    const order = await orderItem.order;
     const allItems = await this.orderItemRepository.find({
       where: { orderId: order.id }
     });
@@ -316,7 +316,7 @@ export class OrderSplitService {
     
     if (allSameStatus) {
       // Update main order status
-      order.status = status as any;
+      (order as any).status = status;
       await this.orderRepository.save(order);
     }
   }

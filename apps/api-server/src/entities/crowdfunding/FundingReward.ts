@@ -89,8 +89,8 @@ export class FundingReward {
   sortOrder: number;
 
   // Relations
-  @OneToMany(() => BackerReward, backerReward => backerReward.reward)
-  backerRewards: BackerReward[];
+  @OneToMany('BackerReward', 'reward')
+  backerRewards!: BackerReward[];
 
   // Timestamps
   @CreateDateColumn()

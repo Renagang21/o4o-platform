@@ -223,7 +223,9 @@ export class AnalyticsCacheService extends EventEmitter {
       logger.info('Starting analytics cache warm-up...');
       
       // Import services that generate analytics data
-      const { AnalyticsService } = await import('./analytics.service');
+      // Note: Using dynamic import with type-only import to avoid circular dependency
+      const analyticsModule = await import('./analytics.service');
+      const AnalyticsService = analyticsModule.AnalyticsService;
       const analyticsService = new AnalyticsService();
       
       // Warm up common dashboard analytics

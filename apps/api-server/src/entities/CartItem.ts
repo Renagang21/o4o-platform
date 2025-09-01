@@ -10,9 +10,9 @@ export class CartItem {
   @Column()
   cartId!: string;
 
-  @ManyToOne(() => Cart, cart => cart.items, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Cart, { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'cartId' })
-  cart!: Cart;
+  cart!: Promise<Cart>;
 
   @Column()
   productId!: string;

@@ -80,7 +80,7 @@ class InventoryScheduler {
       });
 
       for (const rule of activeRules) {
-        const inventory = rule.inventory;
+        const inventory = await rule.inventory;
         
         if (!inventory) continue;
 

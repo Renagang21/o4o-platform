@@ -36,9 +36,9 @@ export class PlaylistItem {
   @Column()
   playlistId!: string;
 
-  @ManyToOne(() => StorePlaylist, playlist => playlist.items, { onDelete: 'CASCADE' })
+  @ManyToOne(() => StorePlaylist, { onDelete: 'CASCADE', lazy: true })
   @JoinColumn({ name: 'playlistId' })
-  playlist!: StorePlaylist;
+  playlist!: Promise<StorePlaylist>;
 
   @Column({ nullable: true })
   contentId?: string; // For video content

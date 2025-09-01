@@ -1,26 +1,10 @@
 import { AppDataSource } from '../database/connection';
 import { Repository } from 'typeorm';
 import { Shortcode, ShortcodeStatus } from '../entities/Shortcode';
-import { ShortcodeExecution, ExecutionStatus, ExecutionContext } from '../entities/ShortcodeExecution';
+import { ShortcodeExecution, ExecutionStatus } from '../entities/ShortcodeExecution';
 import { shortcodeHandlers } from './shortcode-handlers';
+import { ShortcodeParseOptions, ParsedShortcode, ExecutionContext } from '../types/shortcode';
 import logger from '../utils/logger';
-
-export interface ParsedShortcode {
-  name: string;
-  attributes: Record<string, any>;
-  content: string;
-  raw: string;
-  isSelfClosing: boolean;
-}
-
-export interface ShortcodeParseOptions {
-  context?: ExecutionContext;
-  contextId?: string;
-  userId?: string;
-  enableCache?: boolean;
-  maxExecutionTime?: number; // in milliseconds
-  maxNestingLevel?: number;
-}
 
 class ShortcodeParserService {
   private shortcodeRepository: Repository<Shortcode>;

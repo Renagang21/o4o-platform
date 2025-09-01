@@ -267,7 +267,7 @@ export class RecommendationService {
     let priceCount = 0;
     
     orders.forEach(order => {
-      order.items?.forEach(item => {
+      order.items?.forEach((item: any) => {
         if (item.product) {
           // 카테고리 선호도
           const categoryId = item.product.categoryId;

@@ -1,7 +1,6 @@
 // Authentication and Authorization Types
 
 import { Request } from 'express';
-import { User } from '../entities/User';
 
 export enum UserRole {
   SUPER_ADMIN = 'super_admin',
@@ -46,13 +45,36 @@ export interface JWTPayload {
   exp?: number;
 }
 
-// AuthRequest interface with proper User type
+// AuthRequest interface - using type directly instead of importing User entity to avoid circular dependency
 export interface AuthRequest extends Request {
-  user?: User & {
+  user?: any; // Simplified to avoid type conflicts with Express Request
+  authUser?: {
     id: string;
+    email: string;
     role: UserRole;
+    status: UserStatus;
+    firstName?: string;
+    lastName?: string;
+    name?: string;
+    businessInfo?: BusinessInfo;
+    permissions: string[];
+    isActive: boolean;
+    isEmailVerified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    lastLoginAt?: Date;
     vendorId?: string;
     supplierId?: string;
+    betaUserId?: string;
+    domain?: string;
+    // Add other User properties as needed
+    validatePassword?(password: string): Promise<boolean>;
+    hasRole?(role: UserRole | string): boolean;
+    hasAnyRole?(roles: (UserRole | string)[]): boolean;
+    isAdmin?(): boolean;
+    isPending?(): boolean;
+    isActiveUser?(): boolean;
+    toPublicData?(): any;
   };
 }
 

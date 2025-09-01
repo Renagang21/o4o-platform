@@ -7,12 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  OneToMany,
 } from 'typeorm';
 import { VendorInfo } from '../VendorInfo';
-import { StockMovement } from './StockMovement';
-import { ReorderRule } from './ReorderRule';
-import { InventoryAlert } from './InventoryAlert';
 
 @Entity('inventory')
 @Index(['vendorId', 'productId'], { unique: true })
@@ -150,13 +146,8 @@ export class Inventory {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Relations
-  @OneToMany(() => StockMovement, movement => movement.inventory)
-  movements: StockMovement[];
-
-  @OneToMany(() => ReorderRule, rule => rule.inventory)
-  reorderRules: ReorderRule[];
-
-  @OneToMany(() => InventoryAlert, alert => alert.inventory)
-  alerts: InventoryAlert[];
+  // Note: OneToMany relationships removed to prevent circular dependency
+  // Use StockMovementRepository.find({ where: { inventoryId: inventory.id } }) to get movements
+  // Use ReorderRuleRepository.find({ where: { inventoryId: inventory.id } }) to get reorder rules
+  // Use InventoryAlertRepository.find({ where: { inventoryId: inventory.id } }) to get alerts
 }

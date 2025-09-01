@@ -37,7 +37,7 @@ export class FieldGroup {
   @Column({ type: 'text', nullable: true })
   description!: string
 
-  @OneToMany(() => CustomField, field => field.group, { cascade: true })
+  @OneToMany(() => CustomField, field => field.fieldGroup)
   fields!: CustomField[]
 
   @Column({ type: 'json' })
@@ -152,7 +152,7 @@ export class CustomField {
 
   @ManyToOne(() => FieldGroup, group => group.fields, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'groupId' })
-  group!: FieldGroup
+  fieldGroup!: FieldGroup
 
   @CreateDateColumn()
   createdAt!: Date

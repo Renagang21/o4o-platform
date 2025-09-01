@@ -25,22 +25,26 @@ export class CartController {
       }
 
       let cart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items', 'items.product']
+        where: { userId }
       });
 
       // 장바구니가 없으면 새로 생성
       if (!cart) {
         cart = this.cartRepository.create({ userId });
         cart = await this.cartRepository.save(cart);
-        cart.items = [];
       }
+
+      // Fetch cart items separately
+      const cartItems = await this.cartItemRepository.find({
+        where: { cartId: cart.id },
+        relations: ['product']
+      });
 
       // 사용자 역할에 따른 가격 조정
       const userRole = (req.user as any)?.role || 'customer';
       const cartWithUserPrices = {
         ...cart,
-        items: cart.items.map((item: any) => ({
+        items: cartItems.map((item: any) => ({
           ...item,
           product: {
             ...item.product,
@@ -110,8 +114,7 @@ export class CartController {
 
       // 장바구니 찾거나 생성
       let cart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items']
+        where: { userId }
       });
 
       if (!cart) {
@@ -159,13 +162,23 @@ export class CartController {
 
       // 업데이트된 장바구니 반환
       const updatedCart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items', 'items.product']
+        where: { userId }
       });
+      
+      // Fetch cart items separately
+      const cartItems = await this.cartItemRepository.find({
+        where: { cartId: updatedCart!.id },
+        relations: ['product']
+      });
+      
+      const cartWithItems = {
+        ...updatedCart,
+        items: cartItems
+      };
 
       res.json({
         success: true,
-        data: updatedCart,
+        data: cartWithItems,
         message: 'Product added to cart successfully'
       });
     } catch (error) {
@@ -201,9 +214,8 @@ export class CartController {
       // 장바구니 아이템 확인
       const cartItem = await this.cartItemRepository
         .createQueryBuilder('cartItem')
-        .leftJoin('cartItem.cart', 'cart')
-        .leftJoin('cartItem.product', 'product')
-        .addSelect(['cart.userId', 'product.stockQuantity', 'product.manageStock'])
+        .leftJoinAndSelect('cartItem.cart', 'cart')
+        .leftJoinAndSelect('cartItem.product', 'product')
         .where('cartItem.id = :itemId', { itemId })
         .getOne();
 
@@ -215,7 +227,7 @@ export class CartController {
       }
 
       // 권한 확인
-      if (cartItem.cart.userId !== userId) {
+      if ((cartItem.cart as any).userId !== userId) {
         return res.status(403).json({
           success: false,
           error: 'Unauthorized access to cart item'
@@ -264,8 +276,7 @@ export class CartController {
       // 장바구니 아이템 확인
       const cartItem = await this.cartItemRepository
         .createQueryBuilder('cartItem')
-        .leftJoin('cartItem.cart', 'cart')
-        .addSelect('cart.userId')
+        .leftJoinAndSelect('cartItem.cart', 'cart')
         .where('cartItem.id = :itemId', { itemId })
         .getOne();
 
@@ -277,7 +288,7 @@ export class CartController {
       }
 
       // 권한 확인
-      if (cartItem.cart.userId !== userId) {
+      if ((cartItem.cart as any).userId !== userId) {
         return res.status(403).json({
           success: false,
           error: 'Unauthorized access to cart item'
@@ -312,8 +323,7 @@ export class CartController {
       }
 
       const cart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items']
+        where: { userId }
       });
 
       if (!cart) {
@@ -323,7 +333,12 @@ export class CartController {
         });
       }
 
-      await this.cartItemRepository.remove(cart.items);
+      // Fetch cart items separately
+      const cartItems = await this.cartItemRepository.find({
+        where: { cartId: cart.id }
+      });
+
+      await this.cartItemRepository.remove(cartItems);
 
       res.json({
         success: true,
@@ -360,11 +375,23 @@ export class CartController {
 
       // 장바구니 조회
       const cart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items', 'items.product']
+        where: { userId }
       });
 
-      if (!cart || cart.items.length === 0) {
+      if (!cart) {
+        return res.status(400).json({
+          success: false,
+          error: 'Cart not found'
+        });
+      }
+
+      // Fetch cart items separately
+      const cartItems = await this.cartItemRepository.find({
+        where: { cartId: cart.id },
+        relations: ['product']
+      });
+
+      if (cartItems.length === 0) {
         return res.status(400).json({
           success: false,
           error: 'Cart is empty'
@@ -377,7 +404,7 @@ export class CartController {
       const productIds: string[] = [];
       const categoryIds: string[] = [];
 
-      cart.items.forEach((item: any) => {
+      cartItems.forEach((item: any) => {
         const price = item.product.getPriceForUser(userRole);
         subtotal += price * item.quantity;
         productIds.push(item.productId);
@@ -443,8 +470,7 @@ export class CartController {
 
       // 장바구니 조회
       const cart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items', 'items.product']
+        where: { userId }
       });
 
       if (!cart) {

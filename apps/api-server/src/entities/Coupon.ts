@@ -104,8 +104,9 @@ export class Coupon {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @OneToMany(() => CouponUsage, usage => usage.coupon)
-  usages?: CouponUsage[];
+  // Relations removed to prevent circular dependencies
+  // Use lazy loading for reverse relationships:
+  // usages: () => CouponUsage[]
 
   // Compatibility properties for legacy code
   get isActive(): boolean {

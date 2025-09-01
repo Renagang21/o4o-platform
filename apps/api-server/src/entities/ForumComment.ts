@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   Index
 } from 'typeorm';
@@ -55,20 +54,20 @@ export class ForumComment {
   updatedAt!: Date;
 
   // Relations
-  @ManyToOne(() => ForumPost, post => post.comments)
+  @ManyToOne(() => ForumPost, { lazy: true })
   @JoinColumn({ name: 'postId' })
-  post?: ForumPost;
+  post?: Promise<ForumPost>;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'authorId' })
   author?: User;
 
-  @ManyToOne(() => ForumComment, comment => comment.replies, { nullable: true })
+  @ManyToOne(() => ForumComment, { nullable: true, lazy: true })
   @JoinColumn({ name: 'parentId' })
-  parent?: ForumComment;
+  parent?: Promise<ForumComment>;
 
-  @OneToMany(() => ForumComment, comment => comment.parent)
-  replies?: ForumComment[];
+  // Note: OneToMany relationship with replies removed to prevent circular dependency
+  // Use ForumCommentRepository.find({ where: { parentId: comment.id } }) to get replies
 
   // Methods
   canUserView(userRole: string, userId: string): boolean {

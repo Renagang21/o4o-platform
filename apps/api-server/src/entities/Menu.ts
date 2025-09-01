@@ -4,10 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
   Index,
   BeforeInsert,
-  BeforeUpdate
+  BeforeUpdate,
+  OneToMany
 } from 'typeorm';
 import { MenuItem } from './MenuItem';
 
@@ -35,10 +35,7 @@ export class Menu {
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
 
-  @OneToMany(() => MenuItem, (item) => item.menu, {
-    cascade: true,
-    eager: false
-  })
+  @OneToMany(() => MenuItem, item => item.menu)
   items: MenuItem[];
 
   @CreateDateColumn()

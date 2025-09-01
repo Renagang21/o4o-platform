@@ -1,6 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, ManyToMany, JoinColumn, Tree, TreeParent, TreeChildren } from 'typeorm';
-import { Product } from './Product';
-import { Post } from './Post';
 
 @Entity('categories')
 @Tree('nested-set')
@@ -40,9 +38,9 @@ export class Category {
   @TreeChildren()
   children!: Category[];
 
-  // Posts relationship
-  @ManyToMany(() => Post, post => post.categories)
-  posts!: Post[];
+  // Relations
+  @OneToMany('Post', 'category')
+  posts!: any[];
 
   @CreateDateColumn()
   createdAt!: Date;

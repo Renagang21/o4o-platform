@@ -88,8 +88,8 @@ export class FundingBacking {
   refundAmount: number;
 
   // Relations
-  @OneToMany(() => BackerReward, backerReward => backerReward.backing)
-  rewards: BackerReward[];
+  @OneToMany('BackerReward', 'backing')
+  rewards!: BackerReward[];
 
   // Timestamps
   @CreateDateColumn()

@@ -318,7 +318,7 @@ export class ReturnExchangeService extends EventEmitter {
     // 환불 금액 계산
     let refundAmount = 0;
     for (const item of returnRequest.items) {
-      const orderItem = order.items?.find(oi => oi.id === item.orderItemId);
+      const orderItem = order.items?.find((oi: any) => oi.id === item.orderItemId);
       if (orderItem) {
         refundAmount += orderItem.price * item.quantity;
       }
@@ -451,7 +451,7 @@ export class ReturnExchangeService extends EventEmitter {
     order: Order
   ): Promise<void> {
     // 주문 항목 확인
-    const orderItem = order.items?.find(oi => oi.id === item.orderItemId);
+    const orderItem = order.items?.find((oi: any) => oi.id === item.orderItemId);
     if (!orderItem) {
       throw new Error(`Order item not found: ${item.orderItemId}`);
     }
@@ -487,7 +487,7 @@ export class ReturnExchangeService extends EventEmitter {
     let shippingCost = 3000; // 기본 배송비
     
     if (order.items) {
-      const totalWeight = order.items.reduce((sum, item) => {
+      const totalWeight = order.items.reduce((sum, item: any) => {
         return sum + (item.product?.weight || 0) * item.quantity;
       }, 0);
       

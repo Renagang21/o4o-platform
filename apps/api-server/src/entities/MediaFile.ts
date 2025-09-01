@@ -64,9 +64,9 @@ export class MediaFile {
   @Column({ type: 'uuid', nullable: true })
   folderId!: string
 
-  @ManyToOne(() => MediaFolder, { nullable: true })
+  @ManyToOne(() => MediaFolder, { nullable: true, lazy: true })
   @JoinColumn({ name: 'folderId' })
-  folder!: MediaFolder
+  folder!: Promise<MediaFolder>
 
   @Column({ type: 'uuid' })
   uploadedBy!: string

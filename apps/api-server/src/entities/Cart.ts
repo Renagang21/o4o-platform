@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './User';
-import { CartItem } from './CartItem';
 
 @Entity('carts')
 export class Cart {
@@ -14,8 +13,8 @@ export class Cart {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
-  @OneToMany(() => CartItem, cartItem => cartItem.cart, { cascade: true })
-  items!: CartItem[];
+  // Note: OneToMany relationship removed to prevent circular dependency
+  // Use CartItemRepository.find({ where: { cartId: cart.id } }) to get items
 
   @Column({ type: 'json', nullable: true })
   metadata?: {
@@ -30,16 +29,6 @@ export class Cart {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  // 비즈니스 로직 메서드
-  getTotalItems(): number {
-    return this.items?.reduce((total, item) => total + item.quantity, 0) || 0;
-  }
-
-  getTotalPrice(): number {
-    return this.items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0;
-  }
-
-  isEmpty(): boolean {
-    return !this.items || this.items.length === 0;
-  }
+  // Note: Business logic methods removed due to items relationship removal
+  // These methods should be implemented in a service class that can query CartItems
 }

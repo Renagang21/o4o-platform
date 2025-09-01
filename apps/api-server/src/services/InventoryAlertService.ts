@@ -173,12 +173,21 @@ export class InventoryAlertService extends EventEmitter {
 
     // 재고 없음
     if (currentStock === 0) {
+      // Load product relation if needed
+      if (!variation.product) {
+        await this.variationRepository.findOne({
+          where: { id: variation.id },
+          relations: ['product']
+        });
+      }
+      const product = await variation.product;
+      
       await this.createOrUpdateAlert({
         id: alertKey,
         type: 'out_of_stock',
         severity: 'critical',
-        productId: variation.product.id,
-        productName: variation.product.name,
+        productId: product.id,
+        productName: product.name,
         variationId: variation.id,
         sku: variation.sku,
         currentStock: 0,
@@ -192,12 +201,22 @@ export class InventoryAlertService extends EventEmitter {
     else if (currentStock <= lowStockThreshold) {
       const severity = currentStock <= this.thresholds.criticalStock ? 'high' : 'medium';
       
+      // Load product relation if needed
+      if (!variation.product) {
+        const variationWithProduct = await this.variationRepository.findOne({
+          where: { id: variation.id },
+          relations: ['product']
+        });
+        variation.product = variationWithProduct?.product;
+      }
+      const product = await variation.product;
+      
       await this.createOrUpdateAlert({
         id: alertKey,
         type: 'low_stock',
         severity,
-        productId: variation.product.id,
-        productName: variation.product.name,
+        productId: product.id,
+        productName: product.name,
         variationId: variation.id,
         sku: variation.sku,
         currentStock,
@@ -209,12 +228,22 @@ export class InventoryAlertService extends EventEmitter {
     }
     // 재고 과다
     else if (currentStock >= this.thresholds.oversupply) {
+      // Load product relation if needed
+      if (!variation.product) {
+        const variationWithProduct = await this.variationRepository.findOne({
+          where: { id: variation.id },
+          relations: ['product']
+        });
+        variation.product = variationWithProduct?.product;
+      }
+      const product = await variation.product;
+      
       await this.createOrUpdateAlert({
         id: alertKey,
         type: 'oversupply',
         severity: 'low',
-        productId: variation.product.id,
-        productName: variation.product.name,
+        productId: product.id,
+        productName: product.name,
         variationId: variation.id,
         sku: variation.sku,
         currentStock,

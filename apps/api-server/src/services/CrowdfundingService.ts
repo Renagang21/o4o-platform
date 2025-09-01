@@ -266,7 +266,7 @@ export class CrowdfundingService extends EventEmitter {
     // 리워드 연결
     if (data.rewardIds && data.rewardIds.length > 0) {
       for (const rewardId of data.rewardIds) {
-        const reward = project.rewards.find(r => r.id === rewardId);
+        const reward = project.rewards?.find(r => r.id === rewardId);
         if (reward) {
           const backerReward = this.backerRewardRepository.create({
             backingId: backing.id,

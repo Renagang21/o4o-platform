@@ -14,8 +14,8 @@ export class ProductAttributeValue {
   @Index()
   attributeId: string;
 
-  @ManyToOne(() => ProductAttribute, attribute => attribute.values, { onDelete: 'CASCADE' })
-  attribute: ProductAttribute;
+  @ManyToOne(() => ProductAttribute, { onDelete: 'CASCADE', lazy: true })
+  attribute: Promise<ProductAttribute>;
 
   @Column({ length: 100 })
   value: string; // 'Red', 'Large', 'Cotton' 등

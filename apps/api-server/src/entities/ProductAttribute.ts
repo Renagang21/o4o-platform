@@ -15,8 +15,8 @@ export class ProductAttribute {
   @Index()
   productId: string;
 
-  @ManyToOne(() => Product, product => product.attributes, { onDelete: 'CASCADE' })
-  product: Product;
+  @ManyToOne(() => Product, { onDelete: 'CASCADE', lazy: true })
+  product: Promise<Product>;
 
   @Column({ length: 100 })
   name: string; // 'Color', 'Size', 'Material' 등
@@ -36,7 +36,7 @@ export class ProductAttribute {
   @Column({ default: false })
   variation: boolean; // 변형 생성에 사용되는지 여부
 
-  @OneToMany(() => ProductAttributeValue, value => value.attribute, { cascade: true })
+  @OneToMany(() => ProductAttributeValue, value => value.attribute)
   values: ProductAttributeValue[];
 
   @CreateDateColumn()

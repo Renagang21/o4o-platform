@@ -1,5 +1,5 @@
 import { Shortcode } from '../entities/Shortcode';
-import { ShortcodeParseOptions } from './shortcode-parser.service';
+import { ShortcodeParseOptions } from '../types/shortcode';
 import { menuService } from './menu.service';
 import { AppDataSource } from '../database/connection';
 import { MediaFile } from '../entities/MediaFile';

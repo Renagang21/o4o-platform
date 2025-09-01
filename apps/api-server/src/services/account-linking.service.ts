@@ -110,7 +110,6 @@ export class AccountLinkingService {
       // Log activity
       await activityRepo.save(activityRepo.create({
         userId,
-        user,
         action: 'linked',
         provider,
         ipAddress: '',
@@ -305,7 +304,6 @@ export class AccountLinkingService {
       // Log activity
       await activityRepo.save(activityRepo.create({
         userId: session.userId,
-        user: session.user,
         action: 'linked',
         provider: 'email',
         ipAddress: '',
@@ -409,7 +407,6 @@ export class AccountLinkingService {
       // Log activity
       await activityRepo.save(activityRepo.create({
         userId,
-        user,
         action: 'unlinked',
         provider: request.provider,
         ipAddress: '',

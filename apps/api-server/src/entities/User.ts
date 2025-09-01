@@ -1,10 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
 import { UserRole, UserStatus } from '../types/auth';
 import { BusinessInfo } from '../types/user';
-import { RefreshToken } from './RefreshToken';
-import { ApprovalLog } from './ApprovalLog';
-import { LinkedAccount } from './LinkedAccount';
-import { AccountActivity } from './AccountActivity';
 import * as bcrypt from 'bcryptjs';
 
 // Re-export types for external use
@@ -139,25 +135,21 @@ export class User {
     return `${this.firstName || ''} ${this.lastName || ''}`.trim() || this.email;
   }
 
-  // Refresh tokens relationship
-  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
-  refreshTokens: RefreshToken[];
+  // Relations - lazy loaded to prevent circular dependencies
+  @OneToMany('RefreshToken', 'user')
+  refreshTokens?: any[];
 
-  // Approval logs relationship
-  @OneToMany(() => ApprovalLog, log => log.user)
-  approvalLogs: ApprovalLog[];
+  @OneToMany('ApprovalLog', 'user')
+  approvalLogs?: any[];
 
-  // Linked accounts relationship
-  @OneToMany(() => LinkedAccount, linkedAccount => linkedAccount.user)
-  linkedAccounts: LinkedAccount[];
+  @OneToMany('ApprovalLog', 'admin')
+  adminActions?: any[];
 
-  // Account activities relationship
-  @OneToMany(() => AccountActivity, activity => activity.user)
-  accountActivities: AccountActivity[];
+  @OneToMany('LinkedAccount', 'user')
+  linkedAccounts?: any[];
 
-  // Admin actions relationship
-  @OneToMany(() => ApprovalLog, log => log.admin)
-  adminActions: ApprovalLog[];
+  @OneToMany('AccountActivity', 'user')
+  accountActivities?: any[];
 
   // Theme customizations
   @Column({ type: 'json', nullable: true, name: 'theme_customizations' })

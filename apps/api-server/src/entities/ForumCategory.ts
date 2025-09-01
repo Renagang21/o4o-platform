@@ -4,12 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
   ManyToOne,
   JoinColumn,
   Index
 } from 'typeorm';
-import { ForumPost } from './ForumPost';
 import { User } from './User';
 
 @Entity('forum_category')
@@ -59,8 +57,8 @@ export class ForumCategory {
   @JoinColumn({ name: 'createdBy' })
   creator?: User;
 
-  @OneToMany(() => ForumPost, post => post.category)
-  posts?: ForumPost[];
+  // Note: OneToMany relationship with ForumPost removed to prevent circular dependency
+  // Use ForumPostRepository.find({ where: { categoryId: category.id } }) to get posts
 
   // Methods
   canUserAccess(userRole: string): boolean {

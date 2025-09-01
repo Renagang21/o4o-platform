@@ -106,8 +106,9 @@ export class ProductReview {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // Relations
   @OneToMany(() => ReviewVote, vote => vote.review)
-  votes: ReviewVote[];
+  votes!: ReviewVote[];
 }
 
 @Entity('review_votes')

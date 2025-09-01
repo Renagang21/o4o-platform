@@ -1,7 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './User';
-import { StorePlaylist } from './StorePlaylist';
-import { SignageSchedule } from './SignageSchedule';
 
 export enum StoreStatus {
   ACTIVE = 'active',
@@ -56,11 +54,9 @@ export class Store {
   @JoinColumn({ name: 'managerId' })
   manager!: User;
 
-  @OneToMany(() => StorePlaylist, playlist => playlist.store)
-  playlists!: StorePlaylist[];
-
-  @OneToMany(() => SignageSchedule, schedule => schedule.store)
-  schedules!: SignageSchedule[];
+  // Note: OneToMany relationships removed to prevent circular dependency
+  // Use StorePlaylistRepository.find({ where: { storeId: store.id } }) to get playlists
+  // Use SignageScheduleRepository.find({ where: { storeId: store.id } }) to get schedules
 
   @CreateDateColumn()
   createdAt!: Date;

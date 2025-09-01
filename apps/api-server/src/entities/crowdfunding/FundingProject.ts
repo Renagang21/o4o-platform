@@ -143,13 +143,13 @@ export class FundingProject {
 
   // Relations
   @OneToMany(() => FundingReward, reward => reward.project)
-  rewards: FundingReward[];
+  rewards!: FundingReward[];
 
   @OneToMany(() => FundingBacking, backing => backing.project)
-  backings: FundingBacking[];
+  backings!: FundingBacking[];
 
-  @OneToMany(() => FundingUpdate, update => update.project)
-  updates: FundingUpdate[];
+  @OneToMany('FundingUpdate', 'project')
+  updates!: FundingUpdate[];
 
   // Timestamps
   @CreateDateColumn()

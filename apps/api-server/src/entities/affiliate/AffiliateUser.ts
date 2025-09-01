@@ -80,8 +80,8 @@ export class AffiliateUser {
 
   // Relations
   @OneToMany(() => AffiliateClick, click => click.affiliateUser)
-  clicks: AffiliateClick[];
+  clicks!: AffiliateClick[];
 
   @OneToMany(() => AffiliateConversion, conversion => conversion.affiliateUser)
-  conversions: AffiliateConversion[];
+  conversions!: AffiliateConversion[];
 }

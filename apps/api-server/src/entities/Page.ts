@@ -66,7 +66,7 @@ export class Page {
   @Column({ type: 'uuid', nullable: true })
   parentId!: string
 
-  @ManyToOne(() => Page, page => page.children, { nullable: true })
+  @ManyToOne(() => Page, { nullable: true })
   @JoinColumn({ name: 'parentId' })
   parent!: Page
 

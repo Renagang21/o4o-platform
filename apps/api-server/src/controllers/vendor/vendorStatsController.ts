@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { Order, OrderStatus } from '../../entities/Order';
+import { OrderItem } from '../../entities/OrderItem';
 import { Product, ProductStatus } from '../../entities/Product';
 import { Between, MoreThan } from 'typeorm';
 import { AuthRequest } from '../../types/auth';
@@ -20,6 +21,7 @@ export class VendorStatsController {
       tomorrow.setDate(tomorrow.getDate() + 1);
 
       const orderRepository = AppDataSource.getRepository(Order);
+      const orderItemRepository = AppDataSource.getRepository(OrderItem);
       const productRepository = AppDataSource.getRepository(Product);
 
       // 오늘 매출
@@ -176,25 +178,35 @@ export class VendorStatsController {
       }
 
       const orderRepository = AppDataSource.getRepository(Order);
+      const orderItemRepository = AppDataSource.getRepository(OrderItem);
+      
       const recentOrders = await orderRepository.find({
         where: { vendorId },
         order: { createdAt: 'DESC' },
         take: parseInt(limit as string),
-        relations: ['user', 'items', 'items.product']
+        relations: ['user']
       });
 
-      const formattedOrders = recentOrders.map((order: any) => ({
-        id: order.id,
-        orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
-        customer: order.user.name,
-        total: order.totalAmount,
-        status: order.status,
-        createdAt: order.createdAt,
-        items: order.items.map((item: any) => ({
-          productName: item.product.name,
-          quantity: item.quantity,
-          price: item.price
-        }))
+      const formattedOrders = await Promise.all(recentOrders.map(async (order: any) => {
+        // Fetch order items separately
+        const orderItems = await orderItemRepository.find({
+          where: { orderId: order.id },
+          relations: ['product']
+        });
+        
+        return {
+          id: order.id,
+          orderNumber: `#${order.id.slice(-8).toUpperCase()}`,
+          customer: order.user.name,
+          total: order.totalAmount,
+          status: order.status,
+          createdAt: order.createdAt,
+          items: orderItems.map((item: any) => ({
+            productName: item.product.name,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        };
       }));
 
       res.json(formattedOrders);
@@ -213,11 +225,12 @@ export class VendorStatsController {
       }
 
       const orderRepository = AppDataSource.getRepository(Order);
+      const orderItemRepository = AppDataSource.getRepository(OrderItem);
       
       // 판매량 기준 상위 5개 상품
-      const topProducts = await orderRepository
-        .createQueryBuilder('order')
-        .innerJoin('order.items', 'item')
+      const topProducts = await orderItemRepository
+        .createQueryBuilder('item')
+        .innerJoin('item.order', 'order')
         .innerJoin('item.product', 'product')
         .where('order.vendorId = :vendorId', { vendorId })
         .andWhere('order.status = :status', { status: 'completed' })

@@ -4,8 +4,8 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
-  Index
+  Index,
+  OneToMany
 } from 'typeorm';
 import { ACFField } from './ACFField';
 
@@ -114,9 +114,8 @@ export class ACFFieldGroup {
   @Column({ type: 'boolean', default: false })
   instructionPlacement!: boolean; // false = label, true = field
 
-  // Fields relationship
-  @OneToMany(() => ACFField, field => field.fieldGroup, { cascade: true })
-  fields!: ACFField[];
+  // Note: OneToMany relationship with ACFField removed to prevent circular dependency
+  // Use ACFFieldRepository.find({ where: { fieldGroupId: fieldGroup.id } }) to get fields
 
   // WordPress compatibility
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -148,6 +147,9 @@ export class ACFFieldGroup {
 
   @Column({ type: 'uuid', nullable: true })
   updatedBy?: string;
+
+  @OneToMany(() => ACFField, field => field.fieldGroup)
+  fields!: ACFField[];
 
   // Helper methods
   generateKey(): string {

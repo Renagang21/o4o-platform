@@ -81,10 +81,8 @@ export class AffiliateUser {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Relations
-  @OneToMany(() => ReferralRelationship, relationship => relationship.referrer)
-  referrals: ReferralRelationship[];
-
-  @OneToMany(() => AffiliateCommission, commission => commission.affiliateUser)
-  commissions: AffiliateCommission[];
+  // Relations removed to prevent circular dependencies
+  // Use lazy loading for reverse relationships:
+  // referrals: () => ReferralRelationship[]
+  // commissions: () => AffiliateCommission[]
 }

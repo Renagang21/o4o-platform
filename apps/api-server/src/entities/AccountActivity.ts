@@ -19,8 +19,8 @@ export class AccountActivity {
   @Column()
   userId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user!: User;
+  @ManyToOne(() => User, { onDelete: 'CASCADE', lazy: true })
+  user!: Promise<User>;
 
   @Column({
     type: 'enum',

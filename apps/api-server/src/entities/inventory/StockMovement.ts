@@ -21,9 +21,9 @@ export class StockMovement {
   @Column('uuid')
   inventoryId: string;
 
-  @ManyToOne(() => Inventory, inventory => inventory.movements)
+  @ManyToOne(() => Inventory, { lazy: true })
   @JoinColumn({ name: 'inventoryId' })
-  inventory: Inventory;
+  inventory: Promise<Inventory>;
 
   @Column({
     type: 'enum',

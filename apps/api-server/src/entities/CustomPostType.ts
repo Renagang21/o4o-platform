@@ -57,7 +57,8 @@ export class CustomPostType {
   @Column({ type: 'boolean', default: true })
   active!: boolean;
 
-  @OneToMany(() => CustomPost, post => post.postType)
+  // Relations
+  @OneToMany('CustomPost', 'postType')
   posts!: CustomPost[];
 
   @CreateDateColumn()

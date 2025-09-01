@@ -63,9 +63,9 @@ export class SignageSchedule {
   @Column()
   storeId!: string;
 
-  @ManyToOne(() => Store, store => store.schedules)
+  @ManyToOne(() => Store, { lazy: true })
   @JoinColumn({ name: 'storeId' })
-  store!: Store;
+  store!: Promise<Store>;
 
   @Column()
   playlistId!: string;

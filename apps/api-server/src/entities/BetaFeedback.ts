@@ -207,7 +207,7 @@ export class BetaFeedback {
   @JoinColumn({ name: 'resolvedBy' })
   resolver?: User;
 
-  @OneToMany(() => FeedbackConversation, conversation => conversation.feedback)
+  @OneToMany('FeedbackConversation', 'feedback')
   conversations!: FeedbackConversation[];
 
   // Methods

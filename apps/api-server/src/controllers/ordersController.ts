@@ -85,8 +85,6 @@ export class OrdersController {
       
       const queryBuilder = this.orderRepository
         .createQueryBuilder('order')
-        .leftJoinAndSelect('order.items', 'items')
-        .leftJoinAndSelect('items.product', 'product')
         .where('order.userId = :userId', { userId });
 
       if (status) {
@@ -136,8 +134,6 @@ export class OrdersController {
 
       const order = await this.orderRepository
         .createQueryBuilder('order')
-        .leftJoinAndSelect('order.items', 'items')
-        .leftJoinAndSelect('items.product', 'product')
         .where('order.id = :id', { id })
         .andWhere('order.userId = :userId', { userId })
         .getOne();
@@ -149,9 +145,20 @@ export class OrdersController {
         });
       }
 
+      // Fetch order items separately
+      const orderItems = await this.orderItemRepository.find({
+        where: { orderId: order.id },
+        relations: ['product']
+      });
+
+      const orderWithItems = {
+        ...order,
+        items: orderItems
+      };
+
       res.json({
         success: true,
-        data: order
+        data: orderWithItems
       });
     } catch (error) {
       console.error('Error fetching order:', error);
@@ -184,11 +191,23 @@ export class OrdersController {
 
       // 장바구니 조회
       const cart = await this.cartRepository.findOne({
-        where: { userId },
-        relations: ['items', 'items.product']
+        where: { userId }
       });
 
-      if (!cart || cart.isEmpty()) {
+      if (!cart) {
+        return res.status(400).json({
+          success: false,
+          error: 'Cart not found'
+        });
+      }
+
+      // Fetch cart items separately
+      const cartItems = await this.cartItemRepository.find({
+        where: { cartId: cart.id },
+        relations: ['product']
+      });
+
+      if (cartItems.length === 0) {
         return res.status(400).json({
           success: false,
           error: 'Cart is empty'
@@ -196,7 +215,7 @@ export class OrdersController {
       }
 
       // 재고 확인
-      for (const cartItem of cart.items) {
+      for (const cartItem of cartItems) {
         if (!cartItem.product.isInStock()) {
           return res.status(400).json({
             success: false,
@@ -230,7 +249,11 @@ export class OrdersController {
         order.notes = notes;
 
         // 금액 계산
-        order.subtotal = cart.getTotalPrice();
+        order.subtotal = cartItems.reduce((sum, item) => {
+          const userRole = (req as AuthRequest).user?.role || 'customer';
+          const price = item.product.getPriceForUser(userRole);
+          return sum + (price * item.quantity);
+        }, 0);
         order.taxAmount = 0; // TODO: 세금 계산 로직
         order.shippingFee = 0; // TODO: 배송비 계산 로직
         order.discountAmount = 0; // TODO: 할인 계산 로직
@@ -239,7 +262,7 @@ export class OrdersController {
         const savedOrder = await queryRunner.manager.save(order);
 
         // 주문 아이템 생성
-        for (const cartItem of cart.items) {
+        for (const cartItem of cartItems) {
           const orderItem = new OrderItem();
           orderItem.orderId = savedOrder.id;
           orderItem.productId = cartItem.productId;
@@ -264,21 +287,30 @@ export class OrdersController {
         }
 
         // 장바구니 비우기
-        await queryRunner.manager.remove(cart.items);
+        await queryRunner.manager.remove(cartItems);
 
         await queryRunner.commitTransaction();
 
         // 생성된 주문 조회
         const createdOrder = await this.orderRepository
           .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
-          .leftJoinAndSelect('items.product', 'product')
           .where('order.id = :id', { id: savedOrder.id })
           .getOne();
 
+        // Fetch order items separately
+        const newOrderItems = await this.orderItemRepository.find({
+          where: { orderId: savedOrder.id },
+          relations: ['product']
+        });
+
+        const orderWithItems = {
+          ...createdOrder,
+          items: newOrderItems
+        };
+
         res.status(201).json({
           success: true,
-          data: createdOrder,
+          data: orderWithItems,
           message: 'Order created successfully'
         });
       } catch (error) {
@@ -310,8 +342,7 @@ export class OrdersController {
       }
 
       const order = await this.orderRepository.findOne({
-        where: { id, userId },
-        relations: ['items', 'items.product']
+        where: { id, userId }
       });
 
       if (!order) {
@@ -334,8 +365,14 @@ export class OrdersController {
       await queryRunner.startTransaction();
 
       try {
+        // Fetch order items
+        const orderItems = await queryRunner.manager.find(OrderItem, {
+          where: { orderId: order.id },
+          relations: ['product']
+        });
+        
         // 재고 복구
-        for (const orderItem of order.items) {
+        for (const orderItem of orderItems) {
           if (orderItem.product.manageStock) {
             await queryRunner.manager.update(Product, orderItem.productId, {
               stockQuantity: orderItem.product.stockQuantity + orderItem.quantity

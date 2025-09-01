@@ -40,12 +40,12 @@ export class ExportController {
       const end = new Date(endDate as string);
       end.setHours(23, 59, 59, 999); // End of day
 
-      // Fetch orders with items
+      // Fetch orders
       const orders = await this.orderRepository.find({
         where: {
           createdAt: Between(start, end)
         },
-        relations: ['items', 'items.product', 'customer'],
+        relations: ['user'],
         order: {
           createdAt: 'DESC'
         }
@@ -54,7 +54,13 @@ export class ExportController {
       // Transform data for export
       const exportData = [];
       for (const order of orders) {
-        for (const item of order.items) {
+        // Fetch order items for this order
+        const orderItems = await this.orderItemRepository.find({
+          where: { orderId: order.id },
+          relations: ['product']
+        });
+        
+        for (const item of orderItems) {
           exportData.push({
             '주문번호': order.id,
             '주문일시': order.createdAt.toISOString(),
@@ -316,8 +322,7 @@ export class ExportController {
         where: {
           createdAt: Between(startDate, endDate),
           affiliateId: affiliateId ? affiliateId as string : undefined
-        },
-        relations: ['items', 'affiliate']
+        }
       });
 
       const exportData = [];
@@ -325,7 +330,12 @@ export class ExportController {
       for (const order of orders) {
         if (!order.affiliateId) continue;
         
-        const totalAmount = order.items.reduce((sum, item) => 
+        // Fetch order items for this order
+        const orderItems = await this.orderItemRepository.find({
+          where: { orderId: order.id }
+        });
+        
+        const totalAmount = orderItems.reduce((sum, item) => 
           sum + (item.price * item.quantity), 0
         );
         
