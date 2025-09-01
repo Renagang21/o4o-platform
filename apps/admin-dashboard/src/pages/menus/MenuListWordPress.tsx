@@ -219,7 +219,7 @@ const MenuListWordPress: FC = () => {
       },
       {
         label: 'Duplicate',
-        onClick: () => console.log('Duplicate menu:', menu.id)
+        onClick: () => {} // TODO: Implement duplicate functionality
       },
       {
         label: 'Delete',

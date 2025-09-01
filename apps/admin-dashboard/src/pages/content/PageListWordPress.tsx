@@ -182,7 +182,7 @@ const PageListWordPress: FC = () => {
       },
       {
         label: 'Quick Edit',
-        onClick: () => console.log('Quick edit page:', page.id)
+        onClick: () => {} // TODO: Implement quick edit functionality
       },
       {
         label: 'Trash',

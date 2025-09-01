@@ -149,7 +149,7 @@ const TagsWordPress: FC = () => {
       },
       {
         label: 'Quick Edit',
-        onClick: () => console.log('Quick edit tag:', tag.id)
+        onClick: () => {} // TODO: Implement quick edit functionality
       },
       {
         label: 'Delete',

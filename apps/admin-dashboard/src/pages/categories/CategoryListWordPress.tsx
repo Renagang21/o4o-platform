@@ -165,7 +165,7 @@ const CategoryListWordPress: FC = () => {
       },
       {
         label: 'Quick Edit',
-        onClick: () => console.log('Quick edit category:', category.id)
+        onClick: () => {} // TODO: Implement quick edit functionality
       },
       {
         label: 'Delete',
