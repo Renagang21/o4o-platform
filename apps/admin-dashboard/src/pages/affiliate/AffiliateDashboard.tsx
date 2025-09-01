@@ -9,16 +9,40 @@ import { RealTimeActivity } from '@/components/affiliate/RealTimeActivity';
 import { ClickAnalytics } from '@/components/affiliate/ClickAnalytics';
 import { AffiliateNotifications } from '@/components/affiliate/AffiliateNotifications';
 import { useAuth } from '@o4o/auth-context';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import { getAffiliateUser, getAffiliateStats } from '@/api/affiliate';
 import toast from 'react-hot-toast';
 
+interface StatsData {
+  monthlyClicks: number;
+  monthlySignups: number;
+  monthlyOrders: number;
+  monthlyRevenue: number;
+  monthlyCommission: number;
+  totalSignups: number;
+  totalRevenue: number;
+  paidCommission: number;
+  pendingCommission: number;
+}
+
+interface ChartDataPoint {
+  date: string;
+  clicks: number;
+  signups: number;
+  orders: number;
+  commission: number;
+}
+
+interface AffiliateUserData {
+  id: string;
+  affiliateCode: string;
+}
+
 const AffiliateDashboard = () => {
   const { user } = useAuth();
-  const [affiliateUser, setAffiliateUser] = useState(null);
-  const [stats, setStats] = useState(null);
+  const [affiliateUser, setAffiliateUser] = useState<AffiliateUserData | null>(null);
+  const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   
   useEffect(() => {
     fetchAffiliateData();
@@ -83,7 +107,7 @@ const AffiliateDashboard = () => {
     }
   };
 
-  const generateChartData = (statsData) => {
+  const generateChartData = (statsData: StatsData): ChartDataPoint[] => {
     // Generate last 7 days data from API stats
     return Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
@@ -111,6 +135,17 @@ const AffiliateDashboard = () => {
   };
   
   const mockReferralCode = affiliateUser?.affiliateCode || 'DEMO123';
+  const mockStats = stats || {
+    monthlyClicks: 245,
+    monthlySignups: 18,
+    monthlyOrders: 12,
+    monthlyRevenue: 1234000,
+    monthlyCommission: 61700,
+    totalSignups: 156,
+    totalRevenue: 8765000,
+    paidCommission: 350000,
+    pendingCommission: 125000,
+  };
   
   if (loading) {
     return (
@@ -331,85 +366,125 @@ const AffiliateDashboard = () => {
             {/* 클릭 및 가입 추이 */}
             <div>
               <h4 className="text-sm font-medium text-modern-text-secondary mb-4">클릭 및 가입 추이</h4>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#666"
-                      fontSize={12}
-                    />
-                    <YAxis stroke="#666" fontSize={12} />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        fontSize: '12px'
-                      }}
-                    />
-                    <Legend fontSize={12} />
-                    <Line 
-                      type="monotone" 
-                      dataKey="clicks" 
-                      stroke="#3b82f6" 
-                      strokeWidth={2}
-                      name="클릭수"
-                      dot={{ r: 4 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="signups" 
-                      stroke="#10b981" 
-                      strokeWidth={2}
-                      name="가입수"
-                      dot={{ r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+              <div className="space-y-4">
+                {/* Text-based chart */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-600">
+                    <span>클릭수</span>
+                    <span className="text-blue-600 font-medium">최대 {Math.max(...chartData.map(d => d.clicks))}회</span>
+                  </div>
+                  <div className="flex items-end gap-1 h-32">
+                    {chartData.map((data, index) => {
+                      const maxClicks = Math.max(...chartData.map(d => d.clicks));
+                      const heightPercent = (data.clicks / maxClicks) * 100;
+                      return (
+                        <div key={index} className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-full bg-blue-500 hover:bg-blue-600 transition-colors" 
+                               style={{ height: `${heightPercent}%` }}
+                               title={`${data.date}: ${data.clicks} 클릭`}
+                          />
+                          <span className="text-xs text-gray-500 rotate-45 origin-left">{data.date}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-600">
+                    <span>가입수</span>
+                    <span className="text-green-600 font-medium">최대 {Math.max(...chartData.map(d => d.signups))}명</span>
+                  </div>
+                  <div className="flex items-end gap-1 h-32">
+                    {chartData.map((data, index) => {
+                      const maxSignups = Math.max(...chartData.map(d => d.signups));
+                      const heightPercent = (data.signups / maxSignups) * 100;
+                      return (
+                        <div key={index} className="flex-1">
+                          <div className="w-full bg-green-500 hover:bg-green-600 transition-colors" 
+                               style={{ height: `${heightPercent}%` }}
+                               title={`${data.date}: ${data.signups} 가입`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
             
             {/* 주문 및 수수료 추이 */}
             <div>
               <h4 className="text-sm font-medium text-modern-text-secondary mb-4">주문 및 수수료 추이</h4>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#666"
-                      fontSize={12}
-                    />
-                    <YAxis stroke="#666" fontSize={12} />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        fontSize: '12px'
-                      }}
-                      formatter={(value, name) => {
-                        if (name === '수수료') {
-                          return [`₩${value.toLocaleString()}`, name];
-                        }
-                        return [value, name];
-                      }}
-                    />
-                    <Legend fontSize={12} />
-                    <Bar dataKey="orders" fill="#f59e0b" name="주문수" />
-                    <Area 
-                      type="monotone" 
-                      dataKey="commission" 
-                      stroke="#8b5cf6" 
-                      fill="#8b5cf6" 
-                      fillOpacity={0.3}
-                      name="수수료"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="space-y-4">
+                {/* Table format for orders and commission */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 text-gray-600">날짜</th>
+                        <th className="text-right py-2 text-gray-600">주문</th>
+                        <th className="text-right py-2 text-gray-600">수수료</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chartData.map((data, index) => (
+                        <tr key={index} className="border-b hover:bg-gray-50">
+                          <td className="py-2">{data.date}</td>
+                          <td className="text-right py-2">
+                            <span className="inline-flex items-center gap-1">
+                              <span className="text-yellow-600 font-medium">{data.orders}</span>
+                              <span className="text-xs text-gray-500">건</span>
+                            </span>
+                          </td>
+                          <td className="text-right py-2">
+                            <span className="text-purple-600 font-medium">
+                              ₩{data.commission.toLocaleString()}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="font-bold">
+                        <td className="pt-2">합계</td>
+                        <td className="text-right pt-2">
+                          <span className="text-yellow-600">
+                            {chartData.reduce((sum, d) => sum + d.orders, 0)} 건
+                          </span>
+                        </td>
+                        <td className="text-right pt-2">
+                          <span className="text-purple-600">
+                            ₩{chartData.reduce((sum, d) => sum + d.commission, 0).toLocaleString()}
+                          </span>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                
+                {/* Visual bar representation */}
+                <div className="space-y-1">
+                  <div className="text-xs text-gray-600 mb-2">수수료 시각화</div>
+                  {chartData.map((data, index) => {
+                    const maxCommission = Math.max(...chartData.map(d => d.commission));
+                    const widthPercent = (data.commission / maxCommission) * 100;
+                    return (
+                      <div key={index} className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-12">{data.date}</span>
+                        <div className="flex-1 bg-gray-200 rounded-full h-4">
+                          <div className="h-4 bg-purple-500 rounded-full transition-all"
+                               style={{ width: `${widthPercent}%` }}
+                               title={`₩${data.commission.toLocaleString()}`}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-600 w-20 text-right">
+                          ₩{(data.commission / 1000).toFixed(0)}k
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -458,7 +533,7 @@ const AffiliateDashboard = () => {
             <TabsContent value="notifications" className="space-y-6">
               <AffiliateNotifications 
                 referralCode={mockReferralCode}
-                onNotificationClick={(notification) => {
+                onNotificationClick={() => {
                   // Handle notification click (e.g., navigate to relevant section)
                   // TODO: Implement navigation to relevant section based on notification type
                 }}

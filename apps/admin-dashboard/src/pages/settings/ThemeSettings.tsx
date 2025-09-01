@@ -1,6 +1,6 @@
 import { useState, FC } from 'react';
 import { Check, Palette, Moon, Sun } from 'lucide-react'
-import { useTheme } from '../../shared/components/theme/MultiThemeContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 type ThemeName = 'light' | 'dark' | 'evening' | 'noon' | 'dusk' | 'afternoon' | 'twilight'
 

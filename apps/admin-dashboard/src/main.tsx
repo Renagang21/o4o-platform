@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
-import { MultiThemeProvider } from '@/shared/components/theme/MultiThemeContext'
 import { setupWordPressEnvironment } from '@/utils/wordpress-runtime-setup'
 import App from './App'
 import './styles/globals.css'
@@ -49,10 +48,8 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <MultiThemeProvider defaultTheme="light">
-          <App />
-          <Toaster position="top-center" reverseOrder={false} />
-        </MultiThemeProvider>
+        <App />
+        <Toaster position="top-center" reverseOrder={false} />
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

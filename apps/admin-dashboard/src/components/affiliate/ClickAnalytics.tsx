@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { TrendingUp, MousePointer, Smartphone, Monitor, Globe } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,8 +28,6 @@ interface ClickAnalyticsProps {
   referralCode: string;
   period?: string;
 }
-
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export const ClickAnalytics = ({ referralCode, period = '7d' }: ClickAnalyticsProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState(period);
@@ -115,10 +112,24 @@ export const ClickAnalytics = ({ referralCode, period = '7d' }: ClickAnalyticsPr
     }
   };
 
+  const getDeviceColor = (device: string) => {
+    switch (device.toLowerCase()) {
+      case 'mobile':
+        return 'bg-blue-500';
+      case 'desktop':
+        return 'bg-green-500';
+      default:
+        return 'bg-yellow-500';
+    }
+  };
+
   const totalClicks = sourceData.reduce((sum, item) => sum + item.clicks, 0);
   const totalConversions = sourceData.reduce((sum, item) => sum + item.conversions, 0);
   const averageConversionRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0;
   const totalRevenue = sourceData.reduce((sum, item) => sum + item.revenue, 0);
+
+  // Find max clicks for time chart scaling
+  const maxTimeClicks = Math.max(...timeData.map(t => t.clicks), 1);
 
   return (
     <div className="space-y-6">
@@ -198,142 +209,166 @@ export const ClickAnalytics = ({ referralCode, period = '7d' }: ClickAnalyticsPr
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Source Performance */}
+        {/* Source Performance - Table Style */}
         <Card>
           <CardHeader>
             <CardTitle>소스별 성과</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64 mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sourceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="source" fontSize={12} />
-                  <YAxis fontSize={12} />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      fontSize: '12px'
-                    }}
-                    formatter={(value: any, name: string) => {
-                      if (name === 'revenue') {
-                        return [`₩${value.toLocaleString()}`, '수익'];
-                      }
-                      return [value, name === 'clicks' ? '클릭' : '전환'];
-                    }}
-                  />
-                  <Bar dataKey="clicks" fill="#3b82f6" name="clicks" />
-                  <Bar dataKey="conversions" fill="#10b981" name="conversions" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            
-            {/* Source details table */}
-            <div className="space-y-2">
-              {sourceData.map((source, index) => (
-                <div key={source.source} className="flex items-center justify-between p-2 rounded border">
-                  <span className="font-medium">{source.source}</span>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-600">
-                      {source.clicks} 클릭
-                    </span>
-                    <span className="text-green-600">
-                      {source.conversionRate}% 전환
-                    </span>
-                    <span className="text-purple-600 font-medium">
-                      ₩{source.revenue.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 text-sm font-medium text-gray-600">소스</th>
+                    <th className="text-right py-2 text-sm font-medium text-gray-600">클릭</th>
+                    <th className="text-right py-2 text-sm font-medium text-gray-600">전환</th>
+                    <th className="text-right py-2 text-sm font-medium text-gray-600">전환율</th>
+                    <th className="text-right py-2 text-sm font-medium text-gray-600">수익</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sourceData.map((source) => (
+                    <tr key={source.source} className="border-b hover:bg-gray-50">
+                      <td className="py-3 font-medium">{source.source}</td>
+                      <td className="text-right py-3 text-blue-600">{source.clicks}</td>
+                      <td className="text-right py-3 text-green-600">{source.conversions}</td>
+                      <td className="text-right py-3">
+                        <Badge variant="outline" className="font-normal">
+                          {source.conversionRate}%
+                        </Badge>
+                      </td>
+                      <td className="text-right py-3 text-purple-600 font-medium">
+                        ₩{source.revenue.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="font-bold">
+                    <td className="pt-3">합계</td>
+                    <td className="text-right pt-3 text-blue-600">{totalClicks}</td>
+                    <td className="text-right pt-3 text-green-600">{totalConversions}</td>
+                    <td className="text-right pt-3">
+                      <Badge variant="outline">
+                        {averageConversionRate.toFixed(1)}%
+                      </Badge>
+                    </td>
+                    <td className="text-right pt-3 text-purple-600">
+                      ₩{totalRevenue.toLocaleString()}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </CardContent>
         </Card>
 
-        {/* Device Distribution */}
+        {/* Device Distribution - Progress Bar Style */}
         <Card>
           <CardHeader>
             <CardTitle>디바이스 분포</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64 mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={deviceData}
-                    dataKey="clicks"
-                    nameKey="device"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label={({ device, percentage }) => `${device} ${percentage}%`}
-                  >
-                    {deviceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value: any) => [`${value} 클릭`, '클릭수']}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="space-y-2">
-              {deviceData.map((device, index) => (
-                <div key={device.device} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getDeviceIcon(device.device)}
-                    <span>{device.device}</span>
+            <div className="space-y-4">
+              {deviceData.map((device) => (
+                <div key={device.device} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getDeviceIcon(device.device)}
+                      <span className="font-medium">{device.device}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">
+                        {device.clicks} 클릭
+                      </span>
+                      <Badge variant="outline">
+                        {device.percentage}%
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="outline" 
-                      style={{ borderColor: COLORS[index % COLORS.length] }}
-                    >
-                      {device.percentage}%
-                    </Badge>
-                    <span className="text-sm text-gray-600">
-                      {device.clicks} 클릭
-                    </span>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full ${getDeviceColor(device.device)}`}
+                      style={{ width: `${device.percentage}%` }}
+                    />
                   </div>
                 </div>
               ))}
+            </div>
+            
+            {/* Summary */}
+            <div className="mt-6 pt-4 border-t">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">총 디바이스</span>
+                  <p className="font-semibold">{deviceData.length}개</p>
+                </div>
+                <div>
+                  <span className="text-gray-600">총 클릭</span>
+                  <p className="font-semibold">{deviceData.reduce((sum, d) => sum + d.clicks, 0).toLocaleString()}</p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Time Distribution */}
+      {/* Time Distribution - Text Chart */}
       <Card>
         <CardHeader>
           <CardTitle>시간대별 클릭 분포</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={timeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="hour" 
-                  fontSize={12}
-                  interval={1}
-                />
-                <YAxis fontSize={12} />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                  formatter={(value) => [`${value} 클릭`, '클릭수']}
-                />
-                <Bar dataKey="clicks" fill="#8b5cf6" />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="space-y-1">
+            {/* Simple text-based bar chart */}
+            <div className="flex items-end gap-1 h-40 mb-4">
+              {timeData.map((time) => {
+                const heightPercent = (time.clicks / maxTimeClicks) * 100;
+                return (
+                  <div
+                    key={time.hour}
+                    className="flex-1 bg-purple-500 hover:bg-purple-600 transition-colors relative group"
+                    style={{ height: `${heightPercent}%` }}
+                    title={`${time.hour}: ${time.clicks} 클릭`}
+                  >
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                      {time.clicks}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Time labels */}
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>00:00</span>
+              <span>06:00</span>
+              <span>12:00</span>
+              <span>18:00</span>
+              <span>23:00</span>
+            </div>
+            
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
+              <div>
+                <span className="text-sm text-gray-600">피크 시간</span>
+                <p className="font-semibold">
+                  {timeData.reduce((max, t) => t.clicks > max.clicks ? t : max, timeData[0]).hour}
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600">평균 클릭</span>
+                <p className="font-semibold">
+                  {Math.round(timeData.reduce((sum, t) => sum + t.clicks, 0) / timeData.length)}
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600">총 클릭</span>
+                <p className="font-semibold">
+                  {timeData.reduce((sum, t) => sum + t.clicks, 0).toLocaleString()}
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
