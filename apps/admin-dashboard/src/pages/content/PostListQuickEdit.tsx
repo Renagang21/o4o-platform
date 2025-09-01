@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,23 +14,24 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Post, PostStatus } from '@o4o/types';
 import toast from 'react-hot-toast';
+import { WordPressTableWithInlineEdit, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTableWithInlineEdit';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
 import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuickEdit } from '@/hooks/useQuickEdit';
-import { BulkActionBar } from '@/components/common/BulkActionBar';
-import { RowActions } from '@/components/common/RowActions';
 import { PostQuickEdit } from '@/components/content/PostQuickEdit';
 import { ScreenMeta } from '@/components/common/ScreenMeta';
 import { PostsHelp } from '@/components/help/PostsHelp';
-import { useState } from 'react';
 
 /**
- * WordPress-style Posts list with bulk actions and quick edit
+ * WordPress-style Posts list with quick edit functionality
+ * Standardized with WordPressTableWithInlineEdit component
  */
 const PostListQuickEdit: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   // Posts query
   const { data, isLoading, error } = useQuery({
@@ -137,7 +138,7 @@ const PostListQuickEdit: FC = () => {
     };
   };
 
-  // Bulk delete mutation
+  // Bulk mutations
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       await Promise.all(ids.map((id: any) => authClient.api.delete(`/posts/${id}`)));
@@ -145,13 +146,13 @@ const PostListQuickEdit: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success('Selected posts deleted successfully');
+      setSelectedRows([]);
     },
     onError: () => {
       toast.error('Failed to delete some posts');
     }
   });
 
-  // Bulk status update mutation
   const bulkStatusMutation = useMutation({
     mutationFn: async ({ ids, status }: { ids: string[], status: PostStatus }) => {
       await Promise.all(ids.map((id: any) => 
@@ -161,6 +162,7 @@ const PostListQuickEdit: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success('Posts status updated successfully');
+      setSelectedRows([]);
     },
     onError: () => {
       toast.error('Failed to update some posts');
@@ -217,84 +219,83 @@ const PostListQuickEdit: FC = () => {
   ];
 
   const {
-    // selectedIds, // Not used directly
     selectedCount,
-    isAllSelected,
-    // isSomeSelected, // Not used
     isProcessing,
-    toggleAll,
-    toggleItem,
-    executeBulkAction,
-    isSelected
+    executeBulkAction
   } = useBulkActions({
     items: posts,
     idField: 'id',
-    actions: bulkActions
+    actions: bulkActions,
+    selectedIds: selectedRows
   });
 
-  // Table columns
-  const columns = [
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
     {
-      key: 'title',
+      id: 'title',
       label: 'Title',
+      sortable: true
+    },
+    {
+      id: 'author',
+      label: 'Author'
+    },
+    {
+      id: 'categories',
+      label: 'Categories'
+    },
+    {
+      id: 'tags',
+      label: 'Tags'
+    },
+    {
+      id: 'comments',
+      label: 'Comments',
+      align: 'center',
+      width: '80px'
+    },
+    {
+      id: 'date',
+      label: 'Date',
       sortable: true,
-      render: (post: Post) => (
+      width: '150px'
+    }
+  ];
+
+  // Transform posts to table rows
+  const rows: WordPressTableRow[] = posts.map((post: Post) => ({
+    id: post.id,
+    data: {
+      title: (
         <div>
           <Link to={`/posts/${post.id}/edit`} className="font-medium text-blue-600 hover:text-blue-800">
             {post.title || '(no title)'}
           </Link>
           {post.status === 'draft' && <span className="text-gray-500 text-sm ml-2">— Draft</span>}
         </div>
-      )
-    },
-    {
-      key: 'author',
-      label: 'Author',
-      render: (post: Post) => post.author?.name || 'Unknown'
-    },
-    {
-      key: 'categories',
-      label: 'Categories',
-      render: (post: Post) => (
+      ),
+      author: post.author?.name || 'Unknown',
+      categories: (
         <div className="text-sm text-gray-600">
           {post.categories?.map((cat: any) => cat.name).join(', ') || '—'}
         </div>
-      )
-    },
-    {
-      key: 'tags',
-      label: 'Tags',
-      render: (post: Post) => (
+      ),
+      tags: (
         <div className="text-sm text-gray-600">
           {post.tags?.map((tag: any) => tag.name).join(', ') || '—'}
         </div>
-      )
-    },
-    {
-      key: 'comments',
-      label: 'Comments',
-      render: (post: Post) => (
-        <div className="text-center">
-          <span className="comment-count">{post.commentCount || 0}</span>
-        </div>
-      )
-    },
-    {
-      key: 'date',
-      label: 'Date',
-      sortable: true,
-      render: (post: Post) => (
+      ),
+      comments: (
+        <span className="comment-count">{post.commentCount || 0}</span>
+      ),
+      date: (
         <div className="text-sm">
           <div>{post.status === 'published' ? 'Published' : 'Last Modified'}</div>
           <div className="text-gray-600">{formatDate(post.updatedAt || post.createdAt)}</div>
         </div>
       )
-    }
-  ];
-
-  // Row actions with Quick Edit
-  const getRowActions = (post: Post) => {
-    const actions = [
+    },
+    actions: [
       {
         label: 'Edit',
         onClick: () => navigate(`/posts/${post.id}/edit`)
@@ -320,86 +321,40 @@ const PostListQuickEdit: FC = () => {
         href: `/posts/${post.slug}`,
         target: '_blank'
       }
-    ];
+    ]
+  }));
 
-    return <RowActions actions={actions} visible={!quickEdit.isEditing(post.id)} />;
-  };
+  // Inline edit rows configuration
+  const inlineEditRows = posts.map((post: Post) => ({
+    rowId: post.id,
+    renderEdit: () => (
+      <PostQuickEdit
+        post={post}
+        formData={quickEdit.formData}
+        onUpdate={quickEdit.updateField}
+        onSave={quickEdit.saveEdit}
+        onCancel={quickEdit.cancelEdit}
+        isLoading={quickEdit.isLoading}
+        categories={categories}
+      />
+    )
+  }));
 
-  // Status badge - Not used in quick edit view
-  /*
-  const getStatusBadge = (status: PostStatus) => {
-    switch (status) {
-      case 'published':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Published</Badge>;
-      case 'draft':
-        return <Badge variant="secondary">Draft</Badge>;
-      case 'scheduled':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Scheduled</Badge>;
-      case 'trash':
-        return <Badge variant="destructive">Trash</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
     }
   };
-  */
 
-  // Custom table render to handle quick edit rows
-  const renderTableBody = () => {
-    if (posts.length === 0) {
-      return (
-        <tr>
-          <td colSpan={columns.length + 1} className="colspanchange text-center py-4">
-            No posts found
-          </td>
-        </tr>
-      );
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(posts.map((p: Post) => p.id));
+    } else {
+      setSelectedRows([]);
     }
-
-    return posts.map((post: Post, index: number) => {
-      const itemId = String(post.id);
-      const selected = isSelected(itemId);
-      const isBeingEdited = quickEdit.isEditing(itemId);
-      
-      return (
-        <Fragment key={itemId}>
-          <tr
-            className={`${selected ? 'selected' : ''} ${index % 2 === 0 ? 'alternate' : ''} ${isBeingEdited ? 'hidden' : ''}`}
-          >
-            <th scope="row" className="check-column">
-              <label className="screen-reader-text" htmlFor={`cb-select-${itemId}`}>
-                Select {post.title || `Post ${itemId}`}
-              </label>
-              <input
-                type="checkbox"
-                id={`cb-select-${itemId}`}
-                checked={selected}
-                onChange={() => toggleItem(itemId)}
-              />
-            </th>
-            {columns.map((column: any) => (
-              <td
-                key={column.key}
-                className={`column-${column.key}`}
-              >
-                {column.render ? column.render(post) : (post as any)[column.key]}
-                {column.key === columns[0].key && getRowActions(post)}
-              </td>
-            ))}
-          </tr>
-          {isBeingEdited && (
-            <PostQuickEdit
-              post={post}
-              formData={quickEdit.formData}
-              onUpdate={quickEdit.updateField}
-              onSave={quickEdit.saveEdit}
-              onCancel={quickEdit.cancelEdit}
-              isLoading={quickEdit.isLoading}
-              categories={categories}
-            />
-          )}
-        </Fragment>
-      );
-    });
   };
 
   return (
@@ -453,70 +408,28 @@ const PostListQuickEdit: FC = () => {
         position="top"
       />
 
-      {/* Posts Table with Quick Edit */}
-      {isLoading ? (
-        <div className="text-center py-8">Loading posts...</div>
-      ) : error ? (
-        <div className="text-center py-8 text-red-600">Error loading posts</div>
-      ) : (
-        <table className="wp-list-table widefat fixed striped posts">
-          <thead>
-            <tr>
-              <td className="manage-column column-cb check-column">
-                <label className="screen-reader-text" htmlFor="cb-select-all">
-                  Select All
-                </label>
-                <input
-                  type="checkbox"
-                  id="cb-select-all"
-                  checked={isAllSelected}
-                  onChange={toggleAll}
-                />
-              </td>
-              {columns.map((column: any) => (
-                <th
-                  key={column.key}
-                  scope="col"
-                  className={`manage-column column-${column.key}${column.sortable ? ' sortable' : ''}`}
-                >
-                  {column.sortable ? (
-                    <a href="#">
-                      <span>{column.label}</span>
-                      <span className="sorting-indicator"></span>
-                    </a>
-                  ) : (
-                    column.label
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody id="the-list">
-            {renderTableBody()}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td className="manage-column column-cb check-column">
-                <label className="screen-reader-text" htmlFor="cb-select-all-2">
-                  Select All
-                </label>
-                <input
-                  type="checkbox"
-                  id="cb-select-all-2"
-                  checked={isAllSelected}
-                  onChange={toggleAll}
-                />
-              </td>
-              {columns.map((column: any) => (
-                <th key={column.key} scope="col" className={`manage-column column-${column.key}`}>
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-          </tfoot>
-        </table>
-      )}
+      {/* WordPress Table with Inline Edit */}
+      <WordPressTableWithInlineEdit
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        loading={isLoading}
+        emptyMessage="No posts found. Create your first post!"
+        inlineEditRows={inlineEditRows}
+        editingRowId={quickEdit.editingId}
+      />
 
+      {/* Bulk Actions - Bottom */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedCount}
+        onActionExecute={executeBulkAction}
+        isProcessing={isProcessing}
+        position="bottom"
+      />
 
       {/* Pagination */}
       <div className="tablenav bottom">
@@ -525,6 +438,12 @@ const PostListQuickEdit: FC = () => {
           {/* TODO: Add pagination controls */}
         </div>
       </div>
+
+      {error && (
+        <div className="notice notice-error">
+          <p>Error loading posts. Please try again.</p>
+        </div>
+      )}
     </div>
   );
 };

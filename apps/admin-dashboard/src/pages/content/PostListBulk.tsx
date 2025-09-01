@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,20 +14,20 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Post, PostStatus } from '@o4o/types';
 import toast from 'react-hot-toast';
-import { useBulkActions } from '@/hooks/useBulkActions';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
 import { BulkActionBar } from '@/components/common/BulkActionBar';
-import { SelectableTable } from '@/components/common/SelectableTable';
-import { RowActions } from '@/components/common/RowActions';
-import { useState } from 'react';
+import { useBulkActions } from '@/hooks/useBulkActions';
 
 /**
  * WordPress-style Posts list with bulk actions
+ * Standardized with WordPressTable component
  */
 const PostListBulk: FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   // Posts query
   const { data, isLoading, error } = useQuery({
@@ -53,6 +53,7 @@ const PostListBulk: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success('Selected posts deleted successfully');
+      setSelectedRows([]);
     },
     onError: () => {
       toast.error('Failed to delete some posts');
@@ -69,6 +70,7 @@ const PostListBulk: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       toast.success('Posts status updated successfully');
+      setSelectedRows([]);
     },
     onError: () => {
       toast.error('Failed to update some posts');
@@ -125,84 +127,83 @@ const PostListBulk: FC = () => {
   ];
 
   const {
-    // selectedIds, // Used by BulkActionBar component
     selectedCount,
-    isAllSelected,
-    isSomeSelected,
     isProcessing,
-    toggleAll,
-    toggleItem,
-    executeBulkAction,
-    isSelected
+    executeBulkAction
   } = useBulkActions({
     items: posts,
     idField: 'id',
-    actions: bulkActions
+    actions: bulkActions,
+    selectedIds: selectedRows
   });
 
-  // Table columns
-  const columns = [
+  // Table columns configuration
+  const columns: WordPressTableColumn[] = [
     {
-      key: 'title',
+      id: 'title',
       label: 'Title',
+      sortable: true
+    },
+    {
+      id: 'author',
+      label: 'Author'
+    },
+    {
+      id: 'categories',
+      label: 'Categories'
+    },
+    {
+      id: 'tags',
+      label: 'Tags'
+    },
+    {
+      id: 'comments',
+      label: 'Comments',
+      align: 'center',
+      width: '80px'
+    },
+    {
+      id: 'date',
+      label: 'Date',
       sortable: true,
-      render: (post: Post) => (
+      width: '150px'
+    }
+  ];
+
+  // Transform posts to table rows
+  const rows: WordPressTableRow[] = posts.map((post: Post) => ({
+    id: post.id,
+    data: {
+      title: (
         <div>
           <Link to={`/posts/${post.id}/edit`} className="font-medium text-blue-600 hover:text-blue-800">
             {post.title || '(no title)'}
           </Link>
           {post.status === 'draft' && <span className="text-gray-500 text-sm ml-2">— Draft</span>}
         </div>
-      )
-    },
-    {
-      key: 'author',
-      label: 'Author',
-      render: (post: Post) => post.author?.name || 'Unknown'
-    },
-    {
-      key: 'categories',
-      label: 'Categories',
-      render: (post: Post) => (
+      ),
+      author: post.author?.name || 'Unknown',
+      categories: (
         <div className="text-sm text-gray-600">
           {post.categories?.map((cat: any) => cat.name).join(', ') || '—'}
         </div>
-      )
-    },
-    {
-      key: 'tags',
-      label: 'Tags',
-      render: (post: Post) => (
+      ),
+      tags: (
         <div className="text-sm text-gray-600">
           {post.tags?.map((tag: any) => tag.name).join(', ') || '—'}
         </div>
-      )
-    },
-    {
-      key: 'comments',
-      label: 'Comments',
-      render: (post: Post) => (
-        <div className="text-center">
-          <span className="comment-count">{post.commentCount || 0}</span>
-        </div>
-      )
-    },
-    {
-      key: 'date',
-      label: 'Date',
-      sortable: true,
-      render: (post: Post) => (
+      ),
+      comments: (
+        <span className="comment-count">{post.commentCount || 0}</span>
+      ),
+      date: (
         <div className="text-sm">
           <div>{post.status === 'published' ? 'Published' : 'Last Modified'}</div>
           <div className="text-gray-600">{formatDate(post.updatedAt || post.createdAt)}</div>
         </div>
       )
-    }
-  ];
-
-  // Row actions
-  const getRowActions = (post: Post) => {
-    const actions = [
+    },
+    actions: [
       {
         label: 'Edit',
         onClick: () => navigate(`/posts/${post.id}/edit`)
@@ -228,28 +229,25 @@ const PostListBulk: FC = () => {
         href: `/posts/${post.slug}`,
         target: '_blank'
       }
-    ];
+    ]
+  }));
 
-    return <RowActions actions={actions} />;
-  };
-
-  // Status badge - Not used in bulk view
-  /*
-  const getStatusBadge = (status: PostStatus) => {
-    switch (status) {
-      case 'published':
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Published</Badge>;
-      case 'draft':
-        return <Badge variant="secondary">Draft</Badge>;
-      case 'scheduled':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Scheduled</Badge>;
-      case 'trash':
-        return <Badge variant="destructive">Trash</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+  // Handle row selection
+  const handleSelectRow = (rowId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedRows([...selectedRows, rowId]);
+    } else {
+      setSelectedRows(selectedRows.filter(id => id !== rowId));
     }
   };
-  */
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedRows(posts.map((p: Post) => p.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
 
   return (
     <div className="wrap">
@@ -299,25 +297,17 @@ const PostListBulk: FC = () => {
         position="top"
       />
 
-      {/* Posts Table */}
-      {isLoading ? (
-        <div className="text-center py-8">Loading posts...</div>
-      ) : error ? (
-        <div className="text-center py-8 text-red-600">Error loading posts</div>
-      ) : (
-        <SelectableTable
-          columns={columns}
-          data={posts}
-          idField="id"
-          isAllSelected={isAllSelected}
-          isSomeSelected={isSomeSelected}
-          onToggleAll={toggleAll}
-          onToggleItem={toggleItem}
-          isSelected={isSelected}
-          rowActions={getRowActions}
-          emptyMessage="No posts found"
-        />
-      )}
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedRows}
+        onSelectRow={handleSelectRow}
+        onSelectAll={handleSelectAll}
+        loading={isLoading}
+        emptyMessage="No posts found. Create your first post!"
+      />
 
       {/* Bulk Actions - Bottom */}
       <BulkActionBar
@@ -335,6 +325,12 @@ const PostListBulk: FC = () => {
           {/* TODO: Add pagination controls */}
         </div>
       </div>
+
+      {error && (
+        <div className="notice notice-error">
+          <p>Error loading posts. Please try again.</p>
+        </div>
+      )}
     </div>
   );
 };
