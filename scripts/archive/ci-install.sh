@@ -20,8 +20,8 @@ retry_npm_install() {
     npm config set fetch-retries 3
     npm config set registry https://registry.npmjs.org/
     
-    # npm ci 실행
-    if npm ci --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
+    # npm install 실행 (package-lock.json이 없으므로)
+    if npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
       echo "✅ npm install succeeded on attempt $attempt"
       return 0
     fi
