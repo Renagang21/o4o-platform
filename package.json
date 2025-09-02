@@ -140,6 +140,9 @@
     "npm": "10.9.3"
   },
   "overrides": {
+    "tailwindcss": "3.4.17",
+    "postcss": "8.4.31",
+    "autoprefixer": "10.4.16",
     "zod": "~4.0.17",
     "@vitejs/plugin-react": "~4.7.0"
   }
