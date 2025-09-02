@@ -112,7 +112,7 @@
     "@radix-ui/react-toast": "1.2.14",
     "@tosspayments/payment-sdk": "1.9.1",
     "@types/bcrypt": "6.0.0",
-    "@types/cron": "2.0.1",
+    "@types/cron": "2.4.3",
     "@types/jsonwebtoken": "9.0.10",
     "@types/nodemailer": "6.4.17",
     "adm-zip": "0.5.16",
