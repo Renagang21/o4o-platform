@@ -133,3 +133,7 @@ updated_claude_config.json
 *.p12
 test_ssh.bat
 LOCAL_ENVIRONMENT_REPORT.md
+
+# Vite cache
+.vite-cache/
+**/vite-cache/
