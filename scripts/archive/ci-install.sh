@@ -29,9 +29,9 @@ retry_npm_install() {
     npm config set fetch-retries 3
     npm config set registry https://registry.npmjs.org/
     
-    # npm ci 실행 (package-lock.json 사용)
-    if npm ci --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
-      echo "✅ npm ci succeeded on attempt $attempt"
+    # npm install 실행 (package-lock.json 생성)
+    if npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
+      echo "✅ npm install succeeded on attempt $attempt"
       
       # workspace node_modules 재정리 (설치 후)
       echo "🧹 Post-install cleanup of workspace node_modules..."
