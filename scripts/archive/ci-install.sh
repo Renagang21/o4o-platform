@@ -20,20 +20,9 @@ retry_npm_install() {
     npm config set fetch-retries 3
     npm config set registry https://registry.npmjs.org/
     
-    # 캐시 정리 후 npm install 실행
-    npm cache clean --force || true
-    rm -rf node_modules
-    
-    # TailwindCSS v4가 설치되지 않도록 사전 제거
-    npm uninstall tailwindcss @tailwindcss/postcss || true
-    
-    # npm install 실행 (package-lock.json이 없으므로)
-    if npm install --legacy-peer-deps --no-audit --no-fund --fetch-timeout=60000; then
-      echo "✅ npm install succeeded on attempt $attempt"
-      
-      # TailwindCSS v3 강제 설치
-      npm install tailwindcss@3.4.17 --save-dev --legacy-peer-deps || true
-      
+    # npm ci 실행 (package-lock.json 사용)
+    if npm ci --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
+      echo "✅ npm ci succeeded on attempt $attempt"
       return 0
     fi
     
