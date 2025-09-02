@@ -5,6 +5,15 @@ set -e
 
 echo "🚀 Starting CI installation..."
 
+# Workspace node_modules 정리
+echo "🧹 Cleaning workspace node_modules..."
+for dir in apps/* packages/*; do
+  if [ -d "$dir/node_modules" ]; then
+    echo "  Removing $dir/node_modules"
+    rm -rf "$dir/node_modules"
+  fi
+done
+
 # 재시도 함수
 retry_npm_install() {
   local max_attempts=3
@@ -23,6 +32,16 @@ retry_npm_install() {
     # npm ci 실행 (package-lock.json 사용)
     if npm ci --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
       echo "✅ npm ci succeeded on attempt $attempt"
+      
+      # workspace node_modules 재정리 (설치 후)
+      echo "🧹 Post-install cleanup of workspace node_modules..."
+      for dir in apps/* packages/*; do
+        if [ -d "$dir/node_modules" ]; then
+          echo "  Removing $dir/node_modules"
+          rm -rf "$dir/node_modules"
+        fi
+      done
+      
       return 0
     fi
     
