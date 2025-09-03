@@ -81,22 +81,41 @@ export class CreatePostTagTable1725170000000 implements MigrationInterface {
         }), true);
 
         // Create indexes for better performance
-        await queryRunner.createIndex("post_tags", new TableIndex({
-            name: "IDX_POST_TAG_NAME",
-            columnNames: ["name"]
-        }));
-        await queryRunner.createIndex("post_tags", new TableIndex({
-            name: "IDX_POST_TAG_SLUG", 
-            columnNames: ["slug"]
-        }));
-        await queryRunner.createIndex("post_tags", new TableIndex({
-            name: "IDX_POST_TAG_ACTIVE",
-            columnNames: ["isActive"]
-        }));
-        await queryRunner.createIndex("post_tags", new TableIndex({
-            name: "IDX_POST_TAG_USAGE_COUNT",
-            columnNames: ["usageCount"]
-        }));
+        try {
+            await queryRunner.createIndex("post_tags", new TableIndex({
+                name: "IDX_POST_TAG_NAME",
+                columnNames: ["name"]
+            }));
+        } catch (error) {
+            // Index may already exist, continue
+        }
+        
+        try {
+            await queryRunner.createIndex("post_tags", new TableIndex({
+                name: "IDX_POST_TAG_SLUG", 
+                columnNames: ["slug"]
+            }));
+        } catch (error) {
+            // Index may already exist, continue
+        }
+        
+        try {
+            await queryRunner.createIndex("post_tags", new TableIndex({
+                name: "IDX_POST_TAG_ACTIVE",
+                columnNames: ["isActive"]
+            }));
+        } catch (error) {
+            // Index may already exist, continue
+        }
+        
+        try {
+            await queryRunner.createIndex("post_tags", new TableIndex({
+                name: "IDX_POST_TAG_USAGE_COUNT",
+                columnNames: ["usageCount"]
+            }));
+        } catch (error) {
+            // Index may already exist, continue
+        }
 
         // Create many-to-many junction table for posts and tags
         await queryRunner.createTable(new Table({

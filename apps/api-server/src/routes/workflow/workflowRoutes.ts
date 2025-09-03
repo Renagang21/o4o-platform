@@ -1,9 +1,10 @@
 import { Router } from 'express';
+import type { Router as ExpressRouter } from 'express';
 import { WorkflowController } from '../../controllers/workflow/workflowController';
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
-const router = Router();
+const router: ExpressRouter = Router();
 const workflowController = new WorkflowController();
 
 // Apply authentication to all workflow routes
