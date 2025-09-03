@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import React, { useState, FC } from 'react';
 import { ChevronDown, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ColumnOption } from '@/hooks/useScreenOptions';

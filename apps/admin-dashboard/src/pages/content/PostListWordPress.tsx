@@ -1,4 +1,4 @@
-import { useState, FC } from 'react';
+import React, { useState, FC } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
 import WordPressListLayout from '@/components/common/WordPressListLayout';
