@@ -98,9 +98,9 @@ build_app() {
             fi
             cd ../..
             ;;
-        "signage")
-            echo "Building Signage components..."
-            # Signage is part of admin-dashboard, build admin
+        "signage"|"digital-signage")
+            echo "Building Digital Signage components..."
+            # Digital Signage is part of admin-dashboard, build admin
             cd apps/admin-dashboard
             if [ -f "../../pnpm-lock.yaml" ]; then
                 pnpm run build
@@ -141,7 +141,7 @@ build_app() {
             ;;
         *)
             echo "⚠️ Unknown app: $app"
-            echo "Valid options: admin, storefront, api, main, crowdfunding, forum, ecommerce, signage, affiliate, vendors, all"
+            echo "Valid options: admin, storefront, api, main, crowdfunding, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
             exit 1
             ;;
     esac
