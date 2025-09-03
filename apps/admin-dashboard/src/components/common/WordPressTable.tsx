@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import { clsx } from 'clsx';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RowActions, RowAction, useRowActions } from './RowActions';
@@ -171,3 +171,5 @@ export const WordPressTable: FC<WordPressTableProps> = ({
     </div>
   );
 };
+
+export default WordPressTable;

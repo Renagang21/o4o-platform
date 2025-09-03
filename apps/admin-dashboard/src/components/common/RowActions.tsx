@@ -1,4 +1,4 @@
-import { FC, useState, useRef, useEffect } from 'react';
+import React, { FC, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 
@@ -106,3 +106,5 @@ export const useRowActions = () => {
     isRowHovered
   };
 };
+
+export default RowActions;
