@@ -35,7 +35,7 @@ jobs:
       run: bash scripts/ci-install-fixed.sh
     
     - name: Build packages first
-      run: pnpm run build:packages
+      run: bash scripts/ci-build-packages.sh
     
     - name: Run TypeScript check (Frontend only)
       run: pnpm run type-check:frontend
