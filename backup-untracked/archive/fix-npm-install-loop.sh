@@ -139,7 +139,7 @@ else
     echo "Common solutions:"
     echo "1. Delete node_modules and package-lock.json, then try again"
     echo "2. Clear npm cache: npm cache clean --force"
-    echo "3. Use --legacy-peer-deps flag: pnpm install --legacy-peer-deps"
+    echo "3. Use  flag: pnpm install "
     echo "4. Check Node.js version: node --version (should be 22.18.0)"
     exit 1
 fi

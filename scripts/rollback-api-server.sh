@@ -49,7 +49,7 @@ echo -e "${GREEN}📥 Step 1: Rolling back to $TARGET_COMMIT${NC}"
 git checkout $TARGET_COMMIT
 
 echo -e "${GREEN}📦 Step 2: Installing dependencies${NC}"
-pnpm install --frozen-lockfile --prefer-offline --no-audit
+pnpm install --frozen-lockfile --prefer-offline 
 
 echo -e "${GREEN}🔨 Step 3: Building packages${NC}"
 pnpm run build:packages

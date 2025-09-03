@@ -29,7 +29,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     echo ""
     echo "📦 Installing dependencies (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
     
-    if pnpm install --frozen-lockfile --legacy-peer-deps; then
+    if pnpm install --frozen-lockfile ; then
         echo "✅ Dependencies installed successfully"
         break
     else
@@ -44,7 +44,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             
             # Fallback to pnpm install if ci fails
             echo "🔄 Attempting fallback with pnpm install..."
-            if pnpm install --legacy-peer-deps; then
+            if pnpm install ; then
                 echo "✅ Dependencies installed with fallback method"
                 break
             else
@@ -83,7 +83,7 @@ done
 if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
     echo "❌ Missing required packages: ${MISSING_PACKAGES[*]}"
     echo "Attempting to install missing packages..."
-    pnpm install "${MISSING_PACKAGES[@]}" --legacy-peer-deps
+    pnpm install "${MISSING_PACKAGES[@]}" 
 fi
 
 # Build packages if needed (for monorepo)

@@ -59,13 +59,13 @@ install_dependencies() {
     # pnpm install 실행 (다양한 옵션 시도)
     if [ $attempt -eq 1 ]; then
       # 첫 번째 시도: 표준 설치
-      pnpm install --legacy-peer-deps
+      pnpm install
     elif [ $attempt -eq 2 ]; then
-      # 두 번째 시도: 캐시 무시
-      pnpm install --legacy-peer-deps --cache /tmp/empty-cache --prefer-online
+      # 두 번째 시도: prefer-online 사용
+      pnpm install --prefer-online
     else
-      # 마지막 시도: package-lock 무시하고 새로 생성
-      pnpm install --legacy-peer-deps --package-lock-only=false
+      # 마지막 시도: frozen lockfile 없이
+      pnpm install
     fi
     
     if [ $? -eq 0 ]; then

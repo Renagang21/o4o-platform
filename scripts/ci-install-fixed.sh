@@ -34,10 +34,10 @@ fi
 echo "📦 Installing dependencies..."
 if [ "$CI" = "true" ] && [ "$LOCK_EXISTS" = "true" ]; then
     echo "Using frozen-lockfile for CI..."
-    pnpm install --frozen-lockfile --prefer-offline --no-audit
+    pnpm install --frozen-lockfile --prefer-offline 
 else
     echo "Using regular install..."
-    pnpm install --prefer-offline --no-audit
+    pnpm install --prefer-offline 
 fi
 
 # Verify installation

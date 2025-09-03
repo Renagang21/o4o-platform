@@ -61,9 +61,9 @@ set -e
 
 echo "📦 Installing production dependencies only..."
 # Install only production dependencies with reduced memory usage
-NODE_OPTIONS="--max-old-space-size=1024" pnpm install --frozen-lockfile --production --no-audit --no-fund || {
+NODE_OPTIONS="--max-old-space-size=1024" pnpm install --frozen-lockfile --production   || {
     echo "❌ pnpm install --frozen-lockfile failed, trying pnpm install..."
-    NODE_OPTIONS="--max-old-space-size=1024" pnpm install --production --no-audit --no-fund
+    NODE_OPTIONS="--max-old-space-size=1024" pnpm install --production  
 }
 
 echo "✅ Dependencies installed"

@@ -32,10 +32,10 @@ run_pnpm_install() {
   # CI 환경에서는 frozen-lockfile 사용
   if [ "$CI" = "true" ] && [ -f "pnpm-lock.yaml" ]; then
     echo "CI mode: using frozen-lockfile"
-    pnpm install --frozen-lockfile --prefer-offline --no-audit
+    pnpm install --frozen-lockfile --prefer-offline 
   else
     echo "⚠️  Running in fallback mode without pnpm-lock.yaml"
-    pnpm install --prefer-offline --no-audit
+    pnpm install --prefer-offline 
   fi
   
   if [ $? -eq 0 ]; then

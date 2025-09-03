@@ -7,7 +7,7 @@ echo "================================="
 # Measure without lock file
 echo "Test 1: Install without package-lock.json"
 START_TIME=$(date +%s%N)
-pnpm install --no-audit --no-fund --prefer-offline > /dev/null 2>&1
+pnpm install   --prefer-offline > /dev/null 2>&1
 END_TIME=$(date +%s%N)
 DURATION_NO_LOCK=$((($END_TIME - $START_TIME)/1000000))
 echo "Duration: ${DURATION_NO_LOCK}ms"

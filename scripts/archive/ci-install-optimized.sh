@@ -48,15 +48,15 @@ fast_install() {
   # CI 모드로 설치 (package-lock.json 필수)
   if [ -f "package-lock.json" ]; then
     # pnpm install --frozen-lockfile는 package-lock.json을 그대로 사용하므로 빠름
-    pnpm install --frozen-lockfile --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
+    pnpm install --frozen-lockfile     2>&1 | \
       grep -E "(added|ERR)" || true
   else
     # package-lock.json이 없으면 생성 후 설치
     echo "Generating package-lock.json..."
-    pnpm install --legacy-peer-deps --no-audit --no-fund --package-lock-only
+    pnpm install    
     
     echo "Installing with pnpm install --frozen-lockfile..."
-    pnpm install --frozen-lockfile --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
+    pnpm install --frozen-lockfile     2>&1 | \
       grep -E "(added|ERR)" || true
   fi
 }
@@ -110,7 +110,7 @@ main() {
   if ! fast_install; then
     echo -e "${YELLOW}⚠️  Fast install failed, trying fallback...${NC}"
     npm cache clean --force
-    pnpm install --legacy-peer-deps --no-audit --no-fund
+    pnpm install   
   fi
   
   build_essentials

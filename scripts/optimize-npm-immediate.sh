@@ -66,7 +66,7 @@ install_selective() {
             ;;
         5)
             echo "Installing everything..."
-            pnpm install --legacy-peer-deps
+            pnpm install 
             ;;
         *)
             echo "잘못된 선택"
@@ -79,7 +79,7 @@ install_selective() {
 echo "✅ npm 최적화 설정 완료!"
 echo ""
 echo "다음 명령어를 실행하여 효과를 확인하세요:"
-echo "  pnpm install --legacy-peer-deps"
+echo "  pnpm install "
 echo ""
 echo "또는 선택적 설치를 원하시면:"
 echo "  ./scripts/optimize-npm-immediate.sh --selective"
