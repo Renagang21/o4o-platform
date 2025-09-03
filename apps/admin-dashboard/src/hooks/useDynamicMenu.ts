@@ -54,6 +54,7 @@ export const useDynamicMenu = () => {
       // 핵심 메뉴는 항상 표시 (대시보드, 사용자, 페이지/글)
       const coreMenus = [
         'dashboard', 'users', 'posts', 'pages', 'media', 
+        'appearance', // 외모 메뉴 추가
         'theme', 'themes', 'settings', 'tools', 'apps', 
         'monitoring', 'cpt-acf', 'collapse',
         'shortcodes', // Shortcode 메뉴 추가

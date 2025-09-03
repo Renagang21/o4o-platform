@@ -1,16 +1,7 @@
 import { useState, FC } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
-// import { RowAction } from '@/components/common/RowActions'; // Type is exported from WordPressTable
+import { WordPressListLayout } from '@/components/common/WordPressListLayout';
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { formatDate } from '@/lib/utils';
@@ -18,12 +9,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Post, PostStatus } from '@o4o/types';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * WordPress-style Post List with Row Actions
  */
 const PostListWordPress: FC = () => {
-  // const navigate = useNavigate(); // Not used
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
   const [searchQuery, setSearchQuery] = useState('');
@@ -196,9 +188,37 @@ const PostListWordPress: FC = () => {
   }));
 
   return (
-    <div className="wrap">
-      {/* Screen Options */}
-      <div className="relative">
+    <WordPressListLayout
+      title="Posts"
+      subtitle="Manage your blog posts and articles"
+      addNewLabel="Add New Post"
+      onAddNew={() => navigate('/content/posts/new')}
+      searchValue={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder="Search posts..."
+      filters={[
+        {
+          value: statusFilter,
+          onChange: (value) => setStatusFilter(value as PostStatus | 'all'),
+          options: [
+            { value: 'all', label: 'All Statuses' },
+            { value: 'published', label: 'Published' },
+            { value: 'draft', label: 'Draft' },
+            { value: 'scheduled', label: 'Scheduled' },
+            { value: 'trash', label: 'Trash' }
+          ],
+          placeholder: 'Filter by status'
+        }
+      ]}
+      bulkActions={[
+        { value: 'trash', label: 'Move to Trash' },
+        { value: 'publish', label: 'Publish' }
+      ]}
+      onBulkAction={handleBulkAction}
+      selectedCount={selectedPosts.length}
+      totalItems={posts.length}
+      loading={isLoading}
+      screenOptions={
         <ScreenOptionsReact
           title="Screen Options"
           columns={options.columns || defaultColumns}
@@ -206,77 +226,8 @@ const PostListWordPress: FC = () => {
           itemsPerPage={itemsPerPage}
           onItemsPerPageChange={setItemsPerPage}
         />
-      </div>
-      
-      <h1 className="wp-heading-inline">Posts</h1>
-      <a href="/content/posts/new" className="page-title-action">Add New</a>
-      
-      {/* Filters */}
-      <div className="tablenav top">
-        <div className="alignleft actions bulkactions">
-          <label htmlFor="bulk-action-selector-top" className="screen-reader-text">
-            Select bulk action
-          </label>
-          <Select value="" onValueChange={handleBulkAction}>
-            <SelectTrigger id="bulk-action-selector-top" className="w-[180px]">
-              <SelectValue placeholder="Bulk actions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="trash">Move to Trash</SelectItem>
-              <SelectItem value="publish">Publish</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            variant="secondary" 
-            size="sm"
-            disabled={selectedPosts.length === 0}
-          >
-            Apply
-          </Button>
-        </div>
-        
-        <div className="alignleft actions">
-          <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as PostStatus | 'all')}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="trash">Trash</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="secondary" size="sm">Filter</Button>
-        </div>
-        
-        <div className="tablenav-pages">
-          <span className="displaying-num">{posts.length} items</span>
-        </div>
-        
-        <br className="clear" />
-      </div>
-
-      {/* Search Box */}
-      <p className="search-box">
-        <label className="screen-reader-text" htmlFor="post-search-input">
-          Search Posts:
-        </label>
-        <Input
-          type="search"
-          id="post-search-input"
-          value={searchQuery}
-          onChange={(e: any) => setSearchQuery(e.target.value)}
-          placeholder="Search posts..."
-          className="w-auto inline-block mr-2"
-        />
-        <Button variant="secondary" size="sm">
-          Search Posts
-        </Button>
-      </p>
-
-      {/* Posts Table */}
+      }
+    >
       <WordPressTable
         columns={columns}
         rows={rows}
@@ -296,38 +247,9 @@ const PostListWordPress: FC = () => {
             setSelectedPosts([]);
           }
         }}
-        loading={isLoading}
         emptyMessage="No posts found."
       />
-      
-      {/* Bottom navigation */}
-      <div className="tablenav bottom">
-        <div className="alignleft actions bulkactions">
-          <Select value="" onValueChange={handleBulkAction}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Bulk actions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="trash">Move to Trash</SelectItem>
-              <SelectItem value="publish">Publish</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            variant="secondary" 
-            size="sm"
-            disabled={selectedPosts.length === 0}
-          >
-            Apply
-          </Button>
-        </div>
-        
-        <div className="tablenav-pages">
-          <span className="displaying-num">{posts.length} items</span>
-        </div>
-        
-        <br className="clear" />
-      </div>
-    </div>
+    </WordPressListLayout>
   );
 };
 

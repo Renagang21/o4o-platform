@@ -71,6 +71,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                   indeterminate={someSelected}
                   onCheckedChange={(checked) => onSelectAll?.(checked as boolean)}
                   aria-label="Select all"
+                  className="wp-checkbox"
                 />
               </td>
             )}
@@ -83,13 +84,14 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                   `column-${column.id}`,
                   column.sortable && 'sortable',
                   sortColumn === column.id && 'sorted',
-                  sortColumn === column.id && sortDirection
+                  sortColumn === column.id && sortDirection,
+                  'text-left font-semibold text-gray-700 dark:text-gray-200'
                 )}
                 style={{ width: column.width }}
               >
                 {column.sortable ? (
                   <button
-                    className="column-sort-button"
+                    className="column-sort-button inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400"
                     onClick={() => handleSort(column.id)}
                   >
                     <span>{column.label}</span>
@@ -121,7 +123,8 @@ export const WordPressTable: FC<WordPressTableProps> = ({
               <tr
                 key={row.id}
                 className={clsx(
-                  selectedRows.includes(row.id) && 'selected'
+                  'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors',
+                  selectedRows.includes(row.id) && 'selected bg-blue-100 dark:bg-blue-900/30'
                 )}
                 onMouseEnter={() => handleMouseEnter(row.id)}
                 onMouseLeave={handleMouseLeave}
@@ -132,6 +135,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                       checked={selectedRows.includes(row.id)}
                       onCheckedChange={(checked) => onSelectRow?.(row.id, checked as boolean)}
                       aria-label={`Select ${row.id}`}
+                      className="wp-checkbox"
                     />
                   </th>
                 )}
@@ -142,11 +146,14 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                       key={column.id}
                       className={clsx(
                         `column-${column.id}`,
-                        isFirstColumn && 'column-primary',
-                        column.align && `text-${column.align}`
+                        isFirstColumn && 'column-primary font-medium',
+                        column.align && `text-${column.align}`,
+                        'text-gray-900 dark:text-gray-100'
                       )}
                     >
-                      {row.data[column.id]}
+                      <div className="cell-content">
+                        {row.data[column.id]}
+                      </div>
                       {isFirstColumn && row.actions && (
                         <RowActions
                           actions={row.actions}
