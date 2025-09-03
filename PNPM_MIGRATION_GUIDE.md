@@ -37,10 +37,10 @@ EOF
 ```bash
 # package.json에 추가할 스크립트
 "scripts": {
-  "install:admin": "npm install --workspace=@o4o/admin-dashboard",
-  "install:api": "cd apps/api-server && npm install",
-  "install:web": "npm install --workspace=@o4o/main-site",
-  "install:packages": "npm install --workspaces --if-present --include-workspace-root=false"
+  "install:admin": "pnpm install --workspace=@o4o/admin-dashboard",
+  "install:api": "cd apps/api-server && pnpm install",
+  "install:web": "pnpm install --workspace=@o4o/main-site",
+  "install:packages": "pnpm install --workspaces --if-present --include-workspace-root=false"
 }
 ```
 
@@ -55,7 +55,7 @@ EOF
 
 ```bash
 # 1. pnpm 전역 설치
-npm install -g pnpm@latest
+pnpm install -g pnpm@latest
 
 # 2. pnpm 버전 확인 (v8.0 이상 권장)
 pnpm --version
@@ -145,7 +145,7 @@ START_TIME=$(date +%s)
 
 # pnpm 설치 (이미 있으면 스킵)
 if ! command -v pnpm &> /dev/null; then
-    npm install -g pnpm@latest
+    pnpm install -g pnpm@latest
 fi
 
 # 캐시 디렉토리 설정
@@ -201,18 +201,18 @@ jobs:
 ### 개발자용 치트시트
 ```bash
 # 이전 (npm)                    → 새로운 (pnpm)
-npm install                     → pnpm install
-npm install express             → pnpm add express
-npm install -D eslint           → pnpm add -D eslint
+pnpm install                     → pnpm install
+pnpm install express             → pnpm add express
+pnpm install -D eslint           → pnpm add -D eslint
 npm run dev                     → pnpm dev
 npm run build                   → pnpm build
 
 # Workspace 전용 명령어
 npm run dev --workspace=admin   → pnpm --filter admin dev
-npm install --workspaces        → pnpm install -r
+pnpm install --workspaces        → pnpm install -r
 
 # 특정 앱만 작업할 때 (빠른 설치)
-cd apps/admin && npm install    → pnpm install --filter admin
+cd apps/admin && pnpm install    → pnpm install --filter admin
 ```
 
 ## ⚠️ 주의사항 및 트러블슈팅

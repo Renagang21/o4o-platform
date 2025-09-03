@@ -30,8 +30,8 @@ echo -e "${YELLOW}📦 Step 3/7: 의존성 설치 중...${NC}"
 if npm ci --production; then
     echo -e "${GREEN}✓ 의존성 설치 완료 (ci)${NC}"
 else
-    echo -e "${YELLOW}⚠ npm ci 실패, npm install 시도 중...${NC}"
-    npm install --production
+    echo -e "${YELLOW}⚠ npm ci 실패, pnpm install 시도 중...${NC}"
+    pnpm install --production
     echo -e "${GREEN}✓ 의존성 설치 완료 (install)${NC}"
 fi
 

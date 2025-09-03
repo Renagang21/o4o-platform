@@ -117,7 +117,7 @@ pm2 reload o4o-api-server
 ```
 
 ### 4. 패키지 의존성 변경
-- `package.json` 수정 시 → npm install 후 재시작
+- `package.json` 수정 시 → pnpm install 후 재시작
 
 ---
 

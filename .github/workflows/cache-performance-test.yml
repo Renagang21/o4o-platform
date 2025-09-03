@@ -28,7 +28,7 @@ jobs:
         id: measure-with-lock
         run: |
           START_TIME=$(date +%s)
-          npm ci
+          pnpm install --frozen-lockfile
           END_TIME=$(date +%s)
           DURATION=$((END_TIME - START_TIME))
           echo "duration=$DURATION" >> $GITHUB_OUTPUT
@@ -62,7 +62,7 @@ jobs:
         id: measure-with-path
         run: |
           START_TIME=$(date +%s)
-          npm install
+          pnpm install
           END_TIME=$(date +%s)
           DURATION=$((END_TIME - START_TIME))
           echo "duration=$DURATION" >> $GITHUB_OUTPUT

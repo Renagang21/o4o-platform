@@ -55,7 +55,7 @@ rm -rf apps/*/node_modules
 rm -rf packages/*/node_modules
 
 # 종속성 설치
-npm install
+pnpm install
 
 # 프론트엔드 빌드
 npm run build:packages  # 패키지 먼저 빌드
@@ -120,7 +120,7 @@ rm -rf node_modules package-lock.json
 rm -rf apps/api-server/node_modules
 
 # 종속성 설치
-npm install
+pnpm install
 
 # API 서버 빌드
 cd apps/api-server
@@ -187,7 +187,7 @@ git reset --hard [previous-commit-hash]
 
 # 종속성 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 
 # 재빌드 및 재시작
 npm run build

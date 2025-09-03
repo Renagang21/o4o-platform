@@ -42,9 +42,9 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         else
             echo "❌ Installation failed after $MAX_RETRIES attempts"
             
-            # Fallback to npm install if ci fails
-            echo "🔄 Attempting fallback with npm install..."
-            if npm install --legacy-peer-deps; then
+            # Fallback to pnpm install if ci fails
+            echo "🔄 Attempting fallback with pnpm install..."
+            if pnpm install --legacy-peer-deps; then
                 echo "✅ Dependencies installed with fallback method"
                 break
             else
@@ -83,7 +83,7 @@ done
 if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
     echo "❌ Missing required packages: ${MISSING_PACKAGES[*]}"
     echo "Attempting to install missing packages..."
-    npm install "${MISSING_PACKAGES[@]}" --legacy-peer-deps
+    pnpm install "${MISSING_PACKAGES[@]}" --legacy-peer-deps
 fi
 
 # Build packages if needed (for monorepo)

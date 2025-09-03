@@ -221,7 +221,7 @@ npm cache clean --force
 rm -rf node_modules package-lock.json
 
 # 재설치
-npm install
+pnpm install
 
 # 빌드
 npm run build

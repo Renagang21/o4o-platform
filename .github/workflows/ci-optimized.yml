@@ -42,17 +42,17 @@ jobs:
       timeout-minutes: 15
     
     - name: Build packages
-      run: npm run build:packages
+      run: pnpm run build:packages
       timeout-minutes: 10
     
     - name: Type check
-      run: npm run type-check
+      run: pnpm run type-check
       timeout-minutes: 5
     
     - name: Lint
-      run: npm run lint
+      run: pnpm run lint
       timeout-minutes: 5
     
     - name: Build apps
-      run: npm run build:apps
+      run: pnpm run build:apps
       timeout-minutes: 15

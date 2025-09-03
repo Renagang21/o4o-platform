@@ -54,7 +54,7 @@ sudo mkdir -p /etc/nginx/sites-enabled
 Install PM2 globally:
 
 ```bash
-sudo npm install -g pm2
+sudo pnpm install -g pm2
 sudo pm2 startup systemd -u ubuntu --hp /home/ubuntu
 ```
 

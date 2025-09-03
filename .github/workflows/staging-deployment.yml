@@ -23,18 +23,18 @@ jobs:
         cache-dependency-path: '**/package.json'
     
     - name: Install dependencies
-      run: npm install
+      run: pnpm install
     
     - name: Run tests
       run: |
-        npm run test
-        npm run type-check
+        pnpm run test
+        pnpm run type-check
     
     - name: Build packages
-      run: npm run build:packages
+      run: pnpm run build:packages
     
     - name: Build applications
-      run: npm run build:apps
+      run: pnpm run build:apps
 
   security-scan:
     runs-on: ubuntu-latest
@@ -73,8 +73,8 @@ jobs:
         ssh ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }} << 'EOF'
           cd /home/ubuntu/o4o-platform
           git pull origin staging
-          npm install --production
-          npm run build
+          pnpm install --production
+          pnpm run build
           pm2 reload ecosystem.config.js --env staging
           pm2 save
         EOF

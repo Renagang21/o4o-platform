@@ -20,7 +20,7 @@ git pull origin main
 
 ### 3. 의존성 재설치
 ```bash
-npm install
+pnpm install
 ```
 
 ### 4. 패키지 빌드

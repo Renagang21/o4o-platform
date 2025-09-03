@@ -45,7 +45,7 @@ pm2 status
 # 코드 업데이트
 cd /home/ubuntu/o4o-platform
 git pull origin main
-npm install --production
+pnpm install --production
 
 # 환경변수 설정 (처음 한 번만)
 cp .env.example .env.production

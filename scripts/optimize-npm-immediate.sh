@@ -50,23 +50,23 @@ install_selective() {
     case $choice in
         1)
             echo "Installing Admin Dashboard..."
-            npm install --workspace=@o4o/admin-dashboard
+            pnpm install --workspace=@o4o/admin-dashboard
             ;;
         2)
             echo "Installing API Server..."
-            cd apps/api-server && npm install && cd ../..
+            cd apps/api-server && pnpm install && cd ../..
             ;;
         3)
             echo "Installing Main Site..."
-            npm install --workspace=@o4o/main-site
+            pnpm install --workspace=@o4o/main-site
             ;;
         4)
             echo "Installing Packages only..."
-            npm install --workspaces --if-present --include-workspace-root=false
+            pnpm install --workspaces --if-present --include-workspace-root=false
             ;;
         5)
             echo "Installing everything..."
-            npm install --legacy-peer-deps
+            pnpm install --legacy-peer-deps
             ;;
         *)
             echo "잘못된 선택"
@@ -79,7 +79,7 @@ install_selective() {
 echo "✅ npm 최적화 설정 완료!"
 echo ""
 echo "다음 명령어를 실행하여 효과를 확인하세요:"
-echo "  npm install --legacy-peer-deps"
+echo "  pnpm install --legacy-peer-deps"
 echo ""
 echo "또는 선택적 설치를 원하시면:"
 echo "  ./scripts/optimize-npm-immediate.sh --selective"

@@ -164,7 +164,7 @@ cd apps/api-server
 npm uninstall bcryptjs node-fetch express cors compression cookie-parser express-validator tail ua-parser-js
 
 # 버전 조정
-npm install vite@5.4.19 @types/node@20.14.0 --save-dev
+pnpm install vite@5.4.19 @types/node@20.14.0 --save-dev
 ```
 
 ### **Phase 2: 코드 수정 필요** (2-3시간)

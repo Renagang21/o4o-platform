@@ -14,7 +14,7 @@
 git pull origin main
 
 # 의존성 업데이트
-npm install
+pnpm install
 
 # 패키지 재빌드 (필요시)
 npm run build:packages

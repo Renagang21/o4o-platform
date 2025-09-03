@@ -53,7 +53,7 @@ fast_install() {
   else
     # package-lock.json이 없으면 생성 후 설치
     echo "Generating package-lock.json..."
-    npm install --legacy-peer-deps --no-audit --no-fund --package-lock-only
+    pnpm install --legacy-peer-deps --no-audit --no-fund --package-lock-only
     
     echo "Installing with npm ci..."
     npm ci --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
@@ -110,7 +110,7 @@ main() {
   if ! fast_install; then
     echo -e "${YELLOW}⚠️  Fast install failed, trying fallback...${NC}"
     npm cache clean --force
-    npm install --legacy-peer-deps --no-audit --no-fund
+    pnpm install --legacy-peer-deps --no-audit --no-fund
   fi
   
   build_essentials

@@ -84,7 +84,7 @@ NODE_ENV=production
 cd /home/ubuntu/o4o-platform/apps/api-server
 
 # 의존성 설치 (package.json 변경 시)
-npm install
+pnpm install
 
 # 마이그레이션 실행
 npm run migration:run

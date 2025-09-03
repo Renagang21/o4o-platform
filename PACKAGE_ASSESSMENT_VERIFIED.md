@@ -100,7 +100,7 @@ npm uninstall @nestjs/cli
 #### 2. UUID 충돌 해결
 ```bash
 # 전체 프로젝트 통일 (하위 호환성 유지)
-npm install uuid@9.0.1 --save-exact
+pnpm install uuid@9.0.1 --save-exact
 # root package.json의 overrides 수정
 ```
 
@@ -108,7 +108,7 @@ npm install uuid@9.0.1 --save-exact
 ```bash
 # 안정적인 5.4.19로 통일
 cd apps/api-server
-npm install vite@5.4.19 --save-exact
+pnpm install vite@5.4.19 --save-exact
 ```
 
 ### 🟡 중요하지만 급하지 않은 것

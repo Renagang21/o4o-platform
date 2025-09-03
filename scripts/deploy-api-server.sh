@@ -36,17 +36,17 @@ git fetch origin
 git pull origin main
 
 echo -e "${GREEN}📦 Step 2: Installing dependencies${NC}"
-npm ci --prefer-offline --no-audit
+pnpm install --frozen-lockfile --prefer-offline --no-audit
 
 echo -e "${GREEN}🔨 Step 3: Building packages${NC}"
-npm run build:packages
+pnpm run build:packages
 
 echo -e "${GREEN}🏗️  Step 4: Building API server${NC}"
 cd apps/api-server
-npm run build
+pnpm run build
 
 echo -e "${GREEN}🔄 Step 5: Running database migrations${NC}"
-npm run migration:run || {
+pnpm run migration:run || {
     echo -e "${YELLOW}⚠️  Migration failed or no new migrations${NC}"
 }
 

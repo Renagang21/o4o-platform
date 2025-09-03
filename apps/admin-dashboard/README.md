@@ -26,7 +26,7 @@ WordPress-style Admin Dashboard for O4O Platform built with React 18, TypeScript
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
 npm run dev

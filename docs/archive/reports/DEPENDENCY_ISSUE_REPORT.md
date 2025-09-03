@@ -31,7 +31,7 @@
 ```
 
 ### 버전 불일치 원인
-1. **npm install 시 자동 업데이트**: 19.1.0 지정했지만 19.1.1 설치됨
+1. **pnpm install 시 자동 업데이트**: 19.1.0 지정했지만 19.1.1 설치됨
 2. **WordPress 패키지 호환성**: WordPress는 아직 React 19 공식 지원 안함
 3. **Override 미적용**: WordPress 패키지가 자체 번들링하여 override 무시
 
@@ -108,7 +108,7 @@
 ### 즉시 조치 (오늘)
 1. **React 19.1.1로 통일**
    ```bash
-   npm install react@19.1.1 react-dom@19.1.1 --save-exact
+   pnpm install react@19.1.1 react-dom@19.1.1 --save-exact
    ```
 
 2. **Overrides 정리**

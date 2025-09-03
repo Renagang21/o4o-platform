@@ -18,7 +18,7 @@ install_pnpm() {
     
     if ! command -v pnpm &> /dev/null; then
         echo "pnpm이 없습니다. 설치 중..."
-        npm install -g pnpm@latest
+        pnpm install -g pnpm@latest
     else
         echo "pnpm $(pnpm --version) 발견"
     fi

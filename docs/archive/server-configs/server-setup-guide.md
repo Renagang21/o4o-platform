@@ -131,7 +131,7 @@ cd api-server
 nano .env
 
 # PM2 설치
-npm install -g pm2
+pnpm install -g pm2
 
 # 첫 실행
 cd apps/api-server

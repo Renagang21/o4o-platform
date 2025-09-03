@@ -236,7 +236,7 @@ env | grep SERVER_TYPE
 ```bash
 # 캐시 정리 후 재시도
 npm run clean:apiserver
-npm install
+pnpm install
 npm run build:apiserver
 ```
 

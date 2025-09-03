@@ -14,7 +14,7 @@
 git pull origin main
 
 # 의존성 업데이트
-npm install
+pnpm install
 
 # API 서버 빌드
 cd apps/api-server

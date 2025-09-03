@@ -7,7 +7,7 @@ This guide covers the deployment process for the O4O Platform admin dashboard to
 
 - Ubuntu/Debian server
 - Node.js 20.x installed
-- PM2 installed globally (`npm install -g pm2`)
+- PM2 installed globally (`pnpm install -g pm2`)
 - Nginx installed
 - PostgreSQL installed (optional for development)
 - Domain DNS configured to point to your server IP
@@ -26,7 +26,7 @@ cd $DEPLOY_PATH
 git pull origin main
 
 # Install dependencies
-npm install
+pnpm install
 ```
 
 ### 2. Configure Environment Variables

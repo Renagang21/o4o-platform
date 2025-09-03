@@ -28,7 +28,7 @@
 git pull origin main
 
 # 2. 의존성 설치
-npm install
+pnpm install
 
 # 3. PM2로 프론트엔드만 실행
 npm run pm2:start:webserver
@@ -44,7 +44,7 @@ npm run dev:web       # Storefront만
 git pull origin main
 
 # 2. 의존성 설치
-npm install
+pnpm install
 
 # 3. 데이터베이스 마이그레이션
 cd apps/api-server

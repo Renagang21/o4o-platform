@@ -24,7 +24,7 @@ echo -e "${YELLOW}🔨 로컬에서 빌드 중...${NC}"
 cd apps/api-server
 
 # 의존성 설치 및 빌드
-npm install
+pnpm install
 npm run build
 
 # dist 폴더 확인
@@ -101,7 +101,7 @@ sudo mkdir -p logs
 
 # Production 의존성만 설치
 echo "Production 의존성 설치 중..."
-sudo npm ci --only=production || sudo npm install --only=production
+sudo npm ci --only=production || sudo pnpm install --only=production
 
 # PM2로 서비스 시작
 echo "PM2로 API 서버 시작 중..."

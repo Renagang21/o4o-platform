@@ -207,7 +207,7 @@ pm2 start npm --name "o4o-main-site" -- run dev -- --port 3000
 npm run build
 
 # Serve with static server (requires serve package)
-npm install -g serve
+pnpm install -g serve
 pm2 start serve --name "admin-prod" -- -s dist -l 3001
 ```
 
@@ -215,8 +215,8 @@ pm2 start serve --name "admin-prod" -- -s dist -l 3001
 
 1. **package-lock.json out of sync**
    ```bash
-   # Solution: Use npm install instead of npm ci
-   npm install
+   # Solution: Use pnpm install instead of npm ci
+   pnpm install
    ```
 
 2. **Vite host blocking in development**

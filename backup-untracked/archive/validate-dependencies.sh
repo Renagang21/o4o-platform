@@ -53,12 +53,12 @@ else
     echo ""
     echo "⚠️  Please review the changes and run:"
     echo "   rm -rf node_modules package-lock.json"
-    echo "   npm install"
+    echo "   pnpm install"
 fi
 
 # Also check package-lock.json if it exists
 if [ -f "package-lock.json" ] && grep -qE '"[0-9]+":\s*\{' "package-lock.json"; then
     echo ""
     echo "⚠️  Invalid dependencies also found in package-lock.json"
-    echo "   Run: rm package-lock.json && npm install"
+    echo "   Run: rm package-lock.json && pnpm install"
 fi

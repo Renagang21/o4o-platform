@@ -11,7 +11,7 @@ git pull origin main
 ## 2. 의존성 설치 및 빌드
 ```bash
 cd apps/api-server
-npm install
+pnpm install
 npm run build
 ```
 

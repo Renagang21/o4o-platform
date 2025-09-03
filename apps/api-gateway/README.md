@@ -46,7 +46,7 @@ Enterprise-grade API Gateway for the O4O Platform, providing centralized routing
 ### Development
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Copy environment file
 cp .env.example .env

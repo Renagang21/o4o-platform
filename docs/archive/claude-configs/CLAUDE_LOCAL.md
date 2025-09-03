@@ -154,7 +154,7 @@ pm2 profile o4o-api-local
 
 ### 일반적인 문제
 - 포트 충돌: `lsof -i :3001` 또는 `lsof -i :5173`로 확인
-- 빌드 실패: `npm run clean` 후 `npm install`
+- 빌드 실패: `npm run clean` 후 `pnpm install`
 - 타입 에러: `npm run type-check` 실행하여 확인
 - DB 연결 실패: PostgreSQL 서비스 확인
 
@@ -163,7 +163,7 @@ pm2 profile o4o-api-local
 # 완전 초기화
 npm run clean
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 npm run build:packages
 ```
 

@@ -18,7 +18,7 @@
 | 설정 파일들 | backups/20250817_config_backup/ | 16K | 10:52 |
 
 ### 2. 테스트 (✅ 완료)
-- **PM2 설치**: npm install -g pm2 완료
+- **PM2 설치**: pnpm install -g pm2 완료
 - **빌드 테스트**: API 서버 빌드 성공
 - **환경변수 확인**: .env.local 연동 확인
 - **PM2 실행 테스트**: 성공 (프로세스 정상 시작)

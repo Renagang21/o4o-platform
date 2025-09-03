@@ -42,7 +42,7 @@ git pull origin main
 
 # 6. 종속성 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 
 # 7. API 서버 재빌드
 cd apps/api-server
@@ -87,7 +87,7 @@ git pull origin main
 
 # 6. 종속성 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 
 # 7. 프론트엔드 빌드
 npm run build:web
@@ -126,7 +126,7 @@ rm -rf apps/*/node_modules
 rm -rf packages/*/node_modules
 
 # 5. 전체 재설치
-npm install
+pnpm install
 
 # 6. 빌드 테스트
 npm run build:packages
@@ -202,7 +202,7 @@ git reset --hard dbae24fa^  # 이전 커밋으로
 
 # 종속성 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 
 # 서비스 재시작
 pm2 restart all

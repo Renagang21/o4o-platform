@@ -6,7 +6,7 @@
 ```bash
 # 1회만 실행 (초기 설정)
 git clone [repository-url] && cd o4o-platform
-npm install
+pnpm install
 cp .env.webserver.example .env
 # .env 파일에서 VITE_API_URL 수정
 
@@ -14,14 +14,14 @@ cp .env.webserver.example .env
 npm run pm2:start:webserver
 
 # 업데이트 후 재시작
-git pull && npm install && npm run pm2:restart:webserver
+git pull && pnpm install && npm run pm2:restart:webserver
 ```
 
 ### 🔧 o4o-apiserver (API만)
 ```bash
 # 1회만 실행 (초기 설정)
 git clone [repository-url] && cd o4o-platform
-npm install
+pnpm install
 cp .env.apiserver.example apps/api-server/.env
 # apps/api-server/.env 파일에서 DB 정보 설정
 
@@ -35,7 +35,7 @@ cd ../..
 npm run pm2:start:apiserver
 
 # 업데이트 후 재시작
-git pull && npm install
+git pull && pnpm install
 cd apps/api-server && npm run build && npm run migration:run && cd ../..
 npm run pm2:restart:apiserver
 ```
@@ -44,7 +44,7 @@ npm run pm2:restart:apiserver
 ```bash
 # 1회만 실행 (초기 설정)
 git clone [repository-url] && cd o4o-platform
-npm install
+pnpm install
 cp .env.example .env.local
 
 # 실행

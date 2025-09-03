@@ -54,7 +54,7 @@ deploy_api() {
         dist/api-deploy/ ubuntu@43.202.242.215:/home/ubuntu/o4o-platform/apps/api-server/
     
     # Restart service
-    ssh ubuntu@43.202.242.215 "cd /home/ubuntu/o4o-platform/apps/api-server && npm install --production && pm2 restart api-server"
+    ssh ubuntu@43.202.242.215 "cd /home/ubuntu/o4o-platform/apps/api-server && pnpm install --production && pm2 restart api-server"
     
     print_status "API server deployed successfully!"
 }
@@ -151,7 +151,7 @@ smart_deploy() {
     while IFS= read -r file; do
         # Check for package.json changes
         if [[ "$file" == "package.json" ]] || [[ "$file" == "package-lock.json" ]]; then
-            print_status "📦 Dependencies changed - will run npm install"
+            print_status "📦 Dependencies changed - will run pnpm install"
             NEED_NPM_INSTALL=true
             DOCS_ONLY=false
         fi
@@ -213,7 +213,7 @@ smart_deploy() {
     # Install dependencies if needed
     if [ "$NEED_NPM_INSTALL" = true ]; then
         print_status "📦 Installing dependencies..."
-        npm install
+        pnpm install
     fi
     
     # Build packages if needed

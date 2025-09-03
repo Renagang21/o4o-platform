@@ -15,7 +15,7 @@ echo "🚀 API 서버 간단 배포 시작"
 if [ ! -d "apps/api-server/dist" ]; then
     echo "📦 빌드 시작..."
     cd apps/api-server
-    npm install
+    pnpm install
     npm run build
     cd ../..
 else
@@ -47,7 +47,7 @@ mkdir -p logs
 
 # production 의존성만 설치
 echo "📦 Production 의존성 설치..."
-npm ci --only=production || npm install --only=production
+npm ci --only=production || pnpm install --only=production
 
 # PM2 설정 파일 생성
 cat > ecosystem.config.js << 'EOF'

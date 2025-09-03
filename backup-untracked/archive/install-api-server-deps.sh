@@ -11,7 +11,7 @@ npm cache clean --force
 
 # API 서버와 필요한 패키지만 설치
 echo "📥 API 서버 및 의존 패키지 설치 중..."
-npm install \
+pnpm install \
   --workspace=@o4o/api-server \
   --workspace=@o4o/types \
   --workspace=@o4o/utils \

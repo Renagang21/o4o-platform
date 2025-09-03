@@ -254,21 +254,21 @@ SETTLEMENT_DAY=1
 cd apps/api-server
 
 # 필수 패키지 설치
-npm install socket.io
-npm install @socket.io/redis-adapter
-npm install redis
-npm install ioredis
-npm install node-cron
-npm install nodemailer
-npm install @aws-sdk/client-s3
-npm install multer
-npm install multer-s3
-npm install sharp
-npm install fluent-ffmpeg
-npm install bull
-npm install @types/multer --save-dev
-npm install @types/nodemailer --save-dev
-npm install @types/fluent-ffmpeg --save-dev
+pnpm install socket.io
+pnpm install @socket.io/redis-adapter
+pnpm install redis
+pnpm install ioredis
+pnpm install node-cron
+pnpm install nodemailer
+pnpm install @aws-sdk/client-s3
+pnpm install multer
+pnpm install multer-s3
+pnpm install sharp
+pnpm install fluent-ffmpeg
+pnpm install bull
+pnpm install @types/multer --save-dev
+pnpm install @types/nodemailer --save-dev
+pnpm install @types/fluent-ffmpeg --save-dev
 ```
 
 ## 🚀 구현 순서 (권장)

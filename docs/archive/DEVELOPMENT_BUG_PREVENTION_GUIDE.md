@@ -6,7 +6,7 @@
 ```bash
 # 개발 시작 전 항상 실행
 npm run clean
-npm install
+pnpm install
 npm run build:packages  # 반드시 먼저!
 ```
 
@@ -25,7 +25,7 @@ types → utils → ui → auth-client → auth-context → apps
 ```bash
 □ Node.js 버전 확인 (20.x)
 □ npm run clean 실행
-□ npm install 실행
+□ pnpm install 실행
 □ npm run build:packages 실행
 □ npm run type-check 통과
 □ npm run lint 통과
@@ -89,7 +89,7 @@ import type { User } from './User';
 git checkout -b feature/새기능
 
 # 2. 클린 설치
-npm run clean && npm install
+npm run clean && pnpm install
 
 # 3. 패키지 빌드 (필수!)
 npm run build:packages
@@ -127,7 +127,7 @@ npm run clean && npm run install:all
 # 1. 브라우저 콘솔 확인
 # 2. 다음 명령어 실행
 npm run clean
-npm install
+pnpm install
 npm run build:packages
 npm run dev
 ```
@@ -157,7 +157,7 @@ npm ls --depth=0
 
 # 클린 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 ```
 
 ## 🚫 절대 하지 말아야 할 것들

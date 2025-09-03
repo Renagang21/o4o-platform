@@ -28,7 +28,7 @@ cat package.json | grep -v "@o4o/" > package.tmp.json
 mv package.tmp.json package.json
 
 # 의존성 설치
-npm install --production
+pnpm install --production
 
 # 압축
 cd /tmp

@@ -161,7 +161,7 @@ perform_rollback() {
     # 의존성 재설치
     log "의존성 설치 중..."
     cd $DEPLOY_DIR
-    npm ci --production || npm install --production
+    npm ci --production || pnpm install --production
     
     # PM2 프로세스 복원
     log "PM2 프로세스 재시작 중..."

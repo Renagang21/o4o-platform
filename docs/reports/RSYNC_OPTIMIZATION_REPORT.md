@@ -180,7 +180,7 @@ rsync -avzn --exclude-from=.rsyncignore.local \
 
 ## ⚠️ 주의사항
 
-1. **서버에서 npm install 필수** - node_modules 제외됨
+1. **서버에서 pnpm install 필수** - node_modules 제외됨
 2. **환경변수 별도 설정** - .env 파일 제외됨
 3. **빌드 재실행 필요** - dist/build 제외됨
 4. **PM2 설정 확인** - 로컬 설정 제외됨

@@ -180,5 +180,5 @@ echo "----------------------------"
 df -h . | grep -v Filesystem
 
 echo ""
-echo "📝 Note: Run 'npm install' if you encounter any missing dependencies after cleanup."
+echo "📝 Note: Run 'pnpm install' if you encounter any missing dependencies after cleanup."
 echo ""

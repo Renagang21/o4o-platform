@@ -28,7 +28,7 @@ cd /home/ubuntu/o4o-platform
 git pull origin main
 
 # 4. 의존성 설치
-npm install
+pnpm install
 
 # 5. 빌드
 cd apps/admin-dashboard

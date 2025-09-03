@@ -62,8 +62,8 @@ set -e
 echo "📦 Installing production dependencies only..."
 # Install only production dependencies with reduced memory usage
 NODE_OPTIONS="--max-old-space-size=1024" npm ci --production --no-audit --no-fund || {
-    echo "❌ npm ci failed, trying npm install..."
-    NODE_OPTIONS="--max-old-space-size=1024" npm install --production --no-audit --no-fund
+    echo "❌ npm ci failed, trying pnpm install..."
+    NODE_OPTIONS="--max-old-space-size=1024" pnpm install --production --no-audit --no-fund
 }
 
 echo "✅ Dependencies installed"

@@ -144,7 +144,7 @@ run_build() {
     for app in api-server main-site admin-dashboard ecommerce crowdfunding digital-signage; do
         if [ -d "apps/$app" ]; then
             echo "  - Building $app"
-            (cd "apps/$app" && npm run build) || true
+            (cd "apps/$app" && pnpm run build) || true
         fi
     done
 }
@@ -159,7 +159,7 @@ build_packages() {
     for pkg in "${packages[@]}"; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
-            (cd "packages/$pkg" && npm run build) || true
+            (cd "packages/$pkg" && pnpm run build) || true
         fi
     done
 }
@@ -174,11 +174,11 @@ start_dev() {
     
     # Start servers
     echo "Starting API server..."
-    (cd apps/api-server && npm run dev > /tmp/api-server.log 2>&1 &)
+    (cd apps/api-server && pnpm run dev > /tmp/api-server.log 2>&1 &)
     
     echo "Starting web apps..."
-    (cd apps/main-site && npm run dev > /tmp/main-site.log 2>&1 &)
-    (cd apps/admin-dashboard && npm run dev > /tmp/admin-dashboard.log 2>&1 &)
+    (cd apps/main-site && pnpm run dev > /tmp/main-site.log 2>&1 &)
+    (cd apps/admin-dashboard && pnpm run dev > /tmp/admin-dashboard.log 2>&1 &)
     
     echo -e "${GREEN}✅ Development servers started!${NC}"
     echo "  - API Server: http://localhost:4000"

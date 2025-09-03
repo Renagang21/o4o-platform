@@ -56,20 +56,20 @@ install_dependencies() {
     # NPM 설정
     configure_npm
     
-    # npm install 실행 (다양한 옵션 시도)
+    # pnpm install 실행 (다양한 옵션 시도)
     if [ $attempt -eq 1 ]; then
       # 첫 번째 시도: 표준 설치
-      npm install --legacy-peer-deps
+      pnpm install --legacy-peer-deps
     elif [ $attempt -eq 2 ]; then
       # 두 번째 시도: 캐시 무시
-      npm install --legacy-peer-deps --cache /tmp/empty-cache --prefer-online
+      pnpm install --legacy-peer-deps --cache /tmp/empty-cache --prefer-online
     else
       # 마지막 시도: package-lock 무시하고 새로 생성
-      npm install --legacy-peer-deps --package-lock-only=false
+      pnpm install --legacy-peer-deps --package-lock-only=false
     fi
     
     if [ $? -eq 0 ]; then
-      echo "✅ npm install succeeded on attempt $attempt"
+      echo "✅ pnpm install succeeded on attempt $attempt"
       
       # workspace node_modules 재정리 (설치 후)
       echo "🧹 Post-install cleanup of workspace node_modules..."
@@ -86,7 +86,7 @@ install_dependencies() {
     attempt=$((attempt + 1))
   done
   
-  echo "❌ npm install failed after $max_attempts attempts"
+  echo "❌ pnpm install failed after $max_attempts attempts"
   return 1
 }
 

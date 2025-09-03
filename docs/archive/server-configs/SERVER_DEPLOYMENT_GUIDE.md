@@ -33,7 +33,7 @@ O4O Platform은 세 가지 독립적인 환경으로 운영됩니다:
 node --version
 
 # PM2 설치 (전역)
-npm install -g pm2
+pnpm install -g pm2
 
 # Git 설치 확인
 git --version
@@ -51,7 +51,7 @@ cp .env.webserver.example .env
 nano .env
 
 # 3. 의존성 설치
-npm install
+pnpm install
 
 # 4. 패키지 빌드
 npm run build:packages
@@ -72,7 +72,7 @@ cp .env.apiserver.example apps/api-server/.env
 nano apps/api-server/.env
 
 # 3. 의존성 설치
-npm install
+pnpm install
 
 # 4. API 서버 빌드
 cd apps/api-server
@@ -97,7 +97,7 @@ cp .env.example .env.local
 nano .env.local
 
 # 3. 의존성 설치
-npm install
+pnpm install
 
 # 4. 패키지 빌드
 npm run build:packages
@@ -199,7 +199,7 @@ JWT_REFRESH_SECRET=dev-refresh-secret
 git pull origin main
 
 # 2. 의존성 업데이트
-npm install
+pnpm install
 
 # 3. 패키지 재빌드
 npm run build:packages
@@ -221,7 +221,7 @@ pm2 logs o4o-admin --lines 50
 git pull origin main
 
 # 2. 의존성 업데이트
-npm install
+pnpm install
 
 # 3. API 서버 재빌드
 cd apps/api-server
@@ -347,7 +347,7 @@ rm -rf node_modules
 npm cache clean --force
 
 # 재설치 및 빌드
-npm install
+pnpm install
 npm run build:packages
 ```
 

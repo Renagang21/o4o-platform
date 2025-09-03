@@ -78,7 +78,7 @@ npm run build:apps
 ```bash
 # Clean install
 npm run clean
-npm install
+pnpm install
 npm run build
 ```
 

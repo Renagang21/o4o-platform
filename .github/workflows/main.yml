@@ -19,24 +19,29 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 10
+        
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        cache-dependency-path: '**/package.json'
+        cache: 'pnpm'
+        cache-dependency-path: '**/pnpm-lock.yaml'
     
     - name: Install dependencies
       run: bash scripts/archive/ci-install.sh
     
     - name: Build packages first
-      run: npm run build:packages
+      run: pnpm run build:packages
     
     - name: Run TypeScript check (Frontend only)
-      run: npm run type-check:frontend
+      run: pnpm run type-check:frontend
     
     - name: Run ESLint
-      run: npm run lint
+      run: pnpm run lint
     
     - name: Check for console.log statements
       run: |
@@ -73,21 +78,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 10
+        
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        cache-dependency-path: '**/package.json'
+        cache: 'pnpm'
+        cache-dependency-path: '**/pnpm-lock.yaml'
     
     - name: Install dependencies
       run: bash scripts/archive/ci-install.sh
     
     - name: Build packages
-      run: npm run build:packages
+      run: pnpm run build:packages
     
     - name: Build ${{ matrix.app }}
-      run: npm run build --workspace=@o4o/${{ matrix.app }}
+      run: pnpm run build --workspace=@o4o/${{ matrix.app }}
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -127,7 +137,7 @@ jobs:
         
         # Server will handle the build and restart
         echo "⚠️ API server needs manual build and restart on server"
-        echo "Run on server: cd /home/ubuntu/o4o-platform/apps/api-server && npm run build && pm2 restart api-server"
+        echo "Run on server: cd /home/ubuntu/o4o-platform/apps/api-server && pnpm run build && pm2 restart api-server"
     
     - name: Health check
       continue-on-error: true

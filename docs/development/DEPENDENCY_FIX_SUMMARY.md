@@ -25,7 +25,7 @@
 
 ### Build Status
 ```bash
-✅ npm install - Success (no errors)
+✅ pnpm install - Success (no errors)
 ✅ npm run build:packages - Success (all packages built)
 ✅ npm run type-check - Success (0 TypeScript errors)
 ✅ npm run lint - Success (0 ESLint warnings/errors)

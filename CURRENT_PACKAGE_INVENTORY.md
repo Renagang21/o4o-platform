@@ -176,7 +176,7 @@
    - PM2 재시작 필수
 
 2. **로컬 개발 시**
-   - `npm install` 전 캐시 삭제 권장
+   - `pnpm install` 전 캐시 삭제 권장
    - `.vite-cache` 폴더는 gitignore 처리됨
 
 3. **CI/CD 파이프라인**

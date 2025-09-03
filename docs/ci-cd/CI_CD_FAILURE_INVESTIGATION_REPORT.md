@@ -23,7 +23,7 @@ npm error Missing: ajv@8.12.0 from lock file
 - `npm ci` requires exact lock file synchronization and fails when packages are missing
 
 **Timeline**:
-- Recent commits show deployment workflow changes (npm ci → npm install)
+- Recent commits show deployment workflow changes (npm ci → pnpm install)
 - This suggests the issue has been ongoing and workarounds were attempted
 
 ### 2. GitHub Actions Permission Errors (Secondary)
@@ -39,9 +39,9 @@ npm error Missing: ajv@8.12.0 from lock file
 
 ### 3. Environment Differences
 **Local vs CI/CD**:
-- Local: `npm install` works (creates/updates lock file automatically)
+- Local: `pnpm install` works (creates/updates lock file automatically)
 - CI/CD: `npm ci` fails (requires exact lock file match)
-- Deployment: Already changed from `npm ci` to `npm install` as workaround
+- Deployment: Already changed from `npm ci` to `pnpm install` as workaround
 
 ## Problem Correlation Analysis
 
@@ -70,7 +70,7 @@ Cleanup/reporting steps fail with permission errors
 # From project root
 rm -rf node_modules package-lock.json
 rm -rf apps/*/node_modules packages/*/node_modules
-npm install
+pnpm install
 git add package-lock.json
 git commit -m "fix: synchronize package-lock.json with serve dependency"
 git push
@@ -104,7 +104,7 @@ Add lock file validation step early in CI:
 ```yaml
 - name: Validate lock file
   run: |
-    npm ci --dry-run || (echo "Lock file out of sync. Run 'npm install' locally and commit package-lock.json" && exit 1)
+    npm ci --dry-run || (echo "Lock file out of sync. Run 'pnpm install' locally and commit package-lock.json" && exit 1)
 ```
 
 ### 3. Better Error Reporting
@@ -114,7 +114,7 @@ Add explicit error handling for common issues:
   run: |
     npm ci || {
       echo "::error::npm ci failed. This usually means package-lock.json is out of sync."
-      echo "::error::Run 'npm install' locally and commit the updated package-lock.json"
+      echo "::error::Run 'pnpm install' locally and commit the updated package-lock.json"
       exit 1
     }
 ```
@@ -122,7 +122,7 @@ Add explicit error handling for common issues:
 ## Step-by-Step Resolution Roadmap
 
 ### Phase 1: Immediate Fix (5 minutes)
-1. Run `npm install` from project root
+1. Run `pnpm install` from project root
 2. Verify `package-lock.json` includes serve dependencies
 3. Commit and push updated lock file
 4. Monitor CI/CD pipeline for successful builds
@@ -136,7 +136,7 @@ Add explicit error handling for common issues:
 ### Phase 3: Prevention (15 minutes)
 1. Add pre-commit hooks for lock file validation
 2. Update CI workflows with better error messages
-3. Document the npm ci vs npm install distinction
+3. Document the npm ci vs pnpm install distinction
 4. Add lock file check to PR template
 
 ### Phase 4: Long-term Improvements (optional)
@@ -150,7 +150,7 @@ Add explicit error handling for common issues:
 1. **Always update package-lock.json** when adding dependencies
 2. **npm ci is strict** - it's designed to catch drift in CI/CD
 3. **Permission errors can be red herrings** - check earlier failures first
-4. **Deployment workarounds** (npm install) mask the real issue
+4. **Deployment workarounds** (pnpm install) mask the real issue
 5. **Local success doesn't guarantee CI success** due to lock file requirements
 
 ## Recommended Actions
@@ -165,5 +165,5 @@ Add explicit error handling for common issues:
 - [ ] All CI/CD pipelines passing
 - [ ] No npm ci errors
 - [ ] No permission errors in workflows
-- [ ] Deployments using npm ci (not npm install)
+- [ ] Deployments using npm ci (not pnpm install)
 - [ ] Lock file stays synchronized

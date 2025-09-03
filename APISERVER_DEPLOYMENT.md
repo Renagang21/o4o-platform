@@ -22,7 +22,7 @@ rm -rf node_modules/.uuid-* node_modules/.tmp-*
 ### 3. 의존성 설치
 ```bash
 # 프로덕션 의존성만 설치 (빠른 배포)
-npm ci --production || npm install --production
+npm ci --production || pnpm install --production
 ```
 
 ### 4. 빌드
@@ -115,7 +115,7 @@ rm -rf node_modules/.uuid-* node_modules/.tmp-*
 
 # 3. 의존성 설치
 echo "📦 의존성 설치 중..."
-npm ci --production || npm install --production
+npm ci --production || pnpm install --production
 
 # 4. 빌드
 echo "🔨 빌드 중..."
@@ -153,7 +153,7 @@ npm run build --workspace=@o4o/api-server
 
 # 의존성 문제 해결
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 npm run build:packages
 ```
 

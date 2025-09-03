@@ -7,7 +7,7 @@ echo "================================="
 # Measure without lock file
 echo "Test 1: Install without package-lock.json"
 START_TIME=$(date +%s%N)
-npm install --no-audit --no-fund --prefer-offline > /dev/null 2>&1
+pnpm install --no-audit --no-fund --prefer-offline > /dev/null 2>&1
 END_TIME=$(date +%s%N)
 DURATION_NO_LOCK=$((($END_TIME - $START_TIME)/1000000))
 echo "Duration: ${DURATION_NO_LOCK}ms"
@@ -30,7 +30,7 @@ if [ -f "package-lock.json" ]; then
   PERCENT=$((($DIFF * 100) / $DURATION_NO_LOCK))
   echo ""
   echo "Performance Impact:"
-  echo "- npm ci is ${PERCENT}% faster than npm install"
+  echo "- npm ci is ${PERCENT}% faster than pnpm install"
 else
   echo ""
   echo "⚠️  No package-lock.json found for comparison"

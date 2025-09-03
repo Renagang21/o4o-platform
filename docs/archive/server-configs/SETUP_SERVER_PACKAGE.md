@@ -35,7 +35,7 @@ cp package.apiserver.json package.json
 
 # 3. 기존 node_modules 제거 후 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 
 # 4. 빌드 및 실행
 npm run build
@@ -52,7 +52,7 @@ cp package.webserver.json package.json
 
 # 3. 기존 node_modules 제거 후 재설치
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 
 # 4. 빌드 및 실행
 npm run build
@@ -105,12 +105,12 @@ npm run pm2:start
      cp package.webserver.json package.json
    fi
    
-   npm install
+   pnpm install
    ```
 
 ## 🛠️ 문제 해결
 
-### npm install이 여전히 느린 경우:
+### pnpm install이 여전히 느린 경우:
 ```bash
 # 1. npm 캐시 정리
 npm cache clean --force
@@ -120,13 +120,13 @@ npm config set registry https://registry.npmmirror.com
 
 # 3. 메모리 제한 (apiserver)
 export NODE_OPTIONS="--max-old-space-size=1024"
-npm install --prefer-offline --no-audit
+pnpm install --prefer-offline --no-audit
 ```
 
 ### workspace 오류 발생 시:
 ```bash
 # workspace 기능 비활성화
-npm install --no-workspaces
+pnpm install --no-workspaces
 ```
 
 ## 📝 유지보수

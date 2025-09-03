@@ -197,8 +197,8 @@ import { TestDashboard } from './features/test-dashboard/pages/TestDashboard';
 
 2. **번들 분석 도구 도입**
    ```bash
-   npm install -D vite-bundle-visualizer
-   npm install -D rollup-plugin-analyzer
+   pnpm install -D vite-bundle-visualizer
+   pnpm install -D rollup-plugin-analyzer
    ```
 
 3. **성능 모니터링**

@@ -51,17 +51,17 @@ do_build() {
     case $server_type in
         webserver)
             # 웹서버 빌드
-            npm run build:packages
-            npm run build:web
+            pnpm run build:packages
+            pnpm run build:web
             ;;
         apiserver)
             # API 서버 빌드
-            npm run build:packages
-            npm run build:api
+            pnpm run build:packages
+            pnpm run build:api
             ;;
         local|*)
             # 전체 빌드
-            npm run build
+            pnpm run build
             ;;
     esac
 }

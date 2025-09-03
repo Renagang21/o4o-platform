@@ -63,7 +63,7 @@ npm run monitor        # Run monitoring check
 - Parallel execution: **Enabled**
 
 ## Next Steps
-1. Run `npm install` to ensure all dependencies are installed
+1. Run `pnpm install` to ensure all dependencies are installed
 2. Run `npm run setup:apiserver` for automatic environment setup
 3. Test with `npm run build` to verify optimization
 4. Deploy with `npm run pm2:start`

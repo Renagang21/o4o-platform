@@ -11,7 +11,7 @@ echo "📦 내부 패키지 빌드 중..."
 if [ -d "packages/supplier-connector" ]; then
     echo "Building @o4o/supplier-connector..."
     cd packages/supplier-connector
-    npm install
+    pnpm install
     npm run build 2>/dev/null || npx tsc
     cd ../..
 fi
@@ -20,7 +20,7 @@ fi
 if [ -d "packages/shared" ]; then
     echo "Building @o4o/shared..."
     cd packages/shared
-    npm install
+    pnpm install
     npm run build 2>/dev/null || npx tsc
     cd ../..
 fi
@@ -30,7 +30,7 @@ echo "📦 API 서버 의존성 설치..."
 cd apps/api-server
 
 # 누락된 의존성들 설치
-npm install --save \
+pnpm install --save \
     cron \
     zod \
     express \

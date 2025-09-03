@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# npm install 에러를 완전히 해결할 때까지 반복하는 스크립트
-echo "🔧 Starting npm install error fix loop..."
+# pnpm install 에러를 완전히 해결할 때까지 반복하는 스크립트
+echo "🔧 Starting pnpm install error fix loop..."
 
 MAX_ATTEMPTS=10
 attempt=0
@@ -15,7 +15,7 @@ NC='\033[0m'
 
 # 에러 수정 함수
 fix_common_errors() {
-    echo -e "${YELLOW}🔍 Checking and fixing common npm install errors...${NC}"
+    echo -e "${YELLOW}🔍 Checking and fixing common pnpm install errors...${NC}"
     
     # 1. dist 폴더의 package.json 제거
     echo "Removing package.json files from dist folders..."
@@ -61,21 +61,21 @@ fix_common_errors() {
     done
 }
 
-# npm install 시도 함수
+# pnpm install 시도 함수
 try_npm_install() {
-    echo -e "${YELLOW}🚀 Attempt $((attempt + 1))/${MAX_ATTEMPTS}: Running npm install...${NC}"
+    echo -e "${YELLOW}🚀 Attempt $((attempt + 1))/${MAX_ATTEMPTS}: Running pnpm install...${NC}"
     
-    # npm install 실행하고 에러 캡처
-    if npm install 2>&1 | tee npm-install.log; then
+    # pnpm install 실행하고 에러 캡처
+    if pnpm install 2>&1 | tee npm-install.log; then
         # 성공 확인 (실제로 성공했는지 다시 체크)
         if npm ls >/dev/null 2>&1; then
-            echo -e "${GREEN}✅ npm install succeeded!${NC}"
+            echo -e "${GREEN}✅ pnpm install succeeded!${NC}"
             return 0
         fi
     fi
     
     # 에러 분석
-    echo -e "${RED}❌ npm install failed. Analyzing errors...${NC}"
+    echo -e "${RED}❌ pnpm install failed. Analyzing errors...${NC}"
     
     # 특정 에러 패턴 확인 및 수정
     if grep -q "Cannot read properties of null" npm-install.log; then
@@ -110,7 +110,7 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
     # 에러 수정
     fix_common_errors
     
-    # npm install 시도
+    # pnpm install 시도
     if try_npm_install; then
         success=true
         break
@@ -123,7 +123,7 @@ done
 
 # 결과 출력
 if [ "$success" = true ]; then
-    echo -e "${GREEN}🎉 npm install completed successfully after $attempt attempts!${NC}"
+    echo -e "${GREEN}🎉 pnpm install completed successfully after $attempt attempts!${NC}"
     
     # 패키지 빌드
     echo -e "${YELLOW}📦 Building packages...${NC}"
@@ -133,13 +133,13 @@ if [ "$success" = true ]; then
     echo -e "${GREEN}✅ All done! Your environment is ready.${NC}"
     exit 0
 else
-    echo -e "${RED}❌ Failed to complete npm install after $MAX_ATTEMPTS attempts.${NC}"
+    echo -e "${RED}❌ Failed to complete pnpm install after $MAX_ATTEMPTS attempts.${NC}"
     echo "Please check npm-install.log for details."
     echo ""
     echo "Common solutions:"
     echo "1. Delete node_modules and package-lock.json, then try again"
     echo "2. Clear npm cache: npm cache clean --force"
-    echo "3. Use --legacy-peer-deps flag: npm install --legacy-peer-deps"
+    echo "3. Use --legacy-peer-deps flag: pnpm install --legacy-peer-deps"
     echo "4. Check Node.js version: node --version (should be 22.18.0)"
     exit 1
 fi

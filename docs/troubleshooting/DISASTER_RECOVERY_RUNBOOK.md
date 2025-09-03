@@ -42,7 +42,7 @@ pm2 restart api-server
 
 # 재시작 실패 시
 pm2 delete api-server
-npm install
+pnpm install
 npm run build
 pm2 start ecosystem.config.js
 
@@ -213,7 +213,7 @@ git log --oneline -10
 git checkout [이전_안정_커밋]
 
 # 재빌드 및 배포
-npm install
+pnpm install
 npm run build:packages
 cd apps/api-server
 npm run build

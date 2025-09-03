@@ -61,7 +61,7 @@ fi
 # 의존성 설치 (production만)
 echo "📦 Production 의존성 설치..."
 cd apps/api-server
-npm ci --only=production || npm install --only=production
+npm ci --only=production || pnpm install --only=production
 
 # PM2로 재시작
 echo "🔄 API 서버 재시작..."
@@ -108,7 +108,7 @@ ENV
     fi
     
     # 빌드
-    npm ci || npm install
+    npm ci || pnpm install
     npm run build
     
     # 배포
@@ -122,7 +122,7 @@ fi
 if [ -d "apps/shop" ]; then
     echo "🔨 Shop 앱 빌드..."
     cd apps/shop
-    npm ci || npm install
+    npm ci || pnpm install
     npm run build
     sudo cp -r dist/* /var/www/shop.neture.co.kr/
     cd ../..

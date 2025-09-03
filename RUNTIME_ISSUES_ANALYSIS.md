@@ -137,7 +137,7 @@ if (typeof window !== 'undefined' && window.wp) {
 ```bash
 cd apps/api-server
 npm uninstall bcryptjs node-fetch express cors compression cookie-parser
-npm install --save-dev vite@5.4.19 @types/node@20.14.0
+pnpm install --save-dev vite@5.4.19 @types/node@20.14.0
 ```
 
 #### WordPress 안전장치 추가

@@ -40,16 +40,16 @@ pm2 save
 ```bash
 # 1. 패키지 설치 및 빌드
 cd /home/ubuntu/o4o-platform
-npm install
+pnpm install
 npm run build:packages
 
 # 2. Admin Dashboard 빌드
 cd apps/admin-dashboard
-npm install
+pnpm install
 npm run build
 
 # 3. serve 패키지 설치 (없는 경우)
-npm install serve
+pnpm install serve
 
 # 4. PM2로 실행
 cd /home/ubuntu/o4o-platform

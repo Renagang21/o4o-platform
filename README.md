@@ -66,7 +66,7 @@ git clone https://github.com/your-org/o4o-platform.git
 cd o4o-platform
 
 # 의존성 설치
-npm install
+pnpm install
 
 # 환경 변수 설정
 cp .env.example .env.local
@@ -78,22 +78,22 @@ cp .env.example .env.local
 #### 자동 환경 감지 실행
 ```bash
 # 환경 자동 감지하여 실행
-npm run start
+pnpm run start
 
 # 개발 모드 (hot reload)
-npm run dev
+pnpm run dev
 ```
 
 #### 환경별 실행
 ```bash
 # 로컬 개발 환경
-npm run pm2:start:local
+pnpm run pm2:start:local
 
 # 웹서버 환경
-npm run pm2:start:webserver
+pnpm run pm2:start:webserver
 
 # API 서버 환경
-npm run pm2:start:apiserver
+pnpm run pm2:start:apiserver
 ```
 
 ### 빌드
@@ -102,13 +102,13 @@ npm run pm2:start:apiserver
 node scripts/environments/build.cjs
 
 # 전체 빌드
-npm run build
+pnpm run build
 
 # 패키지만 빌드
-npm run build:packages
+pnpm run build:packages
 
 # 앱만 빌드
-npm run build:apps
+pnpm run build:apps
 ```
 
 ## 📁 scripts/ 시스템 (Phase 4)
@@ -175,22 +175,22 @@ npm init
 #### 의존성 관리
 ```bash
 # 특정 워크스페이스에 의존성 추가
-npm install <package> --workspace=@o4o/<workspace-name>
+pnpm install <package> --workspace=@o4o/<workspace-name>
 
 # 로컬 패키지 참조
-npm install @o4o/types --workspace=@o4o/admin-dashboard
+pnpm install @o4o/types --workspace=@o4o/admin-dashboard
 ```
 
 ### 코드 품질 관리
 ```bash
 # TypeScript 타입 체크
-npm run type-check
+pnpm run type-check
 
 # ESLint 검사
-npm run lint
+pnpm run lint
 
 # 자동 수정
-npm run lint:fix
+pnpm run lint:fix
 
 # 테스트 실행
 npm test
@@ -242,10 +242,10 @@ pm2 stop all
 npm test
 
 # 타입 체크
-npm run type-check
+pnpm run type-check
 
 # 린트 검사
-npm run lint
+pnpm run lint
 ```
 
 ### 환경별 테스트 전략
@@ -307,17 +307,17 @@ kill -9 [PID]
 #### 빌드 실패
 ```bash
 # 캐시 정리 후 재설치
-npm run clean
+pnpm run clean
 rm -rf node_modules package-lock.json
-npm install
-npm run build:packages
+pnpm install
+pnpm run build:packages
 ```
 
 #### 메모리 부족
 ```bash
 # Node.js 메모리 증가
 export NODE_OPTIONS="--max-old-space-size=4096"
-npm run build
+pnpm run build
 ```
 
 ## 📄 라이선스

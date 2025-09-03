@@ -31,7 +31,7 @@ git fetch origin
 git reset --hard origin/main
 
 # 패키지 설치
-npm install --production --prefer-offline --no-audit
+pnpm install --production --prefer-offline --no-audit
 ```
 
 ### 1.3 환경변수 설정
@@ -131,7 +131,7 @@ sudo systemctl reload nginx
 ssh ubuntu@neture.co.kr
 
 # PM2 설치
-sudo npm install -g pm2 serve
+sudo pnpm install -g pm2 serve
 ```
 
 ### 2.2 메인 사이트 배포

@@ -39,9 +39,9 @@ The following secrets are used in workflows but not documented:
 ```yaml
 # Line 48: Root dependencies
 npm ci
-# Line 58: API server dependencies (uses npm install, not npm ci)
+# Line 58: API server dependencies (uses pnpm install, not npm ci)
 cd apps/api-server
-npm install  # ⚠️ Should be npm ci
+pnpm install  # ⚠️ Should be npm ci
 ```
 
 **deploy-main-site.yml**:
@@ -156,7 +156,7 @@ types → utils → ui → auth-client → auth-context → apps
    ```yaml
    # In deploy-api-server.yml line 58
    - cd apps/api-server
-   - npm install
+   - pnpm install
    + cd apps/api-server
    + npm ci
    ```
@@ -203,7 +203,7 @@ types → utils → ui → auth-client → auth-context → apps
 ## 🚨 Action Priority
 
 1. **TODAY**: Fix GitHub Secrets naming (deployments are broken)
-2. **This Week**: Fix npm install → npm ci, add SSH setup to rollback
+2. **This Week**: Fix pnpm install → npm ci, add SSH setup to rollback
 3. **This Month**: Implement build optimization and secret validation
 4. **This Quarter**: Move to GitHub Environments, add deployment dashboard
 

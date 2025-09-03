@@ -13,7 +13,7 @@ git pull origin main
 
 ### 2. 의존성 설치 (필요시)
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Admin Dashboard 빌드
