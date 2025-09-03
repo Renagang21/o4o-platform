@@ -5,10 +5,13 @@ set -e
 
 echo "🚀 Starting CI installation (pnpm)..."
 
-# pnpm 설치 확인
-if ! command -v pnpm &> /dev/null; then
+# GitHub Actions에서 pnpm이 이미 설치되어 있는지 확인
+if command -v pnpm &> /dev/null; then
+    echo "✅ pnpm is already installed: $(pnpm --version)"
+else
     echo "📦 Installing pnpm..."
     npm install -g pnpm@latest
+    echo "✅ pnpm installed: $(pnpm --version)"
 fi
 
 echo "Using pnpm $(pnpm --version)"
@@ -29,10 +32,10 @@ run_pnpm_install() {
   # CI 환경에서는 frozen-lockfile 사용
   if [ "$CI" = "true" ] && [ -f "pnpm-lock.yaml" ]; then
     echo "CI mode: using frozen-lockfile"
-    pnpm install --frozen-lockfile --prefer-offline
+    pnpm install --frozen-lockfile --prefer-offline --no-audit
   else
-    echo "Local mode: regular install"
-    pnpm install --prefer-offline
+    echo "⚠️  Running in fallback mode without pnpm-lock.yaml"
+    pnpm install --prefer-offline --no-audit
   fi
   
   if [ $? -eq 0 ]; then

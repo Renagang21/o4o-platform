@@ -32,7 +32,7 @@ jobs:
         cache-dependency-path: '**/pnpm-lock.yaml'
     
     - name: Install dependencies
-      run: bash scripts/archive/ci-install.sh
+      run: bash scripts/ci-install-fixed.sh
     
     - name: Build packages first
       run: pnpm run build:packages
@@ -63,7 +63,7 @@ jobs:
         fi
     
     - name: Run tests
-      run: npm test
+      run: pnpm test
 
   # 2. Build all applications
   build:
@@ -91,7 +91,7 @@ jobs:
         cache-dependency-path: '**/pnpm-lock.yaml'
     
     - name: Install dependencies
-      run: bash scripts/archive/ci-install.sh
+      run: bash scripts/ci-install-fixed.sh
     
     - name: Build packages
       run: pnpm run build:packages
