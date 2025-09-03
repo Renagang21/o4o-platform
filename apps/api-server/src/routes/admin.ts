@@ -16,6 +16,45 @@ import { PagesController } from '../controllers/pagesController';
 const router: Router = Router();
 const pagesController = new PagesController();
 
+// Public routes for frontend compatibility (no auth required)
+router.get('/custom-field-groups', async (req, res) => {
+  try {
+    // Mock data for frontend compatibility
+    const fieldGroups = [
+      {
+        id: 'product-fields',
+        title: '상품 정보',
+        location: 'product',
+        fields: [
+          {
+            key: 'price',
+            label: '가격',
+            type: 'number',
+            required: true
+          },
+          {
+            key: 'sku',
+            label: 'SKU',
+            type: 'text',
+            required: false
+          }
+        ]
+      }
+    ];
+    
+    res.json({
+      success: true,
+      data: fieldGroups,
+      total: fieldGroups.length
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch custom field groups'
+    });
+  }
+});
+
 // 모든 관리자 라우트는 인증 및 관리자 권한 필요
 router.use(authenticateToken);
 router.use(requireAdmin);

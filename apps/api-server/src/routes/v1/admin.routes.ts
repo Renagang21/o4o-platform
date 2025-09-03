@@ -42,8 +42,8 @@ router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Custom field groups endpoint
-router.get('/custom-field-groups', authenticateToken, requireAdmin, async (req, res) => {
+// Custom field groups endpoint (public for frontend compatibility)
+router.get('/custom-field-groups', async (req, res) => {
   try {
     // Mock data for now
     const fieldGroups = [

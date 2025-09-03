@@ -607,6 +607,7 @@ app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full
 // V1 API routes (new standardized endpoints)
 app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
+app.use('/api/categories', categoriesRoutes); // Backward compatibility for old API path
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)
 
 // Tag routes
