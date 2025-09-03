@@ -13,15 +13,18 @@ export class AuthClient {
         // Add auth token to requests
         this.api.interceptors.request.use((config) => {
             // Check multiple possible token locations
-            let token = localStorage.getItem('accessToken') || localStorage.getItem('authToken');
+            // Priority: accessToken > token > authToken > admin-auth-storage
+            let token = localStorage.getItem('accessToken') ||
+                localStorage.getItem('token') ||
+                localStorage.getItem('authToken');
             // Also check admin-auth-storage for token
             if (!token) {
                 const authStorage = localStorage.getItem('admin-auth-storage');
                 if (authStorage) {
                     try {
                         const parsed = JSON.parse(authStorage);
-                        if (parsed.state?.token) {
-                            token = parsed.state.token;
+                        if (parsed.state?.accessToken || parsed.state?.token) {
+                            token = parsed.state.accessToken || parsed.state.token;
                         }
                     }
                     catch {
@@ -71,6 +74,10 @@ export class AuthClient {
                                 const parsed = JSON.parse(authStorage);
                                 if (parsed.state) {
                                     parsed.state.token = accessToken;
+                                    parsed.state.accessToken = accessToken;
+                                    if (newRefreshToken) {
+                                        parsed.state.refreshToken = newRefreshToken;
+                                    }
                                     localStorage.setItem('admin-auth-storage', JSON.stringify(parsed));
                                 }
                             }
