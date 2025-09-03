@@ -24,6 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          
       - name: Setup Node.js (no cache)
         uses: actions/setup-node@v4
         with:
@@ -31,8 +36,8 @@ jobs:
       
       - name: Install dependencies (no audit)
         run: |
-          echo "⚠️  Running in fallback mode without package-lock.json"
-          pnpm install   --prefer-offline
+          echo "⚠️  Running in fallback mode without pnpm-lock.yaml"
+          pnpm install --prefer-offline
       
       - name: Build packages
         run: |
