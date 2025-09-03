@@ -29,12 +29,24 @@ export const useAuth = () => {
 export const CookieAuthProvider = AuthProvider;
 export const SSOAuthProvider = AuthProvider;
 
+export const SessionManager = {
+  getInstance: () => ({
+    checkSession: async () => true,
+    refreshSession: async () => true,
+    clearSession: async () => true
+  })
+};
+
+export const AdminProtectedRoute = ({ children }) => children;
+
 export default {
   AuthContext,
   AuthProvider,
   useAuth,
   CookieAuthProvider,
-  SSOAuthProvider
+  SSOAuthProvider,
+  SessionManager,
+  AdminProtectedRoute
 };
 EOF
 
@@ -54,15 +66,26 @@ export declare const AuthContext: React.Context<AuthContextType | null>;
 export declare const AuthProvider: React.FC<{ children: ReactNode }>;
 export declare const CookieAuthProvider: React.FC<{ children: ReactNode }>;
 export declare const SSOAuthProvider: React.FC<{ children: ReactNode }>;
+export declare const AdminProtectedRoute: React.FC<{ children: ReactNode }>;
 
 export declare function useAuth(): AuthContextType;
+
+export declare class SessionManager {
+  static getInstance(): {
+    checkSession: () => Promise<boolean>;
+    refreshSession: () => Promise<boolean>;
+    clearSession: () => Promise<boolean>;
+  };
+}
 
 export default {
   AuthContext: AuthContext,
   AuthProvider: AuthProvider,
   useAuth: useAuth,
   CookieAuthProvider: CookieAuthProvider,
-  SSOAuthProvider: SSOAuthProvider
+  SSOAuthProvider: SSOAuthProvider,
+  SessionManager: SessionManager,
+  AdminProtectedRoute: AdminProtectedRoute
 };
 EOF
 

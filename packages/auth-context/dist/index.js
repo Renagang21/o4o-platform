@@ -16,10 +16,22 @@ export const useAuth = () => {
 export const CookieAuthProvider = AuthProvider;
 export const SSOAuthProvider = AuthProvider;
 
+export const SessionManager = {
+  getInstance: () => ({
+    checkSession: async () => true,
+    refreshSession: async () => true,
+    clearSession: async () => true
+  })
+};
+
+export const AdminProtectedRoute = ({ children }) => children;
+
 export default {
   AuthContext,
   AuthProvider,
   useAuth,
   CookieAuthProvider,
-  SSOAuthProvider
+  SSOAuthProvider,
+  SessionManager,
+  AdminProtectedRoute
 };

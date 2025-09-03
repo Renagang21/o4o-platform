@@ -31,11 +31,8 @@ jobs:
         cache: 'pnpm'
         cache-dependency-path: '**/pnpm-lock.yaml'
     
-    - name: Install dependencies
-      run: bash scripts/ci-install-fixed.sh
-    
-    - name: Build packages first
-      run: bash scripts/ci-build-packages.sh
+    - name: Complete CI Setup and Build
+      run: bash scripts/ci-complete-setup.sh
     
     - name: Run TypeScript check (Frontend only)
       run: pnpm run type-check:frontend
@@ -93,11 +90,11 @@ jobs:
     - name: Install dependencies
       run: bash scripts/ci-install-fixed.sh
     
-    - name: Build packages
-      run: pnpm run build:packages
+    - name: Complete CI Setup
+      run: bash scripts/ci-complete-setup.sh
     
     - name: Build ${{ matrix.app }}
-      run: pnpm run build --workspace=@o4o/${{ matrix.app }}
+      run: bash scripts/ci-build-app.sh ${{ matrix.app }}
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
