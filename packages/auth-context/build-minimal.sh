@@ -111,16 +111,17 @@ export declare class SessionManager {
   };
 }
 
-export default {
-  AuthContext: AuthContext,
-  AuthProvider: AuthProvider,
-  useAuth: useAuth,
-  useCookieAuth: useCookieAuth,
-  CookieAuthProvider: CookieAuthProvider,
-  SSOAuthProvider: SSOAuthProvider,
-  SessionManager: SessionManager,
-  AdminProtectedRoute: AdminProtectedRoute
+declare const _default: {
+  AuthContext: typeof AuthContext;
+  AuthProvider: typeof AuthProvider;
+  useAuth: typeof useAuth;
+  useCookieAuth: typeof useCookieAuth;
+  CookieAuthProvider: typeof CookieAuthProvider;
+  SSOAuthProvider: typeof SSOAuthProvider;
+  SessionManager: typeof SessionManager;
+  AdminProtectedRoute: typeof AdminProtectedRoute;
 };
+export default _default;
 EOF
 
 echo "✅ Minimal build completed!"
