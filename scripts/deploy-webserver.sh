@@ -70,7 +70,13 @@ echo "🔐 파일 권한 설정..."
 sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
 sudo chmod -R 755 /var/www/admin.neture.co.kr/
 
-# 6. Nginx 재로드
+# 6. 캐시 클리어 및 Nginx 재로드
+echo "🧹 브라우저 캐시 무효화를 위한 헤더 설정..."
+# index.html에 캐시 방지 메타 태그 추가 (이미 있으면 스킵)
+if ! grep -q "no-cache" /var/www/admin.neture.co.kr/index.html; then
+    sudo sed -i '/<head>/a \    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n    <meta http-equiv="Pragma" content="no-cache">\n    <meta http-equiv="Expires" content="0">' /var/www/admin.neture.co.kr/index.html
+fi
+
 echo "🔄 Nginx 재로드..."
 sudo systemctl reload nginx
 
