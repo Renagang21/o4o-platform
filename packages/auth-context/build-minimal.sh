@@ -28,6 +28,17 @@ export const useAuth = () => {
   return context;
 };
 
+export const useCookieAuth = () => {
+  const authContext = useAuth();
+  const logoutAll = async () => {
+    await authContext.logout();
+  };
+  return {
+    ...authContext,
+    logoutAll
+  };
+};
+
 export const CookieAuthProvider = AuthProvider;
 export const SSOAuthProvider = AuthProvider;
 
@@ -45,6 +56,7 @@ export default {
   AuthContext,
   AuthProvider,
   useAuth,
+  useCookieAuth,
   CookieAuthProvider,
   SSOAuthProvider,
   SessionManager,
@@ -71,6 +83,7 @@ export declare const SSOAuthProvider: React.FC<{ children: ReactNode }>;
 export declare const AdminProtectedRoute: React.FC<{ children: ReactNode }>;
 
 export declare function useAuth(): AuthContextType;
+export declare function useCookieAuth(): AuthContextType & { logoutAll: () => Promise<void> };
 
 export declare class SessionManager {
   static getInstance(): {
@@ -84,6 +97,7 @@ export default {
   AuthContext: AuthContext,
   AuthProvider: AuthProvider,
   useAuth: useAuth,
+  useCookieAuth: useCookieAuth,
   CookieAuthProvider: CookieAuthProvider,
   SSOAuthProvider: SSOAuthProvider,
   SessionManager: SessionManager,

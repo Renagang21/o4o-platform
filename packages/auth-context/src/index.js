@@ -37,6 +37,22 @@ export const useAuth = () => {
   return context;
 };
 
+// useCookieAuth hook (alias for useAuth with additional cookie-specific features)
+export const useCookieAuth = () => {
+  const authContext = useAuth();
+  
+  // Add cookie-specific methods
+  const logoutAll = async () => {
+    // Logout from all sessions
+    await authContext.logout();
+  };
+  
+  return {
+    ...authContext,
+    logoutAll
+  };
+};
+
 // Cookie-based AuthProvider (alias for now)
 export const CookieAuthProvider = AuthProvider;
 
@@ -69,6 +85,7 @@ export default {
   AuthContext,
   AuthProvider,
   useAuth,
+  useCookieAuth,
   CookieAuthProvider,
   SSOAuthProvider,
   SessionManager,
