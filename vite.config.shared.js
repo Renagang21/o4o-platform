@@ -10,7 +10,15 @@ export const sharedViteConfig = {
     plugins: [
         react({
             jsxRuntime: 'automatic',
-            jsxImportSource: 'react'
+            jsxImportSource: 'react',
+            babel: {
+                plugins: [
+                    ['@babel/plugin-transform-react-jsx', {
+                        runtime: 'automatic',
+                        importSource: 'react'
+                    }]
+                ]
+            }
         })
     ],
     resolve: {

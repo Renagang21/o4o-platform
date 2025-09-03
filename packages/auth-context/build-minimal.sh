@@ -12,6 +12,8 @@ mkdir -p dist
 # Create minimal working files
 cat > dist/index.js << 'EOF'
 // Auto-generated minimal build for @o4o/auth-context
+import * as React from 'react';
+
 export const AuthContext = React.createContext(null);
 
 export const AuthProvider = ({ children }) => {
