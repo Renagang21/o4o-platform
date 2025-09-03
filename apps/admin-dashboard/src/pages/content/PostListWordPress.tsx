@@ -1,7 +1,7 @@
 import { useState, FC } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
-import { WordPressListLayout } from '@/components/common/WordPressListLayout';
+import WordPressListLayout from '@/components/common/WordPressListLayout';
 import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { formatDate } from '@/lib/utils';

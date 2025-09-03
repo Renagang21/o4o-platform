@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -251,3 +251,5 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
     </div>
   );
 };
+
+export default WordPressListLayout;
