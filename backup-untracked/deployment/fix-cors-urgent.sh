@@ -63,7 +63,7 @@ node /tmp/cors-fix.js
 # Step 3: API 서버 재빌드 및 재시작
 echo -e "${YELLOW}3. API 서버 재빌드 및 재시작...${NC}"
 cd apps/api-server
-npm run build
+pnpm run build
 cd ../..
 
 # PM2로 재시작

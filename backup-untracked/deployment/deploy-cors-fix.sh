@@ -23,7 +23,7 @@ fi
 # Step 1: 로컬에서 빌드
 echo -e "${YELLOW}1. 로컬에서 API 서버 빌드...${NC}"
 cd apps/api-server
-npm run build
+pnpm run build
 cd ../..
 
 # Step 2: 빌드된 파일 압축

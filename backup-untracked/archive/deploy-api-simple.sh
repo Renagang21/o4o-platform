@@ -16,7 +16,7 @@ if [ ! -d "apps/api-server/dist" ]; then
     echo "📦 빌드 시작..."
     cd apps/api-server
     pnpm install
-    npm run build
+    pnpm run build
     cd ../..
 else
     echo "✅ 빌드 파일 확인 완료"
@@ -47,7 +47,7 @@ mkdir -p logs
 
 # production 의존성만 설치
 echo "📦 Production 의존성 설치..."
-npm ci --only=production || pnpm install --only=production
+pnpm install --frozen-lockfile --only=production || pnpm install --only=production
 
 # PM2 설정 파일 생성
 cat > ecosystem.config.js << 'EOF'

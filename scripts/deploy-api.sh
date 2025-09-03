@@ -27,22 +27,22 @@ echo -e "${GREEN}✓ 캐시 정리 완료${NC}"
 
 # 3. 의존성 설치
 echo -e "${YELLOW}📦 Step 3/7: 의존성 설치 중...${NC}"
-if npm ci --production; then
+if pnpm install --frozen-lockfile --production; then
     echo -e "${GREEN}✓ 의존성 설치 완료 (ci)${NC}"
 else
-    echo -e "${YELLOW}⚠ npm ci 실패, pnpm install 시도 중...${NC}"
+    echo -e "${YELLOW}⚠ pnpm install --frozen-lockfile 실패, pnpm install 시도 중...${NC}"
     pnpm install --production
     echo -e "${GREEN}✓ 의존성 설치 완료 (install)${NC}"
 fi
 
 # 4. 패키지 빌드
 echo -e "${YELLOW}🔨 Step 4/7: 패키지 빌드 중...${NC}"
-npm run build:packages
+pnpm run build:packages
 echo -e "${GREEN}✓ 패키지 빌드 완료${NC}"
 
 # 5. API 서버 빌드
 echo -e "${YELLOW}🔨 Step 5/7: API 서버 빌드 중...${NC}"
-npm run build --workspace=@o4o/api-server
+pnpm run build --workspace=@o4o/api-server
 echo -e "${GREEN}✓ API 서버 빌드 완료${NC}"
 
 # 6. 데이터베이스 마이그레이션 (선택적)
@@ -51,7 +51,7 @@ read -p "데이터베이스 마이그레이션을 실행하시겠습니까? (y/n
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     cd apps/api-server
-    npm run migration:run
+    pnpm run migration:run
     cd ../..
     echo -e "${GREEN}✓ 마이그레이션 완료${NC}"
 else

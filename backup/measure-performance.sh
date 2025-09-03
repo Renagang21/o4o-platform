@@ -20,7 +20,7 @@ if [ -f "package-lock.json" ]; then
   echo ""
   echo "Test 2: Install with package-lock.json"
   START_TIME=$(date +%s%N)
-  npm ci > /dev/null 2>&1
+  pnpm install --frozen-lockfile > /dev/null 2>&1
   END_TIME=$(date +%s%N)
   DURATION_WITH_LOCK=$((($END_TIME - $START_TIME)/1000000))
   echo "Duration: ${DURATION_WITH_LOCK}ms"
@@ -30,7 +30,7 @@ if [ -f "package-lock.json" ]; then
   PERCENT=$((($DIFF * 100) / $DURATION_NO_LOCK))
   echo ""
   echo "Performance Impact:"
-  echo "- npm ci is ${PERCENT}% faster than pnpm install"
+  echo "- pnpm install --frozen-lockfile is ${PERCENT}% faster than pnpm install"
 else
   echo ""
   echo "⚠️  No package-lock.json found for comparison"

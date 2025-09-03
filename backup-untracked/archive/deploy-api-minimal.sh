@@ -25,7 +25,7 @@ cd apps/api-server
 
 # 의존성 설치 및 빌드
 pnpm install
-npm run build
+pnpm run build
 
 # dist 폴더 확인
 if [ ! -d "dist" ]; then
@@ -101,7 +101,7 @@ sudo mkdir -p logs
 
 # Production 의존성만 설치
 echo "Production 의존성 설치 중..."
-sudo npm ci --only=production || sudo pnpm install --only=production
+sudo pnpm install --frozen-lockfile --only=production || sudo pnpm install --only=production
 
 # PM2로 서비스 시작
 echo "PM2로 API 서버 시작 중..."

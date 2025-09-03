@@ -34,7 +34,7 @@ deploy_api() {
     
     # Build
     print_status "Building API server..."
-    npm run build:api
+    pnpm run build:api
     
     # Create deployment package
     print_status "Creating deployment package..."
@@ -65,8 +65,8 @@ deploy_web() {
     
     # Build all web apps
     print_status "Building web applications..."
-    npm run build:web
-    npm run build:admin
+    pnpm run build:web
+    pnpm run build:admin
     
     # Deploy main site
     print_status "Deploying main site to o4o-webserver (13.125.144.8)..."
@@ -103,15 +103,15 @@ emergency_deploy() {
 normal_deploy() {
     # Run tests
     print_status "Running tests..."
-    npm test
+    pnpm test
     
     # Run type checks
     print_status "Running type checks..."
-    npm run type-check || print_warning "Type check failed but continuing..."
+    pnpm run type-check || print_warning "Type check failed but continuing..."
     
     # Run lint
     print_status "Running lint..."
-    npm run lint || print_warning "Lint failed but continuing..."
+    pnpm run lint || print_warning "Lint failed but continuing..."
     
     if [[ "$TARGET" == "api" || "$TARGET" == "all" ]]; then
         deploy_api
@@ -219,12 +219,12 @@ smart_deploy() {
     # Build packages if needed
     if [ "$NEED_PACKAGES_BUILD" = true ]; then
         print_status "🏗️ Building packages..."
-        npm run build:packages
+        pnpm run build:packages
     fi
     
     # Run tests
     print_status "🧪 Running tests..."
-    npm test || print_warning "Tests failed but continuing..."
+    pnpm test || print_warning "Tests failed but continuing..."
     
     # Build and deploy API if needed
     if [ "$NEED_API_BUILD" = true ]; then
@@ -237,7 +237,7 @@ smart_deploy() {
     # Build and deploy main site if needed
     if [ "$NEED_MAIN_BUILD" = true ]; then
         print_status "🏗️ Building main site..."
-        npm run build:web
+        pnpm run build:web
         
         print_status "📤 Deploying main site..."
         rsync -avz --delete \
@@ -250,7 +250,7 @@ smart_deploy() {
     # Build and deploy admin if needed
     if [ "$NEED_ADMIN_BUILD" = true ]; then
         print_status "🏗️ Building admin dashboard..."
-        npm run build:admin
+        pnpm run build:admin
         
         print_status "📤 Deploying admin dashboard..."
         rsync -avz --delete \

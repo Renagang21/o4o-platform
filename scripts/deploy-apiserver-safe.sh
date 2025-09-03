@@ -62,7 +62,7 @@ echo -e "  Date: ${DEPLOY_DATE}"
 
 # 5. 의존성 설치
 echo -e "${YELLOW}📦 Installing dependencies...${NC}"
-npm ci
+pnpm install --frozen-lockfile
 
 # 6. TypeScript 컴파일 확인 (선택적)
 echo -e "${YELLOW}🔍 Checking TypeScript compilation...${NC}"
@@ -76,8 +76,8 @@ cd ../..
 
 # 7. 빌드
 echo -e "${YELLOW}🔨 Building API server...${NC}"
-npm run build:packages
-npm run build:api
+pnpm run build:packages
+pnpm run build:api
 
 if [ -f "apps/api-server/dist/main.js" ]; then
     echo -e "${GREEN}✅ Build successful${NC}"

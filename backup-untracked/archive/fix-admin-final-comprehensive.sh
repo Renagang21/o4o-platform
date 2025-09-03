@@ -83,4 +83,4 @@ EOF
 
 echo "✅ Final comprehensive fixes applied!"
 echo ""
-echo "🔍 Run 'npm run type-check' to verify all fixes"
+echo "🔍 Run 'pnpm run type-check' to verify all fixes"

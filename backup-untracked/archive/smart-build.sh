@@ -113,7 +113,7 @@ build_packages() {
     for package in "${build_order[@]}"; do
         if [[ " $packages " =~ " $package " ]]; then
             print_info "Building package: $package"
-            npm run build --workspace=@o4o/$package || {
+            pnpm run build --workspace=@o4o/$package || {
                 print_error "Failed to build $package"
                 return 1
             }
@@ -133,7 +133,7 @@ build_apps() {
     
     for app in $apps; do
         print_info "Building app: $app"
-        npm run build --workspace=@o4o/$app || {
+        pnpm run build --workspace=@o4o/$app || {
             print_error "Failed to build $app"
             return 1
         }
@@ -212,14 +212,14 @@ main() {
             
             # Build all packages
             echo "📦 Building all packages..."
-            npm run build:packages || {
+            pnpm run build:packages || {
                 print_error "Package build failed"
                 exit 1
             }
             
             # Build all apps
             echo "🚀 Building all apps..."
-            npm run build:apps || {
+            pnpm run build:apps || {
                 print_error "App build failed"
                 exit 1
             }

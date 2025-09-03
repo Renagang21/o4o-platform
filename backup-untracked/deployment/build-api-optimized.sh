@@ -20,12 +20,12 @@ cd "$(dirname "$0")/.."
 
 # Step 1: Build supplier-connector only (API server dependency)
 echo -e "${YELLOW}[1/3] Building supplier-connector package...${NC}"
-npm run build --workspace=packages/supplier-connector
+pnpm run build --workspace=packages/supplier-connector
 
 # Step 2: Build API server
 echo -e "${YELLOW}[2/3] Building API server...${NC}"
 cd apps/api-server
-npm run clean:dist 2>/dev/null || rm -rf dist
+pnpm run clean:dist 2>/dev/null || rm -rf dist
 npx nest build
 
 # Step 3: Verify build

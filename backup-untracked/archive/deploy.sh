@@ -15,16 +15,16 @@ echo "🔄 Pulling latest changes..."
 git pull origin main
 
 echo "📦 Installing dependencies..."
-npm ci
+pnpm install --frozen-lockfile
 
 cd apps/main-site
 echo "📂 Changed to main-site directory"
 
 echo "📦 Installing main-site dependencies..."
-npm ci
+pnpm install --frozen-lockfile
 
 echo "🏗️ Building production version..."
-npm run build
+pnpm run build
 
 echo "🔄 Managing PM2 processes..."
 pm2 delete o4o-main-site || true

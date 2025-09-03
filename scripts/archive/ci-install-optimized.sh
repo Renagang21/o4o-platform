@@ -47,16 +47,16 @@ fast_install() {
   
   # CI 모드로 설치 (package-lock.json 필수)
   if [ -f "package-lock.json" ]; then
-    # npm ci는 package-lock.json을 그대로 사용하므로 빠름
-    npm ci --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
+    # pnpm install --frozen-lockfile는 package-lock.json을 그대로 사용하므로 빠름
+    pnpm install --frozen-lockfile --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
       grep -E "(added|ERR)" || true
   else
     # package-lock.json이 없으면 생성 후 설치
     echo "Generating package-lock.json..."
     pnpm install --legacy-peer-deps --no-audit --no-fund --package-lock-only
     
-    echo "Installing with npm ci..."
-    npm ci --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
+    echo "Installing with pnpm install --frozen-lockfile..."
+    pnpm install --frozen-lockfile --legacy-peer-deps --no-audit --no-fund --silent 2>&1 | \
       grep -E "(added|ERR)" || true
   fi
 }
@@ -66,8 +66,8 @@ build_essentials() {
   echo -e "${YELLOW}🔨 Building essential packages...${NC}"
   
   # 타입과 유틸리티 패키지만 먼저 빌드 (병렬 처리)
-  (cd packages/types && npm run build 2>/dev/null) &
-  (cd packages/utils && npm run build 2>/dev/null) &
+  (cd packages/types && pnpm run build 2>/dev/null) &
+  (cd packages/utils && pnpm run build 2>/dev/null) &
   wait
   
   echo "Essential packages built"

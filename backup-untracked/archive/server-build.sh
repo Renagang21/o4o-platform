@@ -10,7 +10,7 @@ echo ""
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm ci
+pnpm install --frozen-lockfile
 
 # Build packages with server-specific script
 echo "📦 Building packages..."
@@ -21,12 +21,12 @@ echo "🔨 Building applications..."
 
 # API Server
 echo "  - Building API server..."
-npm run build --workspace=@o4o/api-server || echo "⚠️  API server build had warnings"
+pnpm run build --workspace=@o4o/api-server || echo "⚠️  API server build had warnings"
 
 # Frontend apps
 echo "  - Building frontend apps..."
-npm run build --workspace=@o4o/main-site || echo "⚠️  Main site build had warnings"
-npm run build --workspace=@o4o/admin-dashboard || echo "⚠️  Admin dashboard build had warnings"
+pnpm run build --workspace=@o4o/main-site || echo "⚠️  Main site build had warnings"
+pnpm run build --workspace=@o4o/admin-dashboard || echo "⚠️  Admin dashboard build had warnings"
 
 echo ""
 echo "✅ Build process completed!"

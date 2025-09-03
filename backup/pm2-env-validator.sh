@@ -183,7 +183,7 @@ main() {
                 log_info "올바른 명령: pm2 start ecosystem.config.apiserver.cjs"
                 ;;
             "local")
-                log_info "올바른 명령: npm run pm2:start:local"
+                log_info "올바른 명령: pnpm run pm2:start:local"
                 ;;
         esac
         

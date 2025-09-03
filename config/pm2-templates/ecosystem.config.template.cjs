@@ -61,7 +61,7 @@ module.exports = {
       ref: 'origin/main',
       repo: 'git@github.com:user/repo.git',
       path: '/home/ubuntu/o4o-platform',
-      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.cjs'
+      'post-deploy': 'pnpm install && pnpm run build && pm2 reload ecosystem.config.cjs'
     }
   }
 };

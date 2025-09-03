@@ -127,7 +127,7 @@ if [ "$success" = true ]; then
     
     # 패키지 빌드
     echo -e "${YELLOW}📦 Building packages...${NC}"
-    npm run build:packages
+    pnpm run build:packages
     
     # 최종 확인
     echo -e "${GREEN}✅ All done! Your environment is ready.${NC}"

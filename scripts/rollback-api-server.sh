@@ -49,14 +49,14 @@ echo -e "${GREEN}📥 Step 1: Rolling back to $TARGET_COMMIT${NC}"
 git checkout $TARGET_COMMIT
 
 echo -e "${GREEN}📦 Step 2: Installing dependencies${NC}"
-npm ci --prefer-offline --no-audit
+pnpm install --frozen-lockfile --prefer-offline --no-audit
 
 echo -e "${GREEN}🔨 Step 3: Building packages${NC}"
-npm run build:packages
+pnpm run build:packages
 
 echo -e "${GREEN}🏗️  Step 4: Building API server${NC}"
 cd apps/api-server
-npm run build
+pnpm run build
 
 echo -e "${GREEN}🔄 Step 5: Restarting PM2 process${NC}"
 cd /home/ubuntu/o4o-platform

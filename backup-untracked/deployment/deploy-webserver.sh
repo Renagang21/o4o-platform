@@ -20,11 +20,11 @@ fi
 
 # Step 1: 의존성 설치
 echo -e "${YELLOW}📦 의존성 설치 중...${NC}"
-npm ci --production
+pnpm install --frozen-lockfile --production
 
 # Step 2: 빌드
 echo -e "${YELLOW}🔨 애플리케이션 빌드 중...${NC}"
-npm run build:web
+pnpm run build:web
 
 # Step 3: PM2 프로세스 중지 (있으면)
 echo -e "${YELLOW}⏹️ 기존 프로세스 중지...${NC}"

@@ -20,7 +20,7 @@ if [ -d "apps/admin-dashboard/dist" ]; then
     echo "✅ 로컬 빌드 해시: $LOCAL_HASH"
 else
     echo "❌ 로컬 빌드가 없습니다. 먼저 빌드를 실행하세요:"
-    echo "   cd apps/admin-dashboard && npm run build"
+    echo "   cd apps/admin-dashboard && pnpm run build"
     exit 1
 fi
 

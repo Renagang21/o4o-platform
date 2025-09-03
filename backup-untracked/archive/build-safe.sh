@@ -39,7 +39,7 @@ build_with_retry() {
         echo "Building $name (attempt $attempt/$max_attempts)..."
         
         # Use timeout to prevent hanging (5 minutes max per build)
-        if timeout 300 npm run build --workspace=$workspace 2>&1; then
+        if timeout 300 pnpm run build --workspace=$workspace 2>&1; then
             print_status "$name built successfully"
             return 0
         else
@@ -151,7 +151,7 @@ else
     done
     echo ""
     echo "To retry failed builds individually:"
-    echo "  npm run build --workspace=@o4o/[app-name]"
+    echo "  pnpm run build --workspace=@o4o/[app-name]"
 fi
 
 echo ""

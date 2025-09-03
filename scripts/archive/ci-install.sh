@@ -8,7 +8,7 @@ echo "🚀 Starting CI installation (pnpm)..."
 # pnpm 설치 확인
 if ! command -v pnpm &> /dev/null; then
     echo "📦 Installing pnpm..."
-    pnpm install -g pnpm@latest
+    npm install -g pnpm@latest
 fi
 
 echo "Using pnpm $(pnpm --version)"

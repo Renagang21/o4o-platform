@@ -12,7 +12,7 @@ rm -rf dist
 
 # 2. Build production
 echo "2. Building for production..."
-npm run build
+pnpm run build
 
 # 3. Create deployment marker
 echo "3. Creating deployment timestamp..."

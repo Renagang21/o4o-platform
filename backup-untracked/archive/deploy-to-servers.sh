@@ -61,7 +61,7 @@ fi
 # 의존성 설치 (production만)
 echo "📦 Production 의존성 설치..."
 cd apps/api-server
-npm ci --only=production || pnpm install --only=production
+pnpm install --frozen-lockfile --only=production || pnpm install --only=production
 
 # PM2로 재시작
 echo "🔄 API 서버 재시작..."
@@ -108,8 +108,8 @@ ENV
     fi
     
     # 빌드
-    npm ci || pnpm install
-    npm run build
+    pnpm install --frozen-lockfile || pnpm install
+    pnpm run build
     
     # 배포
     echo "📤 빌드 파일 배포..."
@@ -122,8 +122,8 @@ fi
 if [ -d "apps/shop" ]; then
     echo "🔨 Shop 앱 빌드..."
     cd apps/shop
-    npm ci || pnpm install
-    npm run build
+    pnpm install --frozen-lockfile || pnpm install
+    pnpm run build
     sudo cp -r dist/* /var/www/shop.neture.co.kr/
     cd ../..
 fi

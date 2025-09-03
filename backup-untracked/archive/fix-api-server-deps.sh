@@ -12,7 +12,7 @@ if [ -d "packages/supplier-connector" ]; then
     echo "Building @o4o/supplier-connector..."
     cd packages/supplier-connector
     pnpm install
-    npm run build 2>/dev/null || npx tsc
+    pnpm run build 2>/dev/null || npx tsc
     cd ../..
 fi
 
@@ -21,7 +21,7 @@ if [ -d "packages/shared" ]; then
     echo "Building @o4o/shared..."
     cd packages/shared
     pnpm install
-    npm run build 2>/dev/null || npx tsc
+    pnpm run build 2>/dev/null || npx tsc
     cd ../..
 fi
 
@@ -51,6 +51,6 @@ pnpm install --save \
 
 # 3. 빌드 재실행
 echo "🔨 API 서버 재빌드..."
-npm run build
+pnpm run build
 
 echo "✅ 완료! 이제 서버에 배포할 준비가 되었습니다."

@@ -103,7 +103,7 @@ packages=(
 
 echo "📦 Building packages..."
 for pkg in "${packages[@]}"; do
-    build_with_monitor "npm run build --workspace=@o4o/$pkg" "$pkg" || {
+    build_with_monitor "pnpm run build --workspace=@o4o/$pkg" "$pkg" || {
         echo "Failed to build $pkg. Continue? (y/n)"
         read -r response
         if [ "$response" != "y" ]; then
@@ -127,7 +127,7 @@ if [ "$1" == "full" ]; then
     for app in "${apps[@]}"; do
         # Increase memory for app builds
         export NODE_OPTIONS="--max-old-space-size=3072"
-        build_with_monitor "npm run build --workspace=@o4o/$app" "$app" || {
+        build_with_monitor "pnpm run build --workspace=@o4o/$app" "$app" || {
             echo "Failed to build $app. Continue? (y/n)"
             read -r response
             if [ "$response" != "y" ]; then

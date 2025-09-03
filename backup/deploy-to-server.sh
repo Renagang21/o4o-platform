@@ -39,7 +39,7 @@ print_status "Building packages locally..."
 }
 
 print_status "Building API server..."
-npm run build --workspace=@o4o/api-server || {
+pnpm run build --workspace=@o4o/api-server || {
     print_error "API server build failed"
     exit 1
 }
@@ -61,8 +61,8 @@ set -e
 
 echo "📦 Installing production dependencies only..."
 # Install only production dependencies with reduced memory usage
-NODE_OPTIONS="--max-old-space-size=1024" npm ci --production --no-audit --no-fund || {
-    echo "❌ npm ci failed, trying pnpm install..."
+NODE_OPTIONS="--max-old-space-size=1024" pnpm install --frozen-lockfile --production --no-audit --no-fund || {
+    echo "❌ pnpm install --frozen-lockfile failed, trying pnpm install..."
     NODE_OPTIONS="--max-old-space-size=1024" pnpm install --production --no-audit --no-fund
 }
 

@@ -23,7 +23,7 @@ rm -rf dist
 
 # 프로덕션 빌드
 echo "빌드 중... (약 1분 소요)"
-npm run build
+pnpm run build
 
 # 빌드 확인
 if [ ! -f "dist/index.html" ]; then

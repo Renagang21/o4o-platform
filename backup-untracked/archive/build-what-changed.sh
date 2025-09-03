@@ -73,7 +73,7 @@ if [ -n "$PACKAGES_TO_BUILD" ]; then
     for pkg in types utils ui auth-client auth-context crowdfunding-types forum-types shortcodes; do
         if [[ " $PACKAGES_TO_BUILD " =~ " $pkg " ]]; then
             echo "  Building $pkg..."
-            npm run build --workspace=@o4o/$pkg
+            pnpm run build --workspace=@o4o/$pkg
             echo -e "${GREEN}  ✅ $pkg built${NC}"
         fi
     done
@@ -85,7 +85,7 @@ if [ -n "$APPS_TO_BUILD" ]; then
     
     for app in $APPS_TO_BUILD; do
         echo "  Building $app..."
-        npm run build --workspace=@o4o/$app
+        pnpm run build --workspace=@o4o/$app
         echo -e "${GREEN}  ✅ $app built${NC}"
     done
 fi

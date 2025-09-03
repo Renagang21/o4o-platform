@@ -13,7 +13,7 @@ NC='\033[0m'
 check_pnpm() {
     if ! command -v pnpm &> /dev/null; then
         echo -e "${YELLOW}📦 Installing pnpm...${NC}"
-        pnpm install -g pnpm@latest
+        npm install -g pnpm@latest
     fi
     echo -e "${GREEN}✓ Using pnpm $(pnpm --version)${NC}"
 }

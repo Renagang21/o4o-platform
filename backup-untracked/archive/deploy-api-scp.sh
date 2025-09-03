@@ -97,7 +97,7 @@ fi
 
 # Production 의존성 설치
 echo "📦 Production 의존성 설치..."
-npm ci --only=production || pnpm install --only=production
+pnpm install --frozen-lockfile --only=production || pnpm install --only=production
 
 # PM2로 서비스 시작
 echo "🔄 PM2로 서비스 시작..."

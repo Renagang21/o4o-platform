@@ -14,7 +14,7 @@ cd /home/user/o4o-platform
 # 1. 빌드
 echo "📦 빌드 중..."
 cd apps/admin-dashboard
-npm run build
+pnpm run build
 
 # 2. 빌드 해시 확인
 BUILD_HASH=$(grep -oE 'index-[a-zA-Z0-9]+\.js' dist/index.html | head -1)

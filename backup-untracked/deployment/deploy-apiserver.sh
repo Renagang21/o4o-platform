@@ -33,19 +33,19 @@ fi
 # Step 2: 의존성 설치
 echo -e "${YELLOW}📦 의존성 설치 중...${NC}"
 cd apps/api-server
-npm ci --production
+pnpm install --frozen-lockfile --production
 cd ../..
 
 # Step 3: 빌드
 echo -e "${YELLOW}🔨 API Server 빌드 중...${NC}"
 cd apps/api-server
-npm run build:prod
+pnpm run build:prod
 cd ../..
 
 # Step 4: 데이터베이스 확인
 echo -e "${YELLOW}🗄️ 데이터베이스 연결 테스트...${NC}"
 cd apps/api-server
-npm run db:test || echo -e "${YELLOW}⚠️ DB 연결 실패 - 계속 진행${NC}"
+pnpm run db:test || echo -e "${YELLOW}⚠️ DB 연결 실패 - 계속 진행${NC}"
 cd ../..
 
 # Step 5: PM2로 실행

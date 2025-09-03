@@ -157,9 +157,9 @@ if [ "$BEFORE_PULL" != "$AFTER_PULL" ]; then
         
         echo
         log_info "개별 빌드 명령어 예시:"
-        echo "  npm run build --workspace=@o4o/[app-name]"
+        echo "  pnpm run build --workspace=@o4o/[app-name]"
         echo "  또는"
-        echo "  npm run build:after-pull"
+        echo "  pnpm run build:after-pull"
     fi
     
     # API 서버 변경 확인 (경고만)

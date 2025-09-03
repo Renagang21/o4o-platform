@@ -29,7 +29,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     echo ""
     echo "📦 Installing dependencies (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
     
-    if npm ci --legacy-peer-deps; then
+    if pnpm install --frozen-lockfile --legacy-peer-deps; then
         echo "✅ Dependencies installed successfully"
         break
     else

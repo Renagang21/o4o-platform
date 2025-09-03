@@ -17,7 +17,7 @@ build_package() {
   rm -rf "$package_path/dist" "$package_path/tsconfig.tsbuildinfo"
   
   # Try normal build first
-  if npm run build --workspace="$package_name"; then
+  if pnpm run build --workspace="$package_name"; then
     echo "✅ $package_name built successfully"
   else
     echo "⚠️  Normal build failed for $package_name, trying alternative..."

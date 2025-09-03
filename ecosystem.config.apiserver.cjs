@@ -92,7 +92,7 @@ module.exports = {
       combine_logs: true,
       
       // Post-deploy actions
-      post_deploy: 'npm run migration:run',
+      post_deploy: 'pnpm run migration:run',
     }
   ],
   
@@ -104,7 +104,7 @@ module.exports = {
       ref: 'origin/main',
       repo: 'git@github.com:Renagang21/o4o-platform.git',
       path: '/home/ubuntu/o4o-platform',
-      'post-deploy': 'npm install && npm run build:packages && cd apps/api-server && npm run build && pm2 reload ecosystem.config.apiserver.cjs --env production',
+      'post-deploy': 'pnpm install && pnpm run build:packages && cd apps/api-server && pnpm run build && pm2 reload ecosystem.config.apiserver.cjs --env production',
       env: {
         NODE_ENV: 'production'
       }

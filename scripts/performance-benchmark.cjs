@@ -29,7 +29,7 @@ function benchmarkDefault() {
     results.default.packages = workspaces.length;
     
     // Run default build
-    execSync('npm run build:packages', { 
+    execSync('pnpm run build:packages', { 
       stdio: 'pipe',
       encoding: 'utf8'
     });
@@ -64,10 +64,10 @@ function benchmarkOptimized() {
     
     // Run optimized build (only required packages)
     const buildCommands = [
-      'npm run build:types',
-      'npm run build:utils',
-      'npm run build:auth-client',
-      'npm run build:api'
+      'pnpm run build:types',
+      'pnpm run build:utils',
+      'pnpm run build:auth-client',
+      'pnpm run build:api'
     ];
     
     buildCommands.forEach(cmd => {
