@@ -76,6 +76,61 @@ build_app() {
             fi
             cd ../..
             ;;
+        "forum")
+            echo "Building Forum components..."
+            # Forum is part of admin-dashboard, build admin
+            cd apps/admin-dashboard
+            if [ -f "../../pnpm-lock.yaml" ]; then
+                pnpm run build
+            else
+                npm run build
+            fi
+            cd ../..
+            ;;
+        "ecommerce")
+            echo "Building E-commerce components..."
+            # E-commerce is part of admin-dashboard, build admin
+            cd apps/admin-dashboard
+            if [ -f "../../pnpm-lock.yaml" ]; then
+                pnpm run build
+            else
+                npm run build
+            fi
+            cd ../..
+            ;;
+        "signage")
+            echo "Building Signage components..."
+            # Signage is part of admin-dashboard, build admin
+            cd apps/admin-dashboard
+            if [ -f "../../pnpm-lock.yaml" ]; then
+                pnpm run build
+            else
+                npm run build
+            fi
+            cd ../..
+            ;;
+        "affiliate")
+            echo "Building Affiliate components..."
+            # Affiliate is part of admin-dashboard, build admin
+            cd apps/admin-dashboard
+            if [ -f "../../pnpm-lock.yaml" ]; then
+                pnpm run build
+            else
+                npm run build
+            fi
+            cd ../..
+            ;;
+        "vendors")
+            echo "Building Vendors components..."
+            # Vendors is part of admin-dashboard, build admin
+            cd apps/admin-dashboard
+            if [ -f "../../pnpm-lock.yaml" ]; then
+                pnpm run build
+            else
+                npm run build
+            fi
+            cd ../..
+            ;;
         "all")
             echo "Building all applications..."
             if [ -f "pnpm-lock.yaml" ]; then
@@ -86,7 +141,7 @@ build_app() {
             ;;
         *)
             echo "⚠️ Unknown app: $app"
-            echo "Valid options: admin, storefront, api, main, crowdfunding, all"
+            echo "Valid options: admin, storefront, api, main, crowdfunding, forum, ecommerce, signage, affiliate, vendors, all"
             exit 1
             ;;
     esac
