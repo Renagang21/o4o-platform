@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { WordPressFilter } from '@/components/common/WordPressFilter';
 import { BulkActionBar } from '@/components/common/BulkActionBar';
 import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -338,56 +339,54 @@ const UsersList: FC = () => {
       <hr className="wp-header-end" />
 
       {/* Filters */}
-      <div className="wp-filter">
-        <div className="filter-items">
-          <Select value={roleFilter} onValueChange={(value: string) => setRoleFilter(value as UserRole | 'all')}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Roles" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <WordPressFilter>
+        <Select value={roleFilter} onValueChange={(value: string) => setRoleFilter(value as UserRole | 'all')}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Roles" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            {Object.entries(ROLE_LABELS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as UserStatus | 'all')}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <div className="search-box">
-            <Input
-              type="search"
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e: any) => setSearchQuery(e.target.value)}
-              className="w-[300px]"
-            />
-            <Button variant="secondary">
-              Search Users
-            </Button>
-          </div>
-
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-
-          <Button variant="outline" onClick={() => refetch()}>
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
+        <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as UserStatus | 'all')}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            {Object.entries(STATUS_LABELS).map(([value, label]) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <div className="search-box">
+          <Input
+            type="search"
+            placeholder="Search users..."
+            value={searchQuery}
+            onChange={(e: any) => setSearchQuery(e.target.value)}
+            className="w-[300px]"
+          />
+          <Button variant="secondary">
+            Search Users
           </Button>
         </div>
-      </div>
+
+        <Button variant="outline" onClick={handleExport}>
+          <Download className="mr-2 h-4 w-4" />
+          Export
+        </Button>
+
+        <Button variant="outline" onClick={() => refetch()}>
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Refresh
+        </Button>
+      </WordPressFilter>
 
       {/* Bulk Actions - Top */}
       <BulkActionBar

@@ -15,6 +15,7 @@ import './styles/quick-edit.css'
 import './styles/help-tab.css'
 import './styles/media-upload.css'
 import './styles/ui-improvements.css'
+import './styles/wordpress-table-fix.css'
 
 
 const queryClient = new QueryClient({
