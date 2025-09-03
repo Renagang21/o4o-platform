@@ -15,6 +15,17 @@ export const useAuth = () => {
   return context;
 };
 
+export const useCookieAuth = () => {
+  const authContext = useAuth();
+  const logoutAll = async () => {
+    await authContext.logout();
+  };
+  return {
+    ...authContext,
+    logoutAll
+  };
+};
+
 export const CookieAuthProvider = AuthProvider;
 export const SSOAuthProvider = AuthProvider;
 
@@ -32,6 +43,7 @@ export default {
   AuthContext,
   AuthProvider,
   useAuth,
+  useCookieAuth,
   CookieAuthProvider,
   SSOAuthProvider,
   SessionManager,
