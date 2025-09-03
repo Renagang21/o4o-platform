@@ -85,7 +85,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                   column.sortable && 'sortable',
                   sortColumn === column.id && 'sorted',
                   sortColumn === column.id && sortDirection,
-                  'text-left font-semibold text-gray-700 dark:text-gray-200'
+                  'text-left font-semibold text-gray-900 dark:text-gray-100'
                 )}
                 style={{ width: column.width }}
               >
@@ -148,7 +148,7 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                         `column-${column.id}`,
                         isFirstColumn && 'column-primary font-medium',
                         column.align && `text-${column.align}`,
-                        'text-gray-900 dark:text-gray-100'
+                        'text-gray-800 dark:text-gray-200'
                       )}
                     >
                       <div className="cell-content">
