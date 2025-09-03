@@ -1,0 +1,33 @@
+# pnpm 최적화 설정 (O4O Platform 전용)
+
+# WordPress 패키지 호환성
+shamefully-hoist=true
+hoist-pattern[]=@wordpress/*
+hoist-pattern[]=@babel/*
+hoist-pattern[]=*eslint*
+
+# React 생태계 최적화
+public-hoist-pattern[]=*react*
+public-hoist-pattern[]=@types/*
+
+# Native 모듈 처리
+node-linker=hoisted
+
+# Peer Dependencies 처리
+auto-install-peers=true
+strict-peer-dependencies=false
+
+# 성능 최적화
+prefer-offline=true
+verify-store-integrity=false
+resolution-mode=highest
+
+# Monorepo 설정
+shared-workspace-lockfile=true
+recursive-install=true
+prefer-workspace-packages=true
+
+# 네트워크 설정
+fetch-retries=2
+fetch-retry-mintimeout=10000
+fetch-retry-maxtimeout=60000

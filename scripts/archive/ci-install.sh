@@ -1,9 +1,17 @@
 #!/bin/bash
-# CI/CD 환경을 위한 설치 스크립트
+# CI/CD 환경을 위한 설치 스크립트 (pnpm 버전)
 
 set -e
 
-echo "🚀 Starting CI installation..."
+echo "🚀 Starting CI installation (pnpm)..."
+
+# pnpm 설치 확인
+if ! command -v pnpm &> /dev/null; then
+    echo "📦 Installing pnpm..."
+    npm install -g pnpm@latest
+fi
+
+echo "Using pnpm $(pnpm --version)"
 
 # Workspace node_modules 정리
 echo "🧹 Cleaning workspace node_modules..."
@@ -14,58 +22,39 @@ for dir in apps/* packages/*; do
   fi
 done
 
-# 재시도 함수
-retry_npm_install() {
-  local max_attempts=3
-  local attempt=1
-  local wait_time=5
+# pnpm 설치 함수
+run_pnpm_install() {
+  echo "⚡ Running pnpm install..."
   
-  while [ $attempt -le $max_attempts ]; do
-    echo "Attempt $attempt of $max_attempts..."
+  # CI 환경에서는 frozen-lockfile 사용
+  if [ "$CI" = "true" ] && [ -f "pnpm-lock.yaml" ]; then
+    echo "CI mode: using frozen-lockfile"
+    pnpm install --frozen-lockfile --prefer-offline
+  else
+    echo "Local mode: regular install"
+    pnpm install --prefer-offline
+  fi
+  
+  if [ $? -eq 0 ]; then
+    echo "✅ pnpm install succeeded"
     
-    # npm 설정 (타임아웃 증가, 재시도 설정)
-    npm config set fetch-retry-mintimeout 20000
-    npm config set fetch-retry-maxtimeout 120000
-    npm config set fetch-retries 3
-    npm config set registry https://registry.npmjs.org/
-    
-    # npm install 실행 (package-lock.json 생성)
-    if npm install --legacy-peer-deps --no-audit --no-fund --prefer-offline --fetch-timeout=60000; then
-      echo "✅ npm install succeeded on attempt $attempt"
-      
-      # workspace node_modules 재정리 (설치 후)
-      echo "🧹 Post-install cleanup of workspace node_modules..."
-      for dir in apps/* packages/*; do
-        if [ -d "$dir/node_modules" ]; then
-          echo "  Removing $dir/node_modules"
-          rm -rf "$dir/node_modules"
-        fi
-      done
-      
-      return 0
-    fi
-    
-    # 실패 시 대기 후 재시도
-    if [ $attempt -lt $max_attempts ]; then
-      echo "⚠️ npm install failed on attempt $attempt. Retrying in $wait_time seconds..."
-      sleep $wait_time
-      wait_time=$((wait_time * 2))  # 지수 백오프
-      
-      # 캐시 정리 (마지막 시도 전)
-      if [ $attempt -eq $((max_attempts - 1)) ]; then
-        echo "Clearing npm cache before final attempt..."
-        npm cache clean --force || true
+    # workspace node_modules 재정리 (설치 후)
+    echo "🧹 Post-install cleanup of workspace node_modules..."
+    for dir in apps/* packages/*; do
+      if [ -d "$dir/node_modules" ]; then
+        echo "  Removing $dir/node_modules"
+        rm -rf "$dir/node_modules"
       fi
-    fi
+    done
     
-    attempt=$((attempt + 1))
-  done
-  
-  echo "❌ npm install failed after $max_attempts attempts"
-  return 1
+    return 0
+  else
+    echo "❌ pnpm install failed"
+    return 1
+  fi
 }
 
 # 설치 실행
-retry_npm_install
+run_pnpm_install
 
 echo "✅ CI installation completed!"
