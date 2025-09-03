@@ -1,54 +1,62 @@
-# Scripts Directory
+# O4O Platform Scripts
 
-Essential utility scripts for the O4O Platform.
+## 📁 현재 스크립트 (8개)
 
-## 🎯 Core Scripts
+### 🚀 배포 스크립트
+- **`update-webserver.sh`** - 웹서버 업데이트 (pull + build + PM2 재시작)
+- **`deploy-api-server.sh`** - API 서버 배포
+- **`deploy.sh`** - 통합 배포 스크립트
 
-### Installation & Dependencies
-**`install.sh`** - Unified installation script
-```bash
-./scripts/install.sh quick     # Fast installation
-./scripts/install.sh split     # Sequential installation
-./scripts/install.sh parallel  # Parallel installation (default)
-./scripts/install.sh blocks    # Block packages only
-./scripts/install.sh ci        # CI/CD optimized
-```
+### 🧹 유지보수 스크립트
+- **`clean-before-build.sh`** - 빌드 전 캐시 정리
+- **`install.sh`** - 패키지 설치 스크립트
+- **`validate-deploy-env.sh`** - 배포 환경 검증
 
-### Deployment & Build
-**`deploy.sh`** - Unified deployment script
-```bash
-./scripts/deploy.sh build      # Build for current environment
-./scripts/deploy.sh start      # Start PM2 services
-./scripts/deploy.sh stop       # Stop PM2 services
-./scripts/deploy.sh restart    # Restart PM2 services
-./scripts/deploy.sh clean      # Clean caches and builds
-./scripts/deploy.sh deploy     # Full deployment process
-```
+### 📦 유틸리티 스크립트
+- **`update-package-versions.sh`** - 패키지 버전 업데이트
+- **`optimize-npm-immediate.sh`** - npm 최적화
 
-### Development
-**`development/dev.sh`** - Development utilities
-```bash
-./scripts/development/dev.sh lint        # Run ESLint
-./scripts/development/dev.sh type-check  # TypeScript check
-./scripts/development/dev.sh test        # Run tests
-./scripts/development/dev.sh build       # Build all
-```
-
-### Utilities
-- **`clean-before-build.sh`** - Pre-build cache cleaning
-- **`validate-deploy-env.sh`** - Environment validation
-- **`ssh-key-converter.py`** - SSH key format converter
-
-## 📊 Script Count
-- **Before**: 70+ scripts across multiple folders
-- **After**: 6 essential scripts
-- **Reduction**: 91% fewer scripts
-
-## 🗑️ Removed
-- 53 archive scripts
-- 9 deployment scripts  
-- 1 testing script
-- Multiple redundant install/build scripts
+### 📂 개발 스크립트
+- **`development/dev.sh`** - 개발 도구 (lint, type-check, test)
 
 ---
-*Last updated: August 2025*
+
+## 🗑️ 삭제된 스크립트 (18개)
+- deploy-apiserver-safe.sh
+- deploy-api.sh
+- deploy-index-html.sh
+- deploy-to-server.sh
+- force-deploy-admin.sh
+- manual-deploy-admin.sh
+- test-ssh-deploy.sh
+- rollback-api-server.sh
+- ci-build-app.sh
+- ci-build-packages.sh
+- ci-complete-setup.sh
+- ci-install-fixed.sh
+- ci-install-pnpm.sh
+- ci-setup-workspace.sh
+- archive/* (모든 archive 스크립트)
+
+---
+
+## 💡 사용 방법
+
+### 웹서버 업데이트
+```bash
+./scripts/update-webserver.sh
+```
+
+### API 서버 배포
+```bash
+./scripts/deploy-api-server.sh
+```
+
+### 개발 환경 작업
+```bash
+./scripts/development/dev.sh lint
+./scripts/development/dev.sh type-check
+```
+
+---
+*최종 정리: 2025년 9월*
