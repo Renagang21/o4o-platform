@@ -17,7 +17,25 @@ import * as React from 'react';
 export const AuthContext = React.createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  return React.createElement(AuthContext.Provider, { value: {} }, children);
+  const [user, setUser] = React.useState(null);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  
+  const value = React.useMemo(() => ({
+    user,
+    setUser,
+    isAuthenticated,
+    setIsAuthenticated,
+    login: async (credentials) => {
+      setIsAuthenticated(true);
+      setUser(credentials);
+    },
+    logout: async () => {
+      setIsAuthenticated(false);
+      setUser(null);
+    }
+  }), [user, isAuthenticated]);
+  
+  return React.createElement(AuthContext.Provider, { value }, children);
 };
 
 export const useAuth = () => {
