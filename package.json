@@ -57,7 +57,17 @@
     "deploy:build": "./scripts/deploy.sh build",
     "pm2:start": "./scripts/deploy.sh start",
     "pm2:stop": "./scripts/deploy.sh stop",
-    "pm2:restart": "./scripts/deploy.sh restart"
+    "pm2:restart": "./scripts/deploy.sh restart",
+    "// === 서버별 PM2 스크립트 ===": "",
+    "pm2:start:local": "pm2 start ecosystem.config.local.cjs",
+    "pm2:stop:local": "pm2 stop ecosystem.config.local.cjs",
+    "pm2:restart:local": "pm2 restart ecosystem.config.local.cjs",
+    "pm2:start:webserver": "pm2 start ecosystem.config.webserver.cjs",
+    "pm2:stop:webserver": "pm2 stop ecosystem.config.webserver.cjs",
+    "pm2:restart:webserver": "pm2 restart ecosystem.config.webserver.cjs",
+    "pm2:start:apiserver": "pm2 start ecosystem.config.apiserver.cjs",
+    "pm2:stop:apiserver": "pm2 stop ecosystem.config.apiserver.cjs",
+    "pm2:restart:apiserver": "pm2 restart ecosystem.config.apiserver.cjs"
   },
   "devDependencies": {
     "@eslint/js": "9.33.0",
