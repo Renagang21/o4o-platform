@@ -150,9 +150,11 @@ const CategoryList: FC = () => {
       ),
       date: (
         <div>
-          <abbr title={formatDate(category.createdAt)}>
-            {formatDate(category.createdAt)}
-          </abbr>
+          {category.createdAt && (
+            <abbr title={formatDate(category.createdAt)}>
+              {formatDate(category.createdAt)}
+            </abbr>
+          )}
         </div>
       )
     },
