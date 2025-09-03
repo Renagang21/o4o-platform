@@ -507,6 +507,9 @@ app.use('/api/forum', forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
 app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 
+// Categories routes (public access)
+app.use('/api/categories', categoriesRoutes);
+
 // ACF and Shortcode routes
 import acfRoutes from './routes/acf';
 import shortcodeRoutes from './routes/shortcodes';
