@@ -53,7 +53,7 @@ const PostListQuickEdit: FC = () => {
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/categories');
+      const response = await authClient.api.get('/api/categories');
       return response.data;
     }
   });
