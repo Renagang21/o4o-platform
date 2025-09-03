@@ -32,10 +32,11 @@ build_app() {
         "admin"|"admin-dashboard")
             echo "Building Admin Dashboard..."
             cd apps/admin-dashboard
-            # Copy CI env file if it exists
-            if [ -f ".env.ci" ]; then
-                cp .env.ci .env.production.local
-                echo "📝 Using CI optimized environment"
+            # Apply CI build optimizations
+            if [ -f "ci.build.config" ]; then
+                echo "📝 Applying CI build optimizations..."
+                # Export environment variables from config
+                export $(cat ci.build.config | grep -v '^#' | xargs)
             fi
             if [ -f "../../pnpm-lock.yaml" ]; then
                 pnpm run build
@@ -78,10 +79,11 @@ build_app() {
             # All these are part of admin-dashboard
             echo "Building ${app} components (admin-dashboard module)..."
             cd apps/admin-dashboard
-            # Copy CI env file if it exists
-            if [ -f ".env.ci" ]; then
-                cp .env.ci .env.production.local
-                echo "📝 Using CI optimized environment"
+            # Apply CI build optimizations
+            if [ -f "ci.build.config" ]; then
+                echo "📝 Applying CI build optimizations..."
+                # Export environment variables from config
+                export $(cat ci.build.config | grep -v '^#' | xargs)
             fi
             if [ -f "../../pnpm-lock.yaml" ]; then
                 pnpm run build
