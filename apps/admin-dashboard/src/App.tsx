@@ -921,14 +921,7 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 도움말 */}
-                    <Route path="/shortcodes" element={
-                      <AdminProtectedRoute requiredPermissions={['content:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Shortcodes />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
+                    {/* 도움말 - Route removed due to duplicate */}
                     
                     {/* 테스트 페이지 */}
                     <Route path="/test" element={
