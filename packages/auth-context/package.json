@@ -12,8 +12,8 @@
     }
   },
   "scripts": {
-    "build": "./build-minimal.sh || node build.js",
-    "build:fallback": "./build-minimal.sh",
+    "build": "npx tsc",
+    "build:fallback": "node build.js",
     "build:server": "node build-server.js",
     "build:tsc": "npx tsc",
     "type-check": "npx tsc --noEmit"

@@ -1,69 +1,7 @@
-// Auto-generated minimal build for @o4o/auth-context
-import * as React from 'react';
-
-export const AuthContext = React.createContext(null);
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = React.useState(null);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  
-  const value = React.useMemo(() => ({
-    user,
-    setUser,
-    isAuthenticated,
-    setIsAuthenticated,
-    login: async (credentials) => {
-      setIsAuthenticated(true);
-      setUser(credentials);
-    },
-    logout: async () => {
-      setIsAuthenticated(false);
-      setUser(null);
-    }
-  }), [user, isAuthenticated]);
-  
-  return React.createElement(AuthContext.Provider, { value }, children);
-};
-
-export const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-};
-
-export const useCookieAuth = () => {
-  const authContext = useAuth();
-  const logoutAll = async () => {
-    await authContext.logout();
-  };
-  return {
-    ...authContext,
-    logoutAll
-  };
-};
-
-export const CookieAuthProvider = AuthProvider;
-export const SSOAuthProvider = AuthProvider;
-
-export const SessionManager = {
-  getInstance: () => ({
-    checkSession: async () => true,
-    refreshSession: async () => true,
-    clearSession: async () => true
-  })
-};
-
-export const AdminProtectedRoute = ({ children }) => children;
-
-export default {
-  AuthContext,
-  AuthProvider,
-  useAuth,
-  useCookieAuth,
-  CookieAuthProvider,
-  SSOAuthProvider,
-  SessionManager,
-  AdminProtectedRoute
-};
+// Authentication context exports
+export * from './AuthContext';
+export * from './AuthProvider';
+export * from './SessionManager';
+export * from './AdminProtectedRoute';
+export * from './CookieAuthProvider';
+export * from './SSOAuthProvider';
