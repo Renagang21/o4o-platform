@@ -43,9 +43,9 @@ jobs:
     - name: Deploy to web server
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.WEBSERVER_HOST }}
-        username: ${{ secrets.WEBSERVER_USER }}
-        key: ${{ secrets.WEBSERVER_SSH_KEY }}
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
         script: |
           # Backup current deployment
           sudo cp -r /var/www/admin.neture.co.kr /var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) || true
@@ -59,9 +59,9 @@ jobs:
     - name: Copy build files
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.WEBSERVER_HOST }}
-        username: ${{ secrets.WEBSERVER_USER }}
-        key: ${{ secrets.WEBSERVER_SSH_KEY }}
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
         source: "apps/admin-dashboard/dist/*"
         target: "/tmp/admin-build/"
         strip_components: 3
@@ -69,9 +69,9 @@ jobs:
     - name: Move files to web directory
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.WEBSERVER_HOST }}
-        username: ${{ secrets.WEBSERVER_USER }}
-        key: ${{ secrets.WEBSERVER_SSH_KEY }}
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
         script: |
           # Move files from temp to web directory
           sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
