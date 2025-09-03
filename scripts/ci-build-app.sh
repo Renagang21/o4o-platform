@@ -7,7 +7,11 @@ set -e  # Exit on error
 
 APP_NAME=$1
 
+# Set Node.js memory limit for builds
+export NODE_OPTIONS="--max-old-space-size=4096"
+
 echo "🚀 Starting CI build process..."
+echo "📊 Node memory limit: 4GB"
 
 # Function to build packages first
 build_packages() {
@@ -28,6 +32,11 @@ build_app() {
         "admin"|"admin-dashboard")
             echo "Building Admin Dashboard..."
             cd apps/admin-dashboard
+            # Copy CI env file if it exists
+            if [ -f ".env.ci" ]; then
+                cp .env.ci .env.production.local
+                echo "📝 Using CI optimized environment"
+            fi
             if [ -f "../../pnpm-lock.yaml" ]; then
                 pnpm run build
             else
@@ -65,65 +74,15 @@ build_app() {
             fi
             cd ../..
             ;;
-        "crowdfunding")
-            echo "Building Crowdfunding components..."
-            # Crowdfunding is part of admin-dashboard, build admin
+        "crowdfunding"|"forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
+            # All these are part of admin-dashboard
+            echo "Building ${app} components (admin-dashboard module)..."
             cd apps/admin-dashboard
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
+            # Copy CI env file if it exists
+            if [ -f ".env.ci" ]; then
+                cp .env.ci .env.production.local
+                echo "📝 Using CI optimized environment"
             fi
-            cd ../..
-            ;;
-        "forum")
-            echo "Building Forum components..."
-            # Forum is part of admin-dashboard, build admin
-            cd apps/admin-dashboard
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
-            cd ../..
-            ;;
-        "ecommerce")
-            echo "Building E-commerce components..."
-            # E-commerce is part of admin-dashboard, build admin
-            cd apps/admin-dashboard
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
-            cd ../..
-            ;;
-        "signage"|"digital-signage")
-            echo "Building Digital Signage components..."
-            # Digital Signage is part of admin-dashboard, build admin
-            cd apps/admin-dashboard
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
-            cd ../..
-            ;;
-        "affiliate")
-            echo "Building Affiliate components..."
-            # Affiliate is part of admin-dashboard, build admin
-            cd apps/admin-dashboard
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
-            cd ../..
-            ;;
-        "vendors")
-            echo "Building Vendors components..."
-            # Vendors is part of admin-dashboard, build admin
-            cd apps/admin-dashboard
             if [ -f "../../pnpm-lock.yaml" ]; then
                 pnpm run build
             else
