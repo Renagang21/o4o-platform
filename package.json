@@ -65,9 +65,9 @@
     "pm2:start:local": "pm2 start ecosystem.config.local.cjs",
     "pm2:stop:local": "pm2 stop ecosystem.config.local.cjs",
     "pm2:restart:local": "pm2 restart ecosystem.config.local.cjs",
-    "pm2:start:webserver": "pm2 start ecosystem.config.webserver.cjs",
-    "pm2:stop:webserver": "pm2 stop ecosystem.config.webserver.cjs",
-    "pm2:restart:webserver": "pm2 restart ecosystem.config.webserver.cjs",
+    "pm2:start:webserver": "pm2 start ecosystem.config.webserver.js",
+    "pm2:stop:webserver": "pm2 stop ecosystem.config.webserver.js",
+    "pm2:restart:webserver": "pm2 restart ecosystem.config.webserver.js",
     "pm2:start:apiserver": "pm2 start ecosystem.config.apiserver.cjs",
     "pm2:stop:apiserver": "pm2 stop ecosystem.config.apiserver.cjs",
     "pm2:restart:apiserver": "pm2 restart ecosystem.config.apiserver.cjs"
