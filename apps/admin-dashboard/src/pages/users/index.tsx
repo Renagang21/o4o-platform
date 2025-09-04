@@ -1,5 +1,5 @@
-import UserList from './UserList'; // WordPress-style list with WordPressTable
+import UsersListBulk from './UsersListBulk'; // WordPress-style list with bulk actions
 
 export default function UsersPage() {
-  return <UserList />;
+  return <UsersListBulk />;
 }

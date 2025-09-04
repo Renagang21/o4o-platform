@@ -1,13 +1,13 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import PageListWordPress from '../content/PageListWordPress'; // Use WordPress-style page list
+import Pages from './Pages'; // Use the recent Pages component with bulk actions
 import PageForm from '../content/PageForm';
 import NewPage from './NewPage';
 
 const PagesRouter: FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<PageListWordPress />} />
+      <Route path="/" element={<Pages />} />
       <Route path="/new" element={<NewPage />} />
       <Route path="/:id/edit" element={<PageForm />} />
       <Route path="*" element={<Navigate to="/" replace />} />
