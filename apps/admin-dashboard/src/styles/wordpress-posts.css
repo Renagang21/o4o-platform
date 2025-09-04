@@ -1,0 +1,330 @@
+/**
+ * WordPress Posts Management Styles
+ * Authentic WordPress admin styling for posts list page
+ */
+
+/* Status Tabs Navigation */
+.subsubsub {
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 0;
+  font-size: 13px;
+  float: left;
+  color: #646970;
+}
+
+.subsubsub li {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.subsubsub a {
+  line-height: 2;
+  padding: 0.2em;
+  text-decoration: none;
+  color: #2271b1;
+  transition: none;
+}
+
+.subsubsub a:hover,
+.subsubsub a:active {
+  color: #135e96;
+}
+
+.subsubsub a.current {
+  color: #000;
+  font-weight: 600;
+  border: none;
+}
+
+.subsubsub .count {
+  color: #50575e;
+  font-weight: 400;
+}
+
+/* Search Box */
+.search-box {
+  position: relative;
+  float: right;
+  margin: 0;
+}
+
+.search-box input[type="search"] {
+  margin: 0 4px 0 0;
+  padding: 0 8px;
+  line-height: 2;
+  min-height: 30px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+/* Table Navigation */
+.tablenav {
+  clear: both;
+  height: 30px;
+  margin: 6px 0 4px;
+  padding-top: 5px;
+  vertical-align: middle;
+}
+
+.tablenav.top {
+  margin-bottom: 15px;
+}
+
+.tablenav.bottom {
+  margin-top: 15px;
+}
+
+.tablenav .actions {
+  float: left;
+  padding-right: 8px;
+}
+
+.tablenav .alignleft {
+  float: left;
+  margin-bottom: 0;
+}
+
+.tablenav .alignright {
+  float: right;
+  margin-bottom: 0;
+}
+
+/* Bulk Actions */
+.bulkactions {
+  position: relative;
+}
+
+.tablenav .actions select {
+  float: left;
+  margin-right: 6px;
+  max-width: 200px;
+  font-size: 14px;
+  vertical-align: middle;
+  height: 32px;
+  line-height: 2.30769231;
+}
+
+.tablenav .actions .button.action {
+  margin: 0 8px 0 0;
+  padding: 0 10px;
+  line-height: 2.15384615;
+  min-height: 32px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+/* Pagination */
+.tablenav-pages {
+  float: right;
+  margin: 0 0 9px;
+}
+
+.tablenav-pages .displaying-num {
+  margin-right: 7px;
+  color: #50575e;
+  font-size: 13px;
+  font-style: italic;
+  vertical-align: middle;
+  line-height: 30px;
+}
+
+.tablenav-pages .pagination-links {
+  display: inline-block;
+  min-width: 200px;
+  text-align: right;
+  margin: 0;
+  padding: 0;
+}
+
+.tablenav-pages .pagination-links .button {
+  display: inline-block;
+  vertical-align: baseline;
+  min-width: 30px;
+  min-height: 30px;
+  margin: 0 2px;
+  padding: 0 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+  background: #f6f7f7;
+  border: 1px solid #c3c4c7;
+  color: #50575e;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.tablenav-pages .pagination-links .button:hover {
+  background: #f0f0f1;
+  border-color: #8c8f94;
+  color: #3c434a;
+}
+
+.tablenav-pages .pagination-links .button:disabled {
+  color: #a7aaad;
+  background: #f6f7f7;
+  border-color: #dcdcde;
+  cursor: default;
+  opacity: 0.5;
+}
+
+.pagination-links .paging-input {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 8px;
+}
+
+.pagination-links .paging-input .current-page {
+  width: 4ch;
+  text-align: center;
+  padding: 0 4px;
+  font-size: 13px;
+  line-height: 2.15384615;
+  min-height: 30px;
+  vertical-align: middle;
+  border: 1px solid #8c8f94;
+  background-color: #fff;
+  color: #2c3338;
+}
+
+.tablenav-paging-text {
+  color: #50575e;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.pagination-links .total-pages {
+  font-weight: 600;
+}
+
+/* Post States */
+.post-state {
+  font-weight: 600;
+  color: #50575e;
+}
+
+/* Row Title */
+.row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2271b1;
+  text-decoration: none;
+}
+
+.row-title:hover {
+  color: #135e96;
+  text-decoration: underline;
+}
+
+/* Comments Count */
+.comment-count {
+  display: inline-block;
+  padding: 0;
+  border-radius: 5px;
+  background-color: #72aee6;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+  min-width: 23px;
+  padding: 1px 6px;
+}
+
+.comment-count-no {
+  display: inline-block;
+}
+
+.comment-count-approved {
+  display: block;
+}
+
+/* Date Column */
+.column-date {
+  color: #50575e;
+  font-size: 13px;
+}
+
+.column-date abbr {
+  text-decoration: none;
+  border-bottom: none;
+  cursor: help;
+}
+
+/* Clear Floats */
+.clear {
+  clear: both;
+}
+
+br.clear {
+  height: 2px;
+}
+
+/* WordPress Filter Bar */
+.wp-filter {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  clear: both;
+  background: #fff;
+  min-height: 35px;
+}
+
+/* Screen Reader Text */
+.screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal;
+}
+
+/* Filter Dropdowns */
+.tablenav .actions select + select {
+  margin-left: 6px;
+}
+
+/* Button Styles */
+.button {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 2.15384615;
+  min-height: 30px;
+  margin: 0;
+  padding: 0 10px;
+  cursor: pointer;
+  border: 1px solid #2271b1;
+  background: #2271b1;
+  color: #fff;
+  border-radius: 3px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.button:hover {
+  background: #135e96;
+  border-color: #135e96;
+  color: #fff;
+}
+
+.button.action {
+  background: #f6f7f7;
+  border-color: #c3c4c7;
+  color: #2c3338;
+}
+
+.button.action:hover {
+  background: #f0f0f1;
+  border-color: #8c8f94;
+  color: #2c3338;
+}
