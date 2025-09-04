@@ -202,6 +202,16 @@ const Tags: FC = () => {
 
   return (
     <div className="wrap">
+      {/* Screen Options - Top Right */}
+      <div style={{ position: 'relative', marginBottom: '20px' }}>
+        <ScreenOptionsReact
+          columns={options.columns}
+          itemsPerPage={itemsPerPage}
+          onColumnToggle={updateColumnVisibility}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      </div>
+      
       <h1 className="wp-heading-inline">Tags</h1>
       
       <Button 
@@ -370,13 +380,6 @@ const Tags: FC = () => {
         </div>
       </div>
 
-      {/* Screen Options */}
-      <ScreenOptionsReact
-        columns={options.columns}
-        itemsPerPage={itemsPerPage}
-        onColumnToggle={updateColumnVisibility}
-        onItemsPerPageChange={setItemsPerPage}
-      />
     </div>
   );
 };

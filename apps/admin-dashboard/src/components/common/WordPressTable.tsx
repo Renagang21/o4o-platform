@@ -61,7 +61,13 @@ export const WordPressTable: FC<WordPressTableProps> = ({
 
   return (
     <div className={clsx('wp-list-table-wrapper overflow-x-auto', className)}>
-      <table className="wp-list-table widefat fixed striped table-view-list">
+      <table className="wp-list-table widefat fixed striped table-view-list" style={{
+        border: '1px solid #c3c4c7',
+        borderSpacing: 0,
+        width: '100%',
+        clear: 'both',
+        margin: 0
+      }}>
         <thead>
           <tr>
             {selectable && (
@@ -87,7 +93,11 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                   sortColumn === column.id && sortDirection,
                   'text-left font-semibold text-gray-900 dark:text-gray-100'
                 )}
-                style={{ width: column.width }}
+                style={{
+                  borderBottom: '1px solid #c3c4c7',
+                  padding: '8px 10px',
+                  width: column.width
+                }}
               >
                 {column.sortable ? (
                   <button
@@ -150,6 +160,10 @@ export const WordPressTable: FC<WordPressTableProps> = ({
                         column.align && `text-${column.align}`,
                         'text-gray-800 dark:text-gray-200'
                       )}
+                      style={{
+                        borderTop: '1px solid #e1e1e1',
+                        padding: '8px 10px'
+                      }}
                     >
                       <div className="cell-content">
                         {row.data[column.id]}

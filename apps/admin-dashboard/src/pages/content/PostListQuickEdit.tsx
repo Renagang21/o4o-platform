@@ -19,7 +19,8 @@ import { BulkActionBar } from '@/components/common/BulkActionBar';
 import { useBulkActions } from '@/hooks/useBulkActions';
 import { useQuickEdit } from '@/hooks/useQuickEdit';
 import { PostQuickEdit } from '@/components/content/PostQuickEdit';
-import { ScreenMeta } from '@/components/common/ScreenMeta';
+import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
+import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { PostsHelp } from '@/components/help/PostsHelp';
 
 /**
@@ -32,6 +33,28 @@ const PostListQuickEdit: FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  // Default column configuration
+  const defaultColumns: ColumnOption[] = [
+    { id: 'title', label: 'Title', visible: true, required: true },
+    { id: 'author', label: 'Author', visible: true },
+    { id: 'categories', label: 'Categories', visible: true },
+    { id: 'tags', label: 'Tags', visible: true },
+    { id: 'comments', label: 'Comments', visible: true },
+    { id: 'date', label: 'Date', visible: true }
+  ];
+
+  // Use screen options hook
+  const {
+    options,
+    itemsPerPage,
+    isColumnVisible,
+    updateColumnVisibility,
+    setItemsPerPage
+  } = useScreenOptions('posts-list', {
+    columns: defaultColumns,
+    itemsPerPage: 20
+  });
 
   // Posts query
   const { data, isLoading, error } = useQuery({
@@ -235,8 +258,8 @@ const PostListQuickEdit: FC = () => {
     selectedIds: selectedRows
   });
 
-  // Table columns configuration
-  const columns: WordPressTableColumn[] = [
+  // Table columns configuration - filter by visibility
+  const allColumns: WordPressTableColumn[] = [
     {
       id: 'title',
       label: 'Title',
@@ -267,6 +290,8 @@ const PostListQuickEdit: FC = () => {
       width: '150px'
     }
   ];
+  
+  const columns = allColumns.filter(col => isColumnVisible(col.id));
 
   // Transform posts to table rows
   const rows: WordPressTableRow[] = posts.map((post: Post) => ({
@@ -366,7 +391,16 @@ const PostListQuickEdit: FC = () => {
   return (
     <div className="wrap">
       <PostsHelp />
-      <ScreenMeta />
+      
+      {/* Screen Options - Top Right */}
+      <div style={{ position: 'relative', marginBottom: '20px' }}>
+        <ScreenOptionsReact
+          columns={options.columns || defaultColumns}
+          itemsPerPage={itemsPerPage}
+          onColumnToggle={updateColumnVisibility}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      </div>
       
       <h1 className="wp-heading-inline">Posts</h1>
       <Link to="/editor/posts/new" className="page-title-action">
