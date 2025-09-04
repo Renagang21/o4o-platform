@@ -410,8 +410,8 @@ const PostsManagement: FC = () => {
       date: (
         <div className="date column-date">
           <div>{post.status === 'published' ? 'Published' : 'Last Modified'}</div>
-          <abbr title={formatDate(post.updatedAt || post.createdAt)}>
-            {formatDate(post.updatedAt || post.createdAt)}
+          <abbr title={formatDate(post.updatedAt || post.createdAt || new Date())}>
+            {formatDate(post.updatedAt || post.createdAt || new Date())}
           </abbr>
         </div>
       )
