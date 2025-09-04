@@ -48,12 +48,20 @@ jobs:
           # 배포
           sudo rm -rf "$TARGET_DIR"/*
           sudo cp -r dist/* "$TARGET_DIR"/
-          echo "{\"version\": \"$(date +%s)\"}" | sudo tee "$TARGET_DIR/version.json" > /dev/null
+          
+          # 버전 정보와 타임스탬프 추가 (캐시 무효화)
+          TIMESTAMP=$(date +%s)
+          echo "{\"version\": \"$TIMESTAMP\", \"commit\": \"${{ github.sha }}\", \"deployed\": \"$(date)\"}" | sudo tee "$TARGET_DIR/version.json" > /dev/null
+          
+          # index.html에 캐시 버스팅 쿼리 추가
+          sudo sed -i "s/src=\"\//src=\"\/?v=$TIMESTAMP/g" "$TARGET_DIR/index.html"
+          sudo sed -i "s/href=\"\//href=\"\/?v=$TIMESTAMP/g" "$TARGET_DIR/index.html"
           
           # 권한 설정
           sudo chown -R www-data:www-data "$TARGET_DIR"
           
-          # Nginx 재로드
+          # Nginx 캐시 클리어 및 재로드
+          sudo rm -rf /var/cache/nginx/*
           sudo systemctl reload nginx
           
           # 정리

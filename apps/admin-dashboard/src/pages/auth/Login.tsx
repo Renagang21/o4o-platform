@@ -111,6 +111,9 @@ const Login: FC = () => {
           <p className="mt-2 text-sm text-blue-200">
             관리자 계정으로 로그인하세요
           </p>
+          <p className="mt-1 text-xs text-green-400 font-bold">
+            ✅ 배포 테스트 v3.0 - {new Date().toLocaleString('ko-KR')}
+          </p>
         </div>
 
         {/* 로그인 폼 */}
