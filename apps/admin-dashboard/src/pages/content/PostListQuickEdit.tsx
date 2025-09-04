@@ -60,23 +60,23 @@ const PostListQuickEdit: FC = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', statusFilter, searchQuery],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (statusFilter !== 'all') params.set('status', statusFilter);
-      if (searchQuery) params.set('search', searchQuery);
-      params.set('type', 'post');
-      
-      const response = await authClient.api.get(`/posts?${params}`);
-      return response.data;
+      try {
+        const params = new URLSearchParams();
+        if (statusFilter !== 'all') params.set('status', statusFilter);
+        if (searchQuery) params.set('search', searchQuery);
+        params.set('type', 'post');
+        
+        const response = await authClient.api.get(`/v1/posts?${params}`);
+        return response.data;
+      } catch (err) {
+        console.error('Failed to fetch posts:', err);
+        throw err;
+      }
     }
   });
 
   // Handle different response structures
   const posts = Array.isArray(data) ? data : (data?.posts || data?.data || []);
-  
-  // Debug: Log the data structure (remove in production)
-  if (data && !Array.isArray(posts)) {
-    console.error('Unexpected posts data structure:', data);
-  }
 
   // Categories query
   const { data: categoriesData } = useQuery({
