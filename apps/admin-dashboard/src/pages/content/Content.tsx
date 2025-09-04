@@ -1,6 +1,6 @@
 import { FC, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import PostListQuickEdit from './PostListQuickEdit'
+import PostList from './PostList' // WordPress-style list with WordPressTable
 import PostFormWYSIWYG from './PostFormWYSIWYG'
 import PageList from './PageList'
 // import PageFormWYSIWYG from './PageFormWYSIWYG' // Temporarily commented - using PostFormWYSIWYG for pages
@@ -28,7 +28,7 @@ const Content: FC = () => {
   
   return (
     <Routes>
-      <Route path="/" element={<PostListQuickEdit />} />
+      <Route path="/" element={<PostList />} />
       <Route path="new" element={<Navigate to="/editor/posts/new" replace />} />
       <Route path=":id/edit" element={<PostFormWYSIWYG />} />
       <Route path="pages" element={<PageList />} />
