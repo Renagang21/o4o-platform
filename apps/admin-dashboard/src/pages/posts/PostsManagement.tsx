@@ -132,7 +132,7 @@ const PostsManagement: FC = () => {
 
   // Posts query with pagination and filters
   const { data, isLoading, error } = useQuery({
-    queryKey: ['posts', statusFilter, searchQuery, currentPage, itemsPerPage, dateFilter, categoryFilter, formatFilter],
+    queryKey: ['posts', statusFilter, searchQuery, currentPage, itemsPerPage, categoryFilter, formatFilter],
     queryFn: async () => {
       try {
         const params = new URLSearchParams();
@@ -145,7 +145,6 @@ const PostsManagement: FC = () => {
         }
         
         if (searchQuery) params.set('search', searchQuery);
-        if (dateFilter !== 'all') params.set('date', dateFilter);
         if (categoryFilter !== 'all') params.set('category', categoryFilter);
         if (formatFilter !== 'all') params.set('format', formatFilter);
         
@@ -433,7 +432,6 @@ const PostsManagement: FC = () => {
     const newParams = new URLSearchParams();
     if (searchQuery) newParams.set('s', searchQuery);
     if (statusFilter !== 'all') newParams.set('status', statusFilter);
-    if (dateFilter !== 'all') newParams.set('date', dateFilter);
     if (categoryFilter !== 'all') newParams.set('category', categoryFilter);
     if (formatFilter !== 'all') newParams.set('format', formatFilter);
     newParams.set('page', '1'); // Reset to first page on search
@@ -445,7 +443,6 @@ const PostsManagement: FC = () => {
     const newParams = new URLSearchParams();
     if (searchQuery) newParams.set('s', searchQuery);
     if (statusFilter !== 'all') newParams.set('status', statusFilter);
-    if (dateFilter !== 'all') newParams.set('date', dateFilter);
     if (categoryFilter !== 'all') newParams.set('category', categoryFilter);
     if (formatFilter !== 'all') newParams.set('format', formatFilter);
     newParams.set('page', '1'); // Reset to first page
