@@ -13,8 +13,7 @@ import {
   Settings,
   Trash2
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { formatDateFromNow } from '@o4o/utils';
 import type { Notification, NotificationType } from '@/types/notifications';
 import { notificationApi } from '@/api/notifications';
 import toast from 'react-hot-toast';
@@ -324,10 +323,7 @@ export const NotificationDropdown: FC<NotificationDropdownProps> = ({
                             <div className="flex items-center gap-3 mt-2">
                               <span className="text-xs text-gray-400 flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
-                                {formatDistanceToNow(new Date(notification.timestamp), {
-                                  addSuffix: true,
-                                  locale: ko
-                                })}
+                                {formatDateFromNow(notification.timestamp)}
                               </span>
                               
                               {notification.link && (

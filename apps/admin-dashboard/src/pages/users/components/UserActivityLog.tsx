@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { formatDate } from '@o4o/utils';
 import { Clock, CheckCircle, XCircle, AlertCircle, User, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -161,7 +161,7 @@ export default function UserActivityLog({ userId }: UserActivityLogProps) {
                   
                   <div className="text-xs text-gray-500 space-y-1">
                     <div>
-                      {format(new Date(activity.timestamp), 'PPp')}
+                      {formatDate(activity.timestamp, 'full')}
                     </div>
                     
                     {activity.performedBy && (
