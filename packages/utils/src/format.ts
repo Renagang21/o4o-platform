@@ -185,7 +185,7 @@ export function formatRelativeTime(
     return '';
   }
 
-  const diffInMs = dateObj.getTime() - baseDate.getTime();
+  const diffInMs = baseDate.getTime() - dateObj.getTime();
   const diffInSeconds = Math.round(diffInMs / 1000);
   const diffInMinutes = Math.round(diffInSeconds / 60);
   const diffInHours = Math.round(diffInMinutes / 60);
@@ -193,20 +193,19 @@ export function formatRelativeTime(
   const diffInMonths = Math.round(diffInDays / 30);
   const diffInYears = Math.round(diffInDays / 365);
 
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-
+  // Simple Korean relative time formatting without Intl.RelativeTimeFormat
   if (Math.abs(diffInSeconds) < 60) {
-    return rtf.format(diffInSeconds, 'second');
+    return `${Math.abs(diffInSeconds)}초 전`;
   } else if (Math.abs(diffInMinutes) < 60) {
-    return rtf.format(diffInMinutes, 'minute');
+    return `${Math.abs(diffInMinutes)}분 전`;
   } else if (Math.abs(diffInHours) < 24) {
-    return rtf.format(diffInHours, 'hour');
+    return `${Math.abs(diffInHours)}시간 전`;
   } else if (Math.abs(diffInDays) < 30) {
-    return rtf.format(diffInDays, 'day');
+    return `${Math.abs(diffInDays)}일 전`;
   } else if (Math.abs(diffInMonths) < 12) {
-    return rtf.format(diffInMonths, 'month');
+    return `${Math.abs(diffInMonths)}개월 전`;
   } else {
-    return rtf.format(diffInYears, 'year');
+    return `${Math.abs(diffInYears)}년 전`;
   }
 }
 
