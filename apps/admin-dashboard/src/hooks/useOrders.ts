@@ -6,7 +6,7 @@ import axios from 'axios';
 // 임시 toast 모킹 (react-hot-toast 미설치)
 const toast = {
   success: (_message: string) => {}, // Success handler
-  error: (_message: string) => {}, // console.error('ERROR:', message),
+  error: (_message: string) => {}, // // console.error('ERROR:', message),
 };
 
 // 주문 목록 조회 훅

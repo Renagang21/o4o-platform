@@ -57,7 +57,7 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
         throw new Error('Upload failed')
       }
     } catch (error) {
-      console.error('Logo upload failed:', error)
+      // console.error('Logo upload failed:', error)
       alert('Failed to upload logo. Please try again.')
     } finally {
       setIsUploading(false)

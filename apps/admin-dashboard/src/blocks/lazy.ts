@@ -25,7 +25,7 @@ export async function loadBlock(blockName: string): Promise<void> {
 
   const importFn = blockImportMap[blockName as keyof typeof blockImportMap];
   if (!importFn) {
-    // Removed console.warn
+    // Removed // console.warn
     return;
   }
 

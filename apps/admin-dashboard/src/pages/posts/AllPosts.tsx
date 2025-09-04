@@ -100,7 +100,7 @@ const AllPosts: FC = () => {
         toast.error(response.message || '게시물을 불러오는데 실패했습니다.')
       }
     } catch (error: any) {
-      console.error('Error loading posts:', error)
+      // console.error('Error loading posts:', error)
       
       // Set empty data for better UX
       setPosts([])

@@ -92,7 +92,7 @@ export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
       setPendingChanges(false)
     } catch (error) {
       toast.error('Failed to save customization')
-      console.error('Save error:', error)
+      // console.error('Save error:', error)
     }
   }, [customization, isAdmin, saveCustomization, requestApproval, onSave, onRequestApproval])
 

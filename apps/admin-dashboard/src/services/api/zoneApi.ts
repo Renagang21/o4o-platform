@@ -38,7 +38,7 @@ class ZoneApiClient {
       const response = await apiClient.get<ZoneApiResponse>(`${this.baseUrl}/${pageId}`)
       return response.data
     } catch (error) {
-      console.error('Error fetching zone content:', error)
+      // console.error('Error fetching zone content:', error)
       throw new Error('Failed to load zone content')
     }
   }
@@ -50,7 +50,7 @@ class ZoneApiClient {
     try {
       await apiClient.put(`${this.baseUrl}/${pageId}`, data)
     } catch (error) {
-      console.error('Error saving zone content:', error)
+      // console.error('Error saving zone content:', error)
       throw new Error('Failed to save zone content')
     }
   }
@@ -62,7 +62,7 @@ class ZoneApiClient {
     try {
       await apiClient.put(`${this.baseUrl}/${pageId}/${zoneId}`, zoneData)
     } catch (error) {
-      console.error('Error updating zone:', error)
+      // console.error('Error updating zone:', error)
       throw new Error('Failed to update zone')
     }
   }
@@ -74,7 +74,7 @@ class ZoneApiClient {
     try {
       await apiClient.post(`${this.baseUrl}/${pageId}/reorder`, { zoneOrder })
     } catch (error) {
-      console.error('Error reordering zones:', error)
+      // console.error('Error reordering zones:', error)
       throw new Error('Failed to reorder zones')
     }
   }
@@ -91,7 +91,7 @@ class ZoneApiClient {
       const response = await apiClient.get<ZoneConfig>(url)
       return response.data
     } catch (error) {
-      console.error('Error fetching zone config:', error)
+      // console.error('Error fetching zone config:', error)
       throw new Error('Failed to load zone configuration')
     }
   }
@@ -108,7 +108,7 @@ class ZoneApiClient {
       const response = await apiClient.get<LayoutConfig>(url)
       return response.data
     } catch (error) {
-      console.error('Error fetching layout config:', error)
+      // console.error('Error fetching layout config:', error)
       throw new Error('Failed to load layout configuration')
     }
   }
@@ -125,7 +125,7 @@ class ZoneApiClient {
       const response = await apiClient.get<ZoneTemplate[]>(url)
       return response.data
     } catch (error) {
-      console.error('Error fetching zone templates:', error)
+      // console.error('Error fetching zone templates:', error)
       throw new Error('Failed to load zone templates')
     }
   }
@@ -138,7 +138,7 @@ class ZoneApiClient {
       const response = await apiClient.post<ZoneTemplate>(`${this.baseUrl}/templates`, template)
       return response.data
     } catch (error) {
-      console.error('Error saving zone template:', error)
+      // console.error('Error saving zone template:', error)
       throw new Error('Failed to save zone template')
     }
   }
@@ -153,7 +153,7 @@ class ZoneApiClient {
         zoneId
       })
     } catch (error) {
-      console.error('Error applying zone template:', error)
+      // console.error('Error applying zone template:', error)
       throw new Error('Failed to apply zone template')
     }
   }
@@ -173,7 +173,7 @@ class ZoneApiClient {
       if (error.response?.status === 404) {
         return null // No customization found
       }
-      console.error('Error fetching theme customization:', error)
+      // console.error('Error fetching theme customization:', error)
       throw new Error('Failed to load theme customization')
     }
   }
@@ -185,7 +185,7 @@ class ZoneApiClient {
     try {
       await apiClient.put('/api/theme/customization', customization)
     } catch (error) {
-      console.error('Error saving theme customization:', error)
+      // console.error('Error saving theme customization:', error)
       throw new Error('Failed to save theme customization')
     }
   }
@@ -198,7 +198,7 @@ class ZoneApiClient {
       const response = await apiClient.post<{ previewUrl: string }>('/api/theme/preview', customization)
       return response.data
     } catch (error) {
-      console.error('Error generating preview:', error)
+      // console.error('Error generating preview:', error)
       throw new Error('Failed to generate preview')
     }
   }
@@ -210,7 +210,7 @@ class ZoneApiClient {
     try {
       await apiClient.post('/api/theme/apply', customization)
     } catch (error) {
-      console.error('Error applying theme customization:', error)
+      // console.error('Error applying theme customization:', error)
       throw new Error('Failed to apply theme customization')
     }
   }
@@ -227,7 +227,7 @@ class ZoneApiClient {
       const response = await apiClient.post('/api/zones/validate', content)
       return response.data
     } catch (error) {
-      console.error('Error validating zone content:', error)
+      // console.error('Error validating zone content:', error)
       throw new Error('Failed to validate zone content')
     }
   }
@@ -243,7 +243,7 @@ class ZoneApiClient {
       })
       return response.data
     } catch (error) {
-      console.error('Error converting to zone format:', error)
+      // console.error('Error converting to zone format:', error)
       throw new Error('Failed to convert content to zone format')
     }
   }
@@ -258,7 +258,7 @@ class ZoneApiClient {
       })
       return response.data
     } catch (error) {
-      console.error('Error exporting zone content:', error)
+      // console.error('Error exporting zone content:', error)
       throw new Error('Failed to export zone content')
     }
   }
@@ -277,7 +277,7 @@ class ZoneApiClient {
         }
       })
     } catch (error) {
-      console.error('Error importing zone content:', error)
+      // console.error('Error importing zone content:', error)
       throw new Error('Failed to import zone content')
     }
   }
@@ -299,7 +299,7 @@ class ZoneApiClient {
       const response = await apiClient.get(url)
       return response.data
     } catch (error) {
-      console.error('Error fetching zone analytics:', error)
+      // console.error('Error fetching zone analytics:', error)
       throw new Error('Failed to load zone analytics')
     }
   }

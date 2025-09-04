@@ -57,7 +57,7 @@ export default function LoopBlockTest() {
       }
     } catch (err: any) {
       setError(err.message || 'Failed to fetch posts');
-      console.error('Error fetching posts:', err);
+      // console.error('Error fetching posts:', err);
     } finally {
       setLoading(false);
     }

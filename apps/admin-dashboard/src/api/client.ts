@@ -30,7 +30,7 @@ apiClient.interceptors.request.use(
             token = parsed.state.accessToken || parsed.state.token
           }
         } catch {
-    // Removed console.warn
+    // Removed // console.warn
         }
       }
     }

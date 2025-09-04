@@ -121,7 +121,7 @@ export const ZoneEditor: React.FC<ZoneEditorProps> = ({
       toast.success('Block added successfully')
     } catch (error) {
       toast.error('Failed to add block')
-      console.error('Error adding block:', error)
+      // console.error('Error adding block:', error)
     }
   }, [isBlockAllowed, canAddMoreBlocks, addBlock])
 
@@ -135,7 +135,7 @@ export const ZoneEditor: React.FC<ZoneEditorProps> = ({
       await updateBlock(zoneId, blockId, updates)
     } catch (error) {
       toast.error('Failed to update block')
-      console.error('Error updating block:', error)
+      // console.error('Error updating block:', error)
     }
   }, [updateBlock])
 
@@ -149,7 +149,7 @@ export const ZoneEditor: React.FC<ZoneEditorProps> = ({
       toast.success('Block removed successfully')
     } catch (error) {
       toast.error('Failed to remove block')
-      console.error('Error removing block:', error)
+      // console.error('Error removing block:', error)
     }
   }, [removeBlock, selectedBlockId])
 
@@ -178,7 +178,7 @@ export const ZoneEditor: React.FC<ZoneEditorProps> = ({
       toast.success('Block moved successfully')
     } catch (error) {
       toast.error('Failed to move block')
-      console.error('Error moving block:', error)
+      // console.error('Error moving block:', error)
     }
   }, [content, isBlockAllowed, canAddMoreBlocks, moveBlock])
 
@@ -209,7 +209,7 @@ export const ZoneEditor: React.FC<ZoneEditorProps> = ({
       toast.success('Content saved successfully')
     } catch (error) {
       toast.error('Failed to save content')
-      console.error('Save error:', error)
+      // console.error('Save error:', error)
     }
   }, [content, validateZoneConstraints, onSave])
 

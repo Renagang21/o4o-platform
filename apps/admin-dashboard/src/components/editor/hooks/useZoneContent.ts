@@ -77,7 +77,7 @@ export const useZoneContent = (
         try {
           await save()
         } catch (error) {
-          console.error('Auto-save failed:', error)
+          // console.error('Auto-save failed:', error)
         }
       }, autoSaveInterval)
 
@@ -97,7 +97,7 @@ export const useZoneContent = (
       setOriginalContent(response.zones)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load content')
-      console.error('Error loading zone content:', err)
+      // console.error('Error loading zone content:', err)
     } finally {
       setIsLoading(false)
     }

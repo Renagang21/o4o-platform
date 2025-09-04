@@ -117,7 +117,7 @@ class SSOService {
   redirectToApp(app: string, returnPath?: string) {
     const token = this.getTokenFromCookie();
     if (!token) {
-    // Removed console.warn
+    // Removed // console.warn
       return;
     }
 

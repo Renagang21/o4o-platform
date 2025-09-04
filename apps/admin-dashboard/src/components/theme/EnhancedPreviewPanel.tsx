@@ -279,7 +279,7 @@ export const EnhancedPreviewPanel: React.FC<EnhancedPreviewPanelProps> = ({
         styleElement.textContent = css
         
       } catch (error) {
-        console.error('Failed to inject customization CSS:', error)
+        // console.error('Failed to inject customization CSS:', error)
       }
     }
   }, [customization])

@@ -81,7 +81,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
   const { metrics, measureRenderTime } = usePerformanceMonitor({
     onPerformanceIssue: (metrics) => {
       if (metrics.blockCount > 100) {
-    // Removed console.warn
+    // Removed // console.warn
       }
     }
   });
@@ -187,7 +187,7 @@ const WordPressBlockEditor: React.FC<WordPressBlockEditorProps> = ({
           setBlocks([paragraphBlock]);
         }
       } catch (error) {
-    // Removed console.warn
+    // Removed // console.warn
         // Create empty paragraph as fallback
         const emptyBlock = createBlock('core/paragraph');
         setBlocks([emptyBlock]);

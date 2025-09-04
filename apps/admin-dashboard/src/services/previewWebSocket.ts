@@ -65,7 +65,7 @@ class PreviewWebSocketService {
             const update: PreviewUpdate = JSON.parse(event.data)
             this.handleUpdate(update)
           } catch (error) {
-            console.error('Failed to parse WebSocket message:', error)
+            // console.error('Failed to parse WebSocket message:', error)
           }
         }
 
@@ -80,14 +80,14 @@ class PreviewWebSocketService {
         }
 
         this.ws.onerror = (error) => {
-          console.error('Preview WebSocket error:', error)
+          // console.error('Preview WebSocket error:', error)
           const errorObj = new Error('WebSocket connection failed')
           this.notifyError(errorObj)
           reject(errorObj)
         }
 
       } catch (error) {
-        console.error('Failed to create WebSocket:', error)
+        // console.error('Failed to create WebSocket:', error)
         reject(error instanceof Error ? error : new Error('WebSocket creation failed'))
       }
     })
@@ -231,11 +231,11 @@ class PreviewWebSocketService {
       try {
         this.ws.send(JSON.stringify(message))
       } catch (error) {
-        console.error('Failed to send WebSocket message:', error)
+        // console.error('Failed to send WebSocket message:', error)
         this.notifyError(error instanceof Error ? error : new Error('Send failed'))
       }
     } else {
-      console.warn('Cannot send message: WebSocket not connected')
+      // console.warn('Cannot send message: WebSocket not connected')
     }
   }
 
@@ -252,7 +252,7 @@ class PreviewWebSocketService {
       try {
         callback(update)
       } catch (error) {
-        console.error('Error in update callback:', error)
+        // console.error('Error in update callback:', error)
       }
     })
   }
@@ -290,7 +290,7 @@ class PreviewWebSocketService {
       this.reconnectAttempts++
       // Attempting to reconnect
       this.connect().catch(error => {
-        console.error('Reconnection failed:', error)
+        // console.error('Reconnection failed:', error)
       })
     }, delay)
   }
@@ -303,7 +303,7 @@ class PreviewWebSocketService {
       try {
         callback(connected)
       } catch (error) {
-        console.error('Error in connection callback:', error)
+        // console.error('Error in connection callback:', error)
       }
     })
   }
@@ -316,7 +316,7 @@ class PreviewWebSocketService {
       try {
         callback(error)
       } catch (error) {
-        console.error('Error in error callback:', error)
+        // console.error('Error in error callback:', error)
       }
     })
   }
@@ -333,7 +333,7 @@ export const usePreviewWebSocket = (userId: string, pageId?: string) => {
     const unsubscribeError = service.onError(setError)
 
     // Connect on mount
-    service.connect().catch(console.error)
+    service.connect().catch(// console.error)
 
     // Cleanup on unmount
     return () => {

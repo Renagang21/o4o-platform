@@ -126,7 +126,7 @@ export const useThemeCustomization = (
         try {
           await saveCustomization()
         } catch (error) {
-          console.error('Auto-save failed:', error)
+          // console.error('Auto-save failed:', error)
         }
       }, autoSaveInterval)
 
@@ -158,7 +158,7 @@ export const useThemeCustomization = (
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load customization')
-      console.error('Error loading theme customization:', err)
+      // console.error('Error loading theme customization:', err)
     } finally {
       setIsLoading(false)
     }

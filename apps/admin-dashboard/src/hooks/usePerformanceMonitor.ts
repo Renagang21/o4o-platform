@@ -152,7 +152,7 @@ export function usePerformanceMonitor(config: PerformanceConfig = {}) {
     }
     
     if (warnings.length > 0 && onPerformanceIssue) {
-    // Removed console.warn
+    // Removed // console.warn
       onPerformanceIssue(metrics);
     }
   }, [metrics, warnThreshold, onPerformanceIssue, enableMonitoring]);

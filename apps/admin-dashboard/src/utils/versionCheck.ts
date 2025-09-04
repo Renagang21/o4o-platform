@@ -6,7 +6,7 @@ export const checkVersion = async () => {
     const storedVersion = localStorage.getItem('app-version');
     
     if (storedVersion && storedVersion !== data.version) {
-      console.log('New version detected, clearing cache...');
+      // New version detected, clearing cache...
       
       // Clear all caches
       if ('caches' in window) {
@@ -27,7 +27,7 @@ export const checkVersion = async () => {
       localStorage.setItem('app-version', data.version);
     }
   } catch (error) {
-    console.error('Version check failed:', error);
+    // Version check failed - silently ignore
   }
 };
 
