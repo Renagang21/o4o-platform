@@ -22,7 +22,7 @@ import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { PostsHelp } from '@/components/help/PostsHelp';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import '@/styles/wordpress-posts.css';
+import '@/styles/wordpress-posts-complete.css';
 
 /**
  * WordPress-style Posts Management Component
@@ -516,15 +516,22 @@ const PostsManagement: FC = () => {
   })) || [];
 
   return (
-    <div className="wrap">
+    <div className="wrap" style={{ 
+      backgroundColor: '#f0f0f1',
+      minHeight: '100vh',
+      padding: '20px',
+      marginRight: '20px'
+    }}>
       <PostsHelp />
       
-      {/* Screen Options - Top Right - absolute positioned */}
+      {/* Screen Options - Top Right - properly aligned */}
       <div className="screen-options-wrap" style={{ 
         position: 'absolute', 
-        top: '30px', 
-        right: '20px',
-        zIndex: 100
+        top: '0', 
+        right: '0',
+        zIndex: 100,
+        display: 'inline-block',
+        verticalAlign: 'middle'
       }}>
         <ScreenOptionsReact
           columns={options.columns || defaultColumns}
@@ -534,15 +541,27 @@ const PostsManagement: FC = () => {
         />
       </div>
       
-      {/* Title and Add New - First Row */}
-      <h1 className="wp-heading-inline">Posts</h1>
-      <Link to="/editor/posts/new" className="page-title-action">
-        Add New
-      </Link>
-      <hr className="wp-header-end" />
+      {/* Title and Add New - First Row - Properly aligned */}
+      <div style={{ position: 'relative', marginBottom: '20px', display: 'flex', alignItems: 'center', height: '40px' }}>
+        <h1 className="wp-heading-inline" style={{ margin: 0, lineHeight: '40px', display: 'inline-block' }}>Posts</h1>
+        <Link to="/editor/posts/new" className="page-title-action" style={{ 
+          marginLeft: '10px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          height: '28px'
+        }}>
+          Add New
+        </Link>
+      </div>
+      <hr className="wp-header-end" style={{ clear: 'both', margin: '10px 0' }} />
 
       {/* Status tabs and Search - Second Row */}
-      <div className="wp-filter" style={{ marginBottom: '10px' }}>
+      <div className="wp-filter" style={{ 
+        marginBottom: '10px',
+        background: 'transparent',
+        padding: '10px 0',
+        overflow: 'hidden'
+      }}>
         <ul className="subsubsub" style={{ float: 'left', margin: '8px 0' }}>
           <li className="all">
             <a 
@@ -786,7 +805,14 @@ const PostsManagement: FC = () => {
         </div>
       )}
 
-      {/* WordPress Table with Inline Edit */}
+      {/* WordPress Table with Inline Edit - White background with padding */}
+      <div style={{
+        backgroundColor: '#fff',
+        border: '1px solid #c3c4c7',
+        boxShadow: '0 1px 1px rgba(0,0,0,0.04)',
+        marginTop: '20px',
+        marginRight: '20px'
+      }}>
       <WordPressTableWithInlineEdit
         columns={columns}
         rows={rows}
@@ -799,6 +825,7 @@ const PostsManagement: FC = () => {
         inlineEditRows={inlineEditRows}
         editingRowId={quickEdit.editingId}
       />
+      </div>
 
       {/* Bottom pagination only - no duplicate bulk actions */}
       <div className="tablenav bottom">
