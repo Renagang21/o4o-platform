@@ -99,10 +99,17 @@ const AdminHome: FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* 배포 테스트 배너 v4.0 */}
+      <div className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 text-white p-6 rounded-xl shadow-2xl animate-pulse">
+        <h1 className="text-3xl font-bold mb-2">🎉 배포 성공 v4.0! 🎉</h1>
+        <p className="text-lg">최종 업데이트: {new Date().toLocaleString('ko-KR')}</p>
+        <p className="text-sm mt-2 opacity-90">캐시 문제 해결 완료 ✅</p>
+      </div>
+      
       {/* WordPress 스타일 환영 메시지 */}
       <div>
         <h1 className="text-2xl font-bold text-wp-text-primary">대시보드</h1>
-        <p className="text-sm text-wp-text-secondary mt-1">O4O Platform 관리자 홈</p>
+        <p className="text-sm text-wp-text-secondary mt-1">O4O Platform 관리자 홈 - v4.0 Updated</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

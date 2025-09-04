@@ -248,19 +248,19 @@ const UserList: FC = () => {
     selectedIds: selectedRows
   });
 
-  // Get role badge style
+  // Get role badge style - UPDATED COLORS v4.0
   const getRoleBadgeStyle = (role: string) => {
     const styles: Record<string, string> = {
-      super_admin: 'bg-purple-500 text-white',
-      admin: 'bg-red-500 text-white',
-      vendor: 'bg-blue-500 text-white',
-      seller: 'bg-green-500 text-white',
-      customer: 'bg-gray-500 text-white',
-      business: 'bg-yellow-500 text-white',
-      moderator: 'bg-indigo-500 text-white',
-      partner: 'bg-pink-500 text-white',
+      super_admin: 'bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold',
+      admin: 'bg-gradient-to-r from-red-500 to-red-700 text-white font-bold',
+      vendor: 'bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold',
+      seller: 'bg-gradient-to-r from-green-500 to-green-700 text-white font-bold',
+      customer: 'bg-gradient-to-r from-gray-500 to-gray-700 text-white font-bold',
+      business: 'bg-gradient-to-r from-yellow-500 to-yellow-700 text-white font-bold',
+      moderator: 'bg-gradient-to-r from-indigo-500 to-indigo-700 text-white font-bold',
+      partner: 'bg-gradient-to-r from-pink-500 to-pink-700 text-white font-bold',
     };
-    return styles[role] || 'bg-gray-500 text-white';
+    return styles[role] || 'bg-gradient-to-r from-gray-500 to-gray-700 text-white font-bold';
   };
 
   // Get status badge style
@@ -414,9 +414,13 @@ const UserList: FC = () => {
 
   return (
     <div className="wrap">
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-lg mb-4 shadow-lg">
+        <h1 className="text-2xl font-bold">🚀 Users Management v4.0</h1>
+        <p className="text-sm mt-1 opacity-90">배포 테스트 성공! - {new Date().toLocaleString('ko-KR')}</p>
+      </div>
       <h1 className="wp-heading-inline">Users</h1>
-      <Link to="/users/add" className="page-title-action">
-        Add New
+      <Link to="/users/add" className="page-title-action bg-green-500 text-white hover:bg-green-600">
+        Add New User 🎉
       </Link>
       <hr className="wp-header-end" />
 
