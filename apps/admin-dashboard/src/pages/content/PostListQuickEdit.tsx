@@ -47,7 +47,13 @@ const PostListQuickEdit: FC = () => {
     }
   });
 
-  const posts = data?.posts || [];
+  // Handle different response structures
+  const posts = Array.isArray(data) ? data : (data?.posts || data?.data || []);
+  
+  // Debug: Log the data structure (remove in production)
+  if (data && !Array.isArray(posts)) {
+    console.error('Unexpected posts data structure:', data);
+  }
 
   // Categories query
   const { data: categoriesData } = useQuery({
@@ -368,6 +374,12 @@ const PostListQuickEdit: FC = () => {
       </Link>
       <hr className="wp-header-end" />
 
+      {error && (
+        <div className="notice notice-error">
+          <p>Error loading posts: {error instanceof Error ? error.message : 'Please try again.'}</p>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="wp-filter">
         <div className="filter-items">
@@ -441,7 +453,7 @@ const PostListQuickEdit: FC = () => {
 
       {error && (
         <div className="notice notice-error">
-          <p>Error loading posts. Please try again.</p>
+          <p>Error loading posts: {error instanceof Error ? error.message : 'Please try again.'}</p>
         </div>
       )}
     </div>
