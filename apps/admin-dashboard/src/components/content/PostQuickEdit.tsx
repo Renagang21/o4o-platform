@@ -86,64 +86,6 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
               </span>
             </label>
 
-            <fieldset className="inline-edit-date">
-              <legend>
-                <span className="title">Date</span>
-              </legend>
-              <div className="timestamp-wrap">
-                <label>
-                  <span className="screen-reader-text">Month</span>
-                  <Select 
-                    value={formData.publishMonth || '01'}
-                    onValueChange={(value) => onUpdate('publishMonth', value)}
-                  >
-                    <SelectTrigger className="inline-edit-month">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="01">Jan</SelectItem>
-                      <SelectItem value="02">Feb</SelectItem>
-                      <SelectItem value="03">Mar</SelectItem>
-                      <SelectItem value="04">Apr</SelectItem>
-                      <SelectItem value="05">May</SelectItem>
-                      <SelectItem value="06">Jun</SelectItem>
-                      <SelectItem value="07">Jul</SelectItem>
-                      <SelectItem value="08">Aug</SelectItem>
-                      <SelectItem value="09">Sep</SelectItem>
-                      <SelectItem value="10">Oct</SelectItem>
-                      <SelectItem value="11">Nov</SelectItem>
-                      <SelectItem value="12">Dec</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-                <label>
-                  <span className="screen-reader-text">Day</span>
-                  <Input
-                    type="text"
-                    name="jj"
-                    value={formData.publishDay || ''}
-                    size={2}
-                    maxLength={2}
-                    onChange={(e: any) => onUpdate('publishDay', e.target.value)}
-                    className="inline-edit-day"
-                  />
-                </label>
-                ,
-                <label>
-                  <span className="screen-reader-text">Year</span>
-                  <Input
-                    type="text"
-                    name="aa"
-                    value={formData.publishYear || ''}
-                    size={4}
-                    maxLength={4}
-                    onChange={(e: any) => onUpdate('publishYear', e.target.value)}
-                    className="inline-edit-year"
-                  />
-                </label>
-              </div>
-            </fieldset>
-
             <br className="clear" />
 
             <label className="inline-edit-author">

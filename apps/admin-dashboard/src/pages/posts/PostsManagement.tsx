@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { formatDate } from '@/lib/utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import type { Post, PostStatus } from '@o4o/types';
@@ -46,7 +45,6 @@ const PostsManagement: FC = () => {
   const [statusFilter, setStatusFilter] = useState<PostStatus | 'all' | 'mine'>(
     (searchParams.get('status') as any) || 'all'
   );
-  const [dateFilter, setDateFilter] = useState(searchParams.get('date') || 'all');
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || 'all');
   const [formatFilter, setFormatFilter] = useState(searchParams.get('format') || 'all');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -74,8 +72,7 @@ const PostsManagement: FC = () => {
     { id: 'author', label: 'Author', visible: true },
     { id: 'categories', label: 'Categories', visible: true },
     { id: 'tags', label: 'Tags', visible: true },
-    { id: 'comments', label: 'Comments', visible: true },
-    { id: 'date', label: 'Date', visible: true }
+    { id: 'comments', label: 'Comments', visible: true }
   ];
 
   // Screen options hook
@@ -121,21 +118,6 @@ const PostsManagement: FC = () => {
     }
   }, [countsData]);
 
-  // Fetch available dates for filter
-  const { data: availableDates } = useQuery({
-    queryKey: ['posts-dates'],
-    queryFn: async () => {
-      try {
-        // API endpoint not implemented yet - return empty array
-        return [];
-        // TODO: Uncomment when API is ready
-        // const response = await authClient.api.get('/v1/posts/dates');
-        return response.data || [];
-      } catch (err) {
-        return [];
-      }
-    }
-  });
 
   // Fetch categories
   const { data: categoriesData } = useQuery({
@@ -206,15 +188,6 @@ const PostsManagement: FC = () => {
         pingStatus: data.pingStatus
       };
 
-      // Handle date
-      if (data.publishYear && data.publishMonth && data.publishDay) {
-        updateData.publishedAt = new Date(
-          parseInt(data.publishYear),
-          parseInt(data.publishMonth) - 1,
-          parseInt(data.publishDay)
-        ).toISOString();
-      }
-
       // Handle tags
       if (data.tags) {
         updateData.tags = data.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean);
@@ -251,25 +224,6 @@ const PostsManagement: FC = () => {
 
   // Prepare quick edit initial data
   const prepareQuickEditData = (post: Post) => {
-    // Safely handle date with fallback
-    let publishDate: Date;
-    try {
-      if (post.publishedAt) {
-        publishDate = new Date(post.publishedAt);
-      } else if (post.createdAt) {
-        publishDate = new Date(post.createdAt);
-      } else {
-        publishDate = new Date(); // Default to current date
-      }
-      
-      // Check if date is valid
-      if (isNaN(publishDate.getTime())) {
-        publishDate = new Date();
-      }
-    } catch (error) {
-      publishDate = new Date(); // Fallback to current date on any error
-    }
-    
     return {
       title: post.title,
       slug: post.slug,
@@ -277,9 +231,6 @@ const PostsManagement: FC = () => {
       authorId: post.author?.id,
       categoryIds: post.categories?.map((c: any) => c.id) || [],
       tags: post.tags?.map((t: any) => t.name).join(', ') || '',
-      publishYear: publishDate.getFullYear().toString() as any,
-      publishMonth: (publishDate.getMonth() + 1).toString().padStart(2, '0'),
-      publishDay: publishDate.getDate().toString().padStart(2, '0'),
       commentStatus: post.commentStatus || 'open',
       pingStatus: post.pingStatus || 'open',
       password: post.password || '',
@@ -362,12 +313,6 @@ const PostsManagement: FC = () => {
       label: '',
       align: 'center',
       width: '50px'
-    },
-    {
-      id: 'date',
-      label: 'Date',
-      sortable: true,
-      width: '150px'
     }
   ];
   
@@ -406,14 +351,6 @@ const PostsManagement: FC = () => {
             <span className="comment-count-no">{post.commentCount || 0}</span>
           </span>
         </span>
-      ),
-      date: (
-        <div className="date column-date">
-          <div>{post.status === 'published' ? 'Published' : 'Last Modified'}</div>
-          <abbr title={formatDate(post.updatedAt || post.createdAt || new Date())}>
-            {formatDate(post.updatedAt || post.createdAt || new Date())}
-          </abbr>
-        </div>
       )
     },
     actions: [
@@ -526,11 +463,6 @@ const PostsManagement: FC = () => {
   const startItem = ((currentPage - 1) * itemsPerPage) + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-  // Generate date options from available dates
-  const dateOptions = availableDates?.map((date: any) => ({
-    value: date.value,
-    label: date.label
-  })) || [];
 
   return (
     <div className="wrap" style={{ 
@@ -678,23 +610,6 @@ const PostsManagement: FC = () => {
         </div>
 
         <div className="alignleft actions">
-          {/* Date Filter */}
-          {dateOptions.length > 0 && (
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger style={{ width: '150px', marginLeft: '8px' }}>
-                <SelectValue placeholder="All dates" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All dates</SelectItem>
-                {dateOptions.map((option: any) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
           {/* Category Filter */}
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger style={{ width: '150px', marginLeft: '8px' }}>
