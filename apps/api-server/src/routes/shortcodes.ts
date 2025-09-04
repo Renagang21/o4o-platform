@@ -3,7 +3,7 @@ import { ShortcodeController } from '../controllers/shortcode/ShortcodeControlle
 import { authenticateToken } from '../middleware/auth';
 import { checkRole } from '../middleware/checkRole';
 
-const router = Router();
+const router: Router = Router();
 const shortcodeController = new ShortcodeController();
 
 // Public routes - available to everyone
