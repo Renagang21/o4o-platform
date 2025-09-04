@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom'
 import PostListQuickEdit from './PostListQuickEdit' // WordPress-style list with quick edit
 import PostFormWYSIWYG from './PostFormWYSIWYG'
 import PageList from './PageList'

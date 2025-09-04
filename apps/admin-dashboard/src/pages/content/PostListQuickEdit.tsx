@@ -268,7 +268,7 @@ const PostListQuickEdit: FC = () => {
     data: {
       title: (
         <div>
-          <Link to={`/posts/${post.id}/edit`} className="font-medium text-blue-600 hover:text-blue-800">
+          <Link to={`/editor/posts/${post.id}`} className="font-medium text-blue-600 hover:text-blue-800">
             {post.title || '(no title)'}
           </Link>
           {post.status === 'draft' && <span className="text-gray-500 text-sm ml-2">— Draft</span>}
@@ -298,7 +298,7 @@ const PostListQuickEdit: FC = () => {
     actions: [
       {
         label: 'Edit',
-        onClick: () => navigate(`/posts/${post.id}/edit`)
+        onClick: () => navigate(`/editor/posts/${post.id}`)
       },
       {
         label: 'Quick Edit',
