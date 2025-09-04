@@ -244,7 +244,12 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['custom_fields:write']
   },
 
-  // Theme - Admin, Manager
+  // Appearance/Theme - Admin, Manager
+  {
+    menuId: 'appearance',
+    roles: ['admin', 'manager'],
+    permissions: ['templates:read']
+  },
   {
     menuId: 'theme',
     roles: ['admin', 'manager'],
@@ -261,9 +266,34 @@ export const menuPermissions: MenuPermission[] = [
     permissions: ['templates:write']
   },
   {
+    menuId: 'appearance-menus',
+    roles: ['admin', 'manager'],
+    permissions: ['menus:write']
+  },
+  {
+    menuId: 'appearance-widgets',
+    roles: ['admin', 'manager'],
+    permissions: ['templates:write']
+  },
+  {
+    menuId: 'appearance-template-parts',
+    roles: ['admin', 'manager'],
+    permissions: ['templates:write']
+  },
+  {
     menuId: 'menus',
     roles: ['admin', 'manager'],
     permissions: ['menus:write']
+  },
+  {
+    menuId: 'widgets',
+    roles: ['admin', 'manager'],
+    permissions: ['templates:write']
+  },
+  {
+    menuId: 'template-parts',
+    roles: ['admin', 'manager'],
+    permissions: ['templates:write']
   },
 
   // Users - Admin, Manager (limited)
