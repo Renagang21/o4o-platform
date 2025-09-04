@@ -51,7 +51,8 @@
     "src/test-utils/**",
     "src/components/users/__tests__/**",
     "src/pages/Users/__tests__/**",
-    "src/pages/Users/**"
+    "src/pages/Users/**",
+    "../../archive/**"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
