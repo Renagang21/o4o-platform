@@ -70,7 +70,16 @@
     "pm2:restart:webserver": "pm2 restart ecosystem.config.webserver.js",
     "pm2:start:apiserver": "pm2 start ecosystem.config.apiserver.cjs",
     "pm2:stop:apiserver": "pm2 stop ecosystem.config.apiserver.cjs",
-    "pm2:restart:apiserver": "pm2 restart ecosystem.config.apiserver.cjs"
+    "pm2:restart:apiserver": "pm2 restart ecosystem.config.apiserver.cjs",
+    "// === Git Hook 직접 배포 ===": "",
+    "deploy:direct": "git push production main",
+    "deploy:force": "git push production main --force",
+    "deploy:status": "git log production/main..main --oneline",
+    "deploy:log": "ssh ubuntu@admin.neture.co.kr 'tail -f /var/log/o4o-deploy.log'",
+    "deploy:log:last": "ssh ubuntu@admin.neture.co.kr 'tail -50 /var/log/o4o-deploy.log'",
+    "deploy:check": "curl -s https://admin.neture.co.kr/version.json | jq .",
+    "deploy:rollback": "ssh ubuntu@admin.neture.co.kr 'ls -la /var/www/admin-backup/'",
+    "deploy:quick": "git add . && git commit -m 'chore: quick deployment' && git push production main"
   },
   "devDependencies": {
     "@eslint/js": "9.33.0",
