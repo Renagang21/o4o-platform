@@ -95,7 +95,18 @@ const PostsManagement: FC = () => {
     queryKey: ['posts-counts'],
     queryFn: async () => {
       try {
-        const response = await authClient.api.get('/v1/posts/counts');
+        // API endpoint not implemented yet - return mock data
+        return {
+          all: 0,
+          mine: 0,
+          published: 0,
+          draft: 0,
+          scheduled: 0,
+          private: 0,
+          trash: 0
+        };
+        // TODO: Uncomment when API is ready
+        // const response = await authClient.api.get('/v1/posts/counts');
         return response.data;
       } catch (err) {
         console.error('Failed to fetch post counts:', err);
@@ -115,7 +126,10 @@ const PostsManagement: FC = () => {
     queryKey: ['posts-dates'],
     queryFn: async () => {
       try {
-        const response = await authClient.api.get('/v1/posts/dates');
+        // API endpoint not implemented yet - return empty array
+        return [];
+        // TODO: Uncomment when API is ready
+        // const response = await authClient.api.get('/v1/posts/dates');
         return response.data || [];
       } catch (err) {
         return [];
@@ -127,7 +141,7 @@ const PostsManagement: FC = () => {
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/api/categories');
+      const response = await authClient.api.get('/categories');
       return response.data;
     }
   });
@@ -786,32 +800,8 @@ const PostsManagement: FC = () => {
         editingRowId={quickEdit.editingId}
       />
 
-      {/* Bottom pagination and bulk actions */}
+      {/* Bottom pagination only - no duplicate bulk actions */}
       <div className="tablenav bottom">
-        <div className="alignleft actions bulkactions">
-          <label htmlFor="bulk-action-selector-bottom" className="screen-reader-text">
-            Select bulk action
-          </label>
-          <Select value={bulkAction} onValueChange={setBulkAction}>
-            <SelectTrigger id="bulk-action-selector-bottom" style={{ width: '150px' }}>
-              <SelectValue placeholder="Bulk actions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Bulk actions</SelectItem>
-              <SelectItem value="edit">Edit</SelectItem>
-              <SelectItem value="trash">Move to Trash</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            type="submit"
-            className="button action"
-            onClick={handleBulkAction}
-            style={{ marginLeft: '8px' }}
-          >
-            Apply
-          </Button>
-        </div>
-
         <div className="tablenav-pages">
           <span className="displaying-num">
             {totalItems} items

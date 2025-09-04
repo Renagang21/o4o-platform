@@ -272,6 +272,23 @@ br.clear {
   min-height: 35px;
 }
 
+/* Main wrapper - add right margin */
+.wrap {
+  margin: 0 20px 0 0;
+  max-width: 100%;
+}
+
+/* WordPress Table spacing */
+.wp-list-table {
+  margin-right: 20px;
+}
+
+/* Ensure proper spacing for table container */
+.wordpress-table-container {
+  margin-right: 20px;
+  padding-right: 10px;
+}
+
 /* Screen Reader Text */
 .screen-reader-text {
   border: 0;
@@ -293,7 +310,9 @@ br.clear {
 }
 
 /* Button Styles */
-.button {
+.button,
+.tablenav .button,
+.search-box .button {
   display: inline-block;
   text-decoration: none;
   font-size: 13px;
@@ -311,7 +330,9 @@ br.clear {
   vertical-align: middle;
 }
 
-.button:hover {
+.button:hover,
+.tablenav .button:hover,
+.search-box .button:hover {
   background: #135e96;
   border-color: #135e96;
   color: #fff;
@@ -327,4 +348,42 @@ br.clear {
   background: #f0f0f1;
   border-color: #8c8f94;
   color: #2c3338;
+}
+
+/* WordPress Admin Page Title */
+.wp-heading-inline {
+  font-size: 23px;
+  font-weight: 400;
+  margin: 0;
+  padding: 9px 0 4px;
+  line-height: 1.3;
+}
+
+.page-title-action {
+  display: inline-block;
+  position: relative;
+  padding: 4px 8px;
+  text-decoration: none;
+  border: 1px solid #2271b1;
+  border-radius: 2px;
+  text-shadow: none;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: normal;
+  color: #2271b1;
+  background: #f6f7f7;
+  cursor: pointer;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.page-title-action:hover {
+  background: #f0f0f1;
+  border-color: #0a4b78;
+  color: #0a4b78;
+}
+
+.wp-header-end {
+  visibility: hidden;
+  margin: -2px 0 0;
 }
