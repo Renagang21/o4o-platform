@@ -44,8 +44,21 @@ jobs:
     - name: Build Admin Dashboard
       run: |
         cd apps/admin-dashboard
-        cp .env.production .env
+        
+        # Create production env file
+        cat > .env.production << EOF
+        NODE_ENV=production
+        VITE_API_URL=https://api.neture.co.kr
+        VITE_WEBSOCKET_URL=wss://api.neture.co.kr
+        VITE_ADMIN_URL=https://admin.neture.co.kr
+        VITE_MAIN_SITE_URL=https://neture.co.kr
+        VITE_STOREFRONT_URL=https://neture.co.kr
+        GENERATE_SOURCEMAP=false
+        EOF
+        
+        # Build with production settings
         NODE_OPTIONS='--max-old-space-size=4096' \
+        NODE_ENV=production \
         GENERATE_SOURCEMAP=false \
         VITE_API_URL=https://api.neture.co.kr \
         pnpm run build
