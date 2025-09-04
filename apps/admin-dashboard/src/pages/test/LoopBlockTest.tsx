@@ -74,7 +74,7 @@ export default function LoopBlockTest() {
     return (
       <Card key={post.id} className="mb-4">
         <CardHeader>
-          <CardTitle>{post.title.rendered}</CardTitle>
+          <CardTitle>{typeof post.title?.rendered === 'string' ? post.title.rendered : (post.title?.rendered as any)?.rendered || 'Untitled'}</CardTitle>
           <div className="text-sm text-gray-500">
             By {authorName} on {new Date(post.date).toLocaleDateString()}
           </div>
@@ -83,13 +83,13 @@ export default function LoopBlockTest() {
           {featuredImage && (
             <img 
               src={featuredImage} 
-              alt={post.title.rendered}
+              alt={typeof post.title?.rendered === 'string' ? post.title.rendered : 'Post image'}
               className="w-full h-48 object-cover mb-4 rounded"
             />
           )}
           <div 
             className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: typeof post.content?.rendered === 'string' ? post.content.rendered : '' }}
           />
           
           {post.acf && Object.keys(post.acf).length > 0 && (
