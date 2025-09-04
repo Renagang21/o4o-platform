@@ -39,9 +39,9 @@ jobs:
     - name: Deploy to Server
       uses: appleboy/scp-action@v0.1.5
       with:
-        host: admin.neture.co.kr
-        username: ubuntu
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
         source: "apps/admin-dashboard/dist/*"
         target: "/var/www/admin.neture.co.kr"
         strip_components: 3
@@ -50,9 +50,9 @@ jobs:
     - name: Reload Nginx
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: admin.neture.co.kr
-        username: ubuntu
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
         script: |
           sudo systemctl reload nginx
           echo "{\"version\": \"$(date +%s)\", \"commit\": \"${{ github.sha }}\"}" | sudo tee /var/www/admin.neture.co.kr/version.json

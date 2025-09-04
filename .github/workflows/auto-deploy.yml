@@ -14,9 +14,9 @@ jobs:
     - name: Deploy to Server
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: admin.neture.co.kr
-        username: ubuntu
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
         script: |
           # 임시 디렉토리
           WORK_DIR="/tmp/deploy-$(date +%s)"
