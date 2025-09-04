@@ -1,0 +1,63 @@
+name: Auto Deploy on Push
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: admin.neture.co.kr
+        username: ubuntu
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          # 임시 디렉토리
+          WORK_DIR="/tmp/deploy-$(date +%s)"
+          TARGET_DIR="/var/www/admin.neture.co.kr"
+          
+          # 최신 코드 가져오기
+          git clone --depth 1 https://github.com/Renagang21/o4o-platform.git "$WORK_DIR"
+          cd "$WORK_DIR"
+          
+          # Node.js 설정
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm use 22.18.0
+          
+          # 빌드
+          pnpm install --frozen-lockfile
+          pnpm run build:packages
+          cd apps/admin-dashboard
+          NODE_OPTIONS='--max-old-space-size=4096' \
+          GENERATE_SOURCEMAP=false \
+          VITE_API_URL=https://api.neture.co.kr \
+          pnpm run build
+          
+          # 백업
+          if [ -d "$TARGET_DIR" ]; then
+              sudo cp -r "$TARGET_DIR" "/var/www/admin-backup/backup-$(date +%Y%m%d-%H%M%S)"
+          fi
+          
+          # 배포
+          sudo rm -rf "$TARGET_DIR"/*
+          sudo cp -r dist/* "$TARGET_DIR"/
+          echo "{\"version\": \"$(date +%s)\"}" | sudo tee "$TARGET_DIR/version.json" > /dev/null
+          
+          # 권한 설정
+          sudo chown -R www-data:www-data "$TARGET_DIR"
+          
+          # Nginx 재로드
+          sudo systemctl reload nginx
+          
+          # 정리
+          cd /
+          rm -rf "$WORK_DIR"
+          
+          echo "✅ Deployment complete!"
