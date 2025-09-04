@@ -414,9 +414,10 @@ const UserList: FC = () => {
 
   return (
     <div className="wrap">
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-lg mb-4 shadow-lg">
-        <h1 className="text-2xl font-bold">🚀 Users Management v4.0</h1>
-        <p className="text-sm mt-1 opacity-90">배포 테스트 성공! - {new Date().toLocaleString('ko-KR')}</p>
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white p-6 rounded-xl mb-4 shadow-2xl animate-bounce">
+        <h1 className="text-3xl font-bold">⭐ Users Management v5.0 ⭐</h1>
+        <p className="text-lg mt-2">배포 완전 성공! - {new Date().toLocaleString('ko-KR')}</p>
+        <p className="text-md mt-1">정확한 경로: /users (회원 관리)</p>
       </div>
       <h1 className="wp-heading-inline">Users</h1>
       <Link to="/users/add" className="page-title-action bg-green-500 text-white hover:bg-green-600">

@@ -26,12 +26,20 @@ const WordPressDashboard: FC = () => {
 
   return (
     <div className="wordpress-dashboard">
+      {/* 배포 테스트 배너 v5.0 - 매우 눈에 띄게! */}
+      <div className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 text-white p-8 rounded-2xl shadow-2xl mb-6 animate-pulse">
+        <h1 className="text-4xl font-bold mb-3">🎊 배포 성공 v5.0! 🎊</h1>
+        <p className="text-xl">정확한 경로: /admin (대시보드)</p>
+        <p className="text-lg mt-2">최종 업데이트: {new Date().toLocaleString('ko-KR')}</p>
+        <p className="text-md mt-1 opacity-90">GitHub Actions 자동 배포 완료 ✅</p>
+      </div>
+
       {/* 페이지 타이틀 */}
-      <h1 className="text-2xl font-semibold mb-6">대시보드</h1>
+      <h1 className="text-2xl font-semibold mb-6">대시보드 - v5.0 Updated</h1>
 
       {/* Welcome Panel - WordPress 스타일 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">O4O 플랫폼에 오신 것을 환영합니다!</h2>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 border-4 border-green-500">
+        <h2 className="text-lg font-semibold mb-4">O4O 플랫폼에 오신 것을 환영합니다! (v5.0)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <h3 className="font-medium mb-2">시작하기</h3>
