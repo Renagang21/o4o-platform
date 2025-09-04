@@ -3,6 +3,20 @@
  * Authentic WordPress admin styling for posts list page
  */
 
+/* Main wrapper - WordPress gray background and proper spacing */
+.wrap {
+  margin: 0;
+  padding: 10px 20px;
+  background: #f0f0f1;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Content wrapper with right margin */
+.wrap > * {
+  max-width: calc(100% - 20px);
+}
+
 /* Status Tabs Navigation */
 .subsubsub {
   list-style: none;
@@ -58,6 +72,8 @@
   min-height: 30px;
   vertical-align: middle;
   font-size: 13px;
+  background: #fff;
+  border: 1px solid #8c8f94;
 }
 
 /* Table Navigation */
@@ -105,15 +121,69 @@
   vertical-align: middle;
   height: 32px;
   line-height: 2.30769231;
+  background: #fff;
+  border: 1px solid #8c8f94;
 }
 
-.tablenav .actions .button.action {
-  margin: 0 8px 0 0;
-  padding: 0 10px;
-  line-height: 2.15384615;
-  min-height: 32px;
+/* Fix dropdown direction - make them open downward */
+.tablenav select,
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2720%27%20height%3D%2720%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cpath%20d%3D%27M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%27%20fill%3D%27%23555%27%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 16px 16px;
+  padding-right: 30px;
+}
+
+/* Button Styles with proper text alignment */
+.button,
+.tablenav .button,
+.search-box .button,
+.button.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   font-size: 13px;
+  min-height: 30px;
+  margin: 0;
+  padding: 0 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  white-space: nowrap;
+  box-sizing: border-box;
   vertical-align: middle;
+  line-height: 1;
+}
+
+.button,
+.search-box .button {
+  border: 1px solid #2271b1;
+  background: #2271b1;
+  color: #fff;
+}
+
+.button:hover,
+.search-box .button:hover {
+  background: #135e96;
+  border-color: #135e96;
+  color: #fff;
+}
+
+.button.action,
+.tablenav .button.action {
+  background: #f6f7f7;
+  border: 1px solid #8c8f94;
+  color: #2c3338;
+}
+
+.button.action:hover,
+.tablenav .button.action:hover {
+  background: #f0f0f1;
+  border-color: #646970;
+  color: #2c3338;
 }
 
 /* Pagination */
@@ -140,14 +210,16 @@
 }
 
 .tablenav-pages .pagination-links .button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   vertical-align: baseline;
   min-width: 30px;
   min-height: 30px;
   margin: 0 2px;
   padding: 0 8px;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1;
   text-align: center;
   background: #f6f7f7;
   border: 1px solid #c3c4c7;
@@ -261,32 +333,29 @@ br.clear {
   height: 2px;
 }
 
-/* WordPress Filter Bar */
+/* WordPress Filter Bar - Gray background */
 .wp-filter {
   display: block;
   position: relative;
-  margin: 0;
-  padding: 0;
+  margin: 0 -20px;
+  padding: 0 20px;
   clear: both;
-  background: #fff;
+  background: #f0f0f1;
   min-height: 35px;
 }
 
-/* Main wrapper - add right margin */
-.wrap {
-  margin: 0 20px 0 0;
-  max-width: 100%;
-}
-
-/* WordPress Table spacing */
-.wp-list-table {
-  margin-right: 20px;
+/* WordPress Table - White background */
+.wp-list-table,
+.wordpress-table-container {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.04);
 }
 
 /* Ensure proper spacing for table container */
 .wordpress-table-container {
   margin-right: 20px;
-  padding-right: 10px;
+  padding: 0;
 }
 
 /* Screen Reader Text */
@@ -309,47 +378,6 @@ br.clear {
   margin-left: 6px;
 }
 
-/* Button Styles */
-.button,
-.tablenav .button,
-.search-box .button {
-  display: inline-block;
-  text-decoration: none;
-  font-size: 13px;
-  line-height: 2.15384615;
-  min-height: 30px;
-  margin: 0;
-  padding: 0 10px;
-  cursor: pointer;
-  border: 1px solid #2271b1;
-  background: #2271b1;
-  color: #fff;
-  border-radius: 3px;
-  white-space: nowrap;
-  box-sizing: border-box;
-  vertical-align: middle;
-}
-
-.button:hover,
-.tablenav .button:hover,
-.search-box .button:hover {
-  background: #135e96;
-  border-color: #135e96;
-  color: #fff;
-}
-
-.button.action {
-  background: #f6f7f7;
-  border-color: #c3c4c7;
-  color: #2c3338;
-}
-
-.button.action:hover {
-  background: #f0f0f1;
-  border-color: #8c8f94;
-  color: #2c3338;
-}
-
 /* WordPress Admin Page Title */
 .wp-heading-inline {
   font-size: 23px;
@@ -357,10 +385,13 @@ br.clear {
   margin: 0;
   padding: 9px 0 4px;
   line-height: 1.3;
+  color: #1d2327;
 }
 
 .page-title-action {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   padding: 4px 8px;
   text-decoration: none;
@@ -369,7 +400,7 @@ br.clear {
   text-shadow: none;
   font-weight: 600;
   font-size: 13px;
-  line-height: normal;
+  line-height: 1;
   color: #2271b1;
   background: #f6f7f7;
   cursor: pointer;
@@ -386,4 +417,62 @@ br.clear {
 .wp-header-end {
   visibility: hidden;
   margin: -2px 0 0;
+}
+
+/* Screen Options positioning */
+.screen-options-wrap {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+}
+
+/* Fix Select/Dropdown components to open downward */
+[role="combobox"] {
+  position: relative;
+}
+
+[role="listbox"],
+[data-radix-select-content] {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: 4px !important;
+  z-index: 50 !important;
+  min-width: 8rem !important;
+  background: white !important;
+  border: 1px solid #c3c4c7 !important;
+  border-radius: 3px !important;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.2) !important;
+}
+
+/* Ensure input fields have white background */
+input[type="text"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+  background-color: #fff;
+  border: 1px solid #8c8f94;
+}
+
+/* Additional spacing adjustments */
+.tablenav {
+  background: transparent;
+  padding: 0 0 0 0;
+}
+
+.tablenav.top {
+  border-bottom: 1px solid #c3c4c7;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.tablenav.bottom {
+  border-top: 1px solid #c3c4c7;
+  padding-top: 10px;
+  margin-top: 20px;
 }
