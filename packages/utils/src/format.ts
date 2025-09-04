@@ -66,16 +66,31 @@ export function formatNumber(
  * @returns 포맷된 날짜 문자열
  */
 export function formatDate(
-  date: Date | string | number,
+  date: Date | string | number | null | undefined,
   format: 'short' | 'medium' | 'long' | 'full' = 'medium',
   locale: string = 'ko-KR'
 ): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' 
-    ? new Date(date) 
-    : date;
+  // Handle null/undefined safely
+  if (!date) {
+    return 'N/A';
+  }
 
-  if (isNaN(dateObj.getTime())) {
-    return '';
+  let dateObj: Date;
+  try {
+    if (typeof date === 'string' || typeof date === 'number') {
+      dateObj = new Date(date);
+    } else {
+      dateObj = date;
+    }
+
+    // Check if date is valid
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      console.warn('Invalid date provided to formatDate:', date);
+      return 'Invalid date';
+    }
+  } catch (error) {
+    console.error('Error parsing date:', error);
+    return 'Error';
   }
 
   const options: Intl.DateTimeFormatOptions = {};

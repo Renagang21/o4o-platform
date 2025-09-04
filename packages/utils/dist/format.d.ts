@@ -30,7 +30,7 @@ export declare function formatNumber(value: number | string, options?: Intl.Numb
  * @param locale 로케일 (기본값: 'ko-KR')
  * @returns 포맷된 날짜 문자열
  */
-export declare function formatDate(date: Date | string | number, format?: 'short' | 'medium' | 'long' | 'full', locale?: string): string;
+export declare function formatDate(date: Date | string | number | null | undefined, format?: 'short' | 'medium' | 'long' | 'full', locale?: string): string;
 /**
  * Format file size to human-readable format
  * @param bytes 바이트 수

@@ -251,7 +251,24 @@ const PostsManagement: FC = () => {
 
   // Prepare quick edit initial data
   const prepareQuickEditData = (post: Post) => {
-    const publishDate = new Date(post.publishedAt || post.createdAt);
+    // Safely handle date with fallback
+    let publishDate: Date;
+    try {
+      if (post.publishedAt) {
+        publishDate = new Date(post.publishedAt);
+      } else if (post.createdAt) {
+        publishDate = new Date(post.createdAt);
+      } else {
+        publishDate = new Date(); // Default to current date
+      }
+      
+      // Check if date is valid
+      if (isNaN(publishDate.getTime())) {
+        publishDate = new Date();
+      }
+    } catch (error) {
+      publishDate = new Date(); // Fallback to current date on any error
+    }
     
     return {
       title: post.title,
