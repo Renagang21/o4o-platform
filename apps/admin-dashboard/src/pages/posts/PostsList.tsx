@@ -4,26 +4,23 @@
 
 import { useState, useEffect, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Filter, MoreVertical, Edit, Trash, Eye } from 'lucide-react';
-import { Button } from '../../components/ui/button';
-import { Card } from '../../components/ui/card';
-import { Input } from '../../components/ui/input';
-import { Badge } from '../../components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../components/ui/dropdown-menu';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../components/ui/table';
-import { apiClient } from '../../utils/apiClient';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
+import { BulkActionBar } from '@/components/common/BulkActionBar';
+import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
+import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
+import { formatDate } from '@/lib/utils';
+import { apiClient } from '@/utils/apiClient';
+import { useAdminNotices } from '@/hooks/useAdminNotices';
 
 interface Post {
   id: string;
@@ -52,39 +49,14 @@ const statusColors = {
   scheduled: 'bg-purple-100 text-purple-800',
 };
 
-// BulkActionBar component - defined outside to avoid recreating on each render
-const BulkActionBar: FC<{
-  selectedCount: number;
-  onPublish: () => void;
-  onDraft: () => void;
-  onDelete: () => void;
-  onClear: () => void;
-}> = ({ selectedCount, onPublish, onDraft, onDelete, onClear }) => (
-  <Card className="p-4 bg-blue-50 border-blue-200">
-    <div className="flex items-center justify-between">
-      <span className="text-blue-800">
-        {selectedCount} posts selected
-      </span>
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={onPublish}>
-          Publish
-        </Button>
-        <Button variant="outline" size="sm" onClick={onDraft}>
-          Draft
-        </Button>
-        <Button variant="outline" size="sm" onClick={onDelete}>
-          Delete
-        </Button>
-        <Button variant="ghost" size="sm" onClick={onClear}>
-          Clear
-        </Button>
-      </div>
-    </div>
-  </Card>
-);
+/**
+ * WordPress-style Posts List
+ * Standardized with WordPressTable component
+ */
 
 const PostsList: FC = () => {
   const navigate = useNavigate();
+  const { success, error } = useAdminNotices();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,6 +65,28 @@ const PostsList: FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
+  
+  // Default column configuration
+  const defaultColumns: ColumnOption[] = [
+    { id: 'title', label: 'Title', visible: true, required: true },
+    { id: 'author', label: 'Author', visible: true },
+    { id: 'categories', label: 'Categories', visible: true },
+    { id: 'tags', label: 'Tags', visible: true },
+    { id: 'comments', label: 'Comments', visible: true },
+    { id: 'date', label: 'Date', visible: true }
+  ];
+  
+  // Use screen options hook
+  const {
+    options,
+    itemsPerPage,
+    isColumnVisible,
+    updateColumnVisibility,
+    setItemsPerPage
+  } = useScreenOptions('posts-list', {
+    columns: defaultColumns,
+    itemsPerPage: 20
+  });
 
   // Fetch posts with authentication
   const fetchPosts = async (page: number, search: string, status: string) => {
@@ -261,262 +255,253 @@ const PostsList: FC = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+  // Define table columns - only show visible ones
+  const allColumns: WordPressTableColumn[] = [
+    { id: 'title', label: 'Title', sortable: true },
+    { id: 'author', label: 'Author' },
+    { id: 'categories', label: 'Categories' },
+    { id: 'tags', label: 'Tags' },
+    { id: 'comments', label: 'Comments', align: 'center' },
+    { id: 'date', label: 'Date', sortable: true }
+  ];
+  
+  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
+  
+  // Transform posts to table rows
+  const rows: WordPressTableRow[] = posts.map((post: Post) => ({
+    id: post.id,
+    data: {
+      title: (
         <div>
-          <h1 className="text-3xl font-bold">Posts</h1>
-          <p className="text-gray-600">Manage your blog posts and articles</p>
+          <strong>
+            <a href={`/posts/${post.id}/edit`} className="row-title">
+              {post.title}
+            </a>
+          </strong>
+          {post.featured && (
+            <span className="ml-2 text-xs text-yellow-600">— Featured</span>
+          )}
+          {post.sticky && (
+            <span className="ml-2 text-xs text-blue-600">— Sticky</span>
+          )}
+          {post.status !== 'published' && (
+            <span className="ml-2 text-xs text-gray-500">— {post.status}</span>
+          )}
         </div>
-        <Button onClick={() => navigate('/posts/new')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Post
-        </Button>
+      ),
+      author: post.author.name,
+      categories: post.categories.length > 0 ? (
+        <div className="flex flex-wrap gap-1">
+          {post.categories.map(cat => (
+            <a key={cat.id} href={`/posts?category=${cat.id}`} className="text-blue-600 hover:underline text-sm">
+              {cat.name}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <span className="text-gray-400">—</span>
+      ),
+      tags: post.tags.length > 0 ? (
+        <div className="flex flex-wrap gap-1">
+          {post.tags.map(tag => (
+            <a key={tag} href={`/posts?tag=${tag}`} className="text-blue-600 hover:underline text-sm">
+              {tag}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <span className="text-gray-400">—</span>
+      ),
+      comments: (
+        <div className="text-center">
+          <span className="comment-count">0</span>
+        </div>
+      ),
+      date: (
+        <div>
+          <abbr title={post.publishedAt || post.updatedAt}>
+            {post.status === 'published' ? 'Published' : 'Last Modified'}
+          </abbr>
+          <br />
+          {formatDate(post.publishedAt || post.updatedAt)}
+        </div>
+      )
+    },
+    actions: [
+      {
+        label: 'Edit',
+        onClick: () => navigate(`/posts/${post.id}/edit`),
+        primary: true
+      },
+      {
+        label: 'Quick Edit',
+        onClick: () => {} // TODO: Implement quick edit
+      },
+      {
+        label: 'Trash',
+        onClick: () => handleDeletePost(post.id),
+        destructive: true
+      },
+      {
+        label: 'View',
+        href: `/posts/${post.slug}`,
+        external: true
+      },
+      {
+        label: 'Duplicate',
+        onClick: () => {} // TODO: Implement duplicate
+      }
+    ]
+  }));
+  
+  // Bulk actions configuration
+  const bulkActions = [
+    {
+      value: 'edit',
+      label: 'Edit'
+    },
+    {
+      value: 'trash',
+      label: 'Move to Trash',
+      action: async (ids: string[]) => {
+        await handleBulkAction('delete');
+      }
+    }
+  ];
+  
+  return (
+    <div className="wrap">
+      <h1 className="wp-heading-inline">Posts</h1>
+      
+      <Button 
+        className="page-title-action ml-2"
+        onClick={() => navigate('/posts/new')}
+      >
+        Add New
+      </Button>
+      
+      <hr className="wp-header-end" />
+
+      {/* Filters */}
+      <div className="wp-filter">
+        <div className="filter-items">
+          <Select value={statusFilter} onValueChange={handleStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="private">Private</SelectItem>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <div className="search-box">
+            <Input
+              type="search"
+              placeholder="Search posts..."
+              value={searchQuery}
+              onChange={(e: any) => handleSearch(e.target.value)}
+              className="w-[300px]"
+            />
+            <Button variant="secondary">
+              Search Posts
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Filters and Search */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Search posts..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 w-64"
-              />
-            </div>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="outline">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Status: {statusFilter === 'all' ? 'All' : statusFilter}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => handleStatusFilter('all')}>
-                  All Statuses
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusFilter('published')}>
-                  Published
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusFilter('draft')}>
-                  Draft
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusFilter('private')}>
-                  Private
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusFilter('scheduled')}>
-                  Scheduled
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleStatusFilter('archived')}>
-                  Archived
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      {/* Bulk Actions - Top */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedPosts.length}
+        onActionExecute={(action) => {
+          if (action === 'trash') {
+            handleBulkAction('delete');
+          }
+        }}
+        isProcessing={false}
+        position="top"
+      />
 
-          <div className="text-sm text-gray-500">
-            {totalPosts} posts total
-          </div>
-        </div>
-      </Card>
-
-      {/* Bulk Actions */}
-      {selectedPosts.length > 0 && (
-        <BulkActionBar
-          selectedCount={selectedPosts.length}
-          onPublish={() => handleBulkAction('publish')}
-          onDraft={() => handleBulkAction('draft')}
-          onDelete={() => handleBulkAction('delete')}
-          onClear={() => setSelectedPosts([])}
-        />
-      )}
-
-      {/* Posts Table */}
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <input
-                  type="checkbox"
-                  checked={selectedPosts.length === posts.length && posts.length > 0}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedPosts(posts.map(p => p.id));
-                    } else {
-                      setSelectedPosts([]);
-                    }
-                  }}
-                />
-              </TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Author</TableHead>
-              <TableHead>Categories</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Views</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  Loading posts...
-                </TableCell>
-              </TableRow>
-            ) : posts.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  No posts found
-                </TableCell>
-              </TableRow>
-            ) : (
-              posts.map((post) => (
-                <TableRow key={post.id}>
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      checked={selectedPosts.includes(post.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedPosts([...selectedPosts, post.id]);
-                        } else {
-                          setSelectedPosts(selectedPosts.filter(id => id !== post.id));
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => navigate(`/posts/${post.id}/edit`)}
-                          className="font-medium text-blue-600 hover:text-blue-800"
-                        >
-                          {post.title}
-                        </button>
-                        {post.featured && (
-                          <Badge variant="secondary" className="text-xs">Featured</Badge>
-                        )}
-                        {post.sticky && (
-                          <Badge variant="secondary" className="text-xs">Sticky</Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <button className="hover:text-blue-600">Edit</button>
-                        <span>|</span>
-                        <button className="hover:text-blue-600">Quick Edit</button>
-                        <span>|</span>
-                        <button 
-                          className="hover:text-red-600"
-                          onClick={() => handleDeletePost(post.id)}
-                        >
-                          Trash
-                        </button>
-                        <span>|</span>
-                        <a 
-                          href={`/posts/${post.slug}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="hover:text-blue-600"
-                        >
-                          View
-                        </a>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{post.author.name}</TableCell>
-                  <TableCell>
-                    {post.categories.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {post.categories.map(cat => (
-                          <Badge key={cat.id} variant="outline" className="text-xs">
-                            {cat.name}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={statusColors[post.status]}>
-                      {post.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {post.publishedAt ? (
-                      <div className="text-sm">
-                        <div>{new Date(post.publishedAt).toLocaleDateString()}</div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(post.publishedAt).toLocaleTimeString()}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{post.views}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(`/posts/${post.id}/edit`)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDeletePost(post.id)}
-                          className="text-red-600"
-                        >
-                          <Trash className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+      {/* WordPress Table */}
+      <WordPressTable
+        columns={columns}
+        rows={rows}
+        selectable={true}
+        selectedRows={selectedPosts}
+        onSelectRow={(rowId, selected) => {
+          if (selected) {
+            setSelectedPosts([...selectedPosts, rowId]);
+          } else {
+            setSelectedPosts(selectedPosts.filter(id => id !== rowId));
+          }
+        }}
+        onSelectAll={(selected) => {
+          if (selected) {
+            setSelectedPosts(posts.map(p => p.id));
+          } else {
+            setSelectedPosts([]);
+          }
+        }}
+        loading={loading}
+        emptyMessage="No posts found. Create your first post!"
+        className="wp-list-table widefat fixed striped posts"
+      />
+      
+      {/* Bulk Actions - Bottom */}
+      <BulkActionBar
+        actions={bulkActions}
+        selectedCount={selectedPosts.length}
+        onActionExecute={(action) => {
+          if (action === 'trash') {
+            handleBulkAction('delete');
+          }
+        }}
+        isProcessing={false}
+        position="bottom"
+      />
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-gray-600">
-            Page {currentPage} of {totalPages}
+      <div className="tablenav bottom">
+        <div className="tablenav-pages">
+          <span className="displaying-num">{totalPosts} items</span>
+          <span className="pagination-links">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              ‹ Previous
+            </Button>
+            
+            <span className="paging-input">
+              <span className="current-page">{currentPage}</span> of <span className="total-pages">{totalPages}</span>
+            </span>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next ›
+            </Button>
           </span>
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </Button>
         </div>
-      )}
+      </div>
+      
+      {/* Screen Options */}
+      <ScreenOptionsReact
+        columns={options.columns}
+        itemsPerPage={itemsPerPage}
+        onColumnToggle={updateColumnVisibility}
+        onItemsPerPageChange={setItemsPerPage}
+      />
     </div>
   );
 };
