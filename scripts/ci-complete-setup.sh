@@ -14,17 +14,27 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
+# Check if pnpm is available
+if command -v pnpm &> /dev/null; then
+    PKG_MANAGER="pnpm"
+    INSTALL_CMD="pnpm install --frozen-lockfile"
+else
+    echo "⚠️  pnpm not found, falling back to npm"
+    PKG_MANAGER="npm"
+    INSTALL_CMD="npm ci"
+fi
+
 # Install dependencies
-echo "📦 Installing dependencies..."
-pnpm install --frozen-lockfile || npm ci
+echo "📦 Installing dependencies with $PKG_MANAGER..."
+$INSTALL_CMD
 
 # Build packages
 echo "🔨 Building packages..."
-pnpm run build:packages || npm run build:packages
+$PKG_MANAGER run build:packages
 
 # Build applications
 echo "🏗️ Building applications..."
-pnpm run build:apps || npm run build:apps
+$PKG_MANAGER run build:apps
 
 echo "✅ CI/CD setup completed successfully!"
 echo "📌 For deployment, use: ./scripts/deploy.sh"

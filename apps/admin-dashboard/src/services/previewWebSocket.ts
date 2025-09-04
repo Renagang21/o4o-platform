@@ -333,7 +333,9 @@ export const usePreviewWebSocket = (userId: string, pageId?: string) => {
     const unsubscribeError = service.onError(setError)
 
     // Connect on mount
-    service.connect().catch(// console.error)
+    service.connect().catch(() => {
+      // Silently handle connection errors
+    })
 
     // Cleanup on unmount
     return () => {
