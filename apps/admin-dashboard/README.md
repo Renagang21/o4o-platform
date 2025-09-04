@@ -159,4 +159,4 @@ npm run preview
 # (Build artifacts in dist/ directory)
 ```
 
-The dashboard is designed to be deployed alongside the O4O Platform services and integrates seamlessly with the existing infrastructure.
+The dashboard is designed to be deployed alongside the O4O Platform services and integrates seamlessly with the existing infrastructure.# Trigger deployment
