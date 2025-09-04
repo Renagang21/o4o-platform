@@ -35,6 +35,10 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm run build:packages
           cd apps/admin-dashboard
+          
+          # 프로덕션 환경변수 설정
+          cp .env.production .env
+          
           NODE_OPTIONS='--max-old-space-size=4096' \
           GENERATE_SOURCEMAP=false \
           VITE_API_URL=https://api.neture.co.kr \
@@ -51,17 +55,29 @@ jobs:
           
           # 버전 정보 추가
           TIMESTAMP=$(date +%s)
-          echo "{\"version\": \"$TIMESTAMP\", \"commit\": \"${{ github.sha }}\", \"deployed\": \"$(date)\"}" | sudo tee "$TARGET_DIR/version.json" > /dev/null
+          COMMIT_SHORT="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_SHORT:0:7}"
+          echo "{\"version\": \"$TIMESTAMP\", \"commit\": \"$COMMIT_SHORT\", \"deployed\": \"$(date)\", \"changes\": \"v4.0\"}" | sudo tee "$TARGET_DIR/version.json" > /dev/null
+          
+          # 테스트 파일 추가 (확인용)
+          echo "Deployment v4.0 - $(date)" | sudo tee "$TARGET_DIR/deploy-test.txt" > /dev/null
           
           # 권한 설정
           sudo chown -R www-data:www-data "$TARGET_DIR"
+          sudo chmod -R 755 "$TARGET_DIR"
           
           # Nginx 캐시 클리어 및 재로드
           sudo rm -rf /var/cache/nginx/*
           sudo systemctl reload nginx
           
-          # 브라우저 캐시 무효화를 위한 헤더 설정
-          echo "Cache cleared. Users may need to hard refresh (Ctrl+F5)"
+          # CloudFlare 캐시 purge (만약 사용중이라면)
+          # curl -X POST "https://api.cloudflare.com/client/v4/zones/ZONE_ID/purge_cache" \
+          #      -H "X-Auth-Email: email" \
+          #      -H "X-Auth-Key: key" \
+          #      -H "Content-Type: application/json" \
+          #      --data '{"purge_everything":true}'
+          
+          echo "✅ Deployment complete! Version: $TIMESTAMP"
           
           # 정리
           cd /
