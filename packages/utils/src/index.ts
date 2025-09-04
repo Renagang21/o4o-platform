@@ -29,11 +29,11 @@ export {
   formatCurrency,
   formatPrice,
   formatNumber,
-  formatDate,
+  // formatDate,  // Removed - causes React rendering issues
   formatFileSize,
   formatPercentage,
-  formatRelativeTime,
-  formatDateFromNow,
+  // formatRelativeTime,  // Removed - causes React rendering issues
+  // formatDateFromNow,  // Removed - causes React rendering issues
   formatPhoneNumber
 } from './format';
 

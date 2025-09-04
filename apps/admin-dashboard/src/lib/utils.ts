@@ -4,7 +4,7 @@ import * as utils from '@o4o/utils';
 
 // Re-export from @o4o/utils
 export const formatCurrency = utils.formatCurrency;
-export const formatDate = utils.formatDate;
+// export const formatDate = utils.formatDate;  // Removed - causes issues
 
 /**
  * Format number with commas
