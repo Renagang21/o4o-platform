@@ -1,6 +1,6 @@
 {
   "name": "@o4o/admin-dashboard",
-  "version": "1.0.0-deploy-1756353453",
+  "version": "1.0.0-deploy-1757017645",
   "description": "WordPress-style Admin Dashboard for O4O Platform - with ParagraphTestBlock and StandaloneEditor",
   "type": "module",
   "scripts": {
