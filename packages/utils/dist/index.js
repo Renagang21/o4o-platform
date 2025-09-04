@@ -5,11 +5,10 @@ export * from './validators';
 // Export pricing functions (excluding format functions that conflict with format.ts)
 export { getRoleBasedPrice, getAllRolePrices, calculateDiscountPercentage, calculateSavings, calculateVolumeDiscount, calculatePrice, formatPriceDisplay, getRoleLabel, getCurrencySymbol, getCurrencyInfo, getDefaultPriceDisplayConfig, isBetterPrice, isPriceInRange, calculateUnitPrice, validatePrice, calculateCartTotal } from './pricing';
 // Export formatting functions from format.ts
-export { formatCurrency, formatPrice, formatNumber, 
-// formatDate,  // Removed - causes React rendering issues
+export { formatCurrency, formatPrice, formatNumber, formatDate, // Basic date formatting - returns string
 formatFileSize, formatPercentage, 
-// formatRelativeTime,  // Removed - causes React rendering issues
-// formatDateFromNow,  // Removed - causes React rendering issues
+// formatRelativeTime,  // Removed - may cause issues
+// formatDateFromNow,  // Removed - may cause issues  
 formatPhoneNumber } from './format';
 // Export cn utility
 export { cn } from './cn';
