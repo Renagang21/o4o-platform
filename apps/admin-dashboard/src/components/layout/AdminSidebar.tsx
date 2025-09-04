@@ -43,11 +43,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ onClose }) => {
   ] : [] // Other roles need proper permissions
   const menuItems = filterMenuByRole(dynamicMenuItems, userRole, userPermissions)
   
-  // 디버깅용 로그
-  console.log('Dynamic Menu Items:', dynamicMenuItems);
-  console.log('Filtered Menu Items:', menuItems);
-  console.log('User Role:', userRole);
-  console.log('User Permissions:', userPermissions);
+  // 메뉴 아이템 필터링 완료
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev: any) => 
