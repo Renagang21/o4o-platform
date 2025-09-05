@@ -31,44 +31,114 @@ type SortOrder = 'asc' | 'desc';
 
 const Posts = () => {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([
-    { 
-      id: '1', 
-      title: 'Welcome to Our New Platform',
-      slug: 'welcome-new-platform',
-      author: 'Admin',
-      categories: ['공지사항'],
-      tags: ['featured', 'news'],
-      comments: 5,
-      date: '2024-01-20',
-      status: 'published',
-      views: 234
-    },
-    { 
-      id: '2', 
-      title: 'Getting Started Guide',
-      slug: 'getting-started-guide',
-      author: 'Editor',
-      categories: ['튜토리얼'],
-      tags: ['tutorial', 'guide'],
-      comments: 12,
-      date: '2024-01-18',
-      status: 'published',
-      views: 456
-    },
-    { 
-      id: '3', 
-      title: 'Draft: Upcoming Features',
-      slug: 'draft-upcoming-features',
-      author: 'Admin',
-      categories: ['이벤트'],
-      tags: ['draft'],
-      comments: 0,
-      date: '2024-01-22',
-      status: 'draft',
-      views: 0
-    }
-  ]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch posts from API on component mount
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const response = await fetch('/api/posts', {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          }
+        });
+        
+        if (!response.ok) {
+          // If API fails, fall back to mock data temporarily
+          if (response.status === 401) {
+            setError('Authentication required. Please login.');
+          } else if (response.status === 500 || response.status === 503) {
+            // Use mock data if server has issues
+            setPosts([
+              { 
+                id: 'ec6ee714-552b-44da-8666-57d249292dc2', 
+                title: 'Welcome to Our New Platform',
+                slug: 'welcome-new-platform',
+                author: 'Admin',
+                categories: ['공지사항'],
+                tags: ['featured', 'news'],
+                comments: 5,
+                date: '2024-01-20',
+                status: 'published',
+                views: 234
+              },
+              { 
+                id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 
+                title: 'Getting Started Guide',
+                slug: 'getting-started-guide',
+                author: 'Editor',
+                categories: ['튜토리얼'],
+                tags: ['tutorial', 'guide'],
+                comments: 12,
+                date: '2024-01-18',
+                status: 'published',
+                views: 456
+              },
+              { 
+                id: 'b2c3d4e5-f678-90ab-cdef-123456789012', 
+                title: 'Draft: Upcoming Features',
+                slug: 'draft-upcoming-features',
+                author: 'Admin',
+                categories: ['이벤트'],
+                tags: ['draft'],
+                comments: 0,
+                date: '2024-01-22',
+                status: 'draft',
+                views: 0
+              }
+            ]);
+            setError('Server temporarily unavailable. Showing sample data.');
+          } else {
+            throw new Error(`Failed to fetch posts: ${response.status}`);
+          }
+          return;
+        }
+        
+        const data = await response.json();
+        
+        // Transform API response to match our Post interface
+        const transformedPosts = data.posts?.map((post: any) => ({
+          id: post.id, // Use UUID from server
+          title: post.title || 'Untitled',
+          slug: post.slug || '',
+          author: post.author?.name || 'Unknown',
+          categories: post.categories?.map((cat: any) => cat.name) || [],
+          tags: post.tags?.map((tag: any) => tag.name) || [],
+          comments: 0, // TODO: Get comment count from API
+          date: post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0] : new Date(post.createdAt).toISOString().split('T')[0],
+          status: post.status || 'draft',
+          views: post.views || 0
+        })) || [];
+        
+        setPosts(transformedPosts);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load posts');
+        // Fall back to mock data with UUIDs
+        setPosts([
+          { 
+            id: 'ec6ee714-552b-44da-8666-57d249292dc2', 
+            title: 'Welcome to Our New Platform',
+            slug: 'welcome-new-platform',
+            author: 'Admin',
+            categories: ['공지사항'],
+            tags: ['featured', 'news'],
+            comments: 5,
+            date: '2024-01-20',
+            status: 'published',
+            views: 234
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, []);
   
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
@@ -283,8 +353,24 @@ const Posts = () => {
   const counts = getStatusCounts();
   const filteredPosts = getFilteredPosts();
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f0f0f1' }}>
+        <div className="text-gray-600">Loading posts...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f0f0f1' }}>
+      {/* Show error message if any */}
+      {error && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-8 mt-4">
+          <p className="text-sm text-yellow-700">{error}</p>
+        </div>
+      )}
+      
       {/* Header with Breadcrumb and Screen Options */}
       <div className="bg-white border-b border-gray-200 px-8 py-3">
         <div className="flex items-center justify-between">

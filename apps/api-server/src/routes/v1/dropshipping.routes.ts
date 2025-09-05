@@ -32,7 +32,7 @@ router.get('/settings', (req, res) => {
  * @access  Admin
  */
 router.put('/settings', (req, res) => {
-  dropshippingController.updateSettings(req, res);
+  dropshippingController.updateSettings(req as any, res);
 });
 
 /**
@@ -41,7 +41,7 @@ router.put('/settings', (req, res) => {
  * @access  Admin
  */
 router.get('/connectors', (req, res) => {
-  dropshippingController.getConnectors(req, res);
+  dropshippingController.getConnectors(req as any, res);
 });
 
 /**
@@ -50,7 +50,7 @@ router.get('/connectors', (req, res) => {
  * @access  Admin
  */
 router.post('/connectors/:connectorId/test', (req, res) => {
-  dropshippingController.testConnector(req, res);
+  dropshippingController.testConnector(req as any, res);
 });
 
 /**
@@ -59,7 +59,7 @@ router.post('/connectors/:connectorId/test', (req, res) => {
  * @access  Admin
  */
 router.get('/margin-policies', (req, res) => {
-  dropshippingController.getMarginPolicies(req, res);
+  dropshippingController.getMarginPolicies(req as any, res);
 });
 
 /**
@@ -68,7 +68,7 @@ router.get('/margin-policies', (req, res) => {
  * @access  Admin
  */
 router.get('/statistics', (req, res) => {
-  dropshippingController.getStatistics(req, res);
+  dropshippingController.getStatistics(req as any, res);
 });
 
 export default router;

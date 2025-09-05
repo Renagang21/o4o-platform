@@ -811,12 +811,14 @@ const startServer = async () => {
         }
       }
 
-      // Initialize monitoring services
-      try {
-        await backupService.initialize();
-        await errorAlertService.initialize();
-      } catch (serviceError) {
-        // Error log removed
+      // Initialize monitoring services - skip in development
+      if (process.env.NODE_ENV === 'production') {
+        try {
+          await backupService.initialize();
+          await errorAlertService.initialize();
+        } catch (serviceError) {
+          logger.warn('Monitoring services initialization failed (non-critical)');
+        }
       }
 
       // Initialize tracking updater job
