@@ -66,7 +66,11 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
               tokenUser.updatedAt = newPayload.updatedAt as Date || new Date();
               tokenUser.lastLoginAt = newPayload.lastLoginAt as Date;
               
-              (req as AuthRequest).user = tokenUser;
+              // Add userId property for backward compatibility
+              (req as AuthRequest).user = {
+                ...tokenUser,
+                userId: tokenUser.id
+              } as any;
               return next();
             }
           }
@@ -140,7 +144,11 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       });
     }
 
-    (req as AuthRequest).user = user;
+    // Add userId property for backward compatibility
+    (req as AuthRequest).user = {
+      ...user,
+      userId: user.id
+    } as any;
     next();
   } catch (error: any) {
     return res.status(401).json({ 
@@ -230,7 +238,11 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     });
     
     if (user && user.status === UserStatus.APPROVED) {
-      (req as AuthRequest).user = user;
+      // Add userId property for backward compatibility
+      (req as AuthRequest).user = {
+        ...user,
+        userId: user.id
+      } as any;
     }
 
     next();
