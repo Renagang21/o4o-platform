@@ -56,7 +56,30 @@ const apiV1Client = axios.create({
 // 요청 인터셉터 (토큰 추가)
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    // 여러 위치에서 토큰 확인
+    let token = localStorage.getItem('authToken');
+    if (!token) {
+      token = localStorage.getItem('accessToken');
+    }
+    if (!token) {
+      token = localStorage.getItem('token');
+    }
+    
+    // Zustand store에서도 확인
+    if (!token) {
+      const adminStorage = localStorage.getItem('admin-auth-storage');
+      if (adminStorage) {
+        try {
+          const parsed = JSON.parse(adminStorage);
+          if (parsed.state?.token) {
+            token = parsed.state.token;
+          }
+        } catch {
+          // Ignore parse error
+        }
+      }
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -75,7 +98,30 @@ apiClient.interceptors.request.use(
 // V1 API 요청 인터셉터 (토큰 추가)
 apiV1Client.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    // 여러 위치에서 토큰 확인
+    let token = localStorage.getItem('authToken');
+    if (!token) {
+      token = localStorage.getItem('accessToken');
+    }
+    if (!token) {
+      token = localStorage.getItem('token');
+    }
+    
+    // Zustand store에서도 확인
+    if (!token) {
+      const adminStorage = localStorage.getItem('admin-auth-storage');
+      if (adminStorage) {
+        try {
+          const parsed = JSON.parse(adminStorage);
+          if (parsed.state?.token) {
+            token = parsed.state.token;
+          }
+        } catch {
+          // Ignore parse error
+        }
+      }
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -129,12 +175,39 @@ export const postApi = {
     }
     
     try {
+      if (import.meta.env.DEV) {
+        console.log('📤 POST /v1/content/posts request:', {
+          url: `${API_V1_URL}/posts`,
+          data,
+          headers: apiV1Client.defaults.headers
+        });
+      }
+      
       const response = await apiV1Client.post('/posts', data);
+      
+      if (import.meta.env.DEV) {
+        console.log('✅ POST /v1/content/posts success:', response.data);
+      }
+      
       return { success: true, data: response.data };
     } catch (error: any) {
+      if (import.meta.env.DEV) {
+        console.error('❌ POST /v1/content/posts failed:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+            headers: error.config?.headers
+          }
+        });
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to create post' 
+        error: error.response?.data?.message || `Failed to create post (${error.response?.status})` 
       };
     }
   },
@@ -201,12 +274,39 @@ export const postApi = {
     
     try {
       const endpoint = 'id' in data ? `/posts/${data.id}/draft` : '/posts/draft';
+      
+      if (import.meta.env.DEV) {
+        console.log('📤 POST save draft request:', {
+          url: `${API_V1_URL}${endpoint}`,
+          data,
+          headers: apiV1Client.defaults.headers
+        });
+      }
+      
       const response = await apiV1Client.post(endpoint, data);
+      
+      if (import.meta.env.DEV) {
+        console.log('✅ POST save draft success:', response.data);
+      }
+      
       return { success: true, data: response.data };
     } catch (error: any) {
+      if (import.meta.env.DEV) {
+        console.error('❌ POST save draft failed:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+            headers: error.config?.headers
+          }
+        });
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to save draft' 
+        error: error.response?.data?.message || `Failed to save draft (${error.response?.status})` 
       };
     }
   },

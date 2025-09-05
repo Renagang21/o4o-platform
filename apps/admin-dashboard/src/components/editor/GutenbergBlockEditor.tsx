@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { EditorHeader } from './EditorHeader';
 import '../../styles/editor.css';
 import { postApi, mediaApi } from '@/services/api/postApi';
+import { debugTokenStatus } from '@/utils/token-debug';
 import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
 import InspectorPanel from './InspectorPanel';
@@ -231,6 +232,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle save
   const handleSave = useCallback(async () => {
     try {
+      // Debug token status
+      if (import.meta.env.DEV) {
+        debugTokenStatus();
+      }
+      
       showToast('Saving draft...', 'info');
       
       // API로 저장
@@ -255,6 +261,11 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle publish
   const handlePublish = useCallback(async () => {
     try {
+      // Debug token status
+      if (import.meta.env.DEV) {
+        debugTokenStatus();
+      }
+      
       showToast('Publishing post...', 'info');
       
       // 먼저 게시글 생성/업데이트
