@@ -141,7 +141,7 @@ export class ContentController {
   createPost = async (req: Request, res: Response) => {
     try {
       const { title, content, status = 'draft' } = req.body;
-      const userId = (req as any).user?.id;
+      const userId = (req as any).user?.userId;
       
       if (!AppDataSource.isInitialized) {
         return res.json({
@@ -154,6 +154,13 @@ export class ContentController {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
+        });
+      }
+
+      // Ensure userId is available
+      if (!userId) {
+        return res.status(401).json({
+          message: 'User authentication required'
         });
       }
 
@@ -181,7 +188,7 @@ export class ContentController {
   createDraft = async (req: Request, res: Response) => {
     try {
       const { title, content } = req.body;
-      const userId = (req as any).user?.id;
+      const userId = (req as any).user?.userId;
       
       if (!AppDataSource.isInitialized) {
         return res.json({
