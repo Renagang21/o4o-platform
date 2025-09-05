@@ -1,0 +1,471 @@
+import { Request, Response } from 'express'
+import { AppDataSource } from '../database/connection'
+import { Post } from '../entities/Post'
+import { Category } from '../entities/Category'
+import { PostTag } from '../entities/PostTag'
+import { User } from '../entities/User'
+import { In, Like, FindManyOptions, FindOptionsWhere } from 'typeorm'
+
+const postRepository = AppDataSource.getRepository(Post)
+const categoryRepository = AppDataSource.getRepository(Category)
+const tagRepository = AppDataSource.getRepository(PostTag)
+const userRepository = AppDataSource.getRepository(User)
+
+// Get all posts with filtering and pagination
+export const getAllPosts = async (req: Request, res: Response) => {
+  try {
+    const {
+      page = 1,
+      per_page = 10,
+      search,
+      status,
+      category,
+      tag,
+      author,
+      orderby = 'createdAt',
+      order = 'DESC',
+      format,
+      type = 'post'
+    } = req.query
+
+    const pageNum = parseInt(page as string)
+    const limitNum = parseInt(per_page as string)
+    const skip = (pageNum - 1) * limitNum
+
+    // Build where conditions
+    const where: FindOptionsWhere<Post> = { type: type as string }
+    
+    if (status) where.status = status as string
+    if (format) where.format = format as string
+    if (author) where.authorId = author as string
+    if (search) {
+      where.title = Like(`%${search}%`)
+    }
+
+    // Build query options
+    const options: FindManyOptions<Post> = {
+      where,
+      relations: ['author', 'categories', 'tags'],
+      skip,
+      take: limitNum,
+      order: { [orderby as string]: order as 'ASC' | 'DESC' }
+    }
+
+    const [posts, total] = await postRepository.findAndCount(options)
+
+    // Apply category and tag filters if needed
+    let filteredPosts = posts
+    if (category) {
+      filteredPosts = posts.filter(post => 
+        post.categories?.some(cat => cat.id === category || cat.slug === category)
+      )
+    }
+    if (tag) {
+      filteredPosts = posts.filter(post =>
+        post.tags?.some(t => t.id === tag || t.slug === tag)
+      )
+    }
+
+    res.json({
+      data: filteredPosts,
+      pagination: {
+        page: pageNum,
+        per_page: limitNum,
+        total,
+        total_pages: Math.ceil(total / limitNum)
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching posts:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch posts' } })
+  }
+}
+
+// Get single post
+export const getPost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    
+    const post = await postRepository.findOne({
+      where: { id },
+      relations: ['author', 'categories', 'tags', 'lastModifier']
+    })
+
+    if (!post) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
+    }
+
+    // Increment view count
+    await postRepository.update(id, { views: post.views + 1 })
+
+    res.json(post)
+  } catch (error) {
+    console.error('Error fetching post:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch post' } })
+  }
+}
+
+// Create new post
+export const createPost = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not authenticated' } })
+    }
+
+    const {
+      title,
+      content,
+      excerpt,
+      slug,
+      status = 'draft',
+      format = 'standard',
+      categories = [],
+      tags = [],
+      featured = false,
+      sticky = false,
+      featuredImage,
+      template,
+      seo,
+      customFields,
+      postMeta,
+      allowComments = true,
+      password,
+      scheduledAt
+    } = req.body
+
+    // Check if slug is unique
+    if (slug) {
+      const existingPost = await postRepository.findOne({ where: { slug } })
+      if (existingPost) {
+        return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
+      }
+    }
+
+    // Create new post
+    const post = postRepository.create({
+      title,
+      content,
+      excerpt,
+      slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      status,
+      format,
+      type: 'post',
+      authorId: userId,
+      featured,
+      sticky,
+      featuredImage,
+      template,
+      seo,
+      customFields,
+      postMeta,
+      allowComments,
+      password,
+      passwordProtected: !!password,
+      scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
+      publishedAt: status === 'published' ? new Date() : undefined
+    })
+
+    // Handle categories
+    if (categories.length > 0) {
+      const categoryEntities = await categoryRepository.findBy({
+        id: In(categories)
+      })
+      post.categories = categoryEntities
+    }
+
+    // Handle tags
+    if (tags.length > 0) {
+      const tagEntities = await tagRepository.findBy({
+        id: In(tags)
+      })
+      post.tags = tagEntities
+    }
+
+    const savedPost = await postRepository.save(post)
+
+    res.status(201).json(savedPost)
+  } catch (error) {
+    console.error('Error creating post:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create post' } })
+  }
+}
+
+// Update post
+export const updatePost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const userId = (req as any).user?.id
+    
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not authenticated' } })
+    }
+
+    const post = await postRepository.findOne({
+      where: { id },
+      relations: ['categories', 'tags']
+    })
+
+    if (!post) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
+    }
+
+    const {
+      title,
+      content,
+      excerpt,
+      slug,
+      status,
+      format,
+      categories,
+      tags,
+      featured,
+      sticky,
+      featuredImage,
+      template,
+      seo,
+      customFields,
+      postMeta,
+      allowComments,
+      password,
+      scheduledAt
+    } = req.body
+
+    // Check slug uniqueness if changed
+    if (slug && slug !== post.slug) {
+      const existingPost = await postRepository.findOne({ where: { slug } })
+      if (existingPost) {
+        return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
+      }
+    }
+
+    // Update post fields
+    if (title !== undefined) post.title = title
+    if (content !== undefined) post.content = content
+    if (excerpt !== undefined) post.excerpt = excerpt
+    if (slug !== undefined) post.slug = slug
+    if (status !== undefined) {
+      post.status = status
+      if (status === 'published' && !post.publishedAt) {
+        post.publishedAt = new Date()
+      }
+    }
+    if (format !== undefined) post.format = format
+    if (featured !== undefined) post.featured = featured
+    if (sticky !== undefined) post.sticky = sticky
+    if (featuredImage !== undefined) post.featuredImage = featuredImage
+    if (template !== undefined) post.template = template
+    if (seo !== undefined) post.seo = seo
+    if (customFields !== undefined) post.customFields = customFields
+    if (postMeta !== undefined) post.postMeta = postMeta
+    if (allowComments !== undefined) post.allowComments = allowComments
+    if (password !== undefined) {
+      post.password = password
+      post.passwordProtected = !!password
+    }
+    if (scheduledAt !== undefined) post.scheduledAt = scheduledAt ? new Date(scheduledAt) : null
+
+    post.lastModifiedBy = userId
+
+    // Update categories
+    if (categories !== undefined) {
+      const categoryEntities = categories.length > 0
+        ? await categoryRepository.findBy({ id: In(categories) })
+        : []
+      post.categories = categoryEntities
+    }
+
+    // Update tags
+    if (tags !== undefined) {
+      const tagEntities = tags.length > 0
+        ? await tagRepository.findBy({ id: In(tags) })
+        : []
+      post.tags = tagEntities
+    }
+
+    const updatedPost = await postRepository.save(post)
+
+    res.json(updatedPost)
+  } catch (error) {
+    console.error('Error updating post:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update post' } })
+  }
+}
+
+// Delete post
+export const deletePost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    
+    const post = await postRepository.findOne({ where: { id } })
+    
+    if (!post) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
+    }
+
+    // Soft delete by changing status to trash
+    post.status = 'trash'
+    await postRepository.save(post)
+
+    res.json({ message: 'Post moved to trash' })
+  } catch (error) {
+    console.error('Error deleting post:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to delete post' } })
+  }
+}
+
+// Auto-save post
+export const autoSavePost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const { content, title, excerpt } = req.body
+    const userId = (req as any).user?.id
+
+    if (!userId) {
+      return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not authenticated' } })
+    }
+
+    const post = await postRepository.findOne({ where: { id } })
+    
+    if (!post) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
+    }
+
+    // Store current version as revision
+    const revisions = post.revisions || []
+    revisions.push({
+      id: `rev_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      author: userId,
+      changes: {
+        title: post.title,
+        content: post.content,
+        excerpt: post.excerpt
+      }
+    })
+
+    // Limit revisions to last 10
+    if (revisions.length > 10) {
+      revisions.shift()
+    }
+
+    // Update post with auto-saved content
+    post.revisions = revisions
+    if (content !== undefined) post.content = content
+    if (title !== undefined) post.title = title
+    if (excerpt !== undefined) post.excerpt = excerpt
+    post.lastModifiedBy = userId
+
+    await postRepository.save(post)
+
+    res.json({ message: 'Auto-save successful', revisionId: revisions[revisions.length - 1].id })
+  } catch (error) {
+    console.error('Error auto-saving post:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to auto-save post' } })
+  }
+}
+
+// Get post revisions
+export const getPostRevisions = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    
+    const post = await postRepository.findOne({ 
+      where: { id },
+      select: ['id', 'revisions']
+    })
+    
+    if (!post) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
+    }
+
+    res.json(post.revisions || [])
+  } catch (error) {
+    console.error('Error fetching revisions:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch revisions' } })
+  }
+}
+
+// Preview post
+export const previewPost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    
+    const post = await postRepository.findOne({
+      where: { id },
+      relations: ['author', 'categories', 'tags']
+    })
+    
+    if (!post) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
+    }
+
+    // Return post with preview flag
+    res.json({
+      ...post,
+      preview: true,
+      previewUrl: `/preview/posts/${id}`
+    })
+  } catch (error) {
+    console.error('Error previewing post:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to preview post' } })
+  }
+}
+
+// Bulk operations
+export const bulkOperatePosts = async (req: Request, res: Response) => {
+  try {
+    const { action, ids } = req.body
+    
+    if (!action || !ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'VALIDATION_ERROR', 
+          message: 'Invalid bulk operation parameters' 
+        }
+      })
+    }
+
+    const posts = await postRepository.findBy({ id: In(ids) })
+    
+    if (posts.length === 0) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'No posts found' } })
+    }
+
+    switch (action) {
+      case 'trash':
+        await postRepository.update({ id: In(ids) }, { status: 'trash' })
+        break
+      case 'restore':
+        await postRepository.update({ id: In(ids) }, { status: 'draft' })
+        break
+      case 'delete':
+        await postRepository.delete({ id: In(ids) })
+        break
+      case 'publish':
+        await postRepository.update(
+          { id: In(ids) }, 
+          { status: 'published', publishedAt: new Date() }
+        )
+        break
+      case 'draft':
+        await postRepository.update({ id: In(ids) }, { status: 'draft' })
+        break
+      default:
+        return res.status(400).json({ 
+          error: { 
+            code: 'VALIDATION_ERROR', 
+            message: 'Invalid action' 
+          }
+        })
+    }
+
+    res.json({ 
+      message: `Bulk ${action} completed`,
+      affected: posts.length 
+    })
+  } catch (error) {
+    console.error('Error in bulk operation:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to perform bulk operation' } })
+  }
+}

@@ -510,6 +510,17 @@ app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
 // Categories routes (public access)
 app.use('/api/categories', categoriesRoutes);
 
+// Gutenberg Content Management Routes
+import postsApiRoutes from './routes/api/posts';
+import pagesApiRoutes from './routes/api/pages';
+import categoriesApiRoutes from './routes/api/categories';
+import tagsApiRoutes from './routes/api/tags';
+
+app.use('/api/posts', postsApiRoutes);
+app.use('/api/pages', pagesApiRoutes);
+app.use('/api/categories', categoriesApiRoutes);
+app.use('/api/tags', tagsApiRoutes);
+
 // ACF and Shortcode routes
 import acfRoutes from './routes/acf';
 import shortcodeRoutes from './routes/shortcodes';
