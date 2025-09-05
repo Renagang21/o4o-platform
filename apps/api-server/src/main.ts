@@ -333,8 +333,8 @@ const corsOptions: CorsOptions = {
 // Apply CORS before any other middleware
 app.use(cors(corsOptions));
 
-// Handle OPTIONS requests for CORS preflight
-app.options('*', cors(corsOptions));
+// OPTIONS requests are already handled by the CORS middleware above
+// No need for additional app.options() handler
 
 // Serve static files for uploads (EARLY in middleware chain)
 app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
