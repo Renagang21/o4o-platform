@@ -321,6 +321,9 @@ const corsOptions: CorsOptions = {
   optionsSuccessStatus: 204
 };
 
+// Handle OPTIONS requests for CORS preflight
+app.options('*', cors(corsOptions));
+
 // Explicit CORS header handling to ensure headers are always set
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin as string;
