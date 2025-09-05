@@ -94,7 +94,7 @@ export const uploadMiddleware = (fieldName: string = 'files', maxFiles: number =
   return (req: Request, res: Response, next: NextFunction) => {
     const uploadHandler = upload.array(fieldName, maxFiles);
     
-    uploadHandler(req, res, (err: any) => {
+    uploadHandler(req as any, res, (err: any) => {
       if (err instanceof multer.MulterError) {
         let errorMessage = 'File upload error';
         
@@ -171,7 +171,7 @@ export const uploadSingleMiddleware = (fieldName: string = 'file') => {
   return (req: Request, res: Response, next: NextFunction) => {
     const uploadHandler = upload.single(fieldName);
     
-    uploadHandler(req, res, (err: any) => {
+    uploadHandler(req as any, res, (err: any) => {
       if (err instanceof multer.MulterError) {
         let errorMessage = 'File upload error';
         
