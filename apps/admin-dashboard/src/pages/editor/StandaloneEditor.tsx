@@ -144,7 +144,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   const loadPostData = async (id: string) => {
     try {
-      console.log('Loading post data for ID:', id);
       const response = await fetch(`/api/posts/${id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -156,7 +155,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       }
       
       const data = await response.json();
-      console.log('Loaded post data:', data);
       
       // Set title
       setPostTitle(data.title || '');
@@ -191,7 +189,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       toast.success('Post loaded successfully');
     } catch (error) {
-      console.error('Failed to load post:', error);
       toast.error('Failed to load post data');
     }
   };
@@ -215,8 +212,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         allowComments: postSettings.commentStatus,
         sticky: postSettings.sticky
       };
-      
-      console.log('Saving post data:', postData);
       
       const url = postId ? `/api/posts/${postId}` : '/api/posts';
       const response = await fetch(url, {
@@ -257,14 +252,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
           });
           
           if (!publishResponse.ok) {
-            console.error('Failed to publish post');
+            // Silent failure - already showed success message
           }
         }
       } else {
         toast.success('Saved as draft');
       }
-    } catch (error) {
-      console.error('Failed to save:', error);
+    } catch (error: any) {
       toast.error(error.message || 'Failed to save');
     } finally {
       setIsSaving(false);
