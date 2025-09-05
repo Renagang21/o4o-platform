@@ -67,8 +67,7 @@ import { backupService } from './services/BackupService';
 import { errorAlertService } from './services/ErrorAlertService';
 import { securityAuditService } from './services/SecurityAuditService';
 
-// Email service
-import { emailService } from './services/email.service';
+// Email service - import moved to runtime to avoid blocking
 
 // 라우트 imports 
 import authRoutes from './routes/auth';
@@ -742,11 +741,15 @@ app.use('*', (req, res) => {
 import { setupSwagger } from './config/swagger-enhanced';
 
 // Setup Swagger API documentation
+logger.info('Setting up Swagger documentation...');
 setupSwagger(app);
+logger.info('Swagger documentation setup completed');
 
 // 서버 시작
 const startServer = async () => {
+  logger.info('Starting server...');
   try {
+    logger.info('Checking database initialization status...');
     // 데이터베이스 초기화 전 상태 확인
     if (AppDataSource.isInitialized) {
       logger.info('Database already initialized');
@@ -765,11 +768,29 @@ const startServer = async () => {
       //   password: dbConfig.password ? '***' : 'NOT SET'
       // });
       
-      // 데이터베이스 초기화
-      await AppDataSource.initialize();
+      // 데이터베이스 초기화 (타임아웃 적용)
+      logger.info('Attempting database connection...');
       
-      // 마이그레이션 실행 (프로덕션 환경)
-      if (process.env.NODE_ENV === 'production') {
+      // Add timeout for database connection in development
+      const dbConnectionPromise = AppDataSource.initialize();
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Database connection timeout')), 5000);
+      });
+      
+      try {
+        await Promise.race([dbConnectionPromise, timeoutPromise]);
+        logger.info('Database connection successful');
+      } catch (connectionError) {
+        logger.warn('Database connection failed:', connectionError);
+        if (process.env.NODE_ENV === 'development') {
+          logger.warn('Continuing without database in development mode');
+        } else {
+          throw connectionError;
+        }
+      }
+      
+      // 마이그레이션 실행 (프로덕션 환경, DB 연결된 경우만)
+      if (process.env.NODE_ENV === 'production' && AppDataSource.isInitialized) {
         try {
           await AppDataSource.runMigrations();
         } catch (migrationError) {
@@ -795,7 +816,9 @@ const startServer = async () => {
       }
 
       // Initialize email service (graceful, non-blocking)
+      logger.info('Initializing email service...');
       try {
+        const { emailService } = await import('./services/email.service');
         await emailService.initialize();
         const status = emailService.getServiceStatus();
         if (status.available) {
@@ -812,6 +835,7 @@ const startServer = async () => {
         });
         // Don't throw - let the app continue without email
       }
+      logger.info('Email service initialization completed');
     }
   } catch (dbError) {
     // Error log removed

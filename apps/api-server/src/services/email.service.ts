@@ -11,9 +11,12 @@ export class EmailService {
 
   constructor() {
     // Check if email service should be enabled
-    this.isEnabled = process.env.EMAIL_SERVICE_ENABLED !== 'false';
+    const envValue = process.env.EMAIL_SERVICE_ENABLED;
+    logger.info(`EMAIL_SERVICE_ENABLED=${envValue}`);
+    this.isEnabled = envValue !== 'false';
     
     if (this.isEnabled) {
+      logger.info('Email service is enabled, creating transporter...');
       this.transporter = this.createTransport();
     } else {
       logger.info('Email service is disabled via EMAIL_SERVICE_ENABLED environment variable');
