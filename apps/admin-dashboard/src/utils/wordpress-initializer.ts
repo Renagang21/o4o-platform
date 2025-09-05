@@ -409,14 +409,26 @@ export async function initializeWordPress() {
       })
     };
 
-    // Initialize apiFetch
+    // Initialize apiFetch with authentication
     window.wp.apiFetch = function(options: any) {
+      // Get token from multiple sources
+      const token = localStorage.getItem('accessToken') || 
+                   localStorage.getItem('token') || 
+                   localStorage.getItem('authToken');
+      
+      const headers: any = {
+        'Content-Type': 'application/json',
+        ...options.headers
+      };
+      
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       return fetch(options.url || options.path, {
         ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers
-        }
+        headers
       }).then(response => response.json());
     };
 
