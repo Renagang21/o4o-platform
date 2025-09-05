@@ -129,7 +129,7 @@ const Tags = () => {
 
   const handleQuickEdit = (id: string) => {
     // Implement quick edit
-    console.log('Quick edit tag:', id);
+    // TODO: Implement quick edit functionality
   };
 
   const handleDelete = (id: string) => {
