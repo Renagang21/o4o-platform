@@ -51,7 +51,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         ]
   );
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
-  const [documentTitle, setDocumentTitle] = useState('Untitled');
+  const [documentTitle, setDocumentTitle] = useState('');
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true); // 기본적으로 열림
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [history, setHistory] = useState<Block[][]>([blocks]);

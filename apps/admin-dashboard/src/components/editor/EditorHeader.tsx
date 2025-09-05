@@ -113,36 +113,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
             </Button>
           </div>
 
-          {/* View Options */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onToggleListView}
-              className="h-8 w-8 hover:bg-gray-100"
-              title="List View"
-            >
-              <ListTree className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={isCodeView ? "secondary" : "ghost"}
-              size="icon"
-              onClick={onToggleCodeView}
-              className="h-8 w-8 hover:bg-gray-100"
-              title={isCodeView ? "Visual Editor" : "Code Editor"}
-            >
-              <Code className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 hover:bg-gray-100"
-              title="Document Overview"
-            >
-              <Info className="h-4 w-4" />
-            </Button>
-          </div>
-
           {/* Design Library */}
           <Button
             variant="ghost"
@@ -158,12 +128,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
 
         {/* Center Section - Status Badge */}
         <div className="flex items-center gap-2">
-          <Badge 
-            variant={postStatus === 'published' ? 'default' : 'secondary'}
-            className="text-xs"
-          >
-            {postStatus === 'published' ? 'Published' : 'Draft'}
-          </Badge>
           {isDirty && (
             <span className="text-xs text-orange-500">• Unsaved changes</span>
           )}

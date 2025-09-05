@@ -14,7 +14,7 @@ import {
 } from '@/types/post.types';
 
 // API 기본 URL (환경변수에서 가져오기)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const API_V1_URL = `${API_BASE_URL}/v1/content`;
 
 // Axios 인스턴스 생성
