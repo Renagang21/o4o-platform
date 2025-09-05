@@ -154,15 +154,33 @@ const Categories = () => {
                   <h3 className="font-medium text-sm mb-3">Show on screen</h3>
                   <div className="space-y-2">
                     <label className="flex items-center text-sm">
-                      <input type="checkbox" defaultChecked className="mr-2" />
+                      <input 
+                        type="checkbox" 
+                        id="screen-option-description"
+                        name="screen-option-description"
+                        defaultChecked 
+                        className="mr-2" 
+                      />
                       Description
                     </label>
                     <label className="flex items-center text-sm">
-                      <input type="checkbox" defaultChecked className="mr-2" />
+                      <input 
+                        type="checkbox" 
+                        id="screen-option-slug"
+                        name="screen-option-slug"
+                        defaultChecked 
+                        className="mr-2" 
+                      />
                       Slug
                     </label>
                     <label className="flex items-center text-sm">
-                      <input type="checkbox" defaultChecked className="mr-2" />
+                      <input 
+                        type="checkbox" 
+                        id="screen-option-count"
+                        name="screen-option-count"
+                        defaultChecked 
+                        className="mr-2" 
+                      />
                       Count
                     </label>
                   </div>
@@ -264,6 +282,8 @@ const Categories = () => {
                   <td className="px-3 py-3">
                     <input
                       type="checkbox"
+                      id={`select-category-${category.id}`}
+                      name={`select-category-${category.id}`}
                       checked={selectedCategories.has(category.id)}
                       onChange={() => handleSelectCategory(category.id)}
                     />
@@ -273,6 +293,8 @@ const Categories = () => {
                       <div className="space-y-2">
                         <input
                           type="text"
+                          id={`edit-category-name-${category.id}`}
+                          name="category-name"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
@@ -426,9 +448,11 @@ const Categories = () => {
             <div className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                  <label htmlFor="new-category-name" className="block text-sm font-medium text-gray-700 mb-1">이름</label>
                   <input
                     type="text"
+                    id="new-category-name"
+                    name="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -436,9 +460,11 @@ const Categories = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">슬러그</label>
+                  <label htmlFor="new-category-slug" className="block text-sm font-medium text-gray-700 mb-1">슬러그</label>
                   <input
                     type="text"
+                    id="new-category-slug"
+                    name="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -446,8 +472,10 @@ const Categories = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">상위 카테고리</label>
+                  <label htmlFor="new-category-parent" className="block text-sm font-medium text-gray-700 mb-1">상위 카테고리</label>
                   <select
+                    id="new-category-parent"
+                    name="parent"
                     value={formData.parent}
                     onChange={(e) => setFormData({ ...formData, parent: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -459,8 +487,10 @@ const Categories = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                  <label htmlFor="new-category-description" className="block text-sm font-medium text-gray-700 mb-1">설명</label>
                   <textarea
+                    id="new-category-description"
+                    name="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
