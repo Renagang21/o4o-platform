@@ -79,7 +79,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isWordPressReady, setIsWordPressReady] = useState(false);
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [showListView, setShowListView] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
@@ -144,9 +143,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   const loadPostData = async (id: string) => {
     try {
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
       const response = await fetch(`/api/posts/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': token ? `Bearer ${token}` : '',
         }
       });
       
@@ -213,12 +213,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         sticky: postSettings.sticky
       };
       
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
       const url = postId ? `/api/posts/${postId}` : '/api/posts';
       const response = await fetch(url, {
         method: postId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': token ? `Bearer ${token}` : '',
         },
         body: JSON.stringify(postData)
       });
@@ -247,7 +248,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
           const publishResponse = await fetch(`/api/posts/${postId || savedData.id}/publish`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': token ? `Bearer ${token}` : '',
             }
           });
           
@@ -262,6 +263,21 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       toast.error(error.message || 'Failed to save');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handlePreview = async () => {
+    // Save draft first to ensure preview has latest content
+    if (isDirty) {
+      toast.info('Saving draft for preview...');
+      await handleSave(false);
+    }
+    
+    // Open preview in new tab
+    if (postId) {
+      window.open(`/post/preview/${postId}`, '_blank');
+    } else {
+      toast.warning('Please save the post first to preview');
     }
   };
 
@@ -472,20 +488,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant={isPreviewMode ? "secondary" : "ghost"}
+                    variant="ghost"
                     size="icon"
                     className="h-9 w-9"
-                    onClick={() => setIsPreviewMode(!isPreviewMode)}
+                    onClick={handlePreview}
                   >
-                    {isPreviewMode ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    <Eye className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{isPreviewMode ? 'Edit' : 'Preview'}</p>
+                  <p>Preview</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -569,12 +581,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
             <DropdownMenuContent align="end">
               {isMobile && (
                 <>
-                  <DropdownMenuItem onClick={() => setIsPreviewMode(!isPreviewMode)}>
-                    {isPreviewMode ? (
-                      <><EyeOff className="h-4 w-4 mr-2" />Edit</>
-                    ) : (
-                      <><Eye className="h-4 w-4 mr-2" />Preview</>
-                    )}
+                  <DropdownMenuItem onClick={handlePreview}>
+                    <Eye className="h-4 w-4 mr-2" />Preview
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -608,7 +616,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         {/* Editor Canvas */}
         <div className={cn(
           "flex-1 overflow-auto bg-gray-50",
-          isPreviewMode && "pointer-events-none",
           isEntering && "editor-canvas-enter"
         )}>
           <div className="min-h-full">
@@ -618,7 +625,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
                 setBlocks(newBlocks);
                 setIsDirty(true);
               }}
-              // readOnly={isPreviewMode}  // TODO: Add readOnly prop to GutenbergBlockEditor
             />
           </div>
         </div>
