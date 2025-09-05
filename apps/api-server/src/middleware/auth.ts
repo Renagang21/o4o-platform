@@ -10,21 +10,28 @@ export { AuthRequest };
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // 개발 환경에서 DB 연결 없이 인증 우회
-    if (!AppDataSource.isInitialized && process.env.NODE_ENV === 'development') {
-      // Create a mock User entity for development
-      const devUser = new User();
-      devUser.id = 'dev-user-1';
-      devUser.email = 'admin@o4o.com';
-      devUser.name = '개발 관리자';
-      devUser.role = UserRole.ADMIN;
-      devUser.status = UserStatus.APPROVED;
-      devUser.createdAt = new Date();
-      devUser.updatedAt = new Date();
-      devUser.lastLoginAt = new Date();
+    // 개발 환경에서 테스트 토큰 허용 또는 DB 연결 없이 인증 우회
+    if (process.env.NODE_ENV === 'development') {
+      // Bearer 토큰 확인
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
       
-      (req as AuthRequest).user = devUser;
-      return next();
+      // 테스트 토큰이거나 DB 미연결인 경우 인증 우회
+      if (token === 'test-token-for-development' || !AppDataSource.isInitialized) {
+        // Create a mock User entity for development
+        const devUser = new User();
+        devUser.id = 'dev-user-1';
+        devUser.email = 'admin@o4o.com';
+        devUser.name = '개발 관리자';
+        devUser.role = UserRole.ADMIN;
+        devUser.status = UserStatus.APPROVED;
+        devUser.createdAt = new Date();
+        devUser.updatedAt = new Date();
+        devUser.lastLoginAt = new Date();
+        
+        (req as AuthRequest).user = devUser;
+        return next();
+      }
     }
 
     // First try cookie-based authentication

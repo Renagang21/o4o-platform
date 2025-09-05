@@ -59,6 +59,11 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // 개발 환경에서 토큰이 없으면 테스트 토큰 생성
+    else if (import.meta.env.DEV) {
+      const testToken = 'test-token-for-development';
+      config.headers.Authorization = `Bearer ${testToken}`;
+    }
     return config;
   },
   (error) => {
@@ -72,6 +77,11 @@ apiV1Client.interceptors.request.use(
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // 개발 환경에서 토큰이 없으면 테스트 토큰 생성
+    else if (import.meta.env.DEV) {
+      const testToken = 'test-token-for-development';
+      config.headers.Authorization = `Bearer ${testToken}`;
     }
     return config;
   },
