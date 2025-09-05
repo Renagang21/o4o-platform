@@ -59,6 +59,6 @@ export const autoLoginForDev = () => {
   if (import.meta.env.DEV && !isAuthenticated()) {
     const testToken = generateTestToken();
     saveToken(testToken);
-    console.log('Dev mode: Auto-login with test token');
+    // Dev mode: Auto-login with test token
   }
 };
