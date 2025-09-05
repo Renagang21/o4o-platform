@@ -75,6 +75,14 @@ class UnifiedApiClient {
     }
     
     if (!token) {
+      token = localStorage.getItem('accessToken');
+    }
+    
+    if (!token) {
+      token = localStorage.getItem('token');
+    }
+    
+    if (!token) {
       const adminStorage = localStorage.getItem('admin-auth-storage');
       if (adminStorage) {
         try {
