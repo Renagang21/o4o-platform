@@ -3,7 +3,7 @@
  * 드랍쉬핑 설정 관리 라우트
  */
 
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { DropshippingController } from '../../controllers/DropshippingController';
 // import { authenticateToken } from '../../middleware/authMiddleware';
 // import { requireRole } from '../../middleware/requireRole';

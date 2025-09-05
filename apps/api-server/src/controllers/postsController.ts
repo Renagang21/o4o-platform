@@ -86,22 +86,38 @@ export const getPost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     
+    // Check if database is connected
+    if (!AppDataSource.isInitialized) {
+      console.error('Database not initialized')
+      return res.status(503).json({ 
+        error: { code: 'DB_NOT_READY', message: 'Database connection not available' } 
+      })
+    }
+    
     const post = await postRepository.findOne({
       where: { id },
-      relations: ['author', 'categories', 'tags', 'lastModifier']
+      relations: ['author', 'categories', 'tags']
     })
 
     if (!post) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
 
-    // Increment view count
-    await postRepository.update(id, { views: post.views + 1 })
+    // Increment view count safely
+    if (typeof post.views === 'number') {
+      await postRepository.update(id, { views: post.views + 1 })
+    }
 
     res.json(post)
   } catch (error) {
     console.error('Error fetching post:', error)
-    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch post' } })
+    res.status(500).json({ 
+      error: { 
+        code: 'INTERNAL_ERROR', 
+        message: 'Failed to fetch post',
+        details: error.message 
+      } 
+    })
   }
 }
 

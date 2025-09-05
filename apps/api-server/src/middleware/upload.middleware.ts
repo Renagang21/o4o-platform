@@ -61,7 +61,7 @@ const getFileType = (mimeType: string): string => {
 };
 
 // Custom file filter
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
   // Check if file type is allowed
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     const error = new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname);
@@ -94,7 +94,7 @@ export const uploadMiddleware = (fieldName: string = 'files', maxFiles: number =
   return (req: Request, res: Response, next: NextFunction) => {
     const uploadHandler = upload.array(fieldName, maxFiles);
     
-    uploadHandler(req as any, res, (err: any) => {
+    uploadHandler(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         let errorMessage = 'File upload error';
         
@@ -171,7 +171,7 @@ export const uploadSingleMiddleware = (fieldName: string = 'file') => {
   return (req: Request, res: Response, next: NextFunction) => {
     const uploadHandler = upload.single(fieldName);
     
-    uploadHandler(req as any, res, (err: any) => {
+    uploadHandler(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         let errorMessage = 'File upload error';
         

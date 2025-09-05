@@ -522,13 +522,25 @@ app.get('/api/dashboard/overview', DashboardController.getDashboardOverview);
 app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    // Check if database is connected
+    if (!AppDataSource.isInitialized) {
+      logger.error('Database not initialized');
+      return res.status(503).json({
+        error: { code: 'DB_NOT_READY', message: 'Database connection not available' }
+      });
+    }
+    
     const postRepository = AppDataSource.getRepository(Post);
     
-    const post = await postRepository.findOne({ where: { id } });
+    const post = await postRepository.findOne({ 
+      where: { id },
+      relations: ['author', 'categories', 'tags']
+    });
     
     if (!post) {
       return res.status(404).json({
-        message: 'Post not found'
+        error: { code: 'NOT_FOUND', message: 'Post not found' }
       });
     }
 
@@ -541,8 +553,9 @@ app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: 
       data: updatedPost
     });
   } catch (error) {
+    logger.error('Error publishing post:', error);
     return res.status(500).json({
-      message: 'Failed to publish post'
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to publish post', details: error.message }
     });
   }
 });
