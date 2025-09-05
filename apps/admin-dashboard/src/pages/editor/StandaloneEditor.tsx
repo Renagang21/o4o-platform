@@ -144,18 +144,54 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   const loadPostData = async (id: string) => {
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch(`/api/posts/${id}`);
-      const data = await response.json();
+      console.log('Loading post data for ID:', id);
+      const response = await fetch(`/api/posts/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
+      });
       
+      if (!response.ok) {
+        throw new Error(`Failed to load post: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Loaded post data:', data);
+      
+      // Set title
       setPostTitle(data.title || '');
-      setBlocks(data.blocks || []);
+      
+      // Parse blocks from content if it exists
+      if (data.content) {
+        if (typeof data.content === 'string') {
+          // If content is HTML string, convert to blocks
+          setBlocks([{
+            id: 'initial-block',
+            type: 'core/paragraph',
+            content: data.content
+          }]);
+        } else if (data.content.blocks) {
+          // If content has blocks array
+          setBlocks(data.content.blocks);
+        }
+      }
+      
+      // Set post settings
       setPostSettings(prev => ({
         ...prev,
-        ...data.settings
+        status: data.status || 'draft',
+        excerpt: data.excerpt || '',
+        slug: data.slug || '',
+        categories: data.categories?.map((c: any) => c.id || c) || [],
+        tags: data.tags?.map((t: any) => t.id || t) || [],
+        featuredImage: data.featuredImage,
+        publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
+        author: data.author?.name || 'Admin User'
       }));
+      
+      toast.success('Post loaded successfully');
     } catch (error) {
-      // Error log removed
+      console.error('Failed to load post:', error);
       toast.error('Failed to load post data');
     }
   };
@@ -166,34 +202,70 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     try {
       const postData = {
         title: postTitle,
-        blocks,
-        settings: {
-          ...postSettings,
-          status: publish ? 'publish' : postSettings.status
-        }
+        content: {
+          blocks: blocks
+        },
+        excerpt: postSettings.excerpt,
+        slug: postSettings.slug || postTitle.toLowerCase().replace(/\s+/g, '-'),
+        status: publish ? 'published' : postSettings.status,
+        categories: postSettings.categories,
+        tags: postSettings.tags,
+        featuredImage: postSettings.featuredImage,
+        format: postSettings.format,
+        allowComments: postSettings.commentStatus,
+        sticky: postSettings.sticky
       };
       
-      // TODO: Replace with actual API call
-      const response = await fetch(
-        postId ? `/api/posts/${postId}` : '/api/posts',
-        {
-          method: postId ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(postData)
-        }
-      );
+      console.log('Saving post data:', postData);
       
-      if (response.ok) {
-        setLastSaved(new Date());
-        setIsDirty(false);
-        if (publish) {
-          setPostSettings(prev => ({ ...prev, status: 'publish' }));
+      const url = postId ? `/api/posts/${postId}` : '/api/posts';
+      const response = await fetch(url, {
+        method: postId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(postData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to save');
+      }
+      
+      const savedData = await response.json();
+      
+      // If it's a new post and we get an ID back, update the URL
+      if (!postId && savedData.id) {
+        window.history.replaceState(null, '', `/editor/posts/${savedData.id}`);
+      }
+      
+      setLastSaved(new Date());
+      setIsDirty(false);
+      
+      if (publish) {
+        setPostSettings(prev => ({ ...prev, status: 'published' }));
+        toast.success('Published successfully!');
+        
+        // If publishing, also call the publish endpoint
+        if (postId || savedData.id) {
+          const publishResponse = await fetch(`/api/posts/${postId || savedData.id}/publish`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          if (!publishResponse.ok) {
+            console.error('Failed to publish post');
+          }
         }
-        toast.success(publish ? 'Published successfully!' : 'Saved as draft');
+      } else {
+        toast.success('Saved as draft');
       }
     } catch (error) {
-      // Error log removed
-      toast.error('Failed to save');
+      console.error('Failed to save:', error);
+      toast.error(error.message || 'Failed to save');
     } finally {
       setIsSaving(false);
     }
