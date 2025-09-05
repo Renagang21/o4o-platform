@@ -13,44 +13,28 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
-# Detect package manager
+# Ensure pnpm is installed
+if ! command -v pnpm &> /dev/null; then
+    echo "📥 Installing pnpm..."
+    npm install -g pnpm@latest
+fi
+
+# Use pnpm for installation
+echo "📦 Using pnpm for installation"
+
 if [ -f "pnpm-lock.yaml" ]; then
-    echo "📦 Using pnpm for installation"
-    
-    # Install pnpm if not available
-    if ! command -v pnpm &> /dev/null; then
-        echo "📥 Installing pnpm..."
-        npm install -g pnpm
-    fi
-    
     # Install dependencies with frozen lockfile
     pnpm install --frozen-lockfile
-    
-elif [ -f "package-lock.json" ]; then
-    echo "📦 Using npm ci for installation"
-    npm ci
-    
-elif [ -f "yarn.lock" ]; then
-    echo "📦 Using yarn for installation"
-    
-    # Install yarn if not available
-    if ! command -v yarn &> /dev/null; then
-        echo "📥 Installing yarn..."
-        npm install -g yarn
-    fi
-    
-    yarn install --frozen-lockfile
-    
 else
-    echo "📦 Using npm install (no lock file found)"
-    npm install
+    echo "⚠️  Warning: pnpm-lock.yaml not found, generating it..."
+    pnpm install
 fi
 
 echo "✅ Dependencies installed successfully!"
 
-# Display Node and npm versions
+# Display environment info
 echo "📊 Environment Info:"
 node --version
-npm --version
+pnpm --version
 
 exit 0

@@ -16,11 +16,12 @@ echo "📊 Node memory limit: 4GB"
 # Function to build packages first
 build_packages() {
     echo "📦 Building packages..."
-    if [ -f "pnpm-lock.yaml" ]; then
-        pnpm run build:packages || npm run build:packages
-    else
-        npm run build:packages
+    # Ensure pnpm is available
+    if ! command -v pnpm &> /dev/null; then
+        echo "📥 Installing pnpm..."
+        npm install -g pnpm@latest
     fi
+    pnpm run build:packages
 }
 
 # Function to build specific app
@@ -38,41 +39,25 @@ build_app() {
                 # Export environment variables from config
                 export $(cat ci.build.config | grep -v '^#' | xargs)
             fi
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
+            pnpm run build
             cd ../..
             ;;
         "storefront")
             echo "Building Storefront..."
             cd apps/storefront
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
+            pnpm run build
             cd ../..
             ;;
         "api"|"api-server")
             echo "Building API Server..."
             cd apps/api-server
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
+            pnpm run build
             cd ../..
             ;;
         "main"|"main-site")
             echo "Building Main Site..."
             cd apps/main-site
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
+            pnpm run build
             cd ../..
             ;;
         "crowdfunding"|"forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
@@ -85,20 +70,12 @@ build_app() {
                 # Export environment variables from config
                 export $(cat ci.build.config | grep -v '^#' | xargs)
             fi
-            if [ -f "../../pnpm-lock.yaml" ]; then
-                pnpm run build
-            else
-                npm run build
-            fi
+            pnpm run build
             cd ../..
             ;;
         "all")
             echo "Building all applications..."
-            if [ -f "pnpm-lock.yaml" ]; then
-                pnpm run build:apps
-            else
-                npm run build:apps
-            fi
+            pnpm run build:apps
             ;;
         *)
             echo "⚠️ Unknown app: $app"

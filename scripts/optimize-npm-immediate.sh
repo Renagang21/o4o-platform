@@ -1,16 +1,16 @@
 #!/bin/bash
-# 즉시 적용 가능한 npm 최적화 스크립트
+# 즉시 적용 가능한 pnpm 최적화 스크립트
 
 set -e
 
-echo "⚡ npm 즉시 최적화 시작..."
+echo "⚡ pnpm 즉시 최적화 시작..."
 
-# 1. npm 캐시 정리
-echo "🧹 npm 캐시 정리 중..."
-npm cache clean --force
+# 1. pnpm 캐시 정리
+echo "🧹 pnpm 캐시 정리 중..."
+pnpm store prune
 
-# 2. 최적화된 .npmrc 생성
-echo "📝 .npmrc 최적화 설정 적용..."
+# 2. 최적화된 .npmrc 생성 (pnpm 호환)
+echo "📝 .npmrc 최적화 설정 적용 (pnpm 호환)..."
 cat > .npmrc << 'EOF'
 # 성능 최적화
 registry=https://registry.npmjs.org/
@@ -79,7 +79,7 @@ install_selective() {
 echo "✅ npm 최적화 설정 완료!"
 echo ""
 echo "다음 명령어를 실행하여 효과를 확인하세요:"
-echo "  pnpm install "
+echo "  pnpm install"
 echo ""
 echo "또는 선택적 설치를 원하시면:"
 echo "  ./scripts/optimize-npm-immediate.sh --selective"

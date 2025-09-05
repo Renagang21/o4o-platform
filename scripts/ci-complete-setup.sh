@@ -14,15 +14,14 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
-# Check if pnpm is available
-if command -v pnpm &> /dev/null; then
-    PKG_MANAGER="pnpm"
-    INSTALL_CMD="pnpm install --frozen-lockfile"
-else
-    echo "⚠️  pnpm not found, falling back to npm"
-    PKG_MANAGER="npm"
-    INSTALL_CMD="npm ci"
+# Ensure pnpm is available
+if ! command -v pnpm &> /dev/null; then
+    echo "📥 Installing pnpm..."
+    npm install -g pnpm@latest
 fi
+
+PKG_MANAGER="pnpm"
+INSTALL_CMD="pnpm install --frozen-lockfile"
 
 # Install dependencies
 echo "📦 Installing dependencies with $PKG_MANAGER..."
