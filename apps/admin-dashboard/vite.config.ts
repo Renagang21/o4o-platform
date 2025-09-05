@@ -125,14 +125,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
-      // WordPress 패키지를 번들에 포함 (external 제거)
-      // external: (id) => {
-      //   // WordPress 패키지는 모두 external로 처리
-      //   if (id.startsWith('@wordpress/')) {
-      //     return true;
-      //   }
-      //   return false;
-      // },
+      // External dependencies that should not be bundled
+      external: (id) => {
+        // Exclude invalid zod import path
+        if (id === 'zod/v4/core') {
+          return true;
+        }
+        return false;
+      },
       plugins: [],
       output: {
         ...sharedViteConfig.build?.rollupOptions?.output,
