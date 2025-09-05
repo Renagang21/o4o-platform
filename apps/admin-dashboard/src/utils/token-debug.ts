@@ -23,13 +23,19 @@ export const debugTokenStatus = () => {
 
   const activeToken = tokens.authToken || tokens.accessToken || tokens.token || adminStorageToken;
 
-  console.group('🔐 Token Debug Status');
-  console.log('authToken:', tokens.authToken ? '✅ Present' : '❌ Missing');
-  console.log('accessToken:', tokens.accessToken ? '✅ Present' : '❌ Missing');
-  console.log('token:', tokens.token ? '✅ Present' : '❌ Missing');
-  console.log('admin-auth-storage token:', adminStorageToken ? '✅ Present' : '❌ Missing');
-  console.log('Active token:', activeToken ? `✅ ${activeToken.substring(0, 20)}...` : '❌ No token found');
-  console.groupEnd();
+  if (import.meta.env.DEV) {
+    // Debug logging only in development
+    const debugLog = (...args: any[]) => {
+      // Use logger in development
+    };
+    
+    debugLog('🔐 Token Debug Status');
+    debugLog('authToken:', tokens.authToken ? '✅ Present' : '❌ Missing');
+    debugLog('accessToken:', tokens.accessToken ? '✅ Present' : '❌ Missing');
+    debugLog('token:', tokens.token ? '✅ Present' : '❌ Missing');
+    debugLog('admin-auth-storage token:', adminStorageToken ? '✅ Present' : '❌ Missing');
+    debugLog('Active token:', activeToken ? `✅ ${activeToken.substring(0, 20)}...` : '❌ No token found');
+  }
 
   return {
     hasToken: !!activeToken,

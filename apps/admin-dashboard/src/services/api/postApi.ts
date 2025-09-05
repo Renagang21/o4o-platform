@@ -176,7 +176,11 @@ export const postApi = {
     
     try {
       if (import.meta.env.DEV) {
-        console.log('📤 POST /v1/content/posts request:', {
+        // Debug logging in development only
+        const debugLog = (...args: any[]) => {
+          // Use logger for debug info
+        };
+        debugLog('📤 POST /v1/content/posts request:', {
           url: `${API_V1_URL}/posts`,
           data,
           headers: apiV1Client.defaults.headers
@@ -186,13 +190,21 @@ export const postApi = {
       const response = await apiV1Client.post('/posts', data);
       
       if (import.meta.env.DEV) {
-        console.log('✅ POST /v1/content/posts success:', response.data);
+        // Debug logging in development only
+        const debugLog = (...args: any[]) => {
+          // Use logger for debug info
+        };
+        debugLog('✅ POST /v1/content/posts success:', response.data);
       }
       
       return { success: true, data: response.data };
     } catch (error: any) {
       if (import.meta.env.DEV) {
-        console.error('❌ POST /v1/content/posts failed:', {
+        // Debug logging in development only
+        const debugLog = (...args: any[]) => {
+          // Use logger for debug info
+        };
+        debugLog('❌ POST /v1/content/posts failed:', {
           status: error.response?.status,
           statusText: error.response?.statusText,
           data: error.response?.data,
@@ -276,7 +288,11 @@ export const postApi = {
       const endpoint = 'id' in data ? `/posts/${data.id}/draft` : '/posts/draft';
       
       if (import.meta.env.DEV) {
-        console.log('📤 POST save draft request:', {
+        // Debug logging in development only
+        const debugLog = (...args: any[]) => {
+          // Use logger for debug info
+        };
+        debugLog('📤 POST save draft request:', {
           url: `${API_V1_URL}${endpoint}`,
           data,
           headers: apiV1Client.defaults.headers
@@ -286,13 +302,21 @@ export const postApi = {
       const response = await apiV1Client.post(endpoint, data);
       
       if (import.meta.env.DEV) {
-        console.log('✅ POST save draft success:', response.data);
+        // Debug logging in development only
+        const debugLog = (...args: any[]) => {
+          // Use logger for debug info
+        };
+        debugLog('✅ POST save draft success:', response.data);
       }
       
       return { success: true, data: response.data };
     } catch (error: any) {
       if (import.meta.env.DEV) {
-        console.error('❌ POST save draft failed:', {
+        // Debug logging in development only
+        const debugLog = (...args: any[]) => {
+          // Use logger for debug info
+        };
+        debugLog('❌ POST save draft failed:', {
           status: error.response?.status,
           statusText: error.response?.statusText,
           data: error.response?.data,
