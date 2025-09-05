@@ -754,23 +754,18 @@ app.use('*', (req, res) => {
 import { setupSwagger } from './config/swagger-enhanced';
 
 // Setup Swagger API documentation
-console.log('Setting up Swagger documentation...');
 logger.info('Setting up Swagger documentation...');
 try {
   setupSwagger(app);
   logger.info('Swagger documentation setup completed');
-  console.log('Swagger setup completed');
 } catch (swaggerError) {
-  console.error('Swagger setup error:', swaggerError);
   logger.error('Swagger setup failed:', swaggerError);
 }
 
 // 서버 시작
 const startServer = async () => {
-  console.log('=== Starting server ===');
   logger.info('Starting server...');
   try {
-    console.log('=== Checking database initialization ===');
     logger.info('Checking database initialization status...');
     // 데이터베이스 초기화 전 상태 확인
     if (AppDataSource.isInitialized) {
@@ -791,11 +786,9 @@ const startServer = async () => {
       // });
       
       // 데이터베이스 초기화 (타임아웃 적용)
-      console.log('=== Attempting database connection ===');
       logger.info('Attempting database connection...');
       
       // Add timeout for database connection in development
-      console.log('Creating database connection promise...');
       const dbConnectionPromise = AppDataSource.initialize();
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Database connection timeout')), 5000);
@@ -920,7 +913,10 @@ const startServer = async () => {
   });
 };
 
-startServer().catch(console.error);
+startServer().catch((error) => {
+  logger.error('Failed to start server:', error);
+  process.exit(1);
+});
 
 // Export services for other modules
 export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
