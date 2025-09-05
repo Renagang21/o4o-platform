@@ -15,7 +15,7 @@ import {
 import { mockPostApi, mockTaxonomyApi, shouldUseMockApi } from './mockApi';
 
 // API 기본 URL (환경변수에서 가져오기)
-// Production: admin.neture.co.kr에서는 같은 도메인의 /api 사용
+// Production: admin.neture.co.kr에서는 api.neture.co.kr 사용
 // Development: localhost:3000/api 사용
 const getApiBaseUrl = () => {
   // 환경변수가 설정되어 있으면 사용
@@ -23,9 +23,9 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // Production 환경 (admin.neture.co.kr)
+  // Production 환경 (admin.neture.co.kr -> api.neture.co.kr)
   if (window.location.hostname === 'admin.neture.co.kr') {
-    return 'https://admin.neture.co.kr/api';
+    return 'https://api.neture.co.kr';
   }
   
   // Development 환경
@@ -123,8 +123,8 @@ apiV1Client.interceptors.response.use(
 export const postApi = {
   // 게시글 생성 (V1 API 사용)
   create: async (data: CreatePostRequest): Promise<PostResponse> => {
-    // Use mock API if configured or API is not available
-    if (shouldUseMockApi() || import.meta.env.DEV) {
+    // Use mock API only if explicitly configured
+    if (shouldUseMockApi()) {
       return mockPostApi.create(data);
     }
     
@@ -132,11 +132,6 @@ export const postApi = {
       const response = await apiV1Client.post('/posts', data);
       return { success: true, data: response.data };
     } catch (error: any) {
-      // Fallback to mock API on error in development
-      if (import.meta.env.DEV && error.response?.status === 401) {
-        // console.warn('API authentication failed, using mock API');
-        return mockPostApi.create(data);
-      }
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to create post' 
@@ -199,8 +194,8 @@ export const postApi = {
 
   // 임시 저장 (V1 API 사용)
   saveDraft: async (data: CreatePostRequest | UpdatePostRequest): Promise<PostResponse> => {
-    // Use mock API if configured or API is not available
-    if (shouldUseMockApi() || import.meta.env.DEV) {
+    // Use mock API only if explicitly configured
+    if (shouldUseMockApi()) {
       return mockPostApi.saveDraft(data);
     }
     
@@ -209,11 +204,6 @@ export const postApi = {
       const response = await apiV1Client.post(endpoint, data);
       return { success: true, data: response.data };
     } catch (error: any) {
-      // Fallback to mock API on error in development
-      if (import.meta.env.DEV && error.response?.status === 401) {
-        // console.warn('API authentication failed, using mock API');
-        return mockPostApi.saveDraft(data);
-      }
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to save draft' 
