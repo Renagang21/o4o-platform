@@ -1,385 +1,560 @@
-import { useState, FC } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from 'react';
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { WordPressTable, WordPressTableColumn, WordPressTableRow } from '@/components/common/WordPressTable';
-import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
-import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
-import { formatDate } from '@/lib/utils';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authClient } from '@o4o/auth-client';
-import type { Tag } from '@/types/content';
-import { useAdminNotices } from '@/hooks/useAdminNotices';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+  ChevronDown,
+  Settings,
+  Eye,
+  Edit2,
+  Trash2,
+  Copy,
+  MoreVertical
+} from 'lucide-react';
+import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 
-const Tags: FC = () => {
-  const queryClient = useQueryClient();
-  const { success, error } = useAdminNotices();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<any[]>([]);
-  const [showAddForm, setShowAddForm] = useState(false);
+interface Tag {
+  id: string;
+  name: string;
+  description: string;
+  slug: string;
+  count: number;
+  date: string;
+}
+
+const Tags = () => {
+  const [tags, setTags] = useState<Tag[]>([
+    { id: '1', name: 'Featured', description: 'Featured posts', slug: 'featured', count: 5, date: '2024-01-15' },
+    { id: '2', name: 'Tutorial', description: 'Tutorial and guide posts', slug: 'tutorial', count: 12, date: '2024-01-10' },
+    { id: '3', name: 'News', description: 'Latest news and updates', slug: 'news', count: 8, date: '2024-01-08' }
+  ]);
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showScreenOptions, setShowScreenOptions] = useState(false);
+  const [editingTag, setEditingTag] = useState<string | null>(null);
+  const [selectedBulkAction, setSelectedBulkAction] = useState<string>('');
+  const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     description: ''
   });
-
-  // Default column configuration
-  const defaultColumns: ColumnOption[] = [
-    { id: 'name', label: 'Name', visible: true, required: true },
-    { id: 'description', label: 'Description', visible: true },
-    { id: 'slug', label: 'Slug', visible: true },
-    { id: 'count', label: 'Count', visible: true },
-    { id: 'date', label: 'Date', visible: true }
-  ];
-
-  // Use screen options hook
-  const {
-    options,
-    itemsPerPage,
-    isColumnVisible,
-    updateColumnVisibility,
-    setItemsPerPage
-  } = useScreenOptions('tags-list', {
-    columns: defaultColumns,
-    itemsPerPage: 20
+  
+  // Screen Options state - load from localStorage
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('tags-visible-columns');
+    return saved ? JSON.parse(saved) : {
+      description: true,
+      slug: true,
+      count: true
+    };
   });
+  
+  // Save visible columns to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('tags-visible-columns', JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
+  
+  const handleColumnToggle = (column: string) => {
+    setVisibleColumns((prev: any) => ({
+      ...prev,
+      [column]: !prev[column]
+    }));
+  };
 
-  // Fetch tags
-  const { data, isLoading } = useQuery({
-    queryKey: ['tags', searchQuery],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (searchQuery) params.set('search', searchQuery);
-      
-      const response = await authClient.api.get(`/tags?${params}`);
-      return response.data;
-    }
-  });
-
-  // Delete tag mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await authClient.api.delete(`/tags/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tags'] });
-      success('Tag deleted.');
-    },
-    onError: () => {
-      error('Failed to delete tag.');
-    }
-  });
-
-  // Create tag mutation
-  const createMutation = useMutation({
-    mutationFn: async (data: { name: string; description: string }) => {
-      const slug = data.name
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9가-힣]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      
-      await authClient.api.post('/api/v1/tags', {
-        ...data,
-        slug
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tags'] });
-      success('Tag created successfully.');
-      setFormData({ name: '', description: '' });
-      setShowAddForm(false);
-    },
-    onError: () => {
-      error('Failed to create tag.');
-    }
-  });
-
-  // Duplicate tag mutation
-  const duplicateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await authClient.api.post(`/tags/${id}/duplicate`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tags'] });
-      success('Tag duplicated successfully.');
-    },
-    onError: () => {
-      error('Failed to duplicate tag.');
-    }
-  });
-
-  // Handle bulk actions
-  const handleBulkAction = (action: string) => {
-    if (selectedTags.length === 0) {
-      error('No tags selected.');
-      return;
-    }
-    
-    switch (action) {
-      case 'delete':
-        success(`${selectedTags.length} tag(s) deleted.`);
-        setSelectedTags([]);
-        break;
-      default:
-        break;
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedTags(new Set(tags.map(t => t.id)));
+    } else {
+      setSelectedTags(new Set());
     }
   };
 
-  // Define table columns - only show visible ones
-  const allColumns: WordPressTableColumn[] = [
-    { id: 'name', label: 'Name', sortable: true },
-    { id: 'description', label: 'Description' },
-    { id: 'slug', label: 'Slug' },
-    { id: 'count', label: 'Count', align: 'center' },
-    { id: 'date', label: 'Date', sortable: true }
-  ];
-  
-  const columns = allColumns.filter((col: any) => isColumnVisible(col.id));
+  const handleSelectTag = (id: string) => {
+    const newSelection = new Set(selectedTags);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedTags(newSelection);
+  };
 
-  // Transform tags to table rows
-  const tags = data?.tags || [];
-  const rows: WordPressTableRow[] = tags.map((tag: Tag) => ({
-    id: tag.id,
-    data: {
-      name: (
-        <div>
-          <strong>
-            <a href={`/posts/tags/${tag.id}/edit`} className="row-title">
-              {tag.name}
-            </a>
-          </strong>
-        </div>
-      ),
-      description: tag.description || '—',
-      slug: tag.slug,
-      count: (
-        <span className="tag-count">
-          {tag.postCount || 0}
-        </span>
-      ),
-      date: (
-        <div>
-          <abbr title={formatDate(tag.createdAt)}>
-            {formatDate(tag.createdAt)}
-          </abbr>
-        </div>
-      )
-    },
-    actions: [
-      {
-        label: 'Edit',
-        href: `/posts/tags/${tag.id}/edit`,
-        primary: true
-      },
-      {
-        label: 'Quick Edit',
-        onClick: () => {/* TODO: Implement quick edit */}
-      },
-      {
-        label: 'Delete',
-        onClick: () => deleteMutation.mutate(tag.id),
-        destructive: true
-      },
-      {
-        label: 'View',
-        href: `/tag/${tag.slug}`,
-        external: true
-      },
-      {
-        label: 'Duplicate',
-        onClick: () => duplicateMutation.mutate(tag.id)
+  const handleAddNew = () => {
+    setShowAddModal(true);
+  };
+
+  const handleSaveTag = () => {
+    if (formData.name) {
+      const newTag: Tag = {
+        id: Date.now().toString(),
+        name: formData.name,
+        description: formData.description,
+        slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
+        count: 0,
+        date: new Date().toISOString().split('T')[0]
+      };
+      setTags([...tags, newTag]);
+      setFormData({ name: '', slug: '', description: '' });
+      setShowAddModal(false);
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingTag(id);
+    const tag = tags.find(t => t.id === id);
+    if (tag) {
+      setFormData({
+        name: tag.name,
+        slug: tag.slug,
+        description: tag.description
+      });
+    }
+  };
+
+  const handleUpdateTag = () => {
+    if (editingTag && formData.name) {
+      setTags(tags.map(tag => 
+        tag.id === editingTag
+          ? {
+              ...tag,
+              name: formData.name,
+              slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
+              description: formData.description
+            }
+          : tag
+      ));
+      setEditingTag(null);
+      setFormData({ name: '', slug: '', description: '' });
+    }
+  };
+
+  const handleQuickEdit = (id: string) => {
+    // Implement quick edit
+    console.log('Quick edit tag:', id);
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm('정말 이 태그를 삭제하시겠습니까?')) {
+      setTags(tags.filter(t => t.id !== id));
+    }
+  };
+
+  const handleApplyBulkAction = () => {
+    if (!selectedBulkAction) {
+      alert('Please select an action.');
+      return;
+    }
+    
+    if (selectedTags.size === 0) {
+      alert('No tags selected.');
+      return;
+    }
+    
+    if (selectedBulkAction === 'delete') {
+      if (confirm(`선택한 ${selectedTags.size}개의 태그를 삭제하시겠습니까?`)) {
+        setTags(tags.filter(t => !selectedTags.has(t.id)));
+        setSelectedTags(new Set());
+        setSelectedBulkAction('');
       }
-    ]
-  }));
+    }
+  };
 
   return (
-    <div className="wrap">
-      {/* Screen Options - Top Right */}
-      <div style={{ position: 'relative', marginBottom: '20px' }}>
-        <ScreenOptionsReact
-          columns={options.columns}
-          itemsPerPage={itemsPerPage}
-          onColumnToggle={updateColumnVisibility}
-          onItemsPerPageChange={setItemsPerPage}
-        />
-      </div>
-      
-      <h1 className="wp-heading-inline">Tags</h1>
-      
-      <Button 
-        className="page-title-action ml-2"
-        onClick={() => setShowAddForm(!showAddForm)}
-      >
-        Add New
-      </Button>
-      
-      <hr className="wp-header-end" />
-
-      {/* Add Tag Form - WordPress Style */}
-      {showAddForm && (
-        <div className="wp-tag-form" style={{ 
-          background: '#fff', 
-          border: '1px solid #c3c4c7', 
-          padding: '20px',
-          marginBottom: '20px',
-          boxShadow: '0 1px 1px rgba(0,0,0,.04)'
-        }}>
-          <h2 style={{ marginTop: 0, marginBottom: '1em', fontSize: '1.3em' }}>Add New Tag</h2>
+    <div className="min-h-screen" style={{ backgroundColor: '#f0f0f1' }}>
+      {/* Header with Breadcrumb and Screen Options */}
+      <div className="bg-white border-b border-gray-200 px-8 py-3">
+        <div className="flex items-center justify-between">
+          <AdminBreadcrumb 
+            items={[
+              { label: 'Admin', href: '/admin' },
+              { label: '글', href: '/admin/posts' },
+              { label: '태그' }
+            ]}
+          />
           
-          <div style={{ marginBottom: '15px' }}>
-            <Label htmlFor="tag-name" style={{ 
-              display: 'block', 
-              marginBottom: '5px', 
-              fontWeight: 600 
-            }}>
-              Name
-            </Label>
-            <Input
-              id="tag-name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Enter tag name"
-              style={{ maxWidth: '400px' }}
-              required
-            />
-            <p style={{ 
-              marginTop: '5px', 
-              color: '#646970', 
-              fontSize: '13px' 
-            }}>
-              The name is how it appears on your site.
-            </p>
-          </div>
-
-          <div style={{ marginBottom: '15px' }}>
-            <Label htmlFor="tag-description" style={{ 
-              display: 'block', 
-              marginBottom: '5px', 
-              fontWeight: 600 
-            }}>
-              Description
-            </Label>
-            <Textarea
-              id="tag-description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Enter tag description (optional)"
-              style={{ maxWidth: '400px', minHeight: '100px' }}
-            />
-            <p style={{ 
-              marginTop: '5px', 
-              color: '#646970', 
-              fontSize: '13px' 
-            }}>
-              The description is not prominent by default; however, some themes may show it.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <Button
-              onClick={() => createMutation.mutate(formData)}
-              disabled={!formData.name.trim() || createMutation.isPending}
+          {/* Screen Options Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowScreenOptions(!showScreenOptions)}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
             >
-              {createMutation.isPending ? 'Adding...' : 'Add New Tag'}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setShowAddForm(false);
-                setFormData({ name: '', description: '' });
-              }}
-            >
-              Cancel
-            </Button>
+              <Settings className="w-4 h-4" />
+              Screen Options
+              <ChevronDown className="w-3 h-3" />
+            </button>
+            
+            {showScreenOptions && (
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-300 rounded-md shadow-lg z-50">
+                <div className="p-4">
+                  <h3 className="font-medium text-sm mb-3">Show on screen</h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        id="screen-option-description"
+                        name="screen-option-description"
+                        checked={visibleColumns.description}
+                        onChange={() => handleColumnToggle('description')}
+                        className="mr-2" 
+                      />
+                      Description
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        id="screen-option-slug"
+                        name="screen-option-slug"
+                        checked={visibleColumns.slug}
+                        onChange={() => handleColumnToggle('slug')}
+                        className="mr-2" 
+                      />
+                      Slug
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        id="screen-option-count"
+                        name="screen-option-count"
+                        checked={visibleColumns.count}
+                        onChange={() => handleColumnToggle('count')}
+                        className="mr-2" 
+                      />
+                      Count
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Search and Filters */}
-      <div className="tablenav top">
-        <div className="alignleft actions bulkactions">
-          <Select onValueChange={handleBulkAction}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Bulk Actions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="delete">Delete</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="ml-2"
-            onClick={() => handleBulkAction('apply')}
+      <div className="px-8 py-6">
+        {/* Title and Add New */}
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-2xl font-normal text-gray-900">태그</h1>
+          <button
+            onClick={handleAddNew}
+            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
           >
-            Apply
-          </Button>
+            Add New
+          </button>
+        </div>
+        
+        <p className="text-sm text-gray-600 mb-6">글에 태그를 추가하여 분류합니다</p>
+
+        {/* Add New Tag Modal */}
+        {showAddModal && (
+          <div className="mb-6 p-4 bg-white border border-gray-300 rounded-lg">
+            <h2 className="text-lg font-medium mb-4">Add New Tag</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Enter tag name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="tag-slug"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="The description is not prominent by default; however, some themes may show it."
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={handleSaveTag}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                Add New Tag
+              </button>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setFormData({ name: '', slug: '', description: '' });
+                }}
+                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Tag Modal */}
+        {editingTag && (
+          <div className="mb-6 p-4 bg-white border border-gray-300 rounded-lg">
+            <h2 className="text-lg font-medium mb-4">Edit Tag</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={handleUpdateTag}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => {
+                  setEditingTag(null);
+                  setFormData({ name: '', slug: '', description: '' });
+                }}
+                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Bulk Actions Bar */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={() => setShowBulkActions(!showBulkActions)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
+              >
+                {selectedBulkAction === 'delete' ? 'Delete' : 'Bulk Actions'}
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              
+              {showBulkActions && (
+                <div className="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-lg z-20">
+                  <button
+                    onClick={() => {
+                      setSelectedBulkAction('delete');
+                      setShowBulkActions(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+            <button 
+              onClick={handleApplyBulkAction}
+              className={`px-3 py-1.5 text-sm border border-gray-300 rounded transition-colors ${
+                selectedBulkAction && selectedTags.size > 0 
+                  ? 'bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!selectedBulkAction || selectedTags.size === 0}
+            >
+              Apply
+            </button>
+          </div>
+          
+          <div className="text-sm text-gray-600">
+            {tags.length} items
+          </div>
         </div>
 
-        <div className="tablenav-pages">
-          <div className="displaying-num">{tags.length} items</div>
+        {/* Table */}
+        <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-white border-b border-gray-200">
+              <tr>
+                <th className="w-10 px-3 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    onChange={handleSelectAll}
+                    checked={selectedTags.size === tags.length && tags.length > 0}
+                  />
+                </th>
+                <th className="px-3 py-3 text-left">
+                  <button className="flex items-center gap-1 font-medium text-sm text-gray-700 hover:text-black">
+                    Name
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </th>
+                {visibleColumns.description && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Description</th>
+                )}
+                {visibleColumns.slug && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Slug</th>
+                )}
+                {visibleColumns.count && (
+                  <th className="px-3 py-3 text-center text-sm font-medium text-gray-700">Count</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {tags.map((tag) => (
+                <tr
+                  key={tag.id}
+                  className="border-b border-gray-100 hover:bg-gray-50"
+                  onMouseEnter={() => setHoveredRow(tag.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                >
+                  <td className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedTags.has(tag.id)}
+                      onChange={() => handleSelectTag(tag.id)}
+                    />
+                  </td>
+                  <td className="px-3 py-3">
+                    <div>
+                      <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                        {tag.name}
+                      </button>
+                      {hoveredRow === tag.id && (
+                        <div className="flex items-center gap-2 mt-1 text-xs">
+                          <button
+                            onClick={() => handleEdit(tag.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Edit
+                          </button>
+                          <span className="text-gray-400">|</span>
+                          <button
+                            onClick={() => handleQuickEdit(tag.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Quick Edit
+                          </button>
+                          <span className="text-gray-400">|</span>
+                          <button
+                            onClick={() => handleDelete(tag.id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            Delete
+                          </button>
+                          <span className="text-gray-400">|</span>
+                          <button
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            View
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  {visibleColumns.description && (
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      {tag.description || '—'}
+                    </td>
+                  )}
+                  {visibleColumns.slug && (
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      {tag.slug}
+                    </td>
+                  )}
+                  {visibleColumns.count && (
+                    <td className="px-3 py-3 text-sm text-center text-gray-600">
+                      <a href="#" className="text-blue-600 hover:text-blue-800">
+                        {tag.count}
+                      </a>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Bottom Bulk Actions */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={() => setShowBulkActions(!showBulkActions)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
+              >
+                {selectedBulkAction === 'delete' ? 'Delete' : 'Bulk Actions'}
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              
+              {showBulkActions && (
+                <div className="absolute left-0 bottom-full mb-1 w-40 bg-white border border-gray-300 rounded shadow-lg z-20">
+                  <button
+                    onClick={() => {
+                      setSelectedBulkAction('delete');
+                      setShowBulkActions(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+            <button 
+              onClick={handleApplyBulkAction}
+              className={`px-3 py-1.5 text-sm border border-gray-300 rounded transition-colors ${
+                selectedBulkAction && selectedTags.size > 0 
+                  ? 'bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!selectedBulkAction || selectedTags.size === 0}
+            >
+              Apply
+            </button>
+          </div>
+          
+          <div className="text-sm text-gray-600">
+            {tags.length} items
+          </div>
         </div>
       </div>
-
-      {/* Search Box */}
-      <p className="search-box">
-        <label className="screen-reader-text" htmlFor="tag-search-input">
-          Search Tags:
-        </label>
-        <Input
-          type="search"
-          id="tag-search-input"
-          value={searchQuery}
-          onChange={(e: any) => setSearchQuery(e.target.value)}
-          placeholder="Search tags..."
-          className="w-auto inline-block mr-2"
-        />
-        <Button variant="secondary" size="sm">
-          Search Tags
-        </Button>
-      </p>
-
-      {/* WordPress Table */}
-      <WordPressTable
-        columns={columns}
-        rows={rows}
-        selectable={true}
-        selectedRows={selectedTags}
-        onSelectRow={(rowId, selected) => {
-          if (selected) {
-            setSelectedTags([...selectedTags, rowId]);
-          } else {
-            setSelectedTags(selectedTags.filter(id => id !== rowId));
-          }
-        }}
-        onSelectAll={(selected) => {
-          if (selected) {
-            setSelectedTags(tags.map((tag: Tag) => tag.id));
-          } else {
-            setSelectedTags([]);
-          }
-        }}
-        loading={isLoading}
-        emptyMessage="No tags found."
-        className="wp-list-table widefat fixed striped tags"
-      />
-
-      {/* Bottom table nav */}
-      <div className="tablenav bottom">
-        <div className="tablenav-pages">
-          <div className="displaying-num">{tags.length} items</div>
-        </div>
-      </div>
-
     </div>
   );
 };
