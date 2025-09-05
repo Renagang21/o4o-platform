@@ -190,12 +190,17 @@ export class ContentController {
         postContent = { blocks: [] };
       }
 
+      // Generate unique slug with timestamp to avoid duplicates
+      const baseSlug = (title || 'untitled').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const uniqueSuffix = Date.now().toString(36); // Convert timestamp to base36 for shorter string
+      const uniqueSlug = `${baseSlug}-${uniqueSuffix}`;
+
       const post = this.postRepository.create({
         title: title || 'Untitled',
         content: postContent,
         status,
         authorId: userId,
-        slug: (title || 'untitled').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: uniqueSlug,
         type: 'post'
       } as any);
       const savedPost = await this.postRepository.save(post);
@@ -260,12 +265,17 @@ export class ContentController {
         postContent = { blocks: [] };
       }
 
+      // Generate unique slug with timestamp to avoid duplicates
+      const baseSlug = (title || 'untitled-draft').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const uniqueSuffix = Date.now().toString(36); // Convert timestamp to base36 for shorter string
+      const uniqueSlug = `${baseSlug}-${uniqueSuffix}`;
+
       const post = this.postRepository.create({
         title: title || 'Untitled Draft',
         content: postContent,
         status: 'draft',
         authorId: userId,
-        slug: (title || 'untitled-draft').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: uniqueSlug,
         type: 'post'
       } as any);
       const savedPost = await this.postRepository.save(post);
