@@ -36,6 +36,28 @@ const Categories = () => {
     description: '',
     parent: ''
   });
+  
+  // Screen Options state - load from localStorage
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('categories-visible-columns');
+    return saved ? JSON.parse(saved) : {
+      description: true,
+      slug: true,
+      count: true
+    };
+  });
+  
+  // Save visible columns to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('categories-visible-columns', JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
+  
+  const handleColumnToggle = (column: string) => {
+    setVisibleColumns((prev: any) => ({
+      ...prev,
+      [column]: !prev[column]
+    }));
+  };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -158,7 +180,8 @@ const Categories = () => {
                         type="checkbox" 
                         id="screen-option-description"
                         name="screen-option-description"
-                        defaultChecked 
+                        checked={visibleColumns.description}
+                        onChange={() => handleColumnToggle('description')}
                         className="mr-2" 
                       />
                       Description
@@ -168,7 +191,8 @@ const Categories = () => {
                         type="checkbox" 
                         id="screen-option-slug"
                         name="screen-option-slug"
-                        defaultChecked 
+                        checked={visibleColumns.slug}
+                        onChange={() => handleColumnToggle('slug')}
                         className="mr-2" 
                       />
                       Slug
@@ -178,7 +202,8 @@ const Categories = () => {
                         type="checkbox" 
                         id="screen-option-count"
                         name="screen-option-count"
-                        defaultChecked 
+                        checked={visibleColumns.count}
+                        onChange={() => handleColumnToggle('count')}
                         className="mr-2" 
                       />
                       Count
@@ -265,9 +290,15 @@ const Categories = () => {
                     <ChevronDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Description</th>
-                <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Slug</th>
-                <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Count</th>
+                {visibleColumns.description && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Description</th>
+                )}
+                {visibleColumns.slug && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Slug</th>
+                )}
+                {visibleColumns.count && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Count</th>
+                )}
                 <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">Date</th>
               </tr>
             </thead>
@@ -369,31 +400,41 @@ const Categories = () => {
                       </div>
                     )}
                   </td>
-                  <td className="px-3 py-3 text-sm text-gray-600">
-                    {editingCategory === category.id ? (
-                      <input
-                        type="text"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                      />
-                    ) : (
-                      category.description
-                    )}
-                  </td>
-                  <td className="px-3 py-3 text-sm text-gray-600">
-                    {editingCategory === category.id ? (
-                      <input
-                        type="text"
-                        value={formData.slug}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                      />
-                    ) : (
-                      category.slug
-                    )}
-                  </td>
-                  <td className="px-3 py-3 text-sm text-gray-600">{category.count}</td>
+                  {visibleColumns.description && (
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      {editingCategory === category.id ? (
+                        <input
+                          type="text"
+                          id={`edit-category-description-${category.id}`}
+                          name="category-description"
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        />
+                      ) : (
+                        category.description
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.slug && (
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      {editingCategory === category.id ? (
+                        <input
+                          type="text"
+                          id={`edit-category-slug-${category.id}`}
+                          name="category-slug"
+                          value={formData.slug}
+                          onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        />
+                      ) : (
+                        category.slug
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.count && (
+                    <td className="px-3 py-3 text-sm text-gray-600">{category.count}</td>
+                  )}
                   <td className="px-3 py-3 text-sm text-gray-600">{category.date}</td>
                 </tr>
               ))}

@@ -1,7 +1,6 @@
 import { FC, ReactNode, useState, useEffect } from 'react';
 import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
-import AdminBreadcrumb from '../common/AdminBreadcrumb'
 import AdminBar from './AdminBar'
 import { AdminNotices } from '../notices/AdminNotices'
 import toast from 'react-hot-toast'
@@ -63,7 +62,6 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         
         {/* Page content */}
         <main>
-          <AdminBreadcrumb />
           <AdminNotices />
           {children}
         </main>

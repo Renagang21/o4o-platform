@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Plus, MessageSquare, RefreshCw } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
-import ThemeToggle from '@/components/ThemeToggle';
+// ThemeToggle removed - not needed in admin bar
 
 interface AdminBarProps {
   onLogout: () => void;
@@ -85,7 +85,6 @@ const AdminBar: FC<AdminBarProps> = ({ onLogout }) => {
 
         {/* Right side */}
         <div className="flex items-center gap-3 relative">
-          <ThemeToggle />
           <div className="relative group">
             <button className="flex items-center gap-1 hover:text-[#00b9eb] cursor-pointer">
               <span className="text-[#ccc]">안녕하세요, {user?.name || 'Admin'}님</span>
