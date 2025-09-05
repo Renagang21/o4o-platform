@@ -14,7 +14,24 @@ import {
 } from '@/types/post.types';
 
 // API 기본 URL (환경변수에서 가져오기)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Production: admin.neture.co.kr에서는 같은 도메인의 /api 사용
+// Development: localhost:3000/api 사용
+const getApiBaseUrl = () => {
+  // 환경변수가 설정되어 있으면 사용
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Production 환경 (admin.neture.co.kr)
+  if (window.location.hostname === 'admin.neture.co.kr') {
+    return 'https://admin.neture.co.kr/api';
+  }
+  
+  // Development 환경
+  return 'http://localhost:3000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 const API_V1_URL = `${API_BASE_URL}/v1/content`;
 
 // Axios 인스턴스 생성
