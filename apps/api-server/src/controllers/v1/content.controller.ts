@@ -141,7 +141,9 @@ export class ContentController {
   createPost = async (req: Request, res: Response) => {
     try {
       const { title, content, status = 'draft' } = req.body;
-      const userId = (req as any).user?.userId;
+      // Use user.id directly instead of userId for UUID compatibility
+      const user = (req as any).user;
+      const userId = user?.id || user?.userId;
       
       if (!AppDataSource.isInitialized) {
         return res.json({
@@ -164,12 +166,36 @@ export class ContentController {
         });
       }
 
+      // Debug: Log the userId to check its format
+      if ((global as any).logger) {
+        (global as any).logger.info('Creating post with userId:', { 
+          userId, 
+          userIdType: typeof userId,
+          userObj: user,
+          userId_direct: user?.userId,
+          id_direct: user?.id
+        });
+      }
+
+      // Prepare content structure
+      let postContent;
+      if (Array.isArray(content)) {
+        // If content is already an array of blocks
+        postContent = { blocks: content };
+      } else if (content && typeof content === 'object' && 'blocks' in content) {
+        // If content already has blocks structure
+        postContent = content;
+      } else {
+        // Default to empty blocks
+        postContent = { blocks: [] };
+      }
+
       const post = this.postRepository.create({
-        title,
-        content: { blocks: typeof content === 'object' ? content : [] },
+        title: title || 'Untitled',
+        content: postContent,
         status,
         authorId: userId,
-        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: (title || 'untitled').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         type: 'post'
       } as any);
       const savedPost = await this.postRepository.save(post);
@@ -203,7 +229,9 @@ export class ContentController {
   createDraft = async (req: Request, res: Response) => {
     try {
       const { title, content } = req.body;
-      const userId = (req as any).user?.userId;
+      // Use user.id directly instead of userId for UUID compatibility
+      const user = (req as any).user;
+      const userId = user?.id || user?.userId;
       
       if (!AppDataSource.isInitialized) {
         return res.json({
@@ -219,12 +247,25 @@ export class ContentController {
         });
       }
 
+      // Prepare content structure
+      let postContent;
+      if (Array.isArray(content)) {
+        // If content is already an array of blocks
+        postContent = { blocks: content };
+      } else if (content && typeof content === 'object' && 'blocks' in content) {
+        // If content already has blocks structure
+        postContent = content;
+      } else {
+        // Default to empty blocks
+        postContent = { blocks: [] };
+      }
+
       const post = this.postRepository.create({
-        title,
-        content: { blocks: typeof content === 'object' ? content : [] },
+        title: title || 'Untitled Draft',
+        content: postContent,
         status: 'draft',
         authorId: userId,
-        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: (title || 'untitled-draft').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         type: 'post'
       } as any);
       const savedPost = await this.postRepository.save(post);
