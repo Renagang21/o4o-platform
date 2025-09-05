@@ -51,7 +51,7 @@ const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 const ReusableBlocksPage = lazy(() => 
   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
 );
-const Categories = lazy(() => import('@/pages/categories/Categories'));
+const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));

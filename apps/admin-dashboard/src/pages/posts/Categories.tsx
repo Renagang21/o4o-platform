@@ -8,7 +8,7 @@ import {
   Copy,
   MoreVertical
 } from 'lucide-react';
-import { AdminBreadcrumb } from '@/components/common/AdminBreadcrumb';
+import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 
 interface Category {
   id: string;
