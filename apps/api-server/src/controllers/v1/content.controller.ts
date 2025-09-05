@@ -178,9 +178,24 @@ export class ContentController {
         success: true,
         data: savedPost
       });
-    } catch (error) {
+    } catch (error: any) {
+      // Log the actual error for debugging
+      const errorMessage = error.message || 'Failed to create post';
+      const errorStack = error.stack;
+      
+      // Use logger if available, otherwise use console for debugging
+      if ((global as any).logger) {
+        (global as any).logger.error('Post creation failed:', {
+          error: errorMessage,
+          stack: errorStack,
+          body: req.body,
+          userId: (req as any).user?.userId
+        });
+      }
+      
       return res.status(500).json({
-        message: 'Failed to create post'
+        message: 'Failed to create post',
+        error: process.env.NODE_ENV === 'development' ? errorMessage : undefined
       });
     }
   };
@@ -218,9 +233,24 @@ export class ContentController {
         success: true,
         data: savedPost
       });
-    } catch (error) {
+    } catch (error: any) {
+      // Log the actual error for debugging
+      const errorMessage = error.message || 'Failed to create draft';
+      const errorStack = error.stack;
+      
+      // Use logger if available, otherwise use console for debugging
+      if ((global as any).logger) {
+        (global as any).logger.error('Draft save failed:', {
+          error: errorMessage,
+          stack: errorStack,
+          body: req.body,
+          userId: (req as any).user?.userId
+        });
+      }
+      
       return res.status(500).json({
-        message: 'Failed to create draft'
+        message: 'Failed to create draft',
+        error: process.env.NODE_ENV === 'development' ? errorMessage : undefined
       });
     }
   };
