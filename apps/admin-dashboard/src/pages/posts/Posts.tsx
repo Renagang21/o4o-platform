@@ -132,12 +132,12 @@ const Posts = () => {
   };
 
   const handleAddNew = () => {
-    navigate('/admin/posts/new');
+    navigate('/editor/posts/new');
   };
 
   const handleEdit = (id: string) => {
     // Navigate to Gutenberg editor with post ID
-    navigate(`/admin/posts/${id}`);
+    navigate(`/editor/posts/${id}`);
   };
 
   const handleQuickEdit = (id: string) => {
