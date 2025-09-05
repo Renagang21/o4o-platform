@@ -122,6 +122,8 @@ const contentController = new ContentController();
 router.get('/posts', cache({ ttl: 300 }), contentController.getPosts);
 router.get('/posts/:id', cache({ ttl: 600 }), contentController.getPost);
 router.post('/posts', authenticateToken, contentController.createPost);
+router.post('/posts/draft', authenticateToken, contentController.createDraft);
+router.post('/posts/:id/publish', authenticateToken, contentController.publishPost);
 router.put('/posts/:id', authenticateToken, contentController.updatePost);
 router.delete('/posts/:id', authenticateToken, contentController.deletePost);
 router.post('/posts/:id/clone', authenticateToken, contentController.clonePost);

@@ -52,11 +52,13 @@ import logger from './utils/logger';
 
 // Database connection
 import { AppDataSource } from './database/connection';
+import { Post } from './entities/Post';
 import { SessionSyncService } from './services/sessionSyncService';
 import { WebSocketSessionSync } from './websocket/sessionSync';
 import { errorHandler } from './middleware/errorHandler';
 import { performanceMonitor } from './middleware/performanceMonitor';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware';
+import { authenticateToken } from './middleware/auth';
 import { startCrowdfundingSchedules } from './schedules/crowdfundingSchedule';
 import { startInventorySchedules } from './schedules/inventorySchedule';
 
@@ -542,6 +544,35 @@ app.get('/api/admin/activities', DashboardController.getActivities);
 app.get('/api/system/health', DashboardController.getSystemHealth);
 app.get('/api/admin/stats', DashboardController.getContentStats);
 app.get('/api/dashboard/overview', DashboardController.getDashboardOverview);
+
+// Add publish endpoint directly at /api/posts level
+app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const postRepository = AppDataSource.getRepository(Post);
+    
+    const post = await postRepository.findOne({ where: { id } });
+    
+    if (!post) {
+      return res.status(404).json({
+        message: 'Post not found'
+      });
+    }
+
+    post.status = 'published';
+    post.publishedAt = new Date();
+    const updatedPost = await postRepository.save(post);
+
+    return res.json({
+      success: true,
+      data: updatedPost
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to publish post'
+    });
+  }
+});
 
 // Direct public endpoints for main site
 app.get('/api/posts', publicLimiter, async (req, res) => {

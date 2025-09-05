@@ -140,31 +140,119 @@ export class ContentController {
 
   createPost = async (req: Request, res: Response) => {
     try {
-      const postData = req.body;
+      const { title, content, status = 'draft' } = req.body;
+      const userId = (req as any).user?.id;
       
       if (!AppDataSource.isInitialized) {
         return res.json({
-          status: 'success',
+          success: true,
           data: {
             id: Date.now().toString(),
-            ...postData,
+            title,
+            content,
+            status,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
         });
       }
 
-      const post = this.postRepository.create(postData);
+      const post = this.postRepository.create({
+        title,
+        content: { blocks: typeof content === 'object' ? content : [] },
+        status,
+        authorId: userId,
+        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        type: 'post'
+      } as any);
       const savedPost = await this.postRepository.save(post);
 
       return res.json({
-        status: 'success',
+        success: true,
         data: savedPost
       });
     } catch (error) {
       return res.status(500).json({
-        status: 'error',
         message: 'Failed to create post'
+      });
+    }
+  };
+
+  createDraft = async (req: Request, res: Response) => {
+    try {
+      const { title, content } = req.body;
+      const userId = (req as any).user?.id;
+      
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          success: true,
+          data: {
+            id: Date.now().toString(),
+            title,
+            content,
+            status: 'draft',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      const post = this.postRepository.create({
+        title,
+        content: { blocks: typeof content === 'object' ? content : [] },
+        status: 'draft',
+        authorId: userId,
+        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        type: 'post'
+      } as any);
+      const savedPost = await this.postRepository.save(post);
+
+      return res.json({
+        success: true,
+        data: savedPost
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Failed to create draft'
+      });
+    }
+  };
+
+  publishPost = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!AppDataSource.isInitialized) {
+        return res.json({
+          success: true,
+          data: {
+            id,
+            status: 'published',
+            publishedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      const post = await this.postRepository.findOne({ where: { id } });
+      
+      if (!post) {
+        return res.status(404).json({
+          message: 'Post not found'
+        });
+      }
+
+      post.status = 'published';
+      post.publishedAt = new Date();
+      const updatedPost = await this.postRepository.save(post);
+
+      return res.json({
+        success: true,
+        data: updatedPost
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: 'Failed to publish post'
       });
     }
   };
@@ -176,7 +264,7 @@ export class ContentController {
       
       if (!AppDataSource.isInitialized) {
         return res.json({
-          status: 'success',
+          success: true,
           data: {
             id,
             ...updateData,
@@ -189,12 +277,11 @@ export class ContentController {
       const updatedPost = await this.postRepository.findOne({ where: { id } });
 
       return res.json({
-        status: 'success',
+        success: true,
         data: updatedPost
       });
     } catch (error) {
       return res.status(500).json({
-        status: 'error',
         message: 'Failed to update post'
       });
     }
@@ -206,7 +293,7 @@ export class ContentController {
       
       if (!AppDataSource.isInitialized) {
         return res.json({
-          status: 'success',
+          success: true,
           message: 'Post deleted successfully'
         });
       }
@@ -214,12 +301,11 @@ export class ContentController {
       await this.postRepository.delete(id);
 
       return res.json({
-        status: 'success',
+        success: true,
         message: 'Post deleted successfully'
       });
     } catch (error) {
       return res.status(500).json({
-        status: 'error',
         message: 'Failed to delete post'
       });
     }
