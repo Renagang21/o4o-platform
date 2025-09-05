@@ -93,7 +93,7 @@ const Categories = () => {
   };
 
   const handleView = (id: string) => {
-    console.log('View category:', id);
+    // TODO: Navigate to category view page
   };
 
   const handleDuplicate = (id: string) => {
