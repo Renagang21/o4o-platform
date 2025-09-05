@@ -219,7 +219,7 @@ const Posts = () => {
 
   const handleSearch = () => {
     // Implement search
-    console.log('Searching for:', searchQuery);
+    // Search functionality is handled in getFilteredPosts()
   };
 
   const handleSort = (field: SortField) => {
