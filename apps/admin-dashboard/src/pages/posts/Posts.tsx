@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ChevronDown,
@@ -16,6 +16,7 @@ import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 interface Post {
   id: string;
   title: string;
+  slug: string;
   author: string;
   categories: string[];
   tags: string[];
@@ -33,7 +34,8 @@ const Posts = () => {
   const [posts, setPosts] = useState<Post[]>([
     { 
       id: '1', 
-      title: 'Welcome to Our New Platform', 
+      title: 'Welcome to Our New Platform',
+      slug: 'welcome-new-platform',
       author: 'Admin',
       categories: ['공지사항'],
       tags: ['featured', 'news'],
@@ -44,7 +46,8 @@ const Posts = () => {
     },
     { 
       id: '2', 
-      title: 'Getting Started Guide', 
+      title: 'Getting Started Guide',
+      slug: 'getting-started-guide',
       author: 'Editor',
       categories: ['튜토리얼'],
       tags: ['tutorial', 'guide'],
@@ -55,7 +58,8 @@ const Posts = () => {
     },
     { 
       id: '3', 
-      title: 'Draft: Upcoming Features', 
+      title: 'Draft: Upcoming Features',
+      slug: 'draft-upcoming-features',
       author: 'Admin',
       categories: ['이벤트'],
       tags: ['draft'],
@@ -75,6 +79,14 @@ const Posts = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft'>('all');
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [quickEditId, setQuickEditId] = useState<string | null>(null);
+  const [quickEditData, setQuickEditData] = useState({
+    title: '',
+    slug: '',
+    status: 'published' as Post['status'],
+    author: '',
+    date: ''
+  });
   
   // Screen Options state - load from localStorage
   const [visibleColumns, setVisibleColumns] = useState(() => {
@@ -124,11 +136,51 @@ const Posts = () => {
   };
 
   const handleEdit = (id: string) => {
+    // Navigate to Gutenberg editor with post ID
     navigate(`/admin/posts/${id}`);
   };
 
   const handleQuickEdit = (id: string) => {
-    // TODO: Implement quick edit
+    const post = posts.find(p => p.id === id);
+    if (post) {
+      setQuickEditId(id);
+      setQuickEditData({
+        title: post.title,
+        slug: post.slug,
+        status: post.status,
+        author: post.author,
+        date: post.date
+      });
+    }
+  };
+
+  const handleSaveQuickEdit = () => {
+    if (quickEditId) {
+      setPosts(posts.map(post => 
+        post.id === quickEditId
+          ? {
+              ...post,
+              title: quickEditData.title,
+              slug: quickEditData.slug,
+              status: quickEditData.status,
+              author: quickEditData.author,
+              date: quickEditData.date
+            }
+          : post
+      ));
+      setQuickEditId(null);
+    }
+  };
+
+  const handleCancelQuickEdit = () => {
+    setQuickEditId(null);
+    setQuickEditData({
+      title: '',
+      slug: '',
+      status: 'published',
+      author: '',
+      date: ''
+    });
   };
 
   const handleDelete = (id: string) => {
@@ -492,12 +544,87 @@ const Posts = () => {
             </thead>
             <tbody>
               {filteredPosts.map((post) => (
-                <tr
-                  key={post.id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                  onMouseEnter={() => setHoveredRow(post.id)}
-                  onMouseLeave={() => setHoveredRow(null)}
-                >
+                <React.Fragment key={post.id}>
+                  {quickEditId === post.id ? (
+                    // Quick Edit Row
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <td colSpan={100} className="p-4">
+                        <div className="bg-white border border-gray-300 rounded p-4">
+                          <h3 className="font-medium text-sm mb-3">Quick Edit</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                              <input
+                                type="text"
+                                value={quickEditData.title}
+                                onChange={(e) => setQuickEditData({...quickEditData, title: e.target.value})}
+                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                              <input
+                                type="text"
+                                value={quickEditData.slug}
+                                onChange={(e) => setQuickEditData({...quickEditData, slug: e.target.value})}
+                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
+                              <input
+                                type="text"
+                                value={quickEditData.author}
+                                onChange={(e) => setQuickEditData({...quickEditData, author: e.target.value})}
+                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                              <input
+                                type="date"
+                                value={quickEditData.date}
+                                onChange={(e) => setQuickEditData({...quickEditData, date: e.target.value})}
+                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                              <select
+                                value={quickEditData.status}
+                                onChange={(e) => setQuickEditData({...quickEditData, status: e.target.value as Post['status']})}
+                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              >
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                                <option value="pending">Pending Review</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-4">
+                            <button
+                              onClick={handleSaveQuickEdit}
+                              className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                              Update
+                            </button>
+                            <button
+                              onClick={handleCancelQuickEdit}
+                              className="px-4 py-1.5 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded hover:bg-gray-200"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    // Normal Row
+                    <tr
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                      onMouseEnter={() => setHoveredRow(post.id)}
+                      onMouseLeave={() => setHoveredRow(null)}
+                    >
                   <td className="px-3 py-3">
                     <input
                       type="checkbox"
@@ -600,7 +727,9 @@ const Posts = () => {
                       )}
                     </td>
                   )}
-                </tr>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
