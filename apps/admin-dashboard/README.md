@@ -29,16 +29,16 @@ WordPress-style Admin Dashboard for O4O Platform built with React 18, TypeScript
 pnpm install
 
 # Start development server
-npm run dev
+pnpm run dev
 
 # Build for production
-npm run build
+pnpm run build
 
 # Type check
-npm run type-check
+pnpm run type-check
 
 # Lint code
-npm run lint
+pnpm run lint
 ```
 
 ## Environment Variables
@@ -150,10 +150,10 @@ This admin dashboard integrates with the O4O Platform API server:
 
 ```bash
 # Production build
-npm run build
+pnpm run build
 
 # Preview production build
-npm run preview
+pnpm run preview
 
 # Deploy to production
 # (Build artifacts in dist/ directory)

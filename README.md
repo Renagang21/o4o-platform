@@ -16,7 +16,7 @@ O4O Platform은 모던 웹 기술을 활용한 통합 이커머스 및 커뮤니
 - **Database**: PostgreSQL
 - **Process Manager**: PM2
 - **Node Version**: 22.18.0
-- **Package Manager**: npm 10.9.3
+- **Package Manager**: pnpm 9.x
 
 ## 🏗️ 워크스페이스 구조
 
@@ -56,7 +56,7 @@ o4o-platform/
 
 ### 사전 요구사항
 - Node.js 22.18.0 이상
-- npm 10.9.3 이상
+- pnpm 9.x 이상
 - PostgreSQL 14 이상
 
 ### 설치
@@ -167,7 +167,7 @@ node scripts/environments/deploy.cjs [options]
 # packages/ 폴더에 새 패키지 생성
 mkdir packages/new-package
 cd packages/new-package
-npm init
+pnpm init
 
 # 루트 package.json의 workspaces에 자동 포함됨
 ```
@@ -193,7 +193,7 @@ pnpm run lint
 pnpm run lint:fix
 
 # 테스트 실행
-npm test
+pnpm test
 ```
 
 ## 🏛️ 아키텍처
@@ -239,7 +239,7 @@ pm2 stop all
 ### 테스트 실행
 ```bash
 # 전체 테스트
-npm test
+pnpm test
 
 # 타입 체크
 pnpm run type-check
@@ -308,7 +308,7 @@ kill -9 [PID]
 ```bash
 # 캐시 정리 후 재설치
 pnpm run clean
-rm -rf node_modules package-lock.json
+rm -rf node_modules pnpm-lock.yaml
 pnpm install
 pnpm run build:packages
 ```

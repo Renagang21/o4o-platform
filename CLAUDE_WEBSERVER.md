@@ -11,17 +11,17 @@
 1. **빌드 명령 실행 금지**
    ```bash
    # 이런 명령어들을 절대 실행하지 마세요!
-   npm run build ❌
-   npm run build:admin ❌
-   npm run build:packages ❌
+   pnpm run build ❌
+   pnpm run build:admin ❌
+   pnpm run build:packages ❌
    ./scripts/build-webserver.sh ❌
    ```
 
 2. **개발 서버 실행 금지**
    ```bash
    # PM2로 개발 서버 실행 금지!
-   npm run dev ❌
-   npm run dev:admin ❌
+   pnpm run dev ❌
+   pnpm run dev:admin ❌
    pm2 start ecosystem.config.webserver.cjs ❌ (dev 스크립트 포함된 경우)
    ```
 
@@ -100,8 +100,8 @@ sudo systemctl status nginx
    ```bash
    # PM2에서 빌드 프로세스 실행 중인지 확인
    pm2 list
-   ps aux | grep "npm run build"
-   ps aux | grep "npm run dev"
+   ps aux | grep "pnpm run build"
+   ps aux | grep "pnpm run dev"
    ```
 
 3. **캐시 정리**
@@ -143,7 +143,7 @@ sudo systemctl status nginx
 ```bash
 # 1. 즉시 프로세스 중지
 pm2 stop all
-pkill -f "npm run build"
+pkill -f "pnpm run build"
 
 # 2. GitHub Actions 재실행 요청
 # GitHub에서 수동으로 workflow 재실행

@@ -10,7 +10,7 @@
 ### 1. 서버 실행 확인
 ```bash
 # 프로젝트 루트에서
-npm run dev
+pnpm run dev
 ```
 
 ### 2. 접속 URL

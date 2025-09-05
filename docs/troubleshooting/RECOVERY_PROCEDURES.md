@@ -217,17 +217,17 @@ pm2 restart all
 2. **빌드 문제 해결**
 ```bash
 # 캐시 정리
-npm cache clean --force
-rm -rf node_modules package-lock.json
+pnpm store prune
+rm -rf node_modules pnpm-lock.yaml
 
 # 재설치
 pnpm install
 
 # 빌드
-npm run build
+pnpm run build
 
 # 테스트
-npm test
+pnpm test
 ```
 
 ---

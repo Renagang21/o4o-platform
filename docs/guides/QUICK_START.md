@@ -6,52 +6,52 @@
 ```bash
 # 1회만 실행 (초기 설정)
 git clone [repository-url] && cd o4o-platform
-pnpm install
+ppnpm install
 cp .env.webserver.example .env
 # .env 파일에서 VITE_API_URL 수정
 
 # 실행
-npm run pm2:start:webserver
+ppnpm run pm2:start:webserver
 
 # 업데이트 후 재시작
-git pull && pnpm install && npm run pm2:restart:webserver
+git pull && ppnpm install && ppnpm run pm2:restart:webserver
 ```
 
 ### 🔧 o4o-apiserver (API만)
 ```bash
 # 1회만 실행 (초기 설정)
 git clone [repository-url] && cd o4o-platform
-pnpm install
+ppnpm install
 cp .env.apiserver.example apps/api-server/.env
 # apps/api-server/.env 파일에서 DB 정보 설정
 
 # 빌드 및 마이그레이션
 cd apps/api-server
-npm run build
-npm run migration:run
+ppnpm run build
+ppnpm run migration:run
 cd ../..
 
 # 실행
-npm run pm2:start:apiserver
+ppnpm run pm2:start:apiserver
 
 # 업데이트 후 재시작
-git pull && pnpm install
-cd apps/api-server && npm run build && npm run migration:run && cd ../..
-npm run pm2:restart:apiserver
+git pull && ppnpm install
+cd apps/api-server && ppnpm run build && ppnpm run migration:run && cd ../..
+ppnpm run pm2:restart:apiserver
 ```
 
 ### 💻 로컬 개발 (전체 스택)
 ```bash
 # 1회만 실행 (초기 설정)
 git clone [repository-url] && cd o4o-platform
-pnpm install
+ppnpm install
 cp .env.example .env.local
 
 # 실행
-npm run pm2:start:local
+ppnpm run pm2:start:local
 
 # 개발 모드 (PM2 없이)
-npm run dev
+ppnpm run dev
 ```
 
 ## 🔍 상태 확인
@@ -64,16 +64,16 @@ pm2 monit         # 실시간 모니터링
 ## 🛑 중지/재시작
 ```bash
 # 웹서버
-npm run pm2:stop:webserver
-npm run pm2:restart:webserver
+ppnpm run pm2:stop:webserver
+ppnpm run pm2:restart:webserver
 
 # API 서버
-npm run pm2:stop:apiserver
-npm run pm2:restart:apiserver
+ppnpm run pm2:stop:apiserver
+ppnpm run pm2:restart:apiserver
 
 # 로컬
-npm run pm2:stop:local
-npm run pm2:restart:local
+ppnpm run pm2:stop:local
+ppnpm run pm2:restart:local
 ```
 
 ## ⚠️ 트러블슈팅 체크리스트

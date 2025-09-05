@@ -22,11 +22,11 @@
 ### 3. 성능 최적화
 - [ ] 프로덕션 빌드 생성
   ```bash
-  npm run build
+  pnpm run build
   ```
 - [ ] 번들 사이즈 분석
   ```bash
-  npm run build:analyze
+  pnpm run build:analyze
   ```
 - [ ] 이미지 최적화
 - [ ] Lazy Loading 구현 확인
@@ -35,7 +35,7 @@
 ### 4. 데이터베이스
 - [ ] 마이그레이션 실행
   ```bash
-  npm run migration:run
+  pnpm run migration:run
   ```
 - [ ] 인덱스 생성 확인
 - [ ] 백업 스크립트 준비
@@ -60,11 +60,11 @@
 ### 7. 테스트
 - [ ] 단위 테스트 실행
   ```bash
-  npm run test
+  pnpm run test
   ```
 - [ ] 통합 테스트 실행
   ```bash
-  npm run test:e2e
+  pnpm run test:e2e
   ```
 - [ ] 부하 테스트 실행
 - [ ] 보안 스캔 실행

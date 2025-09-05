@@ -1,12 +1,12 @@
-# NPM Scripts Guide
+# PNPM Scripts Guide
 
 ## 📚 Overview
 
-This guide documents all npm scripts used in the O4O Platform monorepo, their purposes, and how they're used in CI/CD workflows.
+This guide documents all pnpm scripts used in the O4O Platform monorepo, their purposes, and how they're used in CI/CD workflows.
 
 ## 🏗️ Architecture
 
-The monorepo uses npm workspaces with scripts at two levels:
+The monorepo uses pnpm workspaces with scripts at two levels:
 1. **Root scripts** - Orchestrate builds across all packages/apps
 2. **Workspace scripts** - Individual package/app specific scripts
 
@@ -15,51 +15,51 @@ The monorepo uses npm workspaces with scripts at two levels:
 Located in `/package.json`:
 
 ### Development
-- `npm run dev` - Start all services concurrently (API, Web, Admin)
-- `npm run dev:api` - Start API server only
-- `npm run dev:web` - Start main site only  
-- `npm run dev:admin` - Start admin dashboard only
+- `pnpm run dev` - Start all services concurrently (API, Web, Admin)
+- `pnpm run dev:api` - Start API server only
+- `pnpm run dev:web` - Start main site only  
+- `pnpm run dev:admin` - Start admin dashboard only
 
 ### Building
-- `npm run build` - Build all packages then all apps
-- `npm run build:packages` - Build all packages in dependency order
-- `npm run build:apps` - Build all applications
-- `npm run build:api` - Build packages + API server
-- `npm run build:web` - Build packages + main site
-- `npm run build:admin` - Build packages + admin dashboard
+- `pnpm run build` - Build all packages then all apps
+- `pnpm run build:packages` - Build all packages in dependency order
+- `pnpm run build:apps` - Build all applications
+- `pnpm run build:api` - Build packages + API server
+- `pnpm run build:web` - Build packages + main site
+- `pnpm run build:admin` - Build packages + admin dashboard
 
 ### Code Quality
-- `npm run type-check` - Type check all workspaces
-- `npm run lint` - Lint all TypeScript files
-- `npm run lint:fix` - Auto-fix linting issues
-- `npm run test` - Run all tests
-- `npm run test:e2e` - Run E2E tests
+- `pnpm run type-check` - Type check all workspaces
+- `pnpm run lint` - Lint all TypeScript files
+- `pnpm run lint:fix` - Auto-fix linting issues
+- `pnpm run test` - Run all tests
+- `pnpm run test:e2e` - Run E2E tests
 
 ### Maintenance
-- `npm run clean` - Remove all node_modules and dist folders
-- `npm run install:all` - Clean install and build everything
+- `pnpm run clean` - Remove all node_modules and dist folders
+- `pnpm run install:all` - Clean install and build everything
 
 ## 📱 Application Scripts
 
 ### API Server (`apps/api-server`)
-- `npm run dev` - Start development server with nodemon
-- `npm run build` - TypeScript compilation
-- `npm run start` - Start production server
-- `npm run migration:generate` - Generate TypeORM migration
-- `npm run migration:run` - Run pending migrations
-- `npm run migration:revert` - Revert last migration
+- `pnpm run dev` - Start development server with nodemon
+- `pnpm run build` - TypeScript compilation
+- `pnpm run start` - Start production server
+- `pnpm run migration:generate` - Generate TypeORM migration
+- `pnpm run migration:run` - Run pending migrations
+- `pnpm run migration:revert` - Revert last migration
 
 ### Main Site (`apps/main-site`)
-- `npm run dev` - Start Vite dev server
-- `npm run build` - Production build
-- `npm run build:analyze` - Build with bundle analysis
-- `npm run preview` - Preview production build
+- `pnpm run dev` - Start Vite dev server
+- `pnpm run build` - Production build
+- `pnpm run build:analyze` - Build with bundle analysis
+- `pnpm run preview` - Preview production build
 
 ### Admin Dashboard (`apps/admin-dashboard`)
-- `npm run dev` - Start Vite dev server (port 3001)
-- `npm run build` - Production build
-- `npm run build:analyze` - Build with bundle analysis
-- `npm run preview` - Preview production build
+- `pnpm run dev` - Start Vite dev server (port 3001)
+- `pnpm run build` - Production build
+- `pnpm run build:analyze` - Build with bundle analysis
+- `pnpm run preview` - Preview production build
 
 ## 🚀 CI/CD Usage Patterns
 
@@ -68,18 +68,18 @@ Located in `/package.json`:
 #### From Root Directory
 Most workflows execute scripts from the root:
 ```bash
-npm ci                    # Install dependencies
-npm run type-check        # Type check all
-npm run lint             # Lint all
-npm run build:packages   # Build packages first
+pnpm install --frozen-lockfile                    # Install dependencies
+pnpm run type-check        # Type check all
+pnpm run lint             # Lint all
+pnpm run build:packages   # Build packages first
 ```
 
 #### From App Directory
 Some workflows change to app directory:
 ```bash
 cd apps/main-site
-npm run build            # Build specific app
-npm run build:analyze    # Analyze bundle
+pnpm run build            # Build specific app
+pnpm run build:analyze    # Analyze bundle
 ```
 
 ### Common Patterns
@@ -91,15 +91,15 @@ npm run build:analyze    # Analyze bundle
 
 2. **Full Build Sequence**
    ```bash
-   npm run build:packages  # Build shared packages
-   npm run build          # Build application
+   pnpm run build:packages  # Build shared packages
+   pnpm run build          # Build application
    ```
 
 3. **Quality Checks**
    ```bash
-   npm run type-check
-   npm run lint
-   npm audit --audit-level=high
+   pnpm run type-check
+   pnpm run lint
+   pnpm audit --audit-level=high
    ```
 
 ## 🔧 Troubleshooting
@@ -112,7 +112,7 @@ npm run build:analyze    # Analyze bundle
 
 2. **Use workspace flag**
    ```bash
-   npm run build --workspace=@o4o/main-site
+   pnpm run build --workspace=@o4o/main-site
    ```
 
 3. **Verify script exists**
@@ -123,7 +123,7 @@ npm run build:analyze    # Analyze bundle
 
 Always build packages before apps:
 ```bash
-npm run build:packages && npm run build:apps
+pnpm run build:packages && pnpm run build:apps
 ```
 
 ### Missing Scripts Added
@@ -165,24 +165,24 @@ These scripts provide bundle analysis with graceful fallback.
 
 #### Standard Build Flow
 ```yaml
-- run: npm ci
-- run: npm run build:packages
-- run: npm run build
+- run: pnpm install --frozen-lockfile
+- run: pnpm run build:packages
+- run: pnpm run build
 ```
 
 #### Quality Checks
 ```yaml
-- run: npm run type-check
-- run: npm run lint
-- run: npm audit --audit-level=high
+- run: pnpm run type-check
+- run: pnpm run lint
+- run: pnpm audit --audit-level=high
 ```
 
 #### App-Specific Build
 ```yaml
 - run: |
     cd apps/main-site
-    npm run build
-    npm run build:analyze || true
+    pnpm run build
+    pnpm run build:analyze || true
 ```
 
 ### PM2 Development Mode
@@ -191,23 +191,23 @@ For running applications with PM2 in development mode:
 
 ```bash
 # Admin Dashboard Development
-pm2 start npm --name "o4o-admin-dashboard" -- run dev -- --port 3001
+pm2 start pnpm --name "o4o-admin-dashboard" -- run dev -- --port 3001
 
 # API Server Development
-pm2 start npm --name "api-server" -- run dev
+pm2 start pnpm --name "api-server" -- run dev
 
 # Main Site Development
-pm2 start npm --name "o4o-main-site" -- run dev -- --port 3000
+pm2 start pnpm --name "o4o-main-site" -- run dev -- --port 3000
 ```
 
 ### Production Build and Serve
 
 ```bash
 # Build for production
-npm run build
+pnpm run build
 
 # Serve with static server (requires serve package)
-pnpm install -g serve
+pnpm add -g serve
 pm2 start serve --name "admin-prod" -- -s dist -l 3001
 ```
 
@@ -215,7 +215,7 @@ pm2 start serve --name "admin-prod" -- -s dist -l 3001
 
 1. **package-lock.json out of sync**
    ```bash
-   # Solution: Use pnpm install instead of npm ci
+   # Solution: Use pnpm install instead of pnpm install --frozen-lockfile
    pnpm install
    ```
 
@@ -223,6 +223,6 @@ pm2 start serve --name "admin-prod" -- -s dist -l 3001
    - Add `host: true` to vite.config.ts server configuration
 
 3. **Build order matters**
-   - Always run `npm run build:packages` before building apps
+   - Always run `pnpm run build:packages` before building apps
 
 This documentation ensures consistency across all workflows and helps prevent script-related CI/CD failures.

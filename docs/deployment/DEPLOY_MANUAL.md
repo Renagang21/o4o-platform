@@ -8,7 +8,7 @@ GitHub Actions 워크플로우는 성공하지만 실제 파일이 서버에 반
 ### 방법 1: 로컬에서 테스트 (권장)
 ```bash
 # 개발 서버 실행 (이미 실행 중)
-npm run dev:admin
+ppnpm run dev:admin
 
 # 브라우저에서 접속
 http://localhost:3001
@@ -28,11 +28,11 @@ cd /home/ubuntu/o4o-platform
 git pull origin main
 
 # 4. 의존성 설치
-pnpm install
+ppnpm install
 
 # 5. 빌드
 cd apps/admin-dashboard
-npm run build
+ppnpm run build
 
 # 6. 정적 파일 복사
 sudo cp -r dist/* /var/www/admin.neture.co.kr/
@@ -47,7 +47,7 @@ sudo systemctl reload nginx
 ```bash
 # 로컬에서 빌드
 cd apps/admin-dashboard
-npm run build
+ppnpm run build
 
 # SCP로 업로드 (SSH 키 필요)
 scp -r dist/* ubuntu@admin.neture.co.kr:/var/www/admin.neture.co.kr/
@@ -96,7 +96,7 @@ lsof -i :3001
 kill -9 [PID]
 
 # 다시 시작
-npm run dev:admin
+ppnpm run dev:admin
 ```
 
 ## 📞 추가 지원

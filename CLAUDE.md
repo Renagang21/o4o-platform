@@ -209,7 +209,7 @@ kill -9 [PID]
 ```bash
 # 캐시 정리 후 재설치
 pnpm run clean
-rm -rf node_modules package-lock.json
+rm -rf node_modules pnpm-lock.yaml
 pnpm install
 pnpm run build:packages
 ```
