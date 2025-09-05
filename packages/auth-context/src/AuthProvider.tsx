@@ -104,8 +104,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       
       // 토큰을 localStorage에 저장
       if (response.token) {
-        // accessToken으로도 저장 (AuthClient가 이 키를 찾음)
+        // 여러 키로 저장 (다양한 API 클라이언트 호환성)
         localStorage.setItem('accessToken', response.token);
+        localStorage.setItem('authToken', response.token); // postApi 호환성
         localStorage.setItem('token', response.token); // 하위 호환성
         
         if (response.refreshToken) {
