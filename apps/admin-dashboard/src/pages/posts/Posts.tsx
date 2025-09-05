@@ -1,0 +1,666 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  ChevronDown,
+  ChevronUp,
+  Settings,
+  MessageSquare,
+  Calendar,
+  User,
+  Tag,
+  FolderOpen,
+  Search
+} from 'lucide-react';
+import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
+
+interface Post {
+  id: string;
+  title: string;
+  author: string;
+  categories: string[];
+  tags: string[];
+  comments: number;
+  date: string;
+  status: 'published' | 'draft' | 'pending';
+  views: number;
+}
+
+type SortField = 'title' | 'date' | null;
+type SortOrder = 'asc' | 'desc';
+
+const Posts = () => {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState<Post[]>([
+    { 
+      id: '1', 
+      title: 'Welcome to Our New Platform', 
+      author: 'Admin',
+      categories: ['공지사항'],
+      tags: ['featured', 'news'],
+      comments: 5,
+      date: '2024-01-20',
+      status: 'published',
+      views: 234
+    },
+    { 
+      id: '2', 
+      title: 'Getting Started Guide', 
+      author: 'Editor',
+      categories: ['튜토리얼'],
+      tags: ['tutorial', 'guide'],
+      comments: 12,
+      date: '2024-01-18',
+      status: 'published',
+      views: 456
+    },
+    { 
+      id: '3', 
+      title: 'Draft: Upcoming Features', 
+      author: 'Admin',
+      categories: ['이벤트'],
+      tags: ['draft'],
+      comments: 0,
+      date: '2024-01-22',
+      status: 'draft',
+      views: 0
+    }
+  ]);
+  
+  const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showScreenOptions, setShowScreenOptions] = useState(false);
+  const [selectedBulkAction, setSelectedBulkAction] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft'>('all');
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  
+  // Screen Options state - load from localStorage
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('posts-visible-columns');
+    return saved ? JSON.parse(saved) : {
+      author: true,
+      categories: true,
+      tags: true,
+      comments: true,
+      date: true,
+      status: true
+    };
+  });
+  
+  // Save visible columns to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('posts-visible-columns', JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
+  
+  const handleColumnToggle = (column: string) => {
+    setVisibleColumns((prev: any) => ({
+      ...prev,
+      [column]: !prev[column]
+    }));
+  };
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedPosts(new Set(getFilteredPosts().map(p => p.id)));
+    } else {
+      setSelectedPosts(new Set());
+    }
+  };
+
+  const handleSelectPost = (id: string) => {
+    const newSelection = new Set(selectedPosts);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedPosts(newSelection);
+  };
+
+  const handleAddNew = () => {
+    navigate('/admin/posts/new');
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/admin/posts/${id}`);
+  };
+
+  const handleQuickEdit = (id: string) => {
+    // TODO: Implement quick edit
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm('정말 이 글을 휴지통으로 이동하시겠습니까?')) {
+      setPosts(posts.filter(p => p.id !== id));
+    }
+  };
+
+  const handleView = (id: string) => {
+    // Open in new tab
+    window.open(`/post/${id}`, '_blank');
+  };
+
+  const handleApplyBulkAction = () => {
+    if (!selectedBulkAction) {
+      alert('Please select an action.');
+      return;
+    }
+    
+    if (selectedPosts.size === 0) {
+      alert('No posts selected.');
+      return;
+    }
+    
+    if (selectedBulkAction === 'trash') {
+      if (confirm(`선택한 ${selectedPosts.size}개의 글을 휴지통으로 이동하시겠습니까?`)) {
+        setPosts(posts.filter(p => !selectedPosts.has(p.id)));
+        setSelectedPosts(new Set());
+        setSelectedBulkAction('');
+      }
+    } else if (selectedBulkAction === 'edit') {
+      // Bulk edit functionality
+      alert('Bulk edit feature coming soon');
+    }
+  };
+
+  const handleSearch = () => {
+    // Implement search
+    console.log('Searching for:', searchQuery);
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const getFilteredPosts = () => {
+    let filtered = posts;
+    
+    // Filter by tab
+    if (activeTab === 'published') {
+      filtered = filtered.filter(p => p.status === 'published');
+    } else if (activeTab === 'draft') {
+      filtered = filtered.filter(p => p.status === 'draft');
+    }
+    
+    // Filter by search
+    if (searchQuery) {
+      filtered = filtered.filter(p => 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.author.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Sort
+    if (sortField) {
+      filtered = [...filtered].sort((a, b) => {
+        if (sortField === 'title') {
+          return sortOrder === 'asc' 
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        } else if (sortField === 'date') {
+          return sortOrder === 'asc'
+            ? new Date(a.date).getTime() - new Date(b.date).getTime()
+            : new Date(b.date).getTime() - new Date(a.date).getTime();
+        }
+        return 0;
+      });
+    } else {
+      // Default sort by date desc
+      filtered = [...filtered].sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+    }
+    
+    return filtered;
+  };
+
+  const getStatusCounts = () => {
+    const all = posts.length;
+    const published = posts.filter(p => p.status === 'published').length;
+    const draft = posts.filter(p => p.status === 'draft').length;
+    return { all, published, draft };
+  };
+
+  const counts = getStatusCounts();
+  const filteredPosts = getFilteredPosts();
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#f0f0f1' }}>
+      {/* Header with Breadcrumb and Screen Options */}
+      <div className="bg-white border-b border-gray-200 px-8 py-3">
+        <div className="flex items-center justify-between">
+          <AdminBreadcrumb 
+            items={[
+              { label: 'Admin', href: '/admin' },
+              { label: '글', href: '/admin/posts' },
+              { label: '모든 글' }
+            ]}
+          />
+          
+          {/* Screen Options Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowScreenOptions(!showScreenOptions)}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Screen Options
+              <ChevronDown className="w-3 h-3" />
+            </button>
+            
+            {showScreenOptions && (
+              <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-gray-300 rounded-md shadow-lg z-50">
+                <div className="p-4">
+                  <h3 className="font-medium text-sm mb-3">Columns</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns.author}
+                        onChange={() => handleColumnToggle('author')}
+                        className="mr-2" 
+                      />
+                      글쓴이
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns.categories}
+                        onChange={() => handleColumnToggle('categories')}
+                        className="mr-2" 
+                      />
+                      카테고리
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns.tags}
+                        onChange={() => handleColumnToggle('tags')}
+                        className="mr-2" 
+                      />
+                      태그
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns.comments}
+                        onChange={() => handleColumnToggle('comments')}
+                        className="mr-2" 
+                      />
+                      댓글
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns.date}
+                        onChange={() => handleColumnToggle('date')}
+                        className="mr-2" 
+                      />
+                      날짜
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={visibleColumns.status}
+                        onChange={() => handleColumnToggle('status')}
+                        className="mr-2" 
+                      />
+                      상태
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="px-8 py-6">
+        {/* Title and Add New */}
+        <div className="flex items-center gap-3 mb-4">
+          <h1 className="text-2xl font-normal text-gray-900">Posts</h1>
+          <button
+            onClick={handleAddNew}
+            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          >
+            Add New
+          </button>
+        </div>
+
+        {/* Status Tabs */}
+        <div className="flex items-center gap-4 mb-4">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`text-sm ${activeTab === 'all' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
+          >
+            모든 ({counts.all})
+          </button>
+          <span className="text-gray-400">|</span>
+          <button
+            onClick={() => setActiveTab('published')}
+            className={`text-sm ${activeTab === 'published' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
+          >
+            발행됨 ({counts.published})
+          </button>
+          <span className="text-gray-400">|</span>
+          <button
+            onClick={() => setActiveTab('draft')}
+            className={`text-sm ${activeTab === 'draft' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
+          >
+            임시글 ({counts.draft})
+          </button>
+        </div>
+
+        {/* Search Box */}
+        <div className="flex justify-between items-center mb-4">
+          {/* Bulk Actions Bar */}
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={() => setShowBulkActions(!showBulkActions)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
+              >
+                {selectedBulkAction === 'trash' ? 'Move to Trash' : selectedBulkAction === 'edit' ? 'Edit' : 'Bulk Actions'}
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              
+              {showBulkActions && (
+                <div className="absolute left-0 top-full mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg z-20">
+                  <button
+                    onClick={() => {
+                      setSelectedBulkAction('edit');
+                      setShowBulkActions(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedBulkAction('trash');
+                      setShowBulkActions(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Move to Trash
+                  </button>
+                </div>
+              )}
+            </div>
+            <button 
+              onClick={handleApplyBulkAction}
+              className={`px-3 py-1.5 text-sm border border-gray-300 rounded transition-colors ${
+                selectedBulkAction && selectedPosts.size > 0 
+                  ? 'bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!selectedBulkAction || selectedPosts.size === 0}
+            >
+              Apply
+            </button>
+          </div>
+
+          {/* Search */}
+          <div className="flex items-center gap-2">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="글 검색..."
+            />
+            <button
+              onClick={handleSearch}
+              className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition-colors"
+            >
+              글 검색
+            </button>
+          </div>
+        </div>
+
+        {/* Item count */}
+        <div className="text-sm text-gray-600 mb-2">
+          {filteredPosts.length} items
+        </div>
+
+        {/* Table */}
+        <div className="bg-white border border-gray-300 rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-white border-b border-gray-200">
+              <tr>
+                <th className="w-10 px-3 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    onChange={handleSelectAll}
+                    checked={selectedPosts.size === filteredPosts.length && filteredPosts.length > 0}
+                  />
+                </th>
+                <th className="px-3 py-3 text-left">
+                  <button 
+                    onClick={() => handleSort('title')}
+                    className="flex items-center gap-1 font-medium text-sm text-gray-700 hover:text-black"
+                  >
+                    제목
+                    {sortField === 'title' ? (
+                      sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    )}
+                  </button>
+                </th>
+                {visibleColumns.author && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">글쓴이</th>
+                )}
+                {visibleColumns.categories && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">카테고리</th>
+                )}
+                {visibleColumns.tags && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">태그</th>
+                )}
+                {visibleColumns.comments && (
+                  <th className="px-3 py-3 text-center">
+                    <MessageSquare className="w-4 h-4 text-gray-700 mx-auto" />
+                  </th>
+                )}
+                {visibleColumns.date && (
+                  <th className="px-3 py-3 text-left">
+                    <button 
+                      onClick={() => handleSort('date')}
+                      className="flex items-center gap-1 font-medium text-sm text-gray-700 hover:text-black"
+                    >
+                      날짜
+                      {sortField === 'date' ? (
+                        sortOrder === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3 opacity-50" />
+                      )}
+                    </button>
+                  </th>
+                )}
+                {visibleColumns.status && (
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-700">상태</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPosts.map((post) => (
+                <tr
+                  key={post.id}
+                  className="border-b border-gray-100 hover:bg-gray-50"
+                  onMouseEnter={() => setHoveredRow(post.id)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                >
+                  <td className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedPosts.has(post.id)}
+                      onChange={() => handleSelectPost(post.id)}
+                    />
+                  </td>
+                  <td className="px-3 py-3">
+                    <div>
+                      <button 
+                        onClick={() => handleEdit(post.id)}
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm text-left"
+                      >
+                        {post.title}
+                        {post.status === 'draft' && <span className="ml-2 text-gray-500">— 임시글</span>}
+                      </button>
+                      {hoveredRow === post.id && (
+                        <div className="flex items-center gap-2 mt-1 text-xs">
+                          <button
+                            onClick={() => handleEdit(post.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Edit
+                          </button>
+                          <span className="text-gray-400">|</span>
+                          <button
+                            onClick={() => handleQuickEdit(post.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Quick Edit
+                          </button>
+                          <span className="text-gray-400">|</span>
+                          <button
+                            onClick={() => handleDelete(post.id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            Trash
+                          </button>
+                          <span className="text-gray-400">|</span>
+                          <button
+                            onClick={() => handleView(post.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            View
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  {visibleColumns.author && (
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      {post.author}
+                    </td>
+                  )}
+                  {visibleColumns.categories && (
+                    <td className="px-3 py-3 text-sm">
+                      {post.categories.map((cat, idx) => (
+                        <span key={idx}>
+                          <a href="#" className="text-blue-600 hover:text-blue-800">{cat}</a>
+                          {idx < post.categories.length - 1 && ', '}
+                        </span>
+                      ))}
+                      {post.categories.length === 0 && '—'}
+                    </td>
+                  )}
+                  {visibleColumns.tags && (
+                    <td className="px-3 py-3 text-sm">
+                      {post.tags.map((tag, idx) => (
+                        <span key={idx}>
+                          <a href="#" className="text-blue-600 hover:text-blue-800">{tag}</a>
+                          {idx < post.tags.length - 1 && ', '}
+                        </span>
+                      ))}
+                      {post.tags.length === 0 && '—'}
+                    </td>
+                  )}
+                  {visibleColumns.comments && (
+                    <td className="px-3 py-3 text-sm text-center">
+                      <div className="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full">
+                        {post.comments}
+                      </div>
+                    </td>
+                  )}
+                  {visibleColumns.date && (
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      <div>발행됨</div>
+                      <div>{post.date}</div>
+                    </td>
+                  )}
+                  {visibleColumns.status && (
+                    <td className="px-3 py-3 text-sm">
+                      {post.status === 'published' && (
+                        <span className="text-green-600">발행됨</span>
+                      )}
+                      {post.status === 'draft' && (
+                        <span className="text-orange-600">임시글</span>
+                      )}
+                      {post.status === 'pending' && (
+                        <span className="text-yellow-600">대기중</span>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={() => setShowBulkActions(!showBulkActions)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
+              >
+                {selectedBulkAction === 'trash' ? 'Move to Trash' : selectedBulkAction === 'edit' ? 'Edit' : 'Bulk Actions'}
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              
+              {showBulkActions && (
+                <div className="absolute left-0 bottom-full mb-1 w-48 bg-white border border-gray-300 rounded shadow-lg z-20">
+                  <button
+                    onClick={() => {
+                      setSelectedBulkAction('edit');
+                      setShowBulkActions(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedBulkAction('trash');
+                      setShowBulkActions(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    Move to Trash
+                  </button>
+                </div>
+              )}
+            </div>
+            <button 
+              onClick={handleApplyBulkAction}
+              className={`px-3 py-1.5 text-sm border border-gray-300 rounded transition-colors ${
+                selectedBulkAction && selectedPosts.size > 0 
+                  ? 'bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!selectedBulkAction || selectedPosts.size === 0}
+            >
+              Apply
+            </button>
+          </div>
+          
+          <div className="text-sm text-gray-600">
+            {filteredPosts.length} items
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Posts;

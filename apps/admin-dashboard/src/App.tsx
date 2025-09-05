@@ -51,6 +51,7 @@ const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 const ReusableBlocksPage = lazy(() => 
   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
 );
+const Posts = lazy(() => import('@/pages/posts/Posts'));
 const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
@@ -365,6 +366,13 @@ function App() {
                     } />
                     
                     {/* 글 관리 */}
+                    <Route path="/posts" element={
+                      <AdminProtectedRoute requiredPermissions={['content:read']}>
+                        <Suspense fallback={<PageLoader />}>
+                          <Posts />
+                        </Suspense>
+                      </AdminProtectedRoute>
+                    } />
                     <Route path="/posts/*" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
