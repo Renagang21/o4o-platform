@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { AnalyticsController } from '../../controllers/analytics/analyticsController';
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 const analyticsController = new AnalyticsController();
 
 // Apply authentication to all analytics routes

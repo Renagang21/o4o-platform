@@ -22,8 +22,8 @@ const dropshippingController = new DropshippingController();
  * @desc    Get dropshipping settings
  * @access  Admin
  */
-router.get('/settings', (req, res) => {
-  dropshippingController.getSettings(req, res);
+router.get('/settings', (req: Request, res: Response) => {
+  dropshippingController.getSettings(req as any, res);
 });
 
 /**
@@ -31,7 +31,7 @@ router.get('/settings', (req, res) => {
  * @desc    Update dropshipping settings
  * @access  Admin
  */
-router.put('/settings', (req, res) => {
+router.put('/settings', (req: Request, res: Response) => {
   dropshippingController.updateSettings(req as any, res);
 });
 
@@ -40,7 +40,7 @@ router.put('/settings', (req, res) => {
  * @desc    Get supplier connectors status
  * @access  Admin
  */
-router.get('/connectors', (req, res) => {
+router.get('/connectors', (req: Request, res: Response) => {
   dropshippingController.getConnectors(req as any, res);
 });
 
@@ -49,7 +49,7 @@ router.get('/connectors', (req, res) => {
  * @desc    Test supplier connector
  * @access  Admin
  */
-router.post('/connectors/:connectorId/test', (req, res) => {
+router.post('/connectors/:connectorId/test', (req: Request, res: Response) => {
   dropshippingController.testConnector(req as any, res);
 });
 
@@ -58,7 +58,7 @@ router.post('/connectors/:connectorId/test', (req, res) => {
  * @desc    Get margin policies
  * @access  Admin
  */
-router.get('/margin-policies', (req, res) => {
+router.get('/margin-policies', (req: Request, res: Response) => {
   dropshippingController.getMarginPolicies(req as any, res);
 });
 
@@ -67,7 +67,7 @@ router.get('/margin-policies', (req, res) => {
  * @desc    Get dropshipping statistics
  * @access  Admin
  */
-router.get('/statistics', (req, res) => {
+router.get('/statistics', (req: Request, res: Response) => {
   dropshippingController.getStatistics(req as any, res);
 });
 

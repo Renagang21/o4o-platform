@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { DashboardIntegrationController } from '../../controllers/analytics/dashboardIntegrationController';
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 const dashboardIntegrationController = new DashboardIntegrationController();
 
 // Apply authentication to all dashboard routes

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { EcommerceSettingsController } from '../../controllers/ecommerce/EcommerceSettingsController';
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 const settingsController = new EcommerceSettingsController();
 
 // 인증 미들웨어 적용 (관리자만 접근 가능) - 개발 중에는 임시로 비활성화

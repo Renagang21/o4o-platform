@@ -3,7 +3,7 @@ import { MenuAdvancedController } from '../controllers/menu/MenuAdvancedControll
 import { authenticateToken } from '../middleware/auth';
 import { checkRole } from '../middleware/checkRole';
 
-const router = Router();
+const router: Router = Router();
 const menuAdvancedController = new MenuAdvancedController();
 
 // All advanced menu routes require authentication

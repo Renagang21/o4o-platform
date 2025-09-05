@@ -3,7 +3,7 @@ import { PaymentWebhookController } from '../../controllers/payments/paymentWebh
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
-const router = Router();
+const router: Router = Router();
 const paymentWebhookController = new PaymentWebhookController();
 
 // Webhook endpoints (no auth required - signature verification instead)

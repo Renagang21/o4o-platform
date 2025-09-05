@@ -3,7 +3,7 @@ import { MenuController } from '../controllers/menu/MenuController';
 import { authenticateToken } from '../middleware/auth';
 import { checkRole } from '../middleware/checkRole';
 
-const router = Router();
+const router: Router = Router();
 const menuController = new MenuController();
 
 // Public routes

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { ForecastingController } from '../../controllers/analytics/forecastingController';
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 const forecastingController = new ForecastingController();
 
 // Apply authentication to all forecasting routes

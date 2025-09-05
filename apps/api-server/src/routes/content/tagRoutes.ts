@@ -3,7 +3,7 @@ import { TagController } from '../../controllers/content/TagController';
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { checkRole } from '../../middleware/checkRole';
 
-const router = Router();
+const router: Router = Router();
 const tagController = new TagController();
 
 // Public routes - no authentication required for reading

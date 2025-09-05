@@ -3,7 +3,7 @@ import { OrderAutomationController } from '../../controllers/automation/orderAut
 import { authenticate as authMiddleware } from '../../middleware/auth.middleware';
 import { rateLimitConfig } from '../../config/production.config';
 
-const router = Router();
+const router: Router = Router();
 const orderAutomationController = new OrderAutomationController();
 
 // Apply authentication to all automation routes

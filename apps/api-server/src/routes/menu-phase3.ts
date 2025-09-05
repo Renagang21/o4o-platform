@@ -5,7 +5,7 @@ import { MenuWidgetController } from '../controllers/menu/MenuWidgetController';
 import { authenticateToken } from '../middleware/auth';
 import { checkRole } from '../middleware/checkRole';
 
-const router = Router();
+const router: Router = Router();
 const menuCacheController = new MenuCacheController();
 const menuAnalyticsController = new MenuAnalyticsController();
 const menuWidgetController = new MenuWidgetController();

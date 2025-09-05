@@ -8,7 +8,7 @@ import { authenticate } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validation.middleware';
 import { body, query } from 'express-validator';
 
-const router = Router();
+const router: Router = Router();
 
 // Validation rules
 const settingsValidation = [
