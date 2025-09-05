@@ -29,6 +29,7 @@ const Categories = () => {
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showScreenOptions, setShowScreenOptions] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [selectedBulkAction, setSelectedBulkAction] = useState<string>('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -137,11 +138,22 @@ const Categories = () => {
     }
   };
 
-  const handleBulkAction = (action: string) => {
-    if (action === 'delete') {
+  const handleApplyBulkAction = () => {
+    if (!selectedBulkAction) {
+      alert('Please select an action.');
+      return;
+    }
+    
+    if (selectedCategories.size === 0) {
+      alert('No categories selected.');
+      return;
+    }
+    
+    if (selectedBulkAction === 'delete') {
       if (confirm(`선택한 ${selectedCategories.size}개의 카테고리를 삭제하시겠습니까?`)) {
         setCategories(categories.filter(c => !selectedCategories.has(c.id)));
         setSelectedCategories(new Set());
+        setSelectedBulkAction('');
       }
     }
   };
@@ -244,7 +256,7 @@ const Categories = () => {
                 onClick={() => setShowBulkActions(!showBulkActions)}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
               >
-                Bulk Actions
+                {selectedBulkAction === 'delete' ? 'Delete' : 'Bulk Actions'}
                 <ChevronDown className="w-3 h-3" />
               </button>
               
@@ -252,7 +264,7 @@ const Categories = () => {
                 <div className="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-lg z-20">
                   <button
                     onClick={() => {
-                      handleBulkAction('delete');
+                      setSelectedBulkAction('delete');
                       setShowBulkActions(false);
                     }}
                     className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
@@ -262,7 +274,15 @@ const Categories = () => {
                 </div>
               )}
             </div>
-            <button className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded hover:bg-gray-200">
+            <button 
+              onClick={handleApplyBulkAction}
+              className={`px-3 py-1.5 text-sm border border-gray-300 rounded transition-colors ${
+                selectedBulkAction && selectedCategories.size > 0 
+                  ? 'bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!selectedBulkAction || selectedCategories.size === 0}
+            >
               Apply
             </button>
           </div>
@@ -450,7 +470,7 @@ const Categories = () => {
                 onClick={() => setShowBulkActions(!showBulkActions)}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
               >
-                Bulk Actions
+                {selectedBulkAction === 'delete' ? 'Delete' : 'Bulk Actions'}
                 <ChevronDown className="w-3 h-3" />
               </button>
               
@@ -458,7 +478,7 @@ const Categories = () => {
                 <div className="absolute left-0 bottom-full mb-1 w-40 bg-white border border-gray-300 rounded shadow-lg z-20">
                   <button
                     onClick={() => {
-                      handleBulkAction('delete');
+                      setSelectedBulkAction('delete');
                       setShowBulkActions(false);
                     }}
                     className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
@@ -468,7 +488,15 @@ const Categories = () => {
                 </div>
               )}
             </div>
-            <button className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 border border-gray-300 rounded hover:bg-gray-200">
+            <button 
+              onClick={handleApplyBulkAction}
+              className={`px-3 py-1.5 text-sm border border-gray-300 rounded transition-colors ${
+                selectedBulkAction && selectedCategories.size > 0 
+                  ? 'bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!selectedBulkAction || selectedCategories.size === 0}
+            >
               Apply
             </button>
           </div>
