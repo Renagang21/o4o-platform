@@ -108,42 +108,8 @@ export const errorHandler = (
     stack: err.stack
   });
 
-  // Preserve CORS headers in error responses
-  const origin = req.headers.origin as string | undefined;
-  const allowedOrigins = [
-    'https://neture.co.kr',
-    'https://www.neture.co.kr',
-    'https://admin.neture.co.kr',
-    'http://admin.neture.co.kr', // Allow both http and https for admin
-    'https://shop.neture.co.kr',
-    'https://forum.neture.co.kr',
-    'https://signage.neture.co.kr',
-    'https://funding.neture.co.kr',
-    'https://auth.neture.co.kr',
-    'https://api.neture.co.kr',
-    'http://api.neture.co.kr', // Allow both http and https for API
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://localhost:3003',
-    'http://13.125.144.8:3000',
-    'http://13.125.144.8:3001',
-    'http://13.125.144.8', // Direct IP access
-    'https://13.125.144.8' // Direct IP access (https)
-  ];
-  
-  // Add environment-defined origins
-  const envOrigins = process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || [];
-  allowedOrigins.push(...envOrigins);
-  
-  // Always set CORS headers for allowed origins in error responses
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count, X-Page-Count');
-  }
+  // CORS headers are already set by the main CORS middleware in main.ts
+  // Do not set them again here to avoid duplicate headers
 
   // Send error response
   res.status(statusCode).json(errorResponse);
