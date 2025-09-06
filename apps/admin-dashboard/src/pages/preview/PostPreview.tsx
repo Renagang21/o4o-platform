@@ -320,9 +320,6 @@ const PostPreview: React.FC = () => {
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
                 {content.title || 'Untitled Post'}
               </h1>
-              <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-                <span>Preview Generated: {new Date().toLocaleString()}</span>
-              </div>
             </header>
 
             {/* Post Content */}
