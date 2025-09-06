@@ -72,6 +72,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   // Only consider it a new post if there's no ID and the pathname ends with /new
   const isNewPost = !postId && (location.pathname.endsWith('/new') || location.pathname.endsWith('/new/'));
   
+  // Temporary debug logging
+  console.log('Editor Debug:', {
+    postId,
+    isNewPost,
+    pathname: location.pathname,
+    params
+  });
+  
   // No longer needed debug code removed
   
   // State
@@ -144,6 +152,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   // Load post data function
   const loadPostData = useCallback(async (id: string | number) => {
+    console.log('loadPostData called with:', id);
     const loadingToast = toast.loading(`Loading post: ${id}`);
     
     try {
@@ -185,6 +194,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       // Set title immediately with flushSync to ensure immediate update
       const title = data.title || '';
+      console.log('Extracted title:', title, 'from data:', data);
       
       // Parse content - handle different formats
       let parsedBlocks = [];
@@ -254,8 +264,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         setIsWordPressReady(true);
         
         // Load post data if editing existing post
+        console.log('Load check:', { postId, isNewPost, mounted, willLoad: postId && !isNewPost && mounted });
         if (postId && !isNewPost && mounted) {
+          console.log('Loading post data for:', postId);
           await loadPostData(postId);
+        } else {
+          console.log('NOT loading post data:', { postId, isNewPost, mounted });
         }
         
         // Start entrance animation
