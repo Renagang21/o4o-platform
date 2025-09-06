@@ -166,6 +166,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       const data = response.data;
       
+      // Debug: Log what we received
+      console.log('API Response Data:', {
+        hasData: !!data,
+        dataType: typeof data,
+        title: data?.title,
+        contentType: typeof data?.content,
+        dataKeys: data ? Object.keys(data) : []
+      });
+      
       // Set title
       setPostTitle(data.title || '');
       
