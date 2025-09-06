@@ -167,11 +167,19 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Check if data is nested
       const data = response.data.data || response.data;
       
-      // Debug with alert
-      alert(`Fixed: title="${data.title}", hasContent=${!!data.content}, dataKeys=${Object.keys(data).join(',')}`);
-      
       // Set title
-      setPostTitle(data.title || '');
+      const titleToSet = data.title || '';
+      setPostTitle(titleToSet);
+      
+      // Force update to ensure title is displayed
+      setTimeout(() => {
+        setPostTitle(prevTitle => {
+          if (prevTitle !== titleToSet) {
+            return titleToSet;
+          }
+          return prevTitle;
+        });
+      }, 0);
       
       // Parse blocks from content if it exists
       if (data.content) {
