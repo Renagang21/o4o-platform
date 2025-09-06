@@ -116,9 +116,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   // Load post data if editing
   useEffect(() => {
+    console.log('Editor mode check:', {
+      postId,
+      isNewPost,
+      pathname: location.pathname
+    });
+    
     if (postId && !isNewPost) {
-      // TODO: API 호출로 포스트 데이터 로드
+      console.log('Loading post data for ID:', postId);
       loadPostData(postId);
+    } else if (isNewPost) {
+      console.log('New post mode - no data to load');
     }
   }, [postId, isNewPost]);
 
@@ -143,15 +151,25 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   }, [isDirty]);
 
   const loadPostData = async (id: string | number) => {
+    console.log('Starting to load post data for ID:', id);
+    
     try {
       // Use postApi for consistent API handling
       const response = await postApi.get(String(id));
+      console.log('Post API response:', response);
       
-      if (!response.success || !response.data) {
-        throw new Error('Failed to load post');
+      if (!response.success) {
+        console.error('Post API returned unsuccessful response:', response.error);
+        throw new Error(response.error || 'Failed to load post');
+      }
+      
+      if (!response.data) {
+        console.error('Post API returned no data');
+        throw new Error('No post data received');
       }
       
       const data = response.data;
+      console.log('Post data loaded:', data);
       
       // Set title
       setPostTitle(data.title || '');
@@ -202,8 +220,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       }));
       
       toast.success('Post loaded successfully');
-    } catch (error) {
-      toast.error('Failed to load post data');
+    } catch (error: any) {
+      console.error('Error loading post data:', error);
+      toast.error(error.message || 'Failed to load post data');
     }
   };
 
