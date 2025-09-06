@@ -266,6 +266,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     }
   };
 
+  const handlePublish = async () => {
+    await handleSave(true);
+  };
+
   const handlePreview = async () => {
     // Save draft first to ensure preview has latest content
     if (isDirty) {
