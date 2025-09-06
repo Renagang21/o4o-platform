@@ -60,7 +60,8 @@
       "Bash(git config:*)",
       "Bash(./scripts/dev.sh type-check:*)",
       "Bash(./scripts/dev.sh lint:*)",
-      "Bash(./scripts/dev.sh:*)"
+      "Bash(./scripts/dev.sh:*)",
+      "Bash(pnpm run:*)"
     ],
     "deny": []
   }

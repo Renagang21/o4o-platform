@@ -1,6 +1,5 @@
 import { useState, FC, useEffect, useRef, useCallback } from 'react';
-import { flushSync } from 'react-dom';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   Save,
@@ -46,10 +45,10 @@ import { postApi } from '@/services/api/postApi';
 
 interface StandaloneEditorProps {
   mode?: 'post' | 'page' | 'template' | 'pattern';
-  postId?: string | number;
+  postId?: string | number;  // Now passed from EditorRouteWrapper
 }
 
-const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
+const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) => {
   const [isMobile, setIsMobile] = useState(false);
   
   // 모바일 감지
@@ -63,21 +62,18 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   const navigate = useNavigate();
-  const params = useParams();
   const location = useLocation();
   
-  // Get postId from props or params
-  const postId = params.id;
-  // Most reliable check: if we have a postId, it's NOT a new post
-  // Only consider it a new post if there's no ID and the pathname ends with /new
-  const isNewPost = !postId && (location.pathname.endsWith('/new') || location.pathname.endsWith('/new/'));
+  // postId is now passed as prop from EditorRouteWrapper
+  // Simple and reliable check for new post
+  const isNewPost = !postId || postId === 'new';
   
-  // Temporary debug logging
-  console.log('Editor Debug:', {
+  // Debug logging
+  console.log('[StandaloneEditor] Initialized:', {
     postId,
     isNewPost,
-    pathname: location.pathname,
-    params
+    mode,
+    pathname: location.pathname
   });
   
   // No longer needed debug code removed
@@ -104,33 +100,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     postTitleRef.current = postTitle;
   }, [postTitle]);
   
-  // Reset state only when navigating to a NEW post
-  useEffect(() => {
-    // Only clear state for new posts, not when loading existing posts
-    if (isNewPost) {
-      setPostTitle('');
-      setBlocks([]);
-      setPostSettings({
-        status: 'draft' as 'draft' | 'publish' | 'pending' | 'private',
-        excerpt: '',
-        slug: '',
-        categories: [],
-        tags: [],
-        featuredImage: null,
-        publishDate: new Date().toISOString().slice(0, 16),
-        author: 'Admin User',
-        visibility: 'public' as 'public' | 'private' | 'password',
-        password: '',
-        template: 'default',
-        commentStatus: true,
-        pingStatus: true,
-        sticky: false,
-        format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
-      });
-      setIsDirty(false);
-      setIsEntering(true);
-    }
-  }, [postId, isNewPost]);
+  // Component is now remounted on route changes, so this effect is not needed
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -150,64 +120,51 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
   });
 
-  // Load post data function
+  // Simplified load post data function
   const loadPostData = useCallback(async (id: string | number) => {
-    console.log('loadPostData called with:', id);
-    const loadingToast = toast.loading(`Loading post: ${id}`);
+    console.log('[StandaloneEditor] Loading post:', id);
+    const loadingToast = toast.loading(`Loading post...`);
     
     try {
-      const postId = String(id);
-      const response = await postApi.get(postId);
+      const response = await postApi.get(String(id));
       
-      if (!response.success) {
+      if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to load post');
       }
       
-      if (!response.data) {
-        throw new Error('No post data received');
+      // Normalize nested API response - handle multiple levels of nesting
+      let data: Post = response.data as Post;
+      
+      // Unwrap nested data structures
+      while (data && typeof data === 'object' && 'data' in data && !('title' in data)) {
+        data = (data as any).data;
       }
       
-      // Handle nested API response structure
-      // API server returns: { status: 'success', data: actualPost }
-      interface ApiResponseWrapper {
-        status?: string;
-        data?: Post;
-        [key: string]: unknown;
-      }
+      console.log('[StandaloneEditor] Normalized data:', {
+        hasTitle: !!data.title,
+        hasContent: !!data.content,
+        title: data.title
+      });
       
-      const responseData = response.data as Post | ApiResponseWrapper;
-      
-      // Extract actual post data - handle multiple nesting scenarios
-      let data: Post;
-      
-      // Check if response.data has a nested 'data' property
-      if ('data' in responseData && typeof responseData.data === 'object' && responseData.data !== null) {
-        // Nested structure: { status: 'success', data: actualPost }
-        data = responseData.data;
-      } else if ('title' in responseData) {
-        // Direct Post object
-        data = responseData as Post;
-      } else {
-        // Fallback - use as-is
-        data = responseData as Post;
-      }
-      
-      // Set title immediately with flushSync to ensure immediate update
+      // Extract and set title
       const title = data.title || '';
-      console.log('Extracted title:', title, 'from data:', data);
+      setPostTitle(title);
       
-      // Parse content - handle different formats
+      // Parse and set content
       let parsedBlocks = [];
       if (data.content) {
-        // Try to parse content based on its type
         if (typeof data.content === 'string') {
           try {
             const parsed = JSON.parse(data.content);
             parsedBlocks = Array.isArray(parsed) ? parsed : 
-                          (parsed?.blocks || [{ id: 'initial-block', type: 'core/paragraph', content: data.content }]);
+                          (parsed?.blocks || []);
           } catch {
-            // Plain text content
-            parsedBlocks = [{ id: 'initial-block', type: 'core/paragraph', content: data.content }];
+            // Plain text - create paragraph block
+            parsedBlocks = [{ 
+              id: 'block-1', 
+              type: 'core/paragraph', 
+              attributes: { content: data.content }
+            }];
           }
         } else if (Array.isArray(data.content)) {
           parsedBlocks = data.content;
@@ -216,83 +173,73 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         }
       }
       
-      // Use a single flushSync for all critical state updates
-      flushSync(() => {
-        setPostTitle(title);
-        setBlocks(parsedBlocks);
-        setIsDirty(false); // Reset dirty flag after loading
-      });
+      setBlocks(parsedBlocks);
       
       // Set post settings
-      setPostSettings(prev => ({
-        ...prev,
-        status: data.status || 'draft',
+      setPostSettings({
+        status: (data.status || 'draft') as any,
+        visibility: 'public' as const,
+        publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
+        author: data.author?.name || 'Admin User',
+        featuredImage: data.featuredImage,
         excerpt: data.excerpt || '',
         slug: data.slug || '',
-        categories: data.categories?.map((c: any) => c.id || c) || [],
-        tags: data.tags?.map((t: any) => t.id || t) || [],
-        featuredImage: data.featuredImage,
-        publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
-        author: data.author?.name || 'Admin User'
-      }));
+        categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
+        tags: data.tags?.map((t: any) => typeof t === 'object' ? t.id : t) || [],
+        template: 'default',
+        commentStatus: true,
+        pingStatus: true,
+        sticky: false,
+        format: 'standard' as const
+      });
       
+      setIsDirty(false);
       toast.dismiss(loadingToast);
-      toast.success('Post loaded successfully');
-      // setIsDirty(false) is already called above with flushSync
+      toast.success('Post loaded');
+      
     } catch (error: any) {
+      console.error('[StandaloneEditor] Load error:', error);
       toast.dismiss(loadingToast);
+      toast.error(error.message || 'Failed to load post');
       
-      const errorMessage = error.response?.status === 500 
-        ? 'Server error: Unable to load post. Please try again later.'
-        : (error.message || 'Failed to load post data');
-      
-      toast.error(errorMessage);
+      // Reset to empty state on error
+      setPostTitle('');
+      setBlocks([]);
+      setIsDirty(false);
     }
-  }, [setPostTitle, setBlocks, setPostSettings, setIsDirty]);
+  }, []);
 
   // Initialize editor and load data
   useEffect(() => {
-    let mounted = true;
-    
     const initializeEditor = async () => {
       try {
         // Initialize WordPress editor
         await ensureWordPressLoaded();
-        
-        if (!mounted) return;
-        
         setIsWordPressReady(true);
         
         // Load post data if editing existing post
-        console.log('Load check:', { postId, isNewPost, mounted, willLoad: postId && !isNewPost && mounted });
-        if (postId && !isNewPost && mounted) {
-          console.log('Loading post data for:', postId);
+        if (postId && !isNewPost) {
+          console.log('[StandaloneEditor] Will load post:', postId);
           await loadPostData(postId);
         } else {
-          console.log('NOT loading post data:', { postId, isNewPost, mounted });
+          console.log('[StandaloneEditor] New post mode, not loading data');
+          // Reset states for new post
+          setPostTitle('');
+          setBlocks([]);
+          setIsDirty(false);
         }
         
         // Start entrance animation
-        setTimeout(() => {
-          if (mounted) setIsEntering(false);
-        }, 500);
+        setTimeout(() => setIsEntering(false), 300);
+        
       } catch (error) {
-        if (import.meta.env.DEV) {
-          // Debug logging in development only
-          const debugLog = (...args: any[]) => {
-            // Use logger for debug info
-          };
-          debugLog('Failed to initialize editor:', error);
-        }
+        console.error('[StandaloneEditor] Init error:', error);
         toast.error('Failed to initialize editor');
+        setIsWordPressReady(true); // Still show editor even if init fails
       }
     };
     
     initializeEditor();
-    
-    return () => {
-      mounted = false;
-    };
   }, [postId, isNewPost, loadPostData]);
 
   // Track unsaved changes
@@ -473,6 +420,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         isEntering && "editor-enter"
       )}
     >
+      {/* Debug Bar - Remove in production */}
+      {import.meta.env.DEV && (
+        <div className="bg-yellow-100 text-xs p-1 border-b border-yellow-300 flex gap-4">
+          <span>postId: {String(postId || 'none')}</span>
+          <span>isNewPost: {String(isNewPost)}</span>
+          <span>title: "{postTitle}" ({postTitle.length} chars)</span>
+          <span>blocks: {blocks.length}</span>
+          <span>dirty: {String(isDirty)}</span>
+        </div>
+      )}
+      
       {/* Editor Header */}
       <div className={cn(
         "bg-white border-b flex items-center justify-between",

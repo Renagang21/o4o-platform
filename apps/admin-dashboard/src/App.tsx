@@ -15,8 +15,8 @@ import AdminLayout from '@/components/layout/AdminLayout';
 import EditorLayout from '@/layouts/EditorLayout';
 import InitialRedirect from '@/components/InitialRedirect';
 
-// Import StandaloneEditor directly to avoid lazy loading state issues
-import StandaloneEditor from '@/pages/editor/StandaloneEditor';
+// Import EditorRouteWrapper to handle route-based remounting
+import EditorRouteWrapper from '@/pages/editor/EditorRouteWrapper';
 
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
@@ -255,32 +255,32 @@ function App() {
                   <Routes>
                     <Route path="posts/new" element={
                       <Suspense fallback={<PageLoader />}>
-                        <StandaloneEditor mode="post" />
+                        <EditorRouteWrapper mode="post" />
                       </Suspense>
                     } />
                     <Route path="posts/:id" element={
                       <Suspense fallback={<PageLoader />}>
-                        <StandaloneEditor mode="post" />
+                        <EditorRouteWrapper mode="post" />
                       </Suspense>
                     } />
                     <Route path="pages/new" element={
                       <Suspense fallback={<PageLoader />}>
-                        <StandaloneEditor mode="page" />
+                        <EditorRouteWrapper mode="page" />
                       </Suspense>
                     } />
                     <Route path="pages/:id" element={
                       <Suspense fallback={<PageLoader />}>
-                        <StandaloneEditor mode="page" />
+                        <EditorRouteWrapper mode="page" />
                       </Suspense>
                     } />
                     <Route path="templates/:id" element={
                       <Suspense fallback={<PageLoader />}>
-                        <StandaloneEditor mode="template" />
+                        <EditorRouteWrapper mode="template" />
                       </Suspense>
                     } />
                     <Route path="patterns/:id" element={
                       <Suspense fallback={<PageLoader />}>
-                        <StandaloneEditor mode="pattern" />
+                        <EditorRouteWrapper mode="pattern" />
                       </Suspense>
                     } />
                   </Routes>

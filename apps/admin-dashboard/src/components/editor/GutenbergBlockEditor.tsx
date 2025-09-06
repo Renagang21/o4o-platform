@@ -27,6 +27,7 @@ import { CheckCircle, XCircle, Info } from 'lucide-react';
 // Block interface는 이제 @/types/post.types에서 import
 
 interface GutenbergBlockEditorProps {
+  documentTitle?: string;  // Added to receive title from parent
   initialBlocks?: Block[];
   onChange?: (blocks: Block[]) => void;
   onSave?: () => void;
@@ -34,6 +35,7 @@ interface GutenbergBlockEditorProps {
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
+  documentTitle: propDocumentTitle = '',  // Receive title from parent
   initialBlocks = [],
   onChange,
   onSave,
@@ -52,8 +54,25 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         ]
   );
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
-  const [documentTitle, setDocumentTitle] = useState('');
+  const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true); // 기본적으로 열림
+  
+  // Update blocks when initialBlocks prop changes (important for data loading)
+  useEffect(() => {
+    if (initialBlocks && initialBlocks.length > 0) {
+      console.log('[GutenbergBlockEditor] Updating blocks from prop:', initialBlocks.length);
+      setBlocks(initialBlocks);
+      setHistory([initialBlocks]);
+      setHistoryIndex(0);
+      setIsDirty(false);
+    }
+  }, [initialBlocks]);
+  
+  // Update title when prop changes
+  useEffect(() => {
+    console.log('[GutenbergBlockEditor] Title prop changed:', propDocumentTitle);
+    setDocumentTitle(propDocumentTitle);
+  }, [propDocumentTitle]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [history, setHistory] = useState<Block[][]>([blocks]);
   const [historyIndex, setHistoryIndex] = useState(0);
