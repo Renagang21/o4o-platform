@@ -142,12 +142,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   }, [isDirty]);
 
   const loadPostData = async (id: string | number) => {
-    // Show loading indicator
-    const loadingToast = toast.loading('Loading post data...');
+    // Show loading indicator with ID for debugging
+    const loadingToast = toast.loading(`Loading post: ${id}`);
     
     try {
       // Use postApi for consistent API handling
-      const response = await postApi.get(String(id));
+      const postId = String(id);
+      const response = await postApi.get(postId);
       
       if (!response.success) {
         if (import.meta.env.DEV) {
@@ -229,7 +230,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
           fullError: error
         });
       }
-      toast.error(error.message || 'Failed to load post data');
+      
+      // Show more detailed error message
+      const errorMessage = error.response?.status === 500 
+        ? 'Server error: Unable to load post. Starting with empty editor.'
+        : (error.message || 'Failed to load post data');
+      
+      toast.error(errorMessage);
+      
+      // Set empty state so user can still work
+      if (error.response?.status === 500) {
+        setPostTitle('Untitled (Failed to load original)');
+        setBlocks([]);
+        setPostSettings(prev => ({
+          ...prev,
+          status: 'draft'
+        }));
+      }
     }
   };
 
