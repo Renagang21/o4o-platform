@@ -70,22 +70,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const postId = params.id;
   const isNewPost = location.pathname.includes('/new');
   
-  // Debug: Log route params and state
-  useEffect(() => {
-    (window as any).__routeDebug = {
-      pathname: location.pathname,
-      params: params,
-      postId: postId,
-      isNewPost: isNewPost,
-      hasPostId: !!postId,
-      postIdType: typeof postId
-    };
-    // Debug info stored in window.__routeDebug
-  }, [location.pathname, params, postId, isNewPost]);
+  // No longer needed debug code removed
   
-  // State with force update mechanism
+  // State
   const [postTitle, setPostTitle] = useState('');
-  const [, forceUpdate] = useState({});
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab] = useState<'document' | 'block'>('document');
@@ -104,21 +92,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   // Keep ref in sync with state
   useEffect(() => {
     postTitleRef.current = postTitle;
-    (window as any).__currentPostTitle = postTitle;
   }, [postTitle]);
   
   // Reset state only when navigating to a NEW post
   useEffect(() => {
-    (window as any).__resetEffect = {
-      triggered: true,
-      isNewPost,
-      postId,
-      timestamp: new Date().toISOString()
-    };
-    
     // Only clear state for new posts, not when loading existing posts
     if (isNewPost) {
-      (window as any).__resetEffect.clearing = true;
       setPostTitle('');
       setBlocks([]);
       setPostSettings({
@@ -165,33 +144,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const loadPostData = useCallback(async (id: string | number) => {
     const loadingToast = toast.loading(`Loading post: ${id}`);
     
-    // Debug: Log what we're trying to load
-    (window as any).__loadAttempt = {
-      id,
-      idType: typeof id,
-      stringId: String(id),
-      timestamp: new Date().toISOString(),
-      functionCalled: true
-    };
-    
-    // Log to window for debugging
-    (window as any).__loadPostDataCalled = true;
-    
     try {
       const postId = String(id);
       const response = await postApi.get(postId);
-      
-      // Debug: Log API response with full data
-      (window as any).__apiResponse = {
-        success: response.success,
-        hasData: !!response.data,
-        error: response.error,
-        dataKeys: response.data ? Object.keys(response.data) : [],
-        fullResponse: response,
-        responseData: response.data
-      };
-      
-      // Debug info stored in window.__apiResponse
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to load post');
@@ -214,40 +169,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Extract actual post data - handle multiple nesting scenarios
       let data: Post;
       
-      // Debug: Store extraction process info
-      (window as any).__extractionInfo = {
-        hasDataProperty: 'data' in responseData,
-        hasTitleProperty: 'title' in responseData,
-        responseDataKeys: Object.keys(responseData)
-      };
-      
       // Check if response.data has a nested 'data' property
       if ('data' in responseData && typeof responseData.data === 'object' && responseData.data !== null) {
         // Nested structure: { status: 'success', data: actualPost }
         data = responseData.data;
-        (window as any).__extractionMethod = 'nested';
       } else if ('title' in responseData) {
         // Direct Post object
         data = responseData as Post;
-        (window as any).__extractionMethod = 'direct';
       } else {
         // Fallback - use as-is
         data = responseData as Post;
-        (window as any).__extractionMethod = 'fallback';
       }
       
       // Set title immediately with flushSync to ensure immediate update
       const title = data.title || '';
-      
-      // Debug: Store extracted title
-      (window as any).__extractedTitle = title;
-      (window as any).__extractedData = data;
-      
-      // Debug: Store state before update
-      (window as any).__beforeUpdate = {
-        currentPostTitle: postTitle,
-        newTitle: title
-      };
       
       // Parse content - handle different formats
       let parsedBlocks = [];
@@ -276,38 +211,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         setIsDirty(false); // Reset dirty flag after loading
       });
       
-      // Force update to trigger re-render
-      forceUpdate({});
-      
-      // Debug: Store DOM state after flushSync
-      (window as any).__afterFlushSync = document.querySelector('input[type="text"]')?.value;
-      
-      // Double-check the state update and force another update if needed
-      setTimeout(() => {
-        (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
-        const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-        (window as any).__after100ms = {
-          domValue: input?.value,
-          stateValue: (window as any).__postTitle,
-          inputFound: !!input,
-          titleToSet: title
-        };
-        
-        // Log the decision process
-        (window as any).__forceDecision = {
-          hasInput: !!input,
-          currentInputValue: input?.value,
-          titleToSet: title,
-          willForce: input && !input.value && title
-        };
-        
-        // If state is set but DOM is not updated, force input value directly
-        if (input && !input.value && title) {
-          input.value = title;
-          (window as any).__forcedInputValue = true;
-        }
-      }, 100);
-      
       // Set post settings
       setPostSettings(prev => ({
         ...prev,
@@ -327,33 +230,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     } catch (error: any) {
       toast.dismiss(loadingToast);
       
-      // Debug: Log error details
-      (window as any).__loadError = {
-        id,
-        message: error.message,
-        response: error.response,
-        stack: error.stack
-      };
-      
       const errorMessage = error.response?.status === 500 
         ? 'Server error: Unable to load post. Please try again later.'
         : (error.message || 'Failed to load post data');
       
       toast.error(errorMessage);
-      // Error details stored in window.__loadError
     }
-  }, [setPostTitle, setBlocks, setPostSettings, setIsDirty, forceUpdate]);
+  }, [setPostTitle, setBlocks, setPostSettings, setIsDirty]);
 
   // Initialize editor and load data
   useEffect(() => {
     let mounted = true;
-    
-    (window as any).__initEffect = {
-      triggered: true,
-      postId,
-      isNewPost,
-      timestamp: new Date().toISOString()
-    };
     
     const initializeEditor = async () => {
       try {
@@ -366,9 +253,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         
         // Load post data if editing existing post
         if (postId && !isNewPost && mounted) {
-          (window as any).__initEffect.loadingData = true;
           await loadPostData(postId);
-          (window as any).__initEffect.dataLoaded = true;
         }
         
         // Start entrance animation
@@ -401,14 +286,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     }
   }, [blocks, postTitle]);
 
-  // Debug: Track postTitle changes
-  useEffect(() => {
-    // Store in window for debugging
-    (window as any).__postTitle = postTitle;
-    (window as any).__postId = postId;
-    (window as any).__isNewPost = isNewPost;
-  }, [postTitle, postId, isNewPost]);
-
   // Warn before leaving with unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -432,19 +309,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     
     setIsSaving(true);
     
-    // Debug: Check current state
-    (window as any).__handleSaveDebug = {
-      postId,
-      postTitle,
-      isNewPost,
-      blocksCount: blocks.length,
-      publish
-    };
-    
     try {
-      // IMPORTANT: Get title from DOM if state is empty (React state update issue workaround)
-      const titleInput = document.querySelector('input[type="text"]') as HTMLInputElement;
-      const actualTitle = titleInput?.value || postTitle || 'Untitled';
+      const actualTitle = postTitle || 'Untitled';
       
       const postData: any = {
         title: actualTitle,
@@ -469,15 +335,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       const response = postId 
         ? await postApi.update(postData)
         : await postApi.create(postData);
-      
-      // Debug: Log save response
-      (window as any).__saveResponse = {
-        response,
-        isUpdate: !!postId,
-        postData,
-        success: response.success,
-        error: response.error
-      };
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to save');
@@ -637,25 +494,19 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
           )}
 
           {/* Title Input */}
-          <div className="flex-1 max-w-2xl min-w-0">
+          <div className="flex-1 max-w-2xl">
             <input
-              key={postId || 'new-post'}
               type="text"
               placeholder={isMobile ? getModeLabel() : `Add ${getModeLabel()} title`}
-              value={postTitle || ''}
+              value={postTitle}
               onChange={(e) => {
                 setPostTitle(e.target.value);
                 setIsDirty(true);
               }}
               className={cn(
-                "w-full min-w-[200px] px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400",
+                "w-full px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400 text-gray-900",
                 isMobile ? "text-base" : "text-xl"
               )}
-              style={{ 
-                minWidth: '200px',
-                color: '#111827', // text-gray-900 equivalent
-                backgroundColor: 'transparent'
-              }}
             />
           </div>
 
