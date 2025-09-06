@@ -68,7 +68,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   
   // Get postId from props or params
   const postId = params.id;
-  const isNewPost = location.pathname.includes('/new');
+  // Most reliable check: if we have a postId, it's NOT a new post
+  // Only consider it a new post if there's no ID and the pathname ends with /new
+  const isNewPost = !postId && (location.pathname.endsWith('/new') || location.pathname.endsWith('/new/'));
   
   // No longer needed debug code removed
   
@@ -498,7 +500,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
             <input
               type="text"
               placeholder={isMobile ? getModeLabel() : `Add ${getModeLabel()} title`}
-              value={postTitle}
+              value={postTitle || ''}
               onChange={(e) => {
                 setPostTitle(e.target.value);
                 setIsDirty(true);
