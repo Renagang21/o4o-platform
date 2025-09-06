@@ -233,20 +233,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       // Show more detailed error message
       const errorMessage = error.response?.status === 500 
-        ? 'Server error: Unable to load post. Starting with empty editor.'
+        ? 'Server error: Unable to load post. Please try again later.'
         : (error.message || 'Failed to load post data');
       
       toast.error(errorMessage);
-      
-      // Set empty state so user can still work
-      if (error.response?.status === 500) {
-        setPostTitle('Untitled (Failed to load original)');
-        setBlocks([]);
-        setPostSettings(prev => ({
-          ...prev,
-          status: 'draft'
-        }));
-      }
     }
   };
 
