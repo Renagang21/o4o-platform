@@ -96,6 +96,9 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 // const GutenbergPage = lazy(() => 
 //   import(/* webpackChunkName: "gutenberg" */ '@/pages/test/GutenbergPageWrapped')
 // );
+// Preview Page
+const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
+
 const StandaloneEditor = lazy(() => 
   import(/* webpackChunkName: "standalone-editor" */ '@/pages/editor/StandaloneEditor')
 );
@@ -234,6 +237,13 @@ function App() {
             
             {/* 루트 경로 - 인증 상태에 따라 리다이렉트 */}
             <Route path="/" element={<InitialRedirect />} />
+            
+            {/* 미리보기 페이지 - 인증 불필요 (sessionStorage 기반) */}
+            <Route path="/preview" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostPreview />
+              </Suspense>
+            } />
             
             {/* 독립형 편집기 라우트 - 관리자 레이아웃 밖에서 실행 */}
             <Route path="/editor/*" element={

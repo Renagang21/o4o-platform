@@ -41,7 +41,10 @@ const Posts = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const response = await fetch('/api/posts', {
+        
+        // Get API URL from environment or use production URL
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        const response = await fetch(`${apiUrl}/api/posts`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
           }
@@ -101,18 +104,20 @@ const Posts = () => {
         const data = await response.json();
         
         // Transform API response to match our Post interface
-        const transformedPosts = data.posts?.map((post: any) => ({
+        // API returns data.data array, not data.posts
+        const postsArray = data.data || data.posts || [];
+        const transformedPosts = postsArray.map((post: any) => ({
           id: post.id, // Use UUID from server
           title: post.title || 'Untitled',
           slug: post.slug || '',
-          author: post.author?.name || 'Unknown',
-          categories: post.categories?.map((cat: any) => cat.name) || [],
-          tags: post.tags?.map((tag: any) => tag.name) || [],
-          comments: 0, // TODO: Get comment count from API
+          author: post.author?.name || post.author?.email || 'Unknown',
+          categories: post.categories?.map((cat: any) => typeof cat === 'string' ? cat : cat.name) || [],
+          tags: post.tags?.map((tag: any) => typeof tag === 'string' ? tag : tag.name) || [],
+          comments: post.commentCount || 0,
           date: post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0] : new Date(post.createdAt).toISOString().split('T')[0],
           status: post.status || 'draft',
           views: post.views || 0
-        })) || [];
+        }));
         
         setPosts(transformedPosts);
       } catch (err) {
