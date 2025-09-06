@@ -135,13 +135,25 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       const postId = String(id);
       const response = await postApi.get(postId);
       
-      // Debug: Log API response
+      // Debug: Log API response with full data
       (window as any).__apiResponse = {
         success: response.success,
         hasData: !!response.data,
         error: response.error,
-        dataKeys: response.data ? Object.keys(response.data) : []
+        dataKeys: response.data ? Object.keys(response.data) : [],
+        fullResponse: response,
+        responseData: response.data
       };
+      
+      // Log to see actual structure
+      if (import.meta.env.DEV) {
+        console.log('API Response:', response);
+        console.log('Response Data:', response.data);
+        if (response.data && typeof response.data === 'object') {
+          console.log('Response Data Keys:', Object.keys(response.data));
+          console.log('Has nested data?:', 'data' in response.data);
+        }
+      }
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to load post');
@@ -164,16 +176,32 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Extract actual post data - handle multiple nesting scenarios
       let data: Post;
       
+      // Debug: Log extraction process
+      if (import.meta.env.DEV) {
+        console.log('Extracting data from responseData:', responseData);
+        console.log('Has data property?:', 'data' in responseData);
+        console.log('Has title property?:', 'title' in responseData);
+      }
+      
       // Check if response.data has a nested 'data' property
       if ('data' in responseData && typeof responseData.data === 'object' && responseData.data !== null) {
         // Nested structure: { status: 'success', data: actualPost }
         data = responseData.data;
+        if (import.meta.env.DEV) {
+          console.log('Using nested data structure, extracted:', data);
+        }
       } else if ('title' in responseData) {
         // Direct Post object
         data = responseData as Post;
+        if (import.meta.env.DEV) {
+          console.log('Using direct Post structure, data:', data);
+        }
       } else {
         // Fallback - use as-is
         data = responseData as Post;
+        if (import.meta.env.DEV) {
+          console.log('Using fallback, data as-is:', data);
+        }
       }
       
       // Set title immediately with flushSync to ensure immediate update
@@ -183,14 +211,29 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       (window as any).__extractedTitle = title;
       (window as any).__extractedData = data;
       
+      // Debug: Check state before update
+      if (import.meta.env.DEV) {
+        console.log('Before setPostTitle - current postTitle:', postTitle);
+        console.log('About to set title to:', title);
+      }
+      
       // Use flushSync to bypass React 18 automatic batching
       flushSync(() => {
         setPostTitle(title);
       });
       
+      // Debug: Immediately check DOM after flushSync
+      if (import.meta.env.DEV) {
+        console.log('After flushSync - DOM input value:', document.querySelector('input[type="text"]')?.value);
+      }
+      
       // Double-check the state update
       setTimeout(() => {
         (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
+        if (import.meta.env.DEV) {
+          console.log('After 100ms - DOM input value:', document.querySelector('input[type="text"]')?.value);
+          console.log('After 100ms - window.__postTitle:', (window as any).__postTitle);
+        }
       }, 100);
       
       // Parse content - handle different formats
@@ -255,7 +298,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         console.error('Failed to load post:', error);
       }
     }
-  }, []);
+  }, [setPostTitle, setBlocks, setPostSettings, setIsDirty]);
 
   // Initialize editor and load data
   useEffect(() => {
