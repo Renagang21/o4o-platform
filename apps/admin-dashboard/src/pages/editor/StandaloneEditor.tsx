@@ -164,10 +164,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         throw new Error('No post data received');
       }
       
-      const data = response.data;
+      // Check if data is nested
+      const data = response.data.data || response.data;
       
       // Debug with alert
-      alert(`API Response: title="${data.title}", hasContent=${!!data.content}, dataKeys=${Object.keys(data).join(',')}`);
+      alert(`Fixed: title="${data.title}", hasContent=${!!data.content}, dataKeys=${Object.keys(data).join(',')}`);
       
       // Set title
       setPostTitle(data.title || '');
