@@ -625,6 +625,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
                 setBlocks(newBlocks);
                 setIsDirty(true);
               }}
+              onSave={handleSave}
+              onPublish={handlePublish}
             />
           </div>
         </div>
