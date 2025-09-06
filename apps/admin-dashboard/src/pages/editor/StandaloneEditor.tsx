@@ -648,10 +648,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
                 setIsDirty(true);
               }}
               className={cn(
-                "w-full min-w-[200px] px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400 text-gray-900",
+                "w-full min-w-[200px] px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400",
                 isMobile ? "text-base" : "text-xl"
               )}
-              style={{ minWidth: '200px' }}
+              style={{ 
+                minWidth: '200px',
+                color: '#111827', // text-gray-900 equivalent
+                backgroundColor: 'transparent'
+              }}
             />
           </div>
 
