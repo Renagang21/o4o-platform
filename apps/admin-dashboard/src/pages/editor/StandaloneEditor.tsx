@@ -80,9 +80,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       hasPostId: !!postId,
       postIdType: typeof postId
     };
-    if (import.meta.env.DEV) {
-      console.log('Route Debug:', (window as any).__routeDebug);
-    }
+    // Debug info stored in window.__routeDebug
   }, [location.pathname, params, postId, isNewPost]);
   
   // State
@@ -145,15 +143,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         responseData: response.data
       };
       
-      // Log to see actual structure
-      if (import.meta.env.DEV) {
-        console.log('API Response:', response);
-        console.log('Response Data:', response.data);
-        if (response.data && typeof response.data === 'object') {
-          console.log('Response Data Keys:', Object.keys(response.data));
-          console.log('Has nested data?:', 'data' in response.data);
-        }
-      }
+      // Debug info stored in window.__apiResponse
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to load post');
@@ -176,32 +166,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Extract actual post data - handle multiple nesting scenarios
       let data: Post;
       
-      // Debug: Log extraction process
-      if (import.meta.env.DEV) {
-        console.log('Extracting data from responseData:', responseData);
-        console.log('Has data property?:', 'data' in responseData);
-        console.log('Has title property?:', 'title' in responseData);
-      }
+      // Debug: Store extraction process info
+      (window as any).__extractionInfo = {
+        hasDataProperty: 'data' in responseData,
+        hasTitleProperty: 'title' in responseData,
+        responseDataKeys: Object.keys(responseData)
+      };
       
       // Check if response.data has a nested 'data' property
       if ('data' in responseData && typeof responseData.data === 'object' && responseData.data !== null) {
         // Nested structure: { status: 'success', data: actualPost }
         data = responseData.data;
-        if (import.meta.env.DEV) {
-          console.log('Using nested data structure, extracted:', data);
-        }
+        (window as any).__extractionMethod = 'nested';
       } else if ('title' in responseData) {
         // Direct Post object
         data = responseData as Post;
-        if (import.meta.env.DEV) {
-          console.log('Using direct Post structure, data:', data);
-        }
+        (window as any).__extractionMethod = 'direct';
       } else {
         // Fallback - use as-is
         data = responseData as Post;
-        if (import.meta.env.DEV) {
-          console.log('Using fallback, data as-is:', data);
-        }
+        (window as any).__extractionMethod = 'fallback';
       }
       
       // Set title immediately with flushSync to ensure immediate update
@@ -211,29 +195,27 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       (window as any).__extractedTitle = title;
       (window as any).__extractedData = data;
       
-      // Debug: Check state before update
-      if (import.meta.env.DEV) {
-        console.log('Before setPostTitle - current postTitle:', postTitle);
-        console.log('About to set title to:', title);
-      }
+      // Debug: Store state before update
+      (window as any).__beforeUpdate = {
+        currentPostTitle: postTitle,
+        newTitle: title
+      };
       
       // Use flushSync to bypass React 18 automatic batching
       flushSync(() => {
         setPostTitle(title);
       });
       
-      // Debug: Immediately check DOM after flushSync
-      if (import.meta.env.DEV) {
-        console.log('After flushSync - DOM input value:', document.querySelector('input[type="text"]')?.value);
-      }
+      // Debug: Store DOM state after flushSync
+      (window as any).__afterFlushSync = document.querySelector('input[type="text"]')?.value;
       
       // Double-check the state update
       setTimeout(() => {
         (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
-        if (import.meta.env.DEV) {
-          console.log('After 100ms - DOM input value:', document.querySelector('input[type="text"]')?.value);
-          console.log('After 100ms - window.__postTitle:', (window as any).__postTitle);
-        }
+        (window as any).__after100ms = {
+          domValue: document.querySelector('input[type="text"]')?.value,
+          stateValue: (window as any).__postTitle
+        };
       }, 100);
       
       // Parse content - handle different formats
@@ -294,9 +276,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         : (error.message || 'Failed to load post data');
       
       toast.error(errorMessage);
-      if (import.meta.env.DEV) {
-        console.error('Failed to load post:', error);
-      }
+      // Error details stored in window.__loadError
     }
   }, [setPostTitle, setBlocks, setPostSettings, setIsDirty]);
 
