@@ -116,8 +116,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   // Load post data if editing
   useEffect(() => {
+    // Temporary alert for debugging
     if (postId && !isNewPost) {
+      alert(`Loading post with ID: ${postId}`);
       loadPostData(postId);
+    } else {
+      alert(`Not loading - postId: ${postId}, isNewPost: ${isNewPost}`);
     }
   }, [postId, isNewPost]);
 
