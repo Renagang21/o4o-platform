@@ -69,21 +69,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const postId = params.id;
   const isNewPost = location.pathname.includes('/new');
   
-  // State - Add mount counter to detect remounts
-  const mountCountRef = useRef(0);
-  useEffect(() => {
-    mountCountRef.current += 1;
-    console.log(`StandaloneEditor mounted ${mountCountRef.current} times`);
-  }, []);
-  
-  const [postTitle, setPostTitleOriginal] = useState('');
-  
-  // Wrap setPostTitle to log all changes
-  const setPostTitle = (value: any) => {
-    const newValue = typeof value === 'function' ? value(postTitle) : value;
-    console.log(`setPostTitle called: "${postTitle}" -> "${newValue}"`);
-    setPostTitleOriginal(newValue);
-  };
+  // State
+  const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab] = useState<'document' | 'block'>('document');
@@ -97,7 +84,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const loadedDataRef = useRef<any>(null);
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -125,24 +111,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       setTimeout(() => {
         setIsEntering(false);
       }, 500);
-      
-      // If data was loaded before WordPress was ready, apply it now
-      if (loadedDataRef.current && loadedDataRef.current.title) {
-        setPostTitle(loadedDataRef.current.title);
-      }
     });
   }, []);
 
-  // Load post data if editing
+  // Load post data if editing - only after WordPress is ready
   useEffect(() => {
-    if (postId && !isNewPost) {
-      // Add a small delay to ensure component is fully mounted
-      const timer = setTimeout(() => {
-        loadPostData(postId);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (postId && !isNewPost && isWordPressReady) {
+      loadPostData(postId);
     }
-  }, [postId, isNewPost]);
+  }, [postId, isNewPost, isWordPressReady]);
 
   // Track unsaved changes
   useEffect(() => {
@@ -190,24 +167,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Check if data is nested
       const data = response.data.data || response.data;
       
-      // Store loaded data in ref
-      loadedDataRef.current = data;
-      
       // Set title - using functional update to ensure state is set
       const titleToSet = data.title || '';
       
-      // Force state update with functional setter
-      setPostTitle(() => titleToSet);
-      
-      // Also try setting blocks first, then title
-      if (data.content) {
-        // Process content first...
-      }
-      
-      // Then set title again after content processing
-      setTimeout(() => {
-        setPostTitle(() => titleToSet);
-      }, 10);
+      // Set title with the extracted value
+      setPostTitle(titleToSet);
       
       // Parse blocks from content if it exists
       if (data.content) {
