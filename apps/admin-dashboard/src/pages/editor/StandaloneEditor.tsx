@@ -142,6 +142,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   }, [isDirty]);
 
   const loadPostData = async (id: string | number) => {
+    alert(`loadPostData function called with ID: ${id}`);
     // Show loading indicator with ID for debugging
     const loadingToast = toast.loading(`Loading post: ${id}`);
     
@@ -149,6 +150,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Use postApi for consistent API handling
       const postId = String(id);
       const response = await postApi.get(postId);
+      alert(`API call completed. Success: ${response.success}`);
       
       if (!response.success) {
         if (import.meta.env.DEV) {
@@ -166,9 +168,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       // Check if data is nested
       const data = response.data.data || response.data;
+      alert(`Data extracted. Title: "${data.title}", Has content: ${!!data.content}`);
       
       // Set title
       const titleToSet = data.title || '';
+      alert(`About to set title to: "${titleToSet}"`);
       setPostTitle(titleToSet);
       
       // Force update to ensure title is displayed
