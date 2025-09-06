@@ -365,8 +365,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     // Store in session storage for preview page
     sessionStorage.setItem('previewContent', JSON.stringify(previewContent));
     
-    // Open preview in new tab
-    window.open('/preview', '_blank');
+    // Open preview in new tab with correct route
+    window.open('/admin/preview', '_blank');
   }, [documentTitle, blocks]);
 
   // Switch to block tab when a block is selected

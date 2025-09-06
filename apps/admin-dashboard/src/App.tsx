@@ -239,7 +239,7 @@ function App() {
             <Route path="/" element={<InitialRedirect />} />
             
             {/* 미리보기 페이지 - 인증 불필요 (sessionStorage 기반) */}
-            <Route path="/preview" element={
+            <Route path="/admin/preview" element={
               <Suspense fallback={<PageLoader />}>
                 <PostPreview />
               </Suspense>
