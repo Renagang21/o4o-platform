@@ -108,8 +108,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   
   // Reset state only when navigating to a NEW post
   useEffect(() => {
+    (window as any).__resetEffect = {
+      triggered: true,
+      isNewPost,
+      postId,
+      timestamp: new Date().toISOString()
+    };
+    
     // Only clear state for new posts, not when loading existing posts
     if (isNewPost) {
+      (window as any).__resetEffect.clearing = true;
       setPostTitle('');
       setBlocks([]);
       setPostSettings({
@@ -315,6 +323,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   useEffect(() => {
     let mounted = true;
     
+    (window as any).__initEffect = {
+      triggered: true,
+      postId,
+      isNewPost,
+      timestamp: new Date().toISOString()
+    };
+    
     const initializeEditor = async () => {
       try {
         // Initialize WordPress editor
@@ -326,7 +341,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         
         // Load post data if editing existing post
         if (postId && !isNewPost && mounted) {
+          (window as any).__initEffect.loadingData = true;
           await loadPostData(postId);
+          (window as any).__initEffect.dataLoaded = true;
         }
         
         // Start entrance animation
