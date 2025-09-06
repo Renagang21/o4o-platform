@@ -116,22 +116,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   // Load post data if editing
   useEffect(() => {
-    // Always log in production for debugging
-    console.log('Editor initialization:', {
-      postId,
-      isNewPost,
-      pathname: location.pathname,
-      hasPostId: !!postId,
-      shouldLoad: postId && !isNewPost
-    });
-    
     if (postId && !isNewPost) {
-      console.log('Triggering loadPostData for ID:', postId);
       loadPostData(postId);
-    } else {
-      console.log('Not loading post data:', {
-        reason: !postId ? 'No postId' : 'Is new post'
-      });
     }
   }, [postId, isNewPost]);
 
@@ -156,21 +142,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   }, [isDirty]);
 
   const loadPostData = async (id: string | number) => {
-    console.log('loadPostData called with ID:', id);
-    
     // Show loading indicator
     const loadingToast = toast.loading('Loading post data...');
     
     try {
-      console.log('Making API call to postApi.get()');
       // Use postApi for consistent API handling
       const response = await postApi.get(String(id));
-      
-      console.log('Post API response:', {
-        success: response.success,
-        hasData: !!response.data,
-        error: response.error
-      });
       
       if (!response.success) {
         if (import.meta.env.DEV) {
@@ -188,35 +165,21 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       const data = response.data;
       
-      console.log('Post data structure:', {
-        title: data.title,
-        hasContent: !!data.content,
-        contentType: typeof data.content,
-        contentPreview: data.content ? String(data.content).substring(0, 100) : null
-      });
-      
       // Set title
       setPostTitle(data.title || '');
       
       // Parse blocks from content if it exists
       if (data.content) {
-        console.log('Processing content, type:', typeof data.content);
-        
         if (typeof data.content === 'string') {
           // If content is HTML string, convert to blocks
           try {
-            console.log('Attempting to parse content as JSON');
             const parsed = JSON.parse(data.content);
-            console.log('Parsed content:', parsed);
             
             if (Array.isArray(parsed)) {
-              console.log('Content is array, setting blocks directly');
               setBlocks(parsed);
             } else if (parsed && parsed.blocks && Array.isArray(parsed.blocks)) {
-              console.log('Content has blocks property, using blocks array');
               setBlocks(parsed.blocks);
             } else {
-              console.log('Parsed content is not array, creating paragraph block');
               setBlocks([{
                 id: 'initial-block',
                 type: 'core/paragraph',
@@ -224,7 +187,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
               }]);
             }
           } catch (e) {
-            console.log('JSON parse failed, treating as plain text:', e);
             // If parsing fails, treat as plain text
             setBlocks([{
               id: 'initial-block',
@@ -233,16 +195,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
             }]);
           }
         } else if (Array.isArray(data.content)) {
-          console.log('Content is already array, setting blocks');
           // If content is already an array of blocks
           setBlocks(data.content);
         } else if (data.content.blocks) {
-          console.log('Content has blocks property, using it');
           // If content has blocks array
           setBlocks(data.content.blocks);
         }
-      } else {
-        console.log('No content found in post data');
       }
       
       // Set post settings
@@ -263,12 +221,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       setIsDirty(false); // Mark as clean after loading
     } catch (error: any) {
       toast.dismiss(loadingToast);
-      // Always log errors for debugging
-      console.error('Error loading post data:', {
-        error: error.message,
-        postId: id,
-        fullError: error
-      });
+      // Log errors only in development
+      if (import.meta.env.DEV) {
+        console.error('Error loading post data:', {
+          error: error.message,
+          postId: id,
+          fullError: error
+        });
+      }
       toast.error(error.message || 'Failed to load post data');
     }
   };
