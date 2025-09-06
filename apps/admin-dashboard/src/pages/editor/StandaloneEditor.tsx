@@ -106,6 +106,32 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     (window as any).__currentPostTitle = postTitle;
   }, [postTitle]);
   
+  // Reset state when postId changes (navigation between posts)
+  useEffect(() => {
+    // Clear state when navigating to a different post
+    setPostTitle('');
+    setBlocks([]);
+    setPostSettings({
+      status: 'draft' as 'draft' | 'publish' | 'pending' | 'private',
+      excerpt: '',
+      slug: '',
+      categories: [],
+      tags: [],
+      featuredImage: null,
+      publishDate: new Date().toISOString().slice(0, 16),
+      author: 'Admin User',
+      visibility: 'public' as 'public' | 'private' | 'password',
+      password: '',
+      template: 'default',
+      commentStatus: true,
+      pingStatus: true,
+      sticky: false,
+      format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
+    });
+    setIsDirty(false);
+    setIsEntering(true);
+  }, [postId]);
+  
   // Post settings
   const [postSettings, setPostSettings] = useState({
     status: 'draft' as 'draft' | 'publish' | 'pending' | 'private',
