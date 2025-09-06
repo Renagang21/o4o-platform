@@ -237,6 +237,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       toast.success('Post loaded successfully');
       setIsDirty(false); // Mark as clean after loading
     } catch (error: any) {
+      alert(`Error occurred: ${error.message || 'Unknown error'}`);
       toast.dismiss(loadingToast);
       // Log errors only in development
       if (import.meta.env.DEV) {
