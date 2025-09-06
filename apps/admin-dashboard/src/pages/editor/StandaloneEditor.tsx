@@ -98,6 +98,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const postTitleRef = useRef(postTitle);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    postTitleRef.current = postTitle;
+    (window as any).__currentPostTitle = postTitle;
+  }, [postTitle]);
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -206,6 +213,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         setPostTitle(title);
       });
       
+      // IMPORTANT: Force immediate render by updating multiple states
+      // This ensures React actually processes the update
+      flushSync(() => {
+        setIsDirty(false); // Reset dirty flag after loading
+      });
+      
       // Debug: Store DOM state after flushSync
       (window as any).__afterFlushSync = document.querySelector('input[type="text"]')?.value;
       
@@ -259,7 +272,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       toast.dismiss(loadingToast);
       toast.success('Post loaded successfully');
-      setIsDirty(false); // Mark as clean after loading
+      // setIsDirty(false) is already called above with flushSync
     } catch (error: any) {
       toast.dismiss(loadingToast);
       
