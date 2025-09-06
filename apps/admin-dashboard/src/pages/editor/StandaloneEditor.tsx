@@ -69,8 +69,21 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const postId = params.id;
   const isNewPost = location.pathname.includes('/new');
   
-  // State
-  const [postTitle, setPostTitle] = useState('');
+  // State - Add mount counter to detect remounts
+  const mountCountRef = useRef(0);
+  useEffect(() => {
+    mountCountRef.current += 1;
+    console.log(`StandaloneEditor mounted ${mountCountRef.current} times`);
+  }, []);
+  
+  const [postTitle, setPostTitleOriginal] = useState('');
+  
+  // Wrap setPostTitle to log all changes
+  const setPostTitle = (value: any) => {
+    const newValue = typeof value === 'function' ? value(postTitle) : value;
+    console.log(`setPostTitle called: "${postTitle}" -> "${newValue}"`);
+    setPostTitleOriginal(newValue);
+  };
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab] = useState<'document' | 'block'>('document');
