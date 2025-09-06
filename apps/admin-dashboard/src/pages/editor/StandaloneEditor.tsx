@@ -234,33 +234,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         newTitle: title
       };
       
-      // Use flushSync to bypass React 18 automatic batching
-      flushSync(() => {
-        setPostTitle(title);
-      });
-      
-      // IMPORTANT: Force immediate render by updating multiple states
-      // This ensures React actually processes the update
-      flushSync(() => {
-        setIsDirty(false); // Reset dirty flag after loading
-      });
-      
-      // Debug: Store DOM state after flushSync
-      (window as any).__afterFlushSync = document.querySelector('input[type="text"]')?.value;
-      
-      // Double-check the state update
-      setTimeout(() => {
-        (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
-        (window as any).__after100ms = {
-          domValue: document.querySelector('input[type="text"]')?.value,
-          stateValue: (window as any).__postTitle
-        };
-      }, 100);
-      
       // Parse content - handle different formats
+      let parsedBlocks = [];
       if (data.content) {
-        let parsedBlocks = [];
-        
         // Try to parse content based on its type
         if (typeof data.content === 'string') {
           try {
@@ -276,12 +252,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         } else if (data.content?.blocks) {
           parsedBlocks = data.content.blocks;
         }
-        
-        // Also use flushSync for blocks to ensure immediate update
-        flushSync(() => {
-          setBlocks(parsedBlocks);
-        });
       }
+      
+      // Use a single flushSync for all critical state updates
+      flushSync(() => {
+        setPostTitle(title);
+        setBlocks(parsedBlocks);
+        setIsDirty(false); // Reset dirty flag after loading
+      });
+      
+      // Debug: Store DOM state after flushSync
+      (window as any).__afterFlushSync = document.querySelector('input[type="text"]')?.value;
+      
+      // Double-check the state update
+      setTimeout(() => {
+        (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
+        (window as any).__after100ms = {
+          domValue: document.querySelector('input[type="text"]')?.value,
+          stateValue: (window as any).__postTitle
+        };
+      }, 100);
       
       // Set post settings
       setPostSettings(prev => ({

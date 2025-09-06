@@ -15,6 +15,9 @@ import AdminLayout from '@/components/layout/AdminLayout';
 import EditorLayout from '@/layouts/EditorLayout';
 import InitialRedirect from '@/components/InitialRedirect';
 
+// Import StandaloneEditor directly to avoid lazy loading state issues
+import StandaloneEditor from '@/pages/editor/StandaloneEditor';
+
 // Page Components - Lazy loaded
 const Login = lazy(() => import('@/pages/auth/Login'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
@@ -98,10 +101,6 @@ const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 // );
 // Preview Page
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
-
-const StandaloneEditor = lazy(() => 
-  import(/* webpackChunkName: "standalone-editor" */ '@/pages/editor/StandaloneEditor')
-);
 // Test pages removed for production
 // const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
 // const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
