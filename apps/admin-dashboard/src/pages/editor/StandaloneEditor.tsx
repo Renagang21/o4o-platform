@@ -116,12 +116,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   // Load post data if editing
   useEffect(() => {
-    // Temporary alert for debugging
     if (postId && !isNewPost) {
-      alert(`Loading post with ID: ${postId}`);
       loadPostData(postId);
-    } else {
-      alert(`Not loading - postId: ${postId}, isNewPost: ${isNewPost}`);
     }
   }, [postId, isNewPost]);
 
@@ -169,6 +165,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       }
       
       const data = response.data;
+      
+      // Debug with alert
+      alert(`API Response: title="${data.title}", hasContent=${!!data.content}, dataKeys=${Object.keys(data).join(',')}`);
       
       // Set title
       setPostTitle(data.title || '');
