@@ -83,8 +83,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     // Debug info stored in window.__routeDebug
   }, [location.pathname, params, postId, isNewPost]);
   
-  // State
+  // State with force update mechanism
   const [postTitle, setPostTitle] = useState('');
+  const [, forceUpdate] = useState({});
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab] = useState<'document' | 'block'>('document');
@@ -275,16 +276,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         setIsDirty(false); // Reset dirty flag after loading
       });
       
+      // Force update to trigger re-render
+      forceUpdate({});
+      
       // Debug: Store DOM state after flushSync
       (window as any).__afterFlushSync = document.querySelector('input[type="text"]')?.value;
       
-      // Double-check the state update
+      // Double-check the state update and force another update if needed
       setTimeout(() => {
         (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
         (window as any).__after100ms = {
           domValue: document.querySelector('input[type="text"]')?.value,
           stateValue: (window as any).__postTitle
         };
+        
+        // If state is set but DOM is not updated, force input value directly
+        const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+        if (input && !input.value && title) {
+          input.value = title;
+          (window as any).__forcedInputValue = true;
+        }
       }, 100);
       
       // Set post settings
@@ -321,7 +332,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       toast.error(errorMessage);
       // Error details stored in window.__loadError
     }
-  }, [setPostTitle, setBlocks, setPostSettings, setIsDirty]);
+  }, [setPostTitle, setBlocks, setPostSettings, setIsDirty, forceUpdate]);
 
   // Initialize editor and load data
   useEffect(() => {
