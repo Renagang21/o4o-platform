@@ -169,8 +169,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       id,
       idType: typeof id,
       stringId: String(id),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      functionCalled: true
     };
+    
+    // Log to window for debugging
+    (window as any).__loadPostDataCalled = true;
     
     try {
       const postId = String(id);
@@ -614,9 +618,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
           {/* Title Input */}
           <div className="flex-1 max-w-2xl">
             <input
+              key={postId || 'new-post'}
               type="text"
               placeholder={isMobile ? getModeLabel() : `Add ${getModeLabel()} title`}
-              value={postTitle}
+              value={postTitle || ''}
               onChange={(e) => {
                 setPostTitle(e.target.value);
                 setIsDirty(true);
