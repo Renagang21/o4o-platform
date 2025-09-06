@@ -242,20 +242,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       if (publish) {
         setPostSettings(prev => ({ ...prev, status: 'published' }));
         toast.success('Published successfully!');
-        
-        // If publishing, also call the publish endpoint
-        if (postId || savedData.id) {
-          const publishResponse = await fetch(`/api/posts/${postId || savedData.id}/publish`, {
-            method: 'POST',
-            headers: {
-              'Authorization': token ? `Bearer ${token}` : '',
-            }
-          });
-          
-          if (!publishResponse.ok) {
-            // Silent failure - already showed success message
-          }
-        }
       } else {
         toast.success('Saved as draft');
       }
