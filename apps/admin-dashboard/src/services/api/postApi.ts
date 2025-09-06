@@ -224,10 +224,10 @@ export const postApi = {
     }
   },
 
-  // 게시글 조회
+  // 게시글 조회 (V1 API 사용)
   get: async (id: string): Promise<PostResponse> => {
     try {
-      const response = await apiClient.get(`/posts/${id}`);
+      const response = await apiV1Client.get(`/posts/${id}`);
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -237,11 +237,11 @@ export const postApi = {
     }
   },
 
-  // 게시글 수정
+  // 게시글 수정 (V1 API 사용)
   update: async (data: UpdatePostRequest): Promise<PostResponse> => {
     try {
       const { id, ...updateData } = data;
-      const response = await apiClient.put(`/posts/${id}`, updateData);
+      const response = await apiV1Client.put(`/posts/${id}`, updateData);
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -251,10 +251,10 @@ export const postApi = {
     }
   },
 
-  // 게시글 삭제
+  // 게시글 삭제 (V1 API 사용)
   delete: async (id: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      await apiClient.delete(`/posts/${id}`);
+      await apiV1Client.delete(`/posts/${id}`);
       return { success: true };
     } catch (error: any) {
       return { 
@@ -264,10 +264,10 @@ export const postApi = {
     }
   },
 
-  // 게시글 발행
+  // 게시글 발행 (V1 API 사용)
   publish: async (id: string): Promise<PostResponse> => {
     try {
-      const response = await apiClient.post(`/posts/${id}/publish`);
+      const response = await apiV1Client.post(`/posts/${id}/publish`);
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -335,7 +335,7 @@ export const postApi = {
     }
   },
 
-  // 게시글 목록 조회
+  // 게시글 목록 조회 (V1 API 사용)
   list: async (params?: {
     page?: number;
     pageSize?: number;
@@ -346,7 +346,7 @@ export const postApi = {
     search?: string;
   }): Promise<PostListResponse> => {
     try {
-      const response = await apiClient.get('/posts', { params });
+      const response = await apiV1Client.get('/posts', { params });
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -356,10 +356,10 @@ export const postApi = {
     }
   },
 
-  // 자동 저장 (디바운스 처리 필요)
+  // 자동 저장 (V1 API 사용, 디바운스 처리 필요)
   autoSave: async (id: string, data: Partial<CreatePostRequest>): Promise<PostResponse> => {
     try {
-      const response = await apiClient.post(`/posts/${id}/autosave`, data);
+      const response = await apiV1Client.post(`/posts/${id}/autosave`, data);
       return { success: true, data: response.data };
     } catch (error: any) {
       // 자동 저장 실패는 조용히 처리
@@ -372,13 +372,13 @@ export const postApi = {
  * 미디어 API
  */
 export const mediaApi = {
-  // 파일 업로드
+  // 파일 업로드 (V1 API 사용)
   upload: async (file: File, onProgress?: (progress: number) => void): Promise<MediaUploadResponse> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiClient.post('/media/upload', formData, {
+      const response = await apiV1Client.post('/media/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -399,14 +399,14 @@ export const mediaApi = {
     }
   },
 
-  // 미디어 목록 조회
+  // 미디어 목록 조회 (V1 API 사용)
   list: async (params?: {
     page?: number;
     pageSize?: number;
     type?: string;
   }): Promise<{ success: boolean; data?: Media[]; error?: string }> => {
     try {
-      const response = await apiClient.get('/media', { params });
+      const response = await apiV1Client.get('/media', { params });
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -416,10 +416,10 @@ export const mediaApi = {
     }
   },
 
-  // 미디어 삭제
+  // 미디어 삭제 (V1 API 사용)
   delete: async (id: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      await apiClient.delete(`/media/${id}`);
+      await apiV1Client.delete(`/media/${id}`);
       return { success: true };
     } catch (error: any) {
       return { 
@@ -434,40 +434,40 @@ export const mediaApi = {
  * 카테고리/태그 API
  */
 export const taxonomyApi = {
-  // 카테고리 목록
+  // 카테고리 목록 (V1 API 사용)
   getCategories: async () => {
     try {
-      const response = await apiClient.get('/categories');
+      const response = await apiV1Client.get('/categories');
       return { success: true, data: response.data };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   },
 
-  // 태그 목록
+  // 태그 목록 (V1 API 사용)
   getTags: async () => {
     try {
-      const response = await apiClient.get('/tags');
+      const response = await apiV1Client.get('/tags');
       return { success: true, data: response.data };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   },
 
-  // 카테고리 생성
+  // 카테고리 생성 (V1 API 사용)
   createCategory: async (name: string, description?: string) => {
     try {
-      const response = await apiClient.post('/categories', { name, description });
+      const response = await apiV1Client.post('/categories', { name, description });
       return { success: true, data: response.data };
     } catch (error: any) {
       return { success: false, error: error.message };
     }
   },
 
-  // 태그 생성
+  // 태그 생성 (V1 API 사용)
   createTag: async (name: string) => {
     try {
-      const response = await apiClient.post('/tags', { name });
+      const response = await apiV1Client.post('/tags', { name });
       return { success: true, data: response.data };
     } catch (error: any) {
       return { success: false, error: error.message };
