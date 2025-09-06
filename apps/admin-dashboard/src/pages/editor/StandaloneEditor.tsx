@@ -116,17 +116,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
 
   // Load post data if editing
   useEffect(() => {
-    console.log('Editor mode check:', {
-      postId,
-      isNewPost,
-      pathname: location.pathname
-    });
+    // Debug: Check what values we're getting
+    if (import.meta.env.DEV) {
+      console.log('Editor initialization:', {
+        postId,
+        isNewPost,
+        pathname: location.pathname
+      });
+    }
     
     if (postId && !isNewPost) {
-      console.log('Loading post data for ID:', postId);
+      if (import.meta.env.DEV) {
+        console.log('Loading post data for ID:', postId);
+      }
       loadPostData(postId);
-    } else if (isNewPost) {
-      console.log('New post mode - no data to load');
     }
   }, [postId, isNewPost]);
 
@@ -151,25 +154,40 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   }, [isDirty]);
 
   const loadPostData = async (id: string | number) => {
-    console.log('Starting to load post data for ID:', id);
+    // Show loading indicator
+    const loadingToast = toast.loading('Loading post data...');
+    
+    if (import.meta.env.DEV) {
+      console.log('Starting to load post data for ID:', id);
+    }
     
     try {
       // Use postApi for consistent API handling
       const response = await postApi.get(String(id));
-      console.log('Post API response:', response);
+      
+      if (import.meta.env.DEV) {
+        console.log('Post API response:', response);
+      }
       
       if (!response.success) {
-        console.error('Post API returned unsuccessful response:', response.error);
+        if (import.meta.env.DEV) {
+          console.error('Post API returned unsuccessful response:', response.error);
+        }
         throw new Error(response.error || 'Failed to load post');
       }
       
       if (!response.data) {
-        console.error('Post API returned no data');
+        if (import.meta.env.DEV) {
+          console.error('Post API returned no data');
+        }
         throw new Error('No post data received');
       }
       
       const data = response.data;
-      console.log('Post data loaded:', data);
+      
+      if (import.meta.env.DEV) {
+        console.log('Post data loaded:', data);
+      }
       
       // Set title
       setPostTitle(data.title || '');
@@ -219,9 +237,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         author: data.author?.name || 'Admin User'
       }));
       
+      toast.dismiss(loadingToast);
       toast.success('Post loaded successfully');
+      setIsDirty(false); // Mark as clean after loading
     } catch (error: any) {
-      console.error('Error loading post data:', error);
+      toast.dismiss(loadingToast);
+      // Always log errors for debugging
+      console.error('Error loading post data:', {
+        error: error.message,
+        postId: id,
+        fullError: error
+      });
       toast.error(error.message || 'Failed to load post data');
     }
   };
