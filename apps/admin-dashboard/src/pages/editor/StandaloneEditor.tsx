@@ -142,20 +142,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
-  const loadPostData = async (id: string) => {
+  const loadPostData = async (id: string | number) => {
     try {
-      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-      const response = await fetch(`/api/posts/${id}`, {
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-        }
-      });
+      // Use postApi for consistent API handling
+      const response = await postApi.get(String(id));
       
-      if (!response.ok) {
-        throw new Error(`Failed to load post: ${response.status}`);
+      if (!response.success || !response.data) {
+        throw new Error('Failed to load post');
       }
       
-      const data = await response.json();
+      const data = response.data;
       
       // Set title
       setPostTitle(data.title || '');
@@ -164,11 +160,28 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       if (data.content) {
         if (typeof data.content === 'string') {
           // If content is HTML string, convert to blocks
-          setBlocks([{
-            id: 'initial-block',
-            type: 'core/paragraph',
-            content: data.content
-          }]);
+          try {
+            const parsed = JSON.parse(data.content);
+            if (Array.isArray(parsed)) {
+              setBlocks(parsed);
+            } else {
+              setBlocks([{
+                id: 'initial-block',
+                type: 'core/paragraph',
+                content: data.content
+              }]);
+            }
+          } catch {
+            // If parsing fails, treat as plain text
+            setBlocks([{
+              id: 'initial-block',
+              type: 'core/paragraph',
+              content: data.content
+            }]);
+          }
+        } else if (Array.isArray(data.content)) {
+          // If content is already an array of blocks
+          setBlocks(data.content);
         } else if (data.content.blocks) {
           // If content has blocks array
           setBlocks(data.content.blocks);
