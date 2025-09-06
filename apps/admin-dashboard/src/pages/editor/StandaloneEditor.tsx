@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/tooltip';
 import toast from 'react-hot-toast';
 import '@/styles/editor-animations.css';
+import { postApi } from '@/services/api/postApi';
 
 interface StandaloneEditorProps {
   mode?: 'post' | 'page' | 'template' | 'pattern';
@@ -197,11 +198,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     setIsSaving(true);
     
     try {
-      const postData = {
+      const postData: any = {
         title: postTitle,
-        content: {
-          blocks: blocks
-        },
+        content: blocks, // postApi expects blocks directly, not wrapped in object
         excerpt: postSettings.excerpt,
         slug: postSettings.slug || postTitle.toLowerCase().replace(/\s+/g, '-'),
         status: publish ? 'published' : postSettings.status,
@@ -213,23 +212,21 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         sticky: postSettings.sticky
       };
       
-      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-      const url = postId ? `/api/posts/${postId}` : '/api/posts';
-      const response = await fetch(url, {
-        method: postId ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
-        },
-        body: JSON.stringify(postData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to save');
+      // Add id for update
+      if (postId) {
+        postData.id = postId;
       }
       
-      const savedData = await response.json();
+      // Use postApi instead of fetch for proper token handling and API URL
+      const response = postId 
+        ? await postApi.update(postData)
+        : await postApi.create(postData);
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to save');
+      }
+      
+      const savedData = response.data;
       
       // If it's a new post and we get an ID back, update the URL
       if (!postId && savedData.id) {
