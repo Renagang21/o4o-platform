@@ -148,10 +148,19 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Set title immediately with flushSync to ensure immediate update
       const title = data.title || '';
       
+      // Debug: Store extracted title
+      (window as any).__extractedTitle = title;
+      (window as any).__extractedData = data;
+      
       // Use flushSync to bypass React 18 automatic batching
       flushSync(() => {
         setPostTitle(title);
       });
+      
+      // Double-check the state update
+      setTimeout(() => {
+        (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
+      }, 100);
       
       // Parse content - handle different formats
       if (data.content) {
@@ -253,6 +262,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       setIsDirty(true);
     }
   }, [blocks, postTitle]);
+
+  // Debug: Track postTitle changes
+  useEffect(() => {
+    // Store in window for debugging
+    (window as any).__postTitle = postTitle;
+    (window as any).__postId = postId;
+    (window as any).__isNewPost = isNewPost;
+  }, [postTitle, postId, isNewPost]);
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
