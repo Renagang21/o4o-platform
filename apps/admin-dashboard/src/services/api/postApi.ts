@@ -25,7 +25,7 @@ const getApiBaseUrl = () => {
   
   // Production 환경 (admin.neture.co.kr -> api.neture.co.kr)
   if (window.location.hostname === 'admin.neture.co.kr') {
-    return 'https://api.neture.co.kr';
+    return 'https://api.neture.co.kr/api';
   }
   
   // Development 환경
