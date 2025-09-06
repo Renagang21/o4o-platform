@@ -348,7 +348,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     return () => {
       mounted = false;
     };
-  }, [postId, isNewPost]);
+  }, [postId, isNewPost, loadPostData]);
 
   // Track unsaved changes
   useEffect(() => {
