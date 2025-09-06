@@ -382,11 +382,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     };
     
     try {
+      // IMPORTANT: Get title from DOM if state is empty (React state update issue workaround)
+      const titleInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+      const actualTitle = titleInput?.value || postTitle || 'Untitled';
+      
       const postData: any = {
-        title: postTitle || 'Untitled',
+        title: actualTitle,
         content: blocks, // postApi expects blocks directly, not wrapped in object
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || (postTitle || 'untitled').toLowerCase().replace(/\s+/g, '-'),
+        slug: postSettings.slug || (actualTitle || 'untitled').toLowerCase().replace(/\s+/g, '-'),
         status: publish ? 'published' : postSettings.status,
         categories: postSettings.categories,
         tags: postSettings.tags,
@@ -405,6 +409,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       const response = postId 
         ? await postApi.update(postData)
         : await postApi.create(postData);
+      
+      // Debug: Log save response
+      (window as any).__saveResponse = {
+        response,
+        isUpdate: !!postId,
+        postData,
+        success: response.success,
+        error: response.error
+      };
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to save');
