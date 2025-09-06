@@ -875,6 +875,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         )}>
           <div className="min-h-full">
             <GutenbergBlockEditor
+              documentTitle={postTitle || 'Untitled Document'}
               initialBlocks={blocks}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);
