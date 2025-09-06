@@ -458,7 +458,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
                 setIsDirty(true);
               }}
               className={cn(
-                "w-full px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400",
+                "w-full px-2 py-1 font-semibold border-0 outline-none focus:ring-0 placeholder-gray-400 text-gray-900",
                 isMobile ? "text-base" : "text-xl"
               )}
             />
