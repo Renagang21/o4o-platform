@@ -19,7 +19,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import WordPressBlockEditor from '@/components/editor/WordPressBlockEditor';
+import WordPressEditorWrapper from '@/components/editor/WordPressEditorWrapper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
@@ -258,7 +258,7 @@ export default function TemplatePartEditor() {
               <h2 className="text-lg font-medium">콘텐츠 편집</h2>
             </div>
             <div className="wp-card-body">
-              <WordPressBlockEditor
+              <WordPressEditorWrapper
                 initialContent={serialize(blocks)}
                 onChange={handleBlocksChange}
                 showReusableBlocks={true}

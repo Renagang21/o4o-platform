@@ -54,11 +54,11 @@ const ReusableBlocksPage = lazy(() =>
 const Posts = lazy(() => import('@/pages/posts/Posts'));
 const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
-const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
+// const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
 const Menus = lazy(() => import('@/pages/menus/Menus'));
-const TestPage = lazy(() => import('@/pages/test/TestPage'));
+// const TestPage = lazy(() => import('@/pages/test/TestPage')); // Removed test page
 // const SystemMonitoring = lazy(() => import('@/pages/monitoring/SystemMonitoring'));
 
 // Appearance Pages
@@ -102,9 +102,10 @@ const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 const StandaloneEditor = lazy(() => 
   import(/* webpackChunkName: "standalone-editor" */ '@/pages/editor/StandaloneEditor')
 );
-const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
-const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
-const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
+// Test pages removed for production
+// const LoopBlockTest = lazy(() => import('@/pages/test/LoopBlockTest'));
+// const ParagraphTestDemo = lazy(() => import('@/components/editor/blocks/test/ParagraphTestDemo'));
+// const ParagraphTestDirect = lazy(() => import('@/pages/test/ParagraphTestDirect'));
 
 // Apps Manager
 const AppsManager = lazy(() => import('@/pages/apps/AppsManagerV2'));
@@ -939,49 +940,13 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    {/* 도움말 - Route removed due to duplicate */}
-                    
-                    {/* 테스트 페이지 */}
-                    <Route path="/test" element={
-                      <AdminProtectedRoute requiredPermissions={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <TestPage />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
+                    {/* Test routes removed for production */}
                     
                     {/* Gutenberg Editor - Using Standalone Full Screen Editor */}
                     <Route path="/gutenberg" element={
                       <AdminProtectedRoute requiredPermissions={['content:write']}>
                         <Suspense fallback={<PageLoader />}>
                           <StandaloneEditor mode="post" />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* Loop Block Test */}
-                    <Route path="/loop-block-test" element={
-                      <AdminProtectedRoute requiredPermissions={['content:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <LoopBlockTest />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* Paragraph Test Block Demo */}
-                    <Route path="/paragraph-test" element={
-                      <AdminProtectedRoute requiredPermissions={['content:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ParagraphTestDemo />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* Direct ParagraphTestBlock Test */}
-                    <Route path="/paragraph-test-direct" element={
-                      <AdminProtectedRoute requiredPermissions={['content:write']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ParagraphTestDirect />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

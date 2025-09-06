@@ -32,7 +32,9 @@ const PostPreview: React.FC = () => {
         const parsed = JSON.parse(storedContent);
         setContent(parsed);
       } catch (error) {
-        console.error('Failed to parse preview content');
+        if (import.meta.env.DEV) {
+          console.error('Failed to parse preview content', error);
+        }
       }
     }
     setIsLoading(false);

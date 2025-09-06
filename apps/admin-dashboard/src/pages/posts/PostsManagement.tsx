@@ -106,7 +106,9 @@ const PostsManagement: FC = () => {
         // const response = await authClient.api.get('/v1/posts/counts');
         return response.data;
       } catch (err) {
-        console.error('Failed to fetch post counts:', err);
+        if (import.meta.env.DEV) {
+          console.error('Failed to fetch post counts:', err);
+        }
         return null;
       }
     }
@@ -165,7 +167,9 @@ const PostsManagement: FC = () => {
         
         return response.data;
       } catch (err) {
-        console.error('Failed to fetch posts:', err);
+        if (import.meta.env.DEV) {
+          console.error('Failed to fetch posts:', err);
+        }
         throw err;
       }
     }

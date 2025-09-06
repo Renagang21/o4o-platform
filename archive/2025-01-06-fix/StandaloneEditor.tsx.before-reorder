@@ -120,86 +120,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         // Load post data if editing existing post
         if (postId && !isNewPost) {
           console.log('Loading post data for ID:', postId);
-          // Call loadPostData directly here - it's defined below
-          const loadingToast = toast.loading(`Loading post: ${postId}`);
-          
-          try {
-            const response = await postApi.get(String(postId));
-            
-            if (!response.success) {
-              throw new Error(response.error || 'Failed to load post');
-            }
-            
-            if (!response.data) {
-              throw new Error('No post data received');
-            }
-            
-            // Debug: Log the raw response
-            if (import.meta.env.DEV) {
-              console.log('Raw API response:', response);
-              console.log('response.data keys:', Object.keys(response.data || {}));
-            }
-            
-            // Handle nested structure
-            const responseData = response.data;
-            const data = (responseData as any).data || responseData;
-            
-            // Set title with flushSync for immediate update
-            const title = data.title || '';
-            flushSync(() => {
-              setPostTitle(title);
-            });
-            
-            if (import.meta.env.DEV && title) {
-              console.log('Post title set to:', title);
-            }
-            
-            // Parse and set content
-            if (data.content) {
-              let parsedBlocks = [];
-              
-              if (typeof data.content === 'string') {
-                try {
-                  const parsed = JSON.parse(data.content);
-                  parsedBlocks = Array.isArray(parsed) ? parsed : (parsed?.blocks || []);
-                } catch {
-                  parsedBlocks = [{ id: 'initial-block', type: 'core/paragraph', content: data.content }];
-                }
-              } else if (Array.isArray(data.content)) {
-                parsedBlocks = data.content;
-              } else if (data.content?.blocks) {
-                parsedBlocks = data.content.blocks;
-              }
-              
-              flushSync(() => {
-                setBlocks(parsedBlocks);
-              });
-            }
-            
-            // Set post settings
-            setPostSettings(prev => ({
-              ...prev,
-              status: data.status || 'draft',
-              excerpt: data.excerpt || '',
-              slug: data.slug || '',
-              categories: data.categories?.map((c: any) => c.id || c) || [],
-              tags: data.tags?.map((t: any) => t.id || t) || [],
-              featuredImage: data.featuredImage,
-              publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
-              author: data.author?.name || 'Admin User'
-            }));
-            
-            toast.dismiss(loadingToast);
-            toast.success('Post loaded successfully');
-            setIsDirty(false);
-          } catch (error: any) {
-            toast.dismiss(loadingToast);
-            toast.error(error.message || 'Failed to load post data');
-            
-            if (import.meta.env.DEV) {
-              console.error('Error loading post:', { id: postId, error });
-            }
-          }
+          await loadPostData(postId);
         }
         
         // Start entrance animation
@@ -217,7 +138,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     return () => {
       mounted = false;
     };
-  }, [postId, isNewPost]);
+  }, [postId, isNewPost, loadPostData]);
 
   // Track unsaved changes
   useEffect(() => {
