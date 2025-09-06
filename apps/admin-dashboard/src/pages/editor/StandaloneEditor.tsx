@@ -106,31 +106,33 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     (window as any).__currentPostTitle = postTitle;
   }, [postTitle]);
   
-  // Reset state when postId changes (navigation between posts)
+  // Reset state only when navigating to a NEW post
   useEffect(() => {
-    // Clear state when navigating to a different post
-    setPostTitle('');
-    setBlocks([]);
-    setPostSettings({
-      status: 'draft' as 'draft' | 'publish' | 'pending' | 'private',
-      excerpt: '',
-      slug: '',
-      categories: [],
-      tags: [],
-      featuredImage: null,
-      publishDate: new Date().toISOString().slice(0, 16),
-      author: 'Admin User',
-      visibility: 'public' as 'public' | 'private' | 'password',
-      password: '',
-      template: 'default',
-      commentStatus: true,
-      pingStatus: true,
-      sticky: false,
-      format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
-    });
-    setIsDirty(false);
-    setIsEntering(true);
-  }, [postId]);
+    // Only clear state for new posts, not when loading existing posts
+    if (isNewPost) {
+      setPostTitle('');
+      setBlocks([]);
+      setPostSettings({
+        status: 'draft' as 'draft' | 'publish' | 'pending' | 'private',
+        excerpt: '',
+        slug: '',
+        categories: [],
+        tags: [],
+        featuredImage: null,
+        publishDate: new Date().toISOString().slice(0, 16),
+        author: 'Admin User',
+        visibility: 'public' as 'public' | 'private' | 'password',
+        password: '',
+        template: 'default',
+        commentStatus: true,
+        pingStatus: true,
+        sticky: false,
+        format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
+      });
+      setIsDirty(false);
+      setIsEntering(true);
+    }
+  }, [postId, isNewPost]);
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
