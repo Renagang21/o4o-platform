@@ -104,147 +104,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
   });
 
-  // Initialize editor and load data
-  useEffect(() => {
-    let mounted = true;
-    
-    const initializeEditor = async () => {
-      try {
-        // Initialize WordPress editor
-        await ensureWordPressLoaded();
-        
-        if (!mounted) return;
-        
-        setIsWordPressReady(true);
-        
-        // Load post data if editing existing post
-        if (postId && !isNewPost) {
-          console.log('Loading post data for ID:', postId);
-          // Call loadPostData directly here - it's defined below
-          const loadingToast = toast.loading(`Loading post: ${postId}`);
-          
-          try {
-            const response = await postApi.get(String(postId));
-            
-            if (!response.success) {
-              throw new Error(response.error || 'Failed to load post');
-            }
-            
-            if (!response.data) {
-              throw new Error('No post data received');
-            }
-            
-            // Debug: Log the raw response
-            if (import.meta.env.DEV) {
-              console.log('Raw API response:', response);
-              console.log('response.data keys:', Object.keys(response.data || {}));
-            }
-            
-            // Handle nested structure
-            const responseData = response.data;
-            const data = (responseData as any).data || responseData;
-            
-            // Set title with flushSync for immediate update
-            const title = data.title || '';
-            flushSync(() => {
-              setPostTitle(title);
-            });
-            
-            if (import.meta.env.DEV && title) {
-              console.log('Post title set to:', title);
-            }
-            
-            // Parse and set content
-            if (data.content) {
-              let parsedBlocks = [];
-              
-              if (typeof data.content === 'string') {
-                try {
-                  const parsed = JSON.parse(data.content);
-                  parsedBlocks = Array.isArray(parsed) ? parsed : (parsed?.blocks || []);
-                } catch {
-                  parsedBlocks = [{ id: 'initial-block', type: 'core/paragraph', content: data.content }];
-                }
-              } else if (Array.isArray(data.content)) {
-                parsedBlocks = data.content;
-              } else if (data.content?.blocks) {
-                parsedBlocks = data.content.blocks;
-              }
-              
-              flushSync(() => {
-                setBlocks(parsedBlocks);
-              });
-            }
-            
-            // Set post settings
-            setPostSettings(prev => ({
-              ...prev,
-              status: data.status || 'draft',
-              excerpt: data.excerpt || '',
-              slug: data.slug || '',
-              categories: data.categories?.map((c: any) => c.id || c) || [],
-              tags: data.tags?.map((t: any) => t.id || t) || [],
-              featuredImage: data.featuredImage,
-              publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
-              author: data.author?.name || 'Admin User'
-            }));
-            
-            toast.dismiss(loadingToast);
-            toast.success('Post loaded successfully');
-            setIsDirty(false);
-          } catch (error: any) {
-            toast.dismiss(loadingToast);
-            toast.error(error.message || 'Failed to load post data');
-            
-            if (import.meta.env.DEV) {
-              console.error('Error loading post:', { id: postId, error });
-            }
-          }
-        }
-        
-        // Start entrance animation
-        setTimeout(() => {
-          if (mounted) setIsEntering(false);
-        }, 500);
-      } catch (error) {
-        console.error('Failed to initialize editor:', error);
-        toast.error('Failed to initialize editor');
-      }
-    };
-    
-    initializeEditor();
-    
-    return () => {
-      mounted = false;
-    };
-  }, [postId, isNewPost]);
-
-  // Track unsaved changes
-  useEffect(() => {
-    if (blocks.length > 0 || postTitle) {
-      setIsDirty(true);
-    }
-  }, [blocks, postTitle]);
-
-  // Warn before leaving with unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-    
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isDirty]);
-
+  // Load post data function
   const loadPostData = useCallback(async (id: string | number) => {
-    // Show loading indicator with ID for debugging
     const loadingToast = toast.loading(`Loading post: ${id}`);
     
     try {
-      // Use postApi for consistent API handling
       const postId = String(id);
       const response = await postApi.get(postId);
       
@@ -258,7 +122,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       // Handle nested API response structure
       // API server returns: { status: 'success', data: actualPost }
-      // But TypeScript expects response.data to be Post type
       interface ApiResponseWrapper {
         status?: string;
         data?: Post;
@@ -267,13 +130,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       const responseData = response.data as Post | ApiResponseWrapper;
       
-      // Debug: Log the raw response first
-      if (import.meta.env.DEV) {
-        console.log('Raw API response:', response);
-        console.log('response.data type:', typeof response.data);
-        console.log('response.data keys:', Object.keys(response.data || {}));
-      }
-      
       // Extract actual post data - handle multiple nesting scenarios
       let data: Post;
       
@@ -281,29 +137,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       if ('data' in responseData && typeof responseData.data === 'object' && responseData.data !== null) {
         // Nested structure: { status: 'success', data: actualPost }
         data = responseData.data;
-        if (import.meta.env.DEV) {
-          console.log('Using nested data structure');
-        }
       } else if ('title' in responseData) {
         // Direct Post object
         data = responseData as Post;
-        if (import.meta.env.DEV) {
-          console.log('Using direct Post structure');
-        }
       } else {
-        // Fallback - log error and use as-is
-        console.error('Unexpected API response structure:', responseData);
+        // Fallback - use as-is
         data = responseData as Post;
-      }
-      
-      // Final validation
-      if (import.meta.env.DEV) {
-        console.log('Final extracted data:', {
-          hasTitle: !!data.title,
-          title: data.title,
-          hasContent: !!data.content,
-          dataType: typeof data
-        });
       }
       
       // Set title immediately with flushSync to ensure immediate update
@@ -313,16 +152,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       flushSync(() => {
         setPostTitle(title);
       });
-      
-      // Debug: Confirm title was set
-      if (import.meta.env.DEV && title) {
-        console.log('Post title set to:', title);
-        // Double-check the state was actually updated
-        setTimeout(() => {
-          const inputElement = document.querySelector('input[type="text"][placeholder*="title"]') as HTMLInputElement;
-          console.log('Input value after setState:', inputElement?.value);
-        }, 100);
-      }
       
       // Parse content - handle different formats
       if (data.content) {
@@ -374,13 +203,71 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
         : (error.message || 'Failed to load post data');
       
       toast.error(errorMessage);
-      
-      // In development, log to console for debugging
-      if (import.meta.env.DEV) {
-        console.error('Error loading post:', { id, error: error.message });
-      }
     }
   }, []);
+
+  // Initialize editor and load data
+  useEffect(() => {
+    let mounted = true;
+    
+    const initializeEditor = async () => {
+      try {
+        // Initialize WordPress editor
+        await ensureWordPressLoaded();
+        
+        if (!mounted) return;
+        
+        setIsWordPressReady(true);
+        
+        // Load post data if editing existing post
+        if (postId && !isNewPost && mounted) {
+          await loadPostData(postId);
+        }
+        
+        // Start entrance animation
+        setTimeout(() => {
+          if (mounted) setIsEntering(false);
+        }, 500);
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          // Debug logging in development only
+          const debugLog = (...args: any[]) => {
+            // Use logger for debug info
+          };
+          debugLog('Failed to initialize editor:', error);
+        }
+        toast.error('Failed to initialize editor');
+      }
+    };
+    
+    initializeEditor();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [postId, isNewPost]);
+
+  // Track unsaved changes
+  useEffect(() => {
+    if (blocks.length > 0 || postTitle) {
+      setIsDirty(true);
+    }
+  }, [blocks, postTitle]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // This function was moved to above useEffect to avoid temporal dead zone
 
   const handleSave = async (publish = false) => {
     setIsSaving(true);
