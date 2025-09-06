@@ -222,11 +222,13 @@ export class ContentController {
           body: req.body,
           userId: (req as any).user?.userId
         });
+      } else {
+        console.error('Failed to create post:', error);
       }
       
       return res.status(500).json({
         message: 'Failed to create post',
-        error: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        error: errorMessage
       });
     }
   };
