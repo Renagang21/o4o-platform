@@ -285,13 +285,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Double-check the state update and force another update if needed
       setTimeout(() => {
         (window as any).__finalPostTitle = title; // Use title, not postTitle (closure issue)
+        const input = document.querySelector('input[type="text"]') as HTMLInputElement;
         (window as any).__after100ms = {
-          domValue: document.querySelector('input[type="text"]')?.value,
-          stateValue: (window as any).__postTitle
+          domValue: input?.value,
+          stateValue: (window as any).__postTitle,
+          inputFound: !!input,
+          titleToSet: title
+        };
+        
+        // Log the decision process
+        (window as any).__forceDecision = {
+          hasInput: !!input,
+          currentInputValue: input?.value,
+          titleToSet: title,
+          willForce: input && !input.value && title
         };
         
         // If state is set but DOM is not updated, force input value directly
-        const input = document.querySelector('input[type="text"]') as HTMLInputElement;
         if (input && !input.value && title) {
           input.value = title;
           (window as any).__forcedInputValue = true;
