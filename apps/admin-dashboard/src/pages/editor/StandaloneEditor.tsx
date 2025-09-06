@@ -84,6 +84,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [isEntering, setIsEntering] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const loadedDataRef = useRef<any>(null);
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -111,13 +112,22 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       setTimeout(() => {
         setIsEntering(false);
       }, 500);
+      
+      // If data was loaded before WordPress was ready, apply it now
+      if (loadedDataRef.current && loadedDataRef.current.title) {
+        setPostTitle(loadedDataRef.current.title);
+      }
     });
   }, []);
 
   // Load post data if editing
   useEffect(() => {
     if (postId && !isNewPost) {
-      loadPostData(postId);
+      // Add a small delay to ensure component is fully mounted
+      const timer = setTimeout(() => {
+        loadPostData(postId);
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [postId, isNewPost]);
 
@@ -167,14 +177,24 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Check if data is nested
       const data = response.data.data || response.data;
       
+      // Store loaded data in ref
+      loadedDataRef.current = data;
+      
       // Set title - using functional update to ensure state is set
       const titleToSet = data.title || '';
-      setPostTitle(titleToSet);
       
-      // Double-check and force update after a short delay
-      requestAnimationFrame(() => {
-        setPostTitle(titleToSet);
-      });
+      // Force state update with functional setter
+      setPostTitle(() => titleToSet);
+      
+      // Also try setting blocks first, then title
+      if (data.content) {
+        // Process content first...
+      }
+      
+      // Then set title again after content processing
+      setTimeout(() => {
+        setPostTitle(() => titleToSet);
+      }, 10);
       
       // Parse blocks from content if it exists
       if (data.content) {
