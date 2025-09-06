@@ -7,6 +7,8 @@ import { authenticateToken } from '../middleware/auth';
 import { In, Like, IsNull, Not } from 'typeorm';
 import { validateDto } from '../middleware/validateDto';
 import { body, query, param } from 'express-validator';
+import { v4 as uuidv4 } from 'uuid';
+import { RedisService } from '../services/redis.service';
 
 const router: Router = Router();
 
@@ -690,6 +692,143 @@ router.delete('/:id',
       res.status(500).json({ 
         error: 'Failed to delete post',
         message: error.message 
+      });
+    }
+  }
+);
+
+// POST /api/posts/preview - Save preview data temporarily
+router.post('/preview',
+  authenticateToken,
+  body('title').optional(),
+  body('content').optional(),
+  body('blocks').optional(),
+  validateDto,
+  async (req: Request, res: Response) => {
+    try {
+      const redisService = RedisService.getInstance();
+      const previewId = uuidv4();
+      const previewKey = `preview:${previewId}`;
+      
+      // Prepare preview data
+      const previewData = {
+        id: previewId,
+        title: extractTitle(req.body.title) || 'Untitled Preview',
+        content: extractContent(req.body.content) || '',
+        blocks: req.body.blocks || [],
+        excerpt: req.body.excerpt || '',
+        status: 'preview',
+        type: req.body.type || 'post',
+        categories: req.body.categories || [],
+        tags: req.body.tags || [],
+        featuredImage: req.body.featuredImage || null,
+        author: {
+          id: (req as any).user?.id,
+          name: (req as any).user?.name || 'User',
+          email: (req as any).user?.email
+        },
+        createdAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString() // 30 minutes from now
+      };
+      
+      // Save to Redis with 30 minutes TTL (1800 seconds)
+      const saved = await redisService.set(
+        previewKey, 
+        JSON.stringify(previewData),
+        1800 // 30 minutes in seconds
+      );
+      
+      if (!saved) {
+        return res.status(500).json({
+          error: 'Failed to save preview',
+          message: 'Could not save preview data to cache'
+        });
+      }
+      
+      res.status(201).json({
+        previewId,
+        message: 'Preview saved successfully',
+        expiresAt: previewData.expiresAt
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        error: 'Failed to save preview',
+        message: error.message
+      });
+    }
+  }
+);
+
+// GET /api/posts/preview/:previewId - Get preview data
+router.get('/preview/:previewId',
+  param('previewId').isUUID(),
+  validateDto,
+  async (req: Request, res: Response) => {
+    try {
+      const { previewId } = req.params;
+      const redisService = RedisService.getInstance();
+      const previewKey = `preview:${previewId}`;
+      
+      // Get preview data from Redis
+      const previewDataStr = await redisService.get(previewKey);
+      
+      if (!previewDataStr) {
+        return res.status(404).json({
+          error: 'Preview not found',
+          message: 'Preview has expired or does not exist'
+        });
+      }
+      
+      const previewData = JSON.parse(previewDataStr);
+      
+      // Check if preview has expired (redundant check as Redis TTL should handle this)
+      const expiresAt = new Date(previewData.expiresAt);
+      if (expiresAt < new Date()) {
+        // Clean up expired preview
+        await redisService.del(previewKey);
+        return res.status(404).json({
+          error: 'Preview expired',
+          message: 'This preview has expired'
+        });
+      }
+      
+      res.json(previewData);
+    } catch (error: any) {
+      res.status(500).json({
+        error: 'Failed to fetch preview',
+        message: error.message
+      });
+    }
+  }
+);
+
+// DELETE /api/posts/preview/:previewId - Delete preview data
+router.delete('/preview/:previewId',
+  authenticateToken,
+  param('previewId').isUUID(),
+  validateDto,
+  async (req: Request, res: Response) => {
+    try {
+      const { previewId } = req.params;
+      const redisService = RedisService.getInstance();
+      const previewKey = `preview:${previewId}`;
+      
+      const deleted = await redisService.del(previewKey);
+      
+      if (!deleted) {
+        return res.status(404).json({
+          error: 'Preview not found',
+          message: 'Preview does not exist or has already expired'
+        });
+      }
+      
+      res.json({
+        message: 'Preview deleted successfully'
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        error: 'Failed to delete preview',
+        message: error.message
       });
     }
   }
