@@ -70,6 +70,21 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const postId = params.id;
   const isNewPost = location.pathname.includes('/new');
   
+  // Debug: Log route params and state
+  useEffect(() => {
+    (window as any).__routeDebug = {
+      pathname: location.pathname,
+      params: params,
+      postId: postId,
+      isNewPost: isNewPost,
+      hasPostId: !!postId,
+      postIdType: typeof postId
+    };
+    if (import.meta.env.DEV) {
+      console.log('Route Debug:', (window as any).__routeDebug);
+    }
+  }, [location.pathname, params, postId, isNewPost]);
+  
   // State
   const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);
@@ -108,9 +123,25 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   const loadPostData = useCallback(async (id: string | number) => {
     const loadingToast = toast.loading(`Loading post: ${id}`);
     
+    // Debug: Log what we're trying to load
+    (window as any).__loadAttempt = {
+      id,
+      idType: typeof id,
+      stringId: String(id),
+      timestamp: new Date().toISOString()
+    };
+    
     try {
       const postId = String(id);
       const response = await postApi.get(postId);
+      
+      // Debug: Log API response
+      (window as any).__apiResponse = {
+        success: response.success,
+        hasData: !!response.data,
+        error: response.error,
+        dataKeys: response.data ? Object.keys(response.data) : []
+      };
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to load post');
@@ -207,11 +238,22 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
     } catch (error: any) {
       toast.dismiss(loadingToast);
       
+      // Debug: Log error details
+      (window as any).__loadError = {
+        id,
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      };
+      
       const errorMessage = error.response?.status === 500 
         ? 'Server error: Unable to load post. Please try again later.'
         : (error.message || 'Failed to load post data');
       
       toast.error(errorMessage);
+      if (import.meta.env.DEV) {
+        console.error('Failed to load post:', error);
+      }
     }
   }, []);
 
