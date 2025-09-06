@@ -142,7 +142,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
   }, [isDirty]);
 
   const loadPostData = async (id: string | number) => {
-    alert(`loadPostData function called with ID: ${id}`);
     // Show loading indicator with ID for debugging
     const loadingToast = toast.loading(`Loading post: ${id}`);
     
@@ -150,7 +149,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       // Use postApi for consistent API handling
       const postId = String(id);
       const response = await postApi.get(postId);
-      alert(`API call completed. Success: ${response.success}`);
       
       if (!response.success) {
         if (import.meta.env.DEV) {
@@ -168,22 +166,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       
       // Check if data is nested
       const data = response.data.data || response.data;
-      alert(`Data extracted. Title: "${data.title}", Has content: ${!!data.content}`);
       
-      // Set title
+      // Set title - using functional update to ensure state is set
       const titleToSet = data.title || '';
-      alert(`About to set title to: "${titleToSet}"`);
       setPostTitle(titleToSet);
       
-      // Force update to ensure title is displayed
-      setTimeout(() => {
-        setPostTitle(prevTitle => {
-          if (prevTitle !== titleToSet) {
-            return titleToSet;
-          }
-          return prevTitle;
-        });
-      }, 0);
+      // Double-check and force update after a short delay
+      requestAnimationFrame(() => {
+        setPostTitle(titleToSet);
+      });
       
       // Parse blocks from content if it exists
       if (data.content) {
@@ -237,7 +228,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post' }) => {
       toast.success('Post loaded successfully');
       setIsDirty(false); // Mark as clean after loading
     } catch (error: any) {
-      alert(`Error occurred: ${error.message || 'Unknown error'}`);
       toast.dismiss(loadingToast);
       // Log errors only in development
       if (import.meta.env.DEV) {
