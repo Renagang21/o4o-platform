@@ -302,14 +302,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         console.log('[EDITOR][SAVE][RES]', { publish, respId: savedData?.id, respSlug: savedData?.slug, at: new Date().toISOString() });
       }
       
-      // If it's a new post and we get an ID back, update the URL and reload
+      // If it's a new post and we get an ID back, update the URL (no reload)
       if (!postId && savedData?.id) {
-        // Update URL
-        window.history.replaceState(null, '', `/editor/posts/${savedData.id}`);
-        // CRITICAL: Reload the page with the new ID to properly initialize
-        // This ensures the component re-mounts with correct postId from URL
-        window.location.href = `/editor/posts/${savedData.id}`;
-        return; // Stop here, page will reload
+        navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
+        // Remount will be triggered by EditorRouteWrapper key change
+        return;
       }
       
       setLastSaved(new Date());
@@ -322,7 +319,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         toast.success('Saved as draft');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to save');
+      // Show specific conflict/validation messages when possible
+      const status = error?.response?.status;
+      if (status === 409) {
+        toast.error('Slug already exists. Please choose another slug.');
+      } else if (status === 422) {
+        toast.error('Validation failed. Please check required fields.');
+      } else {
+        toast.error(error?.message || 'Failed to save');
+      }
     } finally {
       setIsSaving(false);
     }
