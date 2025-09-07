@@ -289,7 +289,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         content: blocks,
         excerpt: postSettings.excerpt,
         slug: postSettings.slug || (postTitle ? postTitle.toLowerCase().replace(/\s+/g, '-') : ''),
-        status: publish ? 'published' : (postSettings.status || 'draft'),
+        status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
         featured: false,
