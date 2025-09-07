@@ -20,7 +20,10 @@ import { mockPostApi, shouldUseMockApi } from './mockApi';
 const getApiBaseUrl = () => {
   // 환경변수가 설정되어 있으면 사용
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+    // Normalize to ensure trailing /api is present
+    const v = String(import.meta.env.VITE_API_URL).trim();
+    const url = v.replace(/\/$/, '');
+    return /\/api$/.test(url) ? url : `${url}/api`;
   }
   
   // Production 환경 (admin.neture.co.kr -> api.neture.co.kr)

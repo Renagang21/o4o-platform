@@ -207,7 +207,7 @@ const PostsManagement: FC = () => {
 
       updateData.isSticky = data.isSticky;
 
-      await authClient.api.patch(`/posts/${id}`, updateData);
+      await authClient.api.put(`/posts/${id}`, updateData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -258,15 +258,21 @@ const PostsManagement: FC = () => {
           break;
         case 'trash':
           await Promise.all(
-            selectedRows.map(id => authClient.api.patch(`/posts/${id}`, { status: 'trash' }))
+            selectedRows.map(id => authClient.api.put(`/posts/${id}`, { status: 'trash' }))
           );
           toast.success(`Moved ${selectedRows.length} posts to trash`);
           break;
         case 'publish':
           await Promise.all(
-            selectedRows.map(id => authClient.api.patch(`/posts/${id}`, { status: 'published' }))
+            selectedRows.map(id => authClient.api.put(`/posts/${id}`, { status: 'published' }))
           );
           toast.success(`Published ${selectedRows.length} posts`);
+          break;
+        case 'delete':
+          await Promise.all(
+            selectedRows.map(id => authClient.api.delete(`/posts/${id}?force=true`))
+          );
+          toast.success(`Permanently deleted ${selectedRows.length} posts`);
           break;
       }
       setSelectedRows([]);
@@ -601,6 +607,7 @@ const PostsManagement: FC = () => {
               <SelectItem value="">Bulk actions</SelectItem>
               <SelectItem value="edit">Edit</SelectItem>
               <SelectItem value="trash">Move to Trash</SelectItem>
+              <SelectItem value="delete">Delete Permanently</SelectItem>
             </SelectContent>
           </Select>
           <Button 
