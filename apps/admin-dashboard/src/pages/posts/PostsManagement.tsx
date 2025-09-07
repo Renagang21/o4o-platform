@@ -20,6 +20,7 @@ import { ScreenOptionsReact } from '@/components/common/ScreenOptionsEnhanced';
 import { useScreenOptions, ColumnOption } from '@/hooks/useScreenOptions';
 import { PostsHelp } from '@/components/help/PostsHelp';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { buildPublicPostUrl } from '@/utils/publicUrls';
 import { useAuthStore } from '@/stores/authStore';
 import '@/styles/wordpress-posts-complete.css';
 
@@ -379,8 +380,10 @@ const PostsManagement: FC = () => {
       },
       {
         label: 'View',
-        href: `/posts/${post.slug}`,
-        target: '_blank'
+        // Use absolute public URL to avoid admin SPA routing
+        href: buildPublicPostUrl({ id: post.id, slug: post.slug, isDraft: post.status !== 'published' }),
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]
   }));

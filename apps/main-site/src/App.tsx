@@ -1,5 +1,6 @@
 import { FC, useEffect  } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import PostDetail from './pages/PostDetail';
 import { useAuthStore } from './stores/authStore';
 import { DevAuthProvider } from './lib/DevAuthProvider';
 import { initializeAuthInterceptor } from './services/authInterceptor';
@@ -71,6 +72,7 @@ const App: FC = () => {
           <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomeWithSettings />} />
+          <Route path="/posts/:slugOrId" element={<PostDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallbackV2 />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
