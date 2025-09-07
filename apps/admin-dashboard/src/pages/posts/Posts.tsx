@@ -22,7 +22,7 @@ interface Post {
   tags: string[];
   comments: number;
   date: string;
-  status: 'published' | 'draft' | 'pending';
+  status: 'published' | 'draft' | 'pending' | 'trash';
   views: number;
 }
 
@@ -151,7 +151,7 @@ const Posts = () => {
   const [showScreenOptions, setShowScreenOptions] = useState(false);
   const [selectedBulkAction, setSelectedBulkAction] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft' | 'trash'>('all');
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
@@ -260,6 +260,22 @@ const Posts = () => {
 
   const handleDelete = (id: string) => {
     if (confirm('정말 이 글을 휴지통으로 이동하시겠습니까?')) {
+      setPosts(posts.map(p => 
+        p.id === id ? { ...p, status: 'trash' as const } : p
+      ));
+    }
+  };
+
+  const handleRestore = (id: string) => {
+    if (confirm('이 글을 복원하시겠습니까?')) {
+      setPosts(posts.map(p => 
+        p.id === id ? { ...p, status: 'draft' as const } : p
+      ));
+    }
+  };
+
+  const handlePermanentDelete = (id: string) => {
+    if (confirm('이 글을 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
       setPosts(posts.filter(p => p.id !== id));
     }
   };
@@ -314,6 +330,11 @@ const Posts = () => {
       filtered = filtered.filter(p => p.status === 'published');
     } else if (activeTab === 'draft') {
       filtered = filtered.filter(p => p.status === 'draft');
+    } else if (activeTab === 'trash') {
+      filtered = filtered.filter(p => p.status === 'trash');
+    } else if (activeTab === 'all') {
+      // 'all' tab should exclude trash
+      filtered = filtered.filter(p => p.status !== 'trash');
     }
     
     // Filter by search
@@ -349,10 +370,11 @@ const Posts = () => {
   };
 
   const getStatusCounts = () => {
-    const all = posts.length;
+    const all = posts.filter(p => p.status !== 'trash').length;
     const published = posts.filter(p => p.status === 'published').length;
     const draft = posts.filter(p => p.status === 'draft').length;
-    return { all, published, draft };
+    const trash = posts.filter(p => p.status === 'trash').length;
+    return { all, published, draft, trash };
   };
 
   const counts = getStatusCounts();
@@ -498,6 +520,13 @@ const Posts = () => {
             className={`text-sm ${activeTab === 'draft' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
           >
             임시글 ({counts.draft})
+          </button>
+          <span className="text-gray-400">|</span>
+          <button
+            onClick={() => setActiveTab('trash')}
+            className={`text-sm ${activeTab === 'trash' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
+          >
+            휴지통 ({counts.trash || 0})
           </button>
         </div>
 
@@ -734,33 +763,55 @@ const Posts = () => {
                       </button>
                       {hoveredRow === post.id && (
                         <div className="flex items-center gap-2 mt-1 text-xs">
-                          <button
-                            onClick={() => handleEdit(post.id)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            Edit
-                          </button>
-                          <span className="text-gray-400">|</span>
-                          <button
-                            onClick={() => handleQuickEdit(post.id)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            Quick Edit
-                          </button>
-                          <span className="text-gray-400">|</span>
-                          <button
-                            onClick={() => handleDelete(post.id)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            Trash
-                          </button>
-                          <span className="text-gray-400">|</span>
-                          <button
-                            onClick={() => handleView(post.id)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            View
-                          </button>
+                          {activeTab === 'trash' ? (
+                            // Trash actions
+                            <>
+                              <button
+                                onClick={() => handleRestore(post.id)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                Restore
+                              </button>
+                              <span className="text-gray-400">|</span>
+                              <button
+                                onClick={() => handlePermanentDelete(post.id)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                Delete Permanently
+                              </button>
+                            </>
+                          ) : (
+                            // Normal actions
+                            <>
+                              <button
+                                onClick={() => handleEdit(post.id)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                Edit
+                              </button>
+                              <span className="text-gray-400">|</span>
+                              <button
+                                onClick={() => handleQuickEdit(post.id)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                Quick Edit
+                              </button>
+                              <span className="text-gray-400">|</span>
+                              <button
+                                onClick={() => handleDelete(post.id)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                Trash
+                              </button>
+                              <span className="text-gray-400">|</span>
+                              <button
+                                onClick={() => handleView(post.id)}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                View
+                              </button>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
@@ -815,6 +866,9 @@ const Posts = () => {
                       )}
                       {post.status === 'pending' && (
                         <span className="text-yellow-600">대기중</span>
+                      )}
+                      {post.status === 'trash' && (
+                        <span className="text-red-600">휴지통</span>
                       )}
                     </td>
                   )}
