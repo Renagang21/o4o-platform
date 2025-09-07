@@ -102,11 +102,11 @@ export class ContentController {
           status: 'success',
           data: {
             id,
-            title: 'Sample Post',
-            slug: 'sample-post',
+            title: '',
+            slug: '',
             content: { type: 'doc', content: [] },
-            excerpt: 'This is a sample post',
-            status: 'published',
+            excerpt: '',
+            status: 'draft',
             author: { id: '1', name: 'Admin', email: 'admin@example.com' },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()

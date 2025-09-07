@@ -182,7 +182,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
             <div className="space-y-2">
               <h3 className="font-semibold text-sm">Permalink</h3>
               <Input 
-                placeholder="sample-post" 
+                placeholder="" 
                 className="h-8 text-sm"
               />
               <Button variant="link" size="sm" className="text-blue-600 p-0 h-auto">

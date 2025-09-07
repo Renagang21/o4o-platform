@@ -12,9 +12,9 @@ const Edit: React.FC<any> = ({ attributes, setAttributes }) => {
     // In real implementation, this would fetch from WordPress REST API
     setTimeout(() => {
       setPosts([
-        { id: 1, title: 'Sample Post 1', excerpt: 'This is a sample post' },
-        { id: 2, title: 'Sample Post 2', excerpt: 'Another sample post' },
-        { id: 3, title: 'Sample Post 3', excerpt: 'Yet another sample post' },
+        { id: 1, title: '', excerpt: '' },
+        { id: 2, title: '', excerpt: '' },
+        { id: 3, title: '', excerpt: '' },
       ]);
       setLoading(false);
     }, 500);

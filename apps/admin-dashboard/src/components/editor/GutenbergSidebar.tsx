@@ -260,7 +260,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                     onChange={(e: any) => 
                       onPostSettingsChange({ slug: e.target.value })
                     }
-                    placeholder="post-url-slug"
+                    placeholder=""
                     className={postSettings.slugError ? "border-red-500" : ""}
                   />
                   {postSettings.slugError && (
