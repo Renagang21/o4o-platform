@@ -372,7 +372,7 @@ const Posts = () => {
   };
 
   const getStatusCounts = () => {
-    const all = posts.filter(p => p.status !== 'trash').length;
+    const all = posts.length;  // 휴지통 포함 전체 개수
     const published = posts.filter(p => p.status === 'published').length;
     const draft = posts.filter(p => p.status === 'draft').length;
     const trash = posts.filter(p => p.status === 'trash').length;
