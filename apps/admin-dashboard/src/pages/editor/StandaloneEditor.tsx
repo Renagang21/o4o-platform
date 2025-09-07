@@ -257,20 +257,19 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       const actualTitle = postTitle || 'Untitled';
       
       // Prepare base data for both create and update
-      const baseData = {
+      const baseData: any = {
         title: actualTitle,
-        content: blocks, // postApi expects blocks directly
+        content: blocks,
         excerpt: postSettings.excerpt,
         slug: postSettings.slug || actualTitle.toLowerCase().replace(/\s+/g, '-'),
-        status: publish ? 'published' : postSettings.status,
-        categoryIds: postSettings.categories, // Use categoryIds as per API type
-        tagIds: postSettings.tags, // Use tagIds as per API type
-        featuredImageId: postSettings.featuredImage, // Use featuredImageId as per API type
-        settings: {
-          allowComments: postSettings.commentStatus,
-          allowPingbacks: postSettings.pingStatus,
-          sticky: postSettings.sticky
-        }
+        status: publish ? 'published' : (postSettings.status || 'draft'),
+        categories: postSettings.categories,
+        tags: postSettings.tags,
+        featured: false,
+        sticky: postSettings.sticky,
+        featuredImage: postSettings.featuredImage,
+        format: postSettings.format,
+        allowComments: postSettings.commentStatus
       };
       
       // Debug logging available in development mode

@@ -12,7 +12,7 @@ import {
   MediaUploadResponse,
   Media 
 } from '@/types/post.types';
-import { mockPostApi, mockTaxonomyApi, shouldUseMockApi } from './mockApi';
+import { mockPostApi, shouldUseMockApi } from './mockApi';
 
 // API 기본 URL (환경변수에서 가져오기)
 // Production: admin.neture.co.kr에서는 api.neture.co.kr 사용
@@ -254,7 +254,7 @@ apiV1Client.interceptors.response.use(
  * 게시글 API
  */
 export const postApi = {
-  // 게시글 생성 (V1 API 사용)
+  // 게시글 생성 (/api/posts 사용: 중복 시 409)
   create: async (data: CreatePostRequest): Promise<PostResponse> => {
     // Use mock API only if explicitly configured
     if (shouldUseMockApi()) {
@@ -262,48 +262,10 @@ export const postApi = {
     }
     
     try {
-      if (import.meta.env.DEV) {
-        // Debug logging in development only
-        const debugLog = (...args: any[]) => {
-          // Use logger for debug info
-        };
-        debugLog('📤 POST /v1/content/posts request:', {
-          url: `${API_V1_URL}/posts`,
-          data,
-          headers: apiV1Client.defaults.headers
-        });
-      }
-      
-      const response = await apiV1Client.post('/posts', data);
-      
-      if (import.meta.env.DEV) {
-        // Debug logging in development only
-        const debugLog = (...args: any[]) => {
-          // Use logger for debug info
-        };
-        debugLog('✅ POST /v1/content/posts success:', response.data);
-      }
+      const response = await apiClient.post('/posts', data);
       
       return { success: true, data: response.data };
     } catch (error: any) {
-      if (import.meta.env.DEV) {
-        // Debug logging in development only
-        const debugLog = (...args: any[]) => {
-          // Use logger for debug info
-        };
-        debugLog('❌ POST /v1/content/posts failed:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          headers: error.response?.headers,
-          config: {
-            url: error.config?.url,
-            method: error.config?.method,
-            headers: error.config?.headers
-          }
-        });
-      }
-      
       return { 
         success: false, 
         error: error.response?.data?.message || `Failed to create post (${error.response?.status})` 
@@ -311,10 +273,10 @@ export const postApi = {
     }
   },
 
-  // 게시글 조회 (V1 API 사용)
+  // 게시글 조회 (/api/posts)
   get: async (id: string): Promise<PostResponse> => {
     try {
-      const response = await apiV1Client.get(`/posts/${id}`);
+      const response = await apiClient.get(`/posts/${id}`);
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
@@ -324,12 +286,11 @@ export const postApi = {
     }
   },
 
-  // 게시글 수정 (V1 API 사용)
+  // 게시글 수정 (/api/posts)
   update: async (data: UpdatePostRequest): Promise<PostResponse> => {
     try {
       const { id, ...updateData } = data;
-      
-      const response = await apiV1Client.put(`/posts/${id}`, updateData);
+      const response = await apiClient.put(`/posts/${id}`, updateData);
       
       return { success: true, data: response.data };
     } catch (error: any) {
@@ -377,46 +338,17 @@ export const postApi = {
       const endpoint = 'id' in data ? `/posts/${data.id}/draft` : '/posts/draft';
       
       if (import.meta.env.DEV) {
-        // Debug logging in development only
-        const debugLog = (...args: any[]) => {
-          // Use logger for debug info
-        };
-        debugLog('📤 POST save draft request:', {
-          url: `${API_V1_URL}${endpoint}`,
-          data,
-          headers: apiV1Client.defaults.headers
-        });
+        // Dev-only: draft request
       }
       
       const response = await apiV1Client.post(endpoint, data);
       
       if (import.meta.env.DEV) {
-        // Debug logging in development only
-        const debugLog = (...args: any[]) => {
-          // Use logger for debug info
-        };
-        debugLog('✅ POST save draft success:', response.data);
+        // Dev-only: draft success
       }
       
       return { success: true, data: response.data };
     } catch (error: any) {
-      if (import.meta.env.DEV) {
-        // Debug logging in development only
-        const debugLog = (...args: any[]) => {
-          // Use logger for debug info
-        };
-        debugLog('❌ POST save draft failed:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          config: {
-            url: error.config?.url,
-            method: error.config?.method,
-            headers: error.config?.headers
-          }
-        });
-      }
-      
       return { 
         success: false, 
         error: error.response?.data?.message || `Failed to save draft (${error.response?.status})` 
