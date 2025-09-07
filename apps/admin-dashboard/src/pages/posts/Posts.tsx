@@ -260,7 +260,7 @@ const Posts = () => {
 
   const handleDelete = (id: string) => {
     if (confirm('정말 이 글을 휴지통으로 이동하시겠습니까?')) {
-      setPosts(posts.map(p => 
+      setPosts(prevPosts => prevPosts.map(p => 
         p.id === id ? { ...p, status: 'trash' as const } : p
       ));
     }
@@ -268,7 +268,7 @@ const Posts = () => {
 
   const handleRestore = (id: string) => {
     if (confirm('이 글을 복원하시겠습니까?')) {
-      setPosts(posts.map(p => 
+      setPosts(prevPosts => prevPosts.map(p => 
         p.id === id ? { ...p, status: 'draft' as const } : p
       ));
     }
@@ -276,7 +276,7 @@ const Posts = () => {
 
   const handlePermanentDelete = (id: string) => {
     if (confirm('이 글을 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      setPosts(posts.filter(p => p.id !== id));
+      setPosts(prevPosts => prevPosts.filter(p => p.id !== id));
     }
   };
 
@@ -298,7 +298,9 @@ const Posts = () => {
     
     if (selectedBulkAction === 'trash') {
       if (confirm(`선택한 ${selectedPosts.size}개의 글을 휴지통으로 이동하시겠습니까?`)) {
-        setPosts(posts.filter(p => !selectedPosts.has(p.id)));
+        setPosts(prevPosts => prevPosts.map(p => 
+          selectedPosts.has(p.id) ? { ...p, status: 'trash' as const } : p
+        ));
         setSelectedPosts(new Set());
         setSelectedBulkAction('');
       }
