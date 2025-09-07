@@ -945,7 +945,7 @@ function App() {
                     <Route path="/gutenberg" element={
                       <AdminProtectedRoute requiredPermissions={['content:write']}>
                         <Suspense fallback={<PageLoader />}>
-                          <StandaloneEditor mode="post" />
+                          <EditorRouteWrapper mode="post" />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
