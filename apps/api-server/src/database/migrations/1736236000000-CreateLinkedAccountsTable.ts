@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class CreateLinkedAccountsTable1736236000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -101,12 +101,12 @@ export class CreateLinkedAccountsTable1736236000000 implements MigrationInterfac
     );
 
     // Create indexes
-    await queryRunner.createIndex('linked_accounts', new Index({
+    await queryRunner.createIndex('linked_accounts', new TableIndex({
       name: 'IDX_linked_accounts_userId',
       columnNames: ['userId']
     }));
 
-    await queryRunner.createIndex('linked_accounts', new Index({
+    await queryRunner.createIndex('linked_accounts', new TableIndex({
       name: 'IDX_linked_accounts_provider_providerId',
       columnNames: ['provider', 'providerId'],
       isUnique: true

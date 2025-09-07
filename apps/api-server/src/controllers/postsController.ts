@@ -312,6 +312,7 @@ export const updatePost = async (req: Request, res: Response) => {
 export const deletePost = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
+    const force = req.query.force === 'true'
     
     const post = await postRepository.findOne({ where: { id } })
     
@@ -319,11 +320,16 @@ export const deletePost = async (req: Request, res: Response) => {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
 
-    // Soft delete by changing status to trash
-    post.status = 'trash'
-    await postRepository.save(post)
-
-    res.json({ data: { message: 'Post moved to trash' } })
+    if (force) {
+      // Hard delete - permanently remove from database
+      await postRepository.remove(post)
+      res.json({ data: { message: 'Post permanently deleted' } })
+    } else {
+      // Soft delete by changing status to trash
+      post.status = 'trash'
+      await postRepository.save(post)
+      res.json({ data: { message: 'Post moved to trash' } })
+    }
   } catch (error) {
     console.error('Error deleting post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to delete post' } })
@@ -374,7 +380,13 @@ export const autoSavePost = async (req: Request, res: Response) => {
 
     await postRepository.save(post)
 
-    res.json({ data: { message: 'Auto-save successful', revisionId: revisions[revisions.length - 1].id } })
+    res.json({ 
+      data: { 
+        message: 'Auto-save successful', 
+        revisionId: revisions[revisions.length - 1].id,
+        updatedAt: new Date().toISOString()
+      } 
+    })
   } catch (error) {
     console.error('Error auto-saving post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to auto-save post' } })
@@ -418,9 +430,11 @@ export const previewPost = async (req: Request, res: Response) => {
 
     // Return post with preview flag
     res.json({
-      ...post,
-      preview: true,
-      previewUrl: `/preview/posts/${id}`
+      data: {
+        ...post,
+        preview: true,
+        previewUrl: `/preview/posts/${id}`
+      }
     })
   } catch (error) {
     console.error('Error previewing post:', error)
