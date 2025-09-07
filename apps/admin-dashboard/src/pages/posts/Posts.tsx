@@ -281,8 +281,8 @@ const Posts = () => {
   };
 
   const handleView = (id: string) => {
-    // Open in new tab
-    window.open(`/post/${id}`, '_blank');
+    // Open preview in new tab
+    window.open(`/preview/posts/${id}`, '_blank');
   };
 
   const handleApplyBulkAction = () => {

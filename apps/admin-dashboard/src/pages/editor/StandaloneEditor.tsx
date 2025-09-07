@@ -49,8 +49,9 @@ interface StandaloneEditorProps {
   postId?: string | number;  // Now passed from EditorRouteWrapper
 }
 
-const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) => {
+const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: initialPostId }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | number | undefined>(initialPostId);
   
   // 모바일 감지
   useEffect(() => {
@@ -66,9 +67,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
   const location = useLocation();
   const queryClient = useQueryClient();
   
-  // postId is now passed as prop from EditorRouteWrapper
+  // Use currentPostId state instead of prop directly
   // Simple and reliable check for new post
-  const isNewPost = !postId || postId === 'new';
+  const isNewPost = !currentPostId || currentPostId === 'new';
+  const postId = currentPostId; // Keep postId variable for backward compatibility
   
   // Component initialized with postId and mode from props
   
@@ -341,11 +343,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       
-      // If it's a new post and we get an ID back, update the URL (no reload)
+      // If it's a new post and we get an ID back, update the URL and state
       if (!postId && savedData?.id) {
+        setCurrentPostId(savedData.id);  // Update internal state
         navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
-        // Remount will be triggered by EditorRouteWrapper key change
-        return;
+        // Don't return here - continue with the rest of the save logic
       }
       
       // Update post settings with saved data (including slug from server)
