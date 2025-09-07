@@ -184,12 +184,23 @@ export const createPost = async (req: Request, res: Response) => {
       }
     }
 
+    // Generate unique slug if not provided
+    let finalSlug = slug;
+    if (!finalSlug) {
+      if (title) {
+        finalSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      } else {
+        // Generate timestamp-based slug for posts without title
+        finalSlug = `post-${Date.now()}`;
+      }
+    }
+
     // Create new post
     const post = postRepository.create({
       title,
       content,
       excerpt,
-      slug: slug || (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : ''),
+      slug: finalSlug,
       status,
       format,
       type: 'post',
