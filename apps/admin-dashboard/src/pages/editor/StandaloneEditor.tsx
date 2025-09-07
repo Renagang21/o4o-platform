@@ -302,14 +302,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         console.log('[EDITOR][SAVE][RES]', { publish, respId: savedData?.id, respSlug: savedData?.slug, at: new Date().toISOString() });
       }
       
-      // If it's a new post and we get an ID back, update the URL without reload
+      // If it's a new post and we get an ID back, update the URL and reload
       if (!postId && savedData?.id) {
-        // Update URL using React Router navigation
-        navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
-        // Update local state to reflect the new ID
-        setPostId(savedData.id);
-        // Mark as saved
-        setIsDirty(false);
+        // Update URL
+        window.history.replaceState(null, '', `/editor/posts/${savedData.id}`);
+        // CRITICAL: Reload the page with the new ID to properly initialize
+        // This ensures the component re-mounts with correct postId from URL
+        window.location.href = `/editor/posts/${savedData.id}`;
+        return; // Stop here, page will reload
       }
       
       setLastSaved(new Date());
