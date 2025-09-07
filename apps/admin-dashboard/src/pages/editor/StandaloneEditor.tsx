@@ -247,15 +247,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         
         if (response.success) {
           setLastSaved(new Date());
-          if (import.meta.env.DEV) {
-            console.log('[AUTOSAVE] Saved at', new Date().toISOString());
-          }
+          // Autosave success - no console log needed
         }
       } catch (error) {
         // Silent fail for autosave
-        if (import.meta.env.DEV) {
-          console.error('[AUTOSAVE] Failed:', error);
-        }
       }
     }, 30000); // Autosave after 30 seconds of changes
     
