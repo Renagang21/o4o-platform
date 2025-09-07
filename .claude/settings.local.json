@@ -62,7 +62,20 @@
       "Bash(./scripts/dev.sh lint:*)",
       "Bash(./scripts/dev.sh:*)",
       "Bash(pnpm run:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(pm2 list:*)",
+      "Bash(npx pm2 list:*)",
+      "Bash(./scripts/deploy.sh deploy:*)",
+      "Bash(npx pm2 start:*)",
+      "Bash(npx pm2 logs:*)",
+      "Bash(npx pm2 stop:*)",
+      "Bash(npx pm2 delete:*)",
+      "Bash(NODE_ENV=development JWT_SECRET=dev-jwt-secret-change-in-production JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production npx pm2 start dist/main.js --name o4o-api-local --cwd /home/sohae21/o4o-platform/apps/api-server)",
+      "Bash(kill:*)",
+      "Bash(NODE_ENV=development JWT_SECRET=dev-jwt-secret-change-in-production JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production npx pm2 start apps/api-server/dist/main.js --name o4o-api-local -- --port 3002)",
+      "Bash(NODE_ENV=development PORT=3002 JWT_SECRET=dev-jwt-secret-change-in-production JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production EMAIL_SERVICE_ENABLED=false npx pm2 start dist/main.js --name o4o-api-local)",
+      "Bash(npx pm2 restart:*)",
+      "Read(//var/**)"
     ],
     "deny": []
   }

@@ -167,8 +167,9 @@ export class ZoneContentAdapter {
     const errors: ZoneValidationError[] = []
     
     for (const [zoneId, zone] of Object.entries(zoneContent.zones)) {
+      const typedZone = zone as any
       // Check required zones
-      if (zone.constraints.required && zone.blocks.length === 0) {
+      if (typedZone.constraints?.required && typedZone.blocks?.length === 0) {
         errors.push({
           zoneId,
           type: 'constraint',
@@ -177,26 +178,26 @@ export class ZoneContentAdapter {
       }
 
       // Check min/max blocks
-      if (zone.constraints.minBlocks && zone.blocks.length < zone.constraints.minBlocks) {
+      if (typedZone.constraints?.minBlocks && typedZone.blocks?.length < typedZone.constraints.minBlocks) {
         errors.push({
           zoneId,
           type: 'constraint',
-          message: `Zone "${zoneId}" requires at least ${zone.constraints.minBlocks} blocks`
+          message: `Zone "${zoneId}" requires at least ${typedZone.constraints.minBlocks} blocks`
         })
       }
 
-      if (zone.constraints.maxBlocks && zone.blocks.length > zone.constraints.maxBlocks) {
+      if (typedZone.constraints?.maxBlocks && typedZone.blocks?.length > typedZone.constraints.maxBlocks) {
         errors.push({
           zoneId,
           type: 'constraint',
-          message: `Zone "${zoneId}" allows maximum ${zone.constraints.maxBlocks} blocks`
+          message: `Zone "${zoneId}" allows maximum ${typedZone.constraints.maxBlocks} blocks`
         })
       }
 
       // Check allowed block types
-      if (zone.constraints.allowedBlocks.length > 0) {
-        zone.blocks.forEach(block => {
-          if (!zone.constraints.allowedBlocks.includes(block.type)) {
+      if (typedZone.constraints?.allowedBlocks?.length > 0) {
+        typedZone.blocks?.forEach((block: any) => {
+          if (!typedZone.constraints.allowedBlocks.includes(block.type)) {
             errors.push({
               zoneId,
               blockId: block.id,
@@ -208,8 +209,8 @@ export class ZoneContentAdapter {
       }
 
       // Check nesting levels
-      if (!zone.constraints.allowNesting) {
-        zone.blocks.forEach(block => {
+      if (!typedZone.constraints?.allowNesting) {
+        typedZone.blocks?.forEach((block: any) => {
           if (block.innerBlocks && block.innerBlocks.length > 0) {
             errors.push({
               zoneId,
