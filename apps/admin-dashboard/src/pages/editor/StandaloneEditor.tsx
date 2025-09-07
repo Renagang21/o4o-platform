@@ -51,7 +51,10 @@ interface StandaloneEditorProps {
 
 const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: initialPostId }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [currentPostId, setCurrentPostId] = useState<string | number | undefined>(initialPostId);
+  // Don't use 'new' as an ID - it should be undefined for new posts
+  const [currentPostId, setCurrentPostId] = useState<string | number | undefined>(
+    initialPostId === 'new' ? undefined : initialPostId
+  );
   
   // 모바일 감지
   useEffect(() => {
@@ -67,10 +70,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const location = useLocation();
   const queryClient = useQueryClient();
   
-  // Use currentPostId state instead of prop directly
   // Simple and reliable check for new post
-  const isNewPost = !currentPostId || currentPostId === 'new';
-  const postId = currentPostId; // Keep postId variable for backward compatibility
+  const isNewPost = !currentPostId;
   
   // Component initialized with postId and mode from props
   
@@ -205,8 +206,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         setIsWordPressReady(true);
         
         // Load post data if editing existing post
-        if (postId && !isNewPost) {
-          await loadPostData(postId);
+        if (currentPostId && !isNewPost) {
+          await loadPostData(currentPostId);
         } else {
           // Reset states for new post
           setPostTitle('');
@@ -226,7 +227,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     };
     
     initializeEditor();
-  }, [postId, isNewPost, loadPostData]);
+  }, [currentPostId, isNewPost, loadPostData]);
 
   // Track unsaved changes
   useEffect(() => {
@@ -237,15 +238,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   
   // Autosave functionality
   useEffect(() => {
-    // Use currentPostId for autosave, not the URL param postId
-    const effectiveId = currentPostId || (postId && postId !== 'new' ? postId : undefined);
-    if (!isDirty || !effectiveId || isSaving) {
+    // Only autosave if we have a valid post ID
+    if (!isDirty || !currentPostId || isSaving) {
       return;
     }
     
     const autoSaveTimer = setTimeout(async () => {
       try {
-        const response = await postApi.autoSave(String(effectiveId), {
+        const response = await postApi.autoSave(String(currentPostId), {
           title: postTitle,
           content: blocks,
           excerpt: postSettings.excerpt
@@ -261,7 +261,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     }, 30000); // Autosave after 30 seconds of changes
     
     return () => clearTimeout(autoSaveTimer);
-  }, [isDirty, currentPostId, postId, isSaving, postTitle, blocks, postSettings.excerpt]);
+  }, [isDirty, currentPostId, isSaving, postTitle, blocks, postSettings.excerpt]);
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
@@ -278,7 +278,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
 
   // This function was moved to above useEffect to avoid temporal dead zone
 
-  const handleSave = async (publish = false) => {
+  const handleSave = async (publish = false): Promise<string | undefined> => {
     // Prevent double-clicking
     if (isSaving) {
       return;
@@ -329,11 +329,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Dev log request
       // dev save request observed (logging disabled)
-      // Call appropriate API method
-      // Use currentPostId instead of postId to handle the case after first save
-      const effectiveId = currentPostId || (postId && postId !== 'new' ? postId : undefined);
-      const response = effectiveId 
-        ? await postApi.update({ ...baseData, id: String(effectiveId) }) // Ensure id is string
+      // Call appropriate API method based on whether we have a post ID
+      const response = currentPostId 
+        ? await postApi.update({ ...baseData, id: String(currentPostId) }) // Update existing post
         : await postApi.create(baseData);
       
       if (!response.success) {
@@ -348,7 +346,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       
       // If it's a new post and we get an ID back, update the URL and state
-      if (!effectiveId && savedData?.id) {
+      if (!currentPostId && savedData?.id) {
         setCurrentPostId(savedData.id);  // Update internal state
         navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
         // Don't return here - continue with the rest of the save logic
@@ -368,6 +366,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       } else {
         toast.success('Saved as draft');
       }
+      
+      // Return the saved post ID for use in preview
+      return savedData?.id || currentPostId;
     } catch (error: any) {
       // Show specific conflict/validation messages when possible
       const status = error?.response?.status;
@@ -385,6 +386,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       } else {
         toast.error(error?.message || 'Failed to save');
       }
+      return undefined;
     } finally {
       setIsSaving(false);
     }
@@ -395,17 +397,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   };
 
   const handlePreview = async () => {
-    // Save draft first to ensure preview has latest content
-    if (isDirty) {
+    let postIdToPreview = currentPostId;
+    
+    // Save draft first if needed
+    if (isDirty || !currentPostId) {
       toast('Saving draft for preview...', { icon: '💾' });
-      await handleSave(false);
+      const savedId = await handleSave(false);
+      if (savedId) {
+        postIdToPreview = savedId;
+      } else {
+        toast.error('Failed to save. Cannot preview.');
+        return;
+      }
     }
     
-    // Open preview in new tab
-    if (postId) {
-      window.open(`/preview/posts/${postId}`, '_blank');
-    } else {
-      toast.error('Please save the post first to preview');
+    // Open preview with the correct ID
+    if (postIdToPreview) {
+      window.open(`/preview/posts/${postIdToPreview}`, '_blank');
     }
   };
 
@@ -479,7 +487,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       {/* Development Debug Bar */}
       {import.meta.env.DEV && (
         <div className="bg-gray-800 text-gray-200 text-xs px-2 py-1 flex gap-3 font-mono">
-          <span className="text-blue-400">ID: {postId || 'new'}</span>
+          <span className="text-blue-400">ID: {currentPostId || 'new'}</span>
           <span className="text-green-400">Mode: {mode}</span>
           <span className="text-yellow-400">Title: {postTitle ? `"${postTitle.substring(0, 20)}..."` : 'empty'}</span>
           <span className="text-purple-400">Blocks: {blocks.length}</span>
