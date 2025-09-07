@@ -237,13 +237,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   
   // Autosave functionality
   useEffect(() => {
-    if (!isDirty || !postId || postId === 'new' || isSaving) {
+    // Use currentPostId for autosave, not the URL param postId
+    const effectiveId = currentPostId || (postId && postId !== 'new' ? postId : undefined);
+    if (!isDirty || !effectiveId || isSaving) {
       return;
     }
     
     const autoSaveTimer = setTimeout(async () => {
       try {
-        const response = await postApi.autoSave(String(postId), {
+        const response = await postApi.autoSave(String(effectiveId), {
           title: postTitle,
           content: blocks,
           excerpt: postSettings.excerpt
@@ -259,7 +261,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     }, 30000); // Autosave after 30 seconds of changes
     
     return () => clearTimeout(autoSaveTimer);
-  }, [isDirty, postId, isSaving, postTitle, blocks, postSettings.excerpt]);
+  }, [isDirty, currentPostId, postId, isSaving, postTitle, blocks, postSettings.excerpt]);
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
@@ -328,8 +330,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Dev log request
       // dev save request observed (logging disabled)
       // Call appropriate API method
-      const response = postId 
-        ? await postApi.update({ ...baseData, id: String(postId) }) // Ensure id is string
+      // Use currentPostId instead of postId to handle the case after first save
+      const effectiveId = currentPostId || (postId && postId !== 'new' ? postId : undefined);
+      const response = effectiveId 
+        ? await postApi.update({ ...baseData, id: String(effectiveId) }) // Ensure id is string
         : await postApi.create(baseData);
       
       if (!response.success) {
@@ -344,7 +348,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       
       // If it's a new post and we get an ID back, update the URL and state
-      if (!postId && savedData?.id) {
+      if (!effectiveId && savedData?.id) {
         setCurrentPostId(savedData.id);  // Update internal state
         navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
         // Don't return here - continue with the rest of the save logic
