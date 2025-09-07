@@ -70,9 +70,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
   
   // Component initialized with postId and mode from props
   
-  // No longer needed debug code removed
-  
-  // State
+  // Editor state
   const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -85,16 +83,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
   const [isWordPressReady, setIsWordPressReady] = useState(false);
   const [showListView, setShowListView] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [isEntering, setIsEntering] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const postTitleRef = useRef(postTitle);
-  
-  // Keep ref in sync with state
-  useEffect(() => {
-    postTitleRef.current = postTitle;
-  }, [postTitle]);
-  
-  // Component is now remounted on route changes, so this effect is not needed
+  // Component is now remounted on route changes, so complex state management is not needed
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -219,8 +209,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
           setIsDirty(false);
         }
         
-        // Start entrance animation
-        setTimeout(() => setIsEntering(false), 300);
+        // Editor is ready
         
       } catch (error) {
         if (import.meta.env.DEV) {
@@ -407,27 +396,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
   return (
     <div 
       ref={containerRef}
-      className={cn(
-        "h-screen flex flex-col bg-white",
-        isEntering && "editor-enter"
-      )}
+      className="h-screen flex flex-col bg-white"
     >
-      {/* Debug Bar - Remove in production */}
+      {/* Development Debug Bar */}
       {import.meta.env.DEV && (
-        <div className="bg-yellow-100 text-xs p-1 border-b border-yellow-300 flex gap-4">
-          <span>postId: {String(postId || 'none')}</span>
-          <span>isNewPost: {String(isNewPost)}</span>
-          <span>title: "{postTitle}" ({postTitle.length} chars)</span>
-          <span>blocks: {blocks.length}</span>
-          <span>dirty: {String(isDirty)}</span>
+        <div className="bg-gray-800 text-gray-200 text-xs px-2 py-1 flex gap-3 font-mono">
+          <span className="text-blue-400">ID: {postId || 'new'}</span>
+          <span className="text-green-400">Mode: {mode}</span>
+          <span className="text-yellow-400">Title: {postTitle ? `"${postTitle.substring(0, 20)}..."` : 'empty'}</span>
+          <span className="text-purple-400">Blocks: {blocks.length}</span>
+          {isDirty && <span className="text-red-400">• unsaved</span>}
         </div>
       )}
       
       {/* Editor Header */}
       <div className={cn(
         "bg-white border-b flex items-center justify-between",
-        isMobile ? "px-2 py-2" : "px-3 py-2",
-        isEntering && "editor-header-enter"
+        isMobile ? "px-2 py-2" : "px-3 py-2"
       )}>
         <div className={cn(
           "flex items-center",
@@ -687,8 +672,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       <div className="flex-1 flex overflow-hidden">
         {/* Editor Canvas */}
         <div className={cn(
-          "flex-1 overflow-auto bg-gray-50",
-          isEntering && "editor-canvas-enter"
+          "flex-1 overflow-auto bg-gray-50"
         )}>
           <div className="min-h-full">
             <GutenbergBlockEditor

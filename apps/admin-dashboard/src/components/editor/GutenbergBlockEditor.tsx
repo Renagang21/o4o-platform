@@ -27,7 +27,7 @@ import { CheckCircle, XCircle, Info } from 'lucide-react';
 // Block interface는 이제 @/types/post.types에서 import
 
 interface GutenbergBlockEditorProps {
-  documentTitle?: string;  // Added to receive title from parent
+  documentTitle?: string;
   initialBlocks?: Block[];
   onChange?: (blocks: Block[]) => void;
   onSave?: () => void;
@@ -35,7 +35,7 @@ interface GutenbergBlockEditorProps {
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
-  documentTitle: propDocumentTitle = '',  // Receive title from parent
+  documentTitle: propDocumentTitle = '',
   initialBlocks = [],
   onChange,
   onSave,
@@ -55,9 +55,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   );
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
-  const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true); // 기본적으로 열림
+  const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [history, setHistory] = useState<Block[][]>([blocks]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const [isDirty, setIsDirty] = useState(false);
   
-  // Update blocks when initialBlocks prop changes (important for data loading)
+  // Sync blocks with initialBlocks prop changes
   useEffect(() => {
     if (initialBlocks && initialBlocks.length > 0) {
       setBlocks(initialBlocks);
@@ -67,14 +71,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     }
   }, [initialBlocks]);
   
-  // Update title when prop changes
+  // Sync title with prop changes
   useEffect(() => {
     setDocumentTitle(propDocumentTitle);
   }, [propDocumentTitle]);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [history, setHistory] = useState<Block[][]>([blocks]);
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const [isDirty, setIsDirty] = useState(false);
   const [isCodeView, setIsCodeView] = useState(false);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
