@@ -5,7 +5,6 @@ export class CreateLinkedAccountsTable1736236000000 implements MigrationInterfac
     // Check if table already exists
     const tableExists = await queryRunner.hasTable('linked_accounts');
     if (tableExists) {
-      console.log('linked_accounts table already exists, skipping creation');
       return;
     }
 
