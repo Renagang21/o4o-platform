@@ -76,7 +76,8 @@
       "Bash(NODE_ENV=development PORT=3002 JWT_SECRET=dev-jwt-secret-change-in-production JWT_REFRESH_SECRET=dev-refresh-secret-change-in-production EMAIL_SERVICE_ENABLED=false npx pm2 start dist/main.js --name o4o-api-local)",
       "Bash(npx pm2 restart:*)",
       "Read(//var/**)",
-      "Bash(pm2 restart:*)"
+      "Bash(pm2 restart:*)",
+      "Read(//home/sohae21/.ssh/**)"
     ],
     "deny": []
   }
