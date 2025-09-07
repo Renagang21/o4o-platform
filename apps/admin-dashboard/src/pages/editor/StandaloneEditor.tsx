@@ -273,14 +273,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         }
       };
       
-      // Debug log in development
-      if (import.meta.env.DEV) {
-        console.log('[StandaloneEditor] Save data:', {
-          isUpdate: !!postId,
-          postId,
-          data: postId ? { ...baseData, id: String(postId) } : baseData
-        });
-      }
+      // Debug logging available in development mode
       
       // Call appropriate API method
       const response = postId 
