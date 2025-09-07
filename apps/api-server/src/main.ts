@@ -491,6 +491,7 @@ import pagesApiRoutes from './routes/api/pages';
 import categoriesApiRoutes from './routes/api/categories';
 import tagsApiRoutes from './routes/api/tags';
 
+// Canonical posts API
 app.use('/api/posts', postsApiRoutes);
 app.use('/api/pages', pagesApiRoutes);
 app.use('/api/categories', categoriesApiRoutes);
@@ -628,7 +629,8 @@ app.use('/api/suppliers', supplierRoutes); // Supplier management routes
 app.use('/api/inventory', inventoryRoutes); // Inventory management routes
 app.use('/api/forms', formsRoutes); // Form builder routes
 app.use('/api/v1/monitoring', monitoringRoutes); // Monitoring routes
-app.use('/api/posts', postsRoutes); // Posts routes (WordPress-compatible)
+// Removed duplicate mount to ensure a single canonical router for /api/posts
+// app.use('/api/posts', postsRoutes);
 app.use('/api/reusable-blocks', reusableBlocksRoutes); // Reusable blocks routes (WordPress-compatible)
 app.use('/api/block-patterns', blockPatternsRoutes); // Block patterns routes (WordPress-compatible)
 app.use('/api/template-parts', templatePartsRoutes); // Template parts routes (WordPress FSE)
@@ -636,7 +638,8 @@ app.use('/api/content', contentRoutes); // Content routes - moved to specific pa
 app.use('/api/cms', cmsRoutes); // New CMS routes (Posts, Pages, Media with full features)
 
 // V1 API routes (new standardized endpoints)
-app.use('/api/v1/posts', postsRoutes); // Posts routes (WordPress-compatible)
+// Removed v1 posts duplicate mounting to avoid policy conflicts
+// app.use('/api/v1/posts', postsRoutes);
 app.use('/api/v1/categories', categoriesRoutes); // Categories routes (fixed)
 app.use('/api/categories', categoriesRoutes); // Backward compatibility for old API path
 app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post types (fixed)

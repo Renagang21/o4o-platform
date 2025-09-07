@@ -169,5 +169,5 @@ const EditorContext = createContext({
 
 ---
 
-*조사일: 2025년 1월*
+*조사일: 2025년 9월*
 *조사자: Claude Code Assistant*

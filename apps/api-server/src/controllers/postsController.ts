@@ -68,11 +68,11 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
     res.json({
       data: filteredPosts,
-      pagination: {
+      meta: {
         page: pageNum,
-        per_page: limitNum,
+        perPage: limitNum,
         total,
-        total_pages: Math.ceil(total / limitNum)
+        totalPages: Math.ceil(total / limitNum)
       }
     })
   } catch (error) {
@@ -108,7 +108,7 @@ export const getPost = async (req: Request, res: Response) => {
       await postRepository.update(id, { views: post.views + 1 })
     }
 
-    res.json(post)
+    res.json({ data: post })
   } catch (error) {
     console.error('Error fetching post:', error)
     res.status(500).json({ 
@@ -200,7 +200,7 @@ export const createPost = async (req: Request, res: Response) => {
 
     const savedPost = await postRepository.save(post)
 
-    res.status(201).json(savedPost)
+    res.status(201).json({ data: savedPost })
   } catch (error) {
     console.error('Error creating post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create post' } })
@@ -301,7 +301,7 @@ export const updatePost = async (req: Request, res: Response) => {
 
     const updatedPost = await postRepository.save(post)
 
-    res.json(updatedPost)
+    res.json({ data: updatedPost })
   } catch (error) {
     console.error('Error updating post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update post' } })
@@ -323,7 +323,7 @@ export const deletePost = async (req: Request, res: Response) => {
     post.status = 'trash'
     await postRepository.save(post)
 
-    res.json({ message: 'Post moved to trash' })
+    res.json({ data: { message: 'Post moved to trash' } })
   } catch (error) {
     console.error('Error deleting post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to delete post' } })
@@ -374,7 +374,7 @@ export const autoSavePost = async (req: Request, res: Response) => {
 
     await postRepository.save(post)
 
-    res.json({ message: 'Auto-save successful', revisionId: revisions[revisions.length - 1].id })
+    res.json({ data: { message: 'Auto-save successful', revisionId: revisions[revisions.length - 1].id } })
   } catch (error) {
     console.error('Error auto-saving post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to auto-save post' } })
