@@ -126,7 +126,7 @@ const PostsManagement: FC = () => {
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await authClient.api.get('/categories');
+      const response = await authClient.api.get('/api/categories');
       return response.data;
     }
   });
@@ -155,7 +155,7 @@ const PostsManagement: FC = () => {
         params.set('page', currentPage.toString());
         params.set('limit', itemsPerPage.toString());
         
-        const response = await authClient.api.get(`/v1/posts?${params}`);
+        const response = await authClient.api.get(`/api/posts?${params}`);
         
         // Handle pagination metadata
         if (response.data.meta) {
@@ -207,7 +207,7 @@ const PostsManagement: FC = () => {
 
       updateData.isSticky = data.isSticky;
 
-      await authClient.api.put(`/posts/${id}`, updateData);
+      await authClient.api.put(`/api/posts/${id}`, updateData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -258,19 +258,19 @@ const PostsManagement: FC = () => {
           break;
         case 'trash':
           await Promise.all(
-            selectedRows.map(id => authClient.api.put(`/posts/${id}`, { status: 'trash' }))
+            selectedRows.map(id => authClient.api.put(`/api/posts/${id}`, { status: 'trash' }))
           );
           toast.success(`Moved ${selectedRows.length} posts to trash`);
           break;
         case 'publish':
           await Promise.all(
-            selectedRows.map(id => authClient.api.put(`/posts/${id}`, { status: 'published' }))
+            selectedRows.map(id => authClient.api.put(`/api/posts/${id}`, { status: 'published' }))
           );
           toast.success(`Published ${selectedRows.length} posts`);
           break;
         case 'delete':
           await Promise.all(
-            selectedRows.map(id => authClient.api.delete(`/posts/${id}?force=true`))
+            selectedRows.map(id => authClient.api.delete(`/api/posts/${id}?force=true`))
           );
           toast.success(`Permanently deleted ${selectedRows.length} posts`);
           break;
@@ -287,7 +287,7 @@ const PostsManagement: FC = () => {
   // Single post delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await authClient.api.delete(`/posts/${id}`);
+      await authClient.api.put(`/api/posts/${id}`, { status: 'trash' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });

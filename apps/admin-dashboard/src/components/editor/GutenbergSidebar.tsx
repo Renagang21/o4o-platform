@@ -46,6 +46,7 @@ interface PostSettings {
   featuredImage?: string;
   excerpt: string;
   slug: string;
+  slugError?: boolean;
   categories: string[];
   tags: string[];
   template: string;
@@ -253,16 +254,31 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             <Panel title="Permalink">
               <div className="space-y-2">
                 <Label className="text-xs">URL Slug</Label>
-                <Input
-                  value={postSettings.slug}
-                  onChange={(e: any) => 
-                    onPostSettingsChange({ slug: e.target.value })
-                  }
-                  placeholder="post-url-slug"
-                />
-                <p className="text-xs text-gray-500">
+                <div className="relative">
+                  <Input
+                    value={postSettings.slug}
+                    onChange={(e: any) => 
+                      onPostSettingsChange({ slug: e.target.value })
+                    }
+                    placeholder="post-url-slug"
+                    className={postSettings.slugError ? "border-red-500" : ""}
+                  />
+                  {postSettings.slugError && (
+                    <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3" />
+                      <span>This slug is already in use. Please choose another.</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-6">
                   The last part of the URL. Read more about <a href="#" className="text-blue-600 hover:underline">permalinks</a>
                 </p>
+                {postSettings.slug && (
+                  <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                    <Globe className="h-3 w-3 inline mr-1" />
+                    Preview: /posts/{postSettings.slug}
+                  </div>
+                )}
               </div>
             </Panel>
 

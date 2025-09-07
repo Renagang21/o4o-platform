@@ -95,6 +95,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
     featuredImage: undefined as string | undefined,
     excerpt: '',
     slug: '',
+    slugError: false,
     categories: [] as string[],
     tags: [] as string[],
     template: 'default',
@@ -309,6 +310,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       const status = error?.response?.status;
       if (status === 409) {
         toast.error('Slug already exists. Please choose another slug.');
+        // Set slug error state to show error in sidebar
+        setPostSettings(prev => ({ ...prev, slugError: true }));
       } else if (status === 422) {
         toast.error('Validation failed. Please check required fields.');
       } else {
@@ -721,6 +724,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
               postSettings={postSettings}
               blockSettings={selectedBlock}
               onPostSettingsChange={(settings: any) => {
+                // Clear slug error when slug is changed
+                if (settings.slug !== undefined && postSettings.slugError) {
+                  settings.slugError = false;
+                }
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 setIsDirty(true);
               }}
