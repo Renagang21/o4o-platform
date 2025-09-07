@@ -273,6 +273,19 @@ export const postApi = {
       };
     }
   },
+  
+  // 자동저장 (/api/posts/:id/autosave)
+  autoSave: async (id: string, data: { title?: string; content?: any; excerpt?: string }): Promise<PostResponse> => {
+    try {
+      const response = await apiClient.post(`/posts/${id}/autosave`, data);
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Failed to autosave' 
+      };
+    }
+  },
 
   // 게시글 삭제 (V1 API 사용)
   delete: async (id: string): Promise<{ success: boolean; error?: string }> => {

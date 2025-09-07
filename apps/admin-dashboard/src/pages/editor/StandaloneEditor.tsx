@@ -230,6 +230,37 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       setIsDirty(true);
     }
   }, [blocks, postTitle]);
+  
+  // Autosave functionality
+  useEffect(() => {
+    if (!isDirty || !postId || postId === 'new' || isSaving) {
+      return;
+    }
+    
+    const autoSaveTimer = setTimeout(async () => {
+      try {
+        const response = await postApi.autoSave(String(postId), {
+          title: postTitle,
+          content: blocks,
+          excerpt: postSettings.excerpt
+        });
+        
+        if (response.success) {
+          setLastSaved(new Date());
+          if (import.meta.env.DEV) {
+            console.log('[AUTOSAVE] Saved at', new Date().toISOString());
+          }
+        }
+      } catch (error) {
+        // Silent fail for autosave
+        if (import.meta.env.DEV) {
+          console.error('[AUTOSAVE] Failed:', error);
+        }
+      }
+    }, 30000); // Autosave after 30 seconds of changes
+    
+    return () => clearTimeout(autoSaveTimer);
+  }, [isDirty, postId, isSaving, postTitle, blocks, postSettings.excerpt]);
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
@@ -335,7 +366,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
     
     // Open preview in new tab
     if (postId) {
-      window.open(`/post/preview/${postId}`, '_blank');
+      window.open(`/preview/posts/${postId}`, '_blank');
     } else {
       toast.error('Please save the post first to preview');
     }

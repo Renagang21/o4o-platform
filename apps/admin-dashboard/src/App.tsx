@@ -57,6 +57,7 @@ const ReusableBlocksPage = lazy(() =>
 const Posts = lazy(() => import('@/pages/posts/Posts'));
 const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
+const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 // const Shortcodes = lazy(() => import('@/pages/documentation/Shortcodes'));
 const ProductForm = lazy(() => import('@/pages/ecommerce/ProductForm'));
 const ProductCategories = lazy(() => import('@/pages/ecommerce/ProductCategories'));
@@ -286,6 +287,13 @@ function App() {
                   </Routes>
                 </EditorLayout>
               </AdminProtectedRoute>
+            } />
+            
+            {/* Preview Routes */}
+            <Route path="/preview/posts/:id" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostPreview />
+              </Suspense>
             } />
             
             {/* 보호된 관리자 라우트들 */}
