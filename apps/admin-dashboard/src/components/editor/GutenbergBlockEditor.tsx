@@ -643,7 +643,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               {/* Title Preview Display */}
               <div className="mb-6">
                 <h1 className="text-4xl font-light text-gray-800 leading-tight">
-                  {documentTitle || 'Untitled Document'}
+                  {documentTitle || ''}
                 </h1>
                 <div className="mt-2 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
               </div>

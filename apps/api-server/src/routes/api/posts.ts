@@ -5,6 +5,7 @@ import { authenticate as authenticateToken } from '../../middleware/auth.middlew
 const router: Router = Router()
 
 // Public routes
+router.get('/counts', postsController.getPostCounts)
 router.get('/', postsController.getAllPosts)
 router.get('/:id', postsController.getPost)
 router.get('/:id/preview', postsController.previewPost)

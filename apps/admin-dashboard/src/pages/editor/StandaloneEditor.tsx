@@ -515,7 +515,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
           <div className="flex-1 max-w-2xl">
             <input
               type="text"
-              placeholder="Untitled Document"
+              placeholder=""
               value={postTitle || ''}
               onChange={(e) => {
                 setPostTitle(e.target.value);
@@ -743,7 +743,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         )}>
           <div className="min-h-full">
             <GutenbergBlockEditor
-              documentTitle={postTitle || 'Untitled Document'}
+              documentTitle={postTitle || ''}
               initialBlocks={blocks}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);

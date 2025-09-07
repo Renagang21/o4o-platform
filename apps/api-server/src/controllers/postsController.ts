@@ -620,3 +620,33 @@ export const bulkOperatePosts = async (req: Request, res: Response) => {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to perform bulk operation' } })
   }
 }
+
+// Get post counts by status
+export const getPostCounts = async (req: Request, res: Response) => {
+  try {
+    // Get the authenticated user if available
+    const userId = (req as any).user?.id
+    
+    // Get all posts
+    const allPosts = await postRepository.find({
+      where: { type: 'post' },
+      select: ['id', 'status', 'authorId']
+    })
+    
+    // Calculate counts
+    const counts = {
+      all: allPosts.filter(p => p.status !== 'trash').length,
+      mine: userId ? allPosts.filter(p => p.authorId === userId && p.status !== 'trash').length : 0,
+      published: allPosts.filter(p => p.status === 'publish' || p.status === 'published').length,
+      draft: allPosts.filter(p => p.status === 'draft').length,
+      scheduled: allPosts.filter(p => p.status === 'scheduled').length,
+      private: allPosts.filter(p => p.status === 'private').length,
+      trash: allPosts.filter(p => p.status === 'trash').length
+    }
+    
+    res.json(counts)
+  } catch (error) {
+    console.error('Error fetching post counts:', error)
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch post counts' } })
+  }
+}

@@ -88,27 +88,14 @@ const PostsManagement: FC = () => {
     itemsPerPage: 20
   });
 
-  // Fetch status counts
+  // Fetch status counts from server
   const { data: countsData } = useQuery({
     queryKey: ['posts-counts'],
     queryFn: async () => {
       try {
-        // Fetch all posts to calculate counts
-        const response = await authClient.api.get('/api/posts?type=post&limit=1000');
-        const allPosts = Array.isArray(response.data) ? response.data : (response.data?.posts || response.data?.data || []);
-        
-        // Calculate counts
-        const counts = {
-          all: allPosts.filter((p: Post) => p.status !== 'trash').length,
-          mine: allPosts.filter((p: Post) => p.author?.id === currentUser?.id && p.status !== 'trash').length,
-          published: allPosts.filter((p: Post) => p.status === 'published' || p.status === 'publish').length,
-          draft: allPosts.filter((p: Post) => p.status === 'draft').length,
-          scheduled: allPosts.filter((p: Post) => p.status === 'scheduled').length,
-          private: allPosts.filter((p: Post) => p.status === 'private').length,
-          trash: allPosts.filter((p: Post) => p.status === 'trash').length
-        };
-        
-        return counts;
+        // Use dedicated counts endpoint for accurate server-based counts
+        const response = await authClient.api.get('/api/posts/counts');
+        return response.data;
       } catch (err) {
         if (import.meta.env.DEV) {
           console.error('Failed to fetch post counts:', err);
@@ -124,7 +111,8 @@ const PostsManagement: FC = () => {
           trash: 0
         };
       }
-    }
+    },
+    refetchInterval: 30000 // Refresh counts every 30 seconds
   });
 
   useEffect(() => {
@@ -145,9 +133,9 @@ const PostsManagement: FC = () => {
 
   const categories = categoriesData || [];
 
-  // Posts query with pagination and filters
+  // Posts query with pagination and filters - separate cache by status
   const { data, isLoading, error } = useQuery({
-    queryKey: ['posts', statusFilter, searchQuery, currentPage, itemsPerPage, categoryFilter, formatFilter],
+    queryKey: ['posts', { status: statusFilter, search: searchQuery, page: currentPage, limit: itemsPerPage, category: categoryFilter, format: formatFilter }],
     queryFn: async () => {
       try {
         const params = new URLSearchParams();
@@ -198,7 +186,37 @@ const PostsManagement: FC = () => {
   });
 
   // Handle different response structures
-  const posts = Array.isArray(data) ? data : (data?.posts || data?.data || []);
+  let posts = Array.isArray(data) ? data : (data?.posts || data?.data || []);
+  
+  // Inconsistency detection: Remove trash posts from non-trash views
+  if (statusFilter !== 'trash') {
+    const originalLength = posts.length;
+    posts = posts.filter((post: Post) => {
+      if (post.status === 'trash') {
+        console.error(`Inconsistency detected: Trash post "${post.title}" (${post.id}) found in ${statusFilter} view`);
+        return false;
+      }
+      return true;
+    });
+    if (originalLength !== posts.length) {
+      console.warn(`Filtered out ${originalLength - posts.length} trash posts from ${statusFilter} view`);
+    }
+  }
+  
+  // Ensure trash view only shows trash posts
+  if (statusFilter === 'trash') {
+    const originalLength = posts.length;
+    posts = posts.filter((post: Post) => {
+      if (post.status !== 'trash') {
+        console.error(`Inconsistency detected: Non-trash post "${post.title}" (${post.id}) found in trash view`);
+        return false;
+      }
+      return true;
+    });
+    if (originalLength !== posts.length) {
+      console.warn(`Filtered out ${originalLength - posts.length} non-trash posts from trash view`);
+    }
+  }
 
   // Quick edit mutation
   const quickEditMutation = useMutation({
@@ -231,7 +249,8 @@ const PostsManagement: FC = () => {
       await authClient.api.put(`/api/posts/${id}`, updateData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      // Invalidate only the current status view
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: statusFilter }], exact: false });
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       toast.success('Post updated successfully');
     },
@@ -318,10 +337,13 @@ const PostsManagement: FC = () => {
   // Single post delete mutation (move to trash)
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await authClient.api.put(`/api/posts/${id}`, { status: 'trash' });
+      const response = await authClient.api.put(`/api/posts/${id}`, { status: 'trash' });
+      return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      // Invalidate current status list and trash list
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: statusFilter }], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: 'trash' }], exact: false });
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       toast.success('Post moved to trash');
     },
@@ -336,7 +358,10 @@ const PostsManagement: FC = () => {
       await authClient.api.put(`/api/posts/${id}`, { status: 'draft' });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      // Invalidate trash list and draft list
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: 'trash' }], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: 'draft' }], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: 'all' }], exact: false });
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       toast.success('Post restored from trash');
     },
@@ -351,7 +376,8 @@ const PostsManagement: FC = () => {
       await authClient.api.delete(`/api/posts/${id}?force=true`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      // Only invalidate trash list since post is permanently deleted
+      queryClient.invalidateQueries({ queryKey: ['posts', { status: 'trash' }], exact: false });
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
       toast.success('Post permanently deleted');
     },
@@ -400,7 +426,9 @@ const PostsManagement: FC = () => {
           </Link>
           {post.status === 'draft' && <span className="post-state"> — Draft</span>}
           {post.status === 'private' && <span className="post-state"> — Private</span>}
+          {post.status === 'trash' && <span className="post-state"> — Trash</span>}
           {post.isSticky && <span className="post-state"> — Sticky</span>}
+          {import.meta.env.DEV && <span className="text-xs text-gray-500"> [{post.status}]</span>}
         </div>
       ),
       author: post.author?.name || 'Unknown',
@@ -642,6 +670,10 @@ const PostsManagement: FC = () => {
               href="#" 
               className={statusFilter === 'trash' ? 'current' : ''}
               onClick={(e) => { e.preventDefault(); handleStatusClick('trash'); }}
+              style={{ 
+                color: statusFilter === 'trash' ? '#d63638' : undefined,
+                fontWeight: statusFilter === 'trash' ? 'bold' : undefined 
+              }}
             >
               Trash <span className="count">({statusCounts.trash})</span>
             </a>
