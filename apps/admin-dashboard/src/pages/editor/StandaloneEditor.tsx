@@ -310,7 +310,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         title: postTitle || '',
         content: blocks,
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || (postTitle ? postTitle.toLowerCase().replace(/\s+/g, '-') : ''),
+        slug: postSettings.slug || '',  // Only use existing slug, don't auto-generate
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
@@ -346,6 +346,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
         // Remount will be triggered by EditorRouteWrapper key change
         return;
+      }
+      
+      // Update post settings with saved data (including slug from server)
+      if (savedData?.slug) {
+        setPostSettings(prev => ({ ...prev, slug: savedData.slug }));
       }
       
       setLastSaved(new Date());
