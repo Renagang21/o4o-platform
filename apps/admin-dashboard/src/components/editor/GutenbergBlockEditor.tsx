@@ -249,23 +249,26 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle save
   const handleSave = useCallback(async () => {
     try {
-      // Debug token status
+      // If parent provided handler, delegate to avoid duplicate creates
+      if (onSave) {
+        await onSave();
+        setIsDirty(false);
+        showToast('Draft saved', 'success');
+        return;
+      }
+
+      // Fallback (no parent handler): save draft directly
       if (import.meta.env.DEV) {
         debugTokenStatus();
       }
-      
       showToast('Saving draft...', 'info');
-      
-      // API로 저장
       const response = await postApi.saveDraft({
         title: documentTitle,
         content: blocks,
         status: 'draft',
       });
-      
       if (response.success) {
         setIsDirty(false);
-        onSave?.();
         showToast('Draft saved successfully', 'success');
       } else {
         showToast(response.error || 'Failed to save draft', 'error');
@@ -278,28 +281,26 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Handle publish
   const handlePublish = useCallback(async () => {
     try {
-      // Debug token status
+      if (onPublish) {
+        await onPublish();
+        setIsDirty(false);
+        showToast('Published successfully', 'success');
+        return;
+      }
+
+      // Fallback (no parent handler): create directly
       if (import.meta.env.DEV) {
         debugTokenStatus();
       }
-      
       showToast('Publishing post...', 'info');
-      
-      // 먼저 게시글 생성/업데이트
       const response = await postApi.create({
         title: documentTitle,
         content: blocks,
         status: 'published',
       });
-      
       if (response.success && response.data) {
         setIsDirty(false);
-        onPublish?.();
         showToast('Post published successfully!', 'success');
-        // 발행 후 게시글 페이지로 이동 (2초 후)
-        setTimeout(() => {
-          // navigate(`/posts/${response.data.id}`);
-        }, 2000);
       } else {
         showToast(response.error || 'Failed to publish post', 'error');
       }

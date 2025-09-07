@@ -275,6 +275,18 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       
       // Debug logging available in development mode
       
+      // Dev log request
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('[EDITOR][SAVE][REQ]', {
+          publish,
+          mode,
+          postId,
+          slug: (postSettings.slug || actualTitle.toLowerCase().replace(/\s+/g, '-')),
+          blocks: Array.isArray(blocks) ? blocks.length : 0,
+          at: new Date().toISOString()
+        });
+      }
       // Call appropriate API method
       const response = postId 
         ? await postApi.update({ ...baseData, id: String(postId) }) // Ensure id is string
@@ -285,15 +297,19 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       }
       
       const savedData = response.data;
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('[EDITOR][SAVE][RES]', { publish, respId: savedData?.id, respSlug: savedData?.slug, at: new Date().toISOString() });
+      }
       
-      // If it's a new post and we get an ID back, update the URL and reload
+      // If it's a new post and we get an ID back, update the URL without reload
       if (!postId && savedData?.id) {
-        // Update URL
-        window.history.replaceState(null, '', `/editor/posts/${savedData.id}`);
-        // CRITICAL: Reload the page with the new ID to properly initialize
-        // This ensures the component re-mounts with correct postId from URL
-        window.location.href = `/editor/posts/${savedData.id}`;
-        return; // Stop here, page will reload
+        // Update URL using React Router navigation
+        navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
+        // Update local state to reflect the new ID
+        setPostId(savedData.id);
+        // Mark as saved
+        setIsDirty(false);
       }
       
       setLastSaved(new Date());

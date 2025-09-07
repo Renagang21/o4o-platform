@@ -53,6 +53,55 @@ const apiV1Client = axios.create({
   withCredentials: true,
 });
 
+// Dev-only response logging for post endpoints
+apiClient.interceptors.response.use(
+  (response) => {
+    try {
+      if (import.meta.env?.DEV && response?.config?.url) {
+        const fullUrl = `${response.config.baseURL || ''}${response.config.url}`;
+        if (/\/v1\/content\/posts|\/api\/posts/.test(fullUrl)) {
+          const data = response.data?.data ?? response.data;
+          // eslint-disable-next-line no-console
+          console.log('[NET][RES]', {
+            method: response.config.method,
+            url: fullUrl,
+            status: response.status,
+            respId: data?.id,
+            respSlug: data?.slug,
+            at: new Date().toISOString(),
+          });
+        }
+      }
+    } catch {}
+    return response;
+  },
+  (error) => Promise.reject(error)
+);
+
+apiV1Client.interceptors.response.use(
+  (response) => {
+    try {
+      if (import.meta.env?.DEV && response?.config?.url) {
+        const fullUrl = `${response.config.baseURL || ''}${response.config.url}`;
+        if (/\/v1\/content\/posts|\/api\/posts/.test(fullUrl)) {
+          const data = response.data?.data ?? response.data;
+          // eslint-disable-next-line no-console
+          console.log('[NET][RES]', {
+            method: response.config.method,
+            url: fullUrl,
+            status: response.status,
+            respId: data?.id,
+            respSlug: data?.slug,
+            at: new Date().toISOString(),
+          });
+        }
+      }
+    } catch {}
+    return response;
+  },
+  (error) => Promise.reject(error)
+);
+
 // 요청 인터셉터 (토큰 추가)
 apiClient.interceptors.request.use(
   (config) => {
@@ -88,6 +137,25 @@ apiClient.interceptors.request.use(
       const testToken = 'test-token-for-development';
       config.headers.Authorization = `Bearer ${testToken}`;
     }
+    // Dev-only: log post endpoints
+    try {
+      if (import.meta.env?.DEV && config?.url) {
+        const fullUrl = `${config.baseURL || ''}${config.url}`;
+        if (/\/v1\/content\/posts|\/api\/posts/.test(fullUrl)) {
+          const raw = (config as any).data;
+          let payload: any = raw;
+          if (typeof raw === 'string') { try { payload = JSON.parse(raw); } catch { /* noop */ } }
+          // eslint-disable-next-line no-console
+          console.log('[NET][REQ]', {
+            method: config.method,
+            url: fullUrl,
+            payloadId: payload?.id,
+            payloadSlug: payload?.slug,
+            at: new Date().toISOString(),
+          });
+        }
+      }
+    } catch {}
     return config;
   },
   (error) => {
@@ -130,6 +198,25 @@ apiV1Client.interceptors.request.use(
       const testToken = 'test-token-for-development';
       config.headers.Authorization = `Bearer ${testToken}`;
     }
+    // Dev-only: log post endpoints
+    try {
+      if (import.meta.env?.DEV && config?.url) {
+        const fullUrl = `${config.baseURL || ''}${config.url}`;
+        if (/\/v1\/content\/posts|\/api\/posts/.test(fullUrl)) {
+          const raw = (config as any).data;
+          let payload: any = raw;
+          if (typeof raw === 'string') { try { payload = JSON.parse(raw); } catch { /* noop */ } }
+          // eslint-disable-next-line no-console
+          console.log('[NET][REQ]', {
+            method: config.method,
+            url: fullUrl,
+            payloadId: payload?.id,
+            payloadSlug: payload?.slug,
+            at: new Date().toISOString(),
+          });
+        }
+      }
+    } catch {}
     return config;
   },
   (error) => {
