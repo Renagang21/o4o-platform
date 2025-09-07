@@ -275,17 +275,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       // Debug logging available in development mode
       
       // Dev log request
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log('[EDITOR][SAVE][REQ]', {
-          publish,
-          mode,
-          postId,
-          slug: (postSettings.slug || actualTitle.toLowerCase().replace(/\s+/g, '-')),
-          blocks: Array.isArray(blocks) ? blocks.length : 0,
-          at: new Date().toISOString()
-        });
-      }
+      // dev save request observed (logging disabled)
       // Call appropriate API method
       const response = postId 
         ? await postApi.update({ ...baseData, id: String(postId) }) // Ensure id is string
@@ -296,10 +286,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       }
       
       const savedData = response.data;
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log('[EDITOR][SAVE][RES]', { publish, respId: savedData?.id, respSlug: savedData?.slug, at: new Date().toISOString() });
-      }
+      // dev save response observed (logging disabled)
       
       // If it's a new post and we get an ID back, update the URL (no reload)
       if (!postId && savedData?.id) {
