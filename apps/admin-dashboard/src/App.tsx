@@ -30,7 +30,7 @@ const UserForm = lazy(() => import('@/pages/users/UserForm'));
 const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const RoleManagement = lazy(() => import('@/pages/users/RoleManagement'));
 const UserStatistics = lazy(() => import('@/pages/users/UserStatistics'));
-// Content component removed - using PostsManagement directly
+const Content = lazy(() => import(/* webpackChunkName: "content" */ '@/pages/content/Content'));
 const Products = lazy(() => import('@/pages/ecommerce/Products'));
 const Orders = lazy(() => import('@/pages/ecommerce/Orders'));
 const OrderDetail = lazy(() => import('@/pages/ecommerce/OrderDetail'));
