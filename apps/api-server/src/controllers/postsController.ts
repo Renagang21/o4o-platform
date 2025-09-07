@@ -428,7 +428,7 @@ export const previewPost = async (req: Request, res: Response) => {
   }
 }
 
-// Bulk operations
+// Bulk operations with partial failure handling
 export const bulkOperatePosts = async (req: Request, res: Response) => {
   try {
     const { action, ids } = req.body
@@ -442,43 +442,117 @@ export const bulkOperatePosts = async (req: Request, res: Response) => {
       })
     }
 
-    const posts = await postRepository.findBy({ id: In(ids) })
-    
-    if (posts.length === 0) {
-      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'No posts found' } })
+    // Validate action
+    const validActions = ['trash', 'restore', 'delete', 'publish', 'draft']
+    if (!validActions.includes(action)) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'VALIDATION_ERROR', 
+          message: 'Invalid action' 
+        }
+      })
     }
 
-    switch (action) {
-      case 'trash':
-        await postRepository.update({ id: In(ids) }, { status: 'trash' })
-        break
-      case 'restore':
-        await postRepository.update({ id: In(ids) }, { status: 'draft' })
-        break
-      case 'delete':
-        await postRepository.delete({ id: In(ids) })
-        break
-      case 'publish':
-        await postRepository.update(
-          { id: In(ids) }, 
-          { status: 'published', publishedAt: new Date() }
-        )
-        break
-      case 'draft':
-        await postRepository.update({ id: In(ids) }, { status: 'draft' })
-        break
-      default:
-        return res.status(400).json({ 
-          error: { 
-            code: 'VALIDATION_ERROR', 
-            message: 'Invalid action' 
-          }
+    const succeeded: string[] = []
+    const failed: Array<{ id: string; code: string; message: string }> = []
+
+    // Process each ID individually to handle partial failures
+    for (const id of ids) {
+      try {
+        const post = await postRepository.findOne({ where: { id } })
+        
+        if (!post) {
+          failed.push({
+            id,
+            code: 'NOT_FOUND',
+            message: 'Post not found'
+          })
+          continue
+        }
+
+        // Apply action based on current state
+        switch (action) {
+          case 'trash':
+            if (post.status === 'trash') {
+              failed.push({
+                id,
+                code: 'ALREADY_TRASHED',
+                message: 'Post is already in trash'
+              })
+            } else {
+              post.status = 'trash'
+              await postRepository.save(post)
+              succeeded.push(id)
+            }
+            break
+            
+          case 'restore':
+            if (post.status !== 'trash') {
+              failed.push({
+                id,
+                code: 'NOT_IN_TRASH',
+                message: 'Post is not in trash'
+              })
+            } else {
+              post.status = 'draft'
+              await postRepository.save(post)
+              succeeded.push(id)
+            }
+            break
+            
+          case 'delete':
+            await postRepository.remove(post)
+            succeeded.push(id)
+            break
+            
+          case 'publish':
+            if (post.status === 'published') {
+              failed.push({
+                id,
+                code: 'ALREADY_PUBLISHED',
+                message: 'Post is already published'
+              })
+            } else {
+              post.status = 'published'
+              post.publishedAt = post.publishedAt || new Date()
+              await postRepository.save(post)
+              succeeded.push(id)
+            }
+            break
+            
+          case 'draft':
+            if (post.status === 'draft') {
+              failed.push({
+                id,
+                code: 'ALREADY_DRAFT',
+                message: 'Post is already a draft'
+              })
+            } else {
+              post.status = 'draft'
+              await postRepository.save(post)
+              succeeded.push(id)
+            }
+            break
+        }
+      } catch (error) {
+        failed.push({
+          id,
+          code: 'OPERATION_FAILED',
+          message: error.message || 'Failed to process post'
         })
+      }
     }
 
-    res.json({ 
-      message: `Bulk ${action} completed`,
-      affected: posts.length 
+    // Return 200 with partial results
+    res.json({
+      data: {
+        action,
+        succeeded,
+        failed,
+        total: ids.length,
+        successCount: succeeded.length,
+        failureCount: failed.length
+      }
     })
   } catch (error) {
     console.error('Error in bulk operation:', error)

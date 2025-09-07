@@ -8,6 +8,7 @@ const router: RouterType = Router();
 
 // All routes require authentication
 router.use(authenticate);
+// Note: authorize middleware temporarily disabled
 
 // Get SMTP settings
 router.get('/settings', 
