@@ -163,7 +163,7 @@ export const createPost = async (req: Request, res: Response) => {
       title,
       content,
       excerpt,
-      slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug: slug || (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : ''),
       status,
       format,
       type: 'post',
@@ -179,7 +179,7 @@ export const createPost = async (req: Request, res: Response) => {
       password,
       passwordProtected: !!password,
       scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
-      publishedAt: status === 'published' ? new Date() : undefined
+      publishedAt: status === 'publish' || status === 'published' ? new Date() : undefined
     })
 
     // Handle categories
@@ -262,7 +262,7 @@ export const updatePost = async (req: Request, res: Response) => {
     if (slug !== undefined) post.slug = slug
     if (status !== undefined) {
       post.status = status
-      if (status === 'published' && !post.publishedAt) {
+      if ((status === 'publish' || status === 'published') && !post.publishedAt) {
         post.publishedAt = new Date()
       }
     }
