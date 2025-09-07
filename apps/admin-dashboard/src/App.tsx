@@ -54,7 +54,7 @@ const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 const ReusableBlocksPage = lazy(() => 
   import(/* webpackChunkName: "reusable-blocks" */ '@/pages/content/ReusableBlocksPage')
 );
-const Posts = lazy(() => import('@/pages/posts/Posts'));
+const PostsManagement = lazy(() => import('@/pages/posts/PostsManagement'));
 const Categories = lazy(() => import('@/pages/posts/Categories'));
 const Tags = lazy(() => import('@/pages/posts/Tags'));
 const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
@@ -385,7 +385,7 @@ function App() {
                     <Route path="/posts" element={
                       <AdminProtectedRoute requiredPermissions={['content:read']}>
                         <Suspense fallback={<PageLoader />}>
-                          <Posts />
+                          <PostsManagement />
                         </Suspense>
                       </AdminProtectedRoute>
                     } />

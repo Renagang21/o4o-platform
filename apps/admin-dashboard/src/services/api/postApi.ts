@@ -362,17 +362,6 @@ export const postApi = {
       };
     }
   },
-
-  // 자동 저장 (V1 API 사용, 디바운스 처리 필요)
-  autoSave: async (id: string, data: Partial<CreatePostRequest>): Promise<PostResponse> => {
-    try {
-      const response = await apiV1Client.post(`/posts/${id}/autosave`, data);
-      return { success: true, data: response.data };
-    } catch (error: any) {
-      // 자동 저장 실패는 조용히 처리
-      return { success: false, error: 'Autosave failed' };
-    }
-  },
 };
 
 /**
