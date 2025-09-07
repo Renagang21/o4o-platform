@@ -389,13 +389,6 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    <Route path="/posts/*" element={
-                      <AdminProtectedRoute requiredPermissions={['content:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <Content />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
                     
                     {/* 카테고리 & 태그 */}
                     <Route path="/posts/categories" element={
