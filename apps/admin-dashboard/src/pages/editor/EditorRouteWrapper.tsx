@@ -22,13 +22,6 @@ const EditorRouteWrapper: FC<EditorRouteWrapperProps> = ({ mode = 'post' }) => {
   // id가 있으면 해당 id 사용, 없으면(새 글) location.key 사용
   const componentKey = id ? `${mode}-${id}` : `${mode}-new-${location.key}`;
   
-  console.log('[EditorRouteWrapper] Rendering with key:', componentKey, {
-    mode,
-    id,
-    pathname: location.pathname,
-    locationKey: location.key
-  });
-  
   return (
     <StandaloneEditor 
       key={componentKey}

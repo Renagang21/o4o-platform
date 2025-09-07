@@ -60,7 +60,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Update blocks when initialBlocks prop changes (important for data loading)
   useEffect(() => {
     if (initialBlocks && initialBlocks.length > 0) {
-      console.log('[GutenbergBlockEditor] Updating blocks from prop:', initialBlocks.length);
       setBlocks(initialBlocks);
       setHistory([initialBlocks]);
       setHistoryIndex(0);
@@ -70,7 +69,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   
   // Update title when prop changes
   useEffect(() => {
-    console.log('[GutenbergBlockEditor] Title prop changed:', propDocumentTitle);
     setDocumentTitle(propDocumentTitle);
   }, [propDocumentTitle]);
   const [isFullscreen, setIsFullscreen] = useState(false);

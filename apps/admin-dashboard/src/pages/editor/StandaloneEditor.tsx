@@ -68,13 +68,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
   // Simple and reliable check for new post
   const isNewPost = !postId || postId === 'new';
   
-  // Debug logging
-  console.log('[StandaloneEditor] Initialized:', {
-    postId,
-    isNewPost,
-    mode,
-    pathname: location.pathname
-  });
+  // Component initialized with postId and mode from props
   
   // No longer needed debug code removed
   
@@ -122,7 +116,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
 
   // Simplified load post data function
   const loadPostData = useCallback(async (id: string | number) => {
-    console.log('[StandaloneEditor] Loading post:', id);
     const loadingToast = toast.loading(`Loading post...`);
     
     try {
@@ -140,11 +133,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         data = (data as any).data;
       }
       
-      console.log('[StandaloneEditor] Normalized data:', {
-        hasTitle: !!data.title,
-        hasContent: !!data.content,
-        title: data.title
-      });
+      // Data normalized successfully
       
       // Extract and set title
       const title = data.title || '';
@@ -198,7 +187,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       toast.success('Post loaded');
       
     } catch (error: any) {
-      console.error('[StandaloneEditor] Load error:', error);
+      // Log error in development only
+      if (import.meta.env.DEV) {
+        console.error('[StandaloneEditor] Load error:', error);
+      }
       toast.dismiss(loadingToast);
       toast.error(error.message || 'Failed to load post');
       
@@ -219,10 +211,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         
         // Load post data if editing existing post
         if (postId && !isNewPost) {
-          console.log('[StandaloneEditor] Will load post:', postId);
           await loadPostData(postId);
         } else {
-          console.log('[StandaloneEditor] New post mode, not loading data');
           // Reset states for new post
           setPostTitle('');
           setBlocks([]);
@@ -233,7 +223,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
         setTimeout(() => setIsEntering(false), 300);
         
       } catch (error) {
-        console.error('[StandaloneEditor] Init error:', error);
+        if (import.meta.env.DEV) {
+          console.error('[StandaloneEditor] Init error:', error);
+        }
         toast.error('Failed to initialize editor');
         setIsWordPressReady(true); // Still show editor even if init fails
       }
