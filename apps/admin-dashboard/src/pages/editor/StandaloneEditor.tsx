@@ -229,12 +229,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     initializeEditor();
   }, [currentPostId, isNewPost, loadPostData]);
 
-  // Track unsaved changes
-  useEffect(() => {
-    if (blocks.length > 0 || postTitle) {
-      setIsDirty(true);
-    }
-  }, [blocks, postTitle]);
+  // Track unsaved changes - removed as it causes issues
+  // isDirty is now managed manually when actual changes occur
   
   // Autosave functionality
   useEffect(() => {
