@@ -4,7 +4,7 @@ import { Post } from '../entities/Post'
 import { Category } from '../entities/Category'
 import { PostTag } from '../entities/PostTag'
 import { User } from '../entities/User'
-import { In, Like, FindManyOptions, FindOptionsWhere } from 'typeorm'
+import { In, Like, Not, FindManyOptions, FindOptionsWhere } from 'typeorm'
 
 const postRepository = AppDataSource.getRepository(Post)
 const categoryRepository = AppDataSource.getRepository(Category)
@@ -19,6 +19,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
       per_page = 10,
       search,
       status,
+      excludeStatus,
       category,
       tag,
       author,
@@ -35,7 +36,12 @@ export const getAllPosts = async (req: Request, res: Response) => {
     // Build where conditions
     const where: FindOptionsWhere<Post> = { type: type as string }
     
-    if (status) where.status = status as string
+    // Handle status filtering - excludeStatus takes precedence over status
+    if (excludeStatus) {
+      where.status = Not(excludeStatus as string)
+    } else if (status) {
+      where.status = status as string
+    }
     if (format) where.format = format as string
     if (author) where.authorId = author as string
     if (search) {
@@ -150,6 +156,26 @@ export const createPost = async (req: Request, res: Response) => {
       scheduledAt
     } = req.body
 
+    // Validate that at least title or content is provided
+    if (!title && !content) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'VALIDATION_ERROR', 
+          message: '제목이나 내용 중 하나는 입력해야 합니다' 
+        } 
+      })
+    }
+
+    // Validate title is not just whitespace
+    if (title && typeof title === 'string' && !title.trim()) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'VALIDATION_ERROR', 
+          message: '제목에 공백만 입력할 수 없습니다' 
+        } 
+      })
+    }
+
     // Check if slug is unique
     if (slug) {
       const existingPost = await postRepository.findOne({ where: { slug } })
@@ -246,6 +272,16 @@ export const updatePost = async (req: Request, res: Response) => {
       password,
       scheduledAt
     } = req.body
+
+    // Validate that if updating title, it's not just whitespace
+    if (title !== undefined && title && typeof title === 'string' && !title.trim()) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'VALIDATION_ERROR', 
+          message: '제목에 공백만 입력할 수 없습니다' 
+        } 
+      })
+    }
 
     // Check slug uniqueness if changed
     if (slug && slug !== post.slug) {

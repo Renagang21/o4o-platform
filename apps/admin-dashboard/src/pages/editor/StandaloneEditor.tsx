@@ -1,5 +1,6 @@
 import { useState, FC, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   Save,
@@ -63,6 +64,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
   }, []);
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   
   // postId is now passed as prop from EditorRouteWrapper
   // Simple and reliable check for new post
@@ -278,6 +280,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       return;
     }
     
+    // Client-side validation for empty data
+    const trimmedTitle = postTitle?.trim() || '';
+    const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
+      const content = block.content;
+      if (typeof content === 'string') return content.trim().length > 0;
+      if (content?.text) return content.text.trim().length > 0;
+      if (content?.url) return true; // Image blocks
+      return false;
+    });
+    
+    if (!trimmedTitle && !hasContent) {
+      toast.error('제목이나 내용 중 하나는 입력해야 합니다');
+      return;
+    }
+    
+    if (trimmedTitle && !trimmedTitle.length) {
+      toast.error('제목에 공백만 입력할 수 없습니다');
+      return;
+    }
+    
     setIsSaving(true);
     
     try {
@@ -315,6 +337,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
       const savedData = response.data;
       // dev save response observed (logging disabled)
       
+      // Invalidate posts queries to refresh lists
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
+      
       // If it's a new post and we get an ID back, update the URL (no reload)
       if (!postId && savedData?.id) {
         navigate(`/editor/${mode}s/${savedData.id}`, { replace: true });
@@ -334,10 +360,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
     } catch (error: any) {
       // Show specific conflict/validation messages when possible
       const status = error?.response?.status;
+      const errorMessage = error?.response?.data?.error?.message;
+      
       if (status === 409) {
         toast.error('Slug already exists. Please choose another slug.');
         // Set slug error state to show error in sidebar
         setPostSettings(prev => ({ ...prev, slugError: true }));
+      } else if (status === 400) {
+        // Validation error from API
+        toast.error(errorMessage || '제목이나 내용 중 하나는 입력해야 합니다');
       } else if (status === 422) {
         toast.error('Validation failed. Please check required fields.');
       } else {
@@ -484,7 +515,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
           <div className="flex-1 max-w-2xl">
             <input
               type="text"
-              placeholder={isMobile ? getModeLabel() : `Add ${getModeLabel()} title`}
+              placeholder="Untitled Document"
               value={postTitle || ''}
               onChange={(e) => {
                 setPostTitle(e.target.value);

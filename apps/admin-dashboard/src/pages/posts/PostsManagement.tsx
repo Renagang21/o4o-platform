@@ -93,7 +93,27 @@ const PostsManagement: FC = () => {
     queryKey: ['posts-counts'],
     queryFn: async () => {
       try {
-        // API endpoint not implemented yet - return mock data
+        // Fetch all posts to calculate counts
+        const response = await authClient.api.get('/api/posts?type=post&limit=1000');
+        const allPosts = Array.isArray(response.data) ? response.data : (response.data?.posts || response.data?.data || []);
+        
+        // Calculate counts
+        const counts = {
+          all: allPosts.filter((p: Post) => p.status !== 'trash').length,
+          mine: allPosts.filter((p: Post) => p.author?.id === currentUser?.id && p.status !== 'trash').length,
+          published: allPosts.filter((p: Post) => p.status === 'published' || p.status === 'publish').length,
+          draft: allPosts.filter((p: Post) => p.status === 'draft').length,
+          scheduled: allPosts.filter((p: Post) => p.status === 'scheduled').length,
+          private: allPosts.filter((p: Post) => p.status === 'private').length,
+          trash: allPosts.filter((p: Post) => p.status === 'trash').length
+        };
+        
+        return counts;
+      } catch (err) {
+        if (import.meta.env.DEV) {
+          console.error('Failed to fetch post counts:', err);
+        }
+        // Return default counts on error
         return {
           all: 0,
           mine: 0,
@@ -103,14 +123,6 @@ const PostsManagement: FC = () => {
           private: 0,
           trash: 0
         };
-        // TODO: Uncomment when API is ready
-        // const response = await authClient.api.get('/v1/posts/counts');
-        return response.data;
-      } catch (err) {
-        if (import.meta.env.DEV) {
-          console.error('Failed to fetch post counts:', err);
-        }
-        return null;
       }
     }
   });
@@ -143,7 +155,16 @@ const PostsManagement: FC = () => {
         // Handle status filter
         if (statusFilter === 'mine') {
           params.set('authorId', currentUser?.id || '');
-        } else if (statusFilter !== 'all') {
+          // Exclude trash posts for 'mine' filter
+          params.set('excludeStatus', 'trash');
+        } else if (statusFilter === 'all') {
+          // For 'all' filter, exclude trash posts
+          params.set('excludeStatus', 'trash');
+        } else if (statusFilter === 'trash') {
+          // Only show trash posts
+          params.set('status', 'trash');
+        } else {
+          // For specific status filters
           params.set('status', statusFilter);
         }
         
@@ -262,6 +283,12 @@ const PostsManagement: FC = () => {
           );
           toast.success(`Moved ${selectedRows.length} posts to trash`);
           break;
+        case 'restore':
+          await Promise.all(
+            selectedRows.map(id => authClient.api.put(`/api/posts/${id}`, { status: 'draft' }))
+          );
+          toast.success(`Restored ${selectedRows.length} posts from trash`);
+          break;
         case 'publish':
           await Promise.all(
             selectedRows.map(id => authClient.api.put(`/api/posts/${id}`, { status: 'published' }))
@@ -269,10 +296,14 @@ const PostsManagement: FC = () => {
           toast.success(`Published ${selectedRows.length} posts`);
           break;
         case 'delete':
-          await Promise.all(
-            selectedRows.map(id => authClient.api.delete(`/api/posts/${id}?force=true`))
-          );
-          toast.success(`Permanently deleted ${selectedRows.length} posts`);
+          if (confirm(`Are you sure you want to permanently delete ${selectedRows.length} posts? This action cannot be undone.`)) {
+            await Promise.all(
+              selectedRows.map(id => authClient.api.delete(`/api/posts/${id}?force=true`))
+            );
+            toast.success(`Permanently deleted ${selectedRows.length} posts`);
+          } else {
+            return; // User cancelled
+          }
           break;
       }
       setSelectedRows([]);
@@ -284,7 +315,7 @@ const PostsManagement: FC = () => {
     }
   };
 
-  // Single post delete mutation
+  // Single post delete mutation (move to trash)
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await authClient.api.put(`/api/posts/${id}`, { status: 'trash' });
@@ -292,10 +323,40 @@ const PostsManagement: FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
-      toast.success('Post deleted successfully');
+      toast.success('Post moved to trash');
     },
     onError: () => {
       toast.error('Failed to delete post');
+    }
+  });
+
+  // Restore post mutation
+  const restoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await authClient.api.put(`/api/posts/${id}`, { status: 'draft' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
+      toast.success('Post restored from trash');
+    },
+    onError: () => {
+      toast.error('Failed to restore post');
+    }
+  });
+
+  // Permanent delete mutation
+  const permanentDeleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await authClient.api.delete(`/api/posts/${id}?force=true`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts-counts'] });
+      toast.success('Post permanently deleted');
+    },
+    onError: () => {
+      toast.error('Failed to permanently delete post');
     }
   });
 
@@ -363,7 +424,24 @@ const PostsManagement: FC = () => {
         </span>
       )
     },
-    actions: [
+    actions: post.status === 'trash' ? [
+      {
+        label: 'Restore',
+        onClick: async () => {
+          await restoreMutation.mutateAsync(post.id);
+        },
+        className: 'text-blue-600'
+      },
+      {
+        label: 'Delete Permanently',
+        onClick: async () => {
+          if (confirm('Are you sure you want to permanently delete this post? This action cannot be undone.')) {
+            await permanentDeleteMutation.mutateAsync(post.id);
+          }
+        },
+        className: 'text-red-600'
+      }
+    ] : [
       {
         label: 'Edit',
         onClick: () => navigate(`/editor/posts/${post.id}`)
@@ -605,9 +683,17 @@ const PostsManagement: FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Bulk actions</SelectItem>
-              <SelectItem value="edit">Edit</SelectItem>
-              <SelectItem value="trash">Move to Trash</SelectItem>
-              <SelectItem value="delete">Delete Permanently</SelectItem>
+              {statusFilter === 'trash' ? (
+                <>
+                  <SelectItem value="restore">Restore</SelectItem>
+                  <SelectItem value="delete">Delete Permanently</SelectItem>
+                </>
+              ) : (
+                <>
+                  <SelectItem value="edit">Edit</SelectItem>
+                  <SelectItem value="trash">Move to Trash</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
           <Button 
