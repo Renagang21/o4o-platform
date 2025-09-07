@@ -148,7 +148,10 @@ export default function PostDetail() {
             </div>
           );
         }
-      } catch {}
+      } catch (err) {
+        // Ignore JSON parse error and fall back to rendering as HTML
+        void err;
+      }
       return <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: c }} />;
     }
     return null;
@@ -166,4 +169,3 @@ export default function PostDetail() {
     </main>
   );
 }
-
