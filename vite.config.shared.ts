@@ -17,9 +17,7 @@ export const sharedViteConfig: UserConfig = {
       // React Refresh 설정 개선
       fastRefresh: process.env.NODE_ENV === 'development',
       // React DevTools 호환성을 위한 설정
-      babel: {
-        plugins: process.env.NODE_ENV === 'development' ? ['react-refresh/babel'] : []
-      }
+      // babel 플러그인은 @vitejs/plugin-react가 자동으로 처리
     })
   ],
   resolve: {
