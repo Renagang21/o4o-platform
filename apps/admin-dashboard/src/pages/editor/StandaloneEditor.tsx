@@ -281,14 +281,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
     setIsSaving(true);
     
     try {
-      const actualTitle = postTitle || 'Untitled';
+      // Don't use default title - let backend handle empty titles
       
       // Prepare base data for both create and update
       const baseData: any = {
-        title: actualTitle,
+        title: postTitle || '',
         content: blocks,
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || actualTitle.toLowerCase().replace(/\s+/g, '-'),
+        slug: postSettings.slug || (postTitle ? postTitle.toLowerCase().replace(/\s+/g, '-') : ''),
         status: publish ? 'published' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
