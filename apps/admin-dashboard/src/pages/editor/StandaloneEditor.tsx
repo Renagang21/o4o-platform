@@ -256,29 +256,36 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId }) 
     try {
       const actualTitle = postTitle || 'Untitled';
       
-      const postData: any = {
+      // Prepare base data for both create and update
+      const baseData = {
         title: actualTitle,
-        content: blocks, // postApi expects blocks directly, not wrapped in object
+        content: blocks, // postApi expects blocks directly
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || (actualTitle || 'untitled').toLowerCase().replace(/\s+/g, '-'),
+        slug: postSettings.slug || actualTitle.toLowerCase().replace(/\s+/g, '-'),
         status: publish ? 'published' : postSettings.status,
-        categories: postSettings.categories,
-        tags: postSettings.tags,
-        featuredImage: postSettings.featuredImage,
-        format: postSettings.format,
-        allowComments: postSettings.commentStatus,
-        sticky: postSettings.sticky
+        categoryIds: postSettings.categories, // Use categoryIds as per API type
+        tagIds: postSettings.tags, // Use tagIds as per API type
+        featuredImageId: postSettings.featuredImage, // Use featuredImageId as per API type
+        settings: {
+          allowComments: postSettings.commentStatus,
+          allowPingbacks: postSettings.pingStatus,
+          sticky: postSettings.sticky
+        }
       };
       
-      // Add id for update
-      if (postId) {
-        postData.id = postId;
+      // Debug log in development
+      if (import.meta.env.DEV) {
+        console.log('[StandaloneEditor] Save data:', {
+          isUpdate: !!postId,
+          postId,
+          data: postId ? { ...baseData, id: String(postId) } : baseData
+        });
       }
       
-      // Use postApi instead of fetch for proper token handling and API URL
+      // Call appropriate API method
       const response = postId 
-        ? await postApi.update(postData)
-        : await postApi.create(postData);
+        ? await postApi.update({ ...baseData, id: String(postId) }) // Ensure id is string
+        : await postApi.create(baseData);
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to save');

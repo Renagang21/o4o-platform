@@ -241,9 +241,33 @@ export const postApi = {
   update: async (data: UpdatePostRequest): Promise<PostResponse> => {
     try {
       const { id, ...updateData } = data;
+      
+      // Debug logging in development
+      if (import.meta.env.DEV) {
+        console.log('[postApi.update] Request:', {
+          id,
+          url: `/posts/${id}`,
+          updateData,
+          fullUrl: `${apiV1Client.defaults.baseURL}/posts/${id}`
+        });
+      }
+      
       const response = await apiV1Client.put(`/posts/${id}`, updateData);
+      
+      if (import.meta.env.DEV) {
+        console.log('[postApi.update] Response:', response.data);
+      }
+      
       return { success: true, data: response.data };
     } catch (error: any) {
+      if (import.meta.env.DEV) {
+        console.error('[postApi.update] Error:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.response?.data?.message
+        });
+      }
+      
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to update post' 
