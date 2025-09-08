@@ -212,6 +212,7 @@ const PostForm = () => {
         status: post.status,
         visibility: post.visibility,
         password: post.password,
+        slug: post.slug,
         categoryIds: post.categoryIds || [],
         tagIds: post.tagIds || [],
         featuredImageId: post.featuredImageId,
