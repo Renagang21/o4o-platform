@@ -119,6 +119,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     try {
       const response = await postApi.get(String(id));
       
+      // DIAGNOSTIC: Check API response structure
+      console.warn('[DIAGNOSTIC] Step 1 - Full response object:', response);
+      console.warn('[DIAGNOSTIC] Step 2 - response.data:', response.data);
+      console.warn('[DIAGNOSTIC] Step 3 - response.data type:', typeof response.data);
+      if (response.data && typeof response.data === 'object') {
+        console.warn('[DIAGNOSTIC] Step 4 - response.data keys:', Object.keys(response.data));
+        console.warn('[DIAGNOSTIC] Step 5 - has "data" key?:', 'data' in response.data);
+        console.warn('[DIAGNOSTIC] Step 6 - has "slug" key?:', 'slug' in response.data);
+        if ('data' in response.data) {
+          console.warn('[DIAGNOSTIC] Step 7 - response.data.data:', response.data.data);
+          console.warn('[DIAGNOSTIC] Step 8 - response.data.data.slug:', (response.data as any).data?.slug);
+        }
+      }
+      
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to load post');
       }
@@ -126,22 +140,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Normalize nested API response
       let data: Post = response.data as Post;
       
-      
       // Handle nested data structure from API
       // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
-      // So we need to unwrap once if there's a nested data property
+      // So we need to unwrap if there's a nested data property with actual post data
       if (data && typeof data === 'object' && 'data' in data) {
-        // Check if this looks like the wrapper (has 'data' but no post fields)
-        const hasPostFields = 'id' in data || 'title' in data || 'content' in data || 'slug' in data;
-        if (!hasPostFields) {
-          // if (import.meta.env.DEV) {
-          //   console.log('[DEBUG] Before unwrap:', data);
-          // }
-          data = (data as any).data;
-          // if (import.meta.env.DEV) {
-          //   console.log('[DEBUG] After unwrap:', data);
-          //   console.log('[DEBUG] Slug after unwrap:', data?.slug);
-          // }
+        const nested = (data as any).data;
+        // Check if nested data has post fields
+        if (nested && typeof nested === 'object' && ('id' in nested || 'title' in nested || 'slug' in nested)) {
+          console.warn('[DIAGNOSTIC] Unwrapping nested data structure');
+          console.warn('[DIAGNOSTIC] Before unwrap - data.slug:', (data as any).slug);
+          console.warn('[DIAGNOSTIC] After unwrap - nested.slug:', nested.slug);
+          data = nested;
         }
       }
       

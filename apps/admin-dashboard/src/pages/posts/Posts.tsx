@@ -414,7 +414,7 @@ const Posts = () => {
     
     // Filter by tab
     if (activeTab === 'published') {
-      filtered = filtered.filter(p => p.status === 'published');
+      filtered = filtered.filter(p => p.status === 'published' || p.status === 'publish');
     } else if (activeTab === 'draft') {
       filtered = filtered.filter(p => p.status === 'draft');
     } else if (activeTab === 'trash') {
@@ -457,7 +457,7 @@ const Posts = () => {
   };
 
   const getStatusCounts = () => {
-    const published = posts.filter(p => p.status === 'published').length;
+    const published = posts.filter(p => p.status === 'published' || p.status === 'publish').length;
     const draft = posts.filter(p => p.status === 'draft').length;
     const trash = posts.filter(p => p.status === 'trash').length;
     const all = posts.length;  // 휴지통 포함한 전체 개수
