@@ -12,6 +12,7 @@ import {
   Search
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
+import { postApi } from '@/services/api/postApi';
 
 interface Post {
   id: string;
@@ -51,15 +52,10 @@ const Posts = () => {
         // Get API URL from environment or use production URL
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        // Build query params based on activeTab
+        // Build query params - always get ALL posts and filter client-side
         const params = new URLSearchParams();
-        if (activeTab === 'all') {
-          // Exclude trash posts for 'all' tab
-          params.append('excludeStatus', 'trash');
-        } else {
-          // Filter by specific status
-          params.append('status', activeTab);
-        }
+        params.append('perPage', '100'); // Get more posts (up to 100)
+        // Don't filter by status on server side - get all posts
         
         const response = await fetch(`${apiUrl}/api/posts?${params}`, {
           headers: {
@@ -160,7 +156,7 @@ const Posts = () => {
     };
     
     fetchPosts();
-  }, [activeTab]); // Refetch when activeTab changes
+  }, []); // Only fetch once on mount
   
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
@@ -289,29 +285,33 @@ const Posts = () => {
     });
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('정말 이 글을 휴지통으로 이동하시겠습니까?')) {
-      setPosts(prevPosts => prevPosts.map(p => 
-        p.id === id ? { ...p, status: 'trash' as const } : p
-      ));
+      try {
+        const response = await postApi.update({
+          id,
+          status: 'trash'
+        });
+        
+        if (response.success) {
+          setPosts(prevPosts => prevPosts.map(p => 
+            p.id === id ? { ...p, status: 'trash' as const } : p
+          ));
+        } else {
+          alert('휴지통으로 이동하는데 실패했습니다.');
+        }
+      } catch (error) {
+        alert('휴지통으로 이동 중 오류가 발생했습니다.');
+      }
     }
   };
   
   const handlePermanentDelete = async (id: string) => {
     if (confirm('이 글을 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
       try {
-        // Call API to permanently delete with force=true
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        const response = await postApi.delete(id, true);
         
-        const response = await fetch(`${apiUrl}/api/posts/${id}?force=true`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-          }
-        });
-        
-        if (response.ok) {
+        if (response.success) {
           // Remove from local state
           setPosts(prevPosts => prevPosts.filter(p => p.id !== id));
           // Also remove from sessionStorage to prevent stale data
@@ -320,17 +320,29 @@ const Posts = () => {
           alert('삭제에 실패했습니다.');
         }
       } catch (error) {
-        console.error('Delete error:', error);
         alert('삭제 중 오류가 발생했습니다.');
       }
     }
   };
 
-  const handleRestore = (id: string) => {
+  const handleRestore = async (id: string) => {
     if (confirm('이 글을 복원하시겠습니까?')) {
-      setPosts(prevPosts => prevPosts.map(p => 
-        p.id === id ? { ...p, status: 'draft' as const } : p
-      ));
+      try {
+        const response = await postApi.update({
+          id,
+          status: 'draft'
+        });
+        
+        if (response.success) {
+          setPosts(prevPosts => prevPosts.map(p => 
+            p.id === id ? { ...p, status: 'draft' as const } : p
+          ));
+        } else {
+          alert('복원에 실패했습니다.');
+        }
+      } catch (error) {
+        alert('복원 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -339,7 +351,7 @@ const Posts = () => {
     window.open(`/preview/posts/${id}`, '_blank');
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!selectedBulkAction) {
       alert('Please select an action.');
       return;
@@ -352,11 +364,30 @@ const Posts = () => {
     
     if (selectedBulkAction === 'trash') {
       if (confirm(`선택한 ${selectedPosts.size}개의 글을 휴지통으로 이동하시겠습니까?`)) {
-        setPosts(prevPosts => prevPosts.map(p => 
-          selectedPosts.has(p.id) ? { ...p, status: 'trash' as const } : p
-        ));
-        setSelectedPosts(new Set());
-        setSelectedBulkAction('');
+        try {
+          // Process each selected post
+          const promises = Array.from(selectedPosts).map(id => 
+            postApi.update({
+              id,
+              status: 'trash'
+            })
+          );
+          
+          const results = await Promise.all(promises);
+          const allSuccessful = results.every(r => r.success);
+          
+          if (allSuccessful) {
+            setPosts(prevPosts => prevPosts.map(p => 
+              selectedPosts.has(p.id) ? { ...p, status: 'trash' as const } : p
+            ));
+            setSelectedPosts(new Set());
+            setSelectedBulkAction('');
+          } else {
+            alert('일부 글을 휴지통으로 이동하는데 실패했습니다.');
+          }
+        } catch (error) {
+          alert('휴지통으로 이동 중 오류가 발생했습니다.');
+        }
       }
     } else if (selectedBulkAction === 'edit') {
       // Bulk edit functionality
@@ -426,10 +457,10 @@ const Posts = () => {
   };
 
   const getStatusCounts = () => {
-    const all = posts.length;  // 휴지통 포함 전체 개수
     const published = posts.filter(p => p.status === 'published').length;
     const draft = posts.filter(p => p.status === 'draft').length;
     const trash = posts.filter(p => p.status === 'trash').length;
+    const all = posts.length;  // 휴지통 포함한 전체 개수
     return { all, published, draft, trash };
   };
 

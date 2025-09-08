@@ -123,20 +123,28 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         throw new Error(response.error || 'Failed to load post');
       }
       
-      // Normalize nested API response - handle multiple levels of nesting
+      // Normalize nested API response
       let data: Post = response.data as Post;
       
-      // Unwrap nested data structures
-      // Check for id or slug as well to prevent over-unwrapping
-      while (data && typeof data === 'object' && 'data' in data && 
-             !('id' in data) && !('slug' in data) && !('title' in data)) {
-        data = (data as any).data;
+      
+      // Handle nested data structure from API
+      // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
+      // So we need to unwrap once if there's a nested data property
+      if (data && typeof data === 'object' && 'data' in data) {
+        // Check if this looks like the wrapper (has 'data' but no post fields)
+        const hasPostFields = 'id' in data || 'title' in data || 'content' in data || 'slug' in data;
+        if (!hasPostFields) {
+          if (import.meta.env.DEV) {
+            console.log('[DEBUG] Before unwrap:', data);
+          }
+          data = (data as any).data;
+          if (import.meta.env.DEV) {
+            console.log('[DEBUG] After unwrap:', data);
+            console.log('[DEBUG] Slug after unwrap:', data?.slug);
+          }
+        }
       }
       
-      // Data normalized successfully
-      
-      // Debug log in development
-      // Logging disabled for production
       
       // Extract and set title
       const title = data.title || '';
@@ -168,6 +176,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks(parsedBlocks);
       
       // Set post settings
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Setting post settings, slug value:', data.slug);
+      }
       setPostSettings({
         status: (data.status || 'draft') as any,
         visibility: 'public' as const,
@@ -301,7 +312,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
-      if (content?.text) return content.text.trim().length > 0;
+      if (content?.text && typeof content.text === 'string') return content.text.trim().length > 0;
       if (content?.url) return true; // Image blocks
       return false;
     });
@@ -329,7 +340,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         title: postTitle || '',
         content: blocks,
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || '',  // Only use existing slug, don't auto-generate
+        slug: postSettings.slug || undefined,  // Use undefined instead of empty string to preserve existing slug
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
@@ -339,6 +350,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         format: postSettings.format,
         allowComments: postSettings.commentStatus
       };
+      
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Saving post with data:', {
+          title: baseData.title,
+          contentLength: baseData.content?.length,
+          status: baseData.status,
+          slug: baseData.slug
+        });
+      }
       
       // Debug logging available in development mode
       
@@ -401,6 +421,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Show specific conflict/validation messages when possible
       const status = error?.response?.status;
       const errorMessage = error?.response?.data?.error?.message;
+      
+      if (import.meta.env.DEV) {
+        console.error('[Save Error]', error);
+        console.error('[Error Response]', error?.response);
+      }
       
       if (status === 409) {
         toast.error('Slug already exists. Please choose another slug.');
@@ -827,7 +852,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 const hasRealContent = newBlocks.some(block => {
                   if (block.type === 'core/paragraph') {
                     const text = block.content?.text || block.content || '';
-                    return text.trim().length > 0;
+                    return typeof text === 'string' && text.trim().length > 0;
                   }
                   return true; // Other block types are considered real content
                 });
