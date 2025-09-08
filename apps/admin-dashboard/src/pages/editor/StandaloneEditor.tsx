@@ -170,7 +170,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           title: data.title,
           slug: data.slug,
           hasSlug: !!data.slug,
-          slugType: typeof data.slug
+          slugType: typeof data.slug,
+          allKeys: Object.keys(data || {}),
+          dataStructure: JSON.stringify(data, null, 2).substring(0, 500)
         };
       }
       

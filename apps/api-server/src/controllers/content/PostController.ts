@@ -133,13 +133,25 @@ export class PostController {
       // Increment view count
       await this.postRepository.increment({ id }, 'views', 1);
 
-      res.json({
+      const responseData = {
         success: true,
         data: {
           post: this.formatPostResponse(post),
           revisions: includeRevisions === 'true' ? revisions : undefined
         }
-      });
+      };
+      
+      // Debug log for development
+      if (process.env.NODE_ENV === 'development') {
+        logger.info('API Response Structure:', {
+          hasSuccess: 'success' in responseData,
+          hasData: 'data' in responseData,
+          hasPost: responseData.data && 'post' in responseData.data,
+          slugValue: responseData.data?.post?.slug
+        });
+      }
+      
+      res.json(responseData);
     } catch (error) {
       logger.error('Error getting post:', error);
       res.status(500).json({
