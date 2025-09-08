@@ -256,7 +256,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative">
                   <Input
-                    value={postSettings.slug}
+                    value={postSettings.slug || ''}
                     onChange={(e: any) => 
                       onPostSettingsChange({ slug: e.target.value })
                     }

@@ -119,19 +119,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     try {
       const response = await postApi.get(String(id));
       
-      // DIAGNOSTIC: Check API response structure
-      console.warn('[DIAGNOSTIC] Step 1 - Full response object:', response);
-      console.warn('[DIAGNOSTIC] Step 2 - response.data:', response.data);
-      console.warn('[DIAGNOSTIC] Step 3 - response.data type:', typeof response.data);
-      if (response.data && typeof response.data === 'object') {
-        console.warn('[DIAGNOSTIC] Step 4 - response.data keys:', Object.keys(response.data));
-        console.warn('[DIAGNOSTIC] Step 5 - has "data" key?:', 'data' in response.data);
-        console.warn('[DIAGNOSTIC] Step 6 - has "slug" key?:', 'slug' in response.data);
-        if ('data' in response.data) {
-          console.warn('[DIAGNOSTIC] Step 7 - response.data.data:', response.data.data);
-          console.warn('[DIAGNOSTIC] Step 8 - response.data.data.slug:', (response.data as any).data?.slug);
-        }
-      }
       
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to load post');
@@ -147,12 +134,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         const nested = (data as any).data;
         // Check if nested data has post fields
         if (nested && typeof nested === 'object' && ('id' in nested || 'title' in nested || 'slug' in nested)) {
-          console.warn('[DIAGNOSTIC] Unwrapping nested data structure');
-          console.warn('[DIAGNOSTIC] Before unwrap - data.slug:', (data as any).slug);
-          console.warn('[DIAGNOSTIC] After unwrap - nested.slug:', nested.slug);
           data = nested;
-          console.warn('[DIAGNOSTIC] After assignment - data.slug:', data.slug);
-          console.warn('[DIAGNOSTIC] After assignment - data object:', data);
         }
       }
       
@@ -186,20 +168,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       setBlocks(parsedBlocks);
       
-      // Set post settings
-      console.warn('[DIAGNOSTIC] Final data object before setPostSettings:', data);
-      console.warn('[DIAGNOSTIC] data.slug value before setPostSettings:', data.slug);
-      console.warn('[DIAGNOSTIC] data.slug type:', typeof data.slug);
-      console.warn('[DIAGNOSTIC] data.slug length:', data.slug?.length);
-      
-      const newSettings = {
+      // Set post settings - ensure slug is preserved
+      setPostSettings(prev => ({
+        ...prev,
         status: (data.status || 'draft') as any,
         visibility: 'public' as const,
         publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
         author: data.author?.name || 'Admin User',
         featuredImage: data.featuredImage,
         excerpt: data.excerpt || '',
-        slug: data.slug || '',
+        slug: data.slug || prev.slug || '',
         categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
         tags: data.tags?.map((t: any) => typeof t === 'object' ? t.id : t) || [],
         template: 'default',
@@ -207,12 +185,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         pingStatus: true,
         sticky: false,
         format: 'standard' as const
-      };
-      
-      console.warn('[DIAGNOSTIC] newSettings object:', newSettings);
-      console.warn('[DIAGNOSTIC] newSettings.slug:', newSettings.slug);
-      
-      setPostSettings(newSettings);
+      }));
       
       setIsDirty(false);
       toast.dismiss(loadingToast);
