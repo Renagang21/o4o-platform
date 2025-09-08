@@ -66,7 +66,6 @@ interface GutenbergSidebarProps {
   activeTab?: 'document' | 'block';
   postSettings: PostSettings;
   blockSettings?: BlockSettings;
-  isDataLoaded?: boolean;
   onPostSettingsChange: (settings: Partial<PostSettings>) => void;
   onBlockSettingsChange?: (settings: Partial<BlockSettings>) => void;
   onClose?: () => void;
@@ -101,7 +100,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   activeTab = 'document',
   postSettings,
   blockSettings,
-  isDataLoaded = false,
   onPostSettingsChange,
   onBlockSettingsChange,
   onClose
@@ -258,12 +256,11 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative">
                   <Input
-                    value={isDataLoaded ? (postSettings.slug || '') : ''}
+                    value={postSettings.slug || ''}
                     onChange={(e: any) => 
                       onPostSettingsChange({ slug: e.target.value })
                     }
-                    placeholder={isDataLoaded ? "" : "Loading..."}
-                    disabled={!isDataLoaded}
+                    placeholder=""
                     className={postSettings.slugError ? "border-red-500" : ""}
                   />
                   {postSettings.slugError && (

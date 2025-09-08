@@ -787,6 +787,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   size="icon"
                   className={isMobile ? "h-8 w-8" : "h-9 w-9"}
                   onClick={() => setSidebarOpen(!sidebarOpen)}
+                  disabled={!isPostDataLoaded && !isNewPost}
                 >
                   {sidebarOpen ? (
                     <X className="h-4 w-4" />
@@ -911,7 +912,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlock}
-              isDataLoaded={isPostDataLoaded}
               onPostSettingsChange={(settings: any) => {
                 // Clear slug error when slug is changed
                 if (settings.slug !== undefined && postSettings.slugError) {
