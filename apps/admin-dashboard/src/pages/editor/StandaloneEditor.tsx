@@ -127,9 +127,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       let data: Post = response.data as Post;
       
       // Debug: Log original response structure
-      if (import.meta.env.DEV) {
-        console.log('[DEBUG] Original API response:', response.data);
-      }
+      // if (import.meta.env.DEV) {
+      //   console.log('[DEBUG] Original API response:', response.data);
+      // }
       
       // Handle nested data structure from API
       // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
@@ -138,18 +138,18 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         // Check if this looks like the wrapper (has 'data' but no post fields)
         const hasPostFields = 'id' in data || 'title' in data || 'content' in data;
         if (!hasPostFields) {
-          if (import.meta.env.DEV) {
-            console.log('[DEBUG] Unwrapping nested data structure');
-          }
+          // if (import.meta.env.DEV) {
+          //   console.log('[DEBUG] Unwrapping nested data structure');
+          // }
           data = (data as any).data;
         }
       }
       
       // Debug: Log normalized data
-      if (import.meta.env.DEV) {
-        console.log('[DEBUG] Normalized data:', data);
-        console.log('[DEBUG] Slug value:', data?.slug);
-      }
+      // if (import.meta.env.DEV) {
+      //   console.log('[DEBUG] Normalized data:', data);
+      //   console.log('[DEBUG] Slug value:', data?.slug);
+      // }
       
       // Extract and set title
       const title = data.title || '';
@@ -414,6 +414,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Show specific conflict/validation messages when possible
       const status = error?.response?.status;
       const errorMessage = error?.response?.data?.error?.message;
+      
+      if (import.meta.env.DEV) {
+        console.error('[Save Error]', error);
+        console.error('[Error Response]', error?.response);
+      }
       
       if (status === 409) {
         toast.error('Slug already exists. Please choose another slug.');
