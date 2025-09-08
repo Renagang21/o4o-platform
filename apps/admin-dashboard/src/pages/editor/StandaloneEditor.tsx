@@ -151,6 +151,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           console.warn('[DIAGNOSTIC] Before unwrap - data.slug:', (data as any).slug);
           console.warn('[DIAGNOSTIC] After unwrap - nested.slug:', nested.slug);
           data = nested;
+          console.warn('[DIAGNOSTIC] After assignment - data.slug:', data.slug);
+          console.warn('[DIAGNOSTIC] After assignment - data object:', data);
         }
       }
       
