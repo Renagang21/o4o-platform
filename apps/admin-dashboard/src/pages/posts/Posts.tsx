@@ -52,15 +52,10 @@ const Posts = () => {
         // Get API URL from environment or use production URL
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        // Build query params based on activeTab
+        // Build query params - always get ALL posts and filter client-side
         const params = new URLSearchParams();
-        if (activeTab === 'all') {
-          // Exclude trash posts for 'all' tab
-          params.append('excludeStatus', 'trash');
-        } else {
-          // Filter by specific status
-          params.append('status', activeTab);
-        }
+        params.append('perPage', '100'); // Get more posts (up to 100)
+        // Don't filter by status on server side - get all posts
         
         const response = await fetch(`${apiUrl}/api/posts?${params}`, {
           headers: {
@@ -161,7 +156,7 @@ const Posts = () => {
     };
     
     fetchPosts();
-  }, [activeTab]); // Refetch when activeTab changes
+  }, []); // Only fetch once on mount
   
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
@@ -462,10 +457,10 @@ const Posts = () => {
   };
 
   const getStatusCounts = () => {
-    const all = posts.length;  // 휴지통 포함 전체 개수
     const published = posts.filter(p => p.status === 'published').length;
     const draft = posts.filter(p => p.status === 'draft').length;
     const trash = posts.filter(p => p.status === 'trash').length;
+    const all = posts.filter(p => p.status !== 'trash').length;  // 휴지통 제외한 개수
     return { all, published, draft, trash };
   };
 
