@@ -298,7 +298,7 @@ const initializeMockData = () => {
         id: 'post-sample-1',
         title: 'Getting Started with React',
         slug: 'getting-started-with-react',
-        content: JSON.stringify({ blocks: [{ type: 'paragraph', content: 'This is a sample post about React.' }] }),
+        content: 'This is a sample post about React.',
         status: 'published',
         createdAt: new Date('2024-01-15').toISOString(),
         updatedAt: new Date('2024-01-15').toISOString(),
@@ -309,7 +309,7 @@ const initializeMockData = () => {
         id: 'post-sample-2', 
         title: '웹 개발 베스트 프랙티스',
         slug: 'web-development-best-practices',
-        content: JSON.stringify({ blocks: [{ type: 'paragraph', content: 'Web development best practices guide.' }] }),
+        content: 'Web development best practices guide.',
         status: 'published',
         createdAt: new Date('2024-01-20').toISOString(),
         updatedAt: new Date('2024-01-20').toISOString(),
@@ -320,7 +320,7 @@ const initializeMockData = () => {
         id: 'post-sample-3',
         title: 'Draft Post Example',
         slug: 'draft-post-example',
-        content: JSON.stringify({ blocks: [{ type: 'paragraph', content: 'This is a draft post.' }] }),
+        content: 'This is a draft post.',
         status: 'draft',
         createdAt: new Date('2024-02-01').toISOString(),
         updatedAt: new Date('2024-02-01').toISOString(),
@@ -341,6 +341,8 @@ export const shouldUseMockApi = () => {
   // Use mock API in development when:
   // 1. Explicitly enabled via environment variable
   // 2. Or when API server is not available
+  // 3. Always use mock in dev mode for now (until API is stable)
   return import.meta.env.VITE_USE_MOCK_API === 'true' || 
-         (import.meta.env.DEV && import.meta.env.VITE_FORCE_MOCK === 'true');
+         import.meta.env.VITE_FORCE_MOCK === 'true' ||
+         import.meta.env.DEV; // Always use mock in development for now
 };

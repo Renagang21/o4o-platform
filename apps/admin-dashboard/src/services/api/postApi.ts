@@ -296,6 +296,11 @@ export const postApi = {
 
   // 게시글 조회 (/api/posts)
   get: async (id: string): Promise<PostResponse> => {
+    // Use mock API if configured
+    if (shouldUseMockApi()) {
+      return mockPostApi.get(id);
+    }
+    
     try {
       const response = await apiClient.get(`/posts/${id}`);
       return { success: true, data: response.data };
