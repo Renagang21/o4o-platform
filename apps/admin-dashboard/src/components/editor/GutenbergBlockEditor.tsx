@@ -41,18 +41,20 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onSave,
   onPublish,
 }) => {
-  const [blocks, setBlocks] = useState<Block[]>(
-    initialBlocks.length > 0
-      ? initialBlocks
-      : [
-          {
-            id: `block-${Date.now()}`,
-            type: 'core/paragraph',
-            content: { text: '' },
-            attributes: {},
-          },
-        ]
-  );
+  // Initialize with empty paragraph only if no initial blocks
+  // But don't trigger onChange for this initialization
+  const [blocks, setBlocks] = useState<Block[]>(() => {
+    if (initialBlocks.length > 0) {
+      return initialBlocks;
+    }
+    // Create a default empty paragraph for new posts
+    return [{
+      id: `block-${Date.now()}`,
+      type: 'core/paragraph',
+      content: { text: '' },
+      attributes: {},
+    }];
+  });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [documentTitle, setDocumentTitle] = useState(propDocumentTitle);
   const [isBlockInserterOpen, setIsBlockInserterOpen] = useState(true);
@@ -92,7 +94,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
 
   // Update blocks and history
   const updateBlocks = useCallback(
-    (newBlocks: Block[]) => {
+    (newBlocks: Block[], skipOnChange = false) => {
       setBlocks(newBlocks);
       setIsDirty(true);
 
@@ -102,8 +104,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
       setHistory(newHistory);
       setHistoryIndex(newHistory.length - 1);
 
-      // Notify parent
-      onChange?.(newBlocks);
+      // Notify parent (unless skipped for initialization)
+      if (!skipOnChange) {
+        onChange?.(newBlocks);
+      }
     },
     [history, historyIndex, onChange]
   );

@@ -1,4 +1,4 @@
-import { useState, FC, useEffect, useRef, useCallback } from 'react';
+import { useState, FC, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -84,6 +84,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const saveRequestRef = useRef<AbortController | null>(null);
+  const lastSaveHashRef = useRef<string | null>(null);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isWordPressReady, setIsWordPressReady] = useState(false);
   const [showListView, setShowListView] = useState(false);
@@ -125,11 +127,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       let data: Post = response.data as Post;
       
       // Unwrap nested data structures
-      while (data && typeof data === 'object' && 'data' in data && !('title' in data)) {
+      // Check for id or slug as well to prevent over-unwrapping
+      while (data && typeof data === 'object' && 'data' in data && 
+             !('id' in data) && !('slug' in data) && !('title' in data)) {
         data = (data as any).data;
       }
       
       // Data normalized successfully
+      
+      // Debug log in development
+      if (import.meta.env.DEV) {
+        console.log('[StandaloneEditor] Loaded post data:', {
+          id: data.id,
+          title: data.title,
+          slug: data.slug,
+          status: data.status
+        });
+      }
       
       // Extract and set title
       const title = data.title || '';
@@ -232,32 +246,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   // Track unsaved changes - removed as it causes issues
   // isDirty is now managed manually when actual changes occur
   
-  // Autosave functionality
-  useEffect(() => {
-    // Only autosave if we have a valid post ID
-    if (!isDirty || !currentPostId || isSaving) {
-      return;
-    }
-    
-    const autoSaveTimer = setTimeout(async () => {
-      try {
-        const response = await postApi.autoSave(String(currentPostId), {
-          title: postTitle,
-          content: blocks,
-          excerpt: postSettings.excerpt
-        });
-        
-        if (response.success) {
-          setLastSaved(new Date());
-          // Autosave success - no console log needed
-        }
-      } catch (error) {
-        // Silent fail for autosave
-      }
-    }, 30000); // Autosave after 30 seconds of changes
-    
-    return () => clearTimeout(autoSaveTimer);
-  }, [isDirty, currentPostId, isSaving, postTitle, blocks, postSettings.excerpt]);
+  // Autosave removed - only save when user explicitly clicks save/publish
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
@@ -274,10 +263,44 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
 
   // This function was moved to above useEffect to avoid temporal dead zone
 
+  // Debounce helper
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Generate hash of save data to prevent duplicate saves
+  const generateSaveHash = (data: any) => {
+    const str = JSON.stringify({
+      title: data.title,
+      content: data.content,
+      status: data.status,
+      slug: data.slug
+    });
+    // Simple hash function
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash.toString();
+  };
+  
   const handleSave = async (publish = false): Promise<string | undefined> => {
-    // Prevent double-clicking
+    // Prevent double-clicking and concurrent saves
     if (isSaving) {
+      toast('Save already in progress', { icon: '⏳' });
       return;
+    }
+    
+    // Cancel any pending debounced save
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+      debounceTimeoutRef.current = null;
+    }
+    
+    // Cancel any in-flight request
+    if (saveRequestRef.current) {
+      saveRequestRef.current.abort();
+      saveRequestRef.current = null;
     }
     
     // Client-side validation for empty data
@@ -302,6 +325,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     setIsSaving(true);
     
+    // Create new abort controller for this request
+    saveRequestRef.current = new AbortController();
+    
     try {
       // Don't use default title - let backend handle empty titles
       
@@ -323,12 +349,24 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Debug logging available in development mode
       
+      // Check if this is a duplicate save (same content)
+      const saveHash = generateSaveHash(baseData);
+      if (lastSaveHashRef.current === saveHash && !isDirty) {
+        setIsSaving(false);
+        toast('No changes to save', { icon: 'ℹ️' });
+        return currentPostId;
+      }
+      
+      // Add unique request ID to prevent duplicate processing
+      const requestId = `${Date.now()}-${Math.random()}`;
+      const requestData = { ...baseData, _requestId: requestId };
+      
       // Dev log request
       // dev save request observed (logging disabled)
       // Call appropriate API method based on whether we have a post ID
       const response = currentPostId 
-        ? await postApi.update({ ...baseData, id: String(currentPostId) }) // Update existing post
-        : await postApi.create(baseData);
+        ? await postApi.update({ ...requestData, id: String(currentPostId) }) // Update existing post
+        : await postApi.create(requestData);
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to save');
@@ -355,6 +393,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       setLastSaved(new Date());
       setIsDirty(false);
+      lastSaveHashRef.current = saveHash; // Remember last saved content hash
       
       if (publish) {
         setPostSettings(prev => ({ ...prev, status: 'publish' }));
@@ -385,6 +424,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       return undefined;
     } finally {
       setIsSaving(false);
+      saveRequestRef.current = null;
     }
   };
 
@@ -647,7 +687,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleSave(false)}
+              onClick={() => {
+                // Debounce save to prevent multiple clicks
+                if (debounceTimeoutRef.current) {
+                  clearTimeout(debounceTimeoutRef.current);
+                }
+                debounceTimeoutRef.current = setTimeout(() => {
+                  handleSave(false);
+                  debounceTimeoutRef.current = null;
+                }, 300);
+              }}
               disabled={isSaving || !isDirty}
             >
               {isSaving ? (
@@ -667,7 +716,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              onClick={() => handleSave(false)}
+              onClick={() => {
+                // Debounce save to prevent multiple clicks
+                if (debounceTimeoutRef.current) {
+                  clearTimeout(debounceTimeoutRef.current);
+                }
+                debounceTimeoutRef.current = setTimeout(() => {
+                  handleSave(false);
+                  debounceTimeoutRef.current = null;
+                }, 300);
+              }}
               disabled={isSaving || !isDirty}
             >
               {isSaving ? (
@@ -681,7 +739,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           {/* Publish/Update */}
           <Button
             size="sm"
-            onClick={() => handleSave(true)}
+            onClick={() => {
+              // Debounce publish to prevent multiple clicks
+              if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+              }
+              debounceTimeoutRef.current = setTimeout(() => {
+                handleSave(true);
+                debounceTimeoutRef.current = null;
+              }, 300);
+            }}
             disabled={isSaving}
           >
             {postSettings.status === 'publish' ? 'Update' : 'Publish'}
@@ -762,7 +829,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               initialBlocks={blocks}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);
-                setIsDirty(true);
+                // Only mark as dirty if we have actual content changes, not just initialization
+                // Check if this is not just an empty paragraph block (default initialization)
+                const hasRealContent = newBlocks.some(block => {
+                  if (block.type === 'core/paragraph') {
+                    const text = block.content?.text || block.content || '';
+                    return text.trim().length > 0;
+                  }
+                  return true; // Other block types are considered real content
+                });
+                
+                // Only mark dirty if we have a post ID or real content
+                if (currentPostId || hasRealContent) {
+                  setIsDirty(true);
+                }
               }}
               onSave={handleSave}
               onPublish={handlePublish}

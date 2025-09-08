@@ -5,11 +5,36 @@ import { Category } from '../entities/Category'
 import { PostTag } from '../entities/PostTag'
 import { User } from '../entities/User'
 import { In, Like, Not, FindManyOptions, FindOptionsWhere } from 'typeorm'
+import crypto from 'crypto'
 
 const postRepository = AppDataSource.getRepository(Post)
 const categoryRepository = AppDataSource.getRepository(Category)
 const tagRepository = AppDataSource.getRepository(PostTag)
 const userRepository = AppDataSource.getRepository(User)
+
+// Store recent request hashes to prevent duplicate processing
+const recentRequests = new Map<string, { timestamp: number; result?: any }>()
+
+// Clean up old request hashes every 5 minutes
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, value] of recentRequests.entries()) {
+    if (now - value.timestamp > 5 * 60 * 1000) { // 5 minutes
+      recentRequests.delete(key)
+    }
+  }
+}, 5 * 60 * 1000)
+
+// Generate request hash for deduplication
+const generateRequestHash = (userId: string, body: any): string => {
+  // Remove _requestId and other temporary fields
+  const cleanBody = { ...body }
+  delete cleanBody._requestId
+  delete cleanBody.requestId
+  
+  const data = JSON.stringify({ userId, ...cleanBody })
+  return crypto.createHash('sha256').update(data).digest('hex')
+}
 
 // Get all posts with filtering and pagination
 export const getAllPosts = async (req: Request, res: Response) => {
@@ -135,6 +160,30 @@ export const createPost = async (req: Request, res: Response) => {
       return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User not authenticated' } })
     }
 
+    // Check for duplicate request
+    const requestHash = generateRequestHash(userId, req.body)
+    const existingRequest = recentRequests.get(requestHash)
+    
+    if (existingRequest) {
+      // If request was made within last 2 seconds, return the cached result
+      if (Date.now() - existingRequest.timestamp < 2000) {
+        console.log('Duplicate request detected, returning cached result')
+        if (existingRequest.result) {
+          return res.status(201).json(existingRequest.result)
+        }
+        // Request is still being processed
+        return res.status(409).json({ 
+          error: { 
+            code: 'DUPLICATE_REQUEST', 
+            message: 'A similar request is already being processed' 
+          } 
+        })
+      }
+    }
+    
+    // Mark request as being processed
+    recentRequests.set(requestHash, { timestamp: Date.now() })
+
     const {
       title,
       content,
@@ -237,7 +286,14 @@ export const createPost = async (req: Request, res: Response) => {
 
     const savedPost = await postRepository.save(post)
 
-    res.status(201).json({ data: savedPost })
+    // Cache the result
+    const result = { data: savedPost }
+    const cachedRequest = recentRequests.get(requestHash)
+    if (cachedRequest) {
+      cachedRequest.result = result
+    }
+
+    res.status(201).json(result)
   } catch (error) {
     console.error('Error creating post:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create post' } })

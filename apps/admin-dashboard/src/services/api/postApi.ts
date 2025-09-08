@@ -3,7 +3,7 @@
  * 게시글 관련 API 호출 서비스
  */
 
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { 
   CreatePostRequest, 
   UpdatePostRequest, 
@@ -223,6 +223,24 @@ apiV1Client.interceptors.response.use(
   }
 );
 
+// Request deduplication
+const pendingRequests = new Map<string, AbortController>();
+
+const createRequestKey = (method: string, url: string, data?: any): string => {
+  // Remove _requestId from data for key generation
+  const cleanData = data ? { ...data } : {};
+  delete cleanData._requestId;
+  return `${method}-${url}-${JSON.stringify(cleanData)}`;
+};
+
+const cancelPendingRequest = (key: string) => {
+  const controller = pendingRequests.get(key);
+  if (controller) {
+    controller.abort();
+    pendingRequests.delete(key);
+  }
+};
+
 /**
  * 게시글 API
  */
@@ -234,11 +252,33 @@ export const postApi = {
       return mockPostApi.create(data);
     }
     
+    // Cancel any pending request with same data
+    const requestKey = createRequestKey('POST', '/posts', data);
+    cancelPendingRequest(requestKey);
+    
+    // Create new abort controller
+    const abortController = new AbortController();
+    pendingRequests.set(requestKey, abortController);
+    
     try {
-      const response = await apiClient.post('/posts', data);
+      // Remove _requestId from actual request
+      const requestData = { ...data };
+      delete (requestData as any)._requestId;
       
+      const response = await apiClient.post('/posts', requestData, {
+        signal: abortController.signal
+      } as AxiosRequestConfig);
+      
+      pendingRequests.delete(requestKey);
       return { success: true, data: response.data };
     } catch (error: any) {
+      pendingRequests.delete(requestKey);
+      
+      // Don't report aborted requests as errors
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+        return { success: false, error: 'Request canceled' };
+      }
+      
       return { 
         success: false, 
         error: error.response?.data?.message || `Failed to create post (${error.response?.status})` 
@@ -261,12 +301,35 @@ export const postApi = {
 
   // 게시글 수정 (/api/posts)
   update: async (data: UpdatePostRequest): Promise<PostResponse> => {
+    const { id, ...updateData } = data;
+    
+    // Cancel any pending request with same data
+    const requestKey = createRequestKey('PUT', `/posts/${id}`, updateData);
+    cancelPendingRequest(requestKey);
+    
+    // Create new abort controller
+    const abortController = new AbortController();
+    pendingRequests.set(requestKey, abortController);
+    
     try {
-      const { id, ...updateData } = data;
-      const response = await apiClient.put(`/posts/${id}`, updateData);
+      // Remove _requestId from actual request
+      const requestData = { ...updateData };
+      delete (requestData as any)._requestId;
       
+      const response = await apiClient.put(`/posts/${id}`, requestData, {
+        signal: abortController.signal
+      } as AxiosRequestConfig);
+      
+      pendingRequests.delete(requestKey);
       return { success: true, data: response.data };
     } catch (error: any) {
+      pendingRequests.delete(requestKey);
+      
+      // Don't report aborted requests as errors
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+        return { success: false, error: 'Request canceled' };
+      }
+      
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to update post' 

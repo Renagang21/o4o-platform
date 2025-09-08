@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ChevronDown,
@@ -35,7 +35,7 @@ const Posts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Fetch posts from API on component mount
+  // Fetch posts from API on component mount and when activeTab changes
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -44,7 +44,18 @@ const Posts = () => {
         
         // Get API URL from environment or use production URL
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        const response = await fetch(`${apiUrl}/api/posts`, {
+        
+        // Build query params based on activeTab
+        const params = new URLSearchParams();
+        if (activeTab === 'all') {
+          // Exclude trash posts for 'all' tab
+          params.append('excludeStatus', 'trash');
+        } else {
+          // Filter by specific status
+          params.append('status', activeTab);
+        }
+        
+        const response = await fetch(`${apiUrl}/api/posts?${params}`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
           }
@@ -143,15 +154,34 @@ const Posts = () => {
     };
     
     fetchPosts();
-  }, []);
+  }, [activeTab]); // Refetch when activeTab changes
   
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showScreenOptions, setShowScreenOptions] = useState(false);
   const [selectedBulkAction, setSelectedBulkAction] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft' | 'trash'>('all');
+  // Persist activeTab in sessionStorage to maintain state when navigating back
+  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft' | 'trash'>(() => {
+    const saved = sessionStorage.getItem('posts-active-tab');
+    return (saved as 'all' | 'published' | 'draft' | 'trash') || 'all';
+  });
+  
+  // Save activeTab to sessionStorage when it changes
+  useEffect(() => {
+    sessionStorage.setItem('posts-active-tab', activeTab);
+  }, [activeTab]);
+  
+  // Clean up hover timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
@@ -263,6 +293,35 @@ const Posts = () => {
       setPosts(prevPosts => prevPosts.map(p => 
         p.id === id ? { ...p, status: 'trash' as const } : p
       ));
+    }
+  };
+  
+  const handlePermanentDelete = async (id: string) => {
+    if (confirm('이 글을 영구적으로 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
+      try {
+        // Call API to permanently delete with force=true
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/posts/${id}?force=true`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+          }
+        });
+        
+        if (response.ok) {
+          // Remove from local state
+          setPosts(prevPosts => prevPosts.filter(p => p.id !== id));
+          // Also remove from sessionStorage to prevent stale data
+          sessionStorage.removeItem('posts-data');
+        } else {
+          alert('삭제에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -744,8 +803,24 @@ const Posts = () => {
                     // Normal Row
                     <tr
                       className="border-b border-gray-100 hover:bg-gray-50"
-                      onMouseEnter={() => setHoveredRow(post.id)}
-                      onMouseLeave={() => setHoveredRow(null)}
+                      onMouseEnter={() => {
+                        // Clear any existing timeout
+                        if (hoverTimeoutRef.current) {
+                          clearTimeout(hoverTimeoutRef.current);
+                        }
+                        // Set new timeout to show menu after 300ms
+                        hoverTimeoutRef.current = setTimeout(() => {
+                          setHoveredRow(post.id);
+                        }, 300);
+                      }}
+                      onMouseLeave={() => {
+                        // Clear timeout if mouse leaves before menu shows
+                        if (hoverTimeoutRef.current) {
+                          clearTimeout(hoverTimeoutRef.current);
+                          hoverTimeoutRef.current = null;
+                        }
+                        setHoveredRow(null);
+                      }}
                     >
                   <td className="px-3 py-3">
                     <input
@@ -765,7 +840,7 @@ const Posts = () => {
                       </button>
                       {hoveredRow === post.id && (
                         <div className="flex items-center gap-2 mt-1 text-xs">
-                          {activeTab === 'trash' ? (
+                          {post.status === 'trash' ? (
                             // Trash actions
                             <>
                               <button
