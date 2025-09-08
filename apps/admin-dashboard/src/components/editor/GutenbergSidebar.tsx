@@ -255,7 +255,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
               <div className="space-y-2">
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative">
-                  {console.log('[INVESTIGATION] GutenbergSidebar rendering, postSettings.slug:', postSettings.slug)}
                   <Input
                     value={postSettings.slug || ''}
                     onChange={(e: any) => 
