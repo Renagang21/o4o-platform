@@ -68,11 +68,23 @@ const PostFormWYSIWYG = () => {
     queryFn: async () => {
       const response = await authClient.api.get(`/posts/${id}`);
       
-      // response.data가 { post: {...} } 구조인지 확인
-      if (response.data?.post) {
-        return response.data.post; // post 객체 직접 반환
+      // 여러 가능한 API 응답 구조 처리
+      // Case 1: { success: true, data: { post: {...} } }
+      if (response.data?.data?.post) {
+        return response.data.data.post;
       }
       
+      // Case 2: { success: true, data: {...} } (직접 post 데이터)
+      if (response.data?.data && response.data.data.id) {
+        return response.data.data;
+      }
+      
+      // Case 3: { post: {...} }
+      if (response.data?.post) {
+        return response.data.post;
+      }
+      
+      // Case 4: 직접 post 객체
       return response.data;
     },
     enabled: isEditMode
