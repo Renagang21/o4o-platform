@@ -138,28 +138,28 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         // Store debug info on window object for dev inspection
         (window as any).__DEBUG_RAW_RESPONSE = {
           responseData: response.data,
-          hasNestedData: !!(response.data && typeof response.data === 'object' && 'data' in response.data),
-          directSlug: (response.data as any)?.slug,
-          nestedSlug: (response.data as any)?.data?.slug
+          responseDataKeys: response.data ? Object.keys(response.data) : [],
+          hasSuccess: response.data && 'success' in response.data,
+          hasData: response.data && 'data' in response.data,
+          innerData: (response.data as any)?.data,
+          innerDataKeys: (response.data as any)?.data ? Object.keys((response.data as any).data) : [],
+          hasPost: (response.data as any)?.data && 'post' in (response.data as any).data,
+          postSlug: (response.data as any)?.data?.post?.slug
         };
       }
       
       // Handle nested data structure from API
-      // Case 1: { success: true, data: { post: {...} } }
+      // The API returns: { success: true, data: { post: {...} } }
+      // postApi.get wraps it: { success: true, data: { success: true, data: { post: {...} } } }
+      
+      // First, unwrap the outer postApi wrapper if it exists
+      if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
+        data = (data as any).data;
+      }
+      
+      // Now handle the API response structure
       if (data && typeof data === 'object' && 'post' in data) {
         data = (data as any).post;
-      }
-      // Case 2: { data: { post: {...} } }
-      else if (data && typeof data === 'object' && 'data' in data) {
-        const nested = (data as any).data;
-        // Check if nested.post exists
-        if (nested && typeof nested === 'object' && 'post' in nested) {
-          data = nested.post;
-        }
-        // Check if nested data has post fields directly
-        else if (nested && typeof nested === 'object' && ('id' in nested || 'title' in nested || 'slug' in nested)) {
-          data = nested;
-        }
       }
       
       // Debug: Log normalized data
@@ -169,7 +169,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           id: data.id,
           title: data.title,
           slug: data.slug,
-          hasSlug: !!data.slug,
+          hasSlug: 'slug' in data,
+          slugValue: data.slug,
           slugType: typeof data.slug,
           allKeys: Object.keys(data || {}),
           dataStructure: JSON.stringify(data, null, 2).substring(0, 500)
