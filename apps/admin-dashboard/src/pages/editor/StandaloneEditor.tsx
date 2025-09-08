@@ -329,7 +329,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         title: postTitle || '',
         content: blocks,
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || '',  // Only use existing slug, don't auto-generate
+        slug: postSettings.slug || undefined,  // Use undefined instead of empty string to preserve existing slug
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
