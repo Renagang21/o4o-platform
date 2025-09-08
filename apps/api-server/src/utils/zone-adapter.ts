@@ -1,14 +1,25 @@
-import { 
-  ZoneBasedContent, 
-  LegacyContent, 
-  Zone, 
-  ZoneBlock,
-  LayoutType,
-  ZoneValidationResult,
-  ZoneValidationError,
-  ZoneConfig,
-  BlockConstraint
-} from '@o4o/types'
+// import { 
+//   ZoneBasedContent, 
+//   LegacyContent, 
+//   Zone, 
+//   ZoneBlock,
+//   LayoutType,
+//   ZoneValidationResult,
+//   ZoneValidationError,
+//   ZoneConfig,
+//   BlockConstraint
+// } from '@o4o/types'
+
+// Temporary type definitions
+type ZoneBasedContent = any
+type LegacyContent = any
+type Zone = any
+type ZoneBlock = any
+type LayoutType = any
+type ZoneValidationResult = any
+type ZoneValidationError = any
+type ZoneConfig = any
+type BlockConstraint = any
 
 /**
  * Zone Content Adapter
