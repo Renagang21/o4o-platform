@@ -90,6 +90,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [isWordPressReady, setIsWordPressReady] = useState(false);
   const [showListView, setShowListView] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   // Component is now remounted on route changes, so complex state management is not needed
   
@@ -169,25 +170,38 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks(parsedBlocks);
       
       // Set post settings - ensure slug is preserved
-      setPostSettings(prev => ({
-        ...prev,
-        status: (data.status || 'draft') as any,
-        visibility: 'public' as const,
-        publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
-        author: data.author?.name || 'Admin User',
-        featuredImage: data.featuredImage,
-        excerpt: data.excerpt || '',
-        slug: data.slug || prev.slug || '',
-        categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
-        tags: data.tags?.map((t: any) => typeof t === 'object' ? t.id : t) || [],
-        template: 'default',
-        commentStatus: true,
-        pingStatus: true,
-        sticky: false,
-        format: 'standard' as const
-      }));
+      setPostSettings(prev => {
+        const newSettings = {
+          ...prev,
+          status: (data.status || 'draft') as any,
+          visibility: 'public' as const,
+          publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
+          author: data.author?.name || 'Admin User',
+          featuredImage: data.featuredImage,
+          excerpt: data.excerpt || '',
+          slug: data.slug || prev.slug || '',
+          categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
+          tags: data.tags?.map((t: any) => typeof t === 'object' ? t.id : t) || [],
+          template: 'default',
+          commentStatus: true,
+          pingStatus: true,
+          sticky: false,
+          format: 'standard' as const
+        };
+        
+        // Debug: Log the slug being set
+        if (import.meta.env.DEV && typeof window !== 'undefined') {
+          (window as any).__LOAD_POST_SLUG = data.slug;
+          (window as any).__NEW_SETTINGS_SLUG = newSettings.slug;
+          (window as any).__PREV_SLUG = prev.slug;
+          (window as any).__LOAD_POST_TIME = new Date().toISOString();
+        }
+        
+        return newSettings;
+      });
       
       setIsDirty(false);
+      setIsPostDataLoaded(true);  // Mark data as loaded
       toast.dismiss(loadingToast);
       toast.success('Post loaded');
       
@@ -222,6 +236,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           setPostTitle('');
           setBlocks([]);
           setIsDirty(false);
+          setIsPostDataLoaded(true);  // New post is "loaded" immediately
         }
         
         // Editor is ready
@@ -880,10 +895,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 </Button>
               </div>
             )}
+            {/* Debug only in development */}
+            {import.meta.env.DEV && (
+              <div style={{ display: 'none' }}>
+                {(() => {
+                  if (typeof window !== 'undefined') {
+                    (window as any).__DEBUG_POST_SETTINGS = postSettings;
+                    (window as any).__DEBUG_SLUG = postSettings.slug;
+                  }
+                  return null;
+                })()}
+              </div>
+            )}
             <GutenbergSidebar
               activeTab={activeTab}
               postSettings={postSettings}
               blockSettings={selectedBlock}
+              isDataLoaded={isPostDataLoaded}
               onPostSettingsChange={(settings: any) => {
                 // Clear slug error when slug is changed
                 if (settings.slug !== undefined && postSettings.slugError) {
