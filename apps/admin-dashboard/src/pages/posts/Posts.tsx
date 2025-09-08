@@ -460,7 +460,7 @@ const Posts = () => {
     const published = posts.filter(p => p.status === 'published').length;
     const draft = posts.filter(p => p.status === 'draft').length;
     const trash = posts.filter(p => p.status === 'trash').length;
-    const all = posts.filter(p => p.status !== 'trash').length;  // 휴지통 제외한 개수
+    const all = posts.length;  // 휴지통 포함한 전체 개수
     return { all, published, draft, trash };
   };
 
