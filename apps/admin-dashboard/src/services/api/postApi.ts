@@ -316,6 +316,12 @@ export const postApi = {
     
     try {
       const response = await apiClient.get(`/posts/${id}`);
+      // API returns { success: true, data: { post: {...} } }
+      // Extract the post object directly
+      if (response.data?.data?.post) {
+        return { success: true, data: response.data.data.post };
+      }
+      // Fallback to original behavior
       return { success: true, data: response.data };
     } catch (error: any) {
       return { 
