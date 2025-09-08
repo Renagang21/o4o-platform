@@ -204,6 +204,14 @@ export const createPost = async (req: Request, res: Response) => {
       password,
       scheduledAt
     } = req.body
+    
+    // Debug log
+    // console.log('[DEBUG] Create post request received:', { 
+    //   title, 
+    //   slug, 
+    //   contentLength: content?.length,
+    //   status 
+    // })
 
     // Validate that at least title or content is provided
     if (!title && !content) {
@@ -285,6 +293,13 @@ export const createPost = async (req: Request, res: Response) => {
     }
 
     const savedPost = await postRepository.save(post)
+    
+    // Debug log
+    // console.log('[DEBUG] Post saved:', { 
+    //   id: savedPost.id, 
+    //   title: savedPost.title, 
+    //   slug: savedPost.slug 
+    // })
 
     // Cache the result
     const result = { data: savedPost }

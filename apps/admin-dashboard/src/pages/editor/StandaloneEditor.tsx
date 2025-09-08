@@ -134,14 +134,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         // Check if this looks like the wrapper (has 'data' but no post fields)
         const hasPostFields = 'id' in data || 'title' in data || 'content' in data || 'slug' in data;
         if (!hasPostFields) {
-          if (import.meta.env.DEV) {
-            console.log('[DEBUG] Before unwrap:', data);
-          }
+          // if (import.meta.env.DEV) {
+          //   console.log('[DEBUG] Before unwrap:', data);
+          // }
           data = (data as any).data;
-          if (import.meta.env.DEV) {
-            console.log('[DEBUG] After unwrap:', data);
-            console.log('[DEBUG] Slug after unwrap:', data?.slug);
-          }
+          // if (import.meta.env.DEV) {
+          //   console.log('[DEBUG] After unwrap:', data);
+          //   console.log('[DEBUG] Slug after unwrap:', data?.slug);
+          // }
         }
       }
       
@@ -176,9 +176,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks(parsedBlocks);
       
       // Set post settings
-      if (import.meta.env.DEV) {
-        console.log('[DEBUG] Setting post settings, slug value:', data.slug);
-      }
+      // if (import.meta.env.DEV) {
+      //   console.log('[DEBUG] Setting post settings, slug value:', data.slug);
+      // }
       setPostSettings({
         status: (data.status || 'draft') as any,
         visibility: 'public' as const,
@@ -351,14 +351,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: postSettings.commentStatus
       };
       
-      if (import.meta.env.DEV) {
-        console.log('[DEBUG] Saving post with data:', {
-          title: baseData.title,
-          contentLength: baseData.content?.length,
-          status: baseData.status,
-          slug: baseData.slug
-        });
-      }
+      // if (import.meta.env.DEV) {
+      //   console.log('[DEBUG] Saving post with data:', {
+      //     title: baseData.title,
+      //     contentLength: baseData.content?.length,
+      //     status: baseData.status,
+      //     slug: baseData.slug
+      //   });
+      // }
       
       // Debug logging available in development mode
       
