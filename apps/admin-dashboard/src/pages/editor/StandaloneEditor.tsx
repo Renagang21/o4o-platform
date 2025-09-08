@@ -120,6 +120,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     try {
       const response = await postApi.get(String(id));
       
+      // Debug: Log API response
+      if (import.meta.env.DEV && typeof window !== 'undefined') {
+        console.log('[API Response]', response);
+        (window as any).__LAST_API_RESPONSE = response;
+      }
       
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Failed to load post');

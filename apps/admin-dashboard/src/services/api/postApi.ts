@@ -244,6 +244,16 @@ const cancelPendingRequest = (key: string) => {
 /**
  * 게시글 API
  */
+// Debug: Expose to window in development
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  (window as any).__testMockApi = async () => {
+    const { mockPostApi, shouldUseMockApi } = await import('./mockApi');
+    console.log('shouldUseMockApi:', shouldUseMockApi());
+    console.log('Mock posts:', await mockPostApi.list());
+    return await mockPostApi.get('post-sample-1');
+  };
+}
+
 export const postApi = {
   // 게시글 생성 (/api/posts 사용: 중복 시 409)
   create: async (data: CreatePostRequest): Promise<PostResponse> => {
