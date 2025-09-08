@@ -67,17 +67,9 @@ const PostFormWYSIWYG = () => {
     queryKey: ['post', id],
     queryFn: async () => {
       const response = await authClient.api.get(`/posts/${id}`);
-      console.log('🔍 [DEBUG] API 전체 응답:', response);
-      console.log('🔍 [DEBUG] response.data 구조:', response.data);
-      console.log('🔍 [DEBUG] slug 위치 확인:', {
-        'response.data?.slug': response.data?.slug,
-        'response.data?.post?.slug': response.data?.post?.slug,
-        'response.data?.data?.slug': response.data?.data?.slug,
-      });
       
       // response.data가 { post: {...} } 구조인지 확인
       if (response.data?.post) {
-        console.log('⚠️ [DEBUG] response.data.post 구조 발견!');
         return response.data.post; // post 객체 직접 반환
       }
       
@@ -89,17 +81,6 @@ const PostFormWYSIWYG = () => {
   // Initialize form with post data
   useEffect(() => {
     if (post) {
-      console.log('🔍 [DEBUG] useEffect의 post 객체:', post);
-      console.log('🔍 [DEBUG] post.slug 값:', post.slug);
-      console.log('🔍 [DEBUG] post 객체의 모든 키:', Object.keys(post));
-      console.log('🔍 [DEBUG] post 타입:', typeof post);
-      
-      // post.post 구조인지 다시 확인
-      if (post.post) {
-        console.log('⚠️ [DEBUG] post.post 중첩 구조 발견!');
-        console.log('⚠️ [DEBUG] post.post.slug:', post.post?.slug);
-      }
-      
       setFormData({
         title: post.title || '',
         content: post.content || '',
@@ -116,8 +97,6 @@ const PostFormWYSIWYG = () => {
           seoKeywords: []
         }
       });
-      
-      console.log('🔍 [DEBUG] 설정된 formData.slug:', post.slug || '');
       
       if (post.blocks) {
         setBlocks(post.blocks);
