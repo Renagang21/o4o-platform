@@ -35,6 +35,12 @@ const Posts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Persist activeTab in sessionStorage to maintain state when navigating back
+  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft' | 'trash'>(() => {
+    const saved = sessionStorage.getItem('posts-active-tab');
+    return (saved as 'all' | 'published' | 'draft' | 'trash') || 'all';
+  });
+  
   // Fetch posts from API on component mount and when activeTab changes
   useEffect(() => {
     const fetchPosts = async () => {
@@ -163,11 +169,6 @@ const Posts = () => {
   const [showScreenOptions, setShowScreenOptions] = useState(false);
   const [selectedBulkAction, setSelectedBulkAction] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
-  // Persist activeTab in sessionStorage to maintain state when navigating back
-  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft' | 'trash'>(() => {
-    const saved = sessionStorage.getItem('posts-active-tab');
-    return (saved as 'all' | 'published' | 'draft' | 'trash') || 'all';
-  });
   
   // Save activeTab to sessionStorage when it changes
   useEffect(() => {
