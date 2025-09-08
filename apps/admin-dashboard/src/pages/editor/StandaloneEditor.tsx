@@ -880,6 +880,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 </Button>
               </div>
             )}
+            {console.log('[INVESTIGATION] Sidebar opened, current postSettings.slug:', postSettings.slug)}
             <GutenbergSidebar
               activeTab={activeTab}
               postSettings={postSettings}
