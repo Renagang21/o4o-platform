@@ -476,10 +476,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         console.error('[Error Response]', error?.response);
       }
       
-      if (status === 409) {
-        toast.error('Slug already exists. Please choose another slug.');
-        // Set slug error state to show error in sidebar
+      const errorCode = error.response?.data?.error?.code;
+      
+      if (errorCode === 'INVALID_SLUG') {
+        toast.error('Invalid slug format. Use only lowercase letters, numbers, and hyphens (a-z, 0-9, -)');
         setPostSettings(prev => ({ ...prev, slugError: true }));
+        setSidebarOpen(true); // Open sidebar to show the error
+      } else if (errorCode === 'SLUG_REQUIRED') {
+        toast.error('Please enter a URL slug for this post (Korean titles need manual slug)');
+        setPostSettings(prev => ({ ...prev, slugError: true }));
+        setSidebarOpen(true); // Open sidebar to let user input slug
+      } else if (status === 409) {
+        toast.error('Slug already exists. Please choose another slug.');
+        setPostSettings(prev => ({ ...prev, slugError: true }));
+        setSidebarOpen(true);
       } else if (status === 400) {
         // Validation error from API
         toast.error(errorMessage || '제목이나 내용 중 하나는 입력해야 합니다');

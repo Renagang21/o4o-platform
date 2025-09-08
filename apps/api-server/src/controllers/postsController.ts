@@ -249,13 +249,38 @@ export const createPost = async (req: Request, res: Response) => {
       }
     }
 
-    // Generate unique slug if not provided
+    // Validate and generate slug
     let finalSlug = slug;
+    
+    // Check if provided slug is valid (only lowercase letters, numbers, and hyphens)
+    if (finalSlug && !/^[a-z0-9-]+$/.test(finalSlug)) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'INVALID_SLUG',
+          message: 'Slug can only contain lowercase letters, numbers, and hyphens (a-z, 0-9, -)',
+          field: 'slug'
+        } 
+      })
+    }
+    
+    // If no slug provided, check if we can generate one
     if (!finalSlug) {
       if (title) {
-        finalSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        // Try to generate from title
+        finalSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        
+        // If result is empty (e.g., Korean title), require manual input
+        if (!finalSlug || finalSlug === '') {
+          return res.status(400).json({ 
+            error: { 
+              code: 'SLUG_REQUIRED',
+              message: 'Please provide a URL slug. The title contains characters that cannot be converted to a valid URL.',
+              field: 'slug'
+            } 
+          })
+        }
       } else {
-        // Generate timestamp-based slug for posts without title
+        // No title and no slug - use timestamp
         finalSlug = `post-${Date.now()}`;
       }
     }
@@ -388,11 +413,25 @@ export const updatePost = async (req: Request, res: Response) => {
       })
     }
 
-    // Check slug uniqueness if changed
-    if (slug && slug !== post.slug) {
-      const existingPost = await postRepository.findOne({ where: { slug } })
-      if (existingPost) {
-        return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
+    // Validate slug if provided
+    if (slug) {
+      // Check if slug is valid (only lowercase letters, numbers, and hyphens)
+      if (!/^[a-z0-9-]+$/.test(slug)) {
+        return res.status(400).json({ 
+          error: { 
+            code: 'INVALID_SLUG',
+            message: 'Slug can only contain lowercase letters, numbers, and hyphens (a-z, 0-9, -)',
+            field: 'slug'
+          } 
+        })
+      }
+      
+      // Check slug uniqueness if changed
+      if (slug !== post.slug) {
+        const existingPost = await postRepository.findOne({ where: { slug } })
+        if (existingPost) {
+          return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
+        }
       }
     }
 
