@@ -333,12 +333,6 @@ const Posts = () => {
     }
   };
 
-  const handlePermanentDelete = (id: string) => {
-    if (confirm('이 글을 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      setPosts(prevPosts => prevPosts.filter(p => p.id !== id));
-    }
-  };
-
   const handleView = (id: string) => {
     // Open preview in new tab
     window.open(`/preview/posts/${id}`, '_blank');

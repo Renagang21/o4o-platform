@@ -1,2 +1,0 @@
-// Widget System Types
-export {};
