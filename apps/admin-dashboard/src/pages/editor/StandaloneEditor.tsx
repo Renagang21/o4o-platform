@@ -185,10 +185,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks(parsedBlocks);
       
       // Set post settings
-      // if (import.meta.env.DEV) {
-      //   console.log('[DEBUG] Setting post settings, slug value:', data.slug);
-      // }
-      setPostSettings({
+      console.warn('[DIAGNOSTIC] Final data object before setPostSettings:', data);
+      console.warn('[DIAGNOSTIC] data.slug value before setPostSettings:', data.slug);
+      console.warn('[DIAGNOSTIC] data.slug type:', typeof data.slug);
+      console.warn('[DIAGNOSTIC] data.slug length:', data.slug?.length);
+      
+      const newSettings = {
         status: (data.status || 'draft') as any,
         visibility: 'public' as const,
         publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
@@ -203,7 +205,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         pingStatus: true,
         sticky: false,
         format: 'standard' as const
-      });
+      };
+      
+      console.warn('[DIAGNOSTIC] newSettings object:', newSettings);
+      console.warn('[DIAGNOSTIC] newSettings.slug:', newSettings.slug);
+      
+      setPostSettings(newSettings);
       
       setIsDirty(false);
       toast.dismiss(loadingToast);
