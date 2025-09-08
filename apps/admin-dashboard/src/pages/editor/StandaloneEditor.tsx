@@ -132,9 +132,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // So we need to unwrap once if there's a nested data property
       if (data && typeof data === 'object' && 'data' in data) {
         // Check if this looks like the wrapper (has 'data' but no post fields)
-        const hasPostFields = 'id' in data || 'title' in data || 'content' in data;
+        const hasPostFields = 'id' in data || 'title' in data || 'content' in data || 'slug' in data;
         if (!hasPostFields) {
+          if (import.meta.env.DEV) {
+            console.log('[DEBUG] Before unwrap:', data);
+          }
           data = (data as any).data;
+          if (import.meta.env.DEV) {
+            console.log('[DEBUG] After unwrap:', data);
+            console.log('[DEBUG] Slug after unwrap:', data?.slug);
+          }
         }
       }
       
@@ -169,6 +176,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks(parsedBlocks);
       
       // Set post settings
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Setting post settings, slug value:', data.slug);
+      }
       setPostSettings({
         status: (data.status || 'draft') as any,
         visibility: 'public' as const,
