@@ -351,6 +351,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: postSettings.commentStatus
       };
       
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Saving post with data:', {
+          title: baseData.title,
+          contentLength: baseData.content?.length,
+          status: baseData.status,
+          slug: baseData.slug
+        });
+      }
+      
       // Debug logging available in development mode
       
       // Check if this is a duplicate save (same content)

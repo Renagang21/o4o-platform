@@ -265,9 +265,17 @@ export const postApi = {
       const requestData = { ...data };
       delete (requestData as any)._requestId;
       
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Create post request data:', requestData);
+      }
+      
       const response = await apiClient.post('/posts', requestData, {
         signal: abortController.signal
       } as AxiosRequestConfig);
+      
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Create post response:', response.data);
+      }
       
       pendingRequests.delete(requestKey);
       return { success: true, data: response.data };
