@@ -145,12 +145,19 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       }
       
       // Handle nested data structure from API
-      // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
-      // So we need to unwrap if there's a nested data property with actual post data
-      if (data && typeof data === 'object' && 'data' in data) {
+      // Case 1: { success: true, data: { post: {...} } }
+      if (data && typeof data === 'object' && 'post' in data) {
+        data = (data as any).post;
+      }
+      // Case 2: { data: { post: {...} } }
+      else if (data && typeof data === 'object' && 'data' in data) {
         const nested = (data as any).data;
-        // Check if nested data has post fields
-        if (nested && typeof nested === 'object' && ('id' in nested || 'title' in nested || 'slug' in nested)) {
+        // Check if nested.post exists
+        if (nested && typeof nested === 'object' && 'post' in nested) {
+          data = nested.post;
+        }
+        // Check if nested data has post fields directly
+        else if (nested && typeof nested === 'object' && ('id' in nested || 'title' in nested || 'slug' in nested)) {
           data = nested;
         }
       }
