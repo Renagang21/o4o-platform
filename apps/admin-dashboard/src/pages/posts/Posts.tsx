@@ -238,8 +238,8 @@ const Posts = () => {
   };
 
   const handleEdit = (id: string) => {
-    // Navigate to Gutenberg editor with post ID
-    navigate(`/editor/posts/${id}`);
+    // Navigate to PostForm with WordPress-like UI
+    navigate(`/content/posts/${id}/edit`);
   };
 
   const handleQuickEdit = (id: string) => {

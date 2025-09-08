@@ -1,9 +1,9 @@
 import { FC, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom'
 import Posts from '../posts/Posts' // Posts management component
-import PostFormWYSIWYG from './PostFormWYSIWYG'
+import PostForm from './PostForm' // Using PostForm instead of PostFormWYSIWYG for WordPress-like UI
 import PageList from './PageList'
-// import PageFormWYSIWYG from './PageFormWYSIWYG' // Temporarily commented - using PostFormWYSIWYG for pages
+// import PageFormWYSIWYG from './PageFormWYSIWYG' // Temporarily commented - using PostForm for pages
 import CPTList from './CPTList'
 import CPTForm from './CPTForm'
 import CustomFieldBuilder from './CustomFieldBuilder'
@@ -29,11 +29,13 @@ const Content: FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Posts />} />
-      <Route path="new" element={<Navigate to="/editor/posts/new" replace />} />
-      <Route path=":id/edit" element={<PostFormWYSIWYG />} />
+      <Route path="new" element={<PostForm />} />
+      <Route path="posts/new" element={<PostForm />} />
+      <Route path="posts/:id/edit" element={<PostForm />} />
+      <Route path=":id/edit" element={<PostForm />} />
       <Route path="pages" element={<PageList />} />
-      <Route path="pages/new" element={<PostFormWYSIWYG />} />
-      <Route path="pages/:id/edit" element={<PostFormWYSIWYG />} />
+      <Route path="pages/new" element={<PostForm />} />
+      <Route path="pages/:id/edit" element={<PostForm />} />
       <Route path="cpt" element={<CPTList />} />
       <Route path="cpt/new" element={<CPTForm />} />
       <Route path="cpt/:id/edit" element={<CPTForm />} />
@@ -46,8 +48,8 @@ const Content: FC = () => {
       <Route path="widgets" element={<WidgetManager />} />
       {/* Dynamic routes for custom post types */}
       <Route path=":slug" element={<DynamicContentList />} />
-      <Route path=":slug/new" element={<PostFormWYSIWYG />} />
-      <Route path=":slug/:id/edit" element={<PostFormWYSIWYG />} />
+      <Route path=":slug/new" element={<PostForm />} />
+      <Route path=":slug/:id/edit" element={<PostForm />} />
     </Routes>
   )
 }

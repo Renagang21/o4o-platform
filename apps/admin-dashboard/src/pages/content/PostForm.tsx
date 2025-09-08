@@ -86,7 +86,8 @@ const PostForm = () => {
     queryKey: ['post', id],
     queryFn: async () => {
       const response = await authClient.api.get(`/posts/${id}`)
-      return response.data
+      // API 응답 구조 처리: { data: { id, title, slug, ... } }
+      return response.data?.data || response.data
     },
     enabled: isEditMode
   })
@@ -96,7 +97,9 @@ const PostForm = () => {
     queryKey: ['categories'],
     queryFn: async () => {
       const response = await authClient.api.get('/categories')
-      return response.data
+      // API 응답 구조 처리
+      const data = response.data?.data || response.data
+      return Array.isArray(data) ? data : []
     }
   })
 
@@ -105,7 +108,9 @@ const PostForm = () => {
     queryKey: ['tags'],
     queryFn: async () => {
       const response = await authClient.api.get('/tags')
-      return response.data
+      // API 응답 구조 처리
+      const data = response.data?.data || response.data
+      return Array.isArray(data) ? data : []
     }
   })
 
@@ -167,7 +172,8 @@ const PostForm = () => {
   const createMutation = useMutation({
     mutationFn: async (data: CreatePostDto) => {
       const response = await authClient.api.post('/posts', data)
-      return response.data
+      // API 응답 구조 처리
+      return response.data?.data || response.data
     },
     onSuccess: (data) => {
       toast.success('게시글이 저장되었습니다')
@@ -186,7 +192,8 @@ const PostForm = () => {
   const updateMutation = useMutation({
     mutationFn: async (data: UpdatePostDto) => {
       const response = await authClient.api.put(`/posts/${id}`, data)
-      return response.data
+      // API 응답 구조 처리
+      return response.data?.data || response.data
     },
     onSuccess: () => {
       toast.success('게시글이 수정되었습니다')

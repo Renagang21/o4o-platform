@@ -152,15 +152,24 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // The API returns: { success: true, data: { post: {...} } }
       // postApi.get wraps it: { success: true, data: { success: true, data: { post: {...} } } }
       
+      // Log the raw data structure for debugging
+      console.log('[DEBUG] Raw data from postApi.get:', data);
+      console.log('[DEBUG] Data type:', typeof data);
+      console.log('[DEBUG] Data keys:', data ? Object.keys(data) : 'null');
+      
       // First, unwrap the outer postApi wrapper if it exists
       if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
+        console.log('[DEBUG] Unwrapping outer wrapper');
         data = (data as any).data;
       }
       
       // Now handle the API response structure
       if (data && typeof data === 'object' && 'post' in data) {
+        console.log('[DEBUG] Unwrapping post wrapper');
         data = (data as any).post;
       }
+      
+      console.log('[DEBUG] Final data.slug:', data?.slug);
       
       // Debug: Log normalized data
       if (import.meta.env.DEV && typeof window !== 'undefined') {
@@ -208,7 +217,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks(parsedBlocks);
       
       // Set post settings - ensure slug is preserved
+      console.log('[DEBUG] Before setPostSettings - data.slug:', data?.slug);
+      
       setPostSettings(prev => {
+        console.log('[DEBUG] In setPostSettings - prev.slug:', prev.slug);
+        console.log('[DEBUG] In setPostSettings - data.slug:', data.slug);
+        
         // Debug: Log before setting
         if (import.meta.env.DEV && typeof window !== 'undefined') {
           (window as any).__DEBUG_BEFORE_SET = {
@@ -250,8 +264,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           (window as any).__LOAD_POST_TIME = new Date().toISOString();
         }
         
+        console.log('[DEBUG] newSettings.slug:', newSettings.slug);
         return newSettings;
       });
+      
+      // Verify slug after state update
+      setTimeout(() => {
+        console.log('[DEBUG] After setState - postSettings.slug:', postSettings.slug);
+      }, 100);
       
       setIsDirty(false);
       setIsPostDataLoaded(true);  // Mark data as loaded
