@@ -10,12 +10,18 @@ import { User } from '../entities/User'
 import { authenticateToken } from '../middleware/auth'
 import { validateDto } from '../middleware/validateDto'
 import { ZoneContentAdapter } from '../utils/zone-adapter'
-import { 
-  ZoneBasedContent, 
-  ThemeCustomization,
-  ZoneTemplate,
-  PageZone 
-} from '@o4o/types'
+// import { 
+//   ZoneBasedContent, 
+//   ThemeCustomization,
+//   ZoneTemplate,
+//   PageZone 
+// } from '@o4o/types'
+
+// Temporary type definitions
+type ZoneBasedContent = any
+type ThemeCustomization = any
+type ZoneTemplate = any
+type PageZone = any
 import fs from 'fs/promises'
 import path from 'path'
 

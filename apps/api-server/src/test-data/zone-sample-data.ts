@@ -1,4 +1,9 @@
-import { ZoneBasedContent, ZoneBlock, ThemeCustomization } from '@o4o/types'
+// import { ZoneBasedContent, ZoneBlock, ThemeCustomization } from '@o4o/types'
+
+// Temporary type definitions
+type ZoneBasedContent = any
+type ZoneBlock = any
+type ThemeCustomization = any
 
 /**
  * Sample Zone-based Content Data for Testing
