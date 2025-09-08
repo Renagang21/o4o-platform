@@ -301,7 +301,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
-      if (content?.text) return content.text.trim().length > 0;
+      if (content?.text && typeof content.text === 'string') return content.text.trim().length > 0;
       if (content?.url) return true; // Image blocks
       return false;
     });
@@ -827,7 +827,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                 const hasRealContent = newBlocks.some(block => {
                   if (block.type === 'core/paragraph') {
                     const text = block.content?.text || block.content || '';
-                    return text.trim().length > 0;
+                    return typeof text === 'string' && text.trim().length > 0;
                   }
                   return true; // Other block types are considered real content
                 });
