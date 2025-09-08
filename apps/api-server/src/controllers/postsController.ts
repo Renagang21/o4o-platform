@@ -167,7 +167,7 @@ export const createPost = async (req: Request, res: Response) => {
     if (existingRequest) {
       // If request was made within last 2 seconds, return the cached result
       if (Date.now() - existingRequest.timestamp < 2000) {
-        console.log('Duplicate request detected, returning cached result')
+        // Duplicate request detected, returning cached result
         if (existingRequest.result) {
           return res.status(201).json(existingRequest.result)
         }

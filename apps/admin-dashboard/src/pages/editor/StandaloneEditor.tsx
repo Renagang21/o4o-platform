@@ -136,14 +136,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Data normalized successfully
       
       // Debug log in development
-      if (import.meta.env.DEV) {
-        console.log('[StandaloneEditor] Loaded post data:', {
-          id: data.id,
-          title: data.title,
-          slug: data.slug,
-          status: data.status
-        });
-      }
+      // Logging disabled for production
       
       // Extract and set title
       const title = data.title || '';
