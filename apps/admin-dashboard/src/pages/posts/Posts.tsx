@@ -289,11 +289,31 @@ const Posts = () => {
     });
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('정말 이 글을 휴지통으로 이동하시겠습니까?')) {
-      setPosts(prevPosts => prevPosts.map(p => 
-        p.id === id ? { ...p, status: 'trash' as const } : p
-      ));
+      try {
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: 'trash' })
+        });
+        
+        if (response.ok) {
+          setPosts(prevPosts => prevPosts.map(p => 
+            p.id === id ? { ...p, status: 'trash' as const } : p
+          ));
+        } else {
+          alert('휴지통으로 이동하는데 실패했습니다.');
+        }
+      } catch (error) {
+        alert('휴지통으로 이동 중 오류가 발생했습니다.');
+      }
     }
   };
   
@@ -326,11 +346,31 @@ const Posts = () => {
     }
   };
 
-  const handleRestore = (id: string) => {
+  const handleRestore = async (id: string) => {
     if (confirm('이 글을 복원하시겠습니까?')) {
-      setPosts(prevPosts => prevPosts.map(p => 
-        p.id === id ? { ...p, status: 'draft' as const } : p
-      ));
+      try {
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+        
+        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status: 'draft' })
+        });
+        
+        if (response.ok) {
+          setPosts(prevPosts => prevPosts.map(p => 
+            p.id === id ? { ...p, status: 'draft' as const } : p
+          ));
+        } else {
+          alert('복원에 실패했습니다.');
+        }
+      } catch (error) {
+        alert('복원 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -339,7 +379,7 @@ const Posts = () => {
     window.open(`/preview/posts/${id}`, '_blank');
   };
 
-  const handleApplyBulkAction = () => {
+  const handleApplyBulkAction = async () => {
     if (!selectedBulkAction) {
       alert('Please select an action.');
       return;
@@ -352,11 +392,37 @@ const Posts = () => {
     
     if (selectedBulkAction === 'trash') {
       if (confirm(`선택한 ${selectedPosts.size}개의 글을 휴지통으로 이동하시겠습니까?`)) {
-        setPosts(prevPosts => prevPosts.map(p => 
-          selectedPosts.has(p.id) ? { ...p, status: 'trash' as const } : p
-        ));
-        setSelectedPosts(new Set());
-        setSelectedBulkAction('');
+        try {
+          const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+          const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+          
+          // Process each selected post
+          const promises = Array.from(selectedPosts).map(id => 
+            fetch(`${apiUrl}/api/posts/${id}`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': token ? `Bearer ${token}` : '',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ status: 'trash' })
+            })
+          );
+          
+          const results = await Promise.all(promises);
+          const allSuccessful = results.every(r => r.ok);
+          
+          if (allSuccessful) {
+            setPosts(prevPosts => prevPosts.map(p => 
+              selectedPosts.has(p.id) ? { ...p, status: 'trash' as const } : p
+            ));
+            setSelectedPosts(new Set());
+            setSelectedBulkAction('');
+          } else {
+            alert('일부 글을 휴지통으로 이동하는데 실패했습니다.');
+          }
+        } catch (error) {
+          alert('휴지통으로 이동 중 오류가 발생했습니다.');
+        }
       }
     } else if (selectedBulkAction === 'edit') {
       // Bulk edit functionality
