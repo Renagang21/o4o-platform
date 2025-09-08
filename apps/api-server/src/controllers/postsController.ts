@@ -205,6 +205,14 @@ export const createPost = async (req: Request, res: Response) => {
       scheduledAt
     } = req.body
 
+    // Debug log
+    console.log('[DEBUG] Create post request received:', {
+      title,
+      slug,
+      contentLength: content?.length,
+      status
+    })
+
     // Validate that at least title or content is provided
     if (!title && !content) {
       return res.status(400).json({ 
@@ -286,6 +294,13 @@ export const createPost = async (req: Request, res: Response) => {
 
     const savedPost = await postRepository.save(post)
 
+    // Debug log
+    console.log('[DEBUG] Post saved:', {
+      id: savedPost.id,
+      title: savedPost.title,
+      slug: savedPost.slug
+    })
+
     // Cache the result
     const result = { data: savedPost }
     const cachedRequest = recentRequests.get(requestHash)
@@ -339,6 +354,14 @@ export const updatePost = async (req: Request, res: Response) => {
       password,
       scheduledAt
     } = req.body
+
+    // Debug log
+    console.log('[DEBUG] Update post request received:', {
+      id,
+      title,
+      slug,
+      status
+    })
 
     // Validate that if updating title, it's not just whitespace
     if (title !== undefined && title && typeof title === 'string' && !title.trim()) {
@@ -403,6 +426,13 @@ export const updatePost = async (req: Request, res: Response) => {
     }
 
     const updatedPost = await postRepository.save(post)
+
+    // Debug log
+    console.log('[DEBUG] Post updated:', {
+      id: updatedPost.id,
+      title: updatedPost.title,
+      slug: updatedPost.slug
+    })
 
     res.json({ data: updatedPost })
   } catch (error) {
