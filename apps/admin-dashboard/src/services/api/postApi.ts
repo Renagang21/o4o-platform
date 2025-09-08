@@ -248,9 +248,12 @@ const cancelPendingRequest = (key: string) => {
 if (import.meta.env.DEV && typeof window !== 'undefined') {
   (window as any).__testMockApi = async () => {
     const { mockPostApi, shouldUseMockApi } = await import('./mockApi');
-    console.log('shouldUseMockApi:', shouldUseMockApi());
-    console.log('Mock posts:', await mockPostApi.list());
-    return await mockPostApi.get('post-sample-1');
+    const result = {
+      shouldUseMock: shouldUseMockApi(),
+      mockPosts: await mockPostApi.list(),
+      samplePost: await mockPostApi.get('post-sample-1')
+    };
+    return result;
   };
 }
 

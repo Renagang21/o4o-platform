@@ -120,10 +120,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     try {
       const response = await postApi.get(String(id));
       
-      // Debug: Log API response
+      // Debug: Store API response for inspection
       if (import.meta.env.DEV && typeof window !== 'undefined') {
-        console.log('[API Response]', response);
         (window as any).__LAST_API_RESPONSE = response;
+        (window as any).__LAST_API_RESPONSE_TIME = new Date().toISOString();
       }
       
       if (!response.success || !response.data) {
