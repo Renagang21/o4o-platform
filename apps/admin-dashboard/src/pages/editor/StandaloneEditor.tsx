@@ -126,10 +126,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Normalize nested API response
       let data: Post = response.data as Post;
       
-      // Debug: Log original response structure
-      // if (import.meta.env.DEV) {
-      //   console.log('[DEBUG] Original API response:', response.data);
-      // }
       
       // Handle nested data structure from API
       // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
@@ -138,18 +134,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         // Check if this looks like the wrapper (has 'data' but no post fields)
         const hasPostFields = 'id' in data || 'title' in data || 'content' in data;
         if (!hasPostFields) {
-          // if (import.meta.env.DEV) {
-          //   console.log('[DEBUG] Unwrapping nested data structure');
-          // }
           data = (data as any).data;
         }
       }
       
-      // Debug: Log normalized data
-      // if (import.meta.env.DEV) {
-      //   console.log('[DEBUG] Normalized data:', data);
-      //   console.log('[DEBUG] Slug value:', data?.slug);
-      // }
       
       // Extract and set title
       const title = data.title || '';

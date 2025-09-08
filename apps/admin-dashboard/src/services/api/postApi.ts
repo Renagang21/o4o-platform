@@ -32,7 +32,7 @@ const getApiBaseUrl = () => {
   }
   
   // Development 환경
-  return 'http://localhost:3000/api';
+  return 'http://localhost:3001/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
