@@ -123,7 +123,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         throw new Error(response.error || 'Failed to load post');
       }
       
-      // Normalize nested API response - handle multiple levels of nesting
+      // Normalize nested API response
       let data: Post = response.data as Post;
       
       // Debug: Log original response structure
@@ -131,11 +131,18 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         console.log('[DEBUG] Original API response:', response.data);
       }
       
-      // Unwrap nested data structures
-      // Only check for id and title to prevent over-unwrapping (slug might be optional)
-      while (data && typeof data === 'object' && 'data' in data && 
-             !('id' in data) && !('title' in data)) {
-        data = (data as any).data;
+      // Handle nested data structure from API
+      // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
+      // So we need to unwrap once if there's a nested data property
+      if (data && typeof data === 'object' && 'data' in data) {
+        // Check if this looks like the wrapper (has 'data' but no post fields)
+        const hasPostFields = 'id' in data || 'title' in data || 'content' in data;
+        if (!hasPostFields) {
+          if (import.meta.env.DEV) {
+            console.log('[DEBUG] Unwrapping nested data structure');
+          }
+          data = (data as any).data;
+        }
       }
       
       // Debug: Log normalized data
