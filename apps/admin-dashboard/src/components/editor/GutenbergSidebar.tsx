@@ -254,6 +254,13 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             <Panel title="Permalink">
               <div className="space-y-2">
                 <Label className="text-xs">URL Slug</Label>
+                {/* Debug info in development */}
+                {import.meta.env.DEV && (
+                  <div className="text-xs bg-yellow-50 p-2 rounded mb-2">
+                    Debug: slug = "{postSettings.slug || '(empty)'}" | 
+                    type = {typeof postSettings.slug}
+                  </div>
+                )}
                 <div className="relative">
                   <Input
                     value={postSettings.slug || ''}

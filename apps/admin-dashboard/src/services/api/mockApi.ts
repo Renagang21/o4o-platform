@@ -18,6 +18,7 @@ export const mockPostApi = {
     const newPost = {
       id: `post-${mockPostIdCounter++}`,
       title: data.title,
+      slug: data.slug || data.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/^-|-$/g, ''),
       content: data.content,
       status: data.status || 'draft',
       createdAt: new Date().toISOString(),
@@ -285,6 +286,53 @@ export const mockTaxonomyApi = {
     };
   }
 };
+
+/**
+ * Initialize mock data with sample posts
+ */
+const initializeMockData = () => {
+  if (mockPosts.length === 0) {
+    // Add sample posts with slugs
+    mockPosts = [
+      {
+        id: 'post-sample-1',
+        title: 'Getting Started with React',
+        slug: 'getting-started-with-react',
+        content: JSON.stringify({ blocks: [{ type: 'paragraph', content: 'This is a sample post about React.' }] }),
+        status: 'published',
+        createdAt: new Date('2024-01-15').toISOString(),
+        updatedAt: new Date('2024-01-15').toISOString(),
+        publishedAt: new Date('2024-01-15').toISOString(),
+        author: { id: '1', name: 'Admin User', email: 'admin@example.com' }
+      },
+      {
+        id: 'post-sample-2', 
+        title: '웹 개발 베스트 프랙티스',
+        slug: 'web-development-best-practices',
+        content: JSON.stringify({ blocks: [{ type: 'paragraph', content: 'Web development best practices guide.' }] }),
+        status: 'published',
+        createdAt: new Date('2024-01-20').toISOString(),
+        updatedAt: new Date('2024-01-20').toISOString(),
+        publishedAt: new Date('2024-01-20').toISOString(),
+        author: { id: '1', name: 'Admin User', email: 'admin@example.com' }
+      },
+      {
+        id: 'post-sample-3',
+        title: 'Draft Post Example',
+        slug: 'draft-post-example',
+        content: JSON.stringify({ blocks: [{ type: 'paragraph', content: 'This is a draft post.' }] }),
+        status: 'draft',
+        createdAt: new Date('2024-02-01').toISOString(),
+        updatedAt: new Date('2024-02-01').toISOString(),
+        author: { id: '1', name: 'Admin User', email: 'admin@example.com' }
+      }
+    ];
+    mockPostIdCounter = 4;
+  }
+};
+
+// Initialize mock data when module loads
+initializeMockData();
 
 /**
  * Check if we should use mock API

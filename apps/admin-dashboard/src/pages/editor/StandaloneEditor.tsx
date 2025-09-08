@@ -128,6 +128,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Normalize nested API response
       let data: Post = response.data as Post;
       
+      // Debug: Log raw response structure
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Raw API response:', {
+          responseData: response.data,
+          hasNestedData: !!(response.data && typeof response.data === 'object' && 'data' in response.data),
+          directSlug: (response.data as any)?.slug,
+          nestedSlug: (response.data as any)?.data?.slug
+        });
+      }
+      
       // Handle nested data structure from API
       // The API returns { data: post } and postApi wraps it in { success: true, data: ... }
       // So we need to unwrap if there's a nested data property with actual post data
@@ -137,6 +147,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         if (nested && typeof nested === 'object' && ('id' in nested || 'title' in nested || 'slug' in nested)) {
           data = nested;
         }
+      }
+      
+      // Debug: Log normalized data
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Normalized data:', {
+          id: data.id,
+          title: data.title,
+          slug: data.slug,
+          hasSlug: !!data.slug,
+          slugType: typeof data.slug
+        });
       }
       
       
@@ -171,6 +192,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Set post settings - ensure slug is preserved
       setPostSettings(prev => {
+        // Debug: Log before setting
+        if (import.meta.env.DEV) {
+          console.log('[DEBUG] Before setPostSettings:', {
+            dataSlug: data.slug,
+            prevSlug: prev.slug,
+            willSetSlug: data.slug || prev.slug || ''
+          });
+        }
+        
         const newSettings = {
           ...prev,
           status: (data.status || 'draft') as any,
@@ -189,8 +219,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           format: 'standard' as const
         };
         
-        // Debug: Log the slug being set
-        if (import.meta.env.DEV && typeof window !== 'undefined') {
+        // Debug: Log after setting
+        if (import.meta.env.DEV) {
+          console.log('[DEBUG] After setPostSettings:', {
+            newSlug: newSettings.slug,
+            allNewSettings: newSettings
+          });
+          
+          // Also set on window for console inspection
           (window as any).__LOAD_POST_SLUG = data.slug;
           (window as any).__NEW_SETTINGS_SLUG = newSettings.slug;
           (window as any).__PREV_SLUG = prev.slug;
