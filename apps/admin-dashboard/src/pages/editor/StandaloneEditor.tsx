@@ -126,17 +126,23 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Normalize nested API response - handle multiple levels of nesting
       let data: Post = response.data as Post;
       
+      // Debug: Log original response structure
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Original API response:', response.data);
+      }
+      
       // Unwrap nested data structures
-      // Check for id or slug as well to prevent over-unwrapping
+      // Only check for id and title to prevent over-unwrapping (slug might be optional)
       while (data && typeof data === 'object' && 'data' in data && 
-             !('id' in data) && !('slug' in data) && !('title' in data)) {
+             !('id' in data) && !('title' in data)) {
         data = (data as any).data;
       }
       
-      // Data normalized successfully
-      
-      // Debug log in development
-      // Logging disabled for production
+      // Debug: Log normalized data
+      if (import.meta.env.DEV) {
+        console.log('[DEBUG] Normalized data:', data);
+        console.log('[DEBUG] Slug value:', data?.slug);
+      }
       
       // Extract and set title
       const title = data.title || '';
