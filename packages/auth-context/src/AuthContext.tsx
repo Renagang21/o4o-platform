@@ -1,5 +1,21 @@
 import { createContext, useContext } from 'react';
-import type { User, SessionStatus } from '@o4o/types';
+
+// Type definitions (to avoid circular dependency)
+export interface User {
+  id: string | number;  // Support both string and number IDs
+  email: string;
+  name?: string;
+  role: string;
+  permissions?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface SessionStatus {
+  isValid: boolean;
+  expiresAt: Date;
+  remainingTime: number;
+}
 
 interface AuthContextType {
   user: User | null;

@@ -1,7 +1,7 @@
 import { FC, useState, ReactNode, useEffect  } from 'react';
 import { AuthContext } from './AuthContext';
 import { AuthClient } from '@o4o/auth-client';
-import type { User, SessionStatus } from '@o4o/types';
+import type { User, SessionStatus } from './AuthContext';
 
 interface AuthProviderProps {
   children: ReactNode;
