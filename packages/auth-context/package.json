@@ -12,19 +12,20 @@
     }
   },
   "scripts": {
-    "build": "echo 'Skipping auth-context build due to dependency issues' && mkdir -p dist && touch dist/index.js dist/index.d.ts",
+    "build": "node build.js",
     "build:fallback": "node build.js",
     "build:server": "node build-server.js",
     "build:tsc": "npx tsc",
     "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18.3.1",
     "@o4o/auth-client": "file:../auth-client",
     "@o4o/types": "file:../types",
+    "react": "^18.3.1",
     "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.34.0",
     "@types/react": "^18.3.12",
     "@types/socket.io-client": "^1.4.36",
     "typescript": "~5.9.2"
