@@ -177,12 +177,12 @@ export const AppDataSource = new DataSource({
         MenuLocation
       ],
   
-  // 마이그레이션 설정
-  migrations: NODE_ENV === 'production' 
-    ? ['dist/database/migrations/*.js'] 
-    : ['src/database/migrations/*.ts'],
-  migrationsTableName: 'typeorm_migrations',
-  migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
+  // 마이그레이션 설정 - 임시로 비활성화 (MigrationInterface 문제 해결 중)
+  // migrations: NODE_ENV === 'production' 
+  //   ? ['dist/database/migrations/*.js'] 
+  //   : ['src/database/migrations/*.ts'],
+  // migrationsTableName: 'typeorm_migrations',
+  // migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
   
   // SSL 설정 (프로덕션 환경)
   ssl: NODE_ENV === 'production' ? {
