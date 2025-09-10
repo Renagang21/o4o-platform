@@ -1,7 +1,7 @@
 // @o4o/ui - Shared UI Components
 // Export all UI components here
 
-import { HTMLAttributes, forwardRef, ButtonHTMLAttributes } from 'react';
+import React, { HTMLAttributes, forwardRef, ButtonHTMLAttributes } from 'react';
 
 function cn(...classes: (string | undefined | false)[]) {
   return classes.filter(Boolean).join(' ');
@@ -133,4 +133,120 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, Button };
+// Alert Components
+const Alert = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement> & { variant?: 'default' | 'destructive' }
+>(({ className, variant = 'default', ...props }, ref) => (
+  <div
+    ref={ref}
+    role="alert"
+    className={cn(
+      "relative w-full rounded-lg border p-4",
+      variant === 'default' && "bg-background text-foreground",
+      variant === 'destructive' && "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+      className
+    )}
+    {...props}
+  />
+))
+Alert.displayName = "Alert"
+
+const AlertTitle = forwardRef<
+  HTMLParagraphElement,
+  HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props}
+  />
+))
+AlertTitle.displayName = "AlertTitle"
+
+const AlertDescription = forwardRef<
+  HTMLParagraphElement,
+  HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props}
+  />
+))
+AlertDescription.displayName = "AlertDescription"
+
+// Input Component
+const Input = forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, type, ...props }, ref) => {
+  return (
+    <input
+      type={type}
+      className={cn(
+        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Input.displayName = "Input"
+
+// Label Component
+const Label = forwardRef<
+  HTMLLabelElement,
+  React.LabelHTMLAttributes<HTMLLabelElement>
+>(({ className, ...props }, ref) => (
+  <label
+    ref={ref}
+    className={cn(
+      "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+      className
+    )}
+    {...props}
+  />
+))
+Label.displayName = "Label"
+
+// Badge Component
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
+
+const badgeVariants: Record<BadgeVariant, string> = {
+  default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+  secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+  destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+  outline: "text-foreground"
+}
+
+interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: BadgeVariant
+}
+
+const Badge = forwardRef<HTMLDivElement, BadgeProps>(
+  ({ className, variant = 'default', ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          badgeVariants[variant],
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+Badge.displayName = "Badge"
+
+export { 
+  Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, 
+  Button, 
+  Alert, AlertTitle, AlertDescription,
+  Input,
+  Label,
+  Badge
+};
