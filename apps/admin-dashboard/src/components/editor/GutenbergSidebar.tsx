@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useState, useEffect } from 'react';
 import {
   FileText,
   Settings,
@@ -107,6 +107,31 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
+  
+  // Debug slug value and DOM
+  useEffect(() => {
+    console.log('🔍 GutenbergSidebar: postSettings.slug =', postSettings.slug);
+    console.log('  - Type:', typeof postSettings.slug);
+    console.log('  - Length:', postSettings.slug?.length);
+    console.log('  - Empty?:', !postSettings.slug);
+    
+    // Check actual DOM input value
+    const slugInput = document.querySelector('input[placeholder="post-url-slug"]') as HTMLInputElement;
+    if (slugInput) {
+      console.log('  - DOM input value:', slugInput.value);
+      console.log('  - DOM input exists:', true);
+      
+      // Force set the value if it's empty but should have content
+      if (postSettings.slug && !slugInput.value) {
+        console.warn('⚠️ Input value is empty but should be:', postSettings.slug);
+        console.log('Attempting to force set value...');
+        slugInput.value = postSettings.slug;
+        console.log('After force set, DOM value:', slugInput.value);
+      }
+    } else {
+      console.log('  - DOM input exists:', false);
+    }
+  }, [postSettings.slug]);
 
   // Mock data for categories
   const availableCategories = [
@@ -256,8 +281,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative min-w-[200px]">
                   <Input
+                    key={`slug-input-${postSettings.slug}`} // Force re-render when slug changes
                     value={postSettings.slug || ''}
                     onChange={(e: any) => {
+                      console.log('Slug onChange triggered, new value:', e.target.value);
                       // Auto-format slug as user types
                       const formattedSlug = e.target.value
                         .toLowerCase()
@@ -268,6 +295,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                     placeholder="post-url-slug"
                     className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}`}
                     style={{ minWidth: '200px' }}
+                    data-slug-value={postSettings.slug} // Add data attribute for debugging
                   />
                   {(postSettings.slugError || !postSettings.slug) && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">

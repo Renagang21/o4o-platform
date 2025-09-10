@@ -12,7 +12,6 @@ import {
   MediaUploadResponse,
   Media 
 } from '@/types/post.types';
-import { mockPostApi, shouldUseMockApi } from './mockApi';
 
 // API 기본 URL (환경변수에서 가져오기)
 // Production: admin.neture.co.kr에서는 api.neture.co.kr 사용
@@ -244,27 +243,10 @@ const cancelPendingRequest = (key: string) => {
 /**
  * 게시글 API
  */
-// Debug: Expose to window in development
-if (import.meta.env.DEV && typeof window !== 'undefined') {
-  (window as any).__testMockApi = async () => {
-    const { mockPostApi, shouldUseMockApi } = await import('./mockApi');
-    const result = {
-      shouldUseMock: shouldUseMockApi(),
-      mockPosts: await mockPostApi.list(),
-      samplePost: await mockPostApi.get('post-sample-1')
-    };
-    return result;
-  };
-}
 
 export const postApi = {
   // 게시글 생성 (/api/posts 사용: 중복 시 409)
   create: async (data: CreatePostRequest): Promise<PostResponse> => {
-    // Use mock API only if explicitly configured
-    if (shouldUseMockApi()) {
-      return mockPostApi.create(data);
-    }
-    
     // Cancel any pending request with same data
     const requestKey = createRequestKey('POST', '/posts', data);
     cancelPendingRequest(requestKey);
@@ -309,11 +291,6 @@ export const postApi = {
 
   // 게시글 조회 (/api/posts)
   get: async (id: string): Promise<PostResponse> => {
-    // Use mock API if configured
-    if (shouldUseMockApi()) {
-      return mockPostApi.get(id);
-    }
-    
     try {
       const response = await apiClient.get(`/posts/${id}`);
       return { success: true, data: response.data };
@@ -404,11 +381,6 @@ export const postApi = {
 
   // 임시 저장 (V1 API 사용)
   saveDraft: async (data: CreatePostRequest | UpdatePostRequest): Promise<PostResponse> => {
-    // Use mock API only if explicitly configured
-    if (shouldUseMockApi()) {
-      return mockPostApi.saveDraft(data);
-    }
-    
     try {
       const endpoint = 'id' in data ? `/posts/${data.id}/draft` : '/posts/draft';
       

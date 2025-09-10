@@ -235,6 +235,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         
         // Debug: Log slug setting (works in production too)
         if (typeof window !== 'undefined') {
+          console.log('🔍 DEBUG: Setting slug in postSettings');
+          console.log('  - API data.slug:', data.slug);
+          console.log('  - New slug value:', newSettings.slug);
+          console.log('  - Previous slug:', prev.slug);
+          
           (window as any).__DEBUG_AFTER_SET = {
             newSlug: newSettings.slug,
             allNewSettings: newSettings
