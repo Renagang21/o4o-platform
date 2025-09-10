@@ -140,7 +140,16 @@ export class ContentController {
 
   createPost = async (req: Request, res: Response) => {
     try {
-      const { title, content, status = 'draft' } = req.body;
+      const { title, content, status = 'draft', slug } = req.body;
+      
+      // Validate required fields
+      if (!title || title.trim() === '') {
+        return res.status(400).json({
+          message: 'Title is required',
+          error: 'TITLE_REQUIRED',
+          details: 'Post title cannot be empty'
+        });
+      }
       // Use user.id directly instead of userId for UUID compatibility
       const user = (req as any).user;
       const userId = user?.id || user?.userId;
@@ -190,28 +199,24 @@ export class ContentController {
         postContent = { blocks: [] };
       }
 
-      // Generate unique slug with timestamp to avoid duplicates
-      let baseSlug = (title || 'untitled').toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-');
+      // Validate slug
       
-      // Remove all non-alphanumeric characters (한글 포함 후 다시 체크)
-      const alphanumericSlug = baseSlug.replace(/[^a-z0-9-]/g, '');
-      
-      // If slug is empty after removing non-alphanumeric chars (e.g., Korean only title)
-      if (!alphanumericSlug || alphanumericSlug === '-') {
-        // 한글 제목인 경우 timestamp 기반 slug 생성
-        baseSlug = `post`;
-      } else {
-        baseSlug = alphanumericSlug;
+      // Slug is required for all posts
+      if (!slug || slug.trim() === '') {
+        return res.status(400).json({
+          message: 'Slug is required. Please enter a URL-friendly slug for this post.',
+          error: 'SLUG_REQUIRED',
+          details: 'Every post must have a valid slug for URL generation'
+        });
       }
       
-      const uniqueSuffix = Date.now().toString(36); // Convert timestamp to base36 for shorter string
-      const uniqueSlug = `${baseSlug}-${uniqueSuffix}`;
-      
-      // Validate slug is not empty
-      if (!uniqueSlug || uniqueSlug === '-') {
+      // Validate slug format
+      const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+      if (!slugPattern.test(slug)) {
         return res.status(400).json({
-          message: 'Failed to generate slug for the post',
-          error: 'SLUG_GENERATION_FAILED'
+          message: 'Invalid slug format',
+          error: 'INVALID_SLUG_FORMAT',
+          details: 'Slug can only contain lowercase letters, numbers, and hyphens (a-z, 0-9, -)'
         });
       }
 
@@ -220,7 +225,7 @@ export class ContentController {
         content: postContent,
         status,
         authorId: userId,
-        slug: uniqueSlug,
+        slug: slug.trim(),  // Use user-provided slug
         type: 'post'
       } as any);
       const savedPost = await this.postRepository.save(post);
@@ -371,6 +376,15 @@ export class ContentController {
     try {
       const { id } = req.params;
       const updateData = req.body;
+      
+      // Validate title if it's being updated
+      if ('title' in updateData && (!updateData.title || updateData.title.trim() === '')) {
+        return res.status(400).json({
+          message: 'Title cannot be empty',
+          error: 'INVALID_TITLE',
+          details: 'Post title is required and cannot be blank'
+        });
+      }
       
       // Validate slug if it's being updated
       if ('slug' in updateData) {

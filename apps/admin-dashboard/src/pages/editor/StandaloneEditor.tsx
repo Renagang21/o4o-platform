@@ -326,8 +326,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
 
   // This function was moved to above useEffect to avoid temporal dead zone
 
-  // Debounce helper
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Removed debounce - using direct calls with isSaving flag for duplicate prevention
   
   // Generate hash of save data to prevent duplicate saves
   const generateSaveHash = (data: any) => {
@@ -354,11 +353,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       return;
     }
     
-    // Cancel any pending debounced save
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-      debounceTimeoutRef.current = null;
-    }
+    // isSaving flag prevents duplicate saves
     
     // Cancel any in-flight request
     if (saveRequestRef.current) {
@@ -366,8 +361,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       saveRequestRef.current = null;
     }
     
-    // Client-side validation for empty data
+    // Client-side validation
     const trimmedTitle = postTitle?.trim() || '';
+    const trimmedSlug = postSettings.slug?.trim() || '';
     const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
@@ -376,13 +372,34 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       return false;
     });
     
-    if (!trimmedTitle && !hasContent) {
-      toast.error('제목이나 내용 중 하나는 입력해야 합니다');
+    // Title validation - Title is required
+    if (!trimmedTitle) {
+      toast.error('⚠️ 제목을 입력해주세요. 제목은 필수 항목입니다.', {
+        duration: 5000,
+        icon: '📝'
+      });
       return;
     }
     
-    if (trimmedTitle && !trimmedTitle.length) {
-      toast.error('제목에 공백만 입력할 수 없습니다');
+    // Slug validation - Required for all posts
+    if (!trimmedSlug) {
+      toast.error('⚠️ Slug가 비어있습니다. URL 주소를 위한 slug를 입력해주세요.', {
+        duration: 5000,
+        icon: '🔗'
+      });
+      setPostSettings(prev => ({ ...prev, slugError: true }));
+      setSidebarOpen(true); // Open sidebar to show slug input
+      return;
+    }
+    
+    // Validate slug format
+    const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!slugPattern.test(trimmedSlug)) {
+      toast.error('⚠️ 올바르지 않은 slug 형식입니다. 소문자, 숫자, 하이픈만 사용 가능합니다.', {
+        duration: 5000
+      });
+      setPostSettings(prev => ({ ...prev, slugError: true }));
+      setSidebarOpen(true);
       return;
     }
     
@@ -396,10 +413,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Prepare base data for both create and update
       const baseData: any = {
-        title: postTitle || '',
+        title: trimmedTitle,  // Use validated trimmed title
         content: blocks,
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug,  // Always include slug, even if empty
+        slug: trimmedSlug,  // Use validated trimmed slug
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
@@ -776,16 +793,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                // Debounce save to prevent multiple clicks
-                if (debounceTimeoutRef.current) {
-                  clearTimeout(debounceTimeoutRef.current);
-                }
-                debounceTimeoutRef.current = setTimeout(() => {
-                  handleSave(false);
-                  debounceTimeoutRef.current = null;
-                }, 300);
-              }}
+              onClick={() => handleSave(false)}
               disabled={isSaving || !isDirty}
             >
               {isSaving ? (
@@ -805,16 +813,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              onClick={() => {
-                // Debounce save to prevent multiple clicks
-                if (debounceTimeoutRef.current) {
-                  clearTimeout(debounceTimeoutRef.current);
-                }
-                debounceTimeoutRef.current = setTimeout(() => {
-                  handleSave(false);
-                  debounceTimeoutRef.current = null;
-                }, 300);
-              }}
+              onClick={() => handleSave(false)}
               disabled={isSaving || !isDirty}
             >
               {isSaving ? (
@@ -828,16 +827,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           {/* Publish/Update */}
           <Button
             size="sm"
-            onClick={() => {
-              // Debounce publish to prevent multiple clicks
-              if (debounceTimeoutRef.current) {
-                clearTimeout(debounceTimeoutRef.current);
-              }
-              debounceTimeoutRef.current = setTimeout(() => {
-                handleSave(true);
-                debounceTimeoutRef.current = null;
-              }, 300);
-            }}
+            onClick={() => handleSave(true)}
             disabled={isSaving}
           >
             {postSettings.status === 'publish' ? 'Update' : 'Publish'}
