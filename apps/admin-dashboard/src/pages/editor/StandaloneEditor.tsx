@@ -179,14 +179,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           allKeys: Object.keys(data)
         };
         
-        // Force console log to see what's happening
-        console.log('🔍 DEBUG: Normalized Data', {
-          dataSlug: data.slug,
-          dataKeys: Object.keys(data),
-          hasSlugKey: 'slug' in data,
-          slugType: typeof data.slug,
-          slugValue: data.slug
-        });
+        // Debug data stored in window for production debugging
+        // Access via browser console: window.__DEBUG_NORMALIZED_POST
       }
       
       
@@ -252,16 +246,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           (window as any).__PREV_SLUG = prev.slug;
           (window as any).__LOAD_POST_TIME = new Date().toISOString();
           
-          // Force console log
-          console.log('📝 DEBUG: Setting postSettings', {
-            dataSlug: data.slug,
-            newSlug: newSettings.slug,
-            prevSlug: prev.slug,
-            slugInData: 'slug' in data,
-            slugUndefined: data.slug === undefined,
-            slugNull: data.slug === null,
-            slugEmpty: data.slug === ''
-          });
+          // Debug data stored in window for production debugging
+          // Access via browser console: window.__DEBUG_AFTER_SET
         }
         
         return newSettings;

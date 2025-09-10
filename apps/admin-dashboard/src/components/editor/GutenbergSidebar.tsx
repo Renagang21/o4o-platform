@@ -265,7 +265,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     value={postSettings.slug || ''}
                     onChange={(e: any) => {
-                      console.log('🔄 Slug change:', e.target.value);
                       onPostSettingsChange({ slug: e.target.value });
                     }}
                     placeholder="post-url-slug"
