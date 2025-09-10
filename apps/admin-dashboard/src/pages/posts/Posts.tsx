@@ -210,11 +210,20 @@ const Posts = () => {
   const handleSaveQuickEdit = async () => {
     if (quickEditId) {
       try {
+        // Sanitize slug - replace spaces with hyphens
+        const sanitizedSlug = quickEditData.slug
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+        
         // API 호출하여 실제 데이터베이스 업데이트
         const response = await postApi.update({
           id: quickEditId,
           title: quickEditData.title,
-          slug: quickEditData.slug,
+          slug: sanitizedSlug,
           status: quickEditData.status
         });
         

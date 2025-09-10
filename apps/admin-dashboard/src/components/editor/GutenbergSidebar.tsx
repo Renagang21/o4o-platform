@@ -265,7 +265,12 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     value={postSettings.slug || ''}
                     onChange={(e: any) => {
-                      onPostSettingsChange({ slug: e.target.value });
+                      // Auto-format slug as user types
+                      const formattedSlug = e.target.value
+                        .toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/[^a-z0-9-]/g, '');
+                      onPostSettingsChange({ slug: formattedSlug });
                     }}
                     placeholder="post-url-slug"
                     className={postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}

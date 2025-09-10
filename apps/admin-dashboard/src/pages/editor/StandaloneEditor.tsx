@@ -304,7 +304,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     };
     
     initializeEditor();
-  }, [currentPostId, isNewPost, loadPostData]);
+  }, [currentPostId, isNewPost]); // loadPostData removed - it has empty deps and won't change
 
   // Track unsaved changes - removed as it causes issues
   // isDirty is now managed manually when actual changes occur
