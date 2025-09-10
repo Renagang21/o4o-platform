@@ -23,7 +23,6 @@ import WordPressEditorWrapper from '@/components/editor/WordPressEditorWrapper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { serialize } from '@wordpress/blocks';
 
 
 export default function TemplatePartEditor() {
@@ -259,7 +258,7 @@ export default function TemplatePartEditor() {
             </div>
             <div className="wp-card-body">
               <WordPressEditorWrapper
-                initialContent={serialize(blocks)}
+                initialContent=""
                 onChange={handleBlocksChange}
                 showReusableBlocks={true}
               />
