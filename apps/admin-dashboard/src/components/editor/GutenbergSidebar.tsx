@@ -254,14 +254,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             <Panel title="Permalink">
               <div className="space-y-2">
                 <Label className="text-xs">URL Slug</Label>
-                {/* Debug info - always show for debugging */}
-                <div className="text-xs bg-yellow-50 p-2 rounded mb-2">
-                  Debug: slug = "{postSettings.slug || '(empty)'}" | 
-                  type = {typeof postSettings.slug} |
-                  undefined = {postSettings.slug === undefined ? 'YES' : 'NO'} |
-                  null = {postSettings.slug === null ? 'YES' : 'NO'}
-                </div>
-                <div className="relative">
+                <div className="relative min-w-0">
                   <Input
                     value={postSettings.slug || ''}
                     onChange={(e: any) => {
@@ -273,7 +266,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       onPostSettingsChange({ slug: formattedSlug });
                     }}
                     placeholder="post-url-slug"
-                    className={postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}
+                    className={`min-w-[200px] w-full ${postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}`}
+                    style={{ minWidth: '200px' }}
                   />
                   {(postSettings.slugError || !postSettings.slug) && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
