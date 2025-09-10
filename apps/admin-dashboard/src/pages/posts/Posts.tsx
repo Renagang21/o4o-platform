@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import AdminBreadcrumb from '@/components/common/AdminBreadcrumb';
 import { postApi } from '@/services/api/postApi';
+import toast from 'react-hot-toast';
 
 interface Post {
   id: string;
@@ -64,53 +65,17 @@ const Posts = () => {
         });
         
         if (!response.ok) {
-          // If API fails, fall back to mock data temporarily
+          // API 실패 시 에러 표시 (Mock 데이터 사용하지 않음)
           if (response.status === 401) {
             setError('Authentication required. Please login.');
+            // 로그인 페이지로 리다이렉트
+            window.location.href = '/login';
           } else if (response.status === 500 || response.status === 503) {
-            // Use mock data if server has issues
-            setPosts([
-              { 
-                id: 'ec6ee714-552b-44da-8666-57d249292dc2', 
-                title: 'Welcome to Our New Platform',
-                slug: 'welcome-new-platform',
-                author: 'Admin',
-                categories: ['공지사항'],
-                tags: ['featured', 'news'],
-                comments: 5,
-                date: '2024-01-20',
-                status: 'published',
-                views: 234
-              },
-              { 
-                id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 
-                title: 'Getting Started Guide',
-                slug: 'getting-started-guide',
-                author: 'Editor',
-                categories: ['튜토리얼'],
-                tags: ['tutorial', 'guide'],
-                comments: 12,
-                date: '2024-01-18',
-                status: 'published',
-                views: 456
-              },
-              { 
-                id: 'b2c3d4e5-f678-90ab-cdef-123456789012', 
-                title: 'Draft: Upcoming Features',
-                slug: 'draft-upcoming-features',
-                author: 'Admin',
-                categories: ['이벤트'],
-                tags: ['draft'],
-                comments: 0,
-                date: '2024-01-22',
-                status: 'draft',
-                views: 0
-              }
-            ]);
-            setError('Server temporarily unavailable. Showing sample data.');
+            setError('Server error. Please try again later.');
           } else {
-            throw new Error(`Failed to fetch posts: ${response.status}`);
+            setError(`Failed to fetch posts: ${response.status}`);
           }
+          setPosts([]); // 빈 리스트 표시
           return;
         }
         
@@ -135,21 +100,7 @@ const Posts = () => {
         setPosts(transformedPosts);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load posts');
-        // Fall back to mock data with UUIDs
-        setPosts([
-          { 
-            id: 'ec6ee714-552b-44da-8666-57d249292dc2', 
-            title: 'Welcome to Our New Platform',
-            slug: 'welcome-new-platform',
-            author: 'Admin',
-            categories: ['공지사항'],
-            tags: ['featured', 'news'],
-            comments: 5,
-            date: '2024-01-20',
-            status: 'published',
-            views: 234
-          }
-        ]);
+        setPosts([]); // Mock 데이터 사용하지 않고 빈 리스트 표시
       } finally {
         setLoading(false);
       }
@@ -256,21 +207,40 @@ const Posts = () => {
     }
   };
 
-  const handleSaveQuickEdit = () => {
+  const handleSaveQuickEdit = async () => {
     if (quickEditId) {
-      setPosts(posts.map(post => 
-        post.id === quickEditId
-          ? {
-              ...post,
-              title: quickEditData.title,
-              slug: quickEditData.slug,
-              status: quickEditData.status,
-              author: quickEditData.author,
-              date: quickEditData.date
-            }
-          : post
-      ));
-      setQuickEditId(null);
+      try {
+        // API 호출하여 실제 데이터베이스 업데이트
+        const response = await postApi.update({
+          id: quickEditId,
+          title: quickEditData.title,
+          slug: quickEditData.slug,
+          status: quickEditData.status
+        });
+        
+        if (response.success) {
+          // 성공 시 로컬 state 업데이트
+          setPosts(posts.map(post => 
+            post.id === quickEditId
+              ? {
+                  ...post,
+                  title: quickEditData.title,
+                  slug: quickEditData.slug,
+                  status: quickEditData.status,
+                  author: quickEditData.author,
+                  date: quickEditData.date
+                }
+              : post
+          ));
+          setQuickEditId(null);
+          toast.success('Post updated successfully');
+        } else {
+          toast.error('Failed to update post');
+        }
+      } catch (error) {
+        console.error('Quick edit error:', error);
+        toast.error('Failed to update post');
+      }
     }
   };
 

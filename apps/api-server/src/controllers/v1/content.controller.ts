@@ -191,9 +191,29 @@ export class ContentController {
       }
 
       // Generate unique slug with timestamp to avoid duplicates
-      const baseSlug = (title || 'untitled').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      let baseSlug = (title || 'untitled').toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-');
+      
+      // Remove all non-alphanumeric characters (한글 포함 후 다시 체크)
+      const alphanumericSlug = baseSlug.replace(/[^a-z0-9-]/g, '');
+      
+      // If slug is empty after removing non-alphanumeric chars (e.g., Korean only title)
+      if (!alphanumericSlug || alphanumericSlug === '-') {
+        // 한글 제목인 경우 timestamp 기반 slug 생성
+        baseSlug = `post`;
+      } else {
+        baseSlug = alphanumericSlug;
+      }
+      
       const uniqueSuffix = Date.now().toString(36); // Convert timestamp to base36 for shorter string
       const uniqueSlug = `${baseSlug}-${uniqueSuffix}`;
+      
+      // Validate slug is not empty
+      if (!uniqueSlug || uniqueSlug === '-') {
+        return res.status(400).json({
+          message: 'Failed to generate slug for the post',
+          error: 'SLUG_GENERATION_FAILED'
+        });
+      }
 
       const post = this.postRepository.create({
         title: title || 'Untitled',
@@ -352,6 +372,27 @@ export class ContentController {
       const { id } = req.params;
       const updateData = req.body;
       
+      // Validate slug if it's being updated
+      if ('slug' in updateData) {
+        if (!updateData.slug || updateData.slug.trim() === '') {
+          return res.status(400).json({
+            message: 'Slug cannot be empty',
+            error: 'INVALID_SLUG',
+            details: 'Every post must have a valid slug for URL generation'
+          });
+        }
+        
+        // Check if slug contains only valid characters
+        const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+        if (!slugPattern.test(updateData.slug)) {
+          return res.status(400).json({
+            message: 'Invalid slug format',
+            error: 'INVALID_SLUG_FORMAT',
+            details: 'Slug can only contain lowercase letters, numbers, and hyphens'
+          });
+        }
+      }
+      
       if (!AppDataSource.isInitialized) {
         return res.json({
           success: true,
@@ -370,9 +411,21 @@ export class ContentController {
         success: true,
         data: updatedPost
       });
-    } catch (error) {
+    } catch (error: any) {
+      // Log the actual error
+      console.error('Update post error:', error);
+      
+      // Check for unique constraint violation
+      if (error.code === '23505' && error.detail?.includes('slug')) {
+        return res.status(400).json({
+          message: 'This slug is already in use',
+          error: 'DUPLICATE_SLUG'
+        });
+      }
+      
       return res.status(500).json({
-        message: 'Failed to update post'
+        message: 'Failed to update post',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   };

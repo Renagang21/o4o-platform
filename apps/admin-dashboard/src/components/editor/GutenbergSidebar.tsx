@@ -268,13 +268,17 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       console.log('🔄 Slug change:', e.target.value);
                       onPostSettingsChange({ slug: e.target.value });
                     }}
-                    placeholder=""
-                    className={postSettings.slugError ? "border-red-500" : ""}
+                    placeholder="post-url-slug"
+                    className={postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}
                   />
-                  {postSettings.slugError && (
+                  {(postSettings.slugError || !postSettings.slug) && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
                       <AlertCircle className="h-3 w-3" />
-                      <span>This slug is already in use. Please choose another.</span>
+                      <span>
+                        {!postSettings.slug 
+                          ? '⚠️ Slug가 비어있습니다. 한글 제목은 수동으로 slug를 입력해야 합니다.'
+                          : 'This slug is already in use. Please choose another.'}
+                      </span>
                     </div>
                   )}
                 </div>

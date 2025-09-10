@@ -500,23 +500,25 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         console.error('[Error Response]', error?.response);
       }
       
-      const errorCode = error.response?.data?.error?.code;
+      const errorCode = error.response?.data?.error || error.response?.data?.error?.code;
+      const errorDetails = error.response?.data?.details;
       
-      if (errorCode === 'INVALID_SLUG') {
-        toast.error('Invalid slug format. Use only lowercase letters, numbers, and hyphens (a-z, 0-9, -)');
+      if (errorCode === 'INVALID_SLUG' || errorCode === 'INVALID_SLUG_FORMAT') {
+        toast.error('❌ Slug 에러: ' + (errorDetails || 'Invalid slug format. Use only lowercase letters, numbers, and hyphens'));
         setPostSettings(prev => ({ ...prev, slugError: true }));
         setSidebarOpen(true); // Open sidebar to show the error
-      } else if (errorCode === 'SLUG_REQUIRED') {
-        toast.error('Please enter a URL slug for this post (Korean titles need manual slug)');
+      } else if (errorCode === 'SLUG_REQUIRED' || errorCode === 'SLUG_GENERATION_FAILED') {
+        toast.error('❌ Slug 생성 실패: 한글 제목은 수동으로 slug를 입력해야 합니다');
         setPostSettings(prev => ({ ...prev, slugError: true }));
         setSidebarOpen(true); // Open sidebar to let user input slug
-      } else if (status === 409) {
-        toast.error('Slug already exists. Please choose another slug.');
+      } else if (errorCode === 'DUPLICATE_SLUG' || status === 409) {
+        toast.error('❌ 중복된 slug: 이미 사용 중인 slug입니다. 다른 slug를 입력해주세요');
         setPostSettings(prev => ({ ...prev, slugError: true }));
         setSidebarOpen(true);
       } else if (status === 400) {
         // Validation error from API
-        toast.error(errorMessage || '제목이나 내용 중 하나는 입력해야 합니다');
+        const message = error.response?.data?.message || errorMessage || '제목이나 내용 중 하나는 입력해야 합니다';
+        toast.error('❌ 유효성 검사 실패: ' + message);
       } else if (status === 422) {
         toast.error('Validation failed. Please check required fields.');
       } else {
