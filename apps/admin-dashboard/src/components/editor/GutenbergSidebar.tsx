@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useState, useEffect, useRef } from 'react';
+import { ChangeEvent, FC, ReactNode, useState } from 'react';
 import {
   FileText,
   Settings,
@@ -104,17 +104,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   onBlockSettingsChange,
   onClose
 }) => {
-  const permalinkInputRef = useRef<HTMLInputElement>(null);
-  
-  // Sync permalink input value when postSettings.slug changes
-  useEffect(() => {
-    if (permalinkInputRef.current && postSettings.slug !== undefined) {
-      // Force update the input DOM element value
-      if (permalinkInputRef.current.value !== postSettings.slug) {
-        permalinkInputRef.current.value = postSettings.slug;
-      }
-    }
-  }, [postSettings.slug]);
   const [tagInput, setTagInput] = useState('');
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
@@ -267,8 +256,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative min-w-0">
                   <Input
-                    ref={permalinkInputRef}
-                    defaultValue={postSettings.slug || ''}
+                    value={postSettings.slug || ''}
                     onChange={(e: any) => {
                       // Auto-format slug as user types
                       const formattedSlug = e.target.value
