@@ -178,6 +178,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           slugValue: data.slug || '(empty)',
           allKeys: Object.keys(data)
         };
+        
+        // Force console log to see what's happening
+        console.log('🔍 DEBUG: Normalized Data', {
+          dataSlug: data.slug,
+          dataKeys: Object.keys(data),
+          hasSlugKey: 'slug' in data,
+          slugType: typeof data.slug,
+          slugValue: data.slug
+        });
       }
       
       
@@ -230,8 +239,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           format: 'standard' as const
         };
         
-        // Debug: Log slug setting
-        if (import.meta.env.DEV && typeof window !== 'undefined') {
+        // Debug: Log slug setting (works in production too)
+        if (typeof window !== 'undefined') {
           (window as any).__DEBUG_AFTER_SET = {
             newSlug: newSettings.slug,
             allNewSettings: newSettings
@@ -242,6 +251,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           (window as any).__NEW_SETTINGS_SLUG = newSettings.slug;
           (window as any).__PREV_SLUG = prev.slug;
           (window as any).__LOAD_POST_TIME = new Date().toISOString();
+          
+          // Force console log
+          console.log('📝 DEBUG: Setting postSettings', {
+            dataSlug: data.slug,
+            newSlug: newSettings.slug,
+            prevSlug: prev.slug,
+            slugInData: 'slug' in data,
+            slugUndefined: data.slug === undefined,
+            slugNull: data.slug === null,
+            slugEmpty: data.slug === ''
+          });
         }
         
         return newSettings;

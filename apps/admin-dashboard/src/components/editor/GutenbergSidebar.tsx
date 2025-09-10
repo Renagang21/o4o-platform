@@ -254,19 +254,20 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             <Panel title="Permalink">
               <div className="space-y-2">
                 <Label className="text-xs">URL Slug</Label>
-                {/* Debug info in development */}
-                {import.meta.env.DEV && (
-                  <div className="text-xs bg-yellow-50 p-2 rounded mb-2">
-                    Debug: slug = "{postSettings.slug || '(empty)'}" | 
-                    type = {typeof postSettings.slug}
-                  </div>
-                )}
+                {/* Debug info - always show for debugging */}
+                <div className="text-xs bg-yellow-50 p-2 rounded mb-2">
+                  Debug: slug = "{postSettings.slug || '(empty)'}" | 
+                  type = {typeof postSettings.slug} |
+                  undefined = {postSettings.slug === undefined ? 'YES' : 'NO'} |
+                  null = {postSettings.slug === null ? 'YES' : 'NO'}
+                </div>
                 <div className="relative">
                   <Input
                     value={postSettings.slug || ''}
-                    onChange={(e: any) => 
-                      onPostSettingsChange({ slug: e.target.value })
-                    }
+                    onChange={(e: any) => {
+                      console.log('🔄 Slug change:', e.target.value);
+                      onPostSettingsChange({ slug: e.target.value });
+                    }}
                     placeholder=""
                     className={postSettings.slugError ? "border-red-500" : ""}
                   />
