@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@o4o/block-core": "^1.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "classnames": "^2.3.2"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "@wordpress/i18n": "^4.47.0",
     "@wordpress/data": "^9.17.0",
     "tsup": "^8.0.1",
-    "typescript": "^5.3.3"
+    "typescript": "5.4.5"
   },
   "peerDependencies": {
     "@wordpress/block-editor": "*",

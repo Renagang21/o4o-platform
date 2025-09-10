@@ -151,14 +151,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     try {
       const response = await postApi.get(String(id));
       
-      // Debug: Store API response for inspection
-      if (import.meta.env.DEV && typeof window !== 'undefined') {
+      // Store API response for debugging (works in production too)
+      if (typeof window !== 'undefined') {
         (window as any).__LAST_API_RESPONSE = response;
         (window as any).__LAST_API_RESPONSE_TIME = new Date().toISOString();
-        
-        // Force log raw response
-        console.log('📡 Raw API Response:', response);
-        console.log('📦 Response data:', response.data);
       }
       
       if (!response.success) {
@@ -172,8 +168,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         throw new Error('Invalid post data received');
       }
       
-      // Debug: Log normalized data
-      if (import.meta.env.DEV && typeof window !== 'undefined') {
+      // Store normalized data for debugging (works in production too)
+      if (typeof window !== 'undefined') {
         (window as any).__DEBUG_NORMALIZED_POST = {
           id: data.id,
           title: data.title,
@@ -182,14 +178,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           slugValue: data.slug || '(empty)',
           allKeys: Object.keys(data)
         };
-        
-        // Force log to console for immediate debugging
-        console.log('🔍 Normalized Post Data:', {
-          id: data.id,
-          title: data.title,
-          slug: data.slug,
-          allKeys: Object.keys(data)
-        });
       }
       
       
