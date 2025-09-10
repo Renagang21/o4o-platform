@@ -113,6 +113,37 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
   });
 
+  // Helper function to normalize API response
+  const normalizePostResponse = (response: any): Post | null => {
+    if (!response) return null;
+    
+    let data = response;
+    
+    // Handle various response structures
+    // Case 1: { success: true, data: { data: {...} } } (postApi wrapper + server response)
+    if (data.success && data.data) {
+      data = data.data;
+    }
+    
+    // Case 2: { data: {...} } (server response)
+    if (data.data && !data.id && !data.title) {
+      data = data.data;
+    }
+    
+    // Case 3: { post: {...} } (alternative structure)
+    if (data.post && !data.id && !data.title) {
+      data = data.post;
+    }
+    
+    // Validate essential fields
+    if (!data.id) {
+      console.error('Invalid post data: missing id', data);
+      return null;
+    }
+    
+    return data as Post;
+  };
+
   // Simplified load post data function
   const loadPostData = useCallback(async (id: string | number) => {
     const loadingToast = toast.loading(`Loading post...`);
@@ -126,54 +157,26 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         (window as any).__LAST_API_RESPONSE_TIME = new Date().toISOString();
       }
       
-      if (!response.success || !response.data) {
+      if (!response.success) {
         throw new Error(response.error || 'Failed to load post');
       }
       
-      // Normalize nested API response
-      let data: Post = response.data as Post;
+      // Normalize the response
+      const data = normalizePostResponse(response);
       
-      // Debug: Log raw response structure
-      if (import.meta.env.DEV && typeof window !== 'undefined') {
-        // Store debug info on window object for dev inspection
-        (window as any).__DEBUG_RAW_RESPONSE = {
-          responseData: response.data,
-          responseDataKeys: response.data ? Object.keys(response.data) : [],
-          hasSuccess: response.data && 'success' in response.data,
-          hasData: response.data && 'data' in response.data,
-          innerData: (response.data as any)?.data,
-          innerDataKeys: (response.data as any)?.data ? Object.keys((response.data as any).data) : [],
-          hasPost: (response.data as any)?.data && 'post' in (response.data as any).data,
-          postSlug: (response.data as any)?.data?.post?.slug
-        };
-      }
-      
-      // Handle nested data structure from API
-      // The API returns: { success: true, data: { post: {...} } }
-      // postApi.get wraps it: { success: true, data: { success: true, data: { post: {...} } } }
-      
-      // First, unwrap the outer postApi wrapper if it exists
-      if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
-        data = (data as any).data;
-      }
-      
-      // Now handle the API response structure
-      if (data && typeof data === 'object' && 'post' in data) {
-        data = (data as any).post;
+      if (!data) {
+        throw new Error('Invalid post data received');
       }
       
       // Debug: Log normalized data
       if (import.meta.env.DEV && typeof window !== 'undefined') {
-        // Store debug info on window object for dev inspection
-        (window as any).__DEBUG_NORMALIZED_DATA = {
+        (window as any).__DEBUG_NORMALIZED_POST = {
           id: data.id,
           title: data.title,
           slug: data.slug,
-          hasSlug: 'slug' in data,
-          slugValue: data.slug,
-          slugType: typeof data.slug,
-          allKeys: Object.keys(data || {}),
-          dataStructure: JSON.stringify(data, null, 2).substring(0, 500)
+          hasSlug: !!data.slug,
+          slugValue: data.slug || '(empty)',
+          allKeys: Object.keys(data)
         };
       }
       
@@ -209,15 +212,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Set post settings - ensure slug is preserved
       setPostSettings(prev => {
-        // Debug: Log before setting
-        if (import.meta.env.DEV && typeof window !== 'undefined') {
-          (window as any).__DEBUG_BEFORE_SET = {
-            dataSlug: data.slug,
-            prevSlug: prev.slug,
-            willSetSlug: data.slug || prev.slug || ''
-          };
-        }
-        
         const newSettings = {
           ...prev,
           status: (data.status || 'draft') as any,
@@ -226,7 +220,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           author: data.author?.name || 'Admin User',
           featuredImage: data.featuredImage,
           excerpt: data.excerpt || '',
-          slug: data.slug || prev.slug || '',
+          slug: data.slug || '', // Use empty string if no slug, don't fall back to prev
           categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
           tags: data.tags?.map((t: any) => typeof t === 'object' ? t.id : t) || [],
           template: 'default',
@@ -236,7 +230,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           format: 'standard' as const
         };
         
-        // Debug: Log after setting
+        // Debug: Log slug setting
         if (import.meta.env.DEV && typeof window !== 'undefined') {
           (window as any).__DEBUG_AFTER_SET = {
             newSlug: newSettings.slug,
@@ -399,7 +393,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         title: postTitle || '',
         content: blocks,
         excerpt: postSettings.excerpt,
-        slug: postSettings.slug || undefined,  // Use undefined instead of empty string to preserve existing slug
+        slug: postSettings.slug,  // Always include slug, even if empty
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,

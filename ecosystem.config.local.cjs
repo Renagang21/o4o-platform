@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'o4o-api-local',
       script: './apps/api-server/dist/main.js',
-      cwd: '/home/user/o4o-platform',
+      cwd: '/home/dev/o4o-platform',
       env: {
         NODE_ENV: 'development',
         PORT: 3001,
@@ -23,7 +23,7 @@ module.exports = {
       name: 'o4o-admin-local',
       script: 'npx',
       args: 'serve -s apps/admin-dashboard/dist -l 5173',
-      cwd: '/home/user/o4o-platform',
+      cwd: '/home/dev/o4o-platform',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
