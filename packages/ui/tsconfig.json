@@ -15,6 +15,7 @@
     "declarationMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "sourceMap": true,
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
@@ -23,6 +24,6 @@
     },
     "types": []
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
 }
