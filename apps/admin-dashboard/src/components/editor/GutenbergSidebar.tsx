@@ -108,28 +108,34 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
   
-  // Debug slug value and DOM
+  // Fix slug value sync issue between React state and DOM
   useEffect(() => {
-    console.log('🔍 GutenbergSidebar: postSettings.slug =', postSettings.slug);
-    console.log('  - Type:', typeof postSettings.slug);
-    console.log('  - Length:', postSettings.slug?.length);
-    console.log('  - Empty?:', !postSettings.slug);
+    // Store debug info for production debugging
+    if (typeof window !== 'undefined') {
+      (window as any).__SLUG_DEBUG = {
+        postSettingsSlug: postSettings.slug,
+        type: typeof postSettings.slug,
+        length: postSettings.slug?.length,
+        isEmpty: !postSettings.slug,
+        timestamp: new Date().toISOString()
+      };
+    }
     
-    // Check actual DOM input value
+    // Check and fix DOM sync issue
     const slugInput = document.querySelector('input[placeholder="post-url-slug"]') as HTMLInputElement;
-    if (slugInput) {
-      console.log('  - DOM input value:', slugInput.value);
-      console.log('  - DOM input exists:', true);
+    if (slugInput && postSettings.slug && !slugInput.value) {
+      // Force set the value if React state has value but DOM doesn't
+      slugInput.value = postSettings.slug;
       
-      // Force set the value if it's empty but should have content
-      if (postSettings.slug && !slugInput.value) {
-        console.warn('⚠️ Input value is empty but should be:', postSettings.slug);
-        console.log('Attempting to force set value...');
-        slugInput.value = postSettings.slug;
-        console.log('After force set, DOM value:', slugInput.value);
+      // Store fix attempt for debugging
+      if (typeof window !== 'undefined') {
+        (window as any).__SLUG_FIX_ATTEMPTED = {
+          stateValue: postSettings.slug,
+          domValueBefore: '',
+          domValueAfter: slugInput.value,
+          timestamp: new Date().toISOString()
+        };
       }
-    } else {
-      console.log('  - DOM input exists:', false);
     }
   }, [postSettings.slug]);
 
@@ -284,7 +290,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                     key={`slug-input-${postSettings.slug}`} // Force re-render when slug changes
                     value={postSettings.slug || ''}
                     onChange={(e: any) => {
-                      console.log('Slug onChange triggered, new value:', e.target.value);
                       // Auto-format slug as user types
                       const formattedSlug = e.target.value
                         .toLowerCase()
