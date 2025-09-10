@@ -13,11 +13,11 @@ import { useAuth } from '@o4o/auth-context'
 import { useDynamicMenu } from '@/hooks/useDynamicMenu'
 
 interface AdminSidebarProps {
-  _isOpen: boolean
+  isOpen: boolean
   onClose: () => void
 }
 
-const AdminSidebar: FC<AdminSidebarProps> = ({ onClose }) => {
+const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation()
   const { user } = useAuth()
   const [expandedItems, setExpandedItems] = useState<any[]>([])
@@ -158,8 +158,10 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ onClose }) => {
       className={clsx(
         'admin-sidebar fixed left-0 z-40 transform transition-all duration-300 ease-in-out',
         isCollapsed ? 'w-[36px] collapsed' : 'w-[160px]',
-        // 임시로 항상 보이도록 설정
-        'translate-x-0'
+        // 모바일에서 isOpen에 따라 표시/숨김
+        isOpen ? 'translate-x-0' : '-translate-x-full',
+        // 데스크톱에서는 항상 표시
+        'lg:translate-x-0'
       )}
     >
       <div className="flex h-full flex-col">

@@ -52,7 +52,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       
       {/* Sidebar with proper classes */}
       <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`}>
-        <AdminSidebar _isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       </div>
       
       {/* Main content wrapper with proper positioning */}
