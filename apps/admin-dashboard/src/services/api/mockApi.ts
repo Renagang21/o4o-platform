@@ -338,11 +338,8 @@ initializeMockData();
  * Check if we should use mock API
  */
 export const shouldUseMockApi = () => {
-  // Use mock API in development when:
-  // 1. Explicitly enabled via environment variable
-  // 2. Or when API server is not available
-  // 3. Always use mock in dev mode for now (until API is stable)
+  // Use mock API only when explicitly enabled via environment variable
+  // This allows using real API in development for proper testing
   return import.meta.env.VITE_USE_MOCK_API === 'true' || 
-         import.meta.env.VITE_FORCE_MOCK === 'true' ||
-         import.meta.env.DEV; // Always use mock in development for now
+         import.meta.env.VITE_FORCE_MOCK === 'true';
 };
