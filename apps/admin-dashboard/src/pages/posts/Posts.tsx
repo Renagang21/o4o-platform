@@ -238,8 +238,8 @@ const Posts = () => {
   };
 
   const handleEdit = (id: string) => {
-    // Navigate to PostForm with WordPress-like UI
-    navigate(`/content/posts/${id}/edit`);
+    // Navigate to StandaloneEditor for full-screen editing
+    navigate(`/editor/posts/${id}`);
   };
 
   const handleQuickEdit = (id: string) => {
