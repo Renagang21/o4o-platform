@@ -185,33 +185,10 @@ export class AuthClient {
 }
 
 // Singleton instance
-// Use environment variable or default based on hostname
+// Always use production API server
 const getApiUrl = () => {
-  // Always use production API server
-  const DEFAULT_API_URL = 'https://api.neture.co.kr/api';
-  
-  if (typeof window === 'undefined') {
-    return DEFAULT_API_URL;
-  }
-  
-  // Check for environment variable first (Vite specific)
-  try {
-    // @ts-ignore - Vite environment variable
-    if ((globalThis as any).import?.meta?.env?.VITE_API_URL) {
-      // @ts-ignore
-      return (globalThis as any).import.meta.env.VITE_API_URL;
-    }
-  } catch {
-    // Ignore if import.meta is not available
-  }
-  
-  // Check window global variable (for runtime config)
-  if ((window as any).__API_URL__) {
-    return (window as any).__API_URL__;
-  }
-  
-  // Always return production API URL
-  return DEFAULT_API_URL;
+  // Always use production API server to avoid confusion
+  return 'https://api.neture.co.kr/api';
 };
 
 export const authClient = new AuthClient(getApiUrl());
