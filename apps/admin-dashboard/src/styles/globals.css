@@ -1381,10 +1381,12 @@
     color: var(--admin-bar-text);
   }
 
-  /* Sidebar styles - Basic colors only, positioning handled in admin-layout-fixed.css */
+  /* Sidebar styles */
   .admin-sidebar {
     background: var(--sidebar-bg);
     color: var(--sidebar-text);
+    top: 32px; /* Height of admin bar */
+    height: calc(100vh - 32px);
   }
   
   .admin-sidebar-item {

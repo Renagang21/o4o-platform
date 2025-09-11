@@ -1,0 +1,266 @@
+/**
+ * Admin Layout Styles - WordPress.com Style
+ * Fixes layout overlap issues and implements proper responsive design
+ */
+
+/* Admin Layout Structure */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f1f1f1;
+}
+
+/* Admin Bar (Top Bar) */
+.wordpress-admin-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background-color: #23282d;
+  z-index: 9999;
+}
+
+/* Sidebar Styles */
+.admin-sidebar {
+  position: fixed;
+  top: 32px; /* Below admin bar */
+  left: 0;
+  bottom: 0;
+  width: 160px;
+  background-color: #23282d;
+  z-index: 100;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+/* Expanded sidebar */
+.admin-sidebar.expanded {
+  width: 240px;
+}
+
+/* Main Content Area */
+.wordpress-admin-content {
+  margin-left: 160px; /* Match sidebar width */
+  margin-top: 32px; /* Below admin bar */
+  min-height: calc(100vh - 32px);
+  width: calc(100% - 160px);
+  background-color: #f1f1f1;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* When sidebar is expanded */
+.admin-sidebar.expanded ~ .wordpress-admin-content {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+}
+
+/* Mobile Styles (< 1024px) */
+@media (max-width: 1023px) {
+  /* Sidebar overlay mode on mobile */
+  .admin-sidebar {
+    transform: translateX(-100%);
+    width: 240px;
+    z-index: 1000;
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  /* Full width content on mobile */
+  .wordpress-admin-content {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  /* Even when sidebar is expanded */
+  .admin-sidebar.expanded ~ .wordpress-admin-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Small mobile (< 600px) */
+@media (max-width: 599px) {
+  /* Admin bar adjustments */
+  .wordpress-admin-bar {
+    height: 46px;
+  }
+  
+  .admin-sidebar {
+    top: 46px;
+  }
+  
+  .wordpress-admin-content {
+    margin-top: 46px;
+    min-height: calc(100vh - 46px);
+  }
+}
+
+/* Desktop Large (> 1280px) */
+@media (min-width: 1280px) {
+  .admin-sidebar {
+    width: 240px;
+  }
+  
+  .wordpress-admin-content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+}
+
+/* Sidebar Content Styles */
+.admin-sidebar-menu {
+  padding: 0;
+  margin: 0;
+}
+
+.admin-sidebar-menu-item {
+  display: block;
+  padding: 8px 20px;
+  color: #eee;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.admin-sidebar-menu-item:hover {
+  background-color: #191e23;
+  color: #00b9eb;
+}
+
+.admin-sidebar-menu-item.active {
+  background-color: #0073aa;
+  color: #fff;
+}
+
+/* Submenu Styles */
+.admin-sidebar-submenu {
+  background-color: #32373c;
+  display: none;
+}
+
+.admin-sidebar-menu-item.expanded .admin-sidebar-submenu {
+  display: block;
+}
+
+.admin-sidebar-submenu-item {
+  display: block;
+  padding: 6px 20px 6px 40px;
+  color: rgba(240, 245, 250, 0.7);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.admin-sidebar-submenu-item:hover {
+  color: #00b9eb;
+}
+
+.admin-sidebar-submenu-item.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Menu Separator */
+.admin-sidebar-separator {
+  height: 5px;
+  background-color: transparent;
+  margin: 5px 0;
+  border-top: 1px solid #555;
+}
+
+/* Sidebar Icons */
+.admin-sidebar-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+
+.admin-sidebar-menu-item:hover .admin-sidebar-icon {
+  opacity: 1;
+}
+
+/* Main Content Padding */
+.wordpress-admin-content main {
+  padding: 20px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* WordPress Style Cards */
+.wp-card {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+  padding: 12px;
+}
+
+/* Responsive Tables */
+@media (max-width: 782px) {
+  .wp-list-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Sidebar Toggle Button (Mobile) */
+.admin-sidebar-toggle {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: #0073aa;
+  color: #fff;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1001;
+  cursor: pointer;
+}
+
+@media (max-width: 1023px) {
+  .admin-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Fix for overlapping content */
+.wordpress-admin {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Ensure proper stacking context */
+.wordpress-admin > * {
+  position: relative;
+}
+
+/* Backdrop for mobile sidebar */
+.admin-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@media (max-width: 1023px) {
+  .admin-sidebar-backdrop.show {
+    display: block;
+  }
+}
