@@ -48,8 +48,10 @@
 }
 
 /* Desktop mode - sidebar always visible */
-.admin-sidebar.desktop-mode {
-  transform: translateX(0);
+@media (min-width: 1024px) {
+  .admin-sidebar.desktop-mode {
+    transform: translateX(0);
+  }
 }
 
 /* Main Content Area - Properly offset */
@@ -101,15 +103,15 @@
 @media (max-width: 1023px) {
   /* Sidebar hidden by default */
   .admin-sidebar {
-    transform: translateX(-100%);
+    transform: translateX(-100%) !important;
     width: 280px;
     z-index: 10000; /* Above content on mobile */
     box-shadow: 2px 0 10px rgba(0,0,0,0.3);
   }
   
-  /* Sidebar visible when open */
+  /* Sidebar visible when open - highest specificity */
   .admin-sidebar.open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
   }
   
   /* Full width content on mobile */
