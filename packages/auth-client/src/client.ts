@@ -148,16 +148,30 @@ export class AuthClient {
   }
 
   async logout(): Promise<void> {
-    // For production API server, use the correct auth endpoint
-    let authUrl: string;
-    if (this.baseURL.includes('api.neture.co.kr')) {
-      // Production API server - use /api/auth/logout
-      authUrl = 'https://api.neture.co.kr/api/auth/logout';
-    } else {
-      // Development - remove /api/v1 prefix for auth endpoints
-      authUrl = `${this.baseURL.replace('/api/v1', '/api')}/auth/logout`;
+    try {
+      // For production API server, use the correct auth endpoint
+      let authUrl: string;
+      if (this.baseURL.includes('api.neture.co.kr')) {
+        // Production API server - use /api/auth/logout
+        authUrl = 'https://api.neture.co.kr/api/auth/logout';
+      } else {
+        // Development - remove /api/v1 prefix for auth endpoints
+        authUrl = `${this.baseURL.replace('/api/v1', '/api')}/auth/logout`;
+      }
+      
+      // Get token for authorization
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (token) {
+        await axios.post(authUrl, {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+    } catch (error) {
+      // Even if logout fails (e.g., token expired), continue with local cleanup
+      console.log('Logout API call failed (this is normal if token expired):', error);
     }
-    await axios.post(authUrl);
   }
 
   async checkSession(): Promise<{ isAuthenticated: boolean; user?: any }> {
