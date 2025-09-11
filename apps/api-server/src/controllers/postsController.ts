@@ -427,14 +427,14 @@ export const updatePost = async (req: Request, res: Response) => {
       }
       
       // Check slug uniqueness if changed
-      if (slug !== post.slug) {
+      if (slug && slug !== post.slug) {
         const existingPost = await postRepository.findOne({ 
           where: { 
-            slug,
-            id: Not(id) // Exclude current post from check
+            slug
           } 
         })
-        if (existingPost) {
+        // Check if the found post is different from the current post
+        if (existingPost && existingPost.id !== id) {
           return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
         }
       }
