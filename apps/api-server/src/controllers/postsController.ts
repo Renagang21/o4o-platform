@@ -426,16 +426,24 @@ export const updatePost = async (req: Request, res: Response) => {
         })
       }
       
-      // Check slug uniqueness if changed
+      // Check slug uniqueness only if it's different from current
       if (slug && slug !== post.slug) {
         const existingPost = await postRepository.findOne({ 
           where: { 
             slug
           } 
         })
-        // Check if the found post is different from the current post
+        
+        // Check if the found post exists and is different from current post
         if (existingPost && existingPost.id !== id) {
-          return res.status(409).json({ error: { code: 'CONFLICT', message: 'Slug already exists' } })
+          return res.status(409).json({ 
+            error: { 
+              code: 'SLUG_CONFLICT', 
+              message: `The slug "${slug}" is already in use by another post. Please choose a different slug.`,
+              field: 'slug',
+              suggestedSlug: `${slug}-${Date.now().toString().slice(-4)}`
+            } 
+          })
         }
       }
     }
