@@ -226,7 +226,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Label className="text-xs">Publish</Label>
                   <Input
                     type="datetime-local"
-                    value={postSettings.publishDate}
+                    value={postSettings.publishDate ? postSettings.publishDate.replace('Z', '').slice(0, 16) : ''}
                     onChange={(e: any) => 
                       onPostSettingsChange({ publishDate: e.target.value })
                     }

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 interface AdminHeaderProps {
-  onMenuClick: () => void;
+  onMenuClick?: () => void;
 }
 
 const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
@@ -72,12 +72,14 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
         <div className="flex items-center justify-between">
           {/* Left side */}
           <div className="flex items-center gap-4">
-            <button
-              onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+            {onMenuClick && (
+              <button
+                onClick={onMenuClick}
+                className="lg:hidden p-2 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            )}
             
             <div>
               <h1 className="text-xl font-semibold text-wp-text-primary">

@@ -57,8 +57,8 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       
       {/* Main content wrapper with proper positioning */}
       <div className={`wordpress-admin-content ${!isMobile ? 'with-sidebar' : ''}`}>
-        {/* Header - only show menu button on mobile */}
-        {isMobile && <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />}
+        {/* Header - show without menu button as we have a dedicated toggle button */}
+        {isMobile && <AdminHeader />}
         
         {/* Page content */}
         <main>

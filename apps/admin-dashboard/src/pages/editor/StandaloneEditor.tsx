@@ -219,7 +219,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           ...prev,
           status: (data.status || 'draft') as any,
           visibility: 'public' as const,
-          publishDate: data.publishedAt || data.createdAt || new Date().toISOString().slice(0, 16),
+          publishDate: (data.publishedAt || data.createdAt || new Date().toISOString()).replace('Z', '').slice(0, 16),
           author: data.author?.name || 'Admin User',
           featuredImage: data.featuredImage,
           excerpt: data.excerpt || '',
