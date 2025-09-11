@@ -74,8 +74,8 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       
       {/* Main content wrapper with proper positioning */}
       <div className={`wordpress-admin-content ${!isMobile ? 'with-sidebar' : ''}`}>
-        {/* Header - show without menu button as we have a dedicated toggle button */}
-        {isMobile && <AdminHeader />}
+        {/* Header with menu button for mobile */}
+        {isMobile && <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />}
         
         {/* Page content */}
         <main>
@@ -89,21 +89,6 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         className={`admin-sidebar-backdrop ${sidebarOpen && isMobile ? 'show' : ''}`}
         onClick={() => setSidebarOpen(false)}
       />
-      
-      {/* Mobile menu toggle button - show when sidebar is closed */}
-      <button
-        className="admin-sidebar-toggle"
-        onClick={(e) => {
-          e.stopPropagation();
-          setSidebarOpen(!sidebarOpen);
-        }}
-        aria-label="Toggle menu"
-        style={{ 
-          display: sidebarOpen ? 'none' : 'block'
-        }}
-      >
-        ≡
-      </button>
     </div>
   )
 }

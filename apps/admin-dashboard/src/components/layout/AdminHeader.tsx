@@ -75,9 +75,13 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             {onMenuClick && (
               <button
                 onClick={onMenuClick}
-                className="lg:hidden p-2 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary"
+                className="lg:hidden p-3 rounded-md text-wp-text-secondary hover:text-wp-text-primary hover:bg-wp-bg-tertiary transition-colors"
+                style={{ 
+                  minWidth: '44px',
+                  minHeight: '44px'
+                }}
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-7 h-7" />
               </button>
             )}
             

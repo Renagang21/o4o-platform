@@ -134,33 +134,7 @@
     display: block;
   }
   
-  /* Mobile menu toggle button - in header area */
-  .admin-sidebar-toggle {
-    display: block;
-    position: fixed;
-    top: 60px; /* Position in white header area below admin bar */
-    left: 20px;
-    width: 36px;
-    height: 36px;
-    background-color: transparent; /* Transparent to match header */
-    color: #666; /* Dark gray to match header text */
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    box-shadow: none;
-    z-index: 10001;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 20px;
-    line-height: 36px;
-    text-align: center;
-    padding: 0;
-  }
-  
-  .admin-sidebar-toggle:hover {
-    background-color: #f0f0f0;
-    border-color: #999;
-    color: #333;
-  }
+  /* Mobile menu toggle button - removed, using AdminHeader button instead */
 }
 
 /* Small Mobile (< 600px) */
@@ -179,10 +153,6 @@
 
 /* Desktop only styles */
 @media (min-width: 1024px) {
-  .admin-sidebar-toggle {
-    display: none !important;
-  }
-  
   .admin-sidebar-backdrop {
     display: none !important;
   }
