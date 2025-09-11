@@ -901,6 +901,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             <GutenbergBlockEditor
               documentTitle={postTitle || ''}
               initialBlocks={blocks}
+              slug={postSettings.slug || ''}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);
                 // Only mark as dirty if we have actual content changes, not just initialization

@@ -32,6 +32,7 @@ interface GutenbergBlockEditorProps {
   onChange?: (blocks: Block[]) => void;
   onSave?: () => void;
   onPublish?: () => void;
+  slug?: string;
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
@@ -40,6 +41,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onChange,
   onSave,
   onPublish,
+  slug = '',
 }) => {
   // Initialize with empty paragraph only if no initial blocks
   // But don't trigger onChange for this initialization
@@ -734,7 +736,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
             featuredImage: '',
             excerpt: '',
             allowComments: true,
-            allowPingbacks: true
+            allowPingbacks: true,
+            slug: slug
           }}
           onUploadFeaturedImage={async () => {
             // 미디어 업로드
