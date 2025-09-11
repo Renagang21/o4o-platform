@@ -152,16 +152,39 @@ const Posts = () => {
     };
   });
   
+  // Items per page state - default 20
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+    const saved = localStorage.getItem('posts-items-per-page');
+    return saved ? parseInt(saved) : 20;
+  });
+  
   // Save visible columns to localStorage when they change
   useEffect(() => {
     localStorage.setItem('posts-visible-columns', JSON.stringify(visibleColumns));
   }, [visibleColumns]);
+  
+  // Save items per page to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('posts-items-per-page', itemsPerPage.toString());
+  }, [itemsPerPage]);
   
   const handleColumnToggle = (column: string) => {
     setVisibleColumns((prev: any) => ({
       ...prev,
       [column]: !prev[column]
     }));
+  };
+  
+  const handleItemsPerPageChange = (value: string) => {
+    const num = parseInt(value) || 20;
+    // Validate and set limits
+    if (num < 1) {
+      setItemsPerPage(1);
+    } else if (num > 999) {
+      setItemsPerPage(999);
+    } else {
+      setItemsPerPage(num);
+    }
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -424,7 +447,8 @@ const Posts = () => {
       );
     }
     
-    return filtered;
+    // Apply pagination limit
+    return filtered.slice(0, itemsPerPage);
   };
 
   const getStatusCounts = () => {
@@ -537,6 +561,34 @@ const Posts = () => {
                       />
                       상태
                     </label>
+                  </div>
+                  
+                  {/* Pagination Settings */}
+                  <div className="border-t border-gray-200 mt-3 pt-3">
+                    <h3 className="font-medium text-sm mb-3">Pagination</h3>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-600">페이징 항목 수:</label>
+                      <input
+                        type="number"
+                        value={itemsPerPage}
+                        onChange={(e) => handleItemsPerPageChange(e.target.value)}
+                        onBlur={(e) => {
+                          if (!e.target.value || e.target.value === '0') {
+                            setItemsPerPage(20);
+                          }
+                        }}
+                        min="1"
+                        max="999"
+                        className="w-16 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={() => setShowScreenOptions(false)}
+                        className="ml-auto px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      >
+                        적용
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">1-999 사이의 숫자를 입력하세요</p>
                   </div>
                 </div>
               </div>
