@@ -44,13 +44,13 @@
   z-index: 9998; /* Below admin bar */
   overflow-y: auto;
   overflow-x: hidden;
-  transition: transform 0.3s ease;
 }
 
 /* Desktop mode - sidebar always visible */
 @media (min-width: 1024px) {
-  .admin-sidebar.desktop-mode {
-    transform: translateX(0);
+  .admin-sidebar {
+    left: 0 !important; /* Always visible on desktop */
+    transition: none !important; /* No animation on desktop */
   }
 }
 
@@ -101,17 +101,23 @@
 
 /* Tablet and Mobile (< 1024px) */
 @media (max-width: 1023px) {
-  /* Sidebar hidden by default */
+  /* Sidebar hidden by default - positioned outside viewport */
   .admin-sidebar {
-    transform: translateX(-100%) !important;
-    width: 280px;
-    z-index: 10000; /* Above content on mobile */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    position: fixed !important;
+    left: -280px !important; /* Hidden off-screen to the left */
+    top: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    transform: none !important; /* Remove transform to avoid conflicts */
+    transition: left 0.3s ease-in-out !important;
+    z-index: 10000 !important; /* Above everything on mobile */
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+    background-color: #23282d !important; /* Ensure background is visible */
   }
   
-  /* Sidebar visible when open - highest specificity */
+  /* Sidebar visible when open - slide into view */
   .admin-sidebar.open {
-    transform: translateX(0) !important;
+    left: 0 !important; /* Slide into viewport */
   }
   
   /* Full width content on mobile */
@@ -129,7 +135,8 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
+    z-index: 9999; /* Below sidebar (10000) but above content */
+    transition: opacity 0.3s ease-in-out;
   }
   
   .admin-sidebar-backdrop.show {

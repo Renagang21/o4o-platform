@@ -47,11 +47,6 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
     }
   }, [])
   
-  // Debug: Log sidebar state changes
-  useEffect(() => {
-    console.log('Sidebar state changed:', { sidebarOpen, isMobile });
-  }, [sidebarOpen, isMobile])
-  
   const { logout } = useAuth()
 
   const handleLogout = async () => {
@@ -80,10 +75,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       {/* Main content wrapper with proper positioning */}
       <div className={`wordpress-admin-content ${!isMobile ? 'with-sidebar' : ''}`}>
         {/* Header with menu button for mobile */}
-        {isMobile && <AdminHeader onMenuClick={() => {
-          console.log('Menu clicked - current sidebarOpen:', sidebarOpen, 'isMobile:', isMobile);
-          setSidebarOpen(!sidebarOpen);
-        }} />}
+        {isMobile && <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />}
         
         {/* Page content */}
         <main>
