@@ -6,7 +6,6 @@ import { AdminNotices } from '../notices/AdminNotices'
 import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
 import { WordPressRouter } from '@/components/routing/WordPressRouter'
-import '../../styles/admin-layout-fixed.css'
 
 interface AdminLayoutProps {
   children: ReactNode
