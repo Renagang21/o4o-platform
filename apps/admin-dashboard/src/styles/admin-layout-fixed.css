@@ -177,17 +177,12 @@
 
 /* Desktop only styles */
 @media (min-width: 1024px) {
-  .admin-sidebar-toggle,
-  .admin-sidebar-backdrop,
-  .mobile-only {
+  .admin-sidebar-toggle {
     display: none !important;
   }
-}
-
-/* Mobile only styles */
-@media (max-width: 1023px) {
-  .admin-sidebar-toggle.mobile-only {
-    display: block !important;
+  
+  .admin-sidebar-backdrop {
+    display: none !important;
   }
 }
 

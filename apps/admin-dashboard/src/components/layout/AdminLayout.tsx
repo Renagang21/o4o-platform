@@ -89,23 +89,25 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         onClick={() => setSidebarOpen(false)}
       />
       
-      {/* Mobile menu toggle button - always show on small screens via CSS */}
-      {!sidebarOpen && (
-        <button
-          className="admin-sidebar-toggle mobile-only"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Toggle menu"
-          style={{ 
-            fontSize: '24px',
-            lineHeight: '1',
-            color: '#ffffff',
-            textAlign: 'center',
-            padding: '8px'
-          }}
-        >
-          ≡
-        </button>
-      )}
+      {/* Mobile menu toggle button - show when sidebar is closed */}
+      <button
+        className="admin-sidebar-toggle"
+        onClick={(e) => {
+          e.stopPropagation();
+          setSidebarOpen(!sidebarOpen);
+        }}
+        aria-label="Toggle menu"
+        style={{ 
+          display: sidebarOpen ? 'none' : 'block',
+          fontSize: '24px',
+          lineHeight: '40px',
+          color: '#ffffff',
+          textAlign: 'center',
+          padding: '0'
+        }}
+      >
+        ≡
+      </button>
     </div>
   )
 }
