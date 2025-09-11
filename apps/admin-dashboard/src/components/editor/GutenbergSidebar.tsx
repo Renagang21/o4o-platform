@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useState, useEffect } from 'react';
 import {
   FileText,
   Settings,
@@ -107,6 +107,37 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
+  
+  // Fix slug value sync issue between React state and DOM
+  useEffect(() => {
+    // Store debug info for production debugging
+    if (typeof window !== 'undefined') {
+      (window as any).__SLUG_DEBUG = {
+        postSettingsSlug: postSettings.slug,
+        type: typeof postSettings.slug,
+        length: postSettings.slug?.length,
+        isEmpty: !postSettings.slug,
+        timestamp: new Date().toISOString()
+      };
+    }
+    
+    // Check and fix DOM sync issue
+    const slugInput = document.querySelector('input[placeholder="post-url-slug"]') as HTMLInputElement;
+    if (slugInput && postSettings.slug && !slugInput.value) {
+      // Force set the value if React state has value but DOM doesn't
+      slugInput.value = postSettings.slug;
+      
+      // Store fix attempt for debugging
+      if (typeof window !== 'undefined') {
+        (window as any).__SLUG_FIX_ATTEMPTED = {
+          stateValue: postSettings.slug,
+          domValueBefore: '',
+          domValueAfter: slugInput.value,
+          timestamp: new Date().toISOString()
+        };
+      }
+    }
+  }, [postSettings.slug]);
 
   // Mock data for categories
   const availableCategories = [
@@ -254,8 +285,9 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
             <Panel title="Permalink">
               <div className="space-y-2">
                 <Label className="text-xs">URL Slug</Label>
-                <div className="relative min-w-0">
+                <div className="relative min-w-[200px]">
                   <Input
+                    key={`slug-input-${postSettings.slug}`} // Force re-render when slug changes
                     value={postSettings.slug || ''}
                     onChange={(e: any) => {
                       // Auto-format slug as user types
@@ -266,8 +298,9 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       onPostSettingsChange({ slug: formattedSlug });
                     }}
                     placeholder="post-url-slug"
-                    className={`min-w-[200px] w-full ${postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}`}
+                    className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}`}
                     style={{ minWidth: '200px' }}
+                    data-slug-value={postSettings.slug} // Add data attribute for debugging
                   />
                   {(postSettings.slugError || !postSettings.slug) && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
