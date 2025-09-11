@@ -14,7 +14,13 @@ interface AdminLayoutProps {
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024)
+  const [isMobile, setIsMobile] = useState(() => {
+    // Safe window access for SSR
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1024;
+    }
+    return false; // Default to desktop on server
+  })
 
   useEffect(() => {
     const checkMobile = () => {
@@ -26,10 +32,20 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       }
     }
     
+    // Initial check on mount
     checkMobile()
+    
+    // Listen for resize events
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [sidebarOpen])
+  
+  // Additional effect to ensure mobile detection on first render
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 1024);
+    }
+  }, [])
   const { logout } = useAuth()
 
   const handleLogout = async () => {
@@ -73,19 +89,21 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         onClick={() => setSidebarOpen(false)}
       />
       
-      {/* Mobile menu toggle button */}
-      {isMobile && !sidebarOpen && (
+      {/* Mobile menu toggle button - always show on small screens via CSS */}
+      {!sidebarOpen && (
         <button
-          className="admin-sidebar-toggle"
+          className="admin-sidebar-toggle mobile-only"
           onClick={() => setSidebarOpen(true)}
           aria-label="Toggle menu"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ 
+            fontSize: '24px',
+            lineHeight: '1',
+            color: '#ffffff',
+            textAlign: 'center',
+            padding: '8px'
+          }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
+          ≡
         </button>
       )}
     </div>

@@ -185,7 +185,10 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
                 value={documentSettings.slug || ''}
                 placeholder="post-url-slug" 
                 className="h-8 text-sm"
-                readOnly
+                onChange={(e) => {
+                  // Allow editing - onChange handler needs to be implemented
+                  // This would need to be connected to the parent component
+                }}
               />
             </div>
 
