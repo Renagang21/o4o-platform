@@ -113,7 +113,9 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   
   // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {
-    setLocalSlug(postSettings.slug || '');
+    if (postSettings.slug !== localSlug) {
+      setLocalSlug(postSettings.slug || '');
+    }
   }, [postSettings.slug]);
 
   // Mock data for categories
