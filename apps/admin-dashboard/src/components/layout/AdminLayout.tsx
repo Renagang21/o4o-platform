@@ -98,12 +98,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         }}
         aria-label="Toggle menu"
         style={{ 
-          display: sidebarOpen ? 'none' : 'block',
-          fontSize: '24px',
-          lineHeight: '40px',
-          color: '#ffffff',
-          textAlign: 'center',
-          padding: '0'
+          display: sidebarOpen ? 'none' : 'block'
         }}
       >
         ≡

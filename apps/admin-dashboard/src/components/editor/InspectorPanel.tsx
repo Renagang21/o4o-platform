@@ -45,6 +45,12 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
   const [excerpt, setExcerpt] = useState(documentSettings.excerpt || '');
   const [allowComments, setAllowComments] = useState(documentSettings.allowComments ?? true);
   const [allowPingbacks, setAllowPingbacks] = useState(documentSettings.allowPingbacks ?? true);
+  const [slug, setSlug] = useState(documentSettings.slug || '');
+
+  // Update slug when documentSettings changes
+  useEffect(() => {
+    setSlug(documentSettings.slug || '');
+  }, [documentSettings.slug]);
 
   // Block settings state
   const [fontSize, setFontSize] = useState(selectedBlock?.attributes?.fontSize || 16);
@@ -182,12 +188,14 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
             <div className="space-y-2">
               <h3 className="font-semibold text-sm">Permalink</h3>
               <Input 
-                value={documentSettings.slug || ''}
+                value={slug}
                 placeholder="post-url-slug" 
                 className="h-8 text-sm"
                 onChange={(e) => {
-                  // Allow editing - onChange handler needs to be implemented
-                  // This would need to be connected to the parent component
+                  setSlug(e.target.value);
+                  if (onUpdateDocument) {
+                    onUpdateDocument({ slug: e.target.value });
+                  }
                 }}
               />
             </div>
