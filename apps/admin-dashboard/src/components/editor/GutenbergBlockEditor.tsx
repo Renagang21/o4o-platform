@@ -11,7 +11,6 @@ import { postApi, mediaApi } from '@/services/api/postApi';
 import { debugTokenStatus } from '@/utils/token-debug';
 import { Block } from '@/types/post.types';
 import BlockInserter from './BlockInserter';
-import InspectorPanel from './InspectorPanel';
 import DesignLibraryModalImproved from './DesignLibraryModalImproved';
 import ParagraphBlock from './blocks/ParagraphBlock';
 import EnhancedHeadingBlock from './blocks/EnhancedHeadingBlock';
@@ -82,7 +81,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     setDocumentTitle(propDocumentTitle);
   }, [propDocumentTitle]);
   const [isCodeView, setIsCodeView] = useState(false);
-  const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
   const [copiedBlock, setCopiedBlock] = useState<Block | null>(null);
@@ -642,7 +640,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         <div
           className={`flex-1 transition-all duration-300 overflow-y-auto ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
-          } mr-80`}
+          }`}
           style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 60px)' }}
         >
           <div className="max-w-4xl mx-auto p-8">
@@ -731,55 +729,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
 
-        {/* Inspector Panel with Document/Block tabs */}
-        <InspectorPanel
-          selectedBlock={selectedBlockId ? blocks.find(b => b.id === selectedBlockId) : undefined}
-          documentSettings={{
-            visibility: 'public',
-            publishDate: '',
-            categories: [],
-            tags: [],
-            featuredImage: '',
-            excerpt: '',
-            allowComments: true,
-            allowPingbacks: true,
-            slug: slug
-          }}
-          onUploadFeaturedImage={async () => {
-            // 미디어 업로드
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async (e) => {
-              const file = (e.target as HTMLInputElement).files?.[0];
-              if (file) {
-                try {
-                  // 업로드 진행률 표시 (선택사항)
-                  const response = await mediaApi.upload(file, (_progress) => {
-                    // TODO: 프로그레스 바 표시 - _progress%
-                  });
-                  
-                  if (response.success && response.data) {
-                    // TODO: Featured Image 상태 업데이트
-                    // setFeaturedImage(response.data);
-                  } else {
-                    // TODO: 에러 알림 표시 - response.error
-                  }
-                } catch (error) {
-                  // TODO: 에러 알림 표시 - 'Upload error'
-                }
-              }
-            };
-            input.click();
-          }}
-          activeTab={activeTab}
-          onUpdateBlock={(updates) => {
-            if (selectedBlockId) {
-              handleBlockUpdate(selectedBlockId, blocks.find(b => b.id === selectedBlockId)?.content, updates);
-            }
-          }}
-          onUpdateDocument={() => {}}
-        />
+        {/* Right sidebar space removed - InspectorPanel removed for better UX */}
+        {/* All settings are now managed in StandaloneEditor's GutenbergSidebar */}
       </div>
       
       {/* Simple Toast */}
