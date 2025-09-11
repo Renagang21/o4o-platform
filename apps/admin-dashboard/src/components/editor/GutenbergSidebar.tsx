@@ -108,35 +108,12 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
   
-  // Fix slug value sync issue between React state and DOM
+  // Ensure slug value is properly synced
+  const [localSlug, setLocalSlug] = useState(postSettings.slug || '');
+  
+  // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {
-    // Store debug info for production debugging
-    if (typeof window !== 'undefined') {
-      (window as any).__SLUG_DEBUG = {
-        postSettingsSlug: postSettings.slug,
-        type: typeof postSettings.slug,
-        length: postSettings.slug?.length,
-        isEmpty: !postSettings.slug,
-        timestamp: new Date().toISOString()
-      };
-    }
-    
-    // Check and fix DOM sync issue
-    const slugInput = document.querySelector('input[placeholder="post-url-slug"]') as HTMLInputElement;
-    if (slugInput && postSettings.slug && !slugInput.value) {
-      // Force set the value if React state has value but DOM doesn't
-      slugInput.value = postSettings.slug;
-      
-      // Store fix attempt for debugging
-      if (typeof window !== 'undefined') {
-        (window as any).__SLUG_FIX_ATTEMPTED = {
-          stateValue: postSettings.slug,
-          domValueBefore: '',
-          domValueAfter: slugInput.value,
-          timestamp: new Date().toISOString()
-        };
-      }
-    }
+    setLocalSlug(postSettings.slug || '');
   }, [postSettings.slug]);
 
   // Mock data for categories
@@ -287,26 +264,25 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative min-w-[200px]">
                   <Input
-                    key={`slug-input-${postSettings.slug}`} // Force re-render when slug changes
-                    value={postSettings.slug || ''}
+                    value={localSlug}
                     onChange={(e: any) => {
                       // Auto-format slug as user types
                       const formattedSlug = e.target.value
                         .toLowerCase()
                         .replace(/\s+/g, '-')
                         .replace(/[^a-z0-9-]/g, '');
+                      setLocalSlug(formattedSlug);
                       onPostSettingsChange({ slug: formattedSlug });
                     }}
                     placeholder="post-url-slug"
-                    className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError || !postSettings.slug ? "border-red-500 bg-red-50" : ""}`}
+                    className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError || !localSlug ? "border-red-500 bg-red-50" : ""}`}
                     style={{ minWidth: '200px' }}
-                    data-slug-value={postSettings.slug} // Add data attribute for debugging
                   />
-                  {(postSettings.slugError || !postSettings.slug) && (
+                  {(postSettings.slugError || !localSlug) && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
                       <AlertCircle className="h-3 w-3" />
                       <span>
-                        {!postSettings.slug 
+                        {!localSlug 
                           ? '⚠️ Slug가 비어있습니다. 한글 제목은 수동으로 slug를 입력해야 합니다.'
                           : 'This slug is already in use. Please choose another.'}
                       </span>
@@ -316,10 +292,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <p className="text-xs text-gray-500 mt-6">
                   The last part of the URL. Read more about <a href="#" className="text-blue-600 hover:underline">permalinks</a>
                 </p>
-                {postSettings.slug && (
+                {localSlug && (
                   <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
                     <Globe className="h-3 w-3 inline mr-1" />
-                    Preview: /posts/{postSettings.slug}
+                    Preview: /posts/{localSlug}
                   </div>
                 )}
               </div>

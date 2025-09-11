@@ -95,7 +95,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     // 워커 스레드 활용
     workers: true,
     commonjsOptions: {
-      transformMixedEsModules: true
+      transformMixedEsModules: true,
+      // Ensure proper handling of CommonJS modules
+      strictRequires: true
     },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
@@ -138,6 +140,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         ...sharedViteConfig.build?.rollupOptions?.output,
         // Ensure proper loading order for WordPress modules
         inlineDynamicImports: false,
+        // Fix exports not defined error
+        format: 'es',
         manualChunks: (id) => {
           // 공통 설정 먼저 적용
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
