@@ -234,7 +234,7 @@ const Posts = () => {
               ? {
                   ...post,
                   title: quickEditData.title,
-                  slug: quickEditData.slug,
+                  slug: sanitizedSlug, // Use sanitized slug instead of original
                   status: quickEditData.status,
                   author: quickEditData.author,
                   date: quickEditData.date

@@ -15,7 +15,7 @@ import './styles/bulk-actions.css'
 import './styles/quick-edit.css'
 import './styles/help-tab.css'
 import './styles/media-upload.css'
-import './styles/ui-improvements.css'
+// import './styles/ui-improvements.css' // Temporarily disabled to fix sidebar conflict
 import './styles/wordpress-table-fix.css'
 
 
