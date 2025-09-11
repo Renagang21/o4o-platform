@@ -7,6 +7,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import AppGuard from '@/components/AppGuard';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/stores/authStore';
+import '@/styles/wordpress-theme.css';
+import '@/styles/wordpress-sidebar.css';
 
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
