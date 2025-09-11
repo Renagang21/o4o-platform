@@ -356,8 +356,18 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     }
     
     // Client-side validation
+    console.log('[DEBUG] Save button clicked');
+    console.log('[DEBUG] postTitle value:', postTitle);
+    console.log('[DEBUG] postTitle type:', typeof postTitle);
+    console.log('[DEBUG] postTitle length:', postTitle?.length);
+    
     const trimmedTitle = postTitle?.trim() || '';
     const trimmedSlug = postSettings.slug?.trim() || '';
+    
+    console.log('[DEBUG] trimmedTitle:', trimmedTitle);
+    console.log('[DEBUG] trimmedTitle length:', trimmedTitle.length);
+    console.log('[DEBUG] trimmedTitle boolean check:', !trimmedTitle);
+    
     const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
@@ -368,6 +378,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Title validation - Title is required
     if (!trimmedTitle) {
+      console.log('[DEBUG] Title validation failed - showing error toast');
       toast.error('⚠️ 제목을 입력해주세요. 제목은 필수 항목입니다.', {
         duration: 5000,
         icon: '📝'
@@ -408,7 +419,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Prepare base data for both create and update
       const baseData: any = {
         title: trimmedTitle,  // Use validated trimmed title
-        content: { blocks: blocks },  // Wrap blocks in object to match server schema
+        content: blocks,  // Send blocks array directly - server will handle conversion
         excerpt: postSettings.excerpt,
         slug: trimmedSlug,  // Use validated trimmed slug
         status: publish ? 'publish' : (postSettings.status || 'draft'),
@@ -420,6 +431,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         format: postSettings.format,
         allowComments: postSettings.commentStatus
       };
+      
+      console.log('[DEBUG] Sending data to server:', {
+        title: baseData.title,
+        slug: baseData.slug,
+        contentType: Array.isArray(baseData.content) ? 'array' : 'object',
+        contentLength: baseData.content?.length || baseData.content?.blocks?.length
+      });
       
       // if (import.meta.env.DEV) {
       //   console.log('[DEBUG] Saving post with data:', {
@@ -451,11 +469,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         ? await postApi.update({ ...requestData, id: String(currentPostId) }) // Update existing post
         : await postApi.create(requestData);
       
+      console.log('[DEBUG] Server response:', response);
+      console.log('[DEBUG] Response success:', response.success);
+      console.log('[DEBUG] Response data:', response.data);
+      
       if (!response.success) {
         throw new Error(response.error || 'Failed to save');
       }
       
       const savedData = response.data;
+      console.log('[DEBUG] Saved data title:', savedData?.title);
+      console.log('[DEBUG] Saved data slug:', savedData?.slug);
       // dev save response observed (logging disabled)
       
       // Invalidate posts queries to refresh lists
