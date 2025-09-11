@@ -30,6 +30,7 @@ interface GutenbergBlockEditorProps {
   documentTitle?: string;
   initialBlocks?: Block[];
   onChange?: (blocks: Block[]) => void;
+  onTitleChange?: (title: string) => void;
   onSave?: () => void;
   onPublish?: () => void;
   slug?: string;
@@ -39,6 +40,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   documentTitle: propDocumentTitle = '',
   initialBlocks = [],
   onChange,
+  onTitleChange,
   onSave,
   onPublish,
   slug = '',
@@ -665,6 +667,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                   onChange={(e) => {
                     setDocumentTitle(e.target.value);
                     setIsDirty(true);
+                    // Notify parent component of title change
+                    if (onTitleChange) {
+                      onTitleChange(e.target.value);
+                    }
                   }}
                   placeholder="Enter your title here..."
                   className="w-full px-0 py-1 text-xl font-medium text-gray-900 border-0 border-b-2 border-transparent hover:border-gray-200 focus:border-blue-500 outline-none transition-colors bg-transparent"

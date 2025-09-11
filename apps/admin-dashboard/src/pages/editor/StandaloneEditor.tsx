@@ -356,18 +356,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     }
     
     // Client-side validation
-    console.log('[DEBUG] Save button clicked');
-    console.log('[DEBUG] postTitle value:', postTitle);
-    console.log('[DEBUG] postTitle type:', typeof postTitle);
-    console.log('[DEBUG] postTitle length:', postTitle?.length);
-    
     const trimmedTitle = postTitle?.trim() || '';
     const trimmedSlug = postSettings.slug?.trim() || '';
-    
-    console.log('[DEBUG] trimmedTitle:', trimmedTitle);
-    console.log('[DEBUG] trimmedTitle length:', trimmedTitle.length);
-    console.log('[DEBUG] trimmedTitle boolean check:', !trimmedTitle);
-    
     const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
@@ -378,7 +368,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Title validation - Title is required
     if (!trimmedTitle) {
-      console.log('[DEBUG] Title validation failed - showing error toast');
       toast.error('⚠️ 제목을 입력해주세요. 제목은 필수 항목입니다.', {
         duration: 5000,
         icon: '📝'
@@ -432,13 +421,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: postSettings.commentStatus
       };
       
-      console.log('[DEBUG] Sending data to server:', {
-        title: baseData.title,
-        slug: baseData.slug,
-        contentType: Array.isArray(baseData.content) ? 'array' : 'object',
-        contentLength: baseData.content?.length || baseData.content?.blocks?.length
-      });
-      
       // if (import.meta.env.DEV) {
       //   console.log('[DEBUG] Saving post with data:', {
       //     title: baseData.title,
@@ -469,17 +451,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         ? await postApi.update({ ...requestData, id: String(currentPostId) }) // Update existing post
         : await postApi.create(requestData);
       
-      console.log('[DEBUG] Server response:', response);
-      console.log('[DEBUG] Response success:', response.success);
-      console.log('[DEBUG] Response data:', response.data);
-      
       if (!response.success) {
         throw new Error(response.error || 'Failed to save');
       }
       
       const savedData = response.data;
-      console.log('[DEBUG] Saved data title:', savedData?.title);
-      console.log('[DEBUG] Saved data slug:', savedData?.slug);
       // dev save response observed (logging disabled)
       
       // Invalidate posts queries to refresh lists
@@ -690,8 +666,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
             </div>
           )}
 
-          {/* Title Input */}
-          <div className="flex-1 max-w-2xl">
+          {/* Title Input - Hidden because GutenbergBlockEditor has its own title field */}
+          <div className="flex-1 max-w-2xl" style={{ display: 'none' }}>
             <input
               type="text"
               placeholder=""
@@ -926,6 +902,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               documentTitle={postTitle || ''}
               initialBlocks={blocks}
               slug={postSettings.slug || ''}
+              onTitleChange={(newTitle) => {
+                setPostTitle(newTitle);
+                setIsDirty(true);
+              }}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);
                 // Only mark as dirty if we have actual content changes, not just initialization
