@@ -46,6 +46,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       setIsMobile(window.innerWidth < 1024);
     }
   }, [])
+  
   const { logout } = useAuth()
 
   const handleLogout = async () => {
