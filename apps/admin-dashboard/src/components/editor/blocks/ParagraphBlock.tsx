@@ -386,7 +386,7 @@ const ParagraphBlock: React.FC<ParagraphBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
+      {/* Inspector Controls removed - now handled by GutenbergSidebar */}
 
       {/* Block Content with Enhanced Visual Feedback */}
       <div

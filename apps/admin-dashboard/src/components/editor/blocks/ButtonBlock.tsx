@@ -208,7 +208,7 @@ const ButtonBlock: React.FC<ButtonBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
+      {/* Inspector Controls removed - now handled by GutenbergSidebar */}
 
       {/* Block Content */}
       <EnhancedBlockWrapper

@@ -181,17 +181,6 @@
   transition: all 0.3s ease;
 }
 
-/* Inspector panel animation */
-.inspector-panel-enter {
-  opacity: 0;
-  transform: translateX(20px);
-}
-
-.inspector-panel-enter-active {
-  opacity: 1;
-  transform: translateX(0);
-  transition: all 0.3s ease;
-}
 
 /* Keyboard focus styles */
 .block-wrapper:focus-within {

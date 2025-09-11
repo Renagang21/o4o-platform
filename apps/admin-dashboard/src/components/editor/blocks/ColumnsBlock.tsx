@@ -178,7 +178,7 @@ const ColumnsBlock: React.FC<ColumnsBlockProps> = ({
         </BlockControls>
       )}
 
-      {/* Inspector Controls removed - now handled by InspectorPanel in sidebar */}
+      {/* Inspector Controls removed - now handled by GutenbergSidebar */}
 
       {/* Block Content */}
       <BlockWrapper
