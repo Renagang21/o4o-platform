@@ -55,7 +55,7 @@ const Posts = () => {
         
         // Build query params - always get ALL posts and filter client-side
         const params = new URLSearchParams();
-        params.append('perPage', '100'); // Get more posts (up to 100)
+        params.append('per_page', '1000'); // Get all posts (increased from 100 to handle 37+ posts)
         // Don't filter by status on server side - get all posts
         
         const response = await fetch(`${apiUrl}/api/posts?${params}`, {
