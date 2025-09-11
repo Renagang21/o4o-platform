@@ -136,9 +136,7 @@ const Posts = () => {
   const [quickEditData, setQuickEditData] = useState({
     title: '',
     slug: '',
-    status: 'published' as Post['status'],
-    author: '',
-    date: ''
+    status: 'published' as Post['status']
   });
   
   // Screen Options state - load from localStorage
@@ -200,9 +198,7 @@ const Posts = () => {
       setQuickEditData({
         title: post.title,
         slug: post.slug,
-        status: post.status,
-        author: post.author,
-        date: post.date
+        status: post.status
       });
     }
   };
@@ -235,9 +231,7 @@ const Posts = () => {
                   ...post,
                   title: quickEditData.title,
                   slug: sanitizedSlug, // Use sanitized slug instead of original
-                  status: quickEditData.status,
-                  author: quickEditData.author,
-                  date: quickEditData.date
+                  status: quickEditData.status
                 }
               : post
           ));
@@ -258,9 +252,7 @@ const Posts = () => {
     setQuickEditData({
       title: '',
       slug: '',
-      status: 'published',
-      author: '',
-      date: ''
+      status: 'published'
     });
   };
 
@@ -753,24 +745,6 @@ const Posts = () => {
                                 type="text"
                                 value={quickEditData.slug}
                                 onChange={(e) => setQuickEditData({...quickEditData, slug: e.target.value})}
-                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-                              <input
-                                type="text"
-                                value={quickEditData.author}
-                                onChange={(e) => setQuickEditData({...quickEditData, author: e.target.value})}
-                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                              <input
-                                type="date"
-                                value={quickEditData.date}
-                                onChange={(e) => setQuickEditData({...quickEditData, date: e.target.value})}
                                 className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                             </div>
