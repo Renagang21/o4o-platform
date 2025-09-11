@@ -66,8 +66,20 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       {/* WordPress Admin Bar */}
       <AdminBar onLogout={handleLogout} />
       
-      {/* Sidebar with proper classes */}
-      <div className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`}>
+      {/* Sidebar with proper classes and inline styles for mobile */}
+      <div 
+        className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`}
+        style={isMobile ? {
+          position: 'fixed',
+          top: 0,
+          left: sidebarOpen ? '0px' : '-280px',
+          width: '280px',
+          height: '100vh',
+          zIndex: 10000,
+          transition: 'left 0.3s ease-in-out',
+          backgroundColor: '#23282d'
+        } : {}}
+      >
         <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       </div>
       
