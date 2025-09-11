@@ -35,6 +35,7 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
   activeTab = 'document',
   onUploadFeaturedImage,
   onUpdateBlock,
+  onUpdateDocument,
 }) => {
   // Document settings state
   const [visibility, setVisibility] = useState(documentSettings.visibility || 'public');
