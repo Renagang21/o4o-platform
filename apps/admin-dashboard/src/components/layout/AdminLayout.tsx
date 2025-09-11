@@ -77,10 +77,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       {isMobile && !sidebarOpen && (
         <button
           className="admin-sidebar-toggle"
-          onClick={() => {
-            console.log('[AdminLayout] Hamburger menu clicked, opening sidebar');
-            setSidebarOpen(true);
-          }}
+          onClick={() => setSidebarOpen(true)}
           aria-label="Toggle menu"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
