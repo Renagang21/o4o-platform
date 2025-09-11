@@ -421,17 +421,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: postSettings.commentStatus
       };
       
-      // if (import.meta.env.DEV) {
-      //   console.log('[DEBUG] Saving post with data:', {
-      //     title: baseData.title,
-      //     contentLength: baseData.content?.length,
-      //     status: baseData.status,
-      //     slug: baseData.slug
-      //   });
-      // }
-      
-      // Debug logging available in development mode
-      
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
       if (lastSaveHashRef.current === saveHash && !isDirty) {
@@ -444,8 +433,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       const requestId = `${Date.now()}-${Math.random()}`;
       const requestData = { ...baseData, _requestId: requestId };
       
-      // Dev log request
-      // dev save request observed (logging disabled)
       // Call appropriate API method based on whether we have a post ID
       const response = currentPostId 
         ? await postApi.update({ ...requestData, id: String(currentPostId) }) // Update existing post
@@ -456,7 +443,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       }
       
       const savedData = response.data;
-      // dev save response observed (logging disabled)
       
       // Invalidate posts queries to refresh lists
       queryClient.invalidateQueries({ queryKey: ['posts'] });
