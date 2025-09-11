@@ -58,6 +58,18 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
     }
   }
 
+  // Debug logging for mobile menu
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('[AdminLayout Debug]', {
+        isMobile,
+        sidebarOpen,
+        windowWidth: window.innerWidth,
+        sidebarClasses: `admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`
+      })
+    }
+  }, [isMobile, sidebarOpen])
+
   return (
     <div className="wordpress-admin">
       {/* WordPress Router - only loads when admin is authenticated */}
@@ -74,7 +86,13 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       {/* Main content wrapper with proper positioning */}
       <div className={`wordpress-admin-content ${!isMobile ? 'with-sidebar' : ''}`}>
         {/* Header with menu button for mobile */}
-        {isMobile && <AdminHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />}
+        {isMobile && <AdminHeader onMenuClick={() => {
+          console.log('[Hamburger Click] Before:', sidebarOpen);
+          setSidebarOpen(prev => {
+            console.log('[Hamburger Click] Changing from', prev, 'to', !prev);
+            return !prev;
+          });
+        }} />}
         
         {/* Page content */}
         <main>

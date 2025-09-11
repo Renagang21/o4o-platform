@@ -104,7 +104,7 @@
 /* Tablet and Mobile (< 1024px) */
 @media (max-width: 1023px) {
   /* Sidebar hidden by default - positioned outside viewport */
-  .wordpress-admin .admin-sidebar {
+  div.admin-sidebar {
     position: fixed !important;
     left: -280px !important; /* Hidden off-screen to the left */
     top: 0 !important;
@@ -118,7 +118,7 @@
   }
   
   /* Sidebar visible when open - slide into view */
-  .wordpress-admin .admin-sidebar.open {
+  div.admin-sidebar.open {
     left: 0 !important; /* Slide into viewport */
   }
   
@@ -304,20 +304,32 @@ body {
   margin-top: 0 !important;
 }
 
-/* Mobile-specific sidebar animation override */
-@media (max-width: 1023px) {
+/* Mobile-specific sidebar animation override - HIGHEST PRIORITY */
+@media screen and (max-width: 1023px) {
   /* Force sidebar animation on mobile */
-  .wordpress-admin .admin-sidebar:not(.open) {
+  div.admin-sidebar:not(.open) {
     left: -280px !important;
     visibility: visible !important;
     opacity: 1 !important;
     display: block !important;
   }
   
-  .wordpress-admin .admin-sidebar.open {
-    left: 0 !important;
+  div.admin-sidebar.open {
+    left: 0px !important;
     visibility: visible !important;
     opacity: 1 !important;
     display: block !important;
+    transform: translateX(0) !important;
+  }
+  
+  /* Alternative selectors for maximum specificity */
+  .wordpress-admin div.admin-sidebar.open {
+    left: 0px !important;
+    transform: translateX(0) !important;
+  }
+  
+  body .wordpress-admin div.admin-sidebar.open {
+    left: 0px !important;
+    transform: translateX(0) !important;
   }
 }
