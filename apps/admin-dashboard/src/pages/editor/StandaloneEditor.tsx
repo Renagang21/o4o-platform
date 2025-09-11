@@ -78,7 +78,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   // Editor state
   const [postTitle, setPostTitle] = useState('');
   const [blocks, setBlocks] = useState<any[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Changed to true for better UX and permalink access
   const [activeTab] = useState<'document' | 'block'>('document');
   const [selectedBlock, setSelectedBlock] = useState<any>(null);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);

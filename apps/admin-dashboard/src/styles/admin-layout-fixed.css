@@ -140,7 +140,7 @@
     align-items: center;
     justify-content: center;
     position: fixed;
-    top: 56px; /* Just below admin bar */
+    top: 46px; /* Just below admin bar - fixed from 56px to match admin bar height */
     left: 10px;
     width: 40px;
     height: 40px;
