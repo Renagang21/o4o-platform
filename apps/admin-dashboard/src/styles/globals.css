@@ -1381,12 +1381,7 @@
     color: var(--admin-bar-text);
   }
 
-  /* Sidebar styles - colors only, positioning in admin-layout-fixed.css */
-  .admin-sidebar {
-    background: var(--sidebar-bg);
-    color: var(--sidebar-text);
-  }
-  
+  /* Sidebar item styles - .admin-sidebar styles moved to admin-layout-fixed.css */
   .admin-sidebar-item {
     @apply flex items-center px-2 py-1 text-[13px] transition-colors duration-200 relative justify-between;
     color: var(--sidebar-text);
