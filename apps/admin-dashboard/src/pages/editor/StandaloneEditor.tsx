@@ -326,7 +326,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const generateSaveHash = (data: any) => {
     const str = JSON.stringify({
       title: data.title,
-      content: data.content,
+      content: data.content,  // Now includes { blocks: [...] } structure
       status: data.status,
       slug: data.slug
     });
@@ -408,7 +408,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Prepare base data for both create and update
       const baseData: any = {
         title: trimmedTitle,  // Use validated trimmed title
-        content: blocks,
+        content: { blocks: blocks },  // Wrap blocks in object to match server schema
         excerpt: postSettings.excerpt,
         slug: trimmedSlug,  // Use validated trimmed slug
         status: publish ? 'publish' : (postSettings.status || 'draft'),
