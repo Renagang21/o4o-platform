@@ -116,7 +116,19 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   
   // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {
-    setLocalSlug(postSettings.slug || '');
+    const newSlug = postSettings.slug || '';
+    
+    // DEBUG: Log slug sync
+    if (import.meta.env.DEV) {
+      console.log('[GutenbergSidebar] Slug sync from postSettings:', {
+        postSettingsSlug: postSettings.slug,
+        currentLocalSlug: localSlug,
+        newSlug,
+        willUpdate: localSlug !== newSlug
+      });
+    }
+    
+    setLocalSlug(newSlug);
   }, [postSettings.slug]);
   
   // Show warning only after user interaction or save attempt
@@ -274,6 +286,16 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                         .replace(/\s+/g, '-')
                         .replace(/[^a-z0-9-]/g, '');
                       setLocalSlug(formattedSlug);
+                      
+                      // DEBUG: Log slug change
+                      if (import.meta.env.DEV) {
+                        console.log('[GutenbergSidebar] Slug changed:', {
+                          inputValue,
+                          formattedSlug,
+                          previousSlug: postSettings.slug
+                        });
+                      }
+                      
                       onPostSettingsChange({ slug: formattedSlug, slugError: false });
                       
                       // Clear warning when user starts typing

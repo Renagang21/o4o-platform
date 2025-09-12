@@ -375,6 +375,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       return;
     }
     
+    // DEBUG: Comprehensive slug debugging
+    if (import.meta.env.DEV) {
+      console.log('[StandaloneEditor] Save validation - slug debug:', {
+        'postSettings.slug': postSettings.slug,
+        'trimmedSlug': trimmedSlug,
+        'typeof postSettings.slug': typeof postSettings.slug,
+        'postSettings.slug === null': postSettings.slug === null,
+        'postSettings.slug === undefined': postSettings.slug === undefined,
+        'postSettings.slug === ""': postSettings.slug === '',
+        'trimmedSlug length': trimmedSlug.length,
+        'full postSettings': postSettings
+      });
+    }
+    
     // Slug validation - Required for all posts
     if (!trimmedSlug) {
       toast.error('⚠️ Slug가 비어있습니다. URL 주소를 위한 slug를 입력해주세요.', {
@@ -420,6 +434,21 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         format: postSettings.format,
         allowComments: postSettings.commentStatus
       };
+      
+      // DEBUG: Log API request data
+      if (import.meta.env.DEV) {
+        console.log('[StandaloneEditor] API request data:', {
+          baseData,
+          isUpdate: !!currentPostId,
+          postId: currentPostId,
+          slugInfo: {
+            original: postSettings.slug,
+            trimmed: trimmedSlug,
+            length: trimmedSlug.length,
+            type: typeof trimmedSlug
+          }
+        });
+      }
       
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
@@ -943,6 +972,24 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   if (typeof window !== 'undefined') {
                     (window as any).__DEBUG_POST_SETTINGS = postSettings;
                     (window as any).__DEBUG_SLUG = postSettings.slug;
+                    (window as any).__DEBUG_SLUG_INFO = {
+                      slug: postSettings.slug,
+                      type: typeof postSettings.slug,
+                      length: postSettings.slug?.length || 0,
+                      isEmpty: !postSettings.slug,
+                      trimmed: postSettings.slug?.trim(),
+                      trimmedLength: postSettings.slug?.trim()?.length || 0
+                    };
+                    (window as any).__DEBUG_VALIDATE_SLUG = () => {
+                      const trimmed = postSettings.slug?.trim() || '';
+                      console.log('Manual slug validation:', {
+                        original: postSettings.slug,
+                        trimmed,
+                        isEmpty: !trimmed,
+                        passes: !!trimmed
+                      });
+                      return !!trimmed;
+                    };
                   }
                   return null;
                 })()}
@@ -953,11 +1000,34 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               postSettings={postSettings}
               blockSettings={selectedBlock}
               onPostSettingsChange={(settings: any) => {
+                // DEBUG: Log settings change from sidebar
+                if (import.meta.env.DEV && settings.slug !== undefined) {
+                  console.log('[StandaloneEditor] Settings from sidebar:', {
+                    newSlug: settings.slug,
+                    currentSlug: postSettings.slug,
+                    settingsKeys: Object.keys(settings),
+                    allSettings: settings
+                  });
+                }
+                
                 // Clear slug error when slug is changed
                 if (settings.slug !== undefined && postSettings.slugError) {
                   settings.slugError = false;
                 }
-                setPostSettings(prev => ({ ...prev, ...settings }));
+                setPostSettings(prev => {
+                  const newSettings = { ...prev, ...settings };
+                  
+                  // DEBUG: Log state update
+                  if (import.meta.env.DEV && settings.slug !== undefined) {
+                    console.log('[StandaloneEditor] State updated:', {
+                      previousSlug: prev.slug,
+                      newSlug: newSettings.slug,
+                      wasUpdated: prev.slug !== newSettings.slug
+                    });
+                  }
+                  
+                  return newSettings;
+                });
                 setIsDirty(true);
               }}
               onBlockSettingsChange={(settings: any) => {
