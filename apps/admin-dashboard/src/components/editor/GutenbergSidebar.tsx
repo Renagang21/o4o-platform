@@ -31,6 +31,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import BlockSettingsRenderer from './BlockSettingsRenderer';
 import {
   Collapsible,
   CollapsibleContent,
@@ -504,106 +505,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
         ) : (
           /* Block Tab */
           <div className="w-full">
-            {blockSettings ? (
-              <>
-                <Panel title="Block settings">
-                  <div className="space-y-4">
-                    <div className="p-3 bg-gray-50 rounded-md">
-                      <p className="text-sm font-medium">{blockSettings.type}</p>
-                      <p className="text-xs text-gray-500">Block ID: {blockSettings.id}</p>
-                    </div>
-                  </div>
-                </Panel>
-
-                {/* Dynamic block settings based on block type */}
-                {blockSettings.type === 'heading' && (
-                  <Panel title="Typography">
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-xs">Level</Label>
-                        <Select
-                          value={blockSettings.attributes?.level || 'h2'}
-                          onValueChange={(value: string) => 
-                            onBlockSettingsChange?.({
-                              attributes: { ...blockSettings.attributes, level: value }
-                            })
-                          }
-                        >
-                          <SelectTrigger className="w-full mt-1">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="h1">Heading 1</SelectItem>
-                            <SelectItem value="h2">Heading 2</SelectItem>
-                            <SelectItem value="h3">Heading 3</SelectItem>
-                            <SelectItem value="h4">Heading 4</SelectItem>
-                            <SelectItem value="h5">Heading 5</SelectItem>
-                            <SelectItem value="h6">Heading 6</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <Label className="text-xs">Alignment</Label>
-                        <div className="flex gap-1 mt-1">
-                          {['left', 'center', 'right'].map((align: any) => (
-                            <Button
-                              key={align}
-                              variant={blockSettings.attributes?.align === align ? 'default' : 'outline'}
-                              size={"sm" as const}
-                              onClick={() => 
-                                onBlockSettingsChange?.({
-                                  attributes: { ...blockSettings.attributes, align }
-                                })
-                              }
-                            >
-                              {align}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </Panel>
-                )}
-
-                <Panel title="Advanced">
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-xs">Additional CSS class(es)</Label>
-                      <Input
-                        placeholder="custom-class"
-                        value={blockSettings.attributes?.className || ''}
-                        onChange={(e: any) => 
-                          onBlockSettingsChange?.({
-                            attributes: { ...blockSettings.attributes, className: e.target.value }
-                          })
-                        }
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-xs">HTML anchor</Label>
-                      <Input
-                        placeholder="anchor-id"
-                        value={blockSettings.attributes?.anchor || ''}
-                        onChange={(e: any) => 
-                          onBlockSettingsChange?.({
-                            attributes: { ...blockSettings.attributes, anchor: e.target.value }
-                          })
-                        }
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-                </Panel>
-              </>
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                <AlertCircle className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">Select a block to see its settings</p>
-              </div>
-            )}
+            <BlockSettingsRenderer 
+              block={blockSettings}
+              onBlockSettingsChange={onBlockSettingsChange}
+            />
           </div>
         )}
       </ScrollArea>
