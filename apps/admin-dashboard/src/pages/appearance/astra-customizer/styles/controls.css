@@ -1,0 +1,757 @@
+/* Astra Customizer Controls Styles */
+
+/* Base Control Styles */
+.astra-control {
+  margin-bottom: 20px;
+}
+
+.astra-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.astra-control-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d2327;
+  display: block;
+}
+
+.astra-control-description {
+  font-size: 12px;
+  color: #646970;
+  line-height: 1.4;
+  display: block;
+  margin-top: 4px;
+}
+
+.astra-control-error {
+  font-size: 12px;
+  color: #d63638;
+  margin-top: 4px;
+}
+
+/* Color Picker */
+.astra-color-picker-container {
+  position: relative;
+}
+
+.astra-color-preview-button {
+  width: 48px;
+  height: 30px;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+.astra-color-preview-button:hover {
+  border-color: #646970;
+}
+
+.astra-color-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 4px;
+  min-width: 260px;
+}
+
+.astra-color-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+
+.astra-color-tab {
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  color: #646970;
+  transition: all 0.2s;
+}
+
+.astra-color-tab.active {
+  color: #1d2327;
+  background: #f0f0f1;
+  font-weight: 600;
+}
+
+.astra-color-picker-content {
+  padding: 12px;
+}
+
+.astra-color-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.astra-color-input-wrapper {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.astra-color-input {
+  flex: 1;
+  padding: 6px 36px 6px 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.astra-color-native-picker {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 24px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.astra-color-clear {
+  padding: 4px;
+  background: #f0f0f1;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.astra-color-palette {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.astra-color-palette-item {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.astra-color-palette-item:hover {
+  transform: scale(1.1);
+  border-color: #646970;
+}
+
+/* Slider */
+.astra-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.astra-slider-track-wrapper {
+  flex: 1;
+}
+
+.astra-slider-track {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.astra-slider-track::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0073aa;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.astra-slider-track::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0073aa;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.astra-slider-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.astra-slider-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.astra-slider-unit,
+.astra-slider-unit-label {
+  font-size: 12px;
+  color: #646970;
+}
+
+.astra-slider-unit {
+  padding: 4px;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.astra-slider-devices {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.astra-device-buttons {
+  display: flex;
+  gap: 2px;
+  background: #f0f0f1;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.astra-device-button {
+  padding: 4px 6px;
+  background: transparent;
+  border: none;
+  color: #646970;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+
+.astra-device-button:hover {
+  background: #e5e5e5;
+}
+
+.astra-device-button.active {
+  background: #fff;
+  color: #1d2327;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.astra-link-button {
+  padding: 4px 8px;
+  background: #f0f0f1;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.1s;
+}
+
+.astra-link-button.linked {
+  background: #0073aa;
+  color: #fff;
+  border-color: #0073aa;
+}
+
+.astra-slider-values {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #646970;
+  margin-top: 4px;
+}
+
+/* Toggle */
+.astra-toggle-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.astra-toggle-content {
+  flex: 1;
+}
+
+.astra-toggle-switch {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  background: #8c8f94;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.astra-toggle-switch.active {
+  background: #0073aa;
+}
+
+.astra-toggle-switch.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.astra-toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  pointer-events: none;
+}
+
+.astra-toggle-switch.active .astra-toggle-slider {
+  transform: translateX(22px);
+}
+
+/* Select */
+.astra-select-container {
+  position: relative;
+}
+
+.astra-select-trigger {
+  width: 100%;
+  padding: 6px 32px 6px 12px;
+  background: #fff;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s;
+}
+
+.astra-select-trigger:hover {
+  border-color: #646970;
+}
+
+.astra-select-trigger.open {
+  border-color: #0073aa;
+}
+
+.astra-select-trigger.disabled {
+  background: #f0f0f1;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.astra-select-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.astra-select-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #646970;
+  transition: transform 0.2s;
+  pointer-events: none;
+}
+
+.astra-select-trigger.open .astra-select-icon {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.astra-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 4px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.astra-select-search {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.astra-select-search-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.astra-select-options {
+  padding: 4px 0;
+}
+
+.astra-select-option {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.astra-select-option:hover {
+  background: #f0f0f1;
+}
+
+.astra-select-option.selected {
+  background: #e7f3ff;
+  color: #0073aa;
+  font-weight: 600;
+}
+
+.astra-select-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.astra-select-group {
+  padding: 4px 0;
+}
+
+.astra-select-group-label {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #646970;
+  text-transform: uppercase;
+}
+
+.astra-select-empty {
+  padding: 12px;
+  text-align: center;
+  color: #646970;
+  font-size: 12px;
+}
+
+/* Image Uploader */
+.astra-upload-area {
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s;
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.astra-upload-area.dragging {
+  border-color: #0073aa;
+  background: #f0f8ff;
+}
+
+.astra-upload-area.has-image {
+  padding: 0;
+  border-style: solid;
+}
+
+.astra-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.astra-upload-icon {
+  color: #8c8f94;
+}
+
+.astra-upload-text {
+  font-size: 13px;
+  color: #646970;
+  margin: 0;
+}
+
+.astra-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #0073aa;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.astra-upload-button:hover {
+  background: #005177;
+}
+
+.astra-upload-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.astra-upload-image {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.astra-upload-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.astra-upload-remove:hover {
+  background: #fff;
+  border-color: #d63638;
+  color: #d63638;
+}
+
+.astra-upload-filename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f0f1;
+  border-radius: 3px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #646970;
+}
+
+.astra-upload-clear {
+  margin-left: auto;
+  padding: 2px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #8c8f94;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.astra-upload-clear:hover {
+  color: #d63638;
+}
+
+/* Google Font Selector */
+.google-font-selector-container {
+  position: relative;
+}
+
+.google-font-selector-trigger {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  background: #fff;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s;
+}
+
+.google-font-selector-trigger:hover {
+  border-color: #646970;
+}
+
+.google-font-selector-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.google-font-selector-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #646970;
+  font-size: 10px;
+}
+
+.google-font-preview {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.google-font-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: 4px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.google-font-header {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+
+.google-font-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+.google-font-search svg {
+  color: #646970;
+}
+
+.google-font-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  background: transparent;
+}
+
+.google-font-categories {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.google-font-category {
+  padding: 4px 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #646970;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.google-font-category:hover {
+  background: #f0f0f1;
+  border-color: #8c8f94;
+}
+
+.google-font-category.active {
+  background: #0073aa;
+  color: #fff;
+  border-color: #0073aa;
+}
+
+.google-font-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.google-font-option {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.google-font-option:hover {
+  background: #f5f5f5;
+}
+
+.google-font-option.selected {
+  background: #e7f3ff;
+  color: #0073aa;
+  font-weight: 600;
+}
+
+.google-font-empty {
+  padding: 20px;
+  text-align: center;
+  color: #646970;
+  font-size: 13px;
+}

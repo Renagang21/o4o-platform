@@ -321,13 +321,254 @@
   border-color: #646970;
 }
 
+/* Search */
+.wp-customizer-search {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+.wp-customizer-search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #f0f0f1;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 6px 10px;
+}
+
+.wp-customizer-search-input svg {
+  color: #646970;
+  margin-right: 8px;
+}
+
+.wp-customizer-search-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: #1d2327;
+}
+
+/* Section Panel */
+.wp-customizer-section-panel {
+  width: 300px;
+  background: #f1f1f1;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.wp-customizer-section-header {
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  padding: 12px;
+}
+
+.wp-customizer-back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #2271b1;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  margin-bottom: 8px;
+}
+
+.wp-customizer-back-button:hover {
+  color: #135e96;
+}
+
+.wp-customizer-section-content {
+  padding: 20px;
+}
+
+/* Welcome Screen */
+.wp-customizer-welcome {
+  padding: 20px;
+  background: #fff;
+  margin: 20px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.wp-customizer-welcome h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.wp-customizer-welcome p {
+  margin: 0 0 16px 0;
+  color: #646970;
+  line-height: 1.5;
+}
+
+.wp-customizer-welcome ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wp-customizer-welcome li {
+  padding: 8px 0;
+  color: #646970;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+.wp-customizer-welcome li:last-child {
+  border-bottom: none;
+}
+
+.wp-customizer-welcome strong {
+  color: #1d2327;
+  font-weight: 600;
+}
+
+/* History Buttons */
+.wp-customizer-history {
+  display: flex;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.wp-button-icon {
+  background: transparent;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #646970;
+  transition: all 0.1s;
+}
+
+.wp-button-icon:hover:not(:disabled) {
+  background: #f0f0f1;
+  color: #1d2327;
+  border-color: #646970;
+}
+
+.wp-button-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status Indicator */
+.wp-customizer-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #646970;
+  margin: 0 8px;
+}
+
+.wp-customizer-status .unsaved {
+  color: #d63638;
+  font-weight: 500;
+}
+
+.wp-customizer-status .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Preview Actions */
+.wp-customizer-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wp-customizer-preview-url {
+  font-size: 12px;
+  color: #646970;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Loading State */
+.wp-customizer-preview-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #646970;
+}
+
+.wp-customizer-preview-loading svg {
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+/* Subpanels */
+.wp-customizer-subpanels {
+  background: #f9f9f9;
+}
+
+.wp-customizer-panel.level-1 {
+  font-size: 13px;
+  border-left: 3px solid transparent;
+}
+
+.wp-customizer-panel.level-1:hover {
+  border-left-color: #ddd;
+}
+
+.wp-customizer-panel.level-1.active {
+  border-left-color: #0073aa;
+}
+
+.wp-customizer-panel-arrow {
+  color: #646970;
+  transition: transform 0.2s;
+}
+
+.wp-customizer-panel-wrapper {
+  position: relative;
+}
+
+/* No Results */
+.wp-customizer-no-results {
+  padding: 20px;
+  text-align: center;
+  color: #646970;
+  font-size: 13px;
+}
+
+/* Additional CSS Section */
+.wp-customizer-additional {
+  border-top: 1px solid #ddd;
+  margin-top: auto;
+}
+
 /* Responsive */
 @media (max-width: 782px) {
-  .wp-customizer-sidebar {
+  .wp-customizer-sidebar,
+  .wp-customizer-section-panel {
     width: 250px;
   }
   
   .wp-customizer-panel {
     padding: 12px 15px;
+  }
+  
+  .wp-customizer-preview-url {
+    display: none;
   }
 }
