@@ -76,6 +76,8 @@ type MediaAction =
   | { type: 'SELECT_ITEM'; payload: string }
   | { type: 'DESELECT_ITEM'; payload: string }
   | { type: 'SELECT_ALL'; payload: string[] }
+  | { type: 'SET_SELECTION'; payload: string[] }  // For single selection in picker mode
+  | { type: 'SELECT_MULTIPLE'; payload: string[] } // For multi selection
   | { type: 'CLEAR_SELECTION' }
   | { type: 'SET_FILTER'; payload: { key: string; value: string } }
   | { type: 'SET_SORT'; payload: { by: string; order: string } }
@@ -97,6 +99,13 @@ const mediaReducer = (state: MediaLibraryState, action: MediaAction): MediaLibra
       };
     case 'SELECT_ALL':
       return { ...state, selectedItems: action.payload };
+    case 'SET_SELECTION':
+      return { ...state, selectedItems: action.payload };
+    case 'SELECT_MULTIPLE':
+      return { 
+        ...state, 
+        selectedItems: [...new Set([...state.selectedItems, ...action.payload])]
+      };
     case 'CLEAR_SELECTION':
       return { ...state, selectedItems: [] };
     case 'SET_FILTER':
@@ -131,7 +140,22 @@ const initialState: MediaLibraryState = {
   showUploader: false
 };
 
-const MediaLibrary: FC = () => {
+// WordPress-style MediaLibrary props
+interface MediaLibraryProps {
+  mode?: 'manage' | 'picker';  // 'manage' for full page, 'picker' for selection modal
+  multiple?: boolean;           // Allow multiple selection in picker mode
+  accept?: string;              // File type filter (e.g., 'image/*')
+  onSelect?: (items: MediaItem | MediaItem[]) => void;  // Callback when items selected
+  onClose?: () => void;         // Callback for closing in picker mode
+}
+
+const MediaLibrary: FC<MediaLibraryProps> = ({
+  mode = 'manage',
+  multiple = false,
+  accept,
+  onSelect,
+  onClose
+}) => {
   const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(mediaReducer, initialState);
   const [page, setPage] = useState(1);
@@ -180,11 +204,20 @@ const MediaLibrary: FC = () => {
 
   // Handlers
   const handleItemSelect = useCallback((itemId: string, isSelected: boolean) => {
-    dispatch({ 
-      type: isSelected ? 'SELECT_ITEM' : 'DESELECT_ITEM', 
-      payload: itemId 
-    });
-  }, []);
+    if (mode === 'picker' && !multiple) {
+      // In single picker mode, replace selection
+      dispatch({ 
+        type: 'SET_SELECTION', 
+        payload: isSelected ? [itemId] : []
+      });
+    } else {
+      // Normal multi-selection mode
+      dispatch({ 
+        type: isSelected ? 'SELECT_ITEM' : 'DESELECT_ITEM', 
+        payload: itemId 
+      });
+    }
+  }, [mode, multiple]);
 
   const handleSelectAll = useCallback(() => {
     if (data?.items) {
@@ -228,20 +261,60 @@ const MediaLibrary: FC = () => {
   const totalItems = data?.total || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
+  // Handle selection in picker mode
+  const handleSelectItems = useCallback(() => {
+    if (mode === 'picker' && onSelect) {
+      const selected = state.selectedItems;
+      if (selected.length > 0) {
+        // Find full media items from data
+        const selectedItems = mediaItems.filter((item: MediaItem) => 
+          selected.includes(item.id)
+        );
+        
+        onSelect(multiple ? selectedItems : selectedItems[0]);
+        onClose?.();
+      }
+    }
+  }, [mode, onSelect, onClose, state.selectedItems, mediaItems, multiple]);
+
   return (
     <div className="wrap">
       {/* WordPress-style heading */}
-      <h1 className="wp-heading-inline">Media Library</h1>
-      <a 
-        href="#" 
-        className="page-title-action"
-        onClick={(e) => {
-          e.preventDefault();
-          dispatch({ type: 'TOGGLE_UPLOADER' });
-        }}
-      >
-        Add New
-      </a>
+      <h1 className="wp-heading-inline">
+        {mode === 'picker' ? 'Select Media' : 'Media Library'}
+      </h1>
+      {mode === 'manage' && (
+        <a 
+          href="#" 
+          className="page-title-action"
+          onClick={(e) => {
+            e.preventDefault();
+            dispatch({ type: 'TOGGLE_UPLOADER' });
+          }}
+        >
+          Add New
+        </a>
+      )}
+      
+      {/* Picker mode controls */}
+      {mode === 'picker' && (
+        <div className="media-toolbar wp-filter" style={{ marginTop: '10px' }}>
+          <div className="media-toolbar-primary">
+            <Button
+              onClick={handleSelectItems}
+              disabled={state.selectedItems.length === 0}
+              className="mr-2"
+            >
+              Select {state.selectedItems.length > 0 ? `(${state.selectedItems.length})` : ''}
+            </Button>
+            {onClose && (
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
       
       <hr className="wp-header-end" />
 

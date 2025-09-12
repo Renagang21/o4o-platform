@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
-// MediaLibrary removed - using MediaLibraryModal instead
+import MediaLibrary from '@/pages/media/MediaLibrary';
 import ContentTemplates from '@/components/editor/ContentTemplates';
 import {
   Dialog,
@@ -567,14 +567,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     setIsDirty(true);
   };
 
-  const handleMediaSelect = (media: any[]) => {
-    if (media.length > 0 && selectedBlock) {
+  const handleMediaSelect = (media: any) => {
+    // Handle both single item and array
+    const items = Array.isArray(media) ? media : [media];
+    
+    if (items.length > 0 && selectedBlock) {
       const updatedBlock = {
         ...selectedBlock,
         content: {
           ...selectedBlock.content,
-          url: media[0].url,
-          alt: media[0].alt
+          url: items[0].url,
+          alt: items[0].alt
         }
       };
       
