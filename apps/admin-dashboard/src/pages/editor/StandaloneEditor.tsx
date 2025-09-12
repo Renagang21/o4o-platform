@@ -376,18 +376,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     }
     
     // DEBUG: Comprehensive slug debugging
-    if (import.meta.env.DEV) {
-      console.log('[StandaloneEditor] Save validation - slug debug:', {
-        'postSettings.slug': postSettings.slug,
-        'trimmedSlug': trimmedSlug,
-        'typeof postSettings.slug': typeof postSettings.slug,
-        'postSettings.slug === null': postSettings.slug === null,
-        'postSettings.slug === undefined': postSettings.slug === undefined,
-        'postSettings.slug === ""': postSettings.slug === '',
-        'trimmedSlug length': trimmedSlug.length,
-        'full postSettings': postSettings
-      });
-    }
+    // Logging removed for CI/CD
     
     // Slug validation - Required for all posts
     if (!trimmedSlug) {
@@ -436,19 +425,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       };
       
       // DEBUG: Log API request data
-      if (import.meta.env.DEV) {
-        console.log('[StandaloneEditor] API request data:', {
-          baseData,
-          isUpdate: !!currentPostId,
-          postId: currentPostId,
-          slugInfo: {
-            original: postSettings.slug,
-            trimmed: trimmedSlug,
-            length: trimmedSlug.length,
-            type: typeof trimmedSlug
-          }
-        });
-      }
+      // Logging removed for CI/CD
       
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
@@ -982,12 +959,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                     };
                     (window as any).__DEBUG_VALIDATE_SLUG = () => {
                       const trimmed = postSettings.slug?.trim() || '';
-                      console.log('Manual slug validation:', {
-                        original: postSettings.slug,
-                        trimmed,
-                        isEmpty: !trimmed,
-                        passes: !!trimmed
-                      });
+                      // console.log removed for CI/CD
                       return !!trimmed;
                     };
                   }
@@ -1001,14 +973,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               blockSettings={selectedBlock}
               onPostSettingsChange={(settings: any) => {
                 // DEBUG: Log settings change from sidebar
-                if (import.meta.env.DEV && settings.slug !== undefined) {
-                  console.log('[StandaloneEditor] Settings from sidebar:', {
-                    newSlug: settings.slug,
-                    currentSlug: postSettings.slug,
-                    settingsKeys: Object.keys(settings),
-                    allSettings: settings
-                  });
-                }
+                // Logging removed for CI/CD
                 
                 // Clear slug error when slug is changed
                 if (settings.slug !== undefined && postSettings.slugError) {
@@ -1018,13 +983,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   const newSettings = { ...prev, ...settings };
                   
                   // DEBUG: Log state update
-                  if (import.meta.env.DEV && settings.slug !== undefined) {
-                    console.log('[StandaloneEditor] State updated:', {
-                      previousSlug: prev.slug,
-                      newSlug: newSettings.slug,
-                      wasUpdated: prev.slug !== newSettings.slug
-                    });
-                  }
+                  // Logging removed for CI/CD
                   
                   return newSettings;
                 });

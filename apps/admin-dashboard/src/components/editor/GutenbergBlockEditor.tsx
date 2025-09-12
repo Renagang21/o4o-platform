@@ -821,13 +821,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
               blockSettings={selectedBlock}
               onPostSettingsChange={(settings) => {
                 // DEBUG: Log post settings change
-                if (import.meta.env.DEV && settings.slug !== undefined) {
-                  console.log('[GutenbergBlockEditor] Post settings changed:', {
-                    newSlug: settings.slug,
-                    currentSlug: postSettings.slug,
-                    allSettings: settings
-                  });
-                }
+                // Logging removed for CI/CD
                 
                 setPostSettings(prev => ({ ...prev, ...settings }));
                 setIsDirty(true);

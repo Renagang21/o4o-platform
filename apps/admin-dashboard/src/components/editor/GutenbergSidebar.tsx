@@ -119,14 +119,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
     const newSlug = postSettings.slug || '';
     
     // DEBUG: Log slug sync
-    if (import.meta.env.DEV) {
-      console.log('[GutenbergSidebar] Slug sync from postSettings:', {
-        postSettingsSlug: postSettings.slug,
-        currentLocalSlug: localSlug,
-        newSlug,
-        willUpdate: localSlug !== newSlug
-      });
-    }
+    // Logging removed for CI/CD
     
     setLocalSlug(newSlug);
   }, [postSettings.slug]);
@@ -288,13 +281,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       setLocalSlug(formattedSlug);
                       
                       // DEBUG: Log slug change
-                      if (import.meta.env.DEV) {
-                        console.log('[GutenbergSidebar] Slug changed:', {
-                          inputValue,
-                          formattedSlug,
-                          previousSlug: postSettings.slug
-                        });
-                      }
+                      // Logging removed for CI/CD
                       
                       onPostSettingsChange({ slug: formattedSlug, slugError: false });
                       
