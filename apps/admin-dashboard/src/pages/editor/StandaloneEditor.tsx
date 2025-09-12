@@ -223,7 +223,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           author: data.author?.name || 'Admin User',
           featuredImage: data.featuredImage,
           excerpt: data.excerpt || '',
-          slug: data.slug || '', // Use empty string if no slug, don't fall back to prev
+          slug: data.slug || prev.slug || '', // Preserve existing slug if API doesn't return one
           categories: data.categories?.map((c: any) => typeof c === 'object' ? c.id : c) || [],
           tags: data.tags?.map((t: any) => typeof t === 'object' ? t.id : t) || [],
           template: 'default',
@@ -361,6 +361,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     const currentSettings = postSettings;  // Capture current value
     let trimmedSlug = currentSettings.slug?.trim() || '';
     
+    // For debugging in production
+    if (typeof window !== 'undefined') {
+      (window as any).__DEBUG_SAVE_SLUG = {
+        original: currentSettings.slug,
+        trimmed: trimmedSlug,
+        postId: currentPostId,
+        title: trimmedTitle
+      };
+    }
+    
     // Auto-generate slug from title if empty (for non-Korean titles)
     // Only for new posts, not updates
     if (!trimmedSlug && trimmedTitle && !currentPostId) {
@@ -485,8 +495,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         // Don't return here - continue with the rest of the save logic
       }
       
-      // Update post settings with saved data (including slug from server)
-      if (savedData?.slug) {
+      // Update post settings with saved data
+      // Only update slug if it's different from what we sent (server might have modified it)
+      if (savedData?.slug && savedData.slug !== trimmedSlug) {
         setPostSettings(prev => ({ ...prev, slug: savedData.slug }));
       }
       
