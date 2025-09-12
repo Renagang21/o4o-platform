@@ -10,7 +10,7 @@ import CustomFieldBuilder from './CustomFieldBuilder'
 import DynamicContentList from './DynamicContentList'
 import ACFManager from './ACFManager'
 import ACFFieldGroupForm from './ACFFieldGroupForm'
-import MediaLibrary from './MediaLibrary'
+// MediaLibrary moved to /media route
 import TemplateManager from './TemplateManager'
 import WidgetManager from './WidgetManager'
 // import NewPost from '../posts/NewPost' // No longer needed, redirecting to editor
@@ -43,7 +43,7 @@ const Content: FC = () => {
       <Route path="acf" element={<ACFManager />} />
       <Route path="acf/new" element={<ACFFieldGroupForm />} />
       <Route path="acf/:id/edit" element={<ACFFieldGroupForm />} />
-      <Route path="media" element={<MediaLibrary />} />
+      {/* Media route moved to /media */}
       <Route path="templates" element={<TemplateManager />} />
       <Route path="widgets" element={<WidgetManager />} />
       {/* Dynamic routes for custom post types */}
