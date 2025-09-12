@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useState, useEffect } from 'react';
+import { ChangeEvent, FC, ReactNode, useState } from 'react';
 import {
   FileText,
   Settings,
@@ -109,27 +109,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
-  
-  // Ensure slug value is properly synced
-  const [localSlug, setLocalSlug] = useState(postSettings.slug || '');
-  const [showSlugWarning, setShowSlugWarning] = useState(false); // Don't show warning initially for new posts
-  
-  // Update local slug when postSettings changes (e.g., when data loads from API)
-  useEffect(() => {
-    const newSlug = postSettings.slug || '';
-    
-    // DEBUG: Log slug sync
-    // Logging removed for CI/CD
-    
-    setLocalSlug(newSlug);
-  }, [postSettings.slug]);
-  
-  // Show warning only after user interaction or save attempt
-  useEffect(() => {
-    if (postSettings.slugError) {
-      setShowSlugWarning(true);
-    }
-  }, [postSettings.slugError]);
 
   // Mock data for categories
   const availableCategories = [
@@ -270,25 +249,14 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <Label className="text-xs">URL Slug</Label>
                 <div className="relative min-w-[200px]">
                   <Input
-                    value={localSlug}
+                    value={postSettings.slug || ''}
                     onChange={(e: any) => {
                       const inputValue = e.target.value;
-                      // Auto-format slug as user types
                       const formattedSlug = inputValue
                         .toLowerCase()
                         .replace(/\s+/g, '-')
                         .replace(/[^a-z0-9-]/g, '');
-                      setLocalSlug(formattedSlug);
-                      
-                      // DEBUG: Log slug change
-                      // Logging removed for CI/CD
-                      
                       onPostSettingsChange({ slug: formattedSlug, slugError: false });
-                      
-                      // Clear warning when user starts typing
-                      if (formattedSlug) {
-                        setShowSlugWarning(false);
-                      }
                     }}
                     placeholder="post-url-slug"
                     className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError ? "border-red-500 bg-red-50" : ""}`}
@@ -298,7 +266,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
                       <AlertCircle className="h-3 w-3" />
                       <span>
-                        {!localSlug 
+                        {!postSettings.slug 
                           ? '⚠️ Slug가 비어있습니다. 한글 제목은 수동으로 slug를 입력해야 합니다.'
                           : 'This slug is already in use. Please choose another.'}
                       </span>
@@ -308,10 +276,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <p className="text-xs text-gray-500 mt-6">
                   The last part of the URL. Read more about <a href="#" className="text-blue-600 hover:underline">permalinks</a>
                 </p>
-                {localSlug && (
+                {postSettings.slug && (
                   <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
                     <Globe className="h-3 w-3 inline mr-1" />
-                    Preview: /posts/{localSlug}
+                    Preview: /posts/{postSettings.slug}
                   </div>
                 )}
               </div>
