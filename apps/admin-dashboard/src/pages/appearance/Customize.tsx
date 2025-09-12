@@ -10,7 +10,6 @@ const Customize: React.FC = () => {
   };
   
   const handleSave = async (settings: any) => {
-    console.log('Saving customizer settings:', settings);
     // TODO: Implement API call to save settings
     localStorage.setItem('astra-customizer-settings', JSON.stringify(settings));
   };

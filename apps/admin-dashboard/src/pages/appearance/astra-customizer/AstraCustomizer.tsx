@@ -62,7 +62,6 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
       await onSave(settings);
     } else {
       // Default save implementation
-      console.log('Saving settings:', settings);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -122,13 +121,13 @@ export const AstraCustomizer: React.FC<AstraCustomizerProps> = ({
       eventHandlers={{
         onSave: handleSave,
         onSettingChange: (section, value) => {
-          console.log('Setting changed:', section, value);
+          // Handle setting change
         },
         onDeviceChange: (device) => {
-          console.log('Device changed:', device);
+          // Handle device change
         },
         onReset: () => {
-          console.log('Settings reset');
+          // Handle reset
         },
       }}
     >
