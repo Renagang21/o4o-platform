@@ -111,7 +111,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   
   // Ensure slug value is properly synced
   const [localSlug, setLocalSlug] = useState(postSettings.slug || '');
-  const [showSlugWarning, setShowSlugWarning] = useState(!postSettings.slug);
+  const [showSlugWarning, setShowSlugWarning] = useState(false); // Don't show warning initially for new posts
   
   // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {
@@ -290,10 +290,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       }
                     }}
                     placeholder="post-url-slug"
-                    className={`min-w-[200px] w-full flex-shrink-0 ${(postSettings.slugError || (showSlugWarning && !localSlug)) ? "border-red-500 bg-red-50" : ""}`}
+                    className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError ? "border-red-500 bg-red-50" : ""}`}
                     style={{ minWidth: '200px' }}
                   />
-                  {(postSettings.slugError || (showSlugWarning && !localSlug)) && (
+                  {postSettings.slugError && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
                       <AlertCircle className="h-3 w-3" />
                       <span>
