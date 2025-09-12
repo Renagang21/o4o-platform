@@ -110,6 +110,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   
   // Ensure slug value is properly synced
   const [localSlug, setLocalSlug] = useState(postSettings.slug || '');
+  const [showSlugWarning, setShowSlugWarning] = useState(false);
   
   // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {
@@ -117,6 +118,13 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
       setLocalSlug(postSettings.slug || '');
     }
   }, [postSettings.slug]);
+  
+  // Show warning only after user interaction or save attempt
+  useEffect(() => {
+    if (postSettings.slugError) {
+      setShowSlugWarning(true);
+    }
+  }, [postSettings.slugError]);
 
   // Mock data for categories
   const availableCategories = [
@@ -268,19 +276,25 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                   <Input
                     value={localSlug}
                     onChange={(e: any) => {
+                      const inputValue = e.target.value;
                       // Auto-format slug as user types
-                      const formattedSlug = e.target.value
+                      const formattedSlug = inputValue
                         .toLowerCase()
                         .replace(/\s+/g, '-')
                         .replace(/[^a-z0-9-]/g, '');
                       setLocalSlug(formattedSlug);
-                      onPostSettingsChange({ slug: formattedSlug });
+                      onPostSettingsChange({ slug: formattedSlug, slugError: false });
+                      
+                      // Clear warning when user starts typing
+                      if (formattedSlug) {
+                        setShowSlugWarning(false);
+                      }
                     }}
                     placeholder="post-url-slug"
-                    className={`min-w-[200px] w-full flex-shrink-0 ${postSettings.slugError || !localSlug ? "border-red-500 bg-red-50" : ""}`}
+                    className={`min-w-[200px] w-full flex-shrink-0 ${(postSettings.slugError || (showSlugWarning && !localSlug)) ? "border-red-500 bg-red-50" : ""}`}
                     style={{ minWidth: '200px' }}
                   />
-                  {(postSettings.slugError || !localSlug) && (
+                  {(postSettings.slugError || (showSlugWarning && !localSlug)) && (
                     <div className="absolute -bottom-5 left-0 flex items-center gap-1 text-xs text-red-600">
                       <AlertCircle className="h-3 w-3" />
                       <span>
