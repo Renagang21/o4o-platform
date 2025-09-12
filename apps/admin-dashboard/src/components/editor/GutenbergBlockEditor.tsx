@@ -120,7 +120,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   
   // Sidebar states
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
   const [selectedBlock, setSelectedBlock] = useState<any>(null);
   
@@ -793,10 +793,10 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         {/* GutenbergSidebar - Right Sidebar */}
         {sidebarOpen && (
           <div className={cn(
-            "w-80 bg-white border-l overflow-y-auto transition-all duration-300",
+            "fixed right-0 top-[60px] w-80 bg-white border-l overflow-y-auto transition-all duration-300 z-30",
             "shadow-lg"
           )}
-               style={{ maxHeight: 'calc(100vh - 60px)' }}>
+               style={{ height: 'calc(100vh - 60px)' }}>
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900">Settings</h2>
