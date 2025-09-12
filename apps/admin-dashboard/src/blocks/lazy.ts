@@ -7,7 +7,7 @@
 
 // Map of block names to their import functions
 // Currently empty as WordPress style blocks have been removed
-const blockImportMap = {
+const blockImportMap: Record<string, () => Promise<any>> = {
   // 'o4o/group': () => import('./group'), // Removed
   // 'o4o/columns': () => import('./columns') // Removed
 };
@@ -23,7 +23,7 @@ export async function loadBlock(blockName: string): Promise<void> {
     return;
   }
 
-  const importFn = blockImportMap[blockName as keyof typeof blockImportMap];
+  const importFn = blockImportMap[blockName];
   if (!importFn) {
     // Removed // console.warn
     return;

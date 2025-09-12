@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, X, CheckCircle, AlertCircle, Info, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { Bell, X, CheckCircle, AlertCircle, Info, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,6 @@ interface AffiliateNotificationsProps {
 }
 
 export const AffiliateNotifications = ({ 
-  referralCode, 
   onNotificationClick 
 }: AffiliateNotificationsProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);

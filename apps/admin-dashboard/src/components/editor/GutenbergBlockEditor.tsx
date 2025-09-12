@@ -132,7 +132,6 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     author: 'Admin User',
     featuredImage: undefined,
     excerpt: '',
-    slug: '',
     slugError: false,
     categories: [],
     tags: [],
@@ -142,7 +141,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     sticky: false,
     format: 'standard',
     ...propPostSettings,
-    slug: propPostSettings?.slug || slug || '', // Ensure slug is not overridden
+    slug: propPostSettings?.slug || slug || '' // Ensure slug is not overridden
   });
   
   const navigate = useNavigate();

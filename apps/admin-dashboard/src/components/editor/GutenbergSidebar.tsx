@@ -27,7 +27,6 @@ import {
 } from '@/components/ui/select';
 import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
@@ -112,7 +111,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   
   // Ensure slug value is properly synced
   const [localSlug, setLocalSlug] = useState(postSettings.slug || '');
-  const [showSlugWarning, setShowSlugWarning] = useState(false);
+  const [showSlugWarning, setShowSlugWarning] = useState(!postSettings.slug);
   
   // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {

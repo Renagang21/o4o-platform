@@ -121,7 +121,7 @@ export const RealTimeActivity = ({
 
       // Simulate connection handling
       setTimeout(() => {
-        if (mockWs.onopen) mockWs.onopen({} as any);
+        if (mockWs.onopen) mockWs.onopen();
       }, 1000);
 
     } catch (error) {

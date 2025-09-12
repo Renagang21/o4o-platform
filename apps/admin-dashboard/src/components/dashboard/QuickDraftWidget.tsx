@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import { ContentApi } from '@/api/contentApi';
-import { PostStatus } from '@/types/content';
 
 /**
  * WordPress Quick Draft Widget
@@ -28,7 +27,7 @@ const QuickDraftWidget: FC = () => {
       const draftData = {
         title: title || 'Untitled Draft',
         content: content || '',
-        status: PostStatus.DRAFT,
+        status: 'draft',
         excerpt: content.substring(0, 150) + (content.length > 150 ? '...' : ''),
         postType: 'post' as any,
         slug: (title || 'untitled-draft').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
@@ -37,7 +36,7 @@ const QuickDraftWidget: FC = () => {
       
       const response = await ContentApi.createPost(draftData);
       
-      if (response.success) {
+      if (response) {
         success(`초안이 저장되었습니다: "${title || '제목 없음'}"`, {
           duration: 3000
         });

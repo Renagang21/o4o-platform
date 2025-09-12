@@ -357,7 +357,25 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Client-side validation
     const trimmedTitle = postTitle?.trim() || '';
-    const trimmedSlug = postSettings.slug?.trim() || '';
+    // Always get the latest slug from postSettings
+    const currentSettings = postSettings;  // Capture current value
+    let trimmedSlug = currentSettings.slug?.trim() || '';
+    
+    // Auto-generate slug from title if empty (for non-Korean titles)
+    if (!trimmedSlug && trimmedTitle) {
+      // Check if title contains Korean characters
+      const hasKorean = /[\u3131-\uD79D]/.test(trimmedTitle);
+      if (!hasKorean) {
+        // Auto-generate slug for English titles
+        trimmedSlug = trimmedTitle
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+    }
+    
     const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
@@ -380,7 +398,12 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Slug validation - Required for all posts
     if (!trimmedSlug) {
-      toast.error('⚠️ Slug가 비어있습니다. URL 주소를 위한 slug를 입력해주세요.', {
+      const hasKorean = /[\u3131-\uD79D]/.test(trimmedTitle);
+      const errorMessage = hasKorean 
+        ? '⚠️ 한글 제목은 slug를 수동으로 입력해야 합니다. 오른쪽 사이드바의 Permalink 필드에 영문 URL을 입력해주세요.'
+        : '⚠️ Slug가 비어있습니다. URL 주소를 위한 slug를 입력해주세요.';
+      
+      toast.error(errorMessage, {
         duration: 5000,
         icon: '🔗'
       });
@@ -413,7 +436,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         title: trimmedTitle,  // Use validated trimmed title
         content: blocks,  // Send blocks array directly - server will handle conversion
         excerpt: postSettings.excerpt,
-        slug: trimmedSlug,  // Use validated trimmed slug
+        slug: trimmedSlug || currentSettings.slug,  // Use validated slug or current settings
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
