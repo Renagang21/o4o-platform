@@ -114,9 +114,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   
   // Update local slug when postSettings changes (e.g., when data loads from API)
   useEffect(() => {
-    if (postSettings.slug !== localSlug) {
-      setLocalSlug(postSettings.slug || '');
-    }
+    setLocalSlug(postSettings.slug || '');
   }, [postSettings.slug]);
   
   // Show warning only after user interaction or save attempt
@@ -255,15 +253,6 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                       onPostSettingsChange({ sticky: checked })
                     }
                   />
-                </div>
-
-                <div className="pt-2 border-t">
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto text-red-600 hover:text-red-700"
-                  >
-                    Move to trash
-                  </Button>
                 </div>
               </div>
             </Panel>

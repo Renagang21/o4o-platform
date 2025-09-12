@@ -454,7 +454,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   // Switch to block tab when a block is selected
   useEffect(() => {
     if (selectedBlockId) {
-      setActiveInspectorTab('block');
+      setActiveTab('block');
     }
   }, [selectedBlockId]);
 
