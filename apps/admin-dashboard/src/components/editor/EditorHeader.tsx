@@ -24,6 +24,7 @@ import {
   Keyboard,
   Trash2,
   Library,
+  Settings2,
 } from 'lucide-react';
 
 interface EditorHeaderProps {
@@ -44,6 +45,8 @@ interface EditorHeaderProps {
   postStatus?: string;
   onPreview?: () => void;
   onOpenDesignLibrary?: () => void;
+  onToggleInspector?: () => void;
+  isInspectorOpen?: boolean;
 }
 
 export const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -64,6 +67,8 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   postStatus = 'draft',
   onPreview,
   onOpenDesignLibrary,
+  onToggleInspector,
+  isInspectorOpen = true,
 }) => {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -123,6 +128,21 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
           >
             <Library className="h-4 w-4 mr-1" />
             디자인 라이브러리
+          </Button>
+
+          {/* Inspector Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleInspector}
+            className={cn(
+              "h-8 px-3 hover:bg-gray-100 border border-gray-300",
+              isInspectorOpen && "bg-gray-100"
+            )}
+            title="Toggle Inspector Panel"
+          >
+            <Settings2 className="h-4 w-4 mr-1" />
+            Settings
           </Button>
         </div>
 
