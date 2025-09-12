@@ -20,30 +20,31 @@ import QuoteBlock from './blocks/QuoteBlock';
 import EnhancedImageBlock from './blocks/EnhancedImageBlock';
 import ButtonBlock from './blocks/ButtonBlock';
 import ColumnsBlock from './blocks/ColumnsBlock';
+import GutenbergSidebar from './GutenbergSidebar';
 // Toast 기능을 직접 구현
-import { 
-  CheckCircle, XCircle, Info, Settings2, X, 
-  Type, Palette, Layout, Image, FileText,
-  Eye,
-  MessageSquare, FileImage, AlignLeft, AlignCenter, AlignRight
-} from 'lucide-react';
-import { 
-  Tabs, TabsContent, TabsList, TabsTrigger 
-} from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
 
 // Block interface는 이제 @/types/post.types에서 import
+
+interface PostSettings {
+  status: 'draft' | 'pending' | 'private' | 'publish';
+  visibility: 'public' | 'private' | 'password';
+  publishDate: string;
+  author: string;
+  featuredImage?: string;
+  excerpt: string;
+  slug: string;
+  slugError?: boolean;
+  categories: string[];
+  tags: string[];
+  template: string;
+  commentStatus: boolean;
+  pingStatus: boolean;
+  sticky: boolean;
+  format: 'standard' | 'aside' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio' | 'chat';
+}
 
 interface GutenbergBlockEditorProps {
   documentTitle?: string;
@@ -53,6 +54,8 @@ interface GutenbergBlockEditorProps {
   onSave?: () => void;
   onPublish?: () => void;
   slug?: string;
+  postSettings?: Partial<PostSettings>;
+  onPostSettingsChange?: (settings: Partial<PostSettings>) => void;
 }
 
 const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
@@ -62,6 +65,9 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   onTitleChange,
   onSave,
   onPublish,
+  slug = '',
+  postSettings: propPostSettings,
+  onPostSettingsChange,
 }) => {
   // Initialize with empty paragraph only if no initial blocks
   // But don't trigger onChange for this initialization
@@ -99,6 +105,13 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   useEffect(() => {
     setDocumentTitle(propDocumentTitle);
   }, [propDocumentTitle]);
+  
+  // Sync post settings with prop changes
+  useEffect(() => {
+    if (propPostSettings) {
+      setPostSettings(prev => ({ ...prev, ...propPostSettings }));
+    }
+  }, [propPostSettings]);
   const [isCodeView, setIsCodeView] = useState(false);
   const [draggedBlockId, setDraggedBlockId] = useState<string | null>(null);
   const [dragOverBlockId, setDragOverBlockId] = useState<string | null>(null);
@@ -106,9 +119,30 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [isDesignLibraryOpen, setIsDesignLibraryOpen] = useState(false);
   
-  // Inspector Panel states
-  const [isInspectorOpen, setIsInspectorOpen] = useState(true);
-  const [activeInspectorTab, setActiveInspectorTab] = useState<'document' | 'block'>('document');
+  // Sidebar states
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
+  const [selectedBlock, setSelectedBlock] = useState<any>(null);
+  
+  // Post settings state
+  const [postSettings, setPostSettings] = useState<PostSettings>({
+    status: 'draft',
+    visibility: 'public',
+    publishDate: new Date().toISOString().slice(0, 16),
+    author: 'Admin User',
+    featuredImage: undefined,
+    excerpt: '',
+    slug: slug || '',
+    slugError: false,
+    categories: [],
+    tags: [],
+    template: 'default',
+    commentStatus: true,
+    pingStatus: true,
+    sticky: false,
+    format: 'standard',
+    ...propPostSettings,
+  });
   
   const navigate = useNavigate();
   
@@ -648,8 +682,8 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
         isCodeView={isCodeView}
         onPreview={handlePreview}
         onOpenDesignLibrary={() => setIsDesignLibraryOpen(true)}
-        onToggleInspector={() => setIsInspectorOpen(!isInspectorOpen)}
-        isInspectorOpen={isInspectorOpen}
+        onToggleInspector={() => setSidebarOpen(!sidebarOpen)}
+        isInspectorOpen={sidebarOpen}
       />
 
       {/* Main Layout */}
@@ -666,7 +700,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           className={`flex-1 transition-all duration-300 overflow-y-auto ${
             isBlockInserterOpen ? 'ml-80' : 'ml-0'
           } ${
-            isInspectorOpen ? 'mr-80' : 'mr-0'
+            sidebarOpen ? 'mr-80' : 'mr-0'
           }`}
           style={{ paddingTop: '10px', maxHeight: 'calc(100vh - 60px)' }}
         >
@@ -756,379 +790,48 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
           </div>
         </div>
 
-        {/* Inspector Panel - Right Sidebar */}
-        {isInspectorOpen && (
-          <div className="w-80 bg-white border-l border-gray-200 overflow-y-auto transition-all duration-300"
+        {/* GutenbergSidebar - Right Sidebar */}
+        {sidebarOpen && (
+          <div className={cn(
+            "w-80 bg-white border-l overflow-y-auto transition-all duration-300",
+            "shadow-lg"
+          )}
                style={{ maxHeight: 'calc(100vh - 60px)' }}>
-            {/* Inspector Header */}
+            {/* Sidebar Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <Settings2 className="w-4 h-4 text-gray-600" />
-                <h2 className="font-semibold text-gray-900">Settings</h2>
-              </div>
+              <h2 className="font-semibold text-gray-900">Settings</h2>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => setIsInspectorOpen(false)}
+                onClick={() => setSidebarOpen(false)}
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
-            {/* Inspector Tabs */}
-            <Tabs value={activeInspectorTab} onValueChange={(v) => setActiveInspectorTab(v as 'document' | 'block')}>
-              <TabsList className="w-full rounded-none border-b">
-                <TabsTrigger value="document" className="flex-1">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Document
-                </TabsTrigger>
-                <TabsTrigger value="block" className="flex-1" disabled={!selectedBlockId}>
-                  <Layout className="w-4 h-4 mr-2" />
-                  Block
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Document Tab */}
-              <TabsContent value="document" className="p-4 space-y-4">
-                {/* Status & Visibility */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Eye className="w-4 h-4" />
-                    Status & Visibility
-                  </h3>
-                  <div className="space-y-2 pl-6">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="visibility" className="text-sm">Visibility</Label>
-                      <Select defaultValue="public">
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="private">Private</SelectItem>
-                          <SelectItem value="password">Password</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="status" className="text-sm">Status</Label>
-                      <Select defaultValue="draft">
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="pending">Pending Review</SelectItem>
-                          <SelectItem value="publish">Published</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Featured Image */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <FileImage className="w-4 h-4" />
-                    Featured Image
-                  </h3>
-                  <div className="pl-6">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 cursor-pointer transition-colors">
-                      <Image className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-600">Set featured image</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Discussion */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
-                    Discussion
-                  </h3>
-                  <div className="space-y-2 pl-6">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="comments" className="text-sm">Allow comments</Label>
-                      <Switch id="comments" defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="pingbacks" className="text-sm">Allow pingbacks</Label>
-                      <Switch id="pingbacks" />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              {/* Block Tab */}
-              <TabsContent value="block" className="p-4 space-y-4">
-                {selectedBlockId && (() => {
-                  const selectedBlock = blocks.find(b => b.id === selectedBlockId);
-                  if (!selectedBlock) return null;
-
-                  return (
-                    <>
-                      {/* Block Type Info */}
-                      <div className="pb-3 border-b border-gray-200">
-                        <p className="text-xs text-gray-500">Block Type</p>
-                        <p className="text-sm font-medium text-gray-900 capitalize">
-                          {selectedBlock.type.replace('core/', '').replace('/', ' ')}
-                        </p>
-                      </div>
-
-                      {/* Typography Settings (for text blocks) */}
-                      {['core/paragraph', 'core/heading', 'core/quote'].includes(selectedBlock.type) && (
-                        <div className="space-y-3">
-                          <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                            <Type className="w-4 h-4" />
-                            Typography
-                          </h3>
-                          <div className="space-y-3 pl-6">
-                            {/* Font Size */}
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <Label className="text-sm">Font Size</Label>
-                                <span className="text-xs text-gray-500">
-                                  {selectedBlock.attributes?.fontSize || 16}px
-                                </span>
-                              </div>
-                              <Slider
-                                value={[selectedBlock.attributes?.fontSize || 16]}
-                                onValueChange={(value) => {
-                                  handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    fontSize: value[0]
-                                  });
-                                }}
-                                min={12}
-                                max={48}
-                                step={1}
-                                className="w-full"
-                              />
-                            </div>
-
-                            {/* Line Height */}
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <Label className="text-sm">Line Height</Label>
-                                <span className="text-xs text-gray-500">
-                                  {selectedBlock.attributes?.lineHeight || 1.6}
-                                </span>
-                              </div>
-                              <Slider
-                                value={[selectedBlock.attributes?.lineHeight || 1.6]}
-                                onValueChange={(value) => {
-                                  handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    lineHeight: value[0]
-                                  });
-                                }}
-                                min={1}
-                                max={3}
-                                step={0.1}
-                                className="w-full"
-                              />
-                            </div>
-
-                            {/* Text Alignment */}
-                            <div className="space-y-2">
-                              <Label className="text-sm">Text Alignment</Label>
-                              <div className="flex gap-1">
-                                <Button
-                                  variant={selectedBlock.attributes?.align === 'left' ? 'default' : 'outline'}
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    align: 'left'
-                                  })}
-                                >
-                                  <AlignLeft className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant={selectedBlock.attributes?.align === 'center' ? 'default' : 'outline'}
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    align: 'center'
-                                  })}
-                                >
-                                  <AlignCenter className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant={selectedBlock.attributes?.align === 'right' ? 'default' : 'outline'}
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    align: 'right'
-                                  })}
-                                >
-                                  <AlignRight className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Color Settings */}
-                      <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                          <Palette className="w-4 h-4" />
-                          Colors
-                        </h3>
-                        <div className="space-y-3 pl-6">
-                          {/* Text Color */}
-                          <div className="space-y-2">
-                            <Label className="text-sm">Text Color</Label>
-                            <div className="flex gap-2">
-                              <Input
-                                type="color"
-                                value={selectedBlock.attributes?.textColor || '#000000'}
-                                onChange={(e) => {
-                                  handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    textColor: e.target.value
-                                  });
-                                }}
-                                className="w-12 h-8 p-1 cursor-pointer"
-                              />
-                              <Input
-                                type="text"
-                                value={selectedBlock.attributes?.textColor || '#000000'}
-                                onChange={(e) => {
-                                  handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    textColor: e.target.value
-                                  });
-                                }}
-                                className="flex-1 h-8 text-xs"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Background Color */}
-                          <div className="space-y-2">
-                            <Label className="text-sm">Background Color</Label>
-                            <div className="flex gap-2">
-                              <Input
-                                type="color"
-                                value={selectedBlock.attributes?.backgroundColor || '#ffffff'}
-                                onChange={(e) => {
-                                  handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    backgroundColor: e.target.value
-                                  });
-                                }}
-                                className="w-12 h-8 p-1 cursor-pointer"
-                              />
-                              <Input
-                                type="text"
-                                value={selectedBlock.attributes?.backgroundColor || '#ffffff'}
-                                onChange={(e) => {
-                                  handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                    ...selectedBlock.attributes,
-                                    backgroundColor: e.target.value
-                                  });
-                                }}
-                                className="flex-1 h-8 text-xs"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Spacing Settings */}
-                      <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                          <Layout className="w-4 h-4" />
-                          Spacing
-                        </h3>
-                        <div className="space-y-3 pl-6">
-                          {/* Padding */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <Label className="text-sm">Padding</Label>
-                              <span className="text-xs text-gray-500">
-                                {selectedBlock.attributes?.padding || 0}px
-                              </span>
-                            </div>
-                            <Slider
-                              value={[selectedBlock.attributes?.padding || 0]}
-                              onValueChange={(value) => {
-                                handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                  ...selectedBlock.attributes,
-                                  padding: value[0]
-                                });
-                              }}
-                              min={0}
-                              max={60}
-                              step={4}
-                              className="w-full"
-                            />
-                          </div>
-
-                          {/* Margin */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <Label className="text-sm">Margin</Label>
-                              <span className="text-xs text-gray-500">
-                                {selectedBlock.attributes?.margin || 0}px
-                              </span>
-                            </div>
-                            <Slider
-                              value={[selectedBlock.attributes?.margin || 0]}
-                              onValueChange={(value) => {
-                                handleBlockUpdate(selectedBlockId, selectedBlock.content, {
-                                  ...selectedBlock.attributes,
-                                  margin: value[0]
-                                });
-                              }}
-                              min={0}
-                              max={60}
-                              step={4}
-                              className="w-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Heading-specific settings */}
-                      {selectedBlock.type === 'core/heading' && (
-                        <div className="space-y-3">
-                          <h3 className="text-sm font-semibold text-gray-700">Heading Level</h3>
-                          <div className="pl-6">
-                            <Select
-                              value={String(selectedBlock.content?.level || selectedBlock.attributes?.level || 2)}
-                              onValueChange={(value) => {
-                                handleBlockUpdate(selectedBlockId, {
-                                  ...selectedBlock.content,
-                                  level: parseInt(value)
-                                }, selectedBlock.attributes);
-                              }}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="1">Heading 1</SelectItem>
-                                <SelectItem value="2">Heading 2</SelectItem>
-                                <SelectItem value="3">Heading 3</SelectItem>
-                                <SelectItem value="4">Heading 4</SelectItem>
-                                <SelectItem value="5">Heading 5</SelectItem>
-                                <SelectItem value="6">Heading 6</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      )}
-                    </>
+            {/* GutenbergSidebar Component */}
+            <GutenbergSidebar
+              activeTab={activeTab}
+              postSettings={postSettings}
+              blockSettings={selectedBlock}
+              onPostSettingsChange={(settings) => {
+                setPostSettings(prev => ({ ...prev, ...settings }));
+                setIsDirty(true);
+                onPostSettingsChange?.(settings);
+              }}
+              onBlockSettingsChange={(settings) => {
+                if (selectedBlock) {
+                  const updated = { ...selectedBlock, ...settings };
+                  const newBlocks = blocks.map(block => 
+                    block.id === selectedBlock.id ? updated : block
                   );
-                })()}
-              </TabsContent>
-            </Tabs>
+                  updateBlocks(newBlocks);
+                  setSelectedBlock(updated);
+                }
+              }}
+              onClose={() => setSidebarOpen(false)}
+            />
           </div>
         )}
       </div>
