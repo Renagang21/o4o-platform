@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 import { ensureWordPressLoaded } from '@/utils/wordpress-loader';
 import GutenbergBlockEditor from '@/components/editor/GutenbergBlockEditor';
 import GutenbergSidebar from '@/components/editor/GutenbergSidebar';
-import MediaLibrary from '@/components/media/MediaLibrary';
+// MediaLibrary removed - using MediaLibraryModal instead
 import ContentTemplates from '@/components/editor/ContentTemplates';
 import {
   Dialog,
