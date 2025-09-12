@@ -409,10 +409,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Slug validation - Required for all posts
     if (!trimmedSlug) {
-      const hasKorean = /[\u3131-\uD79D]/.test(trimmedTitle);
-      const errorMessage = hasKorean 
-        ? '⚠️ 한글 제목은 slug를 수동으로 입력해야 합니다. 오른쪽 사이드바의 Permalink 필드에 영문 URL을 입력해주세요.'
-        : '⚠️ Slug가 비어있습니다. URL 주소를 위한 slug를 입력해주세요.';
+      // Always require slug to be entered manually if it's empty
+      const errorMessage = '⚠️ Slug가 비어있습니다. 오른쪽 사이드바의 Permalink 필드에 영문 URL을 입력해주세요.';
       
       toast.error(errorMessage, {
         duration: 5000,

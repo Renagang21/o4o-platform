@@ -121,7 +121,8 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
 
       case 'heading':
         return (
-          <Panel title="Typography">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">Typography</h3>
             <div className="space-y-4">
               <div>
                 <Label className="text-xs">Level</Label>
@@ -170,12 +171,13 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
                 </div>
               </div>
             </div>
-          </Panel>
+          </div>
         );
 
       case 'paragraph':
         return (
-          <Panel title="Typography">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">Typography</h3>
             <div className="space-y-4">
               <div>
                 <Label className="text-xs">Drop Cap</Label>
@@ -214,12 +216,13 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
                 </div>
               </div>
             </div>
-          </Panel>
+          </div>
         );
 
       case 'list':
         return (
-          <Panel title="List Settings">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">List Settings</h3>
             <div className="space-y-4">
               <div>
                 <Label className="text-xs">List Type</Label>
@@ -255,12 +258,13 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
                 />
               </div>
             </div>
-          </Panel>
+          </div>
         );
 
       case 'quote':
         return (
-          <Panel title="Quote Settings">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">Quote Settings</h3>
             <div className="space-y-4">
               <div>
                 <Label className="text-xs">Citation</Label>
@@ -275,12 +279,13 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
                 />
               </div>
             </div>
-          </Panel>
+          </div>
         );
 
       case 'code':
         return (
-          <Panel title="Code Settings">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">Code Settings</h3>
             <div className="space-y-4">
               <div>
                 <Label className="text-xs">Language</Label>
@@ -322,12 +327,13 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
                 />
               </div>
             </div>
-          </Panel>
+          </div>
         );
 
       case 'video':
         return (
-          <Panel title="Video Settings">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">Video Settings</h3>
             <div className="space-y-4">
               <div>
                 <Label className="text-xs">Autoplay</Label>
@@ -382,16 +388,17 @@ const BlockSettingsRenderer: FC<BlockSettingsRendererProps> = ({
                 />
               </div>
             </div>
-          </Panel>
+          </div>
         );
 
       default:
         return (
-          <Panel title="Block Settings">
+          <div className="border-b pb-4">
+            <h3 className="text-sm font-medium mb-3">Block Settings</h3>
             <div className="p-4 text-sm text-gray-600">
               No specific settings available for {blockType} block.
             </div>
-          </Panel>
+          </div>
         );
     }
   };
