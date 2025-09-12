@@ -124,7 +124,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
   const [activeTab, setActiveTab] = useState<'document' | 'block'>('document');
   const [selectedBlock, setSelectedBlock] = useState<any>(null);
   
-  // Post settings state
+  // Post settings state - ensure slug from props is preserved
   const [postSettings, setPostSettings] = useState<PostSettings>({
     status: 'draft',
     visibility: 'public',
@@ -132,7 +132,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     author: 'Admin User',
     featuredImage: undefined,
     excerpt: '',
-    slug: slug || '',
+    slug: '',
     slugError: false,
     categories: [],
     tags: [],
@@ -142,9 +142,18 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     sticky: false,
     format: 'standard',
     ...propPostSettings,
+    slug: propPostSettings?.slug || slug || '', // Ensure slug is not overridden
   });
   
   const navigate = useNavigate();
+  
+  // Update slug when propPostSettings or slug prop changes
+  useEffect(() => {
+    const newSlug = propPostSettings?.slug || slug || '';
+    if (newSlug !== postSettings.slug) {
+      setPostSettings(prev => ({ ...prev, slug: newSlug }));
+    }
+  }, [propPostSettings?.slug, slug]);
   
   // Simple toast function
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {

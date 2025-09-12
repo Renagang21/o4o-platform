@@ -192,9 +192,9 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
 
       {/* Content */}
       <ScrollArea className="flex-1">
-        <Tabs value={activeTab} className="w-full">
-          {/* Document Tab */}
-          <TabsContent value="document" className="m-0">
+        {activeTab === 'document' ? (
+          /* Document Tab */
+          <div className="w-full">
             {/* Status & Visibility */}
             <Panel title="Status & visibility">
               <div className="space-y-4">
@@ -492,10 +492,10 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 </div>
               </div>
             </Panel>
-          </TabsContent>
-
-          {/* Block Tab */}
-          <TabsContent value="block" className="m-0">
+          </div>
+        ) : (
+          /* Block Tab */
+          <div className="w-full">
             {blockSettings ? (
               <>
                 <Panel title="Block settings">
@@ -596,8 +596,8 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
                 <p className="text-sm">Select a block to see its settings</p>
               </div>
             )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </ScrollArea>
     </div>
   );
