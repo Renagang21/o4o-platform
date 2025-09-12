@@ -68,6 +68,7 @@ interface GutenbergSidebarProps {
   blockSettings?: BlockSettings;
   onPostSettingsChange: (settings: Partial<PostSettings>) => void;
   onBlockSettingsChange?: (settings: Partial<BlockSettings>) => void;
+  onTabChange?: (tab: 'document' | 'block') => void;
   onClose?: () => void;
 }
 
@@ -102,6 +103,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
   blockSettings,
   onPostSettingsChange,
   onBlockSettingsChange,
+  onTabChange,
   onClose
 }) => {
   const [tagInput, setTagInput] = useState('');
@@ -164,7 +166,7 @@ const GutenbergSidebar: FC<GutenbergSidebarProps> = ({
     <div className="w-80 h-full bg-white border-l flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
-        <Tabs value={activeTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => onTabChange?.(value as 'document' | 'block')} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="document" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />

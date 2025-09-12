@@ -451,12 +451,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     window.open('/admin/preview', '_blank');
   }, [documentTitle, blocks]);
 
-  // Switch to block tab when a block is selected
-  useEffect(() => {
-    if (selectedBlockId) {
-      setActiveTab('block');
-    }
-  }, [selectedBlockId]);
+  // Removed automatic tab switching - let user control the tab selection
 
   // Handle navigation with unsaved changes warning
   const handleNavigation = useCallback(() => {
@@ -830,6 +825,7 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
                   setSelectedBlock(updated);
                 }
               }}
+              onTabChange={(tab) => setActiveTab(tab)}
               onClose={() => setSidebarOpen(false)}
             />
           </div>
