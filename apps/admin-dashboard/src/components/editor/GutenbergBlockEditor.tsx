@@ -154,6 +154,16 @@ const GutenbergBlockEditor: React.FC<GutenbergBlockEditorProps> = ({
     }
   }, [propPostSettings?.slug, slug]);
   
+  // Update selectedBlock when selectedBlockId changes
+  useEffect(() => {
+    if (selectedBlockId) {
+      const block = blocks.find(b => b.id === selectedBlockId);
+      setSelectedBlock(block || null);
+    } else {
+      setSelectedBlock(null);
+    }
+  }, [selectedBlockId, blocks]);
+  
   // Simple toast function
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });

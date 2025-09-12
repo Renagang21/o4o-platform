@@ -362,7 +362,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     let trimmedSlug = currentSettings.slug?.trim() || '';
     
     // Auto-generate slug from title if empty (for non-Korean titles)
-    if (!trimmedSlug && trimmedTitle) {
+    // Only for new posts, not updates
+    if (!trimmedSlug && trimmedTitle && !currentPostId) {
       // Check if title contains Korean characters
       const hasKorean = /[\u3131-\uD79D]/.test(trimmedTitle);
       if (!hasKorean) {
@@ -436,7 +437,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         title: trimmedTitle,  // Use validated trimmed title
         content: blocks,  // Send blocks array directly - server will handle conversion
         excerpt: postSettings.excerpt,
-        slug: trimmedSlug || currentSettings.slug,  // Use validated slug or current settings
+        slug: trimmedSlug,  // Use the validated/trimmed slug
         status: publish ? 'publish' : (postSettings.status || 'draft'),
         categories: postSettings.categories,
         tags: postSettings.tags,
