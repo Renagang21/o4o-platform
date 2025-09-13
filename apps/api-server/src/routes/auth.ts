@@ -18,6 +18,14 @@ router.post('/login',
     try {
       const { email, password } = req.body;
       
+      // Check if database is initialized
+      if (!AppDataSource.isInitialized) {
+        return res.status(503).json({
+          error: 'Database service unavailable',
+          code: 'DATABASE_UNAVAILABLE'
+        });
+      }
+      
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({ 
         where: { email },
