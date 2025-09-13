@@ -5,7 +5,6 @@ export class PostManagementApiMigration1750000000001 implements MigrationInterfa
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Phase 1: Add new fields while keeping existing ones
-    console.log('🚀 Starting Post Management API Migration...');
 
     // 1. Add new WordPress-compatible fields to posts table
     await queryRunner.query(`
@@ -112,11 +111,9 @@ export class PostManagementApiMigration1750000000001 implements MigrationInterfa
       CREATE INDEX IF NOT EXISTS "IDX_post_autosaves_saved_at" ON "post_autosaves" ("saved_at");
     `);
 
-    console.log('✅ Post Management API Migration completed successfully!');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    console.log('🔄 Rolling back Post Management API Migration...');
 
     // Remove new tables
     await queryRunner.dropTable('post_autosaves', true);
@@ -141,6 +138,5 @@ export class PostManagementApiMigration1750000000001 implements MigrationInterfa
       UPDATE "posts" SET "status" = 'publish' WHERE "status" = 'publish'
     `);
 
-    console.log('✅ Rollback completed!');
   }
 }
