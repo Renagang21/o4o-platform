@@ -293,8 +293,8 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (slug !== undefined) page.slug = slug
     if (status !== undefined) {
       page.status = status
-      if (status === 'publish' && !page.published_at) {
-        page.published_at = new Date()
+      if (status === 'publish' && !page.publishedAt) {
+        page.publishedAt = new Date()
       }
     }
     if (parentId !== undefined) page.parentId = parentId

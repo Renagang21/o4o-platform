@@ -224,8 +224,8 @@ export class CommissionService {
       paymentReference: commission.paymentReference,
       notes: commission.notes,
       rejectionReason: commission.rejectionReason,
-      createdAt: commission.created_at,
-      updatedAt: commission.updated_at
+      createdAt: commission.createdAt,
+      updatedAt: commission.updatedAt
     }));
 
     return {
@@ -267,8 +267,8 @@ export class CommissionService {
       description: affiliate.description,
       lastClickAt: affiliate.lastClickAt,
       lastConversionAt: affiliate.lastConversionAt,
-      createdAt: affiliate.created_at,
-      updatedAt: affiliate.updated_at
+      createdAt: affiliate.createdAt,
+      updatedAt: affiliate.updatedAt
     }));
 
     return {
@@ -392,7 +392,7 @@ export class CommissionService {
         entityId: log.entityId,
         userEmail: log.userEmail,
         description: log.description,
-        createdAt: log.created_at
+        createdAt: log.createdAt
       })),
       topPerformers,
       commissionBreakdown: {

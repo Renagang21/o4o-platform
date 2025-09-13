@@ -262,9 +262,9 @@ router.get('/',
         author: post.author?.id,
         categories: post.categories?.map(c => c.id) || [],
         tags: post.tags || [],
-        sticky: post.sticky || false,
-        format: post.format || 'standard',
-        meta: post.postMeta || {}
+        sticky: post.meta?.sticky || false,
+        format: post.meta?.format || 'standard',
+        meta: post.meta || {}
       }));
 
       res.json(formattedPosts);
@@ -331,9 +331,9 @@ router.get('/:id',
         author: post.author?.id,
         categories: post.categories?.map(c => c.id) || [],
         tags: post.tags || [],
-        sticky: post.sticky || false,
-        format: post.format || 'standard',
-        meta: post.postMeta || {}
+        sticky: post.meta?.sticky || false,
+        format: post.meta?.format || 'standard',
+        meta: post.meta || {}
       };
 
       res.json(formattedPost);
@@ -449,15 +449,16 @@ router.post('/',
 
       const post = await postRepository.save({
         title,
-        content: { blocks: [] }, // TODO: Parse content into blocks format
+        content: content || '',
         status,
-        type: req.body.type || req.body.post_type || 'post',
         slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
         excerpt: extractContent(excerpt),
         tags: Array.isArray(tags) ? tags : (tags ? [tags] : []),
-        format: format || 'standard',
-        sticky: sticky || false,
-        postMeta: meta || {},
+        meta: {
+          format: format || 'standard',
+          sticky: sticky || false,
+          ...meta
+        },
         authorId: userId,
         categories,
         publishedAt: status === 'publish' ? new Date() : null
@@ -466,14 +467,14 @@ router.post('/',
       // Format response for Gutenberg
       const response = {
         id: post.id,
-        date: post.published_at || post.created_at,
-        date_gmt: post.published_at || post.created_at,
+        date: post.publishedAt || post.created_at,
+        date_gmt: post.publishedAt || post.created_at,
         guid: { rendered: `/posts/${post.id}` },
         modified: post.updated_at,
         modified_gmt: post.updated_at,
         slug: post.slug,
         status: post.status,
-        type: post.type || 'post',
+        type: 'post',
         link: `/posts/${post.slug}`,
         title: { 
           raw: post.title,
@@ -493,10 +494,10 @@ router.post('/',
         featured_media: 0,
         comment_status: 'open',
         ping_status: 'open',
-        sticky: post.sticky || false,
+        sticky: post.meta?.sticky || false,
         template: '',
-        format: post.format || 'standard',
-        meta: post.postMeta || {},
+        format: post.meta?.format || 'standard',
+        meta: post.meta || {},
         categories: post.categories?.map(c => c.id) || [],
         tags: post.tags || []
       };
@@ -595,18 +596,15 @@ router.put('/:id',
       const updatedPost = await postRepository.save({
         ...existingPost,
         title: title || existingPost.title,
-        content: content ? { blocks: [] } : existingPost.content, // TODO: Parse content into blocks format
+        content: content || existingPost.content,
         status: status || existingPost.status,
         type: req.body.type || req.body.post_type || existingPost.type,
         slug: slug || existingPost.slug,
         excerpt: excerpt !== undefined ? extractContent(excerpt) : existingPost.excerpt,
         tags: tags || existingPost.tags,
-        format: format || existingPost.format,
-        sticky: sticky !== undefined ? sticky : existingPost.sticky,
-        postMeta: meta || existingPost.postMeta,
         categories,
         lastModifierId: userId,
-        publishedAt: status === 'publish' && !existingPost.published_at ? new Date() : existingPost.published_at
+        published_at: status === 'publish' && !existingPost.published_at ? new Date() : existingPost.published_at
       });
 
       // Format response for Gutenberg
@@ -639,10 +637,10 @@ router.put('/:id',
         featured_media: featured_media || 0,
         comment_status: comment_status || 'open',
         ping_status: ping_status || 'open',
-        sticky: updatedPost.sticky || false,
+        sticky: updatedPost.meta?.sticky || false,
         template: '',
-        format: updatedPost.format || 'standard',
-        meta: updatedPost.postMeta || {},
+        format: updatedPost.meta?.format || 'standard',
+        meta: updatedPost.meta || {},
         categories: updatedPost.categories?.map(c => c.id) || [],
         tags: updatedPost.tags || []
       };

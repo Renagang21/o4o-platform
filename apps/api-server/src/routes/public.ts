@@ -106,7 +106,7 @@ router.get('/pages/:slug', async (req, res) => {
             metaDescription: page.seo?.description || page.excerpt,
             metaKeywords: page.seo?.keywords?.join(', ') || ''
           },
-          updatedAt: page.updated_at
+          updatedAt: page.updatedAt
         }
       }
     });
@@ -150,7 +150,7 @@ router.get('/templates/:type', async (req, res) => {
         metadata: {
           version: template.version,
           layoutType: template.layoutType,
-          updatedAt: template.updated_at
+          updatedAt: template.updatedAt
         }
       }
     });
@@ -200,7 +200,7 @@ router.get('/posts/:type/:slug', async (req, res) => {
             metaDescription: post.meta?.seoDescription || '',
             metaKeywords: post.meta?.tags?.join(', ') || ''
           },
-          updatedAt: post.updated_at
+          updatedAt: post.updatedAt
         }
       }
     });

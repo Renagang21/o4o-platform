@@ -63,11 +63,11 @@ router.get('/:pageId',
       }
 
       // Check if post uses zone-based content
-      if ((post as any).useZones && (post as any).zones) {
+      if (post.meta?.useZones && post.meta?.zones) {
         return res.json({
-          zones: (post as any).zones,
-          customization: (post as any).themeCustomizations || null,
-          layout: (post as any).layoutType || 'single-column'
+          zones: post.meta?.zones,
+          customization: post.meta?.themeCustomizations || null,
+          layout: post.meta?.layoutType || 'single-column'
         })
       }
 
@@ -75,13 +75,13 @@ router.get('/:pageId',
       if (post.content && (post.content as any).blocks) {
         const zoneContent = ZoneContentAdapter.toZoneFormat(
           post.content as any, 
-          (post as any).layoutType || 'single-column'
+          post.meta?.layoutType || 'single-column'
         )
 
         return res.json({
           zones: zoneContent,
-          customization: (post as any).themeCustomizations || null,
-          layout: (post as any).layoutType || 'single-column',
+          customization: post.meta?.themeCustomizations || null,
+          layout: post.meta?.layoutType || 'single-column',
           converted: true // Indicate this was converted
         })
       }
@@ -128,14 +128,17 @@ router.put('/:pageId',
         return res.status(404).json({ error: 'Page not found' })
       }
 
-      // Update post with zone data
-      await postRepository.update(pageId, {
+      // Update post with zone data  
+      const updatedMeta = {
+        ...post.meta,
         zones: zones,
         layoutType: layout,
         themeCustomizations: customization || null,
-        useZones: true,
-        updatedAt: new Date()
-      } as any)
+        useZones: true
+      };
+      await postRepository.update(pageId, {
+        meta: () => `'${JSON.stringify(updatedMeta)}'::jsonb`
+      });
 
       res.json({ success: true })
 
@@ -169,17 +172,22 @@ router.put('/:pageId/:zoneId',
       }
 
       // Update specific zone
-      const currentZones = (post as any).zones || {}
+      const currentZones = post.meta?.zones || {}
       currentZones[zoneId] = {
         ...currentZones[zoneId],
         ...zoneData,
         id: zoneId
       }
 
+      const updatedMeta = {
+        ...post.meta,
+        zones: currentZones
+      };
+
       await postRepository.update(pageId, {
-        zones: currentZones,
-        updatedAt: new Date()
-      } as any)
+        meta: updatedMeta,
+        updated_at: new Date()
+      })
 
       res.json({ success: true })
 
@@ -213,7 +221,7 @@ router.post('/:pageId/reorder',
       }
 
       // Reorder zones based on provided order
-      const currentZones = (post as any).zones || {}
+      const currentZones = post.meta?.zones || {}
       const reorderedZones: any = {}
 
       zoneOrder.forEach((zoneId: string, index: number) => {
@@ -225,9 +233,13 @@ router.post('/:pageId/reorder',
         }
       })
 
+      const updatedMeta = {
+        ...post.meta,
+        zones: reorderedZones
+      };
+      
       await postRepository.update(pageId, {
-        zones: reorderedZones,
-        updatedAt: new Date()
+        meta: () => `'${JSON.stringify(updatedMeta)}'::jsonb`
       })
 
       res.json({ success: true })
@@ -315,9 +327,9 @@ router.get('/:pageId/export',
         res.setHeader('Content-Type', 'application/json')
         res.setHeader('Content-Disposition', `attachment; filename="zones-${pageId}.json"`)
         res.json({
-          zones: (post as any).zones,
-          layout: (post as any).layoutType,
-          customizations: (post as any).themeCustomizations,
+          zones: post.meta?.zones,
+          layout: post.meta?.layoutType,
+          customizations: post.meta?.themeCustomizations,
           exportedAt: new Date().toISOString()
         })
       } else if (format === 'html') {
@@ -352,7 +364,7 @@ router.get('/:pageId/analytics',
         return res.status(404).json({ error: 'Page not found' })
       }
 
-      const zones = (post as any).zones || {}
+      const zones = post.meta?.zones || {}
       let totalBlocks = 0
       const blocksByZone: Record<string, number> = {}
       const blocksByType: Record<string, number> = {}

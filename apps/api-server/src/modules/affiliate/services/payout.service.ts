@@ -243,8 +243,8 @@ export class PayoutService {
       paidAt: payout.paidAt,
       failureReason: payout.failureReason,
       notes: payout.notes,
-      createdAt: payout.created_at,
-      updatedAt: payout.updated_at
+      createdAt: payout.createdAt,
+      updatedAt: payout.updatedAt
     }));
 
     return {
@@ -289,8 +289,8 @@ export class PayoutService {
         paidAt: payout.paidAt,
         failureReason: payout.failureReason,
         notes: payout.notes,
-        createdAt: payout.created_at,
-        updatedAt: payout.updated_at
+        createdAt: payout.createdAt,
+        updatedAt: payout.updatedAt
       },
       commissions: commissions.map(c => ({
         id: c.id,
@@ -298,7 +298,7 @@ export class PayoutService {
         commissionRate: c.commissionRate,
         orderId: c.orderId,
         status: c.status,
-        createdAt: c.created_at
+        createdAt: c.createdAt
       }))
     };
   }
@@ -353,7 +353,7 @@ export class PayoutService {
         id: c.id,
         amount: c.amount,
         orderId: c.orderId,
-        createdAt: c.created_at
+        createdAt: c.createdAt
       })),
       totalAmount,
       commissionCount: eligibleCommissions.length,

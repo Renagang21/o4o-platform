@@ -193,7 +193,7 @@ router.get('/',
 
       // Format filter
       if (format) {
-        queryBuilder.andWhere('post.format = :format', { format });
+        queryBuilder.andWhere('post.meta?.format = :format', { format });
       }
 
       // Sticky filter
@@ -261,8 +261,8 @@ router.get('/',
         categories: post.categories?.map(c => c.id) || [],
         tags: post.tags || [],
         sticky: post.sticky || false,
-        format: post.format || 'standard',
-        meta: post.postMeta || {},
+        format: post.meta?.format || 'standard',
+        meta: post.meta || {},
         _embedded: {
           author: post.author ? [{
             id: post.author.id,
@@ -348,8 +348,8 @@ router.get('/:id',
         categories: post.categories?.map(c => c.id) || [],
         tags: post.tags || [],
         sticky: post.sticky || false,
-        format: post.format || 'standard',
-        meta: post.postMeta || {},
+        format: post.meta?.format || 'standard',
+        meta: post.meta || {},
         _embedded: {
           author: post.author ? [{
             id: post.author.id,
@@ -428,17 +428,14 @@ router.post('/',
 
       const post = await postRepository.save({
         title,
-        content: { blocks: [] }, // TODO: Parse content into blocks format
+        content: content || '',
         status: status || 'draft',
         slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
         excerpt,
         tags: tags || [],
-        format: format || 'standard',
-        sticky: sticky || false,
-        postMeta: meta || {},
         authorId: userId,
         categories,
-        publishedAt: status === 'publish' ? new Date() : null
+        published_at: status === 'publish' ? new Date() : null
       });
 
       res.status(201).json(post);
@@ -500,17 +497,14 @@ router.put('/:id',
       const updatedPost = await postRepository.save({
         ...existingPost,
         title: title || existingPost.title,
-        content: content ? { blocks: [] } : existingPost.content, // TODO: Parse content into blocks format
+        content: content || existingPost.content,
         status: status || existingPost.status,
         slug: slug || existingPost.slug,
         excerpt: excerpt !== undefined ? excerpt : existingPost.excerpt,
         tags: tags || existingPost.tags,
-        format: format || existingPost.format,
-        sticky: sticky !== undefined ? sticky : existingPost.sticky,
-        postMeta: meta || existingPost.postMeta,
         categories,
         lastModifierId: userId,
-        publishedAt: status === 'publish' && !existingPost.published_at ? new Date() : existingPost.published_at
+        published_at: status === 'publish' && !existingPost.published_at ? new Date() : existingPost.published_at
       });
 
       res.json(updatedPost);

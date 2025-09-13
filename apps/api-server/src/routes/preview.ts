@@ -49,8 +49,8 @@ router.get('/',
           pageContent = {
             title: page.title,
             content: page.content,
-            zones: page.zones,
-            customizations: page.themeCustomizations
+            zones: page.meta?.zones,
+            customizations: page.meta?.themeCustomizations
           }
         }
       }
