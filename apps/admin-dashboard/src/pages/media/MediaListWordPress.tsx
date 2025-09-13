@@ -57,7 +57,7 @@ const MediaListWordPress: FC = () => {
     queryKey: ['media', typeFilter, dateFilter, searchQuery, page, itemsPerPage],
     queryFn: async () => {
       // API 서버가 준비될 때까지 목업 데이터를 사용합니다.
-      console.log('Fetching media with params:', { typeFilter, dateFilter, searchQuery, page, itemsPerPage });
+      // console.log('Fetching media with params:', { typeFilter, dateFilter, searchQuery, page, itemsPerPage });
       return {
         media: [
           {
@@ -98,7 +98,7 @@ const MediaListWordPress: FC = () => {
   const deleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
       // await authClient.api.delete(`/media`, { data: { ids } });
-      console.log('Deleting media items:', ids);
+      // console.log('Deleting media items:', ids);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });
@@ -173,7 +173,7 @@ const MediaListWordPress: FC = () => {
       )
     },
     actions: [
-      { label: 'Edit', onClick: () => console.log('Edit', item.id) },
+      { label: 'Edit', onClick: () => { /* Handle Edit */ } },
       { label: 'Delete Permanently', onClick: () => deleteMutation.mutate([item.id]), destructive: true },
       { label: 'View', href: item.url, external: true },
     ]
@@ -200,8 +200,7 @@ const MediaListWordPress: FC = () => {
               <SelectItem value="delete">Delete Permanently</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="secondary" size="sm" className="ml-2" onClick={() => handleBulkAction('apply')}>Apply</Button>
-        </div>
+          <Button variant="secondary" size="sm" className="ml-2" onClick={() => handleBulkAction('apply')}>Apply</Button>_        </div>
 
         <div className="alignleft actions">
           <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
