@@ -61,7 +61,7 @@ export class RevisionService {
       const revision = this.postRevisionRepository.create({
         postId: post.id,
         revisionNumber,
-        authorId: revisionData.author_id,
+        authorId: revisionData.authorId,
         revisionType: revisionData.revisionType,
         title: post.title,
         content: post.content,
@@ -89,7 +89,7 @@ export class RevisionService {
         revisionId: savedRevision.id,
         revisionNumber,
         revisionType: revisionData.revisionType,
-        authorId: revisionData.author_id
+        authorId: revisionData.authorId
       });
 
       return savedRevision;
@@ -119,7 +119,7 @@ export class RevisionService {
       const revision = this.pageRevisionRepository.create({
         pageId: page.id,
         revisionNumber,
-        authorId: revisionData.author_id,
+        authorId: revisionData.authorId,
         revisionType: revisionData.revisionType,
         title: page.title,
         content: page.content,
@@ -147,7 +147,7 @@ export class RevisionService {
         revisionId: savedRevision.id,
         revisionNumber,
         revisionType: revisionData.revisionType,
-        authorId: revisionData.author_id
+        authorId: revisionData.authorId
       });
 
       return savedRevision;
@@ -689,7 +689,7 @@ export class RevisionService {
       if (revisions.length > 1) {
         const timeIntervals = [];
         for (let i = 1; i < revisions.length; i++) {
-          const interval = revisions[i].created_at.getTime() - revisions[i - 1].created_at.getTime();
+          const interval = revisions[i].createdAt.getTime() - revisions[i - 1].createdAt.getTime();
           timeIntervals.push(interval);
         }
         averageTimeBetweenRevisions = timeIntervals.reduce((sum, interval) => sum + interval, 0) / timeIntervals.length;
@@ -698,8 +698,8 @@ export class RevisionService {
       // Find most active author
       const authorCounts = new Map<string, number>();
       revisions.forEach(revision => {
-        const count = authorCounts.get(revision.author_id) || 0;
-        authorCounts.set(revision.author_id, count + 1);
+        const count = authorCounts.get(revision.authorId) || 0;
+        authorCounts.set(revision.authorId, count + 1);
       });
 
       let mostActiveAuthor = null;

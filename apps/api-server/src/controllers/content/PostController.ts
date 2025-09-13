@@ -26,7 +26,7 @@ export class PostController {
         authorId,
         categoryId,
         tag,
-        orderBy = 'created_at',
+        orderBy = 'createdAt',
         order = 'DESC',
         includeDrafts = false
       } = req.query;
@@ -55,7 +55,7 @@ export class PostController {
 
       // Author filter
       if (authorId) {
-        queryBuilder.andWhere('post.author_id = :authorId', { authorId });
+        queryBuilder.andWhere('post.authorId = :authorId', { authorId });
       }
 
       // Category filter
@@ -69,8 +69,8 @@ export class PostController {
       }
 
       // Ordering
-      const allowedOrderBy = ['created_at', 'updated_at', 'published_at', 'title', 'views'];
-      const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'created_at';
+      const allowedOrderBy = ['createdAt', 'updatedAt', 'publishedAt', 'title', 'views'];
+      const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'createdAt';
       const orderDirection = order === 'ASC' ? 'ASC' : 'DESC';
       
       queryBuilder.orderBy(`post.${orderByField}`, orderDirection);
@@ -240,28 +240,20 @@ export class PostController {
         excerpt,
         status,
         type,
-        format,
         template,
         categories,
         tags,
         seo,
-        customFields,
-        postMeta: {
+        meta: {
           ...postMeta,
-          featuredImage,
           featured,
-          sticky
+          ...customFields
         },
-        publishedAt: status === 'publish' ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-        authorId,
-        lastModifiedBy: authorId,
-        password: password || null,
-        passwordProtected: !!password,
-        allowComments,
-        featured,
+        published_at: status === 'publish' ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
+        author_id: authorId,
+        comment_status: allowComments ? 'open' : 'closed',
         sticky,
-        featuredImage
+        featured_media: featuredImage
       });
 
       const savedPost = await this.postRepository.save(post);
@@ -377,8 +369,7 @@ export class PostController {
       // Update post
       Object.assign(post, {
         ...updates,
-        lastModifiedBy: userId,
-        updatedAt: new Date()
+        updated_at: new Date()
       });
 
       const savedPost = await this.postRepository.save(post);
@@ -443,7 +434,7 @@ export class PostController {
       } else {
         // Move to trash
         post.status = 'trash';
-        post.lastModifiedBy = userId;
+        // lastModifiedBy property not available on Post entity
         await this.postRepository.save(post);
         
         res.json({
@@ -493,7 +484,7 @@ export class PostController {
       }
 
       post.status = 'draft';
-      post.lastModifiedBy = userId;
+      // lastModifiedBy property not available on Post entity
       await this.postRepository.save(post);
 
       res.json({
@@ -549,7 +540,7 @@ export class PostController {
             if (post.status === 'draft') {
               post.status = 'publish';
               post.published_at = post.published_at || new Date();
-              post.lastModifiedBy = userId;
+              // lastModifiedBy property not available on Post entity
               await this.postRepository.save(post);
               updatedCount++;
             }
@@ -560,7 +551,7 @@ export class PostController {
           for (const post of posts) {
             if (post.status === 'publish') {
               post.status = 'draft';
-              post.lastModifiedBy = userId;
+              // lastModifiedBy property not available on Post entity
               await this.postRepository.save(post);
               updatedCount++;
             }
@@ -571,7 +562,7 @@ export class PostController {
           for (const post of posts) {
             if (post.status !== 'trash') {
               post.status = 'trash';
-              post.lastModifiedBy = userId;
+              // lastModifiedBy property not available on Post entity
               await this.postRepository.save(post);
               updatedCount++;
             }
@@ -743,8 +734,8 @@ export class PostController {
           customFields: revision.customFields,
           tags: revision.tags,
           postMeta: revision.postMeta,
-          createdAt: revision.created_at,
-          updatedAt: revision.created_at
+          createdAt: revision.createdAt,
+          updatedAt: revision.createdAt
         };
       } else {
         // Preview current post
@@ -821,13 +812,10 @@ export class PostController {
         title: duplicateTitle,
         slug,
         status: 'draft',
-        authorId: userId,
-        lastModifiedBy: userId,
-        views: 0,
-        publishedAt: null,
-        scheduledAt: null,
-        createdAt: undefined,
-        updatedAt: undefined
+        author_id: userId,
+        published_at: null,
+        created_at: undefined,
+        updated_at: undefined
       });
 
       const savedPost = await this.postRepository.save(duplicatedPost);
@@ -885,7 +873,7 @@ export class PostController {
       seo: post.seo,
       customFields: post.customFields,
       postMeta: post.postMeta,
-      publishedAt: post.published_at,
+      publishedAt: post.publishedAt,
       scheduledAt: post.scheduledAt,
       author: post.author ? {
         id: post.author.id,
@@ -906,8 +894,8 @@ export class PostController {
       featuredImage: post.featuredImage,
       readingTime: post.readingTime,
       layoutSettings: post.layoutSettings,
-      createdAt: post.created_at,
-      updatedAt: post.updated_at
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt
     };
   }
 
@@ -922,7 +910,7 @@ export class PostController {
         tag = this.tagRepository.create({
           name: tagName,
           slug,
-          usageCount: 0
+          count: 0
         });
         await this.tagRepository.save(tag);
       }

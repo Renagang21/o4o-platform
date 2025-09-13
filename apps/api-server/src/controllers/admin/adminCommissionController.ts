@@ -139,7 +139,7 @@ export class AdminCommissionController {
             period: c.period,
             amount: c.totalPayable,
             status: c.status,
-            createdAt: c.created_at,
+            createdAt: c.createdAt,
           }))
         },
         
@@ -153,7 +153,7 @@ export class AdminCommissionController {
             period: s.period,
             amount: s.totalPayable,
             status: s.status,
-            createdAt: s.created_at,
+            createdAt: s.createdAt,
           }))
         }
       },

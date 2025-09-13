@@ -190,7 +190,7 @@ export class ForumService {
     if (!post) return null;
 
     // 조회수 증가 (조회한 사용자가 작성자가 아닌 경우)
-    if (userId && userId !== post.author_id) {
+    if (userId && userId !== post.authorId) {
       setTimeout(async () => {
         await this.incrementPostViews(postId);
       }, 0);
@@ -208,7 +208,7 @@ export class ForumService {
     if (!post) return null;
 
     // 조회수 증가
-    if (userId && userId !== post.author_id) {
+    if (userId && userId !== post.authorId) {
       setTimeout(async () => {
         await this.incrementPostViews(post.id);
       }, 0);
@@ -247,7 +247,7 @@ export class ForumService {
 
     // 작성자 필터
     if (options.author_id) {
-      queryBuilder.andWhere('post.author_id = :authorId', { authorId: options.author_id });
+      queryBuilder.andWhere('post.authorId = :authorId', { authorId: options.author_id });
     }
 
     // 타입 필터

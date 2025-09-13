@@ -62,7 +62,7 @@ export class BetaUserController {
           status: betaUser.status,
           type: betaUser.type,
           interestArea: betaUser.interestArea,
-          createdAt: betaUser.created_at
+          createdAt: betaUser.createdAt
         }
       });
     } catch (error) {
@@ -119,7 +119,7 @@ export class BetaUserController {
         success: true,
         data: {
           status: betaUser.status,
-          registeredAt: betaUser.created_at,
+          registeredAt: betaUser.createdAt,
           approvedAt: betaUser.approvedAt,
           canProvideFeedback: betaUser.canProvideFeedback(),
           feedbackCount: betaUser.feedbackCount
@@ -207,7 +207,7 @@ export class BetaUserController {
           title: feedback.title,
           status: feedback.status,
           priority: feedback.priority,
-          createdAt: feedback.created_at
+          createdAt: feedback.createdAt
         }
       });
     } catch (error) {
@@ -1295,7 +1295,7 @@ export class BetaUserController {
         title: feedback.isLive ? 'Live Support Request' : 'High Priority Feedback',
         message: `${feedback.type.replace('_', ' ')} from ${feedback.betaUser?.name || 'Unknown User'}: ${feedback.title}`,
         data: { feedbackId: feedback.id },
-        timestamp: feedback.created_at.toISOString(),
+        timestamp: feedback.createdAt.toISOString(),
         priority: feedback.priority === FeedbackPriority.CRITICAL ? 'critical' : 'high',
         feedbackId: feedback.id
       }));

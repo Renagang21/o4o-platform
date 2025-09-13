@@ -576,7 +576,7 @@ export class WorkflowService {
       const bottlenecks = this.orderWorkflow.states.map(state => {
         const stateTransitions = recentTransitions.filter(t => String(t.fromState) === String(state.id));
         const avgTimeInState = stateTransitions.length > 0
-          ? stateTransitions.reduce((sum, t) => sum + (t.transitionedAt.getTime() - t.created_at.getTime()), 0) / stateTransitions.length
+          ? stateTransitions.reduce((sum, t) => sum + (t.transitionedAt.getTime() - t.createdAt.getTime()), 0) / stateTransitions.length
           : 0;
         
         return {
