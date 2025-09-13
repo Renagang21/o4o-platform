@@ -116,8 +116,7 @@ const Customize = lazy(() => import('@/pages/appearance/Customize'));
 // Plugin Management
 const WordPressPluginManager = lazy(() => import('@/pages/apps/WordPressPluginManager'));
 
-// Shortcode Management
-const ShortcodeManagement = lazy(() => import('@/pages/shortcodes/ShortcodeManagement'));
+// Shortcode Management - REMOVED
 
 // Loading component
 const PageLoader = () => (
@@ -857,14 +856,6 @@ function App() {
                       </AdminProtectedRoute>
                     } />
                     
-                    <Route path="/tools/shortcodes" element={
-                      <AdminProtectedRoute requiredPermissions={['tools:read']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <ShortcodeManagement />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
                     {/* Apps Manager */}
                     <Route path="/apps" element={
                       <AdminProtectedRoute requiredPermissions={['admin']}>
@@ -888,8 +879,6 @@ function App() {
                         </Suspense>
                       </AdminProtectedRoute>
                     } />
-                    
-                    {/* Shortcode routes removed */}
                     
                     {/* 설정 */}
                     <Route path="/settings/*" element={
@@ -949,58 +938,6 @@ function App() {
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-        </Routes>
-      </SessionManager>
-    </AuthProvider>
-    </ThemeProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default App;
-
-// Deployment trigger: 2025-08-21 20:45 UTC - Trigger after PM2 cleanup on webserver                    <AdminProtectedRoute requiredPermissions={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <IntegratedMonitoring />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/monitoring/performance" element={
-                      <AdminProtectedRoute requiredPermissions={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <PerformanceDashboard />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    <Route path="/monitoring/security" element={
-                      <AdminProtectedRoute requiredPermissions={['admin']}>
-                        <Suspense fallback={<PageLoader />}>
-                          <IntegratedMonitoring />
-                        </Suspense>
-                      </AdminProtectedRoute>
-                    } />
-                    
-                    {/* 404 핸들링 */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </AdminLayout>
-              </AdminProtectedRoute>
-            } />
-        </Routes>
-      </SessionManager>
-    </AuthProvider>
-    </ThemeProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default App;
-
-// Deployment trigger: 2025-08-21 20:45 UTC - Trigger after PM2 cleanup on webserver               </AdminLayout>
               </AdminProtectedRoute>
             } />
         </Routes>
