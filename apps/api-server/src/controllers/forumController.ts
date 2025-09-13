@@ -122,7 +122,7 @@ export class ForumController {
       const searchOptions: ForumSearchOptions = {
         query: req.query.q as string,
         categoryId: req.query.categoryId as string,
-        authorId: req.query.authorId as string,
+        authorId: req.query.author_id as string,
         tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
         type: req.query.type as PostType,
         page: parseInt(req.query.page as string) || 1,
@@ -373,7 +373,7 @@ export class ForumController {
       const searchOptions: ForumSearchOptions = {
         query: req.query.q as string,
         categoryId: req.query.categoryId as string,
-        authorId: req.query.authorId as string,
+        authorId: req.query.author_id as string,
         tags: req.query.tags ? (req.query.tags as string).split(',') : undefined,
         type: req.query.type as PostType,
         page: parseInt(req.query.page as string) || 1,

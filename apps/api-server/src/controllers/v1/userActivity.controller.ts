@@ -63,9 +63,9 @@ export class UserActivityController {
       }
 
       if (startDate && endDate) {
-        whereConditions.createdAt = Between(new Date(startDate as string), new Date(endDate as string));
+        whereConditions.created_at = Between(new Date(startDate as string), new Date(endDate as string));
       } else if (startDate) {
-        whereConditions.createdAt = Between(new Date(startDate as string), new Date());
+        whereConditions.created_at = Between(new Date(startDate as string), new Date());
       }
 
       const findOptions: FindManyOptions<UserActivityLog> = {
@@ -103,7 +103,7 @@ export class UserActivityController {
               firstName: activity.performedBy.firstName,
               lastName: activity.performedBy.lastName
             } : null,
-            createdAt: activity.createdAt
+            createdAt: activity.created_at
           })),
           pagination: {
             currentPage: pageNum,
@@ -198,7 +198,7 @@ export class UserActivityController {
           activityCategory: savedActivity.activityCategory,
           title: savedActivity.getDisplayTitle(),
           description: savedActivity.getDisplayDescription(),
-          createdAt: savedActivity.createdAt
+          createdAt: savedActivity.created_at
         },
         message: 'Activity logged successfully'
       });
@@ -344,13 +344,13 @@ export class UserActivityController {
           return acc;
         }, {} as Record<ActivityCategory, number>),
         recentActivity: activities
-          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+          .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
           .slice(0, 5)
           .map(activity => ({
             id: activity.id,
             type: activity.activityType,
             title: activity.title,
-            createdAt: activity.createdAt
+            createdAt: activity.created_at
           }))
       };
 

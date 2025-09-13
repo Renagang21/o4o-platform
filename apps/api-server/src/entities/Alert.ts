@@ -77,9 +77,9 @@ export enum AlertChannel {
 }
 
 @Entity('alerts')
-@Index(['alertType', 'severity', 'status', 'createdAt'])
-@Index(['status', 'createdAt'])
-@Index(['source', 'createdAt'])
+@Index(['alertType', 'severity', 'status', 'created_at'])
+@Index(['status', 'created_at'])
+@Index(['source', 'created_at'])
 export class Alert {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -477,11 +477,11 @@ export class Alert {
   }
 
   getAgeInMinutes(): number {
-    return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60));
+    return Math.floor((Date.now() - this.created_at.getTime()) / (1000 * 60));
   }
 
   getAgeInHours(): number {
-    return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60));
+    return Math.floor((Date.now() - this.created_at.getTime()) / (1000 * 60 * 60));
   }
 
   shouldEscalate(escalationTimeMinutes: number = 30): boolean {

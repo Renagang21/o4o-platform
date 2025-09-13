@@ -36,7 +36,7 @@ export class PagesController {
         dateFrom,
         dateTo,
         parentId,
-        orderBy = 'updatedAt',
+        orderBy = 'updated_at',
         order = 'desc'
       } = req.query;
 
@@ -53,7 +53,7 @@ export class PagesController {
       }
 
       if (author) {
-        queryBuilder.andWhere('page.authorId = :author', { author });
+        queryBuilder.andWhere('page.author_id = :author', { author });
       }
 
       if (search) {
@@ -64,11 +64,11 @@ export class PagesController {
       }
 
       if (dateFrom) {
-        queryBuilder.andWhere('page.createdAt >= :dateFrom', { dateFrom });
+        queryBuilder.andWhere('page.created_at >= :dateFrom', { dateFrom });
       }
 
       if (dateTo) {
-        queryBuilder.andWhere('page.createdAt <= :dateTo', { dateTo });
+        queryBuilder.andWhere('page.created_at <= :dateTo', { dateTo });
       }
 
       if (parentId) {
@@ -76,8 +76,8 @@ export class PagesController {
       }
 
       // Apply ordering
-      const validOrderFields = ['title', 'createdAt', 'updatedAt', 'publishedAt', 'views'];
-      const orderField = validOrderFields.includes(orderBy as string) ? orderBy as string : 'updatedAt';
+      const validOrderFields = ['title', 'created_at', 'updated_at', 'published_at', 'views'];
+      const orderField = validOrderFields.includes(orderBy as string) ? orderBy as string : 'updated_at';
       const orderDirection = order === 'asc' ? 'ASC' : 'DESC';
       
       queryBuilder.orderBy(`page.${orderField}`, orderDirection);
@@ -243,7 +243,7 @@ export class PagesController {
         showInMenu,
         isHomepage,
         seo,
-        publishedAt: status === 'published' ? publishedAt || new Date() : publishedAt,
+        publishedAt: status === 'publish' ? publishedAt || new Date() : publishedAt,
         scheduledAt,
         authorId: userId,
         lastModifiedBy: userId,
@@ -342,7 +342,7 @@ export class PagesController {
         showInMenu,
         isHomepage,
         seo,
-        publishedAt: status === 'published' && !page.publishedAt ? publishedAt || new Date() : publishedAt,
+        publishedAt: status === 'publish' && !page.published_at ? publishedAt || new Date() : publishedAt,
         scheduledAt,
         lastModifiedBy: userId,
         password,
@@ -462,8 +462,8 @@ export class PagesController {
 
       const pageData: PageData = { ...originalPage };
       delete pageData.id;
-      delete pageData.createdAt;
-      delete pageData.updatedAt;
+      delete pageData.created_at;
+      delete pageData.updated_at;
       
       const clonedPage = this.pageRepository.create({
         ...pageData,

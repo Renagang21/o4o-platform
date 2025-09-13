@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { Post } from '../../entities/Post';
-import { PostTag } from '../../entities/PostTag';
+import { Tag } from '../../entities/Tag';
 import { Category } from '../../entities/Category';
 import { User } from '../../entities/User';
 import { slugService } from '../../services/slug.service';
@@ -11,7 +11,7 @@ import { In, Like } from 'typeorm';
 
 export class PostController {
   private postRepository = AppDataSource.getRepository(Post);
-  private tagRepository = AppDataSource.getRepository(PostTag);
+  private tagRepository = AppDataSource.getRepository(Tag);
   private categoryRepository = AppDataSource.getRepository(Category);
   private userRepository = AppDataSource.getRepository(User);
 
@@ -26,7 +26,7 @@ export class PostController {
         authorId,
         categoryId,
         tag,
-        orderBy = 'createdAt',
+        orderBy = 'created_at',
         order = 'DESC',
         includeDrafts = false
       } = req.query;
@@ -55,7 +55,7 @@ export class PostController {
 
       // Author filter
       if (authorId) {
-        queryBuilder.andWhere('post.authorId = :authorId', { authorId });
+        queryBuilder.andWhere('post.author_id = :authorId', { authorId });
       }
 
       // Category filter
@@ -69,8 +69,8 @@ export class PostController {
       }
 
       // Ordering
-      const allowedOrderBy = ['createdAt', 'updatedAt', 'publishedAt', 'title', 'views'];
-      const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'createdAt';
+      const allowedOrderBy = ['created_at', 'updated_at', 'published_at', 'title', 'views'];
+      const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'created_at';
       const orderDirection = order === 'ASC' ? 'ASC' : 'DESC';
       
       queryBuilder.orderBy(`post.${orderByField}`, orderDirection);
@@ -231,7 +231,7 @@ export class PostController {
           featured,
           sticky
         },
-        publishedAt: status === 'published' ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
+        publishedAt: status === 'publish' ? (publishedAt ? new Date(publishedAt) : new Date()) : null,
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
         authorId,
         lastModifiedBy: authorId,
@@ -346,8 +346,8 @@ export class PostController {
       }
 
       // Handle publication status changes
-      if (updates.status === 'published' && post.status !== 'published' && !post.publishedAt) {
-        updates.publishedAt = new Date();
+      if (updates.status === 'publish' && post.status !== 'publish' && !post.published_at) {
+        updates.published_at = new Date();
       }
 
       // Update post
@@ -523,8 +523,8 @@ export class PostController {
         case 'publish':
           for (const post of posts) {
             if (post.status === 'draft') {
-              post.status = 'published';
-              post.publishedAt = post.publishedAt || new Date();
+              post.status = 'publish';
+              post.published_at = post.published_at || new Date();
               post.lastModifiedBy = userId;
               await this.postRepository.save(post);
               updatedCount++;
@@ -534,7 +534,7 @@ export class PostController {
 
         case 'draft':
           for (const post of posts) {
-            if (post.status === 'published') {
+            if (post.status === 'publish') {
               post.status = 'draft';
               post.lastModifiedBy = userId;
               await this.postRepository.save(post);
@@ -719,8 +719,8 @@ export class PostController {
           customFields: revision.customFields,
           tags: revision.tags,
           postMeta: revision.postMeta,
-          createdAt: revision.createdAt,
-          updatedAt: revision.createdAt
+          createdAt: revision.created_at,
+          updatedAt: revision.created_at
         };
       } else {
         // Preview current post
@@ -861,7 +861,7 @@ export class PostController {
       seo: post.seo,
       customFields: post.customFields,
       postMeta: post.postMeta,
-      publishedAt: post.publishedAt,
+      publishedAt: post.published_at,
       scheduledAt: post.scheduledAt,
       author: post.author ? {
         id: post.author.id,
@@ -882,13 +882,13 @@ export class PostController {
       featuredImage: post.featuredImage,
       readingTime: post.readingTime,
       layoutSettings: post.layoutSettings,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt
+      createdAt: post.created_at,
+      updatedAt: post.updated_at
     };
   }
 
-  private async getOrCreateTags(tagNames: string[]): Promise<PostTag[]> {
-    const tags: PostTag[] = [];
+  private async getOrCreateTags(tagNames: string[]): Promise<Tag[]> {
+    const tags: Tag[] = [];
 
     for (const tagName of tagNames) {
       let tag = await this.tagRepository.findOne({ where: { name: tagName } });

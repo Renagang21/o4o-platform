@@ -75,7 +75,7 @@ export class SignageController {
       }
 
       const [contents, total] = await queryBuilder
-        .orderBy('content.createdAt', 'DESC')
+        .orderBy('content.created_at', 'DESC')
         .skip(skip)
         .take(Number(limit))
         .getManyAndCount();

@@ -92,7 +92,7 @@ export const performanceMiddleware = (req: AuthRequest, res: Response, next: Nex
       await AppDataSource.query(`
         INSERT INTO system_performance_logs 
         (endpoint, method, "responseTime", "statusCode", "userId", "userRole", 
-         "queryCount", "cacheHit", "errorMessage", "requestSize", "responseSize", "createdAt")
+         "queryCount", "cacheHit", "errorMessage", "requestSize", "responseSize", "created_at")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
       `, [
         performanceLog.endpoint,
@@ -197,12 +197,12 @@ export const getErrorAnalytics = async (timeRange: 'hour' | 'day' | 'week' = 'da
 
   const errorTrends = await AppDataSource.query(`
     SELECT 
-      DATE_TRUNC('hour', "createdAt") as hour,
+      DATE_TRUNC('hour', "created_at") as hour,
       COUNT(*) FILTER (WHERE "statusCode" >= 400) as error_count,
       COUNT(*) as total_requests
     FROM system_performance_logs 
     WHERE ${timeCondition}
-    GROUP BY DATE_TRUNC('hour', "createdAt")
+    GROUP BY DATE_TRUNC('hour', "created_at")
     ORDER BY hour ASC
   `);
 

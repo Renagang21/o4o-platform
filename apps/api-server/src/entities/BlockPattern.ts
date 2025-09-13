@@ -117,7 +117,7 @@ export class BlockPattern {
   authorId!: string
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author!: User
 
   // Version control

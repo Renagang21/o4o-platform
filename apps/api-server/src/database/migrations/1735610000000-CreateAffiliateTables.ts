@@ -97,12 +97,12 @@ export class CreateAffiliateTables1735610000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -219,7 +219,7 @@ export class CreateAffiliateTables1735610000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -239,7 +239,7 @@ export class CreateAffiliateTables1735610000000 implements MigrationInterface {
     // Create indexes for affiliate_clicks
     await queryRunner.createIndex('affiliate_clicks', new TableIndex({
       name: 'IDX_affiliate_clicks_affiliateUserId_createdAt',
-      columnNames: ['affiliateUserId', 'createdAt']
+      columnNames: ['affiliateUserId', 'created_at']
     }));
 
     await queryRunner.createIndex('affiliate_clicks', new TableIndex({
@@ -360,12 +360,12 @@ export class CreateAffiliateTables1735610000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -397,7 +397,7 @@ export class CreateAffiliateTables1735610000000 implements MigrationInterface {
     // Create indexes for affiliate_conversions
     await queryRunner.createIndex('affiliate_conversions', new TableIndex({
       name: 'IDX_affiliate_conversions_affiliateUserId_createdAt',
-      columnNames: ['affiliateUserId', 'createdAt']
+      columnNames: ['affiliateUserId', 'created_at']
     }));
 
     await queryRunner.createIndex('affiliate_conversions', new TableIndex({

@@ -252,8 +252,8 @@ export class ACFFieldGroup {
       fields: this.fields?.map(field => field.toJSON()),
       wpPostType: this.wpPostType,
       version: this.version,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      createdAt: this.created_at,
+      updatedAt: this.updated_at
     };
   }
 }

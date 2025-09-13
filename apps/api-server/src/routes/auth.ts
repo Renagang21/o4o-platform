@@ -187,7 +187,7 @@ router.get('/status', authenticateToken, async (req: AuthRequest, res) => {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: req.user.id },
-      select: ['id', 'email', 'name', 'role', 'status', 'createdAt', 'lastLoginAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'created_at', 'lastLoginAt']
     });
 
     if (!user) {

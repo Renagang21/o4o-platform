@@ -208,12 +208,12 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -374,7 +374,7 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -620,12 +620,12 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -872,12 +872,12 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -911,7 +911,7 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
 
     await queryRunner.createIndex('stock_movements', new TableIndex({
       name: 'IDX_stock_movements_inventory_created',
-      columnNames: ['inventoryId', 'createdAt']
+      columnNames: ['inventoryId', 'created_at']
     }));
 
     await queryRunner.createIndex('stock_movements', new TableIndex({
@@ -926,7 +926,7 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
 
     await queryRunner.createIndex('stock_movements', new TableIndex({
       name: 'IDX_stock_movements_created',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     await queryRunner.createIndex('reorder_rules', new TableIndex({
@@ -957,7 +957,7 @@ export class CreateInventoryTables1750000000000 implements MigrationInterface {
 
     await queryRunner.createIndex('inventory_alerts', new TableIndex({
       name: 'IDX_inventory_alerts_created',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     await queryRunner.createIndex('inventory_alerts', new TableIndex({

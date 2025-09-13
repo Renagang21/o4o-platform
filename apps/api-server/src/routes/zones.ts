@@ -373,7 +373,7 @@ router.get('/:pageId/analytics',
         totalBlocks,
         blocksByZone,
         blocksByType,
-        lastModified: post.updatedAt?.toISOString() || new Date().toISOString()
+        lastModified: post.updated_at?.toISOString() || new Date().toISOString()
       })
 
     } catch (error) {

@@ -190,7 +190,7 @@ export class ForumService {
     if (!post) return null;
 
     // 조회수 증가 (조회한 사용자가 작성자가 아닌 경우)
-    if (userId && userId !== post.authorId) {
+    if (userId && userId !== post.author_id) {
       setTimeout(async () => {
         await this.incrementPostViews(postId);
       }, 0);
@@ -208,7 +208,7 @@ export class ForumService {
     if (!post) return null;
 
     // 조회수 증가
-    if (userId && userId !== post.authorId) {
+    if (userId && userId !== post.author_id) {
       setTimeout(async () => {
         await this.incrementPostViews(post.id);
       }, 0);
@@ -246,8 +246,8 @@ export class ForumService {
     }
 
     // 작성자 필터
-    if (options.authorId) {
-      queryBuilder.andWhere('post.authorId = :authorId', { authorId: options.authorId });
+    if (options.author_id) {
+      queryBuilder.andWhere('post.author_id = :authorId', { authorId: options.author_id });
     }
 
     // 타입 필터
@@ -270,10 +270,10 @@ export class ForumService {
 
     // 날짜 범위 필터
     if (options.dateRange?.start) {
-      queryBuilder.andWhere('post.createdAt >= :startDate', { startDate: options.dateRange.start });
+      queryBuilder.andWhere('post.created_at >= :startDate', { startDate: options.dateRange.start });
     }
     if (options.dateRange?.end) {
-      queryBuilder.andWhere('post.createdAt <= :endDate', { endDate: options.dateRange.end });
+      queryBuilder.andWhere('post.created_at <= :endDate', { endDate: options.dateRange.end });
     }
 
     // 정렬
@@ -282,25 +282,25 @@ export class ForumService {
         queryBuilder
           .addSelect('(post.viewCount * 0.1 + post.commentCount * 2 + post.likeCount * 1.5)', 'popularity')
           .orderBy('popularity', 'DESC')
-          .addOrderBy('post.createdAt', 'DESC');
+          .addOrderBy('post.created_at', 'DESC');
         break;
       case 'trending':
         queryBuilder
           .addSelect(
-            '(post.viewCount * 0.1 + post.commentCount * 2 + post.likeCount * 1.5) / EXTRACT(epoch FROM (NOW() - post.createdAt)) * 86400',
+            '(post.viewCount * 0.1 + post.commentCount * 2 + post.likeCount * 1.5) / EXTRACT(epoch FROM (NOW() - post.created_at)) * 86400',
             'trending'
           )
-          .where('post.createdAt >= :weekAgo', { weekAgo: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) })
+          .where('post.created_at >= :weekAgo', { weekAgo: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) })
           .orderBy('trending', 'DESC');
         break;
       case 'oldest':
-        queryBuilder.orderBy('post.createdAt', 'ASC');
+        queryBuilder.orderBy('post.created_at', 'ASC');
         break;
       case 'latest':
       default:
         queryBuilder
           .orderBy('post.isPinned', 'DESC')
-          .addOrderBy('post.createdAt', 'DESC');
+          .addOrderBy('post.created_at', 'DESC');
         break;
     }
 
@@ -580,17 +580,17 @@ export class ForumService {
         COALESCE(c.comment_count, 0) as "commentCount"
       FROM "user" u
       LEFT JOIN (
-        SELECT "authorId", COUNT(*) as post_count
+        SELECT "author_id", COUNT(*) as post_count
         FROM forum_post 
-        WHERE status = 'published'
-        GROUP BY "authorId"
-      ) p ON u.id = p."authorId"
+        WHERE status = 'publish'
+        GROUP BY "author_id"
+      ) p ON u.id = p."author_id"
       LEFT JOIN (
-        SELECT "authorId", COUNT(*) as comment_count
+        SELECT "author_id", COUNT(*) as comment_count
         FROM forum_comment 
-        WHERE status = 'published'
-        GROUP BY "authorId"
-      ) c ON u.id = c."authorId"
+        WHERE status = 'publish'
+        GROUP BY "author_id"
+      ) c ON u.id = c."author_id"
       WHERE u."isActive" = true
       ORDER BY (COALESCE(p.post_count, 0) * 2 + COALESCE(c.comment_count, 0)) DESC
       LIMIT $1

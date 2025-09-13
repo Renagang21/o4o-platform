@@ -77,7 +77,7 @@ export class CreateAccountLinkingTables1738000000000 implements MigrationInterfa
             default: 'CURRENT_TIMESTAMP',
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP',
@@ -156,7 +156,7 @@ export class CreateAccountLinkingTables1738000000000 implements MigrationInterfa
             isNullable: true,
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
           },
@@ -226,7 +226,7 @@ export class CreateAccountLinkingTables1738000000000 implements MigrationInterfa
             isNullable: true,
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
           },
@@ -237,7 +237,7 @@ export class CreateAccountLinkingTables1738000000000 implements MigrationInterfa
 
     // Create indexes for account_activities
     await queryRunner.query(
-      `CREATE INDEX "IDX_account_activities_userId_createdAt" ON "account_activities" ("userId", "createdAt")`
+      `CREATE INDEX "IDX_account_activities_userId_createdAt" ON "account_activities" ("userId", "created_at")`
     );
 
     await queryRunner.query(

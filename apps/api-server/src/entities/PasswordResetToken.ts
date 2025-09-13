@@ -3,7 +3,7 @@ import { User } from './User';
 
 @Entity('password_reset_tokens')
 @Index(['token'], { unique: true })
-@Index(['userId', 'createdAt'])
+@Index(['userId', 'created_at'])
 export class PasswordResetToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;

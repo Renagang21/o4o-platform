@@ -138,7 +138,7 @@ const options: swaggerJsdoc.Options = {
             title: { type: 'string' },
             slug: { type: 'string' },
             content: { type: 'string' },
-            status: { type: 'string', enum: ['draft', 'published', 'archived'] },
+            status: { type: 'string', enum: ['draft', 'publish', 'archived'] },
             author: { $ref: '#/components/schemas/User' },
             categories: {
               type: 'array',

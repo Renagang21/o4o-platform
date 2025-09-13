@@ -191,7 +191,7 @@ export class DropshippingProduct {
   isBestSeller!: boolean;
 
   @Column({ type: 'varchar', length: 50, default: 'draft' })
-  status!: 'draft' | 'pending' | 'published' | 'archived';
+  status!: 'draft' | 'pending' | 'publish' | 'archived';
 
   @Column({ type: 'timestamp', nullable: true })
   publishedAt?: Date;
@@ -236,7 +236,7 @@ export class DropshippingProduct {
   }
 
   canBeSold(): boolean {
-    return this.isActive && this.status === 'published' && this.isInStock();
+    return this.isActive && this.status === 'publish' && this.isInStock();
   }
 
   calculateSellerPrice(markup: number): number {

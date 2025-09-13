@@ -10,7 +10,7 @@ import {
 import { AffiliateUser } from './AffiliateUser';
 
 @Entity('affiliate_clicks')
-@Index(['affiliateUserId', 'createdAt'])
+@Index(['affiliateUserId', 'created_at'])
 @Index(['sessionId'])
 @Index(['ipAddress'])
 export class AffiliateClick {

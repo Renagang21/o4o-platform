@@ -35,7 +35,7 @@ const mockPosts = [
     slug: 'welcome-to-neture',
     content: '<p>Welcome to the Neture O4O platform.</p>',
     excerpt: 'Welcome to the Neture O4O platform.',
-    status: 'published',
+    status: 'publish',
     type: 'post',
     author: {
       id: '1',
@@ -81,7 +81,7 @@ router.post('/',
   // Make title and content optional for auto-save support
   body('title').optional(),
   body('content').optional(),
-  body('status').optional().isIn(['draft', 'publish', 'published', 'private', 'archived', 'scheduled', 'auto-draft']),
+  body('status').optional().isIn(['draft', 'publish', 'publish', 'private', 'archived', 'scheduled', 'auto-draft']),
   validateDto,
   async (req: Request, res: Response) => {
     try {
@@ -91,10 +91,10 @@ router.post('/',
       const title = extractTitle(req.body.title) || 'Untitled';
       const content = extractContent(req.body.content) || '';
       
-      // Map 'publish' to 'published' for compatibility
+      // Map 'publish' to 'publish' for compatibility
       let status = req.body.status || 'draft';
       if (status === 'publish') {
-        status = 'published';
+        status = 'publish';
       }
       if (status === 'auto-draft') {
         status = 'draft';
@@ -178,17 +178,17 @@ router.post('/',
         postMeta: meta || {},
         authorId: userId,
         categories,
-        publishedAt: status === 'published' ? new Date() : null
+        publishedAt: status === 'publish' ? new Date() : null
       });
 
       // Format response for Gutenberg
       const response = {
         id: post.id,
-        date: post.publishedAt || post.createdAt,
-        date_gmt: post.publishedAt || post.createdAt,
+        date: post.published_at || post.created_at,
+        date_gmt: post.published_at || post.created_at,
         guid: { rendered: `/posts/${post.id}` },
-        modified: post.updatedAt,
-        modified_gmt: post.updatedAt,
+        modified: post.updated_at,
+        modified_gmt: post.updated_at,
         slug: post.slug,
         status: post.status,
         type: 'post',
@@ -245,10 +245,10 @@ router.put('/:id',
       const title = extractTitle(req.body.title);
       const content = extractContent(req.body.content);
       
-      // Map 'publish' to 'published' for compatibility
+      // Map 'publish' to 'publish' for compatibility
       let status = req.body.status;
       if (status === 'publish') {
-        status = 'published';
+        status = 'publish';
       }
       
       const { 
@@ -323,17 +323,17 @@ router.put('/:id',
         postMeta: meta || existingPost.postMeta,
         categories,
         lastModifierId: userId,
-        publishedAt: status === 'published' && !existingPost.publishedAt ? new Date() : existingPost.publishedAt
+        publishedAt: status === 'publish' && !existingPost.published_at ? new Date() : existingPost.published_at
       });
 
       // Format response for Gutenberg
       const response = {
         id: updatedPost.id,
-        date: updatedPost.publishedAt || updatedPost.createdAt,
-        date_gmt: updatedPost.publishedAt || updatedPost.createdAt,
+        date: updatedPost.published_at || updatedPost.created_at,
+        date_gmt: updatedPost.published_at || updatedPost.created_at,
         guid: { rendered: `/posts/${updatedPost.id}` },
-        modified: updatedPost.updatedAt,
-        modified_gmt: updatedPost.updatedAt,
+        modified: updatedPost.updated_at,
+        modified_gmt: updatedPost.updated_at,
         slug: updatedPost.slug,
         status: updatedPost.status,
         type: 'post',

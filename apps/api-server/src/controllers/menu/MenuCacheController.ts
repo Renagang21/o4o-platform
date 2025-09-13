@@ -180,14 +180,14 @@ export class MenuCacheController {
       
       const oldestCache = cacheEntries.length > 0
         ? cacheEntries.reduce((oldest, entry) => 
-            entry.createdAt < oldest ? entry.createdAt : oldest, 
-            cacheEntries[0].createdAt)
+            entry.created_at < oldest ? entry.created_at : oldest, 
+            cacheEntries[0].created_at)
         : null;
         
       const newestCache = cacheEntries.length > 0
         ? cacheEntries.reduce((newest, entry) => 
-            entry.createdAt > newest ? entry.createdAt : newest, 
-            cacheEntries[0].createdAt)
+            entry.created_at > newest ? entry.created_at : newest, 
+            cacheEntries[0].created_at)
         : null;
 
       const averageResponseTime = this.responseTimes.length > 0

@@ -10,10 +10,10 @@ import {
 import { Inventory } from './Inventory';
 
 @Entity('stock_movements')
-@Index(['inventoryId', 'createdAt'])
+@Index(['inventoryId', 'created_at'])
 @Index(['movementType'])
 @Index(['referenceNumber'])
-@Index(['createdAt'])
+@Index(['created_at'])
 export class StockMovement {
   @PrimaryGeneratedColumn('uuid')
   id: string;

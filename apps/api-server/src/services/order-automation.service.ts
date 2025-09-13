@@ -93,7 +93,7 @@ export class OrderAutomationService {
         queryBuilder.andWhere('rule.triggerEvent = :triggerEvent', { triggerEvent: filters.triggerEvent });
       }
 
-      queryBuilder.orderBy('rule.priority', 'DESC').addOrderBy('rule.createdAt', 'DESC');
+      queryBuilder.orderBy('rule.priority', 'DESC').addOrderBy('rule.created_at', 'DESC');
 
       if (filters.limit) {
         queryBuilder.limit(filters.limit);
@@ -500,7 +500,7 @@ export class OrderAutomationService {
         const dateStr = date.toISOString().split('T')[0];
         
         const dayLogs = recentLogs.filter(log => 
-          log.createdAt.toISOString().split('T')[0] === dateStr
+          log.created_at.toISOString().split('T')[0] === dateStr
         );
         
         recentActivity.push({

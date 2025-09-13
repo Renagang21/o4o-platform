@@ -24,7 +24,7 @@ export const mockPosts = [
       ]
     },
     excerpt: 'Welcome to the Neture platform. This is your first post.',
-    status: 'published',
+    status: 'publish',
     author: {
       id: '1',
       name: 'Admin',
@@ -57,7 +57,7 @@ export const mockPosts = [
       ]
     },
     excerpt: 'Learn how to use the Gutenberg editor effectively.',
-    status: 'published',
+    status: 'publish',
     author: {
       id: '1',
       name: 'Admin',

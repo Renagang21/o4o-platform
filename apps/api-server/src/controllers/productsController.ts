@@ -48,7 +48,7 @@ export class ProductsController {
         category,
         search,
         status = 'active',
-        sortBy = 'createdAt',
+        sortBy = 'created_at',
         sortOrder = 'DESC',
         featured,
         minPrice,

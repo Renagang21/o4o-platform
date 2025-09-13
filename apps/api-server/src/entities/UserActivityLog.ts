@@ -98,9 +98,9 @@ export interface ActivityMetadata {
 }
 
 @Entity('user_activity_logs')
-@Index(['userId', 'activityType', 'createdAt'])
-@Index(['activityCategory', 'createdAt'])
-@Index(['createdAt'])
+@Index(['userId', 'activityType', 'created_at'])
+@Index(['activityCategory', 'created_at'])
+@Index(['created_at'])
 export class UserActivityLog {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

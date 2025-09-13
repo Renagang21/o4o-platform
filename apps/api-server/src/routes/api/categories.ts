@@ -16,7 +16,7 @@ router.get('/', async (req: Request, res: Response) => {
       per_page = 100,
       search,
       parent,
-      orderby = 'sortOrder',
+      orderby = 'name',
       order = 'ASC'
     } = req.query
 
@@ -112,9 +112,7 @@ router.post('/', async (req: Request, res: Response) => {
       description,
       parent,
       image,
-      sortOrder = 0,
-      metaTitle,
-      metaDescription
+      meta
     } = req.body
 
     // Check if slug is unique
@@ -130,9 +128,7 @@ router.post('/', async (req: Request, res: Response) => {
       slug: slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       description,
       image,
-      sortOrder,
-      metaTitle,
-      metaDescription,
+      meta,
       isActive: true
     })
 
@@ -162,9 +158,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       description,
       parent,
       image,
-      sortOrder,
-      metaTitle,
-      metaDescription,
+      meta,
       isActive
     } = req.body
 
@@ -187,9 +181,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (slug !== undefined) category.slug = slug
     if (description !== undefined) category.description = description
     if (image !== undefined) category.image = image
-    if (sortOrder !== undefined) category.sortOrder = sortOrder
-    if (metaTitle !== undefined) category.metaTitle = metaTitle
-    if (metaDescription !== undefined) category.metaDescription = metaDescription
+    if (meta !== undefined) category.meta = meta
     if (isActive !== undefined) category.isActive = isActive
 
     // Update parent

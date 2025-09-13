@@ -12,7 +12,7 @@ import { CustomPostType } from './CustomPostType';
 
 export enum PostStatus {
   DRAFT = 'draft',
-  PUBLISHED = 'published',
+  PUBLISHED = 'publish',
   PRIVATE = 'private',
   TRASH = 'trash'
 }

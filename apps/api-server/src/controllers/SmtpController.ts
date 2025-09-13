@@ -328,10 +328,10 @@ export class SmtpController {
         query.andWhere('log.emailType = :emailType', { emailType });
       }
       if (startDate) {
-        query.andWhere('log.createdAt >= :startDate', { startDate });
+        query.andWhere('log.created_at >= :startDate', { startDate });
       }
       if (endDate) {
-        query.andWhere('log.createdAt <= :endDate', { endDate });
+        query.andWhere('log.created_at <= :endDate', { endDate });
       }
 
       // Pagination
@@ -339,7 +339,7 @@ export class SmtpController {
       query.skip(skip).take(Number(limit));
 
       // Order by latest first
-      query.orderBy('log.createdAt', 'DESC');
+      query.orderBy('log.created_at', 'DESC');
 
       const [logs, total] = await query.getManyAndCount();
 
@@ -416,8 +416,8 @@ export class SmtpController {
         .createQueryBuilder('log')
         .select('log.status', 'status')
         .addSelect('COUNT(*)', 'count')
-        .where('log.createdAt >= :startDate', { startDate })
-        .andWhere('log.createdAt <= :endDate', { endDate })
+        .where('log.created_at >= :startDate', { startDate })
+        .andWhere('log.created_at <= :endDate', { endDate })
         .groupBy('log.status')
         .getRawMany();
 

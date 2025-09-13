@@ -9,7 +9,7 @@ import {
 @Entity('affiliate_audit_logs')
 @Index(['entityType', 'entityId'])
 @Index(['userId'])
-@Index(['createdAt'])
+@Index(['created_at'])
 export class AffiliateAuditLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;

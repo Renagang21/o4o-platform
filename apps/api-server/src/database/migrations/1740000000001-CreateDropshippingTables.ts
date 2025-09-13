@@ -143,12 +143,12 @@ export class CreateDropshippingTables1740000000001 implements MigrationInterface
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP'
@@ -383,12 +383,12 @@ export class CreateDropshippingTables1740000000001 implements MigrationInterface
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP'
@@ -655,12 +655,12 @@ export class CreateDropshippingTables1740000000001 implements MigrationInterface
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP'
@@ -959,7 +959,7 @@ export class CreateDropshippingTables1740000000001 implements MigrationInterface
             default: "'draft'"
           },
           {
-            name: 'publishedAt',
+            name: 'published_at',
             type: 'timestamp',
             isNullable: true
           },
@@ -991,12 +991,12 @@ export class CreateDropshippingTables1740000000001 implements MigrationInterface
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP'

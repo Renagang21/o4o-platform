@@ -7,7 +7,7 @@ export const getCommissionsSchema = Joi.object({
   endDate: Joi.date().iso().optional(),
   page: Joi.number().integer().min(1).optional().default(1),
   limit: Joi.number().integer().min(1).max(100).optional().default(20),
-  orderBy: Joi.string().valid('createdAt', 'amount', 'status').optional().default('createdAt'),
+  orderBy: Joi.string().valid('created_at', 'amount', 'status').optional().default('created_at'),
   orderDirection: Joi.string().valid('ASC', 'DESC').optional().default('DESC')
 });
 
@@ -89,9 +89,9 @@ export const getAffiliateUsersSchema = Joi.object({
   page: Joi.number().integer().min(1).optional().default(1),
   limit: Joi.number().integer().min(1).max(100).optional().default(20),
   orderBy: Joi.string()
-    .valid('createdAt', 'totalEarnings', 'totalClicks', 'totalConversions')
+    .valid('created_at', 'totalEarnings', 'totalClicks', 'totalConversions')
     .optional()
-    .default('createdAt'),
+    .default('created_at'),
   orderDirection: Joi.string().valid('ASC', 'DESC').optional().default('DESC')
 });
 

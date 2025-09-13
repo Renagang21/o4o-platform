@@ -224,8 +224,8 @@ export class CommissionService {
       paymentReference: commission.paymentReference,
       notes: commission.notes,
       rejectionReason: commission.rejectionReason,
-      createdAt: commission.createdAt,
-      updatedAt: commission.updatedAt
+      createdAt: commission.created_at,
+      updatedAt: commission.updated_at
     }));
 
     return {
@@ -267,8 +267,8 @@ export class CommissionService {
       description: affiliate.description,
       lastClickAt: affiliate.lastClickAt,
       lastConversionAt: affiliate.lastConversionAt,
-      createdAt: affiliate.createdAt,
-      updatedAt: affiliate.updatedAt
+      createdAt: affiliate.created_at,
+      updatedAt: affiliate.updated_at
     }));
 
     return {
@@ -370,7 +370,7 @@ export class CommissionService {
       this.commissionRepo.getCommissions({
         page: 1,
         limit: 10,
-        orderBy: 'createdAt',
+        orderBy: 'created_at',
         orderDirection: 'DESC'
       })
     ]);
@@ -392,7 +392,7 @@ export class CommissionService {
         entityId: log.entityId,
         userEmail: log.userEmail,
         description: log.description,
-        createdAt: log.createdAt
+        createdAt: log.created_at
       })),
       topPerformers,
       commissionBreakdown: {

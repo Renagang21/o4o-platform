@@ -72,7 +72,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
     
     if (author) {
-      queryBuilder.andWhere('page.authorId = :authorId', { authorId: author })
+      queryBuilder.andWhere('page.author_id = :authorId', { authorId: author })
     }
     
     if (search) {
@@ -109,7 +109,7 @@ router.get('/hierarchy', async (req: Request, res: Response) => {
   try {
     const pageRepository = AppDataSource.getRepository(Page)
     const pages = await pageRepository.find({
-      where: { status: 'published' },
+      where: { status: 'publish' },
       relations: ['author'],
       order: { menuOrder: 'ASC' }
     })
@@ -225,7 +225,7 @@ router.post('/', async (req: Request, res: Response) => {
       password,
       passwordProtected: !!password,
       scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
-      publishedAt: status === 'published' ? new Date() : undefined,
+      publishedAt: status === 'publish' ? new Date() : undefined,
       authorId: userId,
       showInMenu,
       isHomepage
@@ -293,8 +293,8 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (slug !== undefined) page.slug = slug
     if (status !== undefined) {
       page.status = status
-      if (status === 'published' && !page.publishedAt) {
-        page.publishedAt = new Date()
+      if (status === 'publish' && !page.published_at) {
+        page.published_at = new Date()
       }
     }
     if (parentId !== undefined) page.parentId = parentId
@@ -455,7 +455,7 @@ router.post('/bulk', async (req: Request, res: Response) => {
       case 'publish':
         await pageRepository.update(
           { id: In(ids) }, 
-          { status: 'published', publishedAt: new Date() }
+          { status: 'publish', publishedAt: new Date() }
         )
         break
       case 'draft':

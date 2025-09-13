@@ -39,7 +39,7 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
                 {
                     name: "status",
                     type: "enum",
-                    enum: ["draft", "published", "private", "archived", "scheduled"],
+                    enum: ["draft", "publish", "private", "archived", "scheduled"],
                     default: "'draft'"
                 },
                 {
@@ -75,7 +75,7 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
                     isNullable: true
                 },
                 {
-                    name: "publishedAt",
+                    name: "published_at",
                     type: "timestamp",
                     isNullable: true
                 },
@@ -85,7 +85,7 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
                     isNullable: true
                 },
                 {
-                    name: "authorId",
+                    name: "author_id",
                     type: "uuid"
                 },
                 {
@@ -151,12 +151,12 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
                     isNullable: true
                 },
                 {
-                    name: "createdAt",
+                    name: "created_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP"
                 },
                 {
-                    name: "updatedAt",
+                    name: "updated_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP",
                     onUpdate: "CURRENT_TIMESTAMP"
@@ -183,7 +183,7 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
         await queryRunner.query(`
             ALTER TABLE "posts" 
             ADD CONSTRAINT "FK_posts_authorId" 
-            FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE CASCADE
+            FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE
         `)
 
         await queryRunner.query(`
@@ -207,8 +207,8 @@ export class CreatePostsTable1738500000001 implements MigrationInterface {
         // Create indexes for better performance
         await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_slug", columnNames: ["slug"] }))
         await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_status", columnNames: ["status"] }))
-        await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_publishedAt", columnNames: ["publishedAt"] }))
-        await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_authorId", columnNames: ["authorId"] }))
+        await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_publishedAt", columnNames: ["published_at"] }))
+        await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_authorId", columnNames: ["author_id"] }))
         await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_featured", columnNames: ["featured"] }))
         await queryRunner.createIndex("posts", new TableIndex({ name: "IDX_posts_sticky", columnNames: ["sticky"] }))
         

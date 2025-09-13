@@ -35,7 +35,7 @@ export class CreateEmailTokensTables1738004000000 implements MigrationInterface 
             default: false,
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
           },
@@ -75,7 +75,7 @@ export class CreateEmailTokensTables1738004000000 implements MigrationInterface 
             default: false,
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
           },
@@ -87,9 +87,9 @@ export class CreateEmailTokensTables1738004000000 implements MigrationInterface 
     // Create indexes
     await queryRunner.query(`
       CREATE INDEX "IDX_PASSWORD_RESET_TOKEN" ON "password_reset_tokens" ("token");
-      CREATE INDEX "IDX_PASSWORD_RESET_USER_CREATED" ON "password_reset_tokens" ("userId", "createdAt");
+      CREATE INDEX "IDX_PASSWORD_RESET_USER_CREATED" ON "password_reset_tokens" ("userId", "created_at");
       CREATE INDEX "IDX_EMAIL_VERIFICATION_TOKEN" ON "email_verification_tokens" ("token");
-      CREATE INDEX "IDX_EMAIL_VERIFICATION_USER_CREATED" ON "email_verification_tokens" ("userId", "createdAt");
+      CREATE INDEX "IDX_EMAIL_VERIFICATION_USER_CREATED" ON "email_verification_tokens" ("userId", "created_at");
     `);
 
     // Add foreign keys

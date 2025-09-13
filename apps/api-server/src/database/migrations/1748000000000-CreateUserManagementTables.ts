@@ -78,7 +78,7 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -104,17 +104,17 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
     // Create indexes for user_activity_logs
     await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_userId_activityType_createdAt',
-      columnNames: ['userId', 'activityType', 'createdAt']
+      columnNames: ['userId', 'activityType', 'created_at']
     }));
 
     await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_activityCategory_createdAt',
-      columnNames: ['activityCategory', 'createdAt']
+      columnNames: ['activityCategory', 'created_at']
     }));
 
     await queryRunner.createIndex('user_activity_logs', new TableIndex({
       name: 'IDX_user_activity_logs_createdAt',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     // Create business_info table
@@ -265,12 +265,12 @@ export class CreateUserManagementTables1748000000000 implements MigrationInterfa
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
             onUpdate: 'CURRENT_TIMESTAMP'

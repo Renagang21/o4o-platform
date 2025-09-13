@@ -92,12 +92,12 @@ export class CreateAffiliatePhase2Tables1735620000000 implements MigrationInterf
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -139,7 +139,7 @@ export class CreateAffiliatePhase2Tables1735620000000 implements MigrationInterf
 
     await queryRunner.createIndex('affiliate_commissions', new TableIndex({
       name: 'IDX_affiliate_commissions_createdAt',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     // Create affiliate_payouts table
@@ -250,12 +250,12 @@ export class CreateAffiliatePhase2Tables1735620000000 implements MigrationInterf
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -285,7 +285,7 @@ export class CreateAffiliatePhase2Tables1735620000000 implements MigrationInterf
 
     await queryRunner.createIndex('affiliate_payouts', new TableIndex({
       name: 'IDX_affiliate_payouts_createdAt',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     // Create affiliate_audit_logs table
@@ -365,7 +365,7 @@ export class CreateAffiliatePhase2Tables1735620000000 implements MigrationInterf
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -387,7 +387,7 @@ export class CreateAffiliatePhase2Tables1735620000000 implements MigrationInterf
 
     await queryRunner.createIndex('affiliate_audit_logs', new TableIndex({
       name: 'IDX_affiliate_audit_logs_createdAt',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
   }
 
