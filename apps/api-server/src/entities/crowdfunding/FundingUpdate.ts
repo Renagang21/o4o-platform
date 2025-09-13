@@ -11,7 +11,7 @@ import {
 import { FundingProject } from './FundingProject';
 
 @Entity('funding_updates')
-@Index(['projectId', 'created_at'])
+@Index(['projectId', 'createdAt'])
 export class FundingUpdate {
   @PrimaryGeneratedColumn('uuid')
   id: string;

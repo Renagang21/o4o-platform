@@ -13,7 +13,7 @@ import { AffiliateUser } from './AffiliateUser';
 @Entity('affiliate_payouts')
 @Index(['affiliateUserId', 'status'])
 @Index(['transactionId'])
-@Index(['created_at'])
+@Index(['createdAt'])
 export class AffiliatePayout {
   @PrimaryGeneratedColumn('uuid')
   id: string;

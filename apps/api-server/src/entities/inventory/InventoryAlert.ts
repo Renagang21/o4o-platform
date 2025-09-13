@@ -13,7 +13,7 @@ import { Inventory } from './Inventory';
 @Entity('inventory_alerts')
 @Index(['inventoryId', 'status'])
 @Index(['alertType', 'severity'])
-@Index(['created_at'])
+@Index(['createdAt'])
 @Index(['acknowledgedAt'])
 export class InventoryAlert {
   @PrimaryGeneratedColumn('uuid')

@@ -14,7 +14,7 @@ import { VendorInfo } from './VendorInfo';
 @Index(['vendorId', 'period'], { unique: true })
 @Index(['status'])
 @Index(['period'])
-@Index(['created_at'])
+@Index(['createdAt'])
 export class VendorCommission {
   @PrimaryGeneratedColumn('uuid')
   id: string;

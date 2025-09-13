@@ -3,7 +3,7 @@ import { User } from './User';
 
 @Entity('email_verification_tokens')
 @Index(['token'], { unique: true })
-@Index(['userId', 'created_at'])
+@Index(['userId', 'createdAt'])
 export class EmailVerificationToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -122,10 +122,10 @@ export enum ActionCategory {
 }
 
 @Entity('user_actions')
-@Index(['betaUserId', 'actionType', 'created_at'])
-@Index(['sessionId', 'created_at'])
-@Index(['actionCategory', 'created_at'])
-@Index(['created_at'])
+@Index(['betaUserId', 'actionType', 'createdAt'])
+@Index(['sessionId', 'createdAt'])
+@Index(['actionCategory', 'createdAt'])
+@Index(['createdAt'])
 export class UserAction {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

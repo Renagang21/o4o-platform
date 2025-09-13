@@ -15,7 +15,7 @@ import { AffiliateConversion } from './AffiliateConversion';
 @Index(['affiliateUserId', 'status'])
 @Index(['conversionId'], { unique: true })
 @Index(['orderId'])
-@Index(['created_at'])
+@Index(['createdAt'])
 export class AffiliateCommission {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 
 
 @Entity('login_attempts')
 @Index(['email', 'ipAddress'])
-@Index(['created_at'])
+@Index(['createdAt'])
 export class LoginAttempt {
   @PrimaryGeneratedColumn('uuid')
   id: string;

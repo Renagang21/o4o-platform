@@ -13,7 +13,7 @@ import { User } from '../User';
 import { Order } from '../Order';
 
 @Entity('affiliate_conversions')
-@Index(['affiliateUserId', 'created_at'])
+@Index(['affiliateUserId', 'createdAt'])
 @Index(['status'])
 @Index(['orderId'])
 export class AffiliateConversion {

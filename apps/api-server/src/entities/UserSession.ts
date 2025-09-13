@@ -24,9 +24,9 @@ export enum DeviceType {
 }
 
 @Entity('user_sessions')
-@Index(['betaUserId', 'status', 'created_at'])
+@Index(['betaUserId', 'status', 'createdAt'])
 @Index(['status', 'endedAt'])
-@Index(['deviceType', 'created_at'])
+@Index(['deviceType', 'createdAt'])
 export class UserSession {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -173,9 +173,9 @@ export class UserSession {
 
   private calculateDuration(): void {
     if (this.endedAt) {
-      this.durationMinutes = Math.floor((this.endedAt.getTime() - this.created_at.getTime()) / (1000 * 60));
+      this.durationMinutes = Math.floor((this.endedAt.getTime() - this.createdAt.getTime()) / (1000 * 60));
     } else if (this.lastActivityAt) {
-      this.durationMinutes = Math.floor((this.lastActivityAt.getTime() - this.created_at.getTime()) / (1000 * 60));
+      this.durationMinutes = Math.floor((this.lastActivityAt.getTime() - this.createdAt.getTime()) / (1000 * 60));
     }
   }
 

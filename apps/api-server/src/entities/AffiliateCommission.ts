@@ -6,7 +6,7 @@ import { Product } from './Product';
 @Entity('affiliate_commissions')
 @Index(['affiliateUserId'])
 @Index(['status'])
-@Index(['created_at'])
+@Index(['createdAt'])
 export class AffiliateCommission {
   @PrimaryGeneratedColumn('uuid')
   id: string;

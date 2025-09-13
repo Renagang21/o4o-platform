@@ -12,7 +12,7 @@ import { User } from './User';
 export type ApprovalAction = 'approved' | 'rejected' | 'status_changed';
 
 @Entity('approval_logs')
-@Index(['user_id', 'created_at'])
+@Index(['user_id', 'createdAt'])
 export class ApprovalLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;

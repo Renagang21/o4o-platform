@@ -32,8 +32,8 @@ export enum ReportStatus {
 }
 
 @Entity('analytics_reports')
-@Index(['reportType', 'reportCategory', 'created_at'])
-@Index(['status', 'created_at'])
+@Index(['reportType', 'reportCategory', 'createdAt'])
+@Index(['status', 'createdAt'])
 @Index(['reportPeriodStart', 'reportPeriodEnd'])
 export class AnalyticsReport {
   @PrimaryGeneratedColumn('uuid')

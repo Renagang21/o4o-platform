@@ -37,7 +37,7 @@ export enum ParticipantRole {
 @Entity('feedback_conversations')
 @Index(['feedbackId', 'status'])
 @Index(['betaUserId', 'status'])
-@Index(['status', 'created_at'])
+@Index(['status', 'createdAt'])
 @Index(['assignedTo', 'status'])
 export class FeedbackConversation {
   @PrimaryGeneratedColumn('uuid')
@@ -189,9 +189,9 @@ export class FeedbackConversation {
 }
 
 @Entity('conversation_messages')
-@Index(['conversationId', 'created_at'])
-@Index(['senderId', 'created_at'])
-@Index(['messageType', 'created_at'])
+@Index(['conversationId', 'createdAt'])
+@Index(['senderId', 'createdAt'])
+@Index(['messageType', 'createdAt'])
 export class ConversationMessage {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -285,6 +285,6 @@ export class ConversationMessage {
   }
 
   getAgeInMinutes(): number {
-    return Math.floor((Date.now() - this.created_at.getTime()) / (1000 * 60));
+    return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60));
   }
 }

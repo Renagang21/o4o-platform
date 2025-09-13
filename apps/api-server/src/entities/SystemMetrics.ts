@@ -104,9 +104,9 @@ export enum MetricCategory {
 }
 
 @Entity('system_metrics')
-@Index(['metricType', 'metricCategory', 'created_at'])
-@Index(['created_at'])
-@Index(['source', 'created_at'])
+@Index(['metricType', 'metricCategory', 'createdAt'])
+@Index(['createdAt'])
+@Index(['source', 'createdAt'])
 export class SystemMetrics {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

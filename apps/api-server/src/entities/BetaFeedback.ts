@@ -53,10 +53,10 @@ export enum SignageFeature {
 }
 
 @Entity('beta_feedback')
-@Index(['betaUserId', 'status', 'created_at'])
+@Index(['betaUserId', 'status', 'createdAt'])
 @Index(['type', 'status'])
 @Index(['feature', 'priority'])
-@Index(['status', 'priority', 'created_at'])
+@Index(['status', 'priority', 'createdAt'])
 export class BetaFeedback {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -274,7 +274,7 @@ export class BetaFeedback {
 
   getDaysOpen(): number {
     const endDate = this.resolvedAt || new Date();
-    return Math.floor((endDate.getTime() - this.created_at.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.floor((endDate.getTime() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24));
   }
 
   getBusinessImpactScore(): number {

@@ -18,7 +18,7 @@ export enum CommentStatus {
 }
 
 @Entity('forum_comment')
-@Index(['postId', 'status', 'created_at'])
+@Index(['postId', 'status', 'createdAt'])
 export class ForumComment {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -59,7 +59,7 @@ export class ForumComment {
   post?: Promise<ForumPost>;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'author_id' })
+  @JoinColumn({ name: 'authorId' })
   author?: User;
 
   @ManyToOne(() => ForumComment, { nullable: true, lazy: true })
@@ -72,15 +72,15 @@ export class ForumComment {
   // Methods
   canUserView(userRole: string, userId: string): boolean {
     if (this.status === CommentStatus.DELETED) {
-      return ['admin', 'manager'].includes(userRole) || userId === this.author_id;
+      return ['admin', 'manager'].includes(userRole) || userId === this.authorId;
     }
     return this.status === CommentStatus.PUBLISHED;
   }
 
   canUserEdit(userId: string, userRole: string): boolean {
     if (['admin', 'manager'].includes(userRole)) return true;
-    if (this.author_id === userId && this.status !== CommentStatus.DELETED) {
-      const hoursSinceCreation = (Date.now() - this.created_at.getTime()) / (1000 * 60 * 60);
+    if (this.authorId === userId && this.status !== CommentStatus.DELETED) {
+      const hoursSinceCreation = (Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60);
       return hoursSinceCreation < 24;
     }
     return false;

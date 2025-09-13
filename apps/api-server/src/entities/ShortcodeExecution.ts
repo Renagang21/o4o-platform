@@ -28,10 +28,10 @@ export enum ExecutionContext {
 }
 
 @Entity('shortcode_executions')
-@Index(['shortcode_id', 'created_at'])
-@Index(['user_id', 'created_at'])
-@Index(['status', 'created_at'])
-@Index(['context', 'created_at'])
+@Index(['shortcode_id', 'createdAt'])
+@Index(['user_id', 'createdAt'])
+@Index(['status', 'createdAt'])
+@Index(['context', 'createdAt'])
 export class ShortcodeExecution {
   @PrimaryGeneratedColumn('uuid')
   id: string;
