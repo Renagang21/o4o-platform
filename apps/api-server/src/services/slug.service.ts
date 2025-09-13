@@ -37,12 +37,16 @@ export class SlugService {
   /**
    * Ensure slug uniqueness for posts
    */
-  async ensureUniquePostSlug(slugOrTitle: string, excludeId?: string): Promise<string> {
-    // If it looks like a slug already (no spaces, lowercase, etc), use it directly
-    // Otherwise generate slug from title
-    let baseSlug = slugOrTitle.includes(' ') || /[A-Z가-힣]/.test(slugOrTitle) 
-      ? this.generateSlug(slugOrTitle) 
-      : slugOrTitle;
+  async ensureUniquePostSlug(input: string, excludeId?: string, isSlug: boolean = false): Promise<string> {
+    let baseSlug: string;
+    
+    if (isSlug) {
+      // 이미 처리된 slug 값 - 그대로 사용
+      baseSlug = input;
+    } else {
+      // title에서 slug 생성
+      baseSlug = this.generateSlug(input);
+    }
     
     if (!baseSlug) {
       baseSlug = 'post';

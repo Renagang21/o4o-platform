@@ -166,6 +166,7 @@ export class PostController {
     try {
       const {
         title,
+        slug,
         content,
         excerpt,
         status = 'draft',
@@ -196,8 +197,28 @@ export class PostController {
         return;
       }
 
-      // Generate unique slug
-      const slug = await slugService.ensureUniquePostSlug(title);
+      // Validate slug is provided
+      if (!slug || slug.trim().length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'slug is required. Please provide a URL-friendly slug.'
+        });
+        return;
+      }
+
+      // Check if slug is already taken
+      const isSlugTaken = await this.postRepository
+        .createQueryBuilder('post')
+        .where('post.slug = :slug', { slug })
+        .getCount() > 0;
+
+      if (isSlugTaken) {
+        res.status(400).json({
+          success: false,
+          error: 'This slug is already taken. Please choose a different slug.'
+        });
+        return;
+      }
 
       // Handle categories
       let categories = [];
@@ -320,7 +341,20 @@ export class PostController {
 
       // Handle slug update
       if (updates.slug && updates.slug !== post.slug) {
-        updates.slug = await slugService.ensureUniquePostSlug(updates.slug, id);
+        // Check if new slug is already taken
+        const isSlugTaken = await this.postRepository
+          .createQueryBuilder('post')
+          .where('post.slug = :slug', { slug: updates.slug })
+          .andWhere('post.id != :id', { id })
+          .getCount() > 0;
+
+        if (isSlugTaken) {
+          res.status(400).json({
+            success: false,
+            error: 'This slug is already taken. Please choose a different slug.'
+          });
+          return;
+        }
       }
 
       // Handle categories
