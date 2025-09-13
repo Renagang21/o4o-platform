@@ -76,8 +76,8 @@ export class PagesController {
       }
 
       // Apply ordering
-      const validOrderFields = ['title', 'created_at', 'updated_at', 'published_at', 'views'];
-      const orderField = validOrderFields.includes(orderBy as string) ? orderBy as string : 'updated_at';
+      const validOrderFields = ['title', 'createdAt', 'updatedAt', 'publishedAt', 'views'];
+      const orderField = validOrderFields.includes(orderBy as string) ? orderBy as string : 'updatedAt';
       const orderDirection = order === 'asc' ? 'ASC' : 'DESC';
       
       queryBuilder.orderBy(`page.${orderField}`, orderDirection);
@@ -342,7 +342,7 @@ export class PagesController {
         showInMenu,
         isHomepage,
         seo,
-        publishedAt: status === 'publish' && !page.published_at ? publishedAt || new Date() : publishedAt,
+        publishedAt: status === 'publish' && !page.publishedAt ? publishedAt || new Date() : publishedAt,
         scheduledAt,
         lastModifiedBy: userId,
         password,

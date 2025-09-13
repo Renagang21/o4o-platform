@@ -38,7 +38,7 @@ export class TagService {
     }
 
     // Add sorting
-    const allowedSortFields = ['name', 'slug', 'created_at', 'updated_at'];
+    const allowedSortFields = ['name', 'slug', 'createdAt', 'updatedAt'];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'name';
     queryBuilder.orderBy(`tag.${sortField}`, sortOrder);
 
@@ -89,8 +89,8 @@ export class TagService {
     tag.metaDescription = data.metaDescription || data.description || '';
     
     // Set timestamps
-    tag.created_at = new Date();
-    tag.updated_at = new Date();
+    tag.createdAt = new Date();
+    tag.updatedAt = new Date();
 
     return await this.tagRepository.save(tag);
   }
@@ -113,7 +113,7 @@ export class TagService {
     if (data.metaDescription !== undefined) tag.metaDescription = data.metaDescription;
 
     // Update timestamp
-    tag.updated_at = new Date();
+    tag.updatedAt = new Date();
 
     return await this.tagRepository.save(tag);
   }
@@ -215,8 +215,8 @@ export class TagService {
     // Get recent posts
     const recentPosts = posts
       .sort((a, b) => {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
@@ -224,8 +224,8 @@ export class TagService {
     // Get most viewed posts (using creation date as fallback for now)
     const popularPosts = posts
       .sort((a, b) => {
-        const dateA = new Date(a.created_at).getTime();
-        const dateB = new Date(b.created_at).getTime();
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
@@ -240,7 +240,7 @@ export class TagService {
         id: p.id,
         title: p.title,
         slug: p.slug,
-        created_at: p.created_at,
+        createdAt: p.createdAt,
         viewCount: 0 // viewCount not available yet
       })),
       popularPosts: popularPosts.map(p => ({
@@ -249,8 +249,8 @@ export class TagService {
         slug: p.slug,
         viewCount: 0 // viewCount not available yet
       })),
-      created_at: tag.created_at,
-      updated_at: tag.updated_at
+      createdAt: tag.createdAt,
+      updatedAt: tag.updatedAt
     };
   }
 

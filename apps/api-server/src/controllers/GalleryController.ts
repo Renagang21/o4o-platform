@@ -299,7 +299,7 @@ export class GalleryController {
           alt: updatedFile.altText,
           caption: updatedFile.caption,
           description: updatedFile.description,
-          updatedAt: updatedFile.updated_at
+          updatedAt: updatedFile.updatedAt
         }
       });
     } catch (error: any) {

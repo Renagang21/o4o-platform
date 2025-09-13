@@ -141,7 +141,7 @@ export class AnalyticsController {
               actions: session.actions,
               deviceType: session.deviceType,
               browser: session.browser,
-              createdAt: session.created_at,
+              createdAt: session.createdAt,
               engagementScore: session.getEngagementScore()
             }))
           }
@@ -272,7 +272,7 @@ export class AnalyticsController {
           .select('action.actionType', 'actionType')
           .addSelect('action.actionCategory', 'actionCategory')
           .addSelect('COUNT(*)', 'count')
-          .where('action.created_at > :startDate', { startDate })
+          .where('action.createdAt > :startDate', { startDate })
           .groupBy('action.actionType, action.actionCategory')
           .orderBy('count', 'DESC')
           .getRawMany()
@@ -304,7 +304,7 @@ export class AnalyticsController {
             isError: action.isError,
             errorMessage: action.errorMessage,
             metadata: action.metadata,
-            createdAt: action.created_at
+            createdAt: action.createdAt
           })),
           summary: {
             totalActions: actions.length,
@@ -368,7 +368,7 @@ export class AnalyticsController {
             filePath: report.reportFilePath,
             fileType: report.reportFileType,
             fileSize: report.reportFileSize,
-            createdAt: report.created_at
+            createdAt: report.createdAt
           })),
           pagination: {
             page,
@@ -463,7 +463,7 @@ export class AnalyticsController {
           filePath: report.reportFilePath,
           fileType: report.reportFileType,
           fileSize: report.reportFileSize,
-          createdAt: report.created_at
+          createdAt: report.createdAt
         }
       });
     } catch (error) {
@@ -527,7 +527,7 @@ export class AnalyticsController {
             ageInHours: alert.getAgeInHours(),
             acknowledgedAt: alert.acknowledgedAt,
             resolvedAt: alert.resolvedAt,
-            createdAt: alert.created_at
+            createdAt: alert.createdAt
           })),
           pagination: {
             page,
@@ -683,10 +683,10 @@ export class AnalyticsController {
   private async getDailyActiveUsers(days: number): Promise<number[]> {
     const result = await this.userSessionRepo
       .createQueryBuilder('session')
-      .select('DATE(session.created_at)', 'date')
+      .select('DATE(session.createdAt)', 'date')
       .addSelect('COUNT(DISTINCT session.betaUserId)', 'activeUsers')
-      .where('session.created_at >= DATE_SUB(NOW(), INTERVAL :days DAY)', { days })
-      .groupBy('DATE(session.created_at)')
+      .where('session.createdAt >= DATE_SUB(NOW(), INTERVAL :days DAY)', { days })
+      .groupBy('DATE(session.createdAt)')
       .orderBy('date', 'ASC')
       .getRawMany();
 
@@ -838,7 +838,7 @@ export class AnalyticsController {
       .addSelect('AVG(metric.value)', 'avgResponseTime')
       .addSelect('MAX(metric.value)', 'maxResponseTime')
       .addSelect('COUNT(*)', 'requestCount')
-      .where('metric.created_at >= :startDate', { startDate })
+      .where('metric.createdAt >= :startDate', { startDate })
       .andWhere('metric.metricCategory = :category', { category: 'response_time' })
       .andWhere('metric.endpoint IS NOT NULL')
       .groupBy('metric.endpoint')
