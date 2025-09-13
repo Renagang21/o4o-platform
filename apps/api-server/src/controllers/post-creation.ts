@@ -57,13 +57,13 @@ export const createPost = async (req: Request, res: Response) => {
     post.content = content;
     post.fields = fields || {};
     post.status = status as PostStatus;
-    post.author_id = authorId;
+    post.authorId = authorId;
     post.meta = meta || {};
     post.slug = post.generateSlug();
 
     // 발행 상태인 경우 발행 시간 설정
     if (status === 'publish') {
-      post.published_at = new Date();
+      post.publishedAt = new Date();
     }
 
     // 데이터베이스에 저장
@@ -79,7 +79,7 @@ export const createPost = async (req: Request, res: Response) => {
         title: savedPost.title,
         slug: savedPost.slug,
         status: savedPost.status,
-        createdAt: savedPost.created_at
+        createdAt: savedPost.createdAt
       }
     });
 
@@ -282,7 +282,7 @@ export const createPostType = async (req: Request, res: Response) => {
       data: {
         slug: savedPostType.slug,
         name: savedPostType.name,
-        createdAt: savedPostType.created_at
+        createdAt: savedPostType.createdAt
       }
     });
 
@@ -329,11 +329,11 @@ export const getPostById = async (req: Request, res: Response) => {
         fields: post.fields,
         status: post.status,
         meta: post.meta,
-        authorId: post.author_id,
+        authorId: post.authorId,
         viewCount: post.viewCount + 1,
-        createdAt: post.created_at,
-        updatedAt: post.updated_at,
-        publishedAt: post.published_at,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        publishedAt: post.publishedAt,
         postType: {
           slug: post.postType.slug,
           name: post.postType.name,
@@ -384,8 +384,8 @@ export const updatePost = async (req: Request, res: Response) => {
     if (meta) post.meta = { ...post.meta, ...meta };
 
     // 발행 상태 변경 시 발행 시간 업데이트
-    if (status === 'publish' && !post.published_at) {
-      post.published_at = new Date();
+    if (status === 'publish' && !post.publishedAt) {
+      post.publishedAt = new Date();
     }
 
     const updatedPost = await postRepository.save(post);
@@ -396,7 +396,7 @@ export const updatePost = async (req: Request, res: Response) => {
         id: updatedPost.id,
         title: updatedPost.title,
         status: updatedPost.status,
-        updatedAt: updatedPost.updated_at
+        updatedAt: updatedPost.updatedAt
       }
     });
 

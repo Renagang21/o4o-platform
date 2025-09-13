@@ -58,11 +58,12 @@ export class DashboardController {
     const cachedData = await cacheService.getDashboardData(vendorId, 'integrated');
     if (cachedData) {
       res.set('X-Cache-Hit', 'true');
-      return res.json({
+      res.json({
         success: true,
         data: cachedData,
         message: 'Dashboard data retrieved successfully',
       });
+      return;
     }
 
     // Get vendor details
@@ -115,7 +116,7 @@ export class DashboardController {
         type: vendor.vendorType,
         status: vendor.status,
         rating: vendor.rating,
-        joinedAt: vendor.created_at,
+        joinedAt: vendor.createdAt,
         affiliateCode: vendor.affiliateCode,
         affiliateRate: vendor.affiliateRate,
         totalSales: vendor.totalSales,

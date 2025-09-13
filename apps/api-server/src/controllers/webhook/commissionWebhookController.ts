@@ -55,7 +55,7 @@ export class CommissionWebhookController {
   }
 
   // POST /api/webhooks/commission-status - Handle payment status updates
-  handlePaymentWebhook = asyncHandler(async (req: Request, res: Response) => {
+  handlePaymentWebhook = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const payload: WebhookPayload = req.body;
     const signature = req.headers['x-webhook-signature'] as string;
 
@@ -150,7 +150,7 @@ export class CommissionWebhookController {
   });
 
   // Manual payment status update endpoint
-  updatePaymentStatus = asyncHandler(async (req: Request, res: Response) => {
+  updatePaymentStatus = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { type, id, paymentData } = req.body; // type: 'commission' | 'settlement'
     const user = (req as any).user;
 
@@ -206,7 +206,7 @@ export class CommissionWebhookController {
   });
 
   // Get webhook logs for debugging
-  getWebhookLogs = asyncHandler(async (req: Request, res: Response) => {
+  getWebhookLogs = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { page = 1, limit = 50, event, status } = req.query;
     const user = (req as any).user;
 

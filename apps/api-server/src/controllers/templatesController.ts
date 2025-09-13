@@ -245,7 +245,7 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
-      if (template.author_id !== userId) {
+      if (template.authorId !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
         if (!user || user.role !== 'admin') {
           return res.status(403).json({
@@ -320,7 +320,7 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
-      if (template.author_id !== userId) {
+      if (template.authorId !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
         if (!user || user.role !== 'admin') {
           return res.status(403).json({

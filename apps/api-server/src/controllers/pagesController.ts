@@ -462,8 +462,8 @@ export class PagesController {
 
       const pageData: PageData = { ...originalPage };
       delete pageData.id;
-      delete pageData.created_at;
-      delete pageData.updated_at;
+      delete pageData.createdAt;
+      delete pageData.updatedAt;
       
       const clonedPage = this.pageRepository.create({
         ...pageData,

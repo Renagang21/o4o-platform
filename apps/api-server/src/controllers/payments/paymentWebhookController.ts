@@ -13,7 +13,7 @@ export class PaymentWebhookController {
   }
 
   // POST /api/webhooks/toss/payment - Toss 결제 웹훅
-  handleTossPaymentWebhook = asyncHandler(async (req: AuthRequest, res: Response) => {
+  handleTossPaymentWebhook = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const signature = req.headers['x-toss-signature'] as string;
     const body = JSON.stringify(req.body);
 
@@ -88,7 +88,7 @@ export class PaymentWebhookController {
   });
 
   // POST /api/webhooks/toss/subscription - 정기결제 웹훅
-  handleTossSubscriptionWebhook = asyncHandler(async (req: AuthRequest, res: Response) => {
+  handleTossSubscriptionWebhook = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const signature = req.headers['x-toss-signature'] as string;
     const body = JSON.stringify(req.body);
 
@@ -178,7 +178,7 @@ export class PaymentWebhookController {
   });
 
   // GET /api/webhooks/payment-events - 결제 이벤트 조회
-  getPaymentEvents = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getPaymentEvents = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       page = '1',
@@ -278,7 +278,7 @@ export class PaymentWebhookController {
   });
 
   // GET /api/webhooks/events/stats - 웹훅 이벤트 통계 (보너스 엔드포인트)
-  getWebhookStats = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getWebhookStats = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { days = '7' } = req.query;
 
@@ -386,7 +386,7 @@ export class PaymentWebhookController {
   });
 
   // POST /api/webhooks/events/:id/retry - 실패한 웹훅 이벤트 재처리 (보너스)
-  retryWebhookEvent = asyncHandler(async (req: AuthRequest, res: Response) => {
+  retryWebhookEvent = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { id: eventId } = req.params;
 

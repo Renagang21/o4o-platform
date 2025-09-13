@@ -134,10 +134,14 @@ export const getPost = async (req: Request, res: Response) => {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
 
-    // Increment view count safely
-    if (typeof post.views === 'number') {
-      await postRepository.update(id, { views: post.views + 1 })
-    }
+    // Increment view count safely (using meta field)
+    const currentViews = post.meta?.views || 0;
+    await postRepository.update(id, { 
+      meta: { 
+        ...post.meta, 
+        views: Number(currentViews) + 1 
+      } 
+    });
 
     res.json({ data: post })
   } catch (error) {
@@ -569,14 +573,14 @@ export const getPostRevisions = async (req: Request, res: Response) => {
     
     const post = await postRepository.findOne({ 
       where: { id },
-      select: ['id', 'revisions']
+      select: ['id', 'meta']
     })
     
     if (!post) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
 
-    res.json(post.revisions || [])
+    res.json(post.meta?.revisions || [])
   } catch (error) {
     console.error('Error fetching revisions:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch revisions' } })
@@ -759,9 +763,8 @@ export const getPostCounts = async (req: Request, res: Response) => {
     const counts = {
       all: allPosts.filter(p => p.status !== 'trash').length,
       mine: userId ? allPosts.filter(p => p.author_id === userId && p.status !== 'trash').length : 0,
-      published: allPosts.filter(p => p.status === 'publish' || p.status === 'publish').length,
+      published: allPosts.filter(p => p.status === 'publish').length,
       draft: allPosts.filter(p => p.status === 'draft').length,
-      scheduled: allPosts.filter(p => p.status === 'scheduled').length,
       private: allPosts.filter(p => p.status === 'private').length,
       trash: allPosts.filter(p => p.status === 'trash').length
     }

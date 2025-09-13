@@ -62,7 +62,7 @@ export class CustomizerController {
   /**
    * Get current customizer settings
    */
-  static getSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static getSettings = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.query;
 
@@ -72,7 +72,8 @@ export class CustomizerController {
     
     if (cached) {
       logger.info('Customizer settings retrieved from cache', { userId, themeId });
-      return res.json(cached);
+      res.json(cached);
+      return;
     }
 
     // Fetch from database (mock for now)
@@ -132,7 +133,7 @@ export class CustomizerController {
   /**
    * Save customizer settings
    */
-  static saveSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static saveSettings = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.body;
     const settings = req.body;
@@ -170,7 +171,7 @@ export class CustomizerController {
   /**
    * Publish customizer settings
    */
-  static publishSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static publishSettings = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.body;
     const settings = req.body;
@@ -216,7 +217,7 @@ export class CustomizerController {
       userId, 
       themeId, 
       settingsId: published.id,
-      publishedAt: published.published_at 
+      publishedAt: published.publishedAt 
     });
     
     res.json({
@@ -229,7 +230,7 @@ export class CustomizerController {
   /**
    * Save draft customizer settings
    */
-  static saveDraft = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static saveDraft = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.body;
     const settings = req.body;
@@ -262,7 +263,7 @@ export class CustomizerController {
   /**
    * Get draft customizer settings
    */
-  static getDraft = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static getDraft = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.query;
 
@@ -281,7 +282,7 @@ export class CustomizerController {
   /**
    * Reset customizer settings to defaults
    */
-  static resetSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static resetSettings = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.body;
 
@@ -351,7 +352,7 @@ export class CustomizerController {
   /**
    * Export customizer settings
    */
-  static exportSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static exportSettings = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default' } = req.query;
 
@@ -387,7 +388,7 @@ export class CustomizerController {
   /**
    * Import customizer settings
    */
-  static importSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static importSettings = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { themeId = 'default', settings, overwrite = false } = req.body;
 

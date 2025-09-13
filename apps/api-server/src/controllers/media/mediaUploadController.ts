@@ -46,7 +46,7 @@ export class MediaUploadController {
   /**
    * Upload media file (logo, favicon, background)
    */
-  static uploadMedia = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static uploadMedia = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const file = req.file;
     const { type = 'general' } = req.body;
@@ -168,7 +168,7 @@ export class MediaUploadController {
   /**
    * Delete media file
    */
-  static deleteMedia = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static deleteMedia = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { mediaId } = req.params;
 
@@ -185,7 +185,7 @@ export class MediaUploadController {
   /**
    * Get user's media library
    */
-  static getMediaLibrary = asyncHandler(async (req: AuthRequest, res: Response) => {
+  static getMediaLibrary = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const userId = req.user?.id;
     const { type, page = 1, limit = 20 } = req.query;
 

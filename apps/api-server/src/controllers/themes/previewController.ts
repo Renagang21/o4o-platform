@@ -10,7 +10,7 @@ export class PreviewController {
   /**
    * Render preview page with live customizer settings
    */
-  static renderPreview = asyncHandler(async (req: Request, res: Response) => {
+  static renderPreview = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { themeId = 'default' } = req.query;
 
     // Preview HTML template with PostMessage listener

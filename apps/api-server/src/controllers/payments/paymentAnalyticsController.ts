@@ -24,7 +24,7 @@ export class PaymentAnalyticsController {
   }
 
   // GET /api/analytics/payments/overview - 결제 현황 분석
-  getPaymentOverview = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getPaymentOverview = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -117,7 +117,7 @@ export class PaymentAnalyticsController {
   });
 
   // GET /api/analytics/payments/methods - 결제 수단별 분석
-  getPaymentMethodAnalysis = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getPaymentMethodAnalysis = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -194,7 +194,7 @@ export class PaymentAnalyticsController {
   });
 
   // GET /api/analytics/payments/trends - 결제 트렌드 분석
-  getPaymentTrends = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getPaymentTrends = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -310,7 +310,7 @@ export class PaymentAnalyticsController {
   });
 
   // GET /api/analytics/payments/subscription-metrics - 구독 지표 (보너스 엔드포인트)
-  getSubscriptionMetrics = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getSubscriptionMetrics = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
 
     // Check permissions
@@ -355,7 +355,7 @@ export class PaymentAnalyticsController {
   });
 
   // GET /api/analytics/payments/real-time - 실시간 결제 통계 (보너스 엔드포인트)
-  getRealTimeStats = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getRealTimeStats = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
 
     // Check permissions
@@ -456,7 +456,7 @@ export class PaymentAnalyticsController {
   }
 
   // GET /api/analytics/payments/export - 결제 분석 데이터 내보내기 (보너스)
-  exportPaymentAnalytics = asyncHandler(async (req: AuthRequest, res: Response) => {
+  exportPaymentAnalytics = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       format = 'csv',

@@ -15,7 +15,7 @@ export class AdvancedPaymentController {
   }
 
   // POST /api/payments/subscriptions - 정기결제 등록
-  createSubscription = asyncHandler(async (req: AuthRequest, res: Response) => {
+  createSubscription = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       planId,
@@ -100,7 +100,7 @@ export class AdvancedPaymentController {
   });
 
   // POST /api/payments/subscriptions/:id/cancel - 정기결제 취소
-  cancelSubscription = asyncHandler(async (req: AuthRequest, res: Response) => {
+  cancelSubscription = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { id: subscriptionId } = req.params;
     const { reason, cancelImmediately = false } = req.body;
@@ -152,7 +152,7 @@ export class AdvancedPaymentController {
   });
 
   // POST /api/payments/:id/partial-cancel - 부분 취소
-  partialCancel = asyncHandler(async (req: AuthRequest, res: Response) => {
+  partialCancel = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { id: paymentKey } = req.params;
     const {
@@ -216,7 +216,7 @@ export class AdvancedPaymentController {
   });
 
   // POST /api/payments/escrow/confirm - 에스크로 구매 확정
-  confirmEscrow = asyncHandler(async (req: AuthRequest, res: Response) => {
+  confirmEscrow = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       paymentKey,
@@ -269,7 +269,7 @@ export class AdvancedPaymentController {
   });
 
   // POST /api/payments/cash-receipt - 현금영수증 발급
-  issueCashReceipt = asyncHandler(async (req: AuthRequest, res: Response) => {
+  issueCashReceipt = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       paymentKey,
@@ -331,7 +331,7 @@ export class AdvancedPaymentController {
   });
 
   // GET /api/payments/settlements/:date - 결제 정산 조회
-  getSettlements = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getSettlements = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { date } = req.params;
 
@@ -417,7 +417,7 @@ export class AdvancedPaymentController {
   }
 
   // GET /api/payments/subscriptions - 구독 목록 조회 (보너스 엔드포인트)
-  getSubscriptions = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getSubscriptions = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { customerId } = req.query;
 
@@ -452,7 +452,7 @@ export class AdvancedPaymentController {
   });
 
   // POST /api/payments/subscriptions/:id/pause - 구독 일시정지 (보너스 엔드포인트)
-  pauseSubscription = asyncHandler(async (req: AuthRequest, res: Response) => {
+  pauseSubscription = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { id: subscriptionId } = req.params;
 
@@ -497,7 +497,7 @@ export class AdvancedPaymentController {
   });
 
   // POST /api/payments/subscriptions/:id/resume - 구독 재개 (보너스 엔드포인트)
-  resumeSubscription = asyncHandler(async (req: AuthRequest, res: Response) => {
+  resumeSubscription = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { id: subscriptionId } = req.params;
 
