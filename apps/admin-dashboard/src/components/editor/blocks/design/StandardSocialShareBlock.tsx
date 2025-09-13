@@ -13,10 +13,7 @@ import {
   Check,
   Mail,
   Linkedin,
-  Send,
-  Settings,
-  Palette,
-  Layout
+  Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -104,21 +101,21 @@ const PLATFORM_INFO = {
     name: 'Facebook',
     icon: Facebook,
     color: '#1877F2',
-    shareUrl: (url: string, title: string) => 
+    shareUrl: (url: string) => 
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
   },
   twitter: {
     name: 'Twitter',
     icon: Twitter,
     color: '#1DA1F2',
-    shareUrl: (url: string, title: string, hashtags?: string) => 
-      `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}${hashtags ? `&hashtags=${encodeURIComponent(hashtags)}` : ''}`
+    shareUrl: (url: string, hashtags?: string) => 
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}${hashtags ? `&hashtags=${encodeURIComponent(hashtags)}` : ''}`
   },
   kakao: {
     name: 'KakaoTalk',
     icon: MessageCircle,
     color: '#FEE500',
-    shareUrl: (url: string, title: string) => {
+    shareUrl: (url: string) => {
       // KakaoTalk requires SDK initialization
       // This is a placeholder - actual implementation would use Kakao SDK
       return `https://story.kakao.com/share?url=${encodeURIComponent(url)}`;
@@ -128,7 +125,7 @@ const PLATFORM_INFO = {
     name: 'LinkedIn',
     icon: Linkedin,
     color: '#0A66C2',
-    shareUrl: (url: string, title: string) =>
+    shareUrl: (url: string) =>
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
   },
   telegram: {
@@ -148,7 +145,7 @@ const PLATFORM_INFO = {
 };
 
 const StandardSocialShareBlock: React.FC<SocialShareBlockProps> = (props) => {
-  const { onChange, attributes = {}, isSelected } = props;
+  const { onChange, attributes = {} } = props;
   const {
     platforms = {
       facebook: true,
@@ -173,7 +170,6 @@ const StandardSocialShareBlock: React.FC<SocialShareBlockProps> = (props) => {
     layout = 'horizontal',
     alignment = 'center',
     gap = 10,
-    showShareCount = false,
     showLabels = false,
     labelPosition = 'below'
   } = attributes;

@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -84,8 +84,6 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
   onBulkAction,
   selectedCount = 0,
   totalItems = 0,
-  currentPage = 1,
-  itemsPerPage = 20,
   children,
   loading = false,
   screenOptions,

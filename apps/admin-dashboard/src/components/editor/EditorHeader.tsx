@@ -7,7 +7,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
   Undo,
@@ -16,8 +15,6 @@ import {
   Minimize2,
   MoreVertical,
   Eye,
-  ListTree,
-  Code,
   Settings,
   Save,
   Info,
@@ -61,10 +58,6 @@ export const EditorHeader: React.FC<EditorHeaderProps> = ({
   onToggleFullscreen,
   isDirty = false,
   isPublished = false,
-  onToggleListView,
-  onToggleCodeView,
-  isCodeView = false,
-  postStatus = 'draft',
   onPreview,
   onOpenDesignLibrary,
   onToggleInspector,

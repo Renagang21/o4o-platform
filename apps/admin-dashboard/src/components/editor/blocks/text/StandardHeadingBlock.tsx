@@ -64,7 +64,7 @@ const HEADING_LEVELS = [
 ] as const;
 
 const StandardHeadingBlock: React.FC<HeadingBlockProps> = (props) => {
-  const { content, onChange, attributes = {}, isSelected } = props;
+  const { content, onChange, attributes = {} } = props;
   const [localContent, setLocalContent] = useState(content);
 
   const {

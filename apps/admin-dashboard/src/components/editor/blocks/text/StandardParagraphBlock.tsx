@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Type, Bold, Italic, Link2, Palette } from 'lucide-react';
+import { Type, Bold, Italic, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,7 +37,7 @@ const paragraphConfig: StandardBlockConfig = {
 };
 
 const StandardParagraphBlock: React.FC<ParagraphBlockProps> = (props) => {
-  const { content, onChange, attributes = {}, isSelected } = props;
+  const { content, onChange, attributes = {} } = props;
   const [localContent, setLocalContent] = useState(content);
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');

@@ -8,7 +8,6 @@ import {
   Globe,
   Link,
   Shield,
-  Settings,
   Maximize,
   Code,
   AlertTriangle,
@@ -93,7 +92,7 @@ const REFERRER_POLICIES = [
 ];
 
 const StandardEmbedBlock: React.FC<EmbedBlockProps> = (props) => {
-  const { onChange, attributes = {}, isSelected } = props;
+  const { onChange, attributes = {} } = props;
   const {
     url = '',
     embedCode = '',
@@ -120,7 +119,6 @@ const StandardEmbedBlock: React.FC<EmbedBlockProps> = (props) => {
 
   const [urlInput, setUrlInput] = useState(url);
   const [codeInput, setCodeInput] = useState(embedCode);
-  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
   // Update attribute helper
   const updateAttribute = useCallback((key: string, value: any) => {

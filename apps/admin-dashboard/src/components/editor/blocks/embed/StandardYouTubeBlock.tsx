@@ -7,7 +7,6 @@ import { useCallback, useState, useEffect } from 'react';
 import { 
   Youtube,
   Play,
-  Settings,
   Volume2,
   VolumeX,
   Clock,
@@ -83,7 +82,7 @@ const ALIGNMENTS = [
 ];
 
 const StandardYouTubeBlock: React.FC<YouTubeBlockProps> = (props) => {
-  const { onChange, attributes = {}, isSelected } = props;
+  const { onChange, attributes = {} } = props;
   const {
     url = '',
     videoId = '',

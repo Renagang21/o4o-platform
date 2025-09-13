@@ -12,8 +12,7 @@ import {
   Bookmark,
   Camera,
   Film,
-  Grid3x3,
-  Settings
+  Grid3x3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -75,7 +74,7 @@ const ASPECT_RATIOS = [
 ];
 
 const StandardInstagramBlock: React.FC<InstagramBlockProps> = (props) => {
-  const { onChange, attributes = {}, isSelected } = props;
+  const { onChange, attributes = {} } = props;
   const {
     url = '',
     postId = '',

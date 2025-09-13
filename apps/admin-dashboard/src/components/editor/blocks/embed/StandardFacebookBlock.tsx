@@ -6,14 +6,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import { 
   Facebook,
-  Link,
-  Heart,
-  MessageCircle,
-  Share2,
-  Settings,
-  Palette,
-  Layout,
-  Play
+  Link
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -85,7 +78,7 @@ const LANGUAGES = [
 ];
 
 const StandardFacebookBlock: React.FC<FacebookBlockProps> = (props) => {
-  const { onChange, attributes = {}, isSelected } = props;
+  const { onChange, attributes = {} } = props;
   const {
     url = '',
     embedType = 'post',

@@ -8,8 +8,6 @@ import {
   Folder,
   Plus,
   Settings,
-  Palette,
-  Layout,
   Eye,
   EyeOff,
   Maximize2,
@@ -112,7 +110,7 @@ const SHADOW_PRESETS = [
 ];
 
 const StandardGroupBlock: React.FC<GroupBlockProps> = (props) => {
-  const { innerBlocks = [], onChange, attributes = {}, isSelected } = props;
+  const { innerBlocks = [], onChange, attributes = {} } = props;
   const {
     backgroundColor = 'transparent',
     textColor = 'inherit',

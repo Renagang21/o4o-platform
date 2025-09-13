@@ -27,8 +27,7 @@ import {
   TrendingUp,
   Clock,
   Check,
-  Search,
-  Filter
+  Search
 } from 'lucide-react';
 import { Block } from '@/types/post.types';
 
