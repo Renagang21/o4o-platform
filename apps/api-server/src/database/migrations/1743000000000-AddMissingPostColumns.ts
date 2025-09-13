@@ -31,8 +31,8 @@ export class AddMissingPostColumns1743000000000 implements MigrationInterface {
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS "IDX_posts_status" ON "posts" ("status");
       CREATE INDEX IF NOT EXISTS "IDX_posts_type" ON "posts" ("type");
-      CREATE INDEX IF NOT EXISTS "IDX_posts_publishedAt" ON "posts" ("publishedAt");
-      CREATE INDEX IF NOT EXISTS "IDX_posts_authorId" ON "posts" ("authorId");
+      CREATE INDEX IF NOT EXISTS "IDX_posts_publishedAt" ON "posts" ("published_at");
+      CREATE INDEX IF NOT EXISTS "IDX_posts_authorId" ON "posts" ("author_id");
       CREATE INDEX IF NOT EXISTS "IDX_posts_slug" ON "posts" ("slug");
       CREATE INDEX IF NOT EXISTS "IDX_posts_featured" ON "posts" ("featured");
     `);

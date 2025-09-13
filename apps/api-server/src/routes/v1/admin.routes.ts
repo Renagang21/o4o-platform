@@ -12,7 +12,7 @@ router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {
         id: '1',
         title: 'Home',
         slug: 'home',
-        status: 'published',
+        status: 'publish',
         author: 'admin',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -21,7 +21,7 @@ router.get('/pages', authenticateToken, requireAdmin, async (req, res) => {
         id: '2',
         title: 'About',
         slug: 'about',
-        status: 'published',
+        status: 'publish',
         author: 'admin',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

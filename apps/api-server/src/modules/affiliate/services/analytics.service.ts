@@ -311,7 +311,7 @@ export class AdvancedAnalyticsService {
     }
 
     if (startDate && endDate) {
-      query.andWhere('click.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
+      query.andWhere('click.created_at BETWEEN :startDate AND :endDate', { startDate, endDate });
     }
 
     return await query.getMany();
@@ -329,7 +329,7 @@ export class AdvancedAnalyticsService {
     }
 
     if (startDate && endDate) {
-      query.andWhere('conversion.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
+      query.andWhere('conversion.created_at BETWEEN :startDate AND :endDate', { startDate, endDate });
     }
 
     return await query.getMany();
@@ -377,7 +377,7 @@ export class AdvancedAnalyticsService {
     const pattern = new Array(24).fill(0);
     
     clicks.forEach(click => {
-      const hour = new Date(click.createdAt).getHours();
+      const hour = new Date(click.created_at).getHours();
       pattern[hour]++;
     });
 
@@ -405,7 +405,7 @@ export class AdvancedAnalyticsService {
     const dailyData: Record<string, { clicks: number; uniqueClicks: Set<string> }> = {};
 
     clicks.forEach(click => {
-      const date = new Date(click.createdAt).toISOString().split('T')[0];
+      const date = new Date(click.created_at).toISOString().split('T')[0];
       if (!dailyData[date]) {
         dailyData[date] = { clicks: 0, uniqueClicks: new Set() };
       }
@@ -421,11 +421,11 @@ export class AdvancedAnalyticsService {
 
     // Calculate growth
     const firstWeek = clicks.filter(c => 
-      new Date(c.createdAt) <= new Date(startDate.getTime() + 7 * 86400000)
+      new Date(c.created_at) <= new Date(startDate.getTime() + 7 * 86400000)
     ).length;
     
     const lastWeek = clicks.filter(c => 
-      new Date(c.createdAt) >= new Date(endDate.getTime() - 7 * 86400000)
+      new Date(c.created_at) >= new Date(endDate.getTime() - 7 * 86400000)
     ).length;
 
     const growth = firstWeek > 0 ? ((lastWeek - firstWeek) / firstWeek) * 100 : 0;
@@ -449,7 +449,7 @@ export class AdvancedAnalyticsService {
 
     // Initialize data structure
     clicks.forEach(click => {
-      const key = this.getDateKey(click.createdAt, period);
+      const key = this.getDateKey(click.created_at, period);
       if (!data[key]) {
         data[key] = { clicks: 0, conversions: 0, revenue: 0 };
       }
@@ -457,7 +457,7 @@ export class AdvancedAnalyticsService {
     });
 
     conversions.forEach(conversion => {
-      const key = this.getDateKey(conversion.createdAt, period);
+      const key = this.getDateKey(conversion.created_at, period);
       if (!data[key]) {
         data[key] = { clicks: 0, conversions: 0, revenue: 0 };
       }
@@ -677,12 +677,12 @@ export class AdvancedAnalyticsService {
     }
 
     clicks.forEach(click => {
-      const date = new Date(click.createdAt).toISOString().split('T')[0];
+      const date = new Date(click.created_at).toISOString().split('T')[0];
       if (dailyData[date]) dailyData[date].clicks++;
     });
 
     conversions.forEach(conv => {
-      const date = new Date(conv.createdAt).toISOString().split('T')[0];
+      const date = new Date(conv.created_at).toISOString().split('T')[0];
       if (dailyData[date]) {
         dailyData[date].conversions++;
         dailyData[date].revenue += Number(conv.orderAmount);

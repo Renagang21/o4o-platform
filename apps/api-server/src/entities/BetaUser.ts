@@ -37,7 +37,7 @@ export enum InterestArea {
 
 @Entity('beta_users')
 @Index(['email'], { unique: true })
-@Index(['status', 'createdAt'])
+@Index(['status', 'created_at'])
 @Index(['type', 'status'])
 export class BetaUser {
   @PrimaryGeneratedColumn('uuid')
@@ -178,7 +178,7 @@ export class BetaUser {
   }
 
   getDaysSinceRegistration(): number {
-    return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.floor((Date.now() - this.created_at.getTime()) / (1000 * 60 * 60 * 24));
   }
 
   getDaysSinceLastActive(): number {

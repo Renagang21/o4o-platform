@@ -312,7 +312,7 @@ export class AnalyticsService {
         .addSelect('COUNT(*)', 'orderCount')
         .addSelect('SUM(orders.totalAmount)', 'totalRevenue')
         .addSelect('AVG(orders.totalAmount)', 'averageOrderValue')
-        .where('orders.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
+        .where('orders.created_at BETWEEN :startDate AND :endDate', { startDate, endDate })
         .andWhere('orders.status = :status', { status: 'completed' })
         .groupBy('period')
         .orderBy('period', 'ASC')
@@ -357,7 +357,7 @@ export class AnalyticsService {
       const performance = await this.inventoryRepository
         .createQueryBuilder('inventory')
         .leftJoinAndSelect('inventory.stockMovements', 'movements', 
-          'movements.createdAt BETWEEN :startDate AND :endDate AND movements.movementType = :movementType',
+          'movements.created_at BETWEEN :startDate AND :endDate AND movements.movementType = :movementType',
           { startDate, endDate, movementType: 'sale' }
         )
         .leftJoinAndSelect('inventory.alerts', 'alerts', 'alerts.status = :alertStatus', { alertStatus: 'active' })
@@ -367,23 +367,23 @@ export class AnalyticsService {
           'inventory.productName as name',
           'inventory.category as category',
           'inventory.quantity as stockLevel',
-          'inventory.createdAt as createdAt',
+          'inventory.created_at as createdAt',
         ])
         .addSelect('COALESCE(SUM(movements.quantity), 0)', 'totalSales')
         .addSelect('COALESCE(SUM(movements.totalValue), 0)', 'revenue')
         .addSelect('COALESCE(SUM(movements.totalValue - movements.quantity * movements.unitCost), 0)', 'margin')
-        .addSelect('MAX(movements.createdAt)', 'lastSaleDate')
+        .addSelect('MAX(movements.created_at)', 'lastSaleDate')
         .addSelect('MIN(alerts.alertLevel)', 'alertLevel')
         .where('inventory.status = :status', { status: 'active' })
         .andWhere(filters.productIds ? 'inventory.id IN (:...productIds)' : '1=1', { productIds: filters.productIds })
         .andWhere(filters.categories ? 'inventory.category IN (:...categories)' : '1=1', { categories: filters.categories })
-        .groupBy('inventory.id, inventory.sku, inventory.productName, inventory.category, inventory.quantity, inventory.createdAt')
+        .groupBy('inventory.id, inventory.sku, inventory.productName, inventory.category, inventory.quantity, inventory.created_at')
         .orderBy('totalSales', 'DESC')
         .limit(limit)
         .getRawMany();
 
       const products: ProductPerformance[] = performance.map(p => {
-        const daysInStock = dayjs().diff(dayjs(p.createdAt), 'days');
+        const daysInStock = dayjs().diff(dayjs(p.created_at), 'days');
         const turnoverRate = daysInStock > 0 ? (parseFloat(p.totalSales) / daysInStock) * 30 : 0; // Monthly turnover
 
         return {
@@ -430,10 +430,10 @@ export class AnalyticsService {
       const currentRankings = await this.vendorRepository
         .createQueryBuilder('vendor')
         .leftJoin('vendor.commissions', 'commissions', 
-          'commissions.createdAt BETWEEN :startDate AND :endDate',
+          'commissions.created_at BETWEEN :startDate AND :endDate',
           { startDate, endDate }
         )
-        .leftJoin('orders', 'orders', 'orders.vendorId = vendor.id AND orders.createdAt BETWEEN :startDate AND :endDate')
+        .leftJoin('orders', 'orders', 'orders.vendorId = vendor.id AND orders.created_at BETWEEN :startDate AND :endDate')
         .select([
           'vendor.id as vendorId',
           'vendor.vendorName as vendorName',
@@ -457,7 +457,7 @@ export class AnalyticsService {
       const previousRankings = await this.vendorRepository
         .createQueryBuilder('vendor')
         .leftJoin('vendor.commissions', 'commissions', 
-          'commissions.createdAt BETWEEN :startDate AND :endDate',
+          'commissions.created_at BETWEEN :startDate AND :endDate',
           { startDate: previousStart, endDate: previousEnd }
         )
         .select([
@@ -597,7 +597,7 @@ export class AnalyticsService {
       .createQueryBuilder('movement')
       .select('SUM(movement.quantity)', 'totalSold')
       .where('movement.movementType = :type', { type: 'sale' })
-      .andWhere('movement.createdAt >= :startDate', { 
+      .andWhere('movement.created_at >= :startDate', { 
         startDate: dayjs().subtract(365, 'days').toDate() 
       })
       .getRawOne();
@@ -632,10 +632,10 @@ export class AnalyticsService {
     // Get commission trends over time
     const trends = await this.vendorCommissionRepository
       .createQueryBuilder('commission')
-      .select("DATE_TRUNC('month', commission.createdAt) as period")
+      .select("DATE_TRUNC('month', commission.created_at) as period")
       .addSelect('SUM(commission.totalCommission)', 'totalCommission')
       .addSelect('COUNT(*)', 'commissionCount')
-      .where('commission.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .where('commission.created_at BETWEEN :startDate AND :endDate', { startDate, endDate })
       .groupBy('period')
       .orderBy('period', 'ASC')
       .getRawMany();

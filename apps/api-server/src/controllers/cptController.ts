@@ -278,9 +278,9 @@ export class CPTController {
       }
 
       // WordPress-style sorting
-      const sortField = orderby === 'date' ? 'createdAt' : 
-                       orderby === 'modified' ? 'updatedAt' : 
-                       orderby === 'title' ? 'title' : 'createdAt';
+      const sortField = orderby === 'date' ? 'created_at' : 
+                       orderby === 'modified' ? 'updated_at' : 
+                       orderby === 'title' ? 'title' : 'created_at';
       const sortOrder = typeof order === 'string' ? order.toUpperCase() : 'DESC';
       queryBuilder.orderBy(`post.${sortField}`, sortOrder as 'ASC' | 'DESC');
 
@@ -349,10 +349,10 @@ export class CPTController {
       post.content = content;
       post.status = status || PostStatus.DRAFT;
       post.meta = meta;
-      post.authorId = (req as AuthRequest).user?.id || '';
+      post.author_id = (req as AuthRequest).user?.id || '';
 
       if (status === PostStatus.PUBLISHED) {
-        post.publishedAt = new Date();
+        post.published_at = new Date();
       }
 
       await postRepo.save(post);
@@ -564,9 +564,9 @@ export class CPTController {
       }
 
       // WordPress-style sorting
-      const sortField = orderby === 'date' ? 'publishedAt' : 
-                       orderby === 'modified' ? 'updatedAt' : 
-                       orderby === 'title' ? 'title' : 'publishedAt';
+      const sortField = orderby === 'date' ? 'published_at' : 
+                       orderby === 'modified' ? 'updated_at' : 
+                       orderby === 'title' ? 'title' : 'published_at';
       const sortOrder = typeof order === 'string' ? order.toUpperCase() : 'DESC';
       queryBuilder.orderBy(`post.${sortField}`, sortOrder as 'ASC' | 'DESC');
 

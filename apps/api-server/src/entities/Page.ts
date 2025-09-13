@@ -52,7 +52,7 @@ export class Page {
 
   @Column({ 
     type: 'enum', 
-    enum: ['draft', 'published', 'private', 'archived', 'scheduled'],
+    enum: ['draft', 'publish', 'private', 'archived', 'scheduled'],
     default: 'draft'
   })
   status!: string
@@ -98,7 +98,7 @@ export class Page {
   authorId!: string
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author!: User
 
   @Column({ type: 'uuid', nullable: true })

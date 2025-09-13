@@ -13,7 +13,7 @@ export interface RevisionChanges {
 }
 
 @Entity('post_revisions')
-@Index(['postId', 'createdAt'])
+@Index(['postId', 'created_at'])
 @Index(['postId', 'revisionNumber'])
 export class PostRevision {
   @PrimaryGeneratedColumn('uuid')
@@ -33,7 +33,7 @@ export class PostRevision {
   authorId!: string;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author!: User;
 
   @Column({ type: 'varchar', length: 50 })

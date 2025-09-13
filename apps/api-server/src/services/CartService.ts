@@ -560,7 +560,7 @@ export class CartService {
     // 총액
     cart.total = cart.subtotal + cart.shipping + cart.tax - (cart.couponDiscount || 0);
     
-    cart.updatedAt = new Date();
+    cart.updated_at = new Date();
   }
 
   /**

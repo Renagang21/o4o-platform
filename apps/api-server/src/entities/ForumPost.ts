@@ -13,7 +13,7 @@ import { User } from './User';
 
 export enum PostStatus {
   DRAFT = 'draft',
-  PUBLISHED = 'published',
+  PUBLISHED = 'publish',
   PENDING = 'pending',
   REJECTED = 'rejected',
   ARCHIVED = 'archived'
@@ -28,7 +28,7 @@ export enum PostType {
 }
 
 @Entity('forum_post')
-@Index(['categoryId', 'status', 'isPinned', 'createdAt'])
+@Index(['categoryId', 'status', 'isPinned', 'created_at'])
 export class ForumPost {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -102,7 +102,7 @@ export class ForumPost {
   category?: Promise<ForumCategory>;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author?: User;
 
   @ManyToOne(() => User, { nullable: true })
@@ -122,7 +122,7 @@ export class ForumPost {
 
   canUserEdit(userId: string, userRole: string): boolean {
     if (['admin', 'manager'].includes(userRole)) return true;
-    if (this.authorId === userId && !this.isLocked) return true;
+    if (this.author_id === userId && !this.isLocked) return true;
     return false;
   }
 
@@ -147,7 +147,7 @@ export class ForumPost {
 
   publish(): void {
     this.status = PostStatus.PUBLISHED;
-    this.publishedAt = new Date();
+    this.published_at = new Date();
   }
 
   generateSlug(): string {

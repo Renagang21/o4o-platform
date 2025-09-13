@@ -8,7 +8,7 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
         if (await queryRunner.hasTable('vendor_info')) {
             await queryRunner.createIndex('vendor_info', new TableIndex({
                 name: 'IDX_vendor_info_status_created',
-                columnNames: ['status', 'createdAt']
+                columnNames: ['status', 'created_at']
             }));
 
             await queryRunner.createIndex('vendor_info', new TableIndex({
@@ -74,7 +74,7 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
 
             await queryRunner.createIndex('vendor_commissions', new TableIndex({
                 name: 'IDX_vendor_commissions_created',
-                columnNames: ['createdAt']
+                columnNames: ['created_at']
             }));
 
             await queryRunner.createIndex('vendor_commissions', new TableIndex({
@@ -181,7 +181,7 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
 
             await queryRunner.createIndex('orders', new TableIndex({
                 name: 'IDX_orders_created_status',
-                columnNames: ['createdAt', 'status']
+                columnNames: ['created_at', 'status']
             }));
 
             await queryRunner.createIndex('orders', new TableIndex({
@@ -199,12 +199,12 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
         if (await queryRunner.hasTable('user_activity_logs')) {
             await queryRunner.createIndex('user_activity_logs', new TableIndex({
                 name: 'IDX_user_activity_logs_activity_date',
-                columnNames: ['activityType', 'createdAt']
+                columnNames: ['activityType', 'created_at']
             }));
 
             await queryRunner.createIndex('user_activity_logs', new TableIndex({
                 name: 'IDX_user_activity_logs_user_date',
-                columnNames: ['userId', 'createdAt']
+                columnNames: ['userId', 'created_at']
             }));
         }
 
@@ -212,12 +212,12 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
         if (await queryRunner.hasTable('stock_movements')) {
             await queryRunner.createIndex('stock_movements', new TableIndex({
                 name: 'IDX_stock_movements_type_date',
-                columnNames: ['movementType', 'createdAt']
+                columnNames: ['movementType', 'created_at']
             }));
 
             await queryRunner.createIndex('stock_movements', new TableIndex({
                 name: 'IDX_stock_movements_inventory_date',
-                columnNames: ['inventoryId', 'createdAt']
+                columnNames: ['inventoryId', 'created_at']
             }));
 
             await queryRunner.createIndex('stock_movements', new TableIndex({
@@ -241,13 +241,13 @@ export class OptimizeSystemPerformance1770000000000 implements MigrationInterfac
                 "errorMessage" text,
                 "requestSize" integer,
                 "responseSize" integer,
-                "createdAt" timestamp DEFAULT CURRENT_TIMESTAMP
+                "created_at" timestamp DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
         await queryRunner.createIndex('system_performance_logs', new TableIndex({
             name: 'IDX_performance_logs_endpoint_date',
-            columnNames: ['endpoint', 'createdAt']
+            columnNames: ['endpoint', 'created_at']
         }));
 
         await queryRunner.createIndex('system_performance_logs', new TableIndex({

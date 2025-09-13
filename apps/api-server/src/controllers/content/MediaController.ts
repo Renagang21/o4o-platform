@@ -145,7 +145,7 @@ export class MediaController {
         mimeType,
         folder,
         userId,
-        orderBy = 'createdAt',
+        orderBy = 'created_at',
         order = 'DESC'
       } = req.query;
 
@@ -190,8 +190,8 @@ export class MediaController {
       }
 
       // Ordering
-      const allowedOrderBy = ['createdAt', 'updatedAt', 'filename', 'originalFilename', 'size'];
-      const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'createdAt';
+      const allowedOrderBy = ['created_at', 'updated_at', 'filename', 'originalFilename', 'size'];
+      const orderByField = allowedOrderBy.includes(orderBy as string) ? orderBy : 'created_at';
       const orderDirection = order === 'ASC' ? 'ASC' : 'DESC';
       
       queryBuilder.orderBy(`media.${orderByField}`, orderDirection);

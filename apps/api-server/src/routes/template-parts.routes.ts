@@ -85,7 +85,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     }
     
     // Add ordering
-    const validOrderBy = ['priority', 'name', 'createdAt', 'updatedAt']
+    const validOrderBy = ['priority', 'name', 'created_at', 'updated_at']
     const orderByField = validOrderBy.includes(String(orderBy)) ? String(orderBy) : 'priority'
     const orderDirection = String(order).toUpperCase() === 'DESC' ? 'DESC' : 'ASC'
     query = query.orderBy(`templatePart.${orderByField}`, orderDirection)

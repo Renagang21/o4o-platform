@@ -13,7 +13,7 @@ import { User } from './User';
 @Entity('media')
 @Index(['userId'])
 @Index(['folderPath'])
-@Index(['createdAt'])
+@Index(['created_at'])
 export class Media {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

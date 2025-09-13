@@ -57,13 +57,13 @@ export const createPost = async (req: Request, res: Response) => {
     post.content = content;
     post.fields = fields || {};
     post.status = status as PostStatus;
-    post.authorId = authorId;
+    post.author_id = authorId;
     post.meta = meta || {};
     post.slug = post.generateSlug();
 
     // 발행 상태인 경우 발행 시간 설정
-    if (status === 'published') {
-      post.publishedAt = new Date();
+    if (status === 'publish') {
+      post.published_at = new Date();
     }
 
     // 데이터베이스에 저장
@@ -79,7 +79,7 @@ export const createPost = async (req: Request, res: Response) => {
         title: savedPost.title,
         slug: savedPost.slug,
         status: savedPost.status,
-        createdAt: savedPost.createdAt
+        createdAt: savedPost.created_at
       }
     });
 
@@ -103,7 +103,7 @@ export const getArchiveData = async (req: Request, res: Response) => {
       postTypeSlug,
       limit = 10,
       offset = 0,
-      orderBy = 'createdAt',
+      orderBy = 'created_at',
       sortOrder = 'DESC',
       filters = {},
       search
@@ -125,12 +125,12 @@ export const getArchiveData = async (req: Request, res: Response) => {
     }
 
     // 필터 조건 추가
-    if (filters.authorId) {
-      queryBuilder.andWhere('post.authorId = :authorId', { authorId: filters.authorId });
+    if (filters.author_id) {
+      queryBuilder.andWhere('post.author_id = :authorId', { authorId: filters.author_id });
     }
 
     if (filters.dateRange) {
-      queryBuilder.andWhere('post.createdAt BETWEEN :startDate AND :endDate', {
+      queryBuilder.andWhere('post.created_at BETWEEN :startDate AND :endDate', {
         startDate: filters.dateRange.start,
         endDate: filters.dateRange.end
       });
@@ -145,11 +145,11 @@ export const getArchiveData = async (req: Request, res: Response) => {
       case 'views':
         queryBuilder.orderBy('post.viewCount', orderDirection);
         break;
-      case 'publishedAt':
-        queryBuilder.orderBy('post.publishedAt', orderDirection);
+      case 'published_at':
+        queryBuilder.orderBy('post.published_at', orderDirection);
         break;
       default:
-        queryBuilder.orderBy('post.createdAt', orderDirection);
+        queryBuilder.orderBy('post.created_at', orderDirection);
     }
 
     // 페이지네이션
@@ -175,8 +175,8 @@ export const getArchiveData = async (req: Request, res: Response) => {
           slug: post.slug,
           excerpt: post.content ? post.content.substring(0, 200) + '...' : '',
           content: post.content,
-          date: post.publishedAt || post.createdAt,
-          author: post.authorId, // TODO: User 엔티티와 조인 필요
+          date: post.published_at || post.created_at,
+          author: post.author_id, // TODO: User 엔티티와 조인 필요
           categories: post.meta?.tags || [],
           tags: post.meta?.tags || [],
           featured_image: post.meta?.thumbnail,
@@ -282,7 +282,7 @@ export const createPostType = async (req: Request, res: Response) => {
       data: {
         slug: savedPostType.slug,
         name: savedPostType.name,
-        createdAt: savedPostType.createdAt
+        createdAt: savedPostType.created_at
       }
     });
 
@@ -329,11 +329,11 @@ export const getPostById = async (req: Request, res: Response) => {
         fields: post.fields,
         status: post.status,
         meta: post.meta,
-        authorId: post.authorId,
+        authorId: post.author_id,
         viewCount: post.viewCount + 1,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-        publishedAt: post.publishedAt,
+        createdAt: post.created_at,
+        updatedAt: post.updated_at,
+        publishedAt: post.published_at,
         postType: {
           slug: post.postType.slug,
           name: post.postType.name,
@@ -384,8 +384,8 @@ export const updatePost = async (req: Request, res: Response) => {
     if (meta) post.meta = { ...post.meta, ...meta };
 
     // 발행 상태 변경 시 발행 시간 업데이트
-    if (status === 'published' && !post.publishedAt) {
-      post.publishedAt = new Date();
+    if (status === 'publish' && !post.published_at) {
+      post.published_at = new Date();
     }
 
     const updatedPost = await postRepository.save(post);
@@ -396,7 +396,7 @@ export const updatePost = async (req: Request, res: Response) => {
         id: updatedPost.id,
         title: updatedPost.title,
         status: updatedPost.status,
-        updatedAt: updatedPost.updatedAt
+        updatedAt: updatedPost.updated_at
       }
     });
 
@@ -454,18 +454,18 @@ export const getUserStats = async (req: Request, res: Response) => {
     // 사용자별 포스트 통계
     const totalPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.authorId = :userId', { userId })
+      .where('post.author_id = :userId', { userId })
       .getCount();
     
     const publishedPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.authorId = :userId', { userId })
-      .andWhere('post.status = :status', { status: 'published' })
+      .where('post.author_id = :userId', { userId })
+      .andWhere('post.status = :status', { status: 'publish' })
       .getCount();
     
     const draftPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.authorId = :userId', { userId })
+      .where('post.author_id = :userId', { userId })
       .andWhere('post.status = :status', { status: 'draft' })
       .getCount();
     
@@ -473,7 +473,7 @@ export const getUserStats = async (req: Request, res: Response) => {
     const viewsResult = await postRepository
       .createQueryBuilder('post')
       .select('SUM(post.viewCount)', 'totalViews')
-      .where('post.authorId = :userId', { userId })
+      .where('post.author_id = :userId', { userId })
       .getRawOne();
     
     const totalViews = parseInt(viewsResult?.totalViews || '0');
@@ -481,8 +481,8 @@ export const getUserStats = async (req: Request, res: Response) => {
     // 상위 포스트 조회
     const topPosts = await postRepository
       .createQueryBuilder('post')
-      .where('post.authorId = :userId', { userId })
-      .andWhere('post.status = :status', { status: 'published' })
+      .where('post.author_id = :userId', { userId })
+      .andWhere('post.status = :status', { status: 'publish' })
       .orderBy('post.viewCount', 'DESC')
       .limit(5)
       .getMany();
@@ -502,7 +502,7 @@ export const getUserStats = async (req: Request, res: Response) => {
         id: post.id,
         title: post.title,
         views: post.viewCount,
-        date: post.createdAt.toISOString().split('T')[0]
+        date: post.created_at.toISOString().split('T')[0]
       }))
     };
 

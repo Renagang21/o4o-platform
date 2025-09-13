@@ -51,7 +51,7 @@ export class CrowdfundingRepository {
     }
 
     query = query
-      .orderBy('project.createdAt', 'DESC')
+      .orderBy('project.created_at', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 

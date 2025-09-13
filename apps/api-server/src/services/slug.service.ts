@@ -1,13 +1,13 @@
 import { AppDataSource } from '../database/connection';
 import { Post } from '../entities/Post';
 import { Page } from '../entities/Page';
-import { PostTag } from '../entities/PostTag';
+import { Tag } from '../entities/Tag';
 import { Category } from '../entities/Category';
 
 export class SlugService {
   private postRepository = AppDataSource.getRepository(Post);
   private pageRepository = AppDataSource.getRepository(Page);
-  private tagRepository = AppDataSource.getRepository(PostTag);
+  private tagRepository = AppDataSource.getRepository(Tag);
   private categoryRepository = AppDataSource.getRepository(Category);
 
   /**

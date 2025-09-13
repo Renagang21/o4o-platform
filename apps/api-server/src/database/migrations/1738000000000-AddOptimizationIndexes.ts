@@ -18,7 +18,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_user_role" ON "users" ("role")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_user_created_at" ON "users" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_user_created_at" ON "users" ("created_at")
             `);
         }
 
@@ -38,7 +38,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_product_status" ON "product" ("status")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_product_created_at" ON "product" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_product_created_at" ON "product" ("created_at")
             `);
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_category_id" ON "product" ("categoryId")
@@ -52,7 +52,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_product_status" ON "products" ("status")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_product_created_at" ON "products" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_product_created_at" ON "products" ("created_at")
             `);
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_product_category_id" ON "products" ("categoryId")
@@ -71,7 +71,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_order_status" ON "order" ("status")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_order_created_at" ON "order" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_order_created_at" ON "order" ("created_at")
             `);
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_payment_status" ON "order" ("paymentStatus")
@@ -85,7 +85,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_order_status" ON "orders" ("status")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_order_created_at" ON "orders" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_order_created_at" ON "orders" ("created_at")
             `);
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_payment_status" ON "orders" ("paymentStatus")
@@ -95,7 +95,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         // ForumPost 테이블 인덱스
         if (await queryRunner.hasTable('forum_post')) {
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_forum_post_author_id" ON "forum_post" ("authorId")
+                CREATE INDEX IF NOT EXISTS "IDX_forum_post_author_id" ON "forum_post" ("author_id")
             `);
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_category_id" ON "forum_post" ("categoryId")
@@ -104,12 +104,12 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_status" ON "forum_post" ("status")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_forum_post_created_at" ON "forum_post" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_forum_post_created_at" ON "forum_post" ("created_at")
             `);
         } else if (await queryRunner.hasTable('forum_posts')) {
             // Some systems might use plural
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_forum_post_author_id" ON "forum_posts" ("authorId")
+                CREATE INDEX IF NOT EXISTS "IDX_forum_post_author_id" ON "forum_posts" ("author_id")
             `);
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_category_id" ON "forum_posts" ("categoryId")
@@ -118,7 +118,7 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
                 CREATE INDEX IF NOT EXISTS "IDX_forum_post_status" ON "forum_posts" ("status")
             `);
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_forum_post_created_at" ON "forum_posts" ("createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_forum_post_created_at" ON "forum_posts" ("created_at")
             `);
         }
 
@@ -155,21 +155,21 @@ export class AddOptimizationIndexes1738000000000 implements MigrationInterface {
         
         if (await queryRunner.hasTable('order')) {
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_order_user_status_created" ON "order" ("userId", "status", "createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_order_user_status_created" ON "order" ("userId", "status", "created_at")
             `);
         } else if (await queryRunner.hasTable('orders')) {
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_order_user_status_created" ON "orders" ("userId", "status", "createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_order_user_status_created" ON "orders" ("userId", "status", "created_at")
             `);
         }
         
         if (await queryRunner.hasTable('product')) {
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_product_status_created" ON "product" ("status", "createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_product_status_created" ON "product" ("status", "created_at")
             `);
         } else if (await queryRunner.hasTable('products')) {
             await queryRunner.query(`
-                CREATE INDEX IF NOT EXISTS "IDX_product_status_created" ON "products" ("status", "createdAt")
+                CREATE INDEX IF NOT EXISTS "IDX_product_status_created" ON "products" ("status", "created_at")
             `);
         }
     }

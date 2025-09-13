@@ -20,7 +20,7 @@ export class VendorController {
         status,
         vendorType,
         search,
-        sortBy = 'createdAt',
+        sortBy = 'created_at',
         sortOrder = 'DESC',
       } = req.query;
 

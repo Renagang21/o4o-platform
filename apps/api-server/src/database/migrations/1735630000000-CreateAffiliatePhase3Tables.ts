@@ -127,12 +127,12 @@ export class CreateAffiliatePhase3Tables1735630000000 implements MigrationInterf
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -243,12 +243,12 @@ export class CreateAffiliatePhase3Tables1735630000000 implements MigrationInterf
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -273,7 +273,7 @@ export class CreateAffiliatePhase3Tables1735630000000 implements MigrationInterf
 
     await queryRunner.createIndex('affiliate_notifications', new TableIndex({
       name: 'IDX_affiliate_notifications_created',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     await queryRunner.createIndex('affiliate_notifications', new TableIndex({
@@ -308,12 +308,12 @@ export class CreateAffiliatePhase3Tables1735630000000 implements MigrationInterf
             type: 'timestamp'
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }

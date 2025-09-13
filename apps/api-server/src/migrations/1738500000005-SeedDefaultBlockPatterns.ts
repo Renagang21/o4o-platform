@@ -14,7 +14,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Hero Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Hero with Call to Action',
@@ -46,7 +46,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Header Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Simple Navigation Header',
@@ -78,7 +78,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Patterns using InnerBlocks
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Two Column Layout',
@@ -123,7 +123,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Features Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Three Column Features',
@@ -155,7 +155,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // CTA Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Simple Call to Action',
@@ -187,7 +187,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Footer Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Simple Footer',
@@ -219,7 +219,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Testimonials Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Testimonial Cards',
@@ -238,7 +238,7 @@ export class SeedDefaultBlockPatterns1738500000005 implements MigrationInterface
 
         // Pricing Patterns
         await queryRunner.query(`
-            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "authorId", preview, metadata)
+            INSERT INTO block_patterns (title, slug, description, content, category, source, featured, visibility, "author_id", preview, metadata)
             VALUES 
             (
                 'Pricing Table',

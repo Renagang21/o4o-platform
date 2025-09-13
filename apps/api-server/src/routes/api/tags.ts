@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import { Request, Response } from 'express'
 import { AppDataSource } from '../../database/connection'
-import { PostTag } from '../../entities/PostTag'
+import { Tag } from '../../entities/Tag'
 import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
 import { Like, ILike } from 'typeorm'
 
 const router: Router = Router()
-const tagRepository = AppDataSource.getRepository(PostTag)
+const tagRepository = AppDataSource.getRepository(Tag)
 
 // Get all tags
 router.get('/', async (req: Request, res: Response) => {
@@ -32,8 +32,6 @@ router.get('/', async (req: Request, res: Response) => {
       )
     }
 
-    // Only show active tags
-    queryBuilder.andWhere('tag.isActive = :isActive', { isActive: true })
 
     queryBuilder.orderBy(`tag.${orderby as string}`, order as 'ASC' | 'DESC')
       .skip(skip)
@@ -67,13 +65,12 @@ router.get('/autocomplete', async (req: Request, res: Response) => {
 
     const tags = await tagRepository.find({
       where: {
-        name: ILike(`%${q}%`),
-        isActive: true
+        name: ILike(`%${q}%`)
       },
-      select: ['id', 'name', 'slug', 'color'],
+      select: ['id', 'name', 'slug'],
       take: 10,
       order: {
-        usageCount: 'DESC'
+        count: 'DESC'
       }
     })
 
@@ -115,9 +112,7 @@ router.post('/', async (req: Request, res: Response) => {
       name,
       slug,
       description,
-      color,
-      metaTitle,
-      metaDescription
+      meta
     } = req.body
 
     // Check if slug is unique
@@ -132,11 +127,8 @@ router.post('/', async (req: Request, res: Response) => {
       name,
       slug: finalSlug,
       description,
-      color,
-      metaTitle,
-      metaDescription,
-      isActive: true,
-      usageCount: 0
+      meta,
+      count: 0
     })
 
     const savedTag = await tagRepository.save(tag)
@@ -155,10 +147,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       name,
       slug,
       description,
-      color,
-      metaTitle,
-      metaDescription,
-      isActive
+      meta
     } = req.body
 
     const tag = await tagRepository.findOne({ where: { id } })
@@ -179,10 +168,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (name !== undefined) tag.name = name
     if (slug !== undefined) tag.slug = slug
     if (description !== undefined) tag.description = description
-    if (color !== undefined) tag.color = color
-    if (metaTitle !== undefined) tag.metaTitle = metaTitle
-    if (metaDescription !== undefined) tag.metaDescription = metaDescription
-    if (isActive !== undefined) tag.isActive = isActive
+    if (meta !== undefined) tag.meta = meta
 
     const updatedTag = await tagRepository.save(tag)
     res.json(updatedTag)
@@ -208,10 +194,12 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     // Check if tag is in use
     if (tag.posts && tag.posts.length > 0) {
-      // Instead of deleting, mark as inactive
-      tag.isActive = false
-      await tagRepository.save(tag)
-      return res.json({ message: 'Tag deactivated (still in use by posts)' })
+      return res.status(400).json({ 
+        error: { 
+          code: 'VALIDATION_ERROR', 
+          message: 'Cannot delete tag that is in use by posts' 
+        }
+      })
     }
 
     await tagRepository.remove(tag)
@@ -260,7 +248,7 @@ router.post('/merge', authenticateToken, async (req: Request, res: Response) => 
         }
       }
       // Update usage count
-      targetTag.usageCount += sourceTag.usageCount
+      targetTag.count += sourceTag.count
     }
 
     await tagRepository.save(targetTag)

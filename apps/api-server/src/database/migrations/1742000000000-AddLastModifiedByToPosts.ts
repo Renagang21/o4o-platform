@@ -28,7 +28,7 @@ export class AddLastModifiedByToPosts1742000000000 implements MigrationInterface
     // Set initial value as authorId for existing posts
     await queryRunner.query(`
       UPDATE "posts" 
-      SET "lastModifiedBy" = "authorId" 
+      SET "lastModifiedBy" = "author_id" 
       WHERE "lastModifiedBy" IS NULL
     `);
   }

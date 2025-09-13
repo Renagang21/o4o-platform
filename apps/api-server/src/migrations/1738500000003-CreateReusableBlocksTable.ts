@@ -78,7 +78,7 @@ export class CreateReusableBlocksTable1738500000003 implements MigrationInterfac
                     isNullable: true
                 },
                 {
-                    name: "authorId",
+                    name: "author_id",
                     type: "uuid"
                 },
                 {
@@ -103,12 +103,12 @@ export class CreateReusableBlocksTable1738500000003 implements MigrationInterfac
                     isNullable: true
                 },
                 {
-                    name: "createdAt",
+                    name: "created_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP"
                 },
                 {
-                    name: "updatedAt",
+                    name: "updated_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP",
                     onUpdate: "CURRENT_TIMESTAMP"
@@ -120,7 +120,7 @@ export class CreateReusableBlocksTable1738500000003 implements MigrationInterfac
         await queryRunner.query(`
             ALTER TABLE "reusable_blocks" 
             ADD CONSTRAINT "FK_reusable_blocks_authorId" 
-            FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE CASCADE
+            FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE
         `)
 
         await queryRunner.query(`
@@ -152,7 +152,7 @@ export class CreateReusableBlocksTable1738500000003 implements MigrationInterfac
         
         await queryRunner.createIndex("reusable_blocks", new TableIndex({ 
             name: "IDX_reusable_blocks_authorId", 
-            columnNames: ["authorId"] 
+            columnNames: ["author_id"] 
         }))
         
         await queryRunner.createIndex("reusable_blocks", new TableIndex({ 

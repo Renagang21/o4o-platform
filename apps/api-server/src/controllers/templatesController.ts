@@ -44,7 +44,7 @@ export class TemplatesController {
       // Order by featured first, then by usage count
       queryBuilder.orderBy('template.featured', 'DESC')
                   .addOrderBy('template.usageCount', 'DESC')
-                  .addOrderBy('template.createdAt', 'DESC');
+                  .addOrderBy('template.created_at', 'DESC');
 
       const userTemplates = await queryBuilder.getMany();
 
@@ -245,7 +245,7 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
-      if (template.authorId !== userId) {
+      if (template.author_id !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
         if (!user || user.role !== 'admin') {
           return res.status(403).json({
@@ -320,7 +320,7 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
-      if (template.authorId !== userId) {
+      if (template.author_id !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
         if (!user || user.role !== 'admin') {
           return res.status(403).json({

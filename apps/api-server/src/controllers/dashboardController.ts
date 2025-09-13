@@ -224,7 +224,7 @@ export class DashboardController {
       const [posts, drafts, published, categories, media] = await Promise.all([
         postRepo.count(),
         postRepo.count({ where: { status: 'draft' } }),
-        postRepo.count({ where: { status: 'published' } }),
+        postRepo.count({ where: { status: 'publish' } }),
         categoryRepo.count(),
         mediaRepo.count()
       ]);

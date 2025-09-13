@@ -281,7 +281,7 @@ export const schemas = {
       },
       status: { 
         type: 'string',
-        enum: ['draft', 'published', 'scheduled', 'archived'],
+        enum: ['draft', 'publish', 'scheduled', 'archived'],
         description: '발행 상태'
       },
       visibility: {
@@ -344,7 +344,7 @@ export const schemas = {
       content: { type: 'string' },
       status: { 
         type: 'string',
-        enum: ['draft', 'published', 'archived']
+        enum: ['draft', 'publish', 'archived']
       },
       template: {
         type: 'string',

@@ -45,7 +45,7 @@ router.get('/templates/homepage', async (req, res) => {
         metadata: {
           version: homepageTemplate.version,
           layoutType: homepageTemplate.layoutType,
-          updatedAt: homepageTemplate.updatedAt
+          updatedAt: homepageTemplate.updated_at
         }
       }
     });
@@ -67,7 +67,7 @@ router.get('/pages/:slug', async (req, res) => {
     const page = await pageRepository.findOne({
       where: { 
         slug,
-        status: 'published'
+        status: 'publish'
       }
     });
 
@@ -106,7 +106,7 @@ router.get('/pages/:slug', async (req, res) => {
             metaDescription: page.seo?.description || page.excerpt,
             metaKeywords: page.seo?.keywords?.join(', ') || ''
           },
-          updatedAt: page.updatedAt
+          updatedAt: page.updated_at
         }
       }
     });
@@ -150,7 +150,7 @@ router.get('/templates/:type', async (req, res) => {
         metadata: {
           version: template.version,
           layoutType: template.layoutType,
-          updatedAt: template.updatedAt
+          updatedAt: template.updated_at
         }
       }
     });
@@ -200,7 +200,7 @@ router.get('/posts/:type/:slug', async (req, res) => {
             metaDescription: post.meta?.seoDescription || '',
             metaKeywords: post.meta?.tags?.join(', ') || ''
           },
-          updatedAt: post.updatedAt
+          updatedAt: post.updated_at
         }
       }
     });
@@ -251,7 +251,7 @@ router.get('/products', async (req, res) => {
     }
 
     // Apply sorting
-    const orderBy = req.query.orderby as string || 'createdAt';
+    const orderBy = req.query.orderby as string || 'created_at';
     const order = (req.query.order as string || 'desc').toUpperCase() as 'ASC' | 'DESC';
     queryBuilder.orderBy(`product.${orderBy}`, order);
 
@@ -379,8 +379,8 @@ router.get('/posts', async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const status = req.query.status as string || 'published';
-    const orderBy = req.query.orderBy as string || 'createdAt';
+    const status = req.query.status as string || 'publish';
+    const orderBy = req.query.orderBy as string || 'created_at';
     const order = req.query.order as string || 'DESC';
     const offset = (page - 1) * limit;
 
@@ -392,7 +392,7 @@ router.get('/posts', async (req, res) => {
         slug: 'neture-platform-launch',
         excerpt: 'O4O 비즈니스를 위한 통합 플랫폼이 출시되었습니다.',
         content: '<p>Neture 플랫폼이 공식 출시되었습니다...</p>',
-        status: 'published',
+        status: 'publish',
         author: {
           id: '1',
           name: 'Admin',

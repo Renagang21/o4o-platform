@@ -2,15 +2,17 @@ import { Request, Response } from 'express'
 import { AppDataSource } from '../database/connection'
 import { Post } from '../entities/Post'
 import { Category } from '../entities/Category'
-import { PostTag } from '../entities/PostTag'
+import { Tag } from '../entities/Tag'
 import { User } from '../entities/User'
+import { PostAutosave } from '../entities/PostAutosave'
 import { In, Like, Not, FindManyOptions, FindOptionsWhere } from 'typeorm'
 import crypto from 'crypto'
 
 const postRepository = AppDataSource.getRepository(Post)
 const categoryRepository = AppDataSource.getRepository(Category)
-const tagRepository = AppDataSource.getRepository(PostTag)
+const tagRepository = AppDataSource.getRepository(Tag)
 const userRepository = AppDataSource.getRepository(User)
+const autosaveRepository = AppDataSource.getRepository(PostAutosave)
 
 // Store recent request hashes to prevent duplicate processing
 const recentRequests = new Map<string, { timestamp: number; result?: any }>()
@@ -48,9 +50,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
       category,
       tag,
       author,
-      orderby = 'createdAt',
+      orderby = 'created_at',
       order = 'DESC',
-      format,
       type = 'post'
     } = req.query
 
@@ -63,12 +64,11 @@ export const getAllPosts = async (req: Request, res: Response) => {
     
     // Handle status filtering - excludeStatus takes precedence over status
     if (excludeStatus) {
-      where.status = Not(excludeStatus as string)
+      where.status = Not(excludeStatus as any)
     } else if (status) {
-      where.status = status as string
+      where.status = status as any
     }
-    if (format) where.format = format as string
-    if (author) where.authorId = author as string
+    if (author) where.author_id = author as string
     if (search) {
       where.title = Like(`%${search}%`)
     }
@@ -79,7 +79,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
       relations: ['author', 'categories', 'tags'],
       skip,
       take: limitNum,
-      order: { [orderby as string]: order as 'ASC' | 'DESC' }
+      order: { [orderby === 'created_at' ? 'created_at' : orderby as string]: order as 'ASC' | 'DESC' }
     }
 
     const [posts, total] = await postRepository.findAndCount(options)
@@ -190,19 +190,14 @@ export const createPost = async (req: Request, res: Response) => {
       excerpt,
       slug,
       status = 'draft',
-      format = 'standard',
       categories = [],
       tags = [],
-      featured = false,
-      sticky = false,
-      featuredImage,
+      featured_media,
       template,
-      seo,
-      customFields,
-      postMeta,
-      allowComments = true,
-      password,
-      scheduledAt
+      comment_status = 'open',
+      ping_status = 'open',
+      sticky = false,
+      meta
     } = req.body
     
     // Debug log
@@ -292,21 +287,15 @@ export const createPost = async (req: Request, res: Response) => {
       excerpt,
       slug: finalSlug,
       status,
-      format,
       type: 'post',
-      authorId: userId,
-      featured,
-      sticky,
-      featuredImage,
+      author_id: userId,
       template,
-      seo,
-      customFields,
-      postMeta,
-      allowComments,
-      password,
-      passwordProtected: !!password,
-      scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
-      publishedAt: status === 'publish' || status === 'published' ? new Date() : undefined
+      featured_media,
+      comment_status,
+      ping_status,
+      sticky,
+      meta,
+      published_at: status === 'publish' || status === 'publish' ? new Date() : undefined
     })
 
     // Handle categories
@@ -380,19 +369,14 @@ export const updatePost = async (req: Request, res: Response) => {
       excerpt,
       slug,
       status,
-      format,
       categories,
       tags,
-      featured,
-      sticky,
-      featuredImage,
       template,
-      seo,
-      customFields,
-      postMeta,
-      allowComments,
-      password,
-      scheduledAt
+      featured_media,
+      comment_status,
+      ping_status,
+      sticky,
+      meta
     } = req.body
 
     // Debug log
@@ -455,26 +439,16 @@ export const updatePost = async (req: Request, res: Response) => {
     if (slug !== undefined) post.slug = slug
     if (status !== undefined) {
       post.status = status
-      if ((status === 'publish' || status === 'published') && !post.publishedAt) {
-        post.publishedAt = new Date()
+      if ((status === 'publish' || status === 'publish') && !post.published_at) {
+        post.published_at = new Date()
       }
     }
-    if (format !== undefined) post.format = format
-    if (featured !== undefined) post.featured = featured
-    if (sticky !== undefined) post.sticky = sticky
-    if (featuredImage !== undefined) post.featuredImage = featuredImage
     if (template !== undefined) post.template = template
-    if (seo !== undefined) post.seo = seo
-    if (customFields !== undefined) post.customFields = customFields
-    if (postMeta !== undefined) post.postMeta = postMeta
-    if (allowComments !== undefined) post.allowComments = allowComments
-    if (password !== undefined) {
-      post.password = password
-      post.passwordProtected = !!password
-    }
-    if (scheduledAt !== undefined) post.scheduledAt = scheduledAt ? new Date(scheduledAt) : null
-
-    post.lastModifiedBy = userId
+    if (featured_media !== undefined) post.featured_media = featured_media
+    if (comment_status !== undefined) post.comment_status = comment_status
+    if (ping_status !== undefined) post.ping_status = ping_status
+    if (sticky !== undefined) post.sticky = sticky
+    if (meta !== undefined) post.meta = meta
 
     // Update categories
     if (categories !== undefined) {
@@ -553,38 +527,33 @@ export const autoSavePost = async (req: Request, res: Response) => {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
 
-    // Store current version as revision
-    const revisions = post.revisions || []
-    revisions.push({
-      id: `rev_${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      author: userId,
-      changes: {
-        title: post.title,
-        content: post.content,
-        excerpt: post.excerpt
-      }
+    // Create autosave entry
+    const autosave = autosaveRepository.create({
+      post_id: id,
+      title,
+      content,
+      excerpt
     })
 
-    // Limit revisions to last 10
-    if (revisions.length > 10) {
-      revisions.shift()
+    const savedAutosave = await autosaveRepository.save(autosave)
+
+    // Clean up old autosaves (keep only last 10)
+    const allAutosaves = await autosaveRepository.find({
+      where: { post_id: id },
+      order: { saved_at: 'DESC' }
+    })
+
+    if (allAutosaves.length > 10) {
+      const toDelete = allAutosaves.slice(10)
+      await autosaveRepository.remove(toDelete)
     }
-
-    // Update post with auto-saved content
-    post.revisions = revisions
-    if (content !== undefined) post.content = content
-    if (title !== undefined) post.title = title
-    if (excerpt !== undefined) post.excerpt = excerpt
-    post.lastModifiedBy = userId
-
-    await postRepository.save(post)
 
     res.json({ 
       data: { 
-        message: 'Auto-save successful', 
-        revisionId: revisions[revisions.length - 1].id,
-        updatedAt: new Date().toISOString()
+        id: savedAutosave.id,
+        post_id: id,
+        saved_at: savedAutosave.saved_at,
+        message: 'Auto-save successful'
       } 
     })
   } catch (error) {
@@ -720,15 +689,15 @@ export const bulkOperatePosts = async (req: Request, res: Response) => {
             break
             
           case 'publish':
-            if (post.status === 'published') {
+            if (post.status === 'publish') {
               failed.push({
                 id,
                 code: 'ALREADY_PUBLISHED',
                 message: 'Post is already published'
               })
             } else {
-              post.status = 'published'
-              post.publishedAt = post.publishedAt || new Date()
+              post.status = 'publish'
+              post.published_at = post.published_at || new Date()
               await postRepository.save(post)
               succeeded.push(id)
             }
@@ -783,14 +752,14 @@ export const getPostCounts = async (req: Request, res: Response) => {
     // Get all posts
     const allPosts = await postRepository.find({
       where: { type: 'post' },
-      select: ['id', 'status', 'authorId']
+      select: ['id', 'status', 'author_id']
     })
     
     // Calculate counts
     const counts = {
       all: allPosts.filter(p => p.status !== 'trash').length,
-      mine: userId ? allPosts.filter(p => p.authorId === userId && p.status !== 'trash').length : 0,
-      published: allPosts.filter(p => p.status === 'publish' || p.status === 'published').length,
+      mine: userId ? allPosts.filter(p => p.author_id === userId && p.status !== 'trash').length : 0,
+      published: allPosts.filter(p => p.status === 'publish' || p.status === 'publish').length,
       draft: allPosts.filter(p => p.status === 'draft').length,
       scheduled: allPosts.filter(p => p.status === 'scheduled').length,
       private: allPosts.filter(p => p.status === 'private').length,

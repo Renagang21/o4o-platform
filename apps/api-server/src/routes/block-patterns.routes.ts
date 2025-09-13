@@ -120,8 +120,8 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       colorScheme: pattern.colorScheme,
       typography: pattern.typography,
       status: pattern.status,
-      createdAt: pattern.createdAt,
-      updatedAt: pattern.updatedAt
+      createdAt: pattern.created_at,
+      updatedAt: pattern.updated_at
     })));
 
   } catch (error: any) {
@@ -194,7 +194,7 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
     }
 
     // Check access permissions
-    if (pattern.visibility === 'private' && pattern.authorId !== userId) {
+    if (pattern.visibility === 'private' && pattern.author_id !== userId) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -229,8 +229,8 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
       colorScheme: pattern.colorScheme,
       typography: pattern.typography,
       status: pattern.status,
-      createdAt: pattern.createdAt,
-      updatedAt: pattern.updatedAt
+      createdAt: pattern.created_at,
+      updatedAt: pattern.updated_at
     });
 
   } catch (error: any) {
@@ -293,7 +293,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     pattern.source = 'user';
     pattern.visibility = visibility;
     pattern.metadata = metadata;
-    pattern.authorId = userId!;
+    pattern.author_id = userId!;
     pattern.dependencies = dependencies;
     pattern.colorScheme = colorScheme;
     pattern.typography = typography;
@@ -323,8 +323,8 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
         id: patternWithRelations!.author.id,
         name: patternWithRelations!.author.name
       },
-      createdAt: patternWithRelations!.createdAt,
-      updatedAt: patternWithRelations!.updatedAt
+      createdAt: patternWithRelations!.created_at,
+      updatedAt: patternWithRelations!.updated_at
     });
 
   } catch (error: any) {
@@ -355,7 +355,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     }
 
     // Check edit permissions
-    if (pattern.authorId !== userId && pattern.source !== 'user') {
+    if (pattern.author_id !== userId && pattern.source !== 'user') {
       return res.status(403).json({ error: 'Cannot edit this pattern' });
     }
 
@@ -423,8 +423,8 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       },
       version: patternWithRelations!.version,
       status: patternWithRelations!.status,
-      createdAt: patternWithRelations!.createdAt,
-      updatedAt: patternWithRelations!.updatedAt
+      createdAt: patternWithRelations!.created_at,
+      updatedAt: patternWithRelations!.updated_at
     });
 
   } catch (error: any) {
@@ -454,7 +454,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     }
 
     // Check delete permissions (only author or admin can delete)
-    if (pattern.authorId !== userId) {
+    if (pattern.author_id !== userId) {
       return res.status(403).json({ error: 'Cannot delete this pattern' });
     }
 
@@ -493,7 +493,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     }
 
     // Check access permissions
-    if (originalPattern.visibility === 'private' && originalPattern.authorId !== userId) {
+    if (originalPattern.visibility === 'private' && originalPattern.author_id !== userId) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -521,7 +521,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     duplicatePattern.source = 'user';
     duplicatePattern.visibility = 'private'; // Always create as private
     duplicatePattern.metadata = { ...originalPattern.metadata };
-    duplicatePattern.authorId = userId!;
+    duplicatePattern.author_id = userId!;
     duplicatePattern.dependencies = originalPattern.dependencies;
     duplicatePattern.colorScheme = originalPattern.colorScheme;
     duplicatePattern.typography = originalPattern.typography;
@@ -551,8 +551,8 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
         id: patternWithRelations!.author.id,
         name: patternWithRelations!.author.name
       },
-      createdAt: patternWithRelations!.createdAt,
-      updatedAt: patternWithRelations!.updatedAt
+      createdAt: patternWithRelations!.created_at,
+      updatedAt: patternWithRelations!.updated_at
     });
 
   } catch (error: any) {

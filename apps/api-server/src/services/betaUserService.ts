@@ -197,7 +197,7 @@ export class BetaUserService {
     }
 
     if (dateFrom && dateTo) {
-      queryBuilder.andWhere('betaUser.createdAt BETWEEN :dateFrom AND :dateTo', {
+      queryBuilder.andWhere('betaUser.created_at BETWEEN :dateFrom AND :dateTo', {
         dateFrom,
         dateTo
       });
@@ -205,7 +205,7 @@ export class BetaUserService {
 
     // Sorting
     const sortMapping = {
-      latest: 'betaUser.createdAt',
+      latest: 'betaUser.created_at',
       name: 'betaUser.name',
       email: 'betaUser.email',
       lastActive: 'betaUser.lastActiveAt',
@@ -373,7 +373,7 @@ export class BetaUserService {
     }
 
     if (dateFrom && dateTo) {
-      queryBuilder.andWhere('feedback.createdAt BETWEEN :dateFrom AND :dateTo', {
+      queryBuilder.andWhere('feedback.created_at BETWEEN :dateFrom AND :dateTo', {
         dateFrom,
         dateTo
       });
@@ -381,7 +381,7 @@ export class BetaUserService {
 
     // Sorting
     const sortMapping = {
-      latest: 'feedback.createdAt',
+      latest: 'feedback.created_at',
       priority: 'feedback.priority',
       status: 'feedback.status',
       type: 'feedback.type'
@@ -391,7 +391,7 @@ export class BetaUserService {
 
     // Add secondary sort by business impact score for priority sorting
     if (sortBy === 'priority') {
-      queryBuilder.addOrderBy('feedback.createdAt', 'ASC');
+      queryBuilder.addOrderBy('feedback.created_at', 'ASC');
     }
 
     // Pagination
@@ -483,7 +483,7 @@ export class BetaUserService {
 
     const avgResolutionResult = await this.betaFeedbackRepository
       .createQueryBuilder('feedback')
-      .select('AVG(EXTRACT(EPOCH FROM (feedback.resolvedAt - feedback.createdAt))/86400)', 'avg')
+      .select('AVG(EXTRACT(EPOCH FROM (feedback.resolvedAt - feedback.created_at))/86400)', 'avg')
       .where('feedback.resolvedAt IS NOT NULL')
       .getRawOne();
 
