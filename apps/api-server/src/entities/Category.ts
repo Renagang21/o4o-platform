@@ -42,9 +42,6 @@ export class Category {
   @Column({ default: 0 })
   count!: number;
 
-  @Column({ type: 'json', nullable: true })
-  meta!: Record<string, any>;
-
   // Relations
   @ManyToMany(() => Post, (post: Post) => post.categories)
   posts!: Post[];
