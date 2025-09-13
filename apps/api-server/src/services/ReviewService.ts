@@ -146,7 +146,7 @@ export class ReviewService extends EventEmitter {
     }
 
     // 수정 가능 기간 체크 (30일)
-    const daysSinceCreation = (Date.now() - review.created_at.getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceCreation = (Date.now() - review.createdAt.getTime()) / (1000 * 60 * 60 * 24);
     if (daysSinceCreation > 30) {
       throw new Error('Review can only be edited within 30 days');
     }

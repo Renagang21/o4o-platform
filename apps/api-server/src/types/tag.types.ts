@@ -6,16 +6,30 @@ export interface CreateTagDto {
   name: string;
   slug?: string;
   description?: string;
+  // Backward compatibility - these will be moved to meta field
   metaTitle?: string;
   metaDescription?: string;
+  // New structure
+  meta?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    [key: string]: any;
+  };
 }
 
 export interface UpdateTagDto {
   name?: string;
   slug?: string;
   description?: string;
+  // Backward compatibility - these will be moved to meta field
   metaTitle?: string;
   metaDescription?: string;
+  // New structure
+  meta?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    [key: string]: any;
+  };
 }
 
 export interface TagStatistics {

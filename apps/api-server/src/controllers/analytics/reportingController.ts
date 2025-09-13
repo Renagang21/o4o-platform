@@ -35,7 +35,7 @@ export class ReportingController {
   }
 
   // POST /api/reports/inventory - 재고 보고서 생성
-  generateInventoryReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+  generateInventoryReport = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       format = 'json',
@@ -129,7 +129,7 @@ export class ReportingController {
   });
 
   // POST /api/reports/sales - 판매 보고서 생성
-  generateSalesReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+  generateSalesReport = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       format = 'json',
@@ -224,7 +224,7 @@ export class ReportingController {
   });
 
   // POST /api/reports/commission - 수수료/정산 보고서 생성
-  generateCommissionReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+  generateCommissionReport = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       format = 'json',
@@ -329,7 +329,7 @@ export class ReportingController {
   });
 
   // POST /api/reports/custom - 사용자 정의 보고서 생성
-  generateCustomReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+  generateCustomReport = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       format = 'json',
@@ -402,7 +402,7 @@ export class ReportingController {
   });
 
   // GET /api/reports/:reportId/download - 보고서 파일 다운로드
-  downloadReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+  downloadReport = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { reportId } = req.params;
 

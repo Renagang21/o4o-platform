@@ -38,7 +38,7 @@ export class TagService {
     }
 
     // Add sorting
-    const allowedSortFields = ['name', 'slug', 'createdAt', 'updatedAt'];
+    const allowedSortFields = ['name', 'slug', 'created_at', 'updated_at'];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'name';
     queryBuilder.orderBy(`tag.${sortField}`, sortOrder);
 
@@ -85,12 +85,23 @@ export class TagService {
     tag.name = data.name;
     tag.slug = data.slug || generateSlug(data.name);
     tag.description = data.description || '';
-    tag.metaTitle = data.metaTitle || data.name;
-    tag.metaDescription = data.metaDescription || data.description || '';
     
-    // Set timestamps
-    tag.createdAt = new Date();
-    tag.updatedAt = new Date();
+    // Store meta information in meta field
+    // Support both backward compatibility fields and new meta structure
+    tag.meta = {
+      ...(tag.meta || {}),
+      // Backward compatibility: direct metaTitle/metaDescription fields
+      ...(data.metaTitle && { metaTitle: data.metaTitle }),
+      ...(data.metaDescription && { metaDescription: data.metaDescription }),
+      // New structure: meta object
+      ...(data.meta || {}),
+      // Defaults if nothing provided
+      ...(!data.metaTitle && !data.meta?.metaTitle && { metaTitle: data.name }),
+      ...(!data.metaDescription && !data.meta?.metaDescription && { metaDescription: data.description || '' })
+    };
+    
+    // Timestamps are handled automatically by TypeORM
+    // tag.created_at and tag.updated_at are set by @CreateDateColumn and @UpdateDateColumn
 
     return await this.tagRepository.save(tag);
   }
@@ -109,11 +120,21 @@ export class TagService {
     if (data.name !== undefined) tag.name = data.name;
     if (data.slug !== undefined) tag.slug = generateSlug(data.slug);
     if (data.description !== undefined) tag.description = data.description;
-    if (data.metaTitle !== undefined) tag.metaTitle = data.metaTitle;
-    if (data.metaDescription !== undefined) tag.metaDescription = data.metaDescription;
+    
+    // Update meta information if provided
+    // Support both backward compatibility fields and new meta structure
+    if (data.metaTitle !== undefined || data.metaDescription !== undefined || data.meta !== undefined) {
+      tag.meta = {
+        ...(tag.meta || {}),
+        // Backward compatibility: direct metaTitle/metaDescription fields
+        ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle }),
+        ...(data.metaDescription !== undefined && { metaDescription: data.metaDescription }),
+        // New structure: meta object
+        ...(data.meta || {})
+      };
+    }
 
-    // Update timestamp
-    tag.updatedAt = new Date();
+    // Timestamp is updated automatically by @UpdateDateColumn
 
     return await this.tagRepository.save(tag);
   }
@@ -215,8 +236,8 @@ export class TagService {
     // Get recent posts
     const recentPosts = posts
       .sort((a, b) => {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
@@ -224,8 +245,8 @@ export class TagService {
     // Get most viewed posts (using creation date as fallback for now)
     const popularPosts = posts
       .sort((a, b) => {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
@@ -240,7 +261,7 @@ export class TagService {
         id: p.id,
         title: p.title,
         slug: p.slug,
-        createdAt: p.createdAt,
+        createdAt: p.created_at,
         viewCount: 0 // viewCount not available yet
       })),
       popularPosts: popularPosts.map(p => ({
@@ -249,8 +270,8 @@ export class TagService {
         slug: p.slug,
         viewCount: 0 // viewCount not available yet
       })),
-      createdAt: tag.createdAt,
-      updatedAt: tag.updatedAt
+      createdAt: tag.created_at,
+      updatedAt: tag.updated_at
     };
   }
 

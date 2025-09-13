@@ -40,7 +40,7 @@ export class DashboardController {
   }
 
   // GET /api/vendors/suppliers/:vendorId/dashboard - Integrated vendor/supplier dashboard
-  getIntegratedDashboard = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getIntegratedDashboard = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const { vendorId } = req.params;
     const currentUser = req.user;
 

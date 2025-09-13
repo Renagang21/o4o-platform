@@ -37,7 +37,7 @@ export class AdminCommissionController {
   }
 
   // GET /api/admin/commission-overview - Complete admin commission overview
-  getCommissionOverview = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getCommissionOverview = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { timeRange = 'month', includeStats = 'true' } = req.query;
 
@@ -51,11 +51,12 @@ export class AdminCommissionController {
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
       res.set('X-Cache-Hit', 'true');
-      return res.json({
+      res.json({
         success: true,
         data: cachedData,
         message: 'Commission overview retrieved successfully',
       });
+      return;
     }
 
     // Get time ranges
@@ -231,7 +232,7 @@ export class AdminCommissionController {
   });
 
   // Bulk commission operations
-  bulkApproveCommissions = asyncHandler(async (req: AuthRequest, res: Response) => {
+  bulkApproveCommissions = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { commissionIds, notes } = req.body;
 
@@ -272,7 +273,7 @@ export class AdminCommissionController {
     });
   });
 
-  bulkApproveSettlements = asyncHandler(async (req: AuthRequest, res: Response) => {
+  bulkApproveSettlements = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { settlementIds, notes } = req.body;
 

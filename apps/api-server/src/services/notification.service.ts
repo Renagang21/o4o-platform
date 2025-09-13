@@ -691,7 +691,7 @@ export class NotificationService extends EventEmitter {
         const dateStr = date.toISOString().split('T')[0];
         
         const dayNotifications = weekStats.filter(n => 
-          n.created_at.toISOString().split('T')[0] === dateStr
+          n.createdAt.toISOString().split('T')[0] === dateStr
         );
         
         recentActivity.push({

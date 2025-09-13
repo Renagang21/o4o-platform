@@ -912,7 +912,7 @@ export class OperationsMonitoringService {
         currentValue: alert.currentValue,
         thresholdValue: alert.thresholdValue,
         unit: alert.unit,
-        timestamp: alert.created_at.toISOString()
+        timestamp: alert.createdAt.toISOString()
       },
       context: alert.context,
       metadata: alert.metadata

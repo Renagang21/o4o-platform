@@ -12,7 +12,7 @@ export class DashboardIntegrationController {
   }
 
   // GET /api/dashboard/enhanced - 통합 대시보드 데이터
-  getEnhancedDashboard = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getEnhancedDashboard = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       widgets = 'kpi-overview,sales-trends,inventory-status,alerts',
@@ -61,7 +61,7 @@ export class DashboardIntegrationController {
   });
 
   // POST /api/dashboard/widgets/refresh - 위젯 새로고침
-  refreshWidgets = asyncHandler(async (req: AuthRequest, res: Response) => {
+  refreshWidgets = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const { widgetIds } = req.body;
 
@@ -123,7 +123,7 @@ export class DashboardIntegrationController {
   });
 
   // GET /api/dashboard/config - 대시보드 설정 조회
-  getDashboardConfig = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getDashboardConfig = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
 
     // Check permissions

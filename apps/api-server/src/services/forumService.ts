@@ -246,8 +246,8 @@ export class ForumService {
     }
 
     // 작성자 필터
-    if (options.author_id) {
-      queryBuilder.andWhere('post.authorId = :authorId', { authorId: options.author_id });
+    if (options.authorId) {
+      queryBuilder.andWhere('post.authorId = :authorId', { authorId: options.authorId });
     }
 
     // 타입 필터

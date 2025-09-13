@@ -24,7 +24,7 @@ export class ForecastingController {
   }
 
   // POST /api/forecasting/sales - 판매 예측
-  forecastSales = asyncHandler(async (req: AuthRequest, res: Response) => {
+  forecastSales = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       method = 'linear',
@@ -116,7 +116,7 @@ export class ForecastingController {
   });
 
   // POST /api/forecasting/demand - 수요 예측
-  forecastDemand = asyncHandler(async (req: AuthRequest, res: Response) => {
+  forecastDemand = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       method = 'seasonal',
@@ -216,7 +216,7 @@ export class ForecastingController {
   });
 
   // POST /api/forecasting/inventory - 재고 수준 예측
-  forecastInventory = asyncHandler(async (req: AuthRequest, res: Response) => {
+  forecastInventory = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       method = 'seasonal',
@@ -328,7 +328,7 @@ export class ForecastingController {
   });
 
   // POST /api/forecasting/revenue - 수익 예측
-  forecastRevenue = asyncHandler(async (req: AuthRequest, res: Response) => {
+  forecastRevenue = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       method = 'exponential',

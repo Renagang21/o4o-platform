@@ -25,7 +25,7 @@ export class AnalyticsController {
   }
 
   // GET /api/analytics/dashboard - 통합 대시보드 데이터
-  getDashboard = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getDashboard = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -102,7 +102,7 @@ export class AnalyticsController {
   });
 
   // GET /api/analytics/inventory/overview - 재고 현황 분석
-  getInventoryOverview = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getInventoryOverview = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       categories,
@@ -157,7 +157,7 @@ export class AnalyticsController {
   });
 
   // GET /api/analytics/sales/trends - 판매 트렌드 분석
-  getSalesTrends = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getSalesTrends = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -251,7 +251,7 @@ export class AnalyticsController {
   });
 
   // GET /api/analytics/products/performance - 제품 성과 분석
-  getProductPerformance = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getProductPerformance = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -344,7 +344,7 @@ export class AnalyticsController {
   });
 
   // GET /api/analytics/vendors/ranking - 판매자 순위
-  getVendorRanking = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getVendorRanking = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
     const {
       startDate,
@@ -426,7 +426,7 @@ export class AnalyticsController {
   });
 
   // GET /api/analytics/realtime - 실시간 지표
-  getRealTimeMetrics = asyncHandler(async (req: AuthRequest, res: Response) => {
+  getRealTimeMetrics = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     const currentUser = req.user;
 
     // Check permissions

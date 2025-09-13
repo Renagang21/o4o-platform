@@ -510,7 +510,7 @@ export class RestockNotificationService extends EventEmitter {
   ): Promise<RestockNotification[]> {
     return Array.from(this.notifications.values())
       .filter(n => n.userId === userId && n.status === 'active')
-      .sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   /**

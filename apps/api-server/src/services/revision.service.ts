@@ -68,9 +68,9 @@ export class RevisionService {
         excerpt: post.excerpt,
         status: post.status,
         seo: post.seo,
-        customFields: post.customFields,
+        customFields: post.meta, // Post.meta → PostRevision.customFields for compatibility
         tags: post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name) || [],
-        postMeta: post.postMeta,
+        postMeta: post.meta, // Post.meta → PostRevision.postMeta for compatibility
         changes,
         changeDescription: revisionData.changeDescription,
         isRestorePoint: revisionData.isRestorePoint || false,
@@ -220,18 +220,15 @@ export class RevisionService {
       });
 
       // Restore content (exclude tags for now as they need special handling)
-      const updatedPost = await this.postRepository.save({
-        ...post,
-        title: revision.title,
-        content: revision.content,
-        excerpt: revision.excerpt,
-        status: revision.status,
-        seo: revision.seo,
-        customFields: revision.customFields,
-        postMeta: revision.postMeta,
-        lastModifiedBy: restoredBy,
-        updatedAt: new Date()
-      });
+      post.title = revision.title;
+      post.content = revision.content;
+      post.excerpt = revision.excerpt;
+      post.status = revision.status as 'draft' | 'publish' | 'private' | 'trash';
+      post.seo = revision.seo;
+      post.meta = revision.customFields || revision.postMeta || {}; // Restore from either field to Post.meta
+      post.updated_at = new Date();
+      
+      const updatedPost = await this.postRepository.save(post);
 
       // TODO: Handle tag restoration - need to convert string[] back to PostTag[]
 
@@ -242,7 +239,7 @@ export class RevisionService {
         restoredBy
       });
 
-      return Array.isArray(updatedPost) ? updatedPost[0] : updatedPost;
+      return updatedPost;
     } catch (error) {
       logger.error('Error restoring post revision:', error);
       throw error;
@@ -504,8 +501,8 @@ export class RevisionService {
       changes.seo = { from: oldRevision.seo, to: newPost.seo };
     }
 
-    if (JSON.stringify(oldRevision.customFields) !== JSON.stringify(newPost.customFields)) {
-      changes.customFields = { from: oldRevision.customFields, to: newPost.customFields };
+    if (JSON.stringify(oldRevision.customFields) !== JSON.stringify(newPost.meta)) {
+      changes.customFields = { from: oldRevision.customFields, to: newPost.meta };
     }
 
     if (JSON.stringify(oldRevision.tags) !== JSON.stringify(newPost.tags)) {

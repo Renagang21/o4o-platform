@@ -500,7 +500,7 @@ export class OrderAutomationService {
         const dateStr = date.toISOString().split('T')[0];
         
         const dayLogs = recentLogs.filter(log => 
-          log.created_at.toISOString().split('T')[0] === dateStr
+          log.createdAt.toISOString().split('T')[0] === dateStr
         );
         
         recentActivity.push({
