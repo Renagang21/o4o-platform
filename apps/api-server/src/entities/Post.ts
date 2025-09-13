@@ -129,10 +129,10 @@ export class Post {
   @JoinColumn({ name: 'author_id' })
   author!: User
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdAt' })
   created_at!: Date
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedAt' })
   updated_at!: Date
 
   @Column({ type: 'timestamp', nullable: true })

@@ -46,9 +46,9 @@ export class Category {
   @ManyToMany(() => Post, (post: Post) => post.categories)
   posts!: Post[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdAt' })
   created_at!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updatedAt' })
   updated_at!: Date;
 }
