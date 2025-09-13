@@ -10,9 +10,7 @@ import {
   Check,
   Download,
   Eye,
-  EyeOff,
-  Settings,
-  Palette
+  EyeOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

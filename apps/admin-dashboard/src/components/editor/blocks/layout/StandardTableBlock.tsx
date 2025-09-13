@@ -10,7 +10,6 @@ import {
   Minus,
   MoreHorizontal,
   MoreVertical,
-  Settings,
   Download,
   Upload,
   Trash2,

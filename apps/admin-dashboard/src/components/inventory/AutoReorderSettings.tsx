@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Settings, Package, TrendingUp, AlertCircle, Save } from 'lucide-react';
+import { Settings, TrendingUp, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,7 +43,7 @@ export const AutoReorderSettings: FC = () => {
   const [editingRule, setEditingRule] = useState<ReorderRule | null>(null);
 
   // Fetch global settings
-  const { data: globalSettings, isLoading: loadingGlobal } = useQuery({
+  const { data: globalSettings } = useQuery({
     queryKey: ['reorder-settings-global'],
     queryFn: async () => {
       const response = await authClient.api.get('/inventory/reorder/settings');
@@ -52,7 +52,7 @@ export const AutoReorderSettings: FC = () => {
   });
 
   // Fetch reorder rules
-  const { data: rulesData, isLoading: loadingRules } = useQuery({
+  const { data: rulesData } = useQuery({
     queryKey: ['reorder-rules'],
     queryFn: async () => {
       const response = await authClient.api.get('/inventory/reorder/rules');

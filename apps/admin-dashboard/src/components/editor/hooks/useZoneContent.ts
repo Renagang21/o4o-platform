@@ -6,8 +6,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { 
   ZoneBasedContent, 
   Zone, 
-  ZoneBlock, 
-  LayoutType 
+  ZoneBlock
 } from '@o4o/types'
 import { zoneApi } from '@/services/api/zoneApi'
 
