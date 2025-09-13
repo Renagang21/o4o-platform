@@ -45,7 +45,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
   
   const authClient = ssoClient || new AuthClient(
-    typeof window !== 'undefined' && (window as typeof globalThis & { import?: { meta?: { env?: { VITE_API_BASE_URL?: string } } } }).import?.meta?.env?.VITE_API_BASE_URL || ''
+    typeof window !== 'undefined' ? 
+      (import.meta.env?.VITE_API_BASE_URL || 'https://api.neture.co.kr') : 
+      'https://api.neture.co.kr'
   );
 
   // 초기 인증 상태 확인
