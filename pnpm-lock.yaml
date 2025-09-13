@@ -212,7 +212,7 @@ importers:
     dependencies:
       '@babel/runtime':
         specifier: ^7.26.10
-        version: 7.28.4
+        version: 7.28.3
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -245,7 +245,7 @@ importers:
         version: link:../../packages/auth-client
       '@o4o/auth-context':
         specifier: file:../../packages/auth-context
-        version: file:packages/auth-context(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: link:../../packages/auth-context
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -522,7 +522,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@18.3.1)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: link:../../packages/utils
@@ -580,7 +580,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/compression':
         specifier: ^1.7.5
         version: 1.8.1
@@ -628,7 +628,7 @@ importers:
         version: link:../../packages/crowdfunding-types
       '@o4o/types':
         specifier: file:../../packages/types
-        version: file:packages/types(react@18.3.1)
+        version: link:../../packages/types
       '@o4o/utils':
         specifier: file:../../packages/utils
         version: link:../../packages/utils
@@ -824,7 +824,7 @@ importers:
         version: 6.6.4
       '@testing-library/react':
         specifier: 16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@types/bcryptjs':
         specifier: 2.4.6
         version: 2.4.6
@@ -941,10 +941,10 @@ importers:
         version: link:../../packages/auth-client
       '@o4o/auth-context':
         specifier: file:../../packages/auth-context
-        version: file:packages/auth-context(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: link:../../packages/auth-context
       '@o4o/crowdfunding-types':
         specifier: file:../../packages/crowdfunding-types
-        version: file:packages/crowdfunding-types(react@18.2.0)
+        version: link:../../packages/crowdfunding-types
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1050,7 +1050,7 @@ importers:
         version: 3.10.0(react-hook-form@7.62.0(react@18.2.0))
       '@o4o/auth-context':
         specifier: file:../../packages/auth-context
-        version: file:packages/auth-context(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: link:../../packages/auth-context
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1159,7 +1159,7 @@ importers:
         version: link:../../packages/auth-client
       '@o4o/auth-context':
         specifier: file:../../packages/auth-context
-        version: file:packages/auth-context(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: link:../../packages/auth-context
       '@o4o/shortcodes':
         specifier: file:../../packages/shortcodes
         version: link:../../packages/shortcodes
@@ -1253,10 +1253,10 @@ importers:
         version: link:../../packages/auth-client
       '@o4o/auth-context':
         specifier: file:../../packages/auth-context
-        version: file:packages/auth-context(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: link:../../packages/auth-context
       '@o4o/forum-types':
         specifier: file:../../packages/forum-types
-        version: file:packages/forum-types(react@18.2.0)
+        version: link:../../packages/forum-types
       '@o4o/types':
         specifier: file:../../packages/types
         version: link:../../packages/types
@@ -1305,7 +1305,7 @@ importers:
     devDependencies:
       '@tanstack/react-query-devtools':
         specifier: ^5.83.0
-        version: 5.87.3(@tanstack/react-query@5.87.1(react@18.2.0))(react@18.2.0)
+        version: 5.87.1(@tanstack/react-query@5.87.1(react@18.2.0))(react@18.2.0)
       '@testing-library/jest-dom':
         specifier: 6.6.4
         version: 6.6.4
@@ -1444,13 +1444,13 @@ importers:
     devDependencies:
       '@eslint/js':
         specifier: ^9.29.0
-        version: 9.35.0
+        version: 9.34.0
       '@playwright/test':
         specifier: ^1.53.1
         version: 1.55.0
       '@rollup/rollup-linux-x64-gnu':
         specifier: ^4.44.1
-        version: 4.50.1
+        version: 4.50.0
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.1
@@ -1559,14 +1559,14 @@ importers:
         version: 18.2.0
       react-router-dom:
         specifier: ^7.6.0
-        version: 7.8.2(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+        version: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       socket.io-client:
         specifier: ^4.7.4
         version: 4.8.1
     devDependencies:
       '@eslint/js':
         specifier: ^9.34.0
-        version: 9.35.0
+        version: 9.34.0
       '@types/react':
         specifier: ^18.3.12
         version: 18.3.23
@@ -1618,7 +1618,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../types
-        version: file:packages/types(react@18.3.1)
+        version: link:../types
     devDependencies:
       tsup:
         specifier: ^8.0.1
@@ -1631,7 +1631,7 @@ importers:
     dependencies:
       '@o4o/types':
         specifier: file:../types
-        version: file:packages/types(react@18.3.1)
+        version: link:../types
     devDependencies:
       '@types/node':
         specifier: 24.2.1
@@ -2052,8 +2052,8 @@ packages:
     resolution: {integrity: sha512-FjoyLe754PMiYsFaN5C94ttGiOmBNYTf6pLr4xXHAT5uctHb092PBszndLDR5XA/jghQvn4n7JMHl7dmTgbm9w==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@7.28.4':
-    resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
+  '@babel/runtime@7.28.3':
+    resolution: {integrity: sha512-9uIQ10o0WGdpP6GDhXcdOJPJuDgFtIDtN/9+ArJQ2NAfAmiuhTQdzkaTGR33v43GYS2UrSA0eX2pPPHoFVvpxA==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.27.2':
@@ -2531,8 +2531,8 @@ packages:
     resolution: {integrity: sha512-5K1/mKhWaMfreBGJTwval43JJmkip0RmM+3+IuqupeSKNC/Th2Kc7ucaq5ovTSra/OOKB9c58CGSz3QMVbWt0A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@eslint/js@9.35.0':
-    resolution: {integrity: sha512-30iXE9whjlILfWobBkNerJo+TXYsgVM5ERQwMcMKCHckHflCmf7wXDAHlARoWnh0s1U72WqlbeyE7iAcCzuCPw==}
+  '@eslint/js@9.34.0':
+    resolution: {integrity: sha512-EoyvqQnBNsV1CWaEJ559rxXL4c8V92gxirbawSmVUOWXlsRxxQXl6LmCpdUblgxgSkDIqKnhzba2SjRTI/A5Rw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/object-schema@2.1.6':
@@ -2995,31 +2995,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@o4o/auth-client@file:packages/auth-client':
-    resolution: {directory: packages/auth-client, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/auth-context@file:packages/auth-context':
-    resolution: {directory: packages/auth-context, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-    peerDependencies:
-      react: 18.2.0
-      react-router-dom: ^7.6.0
-
-  '@o4o/crowdfunding-types@file:packages/crowdfunding-types':
-    resolution: {directory: packages/crowdfunding-types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/forum-types@file:packages/forum-types':
-    resolution: {directory: packages/forum-types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-
-  '@o4o/types@file:packages/types':
-    resolution: {directory: packages/types, type: directory}
-    engines: {node: '>=20.0.0', npm: '>=10.0.0'}
-    peerDependencies:
-      react: 18.2.0
 
   '@open-draft/deferred-promise@2.2.0':
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
@@ -3735,6 +3710,11 @@ packages:
     cpu: [s390x]
     os: [linux]
 
+  '@rollup/rollup-linux-x64-gnu@4.50.0':
+    resolution: {integrity: sha512-8PrJJA7/VU8ToHVEPu14FzuSAqVKyo5gg/J8xUerMbyNkWkO9j2ExBho/68RnJsMGNJq4zH114iAttgm7BZVkA==}
+    cpu: [x64]
+    os: [linux]
+
   '@rollup/rollup-linux-x64-gnu@4.50.1':
     resolution: {integrity: sha512-MCgtFB2+SVNuQmmjHf+wfI4CMxy3Tk8XjA5Z//A0AKD7QXUYFMQcns91K6dEHBvZPCnhJSyDWLApk40Iq/H3tA==}
     cpu: [x64]
@@ -4154,11 +4134,11 @@ packages:
   '@tanstack/query-core@5.87.1':
     resolution: {integrity: sha512-HOFHVvhOCprrWvtccSzc7+RNqpnLlZ5R6lTmngb8aq7b4rc2/jDT0w+vLdQ4lD9bNtQ+/A4GsFXy030Gk4ollA==}
 
-  '@tanstack/query-devtools@5.87.3':
-    resolution: {integrity: sha512-LkzxzSr2HS1ALHTgDmJH5eGAVsSQiuwz//VhFW5OqNk0OQ+Fsqba0Tsf+NzWRtXYvpgUqwQr4b2zdFZwxHcGvg==}
+  '@tanstack/query-devtools@5.86.0':
+    resolution: {integrity: sha512-/JDw9BP80eambEK/EsDMGAcsL2VFT+8F5KCOwierjPU7QP8Wt1GT32yJpn3qOinBM8/zS3Jy36+F0GiyJp411A==}
 
-  '@tanstack/react-query-devtools@5.87.3':
-    resolution: {integrity: sha512-uV7m4/m58jU4OaLEyiPLRoXnL5H5E598lhFLSXIcK83on+ZXW7aIfiu5kwRwe1qFa4X4thH8wKaxz1lt6jNmAA==}
+  '@tanstack/react-query-devtools@5.87.1':
+    resolution: {integrity: sha512-YPuEub8RQrrsXOxoiMJn33VcGPIeuVINWBgLu9RLSQB8ueXaKlGLZ3NJkahGpbt2AbWf749FQ6R+1jBFk3kdCA==}
     peerDependencies:
       '@tanstack/react-query': ^5.87.1
       react: ^18 || ^19
@@ -10446,7 +10426,7 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
-  '@babel/runtime@7.28.4': {}
+  '@babel/runtime@7.28.3': {}
 
   '@babel/template@7.27.2':
     dependencies:
@@ -10548,7 +10528,7 @@ snapshots:
   '@emotion/babel-plugin@11.13.5':
     dependencies:
       '@babel/helper-module-imports': 7.27.1
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/hash': 0.9.2
       '@emotion/memoize': 0.9.0
       '@emotion/serialize': 1.3.3
@@ -10597,7 +10577,7 @@ snapshots:
 
   '@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/babel-plugin': 11.13.5
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
@@ -10614,7 +10594,7 @@ snapshots:
 
   '@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/babel-plugin': 11.13.5
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
@@ -10640,7 +10620,7 @@ snapshots:
 
   '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
       '@emotion/react': 11.14.0(@types/react@18.3.12)(react@18.2.0)
@@ -10656,7 +10636,7 @@ snapshots:
 
   '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/babel-plugin': 11.13.5
       '@emotion/is-prop-valid': 1.4.0
       '@emotion/react': 11.14.0(@types/react@18.3.23)(react@18.2.0)
@@ -10863,7 +10843,7 @@ snapshots:
 
   '@eslint/js@9.33.0': {}
 
-  '@eslint/js@9.35.0': {}
+  '@eslint/js@9.34.0': {}
 
   '@eslint/object-schema@2.1.6': {}
 
@@ -11360,7 +11340,7 @@ snapshots:
 
   '@mui/icons-material@7.3.1(@mui/material@7.3.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.3.12)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/material': 7.3.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
     optionalDependencies:
@@ -11368,7 +11348,7 @@ snapshots:
 
   '@mui/icons-material@7.3.1(@mui/material@7.3.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.3.23)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/material': 7.3.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
     optionalDependencies:
@@ -11376,7 +11356,7 @@ snapshots:
 
   '@mui/material@7.3.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/core-downloads-tracker': 7.3.2
       '@mui/system': 7.3.2(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0)
       '@mui/types': 7.4.6(@types/react@18.3.12)
@@ -11397,7 +11377,7 @@ snapshots:
 
   '@mui/material@7.3.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/core-downloads-tracker': 7.3.2
       '@mui/system': 7.3.2(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0)
       '@mui/types': 7.4.6(@types/react@18.3.23)
@@ -11418,7 +11398,7 @@ snapshots:
 
   '@mui/private-theming@7.3.2(@types/react@18.3.12)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/utils': 7.3.2(@types/react@18.3.12)(react@18.2.0)
       prop-types: 15.8.1
       react: 18.2.0
@@ -11427,7 +11407,7 @@ snapshots:
 
   '@mui/private-theming@7.3.2(@types/react@18.3.23)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/utils': 7.3.2(@types/react@18.3.23)(react@18.2.0)
       prop-types: 15.8.1
       react: 18.2.0
@@ -11436,7 +11416,7 @@ snapshots:
 
   '@mui/styled-engine@7.3.2(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
       '@emotion/sheet': 1.4.0
@@ -11449,7 +11429,7 @@ snapshots:
 
   '@mui/styled-engine@7.3.2(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
       '@emotion/sheet': 1.4.0
@@ -11462,7 +11442,7 @@ snapshots:
 
   '@mui/system@7.3.2(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/private-theming': 7.3.2(@types/react@18.3.12)(react@18.2.0)
       '@mui/styled-engine': 7.3.2(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.12)(react@18.2.0))(@types/react@18.3.12)(react@18.2.0))(react@18.2.0)
       '@mui/types': 7.4.6(@types/react@18.3.12)
@@ -11478,7 +11458,7 @@ snapshots:
 
   '@mui/system@7.3.2(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/private-theming': 7.3.2(@types/react@18.3.23)(react@18.2.0)
       '@mui/styled-engine': 7.3.2(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0))(react@18.2.0)
       '@mui/types': 7.4.6(@types/react@18.3.23)
@@ -11494,19 +11474,19 @@ snapshots:
 
   '@mui/types@7.4.6(@types/react@18.3.12)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
     optionalDependencies:
       '@types/react': 18.3.12
 
   '@mui/types@7.4.6(@types/react@18.3.23)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
     optionalDependencies:
       '@types/react': 18.3.23
 
   '@mui/utils@7.3.2(@types/react@18.3.12)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/types': 7.4.6(@types/react@18.3.12)
       '@types/prop-types': 15.7.15
       clsx: 2.1.1
@@ -11518,7 +11498,7 @@ snapshots:
 
   '@mui/utils@7.3.2(@types/react@18.3.23)(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@mui/types': 7.4.6(@types/react@18.3.23)
       '@types/prop-types': 15.7.15
       clsx: 2.1.1
@@ -11541,46 +11521,6 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
-
-  '@o4o/auth-client@file:packages/auth-client':
-    dependencies:
-      axios: 1.11.0
-      js-cookie: 3.0.5
-    transitivePeerDependencies:
-      - debug
-
-  '@o4o/auth-context@file:packages/auth-context(react-router-dom@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)':
-    dependencies:
-      '@o4o/auth-client': file:packages/auth-client
-      '@o4o/types': file:packages/types(react@18.2.0)
-      react: 18.2.0
-      react-router-dom: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      socket.io-client: 4.8.1
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - supports-color
-      - utf-8-validate
-
-  '@o4o/crowdfunding-types@file:packages/crowdfunding-types(react@18.2.0)':
-    dependencies:
-      '@o4o/types': file:packages/types(react@18.2.0)
-    transitivePeerDependencies:
-      - react
-
-  '@o4o/forum-types@file:packages/forum-types(react@18.2.0)':
-    dependencies:
-      '@o4o/types': file:packages/types(react@18.2.0)
-    transitivePeerDependencies:
-      - react
-
-  '@o4o/types@file:packages/types(react@18.2.0)':
-    dependencies:
-      react: 18.2.0
-
-  '@o4o/types@file:packages/types(react@18.3.1)':
-    dependencies:
-      react: 18.3.1
 
   '@open-draft/deferred-promise@2.2.0': {}
 
@@ -12420,7 +12360,10 @@ snapshots:
   '@rollup/rollup-linux-s390x-gnu@4.50.1':
     optional: true
 
-  '@rollup/rollup-linux-x64-gnu@4.50.1': {}
+  '@rollup/rollup-linux-x64-gnu@4.50.0': {}
+
+  '@rollup/rollup-linux-x64-gnu@4.50.1':
+    optional: true
 
   '@rollup/rollup-linux-x64-musl@4.50.1':
     optional: true
@@ -12889,11 +12832,11 @@ snapshots:
 
   '@tanstack/query-core@5.87.1': {}
 
-  '@tanstack/query-devtools@5.87.3': {}
+  '@tanstack/query-devtools@5.86.0': {}
 
-  '@tanstack/react-query-devtools@5.87.3(@tanstack/react-query@5.87.1(react@18.2.0))(react@18.2.0)':
+  '@tanstack/react-query-devtools@5.87.1(@tanstack/react-query@5.87.1(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@tanstack/query-devtools': 5.87.3
+      '@tanstack/query-devtools': 5.86.0
       '@tanstack/react-query': 5.87.1(react@18.2.0)
       react: 18.2.0
 
@@ -12905,7 +12848,7 @@ snapshots:
   '@testing-library/dom@10.4.1':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       dom-accessibility-api: 0.5.16
@@ -12925,7 +12868,7 @@ snapshots:
 
   '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@testing-library/dom': 10.4.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -12935,20 +12878,10 @@ snapshots:
 
   '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@testing-library/dom': 10.4.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    optionalDependencies:
-      '@types/react': 18.3.23
-      '@types/react-dom': 18.3.7(@types/react@18.3.23)
-
-  '@testing-library/react@16.3.0(@testing-library/dom@10.4.1)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@babel/runtime': 7.28.4
-      '@testing-library/dom': 10.4.1
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.23
       '@types/react-dom': 18.3.7(@types/react@18.3.23)
@@ -13953,7 +13886,7 @@ snapshots:
 
   '@wordpress/a11y@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/dom-ready': 3.58.0
       '@wordpress/i18n': 4.58.0
 
@@ -13979,7 +13912,7 @@ snapshots:
 
   '@wordpress/block-editor@14.4.0(@emotion/is-prop-valid@1.4.0)(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/react': 11.14.0(@types/react@18.3.23)(react@18.2.0)
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.2.0))(@types/react@18.3.23)(react@18.2.0)
       '@react-spring/web': 9.7.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -14041,7 +13974,7 @@ snapshots:
 
   '@wordpress/blocks@13.9.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/autop': 4.30.0
       '@wordpress/blob': 4.30.0
       '@wordpress/block-serialization-default-parser': 5.30.0
@@ -14093,7 +14026,7 @@ snapshots:
   '@wordpress/components@27.6.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@ariakit/react': 0.3.14(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/cache': 11.14.0
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.3.23)(react@18.2.0)
@@ -14149,7 +14082,7 @@ snapshots:
   '@wordpress/components@28.9.0(@emotion/is-prop-valid@1.4.0)(@types/react@18.3.23)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@ariakit/react': 0.4.18(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@emotion/cache': 11.14.0
       '@emotion/css': 11.13.5
       '@emotion/react': 11.14.0(@types/react@18.3.23)(react@18.2.0)
@@ -14257,7 +14190,7 @@ snapshots:
 
   '@wordpress/compose@6.35.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@types/mousetrap': 1.6.15
       '@wordpress/deprecated': 3.58.0
       '@wordpress/dom': 3.58.0
@@ -14310,7 +14243,7 @@ snapshots:
 
   '@wordpress/data@9.28.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/compose': 6.35.0(react@18.2.0)
       '@wordpress/deprecated': 3.58.0
       '@wordpress/element': 5.35.0
@@ -14329,7 +14262,7 @@ snapshots:
 
   '@wordpress/date@4.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/deprecated': 3.58.0
       moment: 2.30.1
       moment-timezone: 0.5.48
@@ -14343,7 +14276,7 @@ snapshots:
 
   '@wordpress/deprecated@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/hooks': 3.58.0
 
   '@wordpress/deprecated@4.30.0':
@@ -14353,7 +14286,7 @@ snapshots:
 
   '@wordpress/dom-ready@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   '@wordpress/dom-ready@4.30.0':
     dependencies:
@@ -14361,7 +14294,7 @@ snapshots:
 
   '@wordpress/dom@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/deprecated': 3.58.0
 
   '@wordpress/dom@4.30.0':
@@ -14371,7 +14304,7 @@ snapshots:
 
   '@wordpress/element@5.35.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@types/react': 18.3.23
       '@types/react-dom': 18.3.7(@types/react@18.3.23)
       '@wordpress/escape-html': 2.58.0
@@ -14393,7 +14326,7 @@ snapshots:
 
   '@wordpress/element@6.9.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@types/react': 18.3.23
       '@types/react-dom': 18.3.7(@types/react@18.3.23)
       '@wordpress/escape-html': 3.30.0
@@ -14404,7 +14337,7 @@ snapshots:
 
   '@wordpress/escape-html@2.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   '@wordpress/escape-html@3.30.0':
     dependencies:
@@ -14412,7 +14345,7 @@ snapshots:
 
   '@wordpress/hooks@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   '@wordpress/hooks@4.30.0':
     dependencies:
@@ -14420,7 +14353,7 @@ snapshots:
 
   '@wordpress/html-entities@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   '@wordpress/html-entities@4.30.0':
     dependencies:
@@ -14428,7 +14361,7 @@ snapshots:
 
   '@wordpress/i18n@4.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/hooks': 3.58.0
       gettext-parser: 1.4.0
       memize: 2.1.1
@@ -14437,7 +14370,7 @@ snapshots:
 
   '@wordpress/i18n@5.9.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/hooks': 4.30.0
       gettext-parser: 1.4.0
       memize: 2.1.1
@@ -14463,13 +14396,13 @@ snapshots:
 
   '@wordpress/icons@9.49.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/element': 5.35.0
       '@wordpress/primitives': 3.56.0
 
   '@wordpress/is-shallow-equal@4.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   '@wordpress/is-shallow-equal@5.30.0':
     dependencies:
@@ -14485,7 +14418,7 @@ snapshots:
 
   '@wordpress/keycodes@3.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/i18n': 4.58.0
 
   '@wordpress/keycodes@4.30.0':
@@ -14522,7 +14455,7 @@ snapshots:
 
   '@wordpress/primitives@3.56.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/element': 5.35.0
       clsx: 2.1.1
 
@@ -14535,7 +14468,7 @@ snapshots:
 
   '@wordpress/priority-queue@2.58.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       requestidlecallback: 0.3.0
 
   '@wordpress/priority-queue@3.30.0':
@@ -14545,7 +14478,7 @@ snapshots:
 
   '@wordpress/private-apis@0.40.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   '@wordpress/private-apis@1.30.0':
     dependencies:
@@ -14553,7 +14486,7 @@ snapshots:
 
   '@wordpress/redux-routine@4.58.0(redux@4.2.1)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       is-plain-object: 5.0.0
       is-promise: 4.0.0
       redux: 4.2.1
@@ -14569,7 +14502,7 @@ snapshots:
 
   '@wordpress/rich-text@6.35.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/a11y': 3.58.0
       '@wordpress/compose': 6.35.0(react@18.2.0)
       '@wordpress/data': 9.28.0(react@18.2.0)
@@ -14612,7 +14545,7 @@ snapshots:
 
   '@wordpress/undo-manager@0.18.0':
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       '@wordpress/is-shallow-equal': 4.58.0
 
   '@wordpress/undo-manager@1.30.0':
@@ -14884,7 +14817,7 @@ snapshots:
 
   babel-plugin-macros@3.1.0:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       cosmiconfig: 7.1.0
       resolve: 1.22.10
 
@@ -15444,7 +15377,7 @@ snapshots:
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   date-fns@3.6.0: {}
 
@@ -15557,7 +15490,7 @@ snapshots:
 
   dom-helpers@5.2.1:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       csstype: 3.1.3
 
   dompurify@3.2.6:
@@ -15575,7 +15508,7 @@ snapshots:
 
   downshift@6.1.12(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       compute-scroll-into-view: 1.0.20
       prop-types: 15.8.1
       react: 18.2.0
@@ -18321,12 +18254,6 @@ snapshots:
       react: 18.2.0
       scheduler: 0.23.2
 
-  react-dom@18.3.1(react@18.2.0):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 18.2.0
-      scheduler: 0.23.2
-
   react-dom@18.3.1(react@18.3.1):
     dependencies:
       loose-envify: 1.4.0
@@ -18422,12 +18349,6 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
       react-router: 7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
 
-  react-router-dom@7.8.2(react-dom@18.3.1(react@18.2.0))(react@18.2.0):
-    dependencies:
-      react: 18.2.0
-      react-dom: 18.3.1(react@18.2.0)
-      react-router: 7.8.2(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
-
   react-router@7.8.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       cookie: 1.0.2
@@ -18435,14 +18356,6 @@ snapshots:
       set-cookie-parser: 2.7.1
     optionalDependencies:
       react-dom: 18.2.0(react@18.2.0)
-
-  react-router@7.8.2(react-dom@18.3.1(react@18.2.0))(react@18.2.0):
-    dependencies:
-      cookie: 1.0.2
-      react: 18.2.0
-      set-cookie-parser: 2.7.1
-    optionalDependencies:
-      react-dom: 18.3.1(react@18.2.0)
 
   react-style-singleton@2.2.3(@types/react@18.3.12)(react@18.2.0):
     dependencies:
@@ -18462,7 +18375,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -18538,7 +18451,7 @@ snapshots:
 
   redux@4.2.1:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.3
 
   redux@5.0.1: {}
 
