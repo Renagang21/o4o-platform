@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import { AuthRequest } from '../../types/auth';
 import { workflowService } from '../../services/workflow.service';
 import { validateRequiredFields, createValidationError, createNotFoundError, createInternalServerError } from '../../utils/errorUtils';
@@ -8,7 +8,7 @@ import logger from '../../utils/logger';
 
 export class WorkflowController {
 
-  getOrderStatusWorkflow = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getOrderStatusWorkflow: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager', 'customer'])(req, res, async () => {
       const { orderId } = req.query;
 
@@ -45,7 +45,7 @@ export class WorkflowController {
     });
   });
 
-  transitionOrderStatus = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  transitionOrderStatus: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const { orderId, fromStatus, toStatus, reason } = req.body;
 
@@ -90,7 +90,7 @@ export class WorkflowController {
     });
   });
 
-  getInventoryAlerts = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getInventoryAlerts: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager', 'supplier'])(req, res, async () => {
       const alerts = await workflowService.getInventoryWorkflowAlerts();
 
@@ -111,7 +111,7 @@ export class WorkflowController {
     });
   });
 
-  getCommissionProcessWorkflow = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getCommissionProcessWorkflow: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const commissionWorkflow = await workflowService.getCommissionProcessWorkflow();
 
@@ -129,7 +129,7 @@ export class WorkflowController {
     });
   });
 
-  getWorkflowStats = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getWorkflowStats: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const { 
         startDate, 
@@ -165,7 +165,7 @@ export class WorkflowController {
     });
   });
 
-  validateTransition = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  validateTransition: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const { entityType, fromStatus, toStatus } = req.body;
 
@@ -180,7 +180,7 @@ export class WorkflowController {
     });
   });
 
-  getWorkflowDefinition = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getWorkflowDefinition: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const { workflowName } = req.params;
 
@@ -201,7 +201,7 @@ export class WorkflowController {
     });
   });
 
-  bulkStatusTransition = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  bulkStatusTransition: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin'])(req, res, async () => {
       const { orderIds, fromStatus, toStatus, reason } = req.body;
 
@@ -270,7 +270,7 @@ export class WorkflowController {
     });
   });
 
-  getWorkflowHealth = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getWorkflowHealth: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin'])(req, res, async () => {
       try {
         const stats = await workflowService.getWorkflowStats();

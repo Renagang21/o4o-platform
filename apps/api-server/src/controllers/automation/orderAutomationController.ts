@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import { AuthRequest, UserRole } from '../../types/auth';
 import { orderAutomationService, AutomationRuleConfig } from '../../services/order-automation.service';
 import { validateRequiredFields, createValidationError, createNotFoundError, createInternalServerError } from '../../utils/errorUtils';
@@ -8,7 +8,7 @@ import logger from '../../utils/logger';
 
 export class OrderAutomationController {
   
-  createAutomationRule = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  createAutomationRule: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     // Only admin and vendor managers can create automation rules
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const ruleData: AutomationRuleConfig = req.body;
@@ -45,7 +45,7 @@ export class OrderAutomationController {
     });
   });
 
-  getAutomationRules = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getAutomationRules: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const {
         isActive,
@@ -90,7 +90,7 @@ export class OrderAutomationController {
     });
   });
 
-  updateAutomationRule = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  updateAutomationRule: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const { id } = req.params;
       const updates: Partial<AutomationRuleConfig> = req.body;
@@ -123,7 +123,7 @@ export class OrderAutomationController {
     });
   });
 
-  triggerAutomation = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  triggerAutomation: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin'])(req, res, async () => {
       const { eventType, entityData } = req.body;
 
@@ -145,7 +145,7 @@ export class OrderAutomationController {
     });
   });
 
-  getAutomationLogs = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getAutomationLogs: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const {
         ruleId,
@@ -201,7 +201,7 @@ export class OrderAutomationController {
     });
   });
 
-  getAutomationStats = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  getAutomationStats: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin', 'vendor_manager'])(req, res, async () => {
       const stats = await orderAutomationService.getAutomationStats();
 
@@ -212,7 +212,7 @@ export class OrderAutomationController {
     });
   });
 
-  setupDefaultRules = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  setupDefaultRules: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin'])(req, res, async () => {
       await orderAutomationService.setupDefaultAutomationRules();
 
@@ -227,7 +227,7 @@ export class OrderAutomationController {
     });
   });
 
-  testAutomationRule = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  testAutomationRule: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin'])(req, res, async () => {
       const { ruleId, testData } = req.body;
 
@@ -254,7 +254,7 @@ export class OrderAutomationController {
     });
   });
 
-  deleteAutomationRule = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  deleteAutomationRule: RequestHandler = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
     roleGuard(['admin'])(req, res, async () => {
       const { id } = req.params;
 

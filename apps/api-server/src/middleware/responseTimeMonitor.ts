@@ -68,7 +68,7 @@ class ResponseTimeMonitor {
     }
   }
 
-  public middleware() {
+  public middleware(): (req: Request, res: Response, next: NextFunction) => void {
     return (req: Request, res: Response, next: NextFunction) => {
       const startTime = Date.now();
       
@@ -133,4 +133,5 @@ class ResponseTimeMonitor {
 
 // Export singleton instance
 export const responseTimeMonitor = new ResponseTimeMonitor();
-export default responseTimeMonitor.middleware();
+const middleware: (req: Request, res: Response, next: NextFunction) => void = responseTimeMonitor.middleware();
+export default middleware;
