@@ -130,7 +130,7 @@ import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
-// import shortcodeV1Routes from './routes/v1/shortcodes.routes';
+import shortcodeV1Routes from './routes/v1/shortcodes.routes';
 import { affiliateRoutes, commissionRoutes, phase3Routes } from './modules/affiliate';
 import { AffiliateSocketManager } from './modules/affiliate/websocket/socket.manager';
 
@@ -297,7 +297,7 @@ const corsOptions: CorsOptions = {
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
       "https://api.neture.co.kr", // API server itself
-      "http://api.neture.co.kr", // API server (http)
+      "http://api.neture.co.kr"
       // Add environment-defined origins
       ...envOrigins
     ];
@@ -402,6 +402,7 @@ const ssoCheckLimiter = rateLimit({
     if (process.env.NODE_ENV === 'production') {
       const forwarded = req.headers['x-forwarded-for'];
       if (forwarded) {
+        // Get the first IP in the chain (original client IP)
         return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
       }
     }
@@ -460,7 +461,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/v1/auth', authRoutes); // v1 compatibility - this MUST be the first /api/v1/auth route
 
 // Other specialized auth routes come AFTER basic auth
-app.use('/api/v1/auth/v2', authV2Routes); // Cookie-based auth routes
+app.use('/api/v1/auth', authV2Routes); // Cookie-based auth routes
 app.use('/api/v1/accounts', linkedAccountsRoutes); // Linked accounts routes (moved to avoid conflict)
 app.use('/api/v1/social', socialAuthRoutes); // Social auth routes (moved to avoid conflict)
 
@@ -499,7 +500,7 @@ app.use('/api/tags', tagsApiRoutes);
 
 // ACF and Shortcode routes
 import acfRoutes from './routes/acf';
-// import shortcodeRoutes from './routes/shortcodes';
+import shortcodeRoutes from './routes/shortcodes';
 app.use('/admin', acfRoutes);
 
 // API v1 compatibility for media routes
@@ -507,7 +508,7 @@ app.use('/api/v1/media/folders', (req: Request, res: Response, next: NextFunctio
   req.url = '/folders';
   acfRoutes(req, res, next);
 });
-// app.use('/api/v1/shortcodes', shortcodeRoutes);
+app.use('/api/v1/shortcodes', shortcodeRoutes);
 
 // Dashboard endpoints with real data
 import { DashboardController } from './controllers/dashboardController';
@@ -545,8 +546,8 @@ app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: 
       });
     }
 
-    post.status = 'publish';
-    post.published_at = new Date();
+    post.status = 'published';
+    post.publishedAt = new Date();
     const updatedPost = await postRepository.save(post);
 
     return res.json({
@@ -566,8 +567,8 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const status = req.query.status as string || 'publish';
-    const orderBy = req.query.orderBy as string || 'created_at';
+    const status = req.query.status as string || 'published';
+    const orderBy = req.query.orderBy as string || 'createdAt';
     const order = req.query.order as string || 'DESC';
     const offset = (page - 1) * limit;
 
@@ -579,7 +580,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
         slug: 'neture-platform-launch',
         excerpt: 'O4O 비즈니스를 위한 통합 플랫폼이 출시되었습니다.',
         content: '<p>Neture 플랫폼이 공식 출시되었습니다...</p>',
-        status: 'publish',
+        status: 'published',
         author: {
           id: '1',
           name: 'Admin',
@@ -671,14 +672,14 @@ app.use('/api/v1/coupons', couponV1Routes);
 app.use('/api/v1/themes', themeRoutes);
 app.use('/api/v1/export', exportV1Routes);
 app.use('/api/v1/shipping', shippingV1Routes);
+import dropshippingV1Routes from './routes/v1/dropshipping.routes';
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
-app.use('/api/v1/affiliate', affiliateRoutes); // Affiliate Marketing routes
-app.use('/api/v1/affiliate', commissionRoutes); // Affiliate Commission Management routes
-app.use('/api/v1/affiliate', phase3Routes); // Affiliate Phase 3 (Analytics, Notifications) routes
 app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 app.use('/api/v1/settings', settingsV1Routes); // 설정 라우트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
+import shortcodeV1Routes from './routes/v1/shortcodes.routes';
+app.use('/api/v1/shortcodes', shortcodeV1Routes); // Shortcode v1 라우트
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
@@ -777,7 +778,7 @@ const startServer = async () => {
       // 환경변수 재확인
       const dbConfig = {
         host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432'),
+        port: parseInt(process.env.DB_PORT || '6379'),
         username: process.env.DB_USERNAME || 'postgres',
         password: process.env.DB_PASSWORD || '',
         database: process.env.DB_NAME || 'o4o_platform'
@@ -846,8 +847,6 @@ const startServer = async () => {
           logger.info('Email service initialized successfully');
         } else if (status.enabled && !status.available) {
           logger.warn('Email service enabled but not available (check SMTP config)');
-        } else {
-          logger.info('Email service disabled');
         }
       } catch (emailError: any) {
         logger.error('Failed to initialize email service:', {
