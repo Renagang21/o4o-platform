@@ -318,9 +318,19 @@ export class PostController {
         changeDescription: updates.changeDescription || 'Post updated'
       });
 
-      // Handle slug update
-      if (updates.title && updates.title !== post.title) {
-        updates.slug = await slugService.ensureUniquePostSlug(updates.title, id);
+      // Handle slug update (독립적으로 처리)
+      if (updates.slug !== undefined && updates.slug !== post.slug) {
+        // slug가 직접 수정된 경우
+        const slugResult = await slugService.updatePostSlug(id, updates.slug);
+        if (!slugResult.success) {
+          res.status(400).json({
+            success: false,
+            error: 'Invalid slug',
+            details: slugResult.errors
+          });
+          return;
+        }
+        updates.slug = slugResult.slug;
       }
 
       // Handle categories
