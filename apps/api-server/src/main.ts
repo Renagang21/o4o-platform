@@ -679,7 +679,6 @@ app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 app.use('/api/v1/settings', settingsV1Routes); // 설정 라우트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
-app.use('/api/v1/shortcodes', shortcodeV1Routes); // Shortcode v1 라우트
 
 // Admin routes with correct paths
 app.use('/api/admin', adminV1Routes);
@@ -926,3 +925,4 @@ export { RealtimeFeedbackService } from './services/realtimeFeedbackService';
 export { io }; // Export io instance for use in other modules
 export { affiliateSocketManager }; // Export affiliate socket manager for services to use
 // Note: realtimeFeedbackService should be initialized after server starts, not here
+ts, not here
