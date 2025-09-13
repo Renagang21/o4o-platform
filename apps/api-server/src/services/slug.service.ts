@@ -37,8 +37,12 @@ export class SlugService {
   /**
    * Ensure slug uniqueness for posts
    */
-  async ensureUniquePostSlug(title: string, excludeId?: string): Promise<string> {
-    let baseSlug = this.generateSlug(title);
+  async ensureUniquePostSlug(slugOrTitle: string, excludeId?: string): Promise<string> {
+    // If it looks like a slug already (no spaces, lowercase, etc), use it directly
+    // Otherwise generate slug from title
+    let baseSlug = slugOrTitle.includes(' ') || /[A-Z가-힣]/.test(slugOrTitle) 
+      ? this.generateSlug(slugOrTitle) 
+      : slugOrTitle;
     
     if (!baseSlug) {
       baseSlug = 'post';
@@ -58,8 +62,11 @@ export class SlugService {
   /**
    * Ensure slug uniqueness for pages
    */
-  async ensureUniquePageSlug(title: string, excludeId?: string): Promise<string> {
-    let baseSlug = this.generateSlug(title);
+  async ensureUniquePageSlug(slugOrTitle: string, excludeId?: string): Promise<string> {
+    // If it looks like a slug already, use it directly, otherwise generate from title
+    let baseSlug = slugOrTitle.includes(' ') || /[A-Z가-힣]/.test(slugOrTitle) 
+      ? this.generateSlug(slugOrTitle) 
+      : slugOrTitle;
     
     if (!baseSlug) {
       baseSlug = 'page';
@@ -79,8 +86,11 @@ export class SlugService {
   /**
    * Ensure slug uniqueness for tags
    */
-  async ensureUniqueTagSlug(name: string, excludeId?: string): Promise<string> {
-    let baseSlug = this.generateSlug(name);
+  async ensureUniqueTagSlug(slugOrName: string, excludeId?: string): Promise<string> {
+    // If it looks like a slug already, use it directly, otherwise generate from name
+    let baseSlug = slugOrName.includes(' ') || /[A-Z가-힣]/.test(slugOrName) 
+      ? this.generateSlug(slugOrName) 
+      : slugOrName;
     
     if (!baseSlug) {
       baseSlug = 'tag';
@@ -100,8 +110,11 @@ export class SlugService {
   /**
    * Ensure slug uniqueness for categories
    */
-  async ensureUniqueCategorySlug(name: string, excludeId?: string): Promise<string> {
-    let baseSlug = this.generateSlug(name);
+  async ensureUniqueCategorySlug(slugOrName: string, excludeId?: string): Promise<string> {
+    // If it looks like a slug already, use it directly, otherwise generate from name
+    let baseSlug = slugOrName.includes(' ') || /[A-Z가-힣]/.test(slugOrName) 
+      ? this.generateSlug(slugOrName) 
+      : slugOrName;
     
     if (!baseSlug) {
       baseSlug = 'category';

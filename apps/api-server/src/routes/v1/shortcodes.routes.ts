@@ -1,21 +1,12 @@
 import { Router } from 'express';
-import { ShortcodeController } from '../../controllers/shortcodeController';
-import { authenticateToken, requireAdmin } from '../../middleware/auth';
 
-const router: Router = Router();
+const router = Router();
 
-// Public routes
-router.get('/', ShortcodeController.getShortcodes);
-router.get('/categories', ShortcodeController.getCategories);
-router.get('/:id', ShortcodeController.getShortcode);
-router.post('/render', ShortcodeController.renderShortcode);
+// Placeholder v1 shortcode routes
+// TODO: Implement shortcode functionality
 
-// Admin routes (require authentication)
-router.post('/', authenticateToken, requireAdmin, ShortcodeController.createShortcode);
-router.put('/:id', authenticateToken, requireAdmin, ShortcodeController.updateShortcode);
-router.delete('/:id', authenticateToken, requireAdmin, ShortcodeController.deleteShortcode);
-
-// Initialize default shortcodes
-router.post('/init-defaults', authenticateToken, requireAdmin, ShortcodeController.createDefaultShortcodes);
+router.get('/', (req, res) => {
+  res.json({ message: 'V1 Shortcode routes placeholder' });
+});
 
 export default router;

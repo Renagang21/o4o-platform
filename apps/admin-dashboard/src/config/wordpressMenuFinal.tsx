@@ -240,7 +240,6 @@ export const wordpressMenuItems: MenuItem[] = [
     icon: <Wrench className="w-5 h-5" />,
     children: [
       { id: 'tools-available', label: '사용 가능한 도구', icon: <Wrench className="w-4 h-4" />, path: '/tools' },
-      { id: 'tools-shortcodes', label: 'Shortcode 관리', icon: <Code className="w-4 h-4" />, path: '/tools/shortcodes' },
       { id: 'tools-import', label: '가져오기', icon: <FileText className="w-4 h-4" />, path: '/tools/import' },
       { id: 'tools-export', label: '내보내기', icon: <FileText className="w-4 h-4" />, path: '/tools/export' }
     ]
@@ -253,18 +252,6 @@ export const wordpressMenuItems: MenuItem[] = [
       { id: 'apps-installed', label: '설치된 앱', icon: <Package className="w-4 h-4" />, path: '/apps' },
       { id: 'apps-settings', label: '앱 설정', icon: <Settings className="w-4 h-4" />, path: '/apps/settings' },
       { id: 'apps-marketplace', label: '앱 마켓플레이스', icon: <Store className="w-4 h-4" />, path: '/apps/marketplace' }
-    ]
-  },
-  {
-    id: 'shortcodes',
-    label: 'Shortcodes',
-    icon: <Code className="w-5 h-5" />,
-    children: [
-      { id: 'shortcodes-all', label: '모든 Shortcodes', icon: <Code className="w-4 h-4" />, path: '/shortcodes' },
-      { id: 'shortcodes-by-app', label: '앱별 분류', icon: <Package className="w-4 h-4" />, path: '/shortcodes/by-app' },
-      { id: 'shortcodes-by-category', label: '카테고리별', icon: <FolderTree className="w-4 h-4" />, path: '/shortcodes/by-category' },
-      { id: 'shortcodes-stats', label: '사용 통계', icon: <BarChart3 className="w-4 h-4" />, path: '/shortcodes/stats' },
-      { id: 'shortcodes-settings', label: 'Shortcode 설정', icon: <Settings className="w-4 h-4" />, path: '/shortcodes/settings' }
     ]
   },
   {
