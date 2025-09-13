@@ -361,7 +361,7 @@ export class IncidentEscalationService {
 
     for (const alert of unacknowledgedAlerts) {
       if (!this.activeEscalations.has(alert.id)) {
-        const timeSinceCreated = Date.now() - alert.created_at.getTime();
+        const timeSinceCreated = Date.now() - alert.createdAt.getTime();
         const escalationThreshold = alert.severity === AlertSeverity.CRITICAL ? 5 * 60 * 1000 : 15 * 60 * 1000;
         
         if (timeSinceCreated > escalationThreshold) {

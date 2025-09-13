@@ -42,7 +42,7 @@ export class AuthMiddleware {
       
       const user = await this.userRepository.findOne({ 
         where: { id: decoded.userId },
-        select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at', 'lastLoginAt']
+        select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
       });
       
       if (!user) {
@@ -139,8 +139,8 @@ export class AuthMiddleware {
           role: 'beta_user',
           status: betaUser.status,
           betaUserId: betaUser.id,
-          createdAt: betaUser.created_at,
-          updatedAt: betaUser.updated_at
+          createdAt: betaUser.createdAt,
+          updatedAt: betaUser.updatedAt
         } as any;
 
         next();
@@ -196,15 +196,15 @@ export class AuthMiddleware {
             role: 'beta_user',
             status: betaUser.status,
             betaUserId: betaUser.id,
-            createdAt: betaUser.created_at,
-            updatedAt: betaUser.updated_at
+            createdAt: betaUser.createdAt,
+            updatedAt: betaUser.updatedAt
           } as any;
         }
       } else if (decoded.userId) {
         // Try regular user
         const user = await this.userRepository.findOne({ 
           where: { id: decoded.userId },
-          select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at', 'lastLoginAt']
+          select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
         });
         
         if (user && user.status === UserStatus.APPROVED) {

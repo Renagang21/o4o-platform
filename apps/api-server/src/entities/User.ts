@@ -205,8 +205,8 @@ export class User {
       isActive: this.isActive,
       isEmailVerified: this.isEmailVerified,
       lastLoginAt: this.lastLoginAt,
-      createdAt: this.created_at,
-      updatedAt: this.updated_at
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
     };
   }
 }

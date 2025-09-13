@@ -297,7 +297,7 @@ class AuthService {
     try {
       return await this.userRepository.find({ 
         where: { role, isActive: true },
-        select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'created_at']
+        select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
       });
     } catch (error) {
       // Error log removed

@@ -205,9 +205,7 @@ export const errorHandler = (
 };
 
 // Async error catcher utility
-export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
-): ((req: Request, res: Response, next: NextFunction) => void) => {
+export const asyncHandler = (fn: any): any => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

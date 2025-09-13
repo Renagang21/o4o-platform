@@ -446,7 +446,7 @@ export class MembershipService extends EventEmitter {
           amount: -expired.amount,
           balance: balance - expired.amount,
           source: 'manual',
-          description: `Points expired from ${expired.created_at.toLocaleDateString()}`,
+          description: `Points expired from ${expired.createdAt.toLocaleDateString()}`,
           createdAt: new Date()
         };
 

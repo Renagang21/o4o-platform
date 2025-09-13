@@ -37,7 +37,7 @@ import { PlaylistItem } from '../entities/PlaylistItem';
 import { ScreenTemplate } from '../entities/ScreenTemplate';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
 import { Post } from '../entities/Post';
-import { PostTag } from '../entities/PostTag';
+// import { PostTag } from '../entities/PostTag'; // Entity does not exist
 import { Page } from '../entities/Page';
 import { ReusableBlock } from '../entities/ReusableBlock';
 import { BlockPattern } from '../entities/BlockPattern';
@@ -128,7 +128,7 @@ const CLIDataSource = new DataSource({
     ContentUsageLog,
     // Content entities
     Post,
-    PostTag,
+    // PostTag, // Entity does not exist
     Page,
     ReusableBlock,
     BlockPattern,

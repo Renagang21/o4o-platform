@@ -106,16 +106,16 @@ export class Post {
   @ManyToMany(() => Category, category => category.posts, { nullable: true, cascade: true })
   @JoinTable({
     name: 'post_categories',
-    joinColumn: { name: 'post_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' }
+    joinColumn: { name: 'postId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' }
   })
   categories!: Category[]
 
   @ManyToMany(() => Tag, tag => tag.posts, { nullable: true, cascade: true })
   @JoinTable({
     name: 'post_tags',
-    joinColumn: { name: 'post_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
+    joinColumn: { name: 'postId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' }
   })
   tags!: Tag[]
 

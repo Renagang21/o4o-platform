@@ -127,7 +127,7 @@ export class ReusableBlock {
   // Virtual method to check if user can edit
   canEdit(userId: string): boolean {
     if (!this.isEditable) return false
-    if (this.author_id === userId) return true
+    if (this.authorId === userId) return true
     if (this.isGlobal) return false // Global blocks might need special permissions
     return false
   }

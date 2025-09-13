@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response, NextFunction } from 'express';
 import { AppDataSource } from '../../database/connection';
 import { AuthRequest } from '../../types/auth';
 import logger from '../../utils/logger';

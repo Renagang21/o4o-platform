@@ -103,7 +103,7 @@ export class UserActivityController {
               firstName: activity.performedBy.firstName,
               lastName: activity.performedBy.lastName
             } : null,
-            createdAt: activity.created_at
+            createdAt: activity.createdAt
           })),
           pagination: {
             currentPage: pageNum,
@@ -198,7 +198,7 @@ export class UserActivityController {
           activityCategory: savedActivity.activityCategory,
           title: savedActivity.getDisplayTitle(),
           description: savedActivity.getDisplayDescription(),
-          createdAt: savedActivity.created_at
+          createdAt: savedActivity.createdAt
         },
         message: 'Activity logged successfully'
       });
@@ -344,13 +344,13 @@ export class UserActivityController {
           return acc;
         }, {} as Record<ActivityCategory, number>),
         recentActivity: activities
-          .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
           .slice(0, 5)
           .map(activity => ({
             id: activity.id,
             type: activity.activityType,
             title: activity.title,
-            createdAt: activity.created_at
+            createdAt: activity.createdAt
           }))
       };
 

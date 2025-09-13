@@ -41,7 +41,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     
     // Filter by user access rights
     if (visibility === 'private') {
-      where.author_id = userId;
+      where.authorId = userId;
       where.visibility = 'private';
     } else if (visibility === 'public') {
       where.visibility = 'public';
@@ -85,7 +85,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     if (author) {
       const authorConditions = where.length ? where : [where];
       authorConditions.forEach((condition: any) => {
-        condition.author_id = author;
+        condition.authorId = author;
       });
     }
 
@@ -126,8 +126,8 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
       } : null,
       visibility: block.visibility,
       metadata: block.metadata,
-      createdAt: block.created_at,
-      updatedAt: block.updated_at
+      createdAt: block.createdAt,
+      updatedAt: block.updatedAt
     })));
 
   } catch (error: any) {
@@ -158,7 +158,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     }
 
     // Check access permissions
-    if (block.visibility === 'private' && block.author_id !== userId) {
+    if (block.visibility === 'private' && block.authorId !== userId) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -192,8 +192,8 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
       revisions: block.revisions,
       visibility: block.visibility,
       metadata: block.metadata,
-      createdAt: block.created_at,
-      updatedAt: block.updated_at
+      createdAt: block.createdAt,
+      updatedAt: block.updatedAt
     });
 
   } catch (error: any) {
@@ -252,7 +252,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     block.isGlobal = isGlobal;
     block.isEditable = isEditable;
     block.metadata = metadata;
-    block.author_id = userId!;
+    block.authorId = userId!;
     block.lastModifiedBy = userId!;
 
     const savedBlock = await reusableBlockRepository.save(block);
@@ -279,8 +279,8 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
         id: blockWithRelations!.author.id,
         name: blockWithRelations!.author.name
       },
-      createdAt: blockWithRelations!.created_at,
-      updatedAt: blockWithRelations!.updated_at
+      createdAt: blockWithRelations!.createdAt,
+      updatedAt: blockWithRelations!.updatedAt
     });
 
   } catch (error: any) {
@@ -391,8 +391,8 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         name: blockWithRelations!.lastModifier.name
       } : null,
       revisions: blockWithRelations!.revisions,
-      createdAt: blockWithRelations!.created_at,
-      updatedAt: blockWithRelations!.updated_at
+      createdAt: blockWithRelations!.createdAt,
+      updatedAt: blockWithRelations!.updatedAt
     });
 
   } catch (error: any) {
@@ -422,7 +422,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response)
     }
 
     // Check delete permissions (only author or admin can delete)
-    if (block.author_id !== userId) {
+    if (block.authorId !== userId) {
       return res.status(403).json({ error: 'Cannot delete this block' });
     }
 
@@ -461,7 +461,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     }
 
     // Check access permissions
-    if (originalBlock.visibility === 'private' && originalBlock.author_id !== userId) {
+    if (originalBlock.visibility === 'private' && originalBlock.authorId !== userId) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -488,7 +488,7 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
     duplicateBlock.isGlobal = false;
     duplicateBlock.isEditable = true;
     duplicateBlock.metadata = { ...originalBlock.metadata };
-    duplicateBlock.author_id = userId!;
+    duplicateBlock.authorId = userId!;
     duplicateBlock.lastModifiedBy = userId!;
 
     const savedBlock = await reusableBlockRepository.save(duplicateBlock);
@@ -514,8 +514,8 @@ router.post('/:id/duplicate', authenticateToken, async (req: AuthRequest, res: R
         id: blockWithRelations!.author.id,
         name: blockWithRelations!.author.name
       },
-      createdAt: blockWithRelations!.created_at,
-      updatedAt: blockWithRelations!.updated_at
+      createdAt: blockWithRelations!.createdAt,
+      updatedAt: blockWithRelations!.updatedAt
     });
 
   } catch (error: any) {

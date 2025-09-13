@@ -63,25 +63,25 @@ router.get('/:pageId',
       }
 
       // Check if post uses zone-based content
-      if (post.useZones && post.zones) {
+      if ((post as any).useZones && (post as any).zones) {
         return res.json({
-          zones: post.zones,
-          customization: post.themeCustomizations || null,
-          layout: post.layoutType || 'single-column'
+          zones: (post as any).zones,
+          customization: (post as any).themeCustomizations || null,
+          layout: (post as any).layoutType || 'single-column'
         })
       }
 
       // Convert legacy content to zone format if needed
-      if (post.content && post.content.blocks) {
+      if (post.content && (post.content as any).blocks) {
         const zoneContent = ZoneContentAdapter.toZoneFormat(
           post.content as any, 
-          post.layoutType as any || 'single-column'
+          (post as any).layoutType || 'single-column'
         )
 
         return res.json({
           zones: zoneContent,
-          customization: post.themeCustomizations || null,
-          layout: post.layoutType || 'single-column',
+          customization: (post as any).themeCustomizations || null,
+          layout: (post as any).layoutType || 'single-column',
           converted: true // Indicate this was converted
         })
       }
@@ -130,12 +130,12 @@ router.put('/:pageId',
 
       // Update post with zone data
       await postRepository.update(pageId, {
-        zones: zones as any,
+        zones: zones,
         layoutType: layout,
         themeCustomizations: customization || null,
         useZones: true,
         updatedAt: new Date()
-      })
+      } as any)
 
       res.json({ success: true })
 
@@ -169,7 +169,7 @@ router.put('/:pageId/:zoneId',
       }
 
       // Update specific zone
-      const currentZones = post.zones as any || {}
+      const currentZones = (post as any).zones || {}
       currentZones[zoneId] = {
         ...currentZones[zoneId],
         ...zoneData,
@@ -179,7 +179,7 @@ router.put('/:pageId/:zoneId',
       await postRepository.update(pageId, {
         zones: currentZones,
         updatedAt: new Date()
-      })
+      } as any)
 
       res.json({ success: true })
 
@@ -213,7 +213,7 @@ router.post('/:pageId/reorder',
       }
 
       // Reorder zones based on provided order
-      const currentZones = post.zones as any || {}
+      const currentZones = (post as any).zones || {}
       const reorderedZones: any = {}
 
       zoneOrder.forEach((zoneId: string, index: number) => {
@@ -315,9 +315,9 @@ router.get('/:pageId/export',
         res.setHeader('Content-Type', 'application/json')
         res.setHeader('Content-Disposition', `attachment; filename="zones-${pageId}.json"`)
         res.json({
-          zones: post.zones,
-          layout: post.layoutType,
-          customizations: post.themeCustomizations,
+          zones: (post as any).zones,
+          layout: (post as any).layoutType,
+          customizations: (post as any).themeCustomizations,
           exportedAt: new Date().toISOString()
         })
       } else if (format === 'html') {
@@ -352,7 +352,7 @@ router.get('/:pageId/analytics',
         return res.status(404).json({ error: 'Page not found' })
       }
 
-      const zones = post.zones as any || {}
+      const zones = (post as any).zones || {}
       let totalBlocks = 0
       const blocksByZone: Record<string, number> = {}
       const blocksByType: Record<string, number> = {}

@@ -498,9 +498,9 @@ export class ContentController {
         id: undefined,
         title: `${original.title} (Copy)`,
         slug: `${original.slug}-copy`,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
+        created_at: new Date(),
+        updated_at: new Date()
+      } as any);
 
       const savedPost = await this.postRepository.save(cloned);
 

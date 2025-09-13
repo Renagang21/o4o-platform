@@ -543,8 +543,8 @@ app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: 
       });
     }
 
-    post.status = 'published';
-    post.publishedAt = new Date();
+    post.status = 'publish';
+    post.published_at = new Date();
     const updatedPost = await postRepository.save(post);
 
     return res.json({
@@ -669,7 +669,7 @@ app.use('/api/v1/coupons', couponV1Routes);
 app.use('/api/v1/themes', themeRoutes);
 app.use('/api/v1/export', exportV1Routes);
 app.use('/api/v1/shipping', shippingV1Routes);
-import dropshippingV1Routes from './routes/v1/dropshipping.routes';
+// import dropshippingV1Routes from './routes/v1/dropshipping.routes'; // Already imported above
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
 app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트

@@ -436,7 +436,7 @@ export class AnalyticsService {
       report.feedbackMetrics = reportData.feedbackMetrics;
       report.businessMetrics = reportData.businessMetrics;
       
-      report.markAsCompleted(Date.now() - savedReport.created_at.getTime());
+      report.markAsCompleted(Date.now() - savedReport.createdAt.getTime());
       await this.analyticsReportRepo.save(report);
       
     } catch (error) {
