@@ -26,8 +26,16 @@ const QuickDraftWidget: FC = () => {
       // Create draft via API
       const draftData = {
         title: title || 'Untitled Draft',
-        content: content || '',
-        status: 'draft',
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: content ? [{ type: 'text', text: content }] : []
+            }
+          ]
+        } as any,
+        status: 'draft' as const,
         excerpt: content.substring(0, 150) + (content.length > 150 ? '...' : ''),
         postType: 'post' as any,
         slug: (title || 'untitled-draft').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
@@ -45,7 +53,7 @@ const QuickDraftWidget: FC = () => {
         setTitle('');
         setContent('');
       } else {
-        error(response.message || '초안 저장 중 오류가 발생했습니다.');
+        error('초안 저장 중 오류가 발생했습니다.');
       }
     } catch (err: any) {
       // Error log removed

@@ -99,11 +99,13 @@ const ListBlock: React.FC<ListBlockProps> = ({
       element?.focus();
       
       // Select all text
-      const range = document.createRange();
-      range.selectNodeContents(element);
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
+      if (element) {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
     }
   }, [editingItemId]);
 

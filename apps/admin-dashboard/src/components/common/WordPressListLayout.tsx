@@ -184,9 +184,8 @@ export const WordPressListLayout: FC<WordPressListLayoutProps> = ({
                 <Select 
                   value="" 
                   onValueChange={onBulkAction}
-                  disabled={selectedCount === 0}
                 >
-                  <SelectTrigger id="bulk-action-selector" className="w-[180px]">
+                  <SelectTrigger id="bulk-action-selector" className="w-[180px]" disabled={selectedCount === 0}>
                     <SelectValue placeholder="Bulk actions" />
                   </SelectTrigger>
                   <SelectContent>

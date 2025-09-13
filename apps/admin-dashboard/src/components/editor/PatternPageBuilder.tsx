@@ -16,7 +16,7 @@ import {
   Loader2
 } from 'lucide-react';
 import BlockPatternsBrowser from './BlockPatternsBrowser';
-import WordPressBlockEditor from './WordPressBlockEditor';
+import GutenbergBlockEditor from './GutenbergBlockEditor';
 import useBlockPatterns from '../../hooks/useBlockPatterns';
 
 interface PageTemplate {
@@ -219,10 +219,14 @@ const PatternPageBuilder: React.FC<PatternPageBuilderProps> = ({
 
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
-        <WordPressBlockEditor
-          initialContent={editorContent}
-          onChange={handleEditorChange}
-          showReusableBlocks={true}
+        <GutenbergBlockEditor
+          initialBlocks={editorContent || []}
+          onChange={(blocks) => handleEditorChange(JSON.stringify(blocks), blocks)}
+          documentTitle=""
+          slug=""
+          onTitleChange={() => {}}
+          onSave={() => Promise.resolve()}
+          onPublish={() => Promise.resolve()}
         />
       </div>
 

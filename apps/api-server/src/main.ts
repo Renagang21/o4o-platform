@@ -297,7 +297,7 @@ const corsOptions: CorsOptions = {
       "https://funding.neture.co.kr",
       "https://auth.neture.co.kr",
       "https://api.neture.co.kr", // API server itself
-      "http://api.neture.co.kr"
+      "http://api.neture.co.kr",
       // Add environment-defined origins
       ...envOrigins
     ];

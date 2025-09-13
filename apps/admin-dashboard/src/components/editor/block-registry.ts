@@ -314,11 +314,11 @@ class BlockRegistry {
       
       if (typeof block.component === 'function') {
         // Dynamic import
-        const module = await block.component()
+        const module = await (block.component as () => Promise<{ default: ComponentType<any> }>)()
         component = module.default
       } else {
         // Direct component
-        component = block.component
+        component = block.component as ComponentType<any>
       }
 
       this.loadedComponents.set(name, component)
