@@ -545,8 +545,8 @@ app.post('/api/posts/:id/publish', authenticateToken, async (req: Request, res: 
       });
     }
 
-    post.status = 'published';
-    post.publishedAt = new Date();
+    post.status = 'publish';
+    post.published_at = new Date();
     const updatedPost = await postRepository.save(post);
 
     return res.json({
@@ -566,8 +566,8 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const status = req.query.status as string || 'published';
-    const orderBy = req.query.orderBy as string || 'createdAt';
+    const status = req.query.status as string || 'publish';
+    const orderBy = req.query.orderBy as string || 'created_at';
     const order = req.query.order as string || 'DESC';
     const offset = (page - 1) * limit;
 
@@ -579,7 +579,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
         slug: 'neture-platform-launch',
         excerpt: 'O4O 비즈니스를 위한 통합 플랫폼이 출시되었습니다.',
         content: '<p>Neture 플랫폼이 공식 출시되었습니다...</p>',
-        status: 'published',
+        status: 'publish',
         author: {
           id: '1',
           name: 'Admin',

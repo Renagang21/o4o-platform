@@ -67,12 +67,12 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -132,15 +132,15 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
         {
           name: 'status',
           type: 'enum',
-          enum: ['draft', 'published', 'pending', 'rejected', 'archived'],
-          default: "'published'",
+          enum: ['draft', 'publish', 'pending', 'rejected', 'archived'],
+          default: "'publish'",
         },
         {
           name: 'categoryId',
           type: 'uuid',
         },
         {
-          name: 'authorId',
+          name: 'author_id',
           type: 'uuid',
         },
         {
@@ -185,7 +185,7 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           isNullable: true,
         },
         {
-          name: 'publishedAt',
+          name: 'published_at',
           type: 'timestamp',
           isNullable: true,
         },
@@ -216,12 +216,12 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -234,7 +234,7 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           onDelete: 'CASCADE',
         },
         {
-          columnNames: ['authorId'],
+          columnNames: ['author_id'],
           referencedTableName: 'users',
           referencedColumnNames: ['id'],
         },
@@ -243,7 +243,7 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
 
     // Create indexes for forum_post
     await queryRunner.query(
-      `CREATE INDEX "IDX_FORUM_POST_CATEGORY_STATUS" ON "forum_post" ("categoryId", "status", "isPinned", "createdAt")`
+      `CREATE INDEX "IDX_FORUM_POST_CATEGORY_STATUS" ON "forum_post" ("categoryId", "status", "isPinned", "created_at")`
     );
 
     // Create forum_comment table
@@ -262,7 +262,7 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           type: 'uuid',
         },
         {
-          name: 'authorId',
+          name: 'author_id',
           type: 'uuid',
         },
         {
@@ -272,8 +272,8 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
         {
           name: 'status',
           type: 'enum',
-          enum: ['published', 'pending', 'deleted'],
-          default: "'published'",
+          enum: ['publish', 'pending', 'deleted'],
+          default: "'publish'",
         },
         {
           name: 'parentId',
@@ -321,12 +321,12 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -339,7 +339,7 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           onDelete: 'CASCADE',
         },
         {
-          columnNames: ['authorId'],
+          columnNames: ['author_id'],
           referencedTableName: 'users',
           referencedColumnNames: ['id'],
         },
@@ -411,12 +411,12 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           default: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -448,7 +448,7 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           type: 'uuid',
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -498,12 +498,12 @@ export class CreateForumTables1700000000001 implements MigrationInterface {
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinColumn, JoinTable } from 'typeorm'
 import { User } from './User'
 import { Category } from './Category'
-import { PostTag } from './PostTag'
+import { Tag } from './Tag'
 
 export interface Block {
   id: string
@@ -35,11 +35,6 @@ export interface PostRevision {
   changes: Partial<Post>
 }
 
-// Post-specific interfaces
-export interface PostFormat {
-  type: 'standard' | 'aside' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio' | 'chat'
-}
-
 export interface PostMeta {
   featuredImage?: string
   excerpt?: string
@@ -60,18 +55,18 @@ export class Post {
   @Column({ unique: true, length: 255 })
   slug!: string
 
-  @Column({ type: 'json', nullable: true })
-  content!: { blocks: Block[] }
+  @Column({ type: 'text', nullable: true })
+  content!: string
 
   @Column({ type: 'text', nullable: true })
   excerpt!: string
 
   @Column({ 
     type: 'enum', 
-    enum: ['draft', 'published', 'private', 'archived', 'scheduled'],
+    enum: ['draft', 'publish', 'private', 'trash'],
     default: 'draft'
   })
-  status!: string
+  status!: 'draft' | 'publish' | 'private' | 'trash'
 
   // Post type field for supporting custom post types
   @Column({ 
@@ -81,113 +76,65 @@ export class Post {
   })
   type!: string
 
-  // Post format (WordPress-style)
-  @Column({ 
-    type: 'enum',
-    enum: ['standard', 'aside', 'gallery', 'link', 'image', 'quote', 'status', 'video', 'audio', 'chat'],
-    default: 'standard'
-  })
-  format!: string
-
   @Column({ nullable: true })
   template!: string
 
-  // Categories and Tags (Many-to-Many relationships)
-  @ManyToMany(() => Category, category => category.posts, { nullable: true })
-  @JoinTable({
-    name: 'post_categories',
-    joinColumn: { name: 'postId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' }
+  @Column({ nullable: true })
+  featured_media!: string
+
+  @Column({ 
+    type: 'enum',
+    enum: ['open', 'closed'],
+    default: 'open'
   })
-  categories!: Category[]
+  comment_status!: 'open' | 'closed'
 
-  @ManyToMany(() => PostTag, tag => tag.posts, { nullable: true })
-  @JoinTable({
-    name: 'post_tag_relationships',
-    joinColumn: { name: 'postId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' }
+  @Column({ 
+    type: 'enum',
+    enum: ['open', 'closed'],
+    default: 'open'
   })
-  tags!: PostTag[]
-
-  @Column({ type: 'json', nullable: true })
-  seo!: SEOMetadata
-
-  @Column({ type: 'json', nullable: true })
-  customFields!: Record<string, unknown>
-
-  @Column({ type: 'json', nullable: true })
-  postMeta!: PostMeta
-
-  @Column({ type: 'timestamp', nullable: true })
-  publishedAt!: Date
-
-  @Column({ type: 'timestamp', nullable: true })
-  scheduledAt!: Date
-
-  @Column({ type: 'uuid' })
-  authorId!: string
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'authorId' })
-  author!: User
-
-  @Column({ type: 'uuid', nullable: true })
-  lastModifiedBy!: string
-
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'lastModifiedBy' })
-  lastModifier!: User
-
-  @Column({ default: 0 })
-  views!: number
-
-  @Column({ type: 'text', nullable: true })
-  password!: string
-
-  @Column({ default: false })
-  passwordProtected!: boolean
-
-  @Column({ default: true })
-  allowComments!: boolean
-
-  @Column({ default: 'open' })
-  commentStatus!: string
-
-  // Post-specific fields
-  @Column({ default: false })
-  featured!: boolean
+  ping_status!: 'open' | 'closed'
 
   @Column({ default: false })
   sticky!: boolean
 
-  @Column({ nullable: true })
-  featuredImage!: string
+  @Column({ type: 'json', nullable: true })
+  meta!: Record<string, any>
 
-  @Column({ type: 'integer', nullable: true })
-  readingTime!: number
+  // Categories and Tags (Many-to-Many relationships)
+  @ManyToMany(() => Category, category => category.posts, { nullable: true, cascade: true })
+  @JoinTable({
+    name: 'post_categories',
+    joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' }
+  })
+  categories!: Category[]
+
+  @ManyToMany(() => Tag, tag => tag.posts, { nullable: true, cascade: true })
+  @JoinTable({
+    name: 'post_tags',
+    joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
+  })
+  tags!: Tag[]
 
   @Column({ type: 'json', nullable: true })
-  layoutSettings!: Record<string, unknown>
+  seo!: SEOMetadata
 
-  @Column({ type: 'json', nullable: true })
-  revisions!: PostRevision[]
+  @Column({ type: 'uuid' })
+  author_id!: string
 
-  // Zone-based layout fields
-  @Column({ type: 'json', nullable: true, name: 'zones' })
-  zones?: any
-
-  @Column({ type: 'json', nullable: true, name: 'theme_customizations' })
-  themeCustomizations?: any
-
-  @Column({ nullable: true, name: 'use_zones' })
-  useZones?: boolean
-
-  @Column({ nullable: true, name: 'layout_type' })
-  layoutType?: string
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'author_id' })
+  author!: User
 
   @CreateDateColumn()
-  createdAt!: Date
+  created_at!: Date
 
   @UpdateDateColumn()
-  updatedAt!: Date
+  updated_at!: Date
+
+  @Column({ type: 'timestamp', nullable: true })
+  published_at!: Date
 }

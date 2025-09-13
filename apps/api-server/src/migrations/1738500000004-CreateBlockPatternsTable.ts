@@ -94,7 +94,7 @@ export class CreateBlockPatternsTable1738500000004 implements MigrationInterface
                     isNullable: true
                 },
                 {
-                    name: "authorId",
+                    name: "author_id",
                     type: "uuid"
                 },
                 {
@@ -124,12 +124,12 @@ export class CreateBlockPatternsTable1738500000004 implements MigrationInterface
                     default: "'active'"
                 },
                 {
-                    name: "createdAt",
+                    name: "created_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP"
                 },
                 {
-                    name: "updatedAt",
+                    name: "updated_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP",
                     onUpdate: "CURRENT_TIMESTAMP"
@@ -141,7 +141,7 @@ export class CreateBlockPatternsTable1738500000004 implements MigrationInterface
         await queryRunner.query(`
             ALTER TABLE "block_patterns" 
             ADD CONSTRAINT "FK_block_patterns_authorId" 
-            FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE CASCADE
+            FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE
         `)
 
         // Create indexes for better performance
@@ -187,7 +187,7 @@ export class CreateBlockPatternsTable1738500000004 implements MigrationInterface
         
         await queryRunner.createIndex("block_patterns", new TableIndex({ 
             name: "IDX_block_patterns_authorId", 
-            columnNames: ["authorId"] 
+            columnNames: ["author_id"] 
         }))
 
         // Block patterns table created successfully

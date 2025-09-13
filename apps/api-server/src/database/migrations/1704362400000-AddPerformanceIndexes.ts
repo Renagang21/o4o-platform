@@ -45,17 +45,17 @@ export class AddPerformanceIndexes1704362400000 implements MigrationInterface {
         if (hasOrderTable) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_user_status" 
-                ON "order" ("userId", "status", "createdAt")
+                ON "order" ("userId", "status", "created_at")
             `);
 
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_payment_status" 
-                ON "order" ("paymentStatus", "createdAt")
+                ON "order" ("paymentStatus", "created_at")
             `);
 
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_date_range" 
-                ON "order" ("createdAt", "status") 
+                ON "order" ("created_at", "status") 
                 WHERE "status" IN ('confirmed', 'completed')
             `);
         }
@@ -127,8 +127,8 @@ export class AddPerformanceIndexes1704362400000 implements MigrationInterface {
         if (hasOrderTable) {
             await queryRunner.query(`
                 CREATE INDEX IF NOT EXISTS "IDX_order_recent_active" 
-                ON "order" ("createdAt" DESC, "userId") 
-                WHERE "createdAt" > NOW() - INTERVAL '30 days' AND "status" != 'cancelled'
+                ON "order" ("created_at" DESC, "userId") 
+                WHERE "created_at" > NOW() - INTERVAL '30 days' AND "status" != 'cancelled'
             `);
         }
 

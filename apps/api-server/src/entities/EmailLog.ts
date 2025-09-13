@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('email_logs')
-@Index(['status', 'createdAt'])
+@Index(['status', 'created_at'])
 @Index(['recipient'])
 export class EmailLog {
   @PrimaryGeneratedColumn()

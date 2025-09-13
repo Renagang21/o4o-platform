@@ -102,13 +102,13 @@ export class WordPressTransformer {
     // 기본 WordPress Post 구조
     const wpPost: WordPressPost = {
       id: customPost.id as any, // UUID를 그대로 사용
-      date: customPost.createdAt.toISOString(),
-      date_gmt: customPost.createdAt.toISOString(),
+      date: customPost.created_at.toISOString(),
+      date_gmt: customPost.created_at.toISOString(),
       guid: {
         rendered: `${baseUrl}/cpt/${customPost.postType.slug}/posts/${customPost.id}`
       },
-      modified: customPost.updatedAt.toISOString(),
-      modified_gmt: customPost.updatedAt.toISOString(),
+      modified: customPost.updated_at.toISOString(),
+      modified_gmt: customPost.updated_at.toISOString(),
       slug: customPost.slug,
       status: customPost.status,
       type: customPost.postType.slug,
@@ -146,14 +146,14 @@ export class WordPressTransformer {
       wpPost._embedded = {};
 
       // Author 정보 - 현재는 authorId만 있으므로 기본 정보만 제공
-      if (customPost.authorId) {
+      if (customPost.author_id) {
         wpPost._embedded.author = [{
           id: 1, // Default to 1 since authorId is UUID
           name: 'Unknown Author',
-          url: `${baseUrl}/users/${customPost.authorId}`,
+          url: `${baseUrl}/users/${customPost.author_id}`,
           description: '',
-          link: `${baseUrl}/author/${customPost.authorId}`,
-          slug: customPost.authorId,
+          link: `${baseUrl}/author/${customPost.author_id}`,
+          slug: customPost.author_id,
           avatar_urls: {
             '24': `https://ui-avatars.com/api/?name=User&size=24`,
             '48': `https://ui-avatars.com/api/?name=User&size=48`,

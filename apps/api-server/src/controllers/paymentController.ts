@@ -428,7 +428,7 @@ export class PaymentController {
       }
 
       queryBuilder
-        .orderBy('payment.createdAt', 'DESC')
+        .orderBy('payment.created_at', 'DESC')
         .skip(skip)
         .take(Number(limit));
 

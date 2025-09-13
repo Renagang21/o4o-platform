@@ -15,7 +15,7 @@ import { SupplierStatus, SupplierInfo } from '../../types/dropshipping';
 @Entity('suppliers')
 @Index(['userId'], { unique: true })
 @Index(['verificationStatus'])
-@Index(['createdAt'])
+@Index(['created_at'])
 export class Supplier {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

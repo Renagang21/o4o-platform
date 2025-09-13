@@ -65,13 +65,13 @@ export class CreatePostTagTable1725170000000 implements MigrationInterface {
                     isNullable: true
                 },
                 {
-                    name: "createdAt",
+                    name: "created_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP",
                     isNullable: false
                 },
                 {
-                    name: "updatedAt",
+                    name: "updated_at",
                     type: "timestamp",
                     default: "CURRENT_TIMESTAMP",
                     onUpdate: "CURRENT_TIMESTAMP",

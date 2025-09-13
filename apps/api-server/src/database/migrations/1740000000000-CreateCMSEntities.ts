@@ -65,12 +65,12 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
             comment: 'SEO description for tag pages'
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -100,7 +100,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
             type: 'int'
           },
           {
-            name: 'authorId',
+            name: 'author_id',
             type: 'uuid'
           },
           {
@@ -183,7 +183,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -213,7 +213,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
             type: 'int'
           },
           {
-            name: 'authorId',
+            name: 'author_id',
             type: 'uuid'
           },
           {
@@ -302,7 +302,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -392,7 +392,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     
     await queryRunner.createIndex('post_revisions', {
       name: 'IDX_post_revisions_post_created',
-      columnNames: ['postId', 'createdAt']
+      columnNames: ['postId', 'created_at']
     } as any);
     await queryRunner.createIndex('post_revisions', {
       name: 'IDX_post_revisions_post_revision',
@@ -400,12 +400,12 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     } as any);
     await queryRunner.createIndex('post_revisions', {
       name: 'IDX_post_revisions_author',
-      columnNames: ['authorId']
+      columnNames: ['author_id']
     } as any);
     
     await queryRunner.createIndex('page_revisions', {
       name: 'IDX_page_revisions_page_created',
-      columnNames: ['pageId', 'createdAt']
+      columnNames: ['pageId', 'created_at']
     } as any);
     await queryRunner.createIndex('page_revisions', {
       name: 'IDX_page_revisions_page_revision',
@@ -413,7 +413,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     } as any);
     await queryRunner.createIndex('page_revisions', {
       name: 'IDX_page_revisions_author',
-      columnNames: ['authorId']
+      columnNames: ['author_id']
     } as any);
 
     await queryRunner.createIndex('media', {
@@ -426,7 +426,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     } as any);
     await queryRunner.createIndex('media', {
       name: 'IDX_media_created',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     } as any);
 
     // Create foreign keys
@@ -438,7 +438,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     } as any);
 
     await queryRunner.createForeignKey('post_revisions', {
-      columnNames: ['authorId'],
+      columnNames: ['author_id'],
       referencedTableName: 'users',
       referencedColumnNames: ['id'],
       onDelete: 'RESTRICT'
@@ -452,7 +452,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
     } as any);
 
     await queryRunner.createForeignKey('page_revisions', {
-      columnNames: ['authorId'],
+      columnNames: ['author_id'],
       referencedTableName: 'users',
       referencedColumnNames: ['id'],
       onDelete: 'RESTRICT'
@@ -477,7 +477,7 @@ export class CreateCMSEntities1740000000000 implements MigrationInterface {
       CREATE OR REPLACE FUNCTION update_updated_at_column()
       RETURNS TRIGGER AS $$
       BEGIN
-          NEW.updatedAt = CURRENT_TIMESTAMP;
+          NEW.updated_at = CURRENT_TIMESTAMP;
           RETURN NEW;
       END;
       $$ LANGUAGE plpgsql;

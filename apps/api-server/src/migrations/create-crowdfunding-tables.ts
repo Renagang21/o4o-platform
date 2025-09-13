@@ -194,12 +194,12 @@ export class CreateCrowdfundingTables1700000000000 implements MigrationInterface
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -326,12 +326,12 @@ export class CreateCrowdfundingTables1700000000000 implements MigrationInterface
           default: 0,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -453,12 +453,12 @@ export class CreateCrowdfundingTables1700000000000 implements MigrationInterface
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -555,12 +555,12 @@ export class CreateCrowdfundingTables1700000000000 implements MigrationInterface
           isNullable: true,
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -619,12 +619,12 @@ export class CreateCrowdfundingTables1700000000000 implements MigrationInterface
           length: '255',
         },
         {
-          name: 'createdAt',
+          name: 'created_at',
           type: 'timestamp',
           default: 'now()',
         },
         {
-          name: 'updatedAt',
+          name: 'updated_at',
           type: 'timestamp',
           default: 'now()',
         },
@@ -640,7 +640,7 @@ export class CreateCrowdfundingTables1700000000000 implements MigrationInterface
     }), true);
 
     await queryRunner.query(
-      `CREATE INDEX "IDX_FUNDING_UPDATES_PROJECT_DATE" ON "funding_updates" ("projectId", "createdAt")`
+      `CREATE INDEX "IDX_FUNDING_UPDATES_PROJECT_DATE" ON "funding_updates" ("projectId", "created_at")`
     );
   }
 

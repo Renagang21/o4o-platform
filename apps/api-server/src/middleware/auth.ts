@@ -25,8 +25,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         devUser.name = '개발 관리자';
         devUser.role = UserRole.ADMIN;
         devUser.status = UserStatus.APPROVED;
-        devUser.createdAt = new Date();
-        devUser.updatedAt = new Date();
+        devUser.created_at = new Date();
+        devUser.updated_at = new Date();
         devUser.lastLoginAt = new Date();
         
         (req as AuthRequest).user = devUser;
@@ -62,8 +62,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
               tokenUser.status = newPayload.status as UserStatus || UserStatus.ACTIVE;
               tokenUser.name = newPayload.name;
               tokenUser.businessInfo = newPayload.businessInfo;
-              tokenUser.createdAt = newPayload.createdAt as Date || new Date();
-              tokenUser.updatedAt = newPayload.updatedAt as Date || new Date();
+              tokenUser.created_at = newPayload.created_at as Date || new Date();
+              tokenUser.updated_at = newPayload.updated_at as Date || new Date();
               tokenUser.lastLoginAt = newPayload.lastLoginAt as Date;
               
               // Add userId property for backward compatibility
@@ -91,8 +91,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       cookieUser.status = payload.status as UserStatus || UserStatus.ACTIVE;
       cookieUser.name = payload.name;
       cookieUser.businessInfo = payload.businessInfo;
-      cookieUser.createdAt = payload.createdAt as Date || new Date();
-      cookieUser.updatedAt = payload.updatedAt as Date || new Date();
+      cookieUser.created_at = payload.created_at as Date || new Date();
+      cookieUser.updated_at = payload.updated_at as Date || new Date();
       cookieUser.lastLoginAt = payload.lastLoginAt as Date;
       
       (req as AuthRequest).user = cookieUser;
@@ -126,7 +126,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     
     const user = await userRepository.findOne({ 
       where: { id: decoded.userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at', 'lastLoginAt']
     });
     
     if (!user) {
@@ -200,8 +200,8 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
         refreshTokenUser.status = payload.status as UserStatus || UserStatus.ACTIVE;
         refreshTokenUser.name = payload.name;
         refreshTokenUser.businessInfo = payload.businessInfo;
-        refreshTokenUser.createdAt = payload.createdAt as Date || new Date();
-        refreshTokenUser.updatedAt = payload.updatedAt as Date || new Date();
+        refreshTokenUser.created_at = payload.created_at as Date || new Date();
+        refreshTokenUser.updated_at = payload.updated_at as Date || new Date();
         refreshTokenUser.lastLoginAt = payload.lastLoginAt as Date;
         
         (req as AuthRequest).user = refreshTokenUser;
@@ -234,7 +234,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     
     const user = await userRepository.findOne({ 
       where: { id: decoded.userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'lastLoginAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at', 'lastLoginAt']
     });
     
     if (user && user.status === UserStatus.APPROVED) {

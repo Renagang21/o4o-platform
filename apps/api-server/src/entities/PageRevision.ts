@@ -15,7 +15,7 @@ export interface PageRevisionChanges {
 }
 
 @Entity('page_revisions')
-@Index(['pageId', 'createdAt'])
+@Index(['pageId', 'created_at'])
 @Index(['pageId', 'revisionNumber'])
 export class PageRevision {
   @PrimaryGeneratedColumn('uuid')
@@ -35,7 +35,7 @@ export class PageRevision {
   authorId!: string;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author!: User;
 
   @Column({ type: 'varchar', length: 50 })

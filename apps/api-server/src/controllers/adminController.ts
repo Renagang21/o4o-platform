@@ -165,7 +165,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     
     const user = await userRepository.findOne({ 
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at']
     });
 
     if (!user) {
@@ -195,7 +195,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'approvedAt', 'approvedBy']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at', 'approvedAt', 'approvedBy']
     });
 
     res.json({
@@ -257,7 +257,7 @@ export const rejectUser = async (req: Request, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at']
     });
 
     res.json({
@@ -311,7 +311,7 @@ export const suspendUser = async (req: Request, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at']
     });
 
     res.json({
@@ -365,7 +365,7 @@ export const reactivateUser = async (req: Request, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'updated_at']
     });
 
     res.json({
@@ -418,7 +418,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
     // Get recent users
     const recentUsers = await userRepository.find({
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'approvedBy'],
+      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'created_at', 'approvedBy'],
       order: { createdAt: 'DESC' },
       take: 5
     });

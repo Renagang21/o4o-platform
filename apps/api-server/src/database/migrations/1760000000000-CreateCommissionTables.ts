@@ -329,12 +329,12 @@ export class CreateCommissionTables1760000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -789,12 +789,12 @@ export class CreateCommissionTables1760000000000 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           },
           {
-            name: 'updatedAt',
+            name: 'updated_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -822,7 +822,7 @@ export class CreateCommissionTables1760000000000 implements MigrationInterface {
 
     await queryRunner.createIndex('vendor_commissions', new TableIndex({
       name: 'IDX_vendor_commissions_created',
-      columnNames: ['createdAt']
+      columnNames: ['created_at']
     }));
 
     await queryRunner.createIndex('commission_settlements', new TableIndex({

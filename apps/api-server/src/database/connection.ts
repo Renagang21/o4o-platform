@@ -38,7 +38,8 @@ import { PlaylistItem } from '../entities/PlaylistItem';
 import { ScreenTemplate } from '../entities/ScreenTemplate';
 import { ContentUsageLog } from '../entities/ContentUsageLog';
 import { Post } from '../entities/Post';
-import { PostTag } from '../entities/PostTag';
+import { Tag } from '../entities/Tag';
+import { PostAutosave } from '../entities/PostAutosave';
 import { Page } from '../entities/Page';
 import { ReusableBlock } from '../entities/ReusableBlock';
 import { BlockPattern } from '../entities/BlockPattern';
@@ -145,7 +146,8 @@ export const AppDataSource = new DataSource({
         ContentUsageLog,
         // Content entities
         Post,
-        PostTag,
+        PostAutosave,
+        Tag,
         Page,
         ReusableBlock,
         BlockPattern,
@@ -177,12 +179,12 @@ export const AppDataSource = new DataSource({
         MenuLocation
       ],
   
-  // 마이그레이션 설정 - 임시로 비활성화 (MigrationInterface 문제 해결 중)
-  // migrations: NODE_ENV === 'production' 
-  //   ? ['dist/database/migrations/*.js'] 
-  //   : ['src/database/migrations/*.ts'],
-  // migrationsTableName: 'typeorm_migrations',
-  // migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
+  // 마이그레이션 설정
+  migrations: NODE_ENV === 'production' 
+    ? ['dist/database/migrations/*.js'] 
+    : ['src/database/migrations/*.ts'],
+  migrationsTableName: 'typeorm_migrations',
+  migrationsRun: false, // 자동 마이그레이션 비활성화 (수동 실행)
   
   // SSL 설정 (프로덕션 환경)
   ssl: NODE_ENV === 'production' ? {

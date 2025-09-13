@@ -514,7 +514,7 @@ export class ReportingService {
         'commission.status',
         'commission.paidAt',
       ])
-      .where('commission.createdAt BETWEEN :startDate AND :endDate', {
+      .where('commission.created_at BETWEEN :startDate AND :endDate', {
         startDate: options.startDate,
         endDate: options.endDate,
       });

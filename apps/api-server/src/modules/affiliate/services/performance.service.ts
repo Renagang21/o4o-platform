@@ -151,7 +151,7 @@ export class PerformanceOptimizationService {
       // Preload recent conversions
       const recentConversions = await AppDataSource.getRepository(AffiliateConversion)
         .createQueryBuilder('conversion')
-        .where('conversion.createdAt > :date', {
+        .where('conversion.created_at > :date', {
           date: new Date(Date.now() - 24 * 60 * 60 * 1000)
         })
         .getMany();
@@ -171,7 +171,7 @@ export class PerformanceOptimizationService {
     repository: Repository<T>,
     cursor: string | null,
     limit: number,
-    orderBy: string = 'createdAt'
+    orderBy: string = 'created_at'
   ): Promise<{ items: T[]; nextCursor: string | null }> {
     const query = repository.createQueryBuilder('entity');
 
@@ -435,7 +435,7 @@ export class PerformanceOptimizationService {
       if (pattern.includes('WHERE') && pattern.includes('affiliateUserId')) {
         recommendations.push('CREATE INDEX idx_affiliate_user_id ON table_name(affiliateUserId)');
       }
-      if (pattern.includes('ORDER BY') && pattern.includes('createdAt')) {
+      if (pattern.includes('ORDER BY') && pattern.includes('created_at')) {
         recommendations.push('CREATE INDEX idx_created_at ON table_name(createdAt DESC)');
       }
     }
@@ -479,10 +479,10 @@ export class PerformanceOptimizationService {
     return await AppDataSource.getRepository(AffiliateClick)
       .createQueryBuilder('click')
       .select('COUNT(*)', 'total')
-      .addSelect('DATE(click.createdAt)', 'date')
+      .addSelect('DATE(click.created_at)', 'date')
       .where('click.affiliateUserId = :affiliateUserId', { affiliateUserId })
-      .andWhere('click.createdAt >= :startDate', { startDate })
-      .groupBy('DATE(click.createdAt)')
+      .andWhere('click.created_at >= :startDate', { startDate })
+      .groupBy('DATE(click.created_at)')
       .getRawMany();
   }
 
@@ -494,10 +494,10 @@ export class PerformanceOptimizationService {
       .createQueryBuilder('conversion')
       .select('COUNT(*)', 'total')
       .addSelect('SUM(conversion.orderAmount)', 'revenue')
-      .addSelect('DATE(conversion.createdAt)', 'date')
+      .addSelect('DATE(conversion.created_at)', 'date')
       .where('conversion.affiliateUserId = :affiliateUserId', { affiliateUserId })
-      .andWhere('conversion.createdAt >= :startDate', { startDate })
-      .groupBy('DATE(conversion.createdAt)')
+      .andWhere('conversion.created_at >= :startDate', { startDate })
+      .groupBy('DATE(conversion.created_at)')
       .getRawMany();
   }
 
@@ -509,7 +509,7 @@ export class PerformanceOptimizationService {
       .createQueryBuilder('conversion')
       .select('SUM(conversion.commissionAmount)', 'total')
       .where('conversion.affiliateUserId = :affiliateUserId', { affiliateUserId })
-      .andWhere('conversion.createdAt >= :startDate', { startDate })
+      .andWhere('conversion.created_at >= :startDate', { startDate })
       .getRawOne();
   }
 

@@ -1,16 +1,16 @@
 import { Repository, Like, In } from 'typeorm';
 import { AppDataSource } from '../database/connection';
-import { PostTag } from '../entities/PostTag';
+import { Tag } from '../entities/Tag';
 import { Post } from '../entities/Post';
 import { CreateTagDto, UpdateTagDto, TagStatistics } from '../types/tag.types';
 import { generateSlug } from '../utils/slug';
 
 export class TagService {
-  private tagRepository: Repository<PostTag>;
+  private tagRepository: Repository<Tag>;
   private postRepository: Repository<Post>;
 
   constructor() {
-    this.tagRepository = AppDataSource.getRepository(PostTag);
+    this.tagRepository = AppDataSource.getRepository(Tag);
     this.postRepository = AppDataSource.getRepository(Post);
   }
 
@@ -23,7 +23,7 @@ export class TagService {
     search?: string;
     sortBy?: string;
     sortOrder?: 'ASC' | 'DESC';
-  }): Promise<{ tags: PostTag[]; total: number }> {
+  }): Promise<{ tags: Tag[]; total: number }> {
     const { page, limit, search, sortBy = 'name', sortOrder = 'ASC' } = options;
     const skip = (page - 1) * limit;
 
@@ -38,7 +38,7 @@ export class TagService {
     }
 
     // Add sorting
-    const allowedSortFields = ['name', 'slug', 'createdAt', 'updatedAt'];
+    const allowedSortFields = ['name', 'slug', 'created_at', 'updated_at'];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'name';
     queryBuilder.orderBy(`tag.${sortField}`, sortOrder);
 
@@ -59,7 +59,7 @@ export class TagService {
   /**
    * Get a single tag by ID
    */
-  async getTagById(id: string): Promise<PostTag | null> {
+  async getTagById(id: string): Promise<Tag | null> {
     return await this.tagRepository.findOne({
       where: { id },
       relations: ['posts']
@@ -69,7 +69,7 @@ export class TagService {
   /**
    * Find tag by slug
    */
-  async findBySlug(slug: string): Promise<PostTag | null> {
+  async findBySlug(slug: string): Promise<Tag | null> {
     const normalizedSlug = generateSlug(slug);
     return await this.tagRepository.findOne({
       where: { slug: normalizedSlug }
@@ -79,8 +79,8 @@ export class TagService {
   /**
    * Create a new tag
    */
-  async createTag(data: CreateTagDto & { createdBy?: string }): Promise<PostTag> {
-    const tag = new PostTag();
+  async createTag(data: CreateTagDto & { createdBy?: string }): Promise<Tag> {
+    const tag = new Tag();
     
     tag.name = data.name;
     tag.slug = data.slug || generateSlug(data.name);
@@ -89,8 +89,8 @@ export class TagService {
     tag.metaDescription = data.metaDescription || data.description || '';
     
     // Set timestamps
-    tag.createdAt = new Date();
-    tag.updatedAt = new Date();
+    tag.created_at = new Date();
+    tag.updated_at = new Date();
 
     return await this.tagRepository.save(tag);
   }
@@ -98,7 +98,7 @@ export class TagService {
   /**
    * Update an existing tag
    */
-  async updateTag(id: string, data: UpdateTagDto & { updatedBy?: string }): Promise<PostTag> {
+  async updateTag(id: string, data: UpdateTagDto & { updatedBy?: string }): Promise<Tag> {
     const tag = await this.getTagById(id);
     
     if (!tag) {
@@ -113,7 +113,7 @@ export class TagService {
     if (data.metaDescription !== undefined) tag.metaDescription = data.metaDescription;
 
     // Update timestamp
-    tag.updatedAt = new Date();
+    tag.updated_at = new Date();
 
     return await this.tagRepository.save(tag);
   }
@@ -152,7 +152,7 @@ export class TagService {
   /**
    * Merge one tag into another
    */
-  async mergeTags(fromId: string, toId: string): Promise<{ targetTag: PostTag; postsUpdated: number }> {
+  async mergeTags(fromId: string, toId: string): Promise<{ targetTag: Tag; postsUpdated: number }> {
     const fromTag = await this.getTagById(fromId);
     const toTag = await this.getTagById(toId);
 
@@ -215,8 +215,8 @@ export class TagService {
     // Get recent posts
     const recentPosts = posts
       .sort((a, b) => {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
@@ -224,8 +224,8 @@ export class TagService {
     // Get most viewed posts (using creation date as fallback for now)
     const popularPosts = posts
       .sort((a, b) => {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
@@ -240,7 +240,7 @@ export class TagService {
         id: p.id,
         title: p.title,
         slug: p.slug,
-        createdAt: p.createdAt,
+        created_at: p.created_at,
         viewCount: 0 // viewCount not available yet
       })),
       popularPosts: popularPosts.map(p => ({
@@ -249,8 +249,8 @@ export class TagService {
         slug: p.slug,
         viewCount: 0 // viewCount not available yet
       })),
-      createdAt: tag.createdAt,
-      updatedAt: tag.updatedAt
+      created_at: tag.created_at,
+      updated_at: tag.updated_at
     };
   }
 
@@ -276,7 +276,7 @@ export class TagService {
   /**
    * Search tags by name
    */
-  async searchTags(query: string, limit: number = 10): Promise<PostTag[]> {
+  async searchTags(query: string, limit: number = 10): Promise<Tag[]> {
     return await this.tagRepository.find({
       where: [
         { name: Like(`%${query}%`) },
@@ -292,8 +292,8 @@ export class TagService {
   /**
    * Bulk create tags
    */
-  async bulkCreateTags(tagNames: string[]): Promise<PostTag[]> {
-    const tags: PostTag[] = [];
+  async bulkCreateTags(tagNames: string[]): Promise<Tag[]> {
+    const tags: Tag[] = [];
     
     for (const name of tagNames) {
       const slug = generateSlug(name);
@@ -315,7 +315,7 @@ export class TagService {
   /**
    * Get tags by IDs
    */
-  async getTagsByIds(ids: string[]): Promise<PostTag[]> {
+  async getTagsByIds(ids: string[]): Promise<Tag[]> {
     if (ids.length === 0) {
       return [];
     }

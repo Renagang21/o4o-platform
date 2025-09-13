@@ -10,7 +10,7 @@ import { User } from './User';
 import { AuthProvider } from '../types/account-linking';
 
 @Entity('account_activities')
-@Index(['userId', 'createdAt'])
+@Index(['userId', 'created_at'])
 @Index(['action', 'provider'])
 export class AccountActivity {
   @PrimaryGeneratedColumn('uuid')

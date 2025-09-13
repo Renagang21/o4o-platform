@@ -842,7 +842,7 @@ export class OperationsMonitoringService {
       Severity: ${alert.severity}
       Message: ${alert.message}
       Source: ${alert.source}
-      Time: ${alert.createdAt.toISOString()}
+      Time: ${alert.created_at.toISOString()}
       
       Current Value: ${alert.getFormattedValue()}
       Threshold: ${alert.thresholdValue}
@@ -889,7 +889,7 @@ export class OperationsMonitoringService {
               short: false
             }
           ],
-          ts: Math.floor(alert.createdAt.getTime() / 1000)
+          ts: Math.floor(alert.created_at.getTime() / 1000)
         }
       ]
     };
@@ -912,7 +912,7 @@ export class OperationsMonitoringService {
         currentValue: alert.currentValue,
         thresholdValue: alert.thresholdValue,
         unit: alert.unit,
-        timestamp: alert.createdAt.toISOString()
+        timestamp: alert.created_at.toISOString()
       },
       context: alert.context,
       metadata: alert.metadata

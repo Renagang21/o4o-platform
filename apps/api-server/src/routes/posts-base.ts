@@ -35,7 +35,7 @@ const mockPosts = [
     slug: 'welcome-to-neture',
     content: '<p>Welcome to the Neture O4O platform.</p>',
     excerpt: 'Welcome to the Neture O4O platform.',
-    status: 'published',
+    status: 'publish',
     type: 'post',
     author: {
       id: '1',
@@ -55,7 +55,7 @@ const mockPosts = [
     slug: 'getting-started',
     content: '<p>Learn how to use the platform effectively.</p>',
     excerpt: 'Learn how to use the platform effectively.',
-    status: 'published',
+    status: 'publish',
     type: 'post',
     author: {
       id: '1',
@@ -100,7 +100,7 @@ router.get('/',
   query('page').optional().isInt({ min: 1 }),
   query('per_page').optional().isInt({ min: 1, max: 100 }),
   query('search').optional().isString(),
-  query('status').optional().isIn(['draft', 'published', 'private', 'archived', 'scheduled']),
+  query('status').optional().isIn(['draft', 'publish', 'private', 'archived', 'scheduled']),
   validateDto,
   async (req: Request, res: Response) => {
     try {
@@ -113,7 +113,7 @@ router.get('/',
         include,
         order = 'desc',
         orderby = 'date',
-        status = 'published',
+        status = 'publish',
         categories,
         tags,
         sticky,
@@ -176,7 +176,7 @@ router.get('/',
       // Author filter
       if (author) {
         const authorIds = author.split(',');
-        queryBuilder.andWhere('post.authorId IN (:...authorIds)', { authorIds });
+        queryBuilder.andWhere('post.author_id IN (:...author_ids)', { authorIds });
       }
 
       // Categories filter
@@ -213,13 +213,13 @@ router.get('/',
       }
 
       // Ordering
-      let orderByField = 'post.createdAt';
+      let orderByField = 'post.created_at';
       switch (orderby) {
         case 'date':
-          orderByField = 'post.publishedAt';
+          orderByField = 'post.published_at';
           break;
         case 'modified':
-          orderByField = 'post.updatedAt';
+          orderByField = 'post.updated_at';
           break;
         case 'title':
           orderByField = 'post.title';
@@ -239,11 +239,11 @@ router.get('/',
       // Format response to be WordPress-compatible
       const formattedPosts = posts.map(post => ({
         id: post.id,
-        date: post.publishedAt,
-        date_gmt: post.publishedAt,
+        date: post.published_at,
+        date_gmt: post.published_at,
         guid: { rendered: `/posts/${post.id}` },
-        modified: post.updatedAt,
-        modified_gmt: post.updatedAt,
+        modified: post.updated_at,
+        modified_gmt: post.updated_at,
         slug: post.slug,
         status: post.status,
         type: 'post',
@@ -326,11 +326,11 @@ router.get('/:id',
       // Format response to be WordPress-compatible
       const formattedPost = {
         id: post.id,
-        date: post.publishedAt,
-        date_gmt: post.publishedAt,
+        date: post.published_at,
+        date_gmt: post.published_at,
         guid: { rendered: `/posts/${post.id}` },
-        modified: post.updatedAt,
-        modified_gmt: post.updatedAt,
+        modified: post.updated_at,
+        modified_gmt: post.updated_at,
         slug: post.slug,
         status: post.status,
         type: 'post',
@@ -383,7 +383,7 @@ router.post('/',
   authenticateToken,
   body('title').notEmpty().withMessage('Title is required'),
   body('content').notEmpty().withMessage('Content is required'),
-  body('status').optional().isIn(['draft', 'published', 'private', 'archived', 'scheduled']),
+  body('status').optional().isIn(['draft', 'publish', 'private', 'archived', 'scheduled']),
   validateDto,
   async (req: Request, res: Response) => {
     try {
@@ -409,7 +409,7 @@ router.post('/',
           categories: [],
           tags: tags || [],
           featuredImage: null,
-          publishedAt: status === 'published' ? new Date().toISOString() : null,
+          publishedAt: status === 'publish' ? new Date().toISOString() : null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
@@ -438,7 +438,7 @@ router.post('/',
         postMeta: meta || {},
         authorId: userId,
         categories,
-        publishedAt: status === 'published' ? new Date() : null
+        publishedAt: status === 'publish' ? new Date() : null
       });
 
       res.status(201).json(post);
@@ -510,7 +510,7 @@ router.put('/:id',
         postMeta: meta || existingPost.postMeta,
         categories,
         lastModifierId: userId,
-        publishedAt: status === 'published' && !existingPost.publishedAt ? new Date() : existingPost.publishedAt
+        publishedAt: status === 'publish' && !existingPost.published_at ? new Date() : existingPost.published_at
       });
 
       res.json(updatedPost);

@@ -59,7 +59,7 @@ export class Template {
   authorId!: string
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'authorId' })
+  @JoinColumn({ name: 'author_id' })
   author!: User
 
   @Column({ default: true })

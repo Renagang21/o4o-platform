@@ -216,7 +216,7 @@ export class CustomizerController {
       userId, 
       themeId, 
       settingsId: published.id,
-      publishedAt: published.publishedAt 
+      publishedAt: published.published_at 
     });
     
     res.json({

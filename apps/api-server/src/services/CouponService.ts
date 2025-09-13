@@ -69,7 +69,7 @@ export class CouponService {
     const offset = (page - 1) * limit;
 
     query.skip(offset).take(limit);
-    query.orderBy('coupon.createdAt', 'DESC');
+    query.orderBy('coupon.created_at', 'DESC');
 
     const [coupons, total] = await query.getManyAndCount();
 

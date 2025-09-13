@@ -5,6 +5,7 @@ import { Page } from '../../entities/Page';
 import { Category } from '../../entities/Category';
 import { User, UserStatus } from '../../entities/User';
 import { MediaFile } from '../../entities/MediaFile';
+import { Tag } from '../../entities/Tag';
 
 export class ContentController {
   private postRepository = AppDataSource.getRepository(Post);
@@ -12,6 +13,7 @@ export class ContentController {
   private categoryRepository = AppDataSource.getRepository(Category);
   private userRepository = AppDataSource.getRepository(User);
   private mediaRepository = AppDataSource.getRepository(MediaFile);
+  private tagRepository = AppDataSource.getRepository(Tag);
 
   // Posts Management
   getPosts = async (req: Request, res: Response) => {
@@ -29,7 +31,7 @@ export class ContentController {
               slug: 'welcome-to-o4o-platform',
               content: { type: 'doc', content: [] },
               excerpt: 'Welcome to our new platform',
-              status: 'published',
+              status: 'publish',
               author: { id: '1', name: 'Admin', email: 'admin@example.com' },
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
@@ -342,7 +344,7 @@ export class ContentController {
           success: true,
           data: {
             id,
-            status: 'published',
+            status: 'publish',
             publishedAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
@@ -357,8 +359,8 @@ export class ContentController {
         });
       }
 
-      post.status = 'published';
-      post.publishedAt = new Date();
+      post.status = 'publish';
+      post.published_at = new Date();
       const updatedPost = await this.postRepository.save(post);
 
       return res.json({
@@ -723,7 +725,7 @@ export class ContentController {
         });
       }
 
-      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tagRepository = this.tagRepository;
       let query = tagRepository.createQueryBuilder('tag')
         .where('tag.isActive = :isActive', { isActive: true })
         .orderBy('tag.name', 'ASC');
@@ -744,8 +746,8 @@ export class ContentController {
         slug: tag.slug,
         description: tag.description,
         postCount: tag.usageCount || 0,
-        createdAt: tag.createdAt,
-        updatedAt: tag.updatedAt
+        createdAt: tag.created_at,
+        updatedAt: tag.updated_at
       }));
 
       return res.json({
@@ -772,7 +774,7 @@ export class ContentController {
         });
       }
 
-      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tagRepository = this.tagRepository;
       const tag = await tagRepository.findOne({ where: { id } });
 
       if (!tag) {
@@ -790,8 +792,8 @@ export class ContentController {
           slug: tag.slug,
           description: tag.description,
           postCount: tag.usageCount || 0,
-          createdAt: tag.createdAt,
-          updatedAt: tag.updatedAt
+          createdAt: tag.created_at,
+          updatedAt: tag.updated_at
         }
       });
     } catch (error) {
@@ -828,7 +830,7 @@ export class ContentController {
         });
       }
 
-      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tagRepository = this.tagRepository;
       
       // Check if tag with same slug already exists
       const finalSlug = slug || name.toLowerCase().replace(/[^a-z0-9가-힣]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
@@ -859,8 +861,8 @@ export class ContentController {
           slug: savedTag.slug,
           description: savedTag.description,
           postCount: 0,
-          createdAt: savedTag.createdAt,
-          updatedAt: savedTag.updatedAt
+          createdAt: savedTag.created_at,
+          updatedAt: savedTag.updated_at
         }
       });
     } catch (error) {
@@ -883,7 +885,7 @@ export class ContentController {
         });
       }
 
-      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tagRepository = this.tagRepository;
       const tag = await tagRepository.findOne({ where: { id } });
 
       if (!tag) {
@@ -908,8 +910,8 @@ export class ContentController {
           slug: updatedTag.slug,
           description: updatedTag.description,
           postCount: updatedTag.usageCount || 0,
-          createdAt: updatedTag.createdAt,
-          updatedAt: updatedTag.updatedAt
+          createdAt: updatedTag.created_at,
+          updatedAt: updatedTag.updated_at
         }
       });
     } catch (error) {
@@ -931,7 +933,7 @@ export class ContentController {
         });
       }
 
-      const tagRepository = AppDataSource.getRepository('PostTag');
+      const tagRepository = this.tagRepository;
       const tag = await tagRepository.findOne({ where: { id } });
 
       if (!tag) {
@@ -969,7 +971,7 @@ export class ContentController {
               title: 'About Us',
               slug: 'about-us',
               content: { type: 'doc', content: [] },
-              status: 'published',
+              status: 'publish',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             }

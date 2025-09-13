@@ -30,10 +30,10 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
                 INSERT INTO "posts" (
                     "id", "title", "slug", "content", "excerpt", "status", 
                     "format", "template", "seo", "customFields", 
-                    "publishedAt", "scheduledAt", "authorId", "lastModifiedBy",
+                    "published_at", "scheduledAt", "author_id", "lastModifiedBy",
                     "views", "password", "passwordProtected", "allowComments", 
                     "commentStatus", "layoutSettings", "revisions", 
-                    "createdAt", "updatedAt"
+                    "created_at", "updated_at"
                 )
                 SELECT 
                     "id", 
@@ -50,9 +50,9 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
                     "template",
                     "seo", 
                     "customFields",
-                    "publishedAt", 
+                    "published_at", 
                     "scheduledAt", 
-                    "authorId", 
+                    "author_id", 
                     "lastModifiedBy",
                     "views", 
                     "password", 
@@ -61,8 +61,8 @@ export class MigratePostsFromPages1738500000002 implements MigrationInterface {
                     "commentStatus", 
                     "layoutSettings", 
                     "revisions",
-                    "createdAt", 
-                    "updatedAt"
+                    "created_at", 
+                    "updated_at"
                 FROM "pages" 
                 WHERE "type" = 'post'
                 ON CONFLICT ("id") DO NOTHING

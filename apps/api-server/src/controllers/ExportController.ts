@@ -285,7 +285,7 @@ export class ExportController {
         '마진': p.price - p.cost,
         '마진율': ((p.price - p.cost) / p.price * 100).toFixed(2) + '%',
         '활성상태': p.isActive ? '활성' : '비활성',
-        '등록일': p.createdAt.toISOString().split('T')[0]
+        '등록일': p.created_at.toISOString().split('T')[0]
       }));
 
       return this.exportToCSV(exportData, res, 'inventory');

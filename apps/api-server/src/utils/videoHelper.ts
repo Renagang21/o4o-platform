@@ -90,7 +90,7 @@ export class VideoHelper {
         thumbnailUrl: video.snippet?.thumbnails?.maxres?.url || 
                      video.snippet?.thumbnails?.high?.url ||
                      `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-        publishedAt: video.snippet?.publishedAt
+        publishedAt: video.snippet?.published_at
       };
     } catch (error: any) {
       // Error log removed

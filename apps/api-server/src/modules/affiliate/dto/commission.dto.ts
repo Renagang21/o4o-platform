@@ -5,7 +5,7 @@ export class GetCommissionsDto {
   endDate?: Date;
   page?: number;
   limit?: number;
-  orderBy?: 'createdAt' | 'amount' | 'status';
+  orderBy?: 'created_at' | 'amount' | 'status';
   orderDirection?: 'ASC' | 'DESC';
 }
 
@@ -66,7 +66,7 @@ export class GetAffiliateUsersDto {
   search?: string;
   page?: number;
   limit?: number;
-  orderBy?: 'createdAt' | 'totalEarnings' | 'totalClicks' | 'totalConversions';
+  orderBy?: 'created_at' | 'totalEarnings' | 'totalClicks' | 'totalConversions';
   orderDirection?: 'ASC' | 'DESC';
 }
 

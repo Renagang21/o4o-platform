@@ -30,8 +30,8 @@ export class CreateUsersTable1700000000000 implements MigrationInterface {
                 "approvedBy" varchar(255),
                 "provider" varchar(100),
                 "provider_id" varchar(255),
-                "createdAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                "updatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")
             );
             

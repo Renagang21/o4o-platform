@@ -57,7 +57,7 @@ export class CommissionRepository {
       endDate,
       page = 1,
       limit = 20,
-      orderBy = 'createdAt',
+      orderBy = 'created_at',
       orderDirection = 'DESC'
     } = params;
 
@@ -74,14 +74,14 @@ export class CommissionRepository {
     }
 
     if (startDate && endDate) {
-      query.andWhere('commission.createdAt BETWEEN :startDate AND :endDate', {
+      query.andWhere('commission.created_at BETWEEN :startDate AND :endDate', {
         startDate,
         endDate
       });
     } else if (startDate) {
-      query.andWhere('commission.createdAt >= :startDate', { startDate });
+      query.andWhere('commission.created_at >= :startDate', { startDate });
     } else if (endDate) {
-      query.andWhere('commission.createdAt <= :endDate', { endDate });
+      query.andWhere('commission.created_at <= :endDate', { endDate });
     }
 
     query.orderBy(`commission.${orderBy}`, orderDirection);
@@ -118,7 +118,7 @@ export class CommissionRepository {
     }
 
     if (period) {
-      query.andWhere('commission.createdAt BETWEEN :start AND :end', period);
+      query.andWhere('commission.created_at BETWEEN :start AND :end', period);
     }
 
     const result = await query
@@ -204,22 +204,22 @@ export class CommissionRepository {
       const startOfMonth = new Date(parseInt(year), parseInt(monthNum) - 1, 1);
       const endOfMonth = new Date(parseInt(year), parseInt(monthNum), 0, 23, 59, 59);
       
-      query.andWhere('payout.createdAt BETWEEN :startOfMonth AND :endOfMonth', {
+      query.andWhere('payout.created_at BETWEEN :startOfMonth AND :endOfMonth', {
         startOfMonth,
         endOfMonth
       });
     } else if (startDate && endDate) {
-      query.andWhere('payout.createdAt BETWEEN :startDate AND :endDate', {
+      query.andWhere('payout.created_at BETWEEN :startDate AND :endDate', {
         startDate,
         endDate
       });
     } else if (startDate) {
-      query.andWhere('payout.createdAt >= :startDate', { startDate });
+      query.andWhere('payout.created_at >= :startDate', { startDate });
     } else if (endDate) {
-      query.andWhere('payout.createdAt <= :endDate', { endDate });
+      query.andWhere('payout.created_at <= :endDate', { endDate });
     }
 
-    query.orderBy('payout.createdAt', 'DESC');
+    query.orderBy('payout.created_at', 'DESC');
 
     const skip = (page - 1) * limit;
     query.skip(skip).take(limit);
@@ -243,7 +243,7 @@ export class CommissionRepository {
       search,
       page = 1,
       limit = 20,
-      orderBy = 'createdAt',
+      orderBy = 'created_at',
       orderDirection = 'DESC'
     } = params;
 
@@ -322,8 +322,8 @@ export class CommissionRepository {
     const payoutQuery = this.payoutRepo.createQueryBuilder('payout');
 
     if (period) {
-      commissionQuery.andWhere('commission.createdAt BETWEEN :start AND :end', period);
-      payoutQuery.andWhere('payout.createdAt BETWEEN :start AND :end', period);
+      commissionQuery.andWhere('commission.created_at BETWEEN :start AND :end', period);
+      payoutQuery.andWhere('payout.created_at BETWEEN :start AND :end', period);
     }
 
     const [
@@ -370,8 +370,8 @@ export class CommissionRepository {
 
     if (period) {
       query
-        .andWhere('conversion.createdAt BETWEEN :start AND :end OR conversion.id IS NULL', period)
-        .andWhere('click.createdAt BETWEEN :start AND :end OR click.id IS NULL', period);
+        .andWhere('conversion.created_at BETWEEN :start AND :end OR conversion.id IS NULL', period)
+        .andWhere('click.created_at BETWEEN :start AND :end OR click.id IS NULL', period);
     }
 
     return await query

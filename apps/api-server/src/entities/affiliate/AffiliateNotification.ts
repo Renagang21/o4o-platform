@@ -11,7 +11,7 @@ import { AffiliateUser } from './AffiliateUser';
 
 @Entity('affiliate_notifications')
 @Index(['affiliateUserId', 'read'])
-@Index(['createdAt'])
+@Index(['created_at'])
 @Index(['type'])
 export class AffiliateNotification {
   @PrimaryGeneratedColumn('uuid')

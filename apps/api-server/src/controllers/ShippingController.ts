@@ -275,7 +275,7 @@ export class ShippingController {
         .addSelect('AVG(shipment.shippingCost)', 'avgCost');
 
       if (startDate && endDate) {
-        query.where('shipment.createdAt BETWEEN :startDate AND :endDate', {
+        query.where('shipment.created_at BETWEEN :startDate AND :endDate', {
           startDate: new Date(startDate as string),
           endDate: new Date(endDate as string)
         });

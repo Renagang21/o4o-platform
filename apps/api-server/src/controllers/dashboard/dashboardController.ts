@@ -115,7 +115,7 @@ export class DashboardController {
         type: vendor.vendorType,
         status: vendor.status,
         rating: vendor.rating,
-        joinedAt: vendor.createdAt,
+        joinedAt: vendor.created_at,
         affiliateCode: vendor.affiliateCode,
         affiliateRate: vendor.affiliateRate,
         totalSales: vendor.totalSales,

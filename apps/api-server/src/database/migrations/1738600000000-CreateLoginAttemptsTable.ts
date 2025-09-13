@@ -53,7 +53,7 @@ export class CreateLoginAttemptsTable1738600000000 implements MigrationInterface
             isNullable: true
           },
           {
-            name: 'createdAt',
+            name: 'created_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -70,7 +70,7 @@ export class CreateLoginAttemptsTable1738600000000 implements MigrationInterface
 
     await queryRunner.query(`
       CREATE INDEX "IDX_login_attempts_created" 
-      ON "login_attempts" ("createdAt")
+      ON "login_attempts" ("created_at")
     `);
 
     // Add lockedUntil column to users table if not exists

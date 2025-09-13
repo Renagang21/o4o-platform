@@ -84,7 +84,7 @@ router.get('/',
 
       // Apply pagination
       queryBuilder.skip(parseInt(String(offset))).take(parseInt(String(limit)))
-      queryBuilder.orderBy('customization.updatedAt', 'DESC')
+      queryBuilder.orderBy('customization.updated_at', 'DESC')
 
       const users = await queryBuilder.getMany()
 
@@ -119,7 +119,7 @@ router.get('/',
               customizationId: customization.id,
               customization,
               status: requestStatus,
-              submittedAt: customization.createdAt,
+              submittedAt: customization.created_at,
               reviewedAt: customization.reviewedAt,
               reviewedBy: customization.reviewedBy,
               reviewNote: customization.reviewNote,
@@ -194,7 +194,7 @@ router.get('/:requestId',
         customizationId: customization.id,
         customization,
         status,
-        submittedAt: customization.createdAt,
+        submittedAt: customization.created_at,
         reviewedAt: customization.reviewedAt,
         reviewedBy: customization.reviewedBy,
         reviewNote: customization.reviewNote,
@@ -249,7 +249,7 @@ router.post('/:requestId/approve',
           "reviewedAt" = NOW(),
           "reviewedBy" = $1,
           "reviewNote" = $2,
-          "updatedAt" = NOW()
+          "updated_at" = NOW()
         WHERE id = $3
       `, [adminUserName, note || null, requestId])
 
@@ -310,7 +310,7 @@ router.post('/:requestId/reject',
           "reviewedAt" = NOW(),
           "reviewedBy" = $1,
           "reviewNote" = $2,
-          "updatedAt" = NOW()
+          "updated_at" = NOW()
         WHERE id = $3
       `, [adminUserName, note, requestId])
 
@@ -395,7 +395,7 @@ router.post('/request',
       
       await AppDataSource.query(`
         INSERT INTO theme_customizations 
-        (id, "userId", name, branding, colors, "businessInfo", navigation, "isActive", "isApproved", "createdAt", "updatedAt")
+        (id, "userId", name, branding, colors, "businessInfo", navigation, "isActive", "isApproved", "created_at", "updated_at")
         VALUES ($1, $2, $3, $4, $5, $6, $7, false, NULL, NOW(), NOW())
       `, [
         requestId,
@@ -450,14 +450,14 @@ router.get('/my-requests',
           navigation,
           "isActive",
           "isApproved",
-          "createdAt",
-          "updatedAt",
+          "created_at",
+          "updated_at",
           "reviewedAt",
           "reviewedBy",
           "reviewNote"
         FROM theme_customizations
         WHERE "userId" = $1
-        ORDER BY "updatedAt" DESC
+        ORDER BY "updated_at" DESC
       `, [userId])
 
       const requests = customizations.map((customization: any) => {
@@ -474,7 +474,7 @@ router.get('/my-requests',
           id: customization.id,
           name: customization.name,
           status,
-          submittedAt: customization.createdAt,
+          submittedAt: customization.created_at,
           reviewedAt: customization.reviewedAt,
           reviewedBy: customization.reviewedBy,
           reviewNote: customization.reviewNote,

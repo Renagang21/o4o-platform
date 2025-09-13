@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from 'typeorm';
 import { Post } from './Post';
 
-@Entity('post_tags')
-export class PostTag {
+@Entity('tags')
+export class Tag {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -15,31 +15,22 @@ export class PostTag {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', length: 7, nullable: true })
-  color?: string; // Hex color for tag display
 
   @Column({ default: 0 })
-  usageCount!: number; // Number of posts using this tag
+  count!: number; // Number of posts using this tag
 
-  @Column({ default: true })
-  isActive!: boolean;
-
-  // SEO metadata for tag pages
-  @Column({ nullable: true })
-  metaTitle?: string;
-
-  @Column({ type: 'text', nullable: true })
-  metaDescription?: string;
+  @Column({ type: 'json', nullable: true })
+  meta!: Record<string, any>;
 
   // Relations
   @ManyToMany(() => Post, post => post.tags)
   posts!: Post[];
 
   @CreateDateColumn()
-  createdAt!: Date;
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updated_at!: Date;
 
   // Helper method to generate slug from name
   generateSlug(): void {
@@ -52,11 +43,11 @@ export class PostTag {
 
   // Helper method to increment usage count
   incrementUsage(): void {
-    this.usageCount = (this.usageCount || 0) + 1;
+    this.count = (this.count || 0) + 1;
   }
 
   // Helper method to decrement usage count
   decrementUsage(): void {
-    this.usageCount = Math.max(0, (this.usageCount || 0) - 1);
+    this.count = Math.max(0, (this.count || 0) - 1);
   }
 }

@@ -38,8 +38,8 @@ export enum ComponentType {
 }
 
 @Entity('status_page_incidents')
-@Index(['status', 'impact', 'createdAt'])
-@Index(['createdAt'])
+@Index(['status', 'impact', 'created_at'])
+@Index(['created_at'])
 export class StatusPageIncident {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -103,7 +103,7 @@ export class StatusPageIncident {
 
   getDurationMinutes(): number {
     const endTime = this.resolvedAt || new Date();
-    return Math.floor((endTime.getTime() - this.createdAt.getTime()) / (1000 * 60));
+    return Math.floor((endTime.getTime() - this.created_at.getTime()) / (1000 * 60));
   }
 
   isActive(): boolean {
@@ -180,7 +180,7 @@ export class StatusPageComponent {
   // Instance methods
   updateStatus(status: ServiceStatus): void {
     this.status = status;
-    this.updatedAt = new Date();
+    this.updated_at = new Date();
   }
 
   isOperational(): boolean {

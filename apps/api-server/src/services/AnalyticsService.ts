@@ -269,13 +269,13 @@ export class AnalyticsService {
         .where('user.createdAt >= :startDate', { startDate })
         .getCount(),
       this.userSessionRepo.createQueryBuilder('session')
-        .where('session.createdAt >= :startDate', { startDate })
+        .where('session.created_at >= :startDate', { startDate })
         .getCount(),
       this.getAverageSessionDuration(startDate),
       this.getTotalPageViews(startDate),
       this.getTotalActions(startDate),
       this.betaFeedbackRepo.createQueryBuilder('feedback')
-        .where('feedback.createdAt >= :startDate', { startDate })
+        .where('feedback.created_at >= :startDate', { startDate })
         .getCount(),
       this.getTotalErrors(startDate),
       this.getAverageResponseTime(startDate),
@@ -326,7 +326,7 @@ export class AnalyticsService {
     const sessions = await this.userSessionRepo
       .createQueryBuilder('session')
       .leftJoinAndSelect('session.betaUser', 'betaUser')
-      .where('session.createdAt >= :startDate', { startDate })
+      .where('session.created_at >= :startDate', { startDate })
       .getMany();
 
     const engagementData = sessions.map((session: any) => ({
@@ -370,7 +370,7 @@ export class AnalyticsService {
       .createQueryBuilder('log')
       .leftJoinAndSelect('log.content', 'content')
       .leftJoinAndSelect('log.store', 'store')
-      .where('log.createdAt >= :startDate', { startDate })
+      .where('log.created_at >= :startDate', { startDate })
       .getMany();
 
     const contentUsage = contentLogs.reduce((acc, log) => {
@@ -436,7 +436,7 @@ export class AnalyticsService {
       report.feedbackMetrics = reportData.feedbackMetrics;
       report.businessMetrics = reportData.businessMetrics;
       
-      report.markAsCompleted(Date.now() - savedReport.createdAt.getTime());
+      report.markAsCompleted(Date.now() - savedReport.created_at.getTime());
       await this.analyticsReportRepo.save(report);
       
     } catch (error) {
@@ -620,7 +620,7 @@ export class AnalyticsService {
     const result = await this.userSessionRepo
       .createQueryBuilder('session')
       .select('AVG(session.durationMinutes)', 'avgDuration')
-      .where('session.createdAt >= :startDate', { startDate })
+      .where('session.created_at >= :startDate', { startDate })
       .getRawOne();
     
     return parseFloat(result.avgDuration) || 0;
@@ -630,7 +630,7 @@ export class AnalyticsService {
     const result = await this.userSessionRepo
       .createQueryBuilder('session')
       .select('SUM(session.pageViews)', 'totalPageViews')
-      .where('session.createdAt >= :startDate', { startDate })
+      .where('session.created_at >= :startDate', { startDate })
       .getRawOne();
     
     return parseInt(result.totalPageViews) || 0;
@@ -639,14 +639,14 @@ export class AnalyticsService {
   private async getTotalActions(startDate: Date): Promise<number> {
     return await this.userActionRepo
       .createQueryBuilder('action')
-      .where('action.createdAt >= :startDate', { startDate })
+      .where('action.created_at >= :startDate', { startDate })
       .getCount();
   }
 
   private async getTotalErrors(startDate: Date): Promise<number> {
     return await this.userActionRepo
       .createQueryBuilder('action')
-      .where('action.createdAt >= :startDate', { startDate })
+      .where('action.created_at >= :startDate', { startDate })
       .andWhere('action.isError = :isError', { isError: true })
       .getCount();
   }
@@ -655,7 +655,7 @@ export class AnalyticsService {
     const result = await this.systemMetricsRepo
       .createQueryBuilder('metric')
       .select('AVG(metric.value)', 'avgResponseTime')
-      .where('metric.createdAt >= :startDate', { startDate })
+      .where('metric.created_at >= :startDate', { startDate })
       .andWhere('metric.metricCategory = :category', { category: MetricCategory.RESPONSE_TIME })
       .getRawOne();
     
@@ -666,11 +666,11 @@ export class AnalyticsService {
     const [totalRequests, errorRequests] = await Promise.all([
       this.userActionRepo
         .createQueryBuilder('action')
-        .where('action.createdAt >= :startDate', { startDate })
+        .where('action.created_at >= :startDate', { startDate })
         .getCount(),
       this.userActionRepo
         .createQueryBuilder('action')
-        .where('action.createdAt >= :startDate', { startDate })
+        .where('action.created_at >= :startDate', { startDate })
         .andWhere('action.isError = :isError', { isError: true })
         .getCount()
     ]);
