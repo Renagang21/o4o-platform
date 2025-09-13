@@ -318,22 +318,9 @@ export class PostController {
         changeDescription: updates.changeDescription || 'Post updated'
       });
 
-      // Handle slug update (독립적으로 처리)
-      if (updates.slug !== undefined && updates.slug !== post.slug) {
-        // slug가 직접 수정된 경우
-        console.log(`[DEBUG] Original slug: ${post.slug}, New slug: ${updates.slug}`);
-        const slugResult = await slugService.updatePostSlug(id, updates.slug);
-        if (!slugResult.success) {
-          res.status(400).json({
-            success: false,
-            error: 'Invalid slug',
-            details: slugResult.errors
-          });
-          return;
-        }
-        // post 객체에 직접 할당하여 이후 Object.assign에서 덮어쓰이지 않도록 함
-        post.slug = slugResult.slug;
-        console.log(`[DEBUG] Processed slug: ${slugResult.slug}, post.slug: ${post.slug}`);
+      // Handle slug update
+      if (updates.slug && updates.slug !== post.slug) {
+        updates.slug = await slugService.ensureUniquePostSlug(updates.slug, id);
       }
 
       // Handle categories
@@ -353,15 +340,12 @@ export class PostController {
         updates.published_at = new Date();
       }
 
-      // Update post (slug 제외하고 업데이트)
-      const { slug: _, ...updatesWithoutSlug } = updates;
-      console.log(`[DEBUG] Before Object.assign - post.slug: ${post.slug}`);
+      // Update post
       Object.assign(post, {
-        ...updatesWithoutSlug,
+        ...updates,
         lastModifiedBy: userId,
         updatedAt: new Date()
       });
-      console.log(`[DEBUG] After Object.assign - post.slug: ${post.slug}`);
 
       const savedPost = await this.postRepository.save(post);
 

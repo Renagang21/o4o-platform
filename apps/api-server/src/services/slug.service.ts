@@ -203,28 +203,6 @@ export class SlugService {
     return suggestions.slice(0, count);
   }
 
-  /**
-   * Update slug and handle redirects
-   */
-  async updatePostSlug(postId: string, newSlug: string): Promise<{ success: boolean; slug: string; errors?: string[] }> {
-    try {
-      // Validate new slug
-      const validation = this.validateSlug(newSlug);
-      if (!validation.valid) {
-        return { success: false, slug: '', errors: validation.errors };
-      }
-
-      // Ensure uniqueness
-      const uniqueSlug = await this.ensureUniquePostSlug(newSlug, postId);
-
-      // Note: DB update는 PostController에서 처리하므로 여기서는 하지 않음
-      // TODO: Create redirect from old slug to new slug (Phase 2)
-      
-      return { success: true, slug: uniqueSlug };
-    } catch (error) {
-      return { success: false, slug: '', errors: [error.message] };
-    }
-  }
 
   /**
    * Update page slug and handle redirects
