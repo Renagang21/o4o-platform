@@ -205,10 +205,12 @@ export const errorHandler = (
 };
 
 // Async error catcher utility
-export const asyncHandler = <T extends Request = Request>(
-  fn: (req: T, res: Response, next: NextFunction) => Promise<void>
-) => (req: T, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+export const asyncHandler = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+): ((req: Request, res: Response, next: NextFunction) => void) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
 };
 
 // Handle unhandled promise rejections

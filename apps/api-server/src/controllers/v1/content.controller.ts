@@ -727,7 +727,6 @@ export class ContentController {
 
       const tagRepository = this.tagRepository;
       let query = tagRepository.createQueryBuilder('tag')
-        .where('tag.isActive = :isActive', { isActive: true })
         .orderBy('tag.name', 'ASC');
 
       if (search) {
@@ -745,7 +744,7 @@ export class ContentController {
         name: tag.name,
         slug: tag.slug,
         description: tag.description,
-        postCount: tag.usageCount || 0,
+        postCount: tag.count || 0,
         createdAt: tag.created_at,
         updatedAt: tag.updated_at
       }));
@@ -791,7 +790,7 @@ export class ContentController {
           name: tag.name,
           slug: tag.slug,
           description: tag.description,
-          postCount: tag.usageCount || 0,
+          postCount: tag.count || 0,
           createdAt: tag.created_at,
           updatedAt: tag.updated_at
         }
@@ -847,8 +846,7 @@ export class ContentController {
         name,
         slug: finalSlug,
         description,
-        isActive: true,
-        usageCount: 0
+        count: 0
       });
 
       const savedTag = await tagRepository.save(newTag);
@@ -909,7 +907,7 @@ export class ContentController {
           name: updatedTag.name,
           slug: updatedTag.slug,
           description: updatedTag.description,
-          postCount: updatedTag.usageCount || 0,
+          postCount: updatedTag.count || 0,
           createdAt: updatedTag.created_at,
           updatedAt: updatedTag.updated_at
         }

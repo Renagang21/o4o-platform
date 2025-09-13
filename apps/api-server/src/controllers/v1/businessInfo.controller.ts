@@ -74,8 +74,8 @@ export class BusinessInfoController {
           formattedAddress: businessInfo.getFormattedAddress(),
           isComplete: businessInfo.isComplete(),
           completionPercentage: businessInfo.getCompletionPercentage(),
-          createdAt: businessInfo.created_at,
-          updatedAt: businessInfo.updated_at
+          createdAt: businessInfo.createdAt,
+          updatedAt: businessInfo.updatedAt
         }
       });
     } catch (error) {
@@ -177,7 +177,7 @@ export class BusinessInfoController {
           businessName: savedBusinessInfo.businessName,
           completionPercentage: savedBusinessInfo.getCompletionPercentage(),
           isComplete: savedBusinessInfo.isComplete(),
-          createdAt: savedBusinessInfo.created_at
+          createdAt: savedBusinessInfo.createdAt
         },
         message: 'Business information created successfully'
       });
@@ -276,7 +276,7 @@ export class BusinessInfoController {
           completionPercentage: savedBusinessInfo.getCompletionPercentage(),
           isComplete: savedBusinessInfo.isComplete(),
           changedFields,
-          updatedAt: savedBusinessInfo.updated_at
+          updatedAt: savedBusinessInfo.updatedAt
         },
         message: 'Business information updated successfully'
       });

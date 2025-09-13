@@ -136,11 +136,12 @@ export const getPost = async (req: Request, res: Response) => {
 
     // Increment view count safely (using meta field)
     const currentViews = post.meta?.views || 0;
+    const updatedMeta = { 
+      ...post.meta, 
+      views: Number(currentViews) + 1 
+    };
     await postRepository.update(id, { 
-      meta: { 
-        ...post.meta, 
-        views: Number(currentViews) + 1 
-      } 
+      meta: updatedMeta as any
     });
 
     res.json({ data: post })
