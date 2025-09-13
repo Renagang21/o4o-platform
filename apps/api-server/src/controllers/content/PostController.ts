@@ -355,13 +355,11 @@ export class PostController {
 
       // Update post (slug 제외하고 업데이트)
       const { slug: _, ...updatesWithoutSlug } = updates;
-      console.log(`[DEBUG] Before Object.assign - post.slug: ${post.slug}`);
       Object.assign(post, {
         ...updatesWithoutSlug,
         lastModifiedBy: userId,
         updatedAt: new Date()
       });
-      console.log(`[DEBUG] After Object.assign - post.slug: ${post.slug}`);
 
       const savedPost = await this.postRepository.save(post);
 
