@@ -128,7 +128,6 @@ router.post('/', async (req: Request, res: Response) => {
       slug: slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       description,
       image,
-      meta,
       isActive: true
     })
 
@@ -181,7 +180,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     if (slug !== undefined) category.slug = slug
     if (description !== undefined) category.description = description
     if (image !== undefined) category.image = image
-    if (meta !== undefined) category.meta = meta
+    // meta field removed from Category entity
     if (isActive !== undefined) category.isActive = isActive
 
     // Update parent

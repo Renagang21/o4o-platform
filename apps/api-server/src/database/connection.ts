@@ -98,7 +98,7 @@ export const AppDataSource = new DataSource({
   
   // 엔티티 등록
   entities: NODE_ENV === 'production'
-    ? ['dist/entities/**/*.js']
+    ? [__dirname + '/../entities/**/*.js']
     : [
         User,
         RefreshToken,
