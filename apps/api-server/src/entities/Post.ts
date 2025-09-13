@@ -113,7 +113,7 @@ export class Post {
 
   @ManyToMany(() => Tag, tag => tag.posts, { nullable: true, cascade: true })
   @JoinTable({
-    name: 'post_tags',
+    name: 'post_tag_relationships',
     joinColumn: { name: 'postId', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' }
   })
