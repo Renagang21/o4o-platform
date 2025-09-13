@@ -42,6 +42,8 @@ jobs:
           if ! command -v pnpm &> /dev/null; then
             echo "📦 Installing pnpm..."
             npm install -g pnpm
+            # Add npm global bin to PATH for current session
+            export PATH="$PATH:$(npm config get prefix)/bin"
           fi
           
           # Install dependencies
