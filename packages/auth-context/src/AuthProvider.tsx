@@ -46,7 +46,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   
   const authClient = ssoClient || new AuthClient(
     typeof window !== 'undefined' ? 
-      (import.meta.env?.VITE_API_BASE_URL || 'https://api.neture.co.kr') : 
+      'https://api.neture.co.kr' : 
       'https://api.neture.co.kr'
   );
 
