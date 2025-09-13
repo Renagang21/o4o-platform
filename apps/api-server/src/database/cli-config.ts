@@ -46,8 +46,6 @@ import { Shipment } from '../entities/Shipment';
 import { ShipmentTrackingHistory } from '../entities/ShipmentTrackingHistory';
 import { SmtpSettings } from '../entities/SmtpSettings';
 import { EmailLog } from '../entities/EmailLog';
-import { Shortcode } from '../entities/Shortcode';
-import { ShortcodeExecution } from '../entities/ShortcodeExecution';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField';
 import { Supplier } from '../entities/dropshipping/Supplier';
 import { Seller } from '../entities/dropshipping/Seller';
@@ -137,8 +135,6 @@ const CLIDataSource = new DataSource({
     ShipmentTrackingHistory,
     SmtpSettings,
     EmailLog,
-    Shortcode,
-    ShortcodeExecution,
     FieldGroup,
     CustomField,
     CustomFieldValue,

@@ -497,7 +497,7 @@ app.use('/api/pages', pagesApiRoutes);
 app.use('/api/categories', categoriesApiRoutes);
 app.use('/api/tags', tagsApiRoutes);
 
-// ACF and Shortcode routes
+// ACF routes
 import acfRoutes from './routes/acf';
 app.use('/admin', acfRoutes);
 
