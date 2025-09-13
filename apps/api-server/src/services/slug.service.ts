@@ -217,9 +217,7 @@ export class SlugService {
       // Ensure uniqueness
       const uniqueSlug = await this.ensureUniquePostSlug(newSlug, postId);
 
-      // Update post
-      await this.postRepository.update(postId, { slug: uniqueSlug });
-
+      // Note: DB update는 PostController에서 처리하므로 여기서는 하지 않음
       // TODO: Create redirect from old slug to new slug (Phase 2)
       
       return { success: true, slug: uniqueSlug };
