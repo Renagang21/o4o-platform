@@ -353,7 +353,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     return hash.toString();
   };
   
-  const handleSave = useCallback(async (publish = false): Promise<string | undefined> => {
+  const handleSave = async (publish = false): Promise<string | undefined> => {
     // Prevent double-clicking and concurrent saves
     if (isSaving) {
       toast('Save already in progress', { icon: '⏳' });
@@ -567,13 +567,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setIsSaving(false);
       saveRequestRef.current = null;
     }
-  }, [currentPostId, mode, navigate, queryClient, postTitle]);  // Remove isSaving and isDirty to avoid circular deps
+  };
 
-  const handlePublish = useCallback(async () => {
+  const handlePublish = async () => {
     await handleSave(true);
-  }, [handleSave]);
+  };
 
-  const handlePreview = useCallback(async () => {
+  const handlePreview = async () => {
     let postIdToPreview = currentPostId;
     
     // Save draft first if needed
@@ -592,7 +592,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     if (postIdToPreview) {
       window.open(`/preview/posts/${postIdToPreview}`, '_blank');
     }
-  }, [currentPostId, isDirty, handleSave]);
+  };
 
   const handleBack = () => {
     if (isDirty) {
