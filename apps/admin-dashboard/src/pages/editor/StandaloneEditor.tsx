@@ -353,7 +353,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     return hash.toString();
   };
   
-  const handleSave = async (publish = false): Promise<string | undefined> => {
+  const handleSave = useCallback(async (publish = false): Promise<string | undefined> => {
     // Prevent double-clicking and concurrent saves
     if (isSaving) {
       toast('Save already in progress', { icon: '⏳' });
@@ -567,13 +567,13 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setIsSaving(false);
       saveRequestRef.current = null;
     }
-  };
+  }, [currentPostId, mode, navigate, queryClient, postTitle, isSaving, isDirty]);  // Add minimal dependencies
 
-  const handlePublish = async () => {
+  const handlePublish = useCallback(async () => {
     await handleSave(true);
-  };
+  }, [handleSave]);
 
-  const handlePreview = async () => {
+  const handlePreview = useCallback(async () => {
     let postIdToPreview = currentPostId;
     
     // Save draft first if needed
@@ -592,7 +592,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     if (postIdToPreview) {
       window.open(`/preview/posts/${postIdToPreview}`, '_blank');
     }
-  };
+  }, [currentPostId, isDirty, handleSave]);
 
   const handleBack = () => {
     if (isDirty) {
@@ -946,6 +946,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               documentTitle={postTitle || ''}
               initialBlocks={blocks}
               slug={postSettings.slug || ''}
+              postSettings={postSettings}
+              onPostSettingsChange={(settings) => {
+                setPostSettings(prev => ({ ...prev, ...settings }));
+                setIsDirty(true);
+              }}
               onTitleChange={(newTitle) => {
                 setPostTitle(newTitle);
                 setIsDirty(true);
@@ -967,8 +972,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   setIsDirty(true);
                 }
               }}
-              onSave={handleSave}
-              onPublish={handlePublish}
+              onSave={() => handleSave(false)}
+              onPublish={() => handleSave(true)}
             />
           </div>
         </div>
