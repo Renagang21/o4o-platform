@@ -222,7 +222,7 @@ const limiter = rateLimit({
 // More lenient rate limiting for public endpoints
 const publicLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15분
-  max: 300, // 최대 300 요청 (public endpoints need more)
+  max: 1000, // 최대 1000 요청 (increased for bulk operations)
   message: {
     error: 'Too many requests from this IP',
     code: 'RATE_LIMIT_EXCEEDED'
@@ -491,11 +491,11 @@ import pagesApiRoutes from './routes/api/pages';
 import categoriesApiRoutes from './routes/api/categories';
 import tagsApiRoutes from './routes/api/tags';
 
-// Canonical posts API
-app.use('/api/posts', postsApiRoutes);
-app.use('/api/pages', pagesApiRoutes);
-app.use('/api/categories', categoriesApiRoutes);
-app.use('/api/tags', tagsApiRoutes);
+// Canonical posts API - Apply publicLimiter for read operations
+app.use('/api/posts', publicLimiter, postsApiRoutes);
+app.use('/api/pages', publicLimiter, pagesApiRoutes);
+app.use('/api/categories', publicLimiter, categoriesApiRoutes);
+app.use('/api/tags', publicLimiter, tagsApiRoutes);
 
 // ACF routes
 import acfRoutes from './routes/acf';
