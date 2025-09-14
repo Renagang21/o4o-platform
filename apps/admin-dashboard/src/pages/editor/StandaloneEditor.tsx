@@ -158,7 +158,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   };
 
   // Simplified load post data function
-  const loadPostData = useCallback(async (id: string | number) => {
+  const loadPostData = async (id: string | number) => {
     const loadingToast = toast.loading(`Loading post...`);
     
     try {
@@ -278,7 +278,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setBlocks([]);
       setIsDirty(false);
     }
-  }, []);
+  };
 
   // Initialize editor and load data
   useEffect(() => {
