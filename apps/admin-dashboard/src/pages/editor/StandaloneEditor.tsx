@@ -567,7 +567,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       setIsSaving(false);
       saveRequestRef.current = null;
     }
-  }, [currentPostId, mode, navigate, queryClient, postTitle, isSaving, isDirty]);  // Add minimal dependencies
+  }, [currentPostId, mode, navigate, queryClient, postTitle]);  // Remove isSaving and isDirty to avoid circular deps
 
   const handlePublish = useCallback(async () => {
     await handleSave(true);
@@ -972,8 +972,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   setIsDirty(true);
                 }
               }}
-              onSave={() => handleSave(false)}
-              onPublish={() => handleSave(true)}
+              onSave={handleSave}
+              onPublish={handlePublish}
             />
           </div>
         </div>

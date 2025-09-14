@@ -97,7 +97,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     commonjsOptions: {
       transformMixedEsModules: true,
       // Ensure proper handling of CommonJS modules
-      strictRequires: true
+      strictRequires: true,
+      // Prevent circular dependency issues
+      ignoreDynamicRequires: true
     },
     // 소스맵 비활성화 옵션 (프로덕션)
     sourcemap: process.env.GENERATE_SOURCEMAP === 'false' ? false : true,
@@ -142,6 +144,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         inlineDynamicImports: false,
         // Fix exports not defined error
         format: 'es',
+        // Prevent hoisting to avoid initialization issues
+        hoistTransitiveImports: false,
         manualChunks: (id) => {
           // 공통 설정 먼저 적용
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
