@@ -84,18 +84,35 @@ const Posts = () => {
         // Transform API response to match our Post interface
         // API returns data.data array, not data.posts
         const postsArray = data.data || data.posts || [];
-        const transformedPosts = postsArray.map((post: any) => ({
-          id: post.id, // Use UUID from server
-          title: post.title || 'Untitled',
-          slug: post.slug || '',
-          author: post.author?.name || post.author?.email || 'Unknown',
-          categories: post.categories?.map((cat: any) => typeof cat === 'string' ? cat : cat.name) || [],
-          tags: post.tags?.map((tag: any) => typeof tag === 'string' ? tag : tag.name) || [],
-          comments: post.commentCount || 0,
-          date: post.publishedAt ? new Date(post.publishedAt).toISOString().split('T')[0] : new Date(post.createdAt).toISOString().split('T')[0],
-          status: post.status || 'draft',
-          views: post.views || 0
-        }));
+        const transformedPosts = postsArray.map((post: any) => {
+          // Safely handle date conversion
+          let date = new Date().toISOString().split('T')[0]; // Default to today
+          try {
+            if (post.publishedAt && post.publishedAt !== null) {
+              date = new Date(post.publishedAt).toISOString().split('T')[0];
+            } else if (post.createdAt && post.createdAt !== null) {
+              date = new Date(post.createdAt).toISOString().split('T')[0];
+            } else if (post.created_at && post.created_at !== null) {
+              date = new Date(post.created_at).toISOString().split('T')[0];
+            }
+          } catch (err) {
+            console.warn('Failed to parse date for post:', post.id, err);
+            // Keep default date
+          }
+          
+          return {
+            id: post.id, // Use UUID from server
+            title: post.title || 'Untitled',
+            slug: post.slug || '',
+            author: post.author?.name || post.author?.email || 'Unknown',
+            categories: post.categories?.map((cat: any) => typeof cat === 'string' ? cat : cat.name) || [],
+            tags: post.tags?.map((tag: any) => typeof tag === 'string' ? tag : tag.name) || [],
+            comments: post.commentCount || 0,
+            date: date,
+            status: post.status || 'draft',
+            views: post.views || 0
+          };
+        });
         
         setPosts(transformedPosts);
       } catch (err) {
