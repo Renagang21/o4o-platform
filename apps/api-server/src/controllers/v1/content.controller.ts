@@ -420,8 +420,24 @@ export class ContentController {
         });
       }
 
-      await this.postRepository.update(id, updateData);
-      const updatedPost = await this.postRepository.findOne({ where: { id } });
+      // Find the existing post first
+      const post = await this.postRepository.findOne({ 
+        where: { id },
+        relations: ['author', 'categories', 'tags']
+      });
+      
+      if (!post) {
+        return res.status(404).json({
+          message: 'Post not found',
+          error: 'POST_NOT_FOUND'
+        });
+      }
+
+      // Update all fields including JSON fields like content
+      Object.assign(post, updateData);
+      
+      // Use save() instead of update() to properly handle all fields
+      const updatedPost = await this.postRepository.save(post);
 
       return res.json({
         success: true,

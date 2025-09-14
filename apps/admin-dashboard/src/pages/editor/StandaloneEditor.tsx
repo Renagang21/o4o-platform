@@ -86,6 +86,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [isSaving, setIsSaving] = useState(false);
   const saveRequestRef = useRef<AbortController | null>(null);
   const lastSaveHashRef = useRef<string | null>(null);
+  
+  // Add refs to track latest state values (avoid stale closure issues)
+  const blocksRef = useRef<any[]>([]);
+  const postSettingsRef = useRef<any>({});
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isWordPressReady, setIsWordPressReady] = useState(false);
   const [showListView, setShowListView] = useState(false);
@@ -93,6 +97,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   // Component is now remounted on route changes, so complex state management is not needed
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    blocksRef.current = blocks;
+  }, [blocks]);
+  
+  useEffect(() => {
+    postSettingsRef.current = postSettings;
+  }, [postSettings]);
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -357,8 +370,8 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Client-side validation
     const trimmedTitle = postTitle?.trim() || '';
-    // Always get the latest slug from postSettings
-    const currentSettings = postSettings;  // Capture current value
+    // Always get the latest slug from refs to avoid stale closure
+    const currentSettings = postSettingsRef.current;  // Use ref for latest value
     let trimmedSlug = currentSettings.slug?.trim() || '';
     
     // For debugging in production
@@ -387,7 +400,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       }
     }
     
-    const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
+    // Use ref for latest blocks to avoid stale closure
+    const currentBlocks = blocksRef.current;
+    const hasContent = currentBlocks && currentBlocks.length > 0 && currentBlocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
       if (content?.text && typeof content.text === 'string') return content.text.trim().length > 0;
@@ -441,19 +456,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Don't use default title - let backend handle empty titles
       
       // Prepare base data for both create and update
+      // Use refs for latest state values
       const baseData: any = {
         title: trimmedTitle,  // Use validated trimmed title
-        content: blocks,  // Send blocks array directly - server will handle conversion
-        excerpt: postSettings.excerpt,
+        content: currentBlocks,  // Use ref for latest blocks
+        excerpt: currentSettings.excerpt,
         slug: trimmedSlug,  // Use the validated/trimmed slug
-        status: publish ? 'publish' : (postSettings.status || 'draft'),
-        categories: postSettings.categories,
-        tags: postSettings.tags,
+        status: publish ? 'publish' : (currentSettings.status || 'draft'),
+        categories: currentSettings.categories,
+        tags: currentSettings.tags,
         featured: false,
-        sticky: postSettings.sticky,
-        featuredImage: postSettings.featuredImage,
-        format: postSettings.format,
-        allowComments: postSettings.commentStatus
+        sticky: currentSettings.sticky,
+        featuredImage: currentSettings.featuredImage,
+        format: currentSettings.format,
+        allowComments: currentSettings.commentStatus
       };
       
       // DEBUG: Log API request data
