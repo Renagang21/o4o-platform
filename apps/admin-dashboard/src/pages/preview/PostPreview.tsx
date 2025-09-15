@@ -34,18 +34,40 @@ const PostPreview: React.FC = () => {
           const response = await postApi.get(id);
           const post = response.data;
           
+          // Debug logging for API response
+          if (import.meta.env.DEV) {
+            console.log('[PostPreview] API Response:', response);
+            console.log('[PostPreview] Post data:', post);
+            console.log('[PostPreview] Post content:', post.content);
+            console.log('[PostPreview] Content type:', typeof post.content);
+          }
+          
           // Parse content string back to blocks array
           let blocks: Block[] = [];
           if (post.content) {
             try {
               blocks = JSON.parse(post.content);
+              
+              if (import.meta.env.DEV) {
+                console.log('[PostPreview] Parsed blocks:', blocks);
+                console.log('[PostPreview] Blocks type:', typeof blocks);
+                console.log('[PostPreview] Is array?', Array.isArray(blocks));
+              }
+              
               // Handle case where content is wrapped in { blocks: [...] } structure
               if (blocks && typeof blocks === 'object' && 'blocks' in blocks) {
                 blocks = (blocks as any).blocks;
+                if (import.meta.env.DEV) {
+                  console.log('[PostPreview] Extracted nested blocks:', blocks);
+                }
               }
             } catch (error) {
               console.error('Failed to parse post content:', error);
               blocks = [];
+            }
+          } else {
+            if (import.meta.env.DEV) {
+              console.log('[PostPreview] No content field in post data');
             }
           }
           
