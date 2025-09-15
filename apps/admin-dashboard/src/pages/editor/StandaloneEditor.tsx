@@ -142,7 +142,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     
     // Validate essential fields
     if (!data.id) {
-      console.error('Invalid post data: missing id', data);
+      // Invalid post data: missing id
       return null;
     }
     
@@ -275,7 +275,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     } catch (error: any) {
       // Log error in development only
       if (import.meta.env.DEV) {
-        console.error('[StandaloneEditor] Load error:', error);
+        // Load error occurred
       }
       toast.dismiss(loadingToast);
       toast.error(error.message || 'Failed to load post');
@@ -311,7 +311,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         
       } catch (error) {
         if (import.meta.env.DEV) {
-          console.error('[StandaloneEditor] Init error:', error);
+          // Init error occurred
         }
         toast.error('Failed to initialize editor');
         setIsWordPressReady(true); // Still show editor even if init fails
@@ -543,8 +543,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       const errorMessage = error?.response?.data?.error?.message;
       
       if (import.meta.env.DEV) {
-        console.error('[Save Error]', error);
-        console.error('[Error Response]', error?.response);
+        // Save error occurred
       }
       
       const errorCode = error.response?.data?.error || error.response?.data?.error?.code;
@@ -1030,7 +1029,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                     };
                     (window as any).__DEBUG_VALIDATE_SLUG = () => {
                       const trimmed = postSettings.slug?.trim() || '';
-                      // console.log removed for CI/CD
                       return !!trimmed;
                     };
                   }

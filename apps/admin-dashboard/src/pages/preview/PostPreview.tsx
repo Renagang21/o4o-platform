@@ -15,8 +15,6 @@ interface PreviewContent {
   blocks: Block[];
   postId?: string;
   status?: string;
-  rawContent?: string; // For debugging
-  parseError?: string; // For debugging
 }
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
@@ -32,28 +30,21 @@ const PostPreview: React.FC = () => {
     const loadContent = async () => {
       try {
         if (id) {
-          // Parse content string back to blocks array
-          let blocks: Block[] = [];
-          let parseError: string | null = null;
-          
           // Load content from API using URL parameter
           const response = await postApi.get(id);
           
           // Check if response is successful
           if (!response.success) {
-            parseError = `API Error: ${response.error}`;
-            blocks = [];
-            const previewContent: PreviewContent = {
+            setContent({
               title: 'Error Loading Post',
               blocks: [],
-              postId: id,
-              parseError: parseError
-            };
-            setContent(previewContent);
+              postId: id
+            });
             return;
           }
           
           const post = response.data.data;
+          let blocks: Block[] = [];
           
           if (post.content) {
             try {
@@ -61,40 +52,27 @@ const PostPreview: React.FC = () => {
               
               // Handle different possible formats
               if (Array.isArray(parsed)) {
-                // Direct array of blocks
                 blocks = parsed;
               } else if (parsed && typeof parsed === 'object' && 'blocks' in parsed) {
-                // Wrapped in { blocks: [...] } structure
                 blocks = parsed.blocks || [];
               } else if (parsed && typeof parsed === 'object') {
-                // Single block object, wrap in array
                 blocks = [parsed];
-              } else {
-                parseError = 'Parsed content is not an array or object with blocks';
-                blocks = [];
               }
               
               // Ensure all blocks have required properties
               blocks = blocks.filter(block => block && typeof block === 'object' && block.type);
               
             } catch (error) {
-              parseError = `JSON parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
               blocks = [];
             }
-          } else {
-            parseError = 'No content field in post data';
           }
           
-          const previewContent: PreviewContent = {
+          setContent({
             title: post.title || 'Untitled Post',
             blocks: blocks,
             postId: post.id,
-            status: post.status,
-            rawContent: post.content, // Store raw content for debugging
-            parseError: parseError // Store parse error for debugging
-          };
-          
-          setContent(previewContent);
+            status: post.status
+          });
         } else {
           // Fallback to sessionStorage for editor preview
           const storedContent = sessionStorage.getItem('previewContent');
@@ -103,14 +81,12 @@ const PostPreview: React.FC = () => {
               const parsed = JSON.parse(storedContent);
               setContent(parsed);
             } catch (error) {
-              if (import.meta.env.DEV) {
-                console.error('Failed to parse preview content', error);
-              }
+              // Silent failure for preview content parsing
             }
           }
         }
       } catch (error) {
-        console.error('Failed to load post for preview:', error);
+        // Silent failure for post loading
       } finally {
         setIsLoading(false);
       }
@@ -412,19 +388,6 @@ const PostPreview: React.FC = () => {
             {content.blocks.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">No content blocks to display</p>
-                {/* Debug: Show raw content data - TEMPORARILY ALWAYS VISIBLE */}
-                <div className="mt-4 p-4 bg-gray-100 text-left text-xs">
-                    <p><strong>Debug Info:</strong></p>
-                    <p>Post ID: {content.postId}</p>
-                    <p>Blocks length: {content.blocks?.length || 0}</p>
-                    <p>Blocks type: {typeof content.blocks}</p>
-                    <p>Is array: {Array.isArray(content.blocks) ? 'Yes' : 'No'}</p>
-                    <p>Raw content: {content.rawContent ? content.rawContent.substring(0, 200) + '...' : 'null/undefined'}</p>
-                    <p>Raw content type: {typeof content.rawContent}</p>
-                    {content.parseError && (
-                      <p className="text-red-600"><strong>Parse Error:</strong> {content.parseError}</p>
-                    )}
-                  </div>
               </div>
             )}
           </article>
