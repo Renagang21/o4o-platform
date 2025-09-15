@@ -53,7 +53,7 @@ const PostPreview: React.FC = () => {
             return;
           }
           
-          const post = response.data;
+          const post = response.data.data;
           
           if (post.content) {
             try {
