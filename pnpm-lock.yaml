@@ -360,9 +360,6 @@ importers:
       '@wordpress/element':
         specifier: 6.9.0
         version: 6.9.0
-      '@wordpress/i18n':
-        specifier: 5.9.0
-        version: 5.9.0
       axios:
         specifier: ^1.10.0
         version: 1.12.1

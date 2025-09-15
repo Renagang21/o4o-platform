@@ -66,6 +66,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
       {/* WordPress Admin Bar */}
       <AdminBar onLogout={handleLogout} />
       
+      
       {/* Sidebar - CSS handles all styling, no inline styles needed */}
       <div 
         className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${!isMobile ? 'desktop-mode' : ''}`}
