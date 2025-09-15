@@ -30,10 +30,15 @@ const PostPreview: React.FC = () => {
 
   useEffect(() => {
     const loadContent = async () => {
+      // Temporary debug log
+      window.console.log('[PostPreview] useEffect triggered, id:', id);
+      
       try {
         if (id) {
           // Load content from API using URL parameter
+          window.console.log('[PostPreview] Calling postApi.get with id:', id);
           const response = await postApi.get(id);
+          window.console.log('[PostPreview] Response received:', response);
           const post = response.data;
           
           // Parse content string back to blocks array
@@ -95,8 +100,9 @@ const PostPreview: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('Failed to load post for preview:', error);
+        window.console.error('[PostPreview] Failed to load post for preview:', error);
       } finally {
+        window.console.log('[PostPreview] Loading complete, setting isLoading to false');
         setIsLoading(false);
       }
     };
@@ -397,8 +403,8 @@ const PostPreview: React.FC = () => {
             {content.blocks.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">No content blocks to display</p>
-                {/* Debug: Show raw content data */}
-                {import.meta.env.DEV && (
+                {/* Debug: Show raw content data - ALWAYS VISIBLE FOR DEBUGGING */}
+                {(
                   <div className="mt-4 p-4 bg-gray-100 text-left text-xs">
                     <p><strong>Debug Info:</strong></p>
                     <p>Post ID: {content.postId}</p>
