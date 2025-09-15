@@ -292,12 +292,9 @@ export const postApi = {
   // 게시글 조회 (/api/posts)
   get: async (id: string): Promise<PostResponse> => {
     try {
-      window.console.log('[postApi.get] Calling API with id:', id);
       const response = await apiClient.get(`/posts/${id}`);
-      window.console.log('[postApi.get] API response:', response);
       return { success: true, data: response.data };
     } catch (error: any) {
-      window.console.error('[postApi.get] API error:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Failed to get post' 

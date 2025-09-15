@@ -30,9 +30,6 @@ const PostPreview: React.FC = () => {
 
   useEffect(() => {
     const loadContent = async () => {
-      // Temporary debug log
-      window.console.log('[PostPreview] useEffect triggered, id:', id);
-      
       try {
         if (id) {
           // Parse content string back to blocks array
@@ -40,13 +37,10 @@ const PostPreview: React.FC = () => {
           let parseError: string | null = null;
           
           // Load content from API using URL parameter
-          window.console.log('[PostPreview] Calling postApi.get with id:', id);
           const response = await postApi.get(id);
-          window.console.log('[PostPreview] Response received:', response);
           
           // Check if response is successful
           if (!response.success) {
-            window.console.error('[PostPreview] API call failed:', response.error);
             parseError = `API Error: ${response.error}`;
             blocks = [];
             const previewContent: PreviewContent = {
@@ -116,9 +110,8 @@ const PostPreview: React.FC = () => {
           }
         }
       } catch (error) {
-        window.console.error('[PostPreview] Failed to load post for preview:', error);
+        console.error('Failed to load post for preview:', error);
       } finally {
-        window.console.log('[PostPreview] Loading complete, setting isLoading to false');
         setIsLoading(false);
       }
     };

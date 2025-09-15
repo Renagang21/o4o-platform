@@ -134,14 +134,6 @@ export const getPost = async (req: Request, res: Response) => {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } })
     }
     
-    // Temporary debug log
-    console.log('[DEBUG] Post retrieved:', {
-      id: post.id,
-      title: post.title,
-      contentLength: post.content?.length,
-      contentFirst100: post.content?.substring(0, 100),
-      hasContent: !!post.content
-    })
 
     // Increment view count safely (using meta field)
     const currentViews = post.meta?.views || 0;
