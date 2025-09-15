@@ -4,9 +4,10 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Block } from '@/types/post.types';
 import { ArrowLeft, ExternalLink, Eye, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { postApi } from '@/services/api/postApi';
 import './preview-styles.css';
 
 interface PreviewContent {
@@ -23,22 +24,62 @@ const PostPreview: React.FC = () => {
   const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
-    // Retrieve content from sessionStorage
-    const storedContent = sessionStorage.getItem('previewContent');
-    if (storedContent) {
+    const loadContent = async () => {
       try {
-        const parsed = JSON.parse(storedContent);
-        setContent(parsed);
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error('Failed to parse preview content', error);
+        if (id) {
+          // Load content from API using URL parameter
+          const response = await postApi.getById(id);
+          const post = response.data;
+          
+          // Parse content string back to blocks array
+          let blocks: Block[] = [];
+          if (post.content) {
+            try {
+              blocks = JSON.parse(post.content);
+              // Handle case where content is wrapped in { blocks: [...] } structure
+              if (blocks && typeof blocks === 'object' && 'blocks' in blocks) {
+                blocks = (blocks as any).blocks;
+              }
+            } catch (error) {
+              console.error('Failed to parse post content:', error);
+              blocks = [];
+            }
+          }
+          
+          const previewContent: PreviewContent = {
+            title: post.title || 'Untitled Post',
+            blocks: blocks,
+            postId: post.id,
+            status: post.status
+          };
+          
+          setContent(previewContent);
+        } else {
+          // Fallback to sessionStorage for editor preview
+          const storedContent = sessionStorage.getItem('previewContent');
+          if (storedContent) {
+            try {
+              const parsed = JSON.parse(storedContent);
+              setContent(parsed);
+            } catch (error) {
+              if (import.meta.env.DEV) {
+                console.error('Failed to parse preview content', error);
+              }
+            }
+          }
         }
+      } catch (error) {
+        console.error('Failed to load post for preview:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
-  }, []);
+    };
+
+    loadContent();
+  }, [id]);
 
   const renderBlock = (block: Block) => {
     const { type, content, attributes } = block;

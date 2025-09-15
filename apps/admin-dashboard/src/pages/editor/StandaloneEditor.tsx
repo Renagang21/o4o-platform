@@ -467,7 +467,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Use refs for latest state values
       const baseData: any = {
         title: trimmedTitle,  // Use validated trimmed title
-        content: currentBlocks,  // Use ref for latest blocks
+        content: JSON.stringify(currentBlocks),  // Serialize blocks array to string
         excerpt: currentSettings.excerpt,
         slug: trimmedSlug,  // Use the validated/trimmed slug
         status: publish ? 'publish' : (currentSettings.status || 'draft'),
