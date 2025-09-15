@@ -31,7 +31,7 @@ const PostPreview: React.FC = () => {
       try {
         if (id) {
           // Load content from API using URL parameter
-          const response = await postApi.getById(id);
+          const response = await postApi.get(id);
           const post = response.data;
           
           // Parse content string back to blocks array
