@@ -144,8 +144,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         inlineDynamicImports: false,
         // Fix exports not defined error
         format: 'es',
-        // Prevent hoisting to avoid initialization issues
-        hoistTransitiveImports: false,
+        // Allow hoisting for better module initialization
+        hoistTransitiveImports: true,
         manualChunks: (id) => {
           // 공통 설정 먼저 적용
           const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);

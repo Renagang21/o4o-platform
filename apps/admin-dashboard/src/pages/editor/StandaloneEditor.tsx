@@ -95,8 +95,6 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   
   // Add refs to track latest state values for save operations
   const blocksRef = useRef<any[]>([]);
-  const postSettingsRef = useRef(postSettings);
-  // Component is now remounted on route changes, so complex state management is not needed
   
   // Post settings
   const [postSettings, setPostSettings] = useState({
@@ -116,6 +114,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     sticky: false,
     format: 'standard' as 'standard' | 'aside' | 'chat' | 'gallery' | 'link' | 'image' | 'quote' | 'status' | 'video' | 'audio'
   });
+  
+  // Initialize ref with postSettings after it's defined
+  const postSettingsRef = useRef(postSettings);
 
   // Helper function to normalize API response
   const normalizePostResponse = (response: any): Post | null => {
