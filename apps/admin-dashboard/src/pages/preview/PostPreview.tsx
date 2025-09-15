@@ -35,15 +35,31 @@ const PostPreview: React.FC = () => {
       
       try {
         if (id) {
+          // Parse content string back to blocks array
+          let blocks: Block[] = [];
+          let parseError: string | null = null;
+          
           // Load content from API using URL parameter
           window.console.log('[PostPreview] Calling postApi.get with id:', id);
           const response = await postApi.get(id);
           window.console.log('[PostPreview] Response received:', response);
-          const post = response.data;
           
-          // Parse content string back to blocks array
-          let blocks: Block[] = [];
-          let parseError: string | null = null;
+          // Check if response is successful
+          if (!response.success) {
+            window.console.error('[PostPreview] API call failed:', response.error);
+            parseError = `API Error: ${response.error}`;
+            blocks = [];
+            const previewContent: PreviewContent = {
+              title: 'Error Loading Post',
+              blocks: [],
+              postId: id,
+              parseError: parseError
+            };
+            setContent(previewContent);
+            return;
+          }
+          
+          const post = response.data;
           
           if (post.content) {
             try {
@@ -403,9 +419,8 @@ const PostPreview: React.FC = () => {
             {content.blocks.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500">No content blocks to display</p>
-                {/* Debug: Show raw content data - ALWAYS VISIBLE FOR DEBUGGING */}
-                {(
-                  <div className="mt-4 p-4 bg-gray-100 text-left text-xs">
+                {/* Debug: Show raw content data - TEMPORARILY ALWAYS VISIBLE */}
+                <div className="mt-4 p-4 bg-gray-100 text-left text-xs">
                     <p><strong>Debug Info:</strong></p>
                     <p>Post ID: {content.postId}</p>
                     <p>Blocks length: {content.blocks?.length || 0}</p>
@@ -417,7 +432,6 @@ const PostPreview: React.FC = () => {
                       <p className="text-red-600"><strong>Parse Error:</strong> {content.parseError}</p>
                     )}
                   </div>
-                )}
               </div>
             )}
           </article>
