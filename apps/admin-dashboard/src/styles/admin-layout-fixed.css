@@ -106,12 +106,12 @@
   /* Sidebar hidden by default - positioned outside viewport */
   div.admin-sidebar {
     position: fixed !important;
-    left: -280px !important; /* Hidden off-screen to the left */
+    left: 0 !important; /* Keep at left edge */
     top: 0 !important;
     width: 280px !important;
     height: 100vh !important;
-    transform: none !important; /* Remove transform to avoid conflicts */
-    transition: left 0.3s ease-in-out !important;
+    transform: translateX(-100%) !important; /* Hidden off-screen using transform */
+    transition: transform 0.3s ease-in-out !important; /* Animate transform instead of left */
     z-index: 10000 !important; /* Above everything on mobile */
     box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
     background-color: #23282d !important; /* Ensure background is visible */
@@ -119,7 +119,7 @@
   
   /* Sidebar visible when open - slide into view */
   div.admin-sidebar.open {
-    left: 0 !important; /* Slide into viewport */
+    transform: translateX(0) !important; /* Slide into viewport using transform */
   }
   
   /* Full width content on mobile */
