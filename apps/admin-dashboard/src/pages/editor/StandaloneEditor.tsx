@@ -92,6 +92,10 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
   const [isDirty, setIsDirty] = useState(false);
   const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Add refs to track latest state values for save operations
+  const blocksRef = useRef<any[]>([]);
+  const postSettingsRef = useRef(postSettings);
   // Component is now remounted on route changes, so complex state management is not needed
   
   // Post settings
@@ -212,6 +216,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       }
       
       setBlocks(parsedBlocks);
+      blocksRef.current = parsedBlocks; // Update ref
       
       // Set post settings - ensure slug is preserved
       setPostSettings(prev => {
@@ -246,6 +251,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         
         return newSettings;
       });
+      
+      // Update postSettings ref
+      postSettingsRef.current = {
+        ...postSettingsRef.current,
+        slug: data.slug || '',
+        status: data.status || 'draft',
+        excerpt: data.excerpt || '',
+        categories: data.categories || [],
+        tags: data.tags || [],
+        sticky: data.sticky || false,
+        featuredImage: data.featuredImage,
+        format: data.format || 'standard',
+        commentStatus: data.commentStatus !== false
+      };
       
       setIsDirty(false);
       setIsPostDataLoaded(true);  // Mark data as loaded
@@ -282,6 +301,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
           // Reset states for new post
           setPostTitle('');
           setBlocks([]);
+          blocksRef.current = []; // Reset ref
           setIsDirty(false);
           setIsPostDataLoaded(true);  // New post is "loaded" immediately
         }
@@ -356,13 +376,17 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
     }
     
     // Client-side validation
+    // Use refs to get latest values and avoid stale closure
+    const currentBlocks = blocksRef.current;
+    const currentSettings = postSettingsRef.current;
+    
     const trimmedTitle = postTitle?.trim() || '';
-    let trimmedSlug = postSettings.slug?.trim() || '';
+    let trimmedSlug = currentSettings.slug?.trim() || '';
     
     // For debugging in production
     if (typeof window !== 'undefined') {
       (window as any).__DEBUG_SAVE_SLUG = {
-        original: postSettings.slug,
+        original: currentSettings.slug,
         trimmed: trimmedSlug,
         postId: currentPostId,
         title: trimmedTitle
@@ -385,7 +409,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       }
     }
     
-    const hasContent = blocks && blocks.length > 0 && blocks.some(block => {
+    const hasContent = currentBlocks && currentBlocks.length > 0 && currentBlocks.some(block => {
       const content = block.content;
       if (typeof content === 'string') return content.trim().length > 0;
       if (content?.text && typeof content.text === 'string') return content.text.trim().length > 0;
@@ -439,19 +463,20 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Don't use default title - let backend handle empty titles
       
       // Prepare base data for both create and update
+      // Use refs for latest state values
       const baseData: any = {
         title: trimmedTitle,  // Use validated trimmed title
-        content: blocks,
-        excerpt: postSettings.excerpt,
+        content: currentBlocks,  // Use ref for latest blocks
+        excerpt: currentSettings.excerpt,
         slug: trimmedSlug,  // Use the validated/trimmed slug
-        status: publish ? 'publish' : (postSettings.status || 'draft'),
-        categories: postSettings.categories,
-        tags: postSettings.tags,
+        status: publish ? 'publish' : (currentSettings.status || 'draft'),
+        categories: currentSettings.categories,
+        tags: currentSettings.tags,
         featured: false,
-        sticky: postSettings.sticky,
-        featuredImage: postSettings.featuredImage,
-        format: postSettings.format,
-        allowComments: postSettings.commentStatus
+        sticky: currentSettings.sticky,
+        featuredImage: currentSettings.featuredImage,
+        format: currentSettings.format,
+        allowComments: currentSettings.commentStatus
       };
       
       // DEBUG: Log API request data
@@ -495,6 +520,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Only update slug if it's different from what we sent (server might have modified it)
       if (savedData?.slug && savedData.slug !== trimmedSlug) {
         setPostSettings(prev => ({ ...prev, slug: savedData.slug }));
+        postSettingsRef.current = { ...postSettingsRef.current, slug: savedData.slug };
       }
       
       setLastSaved(new Date());
@@ -588,12 +614,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
 
   const handleSelectTemplate = (template: any) => {
     setBlocks(template.blocks);
+    blocksRef.current = template.blocks; // Update ref
     setShowTemplates(false);
     setIsDirty(true);
   };
 
   const handleSelectPattern = (pattern: any) => {
-    setBlocks(prev => [...prev, ...pattern.blocks]);
+    const newBlocks = [...blocksRef.current, ...pattern.blocks];
+    setBlocks(newBlocks);
+    blocksRef.current = newBlocks; // Update ref
     setShowTemplates(false);
     setIsDirty(true);
   };
@@ -931,6 +960,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               postSettings={postSettings}
               onPostSettingsChange={(settings) => {
                 setPostSettings(prev => ({ ...prev, ...settings }));
+                postSettingsRef.current = { ...postSettingsRef.current, ...settings }; // Update ref
                 setIsDirty(true);
               }}
               onTitleChange={(newTitle) => {
@@ -939,6 +969,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               }}
               onChange={(newBlocks) => {
                 setBlocks(newBlocks);
+                blocksRef.current = newBlocks; // Update ref
                 // Only mark as dirty if we have actual content changes, not just initialization
                 // Check if this is not just an empty paragraph block (default initialization)
                 const hasRealContent = newBlocks.some(block => {
@@ -1024,6 +1055,9 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
                   // DEBUG: Log state update
                   // Logging removed for CI/CD
                   
+                  // Update ref
+                  postSettingsRef.current = newSettings;
+                  
                   return newSettings;
                 });
                 setIsDirty(true);
@@ -1031,9 +1065,11 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
               onBlockSettingsChange={(settings: any) => {
                 if (selectedBlock) {
                   const updated = { ...selectedBlock, ...settings };
-                  setBlocks(blocks.map(block => 
+                  const newBlocks = blocks.map(block => 
                     block.id === selectedBlock.id ? updated : block
-                  ));
+                  );
+                  setBlocks(newBlocks);
+                  blocksRef.current = newBlocks; // Update ref
                   setSelectedBlock(updated);
                   setIsDirty(true);
                 }
