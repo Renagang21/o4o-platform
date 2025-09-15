@@ -1,6 +1,6 @@
 /**
- * Admin Layout Styles - Fixed Version
- * Resolves layout overlap and content visibility issues
+ * Admin Layout Styles - Simplified Version
+ * Clean, single-method approach for sidebar animation
  */
 
 /* Reset and Base */
@@ -23,56 +23,71 @@
   top: 0;
   left: 0;
   right: 0;
-  min-height: 46px; /* Increased height for better visibility */
+  min-height: 46px;
   height: 46px;
   background-color: #23282d;
-  z-index: 99999; /* Highest z-index */
+  z-index: 99999;
   display: flex;
   align-items: center;
-  padding: 0 20px; /* Added padding for content */
+  padding: 0 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-/* Sidebar - Fixed positioning and colors */
+/* Sidebar - Base styles */
 .admin-sidebar {
   position: fixed;
-  top: 46px; /* Below admin bar - updated height */
+  top: 46px;
   left: 0;
   bottom: 0;
   width: 240px;
   background-color: #23282d;
-  background: var(--sidebar-bg);
-  color: var(--sidebar-text);
-  z-index: 9998; /* Below admin bar */
+  color: #eee;
+  z-index: 9998;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-/* Desktop mode - sidebar always visible */
+/* Desktop (>= 1024px) - Sidebar always visible */
 @media (min-width: 1024px) {
   .admin-sidebar {
-    left: 0 !important; /* Always visible on desktop */
-    transition: none !important; /* No animation on desktop */
+    transform: translateX(0);
+    transition: none;
+  }
+  
+  .wordpress-admin-content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
   }
 }
 
-/* Main Content Area - Properly offset */
+/* Mobile (< 1024px) - Sidebar with slide animation */
+@media (max-width: 1023px) {
+  .admin-sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 10000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .wordpress-admin-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Main Content Area */
 .wordpress-admin-content {
   position: relative;
-  margin-left: 0;
-  margin-top: 46px; /* Offset by admin bar height - updated */
-  padding-top: 0; /* Remove any additional top padding */
+  margin-top: 46px;
   min-height: calc(100vh - 46px);
   width: 100%;
   background-color: #f1f1f1;
   transition: margin-left 0.3s ease, width 0.3s ease;
-  overflow: visible; /* Ensure content is not clipped */
-}
-
-/* Desktop mode - content offset for sidebar */
-.wordpress-admin-content.with-sidebar {
-  margin-left: 240px;
-  width: calc(100% - 240px);
 }
 
 /* Main content padding */
@@ -80,55 +95,11 @@
   padding: 20px;
   max-width: 100%;
   position: relative;
-  z-index: 1; /* Ensure content is above background */
-}
-
-/* Ensure content is visible */
-.wordpress-admin-content > * {
-  position: relative;
   z-index: 1;
 }
 
-/* Desktop (>= 1024px) */
-@media (min-width: 1024px) {
-  .admin-sidebar {
-    transform: translateX(0) !important;
-  }
-  
-  .wordpress-admin-content {
-    margin-left: 240px !important;
-    width: calc(100% - 240px) !important;
-  }
-}
-
-/* Tablet and Mobile (< 1024px) */
+/* Mobile backdrop */
 @media (max-width: 1023px) {
-  /* Sidebar hidden by default - positioned outside viewport */
-  div.admin-sidebar {
-    position: fixed !important;
-    left: 0 !important; /* Keep at left edge */
-    top: 0 !important;
-    width: 280px !important;
-    height: 100vh !important;
-    transform: translateX(-100%) !important; /* Hidden off-screen using transform */
-    transition: transform 0.3s ease-in-out !important; /* Animate transform instead of left */
-    z-index: 10000 !important; /* Above everything on mobile */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
-    background-color: #23282d !important; /* Ensure background is visible */
-  }
-  
-  /* Sidebar visible when open - slide into view */
-  div.admin-sidebar.open {
-    transform: translateX(0) !important; /* Slide into viewport using transform */
-  }
-  
-  /* Full width content on mobile */
-  .wordpress-admin-content {
-    margin-left: 0 !important;
-    width: 100% !important;
-  }
-  
-  /* Mobile backdrop */
   .admin-sidebar-backdrop {
     display: none;
     position: fixed;
@@ -137,35 +108,12 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999; /* Below sidebar (10000) but above content */
+    z-index: 9999;
     transition: opacity 0.3s ease-in-out;
   }
   
   .admin-sidebar-backdrop.show {
     display: block;
-  }
-  
-  /* Mobile menu toggle button - removed, using AdminHeader button instead */
-}
-
-/* Small Mobile (< 600px) */
-@media (max-width: 599px) {
-  /* Admin bar already 46px, no change needed */
-  
-  .admin-sidebar {
-    top: 46px;
-  }
-  
-  .wordpress-admin-content {
-    margin-top: 46px;
-    min-height: calc(100vh - 46px);
-  }
-}
-
-/* Desktop only styles */
-@media (min-width: 1024px) {
-  .admin-sidebar-backdrop {
-    display: none !important;
   }
 }
 
@@ -239,19 +187,23 @@
   z-index: 1;
 }
 
-/* Fix for any overlapping elements */
-.wordpress-admin-content .page-header,
-.wordpress-admin-content .content-area,
-.wordpress-admin-content .dashboard-widgets {
+/* Ensure content is visible */
+.wordpress-admin-content > * {
   position: relative;
   z-index: 1;
-  background-color: transparent;
 }
 
-/* Ensure proper stacking order */
-.admin-notices {
-  position: relative;
-  z-index: 100;
+/* Admin Bar User Menu Fixes */
+.wordpress-admin-bar .group:hover .group-hover\:visible {
+  visibility: visible !important;
+}
+
+.wordpress-admin-bar .group:hover .group-hover\:opacity-100 {
+  opacity: 1 !important;
+}
+
+.wordpress-admin-bar .absolute {
+  z-index: 100000 !important;
 }
 
 /* Responsive tables */
@@ -264,72 +216,5 @@
   
   table {
     min-width: 100%;
-  }
-}
-
-/* Debug helper - Remove in production */
-.debug-border {
-  border: 2px solid red !important;
-}
-
-/* Ensure main content is always visible */
-.wordpress-admin-content main > * {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Admin Bar User Menu Fixes */
-.wordpress-admin-bar .group:hover .group-hover\:visible {
-  visibility: visible !important;
-}
-
-.wordpress-admin-bar .group:hover .group-hover\:opacity-100 {
-  opacity: 1 !important;
-}
-
-/* Ensure dropdowns appear above everything */
-.wordpress-admin-bar .absolute {
-  z-index: 100000 !important;
-}
-
-/* Fix body positioning to prevent content from going under admin bar */
-body {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-/* Ensure admin container starts below admin bar */
-.wordpress-admin {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-/* Mobile-specific sidebar animation override - HIGHEST PRIORITY */
-@media screen and (max-width: 1023px) {
-  /* Force sidebar animation on mobile */
-  div.admin-sidebar:not(.open) {
-    left: -280px !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    display: block !important;
-  }
-  
-  div.admin-sidebar.open {
-    left: 0px !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    display: block !important;
-    transform: translateX(0) !important;
-  }
-  
-  /* Alternative selectors for maximum specificity */
-  .wordpress-admin div.admin-sidebar.open {
-    left: 0px !important;
-    transform: translateX(0) !important;
-  }
-  
-  body .wordpress-admin div.admin-sidebar.open {
-    left: 0px !important;
-    transform: translateX(0) !important;
   }
 }
