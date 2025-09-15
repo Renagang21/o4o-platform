@@ -156,12 +156,8 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   return (
     <aside 
       className={clsx(
-        'admin-sidebar fixed left-0 z-40 transform transition-all duration-300 ease-in-out',
-        isCollapsed ? 'w-[36px] collapsed' : 'w-[160px]',
-        // 모바일에서 isOpen에 따라 표시/숨김
-        isOpen ? 'translate-x-0' : '-translate-x-full',
-        // 데스크톱에서는 항상 표시
-        'lg:translate-x-0'
+        'admin-sidebar',
+        isCollapsed ? 'w-[36px] collapsed' : 'w-[160px]'
       )}
     >
       <div className="flex h-full flex-col">
