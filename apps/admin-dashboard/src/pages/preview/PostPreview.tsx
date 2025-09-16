@@ -36,7 +36,7 @@ const PostPreview: React.FC = () => {
           // Check if response is successful
           if (!response.success) {
             setContent({
-              title: 'Error Loading Post',
+              title: 'Error Loading Content',
               blocks: [],
               postId: id
             });
