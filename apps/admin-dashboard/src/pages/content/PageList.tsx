@@ -51,7 +51,7 @@ const PageList = () => {
         params.append('type', 'page');
         params.append('per_page', '1000');
         
-        const response = await fetch(`${apiUrl}/api/pages?${params}`, {
+        const response = await fetch(`${apiUrl}/api/posts?${params}`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
           }
@@ -193,7 +193,7 @@ const PageList = () => {
         const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        const response = await fetch(`${apiUrl}/api/pages/${quickEditId}`, {
+        const response = await fetch(`${apiUrl}/api/posts/${quickEditId}`, {
           method: 'PUT',
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
@@ -225,7 +225,7 @@ const PageList = () => {
     setQuickEditData({
       title: '',
       slug: '',
-      status: 'published'
+      status: 'publish'
     });
   };
   
@@ -235,7 +235,7 @@ const PageList = () => {
         const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        const response = await fetch(`${apiUrl}/api/pages/${id}`, {
+        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
           method: 'PUT',
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
@@ -264,7 +264,7 @@ const PageList = () => {
         const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        const response = await fetch(`${apiUrl}/api/pages/${id}`, {
+        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
@@ -290,7 +290,7 @@ const PageList = () => {
         const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
         
-        const response = await fetch(`${apiUrl}/api/pages/${id}`, {
+        const response = await fetch(`${apiUrl}/api/posts/${id}`, {
           method: 'PUT',
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
@@ -335,7 +335,7 @@ const PageList = () => {
           const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
           
           const promises = Array.from(selectedPages).map(id => 
-            fetch(`${apiUrl}/api/pages/${id}`, {
+            fetch(`${apiUrl}/api/posts/${id}`, {
               method: 'PUT',
               headers: {
                 'Authorization': token ? `Bearer ${token}` : '',
