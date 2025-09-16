@@ -98,6 +98,7 @@ export interface CreatePostRequest {
   content: Block[];
   excerpt?: string;
   status?: PostStatus;
+  type?: string; // Content type: 'post' or 'page'
   featuredImageId?: string;
   categoryIds?: string[];
   tagIds?: string[];
