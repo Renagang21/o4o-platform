@@ -10,6 +10,12 @@ import { Separator } from '@/components/ui/separator';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
+import { 
+  DEFAULT_WRITING_SETTINGS, 
+  STORAGE_KEYS,
+  saveSettingsToStorage,
+  loadSettingsFromStorage
+} from '@/constants/defaultSettings';
 
 interface WritingSettingsData {
   defaultPostCategory: string;
@@ -30,39 +36,44 @@ interface WritingSettingsData {
 export default function WritingSettings() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
-  const [settings, setSettings] = useState<WritingSettingsData>({
-    defaultPostCategory: 'uncategorized',
-    defaultPostFormat: 'standard',
-    enableMarkdown: true,
-    enableRichEditor: true,
-    autoSaveDraft: true,
-    autoSaveInterval: 60,
-    revisionsToKeep: 10,
-    enableComments: true,
-    requireCommentApproval: false,
-    enablePingbacks: true,
-    defaultCommentStatus: 'open',
-    emailNewPost: false,
-    allowEmojis: true
-  });
+  const [settings, setSettings] = useState<WritingSettingsData>(() => 
+    loadSettingsFromStorage(STORAGE_KEYS.WRITING_SETTINGS, DEFAULT_WRITING_SETTINGS)
+  );
 
   // Fetch settings
   const { isLoading } = useQuery({
     queryKey: ['settings', 'writing'],
     queryFn: async () => {
-      const response = await apiClient.get('/v1/settings/writing');
-      const data = response.data.data;
-      if (data) {
-        setSettings(data);
+      try {
+        const response = await apiClient.get('/v1/settings/writing');
+        const data = response.data.data;
+        if (data) {
+          setSettings(data);
+          saveSettingsToStorage(STORAGE_KEYS.WRITING_SETTINGS, data);
+        }
+        return data;
+      } catch (apiError) {
+        console.warn('Writing Settings API 실패, localStorage 사용:', apiError);
+        const fallbackData = loadSettingsFromStorage(STORAGE_KEYS.WRITING_SETTINGS, DEFAULT_WRITING_SETTINGS);
+        setSettings(fallbackData);
+        return fallbackData;
       }
-      return data;
     }
   });
 
   // Save settings mutation
   const saveMutation = useMutation({
     mutationFn: async (data: WritingSettingsData) => {
-      return apiClient.put('/v1/settings/writing', data);
+      try {
+        const response = await apiClient.put('/v1/settings/writing', data);
+        saveSettingsToStorage(STORAGE_KEYS.WRITING_SETTINGS, data);
+        return response;
+      } catch (apiError) {
+        // API 실패 시 localStorage에만 저장
+        console.warn('Writing Settings API 저장 실패, localStorage에만 저장:', apiError);
+        saveSettingsToStorage(STORAGE_KEYS.WRITING_SETTINGS, data);
+        throw new Error('서버 저장 실패, 로컬에만 저장되었습니다');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'writing'] });

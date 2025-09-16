@@ -11,6 +11,12 @@ import { Separator } from '@/components/ui/separator';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
+import { 
+  DEFAULT_DISCUSSION_SETTINGS, 
+  STORAGE_KEYS,
+  saveSettingsToStorage,
+  loadSettingsFromStorage
+} from '@/constants/defaultSettings';
 
 interface DiscussionSettingsData {
   enableComments: boolean;
@@ -33,23 +39,9 @@ interface DiscussionSettingsData {
 export default function DiscussionSettings() {
   const queryClient = useQueryClient();
   const { success, error } = useAdminNotices();
-  const [settings, setSettings] = useState<DiscussionSettingsData>({
-    enableComments: true,
-    requireNameEmail: true,
-    requireRegistration: false,
-    closeCommentsAfterDays: 0,
-    enableThreadedComments: true,
-    threadDepth: 5,
-    commentsPerPage: 50,
-    defaultCommentOrder: 'oldest',
-    requireModeration: false,
-    moderationKeywords: [],
-    blacklistKeywords: [],
-    enableGravatar: true,
-    defaultAvatar: 'mystery',
-    maxLinks: 2,
-    holdForModeration: false
-  });
+  const [settings, setSettings] = useState<DiscussionSettingsData>(() => 
+    loadSettingsFromStorage(STORAGE_KEYS.DISCUSSION_SETTINGS, DEFAULT_DISCUSSION_SETTINGS)
+  );
 
   const [moderationText, setModerationText] = useState('');
   const [blacklistText, setBlacklistText] = useState('');
@@ -58,14 +50,24 @@ export default function DiscussionSettings() {
   const { isLoading } = useQuery({
     queryKey: ['settings', 'discussion'],
     queryFn: async () => {
-      const response = await apiClient.get('/v1/settings/discussion');
-      const data = response.data.data;
-      if (data) {
-        setSettings(data);
-        setModerationText(data.moderationKeywords?.join('\n') || '');
-        setBlacklistText(data.blacklistKeywords?.join('\n') || '');
+      try {
+        const response = await apiClient.get('/v1/settings/discussion');
+        const data = response.data.data;
+        if (data) {
+          setSettings(data);
+          setModerationText(data.moderationKeywords?.join('\n') || '');
+          setBlacklistText(data.blacklistKeywords?.join('\n') || '');
+          saveSettingsToStorage(STORAGE_KEYS.DISCUSSION_SETTINGS, data);
+        }
+        return data;
+      } catch (apiError) {
+        console.warn('Discussion Settings API 실패, localStorage 사용:', apiError);
+        const fallbackData = loadSettingsFromStorage(STORAGE_KEYS.DISCUSSION_SETTINGS, DEFAULT_DISCUSSION_SETTINGS);
+        setSettings(fallbackData);
+        setModerationText(fallbackData.moderationKeywords?.join('\n') || '');
+        setBlacklistText(fallbackData.blacklistKeywords?.join('\n') || '');
+        return fallbackData;
       }
-      return data;
     }
   });
 
@@ -77,7 +79,16 @@ export default function DiscussionSettings() {
         moderationKeywords: moderationText.split('\n').filter(Boolean),
         blacklistKeywords: blacklistText.split('\n').filter(Boolean)
       };
-      return apiClient.put('/v1/settings/discussion', payload);
+      try {
+        const response = await apiClient.put('/v1/settings/discussion', payload);
+        saveSettingsToStorage(STORAGE_KEYS.DISCUSSION_SETTINGS, payload);
+        return response;
+      } catch (apiError) {
+        // API 실패 시 localStorage에만 저장
+        console.warn('Discussion Settings API 저장 실패, localStorage에만 저장:', apiError);
+        saveSettingsToStorage(STORAGE_KEYS.DISCUSSION_SETTINGS, payload);
+        throw new Error('서버 저장 실패, 로컬에만 저장되었습니다');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'discussion'] });

@@ -40,7 +40,7 @@ const OAuthSettings = () => {
   const { data: settings, isLoading } = useQuery<OAuthSettingsResponse>({
     queryKey: ['oauth-settings'],
     queryFn: async () => {
-      const response = await apiClient.get('/settings/oauth');
+      const response = await apiClient.get('/v1/settings/oauth');
       return response.data;
     }
   });
@@ -48,7 +48,7 @@ const OAuthSettings = () => {
   // Update OAuth settings mutation
   const updateMutation = useMutation<OAuthUpdateResponse, Error, OAuthUpdateRequest>({
     mutationFn: async (data: OAuthUpdateRequest) => {
-      const response = await apiClient.put('/settings/oauth', data);
+      const response = await apiClient.put('/v1/settings/oauth', data);
       return response.data;
     },
     onSuccess: (_data, variables) => {
@@ -69,7 +69,7 @@ const OAuthSettings = () => {
   // Test OAuth connection mutation
   const testMutation = useMutation<OAuthTestResponse, Error, OAuthTestRequest>({
     mutationFn: async (data: OAuthTestRequest) => {
-      const response = await apiClient.post('/settings/oauth/test', data);
+      const response = await apiClient.post('/v1/settings/oauth/test', data);
       return response.data;
     },
     onSuccess: (data, _variables) => {
