@@ -974,7 +974,7 @@ export class ContentController {
   // Pages Management
   getPages = async (req: Request, res: Response) => {
     try {
-      const { page = 1, pageSize = 20 } = req.query;
+      const { page = 1, pageSize = 20, status } = req.query;
       
       if (!AppDataSource.isInitialized) {
         return res.json({
@@ -986,6 +986,7 @@ export class ContentController {
               slug: 'about-us',
               content: { type: 'doc', content: [] },
               status: 'publish',
+              type: 'page',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             }
@@ -999,11 +1000,21 @@ export class ContentController {
         });
       }
 
+      // Use Posts API with type='page' for consistency
+      const queryBuilder = this.postRepository.createQueryBuilder('post')
+        .leftJoinAndSelect('post.author', 'author')
+        .leftJoinAndSelect('post.categories', 'categories')
+        .leftJoinAndSelect('post.tags', 'tags')
+        .where('post.type = :type', { type: 'page' });
+
+      if (status) {
+        queryBuilder.andWhere('post.status = :status', { status });
+      }
+
       const skip = (Number(page) - 1) * Number(pageSize);
-      const [pages, total] = await this.pageRepository.findAndCount({
-        skip,
-        take: Number(pageSize)
-      });
+      queryBuilder.skip(skip).take(Number(pageSize));
+
+      const [pages, total] = await queryBuilder.getManyAndCount();
 
       return res.json({
         status: 'success',
@@ -1016,6 +1027,7 @@ export class ContentController {
         }
       });
     } catch (error) {
+      console.error('getPages error:', error);
       return res.status(500).json({
         status: 'error',
         message: 'Failed to fetch pages'
