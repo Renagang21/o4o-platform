@@ -465,13 +465,14 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       
       // Prepare base data for both create and update
       // Use refs for latest state values
+      const contentType = mode === 'page' ? 'page' : 'post';
       const baseData: any = {
         title: trimmedTitle,  // Use validated trimmed title
         content: JSON.stringify(currentBlocks),  // Serialize blocks array to string
         excerpt: currentSettings.excerpt,
         slug: trimmedSlug,  // Use the validated/trimmed slug
         status: publish ? 'publish' : (currentSettings.status || 'draft'),
-        type: mode === 'page' ? 'page' : 'post',  // Set type based on mode
+        type: contentType,  // Explicitly set type based on mode
         categories: currentSettings.categories,
         tags: currentSettings.tags,
         featured: false,
@@ -481,8 +482,15 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: currentSettings.commentStatus
       };
       
-      // DEBUG: Log API request data
-      // Logging removed for CI/CD
+      // DEBUG: Log API request data for investigating type=page issue
+      if (import.meta.env.DEV) {
+        console.log('🐛 DEBUG Save Payload:', {
+          mode,
+          contentType,
+          baseDataType: baseData.type,
+          fullPayload: baseData
+        });
+      }
       
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
