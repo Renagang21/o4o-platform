@@ -1,5 +1,9 @@
 name: Deploy Nginx Configuration
 
+concurrency:
+  group: deploy-nginx-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches: [ main ]

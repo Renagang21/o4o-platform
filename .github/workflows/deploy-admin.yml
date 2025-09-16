@@ -1,5 +1,9 @@
 name: Deploy Admin Dashboard
 
+concurrency:
+  group: deploy-admin-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches: [ main ]

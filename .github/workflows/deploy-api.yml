@@ -1,5 +1,9 @@
 name: Deploy API Server
 
+concurrency:
+  group: deploy-api-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches: [ main ]
