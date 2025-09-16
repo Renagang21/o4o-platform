@@ -483,14 +483,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       };
       
       // DEBUG: Log API request data for investigating type=page issue
-      if (import.meta.env.DEV) {
-        console.log('🐛 DEBUG Save Payload:', {
-          mode,
-          contentType,
-          baseDataType: baseData.type,
-          fullPayload: baseData
-        });
-      }
+      // Logging removed for CI/CD
       
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
