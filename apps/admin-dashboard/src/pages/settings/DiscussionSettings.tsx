@@ -51,7 +51,7 @@ export default function DiscussionSettings() {
     queryKey: ['settings', 'discussion'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/v1/settings/discussion');
+        const response = await apiClient.get('/api/v1/settings/discussion');
         const data = response.data.data;
         if (data) {
           setSettings(data);
@@ -80,7 +80,7 @@ export default function DiscussionSettings() {
         blacklistKeywords: blacklistText.split('\n').filter(Boolean)
       };
       try {
-        const response = await apiClient.put('/v1/settings/discussion', payload);
+        const response = await apiClient.put('/api/v1/settings/discussion', payload);
         saveSettingsToStorage(STORAGE_KEYS.DISCUSSION_SETTINGS, payload);
         return response;
       } catch (apiError) {

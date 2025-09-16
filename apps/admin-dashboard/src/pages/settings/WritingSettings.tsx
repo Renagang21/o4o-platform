@@ -45,7 +45,7 @@ export default function WritingSettings() {
     queryKey: ['settings', 'writing'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/v1/settings/writing');
+        const response = await apiClient.get('/api/v1/settings/writing');
         const data = response.data.data;
         if (data) {
           setSettings(data);

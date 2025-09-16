@@ -64,7 +64,7 @@ export default function ReadingSettings() {
     queryKey: ['settings', 'reading'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/v1/settings/reading');
+        const response = await apiClient.get('/api/v1/settings/reading');
         const data = response.data.data;
         if (data) {
           setSettings(data);
@@ -91,7 +91,7 @@ export default function ReadingSettings() {
   const saveMutation = useMutation({
     mutationFn: async (data: ReadingSettingsData) => {
       try {
-        const response = await apiClient.put('/v1/settings/reading', data);
+        const response = await apiClient.put('/api/v1/settings/reading', data);
         saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
         return response;
       } catch (apiError) {
