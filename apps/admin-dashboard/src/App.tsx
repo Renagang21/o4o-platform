@@ -293,6 +293,11 @@ function App() {
                 <PostPreview />
               </Suspense>
             } />
+            <Route path="/preview/pages/:id" element={
+              <Suspense fallback={<PageLoader />}>
+                <PostPreview />
+              </Suspense>
+            } />
             
             {/* 보호된 관리자 라우트들 */}
             <Route path="/*" element={

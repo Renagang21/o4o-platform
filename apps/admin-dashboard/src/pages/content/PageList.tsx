@@ -140,7 +140,8 @@ const PageList = () => {
   const [quickEditData, setQuickEditData] = useState({
     title: '',
     slug: '',
-    status: 'publish' as 'publish' | 'draft'
+    status: 'publish' as 'publish' | 'draft' | 'private',
+    template: 'default'
   });
   
   // Row actions hover state
@@ -183,7 +184,8 @@ const PageList = () => {
     setQuickEditData({
       title: page.title,
       slug: page.slug,
-      status: page.status as 'publish' | 'draft'
+      status: page.status as 'publish' | 'draft' | 'private',
+      template: page.template || 'default'
     });
   };
   
@@ -225,7 +227,8 @@ const PageList = () => {
     setQuickEditData({
       title: '',
       slug: '',
-      status: 'publish'
+      status: 'publish' as 'publish' | 'draft' | 'private',
+      template: 'default'
     });
   };
   
@@ -729,45 +732,70 @@ const PageList = () => {
                 filteredPages.slice(0, itemsPerPage).map((page) => (
                   <React.Fragment key={page.id}>
                     {quickEditId === page.id ? (
-                      <tr className="bg-gray-50">
-                        <td className="px-3 py-3" colSpan={7}>
-                          <div className="flex items-center gap-4">
-                            <div className="flex-1">
-                              <input
-                                type="text"
-                                value={quickEditData.title}
-                                onChange={(e) => setQuickEditData({ ...quickEditData, title: e.target.value })}
-                                placeholder="Title"
-                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 mb-2"
-                              />
-                              <input
-                                type="text"
-                                value={quickEditData.slug}
-                                onChange={(e) => setQuickEditData({ ...quickEditData, slug: e.target.value })}
-                                placeholder="Slug"
-                                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              />
+                      // Pages Quick Edit Row - Styled like Posts
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <td colSpan={100} className="p-4">
+                          <div className="bg-white border border-gray-300 rounded p-4">
+                            <h3 className="font-medium text-sm mb-3">Quick Edit Page</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                <input
+                                  type="text"
+                                  value={quickEditData.title}
+                                  onChange={(e) => setQuickEditData({...quickEditData, title: e.target.value})}
+                                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                                <input
+                                  type="text"
+                                  value={quickEditData.slug}
+                                  onChange={(e) => setQuickEditData({...quickEditData, slug: e.target.value})}
+                                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select
+                                  value={quickEditData.status}
+                                  onChange={(e) => setQuickEditData({...quickEditData, status: e.target.value as 'publish' | 'draft'})}
+                                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                >
+                                  <option value="publish">Published</option>
+                                  <option value="draft">Draft</option>
+                                  <option value="private">Private</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
+                                <select
+                                  value={quickEditData.template || 'default'}
+                                  onChange={(e) => setQuickEditData({...quickEditData, template: e.target.value})}
+                                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                >
+                                  <option value="default">Default Template</option>
+                                  <option value="page">Page Template</option>
+                                  <option value="full-width">Full Width</option>
+                                  <option value="no-sidebar">No Sidebar</option>
+                                </select>
+                              </div>
                             </div>
-                            <select
-                              value={quickEditData.status}
-                              onChange={(e) => setQuickEditData({ ...quickEditData, status: e.target.value as 'publish' | 'draft' })}
-                              className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            >
-                              <option value="publish">Published</option>
-                              <option value="draft">Draft</option>
-                            </select>
-                            <button
-                              onClick={handleSaveQuickEdit}
-                              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                            >
-                              Update
-                            </button>
-                            <button
-                              onClick={handleCancelQuickEdit}
-                              className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
-                            >
-                              Cancel
-                            </button>
+                            <div className="flex justify-end gap-2 mt-4">
+                              <button
+                                onClick={handleCancelQuickEdit}
+                                className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={handleSaveQuickEdit}
+                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                              >
+                                Update Page
+                              </button>
+                            </div>
                           </div>
                         </td>
                       </tr>
