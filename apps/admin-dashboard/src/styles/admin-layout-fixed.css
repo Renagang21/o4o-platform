@@ -117,6 +117,51 @@
   }
 }
 
+/* Emergency Layout Fixes */
+.wordpress-admin-content {
+  position: relative;
+  margin-top: 46px;
+  min-height: calc(100vh - 46px);
+  width: 100%;
+  background-color: #f1f1f1;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+/* Force proper content display */
+.wordpress-admin-content main {
+  padding: 20px;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 86px);
+  overflow: visible;
+}
+
+/* Ensure page content is not cut off */
+.wp-content,
+.wrap {
+  width: 100%;
+  max-width: none;
+  overflow: visible;
+  position: relative;
+}
+
+/* Fix table overflow issues */
+.wp-list-table {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Desktop sidebar margin fix */
+@media (min-width: 1024px) {
+  .wordpress-admin-content.with-sidebar {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+}
+
 /* Sidebar Menu Styles */
 .admin-sidebar-menu {
   padding: 0;
