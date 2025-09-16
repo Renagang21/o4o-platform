@@ -45,7 +45,11 @@ jobs:
           git config pull.rebase false
           git pull origin main
           
-          # Copy nginx configs to system
+          # Remove any existing API server nginx config (not needed for web server)
+          sudo rm -f /etc/nginx/sites-enabled/api.neture.co.kr.conf || true
+          sudo rm -f /etc/nginx/sites-available/api.neture.co.kr.conf || true
+          
+          # Copy nginx configs to system (web server only)
           echo "📋 Deploying nginx configs..."
           sudo cp nginx-configs/admin.neture.co.kr.conf /etc/nginx/sites-available/
           sudo cp nginx-configs/neture.co.kr.conf /etc/nginx/sites-available/ || true
@@ -53,7 +57,7 @@ jobs:
           sudo cp nginx-configs/shop.neture.co.kr.conf /etc/nginx/sites-available/ || true
           sudo cp nginx-configs/signage.neture.co.kr.conf /etc/nginx/sites-available/ || true
           
-          # Enable sites (create symlinks)
+          # Enable sites (create symlinks - web server only)
           sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
           sudo ln -sf /etc/nginx/sites-available/neture.co.kr.conf /etc/nginx/sites-enabled/ || true
           sudo ln -sf /etc/nginx/sites-available/forum.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
