@@ -196,6 +196,7 @@ export const createPost = async (req: Request, res: Response) => {
       excerpt,
       slug,
       status = 'draft',
+      type = 'post',
       categories = [],
       tags = [],
       featured_media,
@@ -293,7 +294,7 @@ export const createPost = async (req: Request, res: Response) => {
       excerpt,
       slug: finalSlug,
       status,
-      type: 'post',
+      type,
       author_id: userId,
       template,
       featured_media,
@@ -375,6 +376,7 @@ export const updatePost = async (req: Request, res: Response) => {
       excerpt,
       slug,
       status,
+      type,
       categories,
       tags,
       template,
@@ -449,6 +451,7 @@ export const updatePost = async (req: Request, res: Response) => {
         post.published_at = new Date()
       }
     }
+    if (type !== undefined) post.type = type
     if (template !== undefined) post.template = template
     if (featured_media !== undefined) post.featured_media = featured_media
     if (comment_status !== undefined) post.comment_status = comment_status
