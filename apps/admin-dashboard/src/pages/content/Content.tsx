@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-do
 import Posts from '../posts/Posts' // Posts management component
 import PostForm from './PostForm' // Using PostForm instead of PostFormWYSIWYG for WordPress-like UI
 import PageList from './PageList'
-// import PageFormWYSIWYG from './PageFormWYSIWYG' // Temporarily commented - using PostForm for pages
 import CPTList from './CPTList'
 import CPTForm from './CPTForm'
 import CustomFieldBuilder from './CustomFieldBuilder'
