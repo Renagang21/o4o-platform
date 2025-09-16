@@ -466,7 +466,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
       // Prepare base data for both create and update
       // Use refs for latest state values
       const contentType = mode === 'page' ? 'page' : 'post';
-      const baseData: any = {
+      const baseData = {
         title: trimmedTitle,  // Use validated trimmed title
         content: JSON.stringify(currentBlocks),  // Serialize blocks array to string
         excerpt: currentSettings.excerpt,
@@ -482,8 +482,16 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: currentSettings.commentStatus
       };
       
-      // DEBUG: Log API request data for investigating type=page issue
-      // Logging removed for CI/CD
+      // Store debug info in window for manual inspection in dev
+      if (typeof window !== 'undefined' && import.meta.env.DEV && mode === 'page') {
+        (window as any).__PAGES_DEBUG = {
+          mode,
+          contentType,
+          baseDataType: baseData.type,
+          requestData: requestData,
+          timestamp: new Date().toISOString()
+        };
+      }
       
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
