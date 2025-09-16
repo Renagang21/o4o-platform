@@ -388,6 +388,31 @@ app.use(passport.initialize() as any);
 const uploadsPath = process.env.UPLOAD_DIR || './uploads';
 app.use('/uploads', express.static(uploadsPath));
 
+// Settings API rate limiter - very lenient for admin operations
+const settingsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 2000, // 최대 2000 요청 (설정은 자주 읽고 쓰기 때문)
+  message: {
+    error: 'Too many settings requests',
+    code: 'SETTINGS_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    if (process.env.NODE_ENV === 'production') {
+      const forwarded = req.headers['x-forwarded-for'];
+      if (forwarded) {
+        return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
+      }
+    }
+    return req.ip || 'unknown';
+  },
+  skip: (req) => {
+    const ip = req.ip || '';
+    return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  }
+});
+
 // Special rate limit for SSO check endpoint (more lenient to prevent 429 errors)
 const ssoCheckLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15분
@@ -464,6 +489,13 @@ app.use('/api/v1/auth', authRoutes); // v1 compatibility - this MUST be the firs
 app.use('/api/v1/auth', authV2Routes); // Cookie-based auth routes
 app.use('/api/v1/accounts', linkedAccountsRoutes); // Linked accounts routes (moved to avoid conflict)
 app.use('/api/v1/social', socialAuthRoutes); // Social auth routes (moved to avoid conflict)
+
+// Settings routes with lenient rate limiting (BEFORE general rate limiter)
+app.use('/api/v1/settings', settingsLimiter, settingsV1Routes);
+app.use('/v1/settings', settingsLimiter, settingsV1Routes);
+app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
+app.use('/api/settings', settingsLimiter, settingsRoutes);
+app.use('/settings', settingsLimiter, settingsRoutes);
 
 // Apply standard rate limiting to authenticated endpoints
 app.use('/api/', limiter);
@@ -612,8 +644,7 @@ app.get('/api/posts', publicLimiter, async (req, res) => {
 });
 
 // OAuth routes must be registered BEFORE general settings routes
-app.use('/api/settings', oauthSettingsRoutes);
-app.use('/api/settings', settingsRoutes);
+// Settings routes moved before rate limiter
 
 // Email settings routes
 import emailSettingsRoutes from './routes/email-settings.routes';
@@ -674,7 +705,7 @@ app.use('/api/v1/shipping', shippingV1Routes);
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
 app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
 app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
-app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - GitHub Actions 자동 배포 테스트
+// Settings routes moved before rate limiter
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 
 // Admin routes with correct paths
