@@ -107,6 +107,33 @@ const settingsStore: Map<string, any> = new Map([
     analyticsProvider: 'google',
     analyticsId: '',
     shareUserData: false
+  }],
+  ['oauth', {
+    google: {
+      enabled: false,
+      clientId: '',
+      clientSecret: '',
+      redirectUri: '',
+      scopes: ['openid', 'profile', 'email']
+    },
+    kakao: {
+      enabled: false,
+      clientId: '',
+      clientSecret: '',
+      redirectUri: '',
+      scopes: ['profile_nickname', 'profile_image', 'account_email']
+    },
+    naver: {
+      enabled: false,
+      clientId: '',
+      clientSecret: '',
+      redirectUri: '',
+      scopes: ['name', 'email', 'profile_image']
+    },
+    enableSocialLogin: false,
+    autoCreateUser: true,
+    linkExistingAccount: true,
+    requireEmailVerification: false
   }]
 ]);
 
