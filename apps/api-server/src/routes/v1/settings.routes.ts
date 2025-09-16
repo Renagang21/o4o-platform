@@ -4,6 +4,29 @@ import { checkPermission } from '../../middleware/permissions';
 
 const router: Router = Router();
 
+/**
+ * @route   GET /api/v1/settings/test
+ * @desc    Test endpoint to verify Settings API is working
+ * @access  Public (no auth required)
+ */
+router.get('/test', async (req: Request, res: Response) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Settings API is working!',
+      timestamp: new Date().toISOString(),
+      availableSections: Array.from(settingsStore.keys()),
+      version: '1.0.0'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Test endpoint failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // 설정 데이터 저장 (실제로는 DB 사용)
 const settingsStore: Map<string, any> = new Map([
   ['general', {
