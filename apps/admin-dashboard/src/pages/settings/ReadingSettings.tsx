@@ -9,6 +9,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
 import { ContentApi } from '@/api/contentApi';
 import toast from 'react-hot-toast';
+import { 
+  DEFAULT_READING_SETTINGS, 
+  STORAGE_KEYS,
+  saveSettingsToStorage,
+  loadSettingsFromStorage
+} from '@/constants/defaultSettings';
 
 interface ReadingSettingsData {
   homepageType: 'latest_posts' | 'static_page';
@@ -27,21 +33,29 @@ interface ReadingSettingsData {
 
 export default function ReadingSettings() {
   const queryClient = useQueryClient();
-  const [settings, setSettings] = useState<ReadingSettingsData>({
-    homepageType: 'latest_posts',
-    homepageId: undefined,
-    postsPerPage: 10,
-    showSummary: 'excerpt',
-    excerptLength: 200
-  });
+  const [settings, setSettings] = useState<ReadingSettingsData>(() => 
+    loadSettingsFromStorage(STORAGE_KEYS.READING_SETTINGS, DEFAULT_READING_SETTINGS)
+  );
   const [pages, setPages] = useState<any[]>([]);
 
-  // Fetch available pages
+  // Fetch available pages (using Posts API with type=page)
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
     queryKey: ['pages', 'published'],
     queryFn: async () => {
-      const response = await ContentApi.getPages(1, 100, { status: 'published' });
-      return response.data || [];
+      try {
+        const response = await apiClient.get('/api/posts', {
+          params: {
+            type: 'page',
+            status: 'publish',
+            page: 1,
+            pageSize: 100
+          }
+        });
+        return response.data?.data || [];
+      } catch (error) {
+        console.warn('Pages API 실패, 빈 배열 반환:', error);
+        return []; // Fallback: 빈 배열
+      }
     }
   });
 
@@ -49,12 +63,20 @@ export default function ReadingSettings() {
   const { isLoading: settingsLoading } = useQuery({
     queryKey: ['settings', 'reading'],
     queryFn: async () => {
-      const response = await apiClient.get('/settings/reading');
-      const data = response.data.data;
-      if (data) {
-        setSettings(data);
+      try {
+        const response = await apiClient.get('/v1/settings/reading');
+        const data = response.data.data;
+        if (data) {
+          setSettings(data);
+          saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
+        }
+        return data;
+      } catch (apiError) {
+        console.warn('Reading Settings API 실패, localStorage 사용:', apiError);
+        const fallbackData = loadSettingsFromStorage(STORAGE_KEYS.READING_SETTINGS, DEFAULT_READING_SETTINGS);
+        setSettings(fallbackData);
+        return fallbackData;
       }
-      return data;
     }
   });
 
@@ -68,7 +90,16 @@ export default function ReadingSettings() {
   // Save settings mutation
   const saveMutation = useMutation({
     mutationFn: async (data: ReadingSettingsData) => {
-      return apiClient.put('/settings/reading', data);
+      try {
+        const response = await apiClient.put('/v1/settings/reading', data);
+        saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
+        return response;
+      } catch (apiError) {
+        // API 실패 시 localStorage에만 저장
+        console.warn('Reading Settings API 저장 실패, localStorage에만 저장:', apiError);
+        saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
+        throw new Error('서버 저장 실패, 로컬에만 저장되었습니다');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings', 'reading'] });
