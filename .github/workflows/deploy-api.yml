@@ -8,6 +8,11 @@ on:
       - 'packages/**'
       - '.github/workflows/deploy-api.yml'
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment'
+        required: false
+        default: 'false'
 
 jobs:
   deploy:
