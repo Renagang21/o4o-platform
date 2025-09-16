@@ -194,6 +194,74 @@ ssh ubuntu@13.125.144.8 "sudo tail -f /var/log/nginx/error.log"
 - ❌ **Deploy Nginx Configuration**: 로컬 스크립트로 대체
 - ❌ **Build and Deploy**: 중복 제거
 
+## 🧪 배포 테스트 가이드
+
+### 배포 전 로컬 테스트
+```bash
+# 1. 코드 품질 확인
+pnpm run lint
+pnpm run type-check
+
+# 2. 빌드 테스트
+pnpm run build:packages
+cd apps/admin-dashboard && pnpm run build
+cd ../api-server && pnpm run build
+
+# 3. API 서버 로컬 테스트
+cd apps/api-server && pnpm run dev
+curl http://localhost:3001/health
+curl http://localhost:3001/v1/settings/test
+```
+
+### 배포 후 운영 테스트
+```bash
+# 1. API 서버 상태 확인
+curl https://api.neture.co.kr/health
+curl https://api.neture.co.kr/v1/settings/test
+
+# 2. 웹사이트 접속 테스트
+# https://admin.neture.co.kr 접속
+# 설정 페이지들 확인: /settings/writing, /settings/reading 등
+
+# 3. PM2 프로세스 확인
+ssh ubuntu@43.202.242.215 "pm2 list && pm2 logs o4o-api-server --lines 20"
+
+# 4. Nginx 상태 확인  
+ssh ubuntu@13.125.144.8 "sudo nginx -t && sudo systemctl status nginx"
+```
+
+### 배포 롤백 (문제 발생시)
+```bash
+# API 서버 롤백
+ssh ubuntu@43.202.242.215 "cd /home/ubuntu/o4o-platform && git reset --hard HEAD~1 && cd apps/api-server && pnpm run build && pm2 restart ecosystem.config.apiserver.cjs"
+
+# 웹서버 롤백 (백업 사용)
+ssh ubuntu@13.125.144.8 "sudo cp -r /var/www/admin.neture.co.kr.backup.YYYYMMDD_HHMMSS/* /var/www/admin.neture.co.kr/"
+
+# Nginx 롤백 (백업 사용)
+ssh ubuntu@13.125.144.8 "sudo cp -r /etc/nginx/backup/YYYYMMDD_HHMMSS/sites-* /etc/nginx/ && sudo systemctl reload nginx"
+```
+
+## ⚠️ 현재 상태 및 필요한 작업
+
+### ✅ 완료된 작업:
+- Settings API `/api/v1/settings` 라우트 정상 작동
+- 로컬 배포 스크립트 생성 및 검증 로직 구현
+- GitHub Actions 워크플로우 정리 완료
+
+### 🔄 진행 필요한 작업:
+1. **SSH 키 설정**: 배포 스크립트 실제 테스트를 위해 필요
+2. **API 서버 배포**: `/v1/settings` 라우트를 프로덕션에 배포
+3. **전체 시스템 테스트**: 배포 후 모든 기능 정상 작동 확인
+
+### 📋 테스트 체크리스트:
+- [ ] SSH 연결 설정 확인
+- [ ] API 서버 배포 스크립트 실행
+- [ ] `/v1/settings` API 엔드포인트 확인
+- [ ] Admin Dashboard 설정 페이지들 테스트
+- [ ] Nginx 설정 배포 테스트
+- [ ] 롤백 기능 테스트
+
 ## 🔮 향후 개선사항
 
 1. **통합 배포 스크립트**: 하나의 스크립트로 모든 배포 관리
