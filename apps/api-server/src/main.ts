@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import express, { Application, Request, Response, NextFunction } from 'express';
-// Force rebuild for Settings API deployment
+// Force rebuild for Settings API deployment - trigger GitHub Actions v2
 import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
