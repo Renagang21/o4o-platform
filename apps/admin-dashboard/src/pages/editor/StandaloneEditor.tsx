@@ -471,6 +471,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         excerpt: currentSettings.excerpt,
         slug: trimmedSlug,  // Use the validated/trimmed slug
         status: publish ? 'publish' : (currentSettings.status || 'draft'),
+        type: mode === 'page' ? 'page' : 'post',  // Set type based on mode
         categories: currentSettings.categories,
         tags: currentSettings.tags,
         featured: false,
