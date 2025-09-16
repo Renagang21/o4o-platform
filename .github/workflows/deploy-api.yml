@@ -1,0 +1,116 @@
+name: Deploy API Server
+
+concurrency:
+  group: deploy-api-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/api-server/**'
+      - 'packages/**'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment'
+        required: false
+        default: 'false'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Deploy to API server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.API_HOST }}
+        username: ${{ secrets.API_USER }}
+        key: ${{ secrets.API_SSH_KEY }}
+        script: |
+          cd /home/ubuntu/o4o-platform
+          
+          # Pull latest code
+          git fetch origin
+          git pull origin main
+          
+          # Install pnpm if not exists
+          if ! command -v pnpm &> /dev/null; then
+            echo "📦 Installing pnpm..."
+            npm install -g pnpm
+            # Add npm global bin to PATH for current session
+            export PATH="$PATH:$(npm config get prefix)/bin"
+          fi
+          
+          # Install dependencies
+          pnpm install --frozen-lockfile
+          
+          # Build packages
+          pnpm run build:packages
+          
+          # Build API server
+          cd apps/api-server
+          pnpm run build
+          
+          # Check build success
+          if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
+            echo "❌ Build failed: dist folder is empty"
+            exit 1
+          fi
+          
+          echo "✅ API server build complete!"
+          
+          # Database migration check
+          echo "🗄️ Checking database migrations..."
+          if pnpm run migration:show 2>/dev/null | grep -q "No pending migrations"; then
+            echo "📝 No pending migrations"
+          else
+            echo "🔄 Running database migrations..."
+            pnpm run migration:run
+          fi
+          
+          # Restart PM2 API server
+          echo "♻️ Restarting PM2 API server..."
+          cd ../..
+          
+          # Check if PM2 process exists
+          pm2 list | grep -q "o4o-api-server" || echo "⚠️ PM2 process o4o-api-server not found"
+          
+          # Restart API server
+          if pm2 restart ecosystem.config.apiserver.cjs 2>/dev/null; then
+            echo "✅ PM2 restart successful"
+          else
+            echo "🔧 Starting with PM2 config file..."
+            pm2 start ecosystem.config.apiserver.cjs
+          fi
+          
+          # Health check
+          echo "🏥 Health check..."
+          sleep 3
+          
+          if curl -f http://localhost:3001/health 2>/dev/null; then
+            echo "✅ API server is running normally"
+          else
+            echo "⚠️ Health check failed - check logs"
+            echo "📋 PM2 logs: pm2 logs o4o-api-server"
+          fi
+          
+          echo "🎉 API server deployment complete!"
+          echo "🌐 Local: http://localhost:3001"
+          echo "🌐 External: https://api.neture.co.kr"
+          echo "📅 Deploy time: $(date)"
+          echo "📝 Commit: $(git rev-parse HEAD)"

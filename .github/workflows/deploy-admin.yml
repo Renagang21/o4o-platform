@@ -1,0 +1,94 @@
+name: Deploy Admin Dashboard
+
+concurrency:
+  group: deploy-admin-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/admin-dashboard/**'
+      - 'packages/**'
+      - '.github/workflows/deploy-admin.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: |
+        pnpm install --frozen-lockfile
+        
+    - name: Build packages
+      run: pnpm run build:packages
+
+    - name: Build admin dashboard
+      run: |
+        cd apps/admin-dashboard
+        NODE_OPTIONS='--max-old-space-size=4096' \
+        GENERATE_SOURCEMAP=false \
+        VITE_API_URL=https://api.neture.co.kr \
+        VITE_PUBLIC_APP_ORIGIN=https://neture.co.kr \
+        pnpm run build
+
+    - name: Deploy to web server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
+        script: |
+          # Backup current deployment
+          sudo cp -r /var/www/admin.neture.co.kr /var/www/admin.neture.co.kr.backup.$(date +%Y%m%d_%H%M%S) || true
+          
+          # Clear current files
+          sudo rm -rf /var/www/admin.neture.co.kr/*
+          
+          # Create temp directory
+          mkdir -p /tmp/admin-build
+
+    - name: Copy build files
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
+        source: "apps/admin-dashboard/dist/*"
+        target: "/tmp/admin-build/"
+        strip_components: 3
+
+    - name: Move files to web directory
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.WEB_HOST }}
+        username: ${{ secrets.WEB_USER }}
+        key: ${{ secrets.WEB_SSH_KEY }}
+        script: |
+          # Move files from temp to web directory
+          sudo cp -r /tmp/admin-build/* /var/www/admin.neture.co.kr/
+          
+          # Set permissions
+          sudo chown -R www-data:www-data /var/www/admin.neture.co.kr/
+          sudo chmod -R 755 /var/www/admin.neture.co.kr/
+          
+          # Clean up
+          rm -rf /tmp/admin-build
+          
+          # Reload nginx
+          sudo systemctl reload nginx
+          
+          echo "✅ Admin dashboard deployed successfully!"
