@@ -482,16 +482,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         allowComments: currentSettings.commentStatus
       };
       
-      // Store debug info in window for manual inspection in dev
-      if (typeof window !== 'undefined' && import.meta.env.DEV && mode === 'page') {
-        (window as any).__PAGES_DEBUG = {
-          mode,
-          contentType,
-          baseDataType: baseData.type,
-          requestData: requestData,
-          timestamp: new Date().toISOString()
-        };
-      }
+      // Debug info removed - Pages type issue resolved in backend
       
       // Check if this is a duplicate save (same content)
       const saveHash = generateSaveHash(baseData);
