@@ -19,7 +19,7 @@ interface Page {
   template: string;
   comments: number;
   date: string;
-  status: 'published' | 'draft' | 'pending' | 'trash';
+  status: 'publish' | 'draft' | 'private' | 'archived' | 'scheduled' | 'trash';
   views: number;
 }
 
@@ -33,9 +33,9 @@ const PageList = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Persist activeTab in sessionStorage
-  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft' | 'trash'>(() => {
+  const [activeTab, setActiveTab] = useState<'all' | 'publish' | 'draft' | 'trash'>(() => {
     const saved = sessionStorage.getItem('pages-active-tab');
-    return (saved as 'all' | 'published' | 'draft' | 'trash') || 'all';
+    return (saved as 'all' | 'publish' | 'draft' | 'trash') || 'all';
   });
   
   // Fetch pages from API
@@ -140,7 +140,7 @@ const PageList = () => {
   const [quickEditData, setQuickEditData] = useState({
     title: '',
     slug: '',
-    status: 'published' as 'published' | 'draft'
+    status: 'publish' as 'publish' | 'draft'
   });
   
   // Row actions hover state
@@ -165,7 +165,7 @@ const PageList = () => {
   
   const counts = {
     all: pages.length,
-    published: pages.filter(p => p.status === 'published').length,
+    published: pages.filter(p => p.status === 'publish').length,
     draft: pages.filter(p => p.status === 'draft').length,
     trash: pages.filter(p => p.status === 'trash').length
   };
@@ -183,7 +183,7 @@ const PageList = () => {
     setQuickEditData({
       title: page.title,
       slug: page.slug,
-      status: page.status as 'published' | 'draft'
+      status: page.status as 'publish' | 'draft'
     });
   };
   
@@ -382,8 +382,8 @@ const PageList = () => {
     let filtered = pages;
     
     // Filter by tab
-    if (activeTab === 'published') {
-      filtered = filtered.filter(p => p.status === 'published');
+    if (activeTab === 'publish') {
+      filtered = filtered.filter(p => p.status === 'publish');
     } else if (activeTab === 'draft') {
       filtered = filtered.filter(p => p.status === 'draft');
     } else if (activeTab === 'trash') {
@@ -569,8 +569,8 @@ const PageList = () => {
           </button>
           <span className="text-gray-400">|</span>
           <button
-            onClick={() => setActiveTab('published')}
-            className={`text-sm ${activeTab === 'published' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
+            onClick={() => setActiveTab('publish')}
+            className={`text-sm ${activeTab === 'publish' ? 'text-gray-900 font-medium' : 'text-blue-600 hover:text-blue-800'}`}
           >
             발행됨 ({counts.published})
           </button>
@@ -750,10 +750,10 @@ const PageList = () => {
                             </div>
                             <select
                               value={quickEditData.status}
-                              onChange={(e) => setQuickEditData({ ...quickEditData, status: e.target.value as 'published' | 'draft' })}
+                              onChange={(e) => setQuickEditData({ ...quickEditData, status: e.target.value as 'publish' | 'draft' })}
                               className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                             >
-                              <option value="published">Published</option>
+                              <option value="publish">Published</option>
                               <option value="draft">Draft</option>
                             </select>
                             <button
@@ -887,7 +887,7 @@ const PageList = () => {
                         {visibleColumns.status && (
                           <td className="px-3 py-3">
                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                              page.status === 'published' 
+                              page.status === 'publish' 
                                 ? 'bg-green-100 text-green-800' 
                                 : page.status === 'draft'
                                 ? 'bg-yellow-100 text-yellow-800'
@@ -895,7 +895,7 @@ const PageList = () => {
                                 ? 'bg-red-100 text-red-800'
                                 : 'bg-gray-100 text-gray-800'
                             }`}>
-                              {page.status === 'published' ? 'Published' : 
+                              {page.status === 'publish' ? 'Published' : 
                                page.status === 'draft' ? 'Draft' :
                                page.status === 'trash' ? 'Trash' : page.status}
                             </span>
