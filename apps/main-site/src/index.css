@@ -1,6 +1,3 @@
-/* Import TheDANG theme styles */
-@import './styles/thedang-theme.css';
-
 /* Import all theme variations */
 @import './styles/themes/index.css';
 

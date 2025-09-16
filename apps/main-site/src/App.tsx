@@ -1,5 +1,7 @@
 import { FC, useEffect  } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
 import { useAuthStore } from './stores/authStore';
 import { DevAuthProvider } from './lib/DevAuthProvider';
@@ -27,10 +29,6 @@ import CustomerShop from './pages/customer/Shop';
 // Digital Signage Pages
 import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
-// TheDANG Style Home (without editor)
-import TheDANGStyleHome from './pages/TheDANGStyleHome';
-import HomeDynamic from './pages/HomeDynamic';
-import HomeWithSettings from './pages/HomeWithSettings';
 // Temporarily disabled: import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
 
 // Test Dashboard
@@ -71,62 +69,108 @@ const App: FC = () => {
         <Router>
           <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<HomeWithSettings />} />
-          <Route path="/posts/:slugOrId" element={<PostDetail />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/posts/:slugOrId" element={
+            <Layout>
+              <PostDetail />
+            </Layout>
+          } />
+          <Route path="/login" element={
+            <Layout>
+              <Login />
+            </Layout>
+          } />
           <Route path="/auth/callback" element={<AuthCallbackV2 />} />
           <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
-          <Route path="/auth/verify-email/pending" element={<EmailVerificationPending />} />
-          <Route path="/auth/verify-email/success" element={<EmailVerificationSuccess />} />
-          <Route path="/auth/verify-email/error" element={<EmailVerificationError />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/verify-email/pending" element={
+            <Layout>
+              <EmailVerificationPending />
+            </Layout>
+          } />
+          <Route path="/auth/verify-email/success" element={
+            <Layout>
+              <EmailVerificationSuccess />
+            </Layout>
+          } />
+          <Route path="/auth/verify-email/error" element={
+            <Layout>
+              <EmailVerificationError />
+            </Layout>
+          } />
+          <Route path="/auth/forgot-password" element={
+            <Layout>
+              <ForgotPassword />
+            </Layout>
+          } />
+          <Route path="/auth/reset-password" element={
+            <Layout>
+              <ResetPassword />
+            </Layout>
+          } />
           
           {/* Protected Admin Routes */}
           <Route path="/admin" element={
             <PrivateRoute allowedRoles={['admin']}>
-              <AdminDashboard />
+              <Layout>
+                <AdminDashboard />
+              </Layout>
             </PrivateRoute>
           } />
           
           {/* Protected Supplier Routes */}
           <Route path="/supplier" element={
             <PrivateRoute allowedRoles={['supplier']}>
-              <SupplierDashboard />
+              <Layout>
+                <SupplierDashboard />
+              </Layout>
             </PrivateRoute>
           } />
           <Route path="/supplier/products" element={
             <PrivateRoute allowedRoles={['supplier']}>
-              <SupplierProductList />
+              <Layout>
+                <SupplierProductList />
+              </Layout>
             </PrivateRoute>
           } />
           <Route path="/supplier/products/new" element={
             <PrivateRoute allowedRoles={['supplier']}>
-              <SupplierProductForm />
+              <Layout>
+                <SupplierProductForm />
+              </Layout>
             </PrivateRoute>
           } />
           <Route path="/supplier/products/:id" element={
             <PrivateRoute allowedRoles={['supplier']}>
-              <SupplierProductDetail />
+              <Layout>
+                <SupplierProductDetail />
+              </Layout>
             </PrivateRoute>
           } />
           
           {/* Protected Retailer Routes */}
           <Route path="/retailer" element={
             <PrivateRoute allowedRoles={['retailer']}>
-              <RetailerDashboard />
+              <Layout>
+                <RetailerDashboard />
+              </Layout>
             </PrivateRoute>
           } />
           
           {/* Customer Routes */}
-          <Route path="/shop" element={<CustomerShop />} />
+          <Route path="/shop" element={
+            <Layout>
+              <CustomerShop />
+            </Layout>
+          } />
           
           {/* Digital Signage Routes */}
           <Route
             path="/signage"
             element={
                 <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                  <DigitalSignageDashboard />
+                  <Layout>
+                    <DigitalSignageDashboard />
+                  </Layout>
                 </PrivateRoute>
             }
           />
@@ -134,26 +178,68 @@ const App: FC = () => {
             path="/signage/*"
             element={
                 <PrivateRoute allowedUserTypes={['admin', 'manager']}>
-                  <DigitalSignageDashboard />
+                  <Layout>
+                    <DigitalSignageDashboard />
+                  </Layout>
                 </PrivateRoute>
             }
           />
 
           {/* Test Dashboard */}
-          <Route path="/test-dashboard" element={<TestDashboard />} />
-          <Route path="/test/session-sync" element={<SessionSyncTest />} />
+          <Route path="/test-dashboard" element={
+            <Layout>
+              <TestDashboard />
+            </Layout>
+          } />
+          <Route path="/test/session-sync" element={
+            <Layout>
+              <SessionSyncTest />
+            </Layout>
+          } />
           
           {/* Demo Pages */}
-          <Route path="/spectra-blocks-demo" element={<SpectraBlocksDemo />} />
+          <Route path="/spectra-blocks-demo" element={
+            <Layout>
+              <SpectraBlocksDemo />
+            </Layout>
+          } />
           
           {/* Temporarily Disabled Features - will be restored after shared components are fixed */}
-          <Route path="/editor" element={<DisabledFeaturePage />} />
-          <Route path="/editor-demo" element={<DisabledFeaturePage />} />
-          <Route path="/thedang-editor" element={<DisabledFeaturePage />} />
-          <Route path="/fullscreen-editor" element={<DisabledFeaturePage />} />
-          <Route path="/admin-test" element={<DisabledFeaturePage />} />
-          <Route path="/dropshipping" element={<DisabledFeaturePage />} />
-          <Route path="/healthcare" element={<DisabledFeaturePage />} />
+          <Route path="/editor" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
+          <Route path="/editor-demo" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
+          <Route path="/thedang-editor" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
+          <Route path="/fullscreen-editor" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
+          <Route path="/admin-test" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
+          <Route path="/dropshipping" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
+          <Route path="/healthcare" element={
+            <Layout>
+              <DisabledFeaturePage />
+            </Layout>
+          } />
           
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -161,6 +161,34 @@ const settingsStore: Map<string, any> = new Map([
 ]);
 
 /**
+ * @route   GET /api/v1/settings/homepage
+ * @desc    Get homepage settings (public endpoint for frontend)
+ * @access  Public
+ */
+router.get('/homepage', async (req: Request, res: Response) => {
+  try {
+    const readingSettings = settingsStore.get('reading') || {};
+    
+    // 홈페이지 관련 설정만 추출하여 프론트엔드 형식으로 변환
+    const homepageSettings = {
+      type: readingSettings.homepageDisplay === 'latest' ? 'latest_posts' : 'static_page',
+      pageId: readingSettings.staticHomePage,
+      postsPerPage: readingSettings.postsPerPage || 10
+    };
+    
+    res.json({
+      success: true,
+      data: homepageSettings
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch homepage settings'
+    });
+  }
+});
+
+/**
  * @route   GET /api/v1/settings/:section
  * @desc    Get settings for a specific section
  * @access  Private
@@ -189,6 +217,56 @@ router.get('/:section', authenticateToken, async (req: Request, res: Response) =
     });
   }
 });
+
+/**
+ * @route   PUT /api/v1/settings/reading
+ * @desc    Update reading settings (특별히 홈페이지 설정 변환 처리)
+ * @access  Private (Admin only)
+ */
+router.put('/reading',
+  authenticateToken,
+  checkPermission('settings:write'),
+  async (req: Request, res: Response) => {
+    try {
+      const newSettings = req.body;
+      
+      // 기존 설정과 병합
+      const currentSettings = settingsStore.get('reading') || {};
+      const updatedSettings = { ...currentSettings };
+      
+      // 관리자 대시보드에서 온 데이터 형식을 내부 형식으로 변환
+      if (newSettings.homepageType !== undefined) {
+        updatedSettings.homepageDisplay = newSettings.homepageType === 'static_page' ? 'page' : 'latest';
+      }
+      if (newSettings.homepageId !== undefined) {
+        updatedSettings.staticHomePage = newSettings.homepageId;
+      }
+      if (newSettings.postsPerPage !== undefined) {
+        updatedSettings.postsPerPage = newSettings.postsPerPage;
+      }
+      if (newSettings.showSummary !== undefined) {
+        updatedSettings.showFullContent = newSettings.showSummary === 'full';
+      }
+      if (newSettings.excerptLength !== undefined) {
+        updatedSettings.excerptLength = newSettings.excerptLength;
+      }
+      
+      // 설정 저장
+      settingsStore.set('reading', updatedSettings);
+      
+      res.json({
+        success: true,
+        data: updatedSettings,
+        message: 'Reading settings updated successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update reading settings'
+      });
+    }
+  }
+);
 
 /**
  * @route   PUT /api/v1/settings/:section

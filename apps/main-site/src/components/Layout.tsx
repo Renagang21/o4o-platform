@@ -1,18 +1,47 @@
-import { FC } from 'react';
-import { Outlet } from 'react-router-dom';
-import AppHeader from './AppHeader';
-import Footer from './Footer';
+import { FC, ReactNode } from 'react';
+import TemplatePartRenderer from './TemplatePartRenderer';
 
-const Layout: FC = () => {
+interface LayoutProps {
+  children: ReactNode;
+  context?: {
+    pageId?: string;
+    postType?: string;
+    categories?: string[];
+    userRole?: string;
+  };
+  className?: string;
+}
+
+/**
+ * WordPress Theme Layout Component
+ * Provides consistent header/footer using TemplatePartRenderer
+ * All pages should use this layout for theme consistency
+ */
+const Layout: FC<LayoutProps> = ({ 
+  children, 
+  context = {},
+  className = '' 
+}) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <AppHeader />
-      <main className="flex-1">
-        <Outlet />
+    <div className={`wordpress-theme-wrapper min-h-screen flex flex-col ${className}`}>
+      {/* WordPress Header Template Part */}
+      <TemplatePartRenderer 
+        area="header" 
+        context={context}
+      />
+      
+      {/* Main Content Area */}
+      <main className="flex-1 main-content">
+        {children}
       </main>
-      <Footer />
+      
+      {/* WordPress Footer Template Part */}
+      <TemplatePartRenderer 
+        area="footer" 
+        context={context}
+      />
     </div>
   );
 };
 
-export default Layout; 
+export default Layout;
