@@ -42,18 +42,23 @@ jobs:
           # Pull latest changes
           echo "🔄 Pulling latest nginx configs..."
           git fetch origin
+          git config pull.rebase false
           git pull origin main
           
           # Copy nginx configs to system
           echo "📋 Deploying nginx configs..."
           sudo cp nginx-configs/admin.neture.co.kr.conf /etc/nginx/sites-available/
           sudo cp nginx-configs/neture.co.kr.conf /etc/nginx/sites-available/ || true
-          sudo cp nginx-configs/api.neture.co.kr.conf /etc/nginx/sites-available/ || true
+          sudo cp nginx-configs/forum.neture.co.kr.conf /etc/nginx/sites-available/ || true
+          sudo cp nginx-configs/shop.neture.co.kr.conf /etc/nginx/sites-available/ || true
+          sudo cp nginx-configs/signage.neture.co.kr.conf /etc/nginx/sites-available/ || true
           
           # Enable sites (create symlinks)
           sudo ln -sf /etc/nginx/sites-available/admin.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
           sudo ln -sf /etc/nginx/sites-available/neture.co.kr.conf /etc/nginx/sites-enabled/ || true
-          sudo ln -sf /etc/nginx/sites-available/api.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
+          sudo ln -sf /etc/nginx/sites-available/forum.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
+          sudo ln -sf /etc/nginx/sites-available/shop.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
+          sudo ln -sf /etc/nginx/sites-available/signage.neture.co.kr.conf /etc/nginx/sites-enabled/ || true
           
           # Test nginx configuration
           echo "🧪 Testing nginx configuration..."
