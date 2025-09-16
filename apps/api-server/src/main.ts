@@ -617,7 +617,7 @@ app.use('/api/settings', settingsRoutes);
 // Email settings routes
 import emailSettingsRoutes from './routes/email-settings.routes';
 import smtpRoutes from './routes/v1/smtp.routes';
-app.use('/api/v1/settings', emailSettingsRoutes);
+app.use('/api/v1/email', emailSettingsRoutes);
 app.use('/api/v1/smtp', smtpRoutes); // SMTP management routes
 app.use('/api/auth', emailAuthRoutes);
 app.use('/api/auth/accounts', accountLinkingRoutes); // Account linking routes
