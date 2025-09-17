@@ -58,23 +58,26 @@ router.get('/templates/homepage', async (req, res) => {
   }
 });
 
-// Get page by slug
-router.get('/pages/:slug', async (req, res) => {
+// Get page by UUID or slug
+router.get('/pages/:idOrSlug', async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { idOrSlug } = req.params;
     const pageRepository = AppDataSource.getRepository(Page);
     
+    // Check if parameter is UUID format
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+    
+    // Find page by ID or slug
     const page = await pageRepository.findOne({
-      where: { 
-        slug,
-        status: 'publish'
-      }
+      where: isUUID 
+        ? { id: idOrSlug, status: 'publish' }
+        : { slug: idOrSlug, status: 'publish' }
     });
 
     if (!page) {
       return res.status(404).json({
         success: false,
-        error: 'Page not found'
+        error: 'Page not found or not published'
       });
     }
 
