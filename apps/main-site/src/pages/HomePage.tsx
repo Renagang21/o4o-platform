@@ -25,12 +25,31 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Add request interceptor for authentication
+// Add request interceptor for authentication (skip for public endpoints)
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // List of public endpoints that don't require authentication
+  const publicEndpoints = [
+    '/settings/homepage',
+    '/api/public/',
+    '/api/posts',
+    '/api/pages',
+    '/api/categories',
+    '/api/tags'
+  ];
+  
+  // Check if the request is for a public endpoint
+  const isPublicEndpoint = publicEndpoints.some(endpoint => 
+    config.url?.startsWith(endpoint)
+  );
+  
+  // Only add Authorization header for non-public endpoints
+  if (!isPublicEndpoint) {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
+  
   return config;
 });
 
