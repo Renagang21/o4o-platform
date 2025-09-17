@@ -54,6 +54,7 @@ import logger from './utils/logger';
 // Database connection
 import { AppDataSource } from './database/connection';
 import { Post } from './entities/Post';
+import { Page } from './entities/Page';
 import { SessionSyncService } from './services/sessionSyncService';
 import { WebSocketSessionSync } from './websocket/sessionSync';
 import { errorHandler } from './middleware/errorHandler';
@@ -468,6 +469,93 @@ app.get('/api/ecommerce/health', (req, res) => {
     service: 'ecommerce',
     timestamp: new Date().toISOString()
   });
+});
+
+// Temporary debug endpoint to check pages table schema
+app.get('/api/debug/pages-schema', async (req, res) => {
+  try {
+    if (!AppDataSource.isInitialized) {
+      return res.status(503).json({ error: 'Database not initialized' });
+    }
+    
+    const queryRunner = AppDataSource.createQueryRunner();
+    
+    // Check table existence
+    const tableExists = await queryRunner.query(
+      "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'pages')"
+    );
+    
+    if (!tableExists[0].exists) {
+      await queryRunner.release();
+      return res.json({ 
+        tableExists: false, 
+        message: 'Pages table does not exist' 
+      });
+    }
+    
+    // Get column information
+    const columns = await queryRunner.query(`
+      SELECT column_name, data_type, is_nullable, column_default 
+      FROM information_schema.columns 
+      WHERE table_name = 'pages' 
+      ORDER BY ordinal_position
+    `);
+    
+    await queryRunner.release();
+    
+    res.json({
+      tableExists: true,
+      columns: columns
+    });
+  } catch (error) {
+    logger.error('Debug schema check error:', error);
+    res.status(500).json({ 
+      error: 'Schema check failed', 
+      message: error.message 
+    });
+  }
+});
+
+// Temporary debug endpoint to create test page
+app.post('/api/debug/create-test-page', async (req, res) => {
+  try {
+    if (!AppDataSource.isInitialized) {
+      return res.status(503).json({ error: 'Database not initialized' });
+    }
+    
+    const pageRepository = AppDataSource.getRepository(Page);
+    
+    const testPage = pageRepository.create({
+      title: '홈페이지 테스트 페이지',
+      slug: 'homepage-test-' + Date.now(),
+      content: { blocks: [{ type: 'paragraph', data: { text: '이것은 홈페이지용 테스트 페이지입니다.' } }] },
+      excerpt: '홈페이지 테스트용',
+      status: 'publish',
+      type: 'page',
+      authorId: null, // No author for test
+      menuOrder: 0,
+      showInMenu: true,
+      isHomepage: false
+    });
+    
+    const savedPage = await pageRepository.save(testPage);
+    
+    res.json({
+      success: true,
+      page: {
+        id: savedPage.id,
+        title: savedPage.title,
+        slug: savedPage.slug,
+        status: savedPage.status
+      }
+    });
+  } catch (error) {
+    logger.error('Debug create page error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create test page', 
+      message: error.message 
+    });
+  }
 });
 
 // Apply rate limiting to specific endpoints  

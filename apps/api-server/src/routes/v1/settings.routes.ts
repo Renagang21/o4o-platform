@@ -31,6 +31,53 @@ router.get('/test', async (req: Request, res: Response) => {
   }
 });
 
+// Temporary debug endpoint to test homepage settings without auth
+router.put('/debug/homepage', async (req: Request, res: Response) => {
+  try {
+    const { pageId } = req.body;
+    
+    if (!pageId) {
+      return res.status(400).json({
+        success: false,
+        error: 'pageId is required'
+      });
+    }
+    
+    // Test settings save
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    
+    const readingSettings = {
+      homepageType: 'static_page',
+      homepageId: pageId,
+      postsPerPage: 10,
+      showSummary: 'excerpt',
+      excerptLength: 150
+    };
+    
+    // Save to database
+    const settingsEntity = settingsRepository.create({
+      key: 'reading',
+      type: 'reading',
+      value: readingSettings
+    });
+    
+    await settingsRepository.save(settingsEntity);
+    
+    res.json({
+      success: true,
+      message: 'Homepage settings saved successfully (debug)',
+      data: readingSettings
+    });
+  } catch (error) {
+    logger.error('Debug homepage save error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to save homepage settings',
+      message: error.message
+    });
+  }
+});
+
 // 설정 데이터 저장 (실제로는 DB 사용)
 const settingsStore: Map<string, any> = new Map([
   ['general', {
