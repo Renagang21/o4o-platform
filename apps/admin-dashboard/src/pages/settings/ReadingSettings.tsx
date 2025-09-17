@@ -75,6 +75,8 @@ export default function ReadingSettings() {
         console.warn('Reading Settings API 실패, localStorage 사용:', apiError);
         const fallbackData = loadSettingsFromStorage(STORAGE_KEYS.READING_SETTINGS, DEFAULT_READING_SETTINGS);
         setSettings(fallbackData);
+        // 사용자에게 오프라인 상태임을 알림
+        toast.error('서버에서 설정을 불러올 수 없습니다. 로컬 저장된 설정을 사용합니다.');
         return fallbackData;
       }
     }
@@ -95,14 +97,15 @@ export default function ReadingSettings() {
         saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
         return response;
       } catch (apiError) {
-        // API 실패 시 localStorage에만 저장
-        console.warn('Reading Settings API 저장 실패, localStorage에만 저장:', apiError);
-        saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
-        throw new Error('서버 저장 실패, 로컬에만 저장되었습니다');
+        // API 실패 시 에러를 그대로 전파하여 사용자에게 실제 오류 상황을 알림
+        console.warn('Reading Settings API 저장 실패:', apiError);
+        throw new Error('서버에 설정을 저장할 수 없습니다. 네트워크 연결을 확인해주세요.');
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['settings', 'reading'] });
+    onSuccess: async () => {
+      // 즉시 서버에서 최신 데이터를 다시 가져와 동기화
+      await queryClient.invalidateQueries({ queryKey: ['settings', 'reading'] });
+      await queryClient.refetchQueries({ queryKey: ['settings', 'reading'] });
       toast.success('읽기 설정이 저장되었습니다');
     },
     onError: (error: unknown) => {

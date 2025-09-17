@@ -14,30 +14,45 @@ export const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Add auth token if available
-    // 토큰 조회 우선순위: accessToken > token > authToken > admin-auth-storage
-    let token = localStorage.getItem('accessToken') || 
-                localStorage.getItem('token') || 
-                localStorage.getItem('authToken')
+    // 공개 엔드포인트 목록 (인증 헤더 불필요)
+    const publicEndpoints = [
+      '/api/v1/settings/homepage',
+      '/api/public/',
+      '/api/v1/settings/test'
+    ];
     
-    // 위의 키들에서 토큰을 찾지 못했으면 admin-auth-storage에서 확인
-    if (!token) {
-      const adminStorage = localStorage.getItem('admin-auth-storage')
-      if (adminStorage) {
-        try {
-          const parsed = JSON.parse(adminStorage)
-          if (parsed.state?.accessToken || parsed.state?.token) {
-            token = parsed.state.accessToken || parsed.state.token
+    // 현재 요청이 공개 엔드포인트인지 확인
+    const isPublicEndpoint = publicEndpoints.some(endpoint => 
+      config.url?.includes(endpoint)
+    );
+    
+    // 공개 엔드포인트가 아닌 경우에만 인증 토큰 추가
+    if (!isPublicEndpoint) {
+      // Add auth token if available
+      // 토큰 조회 우선순위: accessToken > token > authToken > admin-auth-storage
+      let token = localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token') || 
+                  localStorage.getItem('authToken')
+      
+      // 위의 키들에서 토큰을 찾지 못했으면 admin-auth-storage에서 확인
+      if (!token) {
+        const adminStorage = localStorage.getItem('admin-auth-storage')
+        if (adminStorage) {
+          try {
+            const parsed = JSON.parse(adminStorage)
+            if (parsed.state?.accessToken || parsed.state?.token) {
+              token = parsed.state.accessToken || parsed.state.token
+            }
+          } catch {
+      // Removed // console.warn
           }
-        } catch {
-    // Removed // console.warn
         }
       }
-    }
-    
-    // 토큰이 있으면 헤더에 추가
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
+      
+      // 토큰이 있으면 헤더에 추가
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`
+      }
     }
     
     return config
