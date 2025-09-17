@@ -71,8 +71,8 @@ const MediaListWordPress: FC = () => {
             size: 123456,
             width: 1920,
             height: 1080,
-            thumbnailUrl: 'https://via.placeholder.com/150',
-            url: 'https://via.placeholder.com/1920x1080'
+            thumbnailUrl: '/placeholder-150x150.png',
+            url: '/placeholder-1920x1080.png'
           }
         ],
         pagination: {
@@ -135,7 +135,13 @@ const MediaListWordPress: FC = () => {
     data: {
       file: (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src={item.thumbnailUrl || 'https://via.placeholder.com/60'} alt={item.title} style={{ width: 60, height: 60, objectFit: 'cover' }} />
+          {item.thumbnailUrl ? (
+            <img src={item.thumbnailUrl} alt={item.title} style={{ width: 60, height: 60, objectFit: 'cover' }} />
+          ) : (
+            <div style={{ width: 60, height: 60, backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {getFileIcon(item.mimeType)}
+            </div>
+          )}
           <div>
             <strong>
               <a href="#" className="row-title">

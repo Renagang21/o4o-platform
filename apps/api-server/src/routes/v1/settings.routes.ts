@@ -380,6 +380,47 @@ router.get('/homepage', async (req: Request, res: Response) => {
 });
 
 /**
+ * @route   GET /api/v1/settings/reading
+ * @desc    Get reading settings (public endpoint for frontend)
+ * @access  Public
+ */
+router.get('/reading', async (req: Request, res: Response) => {
+  try {
+    // Get reading settings from database
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    const dbSettings = await settingsRepository.findOne({ 
+      where: { key: 'reading', type: 'reading' } 
+    });
+    
+    if (dbSettings && dbSettings.value) {
+      return res.json({
+        success: true,
+        data: dbSettings.value
+      });
+    }
+    
+    // Fallback to default settings
+    const defaultSettings = {
+      homepageType: 'latest_posts',
+      postsPerPage: 10,
+      showSummary: 'excerpt',
+      excerptLength: 150
+    };
+    
+    res.json({
+      success: true,
+      data: defaultSettings
+    });
+  } catch (error) {
+    logger.error('Failed to fetch reading settings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch reading settings'
+    });
+  }
+});
+
+/**
  * @route   GET /api/v1/settings/:section
  * @desc    Get settings for a specific section
  * @access  Private
