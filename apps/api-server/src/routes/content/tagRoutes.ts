@@ -12,26 +12,27 @@ router.get('/tags/popular', tagController.getPopularTags.bind(tagController));
 router.get('/tags/:id', tagController.getTag.bind(tagController));
 router.get('/tags/:id/stats', tagController.getTagStats.bind(tagController));
 
-// Protected routes - require authentication
-router.use(authMiddleware);
-
-// Admin only routes - require admin role
+// Admin only routes - require authentication and admin role
 router.post('/tags', 
+  authMiddleware,
   checkRole(['admin', 'super_admin', 'editor']), 
   tagController.createTag.bind(tagController)
 );
 
 router.put('/tags/:id', 
+  authMiddleware,
   checkRole(['admin', 'super_admin', 'editor']), 
   tagController.updateTag.bind(tagController)
 );
 
 router.delete('/tags/:id', 
+  authMiddleware,
   checkRole(['admin', 'super_admin']), 
   tagController.deleteTag.bind(tagController)
 );
 
 router.post('/tags/:fromId/merge/:toId', 
+  authMiddleware,
   checkRole(['admin', 'super_admin']), 
   tagController.mergeTags.bind(tagController)
 );

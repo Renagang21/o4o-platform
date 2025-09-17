@@ -571,10 +571,10 @@ app.use('/v1/content', contentV1Routes);
 // API 라우트 - auth routes MUST be before general rate limiter
 // IMPORTANT: Basic auth routes must come FIRST before any other auth-related routes
 app.use('/api/auth', authRoutes);
-app.use('/api/v1/auth', authRoutes); // v1 compatibility - this MUST be the first /api/v1/auth route
 
-// Other specialized auth routes come AFTER basic auth
-app.use('/api/v1/auth', authV2Routes); // Cookie-based auth routes
+// V1 auth routes with more specific paths to avoid conflicts
+app.use('/api/v1/auth/cookie', authV2Routes); // Cookie-based auth routes (moved to specific sub-path)
+app.use('/api/v1/auth', authRoutes); // v1 compatibility - JWT-based auth routes
 app.use('/api/v1/accounts', linkedAccountsRoutes); // Linked accounts routes (moved to avoid conflict)
 app.use('/api/v1/social', socialAuthRoutes); // Social auth routes (moved to avoid conflict)
 
@@ -585,23 +585,24 @@ app.use('/api/settings', settingsLimiter, oauthSettingsRoutes);
 app.use('/api/settings', settingsLimiter, settingsRoutes);
 app.use('/settings', settingsLimiter, settingsRoutes);
 
-// Apply standard rate limiting to authenticated endpoints
-app.use('/api/', limiter);
+// Apply standard rate limiting to authenticated endpoints (exclude public routes)
+// Note: Public routes (/api/public) should not have rate limiting
+// Non-existent routes should return 404, not 401
 
-// Protected API routes (after rate limiter)
-app.use('/api/users', userRoutes);
-app.use('/api/v1/users', usersV1Routes); // V1 user management routes with comprehensive functionality
-app.use('/api/admin', adminRoutes);
-app.use('/api/ecommerce', ecommerceRoutes);
+// Protected API routes (with individual rate limiting)
+app.use('/api/users', limiter, userRoutes);
+app.use('/api/v1/users', limiter, usersV1Routes); // V1 user management routes with comprehensive functionality
+app.use('/api/admin', limiter, adminRoutes);
+app.use('/api/ecommerce', limiter, ecommerceRoutes);
 app.use('/ecommerce', ecommerceSettingsRoutes); // Direct ecommerce settings route
-app.use('/api/cpt', cptRoutes);
-app.use('/api/post-creation', postCreationRoutes);
-app.use('/api/services', servicesRoutes);
-app.use('/api/signage', signageRoutes);
-app.use('/api/crowdfunding', crowdfundingRoutes);
-app.use('/api/forum', forumRoutes);
+app.use('/api/cpt', limiter, cptRoutes);
+app.use('/api/post-creation', limiter, postCreationRoutes);
+app.use('/api/services', limiter, servicesRoutes);
+app.use('/api/signage', limiter, signageRoutes);
+app.use('/api/crowdfunding', limiter, crowdfundingRoutes);
+app.use('/api/forum', limiter, forumRoutes);
 app.use('/api/public', publicRoutes); // Public routes (no auth required)
-app.use('/api/v1/sessions', sessionsRoutes); // Session management routes
+app.use('/api/v1/sessions', limiter, sessionsRoutes); // Session management routes
 
 // Categories routes (public access)
 app.use('/api/categories', categoriesRoutes);
@@ -764,18 +765,18 @@ app.use('/api/v1/custom-post-types', customPostTypesRoutes); // Custom post type
 
 // Tag routes
 import tagRoutes from './routes/content/tagRoutes';
-app.use('/api', tagRoutes); // Tags at /api/tags
+app.use('/api', tagRoutes); // Tags at /api/tags (mounted at specific paths in the router)
 app.use('/api/v1/menus', menusRoutes); // Menus routes
 app.use('/api/v1/menu-items', menuItemsRoutes); // Menu items routes
 app.use('/api/v1/media', contentRoutes); // Media routes (v1 API compatibility)
 
 // Advanced menu features (Phase 2)
 import menuAdvancedRoutes from './routes/menu-advanced';
-app.use('/api/v1', menuAdvancedRoutes); // Advanced menu APIs
+app.use('/api/v1/menus-advanced', menuAdvancedRoutes); // Advanced menu APIs
 
 // Menu Phase 3 features (Caching, Analytics, Widgets)
 import menuPhase3Routes from './routes/menu-phase3';
-app.use('/api/v1', menuPhase3Routes); // Phase 3 menu APIs
+app.use('/api/v1/menus-phase3', menuPhase3Routes); // Phase 3 menu APIs
 app.use('/api/v1/content', contentV1Routes);
 app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
@@ -791,8 +792,8 @@ app.use('/api/v1/export', exportV1Routes);
 app.use('/api/v1/shipping', shippingV1Routes);
 // import dropshippingV1Routes from './routes/v1/dropshipping.routes'; // Already imported above
 app.use('/api/v1/dropshipping', dropshippingV1Routes);
-app.use('/api/v1', productVariationRoutes); // 상품 변형 라우트
-app.use('/api/v1', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
+app.use('/api/v1/products', productVariationRoutes); // 상품 변형 라우트
+app.use('/api/v1/payments', tossPaymentsRoutes); // 토스페이먼츠 결제 라우트
 app.use('/v1/settings', settingsV1Routes); // 설정 라우트 - 자동 배포 재테스트
 app.use('/api/v1/acf', acfV1Routes); // ACF v1 라우트
 
