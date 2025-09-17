@@ -76,11 +76,7 @@ export function useTemplateParts({ area, context }: UseTemplatePartsOptions) {
           throw new Error('Failed to fetch template parts');
         }
       } catch (err) {
-    // Error logging - use proper error handler
         setError(err instanceof Error ? err.message : 'Unknown error');
-        
-        // Fallback to empty array on error
-        setTemplateParts([]);
       } finally {
         setLoading(false);
       }
