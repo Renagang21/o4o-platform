@@ -55,17 +55,8 @@ apiClient.interceptors.request.use((config) => {
 
 // Fetch homepage settings
 const fetchHomepageSettings = async (): Promise<HomepageSettings> => {
-  try {
-    const { data } = await apiClient.get('/settings/homepage');
-    return data.data;
-  } catch (error) {
-    // If homepage settings API fails, default to latest posts
-    console.warn('Homepage settings API failed, defaulting to latest posts:', error);
-    return {
-      type: 'latest_posts',
-      postsPerPage: 10
-    };
-  }
+  const { data } = await apiClient.get('/settings/homepage');
+  return data.data;
 };
 
 // Fetch specific page
@@ -131,11 +122,22 @@ const HomePage: FC = () => {
     );
   }
 
-  // Error fallback - show latest posts
+  // Error handling - show explicit error
   if (settingsError || !settings) {
     return (
       <Layout context={context}>
-        <BlogList postsPerPage={10} />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center p-8 bg-red-50 border border-red-200 rounded-lg">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">홈페이지 로딩 실패</h1>
+            <p className="text-red-500 mb-4">API 오류: 홈페이지 설정을 불러올 수 없습니다</p>
+            <details className="text-left">
+              <summary className="cursor-pointer text-red-700 font-medium">에러 상세정보</summary>
+              <pre className="mt-2 text-sm text-red-600 bg-red-100 p-2 rounded">
+                {settingsError ? String(settingsError) : 'Settings data is null'}
+              </pre>
+            </details>
+          </div>
+        </div>
       </Layout>
     );
   }
@@ -162,11 +164,23 @@ const HomePage: FC = () => {
       );
     }
 
-    // Page error - fallback to latest posts
+    // Page error - show explicit error
     if (pageError || !pageData) {
       return (
         <Layout context={context}>
-          <BlogList postsPerPage={settings.postsPerPage || 10} />
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center p-8 bg-red-50 border border-red-200 rounded-lg">
+              <h1 className="text-2xl font-bold text-red-600 mb-4">페이지 로딩 실패</h1>
+              <p className="text-red-500 mb-4">API 오류: 정적 페이지를 불러올 수 없습니다</p>
+              <p className="text-gray-600 mb-4">페이지 ID: {settings.pageId}</p>
+              <details className="text-left">
+                <summary className="cursor-pointer text-red-700 font-medium">에러 상세정보</summary>
+                <pre className="mt-2 text-sm text-red-600 bg-red-100 p-2 rounded">
+                  {pageError ? String(pageError) : 'Page data is null'}
+                </pre>
+              </details>
+            </div>
+          </div>
         </Layout>
       );
     }
@@ -181,10 +195,21 @@ const HomePage: FC = () => {
     );
   }
 
-  // Final fallback to latest posts
+  // Final fallback - should not reach here
   return (
     <Layout context={context}>
-      <BlogList postsPerPage={10} />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h1 className="text-2xl font-bold text-yellow-600 mb-4">알 수 없는 상태</h1>
+          <p className="text-yellow-500 mb-4">예상하지 못한 홈페이지 상태입니다</p>
+          <details className="text-left">
+            <summary className="cursor-pointer text-yellow-700 font-medium">설정 정보</summary>
+            <pre className="mt-2 text-sm text-yellow-600 bg-yellow-100 p-2 rounded">
+              {JSON.stringify(settings, null, 2)}
+            </pre>
+          </details>
+        </div>
+      </div>
     </Layout>
   );
 };
