@@ -198,7 +198,7 @@ const MediaListWordPress: FC = () => {
 
   const handleEdit = (id: string) => {
     // Handle edit functionality
-    console.log('Edit media:', id);
+    // TODO: Implement edit functionality
   };
 
   const handleDelete = async (id: string) => {
