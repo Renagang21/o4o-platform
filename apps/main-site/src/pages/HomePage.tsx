@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { client } from '../api/client';
+import apiClient from '../api/client';
 import BlogList from '../components/BlogList';
 import PageRenderer from '../components/PageRenderer';
 import Layout from '../components/Layout';
@@ -32,13 +32,13 @@ interface Page {
 
 // Fetch homepage settings
 const fetchHomepageSettings = async (): Promise<HomepageResponse> => {
-  const response = await client.get('/v1/settings/homepage');
+  const response = await apiClient.get('/v1/settings/homepage');
   return response.data;
 };
 
 // Fetch page data for static page mode
 const fetchPageData = async (pageId: string): Promise<Page> => {
-  const response = await client.get(`/public/pages/${pageId}`);
+  const response = await apiClient.get(`/public/pages/${pageId}`);
   return response.data.data;
 };
 
