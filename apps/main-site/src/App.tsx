@@ -1,7 +1,7 @@
 import { FC, useEffect  } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-// import HomePage from './pages/HomePage'; // DELETED
+import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
 import { useAuthStore } from './stores/authStore';
 import { initializeAuthInterceptor } from './services/authInterceptor';
@@ -59,17 +59,7 @@ const App: FC = () => {
         <Router>
           <Routes>
           {/* Public Routes */}
-          <Route path="/" element={
-            <Layout>
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center p-8 bg-red-50 border border-red-200 rounded-lg">
-                  <h1 className="text-2xl font-bold text-red-600 mb-4">홈페이지 제거됨</h1>
-                  <p className="text-red-500 mb-4">기존 홈페이지가 완전히 제거되었습니다.</p>
-                  <p className="text-gray-600">관리자 설정에서 새로운 홈페이지를 구성해주세요.</p>
-                </div>
-              </div>
-            </Layout>
-          } />
+          <Route path="/" element={<HomePage />} />
           <Route path="/posts/:slugOrId" element={
             <Layout>
               <PostDetail />
