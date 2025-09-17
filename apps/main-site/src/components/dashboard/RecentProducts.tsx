@@ -1,45 +1,10 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Package } from 'lucide-react';
 
 const RecentProducts: FC = () => {
-  const products = [
-    {
-      id: '1',
-      name: '비타민 C 1000mg',
-      image: '/images/products/vitamin-c.png',
-      status: '판매중',
-      price: 15000
-    },
-    {
-      id: '2',
-      name: '오메가3 1000mg',
-      image: '/images/products/omega3.png',
-      status: '승인대기',
-      price: 25000
-    },
-    {
-      id: '3',
-      name: '프로바이오틱스',
-      image: '/images/products/probiotics.png',
-      status: '판매중',
-      price: 30000
-    },
-    {
-      id: '4',
-      name: '칼슘 마그네슘',
-      image: '/images/products/calcium.png',
-      status: '승인대기',
-      price: 20000
-    },
-    {
-      id: '5',
-      name: '루테인',
-      image: '/images/products/lutein.png',
-      status: '판매중',
-      price: 35000
-    }
-  ];
+  // Mock 데이터 제거 - 실제 API 연동 필요
+  const products: any[] = [];
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -67,32 +32,46 @@ const RecentProducts: FC = () => {
       </div>
 
       <div className="divide-y divide-gray-200">
-        {products.map((product: any) => (
-          <div key={product.id} className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-12 h-12">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-contain rounded-lg"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {product.name}
-                </p>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-sm text-gray-500">
-                    {product.price.toLocaleString()}원
-                  </span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(product.status)}`}>
-                    {product.status}
-                  </span>
+        {products.length === 0 ? (
+          <div className="p-12 text-center">
+            <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-600 mb-2">등록된 상품이 없습니다</h3>
+            <p className="text-gray-500 mb-4">상품을 등록하여 판매를 시작해보세요</p>
+            <Link
+              to="/dashboard/products/add"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              상품 등록하기
+            </Link>
+          </div>
+        ) : (
+          products.map((product: any) => (
+            <div key={product.id} className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0 w-12 h-12">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {product.name}
+                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-sm text-gray-500">
+                      {product.price.toLocaleString()}원
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(product.status)}`}>
+                      {product.status}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
