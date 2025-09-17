@@ -21,7 +21,7 @@ interface Page {
 
 // Global API client with proper error handling
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr',
   timeout: 10000,
 });
 
@@ -51,7 +51,7 @@ const fetchHomepageSettings = async (): Promise<HomepageSettings> => {
 
 // Fetch specific page
 const fetchPage = async (pageId: string): Promise<Page> => {
-  const { data } = await apiClient.get(`/pages/${pageId}`);
+  const { data } = await apiClient.get(`/api/public/pages/${pageId}`);
   return data.data;
 };
 
