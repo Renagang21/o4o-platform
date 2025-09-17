@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../../middleware/auth';
 import { checkPermission } from '../../middleware/permissions';
+import logger from '../../utils/logger';
 
 const router: Router = Router();
 
@@ -168,7 +169,7 @@ const settingsStore: Map<string, any> = new Map([
 router.get('/homepage', async (req: Request, res: Response) => {
   try {
     // Enhanced logging for debugging 401 issues
-    console.log(`[${new Date().toISOString()}] Homepage settings request:`, {
+    logger.debug('Homepage settings request:', {
       origin: req.headers.origin,
       userAgent: req.headers['user-agent'],
       authorization: req.headers.authorization ? 'Present' : 'None',
@@ -186,7 +187,7 @@ router.get('/homepage', async (req: Request, res: Response) => {
       postsPerPage: readingSettings.postsPerPage || 10
     };
     
-    console.log(`[${new Date().toISOString()}] Homepage settings response:`, {
+    logger.debug('Homepage settings response:', {
       success: true,
       settingsType: homepageSettings.type,
       pageId: homepageSettings.pageId
@@ -197,7 +198,7 @@ router.get('/homepage', async (req: Request, res: Response) => {
       data: homepageSettings
     });
   } catch (error) {
-    console.error(`[${new Date().toISOString()}] Homepage settings error:`, {
+    logger.error('Homepage settings error:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       origin: req.headers.origin
