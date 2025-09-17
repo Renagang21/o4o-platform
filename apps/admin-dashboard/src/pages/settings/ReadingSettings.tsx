@@ -176,7 +176,7 @@ export default function ReadingSettings() {
                         <SelectItem value="">— 선택 —</SelectItem>
                         {pages.map((page: any) => (
                           <SelectItem key={page.id} value={page.id}>
-                            {page.title}
+                            {page.title?.rendered || page.title || page.name || `페이지 ${page.id.substring(0, 8)}`}
                           </SelectItem>
                         ))}
                       </SelectContent>
