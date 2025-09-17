@@ -77,35 +77,17 @@ export const PricingTableBlock: FC<{
     highlighted?: boolean;
   }>;
 }> = ({ plans }) => {
-  const defaultPlans = [
-    {
-      name: 'Basic',
-      price: '$9',
-      period: 'month',
-      features: ['10 GB Storage', '100 GB Bandwidth', 'Email Support', 'Basic Analytics'],
-      highlighted: false
-    },
-    {
-      name: 'Pro',
-      price: '$29',
-      period: 'month',
-      features: ['100 GB Storage', '1 TB Bandwidth', 'Priority Support', 'Advanced Analytics', 'Custom Domain'],
-      highlighted: true
-    },
-    {
-      name: 'Enterprise',
-      price: '$99',
-      period: 'month',
-      features: ['Unlimited Storage', 'Unlimited Bandwidth', '24/7 Phone Support', 'Advanced Analytics', 'Custom Domain', 'API Access'],
-      highlighted: false
-    }
-  ];
-
-  const displayPlans = plans || defaultPlans;
+  if (!plans || plans.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">등록된 요금제가 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid md:grid-cols-3 gap-8 py-8">
-      {displayPlans.map((plan, index) => (
+      {plans.map((plan, index) => (
         <div
           key={index}
           className={`relative p-8 rounded-lg border-2 transition-all hover:shadow-xl ${
