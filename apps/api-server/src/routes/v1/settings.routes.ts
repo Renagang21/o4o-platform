@@ -2,6 +2,9 @@ import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../../middleware/auth';
 import { checkPermission } from '../../middleware/permissions';
 import logger from '../../utils/logger';
+import { AppDataSource } from '../../database/connection';
+import { Settings, ReadingSettings } from '../../entities/Settings';
+import { Page } from '../../entities/Page';
 
 const router: Router = Router();
 
@@ -167,30 +170,105 @@ const settingsStore: Map<string, any> = new Map([
  * @access  Public
  */
 router.get('/homepage', async (req: Request, res: Response) => {
+  const traceId = `hp-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+  
   try {
-    // Enhanced logging for debugging 401 issues
+    // Enhanced logging for debugging and monitoring
     logger.debug('Homepage settings request:', {
+      traceId,
       origin: req.headers.origin,
       userAgent: req.headers['user-agent'],
       authorization: req.headers.authorization ? 'Present' : 'None',
       ip: req.ip,
       method: req.method,
-      url: req.url
+      url: req.url,
+      timestamp: new Date().toISOString()
     });
 
-    const readingSettings = settingsStore.get('reading') || {};
+    // Get settings from database (영속 저장소)
+    const settingsRepository = AppDataSource.getRepository(Settings);
+    let readingSettings: ReadingSettings;
     
-    // 홈페이지 관련 설정만 추출하여 프론트엔드 형식으로 변환
+    try {
+      const dbSettings = await settingsRepository.findOne({ 
+        where: { key: 'reading', type: 'reading' } 
+      });
+      
+      if (dbSettings && dbSettings.value) {
+        readingSettings = dbSettings.value as ReadingSettings;
+        logger.debug('Reading settings loaded from database:', { traceId, settings: readingSettings });
+      } else {
+        // Fallback to default settings
+        readingSettings = {
+          homepageType: 'latest_posts',
+          postsPerPage: 10,
+          showSummary: 'excerpt',
+          excerptLength: 150
+        };
+        logger.info('Using default reading settings (no DB record found):', { traceId });
+      }
+    } catch (dbError) {
+      logger.warn('Database error, falling back to memory store:', { 
+        traceId, 
+        error: dbError instanceof Error ? dbError.message : 'Unknown DB error' 
+      });
+      
+      // Fallback to memory store
+      const fallbackSettings = settingsStore.get('reading') || {};
+      readingSettings = {
+        homepageType: fallbackSettings.homepageDisplay === 'static_page' ? 'static_page' : 'latest_posts',
+        homepageId: fallbackSettings.staticHomePage,
+        postsPerPage: fallbackSettings.postsPerPage || 10,
+        showSummary: fallbackSettings.showFullContent ? 'full' : 'excerpt',
+        excerptLength: fallbackSettings.excerptLength || 150
+      };
+    }
+    
+    // 안전장치: static_page이지만 pageId가 없거나 페이지가 비공개인 경우 다운그레이드
+    let finalSettings = { ...readingSettings };
+    
+    if (readingSettings.homepageType === 'static_page' && readingSettings.homepageId) {
+      try {
+        const pageRepository = AppDataSource.getRepository(Page);
+        const page = await pageRepository.findOne({
+          where: { id: readingSettings.homepageId, status: 'publish' }
+        });
+        
+        if (!page) {
+          logger.warn('Homepage page not found or not published, downgrading to latest_posts:', {
+            traceId,
+            pageId: readingSettings.homepageId,
+            action: 'downgrade_to_latest_posts'
+          });
+          
+          finalSettings = {
+            ...readingSettings,
+            homepageType: 'latest_posts',
+            homepageId: undefined
+          };
+        }
+      } catch (pageError) {
+        logger.error('Error checking page validity:', {
+          traceId,
+          pageId: readingSettings.homepageId,
+          error: pageError instanceof Error ? pageError.message : 'Unknown page error'
+        });
+      }
+    }
+    
+    // 표준 스키마로 변환하여 응답
     const homepageSettings = {
-      type: readingSettings.homepageDisplay === 'latest' ? 'latest_posts' : 'static_page',
-      pageId: readingSettings.staticHomePage,
-      postsPerPage: readingSettings.postsPerPage || 10
+      type: finalSettings.homepageType,
+      pageId: finalSettings.homepageId || null,
+      postsPerPage: finalSettings.postsPerPage || 10
     };
     
     logger.debug('Homepage settings response:', {
+      traceId,
       success: true,
       settingsType: homepageSettings.type,
-      pageId: homepageSettings.pageId
+      pageId: homepageSettings.pageId,
+      timestamp: new Date().toISOString()
     });
     
     res.json({
@@ -199,9 +277,11 @@ router.get('/homepage', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Homepage settings error:', {
+      traceId,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      origin: req.headers.origin
+      origin: req.headers.origin,
+      timestamp: new Date().toISOString()
     });
     
     res.status(500).json({
@@ -250,42 +330,179 @@ router.put('/reading',
   authenticateToken,
   checkPermission('settings:write'),
   async (req: Request, res: Response) => {
+    const traceId = `rs-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    
     try {
       const newSettings = req.body;
+      const actor = (req as any).user?.id || 'unknown';
       
-      // 기존 설정과 병합
-      const currentSettings = settingsStore.get('reading') || {};
-      const updatedSettings = { ...currentSettings };
-      
-      // 관리자 대시보드에서 온 데이터 형식을 내부 형식으로 변환
-      if (newSettings.homepageType !== undefined) {
-        updatedSettings.homepageDisplay = newSettings.homepageType === 'static_page' ? 'page' : 'latest';
-      }
-      if (newSettings.homepageId !== undefined) {
-        updatedSettings.staticHomePage = newSettings.homepageId;
-      }
-      if (newSettings.postsPerPage !== undefined) {
-        updatedSettings.postsPerPage = newSettings.postsPerPage;
-      }
-      if (newSettings.showSummary !== undefined) {
-        updatedSettings.showFullContent = newSettings.showSummary === 'full';
-      }
-      if (newSettings.excerptLength !== undefined) {
-        updatedSettings.excerptLength = newSettings.excerptLength;
-      }
-      
-      // 설정 저장
-      settingsStore.set('reading', updatedSettings);
-      
-      res.json({
-        success: true,
-        data: updatedSettings,
-        message: 'Reading settings updated successfully'
+      logger.info('Reading settings update request:', {
+        traceId,
+        actor,
+        payload: newSettings,
+        origin: req.headers.origin,
+        timestamp: new Date().toISOString()
       });
+      
+      // 입력 검증
+      if (newSettings.homepageType === 'static_page' && !newSettings.homepageId) {
+        logger.warn('Validation failed: static_page requires pageId:', { traceId, actor });
+        return res.status(400).json({
+          success: false,
+          error: 'homepageId is required when homepageType is static_page',
+          code: 'MISSING_PAGE_ID'
+        });
+      }
+      
+      // pageId 유효성 검사 (static_page인 경우)
+      if (newSettings.homepageType === 'static_page' && newSettings.homepageId) {
+        try {
+          const pageRepository = AppDataSource.getRepository(Page);
+          const page = await pageRepository.findOne({
+            where: { id: newSettings.homepageId }
+          });
+          
+          if (!page) {
+            logger.warn('Page not found during validation:', { 
+              traceId, 
+              actor, 
+              pageId: newSettings.homepageId 
+            });
+            return res.status(400).json({
+              success: false,
+              error: `Page with ID '${newSettings.homepageId}' not found`,
+              code: 'PAGE_NOT_FOUND'
+            });
+          }
+          
+          if (page.status !== 'publish') {
+            logger.warn('Page not published during validation:', { 
+              traceId, 
+              actor, 
+              pageId: newSettings.homepageId,
+              currentStatus: page.status
+            });
+            return res.status(400).json({
+              success: false,
+              error: `Page '${page.title}' is not published (current status: ${page.status})`,
+              code: 'PAGE_NOT_PUBLISHED'
+            });
+          }
+          
+          logger.debug('Page validation passed:', { 
+            traceId, 
+            pageId: newSettings.homepageId,
+            pageTitle: page.title 
+          });
+        } catch (pageError) {
+          logger.error('Error during page validation:', {
+            traceId,
+            actor,
+            pageId: newSettings.homepageId,
+            error: pageError instanceof Error ? pageError.message : 'Unknown page error'
+          });
+          
+          return res.status(500).json({
+            success: false,
+            error: 'Failed to validate page',
+            code: 'PAGE_VALIDATION_ERROR'
+          });
+        }
+      }
+      
+      // ReadingSettings 형식으로 변환
+      const readingSettings: ReadingSettings = {
+        homepageType: newSettings.homepageType || 'latest_posts',
+        homepageId: newSettings.homepageId,
+        postsPerPage: newSettings.postsPerPage || 10,
+        showSummary: newSettings.showSummary || 'excerpt',
+        excerptLength: newSettings.excerptLength || 150
+      };
+      
+      // DB에 영구 저장
+      const settingsRepository = AppDataSource.getRepository(Settings);
+      
+      try {
+        let dbSettings = await settingsRepository.findOne({ 
+          where: { key: 'reading', type: 'reading' } 
+        });
+        
+        if (dbSettings) {
+          dbSettings.value = readingSettings;
+          dbSettings.updatedAt = new Date();
+        } else {
+          dbSettings = settingsRepository.create({
+            key: 'reading',
+            type: 'reading',
+            value: readingSettings,
+            description: 'Homepage and reading display settings'
+          });
+        }
+        
+        await settingsRepository.save(dbSettings);
+        
+        logger.info('Reading settings saved to database:', {
+          traceId,
+          actor,
+          settings: readingSettings,
+          timestamp: new Date().toISOString()
+        });
+        
+        // 메모리 스토어도 업데이트 (하위 호환성)
+        const legacySettings = {
+          homepageDisplay: readingSettings.homepageType,
+          staticHomePage: readingSettings.homepageId,
+          postsPerPage: readingSettings.postsPerPage,
+          showFullContent: readingSettings.showSummary === 'full',
+          excerptLength: readingSettings.excerptLength
+        };
+        settingsStore.set('reading', legacySettings);
+        
+        res.json({
+          success: true,
+          data: readingSettings,
+          message: 'Reading settings updated successfully'
+        });
+        
+      } catch (dbError) {
+        logger.error('Database save failed:', {
+          traceId,
+          actor,
+          error: dbError instanceof Error ? dbError.message : 'Unknown DB error',
+          stack: dbError instanceof Error ? dbError.stack : undefined
+        });
+        
+        // DB 실패 시 메모리에만 저장 (임시 보호)
+        const legacySettings = {
+          homepageDisplay: readingSettings.homepageType,
+          staticHomePage: readingSettings.homepageId,
+          postsPerPage: readingSettings.postsPerPage,
+          showFullContent: readingSettings.showSummary === 'full',
+          excerptLength: readingSettings.excerptLength
+        };
+        settingsStore.set('reading', legacySettings);
+        
+        logger.warn('Fallback to memory store due to DB error:', { traceId, actor });
+        
+        res.status(500).json({
+          success: false,
+          error: 'Database save failed, settings saved temporarily',
+          code: 'DB_SAVE_FAILED'
+        });
+      }
+      
     } catch (error) {
+      logger.error('Reading settings update failed:', {
+        traceId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString()
+      });
+      
       res.status(500).json({
         success: false,
-        error: 'Failed to update reading settings'
+        error: 'Failed to update reading settings',
+        code: 'INTERNAL_ERROR'
       });
     }
   }
