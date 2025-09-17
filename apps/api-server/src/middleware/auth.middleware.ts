@@ -17,9 +17,10 @@ export const authenticate = async (
       : null;
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'No token provided'
+      return res.status(403).json({
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED',
+        message: 'Access token is required for this endpoint'
       });
     }
 
@@ -34,9 +35,10 @@ export const authenticate = async (
     });
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'User not found'
+      return res.status(403).json({
+        error: 'Invalid authentication',
+        code: 'INVALID_USER',
+        message: 'User account not found or has been deactivated'
       });
     }
 
@@ -47,9 +49,10 @@ export const authenticate = async (
     } as any;
     next();
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid token'
+    return res.status(403).json({
+      error: 'Invalid authentication',
+      code: 'INVALID_TOKEN',
+      message: 'Access token is invalid or has expired'
     });
   }
 };

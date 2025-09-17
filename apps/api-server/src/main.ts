@@ -132,6 +132,7 @@ import healthRoutes from './routes/health';
 import settingsV1Routes from './routes/v1/settings.routes';
 import galleryRoutes from './routes/gallery.routes';
 import acfV1Routes from './routes/v1/acf.routes';
+import pagesV1Routes from './routes/v1/pages.routes';
 import { affiliateRoutes, commissionRoutes, phase3Routes } from './modules/affiliate';
 import { AffiliateSocketManager } from './modules/affiliate/websocket/socket.manager';
 
@@ -471,93 +472,6 @@ app.get('/api/ecommerce/health', (req, res) => {
   });
 });
 
-// Temporary debug endpoint to check pages table schema
-app.get('/api/debug/pages-schema', async (req, res) => {
-  try {
-    if (!AppDataSource.isInitialized) {
-      return res.status(503).json({ error: 'Database not initialized' });
-    }
-    
-    const queryRunner = AppDataSource.createQueryRunner();
-    
-    // Check table existence
-    const tableExists = await queryRunner.query(
-      "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'pages')"
-    );
-    
-    if (!tableExists[0].exists) {
-      await queryRunner.release();
-      return res.json({ 
-        tableExists: false, 
-        message: 'Pages table does not exist' 
-      });
-    }
-    
-    // Get column information
-    const columns = await queryRunner.query(`
-      SELECT column_name, data_type, is_nullable, column_default 
-      FROM information_schema.columns 
-      WHERE table_name = 'pages' 
-      ORDER BY ordinal_position
-    `);
-    
-    await queryRunner.release();
-    
-    res.json({
-      tableExists: true,
-      columns: columns
-    });
-  } catch (error) {
-    logger.error('Debug schema check error:', error);
-    res.status(500).json({ 
-      error: 'Schema check failed', 
-      message: error.message 
-    });
-  }
-});
-
-// Temporary debug endpoint to create test page
-app.post('/api/debug/create-test-page', async (req, res) => {
-  try {
-    if (!AppDataSource.isInitialized) {
-      return res.status(503).json({ error: 'Database not initialized' });
-    }
-    
-    const pageRepository = AppDataSource.getRepository(Page);
-    
-    const testPage = pageRepository.create({
-      title: '홈페이지 테스트 페이지',
-      slug: 'homepage-test-' + Date.now(),
-      content: { blocks: [{ type: 'paragraph', data: { text: '이것은 홈페이지용 테스트 페이지입니다.' } }] },
-      excerpt: '홈페이지 테스트용',
-      status: 'publish',
-      type: 'page',
-      authorId: null, // No author for test
-      menuOrder: 0,
-      showInMenu: true,
-      isHomepage: false
-    });
-    
-    const savedPage = await pageRepository.save(testPage);
-    
-    res.json({
-      success: true,
-      page: {
-        id: savedPage.id,
-        title: savedPage.title,
-        slug: savedPage.slug,
-        status: savedPage.status
-      }
-    });
-  } catch (error) {
-    logger.error('Debug create page error:', error);
-    res.status(500).json({ 
-      error: 'Failed to create test page', 
-      message: error.message 
-    });
-  }
-});
-
 // Apply rate limiting to specific endpoints  
 app.use('/api/v1/accounts/sso/check', ssoCheckLimiter);
 app.use('/accounts/sso/check', ssoCheckLimiter); // Direct route for frontend
@@ -782,6 +696,7 @@ app.use('/api/v1/platform', platformV1Routes);
 app.use('/api/v1/ecommerce', ecommerceV1Routes);
 app.use('/api/v1/forum', forumV1Routes);
 app.use('/api/v1/media', mediaV1Routes);
+app.use('/api/v1/pages', pagesV1Routes); // V1 pages API with full authentication
 app.use('/api/media/gallery', galleryRoutes); // Gallery-specific routes
 app.use('/api/media', galleryRoutes); // Standard media routes for gallery block
 app.use('/api/v1/apps', appsV1Routes);

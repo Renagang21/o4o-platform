@@ -5,34 +5,50 @@ import { Page } from '../entities/Page';
 import { CustomPost, PostStatus } from '../entities/CustomPost';
 import { Product, ProductStatus } from '../entities/Product';
 import { MockDataService } from '../services/MockDataService';
+import logger from '../utils/logger';
 
 const router: Router = Router();
-const USE_MOCK = process.env.USE_MOCK === 'true' || !AppDataSource.isInitialized;
 
 // Get homepage template
 router.get('/templates/homepage', async (req, res) => {
   try {
     let homepageTemplate;
     
-    if (USE_MOCK) {
+    // Check if we should use mock data (dynamically)
+    const useMock = process.env.USE_MOCK === 'true' || !AppDataSource.isInitialized;
+    
+    if (useMock) {
       // Use mock data
       homepageTemplate = MockDataService.getTemplate('homepage');
     } else {
       // Use database
-      const templateRepository = AppDataSource.getRepository(Template);
-      homepageTemplate = await templateRepository.findOne({
-        where: { 
-          type: 'page',
-          name: 'homepage',
-          active: true
-        }
-      });
+      try {
+        const templateRepository = AppDataSource.getRepository(Template);
+        homepageTemplate = await templateRepository.findOne({
+          where: { 
+            type: 'page',
+            name: 'homepage',
+            active: true
+          }
+        });
+      } catch (dbError) {
+        // If template table doesn't exist or other DB error, return 404
+        logger.warn('Template query failed, returning 404:', {
+          error: dbError instanceof Error ? dbError.message : 'Unknown DB error'
+        });
+        return res.status(404).json({
+          success: false,
+          error: 'Homepage template not found',
+          code: 'TEMPLATE_NOT_FOUND'
+        });
+      }
     }
 
     if (!homepageTemplate) {
       return res.status(404).json({
         success: false,
-        error: 'Homepage template not found'
+        error: 'Homepage template not found',
+        code: 'TEMPLATE_NOT_FOUND'
       });
     }
 
