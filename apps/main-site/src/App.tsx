@@ -29,7 +29,7 @@ import CustomerShop from './pages/customer/Shop';
 // Digital Signage Pages
 import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
-// Temporarily disabled: import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
+// Removed deprecated TheDANGStyleEditorPage
 
 // Test Dashboard
 import { TestDashboard } from './features/test-dashboard';
@@ -215,11 +215,7 @@ const App: FC = () => {
               <DisabledFeaturePage />
             </Layout>
           } />
-          <Route path="/thedang-editor" element={
-            <Layout>
-              <DisabledFeaturePage />
-            </Layout>
-          } />
+          {/* Removed deprecated /thedang-editor route */}
           <Route path="/fullscreen-editor" element={
             <Layout>
               <DisabledFeaturePage />

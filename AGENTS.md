@@ -1,55 +1,27 @@
-# AGENTS.md — 공통 운영 규칙(영구)
+# Repository Guidelines
 
-## 1) 작업 방식
+This guide helps agents and contributors navigate the o4o monorepo quickly while staying aligned with team conventions.
 
-- 지시 범위 밖의 변경 금지. 모호하면 반드시 질문 후 진행.
-- 우회/임시방편 금지. 불가피한 예외는 사전 승인 + 만료일/영구 해결 계획 3줄 기록.
-- 작은 단위로 변경(작은 PR, 관련 파일만 수정). 무관한 리팩터링 포함 금지.
+## Project Structure & Module Organization
+- `apps/` hosts deployable surfaces: `main-site` (Vite storefront), `admin-dashboard` (React control panel), `api-server` (Express + TypeORM), plus auxiliary portals such as `storefront/`.
+- `packages/` publishes shared libraries (`types`, `ui`, `utils`, `auth-*`, `blocks/*`), with specs co-located beside source files.
+- `scripts/` contains automation (see `scripts/development/dev.sh`), `config/` stores env templates and PM2 profiles, and `docs/` captures architecture notes.
 
-## 2) Definition of Done(완결 기준)
+## Build, Test, and Development Commands
+- `pnpm install` — bootstrap all workspace dependencies (Node 22.18.0 via Volta).
+- `pnpm run dev` (+ `pnpm run dev:api`) — start storefront, dashboard, and optionally the API locally.
+- `pnpm run build` — run the release build; scope with `build:api` or `build:main-site` when needed.
+- `pnpm run lint` / `pnpm run type-check` / `pnpm test` — execute linting, TypeScript, and test suites through `dev.sh`.
+- `pnpm --filter=@o4o/api-server run test:cov` — enforce Jest coverage before merging backend changes.
 
-- 기대 동작 충족, 회귀 없음, 사용자 관점 시나리오 통과.
-- 산출물 필수: 변경 요지 3줄, 캡처/로그 2–3장, 테스트 결과 요약, 롤백 방법 1줄.
-- 워크스페이스 기록(CHANGELOG/AGENTS에 1줄).
+## Coding Style & Naming Conventions
+All product code is TypeScript. Use two-space indentation, single quotes in TSX, and PascalCase React component filenames (e.g. `OrderSummary.tsx`). Keep feature code in domain-scoped folders like `apps/main-site/src/features/cart/`. Format before committing via `pnpm exec prettier --check "apps/**/src/**/*.{ts,tsx}"` and rely on the shared ESLint config for consistency.
 
-## 3) 의존성/패키지
+## Testing Guidelines
+Use Vitest for Vite apps and Jest for the API. Co-locate unit tests as `*.test.ts` and integration suites as `*.integration.test.ts`. Run service-specific suites after changes and capture coverage with the API command above. Add snapshot or contract tests to shared packages when behavior changes.
 
-- 신규 패키지 설치 금지(원칙). 필요 시 사전 제안 5항목 제출 후 승인:
-  이유/대안, 영향(번들·성능), 보안·라이선스, 버전 고정 전략, 제거·롤백 방법.
-- 도입 시 반드시 버전 고정 및 변경 이력 링크.
+## Commit & Pull Request Guidelines
+Follow Conventional Commits (e.g. `feat(main-site): add hero carousel`, `fix(api-server): guard null menu items`). PRs must link their tracking issue, describe impact, attach UI screenshots or logs when relevant, list manual verification commands, and note a rollback plan (`git revert <sha>`). Ensure CI is green before requesting review.
 
-## 4) 검증/테스트
-
-- Build/Type/Lint/Test 모두 통과. 핵심 사용자 플로우 스모크/E2E 1–2건 성공.
-- 앱 구동 시 콘솔 에러 0, 불필요 네트워크 호출 0.
-- 성능 영향이 있을 경우 전/후 한 줄 수치 비교.
-
-## 5) 로깅/가시성
-
-- DEV·STAGE에서만 최소 로그. PROD 디버그 로그 OFF.
-- 시크릿/토큰/개인정보 로그 금지. 필요 시 마스킹.
-
-## 6) 보안/환경변수
-
-- 도메인·API·키 등은 환경변수로만 주입. 하드코딩 금지.
-- `.env*`·시크릿 노출 금지(코드/PR/로그/스크린샷).
-
-## 7) CI/CD·배포
-
-- CI 녹색 배지 없으면 병합/배포 금지.
-- 배포 변경(파이프라인/서버 설정)은 사전 승인 및 영향 범위 명시.
-- 롤백 경로를 항상 준비(한 줄로 즉시 실행 가능한 수준).
-
-## 8) PR 규칙
-
-- Conventional Commits 권장. PR 본문은 문제/변경/검증/롤백 각 1–2줄.
-- 스크린샷·로그·테스트 링크 첨부. 큰 변경은 설계 요약 포함.
-
-## 9) 커뮤니케이션
-
-- 불확실/위험 발견 시 즉시 보고: 원인 후보·대안·다음 액션 각 1줄.
-- 일정·리스크 변경은 빠르게 공유(“왜/무엇/언제” 중심).
-
-> 메모: 개별 이슈(라우팅/slug 등) 관련 규칙과 절차는 AGENTS.md에 넣지 않습니다.
-> 그런 항목은 “이슈별 작업 요청서”로 별도 전달·관리합니다.
-
+## Security & Configuration Tips
+Never commit credentials. Base secrets on `config/env-templates/` and confirm `.env.local` settings before migrations. Use the provided PM2 ecosystem configs (`pnpm pm2:start:local` / `pnpm pm2:stop:local`) and document any new runtime needs in `docs/`.

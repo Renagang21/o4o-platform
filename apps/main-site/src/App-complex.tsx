@@ -18,9 +18,7 @@ import CustomerShop from './pages/customer/Shop';
 // Digital Signage Pages
 import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
-// TheDANG Style Home
-import TheDANGStyleHome from './pages/TheDANGStyleHome';
-import TheDANGStyleEditorPage from './pages/TheDANGStyleEditorPage';
+// Removed TheDANG Style components (deprecated)
 
 // Fullscreen Editor Test
 import { FullScreenEditorSimpleTest } from './pages/FullScreenEditorSimpleTest';
@@ -64,13 +62,9 @@ const App: FC = () => {
         
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<TheDANGStyleHome />} />
-          <Route path="/home" element={<TheDANGStyleHome />} />
-          <Route path="/editor/home" element={
-            <EditorErrorBoundary>
-              <TheDANGStyleEditorPage />
-            </EditorErrorBoundary>
-          } />
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/home" element={<Navigate to="/login" />} />
+          {/* Removed deprecated /editor/home route */}
           <Route path="/editor-fullscreen" element={
             <EditorErrorBoundary>
               <FullScreenEditorSimpleTest />

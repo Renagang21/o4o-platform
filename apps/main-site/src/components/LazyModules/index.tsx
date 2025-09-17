@@ -20,7 +20,7 @@ const LoadingSpinner: FC<{ module: string }> = ({ module }) => (
 const LazyDropshippingPage = lazy(() => import('../../pages/DropshippingPage').then(module => ({ default: module.DropshippingPage })));
 const LazyHealthcarePage = lazy(() => import('../../pages/healthcare/HealthcarePage').then(module => ({ default: module.HealthcarePage })));
 const LazyHealthcareDemo = lazy(() => import('../../components/healthcare/HealthcareDemo'));
-const LazyTheDANGStyleEditorPage = lazy(() => import('../../pages/TheDANGStyleEditorPage'));
+// Removed deprecated TheDANGStyleEditorPage
 const LazyFullScreenEditorSimpleTest = lazy(() => import('../../pages/FullScreenEditorSimpleTest').then(module => ({ default: module.FullScreenEditorSimpleTest })));
 const LazyAdminDashboardTest = lazy(() => import('../../pages/AdminDashboardTest').then(module => ({ default: module.AdminDashboardTest })));
 
@@ -49,13 +49,7 @@ export const SafeHealthcareDemo: FC = () => (
   </HealthcareErrorBoundary>
 );
 
-export const SafeTheDANGStyleEditorPage: FC = () => (
-  <EditorErrorBoundary>
-    <Suspense fallback={<LoadingSpinner module="에디터" />}>
-      <LazyTheDANGStyleEditorPage />
-    </Suspense>
-  </EditorErrorBoundary>
-);
+// Removed deprecated SafeTheDANGStyleEditorPage
 
 export const SafeFullScreenEditorSimpleTest: FC = () => (
   <EditorErrorBoundary>

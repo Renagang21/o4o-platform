@@ -21,16 +21,35 @@ interface Page {
 
 // Global API client with proper error handling
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://api.neture.co.kr',
   timeout: 10000,
 });
 
-// Add request interceptor for authentication
+// Add request interceptor for authentication (skip for public endpoints)
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // List of public endpoints that don't require authentication
+  const publicEndpoints = [
+    '/settings/homepage',
+    '/api/public/',
+    '/api/posts',
+    '/api/pages',
+    '/api/categories',
+    '/api/tags'
+  ];
+  
+  // Check if the request is for a public endpoint
+  const isPublicEndpoint = publicEndpoints.some(endpoint => 
+    config.url?.startsWith(endpoint)
+  );
+  
+  // Only add Authorization header for non-public endpoints
+  if (!isPublicEndpoint) {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
+  
   return config;
 });
 
@@ -51,7 +70,7 @@ const fetchHomepageSettings = async (): Promise<HomepageSettings> => {
 
 // Fetch specific page
 const fetchPage = async (pageId: string): Promise<Page> => {
-  const { data } = await apiClient.get(`/pages/${pageId}`);
+  const { data } = await apiClient.get(`/api/public/pages/${pageId}`);
   return data.data;
 };
 
