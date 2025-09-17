@@ -167,6 +167,16 @@ const settingsStore: Map<string, any> = new Map([
  */
 router.get('/homepage', async (req: Request, res: Response) => {
   try {
+    // Enhanced logging for debugging 401 issues
+    console.log(`[${new Date().toISOString()}] Homepage settings request:`, {
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent'],
+      authorization: req.headers.authorization ? 'Present' : 'None',
+      ip: req.ip,
+      method: req.method,
+      url: req.url
+    });
+
     const readingSettings = settingsStore.get('reading') || {};
     
     // 홈페이지 관련 설정만 추출하여 프론트엔드 형식으로 변환
@@ -176,11 +186,23 @@ router.get('/homepage', async (req: Request, res: Response) => {
       postsPerPage: readingSettings.postsPerPage || 10
     };
     
+    console.log(`[${new Date().toISOString()}] Homepage settings response:`, {
+      success: true,
+      settingsType: homepageSettings.type,
+      pageId: homepageSettings.pageId
+    });
+    
     res.json({
       success: true,
       data: homepageSettings
     });
   } catch (error) {
+    console.error(`[${new Date().toISOString()}] Homepage settings error:`, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      origin: req.headers.origin
+    });
+    
     res.status(500).json({
       success: false,
       error: 'Failed to fetch homepage settings'
