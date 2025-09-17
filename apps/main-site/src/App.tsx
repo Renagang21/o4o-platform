@@ -4,11 +4,9 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import PostDetail from './pages/PostDetail';
 import { useAuthStore } from './stores/authStore';
-import { DevAuthProvider } from './lib/DevAuthProvider';
 import { initializeAuthInterceptor } from './services/authInterceptor';
 
 // Auth Pages
-import Login from './pages/auth/Login';
 import AuthCallbackV2 from './pages/auth/AuthCallbackV2';
 import { OAuthCallback } from './pages/auth/OAuthCallback';
 import { EmailVerificationPending } from './pages/auth/EmailVerificationPending';
@@ -65,7 +63,6 @@ const App: FC = () => {
 
   return (
     <ErrorBoundary>
-      <DevAuthProvider>
         <Router>
           <Routes>
           {/* Public Routes */}
@@ -77,7 +74,12 @@ const App: FC = () => {
           } />
           <Route path="/login" element={
             <Layout>
-              <Login />
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">로그인</h1>
+                  <p className="text-gray-600">로그인 페이지는 개발 중입니다.</p>
+                </div>
+              </div>
             </Layout>
           } />
           <Route path="/auth/callback" element={<AuthCallbackV2 />} />
@@ -241,7 +243,6 @@ const App: FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
-      </DevAuthProvider>
     </ErrorBoundary>
   );
 };

@@ -4,8 +4,6 @@ import { Settings as SettingsIcon, Mail, BookOpen, Key, FileText, MessageSquare,
 import GeneralSettings from './GeneralSettings'
 import ReadingSettings from './ReadingSettings'
 import OAuthSettings from './OAuthSettings'
-import WritingSettings from './WritingSettings'
-import DiscussionSettings from './DiscussionSettings'
 import EmailSettings from './EmailSettings'
 
 const UserSettings: FC = () => (
@@ -86,9 +84,7 @@ const Settings: FC = () => {
       {/* Settings Content */}
       <Routes>
         <Route index element={<GeneralSettings />} />
-        <Route path="writing" element={<WritingSettings />} />
         <Route path="reading" element={<ReadingSettings />} />
-        <Route path="discussion" element={<DiscussionSettings />} />
         <Route path="privacy" element={<PrivacySettings />} />
         <Route path="oauth" element={<OAuthSettings />} />
         <Route path="users" element={<UserSettings />} />

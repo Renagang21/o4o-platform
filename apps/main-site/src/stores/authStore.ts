@@ -96,7 +96,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
-          }).catch(console.error);
+          }).catch(() => {});
         }
         
         set({
