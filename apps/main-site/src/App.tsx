@@ -16,12 +16,6 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 
 // User Type Dashboards (non-shared components)
-import AdminDashboard from './pages/admin/Dashboard';
-import SupplierDashboard from './pages/supplier/Dashboard';
-import SupplierProductList from './pages/supplier/ProductList';
-import SupplierProductForm from './pages/supplier/ProductForm';
-import SupplierProductDetail from './pages/supplier/ProductDetail';
-import RetailerDashboard from './pages/retailer/Dashboard';
 import CustomerShop from './pages/customer/Shop';
 
 // Digital Signage Pages
@@ -31,7 +25,6 @@ import DigitalSignageDashboard from './pages/signage/DigitalSignageDashboard';
 
 // Test Dashboard
 import { TestDashboard } from './features/test-dashboard';
-import SessionSyncTest from './pages/test/SessionSyncTest';
 
 // Demo Pages
 import SpectraBlocksDemo from './pages/SpectraBlocksDemo';
@@ -114,7 +107,7 @@ const App: FC = () => {
           <Route path="/admin" element={
             <PrivateRoute allowedRoles={['admin']}>
               <Layout>
-                <AdminDashboard />
+                <DisabledFeaturePage />
               </Layout>
             </PrivateRoute>
           } />
@@ -123,28 +116,28 @@ const App: FC = () => {
           <Route path="/supplier" element={
             <PrivateRoute allowedRoles={['supplier']}>
               <Layout>
-                <SupplierDashboard />
+                <DisabledFeaturePage />
               </Layout>
             </PrivateRoute>
           } />
           <Route path="/supplier/products" element={
             <PrivateRoute allowedRoles={['supplier']}>
               <Layout>
-                <SupplierProductList />
+                <DisabledFeaturePage />
               </Layout>
             </PrivateRoute>
           } />
           <Route path="/supplier/products/new" element={
             <PrivateRoute allowedRoles={['supplier']}>
               <Layout>
-                <SupplierProductForm />
+                <DisabledFeaturePage />
               </Layout>
             </PrivateRoute>
           } />
           <Route path="/supplier/products/:id" element={
             <PrivateRoute allowedRoles={['supplier']}>
               <Layout>
-                <SupplierProductDetail />
+                <DisabledFeaturePage />
               </Layout>
             </PrivateRoute>
           } />
@@ -153,7 +146,7 @@ const App: FC = () => {
           <Route path="/retailer" element={
             <PrivateRoute allowedRoles={['retailer']}>
               <Layout>
-                <RetailerDashboard />
+                <DisabledFeaturePage />
               </Layout>
             </PrivateRoute>
           } />
@@ -195,7 +188,7 @@ const App: FC = () => {
           } />
           <Route path="/test/session-sync" element={
             <Layout>
-              <SessionSyncTest />
+              <DisabledFeaturePage />
             </Layout>
           } />
           
