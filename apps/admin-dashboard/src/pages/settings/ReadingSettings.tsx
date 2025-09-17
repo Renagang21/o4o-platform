@@ -10,10 +10,7 @@ import { apiClient } from '@/api/client';
 import { ContentApi } from '@/api/contentApi';
 import toast from 'react-hot-toast';
 import { 
-  DEFAULT_READING_SETTINGS, 
-  STORAGE_KEYS,
-  saveSettingsToStorage,
-  loadSettingsFromStorage
+  DEFAULT_READING_SETTINGS
 } from '@/constants/defaultSettings';
 
 interface ReadingSettingsData {
@@ -33,9 +30,7 @@ interface ReadingSettingsData {
 
 export default function ReadingSettings() {
   const queryClient = useQueryClient();
-  const [settings, setSettings] = useState<ReadingSettingsData>(() => 
-    loadSettingsFromStorage(STORAGE_KEYS.READING_SETTINGS, DEFAULT_READING_SETTINGS)
-  );
+  const [settings, setSettings] = useState<ReadingSettingsData>(DEFAULT_READING_SETTINGS);
   const [pages, setPages] = useState<any[]>([]);
 
   // Fetch available pages (using Posts API with type=page)
@@ -53,8 +48,7 @@ export default function ReadingSettings() {
         });
         return response.data?.data || [];
       } catch (error) {
-        console.warn('Pages API 실패, 빈 배열 반환:', error);
-        return []; // Fallback: 빈 배열
+        throw error;
       }
     }
   });
@@ -68,16 +62,10 @@ export default function ReadingSettings() {
         const data = response.data.data;
         if (data) {
           setSettings(data);
-          saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
         }
         return data;
       } catch (apiError) {
-        console.warn('Reading Settings API 실패, localStorage 사용:', apiError);
-        const fallbackData = loadSettingsFromStorage(STORAGE_KEYS.READING_SETTINGS, DEFAULT_READING_SETTINGS);
-        setSettings(fallbackData);
-        // 사용자에게 오프라인 상태임을 알림
-        toast.error('서버에서 설정을 불러올 수 없습니다. 로컬 저장된 설정을 사용합니다.');
-        return fallbackData;
+        throw apiError;
       }
     }
   });
@@ -94,11 +82,8 @@ export default function ReadingSettings() {
     mutationFn: async (data: ReadingSettingsData) => {
       try {
         const response = await apiClient.put('/api/v1/settings/reading', data);
-        saveSettingsToStorage(STORAGE_KEYS.READING_SETTINGS, data);
         return response;
       } catch (apiError) {
-        // API 실패 시 에러를 그대로 전파하여 사용자에게 실제 오류 상황을 알림
-        console.warn('Reading Settings API 저장 실패:', apiError);
         throw new Error('서버에 설정을 저장할 수 없습니다. 네트워크 연결을 확인해주세요.');
       }
     },
