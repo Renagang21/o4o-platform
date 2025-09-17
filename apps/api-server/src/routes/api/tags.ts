@@ -4,6 +4,7 @@ import { AppDataSource } from '../../database/connection'
 import { Tag } from '../../entities/Tag'
 import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
 import { Like, ILike } from 'typeorm'
+import logger from '../../utils/logger'
 
 const router: Router = Router()
 const tagRepository = AppDataSource.getRepository(Tag)
@@ -49,7 +50,7 @@ router.get('/', async (req: Request, res: Response) => {
       }
     })
   } catch (error) {
-    console.error('Error fetching tags:', error)
+    logger.error('Error fetching tags:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tags' } })
   }
 })
@@ -76,7 +77,7 @@ router.get('/autocomplete', async (req: Request, res: Response) => {
 
     res.json(tags)
   } catch (error) {
-    console.error('Error in tag autocomplete:', error)
+    logger.error('Error in tag autocomplete:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tag suggestions' } })
   }
 })
@@ -97,7 +98,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json(tag)
   } catch (error) {
-    console.error('Error fetching tag:', error)
+    logger.error('Error fetching tag:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tag' } })
   }
 })
@@ -134,7 +135,7 @@ router.post('/', async (req: Request, res: Response) => {
     const savedTag = await tagRepository.save(tag)
     res.status(201).json(savedTag)
   } catch (error) {
-    console.error('Error creating tag:', error)
+    logger.error('Error creating tag:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create tag' } })
   }
 })
@@ -173,7 +174,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const updatedTag = await tagRepository.save(tag)
     res.json(updatedTag)
   } catch (error) {
-    console.error('Error updating tag:', error)
+    logger.error('Error updating tag:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update tag' } })
   }
 })
@@ -205,7 +206,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     await tagRepository.remove(tag)
     res.json({ message: 'Tag deleted successfully' })
   } catch (error) {
-    console.error('Error deleting tag:', error)
+    logger.error('Error deleting tag:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to delete tag' } })
   }
 })
@@ -261,7 +262,7 @@ router.post('/merge', authenticateToken, async (req: Request, res: Response) => 
       targetTag
     })
   } catch (error) {
-    console.error('Error merging tags:', error)
+    logger.error('Error merging tags:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to merge tags' } })
   }
 })

@@ -4,6 +4,7 @@ import { AppDataSource } from '../../database/connection'
 import { Category } from '../../entities/Category'
 import { authenticate as authenticateToken } from '../../middleware/auth.middleware'
 import { Like, IsNull } from 'typeorm'
+import logger from '../../utils/logger'
 
 const router: Router = Router()
 const categoryRepository = AppDataSource.getTreeRepository(Category)
@@ -57,7 +58,7 @@ router.get('/', async (req: Request, res: Response) => {
       }
     })
   } catch (error) {
-    console.error('Error fetching categories:', error)
+    logger.error('Error fetching categories:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch categories' } })
   }
 })
@@ -68,7 +69,7 @@ router.get('/tree', async (req: Request, res: Response) => {
     const trees = await categoryRepository.findTrees()
     res.json(trees)
   } catch (error) {
-    console.error('Error fetching category tree:', error)
+    logger.error('Error fetching category tree:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch category tree' } })
   }
 })
@@ -95,7 +96,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       descendants
     })
   } catch (error) {
-    console.error('Error fetching category:', error)
+    logger.error('Error fetching category:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch category' } })
   }
 })
@@ -142,7 +143,7 @@ router.post('/', async (req: Request, res: Response) => {
     const savedCategory = await categoryRepository.save(category)
     res.status(201).json(savedCategory)
   } catch (error) {
-    console.error('Error creating category:', error)
+    logger.error('Error creating category:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create category' } })
   }
 })
@@ -207,7 +208,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const updatedCategory = await categoryRepository.save(category)
     res.json(updatedCategory)
   } catch (error) {
-    console.error('Error updating category:', error)
+    logger.error('Error updating category:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update category' } })
   }
 })
@@ -239,7 +240,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     await categoryRepository.remove(category)
     res.json({ message: 'Category deleted successfully' })
   } catch (error) {
-    console.error('Error deleting category:', error)
+    logger.error('Error deleting category:', error)
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to delete category' } })
   }
 })

@@ -8,6 +8,7 @@ import { validateDto } from '../middleware/validateDto'
 import { authenticateToken } from '../middleware/auth'
 import AppDataSource from '../database/connection'
 import { User } from '../entities/User'
+import logger from '../utils/logger'
 import { Post } from '../entities/Post'
 import fs from 'fs/promises'
 import path from 'path'
@@ -74,7 +75,7 @@ router.get('/',
         // Load theme CSS
         themeCss = await fs.readFile(path.join(themeConfigPath, 'style.css'), 'utf8')
       } catch (error) {
-        console.error('Error loading theme files:', error)
+        logger.error('Error loading theme files:', error)
         return res.status(500).json({ error: 'Failed to load theme configuration' })
       }
 
@@ -97,7 +98,7 @@ router.get('/',
       res.send(previewHtml)
 
     } catch (error) {
-      console.error('Error generating preview:', error)
+      logger.error('Error generating preview:', error)
       res.status(500).json({ error: 'Failed to generate preview' })
     }
   }
@@ -128,7 +129,7 @@ router.post('/generate',
       res.json({ previewUrl })
 
     } catch (error) {
-      console.error('Error generating preview URL:', error)
+      logger.error('Error generating preview URL:', error)
       res.status(500).json({ error: 'Failed to generate preview URL' })
     }
   }

@@ -65,7 +65,7 @@ tossPaymentsClient.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      console.error('[TossPayments API Error]', {
+      logger.error('[TossPayments API Error]', {
         status: error.response.status,
         code: error.response.data?.code,
         message: error.response.data?.message,

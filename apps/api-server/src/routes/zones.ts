@@ -8,6 +8,7 @@ import AppDataSource from '../database/connection'
 import { Post } from '../entities/Post'
 import { User } from '../entities/User'
 import { authenticateToken } from '../middleware/auth'
+import logger from '../utils/logger'
 import { validateDto } from '../middleware/validateDto'
 import { ZoneContentAdapter } from '../utils/zone-adapter'
 // import { 
@@ -99,7 +100,7 @@ router.get('/:pageId',
       })
 
     } catch (error) {
-      console.error('Error fetching zone content:', error)
+      logger.error('Error fetching zone content:', error)
       res.status(500).json({ error: 'Failed to fetch zone content' })
     }
   }
@@ -143,7 +144,7 @@ router.put('/:pageId',
       res.json({ success: true })
 
     } catch (error) {
-      console.error('Error saving zone content:', error)
+      logger.error('Error saving zone content:', error)
       res.status(500).json({ error: 'Failed to save zone content' })
     }
   }
@@ -192,7 +193,7 @@ router.put('/:pageId/:zoneId',
       res.json({ success: true })
 
     } catch (error) {
-      console.error('Error updating zone:', error)
+      logger.error('Error updating zone:', error)
       res.status(500).json({ error: 'Failed to update zone' })
     }
   }
