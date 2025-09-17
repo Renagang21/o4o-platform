@@ -94,11 +94,11 @@ export class Page {
   @Column({ type: 'timestamp', nullable: true })
   scheduledAt!: Date
 
-  @Column({ type: 'uuid', name: 'author_id' })
+  @Column({ type: 'uuid' })
   authorId!: string
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'author_id' })
+  @JoinColumn({ name: 'authorId' })
   author!: User
 
   @Column({ type: 'uuid', nullable: true })

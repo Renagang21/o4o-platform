@@ -4,6 +4,7 @@ import { authenticate as authenticateToken } from '../../middleware/auth.middlew
 import { AppDataSource } from '../../database/connection'
 import { Page } from '../../entities/Page'
 import { Request, Response } from 'express'
+import logger from '../../utils/logger'
 
 const router: Router = Router()
 const pagesController = new PagesController()
@@ -72,7 +73,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
     
     if (author) {
-      queryBuilder.andWhere('page.author_id = :authorId', { authorId: author })
+      queryBuilder.andWhere('page.authorId = :authorId', { authorId: author })
     }
     
     if (search) {
@@ -100,7 +101,11 @@ router.get('/', async (req: Request, res: Response) => {
       }
     })
   } catch (error) {
-    console.error('Error fetching pages:', error)
+    logger.error('Error fetching pages:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      query: req.query
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch pages' } })
   }
 })
@@ -117,7 +122,10 @@ router.get('/hierarchy', async (req: Request, res: Response) => {
     const hierarchy = buildPageHierarchy(pages)
     res.json(hierarchy)
   } catch (error) {
-    console.error('Error fetching page hierarchy:', error)
+    logger.error('Error fetching page hierarchy:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch page hierarchy' } })
   }
 })
@@ -127,13 +135,14 @@ router.get('/:id', async (req: Request, res: Response) => {
     const pageRepository = AppDataSource.getRepository(Page)
     const { id } = req.params
     
+    // 공개 엔드포인트이므로 publish 상태의 페이지만 허용
     const page = await pageRepository.findOne({
-      where: { id },
+      where: { id, status: 'publish' },
       relations: ['author', 'parent', 'children', 'lastModifier']
     })
 
     if (!page) {
-      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found' } })
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Page not found or not published' } })
     }
 
     // Increment view count
@@ -141,7 +150,11 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json(page)
   } catch (error) {
-    console.error('Error fetching page:', error)
+    logger.error('Error fetching page:', {
+      pageId: req.params.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch page' } })
   }
 })
@@ -166,7 +179,11 @@ router.get('/:id/preview', async (req: Request, res: Response) => {
       previewUrl: `/preview/pages/${id}`
     })
   } catch (error) {
-    console.error('Error previewing page:', error)
+    logger.error('Error previewing page:', {
+      pageId: req.params.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to preview page' } })
   }
 })
@@ -239,7 +256,12 @@ router.post('/', async (req: Request, res: Response) => {
     const savedPage = await pageRepository.save(page)
     res.status(201).json(savedPage)
   } catch (error) {
-    console.error('Error creating page:', error)
+    logger.error('Error creating page:', {
+      userId: (req as any).user?.id,
+      requestBody: req.body,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create page' } })
   }
 })
@@ -323,7 +345,13 @@ router.put('/:id', async (req: Request, res: Response) => {
     const updatedPage = await pageRepository.save(page)
     res.json(updatedPage)
   } catch (error) {
-    console.error('Error updating page:', error)
+    logger.error('Error updating page:', {
+      pageId: req.params.id,
+      userId: (req as any).user?.id,
+      requestBody: req.body,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update page' } })
   }
 })
@@ -345,7 +373,11 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     res.json({ message: 'Page moved to trash' })
   } catch (error) {
-    console.error('Error deleting page:', error)
+    logger.error('Error deleting page:', {
+      pageId: req.params.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to delete page' } })
   }
 })
@@ -396,7 +428,13 @@ router.post('/:id/autosave', async (req: Request, res: Response) => {
 
     res.json({ message: 'Auto-save successful', revisionId: revisions[revisions.length - 1].id })
   } catch (error) {
-    console.error('Error auto-saving page:', error)
+    logger.error('Error auto-saving page:', {
+      pageId: req.params.id,
+      userId: (req as any).user?.id,
+      requestBody: req.body,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to auto-save page' } })
   }
 })
@@ -417,7 +455,11 @@ router.get('/:id/revisions', async (req: Request, res: Response) => {
 
     res.json(page.revisions || [])
   } catch (error) {
-    console.error('Error fetching revisions:', error)
+    logger.error('Error fetching revisions:', {
+      pageId: req.params.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch revisions' } })
   }
 })
@@ -475,7 +517,11 @@ router.post('/bulk', async (req: Request, res: Response) => {
       affected: pages.length 
     })
   } catch (error) {
-    console.error('Error in bulk operation:', error)
+    logger.error('Error in bulk operation:', {
+      requestBody: req.body,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to perform bulk operation' } })
   }
 })

@@ -224,35 +224,79 @@ router.get('/homepage', async (req: Request, res: Response) => {
       };
     }
     
-    // 안전장치: static_page이지만 pageId가 없거나 페이지가 비공개인 경우 다운그레이드
+    // 안전장치: static_page이지만 pageId가 없거나 페이지가 비공개인 경우에만 다운그레이드
     let finalSettings = { ...readingSettings };
+    let downgradedReason: string | null = null;
     
-    if (readingSettings.homepageType === 'static_page' && readingSettings.homepageId) {
-      try {
-        const pageRepository = AppDataSource.getRepository(Page);
-        const page = await pageRepository.findOne({
-          where: { id: readingSettings.homepageId, status: 'publish' }
+    if (readingSettings.homepageType === 'static_page') {
+      if (!readingSettings.homepageId) {
+        // pageId가 없는 경우 다운그레이드
+        downgradedReason = 'missing_page_id';
+        finalSettings = {
+          ...readingSettings,
+          homepageType: 'latest_posts',
+          homepageId: undefined
+        };
+        logger.warn('Homepage downgraded due to missing pageId:', {
+          traceId,
+          reason: downgradedReason,
+          action: 'downgrade_to_latest_posts'
         });
-        
-        if (!page) {
-          logger.warn('Homepage page not found or not published, downgrading to latest_posts:', {
-            traceId,
-            pageId: readingSettings.homepageId,
-            action: 'downgrade_to_latest_posts'
+      } else {
+        // pageId가 있는 경우 검증
+        try {
+          const pageRepository = AppDataSource.getRepository(Page);
+          const page = await pageRepository.findOne({
+            where: { id: readingSettings.homepageId }
           });
           
-          finalSettings = {
-            ...readingSettings,
-            homepageType: 'latest_posts',
-            homepageId: undefined
-          };
+          if (!page) {
+            downgradedReason = 'page_not_found';
+            finalSettings = {
+              ...readingSettings,
+              homepageType: 'latest_posts',
+              homepageId: undefined
+            };
+            logger.warn('Homepage downgraded - page not found:', {
+              traceId,
+              pageId: readingSettings.homepageId,
+              reason: downgradedReason,
+              action: 'downgrade_to_latest_posts'
+            });
+          } else if (page.status !== 'publish') {
+            downgradedReason = 'page_not_published';
+            finalSettings = {
+              ...readingSettings,
+              homepageType: 'latest_posts',
+              homepageId: undefined
+            };
+            logger.warn('Homepage downgraded - page not published:', {
+              traceId,
+              pageId: readingSettings.homepageId,
+              pageStatus: page.status,
+              pageTitle: page.title,
+              reason: downgradedReason,
+              action: 'downgrade_to_latest_posts'
+            });
+          } else {
+            // 페이지가 유효함 - 다운그레이드 없음
+            logger.debug('Homepage page validation passed:', {
+              traceId,
+              pageId: readingSettings.homepageId,
+              pageTitle: page.title,
+              pageStatus: page.status
+            });
+          }
+        } catch (pageError) {
+          downgradedReason = 'page_validation_error';
+          logger.error('Error checking page validity (keeping original settings):', {
+            traceId,
+            pageId: readingSettings.homepageId,
+            error: pageError instanceof Error ? pageError.message : 'Unknown page error',
+            action: 'keep_original_settings'
+          });
+          // 에러 발생 시 원래 설정 유지 (다운그레이드하지 않음)
         }
-      } catch (pageError) {
-        logger.error('Error checking page validity:', {
-          traceId,
-          pageId: readingSettings.homepageId,
-          error: pageError instanceof Error ? pageError.message : 'Unknown page error'
-        });
       }
     }
     
@@ -263,18 +307,32 @@ router.get('/homepage', async (req: Request, res: Response) => {
       postsPerPage: finalSettings.postsPerPage || 10
     };
     
+    const responseData: any = {
+      success: true,
+      data: homepageSettings
+    };
+    
+    // 다운그레이드가 발생한 경우 정보 추가
+    if (downgradedReason) {
+      responseData.meta = {
+        downgraded: true,
+        reason: downgradedReason,
+        originalType: readingSettings.homepageType,
+        originalPageId: readingSettings.homepageId
+      };
+    }
+    
     logger.debug('Homepage settings response:', {
       traceId,
       success: true,
       settingsType: homepageSettings.type,
       pageId: homepageSettings.pageId,
+      downgraded: !!downgradedReason,
+      downgradedReason,
       timestamp: new Date().toISOString()
     });
     
-    res.json({
-      success: true,
-      data: homepageSettings
-    });
+    res.json(responseData);
   } catch (error) {
     logger.error('Homepage settings error:', {
       traceId,
