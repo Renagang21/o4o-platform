@@ -44,11 +44,43 @@ const SelectGroup = ({ children, className, ...props }: HTMLAttributes<HTMLDivEl
   </div>
 );
 
-const SelectValue = ({ placeholder }: { placeholder?: string }) => {
+interface SelectValueProps {
+  placeholder?: string;
+  displayValue?: string;
+  getDisplayValue?: (value: string) => string;
+}
+
+const SelectValue = ({ 
+  placeholder, 
+  displayValue, 
+  getDisplayValue 
+}: SelectValueProps) => {
   const context = useContext(SelectContext);
   if (!context) throw new Error('SelectValue must be used within Select');
   
-  return <span>{context.value || placeholder}</span>;
+  const getDisplayText = (): string => {
+    const { value } = context;
+    
+    // 1순위: 직접 표시값
+    if (displayValue !== undefined) {
+      return displayValue;
+    }
+    
+    // 2순위: 변환 함수  
+    if (getDisplayValue && value) {
+      try {
+        return getDisplayValue(value);
+      } catch (error) {
+        console.warn('SelectValue getDisplayValue error:', error);
+        return value;
+      }
+    }
+    
+    // 3순위: 원본 값 (기존 동작)
+    return value || placeholder || '';
+  };
+  
+  return <span>{getDisplayText()}</span>;
 };
 
 const SelectTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(

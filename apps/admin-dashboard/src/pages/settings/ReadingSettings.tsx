@@ -170,7 +170,13 @@ export default function ReadingSettings() {
                       onValueChange={(value: string) => handleChange('homepageId', value)}
                     >
                       <SelectTrigger id="homepage-select" className="w-full">
-                        <SelectValue placeholder="페이지를 선택하세요" />
+                        <SelectValue 
+                          placeholder="페이지를 선택하세요"
+                          getDisplayValue={(pageId) => {
+                            const page = pages.find(p => p.id === pageId);
+                            return page?.title || pageId;
+                          }}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">— 선택 —</SelectItem>

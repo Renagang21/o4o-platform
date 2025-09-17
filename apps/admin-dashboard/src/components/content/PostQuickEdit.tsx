@@ -95,7 +95,11 @@ export const PostQuickEdit: FC<PostQuickEditProps> = ({
                 onValueChange={(value) => onUpdate('authorId', value)}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue 
+                    getDisplayValue={(authorId) => {
+                      return post.author?.id === authorId ? post.author.name : 'Unknown';
+                    }}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={post.author?.id || ''}>
