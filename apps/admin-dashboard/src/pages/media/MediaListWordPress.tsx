@@ -120,11 +120,11 @@ const MediaListWordPress: FC = () => {
         
         const transformedMedia = mediaData.map((item: any) => ({
           id: item.id,
-          title: item.originalFilename || item.filename || 'Untitled',
+          title: item.originalName || item.filename || 'Untitled',
           filename: item.filename,
-          author: { name: item.uploadedBy?.name || 'Unknown' },
+          author: { name: item.uploader?.name || 'Unknown' },
           attachedTo: item.attachedTo || null,
-          createdAt: item.createdAt,
+          createdAt: item.uploadedAt,
           mimeType: item.mimeType,
           size: item.size,
           width: item.width,

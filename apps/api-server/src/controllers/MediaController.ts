@@ -251,7 +251,9 @@ export class MediaController {
       const limitNum = parseInt(limit as string);
       const skip = (pageNum - 1) * limitNum;
 
-      const queryBuilder = this.mediaRepository.createQueryBuilder('media');
+      const queryBuilder = this.mediaRepository.createQueryBuilder('media')
+        .leftJoinAndSelect('media.uploader', 'uploader')
+        .leftJoinAndSelect('media.folder', 'folder');
 
       // Apply filters
       if (type) {
