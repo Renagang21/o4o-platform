@@ -429,7 +429,7 @@ export const mediaApi = {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiV1Client.post('/media/upload', formData, {
+      const response = await apiV1Client.post('/content/media/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -470,7 +470,7 @@ export const mediaApi = {
   // 미디어 삭제 (V1 API 사용)
   delete: async (id: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      await apiV1Client.delete(`/media/${id}`);
+      await apiV1Client.delete(`/content/media/${id}`);
       return { success: true };
     } catch (error: any) {
       return { 

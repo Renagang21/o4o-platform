@@ -42,7 +42,7 @@ export default function TiptapImageSelector({ editor, _isOpen, onClose }: Tiptap
   const { data: mediaFiles = [], isLoading } = useQuery({
     queryKey: ['media', 'images', searchTerm],
     queryFn: async () => {
-      const response = await apiClient.get('/api/media', {
+      const response = await apiClient.get('/v1/content/media', {
         params: {
           type: 'image',
           search: searchTerm,

@@ -115,7 +115,7 @@ const MediaListWordPress: FC = () => {
         const params = new URLSearchParams();
         params.append('per_page', '1000');
         
-        const response = await authClient.api.get(`/media?${params}`);
+        const response = await authClient.api.get(`/v1/content/media?${params}`);
         const mediaData = response.data.data || [];
         
         const transformedMedia = mediaData.map((item: any) => ({
@@ -204,7 +204,7 @@ const MediaListWordPress: FC = () => {
   const handleDelete = async (id: string) => {
     if (confirm('정말 이 미디어를 삭제하시겠습니까?')) {
       try {
-        await authClient.api.delete(`/media/${id}`);
+        await authClient.api.delete(`/v1/content/media/${id}`);
         setMedia(prevMedia => prevMedia.filter(m => m.id !== id));
         toast.success('Media deleted successfully');
       } catch (error) {
@@ -235,7 +235,7 @@ const MediaListWordPress: FC = () => {
       if (confirm(`선택한 ${selectedMedia.size}개의 미디어를 삭제하시겠습니까?`)) {
         try {
           const promises = Array.from(selectedMedia).map(id => 
-            authClient.api.delete(`/media/${id}`)
+            authClient.api.delete(`/v1/content/media/${id}`)
           );
           
           await Promise.all(promises);

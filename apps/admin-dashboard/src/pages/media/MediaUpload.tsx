@@ -90,7 +90,7 @@ const MediaUpload: FC = () => {
         );
       }, 300);
 
-      const response = await authClient.api.post('/media/upload', formData, {
+      const response = await authClient.api.post('/v1/content/media/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
