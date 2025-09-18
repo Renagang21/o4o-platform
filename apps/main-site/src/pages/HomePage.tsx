@@ -201,6 +201,10 @@ const HomePage: FC = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">페이지를 불러오는 중...</p>
+            <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-sm">디버그: Static page loading mode</p>
+              <p className="text-sm">Page ID: {settings.pageId}</p>
+            </div>
           </div>
         </div>
       </Layout>
@@ -214,14 +218,16 @@ const HomePage: FC = () => {
         <div className="min-h-[50vh] flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              페이지를 불러올 수 없습니다
+              페이지를 불러올 수 없습니다 [DEBUG MODE]
             </h2>
             <p className="text-gray-600 mb-4">
               요청하신 페이지에 문제가 발생했습니다.
             </p>
-            <p className="text-sm text-gray-500 mb-4">
-              페이지 ID: {settings.pageId}
-            </p>
+            <div className="bg-red-50 border border-red-200 rounded p-4 mb-4">
+              <p className="text-sm"><strong>디버그: Static page error mode</strong></p>
+              <p className="text-sm">Page ID: {settings.pageId}</p>
+              <p className="text-sm">Error Type: {pageError?.message || 'Unknown'}</p>
+            </div>
             <button 
               onClick={() => window.location.reload()}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -244,6 +250,11 @@ const HomePage: FC = () => {
   if (settings.type === 'static_page' && pageData) {
     return (
       <Layout>
+        <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded">
+          <p className="text-sm text-green-700">디버그: Static page render mode - Page loaded successfully</p>
+          <p className="text-sm text-green-700">Page Title: {pageData.title}</p>
+          <p className="text-sm text-green-700">Page ID: {pageData.id}</p>
+        </div>
         <PageRenderer page={pageData} />
       </Layout>
     );
