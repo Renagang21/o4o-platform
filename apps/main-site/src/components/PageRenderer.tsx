@@ -30,12 +30,12 @@ const PageRenderer: FC<PageRendererProps> = ({ page }) => {
   // Check if content is WordPress blocks (array or JSON string)
   const isWordPressBlocks = (content: any): boolean => {
     if (Array.isArray(content)) {
-      return content.length > 0 && content[0].name !== undefined;
+      return content.length > 0 && (content[0].name !== undefined || content[0].type !== undefined);
     }
     if (typeof content === 'string') {
       try {
         const parsed = JSON.parse(content);
-        return Array.isArray(parsed) && parsed.length > 0 && parsed[0].name !== undefined;
+        return Array.isArray(parsed) && parsed.length > 0 && (parsed[0].name !== undefined || parsed[0].type !== undefined);
       } catch {
         return false;
       }
