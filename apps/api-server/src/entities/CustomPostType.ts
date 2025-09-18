@@ -57,6 +57,9 @@ export class CustomPostType {
   @Column({ type: 'boolean', default: true })
   active!: boolean;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  rewrite_slug?: string;
+
   // Relations
   @OneToMany('CustomPost', 'postType')
   posts!: CustomPost[];

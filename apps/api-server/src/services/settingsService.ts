@@ -1,9 +1,9 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/connection';
-import { Settings, GeneralSettings, ReadingSettings, ThemeSettings, EmailSettings } from '../entities/Settings';
+import { Settings, GeneralSettings, ReadingSettings, ThemeSettings, EmailSettings, PermalinkSettings } from '../entities/Settings';
 
-export type SettingsType = 'general' | 'reading' | 'theme' | 'email';
-export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | Record<string, unknown>;
+export type SettingsType = 'general' | 'reading' | 'theme' | 'email' | 'permalink';
+export type SettingsValue = GeneralSettings | ReadingSettings | ThemeSettings | EmailSettings | PermalinkSettings | Record<string, unknown>;
 
 export class SettingsService {
   private settingsRepository: Repository<Settings>;
