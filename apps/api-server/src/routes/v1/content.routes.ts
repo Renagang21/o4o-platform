@@ -1,10 +1,13 @@
 import { Router } from 'express';
 import { authenticateToken } from '../../middleware/auth';
 import { ContentController } from '../../controllers/v1/content.controller';
+import { MediaController } from '../../controllers/content/MediaController';
 import { cache } from '../../middleware/cache';
+import { uploadMiddleware } from '../../middleware/upload.middleware';
 
 const router: Router = Router();
 const contentController = new ContentController();
+const mediaController = new MediaController();
 
 /**
  * @swagger
@@ -152,11 +155,11 @@ router.put('/pages/:id', authenticateToken, contentController.updatePage);
 router.delete('/pages/:id', authenticateToken, contentController.deletePage);
 
 // Media endpoints
-router.get('/media', contentController.getMediaFiles);
-router.get('/media/:id', contentController.getMediaFile);
-router.post('/media/upload', authenticateToken, contentController.uploadMedia);
-router.put('/media/:id', authenticateToken, contentController.updateMedia);
-router.delete('/media/:id', authenticateToken, contentController.deleteMedia);
+router.get('/media', mediaController.getMedia);
+router.get('/media/:id', mediaController.getMediaById);
+router.post('/media/upload', authenticateToken, uploadMiddleware('files', 10), mediaController.uploadMedia);
+router.put('/media/:id', authenticateToken, mediaController.updateMedia);
+router.delete('/media/:id', authenticateToken, mediaController.deleteMedia);
 
 // Authors endpoint
 router.get('/authors', contentController.getAuthors);

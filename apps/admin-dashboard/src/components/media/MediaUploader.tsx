@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useDropzone } from 'react-dropzone';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/client';
+import { ContentApi } from '@/api/contentApi';
 import toast from 'react-hot-toast';
 
 interface UploadFile {
@@ -63,29 +63,21 @@ export default function MediaUploader({
   // File upload mutation
   const uploadMutation = useMutation({
     mutationFn: async ({ file, fileId }: { file: File; fileId: string }) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('convertToWebP', convertToWebP.toString() as any);
+      // Use the ContentApi uploadFiles method
+      const response = await ContentApi.uploadFiles(
+        [file], 
+        undefined, // folderId
+        (progress: number) => updateFileProgress(fileId, progress)
+      );
 
-      // Track upload progress
-      const config = {
-        onUploadProgress: (progressEvent: any) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          updateFileProgress(fileId, percentCompleted);
-        }
-      };
-
-      const response = await apiClient.post('/api/v1/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        ...config
-      });
-
-      return response.data;
+      return response;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (response, variables) => {
+      // ContentApi returns ApiResponse<MediaFile[]>
+      const uploadedFile = response.data && response.data[0]; // Get first uploaded file
       updateFileStatus(variables.fileId, 'completed', {
-        uploadedUrl: data.url,
-        webpUrl: data.webpUrl
+        uploadedUrl: uploadedFile?.url,
+        webpUrl: uploadedFile?.webpUrl
       });
       queryClient.invalidateQueries({ queryKey: ['media'] });
       toast.success('파일이 업로드되었습니다');
